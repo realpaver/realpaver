@@ -1,0 +1,4 @@
+Faire un visiteur de DagNode
+
+Implementer ce visiteur pour decouvrir les noeuds d'une fonction connaissant
+l'indice de sa racine

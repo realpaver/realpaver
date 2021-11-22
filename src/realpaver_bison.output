@@ -1,0 +1,150 @@
+Terminaux inutilisés dans la grammaire
+
+   TK_INT
+   TK_REAL
+   TK_STR_VAR
+   TK_STR_CONST
+   TK_STR_INT
+   TK_STR_REAL
+   TK_EQ
+   TK_LE
+   TK_GE
+   TK_IN
+   TK_LT
+   TK_GT
+   TK_PLUS
+   TK_MINUS
+   TK_MUL
+   TK_DIV
+   TK_POW
+   TK_SQRT
+   TK_LOG
+   TK_EXP
+   TK_TAN
+   TK_COS
+   TK_SIN
+   TK_LEFT_PAR
+   TK_RIGHT_PAR
+   TK_LEFT_SBR
+   TK_RIGHT_SBR
+   TK_COMMA
+   TK_SCOLON
+   TK_COLON
+   TK_SGN
+   TK_ABS
+   TK_MIN
+   TK_MAX
+   TK_UMINUS
+   TK_UPLUS
+
+
+Grammaire
+
+    0 $accept: model $end
+
+    1 model: expr
+
+    2 expr: ident
+
+    3 ident: TK_IDENT
+
+
+Terminaux, suivis des règles où ils apparaissent
+
+$end (0) 0
+error (256)
+TK_IDENT (258) 3
+TK_INT (259)
+TK_REAL (260)
+TK_STR_VAR (261)
+TK_STR_CONST (262)
+TK_STR_INT (263)
+TK_STR_REAL (264)
+TK_EQ (265)
+TK_LE (266)
+TK_GE (267)
+TK_IN (268)
+TK_LT (269)
+TK_GT (270)
+TK_PLUS (271)
+TK_MINUS (272)
+TK_MUL (273)
+TK_DIV (274)
+TK_POW (275)
+TK_SQRT (276)
+TK_LOG (277)
+TK_EXP (278)
+TK_TAN (279)
+TK_COS (280)
+TK_SIN (281)
+TK_LEFT_PAR (282)
+TK_RIGHT_PAR (283)
+TK_LEFT_SBR (284)
+TK_RIGHT_SBR (285)
+TK_COMMA (286)
+TK_SCOLON (287)
+TK_COLON (288)
+TK_SGN (289)
+TK_ABS (290)
+TK_MIN (291)
+TK_MAX (292)
+TK_UMINUS (293)
+TK_UPLUS (294)
+
+
+Non-terminaux, suivis des règles où ils apparaissent
+
+$accept (40)
+    à gauche: 0
+model (41)
+    à gauche: 1, à droite: 0
+expr (42)
+    à gauche: 2, à droite: 1
+ident (43)
+    à gauche: 3, à droite: 2
+
+
+État 0
+
+    0 $accept: . model $end
+
+    TK_IDENT  décalage et aller à l'état 1
+
+    model  aller à l'état 2
+    expr   aller à l'état 3
+    ident  aller à l'état 4
+
+
+État 1
+
+    3 ident: TK_IDENT .
+
+    $défaut  réduction par utilisation de la règle 3 (ident)
+
+
+État 2
+
+    0 $accept: model . $end
+
+    $end  décalage et aller à l'état 5
+
+
+État 3
+
+    1 model: expr .
+
+    $défaut  réduction par utilisation de la règle 1 (model)
+
+
+État 4
+
+    2 expr: ident .
+
+    $défaut  réduction par utilisation de la règle 2 (expr)
+
+
+État 5
+
+    0 $accept: model $end .
+
+    $défaut  accepter
