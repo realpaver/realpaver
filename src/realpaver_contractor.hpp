@@ -3,6 +3,7 @@
 #ifndef REALPAVER_CONTRACTOR_HPP
 #define REALPAVER_CONTRACTOR_HPP
 
+#include <memory>
 #include "realpaver_bitset.hpp"
 #include "realpaver_box.hpp"
 #include "realpaver_scope.hpp"
@@ -35,6 +36,8 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& os, const Contractor& op);
+
+typedef std::shared_ptr<Contractor> SharedContractor;
 
 } // namespace
 

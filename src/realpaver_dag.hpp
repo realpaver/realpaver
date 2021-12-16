@@ -114,6 +114,10 @@ public:
    // assigns the result in val_
    virtual void eval(const Box& B) = 0;
 
+   // interval evaluation given the vector of variable values P
+   // assigns the result in val_
+   virtual void eval(const Point& P) = 0;
+
    // interval evaluation given a new domain x for the variable id
    // this node is evaluated only if it depends on this variable
    // assigns the result in val_
@@ -280,6 +284,7 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval(const Box& B);
+   void eval(const Point& P);
    void evalOnly(size_t id, const Interval& x);
    void proj(Box& B);
    bool diff();
@@ -315,6 +320,7 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval(const Box& B);
+   void eval(const Point& P);
    void evalOnly(size_t id, const Interval& x);
    void proj(Box& B);
    bool diff();
@@ -365,6 +371,7 @@ public:
    size_t nbOcc(size_t id) const;
    virtual void print(std::ostream& os) const;
    void eval(const Box& B);
+   void eval(const Point& P);
    void evalOnly(size_t id, const Interval& x);
    bool diffOnly(size_t id);
    void reval(const Point& P);
@@ -379,6 +386,11 @@ inline OpSymbol DagOp::getSymbol() const
 }
 
 inline void DagOp::eval(const Box& B)
+{
+   eval();
+}
+
+inline void DagOp::eval(const Point& P)
 {
    eval();
 }
@@ -747,6 +759,7 @@ public:
 
    // interval evaluation
    Interval eval(const Box& B);
+   Interval eval(const Point& P);
 
    // interval evaluation given a new domain x for v
    // only the nodes depending on the variable id are evaluated
@@ -792,6 +805,9 @@ public:
 
    // point evaluation
    double reval(const Point& P);
+
+   // access to the result of the point evaluation
+   double rval() const;
 
    // point differentiation in reverse mode
    // evaluates first this function
@@ -929,6 +945,11 @@ inline double DagFun::rderiv(size_t i) const
    return varNode(i)->rdv();
 }
 
+inline double DagFun::rval() const
+{
+   return rootNode()->rval();
+}
+
 /*****************************************************************************
  * Class of contexts such that every dag node is associated with
  * an interval domain.
@@ -1005,6 +1026,9 @@ public:
    // inserts a function and returns its index
    size_t insertFun(DagFun* f);
 
+   // creates and returns the scope of this
+   Scope scope() const;
+
    // output on a stream
    void print(std::ostream& os) const;
 
@@ -1016,6 +1040,9 @@ public:
    const Interval& dom(size_t i) const;
    void setDom(size_t i, const Interval& x);
    void reduceDom(size_t i, const Interval& x);
+
+   // point evaluation
+   void reval(const Point& P);
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

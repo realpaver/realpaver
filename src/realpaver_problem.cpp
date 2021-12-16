@@ -8,7 +8,7 @@
 namespace realpaver {
 
 Problem::Problem(const std::string& name) :
-   name_(), vars_(), ctrs_(), obj_(Obj::Dir::Max, Term(0))
+   name_(), vars_(), ctrs_(), obj_(Obj::Dir::Max, Term(0)), scope_()
 {}
 
 Variable Problem::addBoolVar(const std::string& name)
@@ -29,6 +29,7 @@ Variable Problem::addBoolVar(const std::string& name)
     .setPrecision(Precision::absolute(0));
 
    vars_.push_back(v);
+   scope_.insert(v);
 
    return v;
 }
@@ -52,6 +53,7 @@ Variable Problem::addIntVar(const int& a, const int& b,
     .setPrecision(Precision::absolute(0));
 
    vars_.push_back(v);
+   scope_.insert(v);
 
    return v;
 }
@@ -77,9 +79,10 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    v.setId(id)
     .setDomain(x)
     .setContinuous()
-    .setPrecision(Param::RealVarPrecision());
+    .setPrecision(Param::DefRealVarPrecision());
 
    vars_.push_back(v);
+   scope_.insert(v);
 
    return v;
 }
@@ -145,11 +148,8 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
 
    // objective function
    Obj o = p.obj();
-   if (!o.isConstant())
-   {
-      os << std::endl << s_obj << std::endl;
-      os << indent << o << ";" << std::endl;
-   }
+   os << std::endl << s_obj << std::endl;
+   os << indent << o << ";" << std::endl;
 
    return os;
 }
@@ -181,7 +181,6 @@ bool Problem::preprocess(const Box& B, Problem& other)
       else if (B[i].isCanonical())
       {
          LOG("Fixed variable: " << v.name() << " = " << B[i]);
-
          vim.insert(std::make_pair(v, B[i]));
       }
       else

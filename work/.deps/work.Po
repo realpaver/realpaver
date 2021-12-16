@@ -133,8 +133,23 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/stl_uninitialized.h \
  /usr/include/c++/7/bits/stl_vector.h \
  /usr/include/c++/7/bits/stl_bvector.h /usr/include/c++/7/bits/vector.tcc \
- ../src/realpaver_box.hpp ../src/realpaver_interval.hpp \
- /usr/include/c++/7/utility /usr/include/c++/7/bits/stl_relops.h \
+ ../src/realpaver_box.hpp /usr/include/c++/7/memory \
+ /usr/include/c++/7/bits/stl_tempbuf.h \
+ /usr/include/c++/7/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/7/ext/concurrence.h \
+ /usr/include/c++/7/bits/uses_allocator.h \
+ /usr/include/c++/7/bits/unique_ptr.h /usr/include/c++/7/utility \
+ /usr/include/c++/7/bits/stl_relops.h /usr/include/c++/7/tuple \
+ /usr/include/c++/7/array /usr/include/c++/7/bits/invoke.h \
+ /usr/include/c++/7/bits/shared_ptr.h \
+ /usr/include/c++/7/bits/shared_ptr_base.h \
+ /usr/include/c++/7/bits/allocated_ptr.h \
+ /usr/include/c++/7/bits/refwrap.h \
+ /usr/include/c++/7/ext/aligned_buffer.h \
+ /usr/include/c++/7/bits/shared_ptr_atomic.h \
+ /usr/include/c++/7/bits/atomic_base.h \
+ /usr/include/c++/7/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver_interval.hpp \
  ../src/realpaver_common.hpp /usr/include/c++/7/fstream \
  /usr/include/c++/7/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
@@ -180,24 +195,9 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  ../src/realpaver_point.hpp ../src/realpaver_double.hpp \
  /usr/include/c++/7/cfenv ../src/realpaver_scope.hpp \
  /usr/include/c++/7/map /usr/include/c++/7/bits/stl_tree.h \
- /usr/include/c++/7/ext/aligned_buffer.h \
- /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/tuple \
- /usr/include/c++/7/array /usr/include/c++/7/bits/uses_allocator.h \
- /usr/include/c++/7/bits/invoke.h /usr/include/c++/7/bits/stl_multimap.h \
- /usr/include/c++/7/memory /usr/include/c++/7/bits/stl_tempbuf.h \
- /usr/include/c++/7/bits/stl_raw_storage_iter.h \
- /usr/include/c++/7/ext/concurrence.h \
- /usr/include/c++/7/bits/unique_ptr.h \
- /usr/include/c++/7/bits/shared_ptr.h \
- /usr/include/c++/7/bits/shared_ptr_base.h \
- /usr/include/c++/7/bits/allocated_ptr.h \
- /usr/include/c++/7/bits/refwrap.h \
- /usr/include/c++/7/bits/shared_ptr_atomic.h \
- /usr/include/c++/7/bits/atomic_base.h \
- /usr/include/c++/7/bits/atomic_lockfree_defines.h \
- /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver_bitset.hpp \
- ../src/realpaver_scope_map.hpp /usr/include/c++/7/unordered_map \
- /usr/include/c++/7/bits/hashtable.h \
+ /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
+ ../src/realpaver_bitset.hpp ../src/realpaver_scope_map.hpp \
+ /usr/include/c++/7/unordered_map /usr/include/c++/7/bits/hashtable.h \
  /usr/include/c++/7/bits/hashtable_policy.h \
  /usr/include/c++/7/bits/unordered_map.h ../src/realpaver_variable.hpp \
  ../src/realpaver_stopping.hpp ../src/realpaver_constraint.hpp \
@@ -218,7 +218,14 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/chrono /usr/include/c++/7/ratio \
  /usr/include/c++/7/ctime /usr/include/c++/7/bits/parse_numbers.h \
  ../src/realpaver_contractor_int.hpp ../src/realpaver_scope.hpp \
- ../src/realpaver_model_bco.hpp ../src/realpaver_problem.hpp
+ ../src/realpaver_bco_model.hpp ../src/realpaver_bco_dag.hpp \
+ ../src/realpaver_contractor_bco.hpp ../src/realpaver_problem.hpp \
+ ../src/realpaver_propagator.hpp ../src/realpaver_contractor_pool.hpp \
+ ../src/realpaver_real_fun.hpp ../src/realpaver_bco_local.hpp \
+ ../src/realpaver_bco_space.hpp /usr/include/c++/7/set \
+ /usr/include/c++/7/bits/stl_set.h /usr/include/c++/7/bits/stl_multiset.h \
+ ../src/realpaver_bco_node.hpp ../src/realpaver_param.hpp \
+ ../src/realpaver_timer.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -564,11 +571,47 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver_box.hpp:
 
-../src/realpaver_interval.hpp:
+/usr/include/c++/7/memory:
+
+/usr/include/c++/7/bits/stl_tempbuf.h:
+
+/usr/include/c++/7/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/7/ext/concurrence.h:
+
+/usr/include/c++/7/bits/uses_allocator.h:
+
+/usr/include/c++/7/bits/unique_ptr.h:
 
 /usr/include/c++/7/utility:
 
 /usr/include/c++/7/bits/stl_relops.h:
+
+/usr/include/c++/7/tuple:
+
+/usr/include/c++/7/array:
+
+/usr/include/c++/7/bits/invoke.h:
+
+/usr/include/c++/7/bits/shared_ptr.h:
+
+/usr/include/c++/7/bits/shared_ptr_base.h:
+
+/usr/include/c++/7/bits/allocated_ptr.h:
+
+/usr/include/c++/7/bits/refwrap.h:
+
+/usr/include/c++/7/ext/aligned_buffer.h:
+
+/usr/include/c++/7/bits/shared_ptr_atomic.h:
+
+/usr/include/c++/7/bits/atomic_base.h:
+
+/usr/include/c++/7/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/7/backward/auto_ptr.h:
+
+../src/realpaver_interval.hpp:
 
 ../src/realpaver_common.hpp:
 
@@ -680,45 +723,9 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/stl_tree.h:
 
-/usr/include/c++/7/ext/aligned_buffer.h:
-
 /usr/include/c++/7/bits/stl_map.h:
 
-/usr/include/c++/7/tuple:
-
-/usr/include/c++/7/array:
-
-/usr/include/c++/7/bits/uses_allocator.h:
-
-/usr/include/c++/7/bits/invoke.h:
-
 /usr/include/c++/7/bits/stl_multimap.h:
-
-/usr/include/c++/7/memory:
-
-/usr/include/c++/7/bits/stl_tempbuf.h:
-
-/usr/include/c++/7/bits/stl_raw_storage_iter.h:
-
-/usr/include/c++/7/ext/concurrence.h:
-
-/usr/include/c++/7/bits/unique_ptr.h:
-
-/usr/include/c++/7/bits/shared_ptr.h:
-
-/usr/include/c++/7/bits/shared_ptr_base.h:
-
-/usr/include/c++/7/bits/allocated_ptr.h:
-
-/usr/include/c++/7/bits/refwrap.h:
-
-/usr/include/c++/7/bits/shared_ptr_atomic.h:
-
-/usr/include/c++/7/bits/atomic_base.h:
-
-/usr/include/c++/7/bits/atomic_lockfree_defines.h:
-
-/usr/include/c++/7/backward/auto_ptr.h:
 
 ../src/realpaver_bitset.hpp:
 
@@ -804,6 +811,32 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver_scope.hpp:
 
-../src/realpaver_model_bco.hpp:
+../src/realpaver_bco_model.hpp:
+
+../src/realpaver_bco_dag.hpp:
+
+../src/realpaver_contractor_bco.hpp:
 
 ../src/realpaver_problem.hpp:
+
+../src/realpaver_propagator.hpp:
+
+../src/realpaver_contractor_pool.hpp:
+
+../src/realpaver_real_fun.hpp:
+
+../src/realpaver_bco_local.hpp:
+
+../src/realpaver_bco_space.hpp:
+
+/usr/include/c++/7/set:
+
+/usr/include/c++/7/bits/stl_set.h:
+
+/usr/include/c++/7/bits/stl_multiset.h:
+
+../src/realpaver_bco_node.hpp:
+
+../src/realpaver_param.hpp:
+
+../src/realpaver_timer.hpp:

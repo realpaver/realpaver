@@ -25,7 +25,7 @@ public:
    virtual bool dependsOn(const Bitset& bs) const = 0;
 
    // returns the i-th contractor
-   virtual Contractor* contractorAt(size_t i) const = 0;
+   virtual SharedContractor contractorAt(size_t i) const = 0;
 
    // removes the i-th contractor
    virtual void removeContractorAt(size_t i) = 0;
@@ -41,17 +41,17 @@ public:
 
    // insertion at the end
    // this pool does not own the operator
-   void push(Contractor* op);
+   void push(const SharedContractor& op);
 
    // Override
    size_t poolSize() const;
    Scope scope() const;
    bool dependsOn(const Bitset& bs) const;
-   Contractor* contractorAt(size_t i) const;
+   SharedContractor contractorAt(size_t i) const;
    void removeContractorAt(size_t i);
 
 private:
-   std::vector<Contractor*> v_;
+   std::vector<SharedContractor> v_;
    Scope s_;
    Bitset bs_;
 };

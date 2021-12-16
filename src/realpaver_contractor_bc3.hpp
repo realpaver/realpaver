@@ -17,6 +17,7 @@ class Bc3Contractor : public Contractor {
 public:
    // constructor of a BC3 contractor associated with the i-th function of
    // the given dag and the variable index iv, 0 <= i < dag->nbFun()
+   // this contractor does not own the dag
    Bc3Contractor(Dag* dag, size_t i, size_t iv);
 
    // destructor

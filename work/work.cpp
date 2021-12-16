@@ -13,7 +13,7 @@
 #include "realpaver_timer.hpp"
 #include "realpaver_contractor_int.hpp"
 #include "realpaver_scope.hpp"
-#include "realpaver_model_bco.hpp"
+#include "realpaver_bco_model.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -25,30 +25,121 @@ int main(void)
 
    try
    {
-      Problem prob;
+      Problem* prob = new Problem();
+      Problem* simpl = nullptr;
 
-      Variable x = prob.addRealVar(1, 3, "x"),
-               y = prob.addRealVar(-1, 5, "y");
+      Variable x = prob->addRealVar(0, 10, "x"),
+               y = prob->addRealVar(-2, 6, "y");
+               //z = prob->addRealVar(0, 10, "z");
 
-      // prob.addObj( minimize(2*sqr(x) + 3*y - 1) );
-      // BcoModel model(prob);
-      
-      Term t = sqr(x)*y - y - x + 1;
+      prob->addObj( minimize(sqr(x) + pow(y,3) - x*y) );
 
-      prob.addCtr( t <= 0 );
+      BcoModel* model = new BcoModel(*prob);
+      BcoResult res = model->preprocess();
 
-      Dag dag;
-      dag.insert( prob.ctrAt(0) );
+      if (res.getProof() == Proof::Empty)
+      {
+         delete model;
+         return 1;
+      }
 
-      DagFun* f0 = dag.fun(0);
+      if (res.getProof() == Proof::Optimal)
+      {
+         delete model;
+         return 0;   
+      }
 
+      if (model->nbFixedVars() > 0)
+      {
+         simpl = new Problem();
+         Box* B = res.getBox();
+
+         // fixes the variable representing the objective function in order to
+         // remove it from the simplified problem
+         B->set(model->objVar(), Interval::zero());
+
+         // creates the simplified problem
+         prob->preprocess(*B, *simpl);
+
+
+         DEBUG("\n\n -- Simplified problem --\n" << *simpl);
+
+         delete model;
+         model = new BcoModel(*simpl);
+      }
+
+
+      // branch-and-bound to solve the model
+      res = model->solve();
+
+
+      // TODO
+      delete prob;
+      if (simpl != nullptr)
+         delete simpl;
+ 
+  }
+
+   
+/*
       Box B( prob.getBox() );
 
-      cout << "B : " << B << endl;
+      Term f( sqr(x) -2*y + x*z );
+      cout << "min. " << f << endl;
+      cout << "s.t. " << B << endl << endl;
       
-      cout << "f0(B) : " << f0->eval(B) << endl;   
-      f0->diff();      
-      cout << "df0 : " << f0->grad() << endl;
+      TermDeriver dx( x );
+      f.acceptVisitor( dx );
+      TermDeriver dy( y );
+      f.acceptVisitor( dy );
+      TermDeriver dz( z );
+      f.acceptVisitor( dz );
+
+      Term df_dx( dx.get() );
+      Term df_dy( dy.get() );
+      Term df_dz( dz.get() );
+
+      Interval e_f( f.eval(B) );
+      Interval e_df_dx( df_dx.eval(B) );
+      Interval e_df_dy( df_dy.eval(B) );
+      Interval e_df_dz( df_dz.eval(B) );
+
+      cout << "e_df_dx : " << e_df_dx << endl;
+      cout << "e_df_dy : " << e_df_dy << endl;
+      cout << "e_df_dz : " << e_df_dz << endl << endl;
+
+      double val_y = B[y].right();
+      cout << "Fix y : " << val_y << endl;
+      B.set(y, val_y);
+      cout << "B : " << B << endl << endl;
+
+      Dag dag;
+      size_t ix = dag.insert( df_dx == 0 );
+      size_t iz = dag.insert( df_dz == 0 );
+
+      Bc4Contractor op_x(&dag, ix);
+      Bc4Contractor op_z(&dag, iz);
+
+      Box BB(B);
+
+      Proof p_z = op_z.contract(BB);
+      cout << "p_z : " << p_z << " -> " << BB[z] << endl;
+
+      double val_z = B[z].right();
+      cout << "Fix z : " << val_z << endl;
+      B.set(z, val_z);
+      cout << "B : " << B << endl << endl;
+
+      Proof p_x = op_x.contract(BB);
+      cout << "p_x : " << p_x << " -> " << BB[x] << endl;
+      cout << "Remove the left bound x=-8 since df_dx < 0" << endl << endl;
+
+      cout << "New problem: min x^2 + 10x - 10 with -5 <= x <= -1" << endl << endl;
+
+      Interval ee_f = sqr(BB[x] + 5) - 35;
+      cout << "f = (x+5)^2 -35 -> " << ee_f << endl << endl;
+      cout << "min f = " << ee_f.left() << endl << endl;
+*/
 
 /*
       Problem other;
@@ -137,7 +228,7 @@ int main(void)
       tim.stop();
       cout << tim.elapsedTime() << " ms" << endl;
 */
-   }
+
    catch(Menhir m)
    {
       cout << m.what() << endl;

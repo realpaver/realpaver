@@ -13,7 +13,7 @@ ContractorPool::~ContractorPool()
 ContractorVector::ContractorVector() : ContractorPool(), v_(), s_(), bs_()
 {}
 
-void ContractorVector::push(Contractor* op)
+void ContractorVector::push(const SharedContractor& op)
 {
    v_.push_back(op);
    s_.insert(op->scope());
@@ -25,7 +25,7 @@ bool ContractorVector::dependsOn(const Bitset& bs) const
    return bs_.overlaps(bs);
 }
 
-Contractor* ContractorVector::contractorAt(size_t i) const
+SharedContractor ContractorVector::contractorAt(size_t i) const
 {
    ASSERT(i < v_.size(),
           "access out of range in a vector of contractors @ " << i);

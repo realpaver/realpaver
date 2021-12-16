@@ -3,6 +3,7 @@
 #ifndef REALPAVER_BOX_HPP
 #define REALPAVER_BOX_HPP
 
+#include <memory>
 #include <vector>
 #include "realpaver_interval.hpp"
 #include "realpaver_point.hpp"
@@ -29,9 +30,11 @@ public:
 
    // constant access to the i-th interval
    const Interval& operator[](size_t i) const;
+   const Interval& operator[](const Variable& v) const;
 
    // constant and safe access to the i-th interval
    const Interval& at(size_t i) const;
+   const Interval& at(const Variable& v) const;
 
    // assignment of the i-th interval to x
    void set(size_t i, const Interval& x);
@@ -40,8 +43,11 @@ public:
    // assignment of all the intervals to x
    void setAll(const Interval& x);
 
-   // for each variable v in s assigns this(v) to other(v)
+   // for each variable v in s: assigns this(v) to other(v)
    void set(const Box& other, const Scope& s);
+
+   // for each variable v in the scope of this: assigns this(v) to other(v)
+   void set(const Box& other);
 
    // for each variable v in s assigns this(v) to hull(this(v), other(v))
    void setHull(const Box& other, const Scope& s);
@@ -62,6 +68,12 @@ public:
 
    // midpoint
    Point midpoint() const;
+
+   // corner of this box made from all the left bounds
+   Point lCorner() const;
+
+   // corner of this box made from all the right bounds
+   Point rCorner() const;
 
    // set operations
    bool contains(const Box& other) const;
@@ -93,6 +105,8 @@ private:
    std::vector<Interval> v_;
 };
 
+typedef std::shared_ptr<Box> SharedBox;
+
 // output on a stream
 std::ostream& operator<<(std::ostream& os, const Box& x);
 
@@ -109,6 +123,11 @@ inline void Box::push(const Interval& x)
 inline const Interval& Box::operator[](size_t i) const
 {
    return v_[i];
+}
+
+inline const Interval& Box::operator[](const Variable& v) const
+{
+   return v_[v.id()];
 }
 
 } // namespace

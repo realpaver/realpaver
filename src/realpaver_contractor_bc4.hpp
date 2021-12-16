@@ -16,6 +16,7 @@ class Bc4Contractor : public Contractor {
 public:
    // constructor of a BC4 contractor associated with the i-th function
    // of the given dag, 0 <= i < dag->nbFun()
+   // this contractor does not own the dag
    Bc4Contractor(Dag* dag, size_t i);
 
    // destructor

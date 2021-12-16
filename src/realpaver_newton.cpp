@@ -7,10 +7,10 @@
 namespace realpaver {
 
 Newton::Newton() :
-   imp_(Param::NewtonImprovement()),
-   smax_(Param::NewtonMaxSteps()),
-   prec_(Param::NewtonPrecision()),
-   inflator_(Param::InflatorDelta(), Param::InflatorChi())
+   imp_(Param::DefNewtonImprovement()),
+   smax_(Param::DefNewtonMaxSteps()),
+   prec_(Param::DefNewtonPrecision()),
+   inflator_()
 {}
 
 Proof Newton::contract(UniFun& f, Interval& x)

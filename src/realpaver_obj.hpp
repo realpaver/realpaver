@@ -28,6 +28,10 @@ public:
    // returns true if the function is linear
    bool isLinear() const;
 
+   // objective direction
+   bool isMinimize() const;
+   bool isMaximize() const;
+
 private:
    Dir d_;     // direction
    Term f_;    // function
@@ -58,6 +62,16 @@ inline bool Obj::isConstant() const
 inline bool Obj::isLinear() const
 {
    return f_.isLinear();
+}
+
+inline bool Obj::isMinimize() const
+{
+   return d_ == Obj::Dir::Min;
+}
+
+inline bool Obj::isMaximize() const
+{
+   return d_ == Obj::Dir::Max;   
 }
 
 } // namespace

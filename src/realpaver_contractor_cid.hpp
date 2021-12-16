@@ -16,8 +16,8 @@ public:
    // constructor
    // this contractor owns the slicer, hence the slicer is destroyed
    // when this contractor is destroyed
-   // this contractor does not own the given contractor op
-   CidContractor(Contractor* op, const Variable& v, IntervalSlicer* slicer);
+   CidContractor(const SharedContractor& op, const Variable& v,
+                 IntervalSlicer* slicer);
 
    // destructor
    ~CidContractor();
@@ -33,7 +33,7 @@ public:
    void print(std::ostream& os) const;
 
 private:
-   Contractor* op_;
+   SharedContractor op_;
    Variable v_;
    IntervalSlicer* slicer_;
    Bitset bs_;

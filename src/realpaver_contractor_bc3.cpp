@@ -8,8 +8,8 @@ namespace realpaver {
 
 Bc3Contractor::Bc3Contractor(Dag* dag, size_t i, size_t iv) :
    f_(dag, i, iv),
-   peeler_(Param::BC3PeelWidth()),
-   smax_(Param::BC3MaxSteps())
+   peeler_(Param::DefBC3PeelWidth()),
+   smax_(Param::DefBC3MaxSteps())
 {
    newton_ = new Newton();
 }

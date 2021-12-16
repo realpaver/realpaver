@@ -70,6 +70,10 @@ public:
    // other tests
    virtual bool isLinear() const = 0;
    bool isConstant() const;
+   virtual bool isAdd() const;
+   virtual bool isSub() const;
+   virtual bool isMul() const;
+   virtual bool isDiv() const;
 
    // returns true if this term depends on v
    virtual bool dependsOn(const Variable& v) const = 0;
@@ -137,6 +141,10 @@ public:
    // other tests
    bool isLinear() const;
    bool isConstant() const;
+   bool isAdd() const;
+   bool isSub() const;
+   bool isMul() const;
+   bool isDiv() const;
 
    // returns true if this term depends on v
    bool dependsOn(const Variable& v) const;
@@ -253,6 +261,26 @@ inline bool Term::isConstant() const
 inline bool Term::isLinear() const
 {
    return rep_->isLinear();
+}
+
+inline bool Term::isAdd() const
+{
+   return rep_->isAdd();
+}
+
+inline bool Term::isSub() const
+{
+   return rep_->isSub();
+}
+
+inline bool Term::isMul() const
+{
+   return rep_->isMul();
+}
+
+inline bool Term::isDiv() const
+{
+   return rep_->isDiv();
 }
 
 /*****************************************************************************
@@ -411,6 +439,7 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
+   bool isAdd() const;
 };
 
 /*****************************************************************************
@@ -426,6 +455,7 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
+   bool isSub() const;
 };
 
 /*****************************************************************************
@@ -441,6 +471,7 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
+   bool isMul() const;
 };
 
 /*****************************************************************************
@@ -455,6 +486,7 @@ public:
    Interval eval(const Box& B) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
+   bool isDiv() const;
 };
 
 /*****************************************************************************

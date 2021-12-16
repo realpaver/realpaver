@@ -12,61 +12,129 @@ namespace realpaver {
  *****************************************************************************/
 class Param {
 public:
-   // real variables
-   static Precision RealVarPrecision();
-   static Precision RealVarPrecision(const Precision& val);
+   // constructor
+   Param();
 
-   // univariate interval Newton method
-   static Improvement NewtonImprovement();
-   static Improvement NewtonImprovement(const Improvement& val);
+   // precision of real variables
+   Precision realVarPrecision() const;
+   Precision realVarPrecision(const Precision& val);
+   static Precision DefRealVarPrecision();
+   static Precision DefRealVarPrecision(const Precision& val);
 
-   static int NewtonMaxSteps();
-   static int NewtonMaxSteps(const int& val);
+   // precision of objective function
+   Precision objPrecision() const;
+   Precision objPrecision(const Precision& val);
+   static Precision DefObjPrecision();
+   static Precision DefObjPrecision(const Precision& val);
 
-   static Precision NewtonPrecision();
-   static Precision NewtonPrecision(const Precision& val);
+   // univariate interval Newton method: improvement factor
+   Improvement newtonImprovement() const;
+   Improvement newtonImprovement(const Improvement& val);
+   static Improvement DefNewtonImprovement();
+   static Improvement DefNewtonImprovement(const Improvement& val);
 
-   // inflation
-   static double InflatorDelta();
-   static double InflatorDelta(const double& val);
+   // univariate interval Newton method: maximum number of steps
+   int newtonMaxSteps() const;
+   int newtonMaxSteps(const int& val);
+   static int DefNewtonMaxSteps();
+   static int DefNewtonMaxSteps(const int& val);
 
-   static double InflatorChi();
-   static double InflatorChi(const double& val);
+   // univariate interval Newton method: precision of output
+   Precision newtonPrecision() const;
+   Precision newtonPrecision(const Precision& val);
+   static Precision DefNewtonPrecision();
+   static Precision DefNewtonPrecision(const Precision& val);
 
-   // BC3Revise operator
-   static double BC3PeelWidth();
-   static double BC3PeelWidth(const double& val);
+   // inflation: delta
+   double inflatorDelta() const;
+   double inflatorDelta(const double& val);
+   static double DefInflatorDelta();
+   static double DefInflatorDelta(const double& val);
 
-   static int BC3MaxSteps();
-   static int BC3MaxSteps(const int& val);
+   // inflation: chi
+   double inflatorChi() const;
+   double inflatorChi(const double& val);
+   static double DefInflatorChi();
+   static double DefInflatorChi(const double& val);
 
-   // propagation algorithm
-   static int PropagatorMaxSteps();
-   static int PropagatorMaxSteps(const int& val);
+   // BC3Revise operator: width of peels in consistency checking
+   double bc3PeelWidth() const;
+   double bc3PeelWidth(const double& val);
+   static double DefBC3PeelWidth();
+   static double DefBC3PeelWidth(const double& val);
 
-   static Improvement PropagatorImprovement();
-   static Improvement PropagatorImprovement(const Improvement& val);
+   // BC3Revise operator: maximum number of steps
+   int bc3MaxSteps() const;
+   int bc3MaxSteps(const int& val);
+   static int DefBC3MaxSteps();
+   static int DefBC3MaxSteps(const int& val);
+
+   // propagation algorithm: maximum number of steps
+   int propagatorMaxSteps() const;
+   int propagatorMaxSteps(const int& val);
+   static int DefPropagatorMaxSteps();
+   static int DefPropagatorMaxSteps(const int& val);
+
+   // propagation algorithm: maximum number of steps
+   Improvement propagatorImprovement() const;
+   Improvement propagatorImprovement(const Improvement& val);
+   static Improvement DefPropagatorImprovement();
+   static Improvement DefPropagatorImprovement(const Improvement& val);
+
+   // timeout in milliseconds
+   size_t timeout() const;
+   size_t timeout(const size_t& val);
+   static size_t DefTimeout();
+   static size_t DefTimeout(const size_t& val);
 
 private:
-   // real variables
-   static Precision rvar_prec_;
+   // precision of real variables
+   Precision rvar_prec_;
+   static Precision def_rvar_prec_;
 
-   // univariate interval Newton method
-   static Improvement newton_imp_;  // improvement factor
-   static int newton_ms_;           // maximum number of steps
-   static Precision newton_prec_;   // precision
+   // precision of objective function
+   Precision obj_prec_;
+   static Precision def_obj_prec_;
 
-   // inflation
-   static double inflator_delta_;
-   static double inflator_chi_;
+   // univariate interval Newton method: improvement factor
+   Improvement newton_imp_;
+   static Improvement def_newton_imp_;
 
-   // BC3Revise operator
-   static double  bc3_wpeel_;       // width of peels in consistency checking
-   static int bc3_ms_;
+   // univariate interval Newton method: maximum number of steps   
+   static int def_newton_ms_;
+   int newton_ms_;
 
-   // propagation algorithm
-   static Improvement propag_imp_;  // improvement factor
-   static int propag_ms_;           // maximum number of steps
+   // univariate interval Newton method: precision of output
+   Precision newton_prec_;
+   static Precision def_newton_prec_;
+
+   // inflation: delta
+   double inflator_delta_;
+   static double def_inflator_delta_;
+   
+   // inflation: chi
+   double inflator_chi_;
+   static double def_inflator_chi_;
+
+   // BC3Revise operator: width of peels in consistency checking
+   double bc3_wpeel_;
+   static double def_bc3_wpeel_;
+
+   // BC3Revise operator: maximum number of steps
+   int bc3_ms_;
+   static int def_bc3_ms_;
+
+   // propagation algorithm: improvement factor
+   Improvement propag_imp_;
+   static Improvement def_propag_imp_;
+
+   // propagation algorithm: maximum number of steps
+   int propag_ms_;
+   static int def_propag_ms_;
+
+   // timeout
+   size_t timeout_;
+   static size_t def_timeout_;
 };
 
 } // namespace

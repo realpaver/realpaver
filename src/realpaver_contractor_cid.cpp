@@ -5,11 +5,11 @@
 
 namespace realpaver {
 
-CidContractor::CidContractor(Contractor* op, const Variable& v,
+CidContractor::CidContractor(const SharedContractor& op, const Variable& v,
                              IntervalSlicer* slicer) :
    op_(op), v_(v), slicer_(slicer), bs_()
 {
-   ASSERT(op_ != nullptr, "");
+   ASSERT(op_.get() != nullptr, "");
    ASSERT(op->scope().contains(v), "");
    ASSERT(slicer_ != nullptr, "");
 

@@ -43,7 +43,8 @@ enum class Proof {
    Empty,      // empty solution set
    Maybe,      // no proof is derived
    Feasible,   // proof of existence of a solution
-   Inner       // proof of inner box
+   Inner,      // proof of inner box
+   Optimal     // proof of optimality
 };
 
 std::ostream& operator<<(std::ostream& os, const Proof& p);

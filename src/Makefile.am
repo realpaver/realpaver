@@ -12,6 +12,11 @@ EXTRA_DIST = \
 lib_LTLIBRARIES = librealpaver.la
 
 include_HEADERS = \
+		realpaver_bco_dag.hpp \
+		realpaver_bco_local.hpp \
+		realpaver_bco_model.hpp \
+		realpaver_bco_node.hpp \
+		realpaver_bco_space.hpp \
 		realpaver_bison.hpp \
 		realpaver_bitset.hpp \
 		realpaver_box.hpp \
@@ -23,6 +28,7 @@ include_HEADERS = \
 		realpaver_contractor.hpp \
 		realpaver_contractor_bc3.hpp \
 		realpaver_contractor_bc4.hpp \
+		realpaver_contractor_bco.hpp \
 		realpaver_contractor_cid.hpp \
 		realpaver_contractor_hc4.hpp \
 		realpaver_contractor_int.hpp \
@@ -34,7 +40,6 @@ include_HEADERS = \
 		realpaver_interval_gaol.hpp \
 		realpaver_interval_slicer.hpp \
 		realpaver_interval_union.hpp \
-		realpaver_model_bco.hpp \
 		realpaver_newton.hpp \
 		realpaver_obj.hpp \
 		realpaver_param.hpp \
@@ -42,6 +47,7 @@ include_HEADERS = \
 		realpaver_point.hpp \
 		realpaver_problem.hpp \
 		realpaver_propagator.hpp \
+		realpaver_real_fun.hpp \
 		realpaver_scope.hpp \
 		realpaver_scope_map.hpp \
 		realpaver_stopping.hpp \
@@ -54,6 +60,11 @@ include_HEADERS = \
 		realpaver_variable.hpp
 
 librealpaver_la_SOURCES = \
+		realpaver_bco_dag.cpp \
+		realpaver_bco_local.cpp \
+		realpaver_bco_model.cpp \
+		realpaver_bco_node.cpp \
+		realpaver_bco_space.cpp \
 		realpaver_bison.ypp \
 		realpaver_flex.lpp \
 		realpaver_bitset.cpp \
@@ -65,6 +76,7 @@ librealpaver_la_SOURCES = \
 		realpaver_contractor.cpp \
 		realpaver_contractor_bc3.cpp \
 		realpaver_contractor_bc4.cpp \
+		realpaver_contractor_bco.cpp \
 		realpaver_contractor_cid.cpp \
 		realpaver_contractor_hc4.cpp \
 		realpaver_contractor_int.cpp \
@@ -74,7 +86,6 @@ librealpaver_la_SOURCES = \
 		realpaver_interval.cpp \
 		realpaver_interval_slicer.cpp \
 		realpaver_interval_union.cpp \
-		realpaver_model_bco.cpp \
 		realpaver_newton.cpp \
 		realpaver_obj.cpp \
 		realpaver_param.cpp \
@@ -82,6 +93,7 @@ librealpaver_la_SOURCES = \
 		realpaver_point.cpp \
 		realpaver_problem.cpp \
 		realpaver_propagator.cpp \
+		realpaver_real_fun.cpp \
 		realpaver_scope.cpp \
 		realpaver_scope_map.cpp \
 		realpaver_stopping.cpp \

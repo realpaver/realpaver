@@ -13,12 +13,7 @@ Bc4Contractor::Bc4Contractor(Dag* dag, size_t i) :
    for (auto v : s)
    {
       if (s.count(v) > 1)
-      {
          bc3_.push_back(new Bc3Contractor(f_->dag(), f_->index(), v.id()));
-         DEBUG("bc3 revise on " << v);
-      }
-      else
-         DEBUG("occ simple " << v);
    }
 }
 

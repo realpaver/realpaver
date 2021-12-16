@@ -42,7 +42,6 @@ void TermFixer::apply(const TermAdd* t)
    t_ = vl.t_ + vr.t_;
 }
 
-
 void TermFixer::apply(const TermSub* t)
 {
    TermFixer vl(vvm_, vim_);

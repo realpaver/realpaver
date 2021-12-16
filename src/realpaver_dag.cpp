@@ -75,6 +75,11 @@ void DagConst::eval(const Box& B)
    setVal(x_);
 }
 
+void DagConst::eval(const Point& P)
+{
+   setVal(x_);
+}
+
 void DagConst::evalOnly(size_t id, const Interval& x)
 {
    setVal(x_);
@@ -132,6 +137,11 @@ void DagVar::acceptVisitor(DagVisitor& vis) const
 void DagVar::eval(const Box& B)
 {
    setVal(B[v_.id()]);
+}
+
+void DagVar::eval(const Point& P)
+{
+   setVal(P[v_.id()]);
 }
 
 void DagVar::evalOnly(size_t id, const Interval& x)
@@ -1124,6 +1134,14 @@ Interval DagFun::eval(const Box& B)
    return rootNode()->val();
 }
 
+Interval DagFun::eval(const Point& P)
+{
+   for (size_t i=0; i<nbNode(); ++i)
+      node_[i]->eval(P);
+
+   return rootNode()->val();
+}
+
 Interval DagFun::evalOnly(size_t id, const Interval& x)
 {
    ASSERT(dependsOn(id),
@@ -1584,6 +1602,22 @@ DagVar* Dag::findVarNode(size_t id) const
       DagNode* node = node_[it->second];
       return static_cast<DagVar*>(node);
    }
+}
+
+Scope Dag::scope() const
+{
+   Scope res;
+   for (DagVar* node : vnode_)
+      res.insert(node->getVar());
+   return res;
+}
+
+void Dag::reval(const Point& P)
+{
+   DBL_RND_NEAR();
+
+   for (size_t i=0; i<nbNode(); ++i)
+      node_[i]->reval(P);
 }
 
 void Dag::print(std::ostream& os) const

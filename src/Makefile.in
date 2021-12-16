@@ -135,18 +135,21 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 librealpaver_la_LIBADD =
-am_librealpaver_la_OBJECTS = realpaver_bison.lo realpaver_flex.lo \
-	realpaver_bitset.lo realpaver_box.lo realpaver_common.lo \
-	realpaver_constraint.lo realpaver_constraint_fixer.lo \
-	realpaver_constraint_relaxor.lo realpaver_contractor.lo \
-	realpaver_contractor_bc3.lo realpaver_contractor_bc4.lo \
+am_librealpaver_la_OBJECTS = realpaver_bco_dag.lo \
+	realpaver_bco_local.lo realpaver_bco_model.lo \
+	realpaver_bco_node.lo realpaver_bco_space.lo \
+	realpaver_bison.lo realpaver_flex.lo realpaver_bitset.lo \
+	realpaver_box.lo realpaver_common.lo realpaver_constraint.lo \
+	realpaver_constraint_fixer.lo realpaver_constraint_relaxor.lo \
+	realpaver_contractor.lo realpaver_contractor_bc3.lo \
+	realpaver_contractor_bc4.lo realpaver_contractor_bco.lo \
 	realpaver_contractor_cid.lo realpaver_contractor_hc4.lo \
 	realpaver_contractor_int.lo realpaver_contractor_pool.lo \
 	realpaver_dag.lo realpaver_inflator.lo realpaver_interval.lo \
 	realpaver_interval_slicer.lo realpaver_interval_union.lo \
-	realpaver_model_bco.lo realpaver_newton.lo realpaver_obj.lo \
-	realpaver_param.lo realpaver_parser.lo realpaver_point.lo \
-	realpaver_problem.lo realpaver_propagator.lo \
+	realpaver_newton.lo realpaver_obj.lo realpaver_param.lo \
+	realpaver_parser.lo realpaver_point.lo realpaver_problem.lo \
+	realpaver_propagator.lo realpaver_real_fun.lo \
 	realpaver_scope.lo realpaver_scope_map.lo \
 	realpaver_stopping.lo realpaver_term.lo \
 	realpaver_term_deriver.lo realpaver_term_fixer.lo \
@@ -397,6 +400,11 @@ EXTRA_DIST = \
 
 lib_LTLIBRARIES = librealpaver.la
 include_HEADERS = \
+		realpaver_bco_dag.hpp \
+		realpaver_bco_local.hpp \
+		realpaver_bco_model.hpp \
+		realpaver_bco_node.hpp \
+		realpaver_bco_space.hpp \
 		realpaver_bison.hpp \
 		realpaver_bitset.hpp \
 		realpaver_box.hpp \
@@ -408,6 +416,7 @@ include_HEADERS = \
 		realpaver_contractor.hpp \
 		realpaver_contractor_bc3.hpp \
 		realpaver_contractor_bc4.hpp \
+		realpaver_contractor_bco.hpp \
 		realpaver_contractor_cid.hpp \
 		realpaver_contractor_hc4.hpp \
 		realpaver_contractor_int.hpp \
@@ -419,7 +428,6 @@ include_HEADERS = \
 		realpaver_interval_gaol.hpp \
 		realpaver_interval_slicer.hpp \
 		realpaver_interval_union.hpp \
-		realpaver_model_bco.hpp \
 		realpaver_newton.hpp \
 		realpaver_obj.hpp \
 		realpaver_param.hpp \
@@ -427,6 +435,7 @@ include_HEADERS = \
 		realpaver_point.hpp \
 		realpaver_problem.hpp \
 		realpaver_propagator.hpp \
+		realpaver_real_fun.hpp \
 		realpaver_scope.hpp \
 		realpaver_scope_map.hpp \
 		realpaver_stopping.hpp \
@@ -439,6 +448,11 @@ include_HEADERS = \
 		realpaver_variable.hpp
 
 librealpaver_la_SOURCES = \
+		realpaver_bco_dag.cpp \
+		realpaver_bco_local.cpp \
+		realpaver_bco_model.cpp \
+		realpaver_bco_node.cpp \
+		realpaver_bco_space.cpp \
 		realpaver_bison.ypp \
 		realpaver_flex.lpp \
 		realpaver_bitset.cpp \
@@ -450,6 +464,7 @@ librealpaver_la_SOURCES = \
 		realpaver_contractor.cpp \
 		realpaver_contractor_bc3.cpp \
 		realpaver_contractor_bc4.cpp \
+		realpaver_contractor_bco.cpp \
 		realpaver_contractor_cid.cpp \
 		realpaver_contractor_hc4.cpp \
 		realpaver_contractor_int.cpp \
@@ -459,7 +474,6 @@ librealpaver_la_SOURCES = \
 		realpaver_interval.cpp \
 		realpaver_interval_slicer.cpp \
 		realpaver_interval_union.cpp \
-		realpaver_model_bco.cpp \
 		realpaver_newton.cpp \
 		realpaver_obj.cpp \
 		realpaver_param.cpp \
@@ -467,6 +481,7 @@ librealpaver_la_SOURCES = \
 		realpaver_point.cpp \
 		realpaver_problem.cpp \
 		realpaver_propagator.cpp \
+		realpaver_real_fun.cpp \
 		realpaver_scope.cpp \
 		realpaver_scope_map.cpp \
 		realpaver_stopping.cpp \
@@ -585,6 +600,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bco_dag.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bco_local.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bco_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bco_node.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bco_space.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bison.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_bitset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_box.Plo@am__quote@
@@ -595,6 +615,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor_bc3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor_bc4.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor_bco.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor_cid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor_hc4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_contractor_int.Plo@am__quote@
@@ -605,7 +626,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_interval.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_interval_slicer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_interval_union.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_model_bco.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_newton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_obj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_param.Plo@am__quote@
@@ -613,6 +633,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_propagator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_real_fun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_scope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_scope_map.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_stopping.Plo@am__quote@

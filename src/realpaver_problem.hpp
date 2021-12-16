@@ -58,6 +58,9 @@ public:
    // variable (i is its identifier) is at position i in the output vector
    Box getBox() const;
 
+   // returns the scope of this problem
+   Scope scope() const;
+
    // returns true if v is defined as a variable of this problem but
    // it does not occur anywhere
    bool isFakeVar(const Variable& v) const;
@@ -90,6 +93,7 @@ private:
    std::vector<Variable> vars_;     // vector of variables
    std::vector<Constraint> ctrs_;   // vector of constraints
    Obj obj_;                        // objective function
+   Scope scope_;                    // set of variables
 };
 
 std::ostream& operator<<(std::ostream& os, const Problem& p);
@@ -121,6 +125,11 @@ inline Constraint Problem::ctrAt(size_t i) const
 inline Obj Problem::obj() const
 {
    return obj_;
+}
+
+inline Scope Problem::scope() const
+{
+   return scope_;
 }
 
 inline bool Problem::isConstrained() const

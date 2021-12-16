@@ -15,6 +15,7 @@ class Hc4Contractor : public Contractor {
 public:
    // constructor of an HC4 contractor associated with the i-th function
    // of the given dag, 0 <= i < dag->nbFun()
+   // this contractor does not own the dag
    Hc4Contractor(Dag* dag, size_t i);
 
    // Override

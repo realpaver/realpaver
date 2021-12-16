@@ -8,8 +8,8 @@ namespace realpaver {
 Propagator::Propagator(ContractorPool* pool) :
    Contractor(),
    pool_(pool),
-   imp_(Param::PropagatorImprovement()),
-   max_steps_(Param::PropagatorMaxSteps()),
+   imp_(Param::DefPropagatorImprovement()),
+   max_steps_(Param::DefPropagatorMaxSteps()),
    certif_()
 {}
 

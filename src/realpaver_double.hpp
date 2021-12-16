@@ -24,6 +24,16 @@ inline double DBL_NAN()
    return std::numeric_limits<double>::quiet_NaN();
 }
 
+inline double DBL_LOWEST()
+{
+   return -std::numeric_limits<double>::max();
+}
+
+inline double DBL_GREATEAST()
+{
+   return std::numeric_limits<double>::max();
+}
+
 inline double DBL_IS_INF(const double& x)
 {
    return (x == DBL_INF()) || (x == DBL_MINUS_INF());

@@ -7,8 +7,8 @@ namespace realpaver {
 
 Inflator::Inflator()
 {
-   setDelta(Param::InflatorDelta());
-   setChi(Param::InflatorChi());
+   setDelta(Param::DefInflatorDelta());
+   setChi(Param::DefInflatorChi());
 }
 
 Inflator::Inflator(const double& delta, const double& chi)

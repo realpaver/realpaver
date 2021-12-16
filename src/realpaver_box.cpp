@@ -23,6 +23,11 @@ const Interval& Box::at(size_t i) const
    return v_[i];
 }
 
+const Interval& Box::at(const Variable& v) const
+{
+   return at(v.id());
+}
+
 void Box::set(size_t i, const Interval& x)
 {
    ASSERT(i < size(), "access out of range in a box @ " << i);
@@ -175,6 +180,24 @@ Point Box::midpoint() const
    return P;
 }
 
+Point Box::lCorner() const
+{
+   Point P( size() );
+   for (size_t i=0; i<size(); ++i)
+      P.set(i, v_[i].left());
+
+   return P;
+}
+
+Point Box::rCorner() const
+{
+   Point P( size() );
+   for (size_t i=0; i<size(); ++i)
+      P.set(i, v_[i].right());
+
+   return P;
+}
+
 double Box::oneNorm() const
 {
    Interval norm( 0.0 );
@@ -245,6 +268,15 @@ Box operator|(const Box& x, const Box& y)
    Box z( x );
    z |= y;
    return z;
+}
+
+void Box::set(const Box& other)
+{
+   ASSERT(size() == other.size(),
+          "assignment given boxes with different sizes");
+
+   for (size_t i=0; i<size(); ++i)
+      v_[i] = other.v_[i];
 }
 
 std::ostream& operator<<(std::ostream& os, const Box& x)

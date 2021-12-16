@@ -15,6 +15,7 @@ namespace realpaver {
 class Propagator : public Contractor {
 public:
    // constructor
+   // this propagator does not own the pool
    Propagator(ContractorPool* pool = nullptr);
 
    // management of the pool
@@ -40,7 +41,7 @@ public:
    Proof proofAt(size_t i) const;
 
 private:
-   ContractorPool* pool_;        // pool ofcontractors
+   ContractorPool* pool_;        // pool of contractors
    Improvement imp_;             // improvement factor
    size_t max_steps_;            // maximum number of propagation steps
    std::vector<Proof> certif_;   // proof certificates of contractors
