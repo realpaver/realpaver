@@ -29,55 +29,47 @@ int main(void)
       Problem* simpl = nullptr;
 
       Variable x = prob->addRealVar(0, 10, "x"),
-               y = prob->addRealVar(-2, 6, "y");
-               //z = prob->addRealVar(0, 10, "z");
+               y = prob->addRealVar(-2, 6, "y"),
+               z = prob->addRealVar(0, 10, "z");
 
-      prob->addObj( minimize(sqr(x) + pow(y,3) - x*y) );
+      prob->addObj( minimize(sqr(x) + pow(y,3) - x*y - 2*z) );
 
       BcoModel* model = new BcoModel(*prob);
       BcoResult res = model->preprocess();
 
-      if (res.getProof() == Proof::Empty)
+      if (res.getProof() != Proof::Empty && res.getProof() != Proof::Optimal)
       {
-         delete model;
-         return 1;
-      }
-
-      if (res.getProof() == Proof::Optimal)
-      {
-         delete model;
-         return 0;   
-      }
-
-      if (model->nbFixedVars() > 0)
-      {
-         simpl = new Problem();
          Box* B = res.getBox();
+         Interval lu = B->at(model->objVar());
 
-         // fixes the variable representing the objective function in order to
-         // remove it from the simplified problem
-         B->set(model->objVar(), Interval::zero());
+         if (model->nbFixedVars() > 0)
+         {
+            simpl = new Problem();
 
-         // creates the simplified problem
-         prob->preprocess(*B, *simpl);
+            // fixes the variable representing the objective function in order to
+            // remove it from the simplified problem
+            B->set(model->objVar(), Interval::zero());
 
+            // creates the simplified problem
+            prob->preprocess(*B, *simpl);
 
-         DEBUG("\n\n -- Simplified problem --\n" << *simpl);
+            // creates the model from the simplified problem
+            delete model;
+            model = new BcoModel(*simpl);
+         }
 
-         delete model;
-         model = new BcoModel(*simpl);
+         // assigns the domain of the objective variable
+         model->setObjDomain(lu);
+
+         // branch-and-bound to solve the model
+         res = model->solve();
       }
 
+      LOG("proof : " << res.getProof());
 
-      // branch-and-bound to solve the model
-      res = model->solve();
-
-
-      // TODO
       delete prob;
       if (simpl != nullptr)
          delete simpl;
- 
   }
 
    

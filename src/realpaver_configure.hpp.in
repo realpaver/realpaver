@@ -48,6 +48,9 @@
 /* Define this to 1 to generate log files. */
 #undef LOG_ON
 
+/* Define to 1 to use the Clp solver. */
+#undef LP_LIB_CLP
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 

@@ -41,6 +41,8 @@ BcoDag::BcoDag(Problem& P) :
    // variable representing the objective function
    z_ = P.addRealVar(Interval::universe(), "_z");
 
+   LOG("   > creates an objective variable " << z_.name());
+
    if (P.obj().isMinimize())
       dag_->insert( z_ - to == 0 );
    else
@@ -51,10 +53,8 @@ BcoDag::BcoDag(Problem& P) :
    // scope of the dag
    dscope_ = dag_->scope();
 
-
    // initial box
    init_ = std::make_shared<Box>(P.getBox());
-   DEBUG("init : " << (*init_) << "\n");
 }
 
 BcoDag::~BcoDag()
@@ -89,14 +89,15 @@ bool BcoDag::checkDerivRange() const
 bool BcoDag::checkProblem()
 {
    bool res = checkInitialBox();
-   std::string log = "   > check the initial box: ";
+   std::string log = "   > checks the initial box: ";
    log += res ? "true" : "false";
-   LOG(log);
+   LOG(log);   
+   LOG("     " << *init_);
 
    if (res)
    {
       res = checkObjRange();
-      std::string log = "   > check the range of the objective function: ";
+      std::string log = "   > checks the range of the objective function: ";
       log += res ? "true" : "false";
       LOG(log);
    }
@@ -104,7 +105,7 @@ bool BcoDag::checkProblem()
    if (res)
    {
       res = checkDerivRange();
-      std::string log = "   > check the partial derivatives: ";
+      std::string log = "   > checks the partial derivatives: ";
       log += res ? "true" : "false";
       LOG(log);
    }
@@ -125,7 +126,7 @@ double BcoDag::reval(const Point& x)
 
 void BcoDag::rdiff(const Point& x, Point& g)
 {
-   ASSERT(g.size() == dim(), "gradient having a bad dimension");
+   ASSERT(g.size() == dim(), "gradient with a bad dimension");
 
    // evaluates the dag
    dag_->reval(x);

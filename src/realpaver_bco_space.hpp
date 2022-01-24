@@ -101,6 +101,16 @@ inline size_t BcoSpace::getFrequency() const
    return f_;
 }
 
+inline double BcoSpace::getLowestLowerBound() const
+{
+   return lo_.begin()->node->getLower();
+}
+
+inline double BcoSpace::getLowestUpperBound() const
+{
+   return up_.begin()->node->getUpper();
+}
+
 } // namespace
 
 #endif

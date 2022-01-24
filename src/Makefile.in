@@ -91,6 +91,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@COND_LP_CLP_TRUE@am__append_1 = rpo_simplex_clp.hpp
+@COND_LP_CLP_TRUE@am__append_2 = rpo_simplex_clp.cpp
+@COND_LP_GUROBI_TRUE@am__append_3 = rpo_simplex_gurobi.hpp
+@COND_LP_GUROBI_TRUE@am__append_4 = rpo_simplex_gurobi.cpp
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -99,11 +103,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(include_HEADERS) \
-	$(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am \
+	$(am__librealpaver_la_include_HEADERS_DIST) $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = realpaver_configure.hpp
-CONFIG_CLEAN_FILES = realpaver_interval_impl.hpp
+CONFIG_CLEAN_FILES = realpaver_interval_impl.hpp rpo_simplex_impl.hpp
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -132,9 +136,34 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
+am__installdirs = "$(DESTDIR)$(libdir)" \
+	"$(DESTDIR)$(librealpaver_la_includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-librealpaver_la_LIBADD =
+am__librealpaver_la_SOURCES_DIST = realpaver_bco_dag.cpp \
+	realpaver_bco_local.cpp realpaver_bco_model.cpp \
+	realpaver_bco_node.cpp realpaver_bco_space.cpp \
+	realpaver_bison.ypp realpaver_flex.lpp realpaver_bitset.cpp \
+	realpaver_box.cpp realpaver_common.cpp \
+	realpaver_constraint.cpp realpaver_constraint_fixer.cpp \
+	realpaver_constraint_relaxor.cpp realpaver_contractor.cpp \
+	realpaver_contractor_bc3.cpp realpaver_contractor_bc4.cpp \
+	realpaver_contractor_bco.cpp realpaver_contractor_cid.cpp \
+	realpaver_contractor_hc4.cpp realpaver_contractor_int.cpp \
+	realpaver_contractor_pool.cpp realpaver_dag.cpp \
+	realpaver_inflator.cpp realpaver_interval.cpp \
+	realpaver_interval_slicer.cpp realpaver_interval_union.cpp \
+	rpo_lin_model.cpp realpaver_newton.cpp realpaver_obj.cpp \
+	realpaver_param.cpp realpaver_parser.cpp realpaver_point.cpp \
+	realpaver_problem.cpp realpaver_propagator.cpp \
+	realpaver_real_fun.cpp realpaver_scope.cpp \
+	realpaver_scope_map.cpp realpaver_stopping.cpp \
+	realpaver_term.cpp realpaver_term_deriver.cpp \
+	realpaver_term_fixer.cpp realpaver_timer.cpp \
+	realpaver_thick_fun.cpp realpaver_uni_fun.cpp \
+	realpaver_variable.cpp rpo_simplex_clp.cpp \
+	rpo_simplex_gurobi.cpp
+@COND_LP_CLP_TRUE@am__objects_1 = rpo_simplex_clp.lo
+@COND_LP_GUROBI_TRUE@am__objects_2 = rpo_simplex_gurobi.lo
 am_librealpaver_la_OBJECTS = realpaver_bco_dag.lo \
 	realpaver_bco_local.lo realpaver_bco_model.lo \
 	realpaver_bco_node.lo realpaver_bco_space.lo \
@@ -147,14 +176,14 @@ am_librealpaver_la_OBJECTS = realpaver_bco_dag.lo \
 	realpaver_contractor_int.lo realpaver_contractor_pool.lo \
 	realpaver_dag.lo realpaver_inflator.lo realpaver_interval.lo \
 	realpaver_interval_slicer.lo realpaver_interval_union.lo \
-	realpaver_newton.lo realpaver_obj.lo realpaver_param.lo \
-	realpaver_parser.lo realpaver_point.lo realpaver_problem.lo \
-	realpaver_propagator.lo realpaver_real_fun.lo \
-	realpaver_scope.lo realpaver_scope_map.lo \
-	realpaver_stopping.lo realpaver_term.lo \
+	rpo_lin_model.lo realpaver_newton.lo realpaver_obj.lo \
+	realpaver_param.lo realpaver_parser.lo realpaver_point.lo \
+	realpaver_problem.lo realpaver_propagator.lo \
+	realpaver_real_fun.lo realpaver_scope.lo \
+	realpaver_scope_map.lo realpaver_stopping.lo realpaver_term.lo \
 	realpaver_term_deriver.lo realpaver_term_fixer.lo \
 	realpaver_timer.lo realpaver_thick_fun.lo realpaver_uni_fun.lo \
-	realpaver_variable.lo
+	realpaver_variable.lo $(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -230,13 +259,37 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(librealpaver_la_SOURCES)
-DIST_SOURCES = $(librealpaver_la_SOURCES)
+DIST_SOURCES = $(am__librealpaver_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-HEADERS = $(include_HEADERS)
+am__librealpaver_la_include_HEADERS_DIST = realpaver_bco_dag.hpp \
+	realpaver_bco_local.hpp realpaver_bco_model.hpp \
+	realpaver_bco_node.hpp realpaver_bco_space.hpp \
+	realpaver_bison.hpp realpaver_bitset.hpp realpaver_box.hpp \
+	realpaver_common.hpp realpaver_config.hpp \
+	realpaver_constraint.hpp realpaver_constraint_fixer.hpp \
+	realpaver_constraint_relaxor.hpp realpaver_contractor.hpp \
+	realpaver_contractor_bc3.hpp realpaver_contractor_bc4.hpp \
+	realpaver_contractor_bco.hpp realpaver_contractor_cid.hpp \
+	realpaver_contractor_hc4.hpp realpaver_contractor_int.hpp \
+	realpaver_contractor_pool.hpp realpaver_dag.hpp \
+	realpaver_double.hpp realpaver_inflator.hpp \
+	realpaver_interval.hpp realpaver_interval_gaol.hpp \
+	realpaver_interval_slicer.hpp realpaver_interval_union.hpp \
+	rpo_lin_model.hpp realpaver_newton.hpp realpaver_obj.hpp \
+	realpaver_param.hpp realpaver_parser.hpp realpaver_point.hpp \
+	realpaver_problem.hpp realpaver_propagator.hpp \
+	realpaver_real_fun.hpp realpaver_scope.hpp \
+	realpaver_scope_map.hpp realpaver_stopping.hpp \
+	realpaver_term.hpp realpaver_term_deriver.hpp \
+	realpaver_term_fixer.hpp realpaver_thick_fun.hpp \
+	realpaver_timer.hpp realpaver_uni_fun.hpp \
+	realpaver_variable.hpp rpo_simplex_clp.hpp \
+	rpo_simplex_gurobi.hpp
+HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
 	$(LISP)realpaver_configure.hpp.in
 # Read a list of newline-separated strings from the standard input,
@@ -259,7 +312,8 @@ ETAGS = etags
 CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(srcdir)/realpaver_configure.hpp.in \
-	$(srcdir)/realpaver_interval_gaol.hpp $(top_srcdir)/depcomp \
+	$(srcdir)/realpaver_interval_gaol.hpp \
+	$(srcdir)/rpo_simplex_clp.hpp $(top_srcdir)/depcomp \
 	$(top_srcdir)/ylwrap realpaver_bison.cpp realpaver_bison.hpp \
 	realpaver_flex.cpp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -310,6 +364,7 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LP_LIB = @LP_LIB@
 LTLIBOBJS = @LTLIBOBJS@
 LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
@@ -399,102 +454,54 @@ EXTRA_DIST = \
 		realpaver_bison.ypp
 
 lib_LTLIBRARIES = librealpaver.la
-include_HEADERS = \
-		realpaver_bco_dag.hpp \
-		realpaver_bco_local.hpp \
-		realpaver_bco_model.hpp \
-		realpaver_bco_node.hpp \
-		realpaver_bco_space.hpp \
-		realpaver_bison.hpp \
-		realpaver_bitset.hpp \
-		realpaver_box.hpp \
-		realpaver_common.hpp \
-		realpaver_config.hpp \
-		realpaver_constraint.hpp \
-		realpaver_constraint_fixer.hpp \
-		realpaver_constraint_relaxor.hpp \
-		realpaver_contractor.hpp \
-		realpaver_contractor_bc3.hpp \
-		realpaver_contractor_bc4.hpp \
-		realpaver_contractor_bco.hpp \
-		realpaver_contractor_cid.hpp \
-		realpaver_contractor_hc4.hpp \
-		realpaver_contractor_int.hpp \
-		realpaver_contractor_pool.hpp \
-		realpaver_dag.hpp \
-		realpaver_double.hpp \
-		realpaver_inflator.hpp \
-		realpaver_interval.hpp \
-		realpaver_interval_gaol.hpp \
-		realpaver_interval_slicer.hpp \
-		realpaver_interval_union.hpp \
-		realpaver_newton.hpp \
-		realpaver_obj.hpp \
-		realpaver_param.hpp \
-		realpaver_parser.hpp \
-		realpaver_point.hpp \
-		realpaver_problem.hpp \
-		realpaver_propagator.hpp \
-		realpaver_real_fun.hpp \
-		realpaver_scope.hpp \
-		realpaver_scope_map.hpp \
-		realpaver_stopping.hpp \
-		realpaver_term.hpp \
-		realpaver_term_deriver.hpp \
-		realpaver_term_fixer.hpp \
-		realpaver_thick_fun.hpp \
-		realpaver_timer.hpp \
-		realpaver_uni_fun.hpp \
-		realpaver_variable.hpp
-
-librealpaver_la_SOURCES = \
-		realpaver_bco_dag.cpp \
-		realpaver_bco_local.cpp \
-		realpaver_bco_model.cpp \
-		realpaver_bco_node.cpp \
-		realpaver_bco_space.cpp \
-		realpaver_bison.ypp \
-		realpaver_flex.lpp \
-		realpaver_bitset.cpp \
-		realpaver_box.cpp \
-		realpaver_common.cpp \
-		realpaver_constraint.cpp \
-		realpaver_constraint_fixer.cpp \
-		realpaver_constraint_relaxor.cpp \
-		realpaver_contractor.cpp \
-		realpaver_contractor_bc3.cpp \
-		realpaver_contractor_bc4.cpp \
-		realpaver_contractor_bco.cpp \
-		realpaver_contractor_cid.cpp \
-		realpaver_contractor_hc4.cpp \
-		realpaver_contractor_int.cpp \
-		realpaver_contractor_pool.cpp \
-		realpaver_dag.cpp \
-		realpaver_inflator.cpp \
-		realpaver_interval.cpp \
-		realpaver_interval_slicer.cpp \
-		realpaver_interval_union.cpp \
-		realpaver_newton.cpp \
-		realpaver_obj.cpp \
-		realpaver_param.cpp \
-		realpaver_parser.cpp \
-		realpaver_point.cpp \
-		realpaver_problem.cpp \
-		realpaver_propagator.cpp \
-		realpaver_real_fun.cpp \
-		realpaver_scope.cpp \
-		realpaver_scope_map.cpp \
-		realpaver_stopping.cpp \
-		realpaver_term.cpp \
-		realpaver_term_deriver.cpp \
-		realpaver_term_fixer.cpp \
-		realpaver_timer.cpp \
-		realpaver_thick_fun.cpp \
-		realpaver_uni_fun.cpp \
-		realpaver_variable.cpp
-
+librealpaver_la_includedir = $(includedir)/realpaver
+librealpaver_la_include_HEADERS = realpaver_bco_dag.hpp \
+	realpaver_bco_local.hpp realpaver_bco_model.hpp \
+	realpaver_bco_node.hpp realpaver_bco_space.hpp \
+	realpaver_bison.hpp realpaver_bitset.hpp realpaver_box.hpp \
+	realpaver_common.hpp realpaver_config.hpp \
+	realpaver_constraint.hpp realpaver_constraint_fixer.hpp \
+	realpaver_constraint_relaxor.hpp realpaver_contractor.hpp \
+	realpaver_contractor_bc3.hpp realpaver_contractor_bc4.hpp \
+	realpaver_contractor_bco.hpp realpaver_contractor_cid.hpp \
+	realpaver_contractor_hc4.hpp realpaver_contractor_int.hpp \
+	realpaver_contractor_pool.hpp realpaver_dag.hpp \
+	realpaver_double.hpp realpaver_inflator.hpp \
+	realpaver_interval.hpp realpaver_interval_gaol.hpp \
+	realpaver_interval_slicer.hpp realpaver_interval_union.hpp \
+	rpo_lin_model.hpp realpaver_newton.hpp realpaver_obj.hpp \
+	realpaver_param.hpp realpaver_parser.hpp realpaver_point.hpp \
+	realpaver_problem.hpp realpaver_propagator.hpp \
+	realpaver_real_fun.hpp realpaver_scope.hpp \
+	realpaver_scope_map.hpp realpaver_stopping.hpp \
+	realpaver_term.hpp realpaver_term_deriver.hpp \
+	realpaver_term_fixer.hpp realpaver_thick_fun.hpp \
+	realpaver_timer.hpp realpaver_uni_fun.hpp \
+	realpaver_variable.hpp $(am__append_1) $(am__append_3)
+librealpaver_la_SOURCES = realpaver_bco_dag.cpp \
+	realpaver_bco_local.cpp realpaver_bco_model.cpp \
+	realpaver_bco_node.cpp realpaver_bco_space.cpp \
+	realpaver_bison.ypp realpaver_flex.lpp realpaver_bitset.cpp \
+	realpaver_box.cpp realpaver_common.cpp \
+	realpaver_constraint.cpp realpaver_constraint_fixer.cpp \
+	realpaver_constraint_relaxor.cpp realpaver_contractor.cpp \
+	realpaver_contractor_bc3.cpp realpaver_contractor_bc4.cpp \
+	realpaver_contractor_bco.cpp realpaver_contractor_cid.cpp \
+	realpaver_contractor_hc4.cpp realpaver_contractor_int.cpp \
+	realpaver_contractor_pool.cpp realpaver_dag.cpp \
+	realpaver_inflator.cpp realpaver_interval.cpp \
+	realpaver_interval_slicer.cpp realpaver_interval_union.cpp \
+	rpo_lin_model.cpp realpaver_newton.cpp realpaver_obj.cpp \
+	realpaver_param.cpp realpaver_parser.cpp realpaver_point.cpp \
+	realpaver_problem.cpp realpaver_propagator.cpp \
+	realpaver_real_fun.cpp realpaver_scope.cpp \
+	realpaver_scope_map.cpp realpaver_stopping.cpp \
+	realpaver_term.cpp realpaver_term_deriver.cpp \
+	realpaver_term_fixer.cpp realpaver_timer.cpp \
+	realpaver_thick_fun.cpp realpaver_uni_fun.cpp \
+	realpaver_variable.cpp $(am__append_2) $(am__append_4)
 librealpaver_la_DEPENDENCIES = realpaver_flex.lpp realpaver_bison.ypp
-LDADD = -lm
+librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = realpaver_bison.hpp
 AM_YFLAGS = -d -v
 AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
@@ -644,6 +651,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_uni_fun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realpaver_variable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpo_lin_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpo_simplex_clp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpo_simplex_gurobi.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -677,27 +687,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-includeHEADERS: $(include_HEADERS)
+install-librealpaver_la_includeHEADERS: $(librealpaver_la_include_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(librealpaver_la_include_HEADERS)'; test -n "$(librealpaver_la_includedir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(librealpaver_la_includedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(librealpaver_la_includedir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(librealpaver_la_includedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(librealpaver_la_includedir)" || exit $$?; \
 	done
 
-uninstall-includeHEADERS:
+uninstall-librealpaver_la_includeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(librealpaver_la_include_HEADERS)'; test -n "$(librealpaver_la_includedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(librealpaver_la_includedir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -786,7 +796,7 @@ check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS) realpaver_configure.hpp
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(librealpaver_la_includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: $(BUILT_SOURCES)
@@ -850,7 +860,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-librealpaver_la_includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -896,7 +906,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
+uninstall-am: uninstall-libLTLIBRARIES \
+	uninstall-librealpaver_la_includeHEADERS
 
 .MAKE: all check install install-am install-strip
 
@@ -907,14 +918,14 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
-	install-includeHEADERS install-info install-info-am \
-	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-librealpaver_la_includeHEADERS install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-includeHEADERS \
-	uninstall-libLTLIBRARIES
+	tags tags-am uninstall uninstall-am uninstall-libLTLIBRARIES \
+	uninstall-librealpaver_la_includeHEADERS
 
 .PRECIOUS: Makefile
 

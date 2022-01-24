@@ -57,16 +57,6 @@ SharedBcoNode BcoSpace::extractNode(size_t i)
    return node;   
 }
 
-double BcoSpace::getLowestLowerBound() const
-{
-   return lo_.begin()->node->getLower();
-}
-
-double BcoSpace::getLowestUpperBound() const
-{
-   return up_.begin()->node->getUpper();
-}
-
 void BcoSpace::simplify(const double& u)
 {
    while (true)

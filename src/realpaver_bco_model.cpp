@@ -132,6 +132,8 @@ BcoModel::BcoModel(Problem& P) :
    ASSERT(P.hasObjective(),
           "BCO model created from a problem with no objective.");
 
+   LOG("-- Creation of a BCO model -- ");
+
    ctimer_.start();
 
    bdag_ = new BcoDag(P);
@@ -144,11 +146,8 @@ BcoModel::~BcoModel()
    delete bdag_;
 }
 
-
 BcoResult BcoModel::preprocess(const Param& param)
 {
-   LOG("-- Preprocessing of a Bound-Constrained Optimization problem -- ");
-
    BcoResult res;
    ptimer_.start();
 
@@ -187,6 +186,7 @@ BcoResult BcoModel::preprocess(const Param& param)
             ++nbFixed_;
             LOG("     - fix " << v.name() << " to " << B[v]);
          }
+         initialBox()->set(v, B[v]);
       }
 
       LOG("   > first propagation: true");      
@@ -216,27 +216,23 @@ BcoResult BcoModel::solve(const Param& param)
 
    BcoResult res;
    stimer_.start();
-   
-   DEBUG("ici");
 
-   Point x = initialBox()->midpoint();
-   x.set(objVar().id(), 7.0);
+   L_ = initialBox()->at(objVar()).left();
+   U_ = initialBox()->at(objVar()).right();
 
-   Point g(dim());
-   double val;
-   bdag_->revalDiff(x, val, g);
-   
-   DEBUG("x : " << x);
-   DEBUG("g : " << g);
+   DEBUG("lu : " << Interval(L_, U_));
 
-   DEBUG("f : " << val);
+   // creates the search space
+   BcoSpace space;
+   SharedBcoNode inode = std::make_shared<BcoNode>(*initialBox());
+   inode->setLower(L_);
+   inode->setUpper(U_);
+   inode->setDepth(0);
+   space.insertNode(inode);
+
+DEBUG("inode : " << *inode);
+
 /*
-   // init [L,U]
-   Term to = prob_->obj().getTerm();
-   Interval lu = to.eval(*init_);
-   DEBUG("LU : " << lu);
-   L_ = lu.left();
-   U_ = lu.right();
 
    // creates the search space
    BcoSpace space;

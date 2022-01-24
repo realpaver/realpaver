@@ -11,7 +11,9 @@ EXTRA_DIST = \
 
 lib_LTLIBRARIES = librealpaver.la
 
-include_HEADERS = \
+librealpaver_la_includedir=$(includedir)/realpaver
+
+librealpaver_la_include_HEADERS = \
 		realpaver_bco_dag.hpp \
 		realpaver_bco_local.hpp \
 		realpaver_bco_model.hpp \
@@ -40,6 +42,7 @@ include_HEADERS = \
 		realpaver_interval_gaol.hpp \
 		realpaver_interval_slicer.hpp \
 		realpaver_interval_union.hpp \
+		rpo_lin_model.hpp \
 		realpaver_newton.hpp \
 		realpaver_obj.hpp \
 		realpaver_param.hpp \
@@ -58,6 +61,7 @@ include_HEADERS = \
 		realpaver_timer.hpp \
 		realpaver_uni_fun.hpp \
 		realpaver_variable.hpp
+
 
 librealpaver_la_SOURCES = \
 		realpaver_bco_dag.cpp \
@@ -86,6 +90,7 @@ librealpaver_la_SOURCES = \
 		realpaver_interval.cpp \
 		realpaver_interval_slicer.cpp \
 		realpaver_interval_union.cpp \
+		rpo_lin_model.cpp \
 		realpaver_newton.cpp \
 		realpaver_obj.cpp \
 		realpaver_param.cpp \
@@ -105,9 +110,20 @@ librealpaver_la_SOURCES = \
 		realpaver_uni_fun.cpp \
 		realpaver_variable.cpp
 
+if COND_LP_CLP
+librealpaver_la_include_HEADERS += rpo_simplex_clp.hpp
+librealpaver_la_SOURCES += rpo_simplex_clp.cpp
+endif
+
+if COND_LP_GUROBI
+librealpaver_la_include_HEADERS += rpo_simplex_gurobi.hpp
+librealpaver_la_SOURCES += rpo_simplex_gurobi.cpp
+endif
+
+
 librealpaver_la_DEPENDENCIES = realpaver_flex.lpp realpaver_bison.ypp
 
-LDADD = -lm
+librealpaver_la_LIBADD = -lm
 
 BUILT_SOURCES = realpaver_bison.hpp
 AM_YFLAGS = -d -v

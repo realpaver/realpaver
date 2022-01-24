@@ -100,6 +100,9 @@ public:
    // returns the number of decision variables in the objective function
    size_t dim() const;
 
+   // assigns the domain of the objective variable
+   void setObjDomain(const Interval& lu);
+
 private:
    Problem* prob_;   // problem
    BcoDag* bdag_;    // specific dag
@@ -156,6 +159,11 @@ inline void BcoModel::makeBc4Propagator()
 inline size_t BcoModel::dim() const
 {
    return bdag_->dim();
+}
+
+inline void BcoModel::setObjDomain(const Interval& lu)
+{
+   initialBox()->set(objVar(), lu);
 }
 
 } // namespace

@@ -81,7 +81,7 @@ AC_MSG_RESULT($platform_osx)
 AM_CONDITIONAL(PLATFORM_OSX, test "$platform_osx" = "yes")
 
 
-# --with-itvlib-include
+# --with-include-path
 AC_ARG_WITH([include-path],
             [AS_HELP_STRING([--with-include-path],
                             [Specify an include path for third-party headers])],
@@ -98,20 +98,19 @@ AC_ARG_WITH([lib_path],
             libpath="")
 CXXFLAGS="$CXXFLAGS ${libpath}"
 
-# --with-itvlib
-AC_ARG_WITH([itvlib],
-            [AS_HELP_STRING([--with-itvlib=(gaol)],
+
+# --with-interval-lib
+AC_ARG_WITH([interval-lib],
+            [AS_HELP_STRING([--with-interval-lib=(gaol)],
             [Specify the interval library to use @<:@default=gaol@:>@])],
-            with_itvlib="${with_itvlib}",
-            with_itvlib="gaol")
+            with_interval_lib="${with_interval_lib}",
+            with_interval_lib="gaol")
 
 interval_library="no"
 
 
-# interval library
-
 # gaol with apmathlib
-if test "${with_itvlib}" = "gaol"; then
+if test "${with_interval_lib}" = "gaol"; then
    AC_LANG_PUSH([C++])
    AC_MSG_CHECKING([for gaol headers])
    AC_COMPILE_IFELSE([
@@ -152,6 +151,67 @@ if test ${interval_library} = "no"; then
 fi
 
 AC_SUBST(INTERVAL_LIB)
+
+
+# --with-lp-lib
+AC_ARG_WITH([lp-lib],
+            [AS_HELP_STRING([--with-lp-lib=(clp, gurobi)],
+            [Specify the interval library to use @<:@default=gaol@:>@])],
+            with_lp_lib="${with_lp_lib}",
+            with_lp_lib="clp")
+
+lp_library="no"
+
+
+# Gurobi
+
+have_gurobi="no"
+AM_CONDITIONAL([COND_LP_GUROBI],[test ${have_gurobi} = "yes"])
+
+
+# Clp
+if test "${with_lp_lib}" = "clp"; then
+   AC_LANG_PUSH([C++])
+   AC_MSG_CHECKING([for clp headers])
+   AC_COMPILE_IFELSE([
+                        AC_LANG_PROGRAM( [#include <ClpSimplex.hpp>] )
+                     ],
+                     [have_clp_headers=yes],
+                     [AC_MSG_ERROR("Clp headers not found")] )
+   AC_MSG_RESULT(${have_clp_headers})
+
+   OLD_LIBS=$LIBS
+   LIBS="-lCoinUtils -lClp"
+
+   AC_MSG_CHECKING([for libClp])
+   AC_RUN_IFELSE( [
+                     AC_LANG_PROGRAM( [ #include <ClpSimplex.hpp> ],
+                                       [ ClpSimplex simplex;  ] )
+                  ],
+                  [have_clp=yes],
+                  [have_clp=no])
+   AC_MSG_RESULT(${have_clp})
+   AM_CONDITIONAL([COND_LP_CLP],[test ${have_clp} = "yes"])
+
+   if test ${have_clp} = "yes"; then
+      lp_library="clp"
+      LP_LIB=$LIBS
+      AC_DEFINE(LP_LIB_CLP,1,
+            [Define to 1 to use the Clp solver.])
+      AC_CONFIG_LINKS([src/rpo_simplex_impl.hpp:src/rpo_simplex_clp.hpp])
+   else
+      AC_MSG_ERROR("Clp solver not found")
+   fi
+
+   LIBS=$OLD_LIBS
+   AC_LANG_POP([C++])
+fi
+
+if test ${lp_library} = "no"; then
+   AC_MSG_ERROR("linear programming library not found")   
+fi
+
+AC_SUBST(LP_LIB)
 
 
 # cppUnit
@@ -248,11 +308,12 @@ AC_OUTPUT
 # options display
 echo ""
 printf "Realpaver v.realpaver_version configured\n"
-printf "\tinterval lib       : $interval_library\n"
-printf "\tdebugging          : $enable_debug\n"
-printf "\tlog files          : $enable_log\n"
-printf "\tassertion checking : $enable_log\n"
-printf "\tunit testing       : $have_cppunit\n"
+printf "\tInterval library   : $interval_library\n"
+printf "\tLinear solver      : $lp_library\n"
+printf "\tDebugging          : $enable_debug\n"
+printf "\tLog files          : $enable_log\n"
+printf "\tAssertion checking : $enable_log\n"
+printf "\tUnit testing       : $have_cppunit\n"
 printf "\nRun make to compile Realpaver\n"
 echo ""
 
@@ -261,4 +322,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --enable-debug --enable-log --enable-assert
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-interval-lib=gaol --with-lp-lib=clp --enable-debug --enable-log --enable-assert

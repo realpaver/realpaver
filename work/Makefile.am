@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-LDADD = -lrealpaver @INTERVAL_LIB@
+LDADD = -lrealpaver @INTERVAL_LIB@ @LP_LIB@
 AM_CPPFLAGS = -I../src
 AM_LDFLAGS = -L../src/.libs
 

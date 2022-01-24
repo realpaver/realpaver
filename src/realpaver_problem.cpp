@@ -109,7 +109,7 @@ Box Problem::getBox() const
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
-   std::string indent    = "   ",
+   std::string indent = "   ",
                s_int  = "int  ",
                s_real = "real ",
                s_var  = "Variables",
@@ -156,6 +156,9 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
 
 bool Problem::isFakeVar(const Variable& v) const
 {
+   if (obj_.getTerm().dependsOn(v))
+      return false;
+   
    for (size_t i=0; i<nbCtrs(); ++i)
       if (ctrAt(i).dependsOn(v))
          return false;
@@ -165,6 +168,8 @@ bool Problem::isFakeVar(const Variable& v) const
 
 bool Problem::preprocess(const Box& B, Problem& other)
 {
+   LOG("   > simplifies the problem");
+
    // detects the fixed variables and creates the maps
    ConstraintFixer::VVMap vvm;
    ConstraintFixer::VIMap vim;
@@ -175,12 +180,12 @@ bool Problem::preprocess(const Box& B, Problem& other)
 
       if (B[i].isEmpty())
       {
-         LOG("Empty variable domain: " << v.name());
+         LOG("     - empty variable domain: " << v.name());
          return false;
       }
       else if (B[i].isCanonical())
       {
-         LOG("Fixed variable: " << v.name() << " = " << B[i]);
+         LOG("     - replaces " << v.name() << " by " << B[i]);
          vim.insert(std::make_pair(v, B[i]));
       }
       else
@@ -188,6 +193,7 @@ bool Problem::preprocess(const Box& B, Problem& other)
          // creates a clone of the variable in the other problem
          Variable w = v.clone();
          w.setId(other.nbVars());
+         w.setDomain(B[i]);
          other.vars_.push_back(w);
 
          // new map entry
@@ -207,12 +213,12 @@ bool Problem::preprocess(const Box& B, Problem& other)
       Proof proof = c.isSat(oB);
       if (proof == Proof::Empty)
       {
-         LOG("Violated constraint: " << ctrAt(i));
+         LOG("     - violated constraint: " << ctrAt(i));
          return false;
       }
       else if (proof == Proof::Inner)
       {
-         LOG("Inactive constraint: " << ctrAt(i));
+         LOG("     - inactive constraint: " << ctrAt(i));
       }
       else
       {
@@ -226,7 +232,7 @@ bool Problem::preprocess(const Box& B, Problem& other)
    
    if (!obj_.isConstant() && fixer.getTerm().isConstant())
    {
-      LOG("Fixed objective: " << fixer.getTerm());
+      LOG("     - fixed objective: " << fixer.getTerm());
    }
    
    other.addObj(Obj(obj_.getDir(), fixer.getTerm()));
@@ -236,7 +242,7 @@ bool Problem::preprocess(const Box& B, Problem& other)
    {
       Variable v = other.varAt(i);
       if (other.isFakeVar(v))
-         LOG("Unconstrained variable: " << v.name() << " in " << oB[i]);
+         LOG("     - unconstrained variable: " << v.name());
    }
 
    return true;

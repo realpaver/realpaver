@@ -639,6 +639,11 @@ LIB@&t@OBJS
 CPPUNIT_LIB
 CPPUNIT_COND_FALSE
 CPPUNIT_COND_TRUE
+LP_LIB
+COND_LP_CLP_FALSE
+COND_LP_CLP_TRUE
+COND_LP_GUROBI_FALSE
+COND_LP_GUROBI_TRUE
 INTERVAL_LIB
 PLATFORM_OSX_FALSE
 PLATFORM_OSX_TRUE
@@ -785,7 +790,8 @@ with_sysroot
 enable_libtool_lock
 with_include_path
 with_lib_path
-with_itvlib
+with_interval_lib
+with_lp_lib
 enable_debug
 enable_log
 enable_assert
@@ -1463,7 +1469,10 @@ Optional Packages:
                           compiler's sysroot if not specified).
   --with-include-path     Specify an include path for third-party headers
   --with-lib-path         Specify a library path for third-party libraries
-  --with-itvlib=(gaol)    Specify the interval library to use @<:@default=gaol@:>@
+  --with-interval-lib=(gaol) 
+                          Specify the interval library to use @<:@default=gaol@:>@
+  --with-lp-lib=(clp, gurobi) 
+                          Specify the interval library to use @<:@default=gaol@:>@
 
 Some influential environment variables:
   CC          C compiler command
@@ -16125,7 +16134,7 @@ fi
 
 
 
-# --with-itvlib-include
+# --with-include-path
 
 @%:@ Check whether --with-include-path was given.
 if test "${with_include_path+set}" = set; then :
@@ -16148,23 +16157,22 @@ fi
 
 CXXFLAGS="$CXXFLAGS ${libpath}"
 
-# --with-itvlib
 
-@%:@ Check whether --with-itvlib was given.
-if test "${with_itvlib+set}" = set; then :
-  withval=$with_itvlib; with_itvlib="${with_itvlib}"
+# --with-interval-lib
+
+@%:@ Check whether --with-interval-lib was given.
+if test "${with_interval_lib+set}" = set; then :
+  withval=$with_interval_lib; with_interval_lib="${with_interval_lib}"
 else
-  with_itvlib="gaol"
+  with_interval_lib="gaol"
 fi
 
 
 interval_library="no"
 
 
-# interval library
-
 # gaol with apmathlib
-if test "${with_itvlib}" = "gaol"; then
+if test "${with_interval_lib}" = "gaol"; then
    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16254,6 +16262,136 @@ fi
 
 if test ${interval_library} = "no"; then
    as_fn_error $? "\"interval arithmetic library not found\"" "$LINENO" 5   
+fi
+
+
+
+
+# --with-lp-lib
+
+@%:@ Check whether --with-lp-lib was given.
+if test "${with_lp_lib+set}" = set; then :
+  withval=$with_lp_lib; with_lp_lib="${with_lp_lib}"
+else
+  with_lp_lib="clp"
+fi
+
+
+lp_library="no"
+
+
+# Gurobi
+
+have_gurobi="no"
+ if test ${have_gurobi} = "yes"; then
+  COND_LP_GUROBI_TRUE=
+  COND_LP_GUROBI_FALSE='#'
+else
+  COND_LP_GUROBI_TRUE='#'
+  COND_LP_GUROBI_FALSE=
+fi
+
+
+
+# Clp
+if test "${with_lp_lib}" = "clp"; then
+   ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for clp headers" >&5
+$as_echo_n "checking for clp headers... " >&6; }
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                        #include <ClpSimplex.hpp> 
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+                     
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  have_clp_headers=yes
+else
+  as_fn_error $? "\"Clp headers not found\"" "$LINENO" 5 
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_clp_headers}" >&5
+$as_echo "${have_clp_headers}" >&6; }
+
+   OLD_LIBS=$LIBS
+   LIBS="-lCoinUtils -lClp"
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libClp" >&5
+$as_echo_n "checking for libClp... " >&6; }
+   if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                      #include <ClpSimplex.hpp> 
+int
+main ()
+{
+ ClpSimplex simplex;   
+  ;
+  return 0;
+}
+                  
+_ACEOF
+if ac_fn_cxx_try_run "$LINENO"; then :
+  have_clp=yes
+else
+  have_clp=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_clp}" >&5
+$as_echo "${have_clp}" >&6; }
+    if test ${have_clp} = "yes"; then
+  COND_LP_CLP_TRUE=
+  COND_LP_CLP_FALSE='#'
+else
+  COND_LP_CLP_TRUE='#'
+  COND_LP_CLP_FALSE=
+fi
+
+
+   if test ${have_clp} = "yes"; then
+      lp_library="clp"
+      LP_LIB=$LIBS
+      
+$as_echo "@%:@define LP_LIB_CLP 1" >>confdefs.h
+
+      ac_config_links="$ac_config_links src/rpo_simplex_impl.hpp:src/rpo_simplex_clp.hpp"
+
+   else
+      as_fn_error $? "\"Clp solver not found\"" "$LINENO" 5
+   fi
+
+   LIBS=$OLD_LIBS
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+
+if test ${lp_library} = "no"; then
+   as_fn_error $? "\"linear programming library not found\"" "$LINENO" 5   
 fi
 
 
@@ -16550,6 +16688,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PLATFORM_OSX_TRUE}" && test -z "${PLATFORM_OSX_FALSE}"; then
   as_fn_error $? "conditional \"PLATFORM_OSX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_LP_GUROBI_TRUE}" && test -z "${COND_LP_GUROBI_FALSE}"; then
+  as_fn_error $? "conditional \"COND_LP_GUROBI\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_LP_CLP_TRUE}" && test -z "${COND_LP_CLP_FALSE}"; then
+  as_fn_error $? "conditional \"COND_LP_CLP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CPPUNIT_COND_TRUE}" && test -z "${CPPUNIT_COND_FALSE}"; then
@@ -17537,6 +17683,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "src/realpaver_interval_impl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver_interval_impl.hpp:src/realpaver_interval_gaol.hpp" ;;
+    "src/rpo_simplex_impl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/rpo_simplex_impl.hpp:src/rpo_simplex_clp.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
@@ -19013,11 +19160,12 @@ fi
 # options display
 echo ""
 printf "Realpaver v.1.0 configured\n"
-printf "\tinterval lib       : $interval_library\n"
-printf "\tdebugging          : $enable_debug\n"
-printf "\tlog files          : $enable_log\n"
-printf "\tassertion checking : $enable_log\n"
-printf "\tunit testing       : $have_cppunit\n"
+printf "\tInterval library   : $interval_library\n"
+printf "\tLinear solver      : $lp_library\n"
+printf "\tDebugging          : $enable_debug\n"
+printf "\tLog files          : $enable_log\n"
+printf "\tAssertion checking : $enable_log\n"
+printf "\tUnit testing       : $have_cppunit\n"
 printf "\nRun make to compile Realpaver\n"
 echo ""
 
@@ -19026,4 +19174,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --enable-debug --enable-log --enable-assert
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-interval-lib=gaol --with-lp-lib=clp --enable-debug --enable-log --enable-assert

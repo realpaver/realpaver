@@ -32,6 +32,7 @@ public:
 
    // management of the depth in the search tree
    size_t getDepth() const;
+   void setDepth(size_t d);
    void incrDepth();
 
    // returns the box enclosed
@@ -81,6 +82,11 @@ inline void BcoNode::incrDepth()
 inline Box* BcoNode::getBox() const
 {
    return box_;
+}
+
+inline void BcoNode::setDepth(size_t d)
+{
+   depth_ = d;
 }
 
 } // namespace
