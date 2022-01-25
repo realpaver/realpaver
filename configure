@@ -595,7 +595,7 @@ PACKAGE_STRING='realpaver 1.0'
 PACKAGE_BUGREPORT='laurent.granvilliers@univ-nantes.fr'
 PACKAGE_URL=''
 
-ac_unique_file="src/realpaver_config.hpp"
+ac_unique_file="realpaver/config.hpp"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -637,13 +637,13 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 CPPUNIT_LIB
-CPPUNIT_COND_FALSE
-CPPUNIT_COND_TRUE
-LP_LIB
+COND_CPPUNIT_FALSE
+COND_CPPUNIT_TRUE
 COND_LP_CLP_FALSE
 COND_LP_CLP_TRUE
 COND_LP_GUROBI_FALSE
 COND_LP_GUROBI_TRUE
+LP_LIB
 INTERVAL_LIB
 PLATFORM_OSX_FALSE
 PLATFORM_OSX_TRUE
@@ -790,8 +790,8 @@ with_sysroot
 enable_libtool_lock
 with_include_path
 with_lib_path
-with_interval_lib
-with_lp_lib
+with_itvlib
+with_lplib
 enable_debug
 enable_log
 enable_assert
@@ -1469,10 +1469,10 @@ Optional Packages:
                           compiler's sysroot if not specified).
   --with-include-path     Specify an include path for third-party headers
   --with-lib-path         Specify a library path for third-party libraries
-  --with-interval-lib=(gaol)
-                          Specify the interval library to use [default=gaol]
-  --with-lp-lib=(clp, gurobi)
-                          Specify the interval library to use [default=gaol]
+  --with-itvlib=(gaol)    Specify the interval library to use [default=gaol]
+  --with-lplib=(clp, gurobi)
+                          Specify the linear programming library to use
+                          [default=clp]
 
 Some influential environment variables:
   CC          C compiler command
@@ -2960,7 +2960,7 @@ fi
 
 
 
-ac_config_headers="$ac_config_headers src/realpaver_configure.hpp"
+ac_config_headers="$ac_config_headers realpaver/configure.hpp"
 
 
 
@@ -16158,21 +16158,18 @@ fi
 CXXFLAGS="$CXXFLAGS ${libpath}"
 
 
-# --with-interval-lib
+# --with-itvlib
 
-# Check whether --with-interval-lib was given.
-if test "${with_interval_lib+set}" = set; then :
-  withval=$with_interval_lib; with_interval_lib="${with_interval_lib}"
+# Check whether --with-itvlib was given.
+if test "${with_itvlib+set}" = set; then :
+  withval=$with_itvlib; use_itvlib="${with_itvlib}"
 else
-  with_interval_lib="gaol"
+  use_itvlib="gaol"
 fi
 
 
-interval_library="no"
-
-
 # gaol with apmathlib
-if test "${with_interval_lib}" = "gaol"; then
+if test "${use_itvlib}" = "gaol"; then
    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16240,12 +16237,11 @@ fi
 $as_echo "${have_gaol}" >&6; }
 
    if test ${have_gaol} = "yes"; then
-      interval_library="gaol"
       INTERVAL_LIB=$LIBS
 
 $as_echo "#define INTERVAL_LIB_GAOL 1" >>confdefs.h
 
-      ac_config_links="$ac_config_links src/realpaver_interval_impl.hpp:src/realpaver_interval_gaol.hpp"
+      ac_config_links="$ac_config_links realpaver/wrapper_interval_link.hpp:realpaver/wrapper_interval_${use_itvlib}.hpp"
 
    else
       as_fn_error $? "\"gaol library not found\"" "$LINENO" 5
@@ -16260,49 +16256,135 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
 
-if test ${interval_library} = "no"; then
-   as_fn_error $? "\"interval arithmetic library not found\"" "$LINENO" 5
-fi
-
 
 
 
 # --with-lp-lib
 
-# Check whether --with-lp-lib was given.
-if test "${with_lp_lib+set}" = set; then :
-  withval=$with_lp_lib; with_lp_lib="${with_lp_lib}"
+# Check whether --with-lplib was given.
+if test "${with_lplib+set}" = set; then :
+  withval=$with_lplib; use_lplib="${with_lplib}"
 else
-  with_lp_lib="clp"
+  use_lplib="clp"
 fi
-
-
-lp_library="no"
 
 
 # Gurobi
-
-have_gurobi="no"
- if test ${have_gurobi} = "yes"; then
-  COND_LP_GUROBI_TRUE=
-  COND_LP_GUROBI_FALSE='#'
-else
-  COND_LP_GUROBI_TRUE='#'
-  COND_LP_GUROBI_FALSE=
-fi
-
-
-
-# Clp
-if test "${with_lp_lib}" = "clp"; then
+if test "${use_lplib}" = "gurobi"; then
    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for clp headers" >&5
-$as_echo_n "checking for clp headers... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Gurobi headers" >&5
+$as_echo_n "checking for Gurobi headers... " >&6; }
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                        #include <gurobi_c++.h>
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  have_gurobi_headers=yes
+else
+  as_fn_error $? "\"Gurobi headers not found\"" "$LINENO" 5
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_gurobi_headers}" >&5
+$as_echo "${have_gurobi_headers}" >&6; }
+   OLD_LIBS=$LIBS
+   LIBS="-lgurobi_c++ -lgurobi95"
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libgurobi_c++" >&5
+$as_echo_n "checking for libgurobi_c++... " >&6; }
+   if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                      #include <gurobi_c++.h>
+int
+main ()
+{
+ GRBEnv env;
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_cxx_try_run "$LINENO"; then :
+  have_gurobi=yes
+else
+  have_gurobi=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_gurobi}" >&5
+$as_echo "${have_gurobi}" >&6; }
+   if test ${have_gurobi} = "yes"; then
+      LP_LIB=$LIBS
+
+$as_echo "#define LP_LIB_GUROBI 1" >>confdefs.h
+
+   else
+      as_fn_error $? "\"Gurobi not found\"" "$LINENO" 5
+   fi
+
+   LIBS=$OLD_LIBS
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+
+# Clp
+if test "${with_lplib}" = "clp"; then
+   ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CoinUtils headers" >&5
+$as_echo_n "checking for CoinUtils headers... " >&6; }
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                        #include <CoinParam.hpp>
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  have_coin_headers=yes
+else
+  as_fn_error $? "\"CoinUtils headers not found\"" "$LINENO" 5
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_coin_headers}" >&5
+$as_echo "${have_coin_headers}" >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Clp headers" >&5
+$as_echo_n "checking for Clp headers... " >&6; }
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -16324,10 +16406,40 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_clp_headers}" >&5
 $as_echo "${have_clp_headers}" >&6; }
-
    OLD_LIBS=$LIBS
    LIBS="-lCoinUtils -lClp"
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libCoinUtils" >&5
+$as_echo_n "checking for libCoinUtils... " >&6; }
+   if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
+                      #include <CoinParam.hpp>
+int
+main ()
+{
+ CoinParam param;
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_cxx_try_run "$LINENO"; then :
+  have_coin=yes
+else
+  have_coin=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_coin}" >&5
+$as_echo "${have_coin}" >&6; }
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libClp" >&5
 $as_echo_n "checking for libClp... " >&6; }
    if test "$cross_compiling" = yes; then :
@@ -16360,27 +16472,14 @@ fi
 
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_clp}" >&5
 $as_echo "${have_clp}" >&6; }
-    if test ${have_clp} = "yes"; then
-  COND_LP_CLP_TRUE=
-  COND_LP_CLP_FALSE='#'
-else
-  COND_LP_CLP_TRUE='#'
-  COND_LP_CLP_FALSE=
-fi
-
-
    if test ${have_clp} = "yes"; then
-      lp_library="clp"
       LP_LIB=$LIBS
 
 $as_echo "#define LP_LIB_CLP 1" >>confdefs.h
 
-      ac_config_links="$ac_config_links src/rpo_simplex_impl.hpp:src/rpo_simplex_clp.hpp"
-
    else
-      as_fn_error $? "\"Clp solver not found\"" "$LINENO" 5
+      as_fn_error $? "\"Clp not found\"" "$LINENO" 5
    fi
-
    LIBS=$OLD_LIBS
    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -16390,10 +16489,24 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
 
-if test ${lp_library} = "no"; then
-   as_fn_error $? "\"linear programming library not found\"" "$LINENO" 5
+
+ac_config_links="$ac_config_links realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp"
+
+ if test ${use_lplib} = "gurobi"; then
+  COND_LP_GUROBI_TRUE=
+  COND_LP_GUROBI_FALSE='#'
+else
+  COND_LP_GUROBI_TRUE='#'
+  COND_LP_GUROBI_FALSE=
 fi
 
+ if test ${use_lplib} = "clp"; then
+  COND_LP_CLP_TRUE=
+  COND_LP_CLP_FALSE='#'
+else
+  COND_LP_CLP_TRUE='#'
+  COND_LP_CLP_FALSE=
+fi
 
 
 
@@ -16439,11 +16552,11 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_cppunit}" >&5
 $as_echo "${have_cppunit}" >&6; }
  if test ${have_cppunit} = "yes"; then
-  CPPUNIT_COND_TRUE=
-  CPPUNIT_COND_FALSE='#'
+  COND_CPPUNIT_TRUE=
+  COND_CPPUNIT_FALSE='#'
 else
-  CPPUNIT_COND_TRUE='#'
-  CPPUNIT_COND_FALSE=
+  COND_CPPUNIT_TRUE='#'
+  COND_CPPUNIT_FALSE=
 fi
 
 if test "${have_cppunit}" = "yes"; then
@@ -16543,7 +16656,7 @@ fi
 
 
 # file generation
-ac_config_files="$ac_config_files Makefile check/Makefile src/Makefile work/Makefile"
+ac_config_files="$ac_config_files Makefile check/Makefile realpaver/Makefile work/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16698,8 +16811,8 @@ if test -z "${COND_LP_CLP_TRUE}" && test -z "${COND_LP_CLP_FALSE}"; then
   as_fn_error $? "conditional \"COND_LP_CLP\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${CPPUNIT_COND_TRUE}" && test -z "${CPPUNIT_COND_FALSE}"; then
-  as_fn_error $? "conditional \"CPPUNIT_COND\" was never defined.
+if test -z "${COND_CPPUNIT_TRUE}" && test -z "${COND_CPPUNIT_FALSE}"; then
+  as_fn_error $? "conditional \"COND_CPPUNIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -17679,14 +17792,14 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "src/realpaver_configure.hpp") CONFIG_HEADERS="$CONFIG_HEADERS src/realpaver_configure.hpp" ;;
+    "realpaver/configure.hpp") CONFIG_HEADERS="$CONFIG_HEADERS realpaver/configure.hpp" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "src/realpaver_interval_impl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver_interval_impl.hpp:src/realpaver_interval_gaol.hpp" ;;
-    "src/rpo_simplex_impl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/rpo_simplex_impl.hpp:src/rpo_simplex_clp.hpp" ;;
+    "realpaver/wrapper_interval_link.hpp") CONFIG_LINKS="$CONFIG_LINKS realpaver/wrapper_interval_link.hpp:realpaver/wrapper_interval_${use_itvlib}.hpp" ;;
+    "realpaver/wrapper_lpsolver_link.hpp") CONFIG_LINKS="$CONFIG_LINKS realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
-    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "realpaver/Makefile") CONFIG_FILES="$CONFIG_FILES realpaver/Makefile" ;;
     "work/Makefile") CONFIG_FILES="$CONFIG_FILES work/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -19159,13 +19272,13 @@ fi
 
 # options display
 echo ""
-printf "Realpaver v.1.0 configured\n"
-printf "\tInterval library   : $interval_library\n"
-printf "\tLinear solver      : $lp_library\n"
-printf "\tDebugging          : $enable_debug\n"
-printf "\tLog files          : $enable_log\n"
-printf "\tAssertion checking : $enable_log\n"
-printf "\tUnit testing       : $have_cppunit\n"
+printf "Realpaver v. 1.0 configured\n"
+printf "\tInterval library   : ${use_itvlib}\n"
+printf "\tLinear solver      : ${use_lplib}\n"
+printf "\tDebugging          : ${enable_debug}\n"
+printf "\tLog files          : ${enable_log}\n"
+printf "\tAssertion checking : ${enable_assert}\n"
+printf "\tUnit testing       : ${have_cppunit}\n"
 printf "\nRun make to compile Realpaver\n"
 echo ""
 
@@ -19174,4 +19287,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-interval-lib=gaol --with-lp-lib=clp --enable-debug --enable-log --enable-assert
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --with-lplib=clp --enable-debug --enable-log --enable-assert

@@ -1,0 +1,69 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include "realpaver/problem.hpp"
+
+#undef YYINITDEPTH
+#define YYINITDEPTH 5000
+
+extern char *realpaver_bison_text;
+extern int realpaver_bison_lineno;
+extern char realpaver_parse_error[256];
+extern realpaver::Problem * realpaver_bison_problem;
+
+extern int realpaver_bison_lex(void);
+int realpaver_bison_error(const char *str);
+%}
+
+%define api.prefix {realpaver_bison_}
+
+%code requires
+{
+}
+
+%union
+{
+   char u_str[256];
+}
+
+%type <u_str> ident
+
+%token TK_IDENT TK_INT TK_REAL
+%token TK_STR_VAR TK_STR_CONST TK_STR_INT TK_STR_REAL
+%token TK_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
+%token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
+%token TK_TAN TK_COS TK_SIN
+%token TK_LEFT_PAR TK_RIGHT_PAR TK_LEFT_SBR TK_RIGHT_SBR
+%token TK_COMMA TK_SCOLON TK_COLON
+%token TK_SGN TK_ABS TK_MIN TK_MAX
+
+%left TK_PLUS TK_MINUS
+%left TK_MUL TK_DIV
+%right TK_UMINUS
+%right TK_UPLUS
+%right TK_POW
+
+%start model
+
+%%
+model
+   : expr;
+
+expr
+   : ident
+     {
+     };
+
+ident
+   : TK_IDENT
+     {
+        strcpy($$,realpaver_bison_text);
+     }
+   ;
+%%
+
+int realpaver_bison_error(const char *str)
+{
+   snprintf(realpaver_parse_error,255,"l%d: %s",realpaver_bison_lineno,str);
+   return 0;
+}

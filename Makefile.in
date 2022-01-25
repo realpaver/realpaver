@@ -102,7 +102,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/src/realpaver_configure.hpp
+CONFIG_HEADER = $(top_builddir)/realpaver/configure.hpp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -336,8 +336,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = check src work
-DIST_SUBDIRS = check src
+SUBDIRS = check realpaver work
+DIST_SUBDIRS = check realpaver
 CLEANFILES = *~
 all: all-recursive
 

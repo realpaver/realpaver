@@ -8,8 +8,8 @@ AC_INIT([realpaver_name],
         [laurent.granvilliers@univ-nantes.fr])
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_SRCDIR([src/realpaver_config.hpp])
-AC_CONFIG_HEADERS([src/realpaver_configure.hpp])
+AC_CONFIG_SRCDIR([realpaver/config.hpp])
+AC_CONFIG_HEADERS([realpaver/configure.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 
 
@@ -99,18 +99,15 @@ AC_ARG_WITH([lib_path],
 CXXFLAGS="$CXXFLAGS ${libpath}"
 
 
-# --with-interval-lib
-AC_ARG_WITH([interval-lib],
-            [AS_HELP_STRING([--with-interval-lib=(gaol)],
+# --with-itvlib
+AC_ARG_WITH([itvlib],
+            [AS_HELP_STRING([--with-itvlib=(gaol)],
             [Specify the interval library to use @<:@default=gaol@:>@])],
-            with_interval_lib="${with_interval_lib}",
-            with_interval_lib="gaol")
-
-interval_library="no"
-
+            use_itvlib="${with_itvlib}",
+            use_itvlib="gaol")
 
 # gaol with apmathlib
-if test "${with_interval_lib}" = "gaol"; then
+if test "${use_itvlib}" = "gaol"; then
    AC_LANG_PUSH([C++])
    AC_MSG_CHECKING([for gaol headers])
    AC_COMPILE_IFELSE([
@@ -133,11 +130,10 @@ if test "${with_interval_lib}" = "gaol"; then
    AC_MSG_RESULT(${have_gaol})
 
    if test ${have_gaol} = "yes"; then
-      interval_library="gaol"
       INTERVAL_LIB=$LIBS
       AC_DEFINE(INTERVAL_LIB_GAOL,1,
             [Define to 1 to use the Gaol interval arithmetic library.])
-      AC_CONFIG_LINKS([src/realpaver_interval_impl.hpp:src/realpaver_interval_gaol.hpp])
+      AC_CONFIG_LINKS([realpaver/wrapper_interval_link.hpp:realpaver/wrapper_interval_${use_itvlib}.hpp])
    else
       AC_MSG_ERROR("gaol library not found")
    fi
@@ -146,43 +142,75 @@ if test "${with_interval_lib}" = "gaol"; then
    AC_LANG_POP([C++])
 fi
 
-if test ${interval_library} = "no"; then
-   AC_MSG_ERROR("interval arithmetic library not found")   
-fi
-
 AC_SUBST(INTERVAL_LIB)
 
 
 # --with-lp-lib
-AC_ARG_WITH([lp-lib],
-            [AS_HELP_STRING([--with-lp-lib=(clp, gurobi)],
-            [Specify the interval library to use @<:@default=gaol@:>@])],
-            with_lp_lib="${with_lp_lib}",
-            with_lp_lib="clp")
-
-lp_library="no"
-
+AC_ARG_WITH([lplib],
+            [AS_HELP_STRING([--with-lplib=(clp, gurobi)],
+            [Specify the linear programming library to use @<:@default=clp@:>@])],
+            use_lplib="${with_lplib}",
+            use_lplib="clp")
 
 # Gurobi
+if test "${use_lplib}" = "gurobi"; then
+   AC_LANG_PUSH([C++])
+   AC_MSG_CHECKING([for Gurobi headers])
+   AC_COMPILE_IFELSE([
+                        AC_LANG_PROGRAM( [#include <gurobi_c++.h>] )
+                     ],
+                     [have_gurobi_headers=yes],
+                     [AC_MSG_ERROR("Gurobi headers not found")] )
+   AC_MSG_RESULT(${have_gurobi_headers})
+   OLD_LIBS=$LIBS
+   LIBS="-lgurobi_c++ -lgurobi95"
+   AC_MSG_CHECKING([for libgurobi_c++])
+   AC_RUN_IFELSE( [
+                     AC_LANG_PROGRAM( [ #include <gurobi_c++.h> ],
+                                       [ GRBEnv env;  ] )
+                  ],
+                  [have_gurobi=yes],
+                  [have_gurobi=no])
+   AC_MSG_RESULT(${have_gurobi})
+   if test ${have_gurobi} = "yes"; then
+      LP_LIB=$LIBS
+      AC_DEFINE(LP_LIB_GUROBI, 1,
+            [Define to 1 to use Gurobi.])
+   else
+      AC_MSG_ERROR("Gurobi not found")
+   fi
 
-have_gurobi="no"
-AM_CONDITIONAL([COND_LP_GUROBI],[test ${have_gurobi} = "yes"])
-
+   LIBS=$OLD_LIBS
+   AC_LANG_POP([C++])
+fi
 
 # Clp
-if test "${with_lp_lib}" = "clp"; then
+if test "${with_lplib}" = "clp"; then
    AC_LANG_PUSH([C++])
-   AC_MSG_CHECKING([for clp headers])
+   AC_MSG_CHECKING([for CoinUtils headers])
+   AC_COMPILE_IFELSE([
+                        AC_LANG_PROGRAM( [#include <CoinParam.hpp>] )
+                     ],
+                     [have_coin_headers=yes],
+                     [AC_MSG_ERROR("CoinUtils headers not found")] )
+   AC_MSG_RESULT(${have_coin_headers})
+   AC_MSG_CHECKING([for Clp headers])
    AC_COMPILE_IFELSE([
                         AC_LANG_PROGRAM( [#include <ClpSimplex.hpp>] )
                      ],
                      [have_clp_headers=yes],
                      [AC_MSG_ERROR("Clp headers not found")] )
    AC_MSG_RESULT(${have_clp_headers})
-
    OLD_LIBS=$LIBS
    LIBS="-lCoinUtils -lClp"
-
+   AC_MSG_CHECKING([for libCoinUtils])
+   AC_RUN_IFELSE( [
+                     AC_LANG_PROGRAM( [ #include <CoinParam.hpp> ],
+                                       [ CoinParam param;  ] )
+                  ],
+                  [have_coin=yes],
+                  [have_coin=no])
+   AC_MSG_RESULT(${have_coin})
    AC_MSG_CHECKING([for libClp])
    AC_RUN_IFELSE( [
                      AC_LANG_PROGRAM( [ #include <ClpSimplex.hpp> ],
@@ -191,27 +219,21 @@ if test "${with_lp_lib}" = "clp"; then
                   [have_clp=yes],
                   [have_clp=no])
    AC_MSG_RESULT(${have_clp})
-   AM_CONDITIONAL([COND_LP_CLP],[test ${have_clp} = "yes"])
-
    if test ${have_clp} = "yes"; then
-      lp_library="clp"
       LP_LIB=$LIBS
-      AC_DEFINE(LP_LIB_CLP,1,
+      AC_DEFINE(LP_LIB_CLP, 1,
             [Define to 1 to use the Clp solver.])
-      AC_CONFIG_LINKS([src/rpo_simplex_impl.hpp:src/rpo_simplex_clp.hpp])
    else
-      AC_MSG_ERROR("Clp solver not found")
+      AC_MSG_ERROR("Clp not found")
    fi
-
    LIBS=$OLD_LIBS
    AC_LANG_POP([C++])
 fi
 
-if test ${lp_library} = "no"; then
-   AC_MSG_ERROR("linear programming library not found")   
-fi
-
 AC_SUBST(LP_LIB)
+AC_CONFIG_LINKS([realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp])
+AM_CONDITIONAL([COND_LP_GUROBI], [test ${use_lplib} = "gurobi"])
+AM_CONDITIONAL([COND_LP_CLP], [test ${use_lplib} = "clp"])
 
 
 # cppUnit
@@ -226,7 +248,7 @@ AC_RUN_IFELSE([
            [have_cppunit=yes],
            [have_cppunit=no ])
 AC_MSG_RESULT(${have_cppunit})
-AM_CONDITIONAL([CPPUNIT_COND],[test ${have_cppunit} = "yes"])
+AM_CONDITIONAL([COND_CPPUNIT],[test ${have_cppunit} = "yes"])
 if test "${have_cppunit}" = "yes"; then
    CPPUNIT_LIB=$LIBS
 else
@@ -300,20 +322,20 @@ fi
 # file generation
 AC_CONFIG_FILES([Makefile
                  check/Makefile
-                 src/Makefile
+                 realpaver/Makefile
                  work/Makefile])
 AC_OUTPUT
 
 
 # options display
 echo ""
-printf "Realpaver v.realpaver_version configured\n"
-printf "\tInterval library   : $interval_library\n"
-printf "\tLinear solver      : $lp_library\n"
-printf "\tDebugging          : $enable_debug\n"
-printf "\tLog files          : $enable_log\n"
-printf "\tAssertion checking : $enable_log\n"
-printf "\tUnit testing       : $have_cppunit\n"
+printf "Realpaver v. realpaver_version configured\n"
+printf "\tInterval library   : ${use_itvlib}\n"
+printf "\tLinear solver      : ${use_lplib}\n"
+printf "\tDebugging          : ${enable_debug}\n"
+printf "\tLog files          : ${enable_log}\n"
+printf "\tAssertion checking : ${enable_assert}\n"
+printf "\tUnit testing       : ${have_cppunit}\n"
 printf "\nRun make to compile Realpaver\n"
 echo ""
 
@@ -322,4 +344,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-interval-lib=gaol --with-lp-lib=clp --enable-debug --enable-log --enable-assert
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --with-lplib=clp --enable-debug --enable-log --enable-assert

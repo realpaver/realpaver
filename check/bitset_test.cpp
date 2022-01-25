@@ -1,4 +1,4 @@
-#include "realpaver_bitset.hpp"
+#include "realpaver/bitset.hpp"
 #include "realpaver_test.hpp"
 
 class BitsetTest : public CppUnit::TestFixture

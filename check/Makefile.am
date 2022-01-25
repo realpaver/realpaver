@@ -2,13 +2,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-LDADD = -lrealpaver @INTERVAL_LIB@ @LP_LIB@ @CPPUNIT_LIB@
-AM_CPPFLAGS = -I../src
-AM_LDFLAGS = -L../src/.libs
+LDADD = ../realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@ @CPPUNIT_LIB@
+AM_CPPFLAGS = -I..
+AM_LDFLAGS = -L../realpaver/.libs
 
 CLEANFILES = *~
 
-if CPPUNIT_COND
+if COND_CPPUNIT
 check_PROGRAMS = \
 	bitset_test \
 	dag_test \
