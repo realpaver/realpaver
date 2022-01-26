@@ -34,9 +34,9 @@ public:
 
    void testA()
    {
-      IntervalVector V = { Interval(-10, 15),
-                           Interval(-20, 5),
-                           Interval(-10, 5.5) };
+      Box V = { Interval(-10, 15),
+                Interval(-20, 5),
+                Interval(-10, 5.5) };
 
       Proof p = dag->fun(0)->hc4Revise(V);
 
@@ -48,7 +48,7 @@ public:
 
    void testB()
    {
-      IntervalVector V = { Interval::universe(),
+      Box V = { Interval::universe(),
                            Interval(-20, 5),
                            Interval(-10, 5.5) };
 
@@ -62,9 +62,9 @@ public:
 
    void testC()
    {
-      IntervalVector V = { Interval(-10, 15),
-                           Interval(-20, 5),
-                           Interval(-10, 0) };
+      Box V = { Interval(-10, 15),
+                Interval(-20, 5),
+                Interval(-10, 0) };
 
       Proof p = dag->fun(0)->hc4Revise(V);
 
@@ -73,9 +73,9 @@ public:
 
    void testD()
    {
-      IntervalVector V = { Interval(2, 4),
-                           Interval(3, 10),
-                           Interval(0, 6) };
+      Box V = { Interval(2, 4),
+                Interval(3, 10),
+                Interval(0, 6) };
 
       Proof p = dag->fun(1)->hc4Revise(V);
 

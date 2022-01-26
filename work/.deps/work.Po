@@ -192,7 +192,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /home/granvilliers-l/local/include/gaol/gaol_interval2f.h \
  /usr/lib/gcc/x86_64-linux-gnu/7/include/pmmintrin.h \
  /home/granvilliers-l/local/include/gaol/gaol_allocator.h \
- ../realpaver/point.hpp ../realpaver/double.hpp /usr/include/c++/7/cfenv \
+ ../realpaver/point.hpp ../realpaver/number.hpp /usr/include/c++/7/cfenv \
  ../realpaver/scope.hpp /usr/include/c++/7/map \
  /usr/include/c++/7/bits/stl_tree.h /usr/include/c++/7/bits/stl_map.h \
  /usr/include/c++/7/bits/stl_multimap.h ../realpaver/bitset.hpp \
@@ -707,7 +707,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../realpaver/point.hpp:
 
-../realpaver/double.hpp:
+../realpaver/number.hpp:
 
 /usr/include/c++/7/cfenv:
 

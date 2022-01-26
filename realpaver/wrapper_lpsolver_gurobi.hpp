@@ -9,6 +9,9 @@
 
 namespace realpaver {
 
+/*****************************************************************************
+ * Wrapper class for the Gurobi solver.
+ *****************************************************************************/
 class LPSolver : public LPModel {
 public:
   LPSolver();

@@ -6,16 +6,16 @@
 #undef YYINITDEPTH
 #define YYINITDEPTH 5000
 
-extern char *realpaver_bison_text;
-extern int realpaver_bison_lineno;
-extern char realpaver_parse_error[256];
-extern realpaver::Problem * realpaver_bison_problem;
+extern char* parser_bison_text;
+extern int parser_bison_lineno;
+extern char parser_error[256];
+extern realpaver::Problem* parser_bison_problem;
 
-extern int realpaver_bison_lex(void);
-int realpaver_bison_error(const char *str);
+extern int parser_bison_lex(void);
+int parser_bison_error(const char* str);
 %}
 
-%define api.prefix {realpaver_bison_}
+%define api.prefix {parser_bison_}
 
 %code requires
 {
@@ -33,7 +33,7 @@ int realpaver_bison_error(const char *str);
 %token TK_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
-%token TK_LEFT_PAR TK_RIGHT_PAR TK_LEFT_SBR TK_RIGHT_SBR
+%token TK_LPAR TK_RPAR TK_LSBR TK_RSBR
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
 
@@ -57,13 +57,13 @@ expr
 ident
    : TK_IDENT
      {
-        strcpy($$,realpaver_bison_text);
+        strcpy($$, parser_bison_text);
      }
    ;
 %%
 
-int realpaver_bison_error(const char *str)
+int parser_bison_error(const char* str)
 {
-   snprintf(realpaver_parse_error,255,"l%d: %s",realpaver_bison_lineno,str);
+   snprintf(parser_error, 255, "l%d: %s", parser_bison_lineno, str);
    return 0;
 }

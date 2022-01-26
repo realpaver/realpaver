@@ -268,7 +268,7 @@ inline void DagNode::setRdv(const double& x)
 
 inline void DagNode::addRdv(const double& x)
 {
-   rdv_ = DBL_ADD(rdv_, x);
+   rdv_ = Double::add(rdv_, x);
 }
 
 /*****************************************************************************

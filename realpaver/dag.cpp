@@ -291,7 +291,7 @@ bool DagAdd::diff()
 
 void DagAdd::reval()
 {
-   setRval(DBL_ADD(left()->rval(), right()->rval()));
+   setRval(Double::add(left()->rval(), right()->rval()));
 }
 
 bool DagAdd::rdiff()
@@ -336,7 +336,7 @@ bool DagSub::diff()
 
 void DagSub::reval()
 {
-   setRval(DBL_SUB(left()->rval(), right()->rval()));
+   setRval(Double::sub(left()->rval(), right()->rval()));
 }
 
 bool DagSub::rdiff()
@@ -381,14 +381,14 @@ bool DagMul::diff()
 
 void DagMul::reval()
 {
-   setRval(DBL_MUL(left()->rval(), right()->rval()));
+   setRval(Double::mul(left()->rval(), right()->rval()));
 }
 
 bool DagMul::rdiff()
 {
    // d(l*r)/dl = r, d(l*r)/dr = l
-   left()->addRdv(DBL_MUL(rdv(), right()->rval()));
-   right()->addRdv(DBL_MUL(rdv(), left()->rval()));
+   left()->addRdv(Double::mul(rdv(), right()->rval()));
+   right()->addRdv(Double::mul(rdv(), left()->rval()));
 
    return true;
 }
@@ -426,15 +426,15 @@ bool DagDiv::diff()
 
 void DagDiv::reval()
 {
-   setRval(DBL_DIV(left()->rval(), right()->rval()));
+   setRval(Double::div(left()->rval(), right()->rval()));
 }
 
 bool DagDiv::rdiff()
 {
    // d(l/r)/dl = 1/r, d(l/r)/dr = -l/r^2
-   left()->addRdv(DBL_DIV(rdv(), right()->rval()));
-   right()->addRdv(DBL_DIV(DBL_MUL(DBL_USB(rdv()), left()->rval()),
-                   DBL_SQR(right()->rval())));
+   left()->addRdv(Double::div(rdv(), right()->rval()));
+   right()->addRdv(Double::div(Double::mul(Double::usb(rdv()), left()->rval()),
+                   Double::sqr(right()->rval())));
 
    return right()->rval() != 0.0;
 }
@@ -485,7 +485,7 @@ bool DagMin::diff()
 
 void DagMin::reval()
 {
-   setRval(DBL_MIN(left()->rval(), right()->rval()));
+   setRval(Double::min(left()->rval(), right()->rval()));
 }
 
 bool DagMin::rdiff()
@@ -555,7 +555,7 @@ bool DagMax::diff()
 
 void DagMax::reval()
 {
-   setVal(DBL_MAX(left()->rval(), right()->rval()));
+   setVal(Double::max(left()->rval(), right()->rval()));
 }
 
 bool DagMax::rdiff()
@@ -610,13 +610,13 @@ bool DagUsb::diff()
 
 void DagUsb::reval()
 {
-   setRval(DBL_USB(child()->rval()));
+   setRval(Double::usb(child()->rval()));
 }
 
 bool DagUsb::rdiff()
 {
    // d(-u)/du = -1
-   child()->addRdv(DBL_USB(rdv()));
+   child()->addRdv(Double::usb(rdv()));
 
    return true;
 }
@@ -659,7 +659,7 @@ bool DagAbs::diff()
 
 void DagAbs::reval()
 {
-   setRval(DBL_ABS(child()->rval()));
+   setRval(Double::abs(child()->rval()));
 }
 
 bool DagAbs::rdiff()
@@ -710,7 +710,7 @@ bool DagSgn::diff()
 
 void DagSgn::reval()
 {
-   setRval(DBL_SGN(child()->rval()));
+   setRval(Double::sgn(child()->rval()));
 }
 
 bool DagSgn::rdiff()
@@ -750,13 +750,13 @@ bool DagSqr::diff()
 
 void DagSqr::reval()
 {
-   setRval(DBL_SQR(child()->rval()));
+   setRval(Double::sqr(child()->rval()));
 }
 
 bool DagSqr::rdiff()
 {
    // d(u^2)/du = 2u
-   child()->addRdv(DBL_MUL(2.0, DBL_MUL(child()->rval(), rdv())));
+   child()->addRdv(Double::mul(2.0, Double::mul(child()->rval(), rdv())));
 
    return true;
 }
@@ -792,13 +792,13 @@ bool DagSqrt::diff()
 
 void DagSqrt::reval()
 {
-   setRval(DBL_SQRT(child()->rval()));
+   setRval(Double::sqrt(child()->rval()));
 }
 
 bool DagSqrt::rdiff()
 {
    // d(sqrt(u))/du = 0.5/sqrt(u)
-   child()->addRdv(DBL_DIV(DBL_MUL(0.5, rdv()), rval()));
+   child()->addRdv(Double::div(Double::mul(0.5, rdv()), rval()));
 
    return true;
 }
@@ -850,15 +850,15 @@ bool DagPow::diff()
 
 void DagPow::reval()
 {
-   setRval(DBL_POW(child()->rval(), n_));
+   setRval(Double::pow(child()->rval(), n_));
 }
 
 bool DagPow::rdiff()
 {
    // d(u^n)/du = n * u^(n-1)
-   child()->addRdv(DBL_MUL(n_,
-                           DBL_MUL(rdv(),
-                                   DBL_POW(child()->rval(), n_-1))));
+   child()->addRdv(Double::mul(n_,
+                               Double::mul(rdv(),
+                                       Double::pow(child()->rval(), n_-1))));
 
    return true;
 }
@@ -894,13 +894,13 @@ bool DagExp::diff()
 
 void DagExp::reval()
 {
-   setRval(DBL_EXP(child()->rval()));
+   setRval(Double::exp(child()->rval()));
 }
 
 bool DagExp::rdiff()
 {
    // d(exp(u))/du = exp(u)
-   child()->addRdv(DBL_MUL(rdv(), rval()));
+   child()->addRdv(Double::mul(rdv(), rval()));
 
    return true;
 }
@@ -936,13 +936,13 @@ bool DagLog::diff()
 
 void DagLog::reval()
 {
-   setRval(DBL_LOG(child()->rval()));
+   setRval(Double::log(child()->rval()));
 }
 
 bool DagLog::rdiff()
 {
    // d(log(u))/du = 1/u
-   child()->addRdv(DBL_DIV(rdv(), child()->rval()));
+   child()->addRdv(Double::div(rdv(), child()->rval()));
 
    return child()->val().isCertainlyGtZero();
 }
@@ -978,13 +978,14 @@ bool DagCos::diff()
 
 void DagCos::reval()
 {
-   setRval(DBL_COS(child()->rval()));
+   setRval(Double::cos(child()->rval()));
 }
 
 bool DagCos::rdiff()
 {
    // d(cos(u))/du = -sin(u)
-   child()->addRdv(DBL_MUL(DBL_USB(rdv()), DBL_SIN(child()->rval())));
+   child()->addRdv(Double::mul(Double::usb(rdv()),
+                               Double::sin(child()->rval())));
 
    return true;
 }
@@ -1020,13 +1021,13 @@ bool DagSin::diff()
 
 void DagSin::reval()
 {
-   setRval(DBL_SIN(child()->rval()));
+   setRval(Double::sin(child()->rval()));
 }
 
 bool DagSin::rdiff()
 {
    // d(sin(u))/du = cos(u)
-   child()->addRdv(DBL_MUL(rdv(), DBL_COS(child()->rval())));
+   child()->addRdv(Double::mul(rdv(), Double::cos(child()->rval())));
 
    return true;
 }
@@ -1062,13 +1063,13 @@ bool DagTan::diff()
 
 void DagTan::reval()
 {
-   setRval(DBL_TAN(child()->rval()));
+   setRval(Double::tan(child()->rval()));
 }
 
 bool DagTan::rdiff()
 {
    // d(tan(u))/du = 1+tan^2(u)
-   child()->addRdv(DBL_MUL(rdv(), DBL_ADD(1.0, DBL_SQR(rval()))));
+   child()->addRdv(Double::mul(rdv(), Double::add(1.0, Double::sqr(rval()))));
 
    return val().isFinite();
 }
@@ -1372,7 +1373,7 @@ bool DagFun::diffOnly(size_t id, const Interval& x)
 
 double DagFun::reval(const Point& P)
 {
-   DBL_RND_NEAR();
+   Double::rndNear();
 
    for (size_t i=0; i<nbNode(); ++i)
       node_[i]->reval(P);
@@ -1390,7 +1391,7 @@ bool DagFun::rdiff()
 {
    double e = rootNode()->rval();
 
-   if (DBL_IS_NAN(e) || DBL_IS_INF(e))
+   if (Double::isNan(e) || Double::isInf(e))
       return false;
 
    // initializes the derivatives
@@ -1614,7 +1615,7 @@ Scope Dag::scope() const
 
 void Dag::reval(const Point& P)
 {
-   DBL_RND_NEAR();
+   Double::rndNear();
 
    for (size_t i=0; i<nbNode(); ++i)
       node_[i]->reval(P);

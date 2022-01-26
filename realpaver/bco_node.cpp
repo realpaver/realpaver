@@ -9,8 +9,8 @@ BcoNode::BcoNode(const Box& B)
 {
    box_ = new Box(B);
    depth_ = 0;
-   lower_ = DBL_LOWEST();
-   upper_ = DBL_GREATEAST();
+   lower_ = Double::lowest();
+   upper_ = Double::greatest();
 }
 
 BcoNode::BcoNode(const BcoNode& node)

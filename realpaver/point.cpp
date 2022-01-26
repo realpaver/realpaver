@@ -17,7 +17,7 @@ Point::Point(const std::initializer_list<double>& l) : v_()
       v_.push_back(x);
 }
 
-const double& Point::at(size_t i) const
+double Point::at(size_t i) const
 {
    ASSERT(i < size(), "access out of range in a point @ " << i);
 
@@ -52,10 +52,25 @@ size_t Point::hashCode() const
    return h;
 }
 
+size_t Point::size() const
+{
+   return v_.size();
+}
+
+void Point::push(const double& x)
+{
+   v_.push_back(x);
+}
+
+double Point::operator[](size_t i) const
+{
+   return v_[i];
+}
+
 bool Point::isFinite() const
 {
    for (size_t i=0; i<size(); ++i)
-      if (DBL_IS_INF(v_[i]))
+      if (Double::isInf(v_[i]))
          return false;
 
    return true;
@@ -69,7 +84,7 @@ bool Point::isInf() const
 bool Point::isNan() const
 {
    for (size_t i=0; i<size(); ++i)
-      if (DBL_IS_NAN(v_[i]))
+      if (Double::isNan(v_[i]))
          return true;
 
    return true;
@@ -80,7 +95,7 @@ double Point::oneNorm() const
    double norm( 0.0 );
 
    for (size_t i=0; i<size(); ++i)
-      norm += DBL_ABS(v_[i]);
+      norm += Double::abs(v_[i]);
 
    return norm;
 }
@@ -91,7 +106,7 @@ double Point::infNorm() const
 
    for (size_t i=0; i<size(); ++i)
    {
-      m = DBL_ABS(v_[i]);
+      m = Double::abs(v_[i]);
       if (m > norm) norm = m;
    }
 

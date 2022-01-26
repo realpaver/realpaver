@@ -8,8 +8,8 @@ AM_CPPFLAGS = -I..
 
 EXTRA_DIST = \
 		configure.hpp \
-		realpaver_flex.lpp \
-		realpaver_bison.ypp
+		parser_flex.lpp \
+		parser_bison.ypp
 
 lib_LTLIBRARIES = librealpaver.la
 
@@ -21,7 +21,6 @@ librealpaver_la_include_HEADERS = \
 		bco_model.hpp \
 		bco_node.hpp \
 		bco_space.hpp \
-		realpaver_bison.hpp \
 		bitset.hpp \
 		box.hpp \
 		common.hpp \
@@ -38,16 +37,17 @@ librealpaver_la_include_HEADERS = \
 		contractor_int.hpp \
 		contractor_pool.hpp \
 		dag.hpp \
-		double.hpp \
 		inflator.hpp \
 		interval.hpp \
 		interval_slicer.hpp \
 		interval_union.hpp \
 		lp_model.hpp \
 		newton.hpp \
+		number.hpp \
 		obj.hpp \
 		param.hpp \
 		parser.hpp \
+		parser_bison.hpp \
 		point.hpp \
 		problem.hpp \
 		propagator.hpp \
@@ -78,8 +78,6 @@ librealpaver_la_SOURCES = \
 		bco_model.cpp \
 		bco_node.cpp \
 		bco_space.cpp \
-		realpaver_bison.ypp \
-		realpaver_flex.lpp \
 		bitset.cpp \
 		box.cpp \
 		common.cpp \
@@ -103,6 +101,8 @@ librealpaver_la_SOURCES = \
 		newton.cpp \
 		obj.cpp \
 		param.cpp \
+		parser_bison.ypp \
+		parser_flex.lpp \
 		parser.cpp \
 		point.cpp \
 		problem.cpp \
@@ -127,15 +127,15 @@ if COND_LP_GUROBI
 librealpaver_la_SOURCES += wrapper_lpsolver_gurobi.cpp
 endif
 
-librealpaver_la_DEPENDENCIES = realpaver_flex.lpp realpaver_bison.ypp
+librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 
 librealpaver_la_LIBADD = -lm
 
-BUILT_SOURCES = realpaver_bison.hpp
+BUILT_SOURCES = parser_bison.hpp
 AM_YFLAGS = -d -v
 AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
 
 DISTCLEANFILES = *.~* *.o *.lo
 CLEANFILES = *~
 MAINTAINERCLEANFILES = *.~* *.o *.lo \
-		realpaver_flex.cpp realpaver_bison.hpp realpaver_bison.cpp
+		parser_flex.cpp parser_bison.hpp parser_bison.cpp

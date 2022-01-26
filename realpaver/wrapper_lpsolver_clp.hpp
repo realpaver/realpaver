@@ -8,20 +8,23 @@
 
 namespace realpaver {
 
+/*****************************************************************************
+ * Wrapper class for the Clp solver.
+ *****************************************************************************/
 class LPSolver : public LPModel {
 public:
-  LPSolver();
-  ~LPSolver();
+   LPSolver();
+   ~LPSolver();
 
-  bool optimize();
+   bool optimize();
 
 private:
-  ClpSimplex* simplex_;
+   ClpSimplex* simplex_;
   
-  void makeVars();
-  void makeCtrs();
-  void makeObj();
-  void makeClpSimplex();
+   void makeVars();
+   void makeCtrs();
+   void makeObj();
+   void makeClpSimplex();
 };
 
 } // namespace

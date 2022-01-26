@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <vector>
-#include "realpaver/double.hpp"
+#include "realpaver/number.hpp"
 
 namespace realpaver {
 
@@ -27,10 +27,10 @@ public:
    size_t size() const;
 
    // constant access to the i-th element
-   const double& operator[](size_t i) const;
+   double operator[](size_t i) const;
 
    // constant and safe access to the i-th element
-   const double& at(size_t i) const;
+   double at(size_t i) const;
 
    // assignment of the i-th element to x
    void set(size_t i, const double& x);
@@ -61,21 +61,6 @@ private:
 
 // output on a stream
 std::ostream& operator<<(std::ostream& os, const Point& P);
-
-inline size_t Point::size() const
-{
-   return v_.size();
-}
-
-inline void Point::push(const double& x)
-{
-   v_.push_back(x);
-}
-
-inline const double& Point::operator[](size_t i) const
-{
-   return v_[i];
-}
 
 } // namespace
 

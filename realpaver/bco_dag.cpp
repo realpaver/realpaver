@@ -194,4 +194,40 @@ void BcoDag::makeBc4Propagator()
    pool_.push(op);
 }
 
+
+Dag* BcoDag::getDag() const
+{
+   return dag_;
+}
+
+Variable BcoDag::objVar() const
+{
+   return z_;
+}
+
+Scope BcoDag::fScope() const
+{
+   return fscope_;
+}
+
+Scope BcoDag::dScope() const
+{
+   return dscope_;
+}
+
+SharedBox BcoDag::initialBox() const
+{
+   return init_;
+}
+
+Propagator* BcoDag::propagator()
+{
+   return &propag_;
+}
+
+size_t BcoDag::dim() const
+{
+   return fScope().size();
+}
+
 } // namespace

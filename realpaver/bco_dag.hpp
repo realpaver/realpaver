@@ -1,4 +1,6 @@
-// This file is part of Realpaver. License: see COPYING file.
+/** @file  bco_dag.hpp
+ *  @brief DAGs used for bound constrained optimization.
+ */
 
 #ifndef REALPAVER_BCO_DAG_HPP
 #define REALPAVER_BCO_DAG_HPP
@@ -11,14 +13,13 @@
 
 namespace realpaver {
 
-/*****************************************************************************
- * Class of Dags used for bound constrained optimization models.
+/** This represents a bound constrained optimization models.
  * 
- * Given an objective function f(x0, ..., xk) a dag is created and we have:
- *   - the i-th function in the DAG (i in 0..k) corresponds to df / dxi ;
- *   - the (k+1)-th function in the DAG represents the equation z - f = 0 if
- *     f has to be minimized or z + f = 0 otherwise.
- *****************************************************************************/
+ *  Given an objective function f(x0, ..., xk) a dag is created and we have:
+ *    - the i-th function in the DAG (i in 0..k) corresponds to df / dxi ;
+ *    - the (k+1)-th function in the DAG represents the equation z - f = 0 if
+ *      f has to be minimized or z + f = 0 otherwise.
+ */
 class BcoDag : public RealFun {
 public:
    // constructor
@@ -82,41 +83,6 @@ private:
    bool checkObjRange() const;
    bool checkDerivRange() const;
 };
-
-inline Dag* BcoDag::getDag() const
-{
-   return dag_;
-}
-
-inline Variable BcoDag::objVar() const
-{
-   return z_;
-}
-
-inline Scope BcoDag::fScope() const
-{
-   return fscope_;
-}
-
-inline Scope BcoDag::dScope() const
-{
-   return dscope_;
-}
-
-inline SharedBox BcoDag::initialBox() const
-{
-   return init_;
-}
-
-inline Propagator* BcoDag::propagator()
-{
-   return &propag_;
-}
-
-inline size_t BcoDag::dim() const
-{
-   return fScope().size();
-}
 
 } // namespace
 
