@@ -636,6 +636,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIB@&t@OBJS
+DOT
+DOXYGEN_FALSE
+DOXYGEN_TRUE
+DOXYGEN
 CPPUNIT_LIB
 COND_CPPUNIT_FALSE
 COND_CPPUNIT_TRUE
@@ -709,6 +713,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+REALPAVER_VERSION
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
 AM_DEFAULT_V
@@ -2962,6 +2967,9 @@ fi
 
 ac_config_headers="$ac_config_headers realpaver/configure.hpp"
 
+
+
+REALPAVER_VERSION=1.0
 
 
 
@@ -16259,7 +16267,7 @@ fi
 
 
 
-# --with-lp-lib
+# --with-lplib
 
 @%:@ Check whether --with-lplib was given.
 if test "${with_lplib+set}" = set; then :
@@ -16575,6 +16583,104 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# doxygen
+# Extract the first word of "doxygen", so it can be a program name with args.
+set dummy doxygen; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_DOXYGEN+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$DOXYGEN"; then
+  ac_cv_prog_DOXYGEN="$DOXYGEN" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DOXYGEN="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_DOXYGEN" && ac_cv_prog_DOXYGEN="no"
+fi
+fi
+DOXYGEN=$ac_cv_prog_DOXYGEN
+if test -n "$DOXYGEN"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DOXYGEN" >&5
+$as_echo "$DOXYGEN" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+if test "${DOXYGEN}" = "no"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"doxygen not found\"" >&5
+$as_echo "$as_me: WARNING: \"doxygen not found\"" >&2;}
+fi
+ if test "${DOXYGEN}" = "yes"; then
+  DOXYGEN_TRUE=
+  DOXYGEN_FALSE='#'
+else
+  DOXYGEN_TRUE='#'
+  DOXYGEN_FALSE=
+fi
+
+
+
+# dot
+# Extract the first word of "dot", so it can be a program name with args.
+set dummy dot; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_DOT+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$DOT"; then
+  ac_cv_prog_DOT="$DOT" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DOT="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_DOT" && ac_cv_prog_DOT="no"
+fi
+fi
+DOT=$ac_cv_prog_DOT
+if test -n "$DOT"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DOT" >&5
+$as_echo "$DOT" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+if test "${DOT}" = "no"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"dot not found\"" >&5
+$as_echo "$as_me: WARNING: \"dot not found\"" >&2;}
+fi
+
+
 # --enable-debug
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to turn on debugging" >&5
 $as_echo_n "checking whether to turn on debugging... " >&6; }
@@ -16656,7 +16762,7 @@ fi
 
 
 # file generation
-ac_config_files="$ac_config_files Makefile check/Makefile realpaver/Makefile work/Makefile"
+ac_config_files="$ac_config_files Makefile check/Makefile doc/realpaver_doxygen.cfg doc/Makefile realpaver/Makefile work/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16813,6 +16919,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COND_CPPUNIT_TRUE}" && test -z "${COND_CPPUNIT_FALSE}"; then
   as_fn_error $? "conditional \"COND_CPPUNIT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${DOXYGEN_TRUE}" && test -z "${DOXYGEN_FALSE}"; then
+  as_fn_error $? "conditional \"DOXYGEN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -17799,6 +17909,8 @@ do
     "realpaver/wrapper_lpsolver_link.hpp") CONFIG_LINKS="$CONFIG_LINKS realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
+    "doc/realpaver_doxygen.cfg") CONFIG_FILES="$CONFIG_FILES doc/realpaver_doxygen.cfg" ;;
+    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "realpaver/Makefile") CONFIG_FILES="$CONFIG_FILES realpaver/Makefile" ;;
     "work/Makefile") CONFIG_FILES="$CONFIG_FILES work/Makefile" ;;
 
@@ -19279,6 +19391,7 @@ printf "\tDebugging          : ${enable_debug}\n"
 printf "\tLog files          : ${enable_log}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
 printf "\tUnit testing       : ${have_cppunit}\n"
+printf "\tDoxygen            : ${DOXYGEN}\n"
 printf "\nRun make to compile Realpaver\n"
 echo ""
 

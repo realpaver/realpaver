@@ -12,6 +12,9 @@ AC_CONFIG_SRCDIR([realpaver/config.hpp])
 AC_CONFIG_HEADERS([realpaver/configure.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 
+REALPAVER_VERSION=realpaver_version
+AC_SUBST(REALPAVER_VERSION)
+
 
 # programs
 AC_PROG_CC
@@ -145,7 +148,7 @@ fi
 AC_SUBST(INTERVAL_LIB)
 
 
-# --with-lp-lib
+# --with-lplib
 AC_ARG_WITH([lplib],
             [AS_HELP_STRING([--with-lplib=(clp, gurobi)],
             [Specify the linear programming library to use @<:@default=clp@:>@])],
@@ -260,6 +263,21 @@ AC_LANG_POP([C++])
 AC_SUBST(CPPUNIT_LIB)
 
 
+# doxygen
+AC_CHECK_PROG(DOXYGEN,doxygen,yes,no)
+if test "${DOXYGEN}" = "no"; then
+   AC_MSG_WARN("doxygen not found")
+fi
+AM_CONDITIONAL(DOXYGEN, test "${DOXYGEN}" = "yes")
+
+
+# dot
+AC_CHECK_PROG(DOT,dot,yes,no)
+if test "${DOT}" = "no"; then
+   AC_MSG_WARN("dot not found")
+fi
+
+
 # --enable-debug
 AC_MSG_CHECKING([whether to turn on debugging])
 AC_ARG_ENABLE(debug,
@@ -322,6 +340,8 @@ fi
 # file generation
 AC_CONFIG_FILES([Makefile
                  check/Makefile
+                 doc/realpaver_doxygen.cfg
+                 doc/Makefile
                  realpaver/Makefile
                  work/Makefile])
 AC_OUTPUT
@@ -336,6 +356,7 @@ printf "\tDebugging          : ${enable_debug}\n"
 printf "\tLog files          : ${enable_log}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
 printf "\tUnit testing       : ${have_cppunit}\n"
+printf "\tDoxygen            : ${DOXYGEN}\n"
 printf "\nRun make to compile Realpaver\n"
 echo ""
 

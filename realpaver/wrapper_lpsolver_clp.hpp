@@ -1,5 +1,3 @@
-// This file is part of Realpaver. License: see COPYING file.
-
 #ifndef REALPAVER_WRAPPER_LPSOLVER_CLP_HPP
 #define REALPAVER_WRAPPER_LPSOLVER_CLP_HPP
 
@@ -8,14 +6,24 @@
 
 namespace realpaver {
 
-/*****************************************************************************
- * Wrapper class for the Clp solver.
- *****************************************************************************/
+/**
+ * @brief This is a wrapper class for the LP solver Clp.
+ * 
+ * 
+ */
 class LPSolver : public LPModel {
 public:
    LPSolver();
    ~LPSolver();
 
+   /**
+    * @brief Optimization method
+    * 
+    * A Clp model is created first from the LP model. Then the optimization
+    * method is executed.
+    * 
+    * @return true if an optimal solution is found
+    */
    bool optimize();
 
 private:

@@ -1,6 +1,4 @@
-/** @file  bco_dag.hpp
- *  @brief DAGs used for bound constrained optimization.
- */
+
 
 #ifndef REALPAVER_BCO_DAG_HPP
 #define REALPAVER_BCO_DAG_HPP
@@ -13,7 +11,7 @@
 
 namespace realpaver {
 
-/** This represents a bound constrained optimization models.
+/** This represents a bound constrained optimization model.
  * 
  *  Given an objective function f(x0, ..., xk) a dag is created and we have:
  *    - the i-th function in the DAG (i in 0..k) corresponds to df / dxi ;
