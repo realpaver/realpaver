@@ -4,10 +4,10 @@
 
 all: html pdf
 
-html: realpaver_doxygen.cfg
+html: Doxyfile
 
 if DOXYGEN
-	doxygen ./realpaver_doxygen.cfg
+	doxygen ./Doxyfile
 else
 	@echo Sorry, doxygen does not seem to be present on your system
 endif

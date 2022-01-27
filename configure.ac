@@ -340,7 +340,7 @@ fi
 # file generation
 AC_CONFIG_FILES([Makefile
                  check/Makefile
-                 doc/realpaver_doxygen.cfg
+                 doc/Doxyfile
                  doc/Makefile
                  realpaver/Makefile
                  work/Makefile])

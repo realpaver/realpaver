@@ -36,6 +36,19 @@ inline size_t Hash4(size_t h1, size_t h2, size_t h3, size_t h4)
    return Hash2(h1,Hash3(h2,h3,h4));
 }
 
+
+/*****************************************************************************
+ * Certificates returned by optimizers.
+ *****************************************************************************/
+enum class OptimizationStatus {
+   Optimal,
+   Infeasible,
+   StopOnTimeLimit,
+   StopOnIterLimit,
+   Other
+};
+
+
 /*****************************************************************************
  * Certificates returned by provers.
  *****************************************************************************/

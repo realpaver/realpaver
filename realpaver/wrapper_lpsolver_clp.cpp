@@ -1,3 +1,14 @@
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, a reliable interval solver of nonlinear   //
+//                                 constraint satisfaction and optimization  //
+//                                 problems over the real numbers.           //
+//                                                                           //
+// Copyright (C) 2020-2022 Laboratoire des Sciences du Numérique de Nantes   //
+//                                                                           //
+// Realpaver is a software distributed under the terms of the MIT License.   //
+// See the file COPYING.                                                     //
+///////////////////////////////////////////////////////////////////////////////
+
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/wrapper_lpsolver_clp.hpp"
@@ -50,7 +61,7 @@ void LPSolver::makeCtrs()
 
 void LPSolver::makeObj()
 {
-   LinExpr obj = getObj();
+   LinExpr obj = getObjExpr();
    int n = obj.getNbTerms();
 
    for (int i=0; i<n; ++i)
@@ -88,9 +99,25 @@ bool LPSolver::optimize()
          v.setObjVal(sol[i]);
       }
 
+      setStatus(OptimizationStatus::Optimal);
       return true;
    }
-   return false;
+   else
+   {
+      setStatus(OptimizationStatus::Other);
+
+      if (simplex_->isProvenPrimalInfeasible() ||
+            simplex_->isProvenDualInfeasible())
+         setStatus(OptimizationStatus::Infeasible);
+
+      if (simplex_->isIterationLimitReached())
+         setStatus(OptimizationStatus::StopOnIterLimit);
+
+      if (simplex_->hitMaximumIterations())
+         setStatus(OptimizationStatus::StopOnTimeLimit);
+
+      return false;
+   }
 }
 
 } // namespace

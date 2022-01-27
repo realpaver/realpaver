@@ -1,4 +1,13 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, a reliable interval solver of nonlinear   //
+//                                 constraint satisfaction and optimization  //
+//                                 problems over the real numbers.           //
+//                                                                           //
+// Copyright (C) 2020-2022 Laboratoire des Sciences du Numérique de Nantes   //
+//                                                                           //
+// Realpaver is a software distributed under the terms of the MIT License.   //
+// See the file COPYING.                                                     //
+///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 #include "realpaver/lp_model.hpp"
@@ -160,11 +169,6 @@ double LinVar::getObjVal() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-LinExprRep::LinExprRep() :
-   coefs_(),
-   vars_()
-{}
 
 void LinExprRep::addTerm(double a, LinVar v)
 {
@@ -386,7 +390,8 @@ LPModel::LPModel() :
    minimization_(true),
    objval_(0.0),
    maxseconds_(Double::inf()),
-   maxiter_(Integer::max())
+   maxiter_(Integer::max()),
+   status_(OptimizationStatus::Other)
 {}
 
 LPModel::~LPModel()
@@ -550,7 +555,7 @@ LinCtr LPModel::getLinCtr(int i) const
    return ctrs_[i];
 }
 
-LinExpr LPModel::getObj() const
+LinExpr LPModel::getObjExpr() const
 {
    return obj_;
 }
@@ -583,6 +588,16 @@ void LPModel::setMaxIterations(int n)
 int LPModel::getMaxIterations() const
 {
    return maxiter_;
+}
+
+OptimizationStatus LPModel::getStatus() const
+{
+   return status_;
+}
+
+void LPModel::setStatus(OptimizationStatus status)
+{
+   status_ = status;
 }
 
 } // namespace
