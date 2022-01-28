@@ -1,7 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/bco_node.hpp"
-#include "realpaver/double.hpp"
+#include "realpaver/number.hpp"
 
 namespace realpaver {
 

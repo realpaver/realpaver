@@ -595,7 +595,7 @@ PACKAGE_STRING='realpaver 1.0'
 PACKAGE_BUGREPORT='laurent.granvilliers@univ-nantes.fr'
 PACKAGE_URL=''
 
-ac_unique_file="realpaver/config.hpp"
+ac_unique_file="src/realpaver/config.hpp"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -2965,7 +2965,7 @@ fi
 
 
 
-ac_config_headers="$ac_config_headers realpaver/configure.hpp"
+ac_config_headers="$ac_config_headers src/realpaver/configure.hpp"
 
 
 
@@ -16249,7 +16249,7 @@ $as_echo "${have_gaol}" >&6; }
 
 $as_echo "#define INTERVAL_LIB_GAOL 1" >>confdefs.h
 
-      ac_config_links="$ac_config_links realpaver/wrapper_interval_link.hpp:realpaver/wrapper_interval_${use_itvlib}.hpp"
+      ac_config_links="$ac_config_links src/realpaver/interval_impl.hpp:src/realpaver/wrapper_interval_${use_itvlib}.hpp"
 
    else
       as_fn_error $? "\"gaol library not found\"" "$LINENO" 5
@@ -16498,7 +16498,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 
 
-ac_config_links="$ac_config_links realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp"
+ac_config_links="$ac_config_links src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp"
 
  if test ${use_lplib} = "gurobi"; then
   COND_LP_GUROBI_TRUE=
@@ -16762,7 +16762,7 @@ fi
 
 
 # file generation
-ac_config_files="$ac_config_files Makefile check/Makefile doc/Doxyfile doc/Makefile realpaver/Makefile work/Makefile"
+ac_config_files="$ac_config_files Makefile check/Makefile doc/Doxyfile doc/Makefile examples/Makefile src/Makefile src/realpaver/Makefile work/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17902,16 +17902,18 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "realpaver/configure.hpp") CONFIG_HEADERS="$CONFIG_HEADERS realpaver/configure.hpp" ;;
+    "src/realpaver/configure.hpp") CONFIG_HEADERS="$CONFIG_HEADERS src/realpaver/configure.hpp" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "realpaver/wrapper_interval_link.hpp") CONFIG_LINKS="$CONFIG_LINKS realpaver/wrapper_interval_link.hpp:realpaver/wrapper_interval_${use_itvlib}.hpp" ;;
-    "realpaver/wrapper_lpsolver_link.hpp") CONFIG_LINKS="$CONFIG_LINKS realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp" ;;
+    "src/realpaver/interval_impl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/interval_impl.hpp:src/realpaver/wrapper_interval_${use_itvlib}.hpp" ;;
+    "src/realpaver/lpsolver.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
     "doc/Doxyfile") CONFIG_FILES="$CONFIG_FILES doc/Doxyfile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
-    "realpaver/Makefile") CONFIG_FILES="$CONFIG_FILES realpaver/Makefile" ;;
+    "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
+    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/realpaver/Makefile") CONFIG_FILES="$CONFIG_FILES src/realpaver/Makefile" ;;
     "work/Makefile") CONFIG_FILES="$CONFIG_FILES work/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -19386,7 +19388,7 @@ fi
 echo ""
 printf "Realpaver v. 1.0 configured\n"
 printf "\tInterval library   : ${use_itvlib}\n"
-printf "\tLinear solver      : ${use_lplib}\n"
+printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
 printf "\tLog files          : ${enable_log}\n"
 printf "\tAssertion checking : ${enable_assert}\n"

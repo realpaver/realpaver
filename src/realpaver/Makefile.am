@@ -39,19 +39,21 @@ librealpaver_la_include_HEADERS = \
 		dag.hpp \
 		inflator.hpp \
 		interval.hpp \
+		interval_impl.hpp \
 		interval_slicer.hpp \
 		interval_union.hpp \
-		lp_model.hpp \
+		lpmodel.hpp \
+		lpsolver.hpp \
 		newton.hpp \
 		number.hpp \
 		obj.hpp \
 		param.hpp \
 		parser.hpp \
 		parser_bison.hpp \
-		point.hpp \
 		problem.hpp \
 		propagator.hpp \
 		real_fun.hpp \
+		real_vector.hpp \
 		scope.hpp \
 		scope_map.hpp \
 		stopping.hpp \
@@ -97,17 +99,17 @@ librealpaver_la_SOURCES = \
 		interval.cpp \
 		interval_slicer.cpp \
 		interval_union.cpp \
-		lp_model.cpp \
+		lpmodel.cpp \
 		newton.cpp \
 		obj.cpp \
 		param.cpp \
 		parser_bison.ypp \
 		parser_flex.lpp \
 		parser.cpp \
-		point.cpp \
 		problem.cpp \
 		propagator.cpp \
 		real_fun.cpp \
+		real_vector.cpp \
 		scope.cpp \
 		scope_map.cpp \
 		stopping.cpp \

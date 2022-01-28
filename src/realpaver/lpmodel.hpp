@@ -9,8 +9,8 @@
 // See the file COPYING.                                                     //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LP_MODEL_HPP
-#define REALPAVER_LP_MODEL_HPP
+#ifndef REALPAVER_LPMODEL_HPP
+#define REALPAVER_LPMODEL_HPP
 
 #include <iostream>
 #include <memory>

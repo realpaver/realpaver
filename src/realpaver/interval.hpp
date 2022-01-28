@@ -5,7 +5,7 @@
 
 #include <utility>
 #include "realpaver/common.hpp"
-#include "realpaver/wrapper_interval_link.hpp"
+#include "realpaver/interval_impl.hpp"
 
 namespace realpaver {
 

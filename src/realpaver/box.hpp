@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 #include "realpaver/interval.hpp"
-#include "realpaver/point.hpp"
+#include "realpaver/real_vector.hpp"
 #include "realpaver/scope.hpp"
 
 namespace realpaver {
@@ -67,13 +67,13 @@ public:
    bool isInf() const;
 
    // midpoint
-   Point midpoint() const;
+   RealVector midpoint() const;
 
    // corner of this box made from all the left bounds
-   Point lCorner() const;
+   RealVector lCorner() const;
 
    // corner of this box made from all the right bounds
-   Point rCorner() const;
+   RealVector rCorner() const;
 
    // set operations
    bool contains(const Box& other) const;

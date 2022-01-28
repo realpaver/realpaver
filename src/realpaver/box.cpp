@@ -171,27 +171,27 @@ bool Box::overlaps(const Box& other) const
    return true;
 }
 
-Point Box::midpoint() const
+RealVector Box::midpoint() const
 {
-   Point P( size() );
+   RealVector P( size() );
    for (size_t i=0; i<size(); ++i)
       P.set(i, v_[i].midpoint());
 
    return P;
 }
 
-Point Box::lCorner() const
+RealVector Box::lCorner() const
 {
-   Point P( size() );
+   RealVector P( size() );
    for (size_t i=0; i<size(); ++i)
       P.set(i, v_[i].left());
 
    return P;
 }
 
-Point Box::rCorner() const
+RealVector Box::rCorner() const
 {
-   Point P( size() );
+   RealVector P( size() );
    for (size_t i=0; i<size(); ++i)
       P.set(i, v_[i].right());
 

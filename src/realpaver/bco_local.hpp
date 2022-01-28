@@ -4,7 +4,7 @@
 #define REALPAVER_BCO_LOCAL_HPP
 
 #include "realpaver/box.hpp"
-#include "realpaver/point.hpp"
+#include "realpaver/real_vector.hpp"
 
 namespace realpaver {
 
@@ -18,16 +18,16 @@ public:
 
    // local optimization from x in region
    // returns true if the local solver converges
-   virtual bool minimize(const Box& region, const Point& x) = 0;
+   virtual bool minimize(const Box& region, const RealVector& x) = 0;
 
    // returns the initial point given as input of minimize
-   virtual Point initialPoint() const = 0;
+   virtual RealVector initialPoint() const = 0;
 
    // returns the value of the objective function at the initial point
    virtual double initialBound() const = 0;
 
    // returns the point calculated by minimize
-   virtual Point finalPoint() const = 0;
+   virtual RealVector finalPoint() const = 0;
 
    // returns the value of the objective function at the final point
    virtual double finalBound() const = 0;

@@ -3,7 +3,7 @@
 #ifndef REALPAVER_REAL_FUN_HPP
 #define REALPAVER_REAL_FUN_HPP
 
-#include "realpaver/point.hpp"
+#include "realpaver/real_vector.hpp"
 #include "realpaver/scope.hpp"
 
 namespace realpaver {
@@ -17,13 +17,13 @@ public:
    virtual ~RealFun();
 
    // evaluates this function at x
-   virtual double reval(const Point& x) = 0;
+   virtual double reval(const RealVector& x) = 0;
 
    // evaluates the gradient g of this function at x
-   virtual void rdiff(const Point& x, Point& g) = 0;
+   virtual void rdiff(const RealVector& x, RealVector& g) = 0;
 
    // evaluates this function at x and the gradient g of this function at x
-   virtual void revalDiff(const Point& x, double& val, Point& g) = 0;
+   virtual void revalDiff(const RealVector& x, double& val, RealVector& g) = 0;
 };
 
 } // namespace

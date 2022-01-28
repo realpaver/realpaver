@@ -113,7 +113,7 @@ bool BcoDag::checkProblem()
    return res;
 }
 
-double BcoDag::reval(const Point& x)
+double BcoDag::reval(const RealVector& x)
 {
    // equation representing the objective function
    // z +/- obj = 0
@@ -124,7 +124,7 @@ double BcoDag::reval(const Point& x)
    return f->node(f->nbNode() - 2)->rval();
 }
 
-void BcoDag::rdiff(const Point& x, Point& g)
+void BcoDag::rdiff(const RealVector& x, RealVector& g)
 {
    ASSERT(g.size() == dim(), "gradient with a bad dimension");
 
@@ -136,7 +136,7 @@ void BcoDag::rdiff(const Point& x, Point& g)
       g.set(i, dag_->fun(i)->rval());   
 }
 
-void BcoDag::revalDiff(const Point& x, double& val, Point& g)
+void BcoDag::revalDiff(const RealVector& x, double& val, RealVector& g)
 {
    // evaluates the dag
    dag_->reval(x);

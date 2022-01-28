@@ -46,7 +46,7 @@ Proof BcoContractor::contract(Box& B)
    {
       // monotone function => finds the sign of the derivative at some
       // point of B
-      Point P( copy.midpoint() );
+      RealVector P( copy.midpoint() );
       Interval x = f_->eval(P);
 
       // resets B
@@ -75,7 +75,7 @@ Proof BcoContractor::contract(Box& B)
 
       if (initLB && B[v_].left() != copy[v_].left())
       {
-         Point P( copy.lCorner() );
+         RealVector P( copy.lCorner() );
          Interval x = f_->eval(P);
          if (x.isCertainlyGeZero())
             keepLB = true;
@@ -83,7 +83,7 @@ Proof BcoContractor::contract(Box& B)
 
       if (initRB && B[v_].right() != copy[v_].right())
       {
-         Point P( copy.rCorner() );
+         RealVector P( copy.rCorner() );
          Interval x = f_->eval(P);
          if (x.isCertainlyLeZero())
             keepRB = true;

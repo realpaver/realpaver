@@ -62,9 +62,9 @@ public:
 
    // @Override
    // evaluation and differentiation of the objective function over the reals
-   double reval(const Point& x);
-   void rdiff(const Point& x, Point& g);
-   void revalDiff(const Point& x, double& val, Point& g);
+   double reval(const RealVector& x);
+   void rdiff(const RealVector& x, RealVector& g);
+   void revalDiff(const RealVector& x, double& val, RealVector& g);
 
 private:
    Dag* dag_;        // expression graph

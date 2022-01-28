@@ -8,8 +8,8 @@ AC_INIT([realpaver_name],
         [laurent.granvilliers@univ-nantes.fr])
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_SRCDIR([realpaver/config.hpp])
-AC_CONFIG_HEADERS([realpaver/configure.hpp])
+AC_CONFIG_SRCDIR([src/realpaver/config.hpp])
+AC_CONFIG_HEADERS([src/realpaver/configure.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 
 REALPAVER_VERSION=realpaver_version
@@ -136,7 +136,7 @@ if test "${use_itvlib}" = "gaol"; then
       INTERVAL_LIB=$LIBS
       AC_DEFINE(INTERVAL_LIB_GAOL,1,
             [Define to 1 to use the Gaol interval arithmetic library.])
-      AC_CONFIG_LINKS([realpaver/wrapper_interval_link.hpp:realpaver/wrapper_interval_${use_itvlib}.hpp])
+      AC_CONFIG_LINKS([src/realpaver/interval_impl.hpp:src/realpaver/wrapper_interval_${use_itvlib}.hpp])
    else
       AC_MSG_ERROR("gaol library not found")
    fi
@@ -234,7 +234,7 @@ if test "${with_lplib}" = "clp"; then
 fi
 
 AC_SUBST(LP_LIB)
-AC_CONFIG_LINKS([realpaver/wrapper_lpsolver_link.hpp:realpaver/wrapper_lpsolver_${use_lplib}.hpp])
+AC_CONFIG_LINKS([src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp])
 AM_CONDITIONAL([COND_LP_GUROBI], [test ${use_lplib} = "gurobi"])
 AM_CONDITIONAL([COND_LP_CLP], [test ${use_lplib} = "clp"])
 
@@ -342,7 +342,9 @@ AC_CONFIG_FILES([Makefile
                  check/Makefile
                  doc/Doxyfile
                  doc/Makefile
-                 realpaver/Makefile
+                 examples/Makefile
+                 src/Makefile
+                 src/realpaver/Makefile
                  work/Makefile])
 AC_OUTPUT
 
@@ -351,7 +353,7 @@ AC_OUTPUT
 echo ""
 printf "Realpaver v. realpaver_version configured\n"
 printf "\tInterval library   : ${use_itvlib}\n"
-printf "\tLinear solver      : ${use_lplib}\n"
+printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
 printf "\tLog files          : ${enable_log}\n"
 printf "\tAssertion checking : ${enable_assert}\n"

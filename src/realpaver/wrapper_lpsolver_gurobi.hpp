@@ -9,16 +9,17 @@
 // See the file COPYING.                                                     //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_WRAPPER_LPSOLVER_CLP_HPP
-#define REALPAVER_WRAPPER_LPSOLVER_CLP_HPP
+#ifndef REALPAVER_WRAPPER_LPSOLVER_GUROBI_HPP
+#define REALPAVER_WRAPPER_LPSOLVER_GUROBI_HPP
 
-#include <ClpSimplex.hpp>
-#include "realpaver/lp_model.hpp"
+#include <vector>
+#include <gurobi_c++.h>
+#include "realpaver/lpmodel.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a wrapper class for the LP solver Clp.
+/// @brief This is a wrapper class for the LP solver Gurobi.
 ///
 /// It inherits the methods for creating a model from its base class.
 /// It overrides the optimization method.
@@ -40,17 +41,20 @@ public:
    /// Overrides the optimization method
    /// @return true if an optimal solution is found
    ///
-   /// A Clp model is created first from the LP model. Then the initialSolve
-   /// method of Clp is executed.
+   /// A Gurobi model is created first from the LP model. Then the optimize
+   /// method of Gurobi is executed.
    bool optimize();
 
 private:
-   ClpSimplex* simplex_;
-  
-   void makeVars();
-   void makeCtrs();
-   void makeObj();
-   void makeClpSimplex();
+  GRBEnv* env_;
+  GRBModel* simplex_;
+  std::vector<GRBVar> vars_;
+
+  void makeVars();
+  GRBLinExpr makeGrbLinExpr(LinExpr e);
+  void makeCtrs();
+  void makeObj();
+  void makeGurobiSimplex();
 };
 
 } // namespace

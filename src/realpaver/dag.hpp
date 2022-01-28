@@ -9,7 +9,7 @@
 #include "realpaver/bitset.hpp"
 #include "realpaver/box.hpp"
 #include "realpaver/constraint.hpp"
-#include "realpaver/point.hpp"
+#include "realpaver/real_vector.hpp"
 
 namespace realpaver {
 
@@ -116,7 +116,7 @@ public:
 
    // interval evaluation given the vector of variable values P
    // assigns the result in val_
-   virtual void eval(const Point& P) = 0;
+   virtual void eval(const RealVector& P) = 0;
 
    // interval evaluation given a new domain x for the variable id
    // this node is evaluated only if it depends on this variable
@@ -140,7 +140,7 @@ public:
 
    // point evaluation given the vector of variable values P
    // assigns the result in rval_
-   virtual void reval(const Point& P) = 0;
+   virtual void reval(const RealVector& P) = 0;
 
    // point differentiation in reverse mode
    // assumes that a point evaluation has been done
@@ -284,12 +284,12 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval(const Box& B);
-   void eval(const Point& P);
+   void eval(const RealVector& P);
    void evalOnly(size_t id, const Interval& x);
    void proj(Box& B);
    bool diff();
    bool diffOnly(size_t id);
-   void reval(const Point& P);
+   void reval(const RealVector& P);
    bool rdiff();
 
    // returns the constant interval value
@@ -320,12 +320,12 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval(const Box& B);
-   void eval(const Point& P);
+   void eval(const RealVector& P);
    void evalOnly(size_t id, const Interval& x);
    void proj(Box& B);
    bool diff();
    bool diffOnly(size_t id);
-   void reval(const Point& P);
+   void reval(const RealVector& P);
    bool rdiff();
 
 private:
@@ -371,10 +371,10 @@ public:
    size_t nbOcc(size_t id) const;
    virtual void print(std::ostream& os) const;
    void eval(const Box& B);
-   void eval(const Point& P);
+   void eval(const RealVector& P);
    void evalOnly(size_t id, const Interval& x);
    bool diffOnly(size_t id);
-   void reval(const Point& P);
+   void reval(const RealVector& P);
 
 private:
    OpSymbol symb_;
@@ -390,12 +390,12 @@ inline void DagOp::eval(const Box& B)
    eval();
 }
 
-inline void DagOp::eval(const Point& P)
+inline void DagOp::eval(const RealVector& P)
 {
    eval();
 }
 
-inline void DagOp::reval(const Point& P)
+inline void DagOp::reval(const RealVector& P)
 {
    reval();
 }
@@ -759,7 +759,7 @@ public:
 
    // interval evaluation
    Interval eval(const Box& B);
-   Interval eval(const Point& P);
+   Interval eval(const RealVector& P);
 
    // interval evaluation given a new domain x for v
    // only the nodes depending on the variable id are evaluated
@@ -804,7 +804,7 @@ public:
    const Interval& deriv(const Variable& v) const;
 
    // point evaluation
-   double reval(const Point& P);
+   double reval(const RealVector& P);
 
    // access to the result of the point evaluation
    double rval() const;
@@ -812,7 +812,7 @@ public:
    // point differentiation in reverse mode
    // evaluates first this function
    // returns false if this function is discontinuous, true otherwise
-   bool rdiff(const Point& P);
+   bool rdiff(const RealVector& P);
 
    // point differentiation in reverse mode
    // assumes that this function has been evaluated
@@ -820,8 +820,8 @@ public:
    bool rdiff();
 
    // access to the gradient
-   Point rgrad() const;
-   void toRgrad(Point& G) const;
+   RealVector rgrad() const;
+   void toRgrad(RealVector& G) const;
 
    // access to the partial derivative with respect to the i-th variable
    // in this function (i-th component of the gradient)
@@ -1042,7 +1042,7 @@ public:
    void reduceDom(size_t i, const Interval& x);
 
    // point evaluation
-   void reval(const Point& P);
+   void reval(const RealVector& P);
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

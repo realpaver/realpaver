@@ -95,7 +95,7 @@ host_triplet = @host@
 @COND_LP_GUROBI_TRUE@am__append_2 = wrapper_lpsolver_gurobi.hpp
 @COND_LP_CLP_TRUE@am__append_3 = wrapper_lpsolver_clp.cpp
 @COND_LP_GUROBI_TRUE@am__append_4 = wrapper_lpsolver_gurobi.cpp
-subdir = realpaver
+subdir = src/realpaver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -107,8 +107,7 @@ DIST_COMMON = $(srcdir)/Makefile.am \
 	$(am__librealpaver_la_include_HEADERS_DIST) $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = configure.hpp
-CONFIG_CLEAN_FILES = wrapper_interval_link.hpp \
-	wrapper_lpsolver_link.hpp
+CONFIG_CLEAN_FILES = interval_impl.hpp lpsolver.hpp
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -147,9 +146,9 @@ am__librealpaver_la_SOURCES_DIST = bco_dag.cpp bco_local.cpp \
 	contractor_bc4.cpp contractor_bco.cpp contractor_cid.cpp \
 	contractor_hc4.cpp contractor_int.cpp contractor_pool.cpp \
 	dag.cpp inflator.cpp interval.cpp interval_slicer.cpp \
-	interval_union.cpp lp_model.cpp newton.cpp obj.cpp param.cpp \
-	parser_bison.ypp parser_flex.lpp parser.cpp point.cpp \
-	problem.cpp propagator.cpp real_fun.cpp scope.cpp \
+	interval_union.cpp lpmodel.cpp newton.cpp obj.cpp param.cpp \
+	parser_bison.ypp parser_flex.lpp parser.cpp problem.cpp \
+	propagator.cpp real_fun.cpp real_vector.cpp scope.cpp \
 	scope_map.cpp stopping.cpp term.cpp term_deriver.cpp \
 	term_fixer.cpp timer.cpp thick_fun.cpp uni_fun.cpp \
 	variable.cpp wrapper_lpsolver_clp.cpp \
@@ -162,9 +161,9 @@ am_librealpaver_la_OBJECTS = bco_dag.lo bco_local.lo bco_model.lo \
 	contractor.lo contractor_bc3.lo contractor_bc4.lo \
 	contractor_bco.lo contractor_cid.lo contractor_hc4.lo \
 	contractor_int.lo contractor_pool.lo dag.lo inflator.lo \
-	interval.lo interval_slicer.lo interval_union.lo lp_model.lo \
+	interval.lo interval_slicer.lo interval_union.lo lpmodel.lo \
 	newton.lo obj.lo param.lo parser_bison.lo parser_flex.lo \
-	parser.lo point.lo problem.lo propagator.lo real_fun.lo \
+	parser.lo problem.lo propagator.lo real_fun.lo real_vector.lo \
 	scope.lo scope_map.lo stopping.lo term.lo term_deriver.lo \
 	term_fixer.lo timer.lo thick_fun.lo uni_fun.lo variable.lo \
 	$(am__objects_1) $(am__objects_2)
@@ -255,10 +254,11 @@ am__librealpaver_la_include_HEADERS_DIST = bco_dag.hpp bco_local.hpp \
 	constraint_relaxor.hpp contractor.hpp contractor_bc3.hpp \
 	contractor_bc4.hpp contractor_bco.hpp contractor_cid.hpp \
 	contractor_hc4.hpp contractor_int.hpp contractor_pool.hpp \
-	dag.hpp inflator.hpp interval.hpp interval_slicer.hpp \
-	interval_union.hpp lp_model.hpp newton.hpp number.hpp obj.hpp \
-	param.hpp parser.hpp parser_bison.hpp point.hpp problem.hpp \
-	propagator.hpp real_fun.hpp scope.hpp scope_map.hpp \
+	dag.hpp inflator.hpp interval.hpp interval_impl.hpp \
+	interval_slicer.hpp interval_union.hpp lpmodel.hpp \
+	lpsolver.hpp newton.hpp number.hpp obj.hpp param.hpp \
+	parser.hpp parser_bison.hpp problem.hpp propagator.hpp \
+	real_fun.hpp real_vector.hpp scope.hpp scope_map.hpp \
 	stopping.hpp term.hpp term_deriver.hpp term_fixer.hpp \
 	thick_fun.hpp timer.hpp uni_fun.hpp variable.hpp \
 	wrapper_interval_gaol.hpp wrapper_lpsolver_clp.hpp \
@@ -436,10 +436,11 @@ librealpaver_la_include_HEADERS = bco_dag.hpp bco_local.hpp \
 	constraint_relaxor.hpp contractor.hpp contractor_bc3.hpp \
 	contractor_bc4.hpp contractor_bco.hpp contractor_cid.hpp \
 	contractor_hc4.hpp contractor_int.hpp contractor_pool.hpp \
-	dag.hpp inflator.hpp interval.hpp interval_slicer.hpp \
-	interval_union.hpp lp_model.hpp newton.hpp number.hpp obj.hpp \
-	param.hpp parser.hpp parser_bison.hpp point.hpp problem.hpp \
-	propagator.hpp real_fun.hpp scope.hpp scope_map.hpp \
+	dag.hpp inflator.hpp interval.hpp interval_impl.hpp \
+	interval_slicer.hpp interval_union.hpp lpmodel.hpp \
+	lpsolver.hpp newton.hpp number.hpp obj.hpp param.hpp \
+	parser.hpp parser_bison.hpp problem.hpp propagator.hpp \
+	real_fun.hpp real_vector.hpp scope.hpp scope_map.hpp \
 	stopping.hpp term.hpp term_deriver.hpp term_fixer.hpp \
 	thick_fun.hpp timer.hpp uni_fun.hpp variable.hpp \
 	wrapper_interval_gaol.hpp $(am__append_1) $(am__append_2)
@@ -450,9 +451,9 @@ librealpaver_la_SOURCES = bco_dag.cpp bco_local.cpp bco_model.cpp \
 	contractor_bco.cpp contractor_cid.cpp contractor_hc4.cpp \
 	contractor_int.cpp contractor_pool.cpp dag.cpp inflator.cpp \
 	interval.cpp interval_slicer.cpp interval_union.cpp \
-	lp_model.cpp newton.cpp obj.cpp param.cpp parser_bison.ypp \
-	parser_flex.lpp parser.cpp point.cpp problem.cpp \
-	propagator.cpp real_fun.cpp scope.cpp scope_map.cpp \
+	lpmodel.cpp newton.cpp obj.cpp param.cpp parser_bison.ypp \
+	parser_flex.lpp parser.cpp problem.cpp propagator.cpp \
+	real_fun.cpp real_vector.cpp scope.cpp scope_map.cpp \
 	stopping.cpp term.cpp term_deriver.cpp term_fixer.cpp \
 	timer.cpp thick_fun.cpp uni_fun.cpp variable.cpp \
 	$(am__append_3) $(am__append_4)
@@ -480,9 +481,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign realpaver/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/realpaver/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign realpaver/Makefile
+	  $(AUTOMAKE) --foreign src/realpaver/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -507,7 +508,7 @@ configure.hpp: stamp-h1
 
 stamp-h1: $(srcdir)/configure.hpp.in $(top_builddir)/config.status
 	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status realpaver/configure.hpp
+	cd $(top_builddir) && $(SHELL) ./config.status src/realpaver/configure.hpp
 $(srcdir)/configure.hpp.in:  $(am__configure_deps) 
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
@@ -587,17 +588,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_slicer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_union.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lp_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lpmodel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_bison.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_flex.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/propagator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/real_fun.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/real_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scope_map.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stopping.Plo@am__quote@

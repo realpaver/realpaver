@@ -75,7 +75,7 @@ void DagConst::eval(const Box& B)
    setVal(x_);
 }
 
-void DagConst::eval(const Point& P)
+void DagConst::eval(const RealVector& P)
 {
    setVal(x_);
 }
@@ -100,7 +100,7 @@ bool DagConst::diffOnly(size_t id)
    return true;
 }
 
-void DagConst::reval(const Point& P)
+void DagConst::reval(const RealVector& P)
 {
    setRval(x_.midpoint());
 }
@@ -139,7 +139,7 @@ void DagVar::eval(const Box& B)
    setVal(B[v_.id()]);
 }
 
-void DagVar::eval(const Point& P)
+void DagVar::eval(const RealVector& P)
 {
    setVal(P[v_.id()]);
 }
@@ -165,7 +165,7 @@ bool DagVar::diffOnly(size_t id)
    return true;
 }
 
-void DagVar::reval(const Point& P)
+void DagVar::reval(const RealVector& P)
 {
    setRval(P[v_.id()]);
 }
@@ -1135,7 +1135,7 @@ Interval DagFun::eval(const Box& B)
    return rootNode()->val();
 }
 
-Interval DagFun::eval(const Point& P)
+Interval DagFun::eval(const RealVector& P)
 {
    for (size_t i=0; i<nbNode(); ++i)
       node_[i]->eval(P);
@@ -1371,7 +1371,7 @@ bool DagFun::diffOnly(size_t id, const Interval& x)
    return diffOnly(id);
 }
 
-double DagFun::reval(const Point& P)
+double DagFun::reval(const RealVector& P)
 {
    Double::rndNear();
 
@@ -1381,7 +1381,7 @@ double DagFun::reval(const Point& P)
    return rootNode()->rval();
 }
 
-bool DagFun::rdiff(const Point& P)
+bool DagFun::rdiff(const RealVector& P)
 {
    reval(P);
    return rdiff();
@@ -1411,14 +1411,14 @@ bool DagFun::rdiff()
    return res;
 }
 
-Point DagFun::rgrad() const
+RealVector DagFun::rgrad() const
 {
-   Point G(nbVar());
+   RealVector G(nbVar());
    toRgrad(G);
    return G;
 }
 
-void DagFun::toRgrad(Point& G) const
+void DagFun::toRgrad(RealVector& G) const
 {
    for (size_t i=0; i<nbVar(); ++i)
       G.set(i, rderiv(i));
@@ -1613,7 +1613,7 @@ Scope Dag::scope() const
    return res;
 }
 
-void Dag::reval(const Point& P)
+void Dag::reval(const RealVector& P)
 {
    Double::rndNear();
 

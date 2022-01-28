@@ -128,12 +128,12 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/locale_facets.tcc \
  /usr/include/c++/7/bits/basic_ios.tcc \
  /usr/include/c++/7/bits/ostream.tcc /usr/include/c++/7/istream \
- /usr/include/c++/7/bits/istream.tcc ../realpaver/problem.hpp \
+ /usr/include/c++/7/bits/istream.tcc ../src/realpaver/problem.hpp \
  /usr/include/c++/7/vector /usr/include/c++/7/bits/stl_construct.h \
  /usr/include/c++/7/bits/stl_uninitialized.h \
  /usr/include/c++/7/bits/stl_vector.h \
  /usr/include/c++/7/bits/stl_bvector.h /usr/include/c++/7/bits/vector.tcc \
- ../realpaver/box.hpp /usr/include/c++/7/memory \
+ ../src/realpaver/box.hpp /usr/include/c++/7/memory \
  /usr/include/c++/7/bits/stl_tempbuf.h \
  /usr/include/c++/7/bits/stl_raw_storage_iter.h \
  /usr/include/c++/7/ext/concurrence.h \
@@ -149,14 +149,14 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/shared_ptr_atomic.h \
  /usr/include/c++/7/bits/atomic_base.h \
  /usr/include/c++/7/bits/atomic_lockfree_defines.h \
- /usr/include/c++/7/backward/auto_ptr.h ../realpaver/interval.hpp \
- ../realpaver/common.hpp /usr/include/c++/7/fstream \
+ /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/interval.hpp \
+ ../src/realpaver/common.hpp /usr/include/c++/7/fstream \
  /usr/include/c++/7/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
  /usr/include/c++/7/bits/fstream.tcc /usr/include/c++/7/sstream \
- /usr/include/c++/7/bits/sstream.tcc ../realpaver/config.hpp \
- ../realpaver/configure.hpp ../realpaver/wrapper_interval_link.hpp \
+ /usr/include/c++/7/bits/sstream.tcc ../src/realpaver/config.hpp \
+ ../src/realpaver/configure.hpp ../src/realpaver/interval_impl.hpp \
  /home/granvilliers-l/local/include/gaol/gaol \
  /home/granvilliers-l/local/include/gaol/gaol_config.h \
  /home/granvilliers-l/local/include/gaol/gaol_configuration.h \
@@ -192,34 +192,35 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /home/granvilliers-l/local/include/gaol/gaol_interval2f.h \
  /usr/lib/gcc/x86_64-linux-gnu/7/include/pmmintrin.h \
  /home/granvilliers-l/local/include/gaol/gaol_allocator.h \
- ../realpaver/point.hpp ../realpaver/number.hpp /usr/include/c++/7/cfenv \
- ../realpaver/scope.hpp /usr/include/c++/7/map \
- /usr/include/c++/7/bits/stl_tree.h /usr/include/c++/7/bits/stl_map.h \
- /usr/include/c++/7/bits/stl_multimap.h ../realpaver/bitset.hpp \
- ../realpaver/scope_map.hpp /usr/include/c++/7/unordered_map \
- /usr/include/c++/7/bits/hashtable.h \
+ ../src/realpaver/real_vector.hpp ../src/realpaver/number.hpp \
+ /usr/include/c++/7/cfenv ../src/realpaver/scope.hpp \
+ /usr/include/c++/7/map /usr/include/c++/7/bits/stl_tree.h \
+ /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
+ ../src/realpaver/bitset.hpp ../src/realpaver/scope_map.hpp \
+ /usr/include/c++/7/unordered_map /usr/include/c++/7/bits/hashtable.h \
  /usr/include/c++/7/bits/hashtable_policy.h \
- /usr/include/c++/7/bits/unordered_map.h ../realpaver/variable.hpp \
- ../realpaver/stopping.hpp ../realpaver/constraint.hpp \
- ../realpaver/term.hpp ../realpaver/obj.hpp \
- ../realpaver/contractor_bc3.hpp ../realpaver/contractor.hpp \
- ../realpaver/interval_slicer.hpp /usr/include/c++/7/list \
+ /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/variable.hpp \
+ ../src/realpaver/stopping.hpp ../src/realpaver/constraint.hpp \
+ ../src/realpaver/term.hpp ../src/realpaver/obj.hpp \
+ ../src/realpaver/contractor_bc3.hpp ../src/realpaver/contractor.hpp \
+ ../src/realpaver/interval_slicer.hpp /usr/include/c++/7/list \
  /usr/include/c++/7/bits/stl_list.h /usr/include/c++/7/bits/list.tcc \
- ../realpaver/newton.hpp ../realpaver/inflator.hpp \
- ../realpaver/uni_fun.hpp ../realpaver/thick_fun.hpp ../realpaver/dag.hpp \
- /usr/include/c++/7/unordered_set /usr/include/c++/7/bits/unordered_set.h \
- ../realpaver/contractor_bc4.hpp ../realpaver/contractor_hc4.hpp \
- ../realpaver/interval_union.hpp ../realpaver/term_deriver.hpp \
- ../realpaver/term_fixer.hpp ../realpaver/timer.hpp \
+ ../src/realpaver/newton.hpp ../src/realpaver/inflator.hpp \
+ ../src/realpaver/uni_fun.hpp ../src/realpaver/thick_fun.hpp \
+ ../src/realpaver/dag.hpp /usr/include/c++/7/unordered_set \
+ /usr/include/c++/7/bits/unordered_set.h \
+ ../src/realpaver/contractor_bc4.hpp ../src/realpaver/contractor_hc4.hpp \
+ ../src/realpaver/interval_union.hpp ../src/realpaver/term_deriver.hpp \
+ ../src/realpaver/term_fixer.hpp ../src/realpaver/timer.hpp \
  /usr/include/c++/7/chrono /usr/include/c++/7/ratio \
  /usr/include/c++/7/ctime /usr/include/c++/7/bits/parse_numbers.h \
- ../realpaver/contractor_int.hpp ../realpaver/bco_model.hpp \
- ../realpaver/bco_dag.hpp ../realpaver/contractor_bco.hpp \
- ../realpaver/propagator.hpp ../realpaver/contractor_pool.hpp \
- ../realpaver/real_fun.hpp ../realpaver/bco_local.hpp \
- ../realpaver/bco_space.hpp /usr/include/c++/7/set \
+ ../src/realpaver/contractor_int.hpp ../src/realpaver/bco_model.hpp \
+ ../src/realpaver/bco_dag.hpp ../src/realpaver/contractor_bco.hpp \
+ ../src/realpaver/propagator.hpp ../src/realpaver/contractor_pool.hpp \
+ ../src/realpaver/real_fun.hpp ../src/realpaver/bco_local.hpp \
+ ../src/realpaver/bco_space.hpp /usr/include/c++/7/set \
  /usr/include/c++/7/bits/stl_set.h /usr/include/c++/7/bits/stl_multiset.h \
- ../realpaver/bco_node.hpp ../realpaver/param.hpp
+ ../src/realpaver/bco_node.hpp ../src/realpaver/param.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -549,7 +550,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/istream.tcc:
 
-../realpaver/problem.hpp:
+../src/realpaver/problem.hpp:
 
 /usr/include/c++/7/vector:
 
@@ -563,7 +564,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/vector.tcc:
 
-../realpaver/box.hpp:
+../src/realpaver/box.hpp:
 
 /usr/include/c++/7/memory:
 
@@ -605,9 +606,9 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/backward/auto_ptr.h:
 
-../realpaver/interval.hpp:
+../src/realpaver/interval.hpp:
 
-../realpaver/common.hpp:
+../src/realpaver/common.hpp:
 
 /usr/include/c++/7/fstream:
 
@@ -623,11 +624,11 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/sstream.tcc:
 
-../realpaver/config.hpp:
+../src/realpaver/config.hpp:
 
-../realpaver/configure.hpp:
+../src/realpaver/configure.hpp:
 
-../realpaver/wrapper_interval_link.hpp:
+../src/realpaver/interval_impl.hpp:
 
 /home/granvilliers-l/local/include/gaol/gaol:
 
@@ -705,13 +706,13 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /home/granvilliers-l/local/include/gaol/gaol_allocator.h:
 
-../realpaver/point.hpp:
+../src/realpaver/real_vector.hpp:
 
-../realpaver/number.hpp:
+../src/realpaver/number.hpp:
 
 /usr/include/c++/7/cfenv:
 
-../realpaver/scope.hpp:
+../src/realpaver/scope.hpp:
 
 /usr/include/c++/7/map:
 
@@ -721,9 +722,9 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/stl_multimap.h:
 
-../realpaver/bitset.hpp:
+../src/realpaver/bitset.hpp:
 
-../realpaver/scope_map.hpp:
+../src/realpaver/scope_map.hpp:
 
 /usr/include/c++/7/unordered_map:
 
@@ -733,21 +734,21 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/unordered_map.h:
 
-../realpaver/variable.hpp:
+../src/realpaver/variable.hpp:
 
-../realpaver/stopping.hpp:
+../src/realpaver/stopping.hpp:
 
-../realpaver/constraint.hpp:
+../src/realpaver/constraint.hpp:
 
-../realpaver/term.hpp:
+../src/realpaver/term.hpp:
 
-../realpaver/obj.hpp:
+../src/realpaver/obj.hpp:
 
-../realpaver/contractor_bc3.hpp:
+../src/realpaver/contractor_bc3.hpp:
 
-../realpaver/contractor.hpp:
+../src/realpaver/contractor.hpp:
 
-../realpaver/interval_slicer.hpp:
+../src/realpaver/interval_slicer.hpp:
 
 /usr/include/c++/7/list:
 
@@ -755,31 +756,31 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/list.tcc:
 
-../realpaver/newton.hpp:
+../src/realpaver/newton.hpp:
 
-../realpaver/inflator.hpp:
+../src/realpaver/inflator.hpp:
 
-../realpaver/uni_fun.hpp:
+../src/realpaver/uni_fun.hpp:
 
-../realpaver/thick_fun.hpp:
+../src/realpaver/thick_fun.hpp:
 
-../realpaver/dag.hpp:
+../src/realpaver/dag.hpp:
 
 /usr/include/c++/7/unordered_set:
 
 /usr/include/c++/7/bits/unordered_set.h:
 
-../realpaver/contractor_bc4.hpp:
+../src/realpaver/contractor_bc4.hpp:
 
-../realpaver/contractor_hc4.hpp:
+../src/realpaver/contractor_hc4.hpp:
 
-../realpaver/interval_union.hpp:
+../src/realpaver/interval_union.hpp:
 
-../realpaver/term_deriver.hpp:
+../src/realpaver/term_deriver.hpp:
 
-../realpaver/term_fixer.hpp:
+../src/realpaver/term_fixer.hpp:
 
-../realpaver/timer.hpp:
+../src/realpaver/timer.hpp:
 
 /usr/include/c++/7/chrono:
 
@@ -789,23 +790,23 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/parse_numbers.h:
 
-../realpaver/contractor_int.hpp:
+../src/realpaver/contractor_int.hpp:
 
-../realpaver/bco_model.hpp:
+../src/realpaver/bco_model.hpp:
 
-../realpaver/bco_dag.hpp:
+../src/realpaver/bco_dag.hpp:
 
-../realpaver/contractor_bco.hpp:
+../src/realpaver/contractor_bco.hpp:
 
-../realpaver/propagator.hpp:
+../src/realpaver/propagator.hpp:
 
-../realpaver/contractor_pool.hpp:
+../src/realpaver/contractor_pool.hpp:
 
-../realpaver/real_fun.hpp:
+../src/realpaver/real_fun.hpp:
 
-../realpaver/bco_local.hpp:
+../src/realpaver/bco_local.hpp:
 
-../realpaver/bco_space.hpp:
+../src/realpaver/bco_space.hpp:
 
 /usr/include/c++/7/set:
 
@@ -813,6 +814,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/stl_multiset.h:
 
-../realpaver/bco_node.hpp:
+../src/realpaver/bco_node.hpp:
 
-../realpaver/param.hpp:
+../src/realpaver/param.hpp:
