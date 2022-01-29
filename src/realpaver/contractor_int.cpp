@@ -1,6 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/contractor_int.hpp"
+#include "realpaver/Exception.hpp"
 
 namespace realpaver {
 

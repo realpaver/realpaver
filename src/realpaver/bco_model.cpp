@@ -1,6 +1,8 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/bco_model.hpp"
+#include "realpaver/Exception.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/timer.hpp"
 
 namespace realpaver {

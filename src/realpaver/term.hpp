@@ -92,21 +92,6 @@ private:
    OpPriority priority_;
 };
 
-inline OpPriority TermRep::priority() const
-{
-   return priority_;
-}
-
-inline size_t TermRep::hashCode() const
-{
-   return hcode_;
-}
-
-inline bool TermRep::isConstant() const
-{
-   return constant_;
-}
-
 /*****************************************************************************
  * Main class of expressions.
  *****************************************************************************/
@@ -193,96 +178,6 @@ Term cos(const Term& t);
 Term sin(const Term& t);
 Term tan(const Term& t);
 
-inline size_t Term::hashCode() const
-{
-   return rep_->hashCode();
-}
-
-inline void Term::print(std::ostream& os) const
-{
-   rep_->print(os);
-}
-
-inline Interval Term::evalConst() const
-{
-   return rep_->evalConst();
-}
-
-inline Interval Term::eval(const Box& B) const
-{
-   return rep_->eval(B);
-}
-
-inline void Term::acceptVisitor(TermVisitor& vis) const
-{
-   rep_->acceptVisitor(vis);
-}
-
-inline bool Term::dependsOn(const Variable& v) const
-{
-   return rep_->dependsOn(v);
-}
-
-inline void Term::makeScope(Scope& s) const
-{
-   rep_->makeScope(s);
-}
-
-inline Term::SharedRep Term::rep() const
-{
-   return rep_;
-}
-
-inline bool Term::isZero() const
-{
-   return rep_->isZero();
-}
-
-inline bool Term::isOne() const
-{
-   return rep_->isOne();
-}
-
-inline bool Term::isMinusOne() const
-{
-   return rep_->isMinusOne();
-}
-
-inline bool Term::isNumber() const
-{
-   return rep_->isNumber();
-}
-
-inline bool Term::isConstant() const
-{
-   return rep_->isConstant();
-}
-
-inline bool Term::isLinear() const
-{
-   return rep_->isLinear();
-}
-
-inline bool Term::isAdd() const
-{
-   return rep_->isAdd();
-}
-
-inline bool Term::isSub() const
-{
-   return rep_->isSub();
-}
-
-inline bool Term::isMul() const
-{
-   return rep_->isMul();
-}
-
-inline bool Term::isDiv() const
-{
-   return rep_->isDiv();
-}
-
 /*****************************************************************************
  * Class of constant nodes.
  *****************************************************************************/
@@ -310,11 +205,6 @@ private:
    Interval x_;
 };
 
-inline const Interval& TermConst::getVal() const
-{
-   return x_;
-}
-
 /*****************************************************************************
  * Class of variable nodes.
  *****************************************************************************/
@@ -338,11 +228,6 @@ public:
 private:
    Variable v_;
 };
-
-inline Variable TermVar::var() const
-{
-   return v_;
-}
 
 /*****************************************************************************
  * Base class of operation nodes.
@@ -387,44 +272,6 @@ private:
    std::vector<SharedRep> v_;    // sub-terms
    OpSymbol op_;                 // operation symbol
 };
-
-inline size_t TermOp::arity() const
-{
-   return v_.size();
-}
-
-inline OpSymbol TermOp::opSymbol() const
-{
-   return op_;
-}
-
-inline TermRep::SharedRep TermOp::subTerm(size_t i) const
-{
-   ASSERT(i < arity(), "access out of range to a term operand");
-
-   return v_[i];
-}
-
-inline TermRep::SharedRep TermOp::left() const
-{
-   ASSERT(arity() == 2, "access out of range to a term operand");
-
-   return v_[0];
-}
-
-inline TermRep::SharedRep TermOp::right() const
-{
-   ASSERT(arity() == 2, "access out of range to a term operand");
-
-   return v_[1];
-}
-
-inline TermRep::SharedRep TermOp::sub() const
-{
-   ASSERT(arity() == 1, "access out of range to a term operand");
-
-   return v_[0];
-}
 
 /*****************************************************************************
  * Class of nodes: binary addition.
@@ -600,11 +447,6 @@ public:
 private:
    int n_;
 };
-
-inline int TermPow::exponent() const
-{
-   return n_;
-}
 
 /*****************************************************************************
  * Class of nodes: exponential function.

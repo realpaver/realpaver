@@ -1,5 +1,6 @@
 // This file is part of Realpaver. License: see COPYING file.
 
+#include "realpaver/Exception.hpp"
 #include "realpaver/param.hpp"
 #include "realpaver/propagator.hpp"
 

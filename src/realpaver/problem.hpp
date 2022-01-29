@@ -98,55 +98,6 @@ private:
 
 std::ostream& operator<<(std::ostream& os, const Problem& p);
 
-inline size_t Problem::nbVars() const
-{
-   return vars_.size();
-}
-
-inline Variable Problem::varAt(size_t i) const
-{
-   ASSERT(i < vars_.size(), "bad access to the variables in a problem");
-
-   return vars_[i];
-}
-
-inline size_t Problem::nbCtrs() const
-{
-   return ctrs_.size();
-}
-
-inline Constraint Problem::ctrAt(size_t i) const
-{
-   ASSERT(i < ctrs_.size(), "bad access to the constraints in a problem");
-
-   return ctrs_[i];
-}
-
-inline Obj Problem::obj() const
-{
-   return obj_;
-}
-
-inline Scope Problem::scope() const
-{
-   return scope_;
-}
-
-inline bool Problem::isConstrained() const
-{
-   return nbCtrs() > 0;
-}
-
-inline bool Problem::hasObjective() const
-{
-   return !obj_.isConstant();
-}
-
-inline bool Problem::isLinObjective() const
-{
-   return hasObjective() && obj_.isLinear();
-}
-
 } // namespace
 
 #endif

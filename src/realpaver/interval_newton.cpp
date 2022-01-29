@@ -1,19 +1,71 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, a reliable interval solver of nonlinear   //
+//                                 constraint satisfaction and optimization  //
+//                                 problems over the real numbers.           //
+//                                                                           //
+// Copyright (C) 2020-2022 Laboratoire des Sciences du Numérique de Nantes   //
+//                                                                           //
+// Realpaver is a software distributed under the terms of the MIT License.   //
+// See the file COPYING.                                                     //
+///////////////////////////////////////////////////////////////////////////////
 
 #include <limits>
-#include "realpaver/newton.hpp"
+#include "realpaver/Exception.hpp"
+#include "realpaver/interval_newton.hpp"
 #include "realpaver/param.hpp"
 
 namespace realpaver {
 
-Newton::Newton() :
+IntervalNewton::IntervalNewton() :
    imp_(Param::DefNewtonImprovement()),
-   smax_(Param::DefNewtonMaxSteps()),
+   maxiter_(Param::DefNewtonMaxSteps()),
    prec_(Param::DefNewtonPrecision()),
    inflator_()
 {}
 
-Proof Newton::contract(UniFun& f, Interval& x)
+IntervalImprovement IntervalNewton::getImprovement() const
+{
+   return imp_;
+}
+
+void IntervalNewton::setImprovement(const IntervalImprovement& imp)
+{
+   imp_ = imp;
+}
+
+int IntervalNewton::getMaxIterations() const
+{
+   return maxiter_;
+}
+
+void IntervalNewton::setMaxIterations(int n)
+{
+   ASSERT(n > 0, "bad parameter in the interval Interval Newton method");
+
+   maxiter_ = n;
+}
+
+IntervalPrecision IntervalNewton::getPrecision() const
+{
+   return prec_;
+}
+
+void IntervalNewton::setPrecision(const IntervalPrecision& prec)
+{
+   prec_ = prec;
+}
+
+Inflator IntervalNewton::getInflator() const
+{
+   return inflator_;
+}
+
+void IntervalNewton::setInflator(const Inflator& inflator)
+{
+   inflator_ = inflator;
+}
+
+Proof IntervalNewton::contract(UniFun& f, Interval& x)
 {
    Proof proof = Proof::Maybe;
    Interval y = x;
@@ -39,10 +91,10 @@ Proof Newton::contract(UniFun& f, Interval& x)
          if (!imp_.test(y, prev))
             iter = false;
    
-         if (++steps >= smax_)
+         if (++steps >= maxiter_)
             iter = false;
 
-         if (prec_.test(y))
+         if (prec_.testPrecision(y))
             iter = false;
       }
    }
@@ -52,7 +104,7 @@ Proof Newton::contract(UniFun& f, Interval& x)
    return proof;
 }
 
-Proof Newton::step(UniFun& f, Interval& x)
+Proof IntervalNewton::step(UniFun& f, Interval& x)
 {
    std::pair<Interval,Interval> p = f.evalDiff(x);
    const Interval& fx = p.first;
@@ -108,7 +160,7 @@ Proof Newton::step(UniFun& f, Interval& x)
    return proof;
 }
 
-Proof Newton::localSearch(UniFun& f, Interval& x)
+Proof IntervalNewton::localSearch(UniFun& f, Interval& x)
 {
    Proof proof = Proof::Maybe;
    Interval y = x.midpoint();
@@ -137,7 +189,7 @@ Proof Newton::localSearch(UniFun& f, Interval& x)
          iter = false;
       }
    
-      else if (++steps >= smax_)
+      else if (++steps >= maxiter_)
       {
          y = x;
          iter = false;
@@ -155,7 +207,7 @@ Proof Newton::localSearch(UniFun& f, Interval& x)
    return proof;
 }
 
-Proof Newton::localStep(UniFun& f, Interval& x)
+Proof IntervalNewton::localStep(UniFun& f, Interval& x)
 {
    Interval ix = inflator_.inflate(x);
 

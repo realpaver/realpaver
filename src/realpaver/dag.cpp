@@ -1,6 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/dag.hpp"
+#include "realpaver/Exception.hpp"
 
 namespace realpaver {
 
@@ -1465,6 +1466,13 @@ Dag::~Dag()
       delete fun;
 
    delete defaultContext_;
+}
+
+DagFun* Dag::fun(size_t i) const
+{
+   ASSERT(i < nbFun(), "access out of range of a dag function");
+
+   return fun_[i];
 }
 
 size_t Dag::insert(const Constraint& c)

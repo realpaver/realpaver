@@ -20,84 +20,84 @@ Param::Param()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Precision Param::def_rvar_prec_ = Precision::adaptive(1.0e-8);
+IntervalPrecision Param::def_rvar_prec_ = IntervalPrecision::makeAdaptive(1.0e-8);
 
-Precision Param::DefRealVarPrecision()
+IntervalPrecision Param::DefRealVarPrecision()
 {
    return def_rvar_prec_;
 }
 
-Precision Param::DefRealVarPrecision(const Precision& val)
+IntervalPrecision Param::DefRealVarPrecision(const IntervalPrecision& val)
 {
-   Precision old = def_rvar_prec_;
+   IntervalPrecision old = def_rvar_prec_;
    def_rvar_prec_ = val;
    return old;
 }
 
-Precision Param::realVarPrecision() const
+IntervalPrecision Param::realVarPrecision() const
 {
    return rvar_prec_;
 }
 
-Precision Param::realVarPrecision(const Precision& val)
+IntervalPrecision Param::realVarPrecision(const IntervalPrecision& val)
 {
-   Precision old = rvar_prec_;
+   IntervalPrecision old = rvar_prec_;
    rvar_prec_ = val;
    return old;   
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Precision Param::def_obj_prec_ = Precision::adaptive(1.0e-6);
+IntervalPrecision Param::def_obj_prec_ = IntervalPrecision::makeAdaptive(1.0e-6);
 
-Precision Param::DefObjPrecision()
+IntervalPrecision Param::DefObjPrecision()
 {
    return def_obj_prec_;
 }
 
-Precision Param::DefObjPrecision(const Precision& val)
+IntervalPrecision Param::DefObjPrecision(const IntervalPrecision& val)
 {
-   Precision old = def_obj_prec_;
+   IntervalPrecision old = def_obj_prec_;
    def_obj_prec_ = val;
    return old;
 }
 
-Precision Param::objPrecision() const
+IntervalPrecision Param::objPrecision() const
 {
    return obj_prec_;
 }
 
-Precision Param::objPrecision(const Precision& val)
+IntervalPrecision Param::objPrecision(const IntervalPrecision& val)
 {
-   Precision old = obj_prec_;
+   IntervalPrecision old = obj_prec_;
    obj_prec_ = val;
    return old;   
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Improvement Param::def_newton_imp_( 50.0 );
+IntervalImprovement Param::def_newton_imp_( 50.0 );
 
-Improvement Param::DefNewtonImprovement()
+IntervalImprovement Param::DefNewtonImprovement()
 {
    return def_newton_imp_;
 }
 
-Improvement Param::DefNewtonImprovement(const Improvement& val)
+IntervalImprovement Param::DefNewtonImprovement(const IntervalImprovement& val)
 {
-   Improvement old = def_newton_imp_;
+   IntervalImprovement old = def_newton_imp_;
    def_newton_imp_ = val;
    return old;
 }
 
-Improvement Param::newtonImprovement() const
+IntervalImprovement Param::newtonImprovement() const
 {
    return newton_imp_;
 }
 
-Improvement Param::newtonImprovement(const Improvement& val)
+IntervalImprovement Param::newtonImprovement(const IntervalImprovement& val)
 {
-   Improvement old = newton_imp_;
+   IntervalImprovement old = newton_imp_;
    newton_imp_ = val;
    return old;
 }
@@ -128,28 +128,28 @@ int Param::newtonMaxSteps(const int& val)
    return old;
 }
 
-Precision Param::def_newton_prec_ = 1.0e-8;
+IntervalPrecision Param::def_newton_prec_ = 1.0e-8;
 
-Precision Param::DefNewtonPrecision()
+IntervalPrecision Param::DefNewtonPrecision()
 {
    return def_newton_prec_;
 }
 
-Precision Param::DefNewtonPrecision(const Precision& val)
+IntervalPrecision Param::DefNewtonPrecision(const IntervalPrecision& val)
 {
-   Precision old = def_newton_prec_;
+   IntervalPrecision old = def_newton_prec_;
    def_newton_prec_ = val;
    return old;
 }
 
-Precision Param::newtonPrecision() const
+IntervalPrecision Param::newtonPrecision() const
 {
    return newton_prec_;
 }
 
-Precision Param::newtonPrecision(const Precision& val)
+IntervalPrecision Param::newtonPrecision(const IntervalPrecision& val)
 {
-   Precision old = newton_prec_;
+   IntervalPrecision old = newton_prec_;
    newton_prec_ = val;
    return old;
 }
@@ -264,28 +264,28 @@ int Param::bc3MaxSteps(const int& val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Improvement Param::def_propag_imp_( 10.0 );
+IntervalImprovement Param::def_propag_imp_( 10.0 );
 
-Improvement Param::DefPropagatorImprovement()
+IntervalImprovement Param::DefPropagatorImprovement()
 {
    return def_propag_imp_;
 }
 
-Improvement Param::DefPropagatorImprovement(const Improvement& val)
+IntervalImprovement Param::DefPropagatorImprovement(const IntervalImprovement& val)
 {
-   Improvement old = def_propag_imp_;
+   IntervalImprovement old = def_propag_imp_;
    def_propag_imp_ = val;
    return old;
 }
 
-Improvement Param::propagatorImprovement() const
+IntervalImprovement Param::propagatorImprovement() const
 {
    return propag_imp_;
 }
 
-Improvement Param::propagatorImprovement(const Improvement& val)
+IntervalImprovement Param::propagatorImprovement(const IntervalImprovement& val)
 {
-   Improvement old = propag_imp_;
+   IntervalImprovement old = propag_imp_;
    propag_imp_ = val;
    return old;
 }

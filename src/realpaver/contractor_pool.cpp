@@ -2,6 +2,7 @@
 
 #include "realpaver/common.hpp"
 #include "realpaver/contractor_pool.hpp"
+#include "realpaver/Exception.hpp"
 
 namespace realpaver {
 

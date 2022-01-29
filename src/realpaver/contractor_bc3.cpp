@@ -2,6 +2,7 @@
 
 #include <stack>
 #include "realpaver/contractor_bc3.hpp"
+#include "realpaver/Exception.hpp"
 #include "realpaver/param.hpp"
 
 namespace realpaver {
@@ -11,12 +12,62 @@ Bc3Contractor::Bc3Contractor(Dag* dag, size_t i, size_t iv) :
    peeler_(Param::DefBC3PeelWidth()),
    smax_(Param::DefBC3MaxSteps())
 {
-   newton_ = new Newton();
+   newton_ = new IntervalNewton();
 }
 
 Bc3Contractor::~Bc3Contractor()
 {
    delete newton_;
+}
+
+int Bc3Contractor::maxSteps() const
+{
+   return smax_;
+}
+
+void Bc3Contractor::setMaxSteps(const int& val)
+{
+   ASSERT(val > 0, "bad parameter in the BC3 contractor");
+
+   smax_ = val;
+}
+
+IntervalNewton* Bc3Contractor::getNewton() const
+{
+   return newton_;
+}
+
+Proof Bc3Contractor::shrinkLeft(const Interval& x, Interval& res)
+{
+   return shrink(x, res, SplitLeft, PeelLeft);
+}
+
+Proof Bc3Contractor::shrinkRight(const Interval& x, Interval& res)
+{
+   return shrink(x, res, SplitRight, PeelRight);   
+}
+
+Proof Bc3Contractor::isConsistent(const Interval& x)
+{
+   Interval e = f_.eval(x);
+   const Interval& image = f_.getFun()->getImage();
+
+   if (e.isEmpty())
+      return Proof::Empty;
+
+   else if (!image.overlaps(e))
+      return Proof::Empty;
+
+   else if (image.contains(e))
+      return Proof::Inner;
+
+   else
+      return Proof::Maybe;
+}
+
+Scope Bc3Contractor::scope() const
+{
+   return f_.getFun()->scope();
 }
 
 bool Bc3Contractor::dependsOn(const Bitset& bs) const

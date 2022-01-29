@@ -5,7 +5,6 @@
 
 #include <memory>
 #include "realpaver/interval.hpp"
-#include "realpaver/stopping.hpp"
 
 namespace realpaver {
 
@@ -47,15 +46,15 @@ public:
 
    // management of the precision, i.e. the output precision of
    // interval solutions
-   Precision precision() const;
-   void setPrecision(const Precision& p);
+   IntervalPrecision precision() const;
+   void setPrecision(const IntervalPrecision& p);
 
 private:
    std::string name_;   // name
    size_t id_;          // id
    Interval domain_;    // initial variable domain
    bool continuous_;    // true for a real variable, false for a discrete one
-   Precision eps_;      // output precision of interval solutions
+   IntervalPrecision eps_;      // output precision of interval solutions
 };
 
 inline size_t VariableRep::id() const
@@ -113,12 +112,12 @@ inline size_t VariableRep::hashCode() const
    return id_;
 }
 
-inline Precision VariableRep::precision() const
+inline IntervalPrecision VariableRep::precision() const
 {
    return eps_;
 }
 
-inline void VariableRep::setPrecision(const Precision& p)
+inline void VariableRep::setPrecision(const IntervalPrecision& p)
 {
    eps_ = p;
 }
@@ -163,8 +162,8 @@ public:
    size_t hashCode() const;
 
    // output precision of interval solutions
-   Precision precision() const;
-   Variable& setPrecision(const Precision& p);
+   IntervalPrecision precision() const;
+   Variable& setPrecision(const IntervalPrecision& p);
 
    // clone
    Variable clone() const;
@@ -249,12 +248,12 @@ inline size_t Variable::hashCode() const
    return rep_->hashCode();
 }
 
-inline Precision Variable::precision() const
+inline IntervalPrecision Variable::precision() const
 {
    return rep_->precision();
 }
 
-inline Variable& Variable::setPrecision(const Precision& p)
+inline Variable& Variable::setPrecision(const IntervalPrecision& p)
 {
    rep_->setPrecision(p);
    return *this;

@@ -4,8 +4,8 @@
 #define REALPAVER_CONTRACTOR_BC3_HPP
 
 #include "realpaver/contractor.hpp"
+#include "realpaver/interval_newton.hpp"
 #include "realpaver/interval_slicer.hpp"
-#include "realpaver/newton.hpp"
 #include "realpaver/thick_fun.hpp"
 
 namespace realpaver {
@@ -32,7 +32,7 @@ public:
    void setMaxSteps(const int& val);
 
    // Newton operator
-   Newton* getNewton() const;
+   IntervalNewton* getNewton() const;
 
    // Override
    bool dependsOn(const Bitset& bs) const;
@@ -44,7 +44,7 @@ private:
    ThickFun f_;               // univariate thick interval function
    IntervalPeeler peeler_;    // peeling at interval bounds
    size_t smax_;              // maximum number of steps in shrink
-   Newton* newton_;           // interval Newton method
+   IntervalNewton* newton_;           // interval Newton method
 
    // split functions
    typedef bool (*SplitFun)(const Interval& x, Interval& x1, Interval& x2);
@@ -68,56 +68,6 @@ private:
    // consistency checking
    Proof isConsistent(const Interval& x);
 };
-
-inline int Bc3Contractor::maxSteps() const
-{
-   return smax_;
-}
-
-inline void Bc3Contractor::setMaxSteps(const int& val)
-{
-   ASSERT(val > 0, "bad parameter in the BC3 contractor");
-
-   smax_ = val;
-}
-
-inline Newton* Bc3Contractor::getNewton() const
-{
-   return newton_;
-}
-
-inline Proof Bc3Contractor::shrinkLeft(const Interval& x, Interval& res)
-{
-   return shrink(x, res, SplitLeft, PeelLeft);
-}
-
-inline Proof Bc3Contractor::shrinkRight(const Interval& x, Interval& res)
-{
-   return shrink(x, res, SplitRight, PeelRight);   
-}
-
-inline Proof Bc3Contractor::isConsistent(const Interval& x)
-{
-   Interval e = f_.eval(x);
-   const Interval& image = f_.getFun()->getImage();
-
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (!image.overlaps(e))
-      return Proof::Empty;
-
-   else if (image.contains(e))
-      return Proof::Inner;
-
-   else
-      return Proof::Maybe;
-}
-
-inline Scope Bc3Contractor::scope() const
-{
-   return f_.getFun()->scope();
-}
 
 } // namespace
 

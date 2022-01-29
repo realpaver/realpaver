@@ -2,6 +2,8 @@
 
 #include "realpaver/bco_dag.hpp"
 #include "realpaver/contractor_bc4.hpp"
+#include "realpaver/Exception.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/term_deriver.hpp"
 
 namespace realpaver {

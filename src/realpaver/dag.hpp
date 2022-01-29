@@ -1102,13 +1102,6 @@ inline size_t Dag::nbFun() const
    return fun_.size();
 }
 
-inline DagFun* Dag::fun(size_t i) const
-{
-   ASSERT(i < nbFun(), "access out of range of a dag function");
-
-   return fun_[i];
-}
-
 inline void Dag::pushNode(DagNode* node)
 {
    node_.push_back(node);

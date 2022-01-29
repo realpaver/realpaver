@@ -2,6 +2,8 @@
 
 #include <sstream>
 #include "realpaver/constraint_fixer.hpp"
+#include "realpaver/Exception.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/param.hpp"
 #include "realpaver/problem.hpp"
 
@@ -26,7 +28,7 @@ Variable Problem::addBoolVar(const std::string& name)
    v.setId(id)
     .setDomain(Interval(0,1))
     .setDiscrete()
-    .setPrecision(Precision::absolute(0));
+    .setPrecision(IntervalPrecision::makeAbsolute(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -50,7 +52,7 @@ Variable Problem::addIntVar(const int& a, const int& b,
    v.setId(id)
     .setDomain(Interval(a,b))
     .setDiscrete()
-    .setPrecision(Precision::absolute(0));
+    .setPrecision(IntervalPrecision::makeAbsolute(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -323,6 +325,55 @@ bool Problem::isLinConstrained() const
          return false;
 
    return true;
+}
+
+size_t Problem::nbVars() const
+{
+   return vars_.size();
+}
+
+Variable Problem::varAt(size_t i) const
+{
+   ASSERT(i < vars_.size(), "bad access to the variables in a problem");
+
+   return vars_[i];
+}
+
+size_t Problem::nbCtrs() const
+{
+   return ctrs_.size();
+}
+
+Constraint Problem::ctrAt(size_t i) const
+{
+   ASSERT(i < ctrs_.size(), "bad access to the constraints in a problem");
+
+   return ctrs_[i];
+}
+
+Obj Problem::obj() const
+{
+   return obj_;
+}
+
+Scope Problem::scope() const
+{
+   return scope_;
+}
+
+bool Problem::isConstrained() const
+{
+   return nbCtrs() > 0;
+}
+
+bool Problem::hasObjective() const
+{
+   return !obj_.isConstant();
+}
+
+bool Problem::isLinObjective() const
+{
+   return hasObjective() && obj_.isLinear();
 }
 
 } // namespace

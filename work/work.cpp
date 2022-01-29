@@ -4,10 +4,11 @@
 #include "realpaver/contractor_bc4.hpp"
 #include "realpaver/contractor_hc4.hpp"
 #include "realpaver/dag.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/thick_fun.hpp"
 #include "realpaver/interval_slicer.hpp"
 #include "realpaver/interval_union.hpp"
-#include "realpaver/newton.hpp"
+#include "realpaver/interval_newton.hpp"
 #include "realpaver/term_deriver.hpp"
 #include "realpaver/term_fixer.hpp"
 #include "realpaver/timer.hpp"
@@ -22,6 +23,8 @@ int main(void)
 {
    Logger::connectConsole();
    Interval::precision( 16 );
+
+Problem p;
 
    try
    {
@@ -221,9 +224,9 @@ int main(void)
       cout << tim.elapsedTime() << " ms" << endl;
 */
 
-   catch(Menhir m)
+   catch(Exception e)
    {
-      cout << m.what() << endl;
+      cout << e.what() << endl;
    }
 
    return 0;

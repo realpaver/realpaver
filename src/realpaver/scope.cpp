@@ -1,6 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/common.hpp"
+#include "realpaver/Exception.hpp"
 #include "realpaver/scope.hpp"
 
 namespace realpaver {

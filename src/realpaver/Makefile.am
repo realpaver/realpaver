@@ -37,14 +37,16 @@ librealpaver_la_include_HEADERS = \
 		contractor_int.hpp \
 		contractor_pool.hpp \
 		dag.hpp \
+		Exception.hpp \
 		inflator.hpp \
 		interval.hpp \
 		interval_impl.hpp \
+		interval_newton.hpp \
 		interval_slicer.hpp \
 		interval_union.hpp \
+		Logger.hpp \
 		lpmodel.hpp \
 		lpsolver.hpp \
-		newton.hpp \
 		number.hpp \
 		obj.hpp \
 		param.hpp \
@@ -56,7 +58,6 @@ librealpaver_la_include_HEADERS = \
 		real_vector.hpp \
 		scope.hpp \
 		scope_map.hpp \
-		stopping.hpp \
 		term.hpp \
 		term_deriver.hpp \
 		term_fixer.hpp \
@@ -95,12 +96,14 @@ librealpaver_la_SOURCES = \
 		contractor_int.cpp \
 		contractor_pool.cpp \
 		dag.cpp \
+		Exception.cpp \
 		inflator.cpp \
 		interval.cpp \
+		interval_newton.cpp \
 		interval_slicer.cpp \
 		interval_union.cpp \
+		Logger.cpp \
 		lpmodel.cpp \
-		newton.cpp \
 		obj.cpp \
 		param.cpp \
 		parser_bison.ypp \
@@ -112,7 +115,6 @@ librealpaver_la_SOURCES = \
 		real_vector.cpp \
 		scope.cpp \
 		scope_map.cpp \
-		stopping.cpp \
 		term.cpp \
 		term_deriver.cpp \
 		term_fixer.cpp \

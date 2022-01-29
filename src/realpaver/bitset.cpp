@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "realpaver/bitset.hpp"
 #include "realpaver/common.hpp"
+#include "realpaver/Exception.hpp"
 
 namespace realpaver {
 

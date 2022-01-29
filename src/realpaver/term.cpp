@@ -1,5 +1,6 @@
 // This file is part of Realpaver. License: see COPYING file.
 
+#include "realpaver/Exception.hpp"
 #include "realpaver/term.hpp"
 
 namespace realpaver {
@@ -78,6 +79,21 @@ bool TermRep::isDiv() const
    return false;
 }
 
+OpPriority TermRep::priority() const
+{
+   return priority_;
+}
+
+size_t TermRep::hashCode() const
+{
+   return hcode_;
+}
+
+bool TermRep::isConstant() const
+{
+   return constant_;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Term::Term(const double& a) : rep_(std::make_shared<TermConst>(a))
@@ -91,6 +107,96 @@ Term::Term(const Variable& v) : rep_(std::make_shared<TermVar>(v))
 
 Term::Term(const SharedRep& rep): rep_(rep)
 {}
+
+size_t Term::hashCode() const
+{
+   return rep_->hashCode();
+}
+
+void Term::print(std::ostream& os) const
+{
+   rep_->print(os);
+}
+
+Interval Term::evalConst() const
+{
+   return rep_->evalConst();
+}
+
+Interval Term::eval(const Box& B) const
+{
+   return rep_->eval(B);
+}
+
+void Term::acceptVisitor(TermVisitor& vis) const
+{
+   rep_->acceptVisitor(vis);
+}
+
+bool Term::dependsOn(const Variable& v) const
+{
+   return rep_->dependsOn(v);
+}
+
+void Term::makeScope(Scope& s) const
+{
+   rep_->makeScope(s);
+}
+
+Term::SharedRep Term::rep() const
+{
+   return rep_;
+}
+
+bool Term::isZero() const
+{
+   return rep_->isZero();
+}
+
+bool Term::isOne() const
+{
+   return rep_->isOne();
+}
+
+bool Term::isMinusOne() const
+{
+   return rep_->isMinusOne();
+}
+
+bool Term::isNumber() const
+{
+   return rep_->isNumber();
+}
+
+bool Term::isConstant() const
+{
+   return rep_->isConstant();
+}
+
+bool Term::isLinear() const
+{
+   return rep_->isLinear();
+}
+
+bool Term::isAdd() const
+{
+   return rep_->isAdd();
+}
+
+bool Term::isSub() const
+{
+   return rep_->isSub();
+}
+
+bool Term::isMul() const
+{
+   return rep_->isMul();
+}
+
+bool Term::isDiv() const
+{
+   return rep_->isDiv();
+}
 
 std::ostream& operator<<(std::ostream& os, const Term& t)
 {
@@ -1124,6 +1230,11 @@ TermConst::TermConst(const Interval& x) :
    constant_ = true;
 }
 
+const Interval& TermConst::getVal() const
+{
+   return x_;
+}
+
 Interval TermConst::evalConst() const
 {
    return x_;
@@ -1178,6 +1289,11 @@ TermVar::TermVar(const Variable& v) : TermRep(OpPriority::Low), v_(v)
 {
    hcode_ = v.hashCode();
    constant_ = false;
+}
+
+Variable TermVar::var() const
+{
+   return v_;
 }
 
 Interval TermVar::evalConst() const
@@ -1280,6 +1396,44 @@ void TermOp::makeScope(Scope& s) const
 {
    for (auto sub : v_)
       sub->makeScope(s);
+}
+
+size_t TermOp::arity() const
+{
+   return v_.size();
+}
+
+OpSymbol TermOp::opSymbol() const
+{
+   return op_;
+}
+
+TermRep::SharedRep TermOp::subTerm(size_t i) const
+{
+   ASSERT(i < arity(), "access out of range to a term operand");
+
+   return v_[i];
+}
+
+TermRep::SharedRep TermOp::left() const
+{
+   ASSERT(arity() == 2, "access out of range to a term operand");
+
+   return v_[0];
+}
+
+TermRep::SharedRep TermOp::right() const
+{
+   ASSERT(arity() == 2, "access out of range to a term operand");
+
+   return v_[1];
+}
+
+TermRep::SharedRep TermOp::sub() const
+{
+   ASSERT(arity() == 1, "access out of range to a term operand");
+
+   return v_[0];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1641,6 +1795,11 @@ TermPow::TermPow(const SharedRep& t, int n) :
 
    size_t h = Hash1<int>(n);
    hcode_ = Hash2(h,hcode_);
+}
+
+int TermPow::exponent() const
+{
+   return n_;
 }
 
 Interval TermPow::evalConst() const

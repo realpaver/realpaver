@@ -6,7 +6,7 @@ namespace realpaver {
 
 VariableRep::VariableRep(const std::string& name) :
    name_(name), id_(0), domain_(), continuous_(true),
-   eps_(Precision::absolute(0))
+   eps_(IntervalPrecision::makeAbsolute(0.0))
 {}
 
 Variable::Variable(const std::string& name) :

@@ -39,30 +39,6 @@ private:
    double chi_;
 };
 
-inline double Inflator::delta() const
-{
-   return delta_;
-}
-
-inline double Inflator::chi() const
-{
-   return chi_;
-}
-
-inline void Inflator::setDelta(const double& delta)
-{
-   ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
-
-   delta_ = delta;
-}
-
-inline void Inflator::setChi(const double& chi)
-{
-   ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
-
-   chi_ = chi;
-}
-
 } // namespace
 
 #endif

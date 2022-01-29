@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/common.hpp"
+#include "realpaver/Exception.hpp"
 #include "realpaver/real_vector.hpp"
 
 namespace realpaver {

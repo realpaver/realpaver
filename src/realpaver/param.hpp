@@ -3,7 +3,7 @@
 #ifndef REALPAVER_PARAM_HPP
 #define REALPAVER_PARAM_HPP
 
-#include "realpaver/stopping.hpp"
+#include "realpaver/interval.hpp"
 
 namespace realpaver {
 
@@ -16,22 +16,22 @@ public:
    Param();
 
    // precision of real variables
-   Precision realVarPrecision() const;
-   Precision realVarPrecision(const Precision& val);
-   static Precision DefRealVarPrecision();
-   static Precision DefRealVarPrecision(const Precision& val);
+   IntervalPrecision realVarPrecision() const;
+   IntervalPrecision realVarPrecision(const IntervalPrecision& val);
+   static IntervalPrecision DefRealVarPrecision();
+   static IntervalPrecision DefRealVarPrecision(const IntervalPrecision& val);
 
    // precision of objective function
-   Precision objPrecision() const;
-   Precision objPrecision(const Precision& val);
-   static Precision DefObjPrecision();
-   static Precision DefObjPrecision(const Precision& val);
+   IntervalPrecision objPrecision() const;
+   IntervalPrecision objPrecision(const IntervalPrecision& val);
+   static IntervalPrecision DefObjPrecision();
+   static IntervalPrecision DefObjPrecision(const IntervalPrecision& val);
 
    // univariate interval Newton method: improvement factor
-   Improvement newtonImprovement() const;
-   Improvement newtonImprovement(const Improvement& val);
-   static Improvement DefNewtonImprovement();
-   static Improvement DefNewtonImprovement(const Improvement& val);
+   IntervalImprovement newtonImprovement() const;
+   IntervalImprovement newtonImprovement(const IntervalImprovement& val);
+   static IntervalImprovement DefNewtonImprovement();
+   static IntervalImprovement DefNewtonImprovement(const IntervalImprovement& val);
 
    // univariate interval Newton method: maximum number of steps
    int newtonMaxSteps() const;
@@ -40,10 +40,10 @@ public:
    static int DefNewtonMaxSteps(const int& val);
 
    // univariate interval Newton method: precision of output
-   Precision newtonPrecision() const;
-   Precision newtonPrecision(const Precision& val);
-   static Precision DefNewtonPrecision();
-   static Precision DefNewtonPrecision(const Precision& val);
+   IntervalPrecision newtonPrecision() const;
+   IntervalPrecision newtonPrecision(const IntervalPrecision& val);
+   static IntervalPrecision DefNewtonPrecision();
+   static IntervalPrecision DefNewtonPrecision(const IntervalPrecision& val);
 
    // inflation: delta
    double inflatorDelta() const;
@@ -76,10 +76,10 @@ public:
    static int DefPropagatorMaxSteps(const int& val);
 
    // propagation algorithm: maximum number of steps
-   Improvement propagatorImprovement() const;
-   Improvement propagatorImprovement(const Improvement& val);
-   static Improvement DefPropagatorImprovement();
-   static Improvement DefPropagatorImprovement(const Improvement& val);
+   IntervalImprovement propagatorImprovement() const;
+   IntervalImprovement propagatorImprovement(const IntervalImprovement& val);
+   static IntervalImprovement DefPropagatorImprovement();
+   static IntervalImprovement DefPropagatorImprovement(const IntervalImprovement& val);
 
    // timeout in milliseconds
    size_t timeout() const;
@@ -89,24 +89,24 @@ public:
 
 private:
    // precision of real variables
-   Precision rvar_prec_;
-   static Precision def_rvar_prec_;
+   IntervalPrecision rvar_prec_;
+   static IntervalPrecision def_rvar_prec_;
 
    // precision of objective function
-   Precision obj_prec_;
-   static Precision def_obj_prec_;
+   IntervalPrecision obj_prec_;
+   static IntervalPrecision def_obj_prec_;
 
    // univariate interval Newton method: improvement factor
-   Improvement newton_imp_;
-   static Improvement def_newton_imp_;
+   IntervalImprovement newton_imp_;
+   static IntervalImprovement def_newton_imp_;
 
    // univariate interval Newton method: maximum number of steps   
    static int def_newton_ms_;
    int newton_ms_;
 
    // univariate interval Newton method: precision of output
-   Precision newton_prec_;
-   static Precision def_newton_prec_;
+   IntervalPrecision newton_prec_;
+   static IntervalPrecision def_newton_prec_;
 
    // inflation: delta
    double inflator_delta_;
@@ -125,8 +125,8 @@ private:
    static int def_bc3_ms_;
 
    // propagation algorithm: improvement factor
-   Improvement propag_imp_;
-   static Improvement def_propag_imp_;
+   IntervalImprovement propag_imp_;
+   static IntervalImprovement def_propag_imp_;
 
    // propagation algorithm: maximum number of steps
    int propag_ms_;

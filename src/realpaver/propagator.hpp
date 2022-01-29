@@ -4,7 +4,6 @@
 #define REALPAVER_PROPAGATOR_HPP
 
 #include "realpaver/contractor_pool.hpp"
-#include "realpaver/stopping.hpp"
 
 namespace realpaver {
 
@@ -29,8 +28,8 @@ public:
    void print(std::ostream& os) const;
 
    // improvement factor
-   Improvement improvement() const;
-   void setImprovement(const Improvement& imp);
+   IntervalImprovement improvement() const;
+   void setImprovement(const IntervalImprovement& imp);
 
    // maximum number of propagation steps
    size_t maxSteps() const;
@@ -42,18 +41,18 @@ public:
 
 private:
    ContractorPool* pool_;        // pool of contractors
-   Improvement imp_;             // improvement factor
+   IntervalImprovement imp_;             // improvement factor
    size_t max_steps_;            // maximum number of propagation steps
    std::vector<Proof> certif_;   // proof certificates of contractors
                                  // after contract
 };
 
-inline Improvement Propagator::improvement() const
+inline IntervalImprovement Propagator::improvement() const
 {
    return imp_;
 }
 
-inline void Propagator::setImprovement(const Improvement& imp)
+inline void Propagator::setImprovement(const IntervalImprovement& imp)
 {
    imp_ = imp;
 }

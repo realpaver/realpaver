@@ -145,13 +145,13 @@ am__librealpaver_la_SOURCES_DIST = bco_dag.cpp bco_local.cpp \
 	constraint_relaxor.cpp contractor.cpp contractor_bc3.cpp \
 	contractor_bc4.cpp contractor_bco.cpp contractor_cid.cpp \
 	contractor_hc4.cpp contractor_int.cpp contractor_pool.cpp \
-	dag.cpp inflator.cpp interval.cpp interval_slicer.cpp \
-	interval_union.cpp lpmodel.cpp newton.cpp obj.cpp param.cpp \
-	parser_bison.ypp parser_flex.lpp parser.cpp problem.cpp \
-	propagator.cpp real_fun.cpp real_vector.cpp scope.cpp \
-	scope_map.cpp stopping.cpp term.cpp term_deriver.cpp \
-	term_fixer.cpp timer.cpp thick_fun.cpp uni_fun.cpp \
-	variable.cpp wrapper_lpsolver_clp.cpp \
+	dag.cpp Exception.cpp inflator.cpp interval.cpp \
+	interval_newton.cpp interval_slicer.cpp interval_union.cpp \
+	Logger.cpp lpmodel.cpp obj.cpp param.cpp parser_bison.ypp \
+	parser_flex.lpp parser.cpp problem.cpp propagator.cpp \
+	real_fun.cpp real_vector.cpp scope.cpp scope_map.cpp term.cpp \
+	term_deriver.cpp term_fixer.cpp timer.cpp thick_fun.cpp \
+	uni_fun.cpp variable.cpp wrapper_lpsolver_clp.cpp \
 	wrapper_lpsolver_gurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = wrapper_lpsolver_clp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = wrapper_lpsolver_gurobi.lo
@@ -160,13 +160,13 @@ am_librealpaver_la_OBJECTS = bco_dag.lo bco_local.lo bco_model.lo \
 	constraint.lo constraint_fixer.lo constraint_relaxor.lo \
 	contractor.lo contractor_bc3.lo contractor_bc4.lo \
 	contractor_bco.lo contractor_cid.lo contractor_hc4.lo \
-	contractor_int.lo contractor_pool.lo dag.lo inflator.lo \
-	interval.lo interval_slicer.lo interval_union.lo lpmodel.lo \
-	newton.lo obj.lo param.lo parser_bison.lo parser_flex.lo \
-	parser.lo problem.lo propagator.lo real_fun.lo real_vector.lo \
-	scope.lo scope_map.lo stopping.lo term.lo term_deriver.lo \
-	term_fixer.lo timer.lo thick_fun.lo uni_fun.lo variable.lo \
-	$(am__objects_1) $(am__objects_2)
+	contractor_int.lo contractor_pool.lo dag.lo Exception.lo \
+	inflator.lo interval.lo interval_newton.lo interval_slicer.lo \
+	interval_union.lo Logger.lo lpmodel.lo obj.lo param.lo \
+	parser_bison.lo parser_flex.lo parser.lo problem.lo \
+	propagator.lo real_fun.lo real_vector.lo scope.lo scope_map.lo \
+	term.lo term_deriver.lo term_fixer.lo timer.lo thick_fun.lo \
+	uni_fun.lo variable.lo $(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -254,15 +254,15 @@ am__librealpaver_la_include_HEADERS_DIST = bco_dag.hpp bco_local.hpp \
 	constraint_relaxor.hpp contractor.hpp contractor_bc3.hpp \
 	contractor_bc4.hpp contractor_bco.hpp contractor_cid.hpp \
 	contractor_hc4.hpp contractor_int.hpp contractor_pool.hpp \
-	dag.hpp inflator.hpp interval.hpp interval_impl.hpp \
-	interval_slicer.hpp interval_union.hpp lpmodel.hpp \
-	lpsolver.hpp newton.hpp number.hpp obj.hpp param.hpp \
-	parser.hpp parser_bison.hpp problem.hpp propagator.hpp \
-	real_fun.hpp real_vector.hpp scope.hpp scope_map.hpp \
-	stopping.hpp term.hpp term_deriver.hpp term_fixer.hpp \
-	thick_fun.hpp timer.hpp uni_fun.hpp variable.hpp \
-	wrapper_interval_gaol.hpp wrapper_lpsolver_clp.hpp \
-	wrapper_lpsolver_gurobi.hpp
+	dag.hpp Exception.hpp inflator.hpp interval.hpp \
+	interval_impl.hpp interval_newton.hpp interval_slicer.hpp \
+	interval_union.hpp Logger.hpp lpmodel.hpp lpsolver.hpp \
+	number.hpp obj.hpp param.hpp parser.hpp parser_bison.hpp \
+	problem.hpp propagator.hpp real_fun.hpp real_vector.hpp \
+	scope.hpp scope_map.hpp term.hpp term_deriver.hpp \
+	term_fixer.hpp thick_fun.hpp timer.hpp uni_fun.hpp \
+	variable.hpp wrapper_interval_gaol.hpp \
+	wrapper_lpsolver_clp.hpp wrapper_lpsolver_gurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
 	$(LISP)configure.hpp.in
@@ -436,27 +436,28 @@ librealpaver_la_include_HEADERS = bco_dag.hpp bco_local.hpp \
 	constraint_relaxor.hpp contractor.hpp contractor_bc3.hpp \
 	contractor_bc4.hpp contractor_bco.hpp contractor_cid.hpp \
 	contractor_hc4.hpp contractor_int.hpp contractor_pool.hpp \
-	dag.hpp inflator.hpp interval.hpp interval_impl.hpp \
-	interval_slicer.hpp interval_union.hpp lpmodel.hpp \
-	lpsolver.hpp newton.hpp number.hpp obj.hpp param.hpp \
-	parser.hpp parser_bison.hpp problem.hpp propagator.hpp \
-	real_fun.hpp real_vector.hpp scope.hpp scope_map.hpp \
-	stopping.hpp term.hpp term_deriver.hpp term_fixer.hpp \
-	thick_fun.hpp timer.hpp uni_fun.hpp variable.hpp \
-	wrapper_interval_gaol.hpp $(am__append_1) $(am__append_2)
+	dag.hpp Exception.hpp inflator.hpp interval.hpp \
+	interval_impl.hpp interval_newton.hpp interval_slicer.hpp \
+	interval_union.hpp Logger.hpp lpmodel.hpp lpsolver.hpp \
+	number.hpp obj.hpp param.hpp parser.hpp parser_bison.hpp \
+	problem.hpp propagator.hpp real_fun.hpp real_vector.hpp \
+	scope.hpp scope_map.hpp term.hpp term_deriver.hpp \
+	term_fixer.hpp thick_fun.hpp timer.hpp uni_fun.hpp \
+	variable.hpp wrapper_interval_gaol.hpp $(am__append_1) \
+	$(am__append_2)
 librealpaver_la_SOURCES = bco_dag.cpp bco_local.cpp bco_model.cpp \
 	bco_node.cpp bco_space.cpp bitset.cpp box.cpp common.cpp \
 	constraint.cpp constraint_fixer.cpp constraint_relaxor.cpp \
 	contractor.cpp contractor_bc3.cpp contractor_bc4.cpp \
 	contractor_bco.cpp contractor_cid.cpp contractor_hc4.cpp \
-	contractor_int.cpp contractor_pool.cpp dag.cpp inflator.cpp \
-	interval.cpp interval_slicer.cpp interval_union.cpp \
-	lpmodel.cpp newton.cpp obj.cpp param.cpp parser_bison.ypp \
-	parser_flex.lpp parser.cpp problem.cpp propagator.cpp \
-	real_fun.cpp real_vector.cpp scope.cpp scope_map.cpp \
-	stopping.cpp term.cpp term_deriver.cpp term_fixer.cpp \
-	timer.cpp thick_fun.cpp uni_fun.cpp variable.cpp \
-	$(am__append_3) $(am__append_4)
+	contractor_int.cpp contractor_pool.cpp dag.cpp Exception.cpp \
+	inflator.cpp interval.cpp interval_newton.cpp \
+	interval_slicer.cpp interval_union.cpp Logger.cpp lpmodel.cpp \
+	obj.cpp param.cpp parser_bison.ypp parser_flex.lpp parser.cpp \
+	problem.cpp propagator.cpp real_fun.cpp real_vector.cpp \
+	scope.cpp scope_map.cpp term.cpp term_deriver.cpp \
+	term_fixer.cpp timer.cpp thick_fun.cpp uni_fun.cpp \
+	variable.cpp $(am__append_3) $(am__append_4)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = parser_bison.hpp
@@ -564,6 +565,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Exception.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_dag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_local.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_model.Plo@am__quote@
@@ -586,10 +589,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inflator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_newton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_slicer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_union.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lpmodel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
@@ -601,7 +604,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/real_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scope_map.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stopping.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/term.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/term_deriver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/term_fixer.Plo@am__quote@
