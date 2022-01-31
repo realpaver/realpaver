@@ -26,7 +26,7 @@ const Interval& Box::at(size_t i) const
 
 const Interval& Box::at(const Variable& v) const
 {
-   return at(v.id());
+   return at(v.getId());
 }
 
 void Box::set(size_t i, const Interval& x)
@@ -38,9 +38,9 @@ void Box::set(size_t i, const Interval& x)
 
 void Box::set(const Variable& v, const Interval& x)
 {
-   ASSERT(v.id() < size(), "access out of range in a box @ " << v.id());
+   ASSERT(v.getId() < size(), "access out of range in a box @ " << v.getId());
 
-   v_[v.id()] = x;
+   v_[v.getId()] = x;
 }
 
 void Box::setAll(const Interval& x)
@@ -52,15 +52,15 @@ void Box::setAll(const Interval& x)
 void Box::set(const Box& other, const Scope& s)
 {
    for (auto v : s)
-      set(v.id(), other[v.id()]);
+      set(v.getId(), other[v.getId()]);
 }
 
 void Box::setHull(const Box& other, const Scope& s)
 {
    for (auto v : s)
    {
-      Interval x( other[v.id()] | (*this)[v.id()] );
-      set(v.id(), x);
+      Interval x( other[v.getId()] | (*this)[v.getId()] );
+      set(v.getId(), x);
    }
 }
 

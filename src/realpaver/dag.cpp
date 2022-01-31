@@ -116,18 +116,18 @@ bool DagConst::rdiff()
 DagVar::DagVar(Dag* dag, size_t index, const Variable& v):
    DagNode(dag, index), v_(v)
 {
-   bitset_ = Bitset(1 + v.id(), 0);
-   bitset_.setOne(v.id());
+   bitset_ = Bitset(1 + v.getId(), 0);
+   bitset_.setOne(v.getId());
 }
 
 size_t DagVar::nbOcc(size_t id) const
 {
-   return (id == v_.id()) ? 1 : 0;
+   return (id == v_.getId()) ? 1 : 0;
 }
 
 void DagVar::print(std::ostream& os) const
 {
-   os << v_.name();
+   os << v_.getName();
 }
 
 void DagVar::acceptVisitor(DagVisitor& vis) const
@@ -137,23 +137,23 @@ void DagVar::acceptVisitor(DagVisitor& vis) const
 
 void DagVar::eval(const Box& B)
 {
-   setVal(B[v_.id()]);
+   setVal(B[v_.getId()]);
 }
 
 void DagVar::eval(const RealVector& P)
 {
-   setVal(P[v_.id()]);
+   setVal(P[v_.getId()]);
 }
 
 void DagVar::evalOnly(size_t id, const Interval& x)
 {
-   if (v_.id() == id)
+   if (v_.getId() == id)
       setVal(x);
 }
 
 void DagVar::proj(Box& B)
 {
-   B.set(v_.id(), B[v_.id()] & dom());
+   B.set(v_.getId(), B[v_.getId()] & dom());
 }
 
 bool DagVar::diff()
@@ -168,7 +168,7 @@ bool DagVar::diffOnly(size_t id)
 
 void DagVar::reval(const RealVector& P)
 {
-   setRval(P[v_.id()]);
+   setRval(P[v_.getId()]);
 }
 
 bool DagVar::rdiff()
@@ -1102,7 +1102,7 @@ void DagFun::insertConstNode(DagConst* node)
 
 void DagFun::insertVarNode(DagVar* node)
 {
-   size_t id = node->getVar().id();
+   size_t id = node->getVar().getId();
 
    if (!hasNode(node))
    {
@@ -1112,7 +1112,7 @@ void DagFun::insertVarNode(DagVar* node)
       // insertion in the vector of variables sorted by
       // an ascending ordering of the variable identifiers
       auto it = vnode_.begin();
-      while ((it!=vnode_.end() && (id > (*it)->getVar().id())))
+      while ((it!=vnode_.end() && (id > (*it)->getVar().getId())))
          ++it;
 
       vnode_.insert(it, node);
@@ -1240,7 +1240,7 @@ Proof DagFun::hc4ReviseNeg(Box& B)
          {
             for (size_t i=0; i<nbVar(); ++i)
             {
-               size_t idx = varNode(i)->getVar().id();
+               size_t idx = varNode(i)->getVar().getId();
 
                if (pl == Proof::Empty)
                   B.set(idx, Br[idx]);
@@ -1288,7 +1288,7 @@ Proof DagFun::hc4ReviseBack(Box& B)
 
    for (size_t i=0; i<nbVar(); ++i)
    {
-      size_t idx = varNode(i)->getVar().id();
+      size_t idx = varNode(i)->getVar().getId();
 
       if (B[idx].isEmpty())
          return Proof::Empty;
@@ -1342,7 +1342,7 @@ void DagFun::toGrad(Box& G) const
 
 const Interval& DagFun::deriv(const Variable& v) const
 {
-   return dag_->findVarNode(v.id())->dv();
+   return dag_->findVarNode(v.getId())->dv();
 }
 
 bool DagFun::diffOnly(size_t id)
@@ -1427,7 +1427,7 @@ void DagFun::toRgrad(RealVector& G) const
 
 double DagFun::rderiv(const Variable& v) const
 {
-   return dag_->findVarNode(v.id())->rdv();
+   return dag_->findVarNode(v.getId())->rdv();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1508,7 +1508,7 @@ size_t Dag::insertConstNode(const Interval& x)
 
 size_t Dag::insertVarNode(const Variable& v)
 {
-   auto it = vmap_.find(v.id());
+   auto it = vmap_.find(v.getId());
    size_t index;
 
    if (it == vmap_.end())
@@ -1520,11 +1520,11 @@ size_t Dag::insertVarNode(const Variable& v)
       pushNode(node);
 
       // insertion in the map
-      vmap_.insert(std::make_pair(v.id(), index));
+      vmap_.insert(std::make_pair(v.getId(), index));
 
       // insertion in the vector of variables
       auto it = vnode_.begin();
-      while ((it!=vnode_.end() && (v.id() > (*it)->getVar().id())))
+      while ((it!=vnode_.end() && (v.getId() > (*it)->getVar().getId())))
          ++it;
 
       vnode_.insert(it, node);

@@ -151,7 +151,7 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp bco_dag.cpp \
 	parser_bison.ypp parser_flex.lpp parser.cpp problem.cpp \
 	propagator.cpp real_fun.cpp real_vector.cpp scope.cpp \
 	scope_map.cpp term.cpp term_deriver.cpp term_fixer.cpp \
-	timer.cpp thick_fun.cpp Tolerance.cpp uni_fun.cpp variable.cpp \
+	timer.cpp thick_fun.cpp Tolerance.cpp uni_fun.cpp Variable.cpp \
 	wrapper_lpsolver_clp.cpp wrapper_lpsolver_gurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = wrapper_lpsolver_clp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = wrapper_lpsolver_gurobi.lo
@@ -166,7 +166,7 @@ am_librealpaver_la_OBJECTS = bco_dag.lo bco_local.lo bco_model.lo \
 	parser_bison.lo parser_flex.lo parser.lo problem.lo \
 	propagator.lo real_fun.lo real_vector.lo scope.lo scope_map.lo \
 	term.lo term_deriver.lo term_fixer.lo timer.lo thick_fun.lo \
-	Tolerance.lo uni_fun.lo variable.lo $(am__objects_1) \
+	Tolerance.lo uni_fun.lo Variable.lo $(am__objects_1) \
 	$(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -262,7 +262,7 @@ am__librealpaver_la_include_HEADERS_DIST = bco_dag.hpp bco_local.hpp \
 	problem.hpp propagator.hpp real_fun.hpp real_vector.hpp \
 	scope.hpp scope_map.hpp term.hpp term_deriver.hpp \
 	term_fixer.hpp thick_fun.hpp timer.hpp Tolerance.hpp \
-	uni_fun.hpp variable.hpp wrapper_interval_gaol.hpp \
+	uni_fun.hpp Variable.hpp wrapper_interval_gaol.hpp \
 	wrapper_lpsolver_clp.hpp wrapper_lpsolver_gurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
@@ -444,7 +444,7 @@ librealpaver_la_include_HEADERS = bco_dag.hpp bco_local.hpp \
 	problem.hpp propagator.hpp real_fun.hpp real_vector.hpp \
 	scope.hpp scope_map.hpp term.hpp term_deriver.hpp \
 	term_fixer.hpp thick_fun.hpp timer.hpp Tolerance.hpp \
-	uni_fun.hpp variable.hpp wrapper_interval_gaol.hpp \
+	uni_fun.hpp Variable.hpp wrapper_interval_gaol.hpp \
 	$(am__append_1) $(am__append_2)
 librealpaver_la_SOURCES = AssertDebug.hpp bco_dag.cpp bco_local.cpp \
 	bco_model.cpp bco_node.cpp bco_space.cpp bitset.cpp box.cpp \
@@ -458,7 +458,7 @@ librealpaver_la_SOURCES = AssertDebug.hpp bco_dag.cpp bco_local.cpp \
 	parser_flex.lpp parser.cpp problem.cpp propagator.cpp \
 	real_fun.cpp real_vector.cpp scope.cpp scope_map.cpp term.cpp \
 	term_deriver.cpp term_fixer.cpp timer.cpp thick_fun.cpp \
-	Tolerance.cpp uni_fun.cpp variable.cpp $(am__append_3) \
+	Tolerance.cpp uni_fun.cpp Variable.cpp $(am__append_3) \
 	$(am__append_4)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
@@ -571,6 +571,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Inflator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tolerance.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_dag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_local.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_model.Plo@am__quote@
@@ -613,7 +614,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thick_fun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uni_fun.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wrapper_lpsolver_clp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wrapper_lpsolver_gurobi.Plo@am__quote@
 

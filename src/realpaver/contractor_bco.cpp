@@ -110,7 +110,7 @@ Proof BcoContractor::contract(Box& B)
 
 void BcoContractor::print(std::ostream& os) const
 {
-   os << "BCO contractor " << f_->index() << " / " << v_.name();
+   os << "BCO contractor " << f_->index() << " / " << v_.getName();
 }
 
 } // namespace

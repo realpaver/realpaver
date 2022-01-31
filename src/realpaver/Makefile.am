@@ -65,7 +65,7 @@ librealpaver_la_include_HEADERS = \
 		timer.hpp \
 		Tolerance.hpp \
 		uni_fun.hpp \
-		variable.hpp \
+		Variable.hpp \
 		wrapper_interval_gaol.hpp
 
 if COND_LP_CLP
@@ -124,7 +124,7 @@ librealpaver_la_SOURCES = \
 		thick_fun.cpp \
 		Tolerance.cpp \
 		uni_fun.cpp \
-		variable.cpp
+		Variable.cpp
 
 if COND_LP_CLP
 librealpaver_la_SOURCES += wrapper_lpsolver_clp.cpp

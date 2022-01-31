@@ -7,7 +7,7 @@
 #include <memory>
 #include "realpaver/bitset.hpp"
 #include "realpaver/scope_map.hpp"
-#include "realpaver/variable.hpp"
+#include "realpaver/Variable.hpp"
 
 namespace realpaver {
 
@@ -59,7 +59,7 @@ private:
    struct comp {
       bool operator()(Variable x, Variable y)
       {
-         return x.id() < y.id();
+         return x.getId() < y.getId();
       }
    };
 
@@ -138,7 +138,7 @@ inline size_t ScopeRep::size() const
 
 inline size_t ScopeRep::index(const Variable& v) const
 {
-   return scopeMap_->index(v.id());
+   return scopeMap_->index(v.getId());
 }
 
 inline size_t ScopeRep::minIndex() const

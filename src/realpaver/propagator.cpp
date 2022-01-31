@@ -84,10 +84,11 @@ Proof Propagator::contract(Box& B)
                modified.setAllZero();
 
                for (auto v : scope)
-                  if (imp_.test(B.operator[](v.id()), copy->operator[](v.id())))
+                  if (imp_.test(B.operator[](v.getId()),
+                                             copy->operator[](v.getId())))
                   {
                      isModified = true;
-                     modified.setOne(v.id());
+                     modified.setOne(v.getId());
                   }
 
                // activates all the contractors depending on a modified

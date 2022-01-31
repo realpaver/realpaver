@@ -45,7 +45,7 @@ void ScopeRep::makeMap()
    else
    {
       ScopeHashMap* aux = new ScopeHashMap();
-      for (auto it : m_) aux->insert(it.first.id());
+      for (auto it : m_) aux->insert(it.first.getId());
       scopeMap_ = aux;
    }
 }
@@ -60,7 +60,7 @@ void ScopeRep::insert(const Variable& v, size_t n)
    else
    {
       m_.insert(std::make_pair(v,n));
-      size_t id = v.id();
+      size_t id = v.getId();
 
       if (size() == 1)
       {
@@ -94,10 +94,10 @@ void ScopeRep::remove(const Variable& v)
       else
       {
          auto jt = m_.cbegin();
-         minid_ = maxid_ = jt->first.id();
+         minid_ = maxid_ = jt->first.getId();
          for (++jt; jt!=m_.cend(); ++jt)
          {
-            size_t id = jt->first.id();
+            size_t id = jt->first.getId();
             if (minid_ > id) minid_ = id;
             if (maxid_ < id) maxid_ = id;
          }
@@ -142,7 +142,7 @@ void ScopeRep::print(std::ostream& os) const
       if (first) first = false;
       else os << ", ";
 
-      os << it.first.name() << "|" << it.second;
+      os << it.first.getName() << "|" << it.second;
    }
    os << "}";
 }
@@ -191,7 +191,7 @@ Bitset Scope::toBitset() const
    Bitset b(1+maxIndex(), 0);
 
    for (auto it = begin(); it != end(); ++it)
-      b.setOne(it.var().id());
+      b.setOne(it.var().getId());
 
    return b;
 }
@@ -199,7 +199,7 @@ Bitset Scope::toBitset() const
 void Scope::resetCount(const Variable& v)
 {
    ASSERT(contains(v),
-          "no variable '" << v.name() << "' belongs to this scope");
+          "no variable '" << v.getName() << "' belongs to this scope");
 
    rep_->resetCount(v);
 }

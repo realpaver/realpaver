@@ -127,7 +127,7 @@ inline const Interval& Box::operator[](size_t i) const
 
 inline const Interval& Box::operator[](const Variable& v) const
 {
-   return v_[v.id()];
+   return v_[v.getId()];
 }
 
 } // namespace

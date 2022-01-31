@@ -902,7 +902,7 @@ inline bool DagFun::dependsOn(const Bitset& bs) const
 
 inline bool DagFun::dependsOn(const Variable& v) const
 {
-   return rootNode()->dependsOn(v.id());
+   return rootNode()->dependsOn(v.getId());
 }
 
 inline bool DagFun::dependsOn(size_t id) const

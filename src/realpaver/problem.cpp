@@ -47,7 +47,7 @@ Variable Problem::addIntVar(const int& a, const int& b,
       os << "_i" << id;
    else
       os << name;
-   
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(Interval(a,b))
@@ -104,7 +104,7 @@ Box Problem::getBox() const
    Box B(vars_.size());
    
    for(size_t i=0; i<vars_.size(); ++i)
-      B.set(i,vars_[i].domain());
+      B.set(i,vars_[i].getDomain());
 
    return B;
 }
@@ -132,7 +132,7 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
          os << s_int;
       else
          os << s_real;
-      os << v.name() << " in " << v.domain();
+      os << v.getName() << " in " << v.getDomain();
    }
    os << ";" << std::endl << std::endl;
 

@@ -30,7 +30,7 @@ BcoDag::BcoDag(Problem& P) :
    for (size_t i=0; i<P.nbVars(); ++i)
    {
       Variable v = P.varAt(i);
-      THROW_IF(!to.dependsOn(v), "variable " << v.name() << " does not occur"
+      THROW_IF(!to.dependsOn(v), "variable " << v.getName() << " does not occur"
                                              << " in the objective function");
 
       TermDeriver deriver(v);

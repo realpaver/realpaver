@@ -33,7 +33,7 @@ Scope CidContractor::scope() const
 
 Proof CidContractor::contract(Box& B)
 {
-   slicer_->apply(B[v_.id()]);
+   slicer_->apply(B[v_.getId()]);
 
    if (slicer_->size() == 1)
       return op_->contract(B);
@@ -70,7 +70,7 @@ Proof CidContractor::contract(Box& B)
 
 void CidContractor::print(std::ostream& os) const
 {
-   os << "CID contractor on " << v_.name();
+   os << "CID contractor on " << v_.getName();
 }
 
 } // namespace

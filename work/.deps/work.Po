@@ -193,11 +193,11 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  ../src/realpaver/bitset.hpp ../src/realpaver/scope_map.hpp \
  /usr/include/c++/7/unordered_map /usr/include/c++/7/bits/hashtable.h \
  /usr/include/c++/7/bits/hashtable_policy.h \
- /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/variable.hpp \
+ /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/Variable.hpp \
  ../src/realpaver/Tolerance.hpp ../src/realpaver/constraint.hpp \
  ../src/realpaver/term.hpp ../src/realpaver/obj.hpp \
  ../src/realpaver/contractor_bc3.hpp ../src/realpaver/contractor.hpp \
- ../src/realpaver/interval_newton.hpp ../src/realpaver/inflator.hpp \
+ ../src/realpaver/interval_newton.hpp ../src/realpaver/Inflator.hpp \
  ../src/realpaver/uni_fun.hpp ../src/realpaver/interval_slicer.hpp \
  /usr/include/c++/7/list /usr/include/c++/7/bits/stl_list.h \
  /usr/include/c++/7/bits/list.tcc ../src/realpaver/thick_fun.hpp \
@@ -717,7 +717,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/unordered_map.h:
 
-../src/realpaver/variable.hpp:
+../src/realpaver/Variable.hpp:
 
 ../src/realpaver/Tolerance.hpp:
 
@@ -733,7 +733,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/interval_newton.hpp:
 
-../src/realpaver/inflator.hpp:
+../src/realpaver/Inflator.hpp:
 
 ../src/realpaver/uni_fun.hpp:
 

@@ -3,7 +3,7 @@
 #ifndef REALPAVER_UNI_FUN_HPP
 #define REALPAVER_UNI_FUN_HPP
 
-#include "realpaver/variable.hpp"
+#include "realpaver/Variable.hpp"
 
 namespace realpaver {
 

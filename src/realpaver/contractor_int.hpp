@@ -5,7 +5,7 @@
 
 #include <vector>
 #include "realpaver/contractor.hpp"
-#include "realpaver/variable.hpp"
+#include "realpaver/Variable.hpp"
 
 namespace realpaver {
 

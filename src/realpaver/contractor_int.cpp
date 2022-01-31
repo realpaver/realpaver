@@ -22,7 +22,7 @@ IntContractor::IntContractor(const std::initializer_list<Variable>& l) :
 
 void IntContractor::insert(const Variable& v)
 {
-   ASSERT(v.isDiscrete(), "Not an integer variable: " << v.name());
+   ASSERT(v.isDiscrete(), "Not an integer variable: " << v.getName());
 
    s_.insert(v);
    b_ = s_.toBitset();
@@ -37,8 +37,8 @@ Proof IntContractor::contract(Box& B)
 {
    for (auto v : s_)
    {
-      Interval x = round(B[v.id()]);
-      B.set(v.id(), x);
+      Interval x = round(B[v.getId()]);
+      B.set(v.getId(), x);
 
       if (x.isEmpty())
          return Proof::Empty;
@@ -50,7 +50,7 @@ void IntContractor::print(std::ostream& os) const
 {
    os << "integral: ";
    for (auto v : s_)
-      os << v.name() << " ";
+      os << v.getName() << " ";
 }
 
 } // namespace

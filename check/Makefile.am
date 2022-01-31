@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-LDADD = ../realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@ @CPPUNIT_LIB@
-AM_CPPFLAGS = -I..
-AM_LDFLAGS = -L../realpaver/.libs
+LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@ @CPPUNIT_LIB@
+AM_CPPFLAGS = -I.. -I../src
+AM_LDFLAGS = -L../src/realpaver/.libs
 
 CLEANFILES = *~
 

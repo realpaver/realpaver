@@ -19,10 +19,10 @@ int main(void)
 
    Dag dag;
    size_t idx = dag.insert(c);
-   ThickFun f(&dag, idx, x.id());
+   ThickFun f(&dag, idx, x.getId());
 
    IntervalNewton newton;
-   Interval I( x.domain() );
+   Interval I( x.getDomain() );
 
    Proof p = newton.contract(f, I);
    cout << "Proof: " << p << endl;

@@ -1304,12 +1304,12 @@ Interval TermVar::evalConst() const
 
 Interval TermVar::eval(const Box& B) const
 {
-   return B[v_.id()];
+   return B[v_.getId()];
 }
 
 void TermVar::print(std::ostream& os) const
 {
-   os << v_.name();
+   os << v_.getName();
 }
 
 void TermVar::acceptVisitor(TermVisitor& vis) const
@@ -1319,7 +1319,7 @@ void TermVar::acceptVisitor(TermVisitor& vis) const
 
 bool TermVar::dependsOn(const Variable& v) const
 {
-   return v_.id() == v.id();
+   return v_.getId() == v.getId();
 }
 
 bool TermVar::isLinear() const
