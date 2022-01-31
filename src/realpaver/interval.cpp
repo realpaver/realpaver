@@ -1,6 +1,6 @@
 // This file is part of realpaver. License: see COPYING file.
 
-#include "realpaver/Exception.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/interval.hpp"
 
 namespace realpaver {
@@ -322,87 +322,6 @@ IntervalImprovement IntervalImprovement::calculate(const Interval& x, const Inte
 std::ostream& operator<<(std::ostream& os, const IntervalImprovement& imp)
 {
    return os << imp.getVal();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-IntervalPrecision::IntervalPrecision(const double& val, bool absolute) :
-   val_(val), abs_(absolute)
-{
-   ASSERT(val >= 0.0 && (val <= 1.0 || absolute), "bad precision: " << val);
-}
-
-bool IntervalPrecision::testPrecision(const Interval& x) const
-{
-   if (x.isEmpty())
-      return false;
-
-   else if (x.isCanonical())
-      return true;
-
-   else
-   {
-      double px = (isAbsolute() || Interval::minusOnePlusOne().contains(x)) ?
-                     x.width() : x.relWidth();
-
-      return px <= val_;
-   }
-}
-
-double IntervalPrecision::precisionOf(const Interval& x)
-{
-   if (x.isEmpty())
-      return -1.0;
-
-   else if (x.isCanonical())
-      return 0.0;
- 
-   else if (abs_ || Interval::minusOnePlusOne().contains(x))
-      return x.width();
-
-   else
-      return x.relWidth();
-}
-
-double IntervalPrecision::getVal() const
-{
-   return val_;
-}
-
-void IntervalPrecision::setVal(double m)
-{
-   val_ = m;
-}
-
-bool IntervalPrecision::isAbsolute() const
-{
-   return abs_;
-}
-
-bool IntervalPrecision::isAdaptive() const
-{
-   return !abs_;
-}
-
-IntervalPrecision IntervalPrecision::makeAbsolute(double val)
-{
-   return IntervalPrecision(val, true);
-}
-
-IntervalPrecision IntervalPrecision::makeAdaptive(double val)
-{
-   return IntervalPrecision(val, false);
-}
-
-std::ostream& operator<<(std::ostream& os, const IntervalPrecision& p)
-{
-   os << p.getVal();
-
-   if (p.isAbsolute())
-      os << " abs";
-   else
-      os << " ada";
-
-   return os;
 }
 
 } // namespace

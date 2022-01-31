@@ -20,56 +20,56 @@ Param::Param()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-IntervalPrecision Param::def_rvar_prec_ = IntervalPrecision::makeAdaptive(1.0e-8);
+Tolerance Param::def_rvar_prec_ = Tolerance::makeRel(1.0e-8);
 
-IntervalPrecision Param::DefRealVarPrecision()
+Tolerance Param::DefRealVarPrecision()
 {
    return def_rvar_prec_;
 }
 
-IntervalPrecision Param::DefRealVarPrecision(const IntervalPrecision& val)
+Tolerance Param::DefRealVarPrecision(const Tolerance& val)
 {
-   IntervalPrecision old = def_rvar_prec_;
+   Tolerance old = def_rvar_prec_;
    def_rvar_prec_ = val;
    return old;
 }
 
-IntervalPrecision Param::realVarPrecision() const
+Tolerance Param::realVarPrecision() const
 {
    return rvar_prec_;
 }
 
-IntervalPrecision Param::realVarPrecision(const IntervalPrecision& val)
+Tolerance Param::realVarPrecision(const Tolerance& val)
 {
-   IntervalPrecision old = rvar_prec_;
+   Tolerance old = rvar_prec_;
    rvar_prec_ = val;
    return old;   
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-IntervalPrecision Param::def_obj_prec_ = IntervalPrecision::makeAdaptive(1.0e-6);
+Tolerance Param::def_obj_prec_ = Tolerance::makeRel(1.0e-6);
 
-IntervalPrecision Param::DefObjPrecision()
+Tolerance Param::DefObjPrecision()
 {
    return def_obj_prec_;
 }
 
-IntervalPrecision Param::DefObjPrecision(const IntervalPrecision& val)
+Tolerance Param::DefObjPrecision(const Tolerance& val)
 {
-   IntervalPrecision old = def_obj_prec_;
+   Tolerance old = def_obj_prec_;
    def_obj_prec_ = val;
    return old;
 }
 
-IntervalPrecision Param::objPrecision() const
+Tolerance Param::objPrecision() const
 {
    return obj_prec_;
 }
 
-IntervalPrecision Param::objPrecision(const IntervalPrecision& val)
+Tolerance Param::objPrecision(const Tolerance& val)
 {
-   IntervalPrecision old = obj_prec_;
+   Tolerance old = obj_prec_;
    obj_prec_ = val;
    return old;   
 }
@@ -128,28 +128,28 @@ int Param::newtonMaxSteps(const int& val)
    return old;
 }
 
-IntervalPrecision Param::def_newton_prec_ = 1.0e-8;
+Tolerance Param::def_newton_prec_ = 1.0e-8;
 
-IntervalPrecision Param::DefNewtonPrecision()
+Tolerance Param::DefNewtonPrecision()
 {
    return def_newton_prec_;
 }
 
-IntervalPrecision Param::DefNewtonPrecision(const IntervalPrecision& val)
+Tolerance Param::DefNewtonPrecision(const Tolerance& val)
 {
-   IntervalPrecision old = def_newton_prec_;
+   Tolerance old = def_newton_prec_;
    def_newton_prec_ = val;
    return old;
 }
 
-IntervalPrecision Param::newtonPrecision() const
+Tolerance Param::newtonPrecision() const
 {
    return newton_prec_;
 }
 
-IntervalPrecision Param::newtonPrecision(const IntervalPrecision& val)
+Tolerance Param::newtonPrecision(const Tolerance& val)
 {
-   IntervalPrecision old = newton_prec_;
+   Tolerance old = newton_prec_;
    newton_prec_ = val;
    return old;
 }

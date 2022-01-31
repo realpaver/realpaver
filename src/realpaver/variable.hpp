@@ -5,6 +5,7 @@
 
 #include <memory>
 #include "realpaver/interval.hpp"
+#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
@@ -46,15 +47,15 @@ public:
 
    // management of the precision, i.e. the output precision of
    // interval solutions
-   IntervalPrecision precision() const;
-   void setPrecision(const IntervalPrecision& p);
+   Tolerance getTolerance() const;
+   void setTolerance(const Tolerance& tol);
 
 private:
    std::string name_;   // name
    size_t id_;          // id
    Interval domain_;    // initial variable domain
    bool continuous_;    // true for a real variable, false for a discrete one
-   IntervalPrecision eps_;      // output precision of interval solutions
+   Tolerance tol_;      // output precision of interval solutions
 };
 
 inline size_t VariableRep::id() const
@@ -112,14 +113,14 @@ inline size_t VariableRep::hashCode() const
    return id_;
 }
 
-inline IntervalPrecision VariableRep::precision() const
+inline Tolerance VariableRep::getTolerance() const
 {
-   return eps_;
+   return tol_;
 }
 
-inline void VariableRep::setPrecision(const IntervalPrecision& p)
+inline void VariableRep::setTolerance(const Tolerance& tol)
 {
-   eps_ = p;
+   tol_ = tol;
 }
 
 /*****************************************************************************
@@ -162,8 +163,8 @@ public:
    size_t hashCode() const;
 
    // output precision of interval solutions
-   IntervalPrecision precision() const;
-   Variable& setPrecision(const IntervalPrecision& p);
+   Tolerance getTolerance() const;
+   Variable& setTolerance(const Tolerance& tol);
 
    // clone
    Variable clone() const;
@@ -248,14 +249,14 @@ inline size_t Variable::hashCode() const
    return rep_->hashCode();
 }
 
-inline IntervalPrecision Variable::precision() const
+inline Tolerance Variable::getTolerance() const
 {
-   return rep_->precision();
+   return rep_->getTolerance();
 }
 
-inline Variable& Variable::setPrecision(const IntervalPrecision& p)
+inline Variable& Variable::setTolerance(const Tolerance& tol)
 {
-   rep_->setPrecision(p);
+   rep_->setTolerance(tol);
    return *this;
 }
 

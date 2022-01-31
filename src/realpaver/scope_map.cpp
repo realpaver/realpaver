@@ -1,7 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/common.hpp"
-#include "realpaver/Exception.hpp"
 #include "realpaver/scope_map.hpp"
 
 namespace realpaver {

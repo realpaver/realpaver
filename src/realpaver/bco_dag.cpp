@@ -1,8 +1,8 @@
 // This file is part of Realpaver. License: see COPYING file.
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/bco_dag.hpp"
 #include "realpaver/contractor_bc4.hpp"
-#include "realpaver/Exception.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/term_deriver.hpp"
 
@@ -43,7 +43,7 @@ BcoDag::BcoDag(Problem& P) :
    // variable representing the objective function
    z_ = P.addRealVar(Interval::universe(), "_z");
 
-   LOG("   > creates an objective variable " << z_.name());
+   //LOG_INFO("   > creates an objective variable " << z_.name());
 
    if (P.obj().isMinimize())
       dag_->insert( z_ - to == 0 );
@@ -93,15 +93,15 @@ bool BcoDag::checkProblem()
    bool res = checkInitialBox();
    std::string log = "   > checks the initial box: ";
    log += res ? "true" : "false";
-   LOG(log);   
-   LOG("     " << *init_);
+   //LOG_INFO(log);   
+   //LOG_INFO("     " << *init_);
 
    if (res)
    {
       res = checkObjRange();
       std::string log = "   > checks the range of the objective function: ";
       log += res ? "true" : "false";
-      LOG(log);
+      //LOG_INFO(log);
    }
 
    if (res)
@@ -109,7 +109,7 @@ bool BcoDag::checkProblem()
       res = checkDerivRange();
       std::string log = "   > checks the partial derivatives: ";
       log += res ? "true" : "false";
-      LOG(log);
+      //LOG_INFO(log);
    }
 
    return res;

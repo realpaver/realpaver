@@ -4,8 +4,6 @@
 #define REALPAVER_COMMON_HPP
 
 #include <iostream>
-#include <string>
-#include "realpaver/config.hpp"
 
 namespace realpaver {
 
@@ -58,13 +56,6 @@ enum class Proof {
 };
 
 std::ostream& operator<<(std::ostream& os, const Proof& p);
-
-
-#if DEBUG_ON
-#   define DEBUG(msg)   std::cerr << msg << std::endl
-#else
-#   define DEBUG(msg)
-#endif
 
 } // namespace
 

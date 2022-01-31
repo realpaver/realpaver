@@ -38,7 +38,7 @@ librealpaver_la_include_HEADERS = \
 		contractor_pool.hpp \
 		dag.hpp \
 		Exception.hpp \
-		inflator.hpp \
+		Inflator.hpp \
 		interval.hpp \
 		interval_impl.hpp \
 		interval_newton.hpp \
@@ -63,6 +63,7 @@ librealpaver_la_include_HEADERS = \
 		term_fixer.hpp \
 		thick_fun.hpp \
 		timer.hpp \
+		Tolerance.hpp \
 		uni_fun.hpp \
 		variable.hpp \
 		wrapper_interval_gaol.hpp
@@ -76,6 +77,7 @@ librealpaver_la_include_HEADERS += wrapper_lpsolver_gurobi.hpp
 endif
 
 librealpaver_la_SOURCES = \
+		AssertDebug.hpp \
 		bco_dag.cpp \
 		bco_local.cpp \
 		bco_model.cpp \
@@ -97,7 +99,7 @@ librealpaver_la_SOURCES = \
 		contractor_pool.cpp \
 		dag.cpp \
 		Exception.cpp \
-		inflator.cpp \
+		Inflator.cpp \
 		interval.cpp \
 		interval_newton.cpp \
 		interval_slicer.cpp \
@@ -120,6 +122,7 @@ librealpaver_la_SOURCES = \
 		term_fixer.cpp \
 		timer.cpp \
 		thick_fun.cpp \
+		Tolerance.cpp \
 		uni_fun.cpp \
 		variable.cpp
 

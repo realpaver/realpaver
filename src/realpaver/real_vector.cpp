@@ -9,8 +9,8 @@
 // See the file COPYING.                                                     //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/common.hpp"
-#include "realpaver/Exception.hpp"
 #include "realpaver/real_vector.hpp"
 
 namespace realpaver {

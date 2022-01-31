@@ -1,8 +1,8 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include <stack>
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/contractor_bc3.hpp"
-#include "realpaver/Exception.hpp"
 #include "realpaver/param.hpp"
 
 namespace realpaver {

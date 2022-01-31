@@ -1,7 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/constraint_relaxor.hpp"
-#include "realpaver/Exception.hpp"
 
 namespace realpaver {
 

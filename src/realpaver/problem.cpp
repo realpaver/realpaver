@@ -1,8 +1,8 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include <sstream>
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/constraint_fixer.hpp"
-#include "realpaver/Exception.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/param.hpp"
 #include "realpaver/problem.hpp"
@@ -28,7 +28,7 @@ Variable Problem::addBoolVar(const std::string& name)
    v.setId(id)
     .setDomain(Interval(0,1))
     .setDiscrete()
-    .setPrecision(IntervalPrecision::makeAbsolute(0.0));
+    .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -52,7 +52,7 @@ Variable Problem::addIntVar(const int& a, const int& b,
    v.setId(id)
     .setDomain(Interval(a,b))
     .setDiscrete()
-    .setPrecision(IntervalPrecision::makeAbsolute(0.0));
+    .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -81,7 +81,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    v.setId(id)
     .setDomain(x)
     .setContinuous()
-    .setPrecision(Param::DefRealVarPrecision());
+    .setTolerance(Param::DefRealVarPrecision());
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -170,7 +170,7 @@ bool Problem::isFakeVar(const Variable& v) const
 
 bool Problem::preprocess(const Box& B, Problem& other)
 {
-   LOG("   > simplifies the problem");
+   //LOG_INFO("   > simplifies the problem");
 
    // detects the fixed variables and creates the maps
    ConstraintFixer::VVMap vvm;
@@ -182,12 +182,12 @@ bool Problem::preprocess(const Box& B, Problem& other)
 
       if (B[i].isEmpty())
       {
-         LOG("     - empty variable domain: " << v.name());
+         //LOG_INFO("     - empty variable domain: " << v.name());
          return false;
       }
       else if (B[i].isCanonical())
       {
-         LOG("     - replaces " << v.name() << " by " << B[i]);
+         //LOG_INFO("     - replaces " << v.name() << " by " << B[i]);
          vim.insert(std::make_pair(v, B[i]));
       }
       else
@@ -215,12 +215,12 @@ bool Problem::preprocess(const Box& B, Problem& other)
       Proof proof = c.isSat(oB);
       if (proof == Proof::Empty)
       {
-         LOG("     - violated constraint: " << ctrAt(i));
+         //LOG_INFO("     - violated constraint: " << ctrAt(i));
          return false;
       }
       else if (proof == Proof::Inner)
       {
-         LOG("     - inactive constraint: " << ctrAt(i));
+         //LOG_INFO("     - inactive constraint: " << ctrAt(i));
       }
       else
       {
@@ -234,7 +234,7 @@ bool Problem::preprocess(const Box& B, Problem& other)
    
    if (!obj_.isConstant() && fixer.getTerm().isConstant())
    {
-      LOG("     - fixed objective: " << fixer.getTerm());
+      //LOG_INFO("     - fixed objective: " << fixer.getTerm());
    }
    
    other.addObj(Obj(obj_.getDir(), fixer.getTerm()));
@@ -243,8 +243,8 @@ bool Problem::preprocess(const Box& B, Problem& other)
    for (size_t i=0; i<other.nbVars(); ++i)
    {
       Variable v = other.varAt(i);
-      if (other.isFakeVar(v))
-         LOG("     - unconstrained variable: " << v.name());
+      //if (other.isFakeVar(v))
+         //LOG_INFO("     - unconstrained variable: " << v.name());
    }
 
    return true;

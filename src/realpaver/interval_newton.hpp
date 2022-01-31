@@ -1,18 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, a reliable interval solver of nonlinear   //
-//                                 constraint satisfaction and optimization  //
-//                                 problems over the real numbers.           //
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (C) 2020-2022 Laboratoire des Sciences du Numérique de Nantes   //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
 //                                                                           //
-// Realpaver is a software distributed under the terms of the MIT License.   //
-// See the file COPYING.                                                     //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef REALPAVER_INTERVAL_NEWTON_HPP
 #define REALPAVER_INTERVAL_NEWTON_HPP
 
-#include "realpaver/inflator.hpp"
+#include "realpaver/Inflator.hpp"
+#include "realpaver/Tolerance.hpp"
 #include "realpaver/uni_fun.hpp"
 
 namespace realpaver {
@@ -32,9 +31,8 @@ namespace realpaver {
 /// The contraction method stops on the interval Xk if one of the following
 /// conditions is verified:
 /// - Xk is empty
-/// - the precision of Xk (absolute or relative width) is smaller
-///   than an epsilon
-/// - Xk does not improve enough the previous interval
+/// - the width of Xk is smaller than a given tolerance
+/// - the distance between Xk and Xk-1 is smaller than a given tolerance
 /// - the limit on the number of iterations is reached
 ///
 /// Given a univariate interval function f(x) and an interval X, the local
@@ -48,6 +46,7 @@ namespace realpaver {
 /// - Xk is empty
 /// - the existence of a zero in Xk is proven
 /// - the limit on the number of iterations is reached
+/// - the distance between Xk and Xk-1 is smaller than a given tolerance
 /// - the method diverges
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalNewton {
@@ -83,13 +82,6 @@ public:
    /// @return a certificate of proof
    Proof localStep(UniFun& f, Interval& x);
 
-   /// Gets the improvement factor of the contraction method
-   IntervalImprovement getImprovement() const;
-
-   /// Sets the improvement factor of the contraction method
-   /// @param imp new value of the improvement factor
-   void setImprovement(const IntervalImprovement& imp);
-
    /// Sets a limit of iterations of the iterative methods
    /// @param n new value of the limit
    void setMaxIterations(int n);
@@ -97,12 +89,31 @@ public:
    /// @return the maximum number of iterations of the iterative method
    int getMaxIterations() const;
 
-   /// @return the precision used to stop the contraction method
-   IntervalPrecision getPrecision() const;
+   /// @return the tolerance on the width of an interval in the contraction
+   ///         method
+   Tolerance getXTol() const;
 
-   /// Sets the precision used to stop the contraction method
-   /// @param prec new value of the precision
-   void setPrecision(const IntervalPrecision& prec);
+   /// Sets the tolerance on the width of an interval in the contraction method
+   /// @param tol absolute or relative tolerance
+   void setXTol(const Tolerance& tol);
+
+   /// @return the tolerance on the distance between two consecutive intervals
+   ///         in the contraction method
+   Tolerance getDTol() const;
+
+   /// Sets the tolerance on the distance between two consecutive intervals
+   /// in the contraction method
+   /// @param tol absolute or relative tolerance
+   void setDTol(const Tolerance& tol);
+
+   /// @return the tolerance on the distance between two consecutive intervals
+   ///         in the local search method
+   Tolerance getLocalDTol() const;
+
+   /// Sets the tolerance on the distance between two consecutive intervals
+   /// in the local search method
+   /// @param tol absolute or relative tolerance
+   void setLocalDTol(const Tolerance& tol);
 
    /// @returns the inflator used by the local search method
    Inflator getInflator() const;
@@ -112,10 +123,11 @@ public:
    void setInflator(const Inflator& inflator);
 
 private:
-   IntervalImprovement imp_;    // improvement factor used to stop contract
-   int maxiter_;        // limit on the number of iterations
-   IntervalPrecision prec_;
-   Inflator inflator_;  // inflation operator for the local search
+   int maxiter_;
+   Tolerance xtol_;
+   Tolerance dtol_;
+   Tolerance ldtol_;
+   Inflator inflator_;
 };
 
 } // namespace

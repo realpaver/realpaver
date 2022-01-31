@@ -980,52 +980,6 @@ private:
 std::ostream& operator<<(std::ostream& os, const IntervalImprovement& imp);
 
 
-/*****************************************************************************
- * Class of precisions used to check the tightness of intervals.
- * 
- * The precision of an interval x is equal to
- *     # -1 if x is empty
- *     # 0 if x is canonical
- *     # the width of x if the precision is ABSOLUTE
- *     # otherwise
- *         ## the width of x if x is included in [-1,+1]
- *         ## the relative width of x otherwise
- *****************************************************************************/
-class IntervalPrecision {
-public:
-   // constructor
-   IntervalPrecision(const double& val = 0.0, bool absolute = true);
-
-   // creates an absolute precision
-   static IntervalPrecision makeAbsolute(double val);
-
-   // creates an adaptive precision
-   static IntervalPrecision makeAdaptive(double val);
-
-   // magnitude
-   double getVal() const;
-   void setVal(double val);
-
-   // returns true if x has this precision
-   bool testPrecision(const Interval& x) const;
-
-   // returns true if this precision is absolute
-   bool isAbsolute() const;
-
-   // returns true if this precision is adaptive
-   bool isAdaptive() const;
-
-   // returns the precision of x
-   double precisionOf(const Interval& x);
-
-
-private:
-   double val_;   // magnitude
-   bool abs_;     // true for an absolute precision
-};
-
-// output on a stream
-std::ostream& operator<<(std::ostream& os, const IntervalPrecision& p);
 
 } // namespace
 

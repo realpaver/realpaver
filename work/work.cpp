@@ -21,7 +21,7 @@ using namespace realpaver;
 
 int main(void)
 {
-   Logger::connectConsole();
+   Logger::init(LogLevel::internal, "work.log");
    Interval::precision( 16 );
 
 Problem p;
@@ -39,6 +39,8 @@ Problem p;
 
       BcoModel* model = new BcoModel(*prob);
       BcoResult res = model->preprocess();
+
+      LOG_INTERNAL("after preprocess");
 
       if (res.getProof() != Proof::Empty && res.getProof() != Proof::Optimal)
       {
@@ -68,7 +70,7 @@ Problem p;
          res = model->solve();
       }
 
-      LOG("proof : " << res.getProof());
+      LOG_INTERNAL("proof : " << res.getProof());
 
       delete prob;
       if (simpl != nullptr)

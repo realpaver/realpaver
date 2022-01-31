@@ -5,8 +5,11 @@
 namespace realpaver {
 
 VariableRep::VariableRep(const std::string& name) :
-   name_(name), id_(0), domain_(), continuous_(true),
-   eps_(IntervalPrecision::makeAbsolute(0.0))
+      name_(name),
+      id_(0),
+      domain_(),
+      continuous_(true),
+      tol_(Tolerance::makeAbs(0.0))
 {}
 
 Variable::Variable(const std::string& name) :
@@ -15,12 +18,16 @@ Variable::Variable(const std::string& name) :
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
-   os << "("       << v.name()   << ", "
-      << "id="     << v.id()     << ", "
-      << "domain=" << v.domain() << ", "
-      << (v.isContinuous() ? "continuous" : "discrete") << ", "
-      << "precision=" << v.precision() << ")";
-   
+   os << v.name()
+      << " #"
+      << v.id()
+      << " "
+      << (v.isContinuous() ? "(C)" : "(D)")
+      << " in "
+      << v.domain()
+      << " @ "
+      << v.getTolerance();
+
    return os;
 }
 
@@ -30,7 +37,7 @@ Variable Variable::clone() const
 
    v.setId(id())
     .setDomain(domain())
-    .setPrecision(precision());
+    .setTolerance(getTolerance());
 
    if (isDiscrete())
       v.setDiscrete();

@@ -1,7 +1,7 @@
 // This file is part of Realpaver. License: see COPYING file.
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/bco_model.hpp"
-#include "realpaver/Exception.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/timer.hpp"
 
@@ -134,7 +134,7 @@ BcoModel::BcoModel(Problem& P) :
    ASSERT(P.hasObjective(),
           "BCO model created from a problem with no objective.");
 
-   LOG("-- Creation of a BCO model -- ");
+   //LOG_INFO("-- Creation of a BCO model -- ");
 
    ctimer_.start();
 
@@ -165,13 +165,13 @@ BcoResult BcoModel::preprocess(const Param& param)
    // creates a propagator if any
    bdag_->makeDefaultPropagator();
 
-   LOG("   > tries to fix some variables...");
+   //LOG_INFO("   > tries to fix some variables...");
    Box B(*initialBox());
    Proof proof = bdag_->propagator()->contract(B);
 
    if (proof == Proof::Empty)
    {
-      LOG("   > first propagation: false");
+      //LOG_INFO("   > first propagation: false");
       ptimer_.stop();
       res.addPTime(ptimer_.elapsedTime());
       res.setProof(Proof::Empty);
@@ -186,12 +186,12 @@ BcoResult BcoModel::preprocess(const Param& param)
          if (B[v].isCanonical())
          {
             ++nbFixed_;
-            LOG("     - fix " << v.name() << " to " << B[v]);
+            //LOG_INFO("     - fix " << v.name() << " to " << B[v]);
          }
          initialBox()->set(v, B[v]);
       }
 
-      LOG("   > first propagation: true");      
+      //LOG_INFO("   > first propagation: true");      
 
       res.setOptimum(B[objVar()]);
       res.setBox(B);
@@ -199,12 +199,12 @@ BcoResult BcoModel::preprocess(const Param& param)
 
       if (nbFixed_ == prob_->nbVars())
       {
-         LOG("   > problem solved by preprocessing");
+         //LOG_INFO("   > problem solved by preprocessing");
          res.setProof(Proof::Optimal);
 
       }
 
-      LOG("   > box after preprocessing: " << B);
+      //LOG_INFO("   > box after preprocessing: " << B);
 
       ptimer_.stop();
       res.addPTime(ptimer_.elapsedTime());
@@ -214,7 +214,7 @@ BcoResult BcoModel::preprocess(const Param& param)
 
 BcoResult BcoModel::solve(const Param& param)
 {
-   LOG("\n-- Solving of a Bound-Constrained Optimization problem -- ");
+   //LOG_INFO("\n-- Solving of a Bound-Constrained Optimization problem -- ");
 
    BcoResult res;
    stimer_.start();

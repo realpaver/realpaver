@@ -1,6 +1,13 @@
-# This file is part of Realpaver. License: see COPYING file.
+###############################################################################
+## This file is part of Realpaver, an interval constraint and NLP solver.    ##
+##                                                                           ##
+## Copyright (c) 2017-2022 LS2N, Nantes                                      ##
+##                                                                           ##
+## Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   ##
+## COPYING for information.                                                  ##
+###############################################################################
 
-m4_define([realpaver_name], [realpaver])
+m4_define([realpaver_name], [Realpaver])
 m4_define([realpaver_version], [1.0])
 
 AC_INIT([realpaver_name],
@@ -299,25 +306,6 @@ else
 fi
 
 
-# --enable-log
-AC_MSG_CHECKING([whether to generate log files])
-AC_ARG_ENABLE(log,
-   [AS_HELP_STRING([--enable-log],
-                   [generate log files (default=no)])],
-   [enable_log=yes],
-   [enable_log=no])
-
-if test ${enable_log} = "yes"; then
-   AC_DEFINE(LOG_ON,1,
-             [Define to 1 to generate log files.])
-   AC_MSG_RESULT([yes])
-else
-   AC_DEFINE(LOG_ON,0,
-             [Define this to 1 to generate log files.])
-   AC_MSG_RESULT([no])
-fi
-
-
 # --enable-assert
 AC_MSG_CHECKING([whether to check assertions])
 AC_ARG_ENABLE(assert,
@@ -333,6 +321,25 @@ if test ${enable_assert} = "yes"; then
 else
    AC_DEFINE(ASSERT_ON,0,
              [Define this to 1 to check assertions.])
+   AC_MSG_RESULT([no])
+fi
+
+
+# --enable-log
+AC_MSG_CHECKING([whether to generate log files])
+AC_ARG_ENABLE(log,
+   [AS_HELP_STRING([--enable-log],
+                   [generate log files (default=no)])],
+   [enable_log=yes],
+   [enable_log=no])
+
+if test ${enable_log} = "yes"; then
+   AC_DEFINE(LOG_ON, 1,
+             [Define to 1 to generate log files.])
+   AC_MSG_RESULT([yes])
+else
+   AC_DEFINE(LOG_ON, 0,
+             [Define this to 1 to generate log files.])
    AC_MSG_RESULT([no])
 fi
 
@@ -355,8 +362,8 @@ printf "Realpaver v. realpaver_version configured\n"
 printf "\tInterval library   : ${use_itvlib}\n"
 printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
-printf "\tLog files          : ${enable_log}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
+printf "\tLog files          : ${enable_log}\n"
 printf "\tUnit testing       : ${have_cppunit}\n"
 printf "\tDoxygen            : ${DOXYGEN}\n"
 printf "\nRun make to compile Realpaver\n"
@@ -367,4 +374,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --with-lplib=clp --enable-debug --enable-log --enable-assert
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --with-lplib=clp --enable-debug --enable-assert --enable-log

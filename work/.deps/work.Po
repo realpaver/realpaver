@@ -150,8 +150,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/atomic_base.h \
  /usr/include/c++/7/bits/atomic_lockfree_defines.h \
  /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/interval.hpp \
- ../src/realpaver/common.hpp ../src/realpaver/config.hpp \
- ../src/realpaver/configure.hpp ../src/realpaver/interval_impl.hpp \
+ ../src/realpaver/common.hpp ../src/realpaver/interval_impl.hpp \
  /home/granvilliers-l/local/include/gaol/gaol \
  /home/granvilliers-l/local/include/gaol/gaol_config.h \
  /home/granvilliers-l/local/include/gaol/gaol_configuration.h \
@@ -195,21 +194,23 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/unordered_map /usr/include/c++/7/bits/hashtable.h \
  /usr/include/c++/7/bits/hashtable_policy.h \
  /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/variable.hpp \
- ../src/realpaver/constraint.hpp ../src/realpaver/term.hpp \
- ../src/realpaver/obj.hpp ../src/realpaver/contractor_bc3.hpp \
- ../src/realpaver/contractor.hpp ../src/realpaver/interval_newton.hpp \
- ../src/realpaver/inflator.hpp ../src/realpaver/uni_fun.hpp \
- ../src/realpaver/interval_slicer.hpp /usr/include/c++/7/list \
- /usr/include/c++/7/bits/stl_list.h /usr/include/c++/7/bits/list.tcc \
- ../src/realpaver/thick_fun.hpp ../src/realpaver/dag.hpp \
- /usr/include/c++/7/unordered_set /usr/include/c++/7/bits/unordered_set.h \
+ ../src/realpaver/Tolerance.hpp ../src/realpaver/constraint.hpp \
+ ../src/realpaver/term.hpp ../src/realpaver/obj.hpp \
+ ../src/realpaver/contractor_bc3.hpp ../src/realpaver/contractor.hpp \
+ ../src/realpaver/interval_newton.hpp ../src/realpaver/inflator.hpp \
+ ../src/realpaver/uni_fun.hpp ../src/realpaver/interval_slicer.hpp \
+ /usr/include/c++/7/list /usr/include/c++/7/bits/stl_list.h \
+ /usr/include/c++/7/bits/list.tcc ../src/realpaver/thick_fun.hpp \
+ ../src/realpaver/dag.hpp /usr/include/c++/7/unordered_set \
+ /usr/include/c++/7/bits/unordered_set.h \
  ../src/realpaver/contractor_bc4.hpp ../src/realpaver/contractor_hc4.hpp \
  ../src/realpaver/Logger.hpp /usr/include/c++/7/fstream \
  /usr/include/c++/7/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
  /usr/include/c++/7/bits/fstream.tcc /usr/include/c++/7/sstream \
- /usr/include/c++/7/bits/sstream.tcc ../src/realpaver/Exception.hpp \
+ /usr/include/c++/7/bits/sstream.tcc ../src/realpaver/config.hpp \
+ ../src/realpaver/configure.hpp ../src/realpaver/Exception.hpp \
  ../src/realpaver/interval_union.hpp ../src/realpaver/term_deriver.hpp \
  ../src/realpaver/term_fixer.hpp ../src/realpaver/timer.hpp \
  /usr/include/c++/7/chrono /usr/include/c++/7/ratio \
@@ -610,10 +611,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/common.hpp:
 
-../src/realpaver/config.hpp:
-
-../src/realpaver/configure.hpp:
-
 ../src/realpaver/interval_impl.hpp:
 
 /home/granvilliers-l/local/include/gaol/gaol:
@@ -722,6 +719,8 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/variable.hpp:
 
+../src/realpaver/Tolerance.hpp:
+
 ../src/realpaver/constraint.hpp:
 
 ../src/realpaver/term.hpp:
@@ -773,6 +772,10 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/c++/7/sstream:
 
 /usr/include/c++/7/bits/sstream.tcc:
+
+../src/realpaver/config.hpp:
+
+../src/realpaver/configure.hpp:
 
 ../src/realpaver/Exception.hpp:
 

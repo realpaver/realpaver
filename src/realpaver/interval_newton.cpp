@@ -1,37 +1,27 @@
 ///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, a reliable interval solver of nonlinear   //
-//                                 constraint satisfaction and optimization  //
-//                                 problems over the real numbers.           //
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (C) 2020-2022 Laboratoire des Sciences du Numérique de Nantes   //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
 //                                                                           //
-// Realpaver is a software distributed under the terms of the MIT License.   //
-// See the file COPYING.                                                     //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <limits>
-#include "realpaver/Exception.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/interval_newton.hpp"
-#include "realpaver/param.hpp"
+#include "realpaver/Logger.hpp"
+#include "realpaver/number.hpp"
 
 namespace realpaver {
 
 IntervalNewton::IntervalNewton() :
-   imp_(Param::DefNewtonImprovement()),
-   maxiter_(Param::DefNewtonMaxSteps()),
-   prec_(Param::DefNewtonPrecision()),
+   maxiter_(Integer::max()),
+   xtol_(Tolerance::makeRel(1.0e-8)),
+   dtol_(Tolerance::makeRel(1.0e-8)),
+   ldtol_(Tolerance::makeRel(1.0e-8)),
    inflator_()
 {}
-
-IntervalImprovement IntervalNewton::getImprovement() const
-{
-   return imp_;
-}
-
-void IntervalNewton::setImprovement(const IntervalImprovement& imp)
-{
-   imp_ = imp;
-}
 
 int IntervalNewton::getMaxIterations() const
 {
@@ -45,14 +35,34 @@ void IntervalNewton::setMaxIterations(int n)
    maxiter_ = n;
 }
 
-IntervalPrecision IntervalNewton::getPrecision() const
+Tolerance IntervalNewton::getXTol() const
 {
-   return prec_;
+   return xtol_;
 }
 
-void IntervalNewton::setPrecision(const IntervalPrecision& prec)
+void IntervalNewton::setXTol(const Tolerance& tol)
 {
-   prec_ = prec;
+   xtol_ = tol;
+}
+
+Tolerance IntervalNewton::getDTol() const
+{
+   return dtol_;
+}
+
+void IntervalNewton::setDTol(const Tolerance& tol)
+{
+   dtol_ = tol;
+}
+
+Tolerance IntervalNewton::getLocalDTol() const
+{
+   return ldtol_;
+}
+
+void IntervalNewton::setLocalDTol(const Tolerance& tol)
+{
+   ldtol_ = tol;
 }
 
 Inflator IntervalNewton::getInflator() const
@@ -67,6 +77,9 @@ void IntervalNewton::setInflator(const Inflator& inflator)
 
 Proof IntervalNewton::contract(UniFun& f, Interval& x)
 {
+   LOG_INTERNAL("\nInterval Newton: contract " << x);
+   LOG_INTERNAL("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
+
    Proof proof = Proof::Maybe;
    Interval y = x;
    bool iter = true;
@@ -76,6 +89,8 @@ Proof IntervalNewton::contract(UniFun& f, Interval& x)
    {
       Interval prev(y);
       Proof p = step(f, y);
+
+      LOG_INTERNAL("  step > " << p << " " << y);
 
       if (p == Proof::Empty)
       {
@@ -88,17 +103,19 @@ Proof IntervalNewton::contract(UniFun& f, Interval& x)
          if (p == Proof::Feasible)
             proof = p;
 
-         if (!imp_.test(y, prev))
-            iter = false;
-   
          if (++steps >= maxiter_)
             iter = false;
 
-         if (prec_.testPrecision(y))
+         if (xtol_.hasTolerance(y))
+            iter = false;
+ 
+         if (dtol_.hasTolerance(prev, y))
             iter = false;
       }
    }
    while (iter);
+
+   LOG_INTERNAL("> " << proof << " " << y);
 
    x = y;
    return proof;
@@ -196,6 +213,12 @@ Proof IntervalNewton::localSearch(UniFun& f, Interval& x)
       }
 
       else if (dcur > dold)
+      {
+         y = x;
+         iter = false;
+      }
+
+      else if (ldtol_.hasTolerance(prev, y))
       {
          y = x;
          iter = false;

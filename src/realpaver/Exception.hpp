@@ -75,14 +75,6 @@ private:
    if (cond)                                                \
       THROW(msg)
 
-#if ASSERT_ON
-#   define ASSERT(cond, msg)                                \
-      if (!(cond))                                          \
-         THROW(msg)
-#else
-#   define ASSERT(cond, msg)
-#endif
-
 } // namespace
 
 #endif

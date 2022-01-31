@@ -1,6 +1,7 @@
 #include <iostream>
 #include "realpaver/dag.hpp"
 #include "realpaver/interval_newton.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/problem.hpp"
 #include "realpaver/thick_fun.hpp"
 
@@ -9,6 +10,9 @@ using namespace std;
 
 int main(void)
 {
+   Logger::init(LogLevel::internal, "interval_newton.log");
+   Interval::precision( 16 );
+   
    Problem problem;
    Variable x = problem.addRealVar(1.0, 10.0, "x");
    Constraint c( sqr(x) - 2.0 == 0.0 );

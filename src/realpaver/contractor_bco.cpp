@@ -66,8 +66,8 @@ Proof BcoContractor::contract(Box& B)
          B.set(v_, val);
       }
 
-      else
-         LOG("!!! unable to fix " << v_.name() << " but monotone");
+      //else
+         //LOG_INFO("!!! unable to fix " << v_.name() << " but monotone");
    }
    else
    {

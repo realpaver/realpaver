@@ -4,6 +4,7 @@
 #define REALPAVER_PARAM_HPP
 
 #include "realpaver/interval.hpp"
+#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
@@ -16,16 +17,16 @@ public:
    Param();
 
    // precision of real variables
-   IntervalPrecision realVarPrecision() const;
-   IntervalPrecision realVarPrecision(const IntervalPrecision& val);
-   static IntervalPrecision DefRealVarPrecision();
-   static IntervalPrecision DefRealVarPrecision(const IntervalPrecision& val);
+   Tolerance realVarPrecision() const;
+   Tolerance realVarPrecision(const Tolerance& val);
+   static Tolerance DefRealVarPrecision();
+   static Tolerance DefRealVarPrecision(const Tolerance& val);
 
    // precision of objective function
-   IntervalPrecision objPrecision() const;
-   IntervalPrecision objPrecision(const IntervalPrecision& val);
-   static IntervalPrecision DefObjPrecision();
-   static IntervalPrecision DefObjPrecision(const IntervalPrecision& val);
+   Tolerance objPrecision() const;
+   Tolerance objPrecision(const Tolerance& val);
+   static Tolerance DefObjPrecision();
+   static Tolerance DefObjPrecision(const Tolerance& val);
 
    // univariate interval Newton method: improvement factor
    IntervalImprovement newtonImprovement() const;
@@ -40,10 +41,10 @@ public:
    static int DefNewtonMaxSteps(const int& val);
 
    // univariate interval Newton method: precision of output
-   IntervalPrecision newtonPrecision() const;
-   IntervalPrecision newtonPrecision(const IntervalPrecision& val);
-   static IntervalPrecision DefNewtonPrecision();
-   static IntervalPrecision DefNewtonPrecision(const IntervalPrecision& val);
+   Tolerance newtonPrecision() const;
+   Tolerance newtonPrecision(const Tolerance& val);
+   static Tolerance DefNewtonPrecision();
+   static Tolerance DefNewtonPrecision(const Tolerance& val);
 
    // inflation: delta
    double inflatorDelta() const;
@@ -89,12 +90,12 @@ public:
 
 private:
    // precision of real variables
-   IntervalPrecision rvar_prec_;
-   static IntervalPrecision def_rvar_prec_;
+   Tolerance rvar_prec_;
+   static Tolerance def_rvar_prec_;
 
    // precision of objective function
-   IntervalPrecision obj_prec_;
-   static IntervalPrecision def_obj_prec_;
+   Tolerance obj_prec_;
+   static Tolerance def_obj_prec_;
 
    // univariate interval Newton method: improvement factor
    IntervalImprovement newton_imp_;
@@ -105,8 +106,8 @@ private:
    int newton_ms_;
 
    // univariate interval Newton method: precision of output
-   IntervalPrecision newton_prec_;
-   static IntervalPrecision def_newton_prec_;
+   Tolerance newton_prec_;
+   static Tolerance def_newton_prec_;
 
    // inflation: delta
    double inflator_delta_;
