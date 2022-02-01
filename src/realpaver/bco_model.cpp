@@ -200,7 +200,8 @@ BcoResult BcoModel::preprocess(const Param& param)
       if (nbFixed_ == prob_->nbVars())
       {
          //LOG_INFO("   > problem solved by preprocessing");
-         res.setProof(Proof::Optimal);
+         //res.setProof(Proof::Optimal);
+         // TODO, changer le resultat en OptimizationStatus !!!
 
       }
 

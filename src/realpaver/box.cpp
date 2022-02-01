@@ -77,7 +77,7 @@ size_t Box::hashCode() const
    {
       h = v_[0].hashCode();
       for (size_t i=1; i<size(); ++i)
-         h = Hash2(h, v_[i].hashCode());
+         h = hash2(h, v_[i].hashCode());
    }
 
    return h;

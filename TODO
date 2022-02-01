@@ -1,2 +1,8 @@
+LPModel.hpp LPModel.cpp
+Renommer aussi les wrappers, les liens LPSolver.hpp et .cpp
 
-Logger doit etre revu avec des niveaux de log
+Box.hpp Box.cpp
+Box herite de IntervalVector
+
+Gestion des parametres
+

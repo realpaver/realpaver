@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/number.hpp"
+#include "realpaver/Double.hpp"
 #include "realpaver/Tolerance.hpp"
 
 namespace realpaver {

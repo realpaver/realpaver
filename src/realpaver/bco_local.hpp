@@ -4,7 +4,7 @@
 #define REALPAVER_BCO_LOCAL_HPP
 
 #include "realpaver/box.hpp"
-#include "realpaver/real_vector.hpp"
+#include "realpaver/RealVector.hpp"
 
 namespace realpaver {
 

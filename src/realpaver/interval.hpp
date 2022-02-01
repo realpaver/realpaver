@@ -4,8 +4,8 @@
 #define REALPAVER_INTERVAL_HPP
 
 #include <utility>
-#include "realpaver/common.hpp"
-#include "realpaver/interval_impl.hpp"
+#include "realpaver/Common.hpp"
+#include "realpaver/IntervalImpl.hpp"
 
 namespace realpaver {
 
@@ -285,10 +285,11 @@ public:
    friend Interval sgnPY(const Interval& x, const Interval& y);   
 
 private:
-   IntervalImpl::interval impl_;    // interval enclosed
+   typedef IntervalTraits<RawInterval> Traits;
+   RawInterval impl_;    // interval enclosed
 
    // constructor
-   Interval(const IntervalImpl::interval& x);
+   Interval(const Interval::Traits::interval& x);
 };
 
 // output on a stream
@@ -296,88 +297,88 @@ std::ostream& operator<<(std::ostream& os, const Interval& x);
 
 inline std::streamsize Interval::precision(std::streamsize n)
 {
-   return IntervalImpl::precision(n);
+   return Interval::Traits::precision(n);
 }
 
 inline std::streamsize Interval::precision()
 {
-   return IntervalImpl::precision();
+   return Interval::Traits::precision();
 }
 
 inline double Interval::left() const
 {
-   return IntervalImpl::left(impl_);
+   return Interval::Traits::left(impl_);
 }
 
 inline double Interval::right() const
 {
-   return IntervalImpl::right(impl_);
+   return Interval::Traits::right(impl_);
 }
 
 inline void Interval::setLeft(const double& a)
 {
-   impl_ = IntervalImpl::create(a,right());
+   impl_ = Interval::Traits::create(a, right());
 }
 
 
 inline void Interval::setRight(const double& a)
 {
-   impl_ = IntervalImpl::create(left(),a);   
+   impl_ = Interval::Traits::create(left(), a);   
 }
 
 inline double Interval::width() const
 {
-   return IntervalImpl::width(impl_);
+   return Interval::Traits::width(impl_);
 }
 
 inline double Interval::radius() const
 {
-   return IntervalImpl::radius(impl_);
+   return Interval::Traits::radius(impl_);
 }
 
 inline size_t Interval::hashCode() const
 {
-   return IntervalImpl::hashCode(impl_);
+   return Interval::Traits::hashCode(impl_);
 }
 
 inline double Interval::relWidth() const
 {
-   return IntervalImpl::relWidth(impl_);
+   return Interval::Traits::relWidth(impl_);
 }
 
 inline double Interval::midpoint() const
 {
-   return IntervalImpl::midpoint(impl_);
+   return Interval::Traits::midpoint(impl_);
 }
 
 inline double Interval::mig() const
 {
-   return IntervalImpl::mig(impl_);
+   return Interval::Traits::mig(impl_);
 }
 
 inline double Interval::mag() const
 {
-   return IntervalImpl::mag(impl_);
+   return Interval::Traits::mag(impl_);
 }
 
 inline void Interval::setEmpty()
 {
-   IntervalImpl::setEmpty(impl_);
+   Interval::Traits::setEmpty(impl_);
 }
 
 inline bool Interval::isEmpty() const
 {
-   return IntervalImpl::isEmpty(impl_);
+   return Interval::Traits::isEmpty(impl_);
 }
 
 inline bool Interval::isCanonical() const
 {
-   return IntervalImpl::isCanonical(impl_);
+   return Interval::Traits::isCanonical(impl_);
 }
 
 inline bool Interval::isFinite() const
 {
-   return IntervalImpl::isFinite(impl_);
+   return Interval::Traits::isFinite(impl_);
 }
 
 inline bool Interval::isInf() const
@@ -392,142 +393,142 @@ inline bool Interval::isUniverse() const
 
 inline bool Interval::isInfLeft() const
 {
-   return IntervalImpl::isInfLeft(impl_);
+   return Interval::Traits::isInfLeft(impl_);
 }
 
 inline bool Interval::isInfRight() const
 {
-   return IntervalImpl::isInfRight(impl_);
+   return Interval::Traits::isInfRight(impl_);
 }
 
 inline bool Interval::isSingleton() const
 {
-   return IntervalImpl::isSingleton(impl_);
+   return Interval::Traits::isSingleton(impl_);
 }
 
 inline bool Interval::isZero() const
 {
-   return IntervalImpl::isZero(impl_);
+   return Interval::Traits::isZero(impl_);
 }
 
 inline bool Interval::contains(const double& a) const
 {
-   return IntervalImpl::contains(impl_,a);
+   return Interval::Traits::contains(impl_, a);
 }
 
 inline bool Interval::contains(const Interval& other) const
 {
-   return IntervalImpl::contains(impl_,other.impl_);
+   return Interval::Traits::contains(impl_, other.impl_);
 }
 
 inline bool Interval::strictlyContains(const Interval& other) const
 {
-   return IntervalImpl::strictlyContains(impl_,other.impl_);
+   return Interval::Traits::strictlyContains(impl_, other.impl_);
 }
 
 inline bool Interval::strictlyContains(const double& a) const
 {
-   return IntervalImpl::strictlyContains(impl_,a);
+   return Interval::Traits::strictlyContains(impl_, a);
 }
 
 inline bool Interval::containsZero() const
 {
-   return IntervalImpl::containsZero(impl_);
+   return Interval::Traits::containsZero(impl_);
 }
 
 inline bool Interval::strictlyContainsZero() const
 {
-   return IntervalImpl::strictlyContainsZero(impl_);
+   return Interval::Traits::strictlyContainsZero(impl_);
 }
 
 inline bool Interval::isSetEq(const Interval& other) const
 {
-   return IntervalImpl::isSetEq(impl_,other.impl_);
+   return Interval::Traits::isSetEq(impl_, other.impl_);
 }
 
 inline bool Interval::isSetNeq(const Interval& other) const
 {
-   return IntervalImpl::isSetNeq(impl_,other.impl_);
+   return Interval::Traits::isSetNeq(impl_, other.impl_);
 }
 
 inline bool Interval::isNegative() const
 {
-   return IntervalImpl::isNegative(impl_);
+   return Interval::Traits::isNegative(impl_);
 }
 
 inline bool Interval::isStrictlyNegative() const
 {
-   return IntervalImpl::isStrictlyNegative(impl_);
+   return Interval::Traits::isStrictlyNegative(impl_);
 }
 
 inline bool Interval::isPositive() const
 {
-   return IntervalImpl::isPositive(impl_);
+   return Interval::Traits::isPositive(impl_);
 }
 
 inline bool Interval::isStrictlyPositive() const
 {
-   return IntervalImpl::isStrictlyPositive(impl_);
+   return Interval::Traits::isStrictlyPositive(impl_);
 }
 
 inline bool Interval::isPossiblyEq(const Interval& other) const
 {
-   return IntervalImpl::isPossiblyEq(impl_,other.impl_);
+   return Interval::Traits::isPossiblyEq(impl_, other.impl_);
 }
 
 inline bool Interval::isPossiblyNeq(const Interval& other) const
 {
-   return IntervalImpl::isPossiblyNeq(impl_,other.impl_);
+   return Interval::Traits::isPossiblyNeq(impl_, other.impl_);
 }
 
 inline bool Interval::isPossiblyLe(const Interval& other) const
 {
-   return IntervalImpl::isPossiblyLe(impl_,other.impl_);
+   return Interval::Traits::isPossiblyLe(impl_, other.impl_);
 }
 
 inline bool Interval::isPossiblyLt(const Interval& other) const
 {
-   return IntervalImpl::isPossiblyLt(impl_,other.impl_);
+   return Interval::Traits::isPossiblyLt(impl_, other.impl_);
 }
 
 inline bool Interval::isPossiblyGe(const Interval& other) const
 {
-   return IntervalImpl::isPossiblyGe(impl_,other.impl_);
+   return Interval::Traits::isPossiblyGe(impl_, other.impl_);
 }
 
 inline bool Interval::isPossiblyGt(const Interval& other) const
 {
-   return IntervalImpl::isPossiblyGt(impl_,other.impl_);
+   return Interval::Traits::isPossiblyGt(impl_, other.impl_);
 }
 
 inline bool Interval::isCertainlyEq(const Interval& other) const
 {
-   return IntervalImpl::isCertainlyEq(impl_,other.impl_);
+   return Interval::Traits::isCertainlyEq(impl_, other.impl_);
 }
 
 inline bool Interval::isCertainlyNeq(const Interval& other) const
 {
-   return IntervalImpl::isCertainlyNeq(impl_,other.impl_);
+   return Interval::Traits::isCertainlyNeq(impl_, other.impl_);
 }
 
 inline bool Interval::isCertainlyLe(const Interval& other) const
 {
-   return IntervalImpl::isCertainlyLe(impl_,other.impl_);
+   return Interval::Traits::isCertainlyLe(impl_, other.impl_);
 }
 
 inline bool Interval::isCertainlyLt(const Interval& other) const
 {
-   return IntervalImpl::isCertainlyLt(impl_,other.impl_);
+   return Interval::Traits::isCertainlyLt(impl_, other.impl_);
 }
 
 inline bool Interval::isCertainlyGe(const Interval& other) const
 {
-   return IntervalImpl::isCertainlyGe(impl_,other.impl_);
+   return Interval::Traits::isCertainlyGe(impl_, other.impl_);
 }
 
 inline bool Interval::isCertainlyGt(const Interval& other) const
 {
-   return IntervalImpl::isCertainlyGt(impl_,other.impl_);
+   return Interval::Traits::isCertainlyGt(impl_, other.impl_);
 }
 
 inline bool Interval::isPossiblyEqZero() const
@@ -582,374 +583,376 @@ inline bool Interval::isCertainlyGtZero() const
 
 inline bool Interval::isDisjoint(const Interval& other) const
 {
-   return IntervalImpl::isDisjoint(impl_,other.impl_);
+   return Interval::Traits::isDisjoint(impl_, other.impl_);
 }
 
 inline bool Interval::overlaps(const Interval& other) const
 {
-   return IntervalImpl::overlaps(impl_,other.impl_);
+   return Interval::Traits::overlaps(impl_, other.impl_);
 }
 
 inline double Interval::distance(const Interval& other) const
 {
-   return IntervalImpl::distance(impl_,other.impl_);
+   return Interval::Traits::distance(impl_, other.impl_);
 }
 
 inline Interval& Interval::operator&=(const Interval& other)
 {
-   IntervalImpl::inter_assign(impl_,other.impl_);  
+   Interval::Traits::inter_assign(impl_, other.impl_);  
    return *this;
 }
 
 inline Interval operator&(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::inter(x.impl_,y.impl_));
+   return Interval(Interval::Traits::inter(x.impl_, y.impl_));
 }
 
 inline Interval& Interval::operator|=(const Interval& other)
 {
-   IntervalImpl::hull_assign(impl_,other.impl_);     
+   Interval::Traits::hull_assign(impl_, other.impl_);     
    return *this;
 }
 
 inline Interval operator|(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::hull(x.impl_,y.impl_));   
+   return Interval(Interval::Traits::hull(x.impl_, y.impl_));   
 }
 
 inline Interval round(const Interval& x)
 {
-   return Interval(IntervalImpl::round(x.impl_));      
+   return Interval(Interval::Traits::round(x.impl_));      
 }
 
 inline Interval& Interval::operator+=(const Interval& other)
 {
-   IntervalImpl::addAssign(impl_,other.impl_);     
+   Interval::Traits::addAssign(impl_, other.impl_);     
    return *this;
 }
 
 inline Interval operator+(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::add(x.impl_,y.impl_));      
+   return Interval(Interval::Traits::add(x.impl_, y.impl_));      
 }
 
 inline Interval addPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::addPX(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::addPX(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval addPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::addPY(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::addPY(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval addPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::addPZ(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval& Interval::operator-=(const Interval& other)
 {
-   IntervalImpl::subAssign(impl_,other.impl_);     
+   Interval::Traits::subAssign(impl_, other.impl_);     
    return *this;   
 }
 
 inline Interval operator-(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sub(x.impl_,y.impl_));      
+   return Interval(Interval::Traits::sub(x.impl_, y.impl_));      
 }
 
 inline Interval subPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::subPX(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::subPX(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval subPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::subPY(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::subPY(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval subPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::subPZ(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::subPZ(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval operator-(const Interval& x)
 {
-   return Interval(IntervalImpl::usub(x.impl_));         
+   return Interval(Interval::Traits::usub(x.impl_));
 }
 
 inline Interval usubPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::usubPX(x.impl_,y.impl_));   
+   return Interval(Interval::Traits::usubPX(x.impl_, y.impl_));   
 }
 
 inline Interval usubPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::usubPY(x.impl_,y.impl_));      
+   return Interval(Interval::Traits::usubPY(x.impl_, y.impl_));      
 }
 
 inline Interval& Interval::operator*=(const Interval& other)
 {
-   IntervalImpl::mulAssign(impl_,other.impl_);     
+   Interval::Traits::mulAssign(impl_, other.impl_);  
    return *this;   
 }
 
 inline Interval operator*(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::mul(x.impl_,y.impl_));      
+   return Interval(Interval::Traits::mul(x.impl_, y.impl_));      
 }
 
 inline Interval mulPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::mulPX(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::mulPX(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval mulPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::mulPY(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::mulPY(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval mulPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::mulPZ(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::mulPZ(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval& Interval::operator/=(const Interval& other)
 {
-   IntervalImpl::divAssign(impl_,other.impl_);     
+   Interval::Traits::divAssign(impl_, other.impl_);
    return *this;   
 }
 
 inline Interval operator/(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::div(x.impl_,y.impl_));      
+   return Interval(Interval::Traits::div(x.impl_, y.impl_));      
 }
 
 inline Interval divPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::divPX(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::divPX(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval divPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::divPY(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::divPY(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval divPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::divPZ(x.impl_,y.impl_,z.impl_));   
+   return Interval(Interval::Traits::divPZ(x.impl_, y.impl_, z.impl_));   
 }
 
 inline Interval sqr(const Interval& x)
 {
-   return Interval(IntervalImpl::sqr(x.impl_));
+   return Interval(Interval::Traits::sqr(x.impl_));
 }
 
 inline Interval sqrPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sqrPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sqrPX(x.impl_, y.impl_));
 }
 
 inline Interval sqrPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sqrPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sqrPY(x.impl_, y.impl_));
 }
 
 inline Interval sqrt(const Interval& x)
 {
-   return Interval(IntervalImpl::sqrt(x.impl_));
+   return Interval(Interval::Traits::sqrt(x.impl_));
 }
 
 inline Interval sqrtPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sqrtPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sqrtPX(x.impl_, y.impl_));
 }
 
 inline Interval sqrtPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sqrtPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sqrtPY(x.impl_, y.impl_));
 }
 
 inline Interval pow(const Interval& x, int n)
 {
-   return Interval(IntervalImpl::pow(x.impl_,n));
+   return Interval(Interval::Traits::pow(x.impl_, n));
 }
 
 inline Interval powPX(const Interval& x, int n, const Interval& y)
 {
-   return Interval(IntervalImpl::powPX(x.impl_,n,y.impl_));
+   return Interval(Interval::Traits::powPX(x.impl_, n, y.impl_));
 }
 
 inline Interval powPY(const Interval& x, int n, const Interval& y)
 {
-   return Interval(IntervalImpl::powPY(x.impl_,n,y.impl_));   
+   return Interval(Interval::Traits::powPY(x.impl_, n, y.impl_));   
 }
 
 inline Interval exp(const Interval& x)
 {
-   return Interval(IntervalImpl::exp(x.impl_));
+   return Interval(Interval::Traits::exp(x.impl_));
 }
 
 inline Interval expPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::expPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::expPX(x.impl_, y.impl_));
 }
 
 inline Interval expPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::expPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::expPY(x.impl_, y.impl_));
 }
 
 inline Interval log(const Interval& x)
 {
-   return Interval(IntervalImpl::log(x.impl_));
+   return Interval(Interval::Traits::log(x.impl_));
 }
 
 inline Interval logPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::logPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::logPX(x.impl_, y.impl_));
 }
 
 inline Interval logPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::logPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::logPY(x.impl_, y.impl_));
 }
 
 inline Interval sin(const Interval& x)
 {
-   return Interval(IntervalImpl::sin(x.impl_));
+   return Interval(Interval::Traits::sin(x.impl_));
 }
 
 inline Interval sinPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sinPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sinPX(x.impl_, y.impl_));
 }
 
 inline Interval sinPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sinPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sinPY(x.impl_, y.impl_));
 }
 
 inline Interval cos(const Interval& x)
 {
-   return Interval(IntervalImpl::cos(x.impl_));
+   return Interval(Interval::Traits::cos(x.impl_));
 }
 
 inline Interval cosPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::cosPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::cosPX(x.impl_, y.impl_));
 }
 
 inline Interval cosPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::cosPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::cosPY(x.impl_, y.impl_));
 }
 
 inline Interval tan(const Interval& x)
 {
-   return Interval(IntervalImpl::tan(x.impl_));
+   return Interval(Interval::Traits::tan(x.impl_));
 }
 
 inline Interval tanPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::tanPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::tanPX(x.impl_, y.impl_));
 }
 
 inline Interval tanPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::tanPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::tanPY(x.impl_, y.impl_));
 }
 
 inline Interval abs(const Interval& x)
 {
-   return Interval(IntervalImpl::abs(x.impl_));
+   return Interval(Interval::Traits::abs(x.impl_));
 }
 
 inline Interval absPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::absPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::absPX(x.impl_, y.impl_));
 }
 
 inline Interval absPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::absPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::absPY(x.impl_, y.impl_));
 }
 
 inline Interval min(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::min(x.impl_,y.impl_));
+   return Interval(Interval::Traits::min(x.impl_, y.impl_));
 }
 
 inline Interval minPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::minPX(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::minPX(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval minPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::minPY(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::minPY(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval minPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::minPZ(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::minPZ(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval max(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::max(x.impl_,y.impl_));
+   return Interval(Interval::Traits::max(x.impl_, y.impl_));
 }
 
 inline Interval maxPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::maxPX(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::maxPX(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval maxPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::maxPY(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::maxPY(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval maxPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(IntervalImpl::maxPZ(x.impl_,y.impl_,z.impl_));
+   return Interval(Interval::Traits::maxPZ(x.impl_, y.impl_, z.impl_));
 }
 
 inline Interval sgn(const Interval& x)
 {
-   return Interval(IntervalImpl::sgn(x.impl_));
+   return Interval(Interval::Traits::sgn(x.impl_));
 }
 
 inline Interval sgnPX(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sgnPX(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sgnPX(x.impl_, y.impl_));
 }
 
 inline Interval sgnPY(const Interval& x, const Interval& y)
 {
-   return Interval(IntervalImpl::sgnPY(x.impl_,y.impl_));
+   return Interval(Interval::Traits::sgnPY(x.impl_, y.impl_));
 }
 
 
+
+// TODO: supprimer IntervalImprovement
 /*****************************************************************************
  * Class of improvement factors used to stop a sequence of nested intervals.
  *****************************************************************************/

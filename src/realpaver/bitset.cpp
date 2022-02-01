@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/bitset.hpp"
-#include "realpaver/common.hpp"
+#include "realpaver/Common.hpp"
 
 namespace realpaver {
 
@@ -153,10 +153,10 @@ size_t Bitset::hashCode() const
 
    if (size() > 0)
    {
-      h = Hash1<word_t>(word_[0]);
+      h = hash1<word_t>(word_[0]);
 
       for (size_t i=1; i<wcount_; ++i)
-         h = Hash2(h, Hash1<word_t>(word_[i]));
+         h = hash2(h, hash1<word_t>(word_[i]));
    }
 
    return h;

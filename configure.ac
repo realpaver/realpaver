@@ -111,20 +111,20 @@ CXXFLAGS="$CXXFLAGS ${libpath}"
 
 # --with-itvlib
 AC_ARG_WITH([itvlib],
-            [AS_HELP_STRING([--with-itvlib=(gaol)],
-            [Specify the interval library to use @<:@default=gaol@:>@])],
+            [AS_HELP_STRING([--with-itvlib=(Gaol)],
+            [Specify the interval library to use @<:@default=Gaol@:>@])],
             use_itvlib="${with_itvlib}",
-            use_itvlib="gaol")
+            use_itvlib="Gaol")
 
-# gaol with apmathlib
-if test "${use_itvlib}" = "gaol"; then
+# Gaol with apmathlib
+if test "${use_itvlib}" = "Gaol"; then
    AC_LANG_PUSH([C++])
-   AC_MSG_CHECKING([for gaol headers])
+   AC_MSG_CHECKING([for Gaol headers])
    AC_COMPILE_IFELSE([
                         AC_LANG_PROGRAM( [#include <gaol/gaol_config.h>] )
                      ],
                      [have_gaol_headers=yes],
-                     [AC_MSG_ERROR("gaol headers not found")] )
+                     [AC_MSG_ERROR("Gaol headers not found")] )
    AC_MSG_RESULT(${have_gaol_headers})
 
    OLD_LIBS=$LIBS
@@ -141,11 +141,10 @@ if test "${use_itvlib}" = "gaol"; then
 
    if test ${have_gaol} = "yes"; then
       INTERVAL_LIB=$LIBS
-      AC_DEFINE(INTERVAL_LIB_GAOL,1,
+      AC_DEFINE(INTERVAL_LIB_GAOL, 1,
             [Define to 1 to use the Gaol interval arithmetic library.])
-      AC_CONFIG_LINKS([src/realpaver/interval_impl.hpp:src/realpaver/wrapper_interval_${use_itvlib}.hpp])
    else
-      AC_MSG_ERROR("gaol library not found")
+      AC_MSG_ERROR("Gaol library not found")
    fi
 
    LIBS=$OLD_LIBS
@@ -153,6 +152,8 @@ if test "${use_itvlib}" = "gaol"; then
 fi
 
 AC_SUBST(INTERVAL_LIB)
+AC_CONFIG_LINKS([src/realpaver/IntervalImpl.hpp:src/realpaver/Interval${use_itvlib}.hpp])
+AM_CONDITIONAL([COND_INTERVAL_GAOL], [test ${use_itvlib} = "Gaol"])
 
 
 # --with-lplib
@@ -374,4 +375,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --with-lplib=clp --enable-debug --enable-assert --enable-log
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=clp --enable-debug --enable-assert --enable-log

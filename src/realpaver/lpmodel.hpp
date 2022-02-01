@@ -15,7 +15,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "realpaver/common.hpp"
+#include "realpaver/Common.hpp"
 
 namespace realpaver {
 

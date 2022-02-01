@@ -72,8 +72,8 @@ ConstraintBin::ConstraintBin(const Term& l, const Term& r,
    ConstraintRep(), l_(l), r_(r), rel_(rel)
 {
    hcode_ = static_cast<size_t>(rel);
-   hcode_ = Hash2(l.hashCode(), hcode_);
-   hcode_ = Hash2(r.hashCode(), hcode_);
+   hcode_ = hash2(l.hashCode(), hcode_);
+   hcode_ = hash2(r.hashCode(), hcode_);
 
    Scope s;
    l.makeScope(s);

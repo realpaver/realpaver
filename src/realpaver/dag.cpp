@@ -2,6 +2,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/dag.hpp"
+#include "realpaver/Double.hpp"
 
 namespace realpaver {
 
@@ -45,6 +46,116 @@ void DagNode::setDom(const Interval& x)
 void DagNode::reduceDom(const Interval& x)
 {
    dag_->reduceDom(index_, x);
+}
+
+size_t DagNode::index() const
+{
+   return index_;
+}
+
+void DagNode::setIndex(size_t i)
+{
+   index_ = i;
+}
+
+size_t DagNode::parArity() const
+{
+   return vpar_.size();
+}
+
+size_t DagNode::parNode(size_t i) const
+{
+   return vpar_[i];
+}
+
+void DagNode::addParNode(size_t i)
+{
+   vpar_.push_back(i);
+}
+
+size_t DagNode::subArity() const
+{
+   return vsub_.size();   
+}
+
+size_t DagNode::subIndex(size_t i) const
+{
+   return vsub_[i];
+}
+
+void DagNode::addSubNode(size_t i)
+{
+   vsub_.push_back(i);
+}
+
+Dag* DagNode::dag() const
+{
+   return dag_;
+}
+
+const Bitset& DagNode::bitset() const
+{
+   return bitset_;
+}
+
+bool DagNode::dependsOn(const Bitset& bs) const
+{
+   return bitset_.overlaps(bs);
+}
+
+bool DagNode::dependsOn(size_t id) const
+{
+   return bitset_.get(id);
+}
+
+const Interval& DagNode::val() const
+{
+   return val_;
+}
+
+void DagNode::setVal(const Interval& x)
+{
+   val_ = x;
+}
+
+const Interval& DagNode::dv() const
+{
+   return dv_;
+}
+
+void DagNode::setDv(const Interval& x)
+{
+   dv_ = x;
+}
+
+void DagNode::addDv(const Interval& x)
+{
+   dv_ += x;
+}
+
+const double& DagNode::rval() const
+{
+   return rval_;
+}
+
+void DagNode::setRval(const double& x)
+{
+   rval_ = x;
+}
+
+const double& DagNode::rdv() const
+{
+   return rdv_;
+}
+
+void DagNode::setRdv(const double& x)
+{
+   rdv_ = x;
+}
+
+void DagNode::addRdv(const double& x)
+{
+   rdv_ = Double::add(rdv_, x);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

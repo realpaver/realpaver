@@ -3,7 +3,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <iostream>
 
-#include "realpaver/common.hpp"
+#include "realpaver/Common.hpp"
 
 using namespace std;
 using namespace realpaver;

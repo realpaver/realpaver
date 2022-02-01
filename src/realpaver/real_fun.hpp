@@ -3,7 +3,7 @@
 #ifndef REALPAVER_REAL_FUN_HPP
 #define REALPAVER_REAL_FUN_HPP
 
-#include "realpaver/real_vector.hpp"
+#include "realpaver/RealVector.hpp"
 #include "realpaver/scope.hpp"
 
 namespace realpaver {

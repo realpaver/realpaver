@@ -6,54 +6,54 @@
 namespace realpaver {
 
 Interval::Interval():
-   Interval(IntervalImpl::create())
+   Interval(Interval::Traits::create())
 {}
 
 Interval::Interval(const double& l, const double& r):
-   Interval(IntervalImpl::create(l,r))
+   Interval(Interval::Traits::create(l,r))
 {}
 
 Interval::Interval(const double& a):
-   Interval(IntervalImpl::create(a))
+   Interval(Interval::Traits::create(a))
 {}
 
 Interval::Interval(const char* s):
-   Interval(IntervalImpl::create(s))
+   Interval(Interval::Traits::create(s))
 {}
 
 Interval::Interval(const char* sl, const char* sr):
-   Interval(IntervalImpl::create(sl,sr))
+   Interval(Interval::Traits::create(sl, sr))
 {}
 
 Interval Interval::lessThan(const double& a)
 {
-   return Interval(Interval::universe().left(),a);
+   return Interval(Interval::universe().left(), a);
 }
 
 Interval Interval::moreThan(const double& a)
 {
-   return Interval(a,Interval::universe().right());   
+   return Interval(a, Interval::universe().right());   
 }
 
-Interval::Interval(const IntervalImpl::interval& x):
+Interval::Interval(const Interval::Traits::interval& x):
    impl_(x)
 {}
 
 Interval Interval::universe()
 {
-   static Interval x(IntervalImpl::universe());
+   static Interval x(Interval::Traits::universe());
    return x;
 }
 
 Interval Interval::positive()
 {
-   static Interval x(IntervalImpl::positive());
+   static Interval x(Interval::Traits::positive());
    return x;
 }
 
 Interval Interval::negative()
 {
-   static Interval x(IntervalImpl::negative());
+   static Interval x(Interval::Traits::negative());
    return x;
 }
 
@@ -77,61 +77,61 @@ Interval Interval::zeroPlusOne()
 
 Interval Interval::emptyset()
 {
-   static Interval x(IntervalImpl::emptyset());
+   static Interval x(Interval::Traits::emptyset());
    return x;
 }
 
 Interval Interval::halfPi()
 {
-   static Interval x(IntervalImpl::halfPi());
+   static Interval x(Interval::Traits::halfPi());
    return x;
 }
 
 Interval Interval::pi()
 {
-   static Interval x(IntervalImpl::pi());
+   static Interval x(Interval::Traits::pi());
    return x;
 }
 
 Interval Interval::twoPi()
 {
-   static Interval x(IntervalImpl::twoPi());
+   static Interval x(Interval::Traits::twoPi());
    return x;
 }
 
 Interval Interval::zero()
 {
-   static Interval x(IntervalImpl::zero());
+   static Interval x(Interval::Traits::zero());
    return x;
 }
 
 Interval Interval::one()
 {
-   static Interval x(IntervalImpl::one());
+   static Interval x(Interval::Traits::one());
    return x;
 }
 
 Interval Interval::minusOne()
 {
-   static Interval x(IntervalImpl::minusOne());
+   static Interval x(Interval::Traits::minusOne());
    return x;
 }
 
 Interval Interval::minusPiPlusPi()
 {
-   static Interval x(IntervalImpl::minusPiPlusPi());
+   static Interval x(Interval::Traits::minusPiPlusPi());
    return x;
 }
 
 Interval Interval::zeroTwoPi()
 {
-   static Interval x(IntervalImpl::zeroTwoPi());
+   static Interval x(Interval::Traits::zeroTwoPi());
    return x;
 }
 
 double Interval::infinity()
 {
-   static double a = IntervalImpl::infinity();
+   static double a = Interval::Traits::infinity();
    return a;
 }
 
@@ -153,7 +153,7 @@ std::pair<Interval,Interval> complement(const Interval& x)
    Interval E(Interval::emptyset());
 
    if (x.isEmpty())
-      return std::make_pair(Interval::universe(),E);
+      return std::make_pair(Interval::universe(), E);
 
    bool infl = x.isInfLeft(),
         infr = x.isInfRight();
@@ -161,15 +161,15 @@ std::pair<Interval,Interval> complement(const Interval& x)
    if (infl)
    {
       if (infr)
-         return std::make_pair(E,E);
+         return std::make_pair(E, E);
 
       else
-         return std::make_pair(Interval::moreThan(x.right()),E);
+         return std::make_pair(Interval::moreThan(x.right()), E);
    }
    else
    {
       if (infr)
-         return std::make_pair(Interval::lessThan(x.left()),E);
+         return std::make_pair(Interval::lessThan(x.left()), E);
 
       else
          return std::make_pair(Interval::lessThan(x.left()),
@@ -182,48 +182,48 @@ std::pair<Interval,Interval> setminus(const Interval& x, const Interval& y)
    Interval E(Interval::emptyset());
 
    if (x.isEmpty() || y.isEmpty())
-      return std::make_pair(x,E);
+      return std::make_pair(x, E);
 
    if (y.contains(x))
-      return std::make_pair(E,E);
+      return std::make_pair(E, E);
 
    if (x.contains(y))
    {
       if (y.isSingleton())
-         return std::make_pair(x,E);
+         return std::make_pair(x, E);
 
       if (x.left() == y.left())
       {
-         Interval z(y.right(),x.right());
-         return std::make_pair(z,E);
+         Interval z(y.right(), x.right());
+         return std::make_pair(z, E);
       }
       else if (x.right() == y.right())
       {
-         Interval z(x.left(),y.left());
-         return std::make_pair(z,E);         
+         Interval z(x.left(), y.left());
+         return std::make_pair(z, E);         
       }
       else
       {
-         Interval u(x.left(),y.left());
-         Interval v(y.right(),x.right());
-         return std::make_pair(u,v);
+         Interval u(x.left(), y.left());
+         Interval v(y.right(), x.right());
+         return std::make_pair(u, v);
       }
    }
 
    if (y.contains(x.left()))
    {
-      Interval z(y.right(),x.right());
-      return std::make_pair(z,E);
+      Interval z(y.right(), x.right());
+      return std::make_pair(z, E);
    }
 
    if (y.contains(x.right()))
    {
-      Interval z(x.left(),y.left());
-      return std::make_pair(z,E);
+      Interval z(x.left(), y.left());
+      return std::make_pair(z, E);
    }
 
    // last case: x and y are disjoint
-   return std::make_pair(x,E);
+   return std::make_pair(x, E);
 }
 
 std::pair<Interval,Interval> extDiv(const Interval& x, const Interval& y)
@@ -236,12 +236,12 @@ std::pair<Interval,Interval> extDiv(const Interval& x, const Interval& y)
       if (z1.isDisjoint(z2))
       {
          if (z1.isCertainlyLt(z2))
-            return std::make_pair(z1,z2);
+            return std::make_pair(z1, z2);
          else
-            return std::make_pair(z2,z1);
+            return std::make_pair(z2, z1);
       }
       else
-         return std::make_pair(z1|z2,Interval::emptyset());
+         return std::make_pair(z1|z2, Interval::emptyset());
    }
    else
    {
@@ -251,7 +251,7 @@ std::pair<Interval,Interval> extDiv(const Interval& x, const Interval& y)
 
 std::ostream& operator<<(std::ostream& os, const Interval& x)
 {
-   IntervalImpl::print(os,x.impl_);
+   Interval::Traits::print(os, x.impl_);
    return os;
 }
 

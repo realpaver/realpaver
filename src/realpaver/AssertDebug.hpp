@@ -1,11 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, a reliable interval solver of nonlinear   //
-//                                 constraint satisfaction and optimization  //
-//                                 problems over the real numbers.           //
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 1999-2003 Institut de Recherche en Informatique de Nantes   //
-//               2004-2016 Laboratoire d'Informatique de Nantes Atlantique   //
-//               2017-2022 Laboratoire des Sciences du Numérique de Nantes   //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //

@@ -23,7 +23,7 @@ librealpaver_la_include_HEADERS = \
 		bco_space.hpp \
 		bitset.hpp \
 		box.hpp \
-		common.hpp \
+		Common.hpp \
 		config.hpp \
 		constraint.hpp \
 		constraint_fixer.hpp \
@@ -37,17 +37,23 @@ librealpaver_la_include_HEADERS = \
 		contractor_int.hpp \
 		contractor_pool.hpp \
 		dag.hpp \
+		Double.hpp \
 		Exception.hpp \
 		Inflator.hpp \
 		interval.hpp \
-		interval_impl.hpp \
+		IntervalImpl.hpp \
 		interval_newton.hpp \
 		interval_slicer.hpp \
+		IntervalTraits.hpp \
+		IntervalVector.hpp \
 		interval_union.hpp \
+		LinumDoubleTraits.hpp \
+		LinumIntervalTraits.hpp \
+		LinumTraits.hpp \
 		Logger.hpp \
 		lpmodel.hpp \
 		lpsolver.hpp \
-		number.hpp \
+		NumericVector.hpp \
 		obj.hpp \
 		param.hpp \
 		parser.hpp \
@@ -55,7 +61,7 @@ librealpaver_la_include_HEADERS = \
 		problem.hpp \
 		propagator.hpp \
 		real_fun.hpp \
-		real_vector.hpp \
+		RealVector.hpp \
 		scope.hpp \
 		scope_map.hpp \
 		term.hpp \
@@ -65,8 +71,11 @@ librealpaver_la_include_HEADERS = \
 		timer.hpp \
 		Tolerance.hpp \
 		uni_fun.hpp \
-		Variable.hpp \
-		wrapper_interval_gaol.hpp
+		Variable.hpp
+
+if COND_INTERVAL_GAOL
+librealpaver_la_include_HEADERS += IntervalGaol.hpp
+endif
 
 if COND_LP_CLP
 librealpaver_la_include_HEADERS += wrapper_lpsolver_clp.hpp
@@ -85,7 +94,7 @@ librealpaver_la_SOURCES = \
 		bco_space.cpp \
 		bitset.cpp \
 		box.cpp \
-		common.cpp \
+		Common.cpp \
 		constraint.cpp \
 		constraint_fixer.cpp \
 		constraint_relaxor.cpp \
@@ -103,6 +112,7 @@ librealpaver_la_SOURCES = \
 		interval.cpp \
 		interval_newton.cpp \
 		interval_slicer.cpp \
+		IntervalVector.cpp \
 		interval_union.cpp \
 		Logger.cpp \
 		lpmodel.cpp \
@@ -114,7 +124,7 @@ librealpaver_la_SOURCES = \
 		problem.cpp \
 		propagator.cpp \
 		real_fun.cpp \
-		real_vector.cpp \
+		RealVector.cpp \
 		scope.cpp \
 		scope_map.cpp \
 		term.cpp \

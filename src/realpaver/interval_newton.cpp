@@ -9,9 +9,9 @@
 
 #include <limits>
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Common.hpp"
 #include "realpaver/interval_newton.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/number.hpp"
 
 namespace realpaver {
 

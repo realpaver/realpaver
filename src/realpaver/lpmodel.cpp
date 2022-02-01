@@ -10,8 +10,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include "realpaver/Common.hpp"
+#include "realpaver/Double.hpp"
 #include "realpaver/lpmodel.hpp"
-#include "realpaver/number.hpp"
 
 namespace realpaver {
 

@@ -42,7 +42,7 @@ Problem p;
 
       LOG_INTERNAL("after preprocess");
 
-      if (res.getProof() != Proof::Empty && res.getProof() != Proof::Optimal)
+      if (res.getProof() != Proof::Empty /*&& res.getProof() != Proof::Optimal */)
       {
          Box* B = res.getBox();
          Interval lu = B->at(model->objVar());
@@ -76,7 +76,6 @@ Problem p;
       if (simpl != nullptr)
          delete simpl;
   }
-
    
 /*
       Box B( prob.getBox() );

@@ -1358,7 +1358,7 @@ void TermOp::insert(const SharedRep& t)
 
    hcode_ = static_cast<size_t>(opSymbol());
    for (auto sub : v_)
-      hcode_ = Hash2(sub->hashCode(),hcode_);
+      hcode_ = hash2(sub->hashCode(), hcode_);
 
    if (!t->isConstant())
       constant_ = false;
@@ -1793,8 +1793,8 @@ TermPow::TermPow(const SharedRep& t, int n) :
 {
    ASSERT(n > 0, "bad integral exponent in a term: " << n);
 
-   size_t h = Hash1<int>(n);
-   hcode_ = Hash2(h,hcode_);
+   size_t h = hash1<int>(n);
+   hcode_ = hash2(h, hcode_);
 }
 
 int TermPow::exponent() const

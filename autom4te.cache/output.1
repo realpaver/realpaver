@@ -648,6 +648,8 @@ COND_LP_CLP_TRUE
 COND_LP_GUROBI_FALSE
 COND_LP_GUROBI_TRUE
 LP_LIB
+COND_INTERVAL_GAOL_FALSE
+COND_INTERVAL_GAOL_TRUE
 INTERVAL_LIB
 PLATFORM_OSX_FALSE
 PLATFORM_OSX_TRUE
@@ -1474,7 +1476,7 @@ Optional Packages:
                           compiler's sysroot if not specified).
   --with-include-path     Specify an include path for third-party headers
   --with-lib-path         Specify a library path for third-party libraries
-  --with-itvlib=(gaol)    Specify the interval library to use @<:@default=gaol@:>@
+  --with-itvlib=(Gaol)    Specify the interval library to use @<:@default=Gaol@:>@
   --with-lplib=(clp, gurobi) 
                           Specify the linear programming library to use
                           @<:@default=clp@:>@
@@ -16172,20 +16174,20 @@ CXXFLAGS="$CXXFLAGS ${libpath}"
 if test "${with_itvlib+set}" = set; then :
   withval=$with_itvlib; use_itvlib="${with_itvlib}"
 else
-  use_itvlib="gaol"
+  use_itvlib="Gaol"
 fi
 
 
-# gaol with apmathlib
-if test "${use_itvlib}" = "gaol"; then
+# Gaol with apmathlib
+if test "${use_itvlib}" = "Gaol"; then
    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gaol headers" >&5
-$as_echo_n "checking for gaol headers... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Gaol headers" >&5
+$as_echo_n "checking for Gaol headers... " >&6; }
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -16202,7 +16204,7 @@ _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
   have_gaol_headers=yes
 else
-  as_fn_error $? "\"gaol headers not found\"" "$LINENO" 5 
+  as_fn_error $? "\"Gaol headers not found\"" "$LINENO" 5 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${have_gaol_headers}" >&5
@@ -16249,10 +16251,8 @@ $as_echo "${have_gaol}" >&6; }
       
 $as_echo "@%:@define INTERVAL_LIB_GAOL 1" >>confdefs.h
 
-      ac_config_links="$ac_config_links src/realpaver/interval_impl.hpp:src/realpaver/wrapper_interval_${use_itvlib}.hpp"
-
    else
-      as_fn_error $? "\"gaol library not found\"" "$LINENO" 5
+      as_fn_error $? "\"Gaol library not found\"" "$LINENO" 5
    fi
 
    LIBS=$OLD_LIBS
@@ -16264,6 +16264,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
 
+
+ac_config_links="$ac_config_links src/realpaver/IntervalImpl.hpp:src/realpaver/Interval${use_itvlib}.hpp"
+
+ if test ${use_itvlib} = "Gaol"; then
+  COND_INTERVAL_GAOL_TRUE=
+  COND_INTERVAL_GAOL_FALSE='#'
+else
+  COND_INTERVAL_GAOL_TRUE='#'
+  COND_INTERVAL_GAOL_FALSE=
+fi
 
 
 
@@ -16907,6 +16917,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PLATFORM_OSX_TRUE}" && test -z "${PLATFORM_OSX_FALSE}"; then
   as_fn_error $? "conditional \"PLATFORM_OSX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COND_INTERVAL_GAOL_TRUE}" && test -z "${COND_INTERVAL_GAOL_FALSE}"; then
+  as_fn_error $? "conditional \"COND_INTERVAL_GAOL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COND_LP_GUROBI_TRUE}" && test -z "${COND_LP_GUROBI_FALSE}"; then
@@ -17905,7 +17919,7 @@ do
     "src/realpaver/configure.hpp") CONFIG_HEADERS="$CONFIG_HEADERS src/realpaver/configure.hpp" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "src/realpaver/interval_impl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/interval_impl.hpp:src/realpaver/wrapper_interval_${use_itvlib}.hpp" ;;
+    "src/realpaver/IntervalImpl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/IntervalImpl.hpp:src/realpaver/Interval${use_itvlib}.hpp" ;;
     "src/realpaver/lpsolver.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
@@ -19402,4 +19416,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=gaol --with-lplib=clp --enable-debug --enable-assert --enable-log
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=clp --enable-debug --enable-assert --enable-log

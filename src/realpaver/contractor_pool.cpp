@@ -1,7 +1,6 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/common.hpp"
 #include "realpaver/contractor_pool.hpp"
 
 namespace realpaver {
