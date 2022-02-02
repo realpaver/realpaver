@@ -12,7 +12,7 @@
 #include <iostream>
 #include "realpaver/Common.hpp"
 #include "realpaver/Double.hpp"
-#include "realpaver/lpmodel.hpp"
+#include "realpaver/LPModel.hpp"
 
 namespace realpaver {
 

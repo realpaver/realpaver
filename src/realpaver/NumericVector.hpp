@@ -62,19 +62,14 @@ public:
    /// Constant access in this
    /// @param i an index between 0 and size()-1
    /// @return the i-th element of this
-   ValueType operator[](size_t i) const;
-
-   /// Constant access in this
-   /// @param i an index between 0 and size()-1
-   /// @return the i-th element of this
-   ValueType elemAt(size_t i) const;
+   ValueType at(size_t i) const;
 
    /// Modification of an element of this
    /// @param i an index between 0 and size()-1
    /// @param x a number
    ///
    /// Assigns x to the i-th element of this
-  void set(size_t i, ConstRefType x);
+  void setAt(size_t i, ConstRefType x);
 
    /// Modification of all the element of this
    /// @param x a number
@@ -214,17 +209,7 @@ size_t NumericVector<T>::size() const
 
 template <typename T>
 typename NumericVector<T>::ValueType
-NumericVector<T>::operator[](size_t i) const
-{
-   ASSERT(i<size(), "Bad access in a vector at index: " << i);
-
-   return elems_[i];
-}
-  
-
-template <typename T>
-typename NumericVector<T>::ValueType
-NumericVector<T>::elemAt(size_t i) const
+NumericVector<T>::at(size_t i) const
 {
    ASSERT(i<size(), "Bad access in a vector at index: " << i);
 
@@ -233,7 +218,7 @@ NumericVector<T>::elemAt(size_t i) const
 
 template <typename T>
 void
-NumericVector<T>::set(size_t i, ConstRefType x)
+NumericVector<T>::setAt(size_t i, ConstRefType x)
 {
    ASSERT(i<size(), "Bad access in a vector at index: " << i);
 
@@ -416,7 +401,7 @@ void NumericVector<T>::print(std::ostream& os) const
    for (size_t i=0; i<size(); ++i)
    {
       if (i!=0) os << ", ";
-      os << this->operator[](i);
+      os << at(i);
    }
    os << ')'; 
 }

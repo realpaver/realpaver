@@ -18,9 +18,9 @@ bool Hc4Contractor::dependsOn(const Bitset& bs) const
    return f_->dependsOn(bs);
 }
 
-Proof Hc4Contractor::contract(Box& B)
+Proof Hc4Contractor::contract(IntervalVector& X)
 {
-   return f_->hc4Revise(B);
+   return f_->hc4Revise(X);
 }
 
 void Hc4Contractor::print(std::ostream& os) const

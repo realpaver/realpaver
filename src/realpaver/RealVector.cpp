@@ -25,6 +25,16 @@ RealVector::RealVector(const std::initializer_list<double>& l)
       push(x);
 }
 
+double RealVector::operator[](size_t i) const
+{
+   return at(i);
+}
+
+void RealVector::set(size_t i, double x)
+{
+   setAt(i, x);
+}
+
 double RealVector::scalarProduct(const RealVector& V) const
 {
    ASSERT(size() == V.size(),
@@ -33,7 +43,7 @@ double RealVector::scalarProduct(const RealVector& V) const
    double res = 0.0;
 
    for (size_t i=0; i<size(); ++i)
-      Double::addAssign(res, Double::mul(elemAt(i), V[i]));
+      Double::addAssign(res, Double::mul(at(i), V[i]));
 
    return res;
 }
@@ -43,7 +53,7 @@ double RealVector::euclideanNorm() const
    double sq = 0.0;
 
    for (size_t i=0; i<size(); ++i)
-      Double::addAssign(sq, Double::sqr(elemAt(i)));
+      Double::addAssign(sq, Double::sqr(at(i)));
 
    return Double::sqrt(sq);
 }
@@ -53,7 +63,7 @@ double RealVector::oneNorm() const
    double norm = 0.0;
 
    for (size_t i=0; i<size(); ++i)
-      Double::addAssign(norm, Double::abs(elemAt(i)));
+      Double::addAssign(norm, Double::abs(at(i)));
 
    return norm;
 }
@@ -64,23 +74,11 @@ double RealVector::infNorm() const
 
    for (size_t i=0; i<size(); ++i)
    {
-      double m = Double::abs(elemAt(i));
+      double m = Double::abs(at(i));
       if (m > norm) norm = m;
    }
 
    return norm;
-}
-
-std::ostream& operator<<(std::ostream& os, const RealVector& v)
-{
-   os << "(";
-   for (size_t i=0; i<v.size(); ++i)
-   {
-      if (i != 0) os << ", ";
-      os << v[i];
-   }
-   os << ")";
-   return os;
 }
 
 } // namespace

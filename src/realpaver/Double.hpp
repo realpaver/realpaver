@@ -48,13 +48,13 @@ struct Double {
       return std::numeric_limits<ValueType>::quiet_NaN();
    }
 
-   /// @return the greatest representable value
+   /// @return the lowest representable value
    static inline ValueType lowest()
    {
       return -std::numeric_limits<ValueType>::max();
    }
 
-   /// @return the lowest representable value
+   /// @return the greatest representable value
    static inline ValueType greatest()
    {
       return std::numeric_limits<ValueType>::max();

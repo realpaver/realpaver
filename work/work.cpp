@@ -11,10 +11,11 @@
 #include "realpaver/interval_newton.hpp"
 #include "realpaver/term_deriver.hpp"
 #include "realpaver/term_fixer.hpp"
-#include "realpaver/timer.hpp"
+#include "realpaver/Timer.hpp"
 #include "realpaver/contractor_int.hpp"
 #include "realpaver/scope.hpp"
 #include "realpaver/bco_model.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -24,7 +25,13 @@ int main(void)
    Logger::init(LogLevel::internal, "work.log");
    Interval::precision( 16 );
 
-Problem p;
+   IntervalVector vec(3, Interval(0,10));
+   Bitset bs( {0, 1, 0} );
+   cout << bs << endl;
+   cout << vec.corner(bs) << endl;
+   cout << vec.oppositeCorner(bs) << endl;
+
+   //Problem p;
 
    try
    {
@@ -44,8 +51,8 @@ Problem p;
 
       if (res.getProof() != Proof::Empty /*&& res.getProof() != Proof::Optimal */)
       {
-         Box* B = res.getBox();
-         Interval lu = B->at(model->objVar());
+         IntervalVector* B = res.getBox();
+         Interval lu = B->at(model->objVar().getId());
 
          if (model->nbFixedVars() > 0)
          {
@@ -53,7 +60,7 @@ Problem p;
 
             // fixes the variable representing the objective function in order to
             // remove it from the simplified problem
-            B->set(model->objVar(), Interval::zero());
+            B->set(model->objVar().getId(), Interval::zero());
 
             // creates the simplified problem
             prob->preprocess(*B, *simpl);

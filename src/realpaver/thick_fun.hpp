@@ -30,7 +30,7 @@ public:
 
    // fixes all the variables to their domains from B but the variable
    // involved in this and returns the interval evaluation of this on B
-   Interval update(const Box& B);
+   Interval update(const IntervalVector& X);
 
    // returns the variable index of this
    size_t getVarIndex() const;

@@ -43,7 +43,7 @@ public:
    Scope dScope() const;
 
    // returns the initial box
-   SharedBox initialBox() const;
+   SharedIntervalVector initialBox() const;
 
    // returns the propagator for contracting domains
    Propagator* propagator();
@@ -68,7 +68,7 @@ public:
 
 private:
    Dag* dag_;        // expression graph
-   SharedBox init_;  // initial box
+   SharedIntervalVector init_;  // initial box
    Variable z_;      // variable representing the objective function
    Scope fscope_;    // scope of the objective function
    Scope dscope_;    // scope of the dag (fscope_ + z_)

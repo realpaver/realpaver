@@ -133,7 +133,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/stl_uninitialized.h \
  /usr/include/c++/7/bits/stl_vector.h \
  /usr/include/c++/7/bits/stl_bvector.h /usr/include/c++/7/bits/vector.tcc \
- ../src/realpaver/box.hpp /usr/include/c++/7/memory \
+ ../src/realpaver/IntervalVector.hpp /usr/include/c++/7/memory \
  /usr/include/c++/7/bits/stl_tempbuf.h \
  /usr/include/c++/7/bits/stl_raw_storage_iter.h \
  /usr/include/c++/7/ext/concurrence.h \
@@ -149,9 +149,9 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/shared_ptr_atomic.h \
  /usr/include/c++/7/bits/atomic_base.h \
  /usr/include/c++/7/bits/atomic_lockfree_defines.h \
- /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/interval.hpp \
- ../src/realpaver/Common.hpp /usr/include/c++/7/limits \
- ../src/realpaver/IntervalImpl.hpp \
+ /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/bitset.hpp \
+ ../src/realpaver/interval.hpp ../src/realpaver/Common.hpp \
+ /usr/include/c++/7/limits ../src/realpaver/IntervalImpl.hpp \
  /home/granvilliers-l/local/include/gaol/gaol \
  /home/granvilliers-l/local/include/gaol/gaol_config.h \
  /home/granvilliers-l/local/include/gaol/gaol_configuration.h \
@@ -187,17 +187,17 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /home/granvilliers-l/local/include/gaol/gaol_interval2f.h \
  /usr/lib/gcc/x86_64-linux-gnu/7/include/pmmintrin.h \
  /home/granvilliers-l/local/include/gaol/gaol_allocator.h \
- ../src/realpaver/IntervalTraits.hpp ../src/realpaver/RealVector.hpp \
- ../src/realpaver/Double.hpp /usr/include/c++/7/cfenv \
- ../src/realpaver/NumericVector.hpp ../src/realpaver/AssertDebug.hpp \
- ../src/realpaver/Exception.hpp /usr/include/c++/7/sstream \
- /usr/include/c++/7/bits/sstream.tcc ../src/realpaver/config.hpp \
- ../src/realpaver/configure.hpp ../src/realpaver/Common.hpp \
- ../src/realpaver/LinumTraits.hpp ../src/realpaver/scope.hpp \
+ ../src/realpaver/IntervalTraits.hpp ../src/realpaver/NumericVector.hpp \
+ ../src/realpaver/AssertDebug.hpp ../src/realpaver/Exception.hpp \
+ /usr/include/c++/7/sstream /usr/include/c++/7/bits/sstream.tcc \
+ ../src/realpaver/config.hpp ../src/realpaver/configure.hpp \
+ ../src/realpaver/Common.hpp ../src/realpaver/LinumTraits.hpp \
+ ../src/realpaver/RealVector.hpp ../src/realpaver/Double.hpp \
+ /usr/include/c++/7/cfenv ../src/realpaver/scope.hpp \
  /usr/include/c++/7/map /usr/include/c++/7/bits/stl_tree.h \
  /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
- ../src/realpaver/bitset.hpp ../src/realpaver/scope_map.hpp \
- /usr/include/c++/7/unordered_map /usr/include/c++/7/bits/hashtable.h \
+ ../src/realpaver/scope_map.hpp /usr/include/c++/7/unordered_map \
+ /usr/include/c++/7/bits/hashtable.h \
  /usr/include/c++/7/bits/hashtable_policy.h \
  /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/Variable.hpp \
  ../src/realpaver/Tolerance.hpp ../src/realpaver/constraint.hpp \
@@ -216,7 +216,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
  /usr/include/c++/7/bits/fstream.tcc ../src/realpaver/interval_union.hpp \
  ../src/realpaver/term_deriver.hpp ../src/realpaver/term_fixer.hpp \
- ../src/realpaver/timer.hpp /usr/include/c++/7/chrono \
+ ../src/realpaver/Timer.hpp /usr/include/c++/7/chrono \
  /usr/include/c++/7/ratio /usr/include/c++/7/ctime \
  /usr/include/c++/7/bits/parse_numbers.h \
  ../src/realpaver/contractor_int.hpp ../src/realpaver/bco_model.hpp \
@@ -569,7 +569,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/vector.tcc:
 
-../src/realpaver/box.hpp:
+../src/realpaver/IntervalVector.hpp:
 
 /usr/include/c++/7/memory:
 
@@ -610,6 +610,8 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/c++/7/bits/atomic_lockfree_defines.h:
 
 /usr/include/c++/7/backward/auto_ptr.h:
+
+../src/realpaver/bitset.hpp:
 
 ../src/realpaver/interval.hpp:
 
@@ -695,12 +697,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/IntervalTraits.hpp:
 
-../src/realpaver/RealVector.hpp:
-
-../src/realpaver/Double.hpp:
-
-/usr/include/c++/7/cfenv:
-
 ../src/realpaver/NumericVector.hpp:
 
 ../src/realpaver/AssertDebug.hpp:
@@ -719,6 +715,12 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/LinumTraits.hpp:
 
+../src/realpaver/RealVector.hpp:
+
+../src/realpaver/Double.hpp:
+
+/usr/include/c++/7/cfenv:
+
 ../src/realpaver/scope.hpp:
 
 /usr/include/c++/7/map:
@@ -728,8 +730,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/c++/7/bits/stl_map.h:
 
 /usr/include/c++/7/bits/stl_multimap.h:
-
-../src/realpaver/bitset.hpp:
 
 ../src/realpaver/scope_map.hpp:
 
@@ -799,7 +799,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/term_fixer.hpp:
 
-../src/realpaver/timer.hpp:
+../src/realpaver/Timer.hpp:
 
 /usr/include/c++/7/chrono:
 

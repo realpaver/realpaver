@@ -20,19 +20,19 @@ class BcoContractor : public Contractor {
 public:
    // constructor
    BcoContractor(Dag* dag, size_t i, const Variable& v,
-                 const SharedContractor& op, const SharedBox& init);
+                 const SharedContractor& op, const SharedIntervalVector& init);
 
    // Override
    bool dependsOn(const Bitset& bs) const;
    Scope scope() const;
-   Proof contract(Box& B);
+   Proof contract(IntervalVector& X);
    void print(std::ostream& os) const;
 
 private:
    DagFun* f_;             // df/dv in a dag
    Variable v_;            // the considered variable
    SharedContractor op_;   // contractor for the equation df/dv = 0
-   SharedBox init_;        // initial region
+   SharedIntervalVector init_;        // initial region
 };
 
 } // namespace

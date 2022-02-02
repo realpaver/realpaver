@@ -163,7 +163,7 @@ Proof Bc3Contractor::shrink(const Interval& x, Interval& res,
    return Proof::Empty;
 }
 
-Proof Bc3Contractor::contract(Box& B)
+Proof Bc3Contractor::contract(IntervalVector& X)
 {
    Interval lsol, rsol;
    Proof proof, certif;
@@ -172,7 +172,7 @@ Proof Bc3Contractor::contract(Box& B)
    const Interval& img = f_.getFun()->getImage();
 
    // first interval evaluation that also thickens the function
-   Interval e = f_.update(B);
+   Interval e = f_.update(X);
 
    // consistency checking
    if (e.isEmpty())
@@ -185,17 +185,17 @@ Proof Bc3Contractor::contract(Box& B)
       return Proof::Inner;
 
    // shrinks the left bound
-   proof = shrinkLeft(B[iv], lsol);
+   proof = shrinkLeft(X[iv], lsol);
 
    if (proof == Proof::Empty)
       return Proof::Empty;
 
    // shrinks the right bound
-   Interval y(lsol.left(), B[iv].right());
+   Interval y(lsol.left(), X[iv].right());
    certif = shrinkRight(y, rsol);
 
    // assigns the contracted domain in V
-   B.set(iv, lsol | rsol);
+   X.set(iv, lsol | rsol);
 
    return std::max(proof,certif);
 }

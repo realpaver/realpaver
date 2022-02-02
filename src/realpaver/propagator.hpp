@@ -24,7 +24,7 @@ public:
    // Override
    bool dependsOn(const Bitset& bs) const;
    Scope scope() const;
-   Proof contract(Box& B);
+   Proof contract(IntervalVector& X);
    void print(std::ostream& os) const;
 
    // improvement factor

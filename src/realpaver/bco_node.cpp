@@ -5,9 +5,9 @@
 
 namespace realpaver {
 
-BcoNode::BcoNode(const Box& B)
+BcoNode::BcoNode(const IntervalVector& X)
 {
-   box_ = new Box(B);
+   box_ = new IntervalVector(X);
    depth_ = 0;
    lower_ = Double::lowest();
    upper_ = Double::greatest();
@@ -15,7 +15,7 @@ BcoNode::BcoNode(const Box& B)
 
 BcoNode::BcoNode(const BcoNode& node)
 {
-   box_ = new Box(*node.box_);
+   box_ = new IntervalVector(*node.box_);
    depth_ = node.depth_;
    lower_ = node.lower_;
    upper_ = node.upper_;

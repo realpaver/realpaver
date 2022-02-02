@@ -31,32 +31,32 @@ Scope CidContractor::scope() const
    return op_->scope();
 }
 
-Proof CidContractor::contract(Box& B)
+Proof CidContractor::contract(IntervalVector& X)
 {
-   slicer_->apply(B[v_.getId()]);
+   slicer_->apply(X[v_.getId()]);
 
    if (slicer_->size() == 1)
-      return op_->contract(B);
+      return op_->contract(X);
 
-   Box* init = B.clone();
+   IntervalVector* init = X.clone();
    Proof proof = Proof::Empty, certif;
 
    for (auto it = slicer_->begin(); it != slicer_->end(); ++it)
    {
-      Box* slice = init->clone();
-      slice->set(v_, *it);
+      IntervalVector* slice = init->clone();
+      slice->set(v_.getId(), *it);
       certif = op_->contract(*slice);
    
       if (certif != Proof::Empty)
       {
          if (proof == Proof::Empty)
          {
-            B.set(*slice, scope());
+            X.setOnScope(*slice, scope());
             proof = certif;
          }
          else
          {
-            B.setHull(*slice, scope());
+            X.hullAssignOnScope(*slice, scope());
             proof = std::min(proof,certif);
          }
 

@@ -30,11 +30,11 @@ bool Bc4Contractor::dependsOn(const Bitset& bs) const
   return f_->dependsOn(bs); 
 }
 
-Proof Bc4Contractor::contract(Box& B)
+Proof Bc4Contractor::contract(IntervalVector& X)
 {
    // HC4
    Hc4Contractor hc4(f_->dag(), f_->index());
-   Proof proof = hc4.contract(B);
+   Proof proof = hc4.contract(X);
 
    if (proof != Proof::Maybe)
       return proof;
@@ -42,7 +42,7 @@ Proof Bc4Contractor::contract(Box& B)
    // BC3
    for (size_t i=0; i<bc3_.size(); ++i)
    {
-      Proof certif = bc3_[i]->contract(B);
+      Proof certif = bc3_[i]->contract(X);
 
       if (certif == Proof::Empty)
          return certif;      

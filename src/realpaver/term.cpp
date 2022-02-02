@@ -123,9 +123,9 @@ Interval Term::evalConst() const
    return rep_->evalConst();
 }
 
-Interval Term::eval(const Box& B) const
+Interval Term::eval(const IntervalVector& X) const
 {
-   return rep_->eval(B);
+   return rep_->eval(X);
 }
 
 void Term::acceptVisitor(TermVisitor& vis) const
@@ -1240,7 +1240,7 @@ Interval TermConst::evalConst() const
    return x_;
 }
 
-Interval TermConst::eval(const Box& B) const
+Interval TermConst::eval(const IntervalVector& X) const
 {
    return x_;
 }
@@ -1302,9 +1302,9 @@ Interval TermVar::evalConst() const
    return Interval::universe();
 }
 
-Interval TermVar::eval(const Box& B) const
+Interval TermVar::eval(const IntervalVector& X) const
 {
-   return B[v_.getId()];
+   return X[v_.getId()];
 }
 
 void TermVar::print(std::ostream& os) const
@@ -1447,9 +1447,9 @@ Interval TermAdd::evalConst() const
    return left()->evalConst() + right()->evalConst();
 }
 
-Interval TermAdd::eval(const Box& B) const
+Interval TermAdd::eval(const IntervalVector& X) const
 {
-   return left()->eval(B) + right()->eval(B);
+   return left()->eval(X) + right()->eval(X);
 }
 
 void TermAdd::print(std::ostream& os) const
@@ -1485,9 +1485,9 @@ Interval TermSub::evalConst() const
    return left()->evalConst() - right()->evalConst();
 }
 
-Interval TermSub::eval(const Box& B) const
+Interval TermSub::eval(const IntervalVector& X) const
 {
-   return left()->eval(B) - right()->eval(B);
+   return left()->eval(X) - right()->eval(X);
 }
 
 void TermSub::print(std::ostream& os) const
@@ -1536,9 +1536,9 @@ Interval TermMul::evalConst() const
    return left()->evalConst() * right()->evalConst();
 }
 
-Interval TermMul::eval(const Box& B) const
+Interval TermMul::eval(const IntervalVector& X) const
 {
-   return left()->eval(B) * right()->eval(B);
+   return left()->eval(X) * right()->eval(X);
 }
 
 void TermMul::print(std::ostream& os) const
@@ -1593,9 +1593,9 @@ Interval TermDiv::evalConst() const
    return left()->evalConst() / right()->evalConst();
 }
 
-Interval TermDiv::eval(const Box& B) const
+Interval TermDiv::eval(const IntervalVector& X) const
 {
-   return left()->eval(B) / right()->eval(B);
+   return left()->eval(X) / right()->eval(X);
 }
 
 void TermDiv::print(std::ostream& os) const
@@ -1645,9 +1645,9 @@ Interval TermMin::evalConst() const
    return min(left()->evalConst(), right()->evalConst());
 }
 
-Interval TermMin::eval(const Box& B) const
+Interval TermMin::eval(const IntervalVector& X) const
 {
-   return min(left()->eval(B), right()->eval(B));
+   return min(left()->eval(X), right()->eval(X));
 }
 
 void TermMin::acceptVisitor(TermVisitor& vis) const
@@ -1666,9 +1666,9 @@ Interval TermMax::evalConst() const
    return max(left()->evalConst(), right()->evalConst());
 }
 
-Interval TermMax::eval(const Box& B) const
+Interval TermMax::eval(const IntervalVector& X) const
 {
-   return max(left()->eval(B), right()->eval(B));
+   return max(left()->eval(X), right()->eval(X));
 }
 
 void TermMax::acceptVisitor(TermVisitor& vis) const
@@ -1687,9 +1687,9 @@ Interval TermUsb::evalConst() const
    return -sub()->evalConst();
 }
 
-Interval TermUsb::eval(const Box& B) const
+Interval TermUsb::eval(const IntervalVector& X) const
 {
-   return -sub()->eval(B);
+   return -sub()->eval(X);
 }
 
 void TermUsb::acceptVisitor(TermVisitor& vis) const
@@ -1713,9 +1713,9 @@ Interval TermAbs::evalConst() const
    return abs(sub()->evalConst());
 }
 
-Interval TermAbs::eval(const Box& B) const
+Interval TermAbs::eval(const IntervalVector& X) const
 {
-   return abs(sub()->eval(B));
+   return abs(sub()->eval(X));
 }
 
 void TermAbs::acceptVisitor(TermVisitor& vis) const
@@ -1734,9 +1734,9 @@ Interval TermSgn::evalConst() const
    return sgn(sub()->evalConst());
 }
 
-Interval TermSgn::eval(const Box& B) const
+Interval TermSgn::eval(const IntervalVector& X) const
 {
-   return sgn(sub()->eval(B));
+   return sgn(sub()->eval(X));
 }
 
 void TermSgn::acceptVisitor(TermVisitor& vis) const
@@ -1755,9 +1755,9 @@ Interval TermSqr::evalConst() const
    return sqr(sub()->evalConst());
 }
 
-Interval TermSqr::eval(const Box& B) const
+Interval TermSqr::eval(const IntervalVector& X) const
 {
-   return sqr(sub()->eval(B));
+   return sqr(sub()->eval(X));
 }
 
 void TermSqr::acceptVisitor(TermVisitor& vis) const
@@ -1776,9 +1776,9 @@ Interval TermSqrt::evalConst() const
    return sqrt(sub()->evalConst());
 }
 
-Interval TermSqrt::eval(const Box& B) const
+Interval TermSqrt::eval(const IntervalVector& X) const
 {
-   return sqrt(sub()->eval(B));
+   return sqrt(sub()->eval(X));
 }
 
 void TermSqrt::acceptVisitor(TermVisitor& vis) const
@@ -1807,9 +1807,9 @@ Interval TermPow::evalConst() const
    return pow(sub()->evalConst(), n_);
 }
 
-Interval TermPow::eval(const Box& B) const
+Interval TermPow::eval(const IntervalVector& X) const
 {
-   return pow(sub()->eval(B), n_);
+   return pow(sub()->eval(X), n_);
 }
 
 void TermPow::print(std::ostream& os) const
@@ -1835,9 +1835,9 @@ Interval TermExp::evalConst() const
    return exp(sub()->evalConst());
 }
 
-Interval TermExp::eval(const Box& B) const
+Interval TermExp::eval(const IntervalVector& X) const
 {
-   return exp(sub()->eval(B));
+   return exp(sub()->eval(X));
 }
 
 void TermExp::acceptVisitor(TermVisitor& vis) const
@@ -1856,9 +1856,9 @@ Interval TermLog::evalConst() const
    return log(sub()->evalConst());
 }
 
-Interval TermLog::eval(const Box& B) const
+Interval TermLog::eval(const IntervalVector& X) const
 {
-   return log(sub()->eval(B));
+   return log(sub()->eval(X));
 }
 
 void TermLog::acceptVisitor(TermVisitor& vis) const
@@ -1877,9 +1877,9 @@ Interval TermCos::evalConst() const
    return cos(sub()->evalConst());
 }
 
-Interval TermCos::eval(const Box& B) const
+Interval TermCos::eval(const IntervalVector& X) const
 {
-   return cos(sub()->eval(B));
+   return cos(sub()->eval(X));
 }
 
 void TermCos::acceptVisitor(TermVisitor& vis) const
@@ -1898,9 +1898,9 @@ Interval TermSin::evalConst() const
    return sin(sub()->evalConst());
 }
 
-Interval TermSin::eval(const Box& B) const
+Interval TermSin::eval(const IntervalVector& X) const
 {
-   return sin(sub()->eval(B));
+   return sin(sub()->eval(X));
 }
 
 void TermSin::acceptVisitor(TermVisitor& vis) const
@@ -1919,9 +1919,9 @@ Interval TermTan::evalConst() const
    return tan(sub()->evalConst());
 }
 
-Interval TermTan::eval(const Box& B) const
+Interval TermTan::eval(const IntervalVector& X) const
 {
-   return tan(sub()->eval(B));
+   return tan(sub()->eval(X));
 }
 
 void TermTan::acceptVisitor(TermVisitor& vis) const

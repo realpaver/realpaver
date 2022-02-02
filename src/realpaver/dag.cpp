@@ -33,7 +33,7 @@ DagNode* DagNode::subNode(size_t i) const
    return dag_->node(vsub_[i]);
 }
 
-const Interval& DagNode::dom() const
+Interval DagNode::dom() const
 {
    return dag_->dom(index_);
 }
@@ -182,7 +182,7 @@ void DagConst::print(std::ostream& os) const
       os << x_;
 }
 
-void DagConst::eval(const Box& B)
+void DagConst::eval(const IntervalVector& X)
 {
    setVal(x_);
 }
@@ -197,7 +197,7 @@ void DagConst::evalOnly(size_t id, const Interval& x)
    setVal(x_);
 }
 
-void DagConst::proj(Box& B)
+void DagConst::proj(IntervalVector& X)
 {
    // nothing to do
 }
@@ -246,9 +246,9 @@ void DagVar::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagVar::eval(const Box& B)
+void DagVar::eval(const IntervalVector& X)
 {
-   setVal(B[v_.getId()]);
+   setVal(X[v_.getId()]);
 }
 
 void DagVar::eval(const RealVector& P)
@@ -262,9 +262,9 @@ void DagVar::evalOnly(size_t id, const Interval& x)
       setVal(x);
 }
 
-void DagVar::proj(Box& B)
+void DagVar::proj(IntervalVector& X)
 {
-   B.set(v_.getId(), B[v_.getId()] & dom());
+   X.set(v_.getId(), X[v_.getId()] & dom());
 }
 
 bool DagVar::diff()
@@ -386,7 +386,7 @@ void DagAdd::eval()
    setVal(left()->val()+right()->val());
 }
 
-void DagAdd::proj(Box& B)
+void DagAdd::proj(IntervalVector& X)
 {
    left()->reduceDom(addPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(addPY(left()->val(), right()->val(), dom()));
@@ -431,7 +431,7 @@ void DagSub::eval()
    setVal(left()->val()-right()->val());
 }
 
-void DagSub::proj(Box& B)
+void DagSub::proj(IntervalVector& X)
 {
    left()->reduceDom(subPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(subPY(left()->val(), right()->val(), dom()));
@@ -476,7 +476,7 @@ void DagMul::eval()
    setVal(left()->val()*right()->val());
 }
 
-void DagMul::proj(Box& B)
+void DagMul::proj(IntervalVector& X)
 {
    left()->reduceDom(mulPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(mulPY(left()->val(), right()->val(), dom()));
@@ -521,7 +521,7 @@ void DagDiv::eval()
    setVal(left()->val()/right()->val());
 }
 
-void DagDiv::proj(Box& B)
+void DagDiv::proj(IntervalVector& X)
 {
    left()->reduceDom(divPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(divPY(left()->val(), right()->val(), dom()));
@@ -567,7 +567,7 @@ void DagMin::eval()
    setVal(min(left()->val(), right()->val()));
 }
 
-void DagMin::proj(Box& B)
+void DagMin::proj(IntervalVector& X)
 {
    left()->reduceDom(minPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(minPY(left()->val(), right()->val(), dom()));
@@ -637,7 +637,7 @@ void DagMax::eval()
    setVal(max(left()->val(), right()->val()));
 }
 
-void DagMax::proj(Box& B)
+void DagMax::proj(IntervalVector& X)
 {
    left()->reduceDom(maxPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(maxPY(left()->val(), right()->val(), dom()));
@@ -707,7 +707,7 @@ void DagUsb::eval()
    setVal(-child()->val());
 }
 
-void DagUsb::proj(Box& B)
+void DagUsb::proj(IntervalVector& X)
 {
    child()->reduceDom(usubPX(child()->val(), dom()));
 }
@@ -749,7 +749,7 @@ void DagAbs::eval()
    setVal(abs(child()->val()));
 }
 
-void DagAbs::proj(Box& B)
+void DagAbs::proj(IntervalVector& X)
 {
    child()->reduceDom(absPX(child()->val(), dom()));
 }
@@ -809,7 +809,7 @@ void DagSgn::eval()
    setVal(sgn(child()->val()));
 }
 
-void DagSgn::proj(Box& B)
+void DagSgn::proj(IntervalVector& X)
 {
    child()->reduceDom(sgnPX(child()->val(), dom()));
 }
@@ -847,7 +847,7 @@ void DagSqr::eval()
    setVal(sqr(child()->val()));
 }
 
-void DagSqr::proj(Box& B)
+void DagSqr::proj(IntervalVector& X)
 {
    child()->reduceDom(sqrPX(child()->val(), dom()));
 }
@@ -889,7 +889,7 @@ void DagSqrt::eval()
    setVal(sqrt(child()->val()));
 }
 
-void DagSqrt::proj(Box& B)
+void DagSqrt::proj(IntervalVector& X)
 {
    child()->reduceDom(sqrtPX(child()->val(), dom()));
 }
@@ -947,7 +947,7 @@ void DagPow::eval()
    setVal(pow(child()->val(), n_));
 }
 
-void DagPow::proj(Box& B)
+void DagPow::proj(IntervalVector& X)
 {
    child()->reduceDom(powPX(child()->val(), n_, dom()));
 }
@@ -991,7 +991,7 @@ void DagExp::eval()
    setVal(exp(child()->val()));
 }
 
-void DagExp::proj(Box& B)
+void DagExp::proj(IntervalVector& X)
 {
    child()->reduceDom(expPX(child()->val(), dom()));
 }
@@ -1033,7 +1033,7 @@ void DagLog::eval()
    setVal(log(child()->val()));
 }
 
-void DagLog::proj(Box& B)
+void DagLog::proj(IntervalVector& X)
 {
    child()->reduceDom(logPX(child()->val(), dom()));
 }
@@ -1075,7 +1075,7 @@ void DagCos::eval()
    setVal(cos(child()->val()));
 }
 
-void DagCos::proj(Box& B)
+void DagCos::proj(IntervalVector& X)
 {
    child()->reduceDom(cosPX(child()->val(), dom()));
 }
@@ -1118,7 +1118,7 @@ void DagSin::eval()
    setVal(sin(child()->val()));
 }
 
-void DagSin::proj(Box& B)
+void DagSin::proj(IntervalVector& X)
 {
    child()->reduceDom(sinPX(child()->val(), dom()));
 }
@@ -1160,7 +1160,7 @@ void DagTan::eval()
    setVal(tan(child()->val()));
 }
 
-void DagTan::proj(Box& B)
+void DagTan::proj(IntervalVector& X)
 {
    child()->reduceDom(tanPX(child()->val(), dom()));
 }
@@ -1239,10 +1239,10 @@ void DagFun::insertOpNode(DagOp* node)
    }
 }
 
-Interval DagFun::eval(const Box& B)
+Interval DagFun::eval(const IntervalVector& X)
 {
    for (size_t i=0; i<nbNode(); ++i)
-      node_[i]->eval(B);
+      node_[i]->eval(X);
 
    return rootNode()->val();
 }
@@ -1265,18 +1265,18 @@ Interval DagFun::evalOnly(size_t id, const Interval& x)
    return rootNode()->val();
 }
 
-Proof DagFun::hc4Revise(Box& B)
+Proof DagFun::hc4Revise(IntervalVector& X)
 {
    // assigns the projections to the universe
    for (size_t i=0; i<nbNode(); ++i)
          node_[i]->setDom(Interval::universe());
 
-   return sharedHc4Revise(B);
+   return sharedHc4Revise(X);
 }
 
-Proof DagFun::hc4ReviseNeg(Box& B)
+Proof DagFun::hc4ReviseNeg(IntervalVector& X)
 {
-   Interval e = eval(B);
+   Interval e = eval(X);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1301,7 +1301,7 @@ Proof DagFun::hc4ReviseNeg(Box& B)
          // projection over the root node
          rootNode()->setDom(e & Interval::moreThan(image_.right()));
 
-         return hc4ReviseBack(B);         
+         return hc4ReviseBack(X);
       }
 
       else if (image_.isInfRight())
@@ -1312,7 +1312,7 @@ Proof DagFun::hc4ReviseNeg(Box& B)
 
          // projection over the root node
          rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         return hc4ReviseBack(B);                  
+         return hc4ReviseBack(X);                  
       }
 
       else
@@ -1324,17 +1324,17 @@ Proof DagFun::hc4ReviseNeg(Box& B)
          for (size_t i=0; i<nbNode()-1; ++i)
             node_[i]->setDom(Interval::universe());
 
-         Box Bl(B);
+         IntervalVector Xl(X);
          rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         Proof pl = hc4ReviseBack(Bl);
+         Proof pl = hc4ReviseBack(Xl);
 
          // assigns the projections to the universe
          for (size_t i=0; i<nbNode(); ++i)
             node_[i]->setDom(Interval::universe());
 
-         Box Br(B);
+         IntervalVector Xr(X);
          rootNode()->setDom(e & Interval::moreThan(image_.right()));
-         Proof pr = hc4ReviseBack(Br);
+         Proof pr = hc4ReviseBack(Xr);
 
          Proof proof;
 
@@ -1354,13 +1354,13 @@ Proof DagFun::hc4ReviseNeg(Box& B)
                size_t idx = varNode(i)->getVar().getId();
 
                if (pl == Proof::Empty)
-                  B.set(idx, Br[idx]);
+                  X.set(idx, Xr[idx]);
 
                else if (pr == Proof::Empty)
-                  B.set(idx, Bl[idx]);
+                  X.set(idx, Xl[idx]);
 
                else
-                  B.set(idx, Bl[idx] | Br[idx]);
+                  X.set(idx, Xl[idx] | Xr[idx]);
             }
          }
 
@@ -1369,9 +1369,9 @@ Proof DagFun::hc4ReviseNeg(Box& B)
    }
 }
 
-Proof DagFun::sharedHc4Revise(Box& B)
+Proof DagFun::sharedHc4Revise(IntervalVector& X)
 {
-   Interval e = eval(B);
+   Interval e = eval(X);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1385,32 +1385,32 @@ Proof DagFun::sharedHc4Revise(Box& B)
    else
    {
       rootNode()->setDom(e & image_);
-      return hc4ReviseBack(B);
+      return hc4ReviseBack(X);
    }
 }
 
-Proof DagFun::hc4ReviseBack(Box& B)
+Proof DagFun::hc4ReviseBack(IntervalVector& X)
 {
    for (int i=nbNode()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
-      node_[j]->proj(B);
+      node_[j]->proj(X);
    }
 
    for (size_t i=0; i<nbVar(); ++i)
    {
       size_t idx = varNode(i)->getVar().getId();
 
-      if (B[idx].isEmpty())
+      if (X[idx].isEmpty())
          return Proof::Empty;
    }
 
    return Proof::Maybe;
 }
 
-bool DagFun::diff(const Box& B)
+bool DagFun::diff(const IntervalVector& X)
 {
-   eval(B);
+   eval(X);
    return diff();
 }
 
@@ -1438,14 +1438,14 @@ bool DagFun::diff()
    return res;
 }
 
-Box DagFun::grad() const
+IntervalVector DagFun::grad() const
 {
-   Box G(nbVar());
+   IntervalVector G(nbVar());
    toGrad(G);
    return G;
 }
 
-void DagFun::toGrad(Box& G) const
+void DagFun::toGrad(IntervalVector& G) const
 {
    for (size_t i=0; i<nbVar(); ++i)
       G.set(i, deriv(i));

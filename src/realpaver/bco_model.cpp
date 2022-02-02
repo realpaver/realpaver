@@ -3,7 +3,6 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/bco_model.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/timer.hpp"
 
 namespace realpaver {
 
@@ -27,7 +26,7 @@ BcoResult::BcoResult(const BcoResult& res)
    if (res.xstar_ == nullptr)
       xstar_ = res.xstar_;
    else
-      xstar_ = new Box(*res.xstar_);
+      xstar_ = new IntervalVector(*res.xstar_);
 }
 
 BcoResult& BcoResult::operator=(const BcoResult& res)
@@ -41,7 +40,7 @@ BcoResult& BcoResult::operator=(const BcoResult& res)
    if (res.xstar_ == nullptr)
       xstar_ = res.xstar_;
    else
-      xstar_ = new Box(*res.xstar_);
+      xstar_ = new IntervalVector(*res.xstar_);
 
    return *this;
 }
@@ -103,17 +102,17 @@ void BcoResult::addSTime(size_t t)
    stime_ += t;
 }
 
-Box* BcoResult::getBox() const
+IntervalVector* BcoResult::getBox() const
 {
    return xstar_;
 }
 
-void BcoResult::setBox(const Box& B)
+void BcoResult::setBox(const IntervalVector& X)
 {
    if (xstar_ != nullptr)
       delete xstar_;
 
-   xstar_ = new Box(B);
+   xstar_ = new IntervalVector(X);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,7 +165,7 @@ BcoResult BcoModel::preprocess(const Param& param)
    bdag_->makeDefaultPropagator();
 
    //LOG_INFO("   > tries to fix some variables...");
-   Box B(*initialBox());
+   IntervalVector B(*initialBox());
    Proof proof = bdag_->propagator()->contract(B);
 
    if (proof == Proof::Empty)
@@ -183,17 +182,17 @@ BcoResult BcoModel::preprocess(const Param& param)
       for (size_t i=0; i<prob_->nbVars(); ++i)
       {
          Variable v = prob_->varAt(i);
-         if (B[v].isCanonical())
+         if (B[v.getId()].isCanonical())
          {
             ++nbFixed_;
             //LOG_INFO("     - fix " << v.name() << " to " << B[v]);
          }
-         initialBox()->set(v, B[v]);
+         initialBox()->set(v.getId(), B[v.getId()]);
       }
 
       //LOG_INFO("   > first propagation: true");      
 
-      res.setOptimum(B[objVar()]);
+      res.setOptimum(B[objVar().getId()]);
       res.setBox(B);
       res.setProof(Proof::Maybe);
 
@@ -220,8 +219,8 @@ BcoResult BcoModel::solve(const Param& param)
    BcoResult res;
    stimer_.start();
 
-   L_ = initialBox()->at(objVar()).left();
-   U_ = initialBox()->at(objVar()).right();
+   L_ = initialBox()->at(objVar().getId()).left();
+   U_ = initialBox()->at(objVar().getId()).right();
 
    DEBUG("lu : " << Interval(L_, U_));
 

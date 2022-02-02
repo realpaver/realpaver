@@ -56,7 +56,7 @@ BcoDag::BcoDag(Problem& P) :
    dscope_ = dag_->scope();
 
    // initial box
-   init_ = std::make_shared<Box>(P.getBox());
+   init_ = std::make_shared<IntervalVector>(P.getDomains());
 }
 
 BcoDag::~BcoDag()
@@ -217,7 +217,7 @@ Scope BcoDag::dScope() const
    return dscope_;
 }
 
-SharedBox BcoDag::initialBox() const
+SharedIntervalVector BcoDag::initialBox() const
 {
    return init_;
 }

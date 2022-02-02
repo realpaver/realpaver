@@ -1477,9 +1477,9 @@ Optional Packages:
   --with-include-path     Specify an include path for third-party headers
   --with-lib-path         Specify a library path for third-party libraries
   --with-itvlib=(Gaol)    Specify the interval library to use @<:@default=Gaol@:>@
-  --with-lplib=(clp, gurobi) 
+  --with-lplib=(Clp, Gurobi) 
                           Specify the linear programming library to use
-                          @<:@default=clp@:>@
+                          @<:@default=Clp@:>@
 
 Some influential environment variables:
   CC          C compiler command
@@ -16283,12 +16283,12 @@ fi
 if test "${with_lplib+set}" = set; then :
   withval=$with_lplib; use_lplib="${with_lplib}"
 else
-  use_lplib="clp"
+  use_lplib="Clp"
 fi
 
 
 # Gurobi
-if test "${use_lplib}" = "gurobi"; then
+if test "${use_lplib}" = "Gurobi"; then
    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16371,7 +16371,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 
 # Clp
-if test "${with_lplib}" = "clp"; then
+if test "${with_lplib}" = "Clp"; then
    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16508,9 +16508,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 
 
-ac_config_links="$ac_config_links src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp"
+ac_config_links="$ac_config_links src/realpaver/LPSolver.hpp:src/realpaver/LPSolver${use_lplib}.hpp"
 
- if test ${use_lplib} = "gurobi"; then
+ if test ${use_lplib} = "Gurobi"; then
   COND_LP_GUROBI_TRUE=
   COND_LP_GUROBI_FALSE='#'
 else
@@ -16518,7 +16518,7 @@ else
   COND_LP_GUROBI_FALSE=
 fi
 
- if test ${use_lplib} = "clp"; then
+ if test ${use_lplib} = "Clp"; then
   COND_LP_CLP_TRUE=
   COND_LP_CLP_FALSE='#'
 else
@@ -17920,7 +17920,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "src/realpaver/IntervalImpl.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/IntervalImpl.hpp:src/realpaver/Interval${use_itvlib}.hpp" ;;
-    "src/realpaver/lpsolver.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp" ;;
+    "src/realpaver/LPSolver.hpp") CONFIG_LINKS="$CONFIG_LINKS src/realpaver/LPSolver.hpp:src/realpaver/LPSolver${use_lplib}.hpp" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
     "doc/Doxyfile") CONFIG_FILES="$CONFIG_FILES doc/Doxyfile" ;;
@@ -19416,4 +19416,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=clp --enable-debug --enable-assert --enable-log
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=Clp --enable-debug --enable-assert --enable-log

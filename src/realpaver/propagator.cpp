@@ -24,7 +24,7 @@ Scope Propagator::scope() const
    return pool_->scope();
 }
 
-Proof Propagator::contract(Box& B)
+Proof Propagator::contract(IntervalVector& X)
 {
    ASSERT(pool_ != nullptr, "null pool pointer in a propagator");
 
@@ -48,7 +48,7 @@ Proof Propagator::contract(Box& B)
    Bitset modified(1 + scope.maxIndex());
 
    // copy used to check the domain modifications
-   Box* copy = B.clone();
+   IntervalVector* copy = X.clone();
 
    // result of the algorithm
    Proof proof;
@@ -63,7 +63,7 @@ Proof Propagator::contract(Box& B)
    {
       // apply the next contractor from the queue
       size_t j = queue[next];
-      proof = pool_->contractorAt(j)->contract(B);
+      proof = pool_->contractorAt(j)->contract(X);
       certif_[j] = proof;
 
       if (proof != Proof::Empty)
@@ -84,7 +84,7 @@ Proof Propagator::contract(Box& B)
                modified.setAllZero();
 
                for (auto v : scope)
-                  if (imp_.test(B.operator[](v.getId()),
+                  if (imp_.test(X.operator[](v.getId()),
                                              copy->operator[](v.getId())))
                   {
                      isModified = true;
@@ -108,7 +108,7 @@ Proof Propagator::contract(Box& B)
                   // save the current box for the next propagation step
                   if (count != 0)
                   {
-                     copy->set(B, scope);
+                     copy->setOnScope(X, scope);
                   }
                }
             }

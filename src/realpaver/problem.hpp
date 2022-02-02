@@ -4,7 +4,7 @@
 #define REALPAVER_PROBLEM_HPP
 
 #include <vector>
-#include "realpaver/box.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/constraint.hpp"
 #include "realpaver/obj.hpp"
 
@@ -56,7 +56,7 @@ public:
 
    // returns the vector of variable domains such that the domain of the i-th
    // variable (i is its identifier) is at position i in the output vector
-   Box getBox() const;
+   IntervalVector getDomains() const;
 
    // returns the scope of this problem
    Scope scope() const;
@@ -69,7 +69,7 @@ public:
    // and the inactive constraints
    // creates another problem with a new set of variables
    // returns false if this problem is proved to be unsatisfiable
-   bool preprocess(const Box& B, Problem& other);
+   bool preprocess(const IntervalVector& X, Problem& other);
    bool preprocess(Problem& other);
 
    // tests the variables

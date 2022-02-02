@@ -3,7 +3,7 @@
 #ifndef REALPAVER_BCO_LOCAL_HPP
 #define REALPAVER_BCO_LOCAL_HPP
 
-#include "realpaver/box.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/RealVector.hpp"
 
 namespace realpaver {
@@ -18,7 +18,7 @@ public:
 
    // local optimization from x in region
    // returns true if the local solver converges
-   virtual bool minimize(const Box& region, const RealVector& x) = 0;
+   virtual bool minimize(const IntervalVector& region, const RealVector& x) = 0;
 
    // returns the initial point given as input of minimize
    virtual RealVector initialPoint() const = 0;

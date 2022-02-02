@@ -99,14 +99,14 @@ void Problem::addObj(const Obj& obj)
    obj_ = obj;
 }
 
-Box Problem::getBox() const
+IntervalVector Problem::getDomains() const
 {
-   Box B(vars_.size());
+   IntervalVector X(vars_.size());
    
    for(size_t i=0; i<vars_.size(); ++i)
-      B.set(i,vars_[i].getDomain());
+      X.set(i, vars_[i].getDomain());
 
-   return B;
+   return X;
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)
@@ -168,7 +168,7 @@ bool Problem::isFakeVar(const Variable& v) const
    return true;
 }
 
-bool Problem::preprocess(const Box& B, Problem& other)
+bool Problem::preprocess(const IntervalVector& X, Problem& other)
 {
    //LOG_INFO("   > simplifies the problem");
 
@@ -176,26 +176,26 @@ bool Problem::preprocess(const Box& B, Problem& other)
    ConstraintFixer::VVMap vvm;
    ConstraintFixer::VIMap vim;
 
-   for (size_t i=0; i<B.size(); ++i)
+   for (size_t i=0; i<X.size(); ++i)
    {
       Variable v = varAt(i);
 
-      if (B[i].isEmpty())
+      if (X[i].isEmpty())
       {
          //LOG_INFO("     - empty variable domain: " << v.name());
          return false;
       }
-      else if (B[i].isCanonical())
+      else if (X[i].isCanonical())
       {
          //LOG_INFO("     - replaces " << v.name() << " by " << B[i]);
-         vim.insert(std::make_pair(v, B[i]));
+         vim.insert(std::make_pair(v, X[i]));
       }
       else
       {
          // creates a clone of the variable in the other problem
          Variable w = v.clone();
          w.setId(other.nbVars());
-         w.setDomain(B[i]);
+         w.setDomain(X[i]);
          other.vars_.push_back(w);
 
          // new map entry
@@ -203,7 +203,7 @@ bool Problem::preprocess(const Box& B, Problem& other)
       }
    }
 
-   Box oB = other.getBox();
+   IntervalVector oX = other.getDomains();
 
    // rewrites the constraints
    for (size_t i=0; i<nbCtrs(); ++i)
@@ -212,7 +212,7 @@ bool Problem::preprocess(const Box& B, Problem& other)
       ctrAt(i).acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
 
-      Proof proof = c.isSat(oB);
+      Proof proof = c.isSat(oX);
       if (proof == Proof::Empty)
       {
          //LOG_INFO("     - violated constraint: " << ctrAt(i));
@@ -252,8 +252,8 @@ bool Problem::preprocess(const Box& B, Problem& other)
 
 bool Problem::preprocess(Problem& other)
 {
-   Box V = getBox();
-   return preprocess(V, other);
+   IntervalVector X = getDomains();
+   return preprocess(X, other);
 }
 
 bool Problem::isContinuous() const

@@ -33,14 +33,14 @@ bool IntContractor::dependsOn(const Bitset& bs) const
    return b_.overlaps(bs);
 }
 
-Proof IntContractor::contract(Box& B)
+Proof IntContractor::contract(IntervalVector& X)
 {
    for (auto v : s_)
    {
-      Interval x = round(B[v.getId()]);
-      B.set(v.getId(), x);
+      Interval rnd = round(X[v.getId()]);
+      X.set(v.getId(), rnd);
 
-      if (x.isEmpty())
+      if (rnd.isEmpty())
          return Proof::Empty;
    }
    return Proof::Maybe;

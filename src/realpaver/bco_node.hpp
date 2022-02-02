@@ -3,7 +3,7 @@
 #ifndef REALPAVER_BCO_NODE_HPP
 #define REALPAVER_BCO_NODE_HPP
 
-#include "realpaver/box.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 
@@ -13,7 +13,7 @@ namespace realpaver {
 class BcoNode {
 public:
    // constructors
-   BcoNode(const Box& B);
+   BcoNode(const IntervalVector& X);
    BcoNode(const BcoNode& node);
 
    // copy protection
@@ -36,10 +36,10 @@ public:
    void incrDepth();
 
    // returns the box enclosed
-   Box* getBox() const;
+   IntervalVector* getBox() const;
 
 private:
-   Box* box_;        // variable domains
+   IntervalVector* box_;        // variable domains
    size_t depth_;    // depth in the search tree
    double lower_;    // lower bound of f in this box
    double upper_;    // upper bound of f in this box
@@ -79,7 +79,7 @@ inline void BcoNode::incrDepth()
    ++depth_;
 }
 
-inline Box* BcoNode::getBox() const
+inline IntervalVector* BcoNode::getBox() const
 {
    return box_;
 }

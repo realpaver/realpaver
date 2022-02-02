@@ -43,6 +43,15 @@ public:
    /// Default destructor
    ~RealVector() = default;
 
+   /// @param i an index between 0 and size()-1
+   /// @return the i-th element of this
+   double operator[](size_t i) const;
+
+   /// Sets an element of this
+   /// @param i an index between 0 and size()-1
+   /// @param x a real number
+   void set(size_t i, double x);
+
    /// Scalar product
    /// @param V a vector having the same size than this
    /// @return the scalar product of this and V

@@ -19,6 +19,8 @@ public:
    // constructor of a bitset of 'n' bits assigned to 'val'
    Bitset(size_t n, size_t val = 0);
 
+   Bitset(const std::initializer_list<int>& l);
+
    // copy constructor
    Bitset(const Bitset& other);
 

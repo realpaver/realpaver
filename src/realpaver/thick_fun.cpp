@@ -28,9 +28,9 @@ std::pair<Interval,Interval> ThickFun::evalDiff(const Interval& x)
    return std::make_pair(e, dv);
 }
 
-Interval ThickFun::update(const Box& B)
+Interval ThickFun::update(const IntervalVector& X)
 {
-   return f_->eval(B);
+   return f_->eval(X);
 }
 
 size_t ThickFun::getVarIndex() const

@@ -158,13 +158,13 @@ AM_CONDITIONAL([COND_INTERVAL_GAOL], [test ${use_itvlib} = "Gaol"])
 
 # --with-lplib
 AC_ARG_WITH([lplib],
-            [AS_HELP_STRING([--with-lplib=(clp, gurobi)],
-            [Specify the linear programming library to use @<:@default=clp@:>@])],
+            [AS_HELP_STRING([--with-lplib=(Clp, Gurobi)],
+            [Specify the linear programming library to use @<:@default=Clp@:>@])],
             use_lplib="${with_lplib}",
-            use_lplib="clp")
+            use_lplib="Clp")
 
 # Gurobi
-if test "${use_lplib}" = "gurobi"; then
+if test "${use_lplib}" = "Gurobi"; then
    AC_LANG_PUSH([C++])
    AC_MSG_CHECKING([for Gurobi headers])
    AC_COMPILE_IFELSE([
@@ -196,7 +196,7 @@ if test "${use_lplib}" = "gurobi"; then
 fi
 
 # Clp
-if test "${with_lplib}" = "clp"; then
+if test "${with_lplib}" = "Clp"; then
    AC_LANG_PUSH([C++])
    AC_MSG_CHECKING([for CoinUtils headers])
    AC_COMPILE_IFELSE([
@@ -242,9 +242,9 @@ if test "${with_lplib}" = "clp"; then
 fi
 
 AC_SUBST(LP_LIB)
-AC_CONFIG_LINKS([src/realpaver/lpsolver.hpp:src/realpaver/wrapper_lpsolver_${use_lplib}.hpp])
-AM_CONDITIONAL([COND_LP_GUROBI], [test ${use_lplib} = "gurobi"])
-AM_CONDITIONAL([COND_LP_CLP], [test ${use_lplib} = "clp"])
+AC_CONFIG_LINKS([src/realpaver/LPSolver.hpp:src/realpaver/LPSolver${use_lplib}.hpp])
+AM_CONDITIONAL([COND_LP_GUROBI], [test ${use_lplib} = "Gurobi"])
+AM_CONDITIONAL([COND_LP_CLP], [test ${use_lplib} = "Clp"])
 
 
 # cppUnit
@@ -375,4 +375,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=clp --enable-debug --enable-assert --enable-log
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=Clp --enable-debug --enable-assert --enable-log

@@ -7,7 +7,7 @@ namespace realpaver {
 
 BcoContractor::BcoContractor(Dag* dag, size_t i, const Variable& v,
                              const SharedContractor& op, 
-                             const SharedBox& init) :
+                             const SharedIntervalVector& init) :
    f_(dag->fun(i)),
    v_(v),
    op_(op),
@@ -24,46 +24,46 @@ Scope BcoContractor::scope() const
    return f_->scope();
 }
 
-Proof BcoContractor::contract(Box& B)
+Proof BcoContractor::contract(IntervalVector& X)
 {
-   bool initLB = B[v_].left() == init_->operator[](v_).left(),
-        initRB = B[v_].right() == init_->operator[](v_).right(),
+   bool initLB = X[v_].left() == init_->operator[](v_).left(),
+        initRB = X[v_].right() == init_->operator[](v_).right(),
         initB  = initLB || initRB;
 
    // just finds stationary points if B does not intersect
    // the initial region for this variable
    if (!initB)
    {
-      return op_->contract(B);
+      return op_->contract(X);
    }
 
    // copies the box
-   Box copy( B );
+   IntervalVector copy( X );
 
    // applies the contractor to find stationary points
-   Proof proof = op_->contract(B);
+   Proof proof = op_->contract(X);
 
    if (proof == Proof::Empty)
    {
       // monotone function => finds the sign of the derivative at some
       // point of B
       RealVector P( copy.midpoint() );
-      Interval x = f_->eval(P);
+      Interval ef = f_->eval(P);
 
       // resets B
-      B.set(copy, scope());
+      X.setOnScope(copy, scope());
 
       // instanciates the variable
-      if (x.isCertainlyLeZero())
+      if (ef.isCertainlyLeZero())
       {
          double val = copy[v_].right();
-         B.set(v_, val);
+         X.set(v_, val);
       }
 
-      else if (x.isCertainlyGeZero())
+      else if (ef.isCertainlyGeZero())
       {
          double val = copy[v_].left();
-         B.set(v_, val);
+         X.set(v_, val);
       }
 
       //else
@@ -74,34 +74,34 @@ Proof BcoContractor::contract(Box& B)
       bool keepLB = false,
            keepRB = false;
 
-      if (initLB && B[v_].left() != copy[v_].left())
+      if (initLB && X[v_].left() != copy[v_].left())
       {
          RealVector P( copy.lCorner() );
-         Interval x = f_->eval(P);
-         if (x.isCertainlyGeZero())
+         Interval ef = f_->eval(P);
+         if (ef.isCertainlyGeZero())
             keepLB = true;
       }
 
-      if (initRB && B[v_].right() != copy[v_].right())
+      if (initRB && X[v_].right() != copy[v_].right())
       {
          RealVector P( copy.rCorner() );
-         Interval x = f_->eval(P);
-         if (x.isCertainlyLeZero())
+         Interval ef = f_->eval(P);
+         if (ef.isCertainlyLeZero())
             keepRB = true;
       }
 
       if (keepLB || keepRB)
       {
-         B.set(copy, scope());
-         Interval x = B[v_];
+         X.setOnScope(copy, scope());
+         Interval dom = X[v_];
 
          if (keepLB)
-            x.setLeft(copy[v_].left()); 
+            dom.setLeft(copy[v_].left()); 
 
          if (keepRB)
-            x.setRight(copy[v_].right());
+            dom.setRight(copy[v_].right());
 
-         B.set(v_, x);
+         X.set(v_, dom);
       }
    }
    

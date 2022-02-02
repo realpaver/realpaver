@@ -1,5 +1,3 @@
-LPModel.hpp LPModel.cpp
-Renommer aussi les wrappers, les liens LPSolver.hpp et .cpp
 
 Box.hpp Box.cpp
 Box herite de IntervalVector

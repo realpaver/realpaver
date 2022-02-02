@@ -1,5 +1,5 @@
 #include <iostream>
-#include "realpaver/lpsolver.hpp"
+#include "realpaver/LPSolver.hpp"
 
 using namespace realpaver;
 using namespace std;

@@ -22,7 +22,6 @@ librealpaver_la_include_HEADERS = \
 		bco_node.hpp \
 		bco_space.hpp \
 		bitset.hpp \
-		box.hpp \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
@@ -51,8 +50,8 @@ librealpaver_la_include_HEADERS = \
 		LinumIntervalTraits.hpp \
 		LinumTraits.hpp \
 		Logger.hpp \
-		lpmodel.hpp \
-		lpsolver.hpp \
+		LPModel.hpp \
+		LPSolver.hpp \
 		NumericVector.hpp \
 		obj.hpp \
 		param.hpp \
@@ -68,7 +67,7 @@ librealpaver_la_include_HEADERS = \
 		term_deriver.hpp \
 		term_fixer.hpp \
 		thick_fun.hpp \
-		timer.hpp \
+		Timer.hpp \
 		Tolerance.hpp \
 		uni_fun.hpp \
 		Variable.hpp
@@ -78,11 +77,11 @@ librealpaver_la_include_HEADERS += IntervalGaol.hpp
 endif
 
 if COND_LP_CLP
-librealpaver_la_include_HEADERS += wrapper_lpsolver_clp.hpp
+librealpaver_la_include_HEADERS += LPSolverClp.hpp
 endif
 
 if COND_LP_GUROBI
-librealpaver_la_include_HEADERS += wrapper_lpsolver_gurobi.hpp
+librealpaver_la_include_HEADERS += LPSolverGurobi.hpp
 endif
 
 librealpaver_la_SOURCES = \
@@ -93,7 +92,6 @@ librealpaver_la_SOURCES = \
 		bco_node.cpp \
 		bco_space.cpp \
 		bitset.cpp \
-		box.cpp \
 		Common.cpp \
 		constraint.cpp \
 		constraint_fixer.cpp \
@@ -115,7 +113,7 @@ librealpaver_la_SOURCES = \
 		IntervalVector.cpp \
 		interval_union.cpp \
 		Logger.cpp \
-		lpmodel.cpp \
+		LPModel.cpp \
 		obj.cpp \
 		param.cpp \
 		parser_bison.ypp \
@@ -130,18 +128,18 @@ librealpaver_la_SOURCES = \
 		term.cpp \
 		term_deriver.cpp \
 		term_fixer.cpp \
-		timer.cpp \
+		Timer.cpp \
 		thick_fun.cpp \
 		Tolerance.cpp \
 		uni_fun.cpp \
 		Variable.cpp
 
 if COND_LP_CLP
-librealpaver_la_SOURCES += wrapper_lpsolver_clp.cpp
+librealpaver_la_SOURCES += LPSolverClp.cpp
 endif
 
 if COND_LP_GUROBI
-librealpaver_la_SOURCES += wrapper_lpsolver_gurobi.cpp
+librealpaver_la_SOURCES += LPSolverGurobi.cpp
 endif
 
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp

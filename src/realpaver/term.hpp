@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 #include <vector>
-#include "realpaver/box.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/scope.hpp"
 
 namespace realpaver {
@@ -56,7 +56,7 @@ public:
    virtual Interval evalConst() const = 0;
 
    // interval evaluation of a term
-   virtual Interval eval(const Box& B) const = 0;
+   virtual Interval eval(const IntervalVector& X) const = 0;
 
    // visitor pattern
    virtual void acceptVisitor(TermVisitor& vis) const = 0;
@@ -112,7 +112,7 @@ public:
    Interval evalConst() const;
 
    // interval evaluation of a term
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
 
    // visitor pattern
    void acceptVisitor(TermVisitor& vis) const;   
@@ -189,7 +189,7 @@ public:
    // Override
    void print(std::ostream& os) const;
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isZero() const;
    bool isOne() const;
@@ -216,7 +216,7 @@ public:
    // Override
    void print(std::ostream& os) const;
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool dependsOn(const Variable& v) const;
    bool isLinear() const;
@@ -282,7 +282,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -298,7 +298,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -314,7 +314,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -330,7 +330,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isDiv() const;
@@ -345,7 +345,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -358,7 +358,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -372,7 +372,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
 };
@@ -386,7 +386,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -399,7 +399,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -412,7 +412,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -425,7 +425,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -440,7 +440,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
 
@@ -457,7 +457,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -470,7 +470,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -483,7 +483,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -496,7 +496,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 
@@ -509,7 +509,7 @@ public:
 
    // Override
    Interval evalConst() const;
-   Interval eval(const Box& B) const;
+   Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
 };
 

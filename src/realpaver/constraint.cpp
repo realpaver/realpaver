@@ -124,10 +124,10 @@ void ConstraintEq::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintEq::isSat(const Box& B) const
+Proof ConstraintEq::isSat(const IntervalVector& X) const
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(X),
+            r = right().eval(X);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -158,10 +158,10 @@ void ConstraintLe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLe::isSat(const Box& B) const
+Proof ConstraintLe::isSat(const IntervalVector& X) const
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(X),
+            r = right().eval(X);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -192,10 +192,10 @@ void ConstraintLt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLt::isSat(const Box& B) const
+Proof ConstraintLt::isSat(const IntervalVector& X) const
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(X),
+            r = right().eval(X);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -226,10 +226,10 @@ void ConstraintGe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGe::isSat(const Box& B) const
+Proof ConstraintGe::isSat(const IntervalVector& X) const
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(X),
+            r = right().eval(X);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -260,10 +260,10 @@ void ConstraintGt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGt::isSat(const Box& B) const
+Proof ConstraintGt::isSat(const IntervalVector& X) const
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(X),
+            r = right().eval(X);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -297,9 +297,9 @@ void ConstraintIn::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintIn::isSat(const Box& B) const
+Proof ConstraintIn::isSat(const IntervalVector& X) const
 {
-   Interval e = term().eval(B);
+   Interval e = term().eval(X);
 
    if (e.isEmpty())
       return Proof::Empty;

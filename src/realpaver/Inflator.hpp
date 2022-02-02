@@ -10,7 +10,7 @@
 #ifndef REALPAVER_INFLATOR_HPP
 #define REALPAVER_INFLATOR_HPP
 
-#include "realpaver/box.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 
@@ -59,9 +59,9 @@ public:
    /// @return interval resulting from the inflation of 'x'
    Interval inflate(const Interval& x) const;
 
-   /// Inflates each component of a box
-   /// @param B box that is inflated
-   void inflate(Box& B) const;
+   /// Inflates each component of an interval vector
+   /// @param X interval vector that is inflated
+   void inflate(IntervalVector& X) const;
 
 private:
    double delta_;

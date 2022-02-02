@@ -30,6 +30,16 @@ Bitset::Bitset(size_t n, size_t val) :
    else setAllZero();
 }
 
+Bitset::Bitset(const std::initializer_list<int>& l) : Bitset(l.size(), 0)
+{
+   size_t j = 0;
+
+   for (auto it=l.begin(); it != l.end(); ++it, ++j)
+      if (*it != 0)
+         setOne(j);
+}
+
+
 Bitset& Bitset::operator=(const Bitset& other)
 {
    if (word_ != nullptr)

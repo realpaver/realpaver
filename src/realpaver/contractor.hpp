@@ -5,7 +5,7 @@
 
 #include <memory>
 #include "realpaver/bitset.hpp"
-#include "realpaver/box.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/scope.hpp"
 
 namespace realpaver {
@@ -29,7 +29,7 @@ public:
    virtual Scope scope() const = 0;
 
    // contraction method
-   virtual Proof contract(Box& B) = 0;
+   virtual Proof contract(IntervalVector& X) = 0;
 
    // output on a stream
    virtual void print(std::ostream& os) const;

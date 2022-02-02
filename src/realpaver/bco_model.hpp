@@ -8,7 +8,7 @@
 #include "realpaver/bco_space.hpp"
 #include "realpaver/param.hpp"
 #include "realpaver/problem.hpp"
-#include "realpaver/timer.hpp"
+#include "realpaver/Timer.hpp"
 
 namespace realpaver {
 
@@ -43,12 +43,12 @@ public:
    void addSTime(size_t t);
 
    // management of the box enclosed / optimizer
-   Box* getBox() const;
-   void setBox(const Box& B);
+   IntervalVector* getBox() const;
+   void setBox(const IntervalVector& X);
 
 private:
    Proof proof_;
-   Box* xstar_;
+   IntervalVector* xstar_;
    Interval fstar_;
    size_t ctime_;
    size_t ptime_;
@@ -92,7 +92,7 @@ public:
    size_t nbFixedVars() const;
 
    // initial box
-   SharedBox initialBox() const;
+   SharedIntervalVector initialBox() const;
 
    // returns the dag
    BcoDag* getBcoDag() const;
@@ -127,7 +127,7 @@ inline size_t BcoModel::nbFixedVars() const
    return nbFixed_;
 }
 
-inline SharedBox BcoModel::initialBox() const
+inline SharedIntervalVector BcoModel::initialBox() const
 {
    return bdag_->initialBox();;
 }
@@ -163,7 +163,7 @@ inline size_t BcoModel::dim() const
 
 inline void BcoModel::setObjDomain(const Interval& lu)
 {
-   initialBox()->set(objVar(), lu);
+   initialBox()->set(objVar().getId(), lu);
 }
 
 } // namespace

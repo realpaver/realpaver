@@ -26,10 +26,10 @@ Interval Inflator::inflate(const Interval& x) const
    return x.inflate(delta_, chi_);
 }
 
-void Inflator::inflate(Box& B) const
+void Inflator::inflate(IntervalVector& X) const
 {
-   for (size_t i=0; i<B.size(); ++i)
-      B.set(i, B[i].inflate(delta_, chi_));
+   for (size_t i=0; i<X.size(); ++i)
+      X.set(i, X[i].inflate(delta_, chi_));
 }
 
 double Inflator::getDelta() const
