@@ -16,6 +16,7 @@
 #include "realpaver/scope.hpp"
 #include "realpaver/bco_model.hpp"
 #include "realpaver/IntervalVector.hpp"
+#include "realpaver/Param.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -24,6 +25,19 @@ int main(void)
 {
    Logger::init(LogLevel::internal, "work.log");
    Interval::precision( 16 );
+
+
+   try {
+      Param::init("../src/realpaver/settings.txt");
+
+   cout << "XTOL : " << Param::getTolParam("XTOL") << endl;
+   cout << "NODE_LIMIT : " << Param::getIntParam("NODE_LIMIT") << endl;
+   cout << "TUTU : " << Param::getDblParam("TUTU") << endl;
+
+   }
+   catch (Exception ex) {
+      cout << ex.what() << endl;
+   }
 
    IntervalVector vec(3, Interval(0,10));
    Bitset bs( {0, 1, 0} );

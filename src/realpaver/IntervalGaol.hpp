@@ -70,12 +70,24 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval create(const char* s)
    {
-      return interval(s);
+      try {
+         interval res(s);
+         return res;
+      }
+      catch(std::exception e)
+      {}
+      return interval::emptyset();
    }
 
    static inline interval create(const char* sl, char const* sr)
    {
-      return interval(sl,sr);
+      try {
+         interval res(sl, sr);
+         return res;
+      }
+      catch(std::exception e)
+      {}
+      return interval::emptyset();
    }
 
    static inline void setEmpty(interval& x)

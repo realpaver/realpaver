@@ -1,4 +1,11 @@
-# This file is part of Realpaver. License: see COPYING file.
+###############################################################################
+## This file is part of Realpaver, an interval constraint and NLP solver.    ##
+##                                                                           ##
+## Copyright (c) 2017-2022 LS2N, Nantes                                      ##
+##                                                                           ##
+## Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   ##
+## COPYING for information.                                                  ##
+###############################################################################
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -9,7 +16,8 @@ AM_CPPFLAGS = -I..
 EXTRA_DIST = \
 		configure.hpp \
 		parser_flex.lpp \
-		parser_bison.ypp
+		parser_bison.ypp \
+		settings.txt
 
 lib_LTLIBRARIES = librealpaver.la
 
@@ -54,7 +62,7 @@ librealpaver_la_include_HEADERS = \
 		LPSolver.hpp \
 		NumericVector.hpp \
 		obj.hpp \
-		param.hpp \
+		Param.hpp \
 		parser.hpp \
 		parser_bison.hpp \
 		problem.hpp \
@@ -115,7 +123,7 @@ librealpaver_la_SOURCES = \
 		Logger.cpp \
 		LPModel.cpp \
 		obj.cpp \
-		param.cpp \
+		Param.cpp \
 		parser_bison.ypp \
 		parser_flex.lpp \
 		parser.cpp \

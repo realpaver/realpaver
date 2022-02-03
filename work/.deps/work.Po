@@ -225,7 +225,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  ../src/realpaver/real_fun.hpp ../src/realpaver/bco_local.hpp \
  ../src/realpaver/bco_space.hpp /usr/include/c++/7/set \
  /usr/include/c++/7/bits/stl_set.h /usr/include/c++/7/bits/stl_multiset.h \
- ../src/realpaver/bco_node.hpp ../src/realpaver/param.hpp
+ ../src/realpaver/bco_node.hpp ../src/realpaver/Param.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -835,4 +835,4 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/bco_node.hpp:
 
-../src/realpaver/param.hpp:
+../src/realpaver/Param.hpp:

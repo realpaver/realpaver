@@ -6,7 +6,6 @@
 #include "realpaver/bco_dag.hpp"
 #include "realpaver/bco_local.hpp"
 #include "realpaver/bco_space.hpp"
-#include "realpaver/param.hpp"
 #include "realpaver/problem.hpp"
 #include "realpaver/Timer.hpp"
 
@@ -80,10 +79,10 @@ public:
 
    // preprocessing
    // tries to fix the variables v such that df / dv is constant
-   BcoResult preprocess(const Param& param = Param());
+   BcoResult preprocess();
 
    // solving
-   BcoResult solve(const Param& param = Param());
+   BcoResult solve();
 
    // returns the variable representing the objective function
    Variable objVar() const;

@@ -4,7 +4,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/constraint_fixer.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/param.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/problem.hpp"
 
 namespace realpaver {
@@ -81,7 +81,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    v.setId(id)
     .setDomain(x)
     .setContinuous()
-    .setTolerance(Param::DefRealVarPrecision());
+    .setTolerance(Param::getTolParam("XTOL"));
 
    vars_.push_back(v);
    scope_.insert(v);

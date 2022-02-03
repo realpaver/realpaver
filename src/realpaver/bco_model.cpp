@@ -147,7 +147,7 @@ BcoModel::~BcoModel()
    delete bdag_;
 }
 
-BcoResult BcoModel::preprocess(const Param& param)
+BcoResult BcoModel::preprocess()
 {
    BcoResult res;
    ptimer_.start();
@@ -212,7 +212,7 @@ BcoResult BcoModel::preprocess(const Param& param)
    }
 }
 
-BcoResult BcoModel::solve(const Param& param)
+BcoResult BcoModel::solve()
 {
    //LOG_INFO("\n-- Solving of a Bound-Constrained Optimization problem -- ");
 

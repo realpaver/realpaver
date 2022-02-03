@@ -1,16 +1,18 @@
 // This file is part of Realpaver. License: see COPYING file.
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/param.hpp"
 #include "realpaver/propagator.hpp"
+
+
+// TODO: param, virer improvement factor
 
 namespace realpaver {
 
 Propagator::Propagator(ContractorPool* pool) :
    Contractor(),
    pool_(pool),
-   imp_(Param::DefPropagatorImprovement()),
-   max_steps_(Param::DefPropagatorMaxSteps()),
+   imp_(10.0),
+   max_steps_(50),
    certif_()
 {}
 

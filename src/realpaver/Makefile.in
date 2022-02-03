@@ -14,7 +14,8 @@
 
 @SET_MAKE@
 
-# This file is part of Realpaver. License: see COPYING file.
+###############################################################################
+###############################################################################
 
 
 VPATH = @srcdir@
@@ -148,7 +149,7 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp bco_dag.cpp \
 	contractor_hc4.cpp contractor_int.cpp contractor_pool.cpp \
 	dag.cpp Exception.cpp Inflator.cpp interval.cpp \
 	interval_newton.cpp interval_slicer.cpp IntervalVector.cpp \
-	interval_union.cpp Logger.cpp LPModel.cpp obj.cpp param.cpp \
+	interval_union.cpp Logger.cpp LPModel.cpp obj.cpp Param.cpp \
 	parser_bison.ypp parser_flex.lpp parser.cpp problem.cpp \
 	propagator.cpp real_fun.cpp RealVector.cpp scope.cpp \
 	scope_map.cpp term.cpp term_deriver.cpp term_fixer.cpp \
@@ -163,7 +164,7 @@ am_librealpaver_la_OBJECTS = bco_dag.lo bco_local.lo bco_model.lo \
 	contractor_cid.lo contractor_hc4.lo contractor_int.lo \
 	contractor_pool.lo dag.lo Exception.lo Inflator.lo interval.lo \
 	interval_newton.lo interval_slicer.lo IntervalVector.lo \
-	interval_union.lo Logger.lo LPModel.lo obj.lo param.lo \
+	interval_union.lo Logger.lo LPModel.lo obj.lo Param.lo \
 	parser_bison.lo parser_flex.lo parser.lo problem.lo \
 	propagator.lo real_fun.lo RealVector.lo scope.lo scope_map.lo \
 	term.lo term_deriver.lo term_fixer.lo Timer.lo thick_fun.lo \
@@ -261,7 +262,7 @@ am__librealpaver_la_include_HEADERS_DIST = bco_dag.hpp bco_local.hpp \
 	IntervalTraits.hpp IntervalVector.hpp interval_union.hpp \
 	LinumDoubleTraits.hpp LinumIntervalTraits.hpp LinumTraits.hpp \
 	Logger.hpp LPModel.hpp LPSolver.hpp NumericVector.hpp obj.hpp \
-	param.hpp parser.hpp parser_bison.hpp problem.hpp \
+	Param.hpp parser.hpp parser_bison.hpp problem.hpp \
 	propagator.hpp real_fun.hpp RealVector.hpp scope.hpp \
 	scope_map.hpp term.hpp term_deriver.hpp term_fixer.hpp \
 	thick_fun.hpp Timer.hpp Tolerance.hpp uni_fun.hpp Variable.hpp \
@@ -429,7 +430,8 @@ AM_CPPFLAGS = -I..
 EXTRA_DIST = \
 		configure.hpp \
 		parser_flex.lpp \
-		parser_bison.ypp
+		parser_bison.ypp \
+		settings.txt
 
 lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir = $(includedir)/realpaver
@@ -444,7 +446,7 @@ librealpaver_la_include_HEADERS = bco_dag.hpp bco_local.hpp \
 	IntervalTraits.hpp IntervalVector.hpp interval_union.hpp \
 	LinumDoubleTraits.hpp LinumIntervalTraits.hpp LinumTraits.hpp \
 	Logger.hpp LPModel.hpp LPSolver.hpp NumericVector.hpp obj.hpp \
-	param.hpp parser.hpp parser_bison.hpp problem.hpp \
+	Param.hpp parser.hpp parser_bison.hpp problem.hpp \
 	propagator.hpp real_fun.hpp RealVector.hpp scope.hpp \
 	scope_map.hpp term.hpp term_deriver.hpp term_fixer.hpp \
 	thick_fun.hpp Timer.hpp Tolerance.hpp uni_fun.hpp Variable.hpp \
@@ -457,7 +459,7 @@ librealpaver_la_SOURCES = AssertDebug.hpp bco_dag.cpp bco_local.cpp \
 	contractor_int.cpp contractor_pool.cpp dag.cpp Exception.cpp \
 	Inflator.cpp interval.cpp interval_newton.cpp \
 	interval_slicer.cpp IntervalVector.cpp interval_union.cpp \
-	Logger.cpp LPModel.cpp obj.cpp param.cpp parser_bison.ypp \
+	Logger.cpp LPModel.cpp obj.cpp Param.cpp parser_bison.ypp \
 	parser_flex.lpp parser.cpp problem.cpp propagator.cpp \
 	real_fun.cpp RealVector.cpp scope.cpp scope_map.cpp term.cpp \
 	term_deriver.cpp term_fixer.cpp Timer.cpp thick_fun.cpp \
@@ -578,6 +580,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LPSolverClp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LPSolverGurobi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RealVector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tolerance.Plo@am__quote@
@@ -605,7 +608,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_slicer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_union.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obj.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_bison.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_flex.Plo@am__quote@

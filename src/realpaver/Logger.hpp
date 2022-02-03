@@ -34,7 +34,7 @@ enum class LogLevel {
 /// This is a logger.
 ///
 /// A logger can write log messages to the console or a log file.
-/// This design of this class follows the singleton design pattern.
+/// The design of this class follows the singleton design pattern.
 ///
 /// LOG(msg) writes a log.
 ///////////////////////////////////////////////////////////////////////////////

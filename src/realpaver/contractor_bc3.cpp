@@ -3,14 +3,15 @@
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/contractor_bc3.hpp"
-#include "realpaver/param.hpp"
 
 namespace realpaver {
 
+// TODO : param
+
 Bc3Contractor::Bc3Contractor(Dag* dag, size_t i, size_t iv) :
    f_(dag, i, iv),
-   peeler_(Param::DefBC3PeelWidth()),
-   smax_(Param::DefBC3MaxSteps())
+   peeler_(2.0),
+   smax_(20)
 {
    newton_ = new IntervalNewton();
 }
