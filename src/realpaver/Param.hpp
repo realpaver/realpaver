@@ -58,6 +58,10 @@ public:
    /// @param val value assigned
    static void setTolParam(const string& name, const Tolerance& val);
 
+   /// Writes the parameters onna stream
+   /// @param os output stream
+   static void print(std::ostream& os);
+
 private:
    static Param instance_;    // singleton
    std::string path_;         // file name

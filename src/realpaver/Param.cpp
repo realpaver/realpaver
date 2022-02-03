@@ -24,10 +24,6 @@ Param::Param() : path_(""), lineno_(0), tolmap_(), intmap_(), dblmap_()
    intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
 
 
-
-
-
-   dblmap_.insert(std::make_pair("TUTU", 1.5));
 }
 
 Param::~Param()
@@ -280,6 +276,43 @@ void Param::init(const std::string& filename)
    }
    else
       THROW("file open error '" << filename << "'");
+}
+
+void Param::print(std::ostream& os)
+{
+   os << "# List of registered parameters\n\n";
+
+   os << "# Integral parameters\n";
+   for (auto it = instance_.intmap_.begin();
+             it != instance_.intmap_.end();
+             ++it)
+      os << it-> first << " = " << it->second << "\n\n";
+
+   if (instance_.intmap_.empty()) os << "\n";
+
+   os << "# Double parameters\n";
+   for (auto it = instance_.dblmap_.begin();
+             it != instance_.dblmap_.end();
+             ++it)
+      os << it-> first << " = " << it->second << "\n\n";
+
+   if (instance_.dblmap_.empty()) os << "\n";
+
+   os << "# Tolerances\n";
+   for (auto it = instance_.tolmap_.begin();
+             it != instance_.tolmap_.end();
+             ++it)
+   {
+      Tolerance tol = it->second;
+      if (tol.isAbsolute())
+         os << "ABS_";
+      else
+         os << "REL_";
+
+      os << it-> first << " = " << tol.getVal() << "\n\n";
+   }
+
+   if (instance_.tolmap_.empty()) os << "\n";
 }
 
 } // namespace

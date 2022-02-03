@@ -32,8 +32,8 @@ int main(void)
 
    cout << "XTOL : " << Param::getTolParam("XTOL") << endl;
    cout << "NODE_LIMIT : " << Param::getIntParam("NODE_LIMIT") << endl;
-   cout << "TUTU : " << Param::getDblParam("TUTU") << endl;
 
+   Param::print(std::cout);
    }
    catch (Exception ex) {
       cout << ex.what() << endl;
