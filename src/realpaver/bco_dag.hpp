@@ -5,7 +5,7 @@
 
 #include "realpaver/contractor_bco.hpp"
 #include "realpaver/dag.hpp"
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/propagator.hpp"
 #include "realpaver/real_fun.hpp"
 

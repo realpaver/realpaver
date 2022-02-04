@@ -42,7 +42,7 @@ public:
    virtual bool isConstant() const = 0;
 
    // satisfaction test
-   virtual Proof isSat(const IntervalVector& X) const = 0;
+   virtual Proof isSatisfied(const IntervalVector& X) const = 0;
 
    // output on a stream
    virtual void print(std::ostream& os) const = 0;
@@ -106,7 +106,7 @@ public:
    bool isConstant() const;
 
    // satisfaction test
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 
    // output on a stream
    void print(std::ostream& os) const;
@@ -128,7 +128,7 @@ private:
 
 public:
    // constructor
-   Constraint(const SharedRep& rep);
+   Constraint(const SharedRep& rep = nullptr);
 
    // returns the representation of this constraint
    SharedRep rep() const;
@@ -172,9 +172,9 @@ inline void Constraint::acceptVisitor(ConstraintVisitor& vis) const
    rep_->acceptVisitor(vis);
 }
 
-inline Proof Constraint::isSat(const IntervalVector& X) const
+inline Proof Constraint::isSatisfied(const IntervalVector& X) const
 {
-   return rep_->isSat(X);
+   return rep_->isSatisfied(X);
 }
 
 inline bool Constraint::dependsOn(const Variable& v) const
@@ -259,7 +259,7 @@ public:
    
    // Override
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 };
 
 Constraint operator==(const Term& l, const Term& r);
@@ -273,7 +273,7 @@ public:
    
    // Override
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 };
 
 Constraint operator<=(const Term& l, const Term& r);
@@ -287,7 +287,7 @@ public:
    
    // Override
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 };
 
 Constraint operator< (const Term& l, const Term& r);
@@ -301,7 +301,7 @@ public:
    
    // Override
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 };
 
 Constraint operator>=(const Term& l, const Term& r);
@@ -315,7 +315,7 @@ public:
 
    // Override
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 };
 
 Constraint operator>(const Term& l, const Term& r);
@@ -336,7 +336,7 @@ public:
 
    // Override
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSat(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalVector& X) const;
 
 private:
    Interval x_;

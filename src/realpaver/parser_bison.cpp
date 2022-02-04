@@ -75,7 +75,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 
 #undef YYINITDEPTH
 #define YYINITDEPTH 5000

@@ -128,24 +128,28 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/locale_facets.tcc \
  /usr/include/c++/7/bits/basic_ios.tcc \
  /usr/include/c++/7/bits/ostream.tcc /usr/include/c++/7/istream \
- /usr/include/c++/7/bits/istream.tcc ../src/realpaver/problem.hpp \
+ /usr/include/c++/7/bits/istream.tcc ../src/realpaver/Problem.hpp \
  /usr/include/c++/7/vector /usr/include/c++/7/bits/stl_construct.h \
  /usr/include/c++/7/bits/stl_uninitialized.h \
  /usr/include/c++/7/bits/stl_vector.h \
  /usr/include/c++/7/bits/stl_bvector.h /usr/include/c++/7/bits/vector.tcc \
+ ../src/realpaver/constraint.hpp ../src/realpaver/term.hpp \
+ /usr/include/c++/7/unordered_map /usr/include/c++/7/utility \
+ /usr/include/c++/7/bits/stl_relops.h /usr/include/c++/7/tuple \
+ /usr/include/c++/7/array /usr/include/c++/7/bits/uses_allocator.h \
+ /usr/include/c++/7/bits/invoke.h /usr/include/c++/7/ext/aligned_buffer.h \
+ /usr/include/c++/7/bits/hashtable.h \
+ /usr/include/c++/7/bits/hashtable_policy.h \
+ /usr/include/c++/7/bits/unordered_map.h \
  ../src/realpaver/IntervalVector.hpp /usr/include/c++/7/memory \
  /usr/include/c++/7/bits/stl_tempbuf.h \
  /usr/include/c++/7/bits/stl_raw_storage_iter.h \
  /usr/include/c++/7/ext/concurrence.h \
- /usr/include/c++/7/bits/uses_allocator.h \
- /usr/include/c++/7/bits/unique_ptr.h /usr/include/c++/7/utility \
- /usr/include/c++/7/bits/stl_relops.h /usr/include/c++/7/tuple \
- /usr/include/c++/7/array /usr/include/c++/7/bits/invoke.h \
+ /usr/include/c++/7/bits/unique_ptr.h \
  /usr/include/c++/7/bits/shared_ptr.h \
  /usr/include/c++/7/bits/shared_ptr_base.h \
  /usr/include/c++/7/bits/allocated_ptr.h \
  /usr/include/c++/7/bits/refwrap.h \
- /usr/include/c++/7/ext/aligned_buffer.h \
  /usr/include/c++/7/bits/shared_ptr_atomic.h \
  /usr/include/c++/7/bits/atomic_base.h \
  /usr/include/c++/7/bits/atomic_lockfree_defines.h \
@@ -196,14 +200,10 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/cfenv ../src/realpaver/scope.hpp \
  /usr/include/c++/7/map /usr/include/c++/7/bits/stl_tree.h \
  /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
- ../src/realpaver/scope_map.hpp /usr/include/c++/7/unordered_map \
- /usr/include/c++/7/bits/hashtable.h \
- /usr/include/c++/7/bits/hashtable_policy.h \
- /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/Variable.hpp \
- ../src/realpaver/Tolerance.hpp ../src/realpaver/constraint.hpp \
- ../src/realpaver/term.hpp ../src/realpaver/obj.hpp \
+ ../src/realpaver/scope_map.hpp ../src/realpaver/Variable.hpp \
+ ../src/realpaver/Tolerance.hpp ../src/realpaver/Objective.hpp \
  ../src/realpaver/contractor_bc3.hpp ../src/realpaver/contractor.hpp \
- ../src/realpaver/interval_newton.hpp ../src/realpaver/Inflator.hpp \
+ ../src/realpaver/IntervalNewton.hpp ../src/realpaver/Inflator.hpp \
  ../src/realpaver/uni_fun.hpp ../src/realpaver/interval_slicer.hpp \
  /usr/include/c++/7/list /usr/include/c++/7/bits/stl_list.h \
  /usr/include/c++/7/bits/list.tcc ../src/realpaver/thick_fun.hpp \
@@ -215,7 +215,8 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
  /usr/include/c++/7/bits/fstream.tcc ../src/realpaver/interval_union.hpp \
- ../src/realpaver/term_deriver.hpp ../src/realpaver/term_fixer.hpp \
+ ../src/realpaver/term_deriver.hpp ../src/realpaver/Preprocessor.hpp \
+ ../src/realpaver/ConstraintFixer.hpp ../src/realpaver/TermFixer.hpp \
  ../src/realpaver/Timer.hpp /usr/include/c++/7/chrono \
  /usr/include/c++/7/ratio /usr/include/c++/7/ctime \
  /usr/include/c++/7/bits/parse_numbers.h \
@@ -555,7 +556,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/istream.tcc:
 
-../src/realpaver/problem.hpp:
+../src/realpaver/Problem.hpp:
 
 /usr/include/c++/7/vector:
 
@@ -569,6 +570,32 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/vector.tcc:
 
+../src/realpaver/constraint.hpp:
+
+../src/realpaver/term.hpp:
+
+/usr/include/c++/7/unordered_map:
+
+/usr/include/c++/7/utility:
+
+/usr/include/c++/7/bits/stl_relops.h:
+
+/usr/include/c++/7/tuple:
+
+/usr/include/c++/7/array:
+
+/usr/include/c++/7/bits/uses_allocator.h:
+
+/usr/include/c++/7/bits/invoke.h:
+
+/usr/include/c++/7/ext/aligned_buffer.h:
+
+/usr/include/c++/7/bits/hashtable.h:
+
+/usr/include/c++/7/bits/hashtable_policy.h:
+
+/usr/include/c++/7/bits/unordered_map.h:
+
 ../src/realpaver/IntervalVector.hpp:
 
 /usr/include/c++/7/memory:
@@ -579,19 +606,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/ext/concurrence.h:
 
-/usr/include/c++/7/bits/uses_allocator.h:
-
 /usr/include/c++/7/bits/unique_ptr.h:
-
-/usr/include/c++/7/utility:
-
-/usr/include/c++/7/bits/stl_relops.h:
-
-/usr/include/c++/7/tuple:
-
-/usr/include/c++/7/array:
-
-/usr/include/c++/7/bits/invoke.h:
 
 /usr/include/c++/7/bits/shared_ptr.h:
 
@@ -600,8 +615,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/c++/7/bits/allocated_ptr.h:
 
 /usr/include/c++/7/bits/refwrap.h:
-
-/usr/include/c++/7/ext/aligned_buffer.h:
 
 /usr/include/c++/7/bits/shared_ptr_atomic.h:
 
@@ -733,29 +746,17 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/scope_map.hpp:
 
-/usr/include/c++/7/unordered_map:
-
-/usr/include/c++/7/bits/hashtable.h:
-
-/usr/include/c++/7/bits/hashtable_policy.h:
-
-/usr/include/c++/7/bits/unordered_map.h:
-
 ../src/realpaver/Variable.hpp:
 
 ../src/realpaver/Tolerance.hpp:
 
-../src/realpaver/constraint.hpp:
-
-../src/realpaver/term.hpp:
-
-../src/realpaver/obj.hpp:
+../src/realpaver/Objective.hpp:
 
 ../src/realpaver/contractor_bc3.hpp:
 
 ../src/realpaver/contractor.hpp:
 
-../src/realpaver/interval_newton.hpp:
+../src/realpaver/IntervalNewton.hpp:
 
 ../src/realpaver/Inflator.hpp:
 
@@ -797,7 +798,11 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/term_deriver.hpp:
 
-../src/realpaver/term_fixer.hpp:
+../src/realpaver/Preprocessor.hpp:
+
+../src/realpaver/ConstraintFixer.hpp:
+
+../src/realpaver/TermFixer.hpp:
 
 ../src/realpaver/Timer.hpp:
 

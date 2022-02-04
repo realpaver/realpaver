@@ -1,13 +1,25 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/term_fixer.hpp"
+#include "realpaver/TermFixer.hpp"
 
 namespace realpaver {
 
-TermFixer::TermFixer(VVMap* vvm, VIMap* vim) :
+TermFixer::TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim) :
    vvm_(vvm), vim_(vim), t_()
 {}
+
+Term TermFixer::getTerm() const
+{
+   return t_;
+}
 
 void TermFixer::apply(const TermConst* t)
 {

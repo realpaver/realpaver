@@ -10,16 +10,17 @@
 #include <limits>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
-#include "realpaver/interval_newton.hpp"
+#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
 IntervalNewton::IntervalNewton() :
    maxiter_(Integer::max()),
-   xtol_(Tolerance::makeRel(1.0e-8)),
-   dtol_(Tolerance::makeRel(1.0e-8)),
-   ldtol_(Tolerance::makeRel(1.0e-8)),
+   xtol_(Param::getTolParam("XTOL")),
+   dtol_(Param::getTolParam("DTOL")),
+   ldtol_(Param::getTolParam("DTOL")),
    inflator_()
 {}
 

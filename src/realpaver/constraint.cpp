@@ -124,7 +124,7 @@ void ConstraintEq::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintEq::isSat(const IntervalVector& X) const
+Proof ConstraintEq::isSatisfied(const IntervalVector& X) const
 {
    Interval l = left().eval(X),
             r = right().eval(X);
@@ -158,7 +158,7 @@ void ConstraintLe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLe::isSat(const IntervalVector& X) const
+Proof ConstraintLe::isSatisfied(const IntervalVector& X) const
 {
    Interval l = left().eval(X),
             r = right().eval(X);
@@ -192,7 +192,7 @@ void ConstraintLt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLt::isSat(const IntervalVector& X) const
+Proof ConstraintLt::isSatisfied(const IntervalVector& X) const
 {
    Interval l = left().eval(X),
             r = right().eval(X);
@@ -226,7 +226,7 @@ void ConstraintGe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGe::isSat(const IntervalVector& X) const
+Proof ConstraintGe::isSatisfied(const IntervalVector& X) const
 {
    Interval l = left().eval(X),
             r = right().eval(X);
@@ -260,7 +260,7 @@ void ConstraintGt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGt::isSat(const IntervalVector& X) const
+Proof ConstraintGt::isSatisfied(const IntervalVector& X) const
 {
    Interval l = left().eval(X),
             r = right().eval(X);
@@ -297,7 +297,7 @@ void ConstraintIn::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintIn::isSat(const IntervalVector& X) const
+Proof ConstraintIn::isSatisfied(const IntervalVector& X) const
 {
    Interval e = term().eval(X);
 

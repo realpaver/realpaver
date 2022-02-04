@@ -4,7 +4,7 @@
 #define REALPAVER_CONTRACTOR_BC3_HPP
 
 #include "realpaver/contractor.hpp"
-#include "realpaver/interval_newton.hpp"
+#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/interval_slicer.hpp"
 #include "realpaver/thick_fun.hpp"
 

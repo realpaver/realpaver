@@ -18,7 +18,7 @@ BcoDag::BcoDag(Problem& P) :
    propag_(&pool_)
 {
    // objective function
-   Term to = P.obj().getTerm();
+   Term to = P.getObjective().getTerm();
 
    // scope of the objective function
    to.makeScope(fscope_);
@@ -45,7 +45,7 @@ BcoDag::BcoDag(Problem& P) :
 
    //LOG_INFO("   > creates an objective variable " << z_.name());
 
-   if (P.obj().isMinimize())
+   if (P.getObjective().isMinimization())
       dag_->insert( z_ - to == 0 );
    else
       dag_->insert( z_ + to == 0 );

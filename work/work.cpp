@@ -1,5 +1,5 @@
 #include <iostream>
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/contractor_bc3.hpp"
 #include "realpaver/contractor_bc4.hpp"
 #include "realpaver/contractor_hc4.hpp"
@@ -8,9 +8,9 @@
 #include "realpaver/thick_fun.hpp"
 #include "realpaver/interval_slicer.hpp"
 #include "realpaver/interval_union.hpp"
-#include "realpaver/interval_newton.hpp"
+#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/term_deriver.hpp"
-#include "realpaver/term_fixer.hpp"
+#include "realpaver/Preprocessor.hpp"
 #include "realpaver/Timer.hpp"
 #include "realpaver/contractor_int.hpp"
 #include "realpaver/scope.hpp"
@@ -26,76 +26,79 @@ int main(void)
    Logger::init(LogLevel::internal, "work.log");
    Interval::precision( 16 );
 
-
    try {
       Param::init("../src/realpaver/settings.txt");
-
-   cout << "XTOL : " << Param::getTolParam("XTOL") << endl;
-   cout << "NODE_LIMIT : " << Param::getIntParam("NODE_LIMIT") << endl;
-
-   Param::print(std::cout);
    }
    catch (Exception ex) {
       cout << ex.what() << endl;
    }
 
-   IntervalVector vec(3, Interval(0,10));
-   Bitset bs( {0, 1, 0} );
-   cout << bs << endl;
-   cout << vec.corner(bs) << endl;
-   cout << vec.oppositeCorner(bs) << endl;
 
    //Problem p;
+      //~ Variable x = problem->addRealVar(0, 10, "x"),
+               //~ y = problem->addRealVar(-2, 6, "y"),
+               //~ z = problem->addRealVar(0, 10, "z");
+
+      //~ problem->addObjective(minimize(sqr(x) + pow(y,3) - x*y - 2*z));
 
    try
    {
-      Problem* prob = new Problem();
+      Problem* problem = new Problem();
       Problem* simpl = nullptr;
 
-      Variable x = prob->addRealVar(0, 10, "x"),
-               y = prob->addRealVar(-2, 6, "y"),
-               z = prob->addRealVar(0, 10, "z");
+      Variable x = problem->addRealVar(0, 1, "x"),
+               y = problem->addRealVar(1, 1, "y"),
+               z = problem->addRealVar(-3, -3, "z");
 
-      prob->addObj( minimize(sqr(x) + pow(y,3) - x*y - 2*z) );
+      problem->addObjective(minimize(sqr(x) + pow(y,3) - x*y - 2*z));
+      
+      problem->addCtr( x + y + z >= 0 );
 
-      BcoModel* model = new BcoModel(*prob);
-      BcoResult res = model->preprocess();
+      cout << "-- PROBLEM --\n" << *problem << endl;
 
-      LOG_INTERNAL("after preprocess");
+      Preprocessor prepro;
+      simpl = new Problem();
 
-      if (res.getProof() != Proof::Empty /*&& res.getProof() != Proof::Optimal */)
-      {
-         IntervalVector* B = res.getBox();
-         Interval lu = B->at(model->objVar().getId());
+      prepro.apply(*problem, *simpl);
+      cout << "-- AFTER PREPRO --\n" << *simpl << endl;
 
-         if (model->nbFixedVars() > 0)
-         {
-            simpl = new Problem();
+      //~ BcoModel* model = new BcoModel(*prob);
+      //~ BcoResult res = model->preprocess();
 
-            // fixes the variable representing the objective function in order to
-            // remove it from the simplified problem
-            B->set(model->objVar().getId(), Interval::zero());
+      //~ LOG_INTERNAL("after preprocess");
 
-            // creates the simplified problem
-            prob->preprocess(*B, *simpl);
+      //~ if (res.getProof() != Proof::Empty /*&& res.getProof() != Proof::Optimal */)
+      //~ {
+         //~ IntervalVector* B = res.getBox();
+         //~ Interval lu = B->at(model->objVar().getId());
 
-            // creates the model from the simplified problem
-            delete model;
-            model = new BcoModel(*simpl);
-         }
+         //~ if (model->nbFixedVars() > 0)
+         //~ {
+            //~ simpl = new Problem();
 
-         // assigns the domain of the objective variable
-         model->setObjDomain(lu);
+            //~ // fixes the variable representing the objective function in order to
+            //~ // remove it from the simplified problem
+            //~ B->set(model->objVar().getId(), Interval::zero());
 
-         // branch-and-bound to solve the model
-         res = model->solve();
-      }
+            //~ // creates the simplified problem
+            //~ prob->preprocess(*B, *simpl);
 
-      LOG_INTERNAL("proof : " << res.getProof());
+            //~ // creates the model from the simplified problem
+            //~ delete model;
+            //~ model = new BcoModel(*simpl);
+         //~ }
 
-      delete prob;
-      if (simpl != nullptr)
-         delete simpl;
+         //~ // assigns the domain of the objective variable
+         //~ model->setObjDomain(lu);
+
+         //~ // branch-and-bound to solve the model
+         //~ res = model->solve();
+      //~ }
+
+      //~ LOG_INTERNAL("proof : " << res.getProof());
+
+      delete problem;
+      if (simpl != nullptr) delete simpl;
   }
    
 /*

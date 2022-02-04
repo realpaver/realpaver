@@ -1,16 +1,23 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/constraint_fixer.hpp"
+#include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 
 namespace realpaver {
 
 Problem::Problem(const std::string& name) :
-   name_(), vars_(), ctrs_(), obj_(Obj::Dir::Max, Term(0)), scope_()
+   name_(), vars_(), ctrs_(), obj_(minimize(0)), scope_()
 {}
 
 Variable Problem::addBoolVar(const std::string& name)
@@ -36,9 +43,16 @@ Variable Problem::addBoolVar(const std::string& name)
    return v;
 }
 
-Variable Problem::addIntVar(const int& a, const int& b,
-                            const std::string& name)
+Variable Problem::addIntVar(int lo, int up, const std::string& name)
 {
+   return addIntVar(Interval(lo, up), name);
+}
+
+Variable Problem::addIntVar(const Interval& x, const std::string& name)
+{
+   Interval y = round(x);
+   ASSERT(!y.isEmpty(), "integer variable with an empty domain");
+   
    size_t id = vars_.size();
 
    std::ostringstream os;
@@ -50,7 +64,7 @@ Variable Problem::addIntVar(const int& a, const int& b,
 
    Variable v(os.str());
    v.setId(id)
-    .setDomain(Interval(a,b))
+    .setDomain(y)
     .setDiscrete()
     .setTolerance(Tolerance::makeAbs(0.0));
 
@@ -60,14 +74,15 @@ Variable Problem::addIntVar(const int& a, const int& b,
    return v;
 }
 
-Variable Problem::addRealVar(const double& a, const double& b,
-                             const std::string& name)
+Variable Problem::addRealVar(double lo, double up, const std::string& name)
 {
-   return addRealVar(Interval(a,b), name);
+   return addRealVar(Interval(lo, up), name);
 }
 
 Variable Problem::addRealVar(const Interval& x, const std::string& name)
 {
+   ASSERT(!x.isEmpty(), "real variable with an empty domain");
+
    size_t id = vars_.size();
 
    std::ostringstream os;
@@ -94,7 +109,7 @@ void Problem::addCtr(const Constraint& c)
    ctrs_.push_back(c);
 }
 
-void Problem::addObj(const Obj& obj)
+void Problem::addObjective(const Objective& obj)
 {
    obj_ = obj;
 }
@@ -111,6 +126,9 @@ IntervalVector Problem::getDomains() const
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
+   if (p.isEmpty())
+      return os << "empty problem";
+   
    std::string indent = "   ",
                s_int  = "int  ",
                s_real = "real ",
@@ -134,24 +152,29 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
          os << s_real;
       os << v.getName() << " in " << v.getDomain();
    }
-   os << ";" << std::endl << std::endl;
-
-   // constraints
-   os << s_ctr << std::endl;
-   first = true;
-   for (size_t i=0; i<p.nbCtrs(); ++i)
-   {
-      if (!first) os << "," << std::endl;
-      else first = false;
-
-      os << indent << p.ctrAt(i);
-   }
    os << ";" << std::endl;
 
+   // constraints
+   if (p.nbCtrs() > 0)
+   {
+      os << std::endl << s_ctr << std::endl;
+      first = true;
+      for (size_t i=0; i<p.nbCtrs(); ++i)
+      {
+         if (!first) os << "," << std::endl;
+         else first = false;
+
+         os << indent << p.ctrAt(i);
+      }
+      os << ";" << std::endl;
+   }
+
    // objective function
-   Obj o = p.obj();
-   os << std::endl << s_obj << std::endl;
-   os << indent << o << ";" << std::endl;
+   if (p.hasObjective())
+   {
+      os << std::endl << s_obj << std::endl;
+      os << indent << p.getObjective() << ";" << std::endl;
+   }
 
    return os;
 }
@@ -168,96 +191,10 @@ bool Problem::isFakeVar(const Variable& v) const
    return true;
 }
 
-bool Problem::preprocess(const IntervalVector& X, Problem& other)
-{
-   //LOG_INFO("   > simplifies the problem");
-
-   // detects the fixed variables and creates the maps
-   ConstraintFixer::VVMap vvm;
-   ConstraintFixer::VIMap vim;
-
-   for (size_t i=0; i<X.size(); ++i)
-   {
-      Variable v = varAt(i);
-
-      if (X[i].isEmpty())
-      {
-         //LOG_INFO("     - empty variable domain: " << v.name());
-         return false;
-      }
-      else if (X[i].isCanonical())
-      {
-         //LOG_INFO("     - replaces " << v.name() << " by " << B[i]);
-         vim.insert(std::make_pair(v, X[i]));
-      }
-      else
-      {
-         // creates a clone of the variable in the other problem
-         Variable w = v.clone();
-         w.setId(other.nbVars());
-         w.setDomain(X[i]);
-         other.vars_.push_back(w);
-
-         // new map entry
-         vvm.insert(std::make_pair(v, w));
-      }
-   }
-
-   IntervalVector oX = other.getDomains();
-
-   // rewrites the constraints
-   for (size_t i=0; i<nbCtrs(); ++i)
-   {
-      ConstraintFixer fixer(&vvm, &vim);
-      ctrAt(i).acceptVisitor(fixer);
-      Constraint c = fixer.getConstraint();
-
-      Proof proof = c.isSat(oX);
-      if (proof == Proof::Empty)
-      {
-         //LOG_INFO("     - violated constraint: " << ctrAt(i));
-         return false;
-      }
-      else if (proof == Proof::Inner)
-      {
-         //LOG_INFO("     - inactive constraint: " << ctrAt(i));
-      }
-      else
-      {
-         other.ctrs_.push_back(c);
-      }
-   }
-
-   // simplifies the objective function
-   TermFixer fixer(&vvm, &vim);
-   obj_.getTerm().acceptVisitor(fixer);
-   
-   if (!obj_.isConstant() && fixer.getTerm().isConstant())
-   {
-      //LOG_INFO("     - fixed objective: " << fixer.getTerm());
-   }
-   
-   other.addObj(Obj(obj_.getDir(), fixer.getTerm()));
-
-   // detects fake variables
-   for (size_t i=0; i<other.nbVars(); ++i)
-   {
-      Variable v = other.varAt(i);
-      //if (other.isFakeVar(v))
-         //LOG_INFO("     - unconstrained variable: " << v.name());
-   }
-
-   return true;
-}
-
-bool Problem::preprocess(Problem& other)
-{
-   IntervalVector X = getDomains();
-   return preprocess(X, other);
-}
-
 bool Problem::isContinuous() const
 {
+   if (nbVars() == 0) return false;
+
    for (size_t i=0; i<nbVars(); ++i)
       if (!varAt(i).isContinuous())
          return false;
@@ -267,6 +204,8 @@ bool Problem::isContinuous() const
 
 bool Problem::isDiscrete() const
 {
+   if (nbVars() == 0) return false;
+
    for (size_t i=0; i<nbVars(); ++i)
       if (!varAt(i).isDiscrete())
          return false;
@@ -276,19 +215,24 @@ bool Problem::isDiscrete() const
 
 bool Problem::isMixed() const
 {
+   if (nbVars() < 2) return false;
+
    bool cont = false, dis = false;
 
    for (size_t i=0; i<nbVars(); ++i)
-      if (varAt(i).isDiscrete())
-         dis = true;
-      else if (varAt(i).isContinuous())
-         cont = true;
+   {
+      if (varAt(i).isDiscrete()) dis = true;
+      if (varAt(i).isContinuous()) cont = true;
 
-   return cont && dis;
+      if (dis && cont) return true;
+   }
+   return false;
 }
 
 bool Problem::isEqConstrained() const
 {
+   if (nbCtrs() == 0) return false;
+
    for (size_t i=0; i<nbCtrs(); ++i)
       if (!ctrAt(i).isEquation())
          return false;
@@ -298,6 +242,8 @@ bool Problem::isEqConstrained() const
 
 bool Problem::isIneqConstrained() const
 {
+   if (nbCtrs() == 0) return false;
+
    for (size_t i=0; i<nbCtrs(); ++i)
       if (!ctrAt(i).isInequality())
          return false;
@@ -307,19 +253,24 @@ bool Problem::isIneqConstrained() const
 
 bool Problem::isMixedConstrained() const
 {
+   if (nbCtrs() < 2) return false;
+
    bool eq = false, ineq = false;
 
    for (size_t i=0; i<nbCtrs(); ++i)
    {
       if (ctrAt(i).isEquation()) eq = true;
       if (ctrAt(i).isInequality()) ineq = true;
-   }
 
-   return eq && ineq;
+      if (eq && ineq) return true;
+   }
+   return false;
 }
 
 bool Problem::isLinConstrained() const
 {
+   if (nbCtrs() == 0) return false;
+
    for (size_t i=0; i<nbCtrs(); ++i)
       if (!ctrAt(i).isLinear())
          return false;
@@ -334,7 +285,7 @@ size_t Problem::nbVars() const
 
 Variable Problem::varAt(size_t i) const
 {
-   ASSERT(i < vars_.size(), "bad access to the variables in a problem");
+   ASSERT(i < vars_.size(), "bad access to a variable in a problem");
 
    return vars_[i];
 }
@@ -346,12 +297,12 @@ size_t Problem::nbCtrs() const
 
 Constraint Problem::ctrAt(size_t i) const
 {
-   ASSERT(i < ctrs_.size(), "bad access to the constraints in a problem");
+   ASSERT(i < ctrs_.size(), "bad access to a constraint in a problem");
 
    return ctrs_[i];
 }
 
-Obj Problem::obj() const
+Objective Problem::getObjective() const
 {
    return obj_;
 }
@@ -374,6 +325,26 @@ bool Problem::hasObjective() const
 bool Problem::isLinObjective() const
 {
    return hasObjective() && obj_.isLinear();
+}
+
+bool Problem::isCSP() const
+{
+   return (nbVars() > 0) && (nbCtrs() > 0) && (!hasObjective());
+}
+
+bool Problem::isBOP() const
+{
+   return (nbVars() > 0) && (nbCtrs() == 0) && hasObjective();   
+}
+
+bool Problem::isCOP() const
+{
+   return (nbVars() > 0) && (nbCtrs() > 0) && hasObjective();      
+}
+
+bool Problem::isEmpty() const
+{
+   return (nbVars() == 0) && (nbCtrs() == 0) && (!hasObjective()); 
 }
 
 } // namespace

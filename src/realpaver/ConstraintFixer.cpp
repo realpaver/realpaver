@@ -1,12 +1,26 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/constraint_fixer.hpp"
+#include "realpaver/ConstraintFixer.hpp"
 
 namespace realpaver {
 
-ConstraintFixer::ConstraintFixer(VVMap* vvm, VIMap* vim) :
-   vvm_(vvm), vim_(vim), c_(nullptr)
+ConstraintFixer::ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim)
+      : vvm_(vvm),
+        vim_(vim),
+        c_()
 {}
+
+Constraint ConstraintFixer::getConstraint() const
+{
+   return c_;
+}
 
 void ConstraintFixer::apply(const ConstraintEq* c)
 {

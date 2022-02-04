@@ -33,7 +33,7 @@ librealpaver_la_include_HEADERS = \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
-		constraint_fixer.hpp \
+		ConstraintFixer.hpp \
 		constraint_relaxor.hpp \
 		contractor.hpp \
 		contractor_bc3.hpp \
@@ -49,7 +49,7 @@ librealpaver_la_include_HEADERS = \
 		Inflator.hpp \
 		interval.hpp \
 		IntervalImpl.hpp \
-		interval_newton.hpp \
+		IntervalNewton.hpp \
 		interval_slicer.hpp \
 		IntervalTraits.hpp \
 		IntervalVector.hpp \
@@ -61,11 +61,12 @@ librealpaver_la_include_HEADERS = \
 		LPModel.hpp \
 		LPSolver.hpp \
 		NumericVector.hpp \
-		obj.hpp \
+		Objective.hpp \
 		Param.hpp \
 		parser.hpp \
 		parser_bison.hpp \
-		problem.hpp \
+		Preprocessor.hpp \
+		Problem.hpp \
 		propagator.hpp \
 		real_fun.hpp \
 		RealVector.hpp \
@@ -73,7 +74,7 @@ librealpaver_la_include_HEADERS = \
 		scope_map.hpp \
 		term.hpp \
 		term_deriver.hpp \
-		term_fixer.hpp \
+		TermFixer.hpp \
 		thick_fun.hpp \
 		Timer.hpp \
 		Tolerance.hpp \
@@ -102,7 +103,7 @@ librealpaver_la_SOURCES = \
 		bitset.cpp \
 		Common.cpp \
 		constraint.cpp \
-		constraint_fixer.cpp \
+		ConstraintFixer.cpp \
 		constraint_relaxor.cpp \
 		contractor.cpp \
 		contractor_bc3.cpp \
@@ -116,18 +117,19 @@ librealpaver_la_SOURCES = \
 		Exception.cpp \
 		Inflator.cpp \
 		interval.cpp \
-		interval_newton.cpp \
+		IntervalNewton.cpp \
 		interval_slicer.cpp \
 		IntervalVector.cpp \
 		interval_union.cpp \
 		Logger.cpp \
 		LPModel.cpp \
-		obj.cpp \
+		Objective.cpp \
 		Param.cpp \
 		parser_bison.ypp \
 		parser_flex.lpp \
 		parser.cpp \
-		problem.cpp \
+		Preprocessor.cpp \
+		Problem.cpp \
 		propagator.cpp \
 		real_fun.cpp \
 		RealVector.cpp \
@@ -135,7 +137,7 @@ librealpaver_la_SOURCES = \
 		scope_map.cpp \
 		term.cpp \
 		term_deriver.cpp \
-		term_fixer.cpp \
+		TermFixer.cpp \
 		Timer.cpp \
 		thick_fun.cpp \
 		Tolerance.cpp \

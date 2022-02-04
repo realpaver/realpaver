@@ -20,10 +20,9 @@ Param Param::instance_;
 Param::Param() : path_(""), lineno_(0), tolmap_(), intmap_(), dblmap_()
 {
    tolmap_.insert(std::make_pair("XTOL", Tolerance::makeRel(1.0e-8)));
+   tolmap_.insert(std::make_pair("DTOL", Tolerance::makeRel(1.0e-8)));
 
    intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
-
-
 }
 
 Param::~Param()
@@ -173,10 +172,7 @@ void Param::processParam(const std::string& name, const std::string& val)
    if (name.size() >= 5)
    {
       std::string prefix = name.substr(0, 4);
-      std::cout << "prefix : " << prefix << "\n";
-
       std::string s = name.substr(4, name.size() - 4);
-      std::cout << "s : " << s << "\n";
 
       auto it = instance_.tolmap_.find(s);
       Interval x(val.c_str());

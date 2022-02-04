@@ -1,8 +1,8 @@
 #include <iostream>
 #include "realpaver/dag.hpp"
-#include "realpaver/interval_newton.hpp"
+#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/thick_fun.hpp"
 
 using namespace realpaver;

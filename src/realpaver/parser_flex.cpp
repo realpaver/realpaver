@@ -759,7 +759,7 @@ char *yytext;
 #line 2 "parser_flex.lpp"
 #include <stdio.h>
 #include "realpaver/parser_bison.hpp"
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 
 extern int parser_bison_lineno;
 #line 766 "parser_flex.cpp"
