@@ -81,6 +81,7 @@ bool LPSolver::optimize()
 {
    makeClpSimplex();
 
+   simplex_->setLogLevel(0);
    simplex_->initialSolve();
    if (simplex_->isProvenOptimal())
    {

@@ -26,14 +26,11 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalVector : public NumericVector<Interval> {
 public:
-   /// Creates an empty vector
-   IntervalVector();
-
    /// Creates a vector
    /// @param n number of elements
    /// @param x initialization value
-   IntervalVector(size_t n, const Interval& x = Interval::universe());
-   
+   IntervalVector(size_t n = 0, const Interval& x = Interval::universe());
+
    /// Creates a vector from a list
    /// @param l list of elements inserted in this
    IntervalVector(const std::initializer_list<Interval>& l);

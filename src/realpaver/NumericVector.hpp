@@ -37,12 +37,9 @@ public:
    /// Const reference type
    typedef const T& ConstRefType;
 
-   /// Creates a vector of size zero
-   NumericVector();
-
    /// Creates a vector of a given size
    /// @param size number of elements of this
-   NumericVector(size_t size);
+   NumericVector(size_t size = 0);
 
    /// Creates a vector and initializes its elements
    NumericVector(size_t size, ConstRefType init);
@@ -179,20 +176,12 @@ private:
 };
 
 template <typename T>
-NumericVector<T>::NumericVector() :  elems_()
-{}
-
-template <typename T>
 NumericVector<T>::NumericVector(size_t size) : elems_(size)
-{
-   ASSERT(size > 0, "Initialization of a vector with a null size");
-}
+{}
 
 template <typename T>
 NumericVector<T>::NumericVector(size_t size, ConstRefType init) : elems_(size)
 {
-   ASSERT(size > 0, "Initialization of a vector with a null size");
-
    for (size_t i=0; i<size; ++i)
       elems_[i] = init;
 }

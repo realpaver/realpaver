@@ -24,12 +24,15 @@ lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir=$(includedir)/realpaver
 
 librealpaver_la_include_HEADERS = \
+		AbstractRealFunction.hpp \
 		bco_dag.hpp \
 		bco_local.hpp \
 		bco_model.hpp \
 		bco_node.hpp \
 		bco_space.hpp \
 		bitset.hpp \
+		BOPModel.hpp \
+		BOPSolver.hpp \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
@@ -68,12 +71,11 @@ librealpaver_la_include_HEADERS = \
 		Preprocessor.hpp \
 		Problem.hpp \
 		propagator.hpp \
-		real_fun.hpp \
 		RealVector.hpp \
 		scope.hpp \
 		scope_map.hpp \
 		term.hpp \
-		term_deriver.hpp \
+		TermDeriver.hpp \
 		TermFixer.hpp \
 		thick_fun.hpp \
 		Timer.hpp \
@@ -94,6 +96,7 @@ librealpaver_la_include_HEADERS += LPSolverGurobi.hpp
 endif
 
 librealpaver_la_SOURCES = \
+		AbstractRealFunction.cpp \
 		AssertDebug.hpp \
 		bco_dag.cpp \
 		bco_local.cpp \
@@ -101,6 +104,8 @@ librealpaver_la_SOURCES = \
 		bco_node.cpp \
 		bco_space.cpp \
 		bitset.cpp \
+		BOPModel.cpp \
+		BOPSolver.cpp \
 		Common.cpp \
 		constraint.cpp \
 		ConstraintFixer.cpp \
@@ -131,12 +136,11 @@ librealpaver_la_SOURCES = \
 		Preprocessor.cpp \
 		Problem.cpp \
 		propagator.cpp \
-		real_fun.cpp \
 		RealVector.cpp \
 		scope.cpp \
 		scope_map.cpp \
 		term.cpp \
-		term_deriver.cpp \
+		TermDeriver.cpp \
 		TermFixer.cpp \
 		Timer.cpp \
 		thick_fun.cpp \

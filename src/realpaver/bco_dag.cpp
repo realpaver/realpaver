@@ -4,7 +4,7 @@
 #include "realpaver/bco_dag.hpp"
 #include "realpaver/contractor_bc4.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/term_deriver.hpp"
+#include "realpaver/TermDeriver.hpp"
 
 namespace realpaver {
 
@@ -37,7 +37,7 @@ BcoDag::BcoDag(Problem& P) :
       to.acceptVisitor(deriver);
 
       // insertion of the equation in the dag
-      dag_->insert(deriver.get() == 0);
+      dag_->insert(deriver.getDerivative() == 0);
    }
 
    // variable representing the objective function
@@ -115,7 +115,7 @@ bool BcoDag::checkProblem()
    return res;
 }
 
-double BcoDag::reval(const RealVector& x)
+double BcoDag::realEval(const RealVector& x)
 {
    // equation representing the objective function
    // z +/- obj = 0
@@ -126,7 +126,7 @@ double BcoDag::reval(const RealVector& x)
    return f->node(f->nbNode() - 2)->rval();
 }
 
-void BcoDag::rdiff(const RealVector& x, RealVector& g)
+void BcoDag::realDiff(const RealVector& x, RealVector& g)
 {
    ASSERT(g.size() == dim(), "gradient with a bad dimension");
 
@@ -138,7 +138,12 @@ void BcoDag::rdiff(const RealVector& x, RealVector& g)
       g.set(i, dag_->fun(i)->rval());   
 }
 
-void BcoDag::revalDiff(const RealVector& x, double& val, RealVector& g)
+bool BcoDag::isDifferentiable() const
+{
+   return true;
+}
+
+double BcoDag::realEvalDiff(const RealVector& x, RealVector& g)
 {
    // evaluates the dag
    dag_->reval(x);
@@ -149,7 +154,7 @@ void BcoDag::revalDiff(const RealVector& x, double& val, RealVector& g)
 
    // finds the value
    DagFun* f = dag_->fun(dim());
-   val = f->node(f->nbNode() - 2)->rval();
+   return f->node(f->nbNode() - 2)->rval();
 }
 
 void BcoDag::makeDefaultPropagator()

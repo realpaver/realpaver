@@ -64,6 +64,11 @@ bool TermRep::isAdd() const
    return false;
 }
 
+bool TermRep::isVar() const
+{
+   return false;
+}
+
 bool TermRep::isSub() const
 {
    return false;
@@ -176,6 +181,11 @@ bool Term::isConstant() const
 bool Term::isLinear() const
 {
    return rep_->isLinear();
+}
+
+bool Term::isVar() const
+{
+   return rep_->isVar();
 }
 
 bool Term::isAdd() const
@@ -1332,6 +1342,11 @@ void TermVar::makeScope(Scope& s) const
    s.insert(v_);
 }
 
+bool TermVar::isVar() const
+{
+   return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermOp::TermOp(const SharedRep& t, OpSymbol op, OpPriority p) :
@@ -1500,7 +1515,7 @@ void TermSub::print(std::ostream& os) const
    os << ")";
    os << opSymbol();
    
-   if (rp == p)
+   if (rp <= p && (!right()->isVar()))
    {
       os << "(";
       right()->print(os);

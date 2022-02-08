@@ -13,9 +13,6 @@
 
 namespace realpaver {
 
-IntervalVector::IntervalVector() : NumericVector<Interval>()
-{}
-
 IntervalVector::IntervalVector(size_t n, const Interval& x)
       : NumericVector<Interval>(n, x)
 {}

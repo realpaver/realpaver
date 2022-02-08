@@ -1,15 +1,31 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/term_deriver.hpp"
+#include "realpaver/TermDeriver.hpp"
 
 namespace realpaver {
 
-TermDeriver::TermDeriver(const Variable& v) : id_(v.getId()), dt_()
+TermDeriver::TermDeriver(const Variable& v)
+      : id_(v.getId()),
+        dt_()
 {}
 
-TermDeriver::TermDeriver(size_t id) : id_(id), dt_()
+TermDeriver::TermDeriver(size_t id)
+      : id_(id),
+        dt_()
 {}
+
+Term TermDeriver::getDerivative() const
+{
+   return dt_;
+}
 
 void TermDeriver::apply(const TermConst* t)
 {

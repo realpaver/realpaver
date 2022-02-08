@@ -12,9 +12,6 @@
 
 namespace realpaver {
 
-RealVector::RealVector() : NumericVector<double>()
-{}
-
 RealVector::RealVector(size_t n, double x) : NumericVector<double>(n, x)
 {}
 

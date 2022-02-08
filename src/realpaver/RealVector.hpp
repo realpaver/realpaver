@@ -22,13 +22,10 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class RealVector : public NumericVector<double> {
 public:
-   /// Creates an empty vector
-   RealVector();
-
    /// Creates a vector
    /// @param n number of elements
    /// @param x initialization value
-   RealVector(size_t n, double x = 0.0);
+   RealVector(size_t n = 0, double x = 0.0);
    
    /// Creates a vector from a list
    /// @param l list of elements inserted in this

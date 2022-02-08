@@ -35,7 +35,7 @@ public:
    /// Default destructor
    ~Preprocessor() = default;
 
-   /// Crestes a simplified problem from an initial problem
+   /// Creates a simplified problem from an initial problem
    /// @param src initial problem
    /// @param dest simplified problem
    /// @return false if the problem is proved to be unsatisfiable
@@ -54,6 +54,31 @@ public:
    /// creates a new problem with a new set of variables.
    bool apply(const Problem& src, const IntervalVector& X, Problem& dest);
 
+   /// Tests if a variable of the source problem is fixed
+   /// @param v a variable of the source problem
+   /// @return true if the domain of 'v' is fixed
+   bool hasFixedDomain(const Variable& v) const;
+
+   /// @return true if all the variables of the source problem are fixed
+   bool areAllVarFixed() const;
+
+   /// Gets the domain of a fixed variable
+   /// @param v a variable
+   /// @return the domain of v
+   Interval getFixedDomain(const Variable& v) const;
+
+   /// Gets a variable of the destination problem that is associated
+   /// to a variable of the source problem
+   /// @param v a variable of the source problem
+   /// @return the variable of the destination problem associated with 'v'
+   Variable srcToDestVar(Variable v) const;
+
+   /// @return the number of variables fixed in the last problem preprocessed
+   size_t getNbVarFixed() const;
+
+   /// @return the number of constraints removed from the last problem
+   ///         preprocessed
+   size_t getNbCtrRemoved() const;
 
 private:
    typedef ConstraintFixer::VarVarMapType VarVarMapType;
@@ -61,6 +86,9 @@ private:
 
    VarVarMapType vvm_;
    VarIntervalMapType vim_;
+
+   size_t nbv_;   // number of variables fixed
+   size_t nbc_;   // number of variables removed
 };
 
 } // namespace

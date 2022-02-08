@@ -173,7 +173,7 @@ Variable& Variable::setTolerance(const Tolerance& tol)
 
 bool Variable::operator==(const Variable& other) const
 {
-   return getId() == other.getId();
+   return rep_.get() == other.rep_.get();
 }
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)

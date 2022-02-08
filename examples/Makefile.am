@@ -15,7 +15,8 @@ AM_CPPFLAGS = -I.. -I../src
 
 CLEANFILES = *~
 
-noinst_PROGRAMS = interval_newton lp
+noinst_PROGRAMS = bop newton lp
 
-interval_newton_SOURCES = interval_newton.cpp
+bop_SOURCES = bop.cpp
+newton_SOURCES = newton.cpp
 lp_SOURCES = lp.cpp

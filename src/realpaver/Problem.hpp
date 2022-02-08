@@ -10,6 +10,7 @@
 #ifndef REALPAVER_PROBLEM_HPP
 #define REALPAVER_PROBLEM_HPP
 
+#include <unordered_map>
 #include <vector>
 #include "realpaver/constraint.hpp"
 #include "realpaver/IntervalVector.hpp"
@@ -36,8 +37,8 @@ public:
    /// @param name name of this problem
    Problem(const std::string& name = "");
 
-   /// No copy
-   Problem(const Problem&) = delete;
+   /// Default copy constructor
+   Problem(const Problem&) = default;
 
    /// No assignment
    Problem& operator=(const Problem&) = delete;
@@ -119,6 +120,11 @@ public:
    /// for each i;.
    IntervalVector getDomains() const;
 
+   /// Gets the domain of a variable
+   /// @param v a variable
+   /// @return the domain of v
+   Interval getDomain(const Variable& v) const;
+
    /// @return true if this is a CSP
    bool isCSP() const;
 
@@ -171,6 +177,8 @@ private:
    std::vector<Constraint> ctrs_;   // vector of constraints
    Objective obj_;                  // objective function
    Scope scope_;                    // set of variables
+
+   std::unordered_map<Variable, Interval, VariableHasher> dom_;
 };
 
 /// Output on a stream

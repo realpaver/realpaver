@@ -16,8 +16,13 @@
 
 namespace realpaver {
 
-Problem::Problem(const std::string& name) :
-   name_(), vars_(), ctrs_(), obj_(minimize(0)), scope_()
+Problem::Problem(const std::string& name)
+      : name_(),
+        vars_(),
+        ctrs_(),
+        obj_(minimize(0)),
+        scope_(),
+        dom_()
 {}
 
 Variable Problem::addBoolVar(const std::string& name)
@@ -39,6 +44,7 @@ Variable Problem::addBoolVar(const std::string& name)
 
    vars_.push_back(v);
    scope_.insert(v);
+   dom_.insert(std::make_pair(v, Interval(0,1)));
 
    return v;
 }
@@ -70,6 +76,7 @@ Variable Problem::addIntVar(const Interval& x, const std::string& name)
 
    vars_.push_back(v);
    scope_.insert(v);
+   dom_.insert(std::make_pair(v, y));
 
    return v;
 }
@@ -100,6 +107,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
 
    vars_.push_back(v);
    scope_.insert(v);
+   dom_.insert(std::make_pair(v, x));
 
    return v;
 }
@@ -119,9 +127,18 @@ IntervalVector Problem::getDomains() const
    IntervalVector X(vars_.size());
    
    for(size_t i=0; i<vars_.size(); ++i)
-      X.set(i, vars_[i].getDomain());
+      X.set(i, getDomain(vars_[i]));
 
    return X;
+}
+
+Interval Problem::getDomain(const Variable& v) const
+{
+   ASSERT(scope_.contains(v), "Variable " << v.getName()
+                               << "does not belong to the problem");
+
+   auto it = dom_.find(v);
+   return it->second;
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)

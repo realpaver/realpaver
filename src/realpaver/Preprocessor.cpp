@@ -12,6 +12,43 @@
 
 namespace realpaver {
 
+bool Preprocessor::areAllVarFixed() const
+{
+   return vvm_.empty();
+}
+
+bool Preprocessor::hasFixedDomain(const Variable& v) const
+{
+   auto it = vim_.find(v);
+   return it != vim_.end();
+}
+
+Interval Preprocessor::getFixedDomain(const Variable& v) const
+{
+   ASSERT(hasFixedDomain(v), "Domain of " << v.getName() << " is not fixed");
+
+   auto it = vim_.find(v);
+   return it->second;
+}
+
+Variable Preprocessor::srcToDestVar(Variable v) const
+{
+   ASSERT(!hasFixedDomain(v), "Domain of " << v.getName() << " is fixed");
+
+   auto it = vvm_.find(v);
+   return it->second;
+}
+
+size_t Preprocessor::getNbVarFixed() const
+{
+   return nbv_;
+}
+
+size_t Preprocessor::getNbCtrRemoved() const
+{
+   return nbc_;
+}
+   
 bool Preprocessor::apply(const Problem& src, Problem& dest)
 {
    return apply(src, src.getDomains(), dest);
@@ -28,6 +65,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
 
    vvm_.clear();
    vim_.clear();
+   nbv_ = nbc_ = 0;
 
    for (size_t i=0; i<X.size(); ++i)
    {
@@ -49,6 +87,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
       {
          LOG_COMPONENT("   replaces " << v.getName() << " by " << domain);
          vim_.insert(std::make_pair(v, domain));
+         nbv_ = nbv_ + 1;
       }
       else
       {
@@ -82,6 +121,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
       else if (proof == Proof::Inner)
       {
          LOG_COMPONENT("   inactive constraint " << c);
+         nbc_ = nbc_ + 1;
       }
       else
       {
@@ -93,7 +133,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
    Objective obj = src.getObjective();
    TermFixer fixer(&vvm_, &vim_);
    obj.getTerm().acceptVisitor(fixer);
-   
+
    if ((!obj.isConstant()) && fixer.getTerm().isConstant())
    {
       LOG_COMPONENT("   fixed objective " << fixer.getTerm());

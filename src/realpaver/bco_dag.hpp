@@ -7,7 +7,7 @@
 #include "realpaver/dag.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/propagator.hpp"
-#include "realpaver/real_fun.hpp"
+#include "realpaver/AbstractRealFunction.hpp"
 
 namespace realpaver {
 
@@ -18,7 +18,7 @@ namespace realpaver {
  *    - the (k+1)-th function in the DAG represents the equation z - f = 0 if
  *      f has to be minimized or z + f = 0 otherwise.
  */
-class BcoDag : public RealFun {
+class BcoDag : public AbstractRealFunction {
 public:
    // constructor
    BcoDag(Problem& P);
@@ -62,9 +62,10 @@ public:
 
    // @Override
    // evaluation and differentiation of the objective function over the reals
-   double reval(const RealVector& x);
-   void rdiff(const RealVector& x, RealVector& g);
-   void revalDiff(const RealVector& x, double& val, RealVector& g);
+   double realEval(const RealVector& x);
+   bool isDifferentiable() const;
+   void realDiff(const RealVector& x, RealVector& g);
+   double realEvalDiff(const RealVector& x, RealVector& g);
 
 private:
    Dag* dag_;        // expression graph

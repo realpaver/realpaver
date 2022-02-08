@@ -70,6 +70,7 @@ public:
    // other tests
    virtual bool isLinear() const = 0;
    bool isConstant() const;
+   virtual bool isVar() const;
    virtual bool isAdd() const;
    virtual bool isSub() const;
    virtual bool isMul() const;
@@ -126,6 +127,7 @@ public:
    // other tests
    bool isLinear() const;
    bool isConstant() const;
+   bool isVar() const;
    bool isAdd() const;
    bool isSub() const;
    bool isMul() const;
@@ -221,6 +223,7 @@ public:
    bool dependsOn(const Variable& v) const;
    bool isLinear() const;
    void makeScope(Scope& s) const;
+   bool isVar() const;
 
    // returns the variable enclosed
    Variable var() const;
