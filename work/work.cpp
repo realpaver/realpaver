@@ -9,7 +9,6 @@
 #include "realpaver/interval_slicer.hpp"
 #include "realpaver/interval_union.hpp"
 #include "realpaver/IntervalNewton.hpp"
-#include "realpaver/term_deriver.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Timer.hpp"
 #include "realpaver/contractor_int.hpp"

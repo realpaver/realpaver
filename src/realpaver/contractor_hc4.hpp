@@ -3,7 +3,7 @@
 #ifndef REALPAVER_CONTRACTOR_HC4_HPP
 #define REALPAVER_CONTRACTOR_HC4_HPP
 
-#include "realpaver/contractor.hpp"
+#include "realpaver/Contractor.hpp"
 #include "realpaver/dag.hpp"
 
 namespace realpaver {

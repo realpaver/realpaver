@@ -32,13 +32,14 @@ librealpaver_la_include_HEADERS = \
 		bco_space.hpp \
 		bitset.hpp \
 		BOPModel.hpp \
+		BOPPresolver.hpp \
 		BOPSolver.hpp \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
 		ConstraintFixer.hpp \
 		constraint_relaxor.hpp \
-		contractor.hpp \
+		Contractor.hpp \
 		contractor_bc3.hpp \
 		contractor_bc4.hpp \
 		contractor_bco.hpp \
@@ -105,12 +106,13 @@ librealpaver_la_SOURCES = \
 		bco_space.cpp \
 		bitset.cpp \
 		BOPModel.cpp \
+		BOPPresolver.cpp \
 		BOPSolver.cpp \
 		Common.cpp \
 		constraint.cpp \
 		ConstraintFixer.cpp \
 		constraint_relaxor.cpp \
-		contractor.cpp \
+		Contractor.cpp \
 		contractor_bc3.cpp \
 		contractor_bc4.cpp \
 		contractor_bco.cpp \

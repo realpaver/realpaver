@@ -4,7 +4,7 @@
 #define REALPAVER_CONTRACTOR_INT_HPP
 
 #include <vector>
-#include "realpaver/contractor.hpp"
+#include "realpaver/Contractor.hpp"
 #include "realpaver/Variable.hpp"
 
 namespace realpaver {

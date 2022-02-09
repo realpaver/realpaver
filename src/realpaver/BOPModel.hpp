@@ -73,6 +73,10 @@ private:
 
    // size of the scope of the objective function
    size_t dim() const;
+
+   Dag* getDag();
+
+   friend class BOPPresolver;
 };
 
 } // namespace

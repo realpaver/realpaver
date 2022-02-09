@@ -3,7 +3,7 @@
 #ifndef REALPAVER_CONTRACTOR_CID_HPP
 #define REALPAVER_CONTRACTOR_CID_HPP
 
-#include "realpaver/contractor.hpp"
+#include "realpaver/Contractor.hpp"
 #include "realpaver/interval_slicer.hpp"
 
 namespace realpaver {

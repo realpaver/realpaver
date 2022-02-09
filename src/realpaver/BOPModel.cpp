@@ -79,6 +79,11 @@ Scope BOPModel::getFullScope() const
    return fullscope_;
 }
 
+Dag* BOPModel::getDag()
+{
+   return dag_;
+}
+
 IntervalVector BOPModel::getInitRegion() const
 {
    return initreg_;

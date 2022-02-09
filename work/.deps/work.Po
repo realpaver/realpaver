@@ -202,7 +202,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
  ../src/realpaver/scope_map.hpp ../src/realpaver/Variable.hpp \
  ../src/realpaver/Tolerance.hpp ../src/realpaver/Objective.hpp \
- ../src/realpaver/contractor_bc3.hpp ../src/realpaver/contractor.hpp \
+ ../src/realpaver/contractor_bc3.hpp ../src/realpaver/Contractor.hpp \
  ../src/realpaver/IntervalNewton.hpp ../src/realpaver/Inflator.hpp \
  ../src/realpaver/uni_fun.hpp ../src/realpaver/interval_slicer.hpp \
  /usr/include/c++/7/list /usr/include/c++/7/bits/stl_list.h \
@@ -215,15 +215,14 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
  /usr/include/c++/7/bits/fstream.tcc ../src/realpaver/interval_union.hpp \
- ../src/realpaver/term_deriver.hpp ../src/realpaver/Preprocessor.hpp \
- ../src/realpaver/ConstraintFixer.hpp ../src/realpaver/TermFixer.hpp \
- ../src/realpaver/Timer.hpp /usr/include/c++/7/chrono \
- /usr/include/c++/7/ratio /usr/include/c++/7/ctime \
- /usr/include/c++/7/bits/parse_numbers.h \
+ ../src/realpaver/Preprocessor.hpp ../src/realpaver/ConstraintFixer.hpp \
+ ../src/realpaver/TermFixer.hpp ../src/realpaver/Timer.hpp \
+ /usr/include/c++/7/chrono /usr/include/c++/7/ratio \
+ /usr/include/c++/7/ctime /usr/include/c++/7/bits/parse_numbers.h \
  ../src/realpaver/contractor_int.hpp ../src/realpaver/bco_model.hpp \
  ../src/realpaver/bco_dag.hpp ../src/realpaver/contractor_bco.hpp \
  ../src/realpaver/propagator.hpp ../src/realpaver/contractor_pool.hpp \
- ../src/realpaver/real_fun.hpp ../src/realpaver/bco_local.hpp \
+ ../src/realpaver/AbstractRealFunction.hpp ../src/realpaver/bco_local.hpp \
  ../src/realpaver/bco_space.hpp /usr/include/c++/7/set \
  /usr/include/c++/7/bits/stl_set.h /usr/include/c++/7/bits/stl_multiset.h \
  ../src/realpaver/bco_node.hpp ../src/realpaver/Param.hpp
@@ -754,7 +753,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/contractor_bc3.hpp:
 
-../src/realpaver/contractor.hpp:
+../src/realpaver/Contractor.hpp:
 
 ../src/realpaver/IntervalNewton.hpp:
 
@@ -796,8 +795,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/interval_union.hpp:
 
-../src/realpaver/term_deriver.hpp:
-
 ../src/realpaver/Preprocessor.hpp:
 
 ../src/realpaver/ConstraintFixer.hpp:
@@ -826,7 +823,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/contractor_pool.hpp:
 
-../src/realpaver/real_fun.hpp:
+../src/realpaver/AbstractRealFunction.hpp:
 
 ../src/realpaver/bco_local.hpp:
 

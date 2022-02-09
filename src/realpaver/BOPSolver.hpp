@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BOPSOLVER_HPP
-#define REALPAVER_BOPSOLVER_HPP
+#ifndef REALPAVER_BOP_SOLVER_HPP
+#define REALPAVER_BOP_SOLVER_HPP
 
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
