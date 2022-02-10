@@ -24,16 +24,16 @@ lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir=$(includedir)/realpaver
 
 librealpaver_la_include_HEADERS = \
-		AbstractRealFunction.hpp \
 		bco_dag.hpp \
 		bco_local.hpp \
 		bco_model.hpp \
 		bco_node.hpp \
 		bco_space.hpp \
 		bitset.hpp \
-		BOPModel.hpp \
-		BOPPresolver.hpp \
-		BOPSolver.hpp \
+		BOContractor.hpp \
+		BOModel.hpp \
+		BOPresolver.hpp \
+		BOSolver.hpp \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
@@ -42,7 +42,6 @@ librealpaver_la_include_HEADERS = \
 		Contractor.hpp \
 		contractor_bc3.hpp \
 		contractor_bc4.hpp \
-		contractor_bco.hpp \
 		contractor_cid.hpp \
 		contractor_hc4.hpp \
 		contractor_int.hpp \
@@ -72,6 +71,7 @@ librealpaver_la_include_HEADERS = \
 		Preprocessor.hpp \
 		Problem.hpp \
 		propagator.hpp \
+		RealFunction.hpp \
 		RealVector.hpp \
 		scope.hpp \
 		scope_map.hpp \
@@ -97,7 +97,6 @@ librealpaver_la_include_HEADERS += LPSolverGurobi.hpp
 endif
 
 librealpaver_la_SOURCES = \
-		AbstractRealFunction.cpp \
 		AssertDebug.hpp \
 		bco_dag.cpp \
 		bco_local.cpp \
@@ -105,9 +104,10 @@ librealpaver_la_SOURCES = \
 		bco_node.cpp \
 		bco_space.cpp \
 		bitset.cpp \
-		BOPModel.cpp \
-		BOPPresolver.cpp \
-		BOPSolver.cpp \
+		BOContractor.cpp \
+		BOModel.cpp \
+		BOPresolver.cpp \
+		BOSolver.cpp \
 		Common.cpp \
 		constraint.cpp \
 		ConstraintFixer.cpp \
@@ -115,7 +115,6 @@ librealpaver_la_SOURCES = \
 		Contractor.cpp \
 		contractor_bc3.cpp \
 		contractor_bc4.cpp \
-		contractor_bco.cpp \
 		contractor_cid.cpp \
 		contractor_hc4.cpp \
 		contractor_int.cpp \
@@ -138,6 +137,7 @@ librealpaver_la_SOURCES = \
 		Preprocessor.cpp \
 		Problem.cpp \
 		propagator.cpp \
+		RealFunction.cpp \
 		RealVector.cpp \
 		scope.cpp \
 		scope_map.cpp \

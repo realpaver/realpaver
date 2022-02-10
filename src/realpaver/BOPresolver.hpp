@@ -7,10 +7,10 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BOP_PRESOLVER_HPP
-#define REALPAVER_BOP_PRESOLVER_HPP
+#ifndef REALPAVER_BO_PRESOLVER_HPP
+#define REALPAVER_BO_PRESOLVER_HPP
 
-#include "realpaver/BOPModel.hpp"
+#include "realpaver/BOModel.hpp"
 #include "realpaver/propagator.hpp"
 
 namespace realpaver {
@@ -19,22 +19,22 @@ namespace realpaver {
 /// This prevolves a Bound Optimization Problem.
 ///
 /// It enforces a propagation step on the set of equations df / dxi = 0
-/// using BOP contractors. It leads to possibly instanciate some variables
+/// using BO contractors. It leads to possibly instanciate some variables
 /// xi by proving that df / dxi does not vanish in the initial region.
 ///////////////////////////////////////////////////////////////////////////////
-class BOPPresolver {
+class BOPresolver {
 public:
    /// Creates a presolver from a moddel
-   BOPPresolver(BOPModel& model);
+   BOPresolver(BOModel& model);
 
    /// No copy
-   BOPPresolver(const BOPPresolver&) = delete;
+   BOPresolver(const BOPresolver&) = delete;
 
    /// No assignment
-   BOPPresolver& operator=(const BOPPresolver&) = delete;
+   BOPresolver& operator=(const BOPresolver&) = delete;
 
    /// Default destructor
-   ~BOPPresolver() = default;
+   ~BOPresolver() = default;
 
    /// Presolves this using constraint propagation
    /// @return false if it is proved that there is no solution

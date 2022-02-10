@@ -7,17 +7,18 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/BOPModel.hpp"
+#include "realpaver/BOModel.hpp"
 #include "realpaver/TermDeriver.hpp"
 
 namespace realpaver {
 
-BOPModel::BOPModel(Problem& problem)
+BOModel::BOModel(Problem& problem)
       : dag_(nullptr),
-        initreg_(problem.getDomains()),
+        initreg_(1 + problem.nbVars()),
         z_(""),
         objscope_(),
-        fullscope_()
+        fullscope_(),
+        boundary_()
 {
    // objective function
    Term to = problem.getObjective().getTerm();
@@ -43,12 +44,15 @@ BOPModel::BOPModel(Problem& problem)
       dag_->insert(deriver.getDerivative() == 0);
 
       objscope_.insert(v);
+      boundary_.insert(v);
       fullscope_.insert(v);
+      initreg_.set(v, problem.getDomain(v));
    }
 
    // variable representing the objective function
    z_ = problem.addRealVar(Interval::universe(), "_z");
    fullscope_.insert(z_);
+   initreg_.set(z_, Interval::universe());
 
    //LOG_INFO("   > creates an objective variable " << z_.name());
 
@@ -59,42 +63,64 @@ BOPModel::BOPModel(Problem& problem)
       dag_->insert( z_ + to == 0 );
 }
 
-BOPModel::~BOPModel()
+BOModel::~BOModel()
 {
    delete dag_;
 }
 
-Variable BOPModel::getObjVar() const
+Variable BOModel::getObjVar() const
 {
    return z_;
 }
 
-Scope BOPModel::getObjScope() const
+Scope BOModel::getObjScope() const
 {
    return objscope_;
 }
 
-Scope BOPModel::getFullScope() const
+Scope BOModel::getFullScope() const
 {
    return fullscope_;
 }
 
-Dag* BOPModel::getDag()
+Dag* BOModel::getDag()
 {
    return dag_;
 }
 
-IntervalVector BOPModel::getInitRegion() const
+void BOModel::setBoundaryVar(const Variable& v)
+{
+   if (!boundary_.contains(v)) boundary_.insert(v);
+}
+
+
+void BOModel::setInteriorVar(const Variable& v)
+{
+   if (boundary_.contains(v)) boundary_.remove(v);
+   
+}
+
+bool BOModel::isBoundaryVar(const Variable& v) const
+{
+   return boundary_.contains(v);
+}
+
+bool BOModel::isInteriorVar(const Variable& v) const
+{
+   return !boundary_.contains(v);
+}
+
+IntervalVector BOModel::getInitRegion() const
 {
    return initreg_;
 }
 
-size_t BOPModel::dim() const
+size_t BOModel::dim() const
 {
    return objscope_.size();
 }
 
-double BOPModel::realEval(const RealVector& x)
+double BOModel::realEval(const RealVector& x)
 {
    // equation representing the objective function
    // z +/- obj = 0
@@ -105,7 +131,7 @@ double BOPModel::realEval(const RealVector& x)
    return f->node(f->nbNode() - 2)->rval();
 }
 
-void BOPModel::realDiff(const RealVector& x, RealVector& g)
+void BOModel::realDiff(const RealVector& x, RealVector& g)
 {
    ASSERT(g.size() == dim(), "gradient with a bad dimension");
 
@@ -117,12 +143,12 @@ void BOPModel::realDiff(const RealVector& x, RealVector& g)
       g.set(i, dag_->fun(i)->rval());   
 }
 
-bool BOPModel::isDifferentiable() const
+bool BOModel::isDifferentiable() const
 {
    return true;
 }
 
-double BOPModel::realEvalDiff(const RealVector& x, RealVector& g)
+double BOModel::realEvalDiff(const RealVector& x, RealVector& g)
 {
    // evaluates the dag
    dag_->reval(x);

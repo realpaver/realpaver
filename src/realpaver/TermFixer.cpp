@@ -113,7 +113,7 @@ void TermFixer::apply(const TermMax* t)
 void TermFixer::apply(const TermUsb* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = -vis.t_;
 }
@@ -121,7 +121,7 @@ void TermFixer::apply(const TermUsb* t)
 void TermFixer::apply(const TermAbs* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = abs(vis.t_);
 }
@@ -129,7 +129,7 @@ void TermFixer::apply(const TermAbs* t)
 void TermFixer::apply(const TermSgn* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = sgn(vis.t_);
 }
@@ -137,7 +137,7 @@ void TermFixer::apply(const TermSgn* t)
 void TermFixer::apply(const TermSqr* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = sqr(vis.t_);
 }
@@ -145,7 +145,7 @@ void TermFixer::apply(const TermSqr* t)
 void TermFixer::apply(const TermSqrt* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = sqrt(vis.t_);
 }
@@ -153,7 +153,7 @@ void TermFixer::apply(const TermSqrt* t)
 void TermFixer::apply(const TermPow* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = pow(vis.t_, t->exponent());
 }
@@ -161,7 +161,7 @@ void TermFixer::apply(const TermPow* t)
 void TermFixer::apply(const TermExp* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = exp(vis.t_);
 }
@@ -169,7 +169,7 @@ void TermFixer::apply(const TermExp* t)
 void TermFixer::apply(const TermLog* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = log(vis.t_);
 }
@@ -177,7 +177,7 @@ void TermFixer::apply(const TermLog* t)
 void TermFixer::apply(const TermCos* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = cos(vis.t_);
 }
@@ -185,7 +185,7 @@ void TermFixer::apply(const TermCos* t)
 void TermFixer::apply(const TermSin* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = sin(vis.t_);
 }
@@ -193,7 +193,7 @@ void TermFixer::apply(const TermSin* t)
 void TermFixer::apply(const TermTan* t)
 {
    TermFixer vis(vvm_, vim_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    t_ = tan(vis.t_);
 }

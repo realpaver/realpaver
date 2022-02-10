@@ -125,6 +125,15 @@ public:
    /// @return the domain of v
    Interval getDomain(const Variable& v) const;
 
+   /// Sets the initial region
+   /// @param X vector of domains
+   void setDomains(const IntervalVector& X);
+
+   /// Sets a domain in the initial region
+   /// @param v variable
+   /// @param x new initial domain of v
+   void setDomain(const Variable& v, const Interval& x);
+
    /// @return true if this is a CSP
    bool isCSP() const;
 

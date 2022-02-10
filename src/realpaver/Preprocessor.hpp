@@ -23,6 +23,12 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class Preprocessor {
 public:
+   /// Type of maps Variable -> Variable
+   typedef ConstraintFixer::VarVarMapType VarVarMapType;
+
+   /// Type of maps Variable -> Interval
+   typedef ConstraintFixer::VarIntervalMapType VarIntervalMapType;
+
    /// Default constructor
    Preprocessor() = default;
 
@@ -81,9 +87,6 @@ public:
    size_t getNbCtrRemoved() const;
 
 private:
-   typedef ConstraintFixer::VarVarMapType VarVarMapType;
-   typedef ConstraintFixer::VarIntervalMapType VarIntervalMapType;
-
    VarVarMapType vvm_;
    VarIntervalMapType vim_;
 

@@ -7,10 +7,10 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BOPMODEL_HPP
-#define REALPAVER_BOPMODEL_HPP
+#ifndef REALPAVER_BOMODEL_HPP
+#define REALPAVER_BOMODEL_HPP
 
-#include "realpaver/AbstractRealFunction.hpp"
+#include "realpaver/RealFunction.hpp"
 #include "realpaver/dag.hpp"
 #include "realpaver/Problem.hpp"
 
@@ -26,23 +26,31 @@ namespace realpaver {
 ///
 /// A new variable z is created in the input problem.
 ///
-/// A BOPModel implements the AbstractRealFunction interface, i.e. its
-/// objective acts as a real function.
+/// A model can be created from an original problem or a simplified problem.
+/// It is then important to distinguish boundary variables and interior
+/// variables in order to find optimal points. The domain of a boundary
+/// variable shares at least one bound with the corresponding domain in the
+/// original problem. The domain of an interior variable in strictly included
+/// in the corresponding domain in the original problem. The default status of
+/// a variable is Boundary.
+///
+/// This class implements the RealFunction interface since its objective
+/// function acts as a real function.
 ///////////////////////////////////////////////////////////////////////////////
-class BOPModel : public AbstractRealFunction {
+class BOModel : public RealFunction {
 public:
    /// Creates a model
    /// @param problem problem to be solved
-   BOPModel(Problem& problem);
+   BOModel(Problem& problem);
 
    /// Destructor
-   ~BOPModel();
+   ~BOModel();
 
    /// No copy
-   BOPModel(const BOPModel&) = delete;
+   BOModel(const BOModel&) = delete;
 
    /// No assignment
-   BOPModel& operator=(const BOPModel&) = delete;
+   BOModel& operator=(const BOModel&) = delete;
 
    /// @return the variable representing the objective function
    Variable getObjVar() const;
@@ -56,8 +64,20 @@ public:
    /// @return returns the initial region
    IntervalVector getInitRegion() const;
 
+   /// 
+   void setBoundaryVar(const Variable& v);
+
+   /// 
+   void setInteriorVar(const Variable& v);
+
+   ///
+   bool isBoundaryVar(const Variable& v) const;
+
+   ///
+   bool isInteriorVar(const Variable& v) const;
+
    ///@{
-   /// Overrides the methods of AbstractRealFunction
+   /// Overrides the methods of RealFunction
    double realEval(const RealVector& x);
    bool isDifferentiable() const;
    void realDiff(const RealVector& x, RealVector& g);
@@ -69,14 +89,14 @@ private:
    IntervalVector initreg_;
    Variable z_;
    Scope objscope_;     // scope of the objective function
-   Scope fullscope_;    // scope of the dag (fscope_ + z_)
+   Scope fullscope_;    // objscope_ union {z_}
+   Scope boundary_;     // subset of objscope_
 
    // size of the scope of the objective function
    size_t dim() const;
 
    Dag* getDag();
-
-   friend class BOPPresolver;
+   friend class BOPresolver;
 };
 
 } // namespace

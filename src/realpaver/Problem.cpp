@@ -141,6 +141,23 @@ Interval Problem::getDomain(const Variable& v) const
    return it->second;
 }
 
+void Problem::setDomains(const IntervalVector& X)
+{
+   ASSERT(nbVars() == X.size(), "");
+
+   for(size_t i=0; i<vars_.size(); ++i)
+      setDomain(vars_[i], X[i]);
+}
+
+void Problem::setDomain(const Variable& v, const Interval& x)
+{
+   ASSERT(scope_.contains(v), "Variable " << v.getName()
+                               << "does not belong to the problem");
+
+   auto it = dom_.find(v);
+   it->second = x;
+}
+
 std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
    if (p.isEmpty())

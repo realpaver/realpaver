@@ -1,5 +1,5 @@
 #include <iostream>
-#include "realpaver/BOPSolver.hpp"
+#include "realpaver/BOSolver.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -10,28 +10,24 @@ int main(void)
    {
       Problem problem;
 
-      Variable x = problem.addRealVar( 0,  1, "x"),
-               y = problem.addRealVar( 1,  1, "y"),
-               z = problem.addRealVar(-3, -3, "z");
+      Variable x = problem.addRealVar(-10,  4, "x"),
+               u = problem.addRealVar(-10,  10, "u"),
+               y = problem.addRealVar( -1,  2, "y");
 
-      problem.addObjective(minimize(sqr(x) + pow(y,3) - x*y - 2*z));
+      problem.addObjective(minimize(3*u + sqr(x) + x*y + sqr(y)));
 
-      BOPSolver solver(problem);
+      BOSolver solver(problem);
 
       bool optimal = solver.optimize();
 
+      cout << "Optimization status:    " << solver.getStatus() << endl;
+
       if (optimal)
       {
-         cout << "OPTIMAL"
-              << endl
-              << "Objective value: " << solver.getObjEnclosure()
+         cout << "Objective value:     " << solver.getObjEnclosure()
               << endl
               << "Best solution found: " << solver.getBestSolution()
               << endl;
-      }
-      else
-      {
-         cout << "NOT OPTIMAL" << endl;
       }
    }
    catch(Exception e)

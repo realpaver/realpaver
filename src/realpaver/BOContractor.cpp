@@ -1,44 +1,55 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/contractor_bco.hpp"
+#include "realpaver/BOContractor.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-BcoContractor::BcoContractor(Dag* dag, size_t i, const Variable& v,
-                             const SharedContractor& op, 
-                             const SharedIntervalVector& init) :
-   f_(dag->fun(i)),
-   v_(v),
-   op_(op),
-   init_(init)
+BOContractor::BOContractor(Dag* dag, size_t i, const Variable& v,
+                           const SharedContractor& op, 
+                           const SharedIntervalVector& init)
+      : f_(dag->fun(i)),
+        v_(v),
+        op_(op),
+        init_(init)
 {}
 
-bool BcoContractor::dependsOn(const Bitset& bs) const
+bool BOContractor::dependsOn(const Bitset& bs) const
 {
    return f_->dependsOn(bs);
 }
 
-Scope BcoContractor::scope() const
+Scope BOContractor::scope() const
 {
    return f_->scope();
 }
 
-Proof BcoContractor::contract(IntervalVector& X)
+Proof BOContractor::contract(IntervalVector& X)
 {
-   bool initLB = X[v_].left() == init_->operator[](v_).left(),
-        initRB = X[v_].right() == init_->operator[](v_).right(),
-        initB  = initLB || initRB;
+   // true if X  crosses the initial boundary at the left bound of v_
+   bool initLB = X[v_].left() == init_->operator[](v_).left();
 
-   // just finds stationary points if B does not intersect
-   // the initial region for this variable
+   // true if X crosses the initial boundary at the right bound of v_
+   bool initRB = X[v_].right() == init_->operator[](v_).right();
+
+   // true if X crosses the initial boundary
+   bool initB  = initLB || initRB;
+
+   // just finds stationary points if X does not cross the initial region
    if (!initB)
    {
       return op_->contract(X);
    }
 
    // copies the box
-   IntervalVector copy( X );
+   IntervalVector copy(X);
 
    // applies the contractor to find stationary points
    Proof proof = op_->contract(X);
@@ -46,11 +57,11 @@ Proof BcoContractor::contract(IntervalVector& X)
    if (proof == Proof::Empty)
    {
       // monotone function => finds the sign of the derivative at some
-      // point of B
+      // point of X
       RealVector P( copy.midpoint() );
       Interval ef = f_->eval(P);
 
-      // resets B
+      // resets X
       X.setOnScope(copy, scope());
 
       // instanciates the variable
@@ -108,9 +119,9 @@ Proof BcoContractor::contract(IntervalVector& X)
    return Proof::Maybe;
 }
 
-void BcoContractor::print(std::ostream& os) const
+void BOContractor::print(std::ostream& os) const
 {
-   os << "BCO contractor " << f_->index() << " / " << v_.getName();
+   os << "BO contractor " << f_->index() << " / " << v_.getName();
 }
 
 } // namespace

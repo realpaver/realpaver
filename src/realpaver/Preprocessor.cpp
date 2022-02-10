@@ -129,8 +129,13 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
       }
    }
 
-   // simplifies the objective function
    Objective obj = src.getObjective();
+
+   // checks the range of the objective function
+   Interval dobj = obj.getTerm().eval(src.getDomains());
+   if (dobj.isEmpty()) return false;
+
+   // simplifies the objective function
    TermFixer fixer(&vvm_, &vim_);
    obj.getTerm().acceptVisitor(fixer);
 

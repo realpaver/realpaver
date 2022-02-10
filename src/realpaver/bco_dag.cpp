@@ -172,7 +172,7 @@ void BcoDag::makeHc4Propagator()
    {
       SharedContractor op = std::make_shared<Hc4Contractor>(dag_, i++);
       SharedContractor bcop =
-         std::make_shared<BcoContractor>(dag_, i, v, op, init_);
+         std::make_shared<BOContractor>(dag_, i, v, op, init_);
 
       pool_.push(bcop);
    }
@@ -191,7 +191,7 @@ void BcoDag::makeBc4Propagator()
    {
       SharedContractor op = std::make_shared<Bc4Contractor>(dag_, i++);
       SharedContractor bcop =
-         std::make_shared<BcoContractor>(dag_, i, v, op, init_);
+         std::make_shared<BOContractor>(dag_, i, v, op, init_);
 
       pool_.push(bcop);
    }

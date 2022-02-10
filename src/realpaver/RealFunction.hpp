@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_ABSTRACT_REAL_FUNCTION_HPP
-#define REALPAVER_ABSTRACT_REAL_FUNCTION_HPP
+#ifndef REALPAVER_REAL_FUNCTION_HPP
+#define REALPAVER_REAL_FUNCTION_HPP
 
 #include "realpaver/RealVector.hpp"
 #include "realpaver/scope.hpp"
@@ -20,10 +20,10 @@ namespace realpaver {
 ///
 /// This class is a pure abstract class.
 ///////////////////////////////////////////////////////////////////////////////
-class AbstractRealFunction {
+class RealFunction {
 public:
    /// Virtual destructor
-   virtual ~AbstractRealFunction();
+   virtual ~RealFunction();
 
    /// Evaluates this
    /// @param x argument of this

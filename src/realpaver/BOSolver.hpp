@@ -7,17 +7,20 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BOP_SOLVER_HPP
-#define REALPAVER_BOP_SOLVER_HPP
+#ifndef REALPAVER_BO_SOLVER_HPP
+#define REALPAVER_BO_SOLVER_HPP
 
+#include "realpaver/BOModel.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
 
 namespace realpaver {
 
-class BOPSolver {
+class BOSolver {
 public:
-   BOPSolver(Problem& problem);
+   BOSolver(Problem& problem);
+
+   ~BOSolver();
 
    /// Optimization method
    /// @return true if an optimal solution is found
@@ -44,9 +47,25 @@ private:
    Problem preprob_;    // problem resulting from preprocessing
    Problem solprob_;    // problem resulting from presolving
 
+   BOModel* model_;
+
    OptimizationStatus status_;
-   RealVector sol_;
+   IntervalVector sol_;
    Interval objval_;
+
+   bool preprocess();
+   bool presolve();
+   void solve();
+
+   typedef Preprocessor::VarVarMapType VarVarMapType;
+
+   // Maps every variable of the preprocessed prolem to the associated
+   // variable in the initial problem
+   VarVarMapType vmap21_;
+
+   // Maps every variable of the presolved prolem to the associated
+   // variable in the initial problem
+   VarVarMapType vmap31_;
 };
 
 } // namespace

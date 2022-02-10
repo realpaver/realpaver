@@ -7,13 +7,13 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/BOPPresolver.hpp"
-#include "realpaver/contractor_bco.hpp"
+#include "realpaver/BOContractor.hpp"
+#include "realpaver/BOPresolver.hpp"
 #include "realpaver/contractor_hc4.hpp"
 
 namespace realpaver {
 
-BOPPresolver::BOPPresolver(BOPModel& model)
+BOPresolver::BOPresolver(BOModel& model)
       :  pool_(),
          propagator_(),
          init_(nullptr),
@@ -29,23 +29,30 @@ BOPPresolver::BOPPresolver(BOPModel& model)
    {
       SharedContractor op = std::make_shared<Hc4Contractor>(dag, i++);
 
-      SharedContractor bop =
-         std::make_shared<BcoContractor>(dag, i, v, op, init_);
+      if (model.isBoundaryVar(v))
+      {
+         SharedContractor bop =
+            std::make_shared<BOContractor>(dag, i, v, op, init_);
 
-      pool_.push(bop);
+         pool_.push(bop);
+      }
+      else
+      {
+         pool_.push(op);
+      }
    }
 
    propagator_.setPool(&pool_);
 }
 
-bool BOPPresolver::presolve()
-{
+bool BOPresolver::presolve()
+{   
    Proof proof = propagator_.contract(region_);
 
    return proof != Proof::Empty;
 }
 
-IntervalVector BOPPresolver::getContractedRegion() const
+IntervalVector BOPresolver::getContractedRegion() const
 {
    return region_;
 }

@@ -7,11 +7,11 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/AbstractRealFunction.hpp"
+#include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
 
-AbstractRealFunction::~AbstractRealFunction()
+RealFunction::~RealFunction()
 {}
 
 } // namespace

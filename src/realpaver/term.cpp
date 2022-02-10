@@ -69,6 +69,11 @@ bool TermRep::isVar() const
    return false;
 }
 
+bool TermRep::isUsb() const
+{
+   return false;
+}
+
 bool TermRep::isSub() const
 {
    return false;
@@ -186,6 +191,11 @@ bool Term::isLinear() const
 bool Term::isVar() const
 {
    return rep_->isVar();
+}
+
+bool Term::isUsb() const
+{
+   return rep_->isUsb();
 }
 
 bool Term::isAdd() const
@@ -470,6 +480,12 @@ Term operator-(const Term& l, const Term& r)
 
       else
          return Term(std::make_shared<TermSub>(l.rep(), r.rep()));
+   }
+
+   else if (r.isUsb())
+   {
+      TermUsb* rt = static_cast<TermUsb*>(r.rep().get());
+      return l + Term(rt->child());
    }
 
    else if (l.isAdd() && r.isAdd())
@@ -1068,6 +1084,12 @@ Term operator-(const Term& t)
       return Term(x);
    }
 
+   else if (t.isUsb())
+   {
+      TermUsb* ut = static_cast<TermUsb*>(t.rep().get());
+      return Term(ut->child());
+   }
+
    else
       return Term(std::make_shared<TermUsb>(t.rep()));
 }
@@ -1444,7 +1466,7 @@ TermRep::SharedRep TermOp::right() const
    return v_[1];
 }
 
-TermRep::SharedRep TermOp::sub() const
+TermRep::SharedRep TermOp::child() const
 {
    ASSERT(arity() == 1, "access out of range to a term operand");
 
@@ -1699,12 +1721,12 @@ TermUsb::TermUsb(const SharedRep& t) :
 
 Interval TermUsb::evalConst() const
 {
-   return -sub()->evalConst();
+   return -child()->evalConst();
 }
 
 Interval TermUsb::eval(const IntervalVector& X) const
 {
-   return -sub()->eval(X);
+   return -child()->eval(X);
 }
 
 void TermUsb::acceptVisitor(TermVisitor& vis) const
@@ -1714,7 +1736,12 @@ void TermUsb::acceptVisitor(TermVisitor& vis) const
 
 bool TermUsb::isLinear() const
 {
-   return sub()->isLinear();
+   return child()->isLinear();
+}
+
+bool TermUsb::isUsb() const
+{
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1725,12 +1752,12 @@ TermAbs::TermAbs(const SharedRep& t) :
 
 Interval TermAbs::evalConst() const
 {
-   return abs(sub()->evalConst());
+   return abs(child()->evalConst());
 }
 
 Interval TermAbs::eval(const IntervalVector& X) const
 {
-   return abs(sub()->eval(X));
+   return abs(child()->eval(X));
 }
 
 void TermAbs::acceptVisitor(TermVisitor& vis) const
@@ -1746,12 +1773,12 @@ TermSgn::TermSgn(const SharedRep& t) :
 
 Interval TermSgn::evalConst() const
 {
-   return sgn(sub()->evalConst());
+   return sgn(child()->evalConst());
 }
 
 Interval TermSgn::eval(const IntervalVector& X) const
 {
-   return sgn(sub()->eval(X));
+   return sgn(child()->eval(X));
 }
 
 void TermSgn::acceptVisitor(TermVisitor& vis) const
@@ -1767,12 +1794,12 @@ TermSqr::TermSqr(const SharedRep& t) :
 
 Interval TermSqr::evalConst() const
 {
-   return sqr(sub()->evalConst());
+   return sqr(child()->evalConst());
 }
 
 Interval TermSqr::eval(const IntervalVector& X) const
 {
-   return sqr(sub()->eval(X));
+   return sqr(child()->eval(X));
 }
 
 void TermSqr::acceptVisitor(TermVisitor& vis) const
@@ -1788,12 +1815,12 @@ TermSqrt::TermSqrt(const SharedRep& t) :
 
 Interval TermSqrt::evalConst() const
 {
-   return sqrt(sub()->evalConst());
+   return sqrt(child()->evalConst());
 }
 
 Interval TermSqrt::eval(const IntervalVector& X) const
 {
-   return sqrt(sub()->eval(X));
+   return sqrt(child()->eval(X));
 }
 
 void TermSqrt::acceptVisitor(TermVisitor& vis) const
@@ -1819,18 +1846,18 @@ int TermPow::exponent() const
 
 Interval TermPow::evalConst() const
 {
-   return pow(sub()->evalConst(), n_);
+   return pow(child()->evalConst(), n_);
 }
 
 Interval TermPow::eval(const IntervalVector& X) const
 {
-   return pow(sub()->eval(X), n_);
+   return pow(child()->eval(X), n_);
 }
 
 void TermPow::print(std::ostream& os) const
 {
    os << opSymbol() << "(";
-   sub()->print(os);
+   child()->print(os);
    os << "," << n_ << ")";
 }
 
@@ -1847,12 +1874,12 @@ TermExp::TermExp(const SharedRep& t) :
 
 Interval TermExp::evalConst() const
 {
-   return exp(sub()->evalConst());
+   return exp(child()->evalConst());
 }
 
 Interval TermExp::eval(const IntervalVector& X) const
 {
-   return exp(sub()->eval(X));
+   return exp(child()->eval(X));
 }
 
 void TermExp::acceptVisitor(TermVisitor& vis) const
@@ -1868,12 +1895,12 @@ TermLog::TermLog(const SharedRep& t) :
 
 Interval TermLog::evalConst() const
 {
-   return log(sub()->evalConst());
+   return log(child()->evalConst());
 }
 
 Interval TermLog::eval(const IntervalVector& X) const
 {
-   return log(sub()->eval(X));
+   return log(child()->eval(X));
 }
 
 void TermLog::acceptVisitor(TermVisitor& vis) const
@@ -1889,12 +1916,12 @@ TermCos::TermCos(const SharedRep& t) :
 
 Interval TermCos::evalConst() const
 {
-   return cos(sub()->evalConst());
+   return cos(child()->evalConst());
 }
 
 Interval TermCos::eval(const IntervalVector& X) const
 {
-   return cos(sub()->eval(X));
+   return cos(child()->eval(X));
 }
 
 void TermCos::acceptVisitor(TermVisitor& vis) const
@@ -1910,12 +1937,12 @@ TermSin::TermSin(const SharedRep& t) :
 
 Interval TermSin::evalConst() const
 {
-   return sin(sub()->evalConst());
+   return sin(child()->evalConst());
 }
 
 Interval TermSin::eval(const IntervalVector& X) const
 {
-   return sin(sub()->eval(X));
+   return sin(child()->eval(X));
 }
 
 void TermSin::acceptVisitor(TermVisitor& vis) const
@@ -1931,12 +1958,12 @@ TermTan::TermTan(const SharedRep& t) :
 
 Interval TermTan::evalConst() const
 {
-   return tan(sub()->evalConst());
+   return tan(child()->evalConst());
 }
 
 Interval TermTan::eval(const IntervalVector& X) const
 {
-   return tan(sub()->eval(X));
+   return tan(child()->eval(X));
 }
 
 void TermTan::acceptVisitor(TermVisitor& vis) const

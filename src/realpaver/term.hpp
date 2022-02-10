@@ -75,6 +75,7 @@ public:
    virtual bool isSub() const;
    virtual bool isMul() const;
    virtual bool isDiv() const;
+   virtual bool isUsb() const;
 
    // returns true if this term depends on v
    virtual bool dependsOn(const Variable& v) const = 0;
@@ -123,6 +124,7 @@ public:
    bool isZero() const;
    bool isOne() const;
    bool isMinusOne() const;
+   bool isUsb() const;
 
    // other tests
    bool isLinear() const;
@@ -260,7 +262,7 @@ public:
    SharedRep right() const;
 
    // equivalent to subTerm(0) for unary operation
-   SharedRep sub() const;
+   SharedRep child() const;
 
    // inserts a term at the end of the list of sub-terms
    void insert(const SharedRep& t);
@@ -378,6 +380,7 @@ public:
    Interval eval(const IntervalVector& X) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
+   bool isUsb() const;
 };
 
 /*****************************************************************************

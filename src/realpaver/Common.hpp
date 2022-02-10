@@ -66,6 +66,8 @@ enum class OptimizationStatus {
    Other
 };
 
+/// Output on a stream of an optimization status
+std::ostream& operator<<(std::ostream& os, const OptimizationStatus& status);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a certificate returned by interval solvers.

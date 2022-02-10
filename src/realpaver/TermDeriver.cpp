@@ -98,13 +98,13 @@ void TermDeriver::apply(const TermMax* t)
 void TermDeriver::apply(const TermUsb* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
    dt_ = -vis.dt_;
 }
 
 void TermDeriver::apply(const TermAbs* t)
 {
-   dt_ = sgn(t->sub());
+   dt_ = sgn(t->child());
 }
 
 void TermDeriver::apply(const TermSgn* t)
@@ -115,59 +115,59 @@ void TermDeriver::apply(const TermSgn* t)
 void TermDeriver::apply(const TermSqr* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = (2*vis.dt_)*t->sub();
+   t->child()->acceptVisitor(vis);
+   dt_ = (2*vis.dt_)*t->child();
 }
 
 void TermDeriver::apply(const TermSqrt* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = (0.5*vis.dt_)/sqrt(t->sub());
+   t->child()->acceptVisitor(vis);
+   dt_ = (0.5*vis.dt_)/sqrt(t->child());
 }
 
 void TermDeriver::apply(const TermPow* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
+   t->child()->acceptVisitor(vis);
 
    int n = t->exponent();
-   dt_ = (n*vis.dt_)*pow(t->sub(), n-1);   
+   dt_ = (n*vis.dt_)*pow(t->child(), n-1);   
 }
 
 void TermDeriver::apply(const TermExp* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = vis.dt_*exp(t->sub());
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*exp(t->child());
 }
 
 void TermDeriver::apply(const TermLog* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = vis.dt_ / t->sub();
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / t->child();
 }
 
 void TermDeriver::apply(const TermCos* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = (-vis.dt_)*sin(t->sub());
+   t->child()->acceptVisitor(vis);
+   dt_ = (-vis.dt_)*sin(t->child());
 }
 
 void TermDeriver::apply(const TermSin* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = vis.dt_*cos(t->sub());
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*cos(t->child());
 }
 
 void TermDeriver::apply(const TermTan* t)
 {
    TermDeriver vis(id_);
-   t->sub()->acceptVisitor(vis);
-   dt_ = (1 + sqr(tan(t->sub())))*vis.dt_;
+   t->child()->acceptVisitor(vis);
+   dt_ = (1 + sqr(tan(t->child())))*vis.dt_;
 }
 
 } // namespace

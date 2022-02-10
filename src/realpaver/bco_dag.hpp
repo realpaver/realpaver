@@ -3,11 +3,11 @@
 #ifndef REALPAVER_BCO_DAG_HPP
 #define REALPAVER_BCO_DAG_HPP
 
-#include "realpaver/contractor_bco.hpp"
+#include "realpaver/BOContractor.hpp"
 #include "realpaver/dag.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/propagator.hpp"
-#include "realpaver/AbstractRealFunction.hpp"
+#include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
 
@@ -18,7 +18,7 @@ namespace realpaver {
  *    - the (k+1)-th function in the DAG represents the equation z - f = 0 if
  *      f has to be minimized or z + f = 0 otherwise.
  */
-class BcoDag : public AbstractRealFunction {
+class BcoDag : public RealFunction {
 public:
    // constructor
    BcoDag(Problem& P);
