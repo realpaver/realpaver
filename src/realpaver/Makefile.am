@@ -27,13 +27,13 @@ librealpaver_la_include_HEADERS = \
 		bco_dag.hpp \
 		bco_local.hpp \
 		bco_model.hpp \
-		bco_node.hpp \
-		bco_space.hpp \
 		bitset.hpp \
 		BOContractor.hpp \
 		BOModel.hpp \
+		BONode.hpp \
 		BOPresolver.hpp \
 		BOSolver.hpp \
+		BOSpace.hpp \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
@@ -101,13 +101,13 @@ librealpaver_la_SOURCES = \
 		bco_dag.cpp \
 		bco_local.cpp \
 		bco_model.cpp \
-		bco_node.cpp \
-		bco_space.cpp \
 		bitset.cpp \
 		BOContractor.cpp \
 		BOModel.cpp \
+		BONode.cpp \
 		BOPresolver.cpp \
 		BOSolver.cpp \
+		BOSpace.cpp \
 		Common.cpp \
 		constraint.cpp \
 		ConstraintFixer.cpp \

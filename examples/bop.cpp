@@ -14,7 +14,7 @@ int main(void)
                u = problem.addRealVar(-10,  10, "u"),
                y = problem.addRealVar( -1,  2, "y");
 
-      problem.addObjective(minimize(3*u + sqr(x) + x*y + sqr(y)));
+      problem.addObjective(minimize(3*u + sqr(x)*sqr(y) + x*y));
 
       BOSolver solver(problem);
 

@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BOCONTRACTOR_HPP
-#define REALPAVER_BOCONTRACTOR_HPP
+#ifndef REALPAVER_BO_CONTRACTOR_HPP
+#define REALPAVER_BO_CONTRACTOR_HPP
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/dag.hpp"

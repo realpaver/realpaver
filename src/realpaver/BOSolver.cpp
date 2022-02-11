@@ -35,8 +35,6 @@ BOSolver::~BOSolver()
 
 bool BOSolver::preprocess()
 {
-   DEBUG("PREPROCESS...");
-
    Preprocessor preproc;
    bool feasible = preproc.apply(problem_, preprob_);
 
@@ -56,9 +54,6 @@ bool BOSolver::preprocess()
       {
          Variable pv = preproc.srcToDestVar(v);
          vmap21_.insert(std::make_pair(pv, v));
-   
-DEBUG("vmap21 : new " << pv.getName() << "@" <<  pv.getId() << " -> init "
-<< v.getName() << "@" << v.getId());
       }
    }
 
@@ -76,9 +71,8 @@ DEBUG("vmap21 : new " << pv.getName() << "@" <<  pv.getId() << " -> init "
 
 bool BOSolver::presolve()
 {
-   DEBUG("PRESOLVE...");
+   model_ = new BOModel(preprob_, false);
 
-   model_ = new BOModel(preprob_);
    BOPresolver presolver(*model_);
 
    // propagation phase -> contracted region
@@ -93,8 +87,6 @@ bool BOSolver::presolve()
    // assigns the contracted domains in the preprocessed problem
    preprob_.setDomains(presolver.getContractedRegion());
 
-DEBUG("contracted : " << presolver.getContractedRegion());
-
    // preprocessing after presolving
    Preprocessor preproc;
    bool pfeasible = preproc.apply(preprob_, solprob_);
@@ -104,9 +96,6 @@ DEBUG("contracted : " << presolver.getContractedRegion());
       status_ = OptimizationStatus::Infeasible;
       return false;
    }
-
-DEBUG("after second preprocessing, scope : " << preprob_.scope());
-
 
   // assigns the fixed domains in the solution
    for (auto pv : preprob_.scope())
@@ -124,9 +113,6 @@ DEBUG("after second preprocessing, scope : " << preprob_.scope());
          {
             Variable sv = preproc.srcToDestVar(pv);
             vmap31_.insert(std::make_pair(sv, v));
-
-DEBUG("vmap31 : new " << sv.getName() << "@" <<  sv.getId() << " -> init "
-<< v.getName() << "@" << v.getId());
          }
       }
    }
@@ -147,36 +133,27 @@ DEBUG("vmap31 : new " << sv.getName() << "@" <<  sv.getId() << " -> init "
 
 void BOSolver::solve()
 {
-DEBUG("BOSolver solve");
-
    delete model_;
 
-DEBUG("ici, solprob : " << solprob_);
-
-   model_ = new BOModel(solprob_);
+   model_ = new BOModel(solprob_, true);
 
    for (auto it=vmap31_.begin(); it != vmap31_.end(); ++it)
-   {
-   DEBUG("ITER");
-   
+   {   
       Variable sv = it->first;
       Variable v = it->second;
-
-DEBUG("solved  var : " << sv.getName() << "@" << sv.getId());
-DEBUG("initial var : " << v.getName() << "@" << v.getId());
-
 
       Interval dsv = solprob_.getDomain(sv);
       Interval dv = problem_.getDomain(v);
 
       if (dv.strictlyContains(dsv))
+      {
          model_->setInteriorVar(sv);
-
+      }
       else
+      {
          model_->setBoundaryVar(sv);
-   }
-
-   
+      }
+   }   
 }
 
 bool BOSolver::optimize()
@@ -217,7 +194,6 @@ DEBUG("\nEND OF OPTIMIZATION");
 DEBUG("sol = " << sol_ << "\n\n");
 
    return true;
-   // TODO
 }
 
 OptimizationStatus BOSolver::getStatus() const

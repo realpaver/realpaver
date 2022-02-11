@@ -225,8 +225,8 @@ BcoResult BcoModel::solve()
    DEBUG("lu : " << Interval(L_, U_));
 
    // creates the search space
-   BcoSpace space;
-   SharedBcoNode inode = std::make_shared<BcoNode>(*initialBox());
+   BOSpace space;
+   SharedBONode inode = std::make_shared<BONode>(*initialBox());
    inode->setLower(L_);
    inode->setUpper(U_);
    inode->setDepth(0);

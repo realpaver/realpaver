@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BOMODEL_HPP
-#define REALPAVER_BOMODEL_HPP
+#ifndef REALPAVER_BO_MODEL_HPP
+#define REALPAVER_BO_MODEL_HPP
 
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/dag.hpp"
@@ -19,12 +19,12 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This represents a bound constrained optimization model.
 ///
-/// Given an objective function f(x0, ..., xk) a dag is created and we have:
-/// - the i-th function in the DAG (i in 0..k) corresponds to df / dxi;
-/// - the (k+1)-th function in the DAG represents the equation z - f = 0 if
-///    f has to be minimized or z + f = 0 otherwise.
+/// Given an objective function f(x0, ..., xk) a dag is created and the i-th
+/// function in the DAG (i in 0..k) corresponds to df / dxi.
 ///
-/// A new variable z is created in the input problem.
+/// A (k+1)-th function can be created in the DAG in order to represent the
+/// equation z - f = 0 if f has to be minimized or z + f = 0 otherwise.
+/// To this end, a new variable z is created in the input problem.
 ///
 /// A model can be created from an original problem or a simplified problem.
 /// It is then important to distinguish boundary variables and interior
@@ -41,7 +41,13 @@ class BOModel : public RealFunction {
 public:
    /// Creates a model
    /// @param problem problem to be solved
-   BOModel(Problem& problem);
+   /// @param withobj true if the objective function is added in this
+   ///
+   /// The equations df / dxi = 0 are inserted in this.
+   ///
+   /// If withobj is true, a new variable z is created in the problem and
+   /// an equation representing the objective function is inserted in this.
+   BOModel(Problem& problem, bool withobj = true);
 
    /// Destructor
    ~BOModel();

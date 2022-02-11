@@ -27,7 +27,7 @@ BOPresolver::BOPresolver(BOModel& model)
    // operators associated with df / dv = 0
    for (Variable v : model.getObjScope())
    {
-      SharedContractor op = std::make_shared<Hc4Contractor>(dag, i++);
+      SharedContractor op = std::make_shared<Hc4Contractor>(dag, i);
 
       if (model.isBoundaryVar(v))
       {
@@ -40,6 +40,8 @@ BOPresolver::BOPresolver(BOModel& model)
       {
          pool_.push(op);
       }
+
+      i = i+1;
    }
 
    propagator_.setPool(&pool_);

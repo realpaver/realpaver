@@ -142,9 +142,9 @@ am__installdirs = "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(librealpaver_la_includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp bco_dag.cpp \
-	bco_local.cpp bco_model.cpp bco_node.cpp bco_space.cpp \
-	bitset.cpp BOContractor.cpp BOModel.cpp BOPresolver.cpp \
-	BOSolver.cpp Common.cpp constraint.cpp ConstraintFixer.cpp \
+	bco_local.cpp bco_model.cpp bitset.cpp BOContractor.cpp \
+	BOModel.cpp BONode.cpp BOPresolver.cpp BOSolver.cpp \
+	BOSpace.cpp Common.cpp constraint.cpp ConstraintFixer.cpp \
 	constraint_relaxor.cpp Contractor.cpp contractor_bc3.cpp \
 	contractor_bc4.cpp contractor_cid.cpp contractor_hc4.cpp \
 	contractor_int.cpp contractor_pool.cpp dag.cpp Exception.cpp \
@@ -159,8 +159,8 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp bco_dag.cpp \
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = bco_dag.lo bco_local.lo bco_model.lo \
-	bco_node.lo bco_space.lo bitset.lo BOContractor.lo BOModel.lo \
-	BOPresolver.lo BOSolver.lo Common.lo constraint.lo \
+	bitset.lo BOContractor.lo BOModel.lo BONode.lo BOPresolver.lo \
+	BOSolver.lo BOSpace.lo Common.lo constraint.lo \
 	ConstraintFixer.lo constraint_relaxor.lo Contractor.lo \
 	contractor_bc3.lo contractor_bc4.lo contractor_cid.lo \
 	contractor_hc4.lo contractor_int.lo contractor_pool.lo dag.lo \
@@ -254,9 +254,9 @@ am__can_run_installinfo = \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__librealpaver_la_include_HEADERS_DIST = bco_dag.hpp bco_local.hpp \
-	bco_model.hpp bco_node.hpp bco_space.hpp bitset.hpp \
-	BOContractor.hpp BOModel.hpp BOPresolver.hpp BOSolver.hpp \
-	Common.hpp config.hpp constraint.hpp ConstraintFixer.hpp \
+	bco_model.hpp bitset.hpp BOContractor.hpp BOModel.hpp \
+	BONode.hpp BOPresolver.hpp BOSolver.hpp BOSpace.hpp Common.hpp \
+	config.hpp constraint.hpp ConstraintFixer.hpp \
 	constraint_relaxor.hpp Contractor.hpp contractor_bc3.hpp \
 	contractor_bc4.hpp contractor_cid.hpp contractor_hc4.hpp \
 	contractor_int.hpp contractor_pool.hpp dag.hpp Double.hpp \
@@ -439,9 +439,9 @@ EXTRA_DIST = \
 lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir = $(includedir)/realpaver
 librealpaver_la_include_HEADERS = bco_dag.hpp bco_local.hpp \
-	bco_model.hpp bco_node.hpp bco_space.hpp bitset.hpp \
-	BOContractor.hpp BOModel.hpp BOPresolver.hpp BOSolver.hpp \
-	Common.hpp config.hpp constraint.hpp ConstraintFixer.hpp \
+	bco_model.hpp bitset.hpp BOContractor.hpp BOModel.hpp \
+	BONode.hpp BOPresolver.hpp BOSolver.hpp BOSpace.hpp Common.hpp \
+	config.hpp constraint.hpp ConstraintFixer.hpp \
 	constraint_relaxor.hpp Contractor.hpp contractor_bc3.hpp \
 	contractor_bc4.hpp contractor_cid.hpp contractor_hc4.hpp \
 	contractor_int.hpp contractor_pool.hpp dag.hpp Double.hpp \
@@ -456,20 +456,20 @@ librealpaver_la_include_HEADERS = bco_dag.hpp bco_local.hpp \
 	thick_fun.hpp Timer.hpp Tolerance.hpp uni_fun.hpp Variable.hpp \
 	$(am__append_1) $(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp bco_dag.cpp bco_local.cpp \
-	bco_model.cpp bco_node.cpp bco_space.cpp bitset.cpp \
-	BOContractor.cpp BOModel.cpp BOPresolver.cpp BOSolver.cpp \
-	Common.cpp constraint.cpp ConstraintFixer.cpp \
-	constraint_relaxor.cpp Contractor.cpp contractor_bc3.cpp \
-	contractor_bc4.cpp contractor_cid.cpp contractor_hc4.cpp \
-	contractor_int.cpp contractor_pool.cpp dag.cpp Exception.cpp \
-	Inflator.cpp interval.cpp IntervalNewton.cpp \
-	interval_slicer.cpp IntervalVector.cpp interval_union.cpp \
-	Logger.cpp LPModel.cpp Objective.cpp Param.cpp \
-	parser_bison.ypp parser_flex.lpp parser.cpp Preprocessor.cpp \
-	Problem.cpp propagator.cpp RealFunction.cpp RealVector.cpp \
-	scope.cpp scope_map.cpp term.cpp TermDeriver.cpp TermFixer.cpp \
-	Timer.cpp thick_fun.cpp Tolerance.cpp uni_fun.cpp Variable.cpp \
-	$(am__append_4) $(am__append_5)
+	bco_model.cpp bitset.cpp BOContractor.cpp BOModel.cpp \
+	BONode.cpp BOPresolver.cpp BOSolver.cpp BOSpace.cpp Common.cpp \
+	constraint.cpp ConstraintFixer.cpp constraint_relaxor.cpp \
+	Contractor.cpp contractor_bc3.cpp contractor_bc4.cpp \
+	contractor_cid.cpp contractor_hc4.cpp contractor_int.cpp \
+	contractor_pool.cpp dag.cpp Exception.cpp Inflator.cpp \
+	interval.cpp IntervalNewton.cpp interval_slicer.cpp \
+	IntervalVector.cpp interval_union.cpp Logger.cpp LPModel.cpp \
+	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
+	parser.cpp Preprocessor.cpp Problem.cpp propagator.cpp \
+	RealFunction.cpp RealVector.cpp scope.cpp scope_map.cpp \
+	term.cpp TermDeriver.cpp TermFixer.cpp Timer.cpp thick_fun.cpp \
+	Tolerance.cpp uni_fun.cpp Variable.cpp $(am__append_4) \
+	$(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = parser_bison.hpp
@@ -579,8 +579,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOContractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BONode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOPresolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOSolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOSpace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Common.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConstraintFixer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Contractor.Plo@am__quote@
@@ -606,8 +608,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_dag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_local.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_model.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_node.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bco_space.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constraint_relaxor.Plo@am__quote@

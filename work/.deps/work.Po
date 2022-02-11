@@ -220,12 +220,12 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/chrono /usr/include/c++/7/ratio \
  /usr/include/c++/7/ctime /usr/include/c++/7/bits/parse_numbers.h \
  ../src/realpaver/contractor_int.hpp ../src/realpaver/bco_model.hpp \
- ../src/realpaver/bco_dag.hpp ../src/realpaver/contractor_bco.hpp \
+ ../src/realpaver/bco_dag.hpp ../src/realpaver/BOContractor.hpp \
  ../src/realpaver/propagator.hpp ../src/realpaver/contractor_pool.hpp \
- ../src/realpaver/AbstractRealFunction.hpp ../src/realpaver/bco_local.hpp \
- ../src/realpaver/bco_space.hpp /usr/include/c++/7/set \
+ ../src/realpaver/RealFunction.hpp ../src/realpaver/bco_local.hpp \
+ ../src/realpaver/BOSpace.hpp /usr/include/c++/7/set \
  /usr/include/c++/7/bits/stl_set.h /usr/include/c++/7/bits/stl_multiset.h \
- ../src/realpaver/bco_node.hpp ../src/realpaver/Param.hpp
+ ../src/realpaver/BONode.hpp ../src/realpaver/Param.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -817,17 +817,17 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/bco_dag.hpp:
 
-../src/realpaver/contractor_bco.hpp:
+../src/realpaver/BOContractor.hpp:
 
 ../src/realpaver/propagator.hpp:
 
 ../src/realpaver/contractor_pool.hpp:
 
-../src/realpaver/AbstractRealFunction.hpp:
+../src/realpaver/RealFunction.hpp:
 
 ../src/realpaver/bco_local.hpp:
 
-../src/realpaver/bco_space.hpp:
+../src/realpaver/BOSpace.hpp:
 
 /usr/include/c++/7/set:
 
@@ -835,6 +835,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/stl_multiset.h:
 
-../src/realpaver/bco_node.hpp:
+../src/realpaver/BONode.hpp:
 
 ../src/realpaver/Param.hpp:

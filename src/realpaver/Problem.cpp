@@ -143,7 +143,7 @@ Interval Problem::getDomain(const Variable& v) const
 
 void Problem::setDomains(const IntervalVector& X)
 {
-   ASSERT(nbVars() == X.size(), "");
+   ASSERT(nbVars() == X.size(), "bad assignment of domains");
 
    for(size_t i=0; i<vars_.size(); ++i)
       setDomain(vars_[i], X[i]);

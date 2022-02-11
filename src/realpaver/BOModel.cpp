@@ -12,9 +12,9 @@
 
 namespace realpaver {
 
-BOModel::BOModel(Problem& problem)
+BOModel::BOModel(Problem& problem, bool withobj)
       : dag_(nullptr),
-        initreg_(1 + problem.nbVars()),
+        initreg_(problem.nbVars()),
         z_(""),
         objscope_(),
         fullscope_(),
@@ -49,18 +49,21 @@ BOModel::BOModel(Problem& problem)
       initreg_.set(v, problem.getDomain(v));
    }
 
-   // variable representing the objective function
-   z_ = problem.addRealVar(Interval::universe(), "_z");
-   fullscope_.insert(z_);
-   initreg_.set(z_, Interval::universe());
+   // objective function
+   if (withobj)
+   {
+      z_ = problem.addRealVar(Interval::universe(), "_z");
+      fullscope_.insert(z_);
+      initreg_.push(Interval::universe());
 
-   //LOG_INFO("   > creates an objective variable " << z_.name());
+      //LOG_INFO("   > creates an objective variable " << z_.name());
 
-   if (problem.getObjective().isMinimization())
-      dag_->insert( z_ - to == 0 );
+      if (problem.getObjective().isMinimization())
+         dag_->insert( z_ - to == 0 );
 
-   else
-      dag_->insert( z_ + to == 0 );
+      else
+         dag_->insert( z_ + to == 0 );
+   }
 }
 
 BOModel::~BOModel()

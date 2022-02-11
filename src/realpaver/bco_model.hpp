@@ -5,7 +5,7 @@
 
 #include "realpaver/bco_dag.hpp"
 #include "realpaver/bco_local.hpp"
-#include "realpaver/bco_space.hpp"
+#include "realpaver/BOSpace.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
 
