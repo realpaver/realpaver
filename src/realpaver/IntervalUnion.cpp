@@ -1,6 +1,14 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/interval_union.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalUnion.hpp"
 
 namespace realpaver {
 
@@ -16,6 +24,38 @@ IntervalUnion::IntervalUnion(const std::initializer_list<Interval>& l) : v_()
 {
    for (Interval x : l)
       insert(x);
+}
+
+size_t IntervalUnion::size() const
+{
+   return v_.size();
+}
+
+Interval IntervalUnion::operator[](size_t i) const
+{
+   ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
+
+   return v_[i];
+}
+
+bool IntervalUnion::isEmpty() const
+{
+   return v_.empty();
+}
+
+void IntervalUnion::setEmpty()
+{
+   v_.clear();
+}
+
+IntervalUnion::iterator IntervalUnion::begin()
+{
+   return v_.begin();
+}
+
+IntervalUnion::iterator IntervalUnion::end()
+{
+   return v_.end();
 }
 
 IntervalUnion& IntervalUnion::insert(const Interval& x)
@@ -46,7 +86,7 @@ IntervalUnion& IntervalUnion::insert(const Interval& x)
 
    // dichotomic search of the range of intervals intersecting x
    int first, last;
-   bool found = findInter(x,first,last);
+   bool found = findInter(x, first, last);
 
    if (found)
    {
@@ -59,25 +99,25 @@ IntervalUnion& IntervalUnion::insert(const Interval& x)
       {
          Interval y(v_[first] | v_[last] | x);
             
-         // remove the range first..last from the vector
+         // removes the range first..last from the vector
          auto itfirst = v_.begin();
-         std::advance(itfirst,first);
+         std::advance(itfirst, first);
             
          auto itlast = v_.begin();
-         std::advance(itlast,last + 1);
+         std::advance(itlast, last + 1);
 
          v_.erase(itfirst,itlast);
             
-         // insert the hull at the right place
+         // inserts the hull at the right place
          auto it = v_.begin();
-         std::advance(it,first);
+         std::advance(it, first);
          v_.insert(it,y);
       }
    }
    else
    {
       // no interval intersecting x
-      // insert x before first (we have first == last+1)
+      // inserts x before first (we have first == last+1)
       auto it = v_.begin();
       std::advance(it, first);
       v_.insert(it, x);
@@ -94,7 +134,7 @@ Interval IntervalUnion::hull() const
       return v_[0];
 
    else
-      return Interval(v_[0].left(),v_[size()-1].right());
+      return Interval(v_[0].left(), v_[size()-1].right());
 }
 
 void IntervalUnion::contract(Interval& x) const
@@ -107,7 +147,7 @@ void IntervalUnion::contract(Interval& x) const
       else
       {
          int first, last;
-         bool found = findInter(x,first,last);
+         bool found = findInter(x, first, last);
          if (found)
             x &= (v_[first] | v_[last]);
 
@@ -165,13 +205,13 @@ bool IntervalUnion::findInter(const Interval& x, int& first, int& last) const
 
    if (found)
    {
-      // find the leftmost interval intersecting x
+      // finds the leftmost interval intersecting x
       first = current - 1;
       while (first>=0 && (v_[first].overlaps(x)))
          --first;
       ++first;
 
-      // find the rightmost interval intersecting x
+      // finds the rightmost interval intersecting x
       last = current + 1;
       while ( (last<(int)size()) && (v_[last].overlaps(x)))
          ++last;

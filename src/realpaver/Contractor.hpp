@@ -11,7 +11,7 @@
 #define REALPAVER_CONTRACTOR_HPP
 
 #include <memory>
-#include "realpaver/bitset.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/scope.hpp"
 

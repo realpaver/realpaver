@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include "realpaver/bitset.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/constraint.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/RealVector.hpp"

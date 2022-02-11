@@ -11,7 +11,7 @@
 #define REALPAVER_INTERVAL_VECTOR_HPP
 
 #include <memory>
-#include "realpaver/bitset.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/interval.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealVector.hpp"

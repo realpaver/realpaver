@@ -5,7 +5,7 @@
 
 #include <map>
 #include <memory>
-#include "realpaver/bitset.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/scope_map.hpp"
 #include "realpaver/Variable.hpp"
 

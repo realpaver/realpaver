@@ -1,20 +1,30 @@
-// This file is part of Realpaver. License: see COPYING file.
-
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 #include <algorithm>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/bitset.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/Common.hpp"
 
 namespace realpaver {
 
-Bitset::Bitset(): size_(0), wcount_(0), word_(nullptr), shadow_word_(0)
+Bitset::Bitset()
+      : size_(0),
+        wcount_(0),
+        word_(nullptr),
+        shadow_word_(0)
 {}
 
-Bitset::Bitset(size_t n, size_t val) :
-   size_(n),
-   wcount_(1 + (n - 1) / BITS_PER_WORD),
-   word_(nullptr),
-   shadow_word_(0)
+Bitset::Bitset(size_t n, size_t val)
+      : size_(n),
+        wcount_(1 + (n - 1) / BITS_PER_WORD),
+        word_(nullptr),
+        shadow_word_(0)
 {
    ASSERT(n > 0, "creation of bitset with null size... " <<
                  "the default constructor must be used");
@@ -101,6 +111,44 @@ Bitset::Bitset(Bitset&& other) :
 {
    other.size_ = other.wcount_ = 0;
    other.word_ = nullptr;
+}
+
+size_t Bitset::size() const 
+{
+   return size_;
+}
+
+size_t Bitset::get(size_t i) const
+{
+   return i >= size() ?
+             0 : word_[bitIndex(i)] & (word_t(1) << bitOffset(i));
+}
+
+void Bitset::keepShadowBits()
+{
+   if (wcount_ > 0)
+      word_[wcount_-1] &= shadow_word_;
+}
+
+void Bitset::setZero(size_t i)
+{
+   word_[bitIndex(i)] &= ~(word_t(1) << bitOffset(i));
+}
+
+void Bitset::setOne(size_t i)
+{
+   word_[bitIndex(i)] |= (word_t(1) << bitOffset(i));
+}
+
+void Bitset::flip(size_t i)
+{
+   if (get(i)) setZero(i);
+   else setOne(i);
+}
+
+size_t Bitset::wordCount() const
+{
+   return wcount_;
 }
 
 void Bitset::setAllZero()

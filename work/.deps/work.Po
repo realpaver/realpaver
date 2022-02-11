@@ -153,7 +153,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/shared_ptr_atomic.h \
  /usr/include/c++/7/bits/atomic_base.h \
  /usr/include/c++/7/bits/atomic_lockfree_defines.h \
- /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/bitset.hpp \
+ /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/Bitset.hpp \
  ../src/realpaver/interval.hpp ../src/realpaver/Common.hpp \
  /usr/include/c++/7/limits ../src/realpaver/IntervalImpl.hpp \
  /home/granvilliers-l/local/include/gaol/gaol \
@@ -214,11 +214,11 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
- /usr/include/c++/7/bits/fstream.tcc ../src/realpaver/interval_union.hpp \
- ../src/realpaver/Preprocessor.hpp ../src/realpaver/ConstraintFixer.hpp \
- ../src/realpaver/TermFixer.hpp ../src/realpaver/Timer.hpp \
- /usr/include/c++/7/chrono /usr/include/c++/7/ratio \
- /usr/include/c++/7/ctime /usr/include/c++/7/bits/parse_numbers.h \
+ /usr/include/c++/7/bits/fstream.tcc ../src/realpaver/Preprocessor.hpp \
+ ../src/realpaver/ConstraintFixer.hpp ../src/realpaver/TermFixer.hpp \
+ ../src/realpaver/Timer.hpp /usr/include/c++/7/chrono \
+ /usr/include/c++/7/ratio /usr/include/c++/7/ctime \
+ /usr/include/c++/7/bits/parse_numbers.h \
  ../src/realpaver/contractor_int.hpp ../src/realpaver/bco_model.hpp \
  ../src/realpaver/bco_dag.hpp ../src/realpaver/BOContractor.hpp \
  ../src/realpaver/propagator.hpp ../src/realpaver/contractor_pool.hpp \
@@ -623,7 +623,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/backward/auto_ptr.h:
 
-../src/realpaver/bitset.hpp:
+../src/realpaver/Bitset.hpp:
 
 ../src/realpaver/interval.hpp:
 
@@ -792,8 +792,6 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h:
 
 /usr/include/c++/7/bits/fstream.tcc:
-
-../src/realpaver/interval_union.hpp:
 
 ../src/realpaver/Preprocessor.hpp:
 

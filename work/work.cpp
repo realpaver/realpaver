@@ -7,7 +7,6 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/thick_fun.hpp"
 #include "realpaver/interval_slicer.hpp"
-#include "realpaver/interval_union.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Timer.hpp"

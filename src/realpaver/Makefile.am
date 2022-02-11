@@ -27,7 +27,7 @@ librealpaver_la_include_HEADERS = \
 		bco_dag.hpp \
 		bco_local.hpp \
 		bco_model.hpp \
-		bitset.hpp \
+		Bitset.hpp \
 		BOContractor.hpp \
 		BOModel.hpp \
 		BONode.hpp \
@@ -56,7 +56,7 @@ librealpaver_la_include_HEADERS = \
 		interval_slicer.hpp \
 		IntervalTraits.hpp \
 		IntervalVector.hpp \
-		interval_union.hpp \
+		IntervalUnion.hpp \
 		LinumDoubleTraits.hpp \
 		LinumIntervalTraits.hpp \
 		LinumTraits.hpp \
@@ -101,7 +101,7 @@ librealpaver_la_SOURCES = \
 		bco_dag.cpp \
 		bco_local.cpp \
 		bco_model.cpp \
-		bitset.cpp \
+		Bitset.cpp \
 		BOContractor.cpp \
 		BOModel.cpp \
 		BONode.cpp \
@@ -126,7 +126,7 @@ librealpaver_la_SOURCES = \
 		IntervalNewton.cpp \
 		interval_slicer.cpp \
 		IntervalVector.cpp \
-		interval_union.cpp \
+		IntervalUnion.cpp \
 		Logger.cpp \
 		LPModel.cpp \
 		Objective.cpp \
