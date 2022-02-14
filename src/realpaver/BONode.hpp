@@ -11,6 +11,7 @@
 #define REALPAVER_BO_NODE_HPP
 
 #include "realpaver/IntervalVector.hpp"
+#include "realpaver/SearchNode.hpp"
 
 namespace realpaver {
 
@@ -23,7 +24,7 @@ namespace realpaver {
 /// - an upper bound of the objective function in this region;
 /// - the depth in the search tree.
 ///////////////////////////////////////////////////////////////////////////////
-class BONode {
+class BONode : public SearchNode {
 public:
    /// Creates a node
    /// @param X vector of domains
@@ -52,22 +53,11 @@ public:
    /// @param val new upper bound
    void setUpper(const double& val);
 
-   /// @return the depth of this in the search tree
-   size_t getDepth() const;
-
-   /// Sets the depth of this in the search tree
-   /// @param d new depth
-   void setDepth(size_t d);
-
-   /// Increments the depth of this
-   void incrDepth();
-
    /// @return the vector of domains of this
    IntervalVector* getRegion() const;
 
 private:
    IntervalVector* reg_;
-   size_t depth_;
    double lower_;
    double upper_;
 };

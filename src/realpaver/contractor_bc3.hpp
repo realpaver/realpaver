@@ -5,7 +5,7 @@
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalNewton.hpp"
-#include "realpaver/interval_slicer.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/thick_fun.hpp"
 
 namespace realpaver {

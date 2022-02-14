@@ -35,7 +35,7 @@ Proof CidContractor::contract(IntervalVector& X)
 {
    slicer_->apply(X[v_.getId()]);
 
-   if (slicer_->size() == 1)
+   if (slicer_->nbSlices() == 1)
       return op_->contract(X);
 
    IntervalVector* init = X.clone();

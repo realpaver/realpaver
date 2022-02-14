@@ -34,26 +34,27 @@ librealpaver_la_include_HEADERS = \
 		BOPresolver.hpp \
 		BOSolver.hpp \
 		BOSpace.hpp \
+		BOSplit.hpp \
 		Common.hpp \
 		config.hpp \
 		constraint.hpp \
 		ConstraintFixer.hpp \
-		constraint_relaxor.hpp \
+		ConstraintRelaxor.hpp \
 		Contractor.hpp \
 		contractor_bc3.hpp \
 		contractor_bc4.hpp \
 		contractor_cid.hpp \
-		contractor_hc4.hpp \
 		contractor_int.hpp \
 		contractor_pool.hpp \
 		dag.hpp \
 		Double.hpp \
 		Exception.hpp \
+		HC4Contractor.hpp \
 		Inflator.hpp \
 		interval.hpp \
 		IntervalImpl.hpp \
 		IntervalNewton.hpp \
-		interval_slicer.hpp \
+		IntervalSlicer.hpp \
 		IntervalTraits.hpp \
 		IntervalVector.hpp \
 		IntervalUnion.hpp \
@@ -75,6 +76,8 @@ librealpaver_la_include_HEADERS = \
 		RealVector.hpp \
 		scope.hpp \
 		scope_map.hpp \
+		SearchNode.hpp \
+		SplitStrategy.hpp \
 		term.hpp \
 		TermDeriver.hpp \
 		TermFixer.hpp \
@@ -108,23 +111,24 @@ librealpaver_la_SOURCES = \
 		BOPresolver.cpp \
 		BOSolver.cpp \
 		BOSpace.cpp \
+		BOSplit.cpp \
 		Common.cpp \
 		constraint.cpp \
 		ConstraintFixer.cpp \
-		constraint_relaxor.cpp \
+		ConstraintRelaxor.cpp \
 		Contractor.cpp \
 		contractor_bc3.cpp \
 		contractor_bc4.cpp \
 		contractor_cid.cpp \
-		contractor_hc4.cpp \
 		contractor_int.cpp \
 		contractor_pool.cpp \
 		dag.cpp \
 		Exception.cpp \
+		HC4Contractor.cpp \
 		Inflator.cpp \
 		interval.cpp \
 		IntervalNewton.cpp \
-		interval_slicer.cpp \
+		IntervalSlicer.cpp \
 		IntervalVector.cpp \
 		IntervalUnion.cpp \
 		Logger.cpp \
@@ -141,6 +145,7 @@ librealpaver_la_SOURCES = \
 		RealVector.cpp \
 		scope.cpp \
 		scope_map.cpp \
+		SearchNode.cpp \
 		term.cpp \
 		TermDeriver.cpp \
 		TermFixer.cpp \

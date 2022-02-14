@@ -1,7 +1,14 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/interval_slicer.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 
 namespace realpaver {
 
@@ -13,6 +20,32 @@ size_t IntervalSlicer::apply(const Interval& x)
    cont_.clear();
    applyImpl(x);
    return cont_.size();
+}
+
+void IntervalSlicer::push(const Interval& x)
+{
+   if (!x.isEmpty())
+      cont_.push_back(x);
+}
+
+void IntervalSlicer::clear()
+{
+   cont_.clear();
+}
+
+size_t IntervalSlicer::nbSlices() const
+{
+   return cont_.size();
+}
+
+IntervalSlicer::iterator IntervalSlicer::begin()
+{
+   return cont_.begin();
+}
+
+IntervalSlicer::iterator IntervalSlicer::end()
+{
+   return cont_.end();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,9 +64,15 @@ IntervalPeeler::IntervalPeeler(const double& f) : IntervalSlicer()
    setFactor(f);
 }
 
+double IntervalPeeler::getFactor() const
+{
+   return f_;
+}
+
 void IntervalPeeler::setFactor(const double& f)
 {
-   ASSERT(f<=0.0 || f>=100.0, "bad width factor " << f);
+   ASSERT(f>=0.0 && f<=100.0, "Bad width factor " << f
+                                                  << " in an interval peeler");
 
    f_ = f;
    p_ = f_ / Interval(100.0);
@@ -57,11 +96,11 @@ void IntervalPeeler::applyImpl(const Interval& x)
           d = b.right();
 
    THROW_IF(c<=x.left() || c>=d || d>=x.right(),
-            "unable to peel the interval " << x);
+            "Peeling of " << x << " impossible");
 
-   push(Interval(x.left(),c));
-   push(Interval(c,d));
-   push(Interval(d,x.right()));
+   push(Interval(x.left(), c));
+   push(Interval(c, d));
+   push(Interval(d, x.right()));
 }
 
 Interval IntervalPeeler::peelLeft(const Interval& x) const
@@ -78,7 +117,7 @@ Interval IntervalPeeler::peelLeft(const Interval& x) const
    y += w;
    double c = y.left();
 
-   return x.strictlyContains(c) ? Interval(x.left(),c) : x;
+   return x.strictlyContains(c) ? Interval(x.left(), c) : x;
 }
 
 Interval IntervalPeeler::peelRight(const Interval& x) const
@@ -95,7 +134,7 @@ Interval IntervalPeeler::peelRight(const Interval& x) const
    y -= w;
    double c = y.right();
 
-   return x.strictlyContains(c) ? Interval(c,x.right()) : x;
+   return x.strictlyContains(c) ? Interval(c, x.right()) : x;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,9 +144,14 @@ IntervalPartitioner::IntervalPartitioner(size_t n)
    setArity(n);
 }
 
+size_t IntervalPartitioner::getArity() const
+{
+   return n_;
+}
+
 void IntervalPartitioner::setArity(size_t n)
 {
-   ASSERT(n >= 2, "interval partitionner with bad arity " << n);
+   ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
 
    n_ = n;
 }
@@ -128,6 +172,7 @@ void IntervalPartitioner::applyImpl(const Interval& x)
       bool cond = true;
       double l, r = x.left(), h = x.width() / n_;
       size_t i = 1;
+ 
       while (cond && i < n_)
       {
          l = r;

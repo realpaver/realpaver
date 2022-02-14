@@ -9,7 +9,7 @@
 
 #include "realpaver/BOContractor.hpp"
 #include "realpaver/BOPresolver.hpp"
-#include "realpaver/contractor_hc4.hpp"
+#include "realpaver/HC4Contractor.hpp"
 
 namespace realpaver {
 
@@ -27,7 +27,7 @@ BOPresolver::BOPresolver(BOModel& model)
    // operators associated with df / dv = 0
    for (Variable v : model.getObjScope())
    {
-      SharedContractor op = std::make_shared<Hc4Contractor>(dag, i);
+      SharedContractor op = std::make_shared<HC4Contractor>(dag, i);
 
       if (model.isBoundaryVar(v))
       {

@@ -170,7 +170,7 @@ void BcoDag::makeHc4Propagator()
    // operators associated with df / dv = 0
    for (Variable v : fscope_)
    {
-      SharedContractor op = std::make_shared<Hc4Contractor>(dag_, i++);
+      SharedContractor op = std::make_shared<HC4Contractor>(dag_, i++);
       SharedContractor bcop =
          std::make_shared<BOContractor>(dag_, i, v, op, init_);
 
@@ -178,7 +178,7 @@ void BcoDag::makeHc4Propagator()
    }
 
    // operator associated with z_ = objective function
-   SharedContractor op = std::make_shared<Hc4Contractor>(dag_, i);
+   SharedContractor op = std::make_shared<HC4Contractor>(dag_, i);
    pool_.push(op);
 }
 

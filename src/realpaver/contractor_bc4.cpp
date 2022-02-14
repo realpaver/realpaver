@@ -7,7 +7,7 @@ namespace realpaver {
 Bc4Contractor::Bc4Contractor(Dag* dag, size_t i) :
    f_(dag->fun(i)), hc4_(nullptr), bc3_()
 {
-   hc4_ = new Hc4Contractor(f_->dag(), f_->index());
+   hc4_ = new HC4Contractor(f_->dag(), f_->index());
 
    Scope s = f_->scope();
    for (auto v : s)
@@ -33,7 +33,7 @@ bool Bc4Contractor::dependsOn(const Bitset& bs) const
 Proof Bc4Contractor::contract(IntervalVector& X)
 {
    // HC4
-   Hc4Contractor hc4(f_->dag(), f_->index());
+   HC4Contractor hc4(f_->dag(), f_->index());
    Proof proof = hc4.contract(X);
 
    if (proof != Proof::Maybe)

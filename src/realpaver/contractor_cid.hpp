@@ -4,7 +4,7 @@
 #define REALPAVER_CONTRACTOR_CID_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/interval_slicer.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 
 namespace realpaver {
 
