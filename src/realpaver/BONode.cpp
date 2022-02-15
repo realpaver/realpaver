@@ -12,18 +12,27 @@
 
 namespace realpaver {
 
-BONode::BONode(const IntervalVector& X) : SearchNode(0)
+BONode::BONode(const Scope& scope, const Variable& objvar,
+               const IntervalVector& X)
+      : SearchNode(0),
+        scope_(scope),
+        objvar_(objvar),
+        reg_(nullptr),
+        lower_(Double::neginf()),
+        upper_(Double::inf())
 {
    reg_ = new IntervalVector(X);
-   lower_ = Double::neginf();
-   upper_ = Double::inf();
 }
 
-BONode::BONode(const BONode& node) : SearchNode(node)
+BONode::BONode(const BONode& node)
+      : SearchNode(node),
+        scope_(node.scope_),
+        objvar_(node.objvar_),
+        reg_(nullptr),
+        lower_(node.lower_),
+        upper_(node.upper_)
 {
    reg_ = new IntervalVector(*node.reg_);
-   lower_ = node.lower_;
-   upper_ = node.upper_;
 }
 
 BONode::~BONode()
@@ -55,6 +64,17 @@ IntervalVector* BONode::getRegion() const
 {
    return reg_;
 }
+
+Scope BONode::getScope() const
+{
+   return scope_;
+}
+
+Variable BONode::getObjVar() const
+{
+   return objvar_;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const BONode& node)
 {

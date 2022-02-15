@@ -15,7 +15,7 @@
 #include "realpaver/interval.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealVector.hpp"
-#include "realpaver/scope.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 

@@ -23,6 +23,8 @@ Param::Param() : path_(""), lineno_(0), tolmap_(), intmap_(), dblmap_()
    tolmap_.insert(std::make_pair("DTOL", Tolerance::makeRel(1.0e-8)));
 
    intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
+
+   dblmap_.insert(std::make_pair("TIME_LIMIT", 100.0));
 }
 
 Param::~Param()

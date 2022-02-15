@@ -50,7 +50,7 @@ public:
    /// creates a new problem with a new set of variables.
    bool apply(const Problem& src, Problem& dest);
 
-   /// Crestes a simplified problem from an initial problem
+   /// Creates a simplified problem from an initial problem
    /// @param src initial problem
    /// @param X the variable domains
    /// @param dest simplified problem

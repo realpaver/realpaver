@@ -11,7 +11,7 @@
 #define REALPAVER_REAL_FUNCTION_HPP
 
 #include "realpaver/RealVector.hpp"
-#include "realpaver/scope.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 

@@ -1,19 +1,30 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
-#include "realpaver/scope.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
-ScopeRep::ScopeRep() : m_(), scopeMap_(nullptr), minid_(0), maxid_(0)
+ScopeRep::ScopeRep()
+      : m_(),
+        scopeMap_(nullptr),
+        minid_(0),
+        maxid_(0)
 {}
 
-ScopeRep::ScopeRep(const ScopeRep& other) :
-   m_(other.m_),
-   scopeMap_(nullptr),
-   minid_(other.minid_),
-   maxid_(other.maxid_)
+ScopeRep::ScopeRep(const ScopeRep& other)
+      : m_(other.m_),
+        scopeMap_(nullptr),
+        minid_(other.minid_),
+        maxid_(other.maxid_)
 {
    if (other.scopeMap_ != nullptr)
       scopeMap_ = other.scopeMap_->clone();
@@ -48,6 +59,38 @@ void ScopeRep::makeMap()
       for (auto it : m_) aux->insert(it.first.getId());
       scopeMap_ = aux;
    }
+}
+
+size_t ScopeRep::size() const
+{
+   return m_.size();
+}
+
+size_t ScopeRep::index(const Variable& v) const
+{
+   return scopeMap_->index(v.getId());
+}
+
+size_t ScopeRep::minIndex() const
+{
+   return minid_;
+}
+
+size_t ScopeRep::maxIndex() const
+{
+   return maxid_;
+}
+
+typename ScopeRep::const_iterator
+ScopeRep::begin() const
+{
+   return const_iterator(m_.cbegin());
+}
+
+typename ScopeRep::const_iterator
+ScopeRep::end() const
+{
+   return const_iterator(m_.cend());   
 }
 
 void ScopeRep::insert(const Variable& v, size_t n)
@@ -152,8 +195,8 @@ void ScopeRep::print(std::ostream& os) const
 Scope::Scope() : rep_(std::make_shared< ScopeRep >())
 {}
 
-Scope::Scope(const std::initializer_list<Variable>& l) :
-   rep_(std::make_shared<ScopeRep>())
+Scope::Scope(const std::initializer_list<Variable>& l)
+      : rep_(std::make_shared<ScopeRep>())
 {
    for (Variable v : l)
       insert(v);
@@ -161,6 +204,81 @@ Scope::Scope(const std::initializer_list<Variable>& l) :
 
 Scope::Scope(std::shared_ptr<ScopeRep> rep) : rep_(rep)
 {}
+
+void Scope::insert(const Variable& v)
+{
+   rep_->insert(v,1);
+}
+
+void Scope::insert(const Variable& v, size_t n)
+{
+   rep_->insert(v,n);
+}
+
+void Scope::remove(const Variable& v)
+{
+   rep_->remove(v);
+}
+
+void Scope::remove(const Variable& v, size_t n)
+{
+   rep_->remove(v,n);
+}
+
+size_t Scope::size() const
+{
+   return rep_->size();
+}
+
+bool Scope::isEmpty() const
+{
+   return size() == 0;
+}
+
+bool Scope::contains(const Variable& v) const
+{
+   return find(v) != end();
+}
+
+size_t Scope::minIndex() const
+{
+   return rep_->minIndex();
+}
+
+size_t Scope::maxIndex() const
+{
+   return rep_->maxIndex();
+}
+
+void Scope::resetCountAll()
+{
+   rep_->resetCountAll();
+}
+
+void Scope::print(std::ostream& os) const
+{
+   rep_->print(os);
+}
+
+typename Scope::const_iterator Scope::begin() const
+{
+   return rep_->begin();
+}
+
+typename Scope::const_iterator Scope::end() const
+{
+   return rep_->end();   
+}
+
+typename Scope::const_iterator Scope::find(const Variable& v) const
+{
+   return rep_->find(v);
+}
+
+size_t Scope::index(const Variable& v) const
+{
+   return rep_->index(v);
+}
 
 void Scope::insert(const std::initializer_list<Variable>& l)
 {
@@ -171,13 +289,13 @@ void Scope::insert(const std::initializer_list<Variable>& l)
 void Scope::insert(const Scope& other)
 {
    for (Variable v : other)
-      insert(v,other.count(v));
+      insert(v, other.count(v));
 }
 
 void Scope::remove(const Scope& other)
 {
    for (Variable v : other)
-      remove(v,other.count(v));
+      remove(v, other.count(v));
 }
 
 size_t Scope::count(const Variable& v) const
@@ -199,7 +317,7 @@ Bitset Scope::toBitset() const
 void Scope::resetCount(const Variable& v)
 {
    ASSERT(contains(v),
-          "no variable '" << v.getName() << "' belongs to this scope");
+          "Variable " << v.getName() << " does not belong to this scope");
 
    rep_->resetCount(v);
 }
@@ -208,7 +326,7 @@ Scope Scope::clone() const
 {
    Scope s;
    for (auto it = begin(); it != end(); ++it)
-      s.insert(it.var(),it.count());
+      s.insert(it.var(), it.count());
 
    return s;
 }

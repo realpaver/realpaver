@@ -12,6 +12,7 @@
 
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/SearchNode.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
@@ -27,8 +28,10 @@ namespace realpaver {
 class BONode : public SearchNode {
 public:
    /// Creates a node
+   /// @param scope set of variables of the optimization problem
+   /// @param variable representing the objective function
    /// @param X vector of domains
-   BONode(const IntervalVector& X);
+   BONode(const Scope& scope, const Variable& objvar, const IntervalVector& X);
 
    /// Copy constructor
    BONode(const BONode& node);
@@ -56,7 +59,15 @@ public:
    /// @return the vector of domains of this
    IntervalVector* getRegion() const;
 
+   /// @return the scope of this
+   Scope getScope() const;
+
+   /// @return the objective variable of this
+   Variable getObjVar() const;
+
 private:
+   Scope scope_;
+   Variable objvar_;
    IntervalVector* reg_;
    double lower_;
    double upper_;

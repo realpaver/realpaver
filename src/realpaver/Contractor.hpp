@@ -13,7 +13,7 @@
 #include <memory>
 #include "realpaver/Bitset.hpp"
 #include "realpaver/IntervalVector.hpp"
-#include "realpaver/scope.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 

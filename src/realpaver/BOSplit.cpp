@@ -11,10 +11,11 @@
 
 namespace realpaver {
 
-BOSplit::BOSplit()
+BOSplit::BOSplit(const Scope& scope)
+      : SplitStrategy<SharedBONode>(),
+        scope_(scope)
 {
-   // TODO
-   // split sur un scope de variables
+   ASSERT(!scope.isEmpty(), "Empty scope in a split object");
 }
 
 BOSplit::~BOSplit()
@@ -22,9 +23,10 @@ BOSplit::~BOSplit()
    // TODO   
 }
 
-bool applyImpl(SharedBONode node)
+bool BOSplit::applyImpl(SharedBONode node)
 {
-   // TODO
+   ASSERT(scope_.maxIndex()<node->getRegion()->size(),
+          "Inconsistency between scope and region in a BO node");
    
    
    // selectionner alternativement avec une frequence la stratégie

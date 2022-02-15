@@ -9,6 +9,7 @@
 
 #include "realpaver/BOPresolver.hpp"
 #include "realpaver/BOSolver.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
 
 namespace realpaver {
@@ -22,7 +23,10 @@ BOSolver::BOSolver(Problem& problem)
         sol_(problem.nbVars()),
         objval_(Interval::universe()),
         vmap21_(),
-        vmap31_()
+        vmap31_(),
+        ptimer_(),
+        stimer_(),
+        maxseconds_(Param::getDblParam("TIME_LIMIT"))
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
@@ -31,6 +35,16 @@ BOSolver::BOSolver(Problem& problem)
 BOSolver::~BOSolver()
 {
    if (model_ != nullptr) delete model_;
+}
+
+double BOSolver::getPreprocessingTime() const
+{
+   return ptimer_.elapsedTime();
+}
+
+double BOSolver::getSolvingTime() const
+{
+   return stimer_.elapsedTime();
 }
 
 bool BOSolver::preprocess()
@@ -131,13 +145,50 @@ bool BOSolver::presolve()
    return true;
 }
 
+bool BOSolver::bbStep(BOSpace& space)
+{
+   
+   // TODO
+   // attention on retourne faux si la resolution termine
+
+   return false;
+}
+
+void BOSolver::branchAndBound()
+{
+   // creates the initial node
+   SharedBONode node = std::make_shared<BONode>(model_->getFullScope(),
+                                                model_->getObjVar(),
+                                                model_->getInitRegion());
+
+   BOSpace space;
+   space.insertNode(node);
+
+   bool iter = true;
+
+   do
+   {
+      iter = bbStep(space);
+
+      if (iter &&
+          ptimer_.elapsedTime() + stimer_.elapsedTime() > getMaxSeconds())
+      {
+         iter = false;
+         status_ = OptimizationStatus::StopOnTimeLimit;
+      }
+   }
+   while (iter);
+}
+
 void BOSolver::solve()
 {
    delete model_;
 
+   // creates the solving model
    model_ = new BOModel(solprob_, true);
 
-   for (auto it=vmap31_.begin(); it != vmap31_.end(); ++it)
+   // manages the status of every variable: interior or boundary
+   for (auto it = vmap31_.begin(); it != vmap31_.end(); ++it)
    {   
       Variable sv = it->first;
       Variable v = it->second;
@@ -153,7 +204,10 @@ void BOSolver::solve()
       {
          model_->setBoundaryVar(sv);
       }
-   }   
+   }
+
+   // search
+   branchAndBound();
 }
 
 bool BOSolver::optimize()
@@ -161,6 +215,7 @@ bool BOSolver::optimize()
    DEBUG("---------- Input problem\n" << problem_);
 
    status_ = OptimizationStatus::Other;
+   ptimer_.start();
 
    // first phase: preprocessing
    bool pfeasible = preprocess();
@@ -168,6 +223,7 @@ bool BOSolver::optimize()
    if (status_ == OptimizationStatus::Infeasible ||
        status_ == OptimizationStatus::Optimal)
    {
+      ptimer_.stop();
       return pfeasible;
    }
 
@@ -179,16 +235,19 @@ DEBUG("\n---------- Simplified problem\n" << preprob_);
    if (status_ == OptimizationStatus::Infeasible ||
        status_ == OptimizationStatus::Optimal)
    {
+      ptimer_.stop();
       return sfeasible;
    }
 
 DEBUG("\n---------- Presolved problem\n" << solprob_);
 
-
+   ptimer_.stop();
+   stimer_.start();
 
    // third phase: solving
    solve();
 
+   stimer_.stop();
 
 DEBUG("\nEND OF OPTIMIZATION");
 DEBUG("sol = " << sol_ << "\n\n");
@@ -203,12 +262,14 @@ OptimizationStatus BOSolver::getStatus() const
 
 void BOSolver::setMaxSeconds(double s)
 {
-   // TODO
+   ASSERT(s > 0.0, "Bad time limit for a BO solver");
+
+   maxseconds_ = s;
 }
 
 double BOSolver::getMaxSeconds() const
 {
-   // TODO
+   return maxseconds_;
 }
 
 Interval BOSolver::getObjEnclosure() const

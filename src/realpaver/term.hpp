@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include "realpaver/IntervalVector.hpp"
-#include "realpaver/scope.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 

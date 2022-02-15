@@ -11,15 +11,20 @@
 #define REALPAVER_BO_SOLVER_HPP
 
 #include "realpaver/BOModel.hpp"
+#include "realpaver/BOSpace.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/Timer.hpp"
 
 namespace realpaver {
 
 class BOSolver {
 public:
+   /// Creates a solver
+   /// @param problem a bound optimization problem
    BOSolver(Problem& problem);
 
+   /// Destructor
    ~BOSolver();
 
    /// Optimization method
@@ -42,6 +47,12 @@ public:
    /// @return the best point found by the optimization process
    RealVector getBestSolution() const;
 
+   /// @return the preprocessing time in seconds
+   double getPreprocessingTime() const;
+
+   /// @return the solving time in seconds
+   double getSolvingTime() const;
+
 private:
    Problem problem_;    // initial problem
    Problem preprob_;    // problem resulting from preprocessing
@@ -56,6 +67,8 @@ private:
    bool preprocess();
    bool presolve();
    void solve();
+   void branchAndBound();
+   bool bbStep(BOSpace& space);
 
    typedef Preprocessor::VarVarMapType VarVarMapType;
 
@@ -66,6 +79,12 @@ private:
    // Maps every variable of the presolved prolem to the associated
    // variable in the initial problem
    VarVarMapType vmap31_;
+
+   // Timings
+   Timer ptimer_;       // timer for the preprocessing phase
+   Timer stimer_;       // timer for the solving phase
+
+   double maxseconds_;  // time limit
 };
 
 } // namespace

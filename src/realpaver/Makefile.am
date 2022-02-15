@@ -24,9 +24,7 @@ lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir=$(includedir)/realpaver
 
 librealpaver_la_include_HEADERS = \
-		bco_dag.hpp \
 		bco_local.hpp \
-		bco_model.hpp \
 		Bitset.hpp \
 		BOContractor.hpp \
 		BOModel.hpp \
@@ -74,8 +72,8 @@ librealpaver_la_include_HEADERS = \
 		propagator.hpp \
 		RealFunction.hpp \
 		RealVector.hpp \
-		scope.hpp \
-		scope_map.hpp \
+		Scope.hpp \
+		ScopeMap.hpp \
 		SearchNode.hpp \
 		SplitStrategy.hpp \
 		term.hpp \
@@ -101,9 +99,7 @@ endif
 
 librealpaver_la_SOURCES = \
 		AssertDebug.hpp \
-		bco_dag.cpp \
 		bco_local.cpp \
-		bco_model.cpp \
 		Bitset.cpp \
 		BOContractor.cpp \
 		BOModel.cpp \
@@ -143,8 +139,8 @@ librealpaver_la_SOURCES = \
 		propagator.cpp \
 		RealFunction.cpp \
 		RealVector.cpp \
-		scope.cpp \
-		scope_map.cpp \
+		Scope.cpp \
+		ScopeMap.cpp \
 		SearchNode.cpp \
 		term.cpp \
 		TermDeriver.cpp \

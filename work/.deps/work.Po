@@ -197,19 +197,19 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  ../src/realpaver/config.hpp ../src/realpaver/configure.hpp \
  ../src/realpaver/Common.hpp ../src/realpaver/LinumTraits.hpp \
  ../src/realpaver/RealVector.hpp ../src/realpaver/Double.hpp \
- /usr/include/c++/7/cfenv ../src/realpaver/scope.hpp \
+ /usr/include/c++/7/cfenv ../src/realpaver/Scope.hpp \
  /usr/include/c++/7/map /usr/include/c++/7/bits/stl_tree.h \
  /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
- ../src/realpaver/scope_map.hpp ../src/realpaver/Variable.hpp \
+ ../src/realpaver/ScopeMap.hpp ../src/realpaver/Variable.hpp \
  ../src/realpaver/Tolerance.hpp ../src/realpaver/Objective.hpp \
  ../src/realpaver/contractor_bc3.hpp ../src/realpaver/Contractor.hpp \
  ../src/realpaver/IntervalNewton.hpp ../src/realpaver/Inflator.hpp \
- ../src/realpaver/uni_fun.hpp ../src/realpaver/interval_slicer.hpp \
+ ../src/realpaver/uni_fun.hpp ../src/realpaver/IntervalSlicer.hpp \
  /usr/include/c++/7/list /usr/include/c++/7/bits/stl_list.h \
  /usr/include/c++/7/bits/list.tcc ../src/realpaver/thick_fun.hpp \
  ../src/realpaver/dag.hpp /usr/include/c++/7/unordered_set \
  /usr/include/c++/7/bits/unordered_set.h \
- ../src/realpaver/contractor_bc4.hpp ../src/realpaver/contractor_hc4.hpp \
+ ../src/realpaver/contractor_bc4.hpp ../src/realpaver/HC4Contractor.hpp \
  ../src/realpaver/Logger.hpp /usr/include/c++/7/fstream \
  /usr/include/c++/7/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
@@ -219,13 +219,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  ../src/realpaver/Timer.hpp /usr/include/c++/7/chrono \
  /usr/include/c++/7/ratio /usr/include/c++/7/ctime \
  /usr/include/c++/7/bits/parse_numbers.h \
- ../src/realpaver/contractor_int.hpp ../src/realpaver/bco_model.hpp \
- ../src/realpaver/bco_dag.hpp ../src/realpaver/BOContractor.hpp \
- ../src/realpaver/propagator.hpp ../src/realpaver/contractor_pool.hpp \
- ../src/realpaver/RealFunction.hpp ../src/realpaver/bco_local.hpp \
- ../src/realpaver/BOSpace.hpp /usr/include/c++/7/set \
- /usr/include/c++/7/bits/stl_set.h /usr/include/c++/7/bits/stl_multiset.h \
- ../src/realpaver/BONode.hpp ../src/realpaver/Param.hpp
+ ../src/realpaver/contractor_int.hpp ../src/realpaver/Param.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -733,7 +727,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/cfenv:
 
-../src/realpaver/scope.hpp:
+../src/realpaver/Scope.hpp:
 
 /usr/include/c++/7/map:
 
@@ -743,7 +737,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/stl_multimap.h:
 
-../src/realpaver/scope_map.hpp:
+../src/realpaver/ScopeMap.hpp:
 
 ../src/realpaver/Variable.hpp:
 
@@ -761,7 +755,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/uni_fun.hpp:
 
-../src/realpaver/interval_slicer.hpp:
+../src/realpaver/IntervalSlicer.hpp:
 
 /usr/include/c++/7/list:
 
@@ -779,7 +773,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/contractor_bc4.hpp:
 
-../src/realpaver/contractor_hc4.hpp:
+../src/realpaver/HC4Contractor.hpp:
 
 ../src/realpaver/Logger.hpp:
 
@@ -810,29 +804,5 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/c++/7/bits/parse_numbers.h:
 
 ../src/realpaver/contractor_int.hpp:
-
-../src/realpaver/bco_model.hpp:
-
-../src/realpaver/bco_dag.hpp:
-
-../src/realpaver/BOContractor.hpp:
-
-../src/realpaver/propagator.hpp:
-
-../src/realpaver/contractor_pool.hpp:
-
-../src/realpaver/RealFunction.hpp:
-
-../src/realpaver/bco_local.hpp:
-
-../src/realpaver/BOSpace.hpp:
-
-/usr/include/c++/7/set:
-
-/usr/include/c++/7/bits/stl_set.h:
-
-/usr/include/c++/7/bits/stl_multiset.h:
-
-../src/realpaver/BONode.hpp:
 
 ../src/realpaver/Param.hpp:

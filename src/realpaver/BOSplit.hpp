@@ -28,7 +28,10 @@ public:
    typedef SharedBONode NodeType;
 
    /// Creates a splitting object
-   BOSplit();
+   /// @param scope set of variables whose domains are split
+   ///
+   /// The tolerances are taken from the variables.
+   BOSplit(const Scope& scope);
 
    /// Destructor
    ~BOSplit();
@@ -41,6 +44,9 @@ public:
 
    /// Overrides
    bool applyImpl(SharedBONode node);
+
+private:
+   Scope scope_;
 };
 
 } // namespace
