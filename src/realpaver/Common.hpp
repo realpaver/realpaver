@@ -54,15 +54,15 @@ struct Integer {
    }
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a certificate returned by solvers of optimization problems.
 ///////////////////////////////////////////////////////////////////////////////
 enum class OptimizationStatus {
    Optimal,
    Infeasible,
-   StopOnTimeLimit,
    StopOnIterLimit,
+   StopOnNodeLimit,
+   StopOnTimeLimit,
    Other
 };
 

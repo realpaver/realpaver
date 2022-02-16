@@ -74,6 +74,9 @@ public:
    /// u upper bound of the optimal value (we seek for minimum)
    void simplify(const double& u);
 
+   /// @return the number of nodes inserted in this
+   int getNodeCount() const;
+
 private:
    struct Item {
       SharedBONode node;
@@ -102,12 +105,13 @@ private:
 
    typedef std::unordered_map<size_t, SpaceIter> SpaceMap;
 
-   SpaceLo lo_;   // set of nodes sorted wrt. the lower bounds
-   SpaceUp up_;   // set of nodes sorted wrt. the upper bounds
-   SpaceMap ma_;  // auxiliary map
-   size_t id_;    // next id
-   size_t ex_;    // counts the extractions
-   size_t f_;     // frequency
+   SpaceLo lo_;         // set of nodes sorted wrt. the lower bounds
+   SpaceUp up_;         // set of nodes sorted wrt. the upper bounds
+   SpaceMap ma_;        // auxiliary map
+   size_t id_;          // next id
+   size_t ex_;          // counts the extractions
+   size_t f_;           // frequency
+   int nodecount_;      // counter of nodes inserted in this
 
    // extracts the i-th node from this space
    SharedBONode extractNode(size_t i);

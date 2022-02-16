@@ -1,13 +1,25 @@
 #include <iostream>
 #include "realpaver/BOSolver.hpp"
+#include "realpaver/Logger.hpp"
+#include "realpaver/Param.hpp"
 
 using namespace realpaver;
 using namespace std;
 
 int main(void)
 {
-   try
-   {
+   Logger::init(LogLevel::internal, "bop.log");
+   Interval::precision( 16 );
+
+   try {
+      Param::init("../src/realpaver/settings.txt");
+      Param::print(cout);
+   }
+   catch (Exception ex) {
+      cout << ex.what() << endl;
+   }
+
+   try {
       Problem problem;
 
       Variable x = problem.addRealVar(-10,  4, "x"),
@@ -30,8 +42,7 @@ int main(void)
               << endl;
       }
    }
-   catch(Exception e)
-   {
+   catch(Exception e) {
       cout << e.what() << endl;
    }
 

@@ -17,7 +17,13 @@ namespace realpaver {
 
 Param Param::instance_;
 
-Param::Param() : path_(""), lineno_(0), tolmap_(), intmap_(), dblmap_()
+Param::Param()
+      : path_(""),
+        lineno_(0),
+        tolmap_(),
+        intmap_(),
+        dblmap_(),
+        strmap_()
 {
    tolmap_.insert(std::make_pair("XTOL", Tolerance::makeRel(1.0e-8)));
    tolmap_.insert(std::make_pair("DTOL", Tolerance::makeRel(1.0e-8)));
@@ -25,6 +31,8 @@ Param::Param() : path_(""), lineno_(0), tolmap_(), intmap_(), dblmap_()
    intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
 
    dblmap_.insert(std::make_pair("TIME_LIMIT", 100.0));
+
+   strmap_.insert(std::make_pair("SPLIT_OBJ_VAR", "NO"));
 }
 
 Param::~Param()
@@ -68,6 +76,26 @@ void Param::setDblParam(const string& name, double val)
       THROW("'" << name << "' is not a real parameter");
 
    instance_.dblmap_[name] = val;
+}
+
+std::string Param::getStrParam(const string& name)
+{
+   auto it = instance_.strmap_.find(name);
+
+   if (it == instance_.strmap_.end())
+      THROW("'" << name << "' is not a string parameter");
+
+   return it->second;      
+}
+
+void Param::setStrParam(const string& name, const std::string& val)
+{
+   auto it = instance_.strmap_.find(name);
+
+   if (it == instance_.strmap_.end())
+      THROW("'" << name << "' is not a string parameter");
+
+   instance_.strmap_[name] = val;   
 }
 
 Tolerance Param::getTolParam(const string& name)
@@ -168,6 +196,14 @@ void Param::processParam(const std::string& name, const std::string& val)
       {
          throwEx();
       }
+   }
+
+   // String
+   auto its = instance_.strmap_.find(name);
+   if (its != strmap_.end())
+   {
+      strmap_[name] = val;
+      return;
    }
 
    // Tolerance: name has a prefix ABS_ or REL_
@@ -284,17 +320,22 @@ void Param::print(std::ostream& os)
    for (auto it = instance_.intmap_.begin();
              it != instance_.intmap_.end();
              ++it)
-      os << it-> first << " = " << it->second << "\n\n";
-
-   if (instance_.intmap_.empty()) os << "\n";
+      os << it-> first << " = " << it->second << "\n";
+   os << "\n";
 
    os << "# Double parameters\n";
    for (auto it = instance_.dblmap_.begin();
              it != instance_.dblmap_.end();
              ++it)
-      os << it-> first << " = " << it->second << "\n\n";
+      os << it-> first << " = " << it->second << "\n";
+   os << "\n";
 
-   if (instance_.dblmap_.empty()) os << "\n";
+   os << "# String parameters\n";
+   for (auto it = instance_.strmap_.begin();
+             it != instance_.strmap_.end();
+             ++it)
+      os << it-> first << " = " << it->second << "\n";
+   os << "\n";
 
    os << "# Tolerances\n";
    for (auto it = instance_.tolmap_.begin();
@@ -307,10 +348,9 @@ void Param::print(std::ostream& os)
       else
          os << "REL_";
 
-      os << it-> first << " = " << tol.getVal() << "\n\n";
+      os << it-> first << " = " << tol.getVal() << "\n";
    }
-
-   if (instance_.tolmap_.empty()) os << "\n";
+   os << "\n";
 }
 
 } // namespace

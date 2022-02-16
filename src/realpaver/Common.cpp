@@ -25,8 +25,9 @@ std::ostream& operator<<(std::ostream& os, const OptimizationStatus& status)
    {
       case OptimizationStatus::Optimal:         return os << "Optimal";
       case OptimizationStatus::Infeasible:      return os << "Infeasible";
-      case OptimizationStatus::StopOnTimeLimit: return os << "StopOnTimeLimit";
       case OptimizationStatus::StopOnIterLimit: return os << "StopOnIterLimit";
+      case OptimizationStatus::StopOnTimeLimit: return os << "StopOnTimeLimit";
+      case OptimizationStatus::StopOnNodeLimit: return os << "StopOnNodeLimit";
       case OptimizationStatus::Other:           return os << "Other";
    }
    return os;

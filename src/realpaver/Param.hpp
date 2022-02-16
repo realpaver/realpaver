@@ -58,6 +58,16 @@ public:
    /// @param val value assigned
    static void setTolParam(const string& name, const Tolerance& val);
 
+   /// Gets the value of a string parameter
+   /// @param name name of parameter
+   /// @return value of parameter
+   static std::string getStrParam(const string& name);
+
+   /// Sets the value of a string parameter
+   /// @param name name of parameter
+   /// @param val value assigned
+   static void setStrParam(const string& name, const std::string& val);
+
    /// Writes the parameters onna stream
    /// @param os output stream
    static void print(std::ostream& os);
@@ -85,6 +95,9 @@ private:
 
    // map of doubles
    std::unordered_map<std::string, double> dblmap_;
+
+   // map of strings
+   std::unordered_map<std::string, std::string> strmap_;
 
    // processing of lines in a settings file
    void processParam(const std::string& name, const std::string& val);

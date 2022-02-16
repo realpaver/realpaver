@@ -35,11 +35,11 @@ public:
    OptimizationStatus getStatus() const;
 
    /// Sets a time limit of the optimization method
-   /// @param s a time limit in seconds
-   void setMaxSeconds(double s);
+   /// @param t a time limit in seconds
+   void setTimeLimit(double t);
 
-   /// @return the time limit of the optimization method
-   double getMaxSeconds() const;
+   /// @return the time limit of the optimization method in seconds
+   double getTimeLimit() const;
 
    /// @return the enclosure of the optimum after the optimization process
    Interval getObjEnclosure() const;
@@ -53,6 +53,20 @@ public:
    /// @return the solving time in seconds
    double getSolvingTime() const;
 
+   /// @return the maximum number of nodes in the search tree
+   int getNodeLimit() const;
+
+   /// Sets the maximum number of nodes in the search tree
+   /// @param limit new node limit
+   void setNodeLimit(int limit);
+
+   /// @return true if the domain of the objective variable is split
+   bool getSplitObjVar() const;
+
+   /// Sets the splitting status of the objective variable
+   /// @param split true if the domain of the objective variable is split
+   void setSplitObjVar(bool split);
+
 private:
    Problem problem_;    // initial problem
    Problem preprob_;    // problem resulting from preprocessing
@@ -60,10 +74,12 @@ private:
 
    BOModel* model_;
 
+   // Result of optimization
    OptimizationStatus status_;
    IntervalVector sol_;
    Interval objval_;
 
+   // Auxiliary methods
    bool preprocess();
    bool presolve();
    void solve();
@@ -81,10 +97,12 @@ private:
    VarVarMapType vmap31_;
 
    // Timings
-   Timer ptimer_;       // timer for the preprocessing phase
-   Timer stimer_;       // timer for the solving phase
+   Timer ptimer_;      // timer for the preprocessing phase
+   Timer stimer_;      // timer for the solving phase
+   double timelimit_;  // time limit in seconds
 
-   double maxseconds_;  // time limit
+   int nodelimit_;     // node limit
+   bool splitobjvar_;  // true if the domain of the objective variable is split
 };
 
 } // namespace

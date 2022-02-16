@@ -26,7 +26,9 @@ BOSolver::BOSolver(Problem& problem)
         vmap31_(),
         ptimer_(),
         stimer_(),
-        maxseconds_(Param::getDblParam("TIME_LIMIT"))
+        timelimit_(Param::getDblParam("TIME_LIMIT")),
+        nodelimit_(Param::getIntParam("NODE_LIMIT")),
+        splitobjvar_(Param::getStrParam("SPLIT_OBJ_VAR") == "YES")
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
@@ -45,6 +47,28 @@ double BOSolver::getPreprocessingTime() const
 double BOSolver::getSolvingTime() const
 {
    return stimer_.elapsedTime();
+}
+
+int BOSolver::getNodeLimit() const
+{
+   return nodelimit_;
+}
+
+void BOSolver::setNodeLimit(int limit)
+{
+   ASSERT(limit > 0, "Bad node limit in a BO solver");
+
+   nodelimit_ = limit;
+}
+
+bool BOSolver::getSplitObjVar() const
+{
+   return splitobjvar_;
+}
+
+void BOSolver::setSplitObjVar(bool split)
+{
+   splitobjvar_ = split;
 }
 
 bool BOSolver::preprocess()
@@ -157,10 +181,22 @@ bool BOSolver::bbStep(BOSpace& space)
 void BOSolver::branchAndBound()
 {
    // creates the initial node
-   SharedBONode node = std::make_shared<BONode>(model_->getFullScope(),
-                                                model_->getObjVar(),
-                                                model_->getInitRegion());
+   SharedBONode node;
+ 
+   if (getSplitObjVar())
+   {   
+      node = std::make_shared<BONode>(model_->getFullScope(),
+                                      model_->getObjVar(),
+                                      model_->getInitRegion());
+   }
+   else
+   {   
+      node = std::make_shared<BONode>(model_->getObjScope(),
+                                      model_->getObjVar(),
+                                      model_->getInitRegion());
+   }
 
+   // creates the optimization space
    BOSpace space;
    space.insertNode(node);
 
@@ -171,10 +207,16 @@ void BOSolver::branchAndBound()
       iter = bbStep(space);
 
       if (iter &&
-          ptimer_.elapsedTime() + stimer_.elapsedTime() > getMaxSeconds())
+          ptimer_.elapsedTime() + stimer_.elapsedTime() > getTimeLimit())
       {
          iter = false;
          status_ = OptimizationStatus::StopOnTimeLimit;
+      }
+
+      if (iter && space.getNodeCount() > nodelimit_)
+      {
+         iter = false;
+         status_ = OptimizationStatus::StopOnNodeLimit;
       }
    }
    while (iter);
@@ -260,16 +302,16 @@ OptimizationStatus BOSolver::getStatus() const
    return status_;
 }
 
-void BOSolver::setMaxSeconds(double s)
+void BOSolver::setTimeLimit(double t)
 {
-   ASSERT(s > 0.0, "Bad time limit for a BO solver");
+   ASSERT(t > 0.0, "Bad time limit for a BO solver");
 
-   maxseconds_ = s;
+   timelimit_ = t;
 }
 
-double BOSolver::getMaxSeconds() const
+double BOSolver::getTimeLimit() const
 {
-   return maxseconds_;
+   return timelimit_;
 }
 
 Interval BOSolver::getObjEnclosure() const
