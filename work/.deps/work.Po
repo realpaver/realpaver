@@ -140,7 +140,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/stl_uninitialized.h \
  /usr/include/c++/7/bits/stl_vector.h \
  /usr/include/c++/7/bits/stl_bvector.h /usr/include/c++/7/bits/vector.tcc \
- ../src/realpaver/constraint.hpp ../src/realpaver/term.hpp \
+ ../src/realpaver/Constraint.hpp ../src/realpaver/term.hpp \
  ../src/realpaver/IntervalVector.hpp /usr/include/c++/7/memory \
  /usr/include/c++/7/bits/stl_tempbuf.h \
  /usr/include/c++/7/bits/stl_raw_storage_iter.h \
@@ -584,7 +584,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 /usr/include/c++/7/bits/vector.tcc:
 
-../src/realpaver/constraint.hpp:
+../src/realpaver/Constraint.hpp:
 
 ../src/realpaver/term.hpp:
 

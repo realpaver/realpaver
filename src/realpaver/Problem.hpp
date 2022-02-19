@@ -12,7 +12,7 @@
 
 #include <unordered_map>
 #include <vector>
-#include "realpaver/constraint.hpp"
+#include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/Objective.hpp"
 

@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <vector>
 #include "realpaver/Bitset.hpp"
-#include "realpaver/constraint.hpp"
+#include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/RealVector.hpp"
 

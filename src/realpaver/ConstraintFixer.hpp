@@ -10,7 +10,7 @@
 #ifndef REALPAVER_CONSTRAINT_FIXER_HPP
 #define REALPAVER_CONSTRAINT_FIXER_HPP
 
-#include "realpaver/constraint.hpp"
+#include "realpaver/Constraint.hpp"
 #include "realpaver/TermFixer.hpp"
 
 namespace realpaver {

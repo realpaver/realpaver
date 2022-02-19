@@ -35,7 +35,7 @@ librealpaver_la_include_HEADERS = \
 		BOSplit.hpp \
 		Common.hpp \
 		config.hpp \
-		constraint.hpp \
+		Constraint.hpp \
 		ConstraintFixer.hpp \
 		ConstraintRelaxor.hpp \
 		Contractor.hpp \
@@ -109,7 +109,7 @@ librealpaver_la_SOURCES = \
 		BOSpace.cpp \
 		BOSplit.cpp \
 		Common.cpp \
-		constraint.cpp \
+		Constraint.cpp \
 		ConstraintFixer.cpp \
 		ConstraintRelaxor.cpp \
 		Contractor.cpp \

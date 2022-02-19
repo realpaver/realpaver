@@ -1,7 +1,14 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/constraint.hpp"
+#include "realpaver/Constraint.hpp"
 
 namespace realpaver {
 
@@ -22,11 +29,29 @@ std::ostream& operator<<(std::ostream& os, const RelSymbol& s)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintRep::ConstraintRep() : scope_(), bs_(), hcode_(0)
+ConstraintRep::ConstraintRep()
+      : scope_(),
+        bs_(),
+        hcode_(0)
 {}
 
 ConstraintRep::~ConstraintRep()
 {}
+
+size_t ConstraintRep::hashCode() const
+{
+   return hcode_;
+}
+
+Bitset ConstraintRep::bitset() const
+{
+   return bs_;
+}
+
+Scope ConstraintRep::scope() const
+{
+   return scope_;
+}
 
 void ConstraintRep::setScope(const Scope& s)
 {
@@ -59,6 +84,66 @@ bool ConstraintRep::isLinear() const
 Constraint::Constraint(const SharedRep& rep) : rep_(rep)
 {}
 
+Constraint::SharedRep Constraint::rep() const
+{
+   return rep_;
+}
+
+size_t Constraint::hashCode() const
+{
+   return rep_->hashCode();
+}
+
+Scope Constraint::scope() const
+{
+   return rep_->scope();
+}
+
+Bitset Constraint::bitset() const
+{
+   return rep_->bitset();
+}
+
+bool Constraint::isConstant() const
+{
+   return rep_->isConstant();
+}
+
+void Constraint::print(std::ostream& os) const
+{
+   rep_->print(os);
+}
+
+void Constraint::acceptVisitor(ConstraintVisitor& vis) const
+{
+   rep_->acceptVisitor(vis);
+}
+
+Proof Constraint::isSatisfied(const IntervalVector& X) const
+{
+   return rep_->isSatisfied(X);
+}
+
+bool Constraint::dependsOn(const Variable& v) const
+{
+   return rep_->dependsOn(v);
+}
+
+bool Constraint::isEquation() const
+{
+   return rep_->isEquation();
+}
+
+bool Constraint::isInequality() const
+{
+   return rep_->isInequality();
+}
+
+bool Constraint::isLinear() const
+{
+   return rep_->isLinear();
+}
+
 std::ostream& operator<<(std::ostream& os, const Constraint& c)
 {
    c.print(os);
@@ -67,9 +152,11 @@ std::ostream& operator<<(std::ostream& os, const Constraint& c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintBin::ConstraintBin(const Term& l, const Term& r,
-                                   RelSymbol rel) :
-   ConstraintRep(), l_(l), r_(r), rel_(rel)
+ConstraintBin::ConstraintBin(const Term& l, const Term& r, RelSymbol rel)
+      : ConstraintRep(),
+        l_(l),
+        r_(r),
+        rel_(rel)
 {
    hcode_ = static_cast<size_t>(rel);
    hcode_ = hash2(l.hashCode(), hcode_);
@@ -83,6 +170,26 @@ ConstraintBin::ConstraintBin(const Term& l, const Term& r,
 
 ConstraintBin::~ConstraintBin()
 {}
+
+Term ConstraintBin::left() const
+{
+   return l_;
+}
+
+Term ConstraintBin::right() const
+{
+   return r_;
+}
+
+RelSymbol ConstraintBin::relSymbol() const
+{
+   return rel_;
+}
+
+bool ConstraintBin::isConstant() const
+{
+   return l_.isConstant() && r_.isConstant();
+}
 
 void ConstraintBin::print(std::ostream& os) const
 {
@@ -115,8 +222,8 @@ bool ConstraintBin::isLinear() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintEq::ConstraintEq(const Term& l, const Term& r) :
-   ConstraintBin(l, r, RelSymbol::Eq)
+ConstraintEq::ConstraintEq(const Term& l, const Term& r)
+      : ConstraintBin(l, r, RelSymbol::Eq)
 {}
 
 void ConstraintEq::acceptVisitor(ConstraintVisitor& vis) const
@@ -149,8 +256,8 @@ Constraint operator==(const Term& l, const Term& r)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintLe::ConstraintLe(const Term& l, const Term& r) :
-   ConstraintBin(l, r, RelSymbol::Le)
+ConstraintLe::ConstraintLe(const Term& l, const Term& r)
+      : ConstraintBin(l, r, RelSymbol::Le)
 {}
 
 void ConstraintLe::acceptVisitor(ConstraintVisitor& vis) const
@@ -183,8 +290,8 @@ Constraint operator<=(const Term& l, const Term& r)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintLt::ConstraintLt(const Term& l, const Term& r) :
-   ConstraintBin(l, r, RelSymbol::Lt)
+ConstraintLt::ConstraintLt(const Term& l, const Term& r)
+      : ConstraintBin(l, r, RelSymbol::Lt)
 {}
 
 void ConstraintLt::acceptVisitor(ConstraintVisitor& vis) const
@@ -217,8 +324,8 @@ Constraint operator<(const Term& l, const Term& r)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintGe::ConstraintGe(const Term& l, const Term& r) :
-   ConstraintBin(l, r, RelSymbol::Ge)
+ConstraintGe::ConstraintGe(const Term& l, const Term& r)
+      : ConstraintBin(l, r, RelSymbol::Ge)
 {}
 
 void ConstraintGe::acceptVisitor(ConstraintVisitor& vis) const
@@ -251,8 +358,8 @@ Constraint operator>=(const Term& l, const Term& r)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintGt::ConstraintGt(const Term& l, const Term& r) :
-   ConstraintBin(l, r, RelSymbol::Gt)
+ConstraintGt::ConstraintGt(const Term& l, const Term& r)
+      : ConstraintBin(l, r, RelSymbol::Gt)
 {}
 
 void ConstraintGt::acceptVisitor(ConstraintVisitor& vis) const
@@ -285,11 +392,21 @@ Constraint operator>(const Term& l, const Term& r)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintIn::ConstraintIn(const Term& t, const Interval& x):
-   ConstraintBin(t, x, RelSymbol::In), x_(x)
+ConstraintIn::ConstraintIn(const Term& t, const Interval& x)
+      : ConstraintBin(t, x, RelSymbol::In), x_(x)
 {
    ASSERT(!(x.isEmpty() || x.isUniverse()),
-          "bad interval target in an 'in' constraint");
+          "Bad interval target in a IN constraint");
+}
+
+Interval ConstraintIn::image() const
+{
+   return x_;
+}
+
+Term ConstraintIn::term() const
+{
+   return left();
 }
 
 void ConstraintIn::acceptVisitor(ConstraintVisitor& vis) const
@@ -314,24 +431,24 @@ Proof ConstraintIn::isSatisfied(const IntervalVector& X) const
       return Proof::Empty;
 }
 
-Constraint in(const Term& l, const Interval& x)
+Constraint in(const Term& t, const Interval& x)
 {
    if (x.isSingleton())
-      return l == x;
+      return t == x;
 
    else if (x.isInfLeft())
-      return l <= x.right();
+      return t <= x.right();
 
    else if (x.isInfRight())
-      return l >= x.left();
+      return t >= x.left();
 
    else
-      return Constraint(std::make_shared<ConstraintIn>(l.rep(), x));
+      return Constraint(std::make_shared<ConstraintIn>(t.rep(), x));
 }
 
-Constraint in(const Term& l, const double& a, const double& b)
+Constraint in(const Term& t, const double& a, const double& b)
 {
-   return in(l, Interval(a,b));
+   return in(t, Interval(a,b));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -341,32 +458,32 @@ ConstraintVisitor::~ConstraintVisitor()
 
 void ConstraintVisitor::apply(const ConstraintEq* c)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void ConstraintVisitor::apply(const ConstraintLe* c)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void ConstraintVisitor::apply(const ConstraintLt* c)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void ConstraintVisitor::apply(const ConstraintGe* c)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void ConstraintVisitor::apply(const ConstraintGt* c)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void ConstraintVisitor::apply(const ConstraintIn* c)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 } // namespace
