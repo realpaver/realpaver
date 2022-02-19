@@ -32,7 +32,7 @@ Param::Param()
 
    dblmap_.insert(std::make_pair("TIME_LIMIT", 100.0));
 
-   strmap_.insert(std::make_pair("SPLIT_OBJ_VAR", "NO"));
+   strmap_.insert(std::make_pair("SPLIT_OBJ", "NO"));
 }
 
 Param::~Param()

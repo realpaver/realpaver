@@ -3,7 +3,7 @@
 #ifndef REALPAVER_PROPAGATOR_HPP
 #define REALPAVER_PROPAGATOR_HPP
 
-#include "realpaver/contractor_pool.hpp"
+#include "realpaver/ContractorPool.hpp"
 
 namespace realpaver {
 

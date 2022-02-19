@@ -42,13 +42,13 @@ librealpaver_la_include_HEADERS = \
 		contractor_bc3.hpp \
 		contractor_bc4.hpp \
 		contractor_cid.hpp \
-		contractor_int.hpp \
-		contractor_pool.hpp \
+		ContractorPool.hpp \
 		dag.hpp \
 		Double.hpp \
 		Exception.hpp \
 		HC4Contractor.hpp \
 		Inflator.hpp \
+		IntContractor.hpp \
 		interval.hpp \
 		IntervalImpl.hpp \
 		IntervalNewton.hpp \
@@ -116,12 +116,12 @@ librealpaver_la_SOURCES = \
 		contractor_bc3.cpp \
 		contractor_bc4.cpp \
 		contractor_cid.cpp \
-		contractor_int.cpp \
-		contractor_pool.cpp \
+		ContractorPool.cpp \
 		dag.cpp \
 		Exception.cpp \
 		HC4Contractor.cpp \
 		Inflator.cpp \
+		IntContractor.cpp \
 		interval.cpp \
 		IntervalNewton.cpp \
 		IntervalSlicer.cpp \

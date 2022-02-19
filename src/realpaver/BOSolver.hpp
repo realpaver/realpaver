@@ -61,11 +61,11 @@ public:
    void setNodeLimit(int limit);
 
    /// @return true if the domain of the objective variable is split
-   bool getSplitObjVar() const;
+   bool isSplitableObj() const;
 
    /// Sets the splitting status of the objective variable
    /// @param split true if the domain of the objective variable is split
-   void setSplitObjVar(bool split);
+   void setSplitableObj(bool split);
 
 private:
    Problem problem_;    // initial problem
@@ -84,7 +84,7 @@ private:
    bool presolve();
    void solve();
    void branchAndBound();
-   bool bbStep(BOSpace& space);
+   bool bbStep(BOSpace& space, BOSpace& sol);
 
    typedef Preprocessor::VarVarMapType VarVarMapType;
 
@@ -102,7 +102,7 @@ private:
    double timelimit_;  // time limit in seconds
 
    int nodelimit_;     // node limit
-   bool splitobjvar_;  // true if the domain of the objective variable is split
+   bool splitobj_;     // true if the domain of the objective variable is split
 };
 
 } // namespace

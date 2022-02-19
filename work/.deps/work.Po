@@ -218,8 +218,7 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  ../src/realpaver/ConstraintFixer.hpp ../src/realpaver/TermFixer.hpp \
  ../src/realpaver/Timer.hpp /usr/include/c++/7/chrono \
  /usr/include/c++/7/ratio /usr/include/c++/7/ctime \
- /usr/include/c++/7/bits/parse_numbers.h \
- ../src/realpaver/contractor_int.hpp ../src/realpaver/Param.hpp
+ /usr/include/c++/7/bits/parse_numbers.h ../src/realpaver/Param.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -802,7 +801,5 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 /usr/include/c++/7/ctime:
 
 /usr/include/c++/7/bits/parse_numbers.h:
-
-../src/realpaver/contractor_int.hpp:
 
 ../src/realpaver/Param.hpp:

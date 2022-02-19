@@ -10,7 +10,6 @@
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Timer.hpp"
-#include "realpaver/contractor_int.hpp"
 #include "realpaver/Scope.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/Param.hpp"

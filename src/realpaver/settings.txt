@@ -28,4 +28,4 @@ TIME_LIMIT = 100.0
 # The objective function in an optimization problem is represented by a
 # variable. YES means that it is considered as any other variable in the
 # splitting strategy. NO means that its domain is not split.
-SPLIT_OBJ_VAR = YES
+SPLIT_OBJ = YES

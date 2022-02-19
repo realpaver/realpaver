@@ -18,7 +18,7 @@ BOSpace::BOSpace(size_t frequency)
         ma_(),
         id_(0),
         ex_(0),
-        nodecount_(0)
+        nbNodes_(0)
 {
    setFrequency(frequency);
 }
@@ -49,15 +49,20 @@ double BOSpace::getLowestUpperBound() const
    return up_.begin()->node->getUpper();
 }
 
-int BOSpace::getNodeCount() const
+Interval BOSpace::getObjEnclosure() const
 {
-   return nodecount_;
+   return Interval(getLowestLowerBound(), getLowestUpperBound());
+}
+
+int BOSpace::getNbNodes() const
+{
+   return nbNodes_;
 }
 
 void BOSpace::insertNode(const SharedBONode& node)
 {
    // one mode node
-   ++nodecount_;
+   ++nbNodes_;
 
    // new item
    size_t i = id_++;
@@ -105,10 +110,10 @@ void BOSpace::simplify(const double& u)
       auto it = lo_.rbegin();
       if (it == lo_.rend())
          return;
-      
+
       if (it->node->getLower() > u)
          extractNode(it->id);
-      
+
       else
          return;
    }

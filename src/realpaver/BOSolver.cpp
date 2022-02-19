@@ -28,7 +28,7 @@ BOSolver::BOSolver(Problem& problem)
         stimer_(),
         timelimit_(Param::getDblParam("TIME_LIMIT")),
         nodelimit_(Param::getIntParam("NODE_LIMIT")),
-        splitobjvar_(Param::getStrParam("SPLIT_OBJ_VAR") == "YES")
+        splitobj_(Param::getStrParam("SPLIT_OBJ") == "YES")
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
@@ -61,14 +61,14 @@ void BOSolver::setNodeLimit(int limit)
    nodelimit_ = limit;
 }
 
-bool BOSolver::getSplitObjVar() const
+bool BOSolver::isSplitableObj() const
 {
-   return splitobjvar_;
+   return splitobj_;
 }
 
-void BOSolver::setSplitObjVar(bool split)
+void BOSolver::setSplitableObj(bool split)
 {
-   splitobjvar_ = split;
+   splitobj_ = split;
 }
 
 bool BOSolver::preprocess()
@@ -169,9 +169,14 @@ bool BOSolver::presolve()
    return true;
 }
 
-bool BOSolver::bbStep(BOSpace& space)
+bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 {
-   
+   // stops the search if the space is empty
+   if (space.isEmpty()) return false;
+
+   SharedBONode node = space.extractNode();
+
+
    // TODO
    // attention on retourne faux si la resolution termine
 
@@ -183,7 +188,7 @@ void BOSolver::branchAndBound()
    // creates the initial node
    SharedBONode node;
  
-   if (getSplitObjVar())
+   if (isSplitableObj())
    {   
       node = std::make_shared<BONode>(model_->getFullScope(),
                                       model_->getObjVar(),
@@ -196,15 +201,24 @@ void BOSolver::branchAndBound()
                                       model_->getInitRegion());
    }
 
-   // creates the optimization space
+
+   // TODO, ici traiter le premier noeud pour chercher
+   // de bonnes bornes avant la recherche
+
+
+
+   // creates the space of nodes to be processed
    BOSpace space;
    space.insertNode(node);
+
+   // creates the space of solution nodes, i.e. nodes that cannot be split
+   BOSpace sol;
 
    bool iter = true;
 
    do
    {
-      iter = bbStep(space);
+      iter = bbStep(space, sol);
 
       if (iter &&
           ptimer_.elapsedTime() + stimer_.elapsedTime() > getTimeLimit())
@@ -213,13 +227,16 @@ void BOSolver::branchAndBound()
          status_ = OptimizationStatus::StopOnTimeLimit;
       }
 
-      if (iter && space.getNodeCount() > nodelimit_)
+      if (iter && space.getNbNodes() > nodelimit_)
       {
          iter = false;
          status_ = OptimizationStatus::StopOnNodeLimit;
       }
    }
    while (iter);
+
+   // assigns the enclosure of the optimum
+   // objval_, TODO
 }
 
 void BOSolver::solve()
