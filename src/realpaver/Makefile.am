@@ -24,9 +24,9 @@ lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir=$(includedir)/realpaver
 
 librealpaver_la_include_HEADERS = \
-		bco_local.hpp \
 		Bitset.hpp \
 		BOContractor.hpp \
+		BOLocalSolver.hpp \
 		BOModel.hpp \
 		BONode.hpp \
 		BOPresolver.hpp \
@@ -50,6 +50,7 @@ librealpaver_la_include_HEADERS = \
 		Inflator.hpp \
 		IntContractor.hpp \
 		interval.hpp \
+		IntervalFunction.hpp \
 		IntervalImpl.hpp \
 		IntervalNewton.hpp \
 		IntervalSlicer.hpp \
@@ -99,9 +100,9 @@ endif
 
 librealpaver_la_SOURCES = \
 		AssertDebug.hpp \
-		bco_local.cpp \
 		Bitset.cpp \
 		BOContractor.cpp \
+		BOLocalSolver.cpp \
 		BOModel.cpp \
 		BONode.cpp \
 		BOPresolver.cpp \
@@ -123,6 +124,7 @@ librealpaver_la_SOURCES = \
 		Inflator.cpp \
 		IntContractor.cpp \
 		interval.cpp \
+		IntervalFunction.cpp \
 		IntervalNewton.cpp \
 		IntervalSlicer.cpp \
 		IntervalVector.cpp \

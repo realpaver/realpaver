@@ -10,9 +10,10 @@
 #ifndef REALPAVER_BO_MODEL_HPP
 #define REALPAVER_BO_MODEL_HPP
 
-#include "realpaver/RealFunction.hpp"
 #include "realpaver/dag.hpp"
+#include "realpaver/IntervalFunction.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
 
@@ -70,24 +71,38 @@ public:
    /// @return returns the initial region
    IntervalVector getInitRegion() const;
 
-   /// 
+   /// Sets a variable as a boundary variable
+   /// @param v a variable of this
    void setBoundaryVar(const Variable& v);
 
-   /// 
+   /// Sets a variable as an interior variable
+   /// @param v a variable of this
    void setInteriorVar(const Variable& v);
 
-   ///
+   /// Tests if a variable is a boundary variable
+   /// @param v a variable of this
+   /// @return true if v is a boundary variable
    bool isBoundaryVar(const Variable& v) const;
 
-   ///
+   /// Tests if a variable is an interior variable
+   /// @param v a variable of this
+   /// @return true if v is an interior variable
    bool isInteriorVar(const Variable& v) const;
 
    ///@{
    /// Overrides the methods of RealFunction
    double realEval(const RealVector& x);
-   bool isDifferentiable() const;
+   bool isRealDiff() const;
    void realDiff(const RealVector& x, RealVector& g);
    double realEvalDiff(const RealVector& x, RealVector& g);
+   ///@}
+
+   ///@{
+   /// Overrides the methods of IntervalFunction
+   Interval intervalEval(const IntervalVector& x);
+   bool isIntervalDiff() const;
+   void intervalDiff(const IntervalVector& x, IntervalVector& g);
+   Interval intervalEvalDiff(const IntervalVector& x, IntervalVector& g);
    ///@}
 
 private:

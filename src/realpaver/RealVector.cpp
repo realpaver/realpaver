@@ -32,6 +32,17 @@ void RealVector::set(size_t i, double x)
    setAt(i, x);
 }
 
+RealVector& RealVector::operator=(const RealVector& V)
+{
+   ASSERT(size() == V.size(),
+          "Assignment of vectors having different sizes");
+
+   for (size_t i=0; i<size(); ++i)
+      set(i, V[i]);
+
+   return *this;
+}
+
 double RealVector::scalarProduct(const RealVector& V) const
 {
    ASSERT(size() == V.size(),

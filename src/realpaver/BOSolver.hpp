@@ -85,6 +85,7 @@ private:
    void solve();
    void branchAndBound();
    bool bbStep(BOSpace& space, BOSpace& sol);
+   void findInitialBounds(SharedBONode& node);
 
    typedef Preprocessor::VarVarMapType VarVarMapType;
 

@@ -183,6 +183,30 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
    return false;
 }
 
+void BOSolver::findInitialBounds(SharedBONode& node)
+{
+   IntervalVector* region = node->getRegion();
+
+   Interval val = model_->intervalEval(*region);
+
+   if (val.isEmpty())
+   {
+      status_ = OptimizationStatus::Infeasible;
+      return;
+   }
+
+   node->setLower(val.left());
+   node->setUpper(val.right());
+
+   DEBUG("Node bounds : " << node->getLower() << ", " << node->getUpper());
+
+   // TODO, local optimization
+
+
+   // TODO, first relaxation
+   
+}
+
 void BOSolver::branchAndBound()
 {
    // creates the initial node
@@ -201,11 +225,11 @@ void BOSolver::branchAndBound()
                                       model_->getInitRegion());
    }
 
+   // finds bounds of the objective in the initial node
+   findInitialBounds(node);
 
-   // TODO, ici traiter le premier noeud pour chercher
-   // de bonnes bornes avant la recherche
-
-
+   if (status_ == OptimizationStatus::Infeasible)
+      return;
 
    // creates the space of nodes to be processed
    BOSpace space;

@@ -7,39 +7,40 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_REAL_FUNCTION_HPP
-#define REALPAVER_REAL_FUNCTION_HPP
+#ifndef REALPAVER_INTERVAL_FUNCTION_HPP
+#define REALPAVER_INTERVAL_FUNCTION_HPP
 
-#include "realpaver/RealVector.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for differentiable real-valued functions.
+/// This is an interface for differentiable interval-valued functions.
 ///
 /// This class is a pure abstract class.
 ///////////////////////////////////////////////////////////////////////////////
-class RealFunction {
+class IntervalFunction {
 public:
    /// Virtual destructor
-   virtual ~RealFunction();
+   virtual ~IntervalFunction();
 
    /// Evaluates this
    /// @param x argument of this
    /// @return value of this at x
-   virtual double realEval(const RealVector& x) = 0;
+   virtual Interval intervalEval(const IntervalVector& x) = 0;
 
    /// Differentiates this, i.e. evaluates its gradient
    /// @param x argument of this
    /// @param g gradient of this at x (output)
-   virtual void realDiff(const RealVector& x, RealVector& g) = 0;
+   virtual void intervalDiff(const IntervalVector& x, IntervalVector& g) = 0;
 
    /// Evaluates and differentiates this
    /// @param x argument of this
    /// @param g gradient of this at x (output)
    /// @return value of this at x
-   virtual double realEvalDiff(const RealVector& x, RealVector& g) = 0;
+   virtual Interval intervalEvalDiff(const IntervalVector& x,
+                                     IntervalVector& g) = 0;
 };
 
 } // namespace

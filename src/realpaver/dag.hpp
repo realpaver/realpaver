@@ -651,6 +651,9 @@ public:
    Interval eval(const IntervalVector& X);
    Interval eval(const RealVector& P);
 
+   // access to the result of the interval evaluation
+   Interval val() const;
+
    // interval evaluation given a new domain x for v
    // only the nodes depending on the variable id are evaluated
    Interval evalOnly(size_t id, const Interval& x);
@@ -840,6 +843,11 @@ inline double DagFun::rval() const
    return rootNode()->rval();
 }
 
+inline Interval DagFun::val() const
+{
+   return rootNode()->val();
+}
+
 /*****************************************************************************
  * Class of contexts such that every dag node is associated with
  * an interval domain.
@@ -930,6 +938,9 @@ public:
    Interval dom(size_t i) const;
    void setDom(size_t i, const Interval& x);
    void reduceDom(size_t i, const Interval& x);
+
+   // interval evaluation
+   void eval(const IntervalVector& X);
 
    // point evaluation
    void reval(const RealVector& P);

@@ -1740,6 +1740,12 @@ void Dag::reval(const RealVector& P)
       node_[i]->reval(P);
 }
 
+void Dag::eval(const IntervalVector& X)
+{
+   for (size_t i=0; i<nbNode(); ++i)
+      node_[i]->eval(X);
+}
+
 void Dag::print(std::ostream& os) const
 {
    for (size_t i=0; i<nbFun(); ++i)

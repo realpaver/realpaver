@@ -71,6 +71,10 @@ public:
    /// @return the midpoint of this
    RealVector midpoint() const;
 
+   /// Calculates the midpoint of this
+   /// @param mid vector assigned to the midpoint of this
+   void toMidpoint(RealVector& mid) const;
+
    /// @return the corner of this made from all the left bounds
    RealVector lCorner() const;
 

@@ -68,12 +68,18 @@ double IntervalVector::width() const
 
 RealVector IntervalVector::midpoint() const
 {
-   RealVector mp(size());
+   RealVector mid(size());
+   toMidpoint(mid);
+   return mid;
+}
+
+void IntervalVector::toMidpoint(RealVector& mid) const
+{
+   ASSERT(size() == mid.size(),
+          "Midpoint vector with a bad size " << mid.size());
 
    for (size_t i=0; i<size(); ++i)
-      mp.set(i, at(i).midpoint());
-
-   return mp;
+      mid.set(i, at(i).midpoint());
 }
 
 RealVector IntervalVector::lCorner() const
