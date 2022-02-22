@@ -10,6 +10,7 @@
 #ifndef REALPAVER_BO_SOLVER_HPP
 #define REALPAVER_BO_SOLVER_HPP
 
+#include "realpaver/BOLocalSolver.hpp"
 #include "realpaver/BOModel.hpp"
 #include "realpaver/BOSpace.hpp"
 #include "realpaver/Preprocessor.hpp"
@@ -67,12 +68,19 @@ public:
    /// @param split true if the domain of the objective variable is split
    void setSplitableObj(bool split);
 
+   /// Sets the local optimization solver
+   /// @param solver a local solver
+   ///
+   /// The local solver is owned by this, i.e. it is destroyed with this
+   void setLocalSolver(BOLocalSolver* solver);
+
 private:
    Problem problem_;    // initial problem
    Problem preprob_;    // problem resulting from preprocessing
    Problem solprob_;    // problem resulting from presolving
 
    BOModel* model_;
+   BOLocalSolver* localSolver_;
 
    // Result of optimization
    OptimizationStatus status_;

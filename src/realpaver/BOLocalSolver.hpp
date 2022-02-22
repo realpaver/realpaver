@@ -57,6 +57,11 @@ public:
    /// @return the value of the objective function at the final point
    double getFinalObjVal() const;
 
+
+   static std::pair<bool, double>
+   lineSearch(RealFunction& f, RealVector& x, RealVector& p, RealVector& s,
+              double u, double tol);
+
 protected:
    // management of the values of the objective functions
    void setInitObjVal(double& val);

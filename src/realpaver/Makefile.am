@@ -26,6 +26,7 @@ librealpaver_la_includedir=$(includedir)/realpaver
 librealpaver_la_include_HEADERS = \
 		Bitset.hpp \
 		BOContractor.hpp \
+		BOLocalConjugate.hpp \
 		BOLocalSolver.hpp \
 		BOModel.hpp \
 		BONode.hpp \
@@ -102,6 +103,7 @@ librealpaver_la_SOURCES = \
 		AssertDebug.hpp \
 		Bitset.cpp \
 		BOContractor.cpp \
+		BOLocalConjugate.cpp \
 		BOLocalSolver.cpp \
 		BOModel.cpp \
 		BONode.cpp \

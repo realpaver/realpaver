@@ -19,7 +19,7 @@ namespace realpaver {
 /// This is a specialization of a traits class for intervals.
 ///////////////////////////////////////////////////////////////////////////////
 template <>
-struct LinearTraits<Interval>
+struct LinumTraits<Interval>
 {
    /// Value type
    typedef Interval ValueType;

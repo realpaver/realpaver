@@ -19,6 +19,7 @@ BOSolver::BOSolver(Problem& problem)
         preprob_(),
         solprob_(),
         model_(nullptr),
+        localSolver_(nullptr),
         status_(OptimizationStatus::Other),
         sol_(problem.nbVars()),
         objval_(Interval::universe()),
@@ -32,11 +33,16 @@ BOSolver::BOSolver(Problem& problem)
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
+
+   // default local solver
+   localSolver_ = new BOLocalSolver();
 }
 
 BOSolver::~BOSolver()
 {
    if (model_ != nullptr) delete model_;
+
+   if (localSolver_ != nullptr) delete localSolver_;
 }
 
 double BOSolver::getPreprocessingTime() const
@@ -69,6 +75,16 @@ bool BOSolver::isSplitableObj() const
 void BOSolver::setSplitableObj(bool split)
 {
    splitobj_ = split;
+}
+
+void BOSolver::setLocalSolver(BOLocalSolver* solver)
+{
+   ASSERT(solver != nullptr,
+          "Local solver expected but null pointer as input");
+
+   if (localSolver_ != nullptr) delete localSolver_;
+
+   localSolver_ = solver;
 }
 
 bool BOSolver::preprocess()

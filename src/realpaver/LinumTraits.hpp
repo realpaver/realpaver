@@ -16,7 +16,7 @@ namespace realpaver {
 /// This is a traits class for numbers used in linear algebra.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-struct LinearTraits
+struct LinumTraits
 {
    /// Value type
    typedef T ValueType;

@@ -52,4 +52,29 @@ OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
                                          OptimizationStatus::Optimal;
 }
 
+std::pair<bool, double>
+BOLocalSolver::lineSearch(RealFunction& f, RealVector& x, RealVector& p,
+                          RealVector& s, double u, double tol)
+{
+   double step = 1.0, rstep;
+   double c_armijo = 0.1;
+   double p_s = p.scalarProduct(s);
+
+   bool found = false;
+   bool iter = true;
+
+   while (iter && (step > tol))
+   {
+      // next point
+      RealVector y = x + step * p;
+
+      // value of the upper bound
+      double upper = f.realEval(y);
+
+
+   }
+
+   return std::make_pair(found, rstep);
+}
+
 } // namespace

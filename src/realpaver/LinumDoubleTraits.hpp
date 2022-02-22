@@ -19,7 +19,7 @@ namespace realpaver {
 /// This is a specialization of a traits class for real numbers.
 ///////////////////////////////////////////////////////////////////////////////
 template <>
-struct LinearTraits<double>
+struct LinumTraits<double>
 {
    /// Value type
    typedef double ValueType;

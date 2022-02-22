@@ -89,4 +89,56 @@ double RealVector::infNorm() const
    return norm;
 }
 
+RealVector& RealVector::operator+=(const RealVector& V)
+{
+   RealVector::BaseType::add(*this, V, *this);
+   return *this;
+}
+
+RealVector& RealVector::operator-=(const RealVector& V)
+{
+   RealVector::BaseType::sub(*this, V, *this);
+   return *this;   
+}
+
+RealVector& RealVector::operator*=(double a)
+{
+   RealVector::BaseType::mulScalar(a, *this, *this);
+   return *this;
+}
+
+RealVector& RealVector::operator/=(double a)
+{
+   RealVector::BaseType::divScalar(*this, a, *this);
+   return *this;
+}
+
+RealVector operator+(const RealVector& V, const RealVector& W)
+{
+   RealVector res(V.size());
+   RealVector::BaseType::add(V, W, res);
+   return res;
+}
+
+RealVector operator-(const RealVector& V, const RealVector& W)
+{
+   RealVector res(V.size());
+   RealVector::BaseType::sub(V, W, res);
+   return res;
+}
+
+RealVector operator*(double a, const RealVector& V)
+{
+   RealVector res(V.size());
+   RealVector::BaseType::mulScalar(a, V, res);
+   return res;
+}
+
+RealVector operator/(const RealVector& V, double a)
+{
+   RealVector res(V.size());
+   RealVector::BaseType::divScalar(V, a, res);
+   return res;
+}
+
 } // namespace

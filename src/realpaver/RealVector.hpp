@@ -11,6 +11,7 @@
 #define REALPAVER_REAL_VECTOR_HPP
 
 #include "realpaver/Double.hpp"
+#include "realpaver/LinumDoubleTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 
 namespace realpaver {
@@ -22,6 +23,9 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class RealVector : public NumericVector<double> {
 public:
+   /// Base class
+   typedef NumericVector<double> BaseType;
+
    /// Creates a vector
    /// @param n number of elements
    /// @param x initialization value
@@ -64,7 +68,46 @@ public:
 
    /// @return the infinite-norm of this
    double infNorm() const;
+
+   /// Addition with assignment
+   /// @param V a vector
+   /// @return a reference to this
+   ///
+   /// this is assigned to this + V
+   RealVector& operator+=(const RealVector& V);
+
+   /// Subtraction with assignment
+   /// @param V a vector
+   /// @return a reference to this
+   ///
+   /// this is assigned to this - V
+   RealVector& operator-=(const RealVector& V);
+
+   /// Multiplication with assignment
+   /// @param a a scalar
+   /// @return a reference to this
+   ///
+   /// this is assigned to this * a
+   RealVector& operator*=(double a);
+
+   /// Division with assignment
+   /// @param a a scalar
+   /// @return a reference to this
+   ///
+   /// this is assigned to this / a
+   RealVector& operator/=(double a);
 };
+
+///@{
+/// Operators on real vectors
+RealVector operator+(const RealVector& V, const RealVector& W);
+RealVector operator-(const RealVector& V, const RealVector& W);
+
+RealVector operator*(double a, const RealVector& V);
+RealVector operator*(const RealVector& V, double a);
+
+RealVector operator/(const RealVector& V, double a);
+///@}
 
 } // namespace
 

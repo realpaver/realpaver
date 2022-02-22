@@ -12,9 +12,9 @@
 
 #include <iostream>
 #include <vector>
-#include "AssertDebug.hpp"
-#include "Common.hpp"
-#include "LinumTraits.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/Common.hpp"
+#include "realpaver/LinumTraits.hpp"
 
 namespace realpaver {
 
@@ -25,7 +25,7 @@ template <typename T>
 class NumericVector {
 protected:
    /// Traits class
-  typedef LinearTraits<T> TraitsType;
+  typedef LinumTraits<T> TraitsType;
       
 public:
    /// Value type
@@ -78,83 +78,6 @@ public:
    /// @param x a number inserted at the end
    void push(const T& x);
 
-   /// Addition with assignment
-   /// @param V a vector
-   /// @return a reference to this
-   ///
-   /// this[i] += V[i] for each i
-   NumericVector& operator+=(const NumericVector& V);
-
-   /// Subtraction with assignment
-   /// @param V a vector
-   /// @return a reference to this
-   ///
-   /// this[i] -= V[i] for each i
-   NumericVector& operator-=(const NumericVector& V);
-
-   /// Multiplication with assignment
-   /// @param V a vector
-   /// @return a reference to this
-   ///
-   /// this[i] *= V[i] for each i
-   NumericVector& operator*=(const NumericVector& V);
-
-   /// Multiplication with assignment
-   /// @param x a number
-   /// @return a reference to this
-   ///
-   /// this[i] *= x for each i
-   NumericVector& operator*=(ConstRefType x);
-
-   /// Division with assignment
-   /// @param V a vector
-   /// @return a reference to this
-   ///
-   /// this[i] /= V[i] for each i
-   NumericVector& operator/=(const NumericVector& V);
-
-   /// Multiplication with assignment
-   /// @param x a number
-   /// @return a reference to this
-   ///
-   /// this[i] /= x for each i
-   NumericVector& operator/=(ConstRefType x);
-
-   /// Addition
-   /// @param V a vector
-   /// @return this + V
-   NumericVector operator+(const NumericVector& V) const;
-
-   /// Subtraction
-   /// @param V a vector
-   /// @return this - V
-   NumericVector operator-(const NumericVector& V) const;
-
-   /// Unary subtraction
-   /// @return -this
-   NumericVector operator-() const;
-
-   /// Multiplication
-   /// @param V a vector
-   /// @return this * V
-   NumericVector operator*(const NumericVector& V) const;
-
-   /// Multiplication
-   /// @param x a number
-   /// @return this * x
-   NumericVector operator*(ConstRefType x) const;
-
-   /// Division
-   /// @param x a number
-   /// @return this / x
-   NumericVector operator/(ConstRefType x) const;
-
-   /// Extracts a sub-vector from this
-   /// @param i an index of this
-   /// @param j an index of this
-   /// @return the sub-vector of this between i and j
-   NumericVector subVector(size_t i, size_t j) const;
-
    /// Output on a stream
    /// @param os an output stream
    virtual void print(std::ostream& os) const;
@@ -167,6 +90,34 @@ public:
 
    /// @return true if all the elements of this are finite
    bool isFinite() const;
+
+   /// Addition
+   /// @param V a vector
+   /// @param W a vector
+   /// @param res result assigned to V + W
+   static void add(const NumericVector& V, const NumericVector& W,
+                   NumericVector& res);
+
+   /// Subtraction
+   /// @param V a vector
+   /// @param W a vector
+   /// @param res result assigned to V - W
+   static void sub(const NumericVector& V, const NumericVector& W,
+                   NumericVector& res);
+
+   /// Multiplication
+   /// @param a a scalar
+   /// @param V a vector
+   /// @param res result assigned to a * V
+   static void mulScalar(ConstRefType a, const NumericVector& V,
+                         NumericVector& res);
+
+   /// Division
+   /// @param V a vector
+   /// @param a a scalar
+   /// @param res result assigned to V / a
+   static void divScalar(const NumericVector& V, ConstRefType a,
+                         NumericVector& res);
 
 private:
    typedef std::vector<ValueType> VectorType;
@@ -200,7 +151,7 @@ template <typename T>
 typename NumericVector<T>::ValueType
 NumericVector<T>::at(size_t i) const
 {
-   ASSERT(i<size(), "Bad access in a vector at index: " << i);
+   ASSERT(i<size(), "Bad access in a vector at index " << i);
 
    return elems_[i];
 }
@@ -209,7 +160,7 @@ template <typename T>
 void
 NumericVector<T>::setAt(size_t i, ConstRefType x)
 {
-   ASSERT(i<size(), "Bad access in a vector at index: " << i);
+   ASSERT(i<size(), "Bad access in a vector at index " << i);
 
    elems_[i] = x;
 }
@@ -226,157 +177,6 @@ template <typename T>
 void NumericVector<T>::push(const T& x)
 {
    elems_.push_back(x);
-}
-  
-template <typename T>
-NumericVector<T>&
-NumericVector<T>::operator+=(const NumericVector& V)
-{
-   ASSERT(size() == V.size(), "Addition of vectors having different sizes");
-
-   for (size_t i=0; i<elems_.size(); ++i)
-      TraitsType::addEq(elems_[i], V.elems_[i]);
-
-   return *this;
-}
-
-template <typename T>
-NumericVector<T>&
-NumericVector<T>::operator-=(const NumericVector& V)
-{
-   ASSERT(size() == V.size(), "Subtraction of vectors having different sizes");
-
-   for (size_t i=0; i<elems_.size(); ++i)
-      TraitsType::subEq(elems_[i], V.elems_[i]);
-
-   return *this;
-}
-
-template <typename T>
-NumericVector<T>&
-NumericVector<T>::operator*=(const NumericVector& V)
-{
-   ASSERT(size() == V.size(),
-          "Multiplication of vectors having different sizes");
-
-   for (size_t i=0; i<elems_.size(); ++i)
-      TraitsType::mulEq(elems_[i], V.elems_[i]);
-
-  return *this;
-}
-
-template <typename T>
-NumericVector<T>&
-NumericVector<T>::operator*=(ConstRefType x)
-{
-   ASSERT(!TraitsType::isNan(x),
-		    "Product of a vector with an invalid number: " << x);
-
-   for (size_t i=0; i<elems_.size(); ++i)
-      TraitsType::mulEq(elems_[i], x);
-
-   return *this;
-}
-
-template <typename T>
-NumericVector<T>&
-NumericVector<T>::operator/=(const NumericVector& V)
-{
-  ASSERT(size() == V.size(),
-         "Division of vectors having different sizes");
-
-   for (size_t i=0; i<elems_.size(); ++i)
-   {
-      ASSERT( V.elems_[i] != TraitsType::zero(),
-             "Division of a vector by another vector " <<
-             "which contains a zero" );
-
-      TraitsType::divEq(elems_[i], V.elems_[i]);
-   }
-
-   return *this;
-}
-
-template <typename T>
-NumericVector<T>&
-NumericVector<T>::operator/=(ConstRefType x)
-{
-   ASSERT((!TraitsType::isNan(x)) && (x!=TraitsType::zero()),
-          "Division of a vector by an invalid number: " << x);
-
-   for (size_t i=0; i<elems_.size(); ++i)
-      TraitsType::divEq(elems_[i], x);
-
-   return *this;
-}
-
-template <typename T>
-NumericVector<T>
-NumericVector<T>::operator+(const NumericVector& V) const
-{
-   NumericVector result(*this);
-   result += V;
-   return result;
-}
-
-template <typename T>
-NumericVector<T>
-NumericVector<T>::operator-(const NumericVector& V) const
-{
-   NumericVector result(*this);
-   result -= V;
-   return result;
-}
-
-template <typename T>
-NumericVector<T>
-NumericVector<T>::operator-() const
-{
-   NumericVector result(size(), TraitsType::zero());
-   result -= *this;
-   return result;
-}
-
-template <typename T>
-NumericVector<T>
-NumericVector<T>::operator*(const NumericVector& V) const
-{
-   NumericVector result(*this);
-   result *= V;
-   return result;
-}
-      
-template <typename T>
-NumericVector<T>
-NumericVector<T>::operator*(ConstRefType x) const
-{
-   NumericVector result(*this);
-   result *= x;
-   return result;
-}
-
-template <typename T>
-NumericVector<T>
-NumericVector<T>::operator/(ConstRefType x) const
-{
-   NumericVector result(*this);
-   result /= x;
-   return result;
-}
-   
-template <typename T>
-NumericVector<T>
-NumericVector<T>::subVector(size_t i, size_t j) const
-{
-   ASSERT((j>=i) && (j<size()), "sub-vector not defined: wrong indexes");
-
-   typename VectorType::const_iterator pi = elems_.begin();
-   pi += i;
-
-   typename VectorType::const_iterator pj = elems_.begin();
-   pj += (j+1);
-
-   return NumericVector( VectorType(pi, pj) );
 }
    
 template <typename T>
@@ -437,6 +237,48 @@ bool NumericVector<T>::isFinite() const
          return false;
 
    return true;
+}
+
+template <typename T>
+void NumericVector<T>::add(const NumericVector& V, const NumericVector& W,
+                           NumericVector& res)
+{
+   ASSERT(V.size() == W.size(), "Bad vector sizes in an addition");
+   ASSERT(V.size() == res.size(), "Bad vector sizes in an addition");
+
+   for (size_t i=0; i<V.size(); ++i)
+      res.elems_[i] = TraitsType::add(V.elems_[i], W.elems_[i]);
+}
+
+template <typename T>
+void NumericVector<T>::sub(const NumericVector& V, const NumericVector& W,
+                           NumericVector& res)
+{
+   ASSERT(V.size() == W.size(), "Bad vector sizes in a subtraction");
+   ASSERT(V.size() == res.size(), "Bad vector sizes in a subtraction");
+
+   for (size_t i=0; i<V.size(); ++i)
+      res.elems_[i] = TraitsType::sub(V.elems_[i], W.elems_[i]);
+}
+
+template <typename T>
+void NumericVector<T>::mulScalar(ConstRefType a, const NumericVector& V,
+                                 NumericVector& res)
+{
+   ASSERT(V.size() == res.size(), "Bad vector sizes in a multiplication");
+
+   for (size_t i=0; i<V.size(); ++i)
+      res.elems_[i] = TraitsType::mul(a, V.elems_[i]);
+}
+
+template <typename T>
+void NumericVector<T>::divScalar(const NumericVector& V, ConstRefType a,
+                                 NumericVector& res)
+{
+   ASSERT(V.size() == res.size(), "Bad vector sizes in a multiplication");
+
+   for (size_t i=0; i<V.size(); ++i)
+      res.elems_[i] = TraitsType::div(a, V.elems_[i]);
 }
 
 } // namespace
