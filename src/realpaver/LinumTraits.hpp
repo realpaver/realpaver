@@ -45,6 +45,11 @@ struct LinumTraits
    /// @return x - y
    static ValueType sub(ConstRefType x, ConstRefType y);
 
+   /// Unary subtraction
+   /// @param x a number
+   /// @return -x
+   static ValueType usb(ConstRefType x);
+
    /// Multiplication
    /// @param x a number
    /// @param y a number

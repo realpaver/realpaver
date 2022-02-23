@@ -29,8 +29,11 @@ Param::Param()
    tolmap_.insert(std::make_pair("DTOL", Tolerance::makeRel(1.0e-8)));
 
    intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
+   intmap_.insert(std::make_pair("LS_ITER_LIMIT", 20));
 
    dblmap_.insert(std::make_pair("TIME_LIMIT", 100.0));
+   dblmap_.insert(std::make_pair("LS_ARMIJO_COEF", 0.125));
+   dblmap_.insert(std::make_pair("LS_STEP_TOL", 1.0e-8));
 
    strmap_.insert(std::make_pair("SPLIT_OBJ", "NO"));
 }

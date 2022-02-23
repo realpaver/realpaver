@@ -60,6 +60,14 @@ struct LinumTraits<Interval>
       return x - y;
    }
 
+   /// Unary subtraction
+   /// @param x a number
+   /// @return -x
+   static ValueType usb(ConstRefType x)
+   {
+      return -x;
+   }
+
    /// Multiplication
    /// @param x a number
    /// @param y a number

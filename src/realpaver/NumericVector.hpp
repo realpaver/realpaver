@@ -105,6 +105,11 @@ public:
    static void sub(const NumericVector& V, const NumericVector& W,
                    NumericVector& res);
 
+   /// Unary subtraction
+   /// @param V a vector
+   /// @param res result assigned to - V
+   static void usb(const NumericVector& V, NumericVector& res);
+
    /// Multiplication
    /// @param a a scalar
    /// @param V a vector
@@ -259,6 +264,15 @@ void NumericVector<T>::sub(const NumericVector& V, const NumericVector& W,
 
    for (size_t i=0; i<V.size(); ++i)
       res.elems_[i] = TraitsType::sub(V.elems_[i], W.elems_[i]);
+}
+
+template <typename T>
+void NumericVector<T>::usb(const NumericVector& V, NumericVector& res)
+{
+   ASSERT(V.size() == res.size(), "Bad vector sizes in a subtraction");
+
+   for (size_t i=0; i<V.size(); ++i)
+      res.elems_[i] = TraitsType::usb(V.elems_[i]);
 }
 
 template <typename T>

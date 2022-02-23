@@ -43,6 +43,14 @@ RealVector& RealVector::operator=(const RealVector& V)
    return *this;
 }
 
+bool RealVector::isNan() const
+{
+   for (size_t i=0; i<size(); ++i)
+      if (Double::isNan(at(i))) return true;
+
+   return false;
+}
+
 double RealVector::scalarProduct(const RealVector& V) const
 {
    ASSERT(size() == V.size(),
@@ -124,6 +132,13 @@ RealVector operator-(const RealVector& V, const RealVector& W)
 {
    RealVector res(V.size());
    RealVector::BaseType::sub(V, W, res);
+   return res;
+}
+
+RealVector operator-(const RealVector& V)
+{
+   RealVector res(V.size());
+   RealVector::BaseType::usb(V, res);
    return res;
 }
 

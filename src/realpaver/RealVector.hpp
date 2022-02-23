@@ -55,6 +55,9 @@ public:
    /// @param x a real number
    void set(size_t i, double x);
 
+   /// @return true if at least one component is a NaN
+   bool isNan() const;
+
    /// Scalar product
    /// @param V a vector having the same size than this
    /// @return the scalar product of this and V
@@ -102,6 +105,7 @@ public:
 /// Operators on real vectors
 RealVector operator+(const RealVector& V, const RealVector& W);
 RealVector operator-(const RealVector& V, const RealVector& W);
+RealVector operator-(const RealVector& V);
 
 RealVector operator*(double a, const RealVector& V);
 RealVector operator*(const RealVector& V, double a);

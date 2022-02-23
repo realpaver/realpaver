@@ -9,6 +9,10 @@
 
 # The name of a parameter respects the pattern [A-Z](A-Z0-9_)*
 
+###############################################################################
+## GENERAL PARAMETERS                                                        ##
+###############################################################################
+
 # Tolerance on the width of an interval domain of a constrained variable
 # ABS_XTOL: absolute tolerance
 # REL_XTOL: relative tolerance
@@ -29,3 +33,17 @@ TIME_LIMIT = 100.0
 # variable. YES means that it is considered as any other variable in the
 # splitting strategy. NO means that its domain is not split.
 SPLIT_OBJ = YES
+
+###############################################################################
+## LOCAL OPTIMiZATION BASED ON LINE SEARCH                                   ##
+###############################################################################
+
+# Coefficient of the Armijo rule used to stop a line search optimization
+# > 0.0 and < 1.0
+LS_ARMIJO_COEF = 0.125
+
+# Smallest value of the step length
+LS_STEP_TOL = 1.0e-8
+
+# Iteration limit
+LS_ITER_LIMIT = 20

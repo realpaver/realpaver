@@ -25,6 +25,12 @@ public:
    /// Virtual destructor
    virtual ~RealFunction();
 
+   /// @return the scopeof this, i.e. the set of variables
+   virtual Scope getRealFunScope() const = 0;
+
+   /// @return the number of variables in this
+   virtual size_t getRealFunArity() const = 0;
+
    /// Evaluates this
    /// @param x argument of this
    /// @return value of this at x

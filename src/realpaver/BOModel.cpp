@@ -123,6 +123,16 @@ size_t BOModel::dim() const
    return objscope_.size();
 }
 
+Scope BOModel::getRealFunScope() const
+{
+   return objscope_;
+}
+
+size_t BOModel::getRealFunArity() const
+{
+   return objscope_.size();
+}
+
 double BOModel::realEval(const RealVector& x)
 {
    // equation representing the objective function z +/- obj = 0
