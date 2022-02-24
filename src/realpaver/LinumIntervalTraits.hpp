@@ -10,7 +10,7 @@
 #ifndef REALPAVER_LINUM_INTERVAL_TRAITS_HPP
 #define REALPAVER_LINUM_INTERVAL_TRAITS_HPP
 
-#include "interval.hpp"
+#include "Interval.hpp"
 #include "LinumTraits.hpp"
 
 namespace realpaver {

@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include <vector>
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 
 namespace realpaver {
 

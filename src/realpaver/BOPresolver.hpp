@@ -11,7 +11,7 @@
 #define REALPAVER_BO_PRESOLVER_HPP
 
 #include "realpaver/BOModel.hpp"
-#include "realpaver/propagator.hpp"
+#include "realpaver/Propagator.hpp"
 
 namespace realpaver {
 

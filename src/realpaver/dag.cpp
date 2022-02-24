@@ -1541,6 +1541,34 @@ double DagFun::rderiv(const Variable& v) const
    return dag_->findVarNode(v.getId())->rdv();
 }
 
+Scope DagFun::realFunScope() const
+{
+   return scope();
+}
+
+size_t DagFun::realFunArity() const
+{
+   return scope().size();   
+}
+
+double DagFun::realFunEval(const RealVector& x)
+{
+   return reval(x);
+}
+
+void DagFun::realFunDiff(const RealVector& x, RealVector& g)
+{
+   rdiff(x);
+   toRgrad(g);
+}
+
+void DagFun::realFunEvalDiff(const RealVector& x, RealVector& g, double& val)
+{
+   rdiff(x);
+   toRgrad(g);
+   val = rval();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagContext::DagContext() : dom()
@@ -1592,6 +1620,15 @@ size_t Dag::insert(const Constraint& c)
    c.acceptVisitor(creator);
    return creator.index();
 }
+
+size_t Dag::insert(const Term& t, const Interval& img)
+{
+   Constraint c( t == 0.0 );
+   size_t idx = insert(c);
+   fun_[idx]->setImage(img);
+   return idx;
+}
+
 
 size_t Dag::insertFun(DagFun* f)
 {

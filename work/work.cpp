@@ -1,7 +1,8 @@
 #include <iostream>
 #include "realpaver/Logger.hpp"
-#include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/RealVector.hpp"
+#include "realpaver/BOLocalConjugate.hpp"
+#include "realpaver/dag.hpp"
+#include "realpaver/Problem.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -13,15 +14,24 @@ int main(void)
 
    try {
 
-      RealVector x = {1.0, 2.0, 3.5};
-      cout << x << endl;
+      Problem P;
+      Variable x = P.addRealVar(-4, 6, "x");
+      Variable y = P.addRealVar(-3, 8, "y");
 
-      RealVector y = {1.5, 1.0, 0.5};
-      cout << y << endl;
+      IntervalVector initRegion = P.getDomains();
+      RealVector initPoint = initRegion.midpoint();
+      RealVector finalPoint(initPoint.size());
 
-      cout << x - y << endl;
+      Dag D;
+      size_t i = D.insert( 1.5*sqr(x) + 3.0*sqr(y) + 2.0*x*y -2.0*x + 8.0*y );
 
-      cout << x.scalarProduct(y) << endl;
+      DagFun* fi = D.fun(i);
+
+      BOLocalConjugate solver;
+
+      OptimizationStatus status = solver.minimize(*fi, initRegion, initPoint, finalPoint);
+
+      cout << status << endl << finalPoint << endl;
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

@@ -12,7 +12,7 @@
 
 #include <string>
 #include <unordered_map>
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver/Tolerance.hpp"
 
 namespace realpaver {

@@ -12,7 +12,7 @@
 
 #include <memory>
 #include "realpaver/Bitset.hpp"
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver/LinumIntervalTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealVector.hpp"
@@ -99,14 +99,28 @@ public:
    RealVector oppositeCorner(const Bitset& bs) const;
 
    /// Set containment test
-   /// @param X a vector having the same size than this
-   /// @return true if this contains X
+   /// @param X a vector whose size is smaller than or equal to the size
+   ///        of this
+   /// @return true if each X[i] is included in this[i]
    bool contains(const IntervalVector& X) const;
 
    /// Set containment test
-   /// @param X a vector having the same size than this
-   /// @return true if this strictly contains X
+   /// @param X a vector whose size is smaller than or equal to the size
+   ///        of this
+   /// @return true if each X[i] is strictly included in this[i]
    bool strictlyContains(const IntervalVector& X) const;
+
+   /// Set containment test
+   /// @param X a vector whose size is smaller than or equal to the size
+   ///        of this
+   /// @return true if each X[i] belongs to this[i]
+   bool contains(const RealVector& X) const;
+
+   /// Set containment test
+   /// @param X a vector whose size is smaller than or equal to the size
+   ///        of this
+   /// @return true if each X[i] strictly belongs to this[i]
+   bool strictlyContains(const RealVector& X) const;
 
    /// Set containment test
    /// @return true if this contains 0.0

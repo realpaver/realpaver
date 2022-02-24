@@ -135,13 +135,28 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /usr/include/c++/7/bits/fstream.tcc /usr/include/c++/7/sstream \
  /usr/include/c++/7/bits/sstream.tcc ../src/realpaver/config.hpp \
  ../src/realpaver/configure.hpp ../src/realpaver/Exception.hpp \
- ../src/realpaver/IntervalSlicer.hpp /usr/include/c++/7/list \
- /usr/include/c++/7/bits/stl_list.h \
+ ../src/realpaver/BOLocalConjugate.hpp ../src/realpaver/BOLocalSolver.hpp \
+ ../src/realpaver/Common.hpp /usr/include/c++/7/limits \
+ ../src/realpaver/IntervalVector.hpp /usr/include/c++/7/memory \
+ /usr/include/c++/7/bits/stl_construct.h \
+ /usr/include/c++/7/bits/stl_uninitialized.h \
+ /usr/include/c++/7/bits/stl_tempbuf.h \
+ /usr/include/c++/7/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/7/ext/concurrence.h \
+ /usr/include/c++/7/bits/uses_allocator.h \
+ /usr/include/c++/7/bits/unique_ptr.h /usr/include/c++/7/utility \
+ /usr/include/c++/7/bits/stl_relops.h /usr/include/c++/7/tuple \
+ /usr/include/c++/7/array /usr/include/c++/7/bits/invoke.h \
+ /usr/include/c++/7/bits/shared_ptr.h \
+ /usr/include/c++/7/bits/shared_ptr_base.h \
  /usr/include/c++/7/bits/allocated_ptr.h \
- /usr/include/c++/7/ext/aligned_buffer.h /usr/include/c++/7/bits/list.tcc \
- ../src/realpaver/interval.hpp /usr/include/c++/7/utility \
- /usr/include/c++/7/bits/stl_relops.h ../src/realpaver/Common.hpp \
- /usr/include/c++/7/limits ../src/realpaver/IntervalImpl.hpp \
+ /usr/include/c++/7/bits/refwrap.h \
+ /usr/include/c++/7/ext/aligned_buffer.h \
+ /usr/include/c++/7/bits/shared_ptr_atomic.h \
+ /usr/include/c++/7/bits/atomic_base.h \
+ /usr/include/c++/7/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/7/backward/auto_ptr.h ../src/realpaver/Bitset.hpp \
+ ../src/realpaver/Interval.hpp ../src/realpaver/IntervalImpl.hpp \
  /home/granvilliers-l/local/include/gaol/gaol \
  /home/granvilliers-l/local/include/gaol/gaol_config.h \
  /home/granvilliers-l/local/include/gaol/gaol_configuration.h \
@@ -177,15 +192,26 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
  /home/granvilliers-l/local/include/gaol/gaol_interval2f.h \
  /usr/lib/gcc/x86_64-linux-gnu/7/include/pmmintrin.h \
  /home/granvilliers-l/local/include/gaol/gaol_allocator.h \
- ../src/realpaver/IntervalTraits.hpp ../src/realpaver/RealVector.hpp \
- ../src/realpaver/Double.hpp /usr/include/c++/7/cfenv \
- ../src/realpaver/LinumDoubleTraits.hpp ../src/realpaver/Double.hpp \
+ ../src/realpaver/IntervalTraits.hpp \
+ ../src/realpaver/LinumIntervalTraits.hpp ../src/realpaver/Interval.hpp \
  ../src/realpaver/LinumTraits.hpp ../src/realpaver/NumericVector.hpp \
- /usr/include/c++/7/vector /usr/include/c++/7/bits/stl_construct.h \
- /usr/include/c++/7/bits/stl_uninitialized.h \
- /usr/include/c++/7/bits/stl_vector.h \
+ /usr/include/c++/7/vector /usr/include/c++/7/bits/stl_vector.h \
  /usr/include/c++/7/bits/stl_bvector.h /usr/include/c++/7/bits/vector.tcc \
- ../src/realpaver/AssertDebug.hpp ../src/realpaver/LinumTraits.hpp
+ ../src/realpaver/AssertDebug.hpp ../src/realpaver/LinumTraits.hpp \
+ ../src/realpaver/RealVector.hpp ../src/realpaver/Double.hpp \
+ /usr/include/c++/7/cfenv ../src/realpaver/LinumDoubleTraits.hpp \
+ ../src/realpaver/Double.hpp ../src/realpaver/Scope.hpp \
+ /usr/include/c++/7/map /usr/include/c++/7/bits/stl_tree.h \
+ /usr/include/c++/7/bits/stl_map.h /usr/include/c++/7/bits/stl_multimap.h \
+ ../src/realpaver/ScopeMap.hpp /usr/include/c++/7/unordered_map \
+ /usr/include/c++/7/bits/hashtable.h \
+ /usr/include/c++/7/bits/hashtable_policy.h \
+ /usr/include/c++/7/bits/unordered_map.h ../src/realpaver/Variable.hpp \
+ ../src/realpaver/Tolerance.hpp ../src/realpaver/RealFunction.hpp \
+ ../src/realpaver/dag.hpp /usr/include/c++/7/unordered_set \
+ /usr/include/c++/7/bits/unordered_set.h ../src/realpaver/Constraint.hpp \
+ ../src/realpaver/term.hpp ../src/realpaver/Problem.hpp \
+ ../src/realpaver/Objective.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -537,27 +563,63 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/Exception.hpp:
 
-../src/realpaver/IntervalSlicer.hpp:
+../src/realpaver/BOLocalConjugate.hpp:
 
-/usr/include/c++/7/list:
+../src/realpaver/BOLocalSolver.hpp:
 
-/usr/include/c++/7/bits/stl_list.h:
+../src/realpaver/Common.hpp:
 
-/usr/include/c++/7/bits/allocated_ptr.h:
+/usr/include/c++/7/limits:
 
-/usr/include/c++/7/ext/aligned_buffer.h:
+../src/realpaver/IntervalVector.hpp:
 
-/usr/include/c++/7/bits/list.tcc:
+/usr/include/c++/7/memory:
 
-../src/realpaver/interval.hpp:
+/usr/include/c++/7/bits/stl_construct.h:
+
+/usr/include/c++/7/bits/stl_uninitialized.h:
+
+/usr/include/c++/7/bits/stl_tempbuf.h:
+
+/usr/include/c++/7/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/7/ext/concurrence.h:
+
+/usr/include/c++/7/bits/uses_allocator.h:
+
+/usr/include/c++/7/bits/unique_ptr.h:
 
 /usr/include/c++/7/utility:
 
 /usr/include/c++/7/bits/stl_relops.h:
 
-../src/realpaver/Common.hpp:
+/usr/include/c++/7/tuple:
 
-/usr/include/c++/7/limits:
+/usr/include/c++/7/array:
+
+/usr/include/c++/7/bits/invoke.h:
+
+/usr/include/c++/7/bits/shared_ptr.h:
+
+/usr/include/c++/7/bits/shared_ptr_base.h:
+
+/usr/include/c++/7/bits/allocated_ptr.h:
+
+/usr/include/c++/7/bits/refwrap.h:
+
+/usr/include/c++/7/ext/aligned_buffer.h:
+
+/usr/include/c++/7/bits/shared_ptr_atomic.h:
+
+/usr/include/c++/7/bits/atomic_base.h:
+
+/usr/include/c++/7/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/7/backward/auto_ptr.h:
+
+../src/realpaver/Bitset.hpp:
+
+../src/realpaver/Interval.hpp:
 
 ../src/realpaver/IntervalImpl.hpp:
 
@@ -637,25 +699,15 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 
 ../src/realpaver/IntervalTraits.hpp:
 
-../src/realpaver/RealVector.hpp:
+../src/realpaver/LinumIntervalTraits.hpp:
 
-../src/realpaver/Double.hpp:
-
-/usr/include/c++/7/cfenv:
-
-../src/realpaver/LinumDoubleTraits.hpp:
-
-../src/realpaver/Double.hpp:
+../src/realpaver/Interval.hpp:
 
 ../src/realpaver/LinumTraits.hpp:
 
 ../src/realpaver/NumericVector.hpp:
 
 /usr/include/c++/7/vector:
-
-/usr/include/c++/7/bits/stl_construct.h:
-
-/usr/include/c++/7/bits/stl_uninitialized.h:
 
 /usr/include/c++/7/bits/stl_vector.h:
 
@@ -666,3 +718,53 @@ work.o: work.cpp /usr/include/stdc-predef.h /usr/include/c++/7/iostream \
 ../src/realpaver/AssertDebug.hpp:
 
 ../src/realpaver/LinumTraits.hpp:
+
+../src/realpaver/RealVector.hpp:
+
+../src/realpaver/Double.hpp:
+
+/usr/include/c++/7/cfenv:
+
+../src/realpaver/LinumDoubleTraits.hpp:
+
+../src/realpaver/Double.hpp:
+
+../src/realpaver/Scope.hpp:
+
+/usr/include/c++/7/map:
+
+/usr/include/c++/7/bits/stl_tree.h:
+
+/usr/include/c++/7/bits/stl_map.h:
+
+/usr/include/c++/7/bits/stl_multimap.h:
+
+../src/realpaver/ScopeMap.hpp:
+
+/usr/include/c++/7/unordered_map:
+
+/usr/include/c++/7/bits/hashtable.h:
+
+/usr/include/c++/7/bits/hashtable_policy.h:
+
+/usr/include/c++/7/bits/unordered_map.h:
+
+../src/realpaver/Variable.hpp:
+
+../src/realpaver/Tolerance.hpp:
+
+../src/realpaver/RealFunction.hpp:
+
+../src/realpaver/dag.hpp:
+
+/usr/include/c++/7/unordered_set:
+
+/usr/include/c++/7/bits/unordered_set.h:
+
+../src/realpaver/Constraint.hpp:
+
+../src/realpaver/term.hpp:
+
+../src/realpaver/Problem.hpp:
+
+../src/realpaver/Objective.hpp:

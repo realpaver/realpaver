@@ -50,7 +50,7 @@ librealpaver_la_include_HEADERS = \
 		HC4Contractor.hpp \
 		Inflator.hpp \
 		IntContractor.hpp \
-		interval.hpp \
+		Interval.hpp \
 		IntervalFunction.hpp \
 		IntervalImpl.hpp \
 		IntervalNewton.hpp \
@@ -71,7 +71,7 @@ librealpaver_la_include_HEADERS = \
 		parser_bison.hpp \
 		Preprocessor.hpp \
 		Problem.hpp \
-		propagator.hpp \
+		Propagator.hpp \
 		RealFunction.hpp \
 		RealVector.hpp \
 		Scope.hpp \
@@ -125,7 +125,7 @@ librealpaver_la_SOURCES = \
 		HC4Contractor.cpp \
 		Inflator.cpp \
 		IntContractor.cpp \
-		interval.cpp \
+		Interval.cpp \
 		IntervalFunction.cpp \
 		IntervalNewton.cpp \
 		IntervalSlicer.cpp \
@@ -140,7 +140,7 @@ librealpaver_la_SOURCES = \
 		parser.cpp \
 		Preprocessor.cpp \
 		Problem.cpp \
-		propagator.cpp \
+		Propagator.cpp \
 		RealFunction.cpp \
 		RealVector.cpp \
 		Scope.cpp \

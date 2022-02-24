@@ -10,7 +10,7 @@
 #ifndef REALPAVER_TOLERANCE_HPP
 #define REALPAVER_TOLERANCE_HPP
 
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 
 namespace realpaver {
 

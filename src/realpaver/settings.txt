@@ -35,6 +35,22 @@ TIME_LIMIT = 100.0
 SPLIT_OBJ = YES
 
 ###############################################################################
+## CONTRACTORS AND PROPAGATION                                               ##
+###############################################################################
+
+# Tolerance on the distance between consecutive intervals in a propagator
+# Given the interval domain Xk of a variable x at the beginning of the k-th
+# iteration and Xk' the reduced domain, the variable is considered as modified
+# if the distance between Xk and Xk+1 is greater than this tolerance and it
+# leads to propagation with respect to this variable.
+# ABS_PROPAGATOR_DTOL: absolute tolerance
+# REL_PROPAGATOR_DTOL: relative tolerance
+REL_PROPAGATOR_DTOL = 1.0e-8
+
+# Iteration limit for constraint propagation
+PROPAGATOR_ITER_LIMIT = 50
+
+###############################################################################
 ## LOCAL OPTIMiZATION BASED ON LINE SEARCH                                   ##
 ###############################################################################
 

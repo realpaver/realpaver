@@ -9,7 +9,7 @@
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalVector.hpp"
-#include "realpaver/RealVector.hpp"
+#include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
 
@@ -597,13 +597,14 @@ public:
  * 
  * To every function is associated an image, i.e. we have L <= f(x) <= U.
  *****************************************************************************/
-class DagFun {
+class DagFun : public RealFunction {
 public:
    // constructors
    DagFun(Dag* dag, size_t root, const Interval& image);
 
    // image of the function
    const Interval& getImage() const;
+   void setImage(const Interval& x);
 
    // returns the dag
    Dag* dag() const;
@@ -725,6 +726,15 @@ public:
    // useful after a call to rdiff()
    double rderiv(const Variable& v) const;
 
+   ///@{
+   /// Overrides the methods of RealFunction
+   Scope realFunScope() const;
+   size_t realFunArity() const;
+   double realFunEval(const RealVector& x);
+   void realFunDiff(const RealVector& x, RealVector& g);
+   void realFunEvalDiff(const RealVector& x, RealVector& g, double& val);
+   ///@}
+
 private:
    Dag* dag_;                    // the DAG
    std::vector<DagNode*> node_;  // vector of nodes of the function sorted by
@@ -751,6 +761,11 @@ private:
 inline const Interval& DagFun::getImage() const
 {
    return image_;
+}
+
+inline void DagFun::setImage(const Interval& x)
+{
+   image_ = x;
 }
 
 inline Dag* DagFun::dag() const
@@ -911,6 +926,10 @@ public:
    // inserts a constraint and returns its index in the DAG
    // throws an exception if the constraint cannot be handled
    size_t insert(const Constraint& c);
+
+   // inserts a constraint and returns its index in the DAG
+   // throws an exception if the constraint cannot be handled
+   size_t insert(const Term& t, const Interval& img = Interval::universe());
 
    // inserts a constant node and returns its index
    size_t insertConstNode(const Interval& x);

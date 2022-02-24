@@ -11,7 +11,7 @@
 #define REALPAVER_VARIABLE_HPP
 
 #include <memory>
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver/Tolerance.hpp"
 
 namespace realpaver {

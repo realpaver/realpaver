@@ -66,7 +66,7 @@ double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
    while (iter)
    {
       RealVector y = x + step * p;
-      double fy = f.realEval(y);
+      double fy = f.realFunEval(y);
 
       if (!Double::isNan(fy))
       {
@@ -95,29 +95,9 @@ BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
                            const RealVector& initialPoint,
                            RealVector& finalPoint)
 {
-   size_t dim = f.getRealFunArity();
+   size_t dim = f.realFunArity();
 
    double uk, uk_1, step;
-
-
-
-
-TODO, CHANGER LES BELONGSTO EN CONTAINS
-
-REVOIR CELA DANS INTERVALVECTOR, voir la question des dimensions...
-pas forcement les memes.................
-... dans le cas des BO, la region a une variable en plus, ...
-
-this contient other si tout element de other est contenu dans this,
-sachant que this peut etre de plus grande dimension
-
-
-
-
-
-
-
-
 
    RealVector xk(initialPoint),  // current point
               grad(dim),         // gradient
@@ -128,8 +108,10 @@ sachant que this peut etre de plus grande dimension
               pk_1(dim);         // next value of pk
 
    // evaluates and differentiates f at xk
-   uk = f.realEvalDiff(xk, grad);
+   f.realFunEvalDiff(xk, grad, uk);
    setInitObjVal(uk);
+
+   DEBUG("\npoint : " << xk << "   " << "grad : " << grad << "   val : " << uk);
 
    if (Double::isNan(uk) || grad.isNan())
       return OptimizationStatus::Other;
@@ -139,10 +121,12 @@ sachant que this peut etre de plus grande dimension
    pk = sk;
    step = findStep(f, xk, pk, sk, uk);
 
+   DEBUG("dir : " << pk << "   step : " << step);
+
    if (step > 0.0)
       xk_1 = xk + step * pk;
 
-   if (step < 0.0 || (!xk_1.belongsTo(region)))
+   if (step < 0.0 || (!region.contains(xk_1)))
       return OptimizationStatus::Other;
 
    // loop
@@ -151,8 +135,10 @@ sachant que this peut etre de plus grande dimension
 
    while (iter)
    {
-      uk_1 = f.realEvalDiff(xk_1, grad);
+      f.realFunEvalDiff(xk_1, grad, uk_1);
       sk_1 = -grad;
+
+   DEBUG("\npoint : " << xk_1 << "   " << "grad : " << grad << "   val : " << uk_1);
     
       if (Double::isNan(uk_1) || grad.isNan())
       {
@@ -168,6 +154,8 @@ sachant que this peut etre de plus grande dimension
       pk_1 = sk_1 + beta * pk;
       step = findStep(f, xk_1, pk_1, sk_1, uk_1);
 
+   DEBUG("dir : " << pk_1 << "   step : " << step);
+
       if (step > 0.0)
       {
          // update
@@ -181,7 +169,7 @@ sachant que this peut etre de plus grande dimension
          iter = false;  // no improvement of the upper bound
       }
 
-      if (iter && (!xk_1.belongsTo(region)))
+      if (iter && (!region.contains(xk_1)))
       {
          xk_1 = xk;
          uk_1 = uk;

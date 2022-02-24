@@ -11,7 +11,7 @@
 #define REALPAVER_INTERVAL_SLICER_HPP
 
 #include <list>
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 
 namespace realpaver {
 

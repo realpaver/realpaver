@@ -91,12 +91,11 @@ public:
 
    ///@{
    /// Overrides the methods of RealFunction
-   Scope getRealFunScope() const;
-   size_t getRealFunArity() const;
-   double realEval(const RealVector& x);
-   bool isRealDiff() const;
-   void realDiff(const RealVector& x, RealVector& g);
-   double realEvalDiff(const RealVector& x, RealVector& g);
+   Scope realFunScope() const;
+   size_t realFunArity() const;
+   double realFunEval(const RealVector& x);
+   void realFunDiff(const RealVector& x, RealVector& g);
+   void realFunEvalDiff(const RealVector& x, RealVector& g, double& val);
    ///@}
 
    ///@{

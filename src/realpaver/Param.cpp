@@ -25,11 +25,15 @@ Param::Param()
         dblmap_(),
         strmap_()
 {
-   tolmap_.insert(std::make_pair("XTOL", Tolerance::makeRel(1.0e-8)));
-   tolmap_.insert(std::make_pair("DTOL", Tolerance::makeRel(1.0e-8)));
+   Tolerance tol = Tolerance::makeRel(1.0e-8);
+
+   tolmap_.insert(std::make_pair("XTOL", tol));
+   tolmap_.insert(std::make_pair("DTOL", tol));
+   tolmap_.insert(std::make_pair("PROPAGATOR_DTOL", tol));
 
    intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
    intmap_.insert(std::make_pair("LS_ITER_LIMIT", 20));
+   intmap_.insert(std::make_pair("PROPAGATOR_ITER_LIMIT", 50));
 
    dblmap_.insert(std::make_pair("TIME_LIMIT", 100.0));
    dblmap_.insert(std::make_pair("LS_ARMIJO_COEF", 0.125));

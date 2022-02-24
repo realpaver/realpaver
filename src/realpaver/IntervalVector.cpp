@@ -47,8 +47,7 @@ void IntervalVector::set(Variable v, const Interval& x)
 bool IntervalVector::isEmpty() const
 {
    for (size_t i=0; i<size(); ++i)
-      if (at(i).isEmpty())
-         return true;
+      if (at(i).isEmpty()) return true;
 
    return false;
 }
@@ -104,8 +103,8 @@ RealVector IntervalVector::rCorner() const
 
 RealVector IntervalVector::corner(const Bitset& bs) const
 {
-   ASSERT(size() == bs.size(),
-          "interval vector and bitset with different sizes");
+   ASSERT(size() <= bs.size(), "Bad access to the corner of " << (*this) <<
+                               " given a bitset " << bs);
 
    RealVector co(size());
 
@@ -120,8 +119,8 @@ RealVector IntervalVector::corner(const Bitset& bs) const
 
 RealVector IntervalVector::oppositeCorner(const Bitset& bs) const
 {
-   ASSERT(size() == bs.size(),
-          "interval vector and bitset with different sizes");
+   ASSERT(size() <= bs.size(), "Bad access to the corner of " << (*this) <<
+                               " given a bitset " << bs);
 
    RealVector co(size());
 
@@ -136,24 +135,42 @@ RealVector IntervalVector::oppositeCorner(const Bitset& bs) const
 
 bool IntervalVector::contains(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(),
-          "Bad inclusion test: " << (*this) << " contains " << X);
+   ASSERT(size() >= X.size(), "Bad test " << (*this) << " contains " << X);
 
-   for (size_t i=0; i<size(); ++i)
-      if (!at(i).contains(X[i]))
-         return false;
+   for (size_t i=0; i<X.size(); ++i)
+      if (!at(i).contains(X[i])) return false;
 
    return true;
 }
 
 bool IntervalVector::strictlyContains(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(),
-          "Bad inclusion test: " << (*this) << " strictly contains " << X);
+   ASSERT(size() >= X.size(), "Bad test " << (*this) <<
+                              " strictly contains " << X);
 
-   for (size_t i=0; i<size(); ++i)
-      if (!at(i).strictlyContains(X[i]))
-         return false;
+   for (size_t i=0; i<X.size(); ++i)
+      if (!at(i).strictlyContains(X[i])) return false;
+
+   return true;
+}
+
+bool IntervalVector::contains(const RealVector& X) const
+{
+   ASSERT(size() >= X.size(), "Bad test " << (*this) << " contains " << X);
+
+   for (size_t i=0; i<X.size(); ++i)
+      if (!at(i).contains(X[i])) return false;
+
+   return true;
+}
+
+bool IntervalVector::strictlyContains(const RealVector& X) const
+{
+   ASSERT(size() >= X.size(), "Bad test " << (*this) <<
+                              " strictly contains " << X);
+
+   for (size_t i=0; i<X.size(); ++i)
+      if (!at(i).strictlyContains(X[i])) return false;
 
    return true;
 }
@@ -161,8 +178,7 @@ bool IntervalVector::strictlyContains(const IntervalVector& X) const
 bool IntervalVector::containsZero() const
 {
    for (size_t i=0; i<size(); ++i)
-      if (!at(i).containsZero())
-         return false;
+      if (!at(i).containsZero()) return false;
 
    return true;
 }
@@ -170,32 +186,28 @@ bool IntervalVector::containsZero() const
 bool IntervalVector::strictlyContainsZero() const
 {
    for (size_t i=0; i<size(); ++i)
-      if (!at(i).strictlyContainsZero())
-         return false;
+      if (!at(i).strictlyContainsZero()) return false;
 
    return true;
 }
 
 bool IntervalVector::isDisjoint(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(),
-          "Bad test: " << (*this) << " is disjoint from " << X);
+   ASSERT(size() == X.size(), "Bad test " << (*this) <<
+                              " is disjoint from " << X);
 
    for (size_t i=0; i<size(); ++i)
-      if (at(i).isDisjoint(X[i]))
-         return true;
+      if (at(i).isDisjoint(X[i])) return true;
 
    return false;
 }
 
 bool IntervalVector::overlaps(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(),
-          "Bad test: " << (*this) << " overlaps " << X);
+   ASSERT(size() == X.size(), "Bad test " << (*this) << " overlaps " << X);
 
    for (size_t i=0; i<size(); ++i)
-      if (!at(i).overlaps(X[i]))
-         return false;
+      if (!at(i).overlaps(X[i])) return false;
 
    return true;
 }
@@ -225,8 +237,7 @@ double IntervalVector::infNorm() const
 
 void IntervalVector::interAssign(const IntervalVector& X)
 {
-   ASSERT(size() == X.size(),
-          "Bad assignment: " << (*this) << " &= " << X);
+   ASSERT(size() == X.size(), "Bad assignment " << (*this) << " &= " << X);
 
    for (size_t i=0; i<size(); ++i)
       set(i, at(i) & X[i]);
@@ -234,8 +245,7 @@ void IntervalVector::interAssign(const IntervalVector& X)
 
 void IntervalVector::hullAssign(const IntervalVector& X)
 {
-   ASSERT(size() == X.size(),
-          "Bad assignment: " << (*this) << " |= " << X);
+   ASSERT(size() == X.size(), "Bad assignment " << (*this) << " |= " << X);
 
    for (size_t i=0; i<size(); ++i)
       set(i, at(i) | X[i]);
@@ -247,8 +257,8 @@ void IntervalVector::hullAssignOnScope(const IntervalVector& X, const Scope& s)
    {
       size_t i = v.getId();
 
-      ASSERT(i < size(),   "Bad assignment: " << " |= " << X << " on " << s);
-      ASSERT(i < X.size(), "Bad assignment: " << " |= " << X << " on " << s);
+      ASSERT(i < size(),   "Bad assignment " << " |= " << X << " on " << s);
+      ASSERT(i < X.size(), "Bad assignment " << " |= " << X << " on " << s);
 
       set(i, at(i) | X[i]);
    }
@@ -260,8 +270,8 @@ void IntervalVector::setOnScope(const IntervalVector& X, const Scope& s)
    {
       size_t i = v.getId();
 
-      ASSERT(i < size(),   "Bad assignment: " << " := " << X << " on " << s);
-      ASSERT(i < X.size(), "Bad assignment: " << " := " << X << " on " << s);
+      ASSERT(i < size(),   "Bad assignment " << " := " << X << " on " << s);
+      ASSERT(i < X.size(), "Bad assignment " << " := " << X << " on " << s);
 
       set(i, X[i]);
    }

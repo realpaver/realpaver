@@ -1,20 +1,65 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/propagator.hpp"
-
-
-// TODO: param, virer improvement factor
+#include "realpaver/Param.hpp"
+#include "realpaver/Propagator.hpp"
 
 namespace realpaver {
 
-Propagator::Propagator(ContractorPool* pool) :
-   Contractor(),
-   pool_(pool),
-   imp_(10.0),
-   max_steps_(50),
-   certif_()
+Propagator::Propagator(ContractorPool* pool)
+      : Contractor(),
+        pool_(pool),
+        dtol_(Param::getTolParam("PROPAGATOR_DTOL")),
+        maxiter_(Param::getIntParam("PROPAGATOR_ITER_LIMIT")),
+        certif_()
 {}
+
+Tolerance Propagator::getDistTol() const
+{
+   return dtol_;
+}
+
+void Propagator::setDistTol(Tolerance tol)
+{
+   dtol_ = tol;
+}
+
+size_t Propagator::poolSize() const
+{
+   return pool_->poolSize();
+}
+
+size_t Propagator::getMaxIterations() const
+{
+   return maxiter_;
+}
+
+void Propagator::setMaxIterations(size_t n)
+{
+   maxiter_ = n;
+}
+
+Proof Propagator::proofAt(size_t i) const
+{
+   return certif_[i];
+}
+
+ContractorPool* Propagator::getPool() const
+{
+   return pool_;
+}
+
+void Propagator::setPool(ContractorPool* pool)
+{
+   pool_ = pool;
+}
 
 bool Propagator::dependsOn(const Bitset& bs) const
 {
@@ -28,7 +73,7 @@ Scope Propagator::scope() const
 
 Proof Propagator::contract(IntervalVector& X)
 {
-   ASSERT(pool_ != nullptr, "null pool pointer in a propagator");
+   ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
    Scope scope = pool_->scope();
 
@@ -37,8 +82,7 @@ Proof Propagator::contract(IntervalVector& X)
 
    // propagation queue
    std::vector<size_t> queue(N);
-   for (size_t i=0; i<N; ++i)
-      queue[i] = i;
+   for (size_t i=0; i<N; ++i) queue[i] = i;
 
    // number of active contractors
    size_t count = N;
@@ -75,7 +119,7 @@ Proof Propagator::contract(IntervalVector& X)
          // propagation when the queue is empty
          if (next == count)
          {
-            if (++num_steps > max_steps_)
+            if (++num_steps > maxiter_)
             {
                count = 0;
             }
@@ -86,12 +130,17 @@ Proof Propagator::contract(IntervalVector& X)
                modified.setAllZero();
 
                for (auto v : scope)
-                  if (imp_.test(X.operator[](v.getId()),
-                                             copy->operator[](v.getId())))
+               {
+                  size_t iv = v.getId();
+                  const Interval& prev = copy->at(iv);
+                  const Interval& curr = X.at(iv);
+                  
+                  if (!dtol_.hasTolerance(prev, curr))
                   {
                      isModified = true;
                      modified.setOne(v.getId());
                   }
+               }
 
                // activates all the contractors depending on a modified
                // variable

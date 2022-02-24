@@ -123,17 +123,17 @@ size_t BOModel::dim() const
    return objscope_.size();
 }
 
-Scope BOModel::getRealFunScope() const
+Scope BOModel::realFunScope() const
 {
    return objscope_;
 }
 
-size_t BOModel::getRealFunArity() const
+size_t BOModel::realFunArity() const
 {
    return objscope_.size();
 }
 
-double BOModel::realEval(const RealVector& x)
+double BOModel::realFunEval(const RealVector& x)
 {
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
@@ -143,7 +143,7 @@ double BOModel::realEval(const RealVector& x)
    return f->node(f->nbNode() - 2)->rval();
 }
 
-void BOModel::realDiff(const RealVector& x, RealVector& g)
+void BOModel::realFunDiff(const RealVector& x, RealVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
@@ -155,7 +155,7 @@ void BOModel::realDiff(const RealVector& x, RealVector& g)
       g.set(i, dag_->fun(i)->rval());   
 }
 
-double BOModel::realEvalDiff(const RealVector& x, RealVector& g)
+void BOModel::realFunEvalDiff(const RealVector& x, RealVector& g, double& val)
 {
    // evaluates the dag
    dag_->reval(x);
@@ -166,7 +166,7 @@ double BOModel::realEvalDiff(const RealVector& x, RealVector& g)
 
    // finds the value
    DagFun* f = dag_->fun(dim());
-   return f->node(f->nbNode() - 2)->rval();
+   val = f->node(f->nbNode() - 2)->rval();
 }
 
 Interval BOModel::intervalEval(const IntervalVector& x)
