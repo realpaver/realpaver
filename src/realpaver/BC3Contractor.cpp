@@ -1,54 +1,68 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/contractor_bc3.hpp"
+#include "realpaver/BC3Contractor.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
-// TODO : param
-
-Bc3Contractor::Bc3Contractor(Dag* dag, size_t i, size_t iv) :
-   f_(dag, i, iv),
-   peeler_(2.0),
-   smax_(20)
+BC3Contractor::BC3Contractor(Dag* dag, size_t i, size_t iv)
+      : f_(dag, i, iv),
+        peeler_(Param::getDblParam("BC3_PEEL_FACTOR")),
+        maxiter_(Param::getIntParam("BC3_ITER_LIMIT"))
 {
    newton_ = new IntervalNewton();
 }
 
-Bc3Contractor::~Bc3Contractor()
+BC3Contractor::~BC3Contractor()
 {
    delete newton_;
 }
 
-int Bc3Contractor::maxSteps() const
+double BC3Contractor::getPeelFactor() const
 {
-   return smax_;
+   return peeler_.getFactor();
 }
 
-void Bc3Contractor::setMaxSteps(const int& val)
+void BC3Contractor::setPeelFactor(double f)
 {
-   ASSERT(val > 0, "bad parameter in the BC3 contractor");
-
-   smax_ = val;
+   peeler_.setFactor(f);
 }
 
-IntervalNewton* Bc3Contractor::getNewton() const
+size_t BC3Contractor::getMaxIter() const
+{
+   return maxiter_;
+}
+
+void BC3Contractor::setMaxIter(size_t val)
+{
+   maxiter_ = val;
+}
+
+IntervalNewton* BC3Contractor::getNewton() const
 {
    return newton_;
 }
 
-Proof Bc3Contractor::shrinkLeft(const Interval& x, Interval& res)
+Proof BC3Contractor::shrinkLeft(const Interval& x, Interval& res)
 {
-   return shrink(x, res, SplitLeft, PeelLeft);
+   return shrink(x, res, splitLeft, peelLeft);
 }
 
-Proof Bc3Contractor::shrinkRight(const Interval& x, Interval& res)
+Proof BC3Contractor::shrinkRight(const Interval& x, Interval& res)
 {
-   return shrink(x, res, SplitRight, PeelRight);   
+   return shrink(x, res, splitRight, peelRight);   
 }
 
-Proof Bc3Contractor::isConsistent(const Interval& x)
+Proof BC3Contractor::isConsistent(const Interval& x)
 {
    Interval e = f_.eval(x);
    const Interval& image = f_.getFun()->getImage();
@@ -66,17 +80,17 @@ Proof Bc3Contractor::isConsistent(const Interval& x)
       return Proof::Maybe;
 }
 
-Scope Bc3Contractor::scope() const
+Scope BC3Contractor::scope() const
 {
    return f_.getFun()->scope();
 }
 
-bool Bc3Contractor::dependsOn(const Bitset& bs) const
+bool BC3Contractor::dependsOn(const Bitset& bs) const
 {
    return f_.dependsOn(bs);
 }
 
-bool Bc3Contractor::SplitLeft(const Interval& x, Interval& x1, Interval& x2)
+bool BC3Contractor::splitLeft(const Interval& x, Interval& x1, Interval& x2)
 {
    double c = x.midpoint();
    x1 = Interval(c,x.right());
@@ -84,7 +98,7 @@ bool Bc3Contractor::SplitLeft(const Interval& x, Interval& x1, Interval& x2)
    return x.strictlyContains(c);
 }
 
-bool Bc3Contractor::SplitRight(const Interval& x, Interval& x1, Interval& x2)
+bool BC3Contractor::splitRight(const Interval& x, Interval& x1, Interval& x2)
 {
    double c = x.midpoint();
    x1 = Interval(x.left(), c);
@@ -92,27 +106,27 @@ bool Bc3Contractor::SplitRight(const Interval& x, Interval& x1, Interval& x2)
    return x.strictlyContains(c);
 }
 
-void Bc3Contractor::PeelLeft(const Interval& x, IntervalPeeler& peeler,
+void BC3Contractor::peelLeft(const Interval& x, IntervalPeeler& peeler,
                              Interval& b, Interval& r)
 {
    b = peeler.peelLeft(x);
    r = Interval(b.right(), x.right());
 }
 
-void Bc3Contractor::PeelRight(const Interval& x, IntervalPeeler& peeler,
+void BC3Contractor::peelRight(const Interval& x, IntervalPeeler& peeler,
                               Interval& b, Interval& r)
 {
    b = peeler.peelRight(x);
    r = Interval(x.left(), b.left());
 }
 
-Proof Bc3Contractor::shrink(const Interval& x, Interval& res,
+Proof BC3Contractor::shrink(const Interval& x, Interval& res,
                             SplitFun split_fun, PeelFun peel_fun)
 {
    std::stack<Interval> stak;
    Interval b, z, z1, z2;
    Proof proof;
-   size_t num_steps = 0;
+   size_t nbiter = 0;
 
    stak.push(x);
    while (!stak.empty())
@@ -120,7 +134,7 @@ Proof Bc3Contractor::shrink(const Interval& x, Interval& res,
       Interval y( stak.top() );
       stak.pop();
       
-      if (++num_steps > smax_)
+      if (++nbiter > maxiter_)
       {
          res = y;
          return Proof::Maybe;
@@ -164,7 +178,7 @@ Proof Bc3Contractor::shrink(const Interval& x, Interval& res,
    return Proof::Empty;
 }
 
-Proof Bc3Contractor::contract(IntervalVector& X)
+Proof BC3Contractor::contract(IntervalVector& X)
 {
    Interval lsol, rsol;
    Proof proof, certif;
@@ -201,7 +215,7 @@ Proof Bc3Contractor::contract(IntervalVector& X)
    return std::max(proof,certif);
 }
 
-void Bc3Contractor::print(std::ostream& os) const
+void BC3Contractor::print(std::ostream& os) const
 {
    os << "BC3 contractor #" << f_.getFun()->index();
 }

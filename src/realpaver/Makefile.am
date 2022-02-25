@@ -25,6 +25,7 @@ librealpaver_la_includedir=$(includedir)/realpaver
 
 librealpaver_la_include_HEADERS = \
 		Bitset.hpp \
+		BC3Contractor.hpp \
 		BOContractor.hpp \
 		BOLocalConjugate.hpp \
 		BOLocalSolver.hpp \
@@ -34,15 +35,14 @@ librealpaver_la_include_HEADERS = \
 		BOSolver.hpp \
 		BOSpace.hpp \
 		BOSplit.hpp \
+		CIDContractor.hpp \
 		Common.hpp \
 		config.hpp \
 		Constraint.hpp \
 		ConstraintFixer.hpp \
 		ConstraintRelaxor.hpp \
 		Contractor.hpp \
-		contractor_bc3.hpp \
 		contractor_bc4.hpp \
-		contractor_cid.hpp \
 		ContractorPool.hpp \
 		dag.hpp \
 		Double.hpp \
@@ -81,10 +81,10 @@ librealpaver_la_include_HEADERS = \
 		term.hpp \
 		TermDeriver.hpp \
 		TermFixer.hpp \
-		thick_fun.hpp \
+		ThickIntervalFunction.hpp \
 		Timer.hpp \
 		Tolerance.hpp \
-		uni_fun.hpp \
+		UniIntervalFunction.hpp \
 		Variable.hpp
 
 if COND_INTERVAL_GAOL
@@ -102,6 +102,7 @@ endif
 librealpaver_la_SOURCES = \
 		AssertDebug.hpp \
 		Bitset.cpp \
+		BC3Contractor.cpp \
 		BOContractor.cpp \
 		BOLocalConjugate.cpp \
 		BOLocalSolver.cpp \
@@ -111,14 +112,13 @@ librealpaver_la_SOURCES = \
 		BOSolver.cpp \
 		BOSpace.cpp \
 		BOSplit.cpp \
+		CIDContractor.cpp \
 		Common.cpp \
 		Constraint.cpp \
 		ConstraintFixer.cpp \
 		ConstraintRelaxor.cpp \
 		Contractor.cpp \
-		contractor_bc3.cpp \
 		contractor_bc4.cpp \
-		contractor_cid.cpp \
 		ContractorPool.cpp \
 		dag.cpp \
 		Exception.cpp \
@@ -150,9 +150,9 @@ librealpaver_la_SOURCES = \
 		TermDeriver.cpp \
 		TermFixer.cpp \
 		Timer.cpp \
-		thick_fun.cpp \
+		ThickIntervalFunction.cpp \
 		Tolerance.cpp \
-		uni_fun.cpp \
+		UniIntervalFunction.cpp \
 		Variable.cpp
 
 if COND_LP_CLP

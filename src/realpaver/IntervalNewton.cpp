@@ -76,7 +76,7 @@ void IntervalNewton::setInflator(const Inflator& inflator)
    inflator_ = inflator;
 }
 
-Proof IntervalNewton::contract(UniFun& f, Interval& x)
+Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
 {
    LOG_INTERNAL("\nInterval Newton: contract " << x);
    LOG_INTERNAL("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
@@ -122,7 +122,7 @@ Proof IntervalNewton::contract(UniFun& f, Interval& x)
    return proof;
 }
 
-Proof IntervalNewton::step(UniFun& f, Interval& x)
+Proof IntervalNewton::step(UniIntervalFunction& f, Interval& x)
 {
    std::pair<Interval,Interval> p = f.evalDiff(x);
    const Interval& fx = p.first;
@@ -178,7 +178,7 @@ Proof IntervalNewton::step(UniFun& f, Interval& x)
    return proof;
 }
 
-Proof IntervalNewton::localSearch(UniFun& f, Interval& x)
+Proof IntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)
 {
    Proof proof = Proof::Maybe;
    Interval y = x.midpoint();
@@ -231,7 +231,7 @@ Proof IntervalNewton::localSearch(UniFun& f, Interval& x)
    return proof;
 }
 
-Proof IntervalNewton::localStep(UniFun& f, Interval& x)
+Proof IntervalNewton::localStep(UniIntervalFunction& f, Interval& x)
 {
    Interval ix = inflator_.inflate(x);
 

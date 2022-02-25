@@ -1,17 +1,28 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/contractor_cid.hpp"
+#include "realpaver/CIDContractor.hpp"
 
 namespace realpaver {
 
 CidContractor::CidContractor(const SharedContractor& op, const Variable& v,
-                             IntervalSlicer* slicer) :
-   op_(op), v_(v), slicer_(slicer), bs_()
+                             IntervalSlicer* slicer)
+         : op_(op),
+           v_(v),
+           slicer_(slicer),
+           bs_()
 {
-   ASSERT(op_.get() != nullptr, "");
-   ASSERT(op->scope().contains(v), "");
-   ASSERT(slicer_ != nullptr, "");
+   ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
+   ASSERT(op->scope().contains(v), "Bad variable " << v <<
+                                   " in a CID contractor");
+   ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
 
    bs_ = op->scope().toBitset();
 }

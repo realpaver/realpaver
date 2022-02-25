@@ -15,8 +15,9 @@ AM_CPPFLAGS = -I.. -I../src
 
 CLEANFILES = *~
 
-noinst_PROGRAMS = bop newton lp
+noinst_PROGRAMS = bop lp newton propag
 
 bop_SOURCES = bop.cpp
-newton_SOURCES = newton.cpp
 lp_SOURCES = lp.cpp
+newton_SOURCES = newton.cpp
+propag_SOURCES = propag.cpp

@@ -12,7 +12,7 @@
 
 #include "realpaver/Inflator.hpp"
 #include "realpaver/Tolerance.hpp"
-#include "realpaver/uni_fun.hpp"
+#include "realpaver/UniIntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -59,7 +59,7 @@ public:
    /// @param f a univariate function
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof contract(UniFun& f, Interval& x);
+   Proof contract(UniIntervalFunction& f, Interval& x);
 
    /// Step of the contraction method
    /// @param f a univariate function
@@ -68,19 +68,19 @@ public:
    ///
    /// The interval x is contracted as the intersection of x and
    /// the set hull( c - f(c) / f'(x) ) where c is the midpoint of x.
-   Proof step(UniFun& f, Interval& x);
+   Proof step(UniIntervalFunction& f, Interval& x);
 
    /// Local search method
    /// @param f a univariate function
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localSearch(UniFun& f, Interval& x);
+   Proof localSearch(UniIntervalFunction& f, Interval& x);
 
    /// Step of the local search method
    /// @param f a univariate function
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localStep(UniFun& f, Interval& x);
+   Proof localStep(UniIntervalFunction& f, Interval& x);
 
    /// Sets a limit of iterations of the iterative methods
    /// @param n new value of the limit

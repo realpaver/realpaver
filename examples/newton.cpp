@@ -3,7 +3,7 @@
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/thick_fun.hpp"
+#include "realpaver/ThickIntervalFunction.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -19,7 +19,7 @@ int main(void)
 
    Dag dag;
    size_t idx = dag.insert(c);
-   ThickFun f(&dag, idx, x.getId());
+   ThickIntervalFunction f(&dag, idx, x.getId());
 
    IntervalNewton newton;
    Interval I( x.getDomain() );

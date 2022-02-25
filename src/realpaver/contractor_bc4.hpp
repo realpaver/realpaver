@@ -4,7 +4,7 @@
 #define REALPAVER_CONTRACTOR_BC4_HPP
 
 #include <vector>
-#include "realpaver/contractor_bc3.hpp"
+#include "realpaver/BC3Contractor.hpp"
 #include "realpaver/HC4Contractor.hpp"
 
 namespace realpaver {
@@ -35,7 +35,7 @@ public:
 private:
    DagFun* f_;                         // function in a dag
    HC4Contractor* hc4_;                // hc4 contractor associated with f_
-   std::vector<Bc3Contractor*> bc3_;   // bc3 contractors associated with
+   std::vector<BC3Contractor*> bc3_;   // bc3 contractors associated with
                                        // the variables having multiple
                                        // occurrences in f_
 };

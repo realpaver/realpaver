@@ -134,7 +134,7 @@ Proof Propagator::contract(IntervalVector& X)
                   size_t iv = v.getId();
                   const Interval& prev = copy->at(iv);
                   const Interval& curr = X.at(iv);
-                  
+
                   if (!dtol_.hasTolerance(prev, curr))
                   {
                      isModified = true;
