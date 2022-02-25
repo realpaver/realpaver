@@ -142,11 +142,11 @@ am__installdirs = "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(librealpaver_la_includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
-	BC3Contractor.cpp BOContractor.cpp BOLocalConjugate.cpp \
-	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
-	BOSolver.cpp BOSpace.cpp BOSplit.cpp CIDContractor.cpp \
-	Common.cpp Constraint.cpp ConstraintFixer.cpp \
-	ConstraintRelaxor.cpp Contractor.cpp contractor_bc4.cpp \
+	BC3Contractor.cpp BC4Contractor.cpp BOContractor.cpp \
+	BOLocalConjugate.cpp BOLocalSolver.cpp BOModel.cpp BONode.cpp \
+	BOPresolver.cpp BOSolver.cpp BOSpace.cpp BOSplit.cpp \
+	CIDContractor.cpp Common.cpp Constraint.cpp \
+	ConstraintFixer.cpp ConstraintRelaxor.cpp Contractor.cpp \
 	ContractorPool.cpp dag.cpp Exception.cpp HC4Contractor.cpp \
 	Inflator.cpp IntContractor.cpp Interval.cpp \
 	IntervalFunction.cpp IntervalNewton.cpp IntervalSlicer.cpp \
@@ -154,27 +154,27 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
 	parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
 	RealFunction.cpp RealVector.cpp Scope.cpp ScopeMap.cpp \
-	SearchNode.cpp term.cpp TermDeriver.cpp TermFixer.cpp \
-	Timer.cpp ThickIntervalFunction.cpp Tolerance.cpp \
-	UniIntervalFunction.cpp Variable.cpp LPSolverClp.cpp \
-	LPSolverGurobi.cpp
+	SearchNode.cpp Selector.cpp term.cpp TermDeriver.cpp \
+	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
+	LPSolverClp.cpp LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
-	BOContractor.lo BOLocalConjugate.lo BOLocalSolver.lo \
-	BOModel.lo BONode.lo BOPresolver.lo BOSolver.lo BOSpace.lo \
-	BOSplit.lo CIDContractor.lo Common.lo Constraint.lo \
-	ConstraintFixer.lo ConstraintRelaxor.lo Contractor.lo \
-	contractor_bc4.lo ContractorPool.lo dag.lo Exception.lo \
+	BC4Contractor.lo BOContractor.lo BOLocalConjugate.lo \
+	BOLocalSolver.lo BOModel.lo BONode.lo BOPresolver.lo \
+	BOSolver.lo BOSpace.lo BOSplit.lo CIDContractor.lo Common.lo \
+	Constraint.lo ConstraintFixer.lo ConstraintRelaxor.lo \
+	Contractor.lo ContractorPool.lo dag.lo Exception.lo \
 	HC4Contractor.lo Inflator.lo IntContractor.lo Interval.lo \
 	IntervalFunction.lo IntervalNewton.lo IntervalSlicer.lo \
 	IntervalVector.lo IntervalUnion.lo Logger.lo LPModel.lo \
 	Objective.lo Param.lo parser_bison.lo parser_flex.lo parser.lo \
 	Preprocessor.lo Problem.lo Propagator.lo RealFunction.lo \
-	RealVector.lo Scope.lo ScopeMap.lo SearchNode.lo term.lo \
-	TermDeriver.lo TermFixer.lo Timer.lo ThickIntervalFunction.lo \
-	Tolerance.lo UniIntervalFunction.lo Variable.lo \
-	$(am__objects_1) $(am__objects_2)
+	RealVector.lo Scope.lo ScopeMap.lo SearchNode.lo Selector.lo \
+	term.lo TermDeriver.lo TermFixer.lo Timer.lo \
+	ThickIntervalFunction.lo Tolerance.lo UniIntervalFunction.lo \
+	Variable.lo $(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -257,11 +257,11 @@ am__can_run_installinfo = \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
-	BC3Contractor.hpp BOContractor.hpp BOLocalConjugate.hpp \
-	BOLocalSolver.hpp BOModel.hpp BONode.hpp BOPresolver.hpp \
-	BOSolver.hpp BOSpace.hpp BOSplit.hpp CIDContractor.hpp \
-	Common.hpp config.hpp Constraint.hpp ConstraintFixer.hpp \
-	ConstraintRelaxor.hpp Contractor.hpp contractor_bc4.hpp \
+	BC3Contractor.hpp BC4Contractor.hpp BOContractor.hpp \
+	BOLocalConjugate.hpp BOLocalSolver.hpp BOModel.hpp BONode.hpp \
+	BOPresolver.hpp BOSolver.hpp BOSpace.hpp BOSplit.hpp \
+	CIDContractor.hpp Common.hpp config.hpp Constraint.hpp \
+	ConstraintFixer.hpp ConstraintRelaxor.hpp Contractor.hpp \
 	ContractorPool.hpp dag.hpp Double.hpp Exception.hpp \
 	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Interval.hpp \
 	IntervalFunction.hpp IntervalImpl.hpp IntervalNewton.hpp \
@@ -271,10 +271,11 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	LPSolver.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
 	Propagator.hpp RealFunction.hpp RealVector.hpp Scope.hpp \
-	ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp term.hpp \
-	TermDeriver.hpp TermFixer.hpp ThickIntervalFunction.hpp \
-	Timer.hpp Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
-	IntervalGaol.hpp LPSolverClp.hpp LPSolverGurobi.hpp
+	ScopeMap.hpp SearchNode.hpp Selector.hpp SplitStrategy.hpp \
+	term.hpp TermDeriver.hpp TermFixer.hpp \
+	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
+	UniIntervalFunction.hpp Variable.hpp IntervalGaol.hpp \
+	LPSolverClp.hpp LPSolverGurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
 	$(LISP)configure.hpp.in
@@ -444,13 +445,13 @@ EXTRA_DIST = \
 lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir = $(includedir)/realpaver
 librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
-	BOContractor.hpp BOLocalConjugate.hpp BOLocalSolver.hpp \
-	BOModel.hpp BONode.hpp BOPresolver.hpp BOSolver.hpp \
-	BOSpace.hpp BOSplit.hpp CIDContractor.hpp Common.hpp \
-	config.hpp Constraint.hpp ConstraintFixer.hpp \
-	ConstraintRelaxor.hpp Contractor.hpp contractor_bc4.hpp \
-	ContractorPool.hpp dag.hpp Double.hpp Exception.hpp \
-	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Interval.hpp \
+	BC4Contractor.hpp BOContractor.hpp BOLocalConjugate.hpp \
+	BOLocalSolver.hpp BOModel.hpp BONode.hpp BOPresolver.hpp \
+	BOSolver.hpp BOSpace.hpp BOSplit.hpp CIDContractor.hpp \
+	Common.hpp config.hpp Constraint.hpp ConstraintFixer.hpp \
+	ConstraintRelaxor.hpp Contractor.hpp ContractorPool.hpp \
+	dag.hpp Double.hpp Exception.hpp HC4Contractor.hpp \
+	Inflator.hpp IntContractor.hpp Interval.hpp \
 	IntervalFunction.hpp IntervalImpl.hpp IntervalNewton.hpp \
 	IntervalSlicer.hpp IntervalTraits.hpp IntervalVector.hpp \
 	IntervalUnion.hpp LinumDoubleTraits.hpp \
@@ -458,26 +459,28 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	LPSolver.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
 	Propagator.hpp RealFunction.hpp RealVector.hpp Scope.hpp \
-	ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp term.hpp \
-	TermDeriver.hpp TermFixer.hpp ThickIntervalFunction.hpp \
-	Timer.hpp Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
-	$(am__append_1) $(am__append_2) $(am__append_3)
+	ScopeMap.hpp SearchNode.hpp Selector.hpp SplitStrategy.hpp \
+	term.hpp TermDeriver.hpp TermFixer.hpp \
+	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
+	UniIntervalFunction.hpp Variable.hpp $(am__append_1) \
+	$(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
-	BOContractor.cpp BOLocalConjugate.cpp BOLocalSolver.cpp \
-	BOModel.cpp BONode.cpp BOPresolver.cpp BOSolver.cpp \
-	BOSpace.cpp BOSplit.cpp CIDContractor.cpp Common.cpp \
-	Constraint.cpp ConstraintFixer.cpp ConstraintRelaxor.cpp \
-	Contractor.cpp contractor_bc4.cpp ContractorPool.cpp dag.cpp \
-	Exception.cpp HC4Contractor.cpp Inflator.cpp IntContractor.cpp \
-	Interval.cpp IntervalFunction.cpp IntervalNewton.cpp \
-	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
-	Logger.cpp LPModel.cpp Objective.cpp Param.cpp \
-	parser_bison.ypp parser_flex.lpp parser.cpp Preprocessor.cpp \
-	Problem.cpp Propagator.cpp RealFunction.cpp RealVector.cpp \
-	Scope.cpp ScopeMap.cpp SearchNode.cpp term.cpp TermDeriver.cpp \
-	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
-	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
-	$(am__append_4) $(am__append_5)
+	BC4Contractor.cpp BOContractor.cpp BOLocalConjugate.cpp \
+	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
+	BOSolver.cpp BOSpace.cpp BOSplit.cpp CIDContractor.cpp \
+	Common.cpp Constraint.cpp ConstraintFixer.cpp \
+	ConstraintRelaxor.cpp Contractor.cpp ContractorPool.cpp \
+	dag.cpp Exception.cpp HC4Contractor.cpp Inflator.cpp \
+	IntContractor.cpp Interval.cpp IntervalFunction.cpp \
+	IntervalNewton.cpp IntervalSlicer.cpp IntervalVector.cpp \
+	IntervalUnion.cpp Logger.cpp LPModel.cpp Objective.cpp \
+	Param.cpp parser_bison.ypp parser_flex.lpp parser.cpp \
+	Preprocessor.cpp Problem.cpp Propagator.cpp RealFunction.cpp \
+	RealVector.cpp Scope.cpp ScopeMap.cpp SearchNode.cpp \
+	Selector.cpp term.cpp TermDeriver.cpp TermFixer.cpp Timer.cpp \
+	ThickIntervalFunction.cpp Tolerance.cpp \
+	UniIntervalFunction.cpp Variable.cpp $(am__append_4) \
+	$(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = parser_bison.hpp
@@ -586,6 +589,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BC3Contractor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BC4Contractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOContractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalConjugate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalSolver.Plo@am__quote@
@@ -627,6 +631,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Scope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ScopeMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SearchNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermDeriver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermFixer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ThickIntervalFunction.Plo@am__quote@
@@ -634,7 +639,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tolerance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UniIntervalFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/contractor_bc4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_bison.Plo@am__quote@

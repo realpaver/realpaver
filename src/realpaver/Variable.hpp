@@ -97,6 +97,9 @@ public:
    /// @param name of the variable
    Variable(const std::string& name);
 
+   /// Creates a variable with no representation
+   Variable();
+
    /// Default copy constructor
    Variable(const Variable&) = default;
 

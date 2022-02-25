@@ -71,11 +71,11 @@ public:
    void setDistTol(Tolerance tol);
 
    /// @return the maximum number of propagation steps
-   size_t getMaxIterations() const;
+   size_t getMaxIter() const;
 
    /// Sets the maximum number of propagation steps
    /// @param n new value
-   void setMaxIterations(size_t n);
+   void setMaxIter(size_t n);
 
    /// Gets a proof certificate after a contraction
    /// @param i an index of a contractor between 0 and getNbContractors()

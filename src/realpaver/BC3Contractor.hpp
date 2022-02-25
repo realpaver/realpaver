@@ -19,7 +19,18 @@ namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the BC3Revise contractor implementing box consistency.
-///////////////////////////////////////////////////////////////////////////////
+///
+/// It applies to a bounded thick interval function with form a <= F(x) <= b.
+/// Given x in X, it finds the outermost consistent values by combining
+/// search with an interval Newton method. It returns the interval [c, d]
+/// such that c is the smallest value in X verifying a <= F(c) <= b and d
+/// is the greatest value in X such that a <= F(d) <= b. If there is no
+/// consistent value in X, it returns the empty set. This is the theory.
+///
+/// In practice, we use a tolerance to check the consistency of small intervals
+/// at the bounds of domains. The peel factor is a percentage of the width of
+/// an interval.
+//////////////////////////////////////////////////////////////////////////////////
 class BC3Contractor : public Contractor {
 public:
    /// Creates a contractor
@@ -65,7 +76,7 @@ public:
    Proof contract(IntervalVector& X);
    void print(std::ostream& os) const;
    ///@}
-   
+
 private:
    ThickIntervalFunction f_;  // univariate thick interval function
    IntervalPeeler peeler_;    // peeling at interval bounds

@@ -84,10 +84,10 @@ public:
 
    /// Sets a limit of iterations of the iterative methods
    /// @param n new value of the limit
-   void setMaxIterations(int n);
+   void setMaxIter(size_t n);
 
    /// @return the maximum number of iterations of the iterative method
-   int getMaxIterations() const;
+   size_t getMaxIter() const;
 
    /// @return the tolerance on the width of an interval in the contraction
    ///         method
@@ -123,7 +123,7 @@ public:
    void setInflator(const Inflator& inflator);
 
 private:
-   int maxiter_;
+   size_t maxiter_;
    Tolerance xtol_;
    Tolerance dtol_;
    Tolerance ldtol_;

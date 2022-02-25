@@ -27,8 +27,7 @@ bool BOSplit::applyImpl(SharedBONode node)
 {
    ASSERT(scope_.maxIndex()<node->getRegion()->size(),
           "Inconsistency between scope and region in a BO node");
-   
-   
+
    // selectionner alternativement avec une frequence la stratégie
    // largest et la stratégie smear
    //

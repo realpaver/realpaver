@@ -90,6 +90,9 @@ Variable::Variable(const std::string& name) :
    rep_(std::make_shared<VariableRep>(name))
 {}
 
+Variable::Variable() : rep_(nullptr)
+{}
+
 size_t Variable::getId() const
 {
    return rep_->getId();

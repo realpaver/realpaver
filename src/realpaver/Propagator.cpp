@@ -36,12 +36,12 @@ size_t Propagator::poolSize() const
    return pool_->poolSize();
 }
 
-size_t Propagator::getMaxIterations() const
+size_t Propagator::getMaxIter() const
 {
    return maxiter_;
 }
 
-void Propagator::setMaxIterations(size_t n)
+void Propagator::setMaxIter(size_t n)
 {
    maxiter_ = n;
 }

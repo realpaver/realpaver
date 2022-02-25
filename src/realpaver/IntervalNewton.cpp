@@ -17,19 +17,19 @@
 namespace realpaver {
 
 IntervalNewton::IntervalNewton() :
-   maxiter_(Integer::max()),
+   maxiter_(Param::getIntParam("NEWTON_ITER_LIMIT")),
    xtol_(Param::getTolParam("XTOL")),
    dtol_(Param::getTolParam("DTOL")),
    ldtol_(Param::getTolParam("DTOL")),
    inflator_()
 {}
 
-int IntervalNewton::getMaxIterations() const
+size_t IntervalNewton::getMaxIter() const
 {
    return maxiter_;
 }
 
-void IntervalNewton::setMaxIterations(int n)
+void IntervalNewton::setMaxIter(size_t n)
 {
    ASSERT(n > 0, "bad parameter in the interval Interval Newton method");
 
@@ -84,7 +84,7 @@ Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
    Proof proof = Proof::Maybe;
    Interval y = x;
    bool iter = true;
-   int steps = 0;
+   size_t nbiter = 0;
 
    do
    {
@@ -104,7 +104,7 @@ Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
          if (p == Proof::Feasible)
             proof = p;
 
-         if (++steps >= maxiter_)
+         if (++nbiter >= maxiter_)
             iter = false;
 
          if (xtol_.hasTolerance(y))
@@ -183,7 +183,7 @@ Proof IntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)
    Proof proof = Proof::Maybe;
    Interval y = x.midpoint();
    bool iter = true;
-   int steps = 0;
+   size_t nbiter = 0;
    double dold,
           dcur = std::numeric_limits<double>::infinity();
 
@@ -207,7 +207,7 @@ Proof IntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)
          iter = false;
       }
    
-      else if (++steps >= maxiter_)
+      else if (++nbiter >= maxiter_)
       {
          y = x;
          iter = false;

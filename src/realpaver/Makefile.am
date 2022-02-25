@@ -26,6 +26,7 @@ librealpaver_la_includedir=$(includedir)/realpaver
 librealpaver_la_include_HEADERS = \
 		Bitset.hpp \
 		BC3Contractor.hpp \
+		BC4Contractor.hpp \
 		BOContractor.hpp \
 		BOLocalConjugate.hpp \
 		BOLocalSolver.hpp \
@@ -42,7 +43,6 @@ librealpaver_la_include_HEADERS = \
 		ConstraintFixer.hpp \
 		ConstraintRelaxor.hpp \
 		Contractor.hpp \
-		contractor_bc4.hpp \
 		ContractorPool.hpp \
 		dag.hpp \
 		Double.hpp \
@@ -77,6 +77,7 @@ librealpaver_la_include_HEADERS = \
 		Scope.hpp \
 		ScopeMap.hpp \
 		SearchNode.hpp \
+		Selector.hpp \
 		SplitStrategy.hpp \
 		term.hpp \
 		TermDeriver.hpp \
@@ -103,6 +104,7 @@ librealpaver_la_SOURCES = \
 		AssertDebug.hpp \
 		Bitset.cpp \
 		BC3Contractor.cpp \
+		BC4Contractor.cpp \
 		BOContractor.cpp \
 		BOLocalConjugate.cpp \
 		BOLocalSolver.cpp \
@@ -118,7 +120,6 @@ librealpaver_la_SOURCES = \
 		ConstraintFixer.cpp \
 		ConstraintRelaxor.cpp \
 		Contractor.cpp \
-		contractor_bc4.cpp \
 		ContractorPool.cpp \
 		dag.cpp \
 		Exception.cpp \
@@ -146,6 +147,7 @@ librealpaver_la_SOURCES = \
 		Scope.cpp \
 		ScopeMap.cpp \
 		SearchNode.cpp \
+		Selector.cpp \
 		term.cpp \
 		TermDeriver.cpp \
 		TermFixer.cpp \

@@ -37,6 +37,7 @@ Param::Param()
    intmap_.insert(std::make_pair("LS_ITER_LIMIT",         20));
    intmap_.insert(std::make_pair("PROPAGATOR_ITER_LIMIT", 50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",        30));
+   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",     20));
 
    dblmap_.insert(std::make_pair("TIME_LIMIT",      100.0));
    dblmap_.insert(std::make_pair("LS_ARMIJO_COEF",  0.125));
