@@ -540,10 +540,10 @@ public:
 
    /// Sets a limit of iterations of the optimization method
    /// @param n a maximum number of iterations
-   void setMaxIterations(int n);
+   void setMaxIter(size_t n);
 
    /// @return the maximum number of iterations of the optimization method
-   int getMaxIterations() const;
+   size_t getMaxIter() const;
 
    /// @return the status of the last optimization stage
    OptimizationStatus getStatus() const;
@@ -564,7 +564,7 @@ private:
    bool minimization_;
    double objval_;
    double maxseconds_;
-   int maxiter_;
+   size_t maxiter_;
    OptimizationStatus status_;
 
    void printLinExpr(std::ostream& os, LinExpr e) const;

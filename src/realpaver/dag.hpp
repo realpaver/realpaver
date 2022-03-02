@@ -8,7 +8,7 @@
 #include <vector>
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalFunction.hpp"
 #include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
@@ -597,7 +597,7 @@ public:
  * 
  * To every function is associated an image, i.e. we have L <= f(x) <= U.
  *****************************************************************************/
-class DagFun : public RealFunction {
+class DagFun : public IntervalFunction, public RealFunction {
 public:
    // constructors
    DagFun(Dag* dag, size_t root, const Interval& image);
@@ -727,12 +727,22 @@ public:
    double rderiv(const Variable& v) const;
 
    ///@{
+   /// Overrides the methods of IntervalFunction
+   Scope ifunScope() const;
+   size_t ifunArity() const;
+   Interval ifunEval(const IntervalVector& x);
+   void ifunDiff(const IntervalVector& x, IntervalVector& g);
+   void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
+                      Interval& valf);
+   ///@}
+
+   ///@{
    /// Overrides the methods of RealFunction
-   Scope realFunScope() const;
-   size_t realFunArity() const;
-   double realFunEval(const RealVector& x);
-   void realFunDiff(const RealVector& x, RealVector& g);
-   void realFunEvalDiff(const RealVector& x, RealVector& g, double& val);
+   Scope rfunScope() const;
+   size_t rfunArity() const;
+   double rfunEval(const RealVector& x);
+   void rfunDiff(const RealVector& x, RealVector& g);
+   void rfunEvalDiff(const RealVector& x, RealVector& g, double& valf);
    ///@}
 
 private:

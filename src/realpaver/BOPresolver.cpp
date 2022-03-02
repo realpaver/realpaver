@@ -14,10 +14,10 @@
 namespace realpaver {
 
 BOPresolver::BOPresolver(BOModel& model)
-      :  pool_(),
-         propagator_(),
-         init_(nullptr),
-         region_(model.getInitRegion())
+      : pool_(),
+        propagator_(),
+        init_(nullptr),
+        region_(model.getInitRegion())
 {
    init_ = std::make_shared<IntervalVector>(model.getInitRegion());
 

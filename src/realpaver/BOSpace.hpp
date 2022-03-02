@@ -81,7 +81,7 @@ public:
    void simplify(const double& u);
 
    /// @return the number of nodes inserted in this
-   int getNbNodes() const;
+   size_t getNbNodes() const;
 
 private:
    struct Item {
@@ -117,7 +117,7 @@ private:
    size_t id_;       // next id
    size_t ex_;       // counts the extractions
    size_t f_;        // frequency
-   int nbNodes_;    // counter of nodes inserted in this
+   size_t nbNodes_;  // counter of nodes inserted in this
 
    // extracts the i-th node from this space
    SharedBONode extractNode(size_t i);

@@ -25,22 +25,28 @@ public:
    /// Virtual destructor
    virtual ~IntervalFunction();
 
+   /// @return the scopeof this, i.e. the set of variables
+   virtual Scope ifunScope() const = 0;
+
+   /// @return the number of variables in this
+   virtual size_t ifunArity() const = 0;
+
    /// Evaluates this
    /// @param x argument of this
    /// @return value of this at x
-   virtual Interval intervalEval(const IntervalVector& x) = 0;
+   virtual Interval ifunEval(const IntervalVector& x) = 0;
 
    /// Differentiates this, i.e. evaluates its gradient
    /// @param x argument of this
    /// @param g gradient of this at x (output)
-   virtual void intervalDiff(const IntervalVector& x, IntervalVector& g) = 0;
+   virtual void ifunDiff(const IntervalVector& x, IntervalVector& g) = 0;
 
    /// Evaluates and differentiates this
    /// @param x argument of this
    /// @param g gradient of this at x (output)
-   /// @return value of this at x
-   virtual Interval intervalEvalDiff(const IntervalVector& x,
-                                     IntervalVector& g) = 0;
+   /// @param val value of this at x
+   virtual void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
+                              Interval& val) = 0;
 };
 
 } // namespace

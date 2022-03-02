@@ -9,8 +9,9 @@
 
 #include "realpaver/BOPresolver.hpp"
 #include "realpaver/BOSolver.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/Preprocessor.hpp"
+#include "realpaver/Selector.hpp"
 
 namespace realpaver {
 
@@ -20,6 +21,7 @@ BOSolver::BOSolver(Problem& problem)
         solprob_(),
         model_(nullptr),
         localSolver_(nullptr),
+        split_(nullptr),
         status_(OptimizationStatus::Other),
         sol_(problem.nbVars()),
         objval_(Interval::universe()),
@@ -33,16 +35,13 @@ BOSolver::BOSolver(Problem& problem)
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
-
-   // default local solver
-   localSolver_ = new BOLocalSolver();
 }
 
 BOSolver::~BOSolver()
 {
-   if (model_ != nullptr) delete model_;
-
+   if (model_ != nullptr)       delete model_;
    if (localSolver_ != nullptr) delete localSolver_;
+   if (split_ != nullptr)       delete split_;
 }
 
 double BOSolver::getPreprocessingTime() const
@@ -55,16 +54,16 @@ double BOSolver::getSolvingTime() const
    return stimer_.elapsedTime();
 }
 
-int BOSolver::getNodeLimit() const
+size_t BOSolver::getNodeLimit() const
 {
    return nodelimit_;
 }
 
-void BOSolver::setNodeLimit(int limit)
+void BOSolver::setNodeLimit(size_t n)
 {
-   ASSERT(limit > 0, "Bad node limit in a BO solver");
+   ASSERT(n > 0, "Bad node limit in a BO solver");
 
-   nodelimit_ = limit;
+   nodelimit_ = n;
 }
 
 bool BOSolver::isSplitableObj() const
@@ -77,14 +76,41 @@ void BOSolver::setSplitableObj(bool split)
    splitobj_ = split;
 }
 
-void BOSolver::setLocalSolver(BOLocalSolver* solver)
+void BOSolver::makeLocalSolver()
 {
-   ASSERT(solver != nullptr,
-          "Local solver expected but null pointer as input");
+   // default local solver
+   localSolver_ = new BOLocalSolver();
+}
 
-   if (localSolver_ != nullptr) delete localSolver_;
+void BOSolver::makeSplit()
+{
+   Selector* selector = nullptr;
+   IntervalSlicer* slicer = nullptr;
 
-   localSolver_ = solver;
+   const Scope& S = isSplitableObj() ? model_->getFullScope() :
+                                       model_->getObjScope();
+
+   std::string sel = Param::getStrParam("SPLIT_SELECTOR");
+   if (sel == "MaxDom") selector = new SelectorMaxDom(S);
+   if (sel == "MaxSmear") selector = new SelectorMaxSmear(model_, S);
+
+   std::string sli = Param::getStrParam("SPLIT_SLICER");
+   if (sli == "Bisection") slicer = new IntervalBisecter();
+   if (sli == "Peeling")
+   {
+      double f = Param::getDblParam("SPLIT_PEEL_FACTOR");
+      slicer = new IntervalPeeler(f);
+   }
+   if (sli == "Partition")
+   {
+      size_t n = Param::getIntParam("SPLIT_NB_SLICES");
+      slicer = new IntervalPartitioner(n);
+   }
+
+   THROW_IF(selector == nullptr || slicer == nullptr,
+            "Unable to make the split object in a BO solver");
+
+   split_ = new BOSplit(selector, slicer);
 }
 
 bool BOSolver::preprocess()
@@ -187,23 +213,39 @@ bool BOSolver::presolve()
 
 bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 {
+   // TODO
    // stops the search if the space is empty
    if (space.isEmpty()) return false;
 
    SharedBONode node = space.extractNode();
 
 
-   // TODO
-   // attention on retourne faux si la resolution termine
+DEBUG("NODE : " << *node->getRegion());
 
-   return false;
+   // splits the node
+   split_->apply(node);
+
+   if (split_->getNbNodes() == 1)
+   {
+      sol.insertNode(node);
+      return false;
+   }
+   else
+   {
+      for (auto it = split_->begin(); it != split_->end(); ++it)
+      {
+         SharedBONode aux = *it;
+         space.insertNode(aux);
+      }
+      return true;
+   }
 }
 
 void BOSolver::findInitialBounds(SharedBONode& node)
 {
    IntervalVector* region = node->getRegion();
 
-   Interval val = model_->intervalEval(*region);
+   Interval val = model_->ifunEval(*region);
 
    if (val.isEmpty())
    {
@@ -213,6 +255,8 @@ void BOSolver::findInitialBounds(SharedBONode& node)
 
    node->setLower(val.left());
    node->setUpper(val.right());
+
+   region->set(model_->getObjVar(), val);
 
    DEBUG("Node bounds : " << node->getLower() << ", " << node->getUpper());
 
@@ -225,6 +269,10 @@ void BOSolver::findInitialBounds(SharedBONode& node)
 
 void BOSolver::branchAndBound()
 {
+   // creates the algorithmic components
+   makeLocalSolver();
+   makeSplit();
+
    // creates the initial node
    SharedBONode node;
  
@@ -244,8 +292,7 @@ void BOSolver::branchAndBound()
    // finds bounds of the objective in the initial node
    findInitialBounds(node);
 
-   if (status_ == OptimizationStatus::Infeasible)
-      return;
+   if (status_ == OptimizationStatus::Infeasible) return;
 
    // creates the space of nodes to be processed
    BOSpace space;

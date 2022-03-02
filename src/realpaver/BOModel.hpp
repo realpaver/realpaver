@@ -38,7 +38,7 @@ namespace realpaver {
 /// This class implements the RealFunction interface since its objective
 /// function acts as a real function.
 ///////////////////////////////////////////////////////////////////////////////
-class BOModel : public RealFunction {
+class BOModel : public IntervalFunction, public RealFunction {
 public:
    /// Creates a model
    /// @param problem problem to be solved
@@ -90,20 +90,22 @@ public:
    bool isInteriorVar(const Variable& v) const;
 
    ///@{
-   /// Overrides the methods of RealFunction
-   Scope realFunScope() const;
-   size_t realFunArity() const;
-   double realFunEval(const RealVector& x);
-   void realFunDiff(const RealVector& x, RealVector& g);
-   void realFunEvalDiff(const RealVector& x, RealVector& g, double& val);
+   /// Overrides the methods of IntervalFunction
+   Scope ifunScope() const;
+   size_t ifunArity() const;
+   Interval ifunEval(const IntervalVector& x);
+   void ifunDiff(const IntervalVector& x, IntervalVector& g);
+   void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
+                      Interval& valf);
    ///@}
 
    ///@{
-   /// Overrides the methods of IntervalFunction
-   Interval intervalEval(const IntervalVector& x);
-   bool isIntervalDiff() const;
-   void intervalDiff(const IntervalVector& x, IntervalVector& g);
-   Interval intervalEvalDiff(const IntervalVector& x, IntervalVector& g);
+   /// Overrides the methods of RealFunction
+   Scope rfunScope() const;
+   size_t rfunArity() const;
+   double rfunEval(const RealVector& x);
+   void rfunDiff(const RealVector& x, RealVector& g);
+   void rfunEvalDiff(const RealVector& x, RealVector& g, double& val);
    ///@}
 
 private:

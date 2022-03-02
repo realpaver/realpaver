@@ -1541,32 +1541,61 @@ double DagFun::rderiv(const Variable& v) const
    return dag_->findVarNode(v.getId())->rdv();
 }
 
-Scope DagFun::realFunScope() const
+Scope DagFun::rfunScope() const
 {
    return scope();
 }
 
-size_t DagFun::realFunArity() const
+size_t DagFun::rfunArity() const
 {
    return scope().size();   
 }
 
-double DagFun::realFunEval(const RealVector& x)
+double DagFun::rfunEval(const RealVector& x)
 {
    return reval(x);
 }
 
-void DagFun::realFunDiff(const RealVector& x, RealVector& g)
+void DagFun::rfunDiff(const RealVector& x, RealVector& g)
 {
    rdiff(x);
    toRgrad(g);
 }
 
-void DagFun::realFunEvalDiff(const RealVector& x, RealVector& g, double& val)
+void DagFun::rfunEvalDiff(const RealVector& x, RealVector& g, double& valf)
 {
    rdiff(x);
    toRgrad(g);
-   val = rval();
+   valf = rval();
+}
+
+Scope DagFun::ifunScope() const
+{
+   return scope();
+}
+
+size_t DagFun::ifunArity() const
+{
+   return scope().size();   
+}
+
+Interval DagFun::ifunEval(const IntervalVector& x)
+{
+   return eval(x);
+}
+
+void DagFun::ifunDiff(const IntervalVector& x, IntervalVector& g)
+{
+   diff(x);
+   toGrad(g);
+}
+
+void DagFun::ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
+                          Interval& valf)
+{
+   diff(x);
+   toGrad(g);
+   valf = val();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

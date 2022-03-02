@@ -70,7 +70,7 @@ void LPSolver::makeObj()
 void LPSolver::makeClpSimplex()
 {
    simplex_->setMaximumSeconds(getMaxSeconds());
-   simplex_->setMaximumIterations(getMaxIterations());
+   simplex_->setMaximumIterations(getMaxIter());
   
    makeVars();
    makeCtrs();

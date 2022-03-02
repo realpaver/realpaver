@@ -45,7 +45,7 @@ OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
                                            RealVector& finalPoint)
 {
    finalPoint = initialPoint;
-   initObjVal_ = finalObjVal_ = f.realFunEval(initialPoint);
+   initObjVal_ = finalObjVal_ = f.rfunEval(initialPoint);
 
    return (Double::isInf(initObjVal_) ||
            Double::isNan(initObjVal_)) ? OptimizationStatus::Other :

@@ -54,7 +54,7 @@ Interval BOSpace::getObjEnclosure() const
    return Interval(getLowestLowerBound(), getLowestUpperBound());
 }
 
-int BOSpace::getNbNodes() const
+size_t BOSpace::getNbNodes() const
 {
    return nbNodes_;
 }

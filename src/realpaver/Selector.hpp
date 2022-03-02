@@ -11,6 +11,7 @@
 #define REALPAVER_SELECTOR_HPP
 
 #include <vector>
+#include "realpaver/IntervalFunction.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/Scope.hpp"
 #include "realpaver/Tolerance.hpp"
@@ -71,6 +72,35 @@ public:
    /// @return a pair <b, v> such that no variable is selected if b = false,
    ///         otherwise v is the selected variable
    std::pair<bool, Variable> selectVar(const IntervalVector& X);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a selector of the variable with maximum smear.
+///////////////////////////////////////////////////////////////////////////////
+class SelectorMaxSmear : public Selector {
+public:
+   /// Creates a selector on a set of variables
+   ///@param f a function
+   ///@param s a scope
+   SelectorMaxSmear(IntervalFunction* f, const Scope& s);
+
+   /// Destructor
+   ~SelectorMaxSmear() = default;
+
+   /// Default copy constructor
+   SelectorMaxSmear(const SelectorMaxSmear&) = default;
+
+   /// No assignment
+   SelectorMaxSmear& operator=(const SelectorMaxSmear&) = delete;
+
+   /// Overrides
+   /// @param X a region
+   /// @return a pair <b, v> such that no variable is selected if b = false,
+   ///         otherwise v is the selected variable
+   std::pair<bool, Variable> selectVar(const IntervalVector& X);
+
+private:
+   IntervalFunction* f_;
 };
 
 } // namespace

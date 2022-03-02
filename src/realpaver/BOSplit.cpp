@@ -11,33 +11,47 @@
 
 namespace realpaver {
 
-BOSplit::BOSplit(const Scope& scope)
+BOSplit::BOSplit(Selector* selector, IntervalSlicer* slicer)
       : SplitStrategy<SharedBONode>(),
-        scope_(scope)
+        selector_(selector),
+        slicer_(slicer)
 {
-   ASSERT(!scope.isEmpty(), "Empty scope in a split object");
+   ASSERT(selector != nullptr, "No selector in a split object");
+   ASSERT(slicer != nullptr, "No slicer in a split object");
 }
 
 BOSplit::~BOSplit()
 {
-   // TODO   
+   if (selector_ != nullptr) delete selector_;
+   if (slicer_ != nullptr) delete slicer_;
 }
 
 bool BOSplit::applyImpl(SharedBONode node)
 {
-   ASSERT(scope_.maxIndex()<node->getRegion()->size(),
-          "Inconsistency between scope and region in a BO node");
+   IntervalVector* X = node->getRegion();
 
-   // selectionner alternativement avec une frequence la stratégie
-   // largest et la stratégie smear
-   //
-   // embarquer un vectur de tolérances pour les variables
-   //
-   // Comme IntervalVector -> ToleranceVector
-   //
-   // par défaut on prend les tolerances dans les objets variables
-   //
-   // on peut aussi affecter tout le vecteur...
+   std::pair<bool, Variable> p = selector_->selectVar(*X);
+   if (!p.first) return false;
+
+   size_t id = p.second.getId();
+
+   size_t n = slicer_->apply(X->at(id));
+   if (n < 2) return false;
+
+   // reuses the input node
+   auto it = slicer_->begin();
+   X->set(id, *it);
+   push(node);
+
+   // generates the other nodes
+   while (++it != slicer_->end())
+   {
+      SharedBONode aux = std::make_shared<BONode>(*node);
+      aux->getRegion()->set(id, *it);
+      push(aux);
+   }
+
+   return true;
 }
 
 } // namespace

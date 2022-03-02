@@ -29,6 +29,7 @@ int main(void)
       problem.addObjective(minimize(3*u + sqr(x)*sqr(y) + x*y));
 
       BOSolver solver(problem);
+      solver.setNodeLimit(5);
 
       bool optimal = solver.optimize();
 

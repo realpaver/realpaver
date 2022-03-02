@@ -8,9 +8,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include "realpaver/Common.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/LPModel.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
@@ -388,8 +388,8 @@ LPModel::LPModel() :
    obj_(),
    minimization_(true),
    objval_(0.0),
-   maxseconds_(Double::inf()),
-   maxiter_(Integer::max()),
+   maxseconds_(Param::getDblParam("LP_TIME_LIMIT")),
+   maxiter_(Param::getIntParam("LP_ITER_LIMIT")),
    status_(OptimizationStatus::Other)
 {}
 
@@ -579,12 +579,12 @@ double LPModel::getMaxSeconds() const
    return maxseconds_;
 }
 
-void LPModel::setMaxIterations(int n)
+void LPModel::setMaxIter(size_t n)
 {
    maxiter_ = n;
 }
 
-int LPModel::getMaxIterations() const
+size_t LPModel::getMaxIter() const
 {
    return maxiter_;
 }

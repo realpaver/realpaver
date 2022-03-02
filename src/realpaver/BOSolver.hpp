@@ -13,6 +13,7 @@
 #include "realpaver/BOLocalSolver.hpp"
 #include "realpaver/BOModel.hpp"
 #include "realpaver/BOSpace.hpp"
+#include "realpaver/BOSplit.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
@@ -35,13 +36,6 @@ public:
    /// @return the status of the last optimization stage
    OptimizationStatus getStatus() const;
 
-   /// Sets a time limit of the optimization method
-   /// @param t a time limit in seconds
-   void setTimeLimit(double t);
-
-   /// @return the time limit of the optimization method in seconds
-   double getTimeLimit() const;
-
    /// @return the enclosure of the optimum after the optimization process
    Interval getObjEnclosure() const;
 
@@ -54,12 +48,19 @@ public:
    /// @return the solving time in seconds
    double getSolvingTime() const;
 
+   /// Sets a time limit of the optimization method
+   /// @param t a time limit in seconds
+   void setTimeLimit(double t);
+
+   /// @return the time limit of the optimization method in seconds
+   double getTimeLimit() const;
+
    /// @return the maximum number of nodes in the search tree
-   int getNodeLimit() const;
+   size_t getNodeLimit() const;
 
    /// Sets the maximum number of nodes in the search tree
-   /// @param limit new node limit
-   void setNodeLimit(int limit);
+   /// @param n new node limit
+   void setNodeLimit(size_t n);
 
    /// @return true if the domain of the objective variable is split
    bool isSplitableObj() const;
@@ -68,12 +69,6 @@ public:
    /// @param split true if the domain of the objective variable is split
    void setSplitableObj(bool split);
 
-   /// Sets the local optimization solver
-   /// @param solver a local solver
-   ///
-   /// The local solver is owned by this, i.e. it is destroyed with this
-   void setLocalSolver(BOLocalSolver* solver);
-
 private:
    Problem problem_;    // initial problem
    Problem preprob_;    // problem resulting from preprocessing
@@ -81,6 +76,7 @@ private:
 
    BOModel* model_;
    BOLocalSolver* localSolver_;
+   BOSplit* split_;
 
    // Result of optimization
    OptimizationStatus status_;
@@ -88,8 +84,12 @@ private:
    Interval objval_;
 
    // Auxiliary methods
+   void makeLocalSolver();
+   void makeSplit();
+
    bool preprocess();
    bool presolve();
+
    void solve();
    void branchAndBound();
    bool bbStep(BOSpace& space, BOSpace& sol);
@@ -105,12 +105,11 @@ private:
    // variable in the initial problem
    VarVarMapType vmap31_;
 
-   // Timings
    Timer ptimer_;      // timer for the preprocessing phase
    Timer stimer_;      // timer for the solving phase
-   double timelimit_;  // time limit in seconds
 
-   int nodelimit_;     // node limit
+   double timelimit_;  // time limit in seconds
+   size_t nodelimit_;  // node limit
    bool splitobj_;     // true if the domain of the objective variable is split
 };
 

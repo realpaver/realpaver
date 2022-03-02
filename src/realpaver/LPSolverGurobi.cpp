@@ -99,7 +99,7 @@ void LPSolver::makeObj()
 void LPSolver::makeGurobiSimplex()
 {
    env_->set(GRB_DoubleParam_TimeLimit, getMaxSeconds());  
-   env_->set(GRB_DoubleParam_IterationLimit, getMaxIterations());  
+   env_->set(GRB_DoubleParam_IterationLimit, getMaxIter());  
 
    makeVars();
    makeCtrs();

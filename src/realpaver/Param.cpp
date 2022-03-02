@@ -38,13 +38,19 @@ Param::Param()
    intmap_.insert(std::make_pair("PROPAGATOR_ITER_LIMIT", 50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",        30));
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",     20));
+   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",       5));
+   intmap_.insert(std::make_pair("LP_ITER_LIMIT",         50));
 
-   dblmap_.insert(std::make_pair("TIME_LIMIT",      100.0));
-   dblmap_.insert(std::make_pair("LS_ARMIJO_COEF",  0.125));
-   dblmap_.insert(std::make_pair("LS_STEP_TOL",     1.0e-8));
-   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR", 2.0));
+   dblmap_.insert(std::make_pair("TIME_LIMIT",        100.0));
+   dblmap_.insert(std::make_pair("LS_ARMIJO_COEF",    0.125));
+   dblmap_.insert(std::make_pair("LS_STEP_TOL",       1.0e-8));
+   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",   2.0));
+   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR", 10.0));
+   dblmap_.insert(std::make_pair("LP_TIME_LIMIT",     10.0));
 
-   strmap_.insert(std::make_pair("SPLIT_OBJ", "NO"));
+   strmap_.insert(std::make_pair("SPLIT_OBJ",      "NO"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTOR", "MaxDom"));
+   strmap_.insert(std::make_pair("SPLIT_SLICER",   "Bisection"));
 }
 
 Param::~Param()

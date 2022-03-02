@@ -123,17 +123,17 @@ size_t BOModel::dim() const
    return objscope_.size();
 }
 
-Scope BOModel::realFunScope() const
+Scope BOModel::rfunScope() const
 {
    return objscope_;
 }
 
-size_t BOModel::realFunArity() const
+size_t BOModel::rfunArity() const
 {
    return objscope_.size();
 }
 
-double BOModel::realFunEval(const RealVector& x)
+double BOModel::rfunEval(const RealVector& x)
 {
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
@@ -143,7 +143,7 @@ double BOModel::realFunEval(const RealVector& x)
    return f->node(f->nbNode() - 2)->rval();
 }
 
-void BOModel::realFunDiff(const RealVector& x, RealVector& g)
+void BOModel::rfunDiff(const RealVector& x, RealVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
@@ -155,7 +155,7 @@ void BOModel::realFunDiff(const RealVector& x, RealVector& g)
       g.set(i, dag_->fun(i)->rval());   
 }
 
-void BOModel::realFunEvalDiff(const RealVector& x, RealVector& g, double& val)
+void BOModel::rfunEvalDiff(const RealVector& x, RealVector& g, double& val)
 {
    // evaluates the dag
    dag_->reval(x);
@@ -169,7 +169,17 @@ void BOModel::realFunEvalDiff(const RealVector& x, RealVector& g, double& val)
    val = f->node(f->nbNode() - 2)->rval();
 }
 
-Interval BOModel::intervalEval(const IntervalVector& x)
+Scope BOModel::ifunScope() const
+{
+   return objscope_;
+}
+
+size_t BOModel::ifunArity() const
+{
+   return objscope_.size();
+}
+
+Interval BOModel::ifunEval(const IntervalVector& x)
 {
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
@@ -179,7 +189,7 @@ Interval BOModel::intervalEval(const IntervalVector& x)
    return f->node(f->nbNode() - 2)->val();
 }
 
-void BOModel::intervalDiff(const IntervalVector& x, IntervalVector& g)
+void BOModel::ifunDiff(const IntervalVector& x, IntervalVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
@@ -191,7 +201,8 @@ void BOModel::intervalDiff(const IntervalVector& x, IntervalVector& g)
       g.set(i, dag_->fun(i)->val());      
 }
 
-Interval BOModel::intervalEvalDiff(const IntervalVector& x, IntervalVector& g)
+void BOModel::ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
+                           Interval& valf)
 {
    // evaluates the dag
    dag_->eval(x);
@@ -202,7 +213,7 @@ Interval BOModel::intervalEvalDiff(const IntervalVector& x, IntervalVector& g)
 
    // finds the value
    DagFun* f = dag_->fun(dim());
-   return f->node(f->nbNode() - 2)->val();
+   valf = f->node(f->nbNode() - 2)->val();
 }
 
 } // namespace

@@ -12,6 +12,8 @@
 
 #include <list>
 #include "realpaver/BONode.hpp"
+#include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/Selector.hpp"
 #include "realpaver/SplitStrategy.hpp"
 
 namespace realpaver {
@@ -28,10 +30,7 @@ public:
    typedef SharedBONode NodeType;
 
    /// Creates a splitting object
-   /// @param scope set of variables whose domains are split
-   ///
-   /// The tolerances are taken from the variables.
-   BOSplit(const Scope& scope);
+   BOSplit(Selector* selector, IntervalSlicer* slicer);
 
    /// Destructor
    ~BOSplit();
@@ -46,7 +45,8 @@ public:
    bool applyImpl(SharedBONode node);
 
 private:
-   Scope scope_;
+   Selector* selector_;
+   IntervalSlicer* slicer_;
 };
 
 } // namespace

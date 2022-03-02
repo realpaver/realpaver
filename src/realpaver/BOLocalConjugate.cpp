@@ -66,7 +66,7 @@ double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
    while (iter)
    {
       RealVector y = x + step * p;
-      double fy = f.realFunEval(y);
+      double fy = f.rfunEval(y);
 
       if (!Double::isNan(fy))
       {
@@ -95,7 +95,7 @@ BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
                            const RealVector& initialPoint,
                            RealVector& finalPoint)
 {
-   size_t dim = f.realFunArity();
+   size_t dim = f.rfunArity();
 
    double uk, uk_1, step;
 
@@ -108,7 +108,7 @@ BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
               pk_1(dim);         // next value of pk
 
    // evaluates and differentiates f at xk
-   f.realFunEvalDiff(xk, grad, uk);
+   f.rfunEvalDiff(xk, grad, uk);
    setInitObjVal(uk);
 
    DEBUG("\npoint : " << xk << "   " << "grad : " << grad << "   val : " << uk);
@@ -135,7 +135,7 @@ BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
 
    while (iter)
    {
-      f.realFunEvalDiff(xk_1, grad, uk_1);
+      f.rfunEvalDiff(xk_1, grad, uk_1);
       sk_1 = -grad;
 
    DEBUG("\npoint : " << xk_1 << "   " << "grad : " << grad << "   val : " << uk_1);
