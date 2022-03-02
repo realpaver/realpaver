@@ -79,7 +79,7 @@ librealpaver_la_include_HEADERS = \
 		SearchNode.hpp \
 		Selector.hpp \
 		SplitStrategy.hpp \
-		term.hpp \
+		Term.hpp \
 		TermDeriver.hpp \
 		TermFixer.hpp \
 		ThickIntervalFunction.hpp \
@@ -148,7 +148,7 @@ librealpaver_la_SOURCES = \
 		ScopeMap.cpp \
 		SearchNode.cpp \
 		Selector.cpp \
-		term.cpp \
+		Term.cpp \
 		TermDeriver.cpp \
 		TermFixer.cpp \
 		Timer.cpp \

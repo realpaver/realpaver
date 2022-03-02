@@ -154,7 +154,7 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
 	parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
 	RealFunction.cpp RealVector.cpp Scope.cpp ScopeMap.cpp \
-	SearchNode.cpp Selector.cpp term.cpp TermDeriver.cpp \
+	SearchNode.cpp Selector.cpp Term.cpp TermDeriver.cpp \
 	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
 	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
 	LPSolverClp.cpp LPSolverGurobi.cpp
@@ -172,7 +172,7 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	Objective.lo Param.lo parser_bison.lo parser_flex.lo parser.lo \
 	Preprocessor.lo Problem.lo Propagator.lo RealFunction.lo \
 	RealVector.lo Scope.lo ScopeMap.lo SearchNode.lo Selector.lo \
-	term.lo TermDeriver.lo TermFixer.lo Timer.lo \
+	Term.lo TermDeriver.lo TermFixer.lo Timer.lo \
 	ThickIntervalFunction.lo Tolerance.lo UniIntervalFunction.lo \
 	Variable.lo $(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
@@ -272,7 +272,7 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
 	Propagator.hpp RealFunction.hpp RealVector.hpp Scope.hpp \
 	ScopeMap.hpp SearchNode.hpp Selector.hpp SplitStrategy.hpp \
-	term.hpp TermDeriver.hpp TermFixer.hpp \
+	Term.hpp TermDeriver.hpp TermFixer.hpp \
 	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
 	UniIntervalFunction.hpp Variable.hpp IntervalGaol.hpp \
 	LPSolverClp.hpp LPSolverGurobi.hpp
@@ -460,7 +460,7 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
 	Propagator.hpp RealFunction.hpp RealVector.hpp Scope.hpp \
 	ScopeMap.hpp SearchNode.hpp Selector.hpp SplitStrategy.hpp \
-	term.hpp TermDeriver.hpp TermFixer.hpp \
+	Term.hpp TermDeriver.hpp TermFixer.hpp \
 	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
 	UniIntervalFunction.hpp Variable.hpp $(am__append_1) \
 	$(am__append_2) $(am__append_3)
@@ -477,7 +477,7 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	Param.cpp parser_bison.ypp parser_flex.lpp parser.cpp \
 	Preprocessor.cpp Problem.cpp Propagator.cpp RealFunction.cpp \
 	RealVector.cpp Scope.cpp ScopeMap.cpp SearchNode.cpp \
-	Selector.cpp term.cpp TermDeriver.cpp TermFixer.cpp Timer.cpp \
+	Selector.cpp Term.cpp TermDeriver.cpp TermFixer.cpp Timer.cpp \
 	ThickIntervalFunction.cpp Tolerance.cpp \
 	UniIntervalFunction.cpp Variable.cpp $(am__append_4) \
 	$(am__append_5)
@@ -632,6 +632,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ScopeMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SearchNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Term.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermDeriver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermFixer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ThickIntervalFunction.Plo@am__quote@
@@ -643,7 +644,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_bison.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_flex.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/term.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

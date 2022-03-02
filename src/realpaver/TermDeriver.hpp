@@ -10,7 +10,7 @@
 #ifndef REALPAVER_TERM_DERIVER_HPP
 #define REALPAVER_TERM_DERIVER_HPP
 
-#include "realpaver/term.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 

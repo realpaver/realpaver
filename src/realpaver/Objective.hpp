@@ -10,7 +10,7 @@
 #ifndef REALPAVER_OBJECTIVE_HPP
 #define REALPAVER_OBJECTIVE_HPP
 
-#include "realpaver/term.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 

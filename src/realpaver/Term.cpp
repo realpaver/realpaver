@@ -1,7 +1,14 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/term.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 
@@ -33,7 +40,10 @@ std::ostream& operator<<(std::ostream& os, const OpSymbol& s)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermRep::TermRep(OpPriority p) : hcode_(0), constant_(true), priority_(p)
+TermRep::TermRep(OpPriority p)
+      : hcode_(0),
+        constant_(true),
+        priority_(p)
 {}
 
 TermRep::~TermRep()
@@ -864,7 +874,7 @@ Term operator*(const Term& l, const Term& r)
 
 Term operator/(const Term& l, const Term& r)
 {
-   ASSERT(!r.isZero(), "term divided by zero");
+   ASSERT(!r.isZero(), "Term divided by zero");
 
    if (l.isZero() || r.isOne())
       return l;
@@ -1253,10 +1263,11 @@ Term tan(const Term& t)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermConst::TermConst(const Interval& x) :
-   TermRep(OpPriority::Low), x_(x)
+TermConst::TermConst(const Interval& x)
+      : TermRep(OpPriority::Low),
+        x_(x)
 {
-   ASSERT(!x.isEmpty(), "bad constant term: " << x);
+   ASSERT(!x.isEmpty(), "Bad constant term " << x);
 
    hcode_ = x.hashCode();
    constant_ = true;
@@ -1317,7 +1328,9 @@ void TermConst::makeScope(Scope& s) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermVar::TermVar(const Variable& v) : TermRep(OpPriority::Low), v_(v)
+TermVar::TermVar(const Variable& v)
+      : TermRep(OpPriority::Low),
+        v_(v)
 {
    hcode_ = v.hashCode();
    constant_ = false;
@@ -1371,15 +1384,20 @@ bool TermVar::isVar() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermOp::TermOp(const SharedRep& t, OpSymbol op, OpPriority p) :
-   TermRep(p), v_(), op_(op)
+TermOp::TermOp(const SharedRep& t, OpSymbol op, OpPriority p)
+      : TermRep(p),
+        v_(),
+        op_(op)
 {
    constant_ = true;
    insert(t);
 }
 
 TermOp::TermOp(const SharedRep& l, const SharedRep& r, OpSymbol op,
-               OpPriority p) : TermRep(p), v_(), op_(op)
+               OpPriority p)
+      : TermRep(p),
+        v_(),
+        op_(op)
 {
    constant_ = true;
    insert(l);
@@ -1447,36 +1465,36 @@ OpSymbol TermOp::opSymbol() const
 
 TermRep::SharedRep TermOp::subTerm(size_t i) const
 {
-   ASSERT(i < arity(), "access out of range to a term operand");
+   ASSERT(i < arity(), "Access out of range to a term operand");
 
    return v_[i];
 }
 
 TermRep::SharedRep TermOp::left() const
 {
-   ASSERT(arity() == 2, "access out of range to a term operand");
+   ASSERT(arity() == 2, "Access out of range to a term operand");
 
    return v_[0];
 }
 
 TermRep::SharedRep TermOp::right() const
 {
-   ASSERT(arity() == 2, "access out of range to a term operand");
+   ASSERT(arity() == 2, "Access out of range to a term operand");
 
    return v_[1];
 }
 
 TermRep::SharedRep TermOp::child() const
 {
-   ASSERT(arity() == 1, "access out of range to a term operand");
+   ASSERT(arity() == 1, "Access out of range to a term operand");
 
    return v_[0];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermAdd::TermAdd(const SharedRep& l, const SharedRep& r) :
-   TermOp(l,r,OpSymbol::Add,OpPriority::AddSub)
+TermAdd::TermAdd(const SharedRep& l, const SharedRep& r)
+      : TermOp(l, r, OpSymbol::Add, OpPriority::AddSub)
 {}
 
 Interval TermAdd::evalConst() const
@@ -1513,8 +1531,8 @@ bool TermAdd::isAdd() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermSub::TermSub(const SharedRep& l, const SharedRep& r) :
-   TermOp(l,r,OpSymbol::Sub,OpPriority::AddSub)
+TermSub::TermSub(const SharedRep& l, const SharedRep& r)
+      : TermOp(l, r, OpSymbol::Sub, OpPriority::AddSub)
 {}
 
 Interval TermSub::evalConst() const
@@ -1564,8 +1582,8 @@ bool TermSub::isSub() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermMul::TermMul(const SharedRep& l, const SharedRep& r) :
-   TermOp(l,r,OpSymbol::Mul,OpPriority::MulDiv)
+TermMul::TermMul(const SharedRep& l, const SharedRep& r)
+      : TermOp(l, r, OpSymbol::Mul, OpPriority::MulDiv)
 {}
 
 Interval TermMul::evalConst() const
@@ -1621,8 +1639,8 @@ bool TermMul::isMul() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TermDiv::TermDiv(const SharedRep& l, const SharedRep& r) :
-   TermOp(l,r,OpSymbol::Div,OpPriority::MulDiv)
+TermDiv::TermDiv(const SharedRep& l, const SharedRep& r)
+      : TermOp(l, r, OpSymbol::Div, OpPriority::MulDiv)
 {}
 
 Interval TermDiv::evalConst() const
@@ -1673,8 +1691,8 @@ bool TermDiv::isDiv() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermMin::TermMin(const SharedRep& l, const SharedRep& r) :
-   TermOp(l,r,OpSymbol::Min,OpPriority::High)
+TermMin::TermMin(const SharedRep& l, const SharedRep& r)
+      : TermOp(l, r, OpSymbol::Min, OpPriority::High)
 {}
 
 Interval TermMin::evalConst() const
@@ -1694,8 +1712,8 @@ void TermMin::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermMax::TermMax(const SharedRep& l, const SharedRep& r) :
-   TermOp(l,r,OpSymbol::Max,OpPriority::High)
+TermMax::TermMax(const SharedRep& l, const SharedRep& r)
+      : TermOp(l, r, OpSymbol::Max, OpPriority::High)
 {}
 
 Interval TermMax::evalConst() const
@@ -1715,8 +1733,8 @@ void TermMax::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermUsb::TermUsb(const SharedRep& t) :
-   TermOp(t,OpSymbol::Usb,OpPriority::AddSub)
+TermUsb::TermUsb(const SharedRep& t)
+      : TermOp(t, OpSymbol::Usb, OpPriority::AddSub)
 {}
 
 Interval TermUsb::evalConst() const
@@ -1746,8 +1764,8 @@ bool TermUsb::isUsb() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermAbs::TermAbs(const SharedRep& t) :
-   TermOp(t,OpSymbol::Abs,OpPriority::High)
+TermAbs::TermAbs(const SharedRep& t)
+      : TermOp(t, OpSymbol::Abs, OpPriority::High)
 {}
 
 Interval TermAbs::evalConst() const
@@ -1767,8 +1785,8 @@ void TermAbs::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermSgn::TermSgn(const SharedRep& t) :
-   TermOp(t,OpSymbol::Sgn,OpPriority::High)
+TermSgn::TermSgn(const SharedRep& t)
+      : TermOp(t, OpSymbol::Sgn, OpPriority::High)
 {}
 
 Interval TermSgn::evalConst() const
@@ -1788,8 +1806,8 @@ void TermSgn::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermSqr::TermSqr(const SharedRep& t) :
-   TermOp(t,OpSymbol::Sqr,OpPriority::High)
+TermSqr::TermSqr(const SharedRep& t)
+      : TermOp(t, OpSymbol::Sqr, OpPriority::High)
 {}
 
 Interval TermSqr::evalConst() const
@@ -1809,8 +1827,8 @@ void TermSqr::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermSqrt::TermSqrt(const SharedRep& t) :
-   TermOp(t,OpSymbol::Sqrt,OpPriority::High)
+TermSqrt::TermSqrt(const SharedRep& t)
+      : TermOp(t, OpSymbol::Sqrt, OpPriority::High)
 {}
 
 Interval TermSqrt::evalConst() const
@@ -1830,10 +1848,11 @@ void TermSqrt::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermPow::TermPow(const SharedRep& t, int n) :
-   TermOp(t,OpSymbol::Pow,OpPriority::High), n_(n)
+TermPow::TermPow(const SharedRep& t, int n)
+      : TermOp(t, OpSymbol::Pow, OpPriority::High),
+        n_(n)
 {
-   ASSERT(n > 0, "bad integral exponent in a term: " << n);
+   ASSERT(n > 0, "Bad integral exponent in a term " << n);
 
    size_t h = hash1<int>(n);
    hcode_ = hash2(h, hcode_);
@@ -1868,8 +1887,8 @@ void TermPow::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermExp::TermExp(const SharedRep& t) :
-   TermOp(t,OpSymbol::Exp,OpPriority::High)
+TermExp::TermExp(const SharedRep& t)
+      : TermOp(t, OpSymbol::Exp, OpPriority::High)
 {}
 
 Interval TermExp::evalConst() const
@@ -1889,8 +1908,8 @@ void TermExp::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermLog::TermLog(const SharedRep& t) :
-   TermOp(t,OpSymbol::Log,OpPriority::High)
+TermLog::TermLog(const SharedRep& t)
+      : TermOp(t, OpSymbol::Log, OpPriority::High)
 {}
 
 Interval TermLog::evalConst() const
@@ -1910,8 +1929,8 @@ void TermLog::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermCos::TermCos(const SharedRep& t) :
-   TermOp(t,OpSymbol::Cos,OpPriority::High)
+TermCos::TermCos(const SharedRep& t)
+      : TermOp(t, OpSymbol::Cos, OpPriority::High)
 {}
 
 Interval TermCos::evalConst() const
@@ -1931,8 +1950,8 @@ void TermCos::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermSin::TermSin(const SharedRep& t) :
-   TermOp(t,OpSymbol::Sin,OpPriority::High)
+TermSin::TermSin(const SharedRep& t)
+      : TermOp(t, OpSymbol::Sin, OpPriority::High)
 {}
 
 Interval TermSin::evalConst() const
@@ -1952,8 +1971,8 @@ void TermSin::acceptVisitor(TermVisitor& vis) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermTan::TermTan(const SharedRep& t) :
-   TermOp(t,OpSymbol::Tan,OpPriority::High)
+TermTan::TermTan(const SharedRep& t)
+      : TermOp(t, OpSymbol::Tan, OpPriority::High)
 {}
 
 Interval TermTan::evalConst() const
@@ -1978,97 +1997,97 @@ TermVisitor::~TermVisitor()
 
 void TermVisitor::apply(const TermConst* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermVar* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermAdd* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermSub* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermMul* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermDiv* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermMin* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermMax* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermUsb* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermAbs* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermSgn* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermSqr* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermSqrt* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermPow* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermExp* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermLog* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermCos* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermSin* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 void TermVisitor::apply(const TermTan* t)
 {
-   THROW("visit method not implemented");
+   THROW("Visit method not implemented");
 }
 
 } // namespace

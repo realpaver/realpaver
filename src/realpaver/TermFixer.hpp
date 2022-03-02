@@ -10,7 +10,7 @@
 #ifndef REALPAVER_TERM_FIXER_HPP
 #define REALPAVER_TERM_FIXER_HPP
 
-#include "realpaver/term.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 

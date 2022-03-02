@@ -10,7 +10,7 @@
 #ifndef REALPAVER_CONSTRAINT_HPP
 #define REALPAVER_CONSTRAINT_HPP
 
-#include "realpaver/term.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 
