@@ -41,12 +41,24 @@ size_t BOSpace::getFrequency() const
 
 double BOSpace::getLowestLowerBound() const
 {
-   return lo_.begin()->node->getLower();
+   auto it = lo_.begin();
+
+   if (it == lo_.end())
+      return Double::inf();
+
+   else
+      return it->node->getLower();
 }
 
 double BOSpace::getLowestUpperBound() const
 {
-   return up_.begin()->node->getUpper();
+   auto it = up_.begin();
+
+   if (it == up_.end())
+      return Double::inf();
+
+   else
+      return it->node->getUpper();
 }
 
 Interval BOSpace::getObjEnclosure() const

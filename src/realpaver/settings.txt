@@ -84,6 +84,11 @@ BC3_PEEL_FACTOR = 2.0
 # the outermost zeros of a function in a given interval
 BC3_ITER_LIMIT = 30
 
+# Propagation strategy
+# - HC4
+# - BC4
+PROPAGATOR_ALGORITHM = HC4
+
 ###############################################################################
 ## LOCAL OPTIMiZATION BASED ON LINE SEARCH                                   ##
 ###############################################################################

@@ -65,10 +65,10 @@ public:
    /// @param frequency new value of the frequency
    void setFrequency(size_t frequency);
 
-   /// @return the lowest lower bound
+   /// @return the lowest lower bound if this is non empty, +oo otherwise
    double getLowestLowerBound() const;
 
-   /// @return the lowest upper bound
+   /// @return the lowest upper bound if this is non empty, +oo otherwise
    double getLowestUpperBound() const;
 
    /// @return the enclosure of the range of the objective function

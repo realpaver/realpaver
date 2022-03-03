@@ -11,6 +11,7 @@
 #define REALPAVER_INTERVAL_FUNCTION_HPP
 
 #include "realpaver/IntervalVector.hpp"
+#include "realpaver/RealVector.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -35,6 +36,11 @@ public:
    /// @param x argument of this
    /// @return value of this at x
    virtual Interval ifunEval(const IntervalVector& x) = 0;
+
+   /// Evaluates this
+   /// @param x argument of this
+   /// @return value of this at x
+   virtual Interval ifunEvalPoint(const RealVector& x) = 0;
 
    /// Differentiates this, i.e. evaluates its gradient
    /// @param x argument of this

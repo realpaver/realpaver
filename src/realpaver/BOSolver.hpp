@@ -14,6 +14,8 @@
 #include "realpaver/BOModel.hpp"
 #include "realpaver/BOSpace.hpp"
 #include "realpaver/BOSplit.hpp"
+#include "realpaver/Contractor.hpp"
+#include "realpaver/ContractorPool.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
@@ -77,6 +79,10 @@ private:
    BOModel* model_;
    BOLocalSolver* localSolver_;
    BOSplit* split_;
+   Contractor* contractor_;
+   ContractorPool* pool_;
+
+   SharedIntervalVector init_;   // initial region
 
    // Result of optimization
    OptimizationStatus status_;
@@ -86,9 +92,14 @@ private:
    // Auxiliary methods
    void makeLocalSolver();
    void makeSplit();
+   void makeContractor();
+   void makeHC4();
 
    bool preprocess();
    bool presolve();
+
+   void calculateLower(SharedBONode& node);
+   void calculateUpper(SharedBONode& node);
 
    void solve();
    void branchAndBound();

@@ -731,6 +731,7 @@ public:
    Scope ifunScope() const;
    size_t ifunArity() const;
    Interval ifunEval(const IntervalVector& x);
+   Interval ifunEvalPoint(const RealVector& x);
    void ifunDiff(const IntervalVector& x, IntervalVector& g);
    void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
                       Interval& valf);

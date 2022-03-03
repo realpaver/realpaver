@@ -7,8 +7,10 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/BOContractor.hpp"
 #include "realpaver/BOPresolver.hpp"
 #include "realpaver/BOSolver.hpp"
+#include "realpaver/HC4Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Selector.hpp"
@@ -22,6 +24,9 @@ BOSolver::BOSolver(Problem& problem)
         model_(nullptr),
         localSolver_(nullptr),
         split_(nullptr),
+        contractor_(nullptr),
+        pool_(nullptr),
+        init_(nullptr),
         status_(OptimizationStatus::Other),
         sol_(problem.nbVars()),
         objval_(Interval::universe()),
@@ -39,9 +44,11 @@ BOSolver::BOSolver(Problem& problem)
 
 BOSolver::~BOSolver()
 {
-   if (model_ != nullptr)       delete model_;
-   if (localSolver_ != nullptr) delete localSolver_;
+   if (contractor_ != nullptr)  delete contractor_;
+   if (pool_ != nullptr)        delete pool_;
    if (split_ != nullptr)       delete split_;
+   if (localSolver_ != nullptr) delete localSolver_;
+   if (model_ != nullptr)       delete model_;
 }
 
 double BOSolver::getPreprocessingTime() const
@@ -111,6 +118,59 @@ void BOSolver::makeSplit()
             "Unable to make the split object in a BO solver");
 
    split_ = new BOSplit(selector, slicer);
+}
+
+void BOSolver::makeHC4()
+{
+DEBUG("MAKE HC4");
+
+   ContractorVector* vpool = new ContractorVector();
+
+   Dag* dag = model_->getDag();
+   size_t i = 0;
+
+   // contractors associated with df / dv = 0
+   for (Variable v : model_->getObjScope())
+   {
+
+DEBUG("     hc4 for var " << v.getName());
+
+      SharedContractor op = std::make_shared<HC4Contractor>(dag, i);
+
+      if (model_->isBoundaryVar(v))
+      {
+         SharedContractor bop =
+            std::make_shared<BOContractor>(dag, i, v, op, init_);
+
+         vpool->push(bop);
+      }
+      else
+      {
+         vpool->push(op);
+      }
+
+      i = i+1;
+   }
+
+   // contractor associated with the objective constraint
+   SharedContractor op = std::make_shared<HC4Contractor>(dag, dag->nbFun()-1);
+   vpool->push(op);
+
+DEBUG("     hc4 for fun " << dag->nbFun()-1);
+
+   pool_ = vpool;
+   contractor_ = new Propagator(pool_);
+}
+
+void BOSolver::makeContractor()
+{
+   init_ = std::make_shared<IntervalVector>(model_->getInitRegion());
+
+   std::string algo = Param::getStrParam("PROPAGATOR_ALGORITHM");
+
+   if (algo == "HC4") makeHC4();
+
+   THROW_IF(contractor_ == nullptr, "No contractor in a BO solver");
 }
 
 bool BOSolver::preprocess()
@@ -197,11 +257,10 @@ bool BOSolver::presolve()
       }
    }
 
-   // initial problem solved if only the objective variable remains in
-   // the presolved problem
-   if (solprob_.nbVars() == 1)
+   // initial problem solved if all the variables are fixed
+   if (solprob_.nbVars() == 0)
    {
-      Term t = problem_.getObjective().getTerm();
+      Term t = preprob_.getObjective().getTerm();
       objval_ = t.eval(sol_);
 
       status_ = objval_.isEmpty() ? OptimizationStatus::Infeasible :
@@ -211,9 +270,46 @@ bool BOSolver::presolve()
    return true;
 }
 
-bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
+void BOSolver::calculateLower(SharedBONode& node)
 {
    // TODO
+}
+
+void BOSolver::calculateUpper(SharedBONode& node)
+{
+   IntervalVector* X = node->getRegion();
+   RealVector m = X->midpoint();
+   RealVector p(X->size());
+
+   // domain of the objective variable after propagation
+   Interval z(X->operator[](model_->getObjVar()));
+   node->setUpper(z.right());
+
+   // local optimization
+   OptimizationStatus status = localSolver_->minimize(*model_, *X, m, p);
+
+   if (status == OptimizationStatus::Optimal)
+   {
+      // safe interval evaluation at the final point
+      Interval e = model_->ifunEvalPoint(p);
+
+      if (!e.isEmpty())
+      {
+         double u = e.right();
+         if (u < z.right())
+         {
+            node->setUpper(u);
+            z.setRight(u);
+            X->set(model_->getObjVar(), z);
+
+      DEBUG("   UPPER BOUND " << u);
+         }
+      }
+   }
+}
+
+bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
+{
    // stops the search if the space is empty
    if (space.isEmpty()) return false;
 
@@ -227,6 +323,9 @@ DEBUG("NODE : " << *node->getRegion());
 
    if (split_->getNbNodes() == 1)
    {
+DEBUG("   sol NODE !");
+
+
       sol.insertNode(node);
       return false;
    }
@@ -234,8 +333,32 @@ DEBUG("NODE : " << *node->getRegion());
    {
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
-         SharedBONode aux = *it;
-         space.insertNode(aux);
+         SharedBONode subnode = *it;
+         IntervalVector* X = subnode->getRegion();
+
+DEBUG("sub NODE : " << *X);
+
+
+         Proof proof = contractor_->contract(*X);
+
+DEBUG("proof : " << proof);
+
+         if (proof != Proof::Empty)
+         {
+            calculateLower(subnode);
+            calculateUpper(subnode);
+
+            THROW_IF(subnode->getLower() > subnode->getUpper(),
+                     "Lower bound greater than upper bound in a BO node");
+
+
+
+   // TODO, simplifier les espaces
+   // TODO, calculer un encadrement de l'optimum
+
+
+            space.insertNode(subnode);
+         }
       }
       return true;
    }
@@ -269,9 +392,12 @@ void BOSolver::findInitialBounds(SharedBONode& node)
 
 void BOSolver::branchAndBound()
 {
+DEBUG("-- branchAndBound");
+
    // creates the algorithmic components
    makeLocalSolver();
    makeSplit();
+   makeContractor();
 
    // creates the initial node
    SharedBONode node;
@@ -366,6 +492,8 @@ bool BOSolver::optimize()
    // first phase: preprocessing
    bool pfeasible = preprocess();
 
+DEBUG("\n---------- Simplified problem\n" << preprob_);
+
    if (status_ == OptimizationStatus::Infeasible ||
        status_ == OptimizationStatus::Optimal)
    {
@@ -373,10 +501,10 @@ bool BOSolver::optimize()
       return pfeasible;
    }
 
-DEBUG("\n---------- Simplified problem\n" << preprob_);
-
    // second phase: presolving
    bool sfeasible = presolve();
+
+DEBUG("\n---------- Presolved problem\n" << solprob_);
 
    if (status_ == OptimizationStatus::Infeasible ||
        status_ == OptimizationStatus::Optimal)
@@ -384,8 +512,6 @@ DEBUG("\n---------- Simplified problem\n" << preprob_);
       ptimer_.stop();
       return sfeasible;
    }
-
-DEBUG("\n---------- Presolved problem\n" << solprob_);
 
    ptimer_.stop();
    stimer_.start();

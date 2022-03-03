@@ -48,9 +48,10 @@ Param::Param()
    dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR", 10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",     10.0));
 
-   strmap_.insert(std::make_pair("SPLIT_OBJ",      "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR", "MaxDom"));
-   strmap_.insert(std::make_pair("SPLIT_SLICER",   "Bisection"));
+   strmap_.insert(std::make_pair("SPLIT_OBJ",            "NO"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTOR",       "MaxDom"));
+   strmap_.insert(std::make_pair("SPLIT_SLICER",         "Bisection"));
+   strmap_.insert(std::make_pair("PROPAGATOR_ALGORITHM", "HC4"));
 }
 
 Param::~Param()

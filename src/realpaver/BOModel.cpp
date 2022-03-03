@@ -189,6 +189,16 @@ Interval BOModel::ifunEval(const IntervalVector& x)
    return f->node(f->nbNode() - 2)->val();
 }
 
+Interval BOModel::ifunEvalPoint(const RealVector& x)
+{
+   // equation representing the objective function z +/- obj = 0
+   DagFun* f = dag_->fun(dim());
+   f->eval(x);
+
+   // finds the root node of the objective function
+   return f->node(f->nbNode() - 2)->val();
+}
+
 void BOModel::ifunDiff(const IntervalVector& x, IntervalVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");

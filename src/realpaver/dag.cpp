@@ -1584,6 +1584,11 @@ Interval DagFun::ifunEval(const IntervalVector& x)
    return eval(x);
 }
 
+Interval DagFun::ifunEvalPoint(const RealVector& x)
+{
+   return eval(x);
+}
+
 void DagFun::ifunDiff(const IntervalVector& x, IntervalVector& g)
 {
    diff(x);

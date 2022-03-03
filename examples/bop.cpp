@@ -26,10 +26,10 @@ int main(void)
                u = problem.addRealVar(-10,  10, "u"),
                y = problem.addRealVar( -1,  2, "y");
 
-      problem.addObjective(minimize(3*u + sqr(x)*sqr(y) + x*y));
+      problem.addObjective(minimize(3*u + sqr(x) - sqr(y)));
 
       BOSolver solver(problem);
-      solver.setNodeLimit(5);
+      solver.setNodeLimit(10);
 
       bool optimal = solver.optimize();
 
