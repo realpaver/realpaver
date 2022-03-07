@@ -32,11 +32,14 @@ BOSolver::BOSolver(Problem& problem)
         objval_(Interval::universe()),
         vmap21_(),
         vmap31_(),
+        nbnodes_(0),
+        nbpending_(0),
         ptimer_(),
         stimer_(),
         timelimit_(Param::getDblParam("TIME_LIMIT")),
         nodelimit_(Param::getIntParam("NODE_LIMIT")),
-        splitobj_(Param::getStrParam("SPLIT_OBJ") == "YES")
+        splitobj_(Param::getStrParam("SPLIT_OBJ") == "YES"),
+        otol_(Param::getTolParam("OBJ_TOL"))
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
@@ -83,6 +86,26 @@ void BOSolver::setSplitableObj(bool split)
    splitobj_ = split;
 }
 
+Tolerance BOSolver::getObjTol() const
+{
+   return otol_;
+}
+
+void BOSolver::setObjTol(Tolerance tol)
+{
+   otol_ = tol;
+}
+
+size_t BOSolver::getNbNodes() const
+{
+   return nbnodes_;
+}
+
+size_t BOSolver::getNbPendingNodes() const
+{
+   return nbpending_;
+}
+
 void BOSolver::makeLocalSolver()
 {
    // default local solver
@@ -122,8 +145,6 @@ void BOSolver::makeSplit()
 
 void BOSolver::makeHC4()
 {
-DEBUG("MAKE HC4");
-
    ContractorVector* vpool = new ContractorVector();
 
    Dag* dag = model_->getDag();
@@ -132,9 +153,6 @@ DEBUG("MAKE HC4");
    // contractors associated with df / dv = 0
    for (Variable v : model_->getObjScope())
    {
-
-DEBUG("     hc4 for var " << v.getName());
-
       SharedContractor op = std::make_shared<HC4Contractor>(dag, i);
 
       if (model_->isBoundaryVar(v))
@@ -155,8 +173,6 @@ DEBUG("     hc4 for var " << v.getName());
    // contractor associated with the objective constraint
    SharedContractor op = std::make_shared<HC4Contractor>(dag, dag->nbFun()-1);
    vpool->push(op);
-
-DEBUG("     hc4 for fun " << dag->nbFun()-1);
 
    pool_ = vpool;
    contractor_ = new Propagator(pool_);
@@ -275,8 +291,21 @@ void BOSolver::calculateLower(SharedBONode& node)
    // TODO
 }
 
-void BOSolver::calculateUpper(SharedBONode& node)
+void BOSolver::saveIncumbent(const RealVector& P)
 {
+   for (auto it = vmap31_.begin(); it != vmap31_.end(); ++it)
+   {   
+      Variable sv = it->first;
+      Variable v = it->second;
+
+      double val = P[sv.getId()];
+      sol_.set(v, Interval(val));
+   }
+}
+
+void BOSolver::calculateUpper(SharedBONode& node, double U)
+{
+DEBUG("calculateUpper given U:" << U);
    IntervalVector* X = node->getRegion();
    RealVector m = X->midpoint();
    RealVector p(X->size());
@@ -285,11 +314,19 @@ void BOSolver::calculateUpper(SharedBONode& node)
    Interval z(X->operator[](model_->getObjVar()));
    node->setUpper(z.right());
 
+   if (z.left() > U) return;
+
    // local optimization
    OptimizationStatus status = localSolver_->minimize(*model_, *X, m, p);
 
+DEBUG("local optim -> " << status);
+
+
    if (status == OptimizationStatus::Optimal)
    {
+DEBUG("final point " << p);
+
+
       // safe interval evaluation at the final point
       Interval e = model_->ifunEvalPoint(p);
 
@@ -304,6 +341,9 @@ void BOSolver::calculateUpper(SharedBONode& node)
 
       DEBUG("   UPPER BOUND " << u);
          }
+
+         // new upper bound of the global minimum?
+         if (u < U) saveIncumbent(p);
       }
    }
 }
@@ -313,10 +353,13 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
    // stops the search if the space is empty
    if (space.isEmpty()) return false;
 
+   // current upper bound of the global minimum
+   double U = std::min(space.getLowestUpperBound(), sol.getLowestUpperBound());
+
    SharedBONode node = space.extractNode();
 
-
-DEBUG("NODE : " << *node->getRegion());
+DEBUG("NODE : " << *node->getRegion() << " l: " << node->getLower()
+               << " u: " << node->getUpper());
 
    // splits the node
    split_->apply(node);
@@ -327,39 +370,44 @@ DEBUG("   sol NODE !");
 
 
       sol.insertNode(node);
-      return false;
+      return true;
    }
    else
    {
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
+         ++nbnodes_;
+
          SharedBONode subnode = *it;
          IntervalVector* X = subnode->getRegion();
 
 DEBUG("sub NODE : " << *X);
 
-
          Proof proof = contractor_->contract(*X);
 
-DEBUG("proof : " << proof);
+DEBUG("proof : " << proof << "  -> " << *X);
 
          if (proof != Proof::Empty)
          {
             calculateLower(subnode);
-            calculateUpper(subnode);
+            calculateUpper(subnode, U);
+
+            if (U > subnode->getUpper()) U = subnode->getUpper();
+
+DEBUG("    ... l : " << subnode->getLower());
+DEBUG("    ... u : " << subnode->getUpper());
 
             THROW_IF(subnode->getLower() > subnode->getUpper(),
                      "Lower bound greater than upper bound in a BO node");
 
-
-
-   // TODO, simplifier les espaces
-   // TODO, calculer un encadrement de l'optimum
-
-
             space.insertNode(subnode);
          }
+         
       }
+
+      space.simplify(U);
+      sol.simplify(U);
+
       return true;
    }
 }
@@ -392,7 +440,7 @@ void BOSolver::findInitialBounds(SharedBONode& node)
 
 void BOSolver::branchAndBound()
 {
-DEBUG("-- branchAndBound");
+DEBUG("-- branchAndBound with sol_ : " << sol_);
 
    // creates the algorithmic components
    makeLocalSolver();
@@ -403,7 +451,7 @@ DEBUG("-- branchAndBound");
    SharedBONode node;
  
    if (isSplitableObj())
-   {   
+   {
       node = std::make_shared<BONode>(model_->getFullScope(),
                                       model_->getObjVar(),
                                       model_->getInitRegion());
@@ -418,7 +466,11 @@ DEBUG("-- branchAndBound");
    // finds bounds of the objective in the initial node
    findInitialBounds(node);
 
-   if (status_ == OptimizationStatus::Infeasible) return;
+   if (status_ == OptimizationStatus::Infeasible)
+   {
+      nbnodes_ = 1;
+      return;
+   }
 
    // creates the space of nodes to be processed
    BOSpace space;
@@ -426,12 +478,25 @@ DEBUG("-- branchAndBound");
 
    // creates the space of solution nodes, i.e. nodes that cannot be split
    BOSpace sol;
+   double L, U;
 
    bool iter = true;
 
    do
    {
       iter = bbStep(space, sol);
+
+      L = std::min(space.getLowestLowerBound(), sol.getLowestLowerBound());
+      U = std::min(space.getLowestUpperBound(), sol.getLowestUpperBound());
+      objval_ = Interval(L, U);
+
+DEBUG("OBJ ENCLOSURE : " << objval_);
+
+      if (iter && otol_.hasTolerance(objval_))
+      {
+         iter = false;
+         status_ = OptimizationStatus::Optimal;         
+      }
 
       if (iter &&
           ptimer_.elapsedTime() + stimer_.elapsedTime() > getTimeLimit())
@@ -448,8 +513,7 @@ DEBUG("-- branchAndBound");
    }
    while (iter);
 
-   // assigns the enclosure of the optimum
-   // objval_, TODO
+   nbpending_ = space.getNbNodes();
 }
 
 void BOSolver::solve()

@@ -31,6 +31,7 @@ Param::Param()
 
    tolmap_.insert(std::make_pair("XTOL",            tol8));
    tolmap_.insert(std::make_pair("DTOL",            tol6));
+   tolmap_.insert(std::make_pair("OBJ_TOL",         tol6));
    tolmap_.insert(std::make_pair("PROPAGATOR_DTOL", tol3));
 
    intmap_.insert(std::make_pair("NODE_LIMIT",            100000));
@@ -40,6 +41,7 @@ Param::Param()
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",     20));
    intmap_.insert(std::make_pair("SPLIT_NB_SLICES",       5));
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",         50));
+   intmap_.insert(std::make_pair("FLOAT_PRECISION",       8));
 
    dblmap_.insert(std::make_pair("TIME_LIMIT",        100.0));
    dblmap_.insert(std::make_pair("LS_ARMIJO_COEF",    0.125));

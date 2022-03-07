@@ -50,6 +50,12 @@ public:
    /// @return the solving time in seconds
    double getSolvingTime() const;
 
+   /// @return the number of nodes processed
+   size_t getNbNodes() const;
+
+   /// @return the number of nodes that remains in the optimization space
+   size_t getNbPendingNodes() const;
+
    /// Sets a time limit of the optimization method
    /// @param t a time limit in seconds
    void setTimeLimit(double t);
@@ -70,6 +76,9 @@ public:
    /// Sets the splitting status of the objective variable
    /// @param split true if the domain of the objective variable is split
    void setSplitableObj(bool split);
+
+   Tolerance getObjTol() const;
+   void setObjTol(Tolerance tol);
 
 private:
    Problem problem_;    // initial problem
@@ -99,7 +108,8 @@ private:
    bool presolve();
 
    void calculateLower(SharedBONode& node);
-   void calculateUpper(SharedBONode& node);
+   void calculateUpper(SharedBONode& node, double U);
+   void saveIncumbent(const RealVector& P);
 
    void solve();
    void branchAndBound();
@@ -116,12 +126,16 @@ private:
    // variable in the initial problem
    VarVarMapType vmap31_;
 
+   size_t nbnodes_;    // number of nodes processed
+   size_t nbpending_;  // number of pending nodes
+
    Timer ptimer_;      // timer for the preprocessing phase
    Timer stimer_;      // timer for the solving phase
 
    double timelimit_;  // time limit in seconds
    size_t nodelimit_;  // node limit
    bool splitobj_;     // true if the domain of the objective variable is split
+   Tolerance otol_;    // threshold on width of the enclosure of the optimum
 };
 
 } // namespace
