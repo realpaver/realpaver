@@ -160,7 +160,7 @@ public:
    /// @param tol new tolerance of this
    Variable& setTolerance(const Tolerance& tol);
 
-   /// @return a clone of this with a new representation.
+   /// @return a clone of this with a new representation
    Variable clone() const;
 
    /// Tests the equality of two variables

@@ -12,7 +12,7 @@
 
 #include <memory>
 #include "realpaver/Bitset.hpp"
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -21,7 +21,7 @@ namespace realpaver {
 /// This is an interface for interval contractors.
 ///
 /// An interval contractor is in general associated with a constraint.
-/// Given an interval vector, it removes infeasible facets (or it prunes
+/// Given an interval region, it removes infeasible facets (or it prunes
 /// interval bounds) and returns a certificate of proof:
 /// - Proof::Empty if there is no solution;
 /// - Proof::Feasible if it is proved that there is a solution;
@@ -53,9 +53,9 @@ public:
    virtual Scope scope() const = 0;
 
    /// Contraction method
-   /// @param X input interval vector that is contracted
+   /// @param reg interval region that is contracted
    /// @return a certificate of proof
-   virtual Proof contract(IntervalVector& X) = 0;
+   virtual Proof contract(IntervalRegion& reg) = 0;
 
    /// Output on a stream
    /// param os an output stream

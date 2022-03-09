@@ -1,4 +1,4 @@
-#include "realpaver/interval.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver_test.hpp"
 
 class IntervalTest : public CppUnit::TestFixture

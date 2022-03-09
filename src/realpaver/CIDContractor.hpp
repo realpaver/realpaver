@@ -22,7 +22,7 @@ namespace realpaver {
 /// v in R is divided by the slicer, each slice is reduced by the contractor,
 /// and the hull of the contracted slices is returned.
 ///////////////////////////////////////////////////////////////////////////////
-class CidContractor : public Contractor {
+class CIDContractor : public Contractor {
 public:
    /// Creates a contractor
    /// @param op a contractor
@@ -30,23 +30,23 @@ public:
    /// @param a slicer
    ///
    /// This owns the slicer, hence the slicer is destroyed with this.
-   CidContractor(const SharedContractor& op, const Variable& v,
+   CIDContractor(const SharedContractor& op, const Variable& v,
                  IntervalSlicer* slicer);
 
    /// Destructor
-   ~CidContractor();
+   ~CIDContractor();
 
    /// No copy
-   CidContractor(const CidContractor&) = delete;
+   CIDContractor(const CIDContractor&) = delete;
 
    /// No assignment
-   CidContractor& operator=(const CidContractor&) = delete;
+   CIDContractor& operator=(const CIDContractor&) = delete;
 
    ///@{
-   /// Overrides the methods of Contractor
+   /// Overrides (Contractor)
    bool dependsOn(const Bitset& bs) const;
    Scope scope() const;
-   Proof contract(IntervalVector& X);
+   Proof contract(IntervalRegion& reg);
    void print(std::ostream& os) const;
    ///@}
 

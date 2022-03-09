@@ -54,12 +54,12 @@ bool Preprocessor::apply(const Problem& src, Problem& dest)
    return apply(src, src.getDomains(), dest);
 }
 
-bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
+bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
                          Problem& dest)
 {
-   ASSERT(src.nbVars() == X.size(), "preprocessing error");
-   ASSERT(!src.isEmpty(), "preprocessing error");
-   ASSERT(dest.isEmpty(), "preprocessing error");
+   ASSERT(src.nbVars() == reg.size(), "Preprocessing error");
+   ASSERT(!src.isEmpty(), "Preprocessing error");
+   ASSERT(dest.isEmpty(), "Preprocessing error");
 
    LOG_COMPONENT("-- Preprocessing of problem --");
 
@@ -67,14 +67,14 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
    vim_.clear();
    nbv_ = nbc_ = 0;
 
-   for (size_t i=0; i<X.size(); ++i)
+   for (size_t i=0; i<src.nbVars(); ++i)
    {
       Variable v        = src.varAt(i);
-      Interval domain   = X[i];
+      Interval domain   = reg.get(v);
       bool isContinuous = v.isContinuous();
       Tolerance tol     = v.getTolerance();
 
-      if (X[i].isEmpty())
+      if (domain.isEmpty())
       {
          LOG_COMPONENT("   empty variable domain: " << v.getName());
          return false;
@@ -102,7 +102,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalVector& X,
       }
    }
 
-   IntervalVector Y = dest.getDomains();
+   IntervalRegion Y = dest.getDomains();
 
    // rewrites the constraints
    for (size_t i=0; i<src.nbCtrs(); ++i)

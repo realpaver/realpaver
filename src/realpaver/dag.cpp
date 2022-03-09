@@ -6,8 +6,13 @@
 
 namespace realpaver {
 
-DagNode::DagNode(Dag* dag, size_t index):
-   bitset_(), dag_(dag), index_(index), vpar_(), vsub_(), val_()
+DagNode::DagNode(Dag* dag, size_t index)
+      : bitset_(),
+        dag_(dag),
+        index_(index),
+        vpar_(),
+        vsub_(),
+        val_()
 {}
 
 DagNode::~DagNode()
@@ -103,9 +108,9 @@ bool DagNode::dependsOn(const Bitset& bs) const
    return bitset_.overlaps(bs);
 }
 
-bool DagNode::dependsOn(size_t id) const
+bool DagNode::dependsOn(const Variable& v) const
 {
-   return bitset_.get(id);
+   return bitset_.get(v.getId());
 }
 
 const Interval& DagNode::val() const
@@ -160,8 +165,9 @@ void DagNode::addRdv(const double& x)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagConst::DagConst(Dag* dag, size_t index, const Interval& x):
-   DagNode(dag, index), x_(x)
+DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
+      : DagNode(dag, index),
+        x_(x)
 {}
 
 size_t DagConst::nbOcc(size_t id) const
@@ -182,7 +188,7 @@ void DagConst::print(std::ostream& os) const
       os << x_;
 }
 
-void DagConst::eval(const IntervalVector& X)
+void DagConst::eval(const IntervalRegion& reg)
 {
    setVal(x_);
 }
@@ -192,12 +198,12 @@ void DagConst::eval(const RealVector& P)
    setVal(x_);
 }
 
-void DagConst::evalOnly(size_t id, const Interval& x)
+void DagConst::evalOnly(const Variable& v, const Interval& x)
 {
    setVal(x_);
 }
 
-void DagConst::proj(IntervalVector& X)
+void DagConst::proj(IntervalRegion& reg)
 {
    // nothing to do
 }
@@ -207,7 +213,7 @@ bool DagConst::diff()
    return true;
 }
 
-bool DagConst::diffOnly(size_t id)
+bool DagConst::diffOnly(const Variable& v)
 {
    return true;
 }
@@ -222,10 +228,16 @@ bool DagConst::rdiff()
    return true;
 }
 
+Interval DagConst::getConst() const
+{
+   return x_;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-DagVar::DagVar(Dag* dag, size_t index, const Variable& v):
-   DagNode(dag, index), v_(v)
+DagVar::DagVar(Dag* dag, size_t index, const Variable& v)
+      : DagNode(dag, index),
+        v_(v)
 {
    bitset_ = Bitset(1 + v.getId(), 0);
    bitset_.setOne(v.getId());
@@ -246,9 +258,9 @@ void DagVar::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagVar::eval(const IntervalVector& X)
+void DagVar::eval(const IntervalRegion& reg)
 {
-   setVal(X[v_.getId()]);
+   setVal(reg.get(v_));
 }
 
 void DagVar::eval(const RealVector& P)
@@ -256,15 +268,15 @@ void DagVar::eval(const RealVector& P)
    setVal(P[v_.getId()]);
 }
 
-void DagVar::evalOnly(size_t id, const Interval& x)
+void DagVar::evalOnly(const Variable& v, const Interval& x)
 {
-   if (v_.getId() == id)
+   if (v_.getId() == v.getId())
       setVal(x);
 }
 
-void DagVar::proj(IntervalVector& X)
+void DagVar::proj(IntervalRegion& reg)
 {
-   X.set(v_.getId(), X[v_.getId()] & dom());
+   reg.set(v_, reg.get(v_) & dom());
 }
 
 bool DagVar::diff()
@@ -272,7 +284,7 @@ bool DagVar::diff()
    return true;
 }
 
-bool DagVar::diffOnly(size_t id)
+bool DagVar::diffOnly(const Variable& v)
 {
    return true;
 }
@@ -287,10 +299,16 @@ bool DagVar::rdiff()
    return true;
 }
 
+Variable DagVar::getVar() const
+{
+   return v_;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-DagOp::DagOp(Dag* dag, OpSymbol symb, const IndexList& lsub):
-   DagNode(dag), symb_(symb)
+DagOp::DagOp(Dag* dag, OpSymbol symb, const IndexList& lsub)
+      : DagNode(dag),
+        symb_(symb)
 {
    for (size_t i : lsub)
    {
@@ -305,6 +323,7 @@ DagOp::~DagOp()
 void DagOp::setIndex(size_t index)
 {
    DagNode::setIndex(index);
+
    for (size_t i=0; i<subArity(); ++i)
       subNode(i)->addParNode(index);
 }
@@ -344,36 +363,56 @@ void DagOp::print(std::ostream& os) const
    os << symb_;
 }
 
-void DagOp::evalOnly(size_t id, const Interval& x)
+void DagOp::evalOnly(const Variable& v, const Interval& x)
 {
-   if (dependsOn(id))
+   if (dependsOn(v))
    {
       for (size_t i=0; i<subArity(); ++i)
-         subNode(i)->evalOnly(id, x);
+         subNode(i)->evalOnly(v, x);
 
       eval();
    }
 }
 
-bool DagOp::diffOnly(size_t id)
+bool DagOp::diffOnly(const Variable& v)
 {
    bool res = true;
 
-   if (dependsOn(id))
+   if (dependsOn(v))
    {
       res = diff();
 
       for (size_t i=0; i<subArity(); ++i)
-         res = res && subNode(i)->diffOnly(id);
+         res = res && subNode(i)->diffOnly(v);
    }
 
    return res;
 }
 
+OpSymbol DagOp::getSymbol() const
+{
+   return symb_;
+}
+
+void DagOp::eval(const IntervalRegion& reg)
+{
+   eval();
+}
+
+void DagOp::eval(const RealVector& P)
+{
+   eval();
+}
+
+void DagOp::reval(const RealVector& P)
+{
+   reval();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-DagAdd::DagAdd(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Add, lsub)
+DagAdd::DagAdd(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Add, lsub)
 {}
 
 void DagAdd::acceptVisitor(DagVisitor& vis) const
@@ -386,7 +425,7 @@ void DagAdd::eval()
    setVal(left()->val()+right()->val());
 }
 
-void DagAdd::proj(IntervalVector& X)
+void DagAdd::proj(IntervalRegion& reg)
 {
    left()->reduceDom(addPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(addPY(left()->val(), right()->val(), dom()));
@@ -417,8 +456,8 @@ bool DagAdd::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagSub::DagSub(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Sub, lsub)
+DagSub::DagSub(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sub, lsub)
 {}
 
 void DagSub::acceptVisitor(DagVisitor& vis) const
@@ -431,7 +470,7 @@ void DagSub::eval()
    setVal(left()->val()-right()->val());
 }
 
-void DagSub::proj(IntervalVector& X)
+void DagSub::proj(IntervalRegion& reg)
 {
    left()->reduceDom(subPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(subPY(left()->val(), right()->val(), dom()));
@@ -462,8 +501,8 @@ bool DagSub::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagMul::DagMul(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Mul, lsub)
+DagMul::DagMul(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Mul, lsub)
 {}
 
 void DagMul::acceptVisitor(DagVisitor& vis) const
@@ -476,7 +515,7 @@ void DagMul::eval()
    setVal(left()->val()*right()->val());
 }
 
-void DagMul::proj(IntervalVector& X)
+void DagMul::proj(IntervalRegion& reg)
 {
    left()->reduceDom(mulPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(mulPY(left()->val(), right()->val(), dom()));
@@ -507,8 +546,8 @@ bool DagMul::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagDiv::DagDiv(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Div, lsub)
+DagDiv::DagDiv(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Div, lsub)
 {}
 
 void DagDiv::acceptVisitor(DagVisitor& vis) const
@@ -521,7 +560,7 @@ void DagDiv::eval()
    setVal(left()->val()/right()->val());
 }
 
-void DagDiv::proj(IntervalVector& X)
+void DagDiv::proj(IntervalRegion& reg)
 {
    left()->reduceDom(divPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(divPY(left()->val(), right()->val(), dom()));
@@ -553,8 +592,8 @@ bool DagDiv::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagMin::DagMin(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Min, lsub)
+DagMin::DagMin(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Min, lsub)
 {}
 
 void DagMin::acceptVisitor(DagVisitor& vis) const
@@ -567,7 +606,7 @@ void DagMin::eval()
    setVal(min(left()->val(), right()->val()));
 }
 
-void DagMin::proj(IntervalVector& X)
+void DagMin::proj(IntervalRegion& reg)
 {
    left()->reduceDom(minPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(minPY(left()->val(), right()->val(), dom()));
@@ -623,8 +662,8 @@ bool DagMin::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagMax::DagMax(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Max, lsub)
+DagMax::DagMax(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Max, lsub)
 {}
 
 void DagMax::acceptVisitor(DagVisitor& vis) const
@@ -637,7 +676,7 @@ void DagMax::eval()
    setVal(max(left()->val(), right()->val()));
 }
 
-void DagMax::proj(IntervalVector& X)
+void DagMax::proj(IntervalRegion& reg)
 {
    left()->reduceDom(maxPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(maxPY(left()->val(), right()->val(), dom()));
@@ -693,8 +732,8 @@ bool DagMax::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagUsb::DagUsb(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Usb, lsub)
+DagUsb::DagUsb(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Usb, lsub)
 {}
 
 void DagUsb::acceptVisitor(DagVisitor& vis) const
@@ -707,7 +746,7 @@ void DagUsb::eval()
    setVal(-child()->val());
 }
 
-void DagUsb::proj(IntervalVector& X)
+void DagUsb::proj(IntervalRegion& reg)
 {
    child()->reduceDom(usubPX(child()->val(), dom()));
 }
@@ -735,8 +774,8 @@ bool DagUsb::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagAbs::DagAbs(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Abs, lsub)
+DagAbs::DagAbs(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Abs, lsub)
 {}
 
 void DagAbs::acceptVisitor(DagVisitor& vis) const
@@ -749,7 +788,7 @@ void DagAbs::eval()
    setVal(abs(child()->val()));
 }
 
-void DagAbs::proj(IntervalVector& X)
+void DagAbs::proj(IntervalRegion& reg)
 {
    child()->reduceDom(absPX(child()->val(), dom()));
 }
@@ -795,8 +834,8 @@ bool DagAbs::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagSgn::DagSgn(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Sgn, lsub)
+DagSgn::DagSgn(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sgn, lsub)
 {}
 
 void DagSgn::acceptVisitor(DagVisitor& vis) const
@@ -809,7 +848,7 @@ void DagSgn::eval()
    setVal(sgn(child()->val()));
 }
 
-void DagSgn::proj(IntervalVector& X)
+void DagSgn::proj(IntervalRegion& reg)
 {
    child()->reduceDom(sgnPX(child()->val(), dom()));
 }
@@ -833,8 +872,8 @@ bool DagSgn::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagSqr::DagSqr(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Sqr, lsub)
+DagSqr::DagSqr(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sqr, lsub)
 {}
 
 void DagSqr::acceptVisitor(DagVisitor& vis) const
@@ -847,7 +886,7 @@ void DagSqr::eval()
    setVal(sqr(child()->val()));
 }
 
-void DagSqr::proj(IntervalVector& X)
+void DagSqr::proj(IntervalRegion& reg)
 {
    child()->reduceDom(sqrPX(child()->val(), dom()));
 }
@@ -875,8 +914,8 @@ bool DagSqr::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Sqrt, lsub)
+DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sqrt, lsub)
 {}
 
 void DagSqrt::acceptVisitor(DagVisitor& vis) const
@@ -889,7 +928,7 @@ void DagSqrt::eval()
    setVal(sqrt(child()->val()));
 }
 
-void DagSqrt::proj(IntervalVector& X)
+void DagSqrt::proj(IntervalRegion& reg)
 {
    child()->reduceDom(sqrtPX(child()->val(), dom()));
 }
@@ -917,9 +956,15 @@ bool DagSqrt::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagPow::DagPow(Dag* dag, int n, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Pow, lsub), n_(n)
+DagPow::DagPow(Dag* dag, int n, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Pow, lsub),
+        n_(n)
 {}
+
+int DagPow::exponent() const
+{
+   return n_;
+}
 
 bool DagPow::eqSymbol(const DagOp* other) const
 {
@@ -947,7 +992,7 @@ void DagPow::eval()
    setVal(pow(child()->val(), n_));
 }
 
-void DagPow::proj(IntervalVector& X)
+void DagPow::proj(IntervalRegion& reg)
 {
    child()->reduceDom(powPX(child()->val(), n_, dom()));
 }
@@ -977,8 +1022,8 @@ bool DagPow::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagExp::DagExp(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Exp, lsub)
+DagExp::DagExp(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Exp, lsub)
 {}
 
 void DagExp::acceptVisitor(DagVisitor& vis) const
@@ -991,7 +1036,7 @@ void DagExp::eval()
    setVal(exp(child()->val()));
 }
 
-void DagExp::proj(IntervalVector& X)
+void DagExp::proj(IntervalRegion& reg)
 {
    child()->reduceDom(expPX(child()->val(), dom()));
 }
@@ -1019,8 +1064,8 @@ bool DagExp::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagLog::DagLog(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Log, lsub)
+DagLog::DagLog(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Log, lsub)
 {}
 
 void DagLog::acceptVisitor(DagVisitor& vis) const
@@ -1033,7 +1078,7 @@ void DagLog::eval()
    setVal(log(child()->val()));
 }
 
-void DagLog::proj(IntervalVector& X)
+void DagLog::proj(IntervalRegion& reg)
 {
    child()->reduceDom(logPX(child()->val(), dom()));
 }
@@ -1061,8 +1106,8 @@ bool DagLog::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagCos::DagCos(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Cos, lsub)
+DagCos::DagCos(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Cos, lsub)
 {}
 
 void DagCos::acceptVisitor(DagVisitor& vis) const
@@ -1075,7 +1120,7 @@ void DagCos::eval()
    setVal(cos(child()->val()));
 }
 
-void DagCos::proj(IntervalVector& X)
+void DagCos::proj(IntervalRegion& reg)
 {
    child()->reduceDom(cosPX(child()->val(), dom()));
 }
@@ -1104,8 +1149,8 @@ bool DagCos::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagSin::DagSin(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Sin, lsub)
+DagSin::DagSin(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sin, lsub)
 {}
 
 void DagSin::acceptVisitor(DagVisitor& vis) const
@@ -1118,7 +1163,7 @@ void DagSin::eval()
    setVal(sin(child()->val()));
 }
 
-void DagSin::proj(IntervalVector& X)
+void DagSin::proj(IntervalRegion& reg)
 {
    child()->reduceDom(sinPX(child()->val(), dom()));
 }
@@ -1146,8 +1191,8 @@ bool DagSin::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagTan::DagTan(Dag* dag, const IndexList& lsub):
-   DagOp(dag, OpSymbol::Tan, lsub)
+DagTan::DagTan(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Tan, lsub)
 {}
 
 void DagTan::acceptVisitor(DagVisitor& vis) const
@@ -1160,7 +1205,7 @@ void DagTan::eval()
    setVal(tan(child()->val()));
 }
 
-void DagTan::proj(IntervalVector& X)
+void DagTan::proj(IntervalRegion& reg)
 {
    child()->reduceDom(tanPX(child()->val(), dom()));
 }
@@ -1239,10 +1284,10 @@ void DagFun::insertOpNode(DagOp* node)
    }
 }
 
-Interval DagFun::eval(const IntervalVector& X)
+Interval DagFun::eval(const IntervalRegion& reg)
 {
    for (size_t i=0; i<nbNode(); ++i)
-      node_[i]->eval(X);
+      node_[i]->eval(reg);
 
    return rootNode()->val();
 }
@@ -1255,28 +1300,28 @@ Interval DagFun::eval(const RealVector& P)
    return rootNode()->val();
 }
 
-Interval DagFun::evalOnly(size_t id, const Interval& x)
+Interval DagFun::evalOnly(const Variable& v, const Interval& x)
 {
-   ASSERT(dependsOn(id),
+   ASSERT(dependsOn(v),
           "Node " << rootNode()->index()
-                  << " does not depend on variable " << id << ".");
+                  << " does not depend on variable " << v.getName());
 
-   rootNode()->evalOnly(id, x);
+   rootNode()->evalOnly(v, x);
    return rootNode()->val();
 }
 
-Proof DagFun::hc4Revise(IntervalVector& X)
+Proof DagFun::hc4Revise(IntervalRegion& reg)
 {
    // assigns the projections to the universe
    for (size_t i=0; i<nbNode(); ++i)
          node_[i]->setDom(Interval::universe());
 
-   return sharedHc4Revise(X);
+   return sharedHc4Revise(reg);
 }
 
-Proof DagFun::hc4ReviseNeg(IntervalVector& X)
+Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
 {
-   Interval e = eval(X);
+   Interval e = eval(reg);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1301,7 +1346,7 @@ Proof DagFun::hc4ReviseNeg(IntervalVector& X)
          // projection over the root node
          rootNode()->setDom(e & Interval::moreThan(image_.right()));
 
-         return hc4ReviseBack(X);
+         return hc4ReviseBack(reg);
       }
 
       else if (image_.isInfRight())
@@ -1312,7 +1357,7 @@ Proof DagFun::hc4ReviseNeg(IntervalVector& X)
 
          // projection over the root node
          rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         return hc4ReviseBack(X);                  
+         return hc4ReviseBack(reg);                  
       }
 
       else
@@ -1324,7 +1369,7 @@ Proof DagFun::hc4ReviseNeg(IntervalVector& X)
          for (size_t i=0; i<nbNode()-1; ++i)
             node_[i]->setDom(Interval::universe());
 
-         IntervalVector Xl(X);
+         IntervalRegion Xl(reg);
          rootNode()->setDom(e & Interval::lessThan(image_.left()));
          Proof pl = hc4ReviseBack(Xl);
 
@@ -1332,7 +1377,7 @@ Proof DagFun::hc4ReviseNeg(IntervalVector& X)
          for (size_t i=0; i<nbNode(); ++i)
             node_[i]->setDom(Interval::universe());
 
-         IntervalVector Xr(X);
+         IntervalRegion Xr(reg);
          rootNode()->setDom(e & Interval::moreThan(image_.right()));
          Proof pr = hc4ReviseBack(Xr);
 
@@ -1351,16 +1396,16 @@ Proof DagFun::hc4ReviseNeg(IntervalVector& X)
          {
             for (size_t i=0; i<nbVar(); ++i)
             {
-               size_t idx = varNode(i)->getVar().getId();
+               Variable v = varNode(i)->getVar();
 
                if (pl == Proof::Empty)
-                  X.set(idx, Xr[idx]);
+                  reg.set(v, Xr.get(v));
 
                else if (pr == Proof::Empty)
-                  X.set(idx, Xl[idx]);
+                  reg.set(v, Xl.get(v));
 
                else
-                  X.set(idx, Xl[idx] | Xr[idx]);
+                  reg.set(v, Xl.get(v) | Xr.get(v));
             }
          }
 
@@ -1369,9 +1414,9 @@ Proof DagFun::hc4ReviseNeg(IntervalVector& X)
    }
 }
 
-Proof DagFun::sharedHc4Revise(IntervalVector& X)
+Proof DagFun::sharedHc4Revise(IntervalRegion& reg)
 {
-   Interval e = eval(X);
+   Interval e = eval(reg);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1385,32 +1430,32 @@ Proof DagFun::sharedHc4Revise(IntervalVector& X)
    else
    {
       rootNode()->setDom(e & image_);
-      return hc4ReviseBack(X);
+      return hc4ReviseBack(reg);
    }
 }
 
-Proof DagFun::hc4ReviseBack(IntervalVector& X)
+Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
 {
    for (int i=nbNode()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
-      node_[j]->proj(X);
+      node_[j]->proj(reg);
    }
 
    for (size_t i=0; i<nbVar(); ++i)
    {
-      size_t idx = varNode(i)->getVar().getId();
+      Variable v = varNode(i)->getVar();
 
-      if (X[idx].isEmpty())
+      if (reg.get(v).isEmpty())
          return Proof::Empty;
    }
 
    return Proof::Maybe;
 }
 
-bool DagFun::diff(const IntervalVector& X)
+bool DagFun::diff(const IntervalRegion& reg)
 {
-   eval(X);
+   eval(reg);
    return diff();
 }
 
@@ -1456,16 +1501,14 @@ const Interval& DagFun::deriv(const Variable& v) const
    return dag_->findVarNode(v.getId())->dv();
 }
 
-bool DagFun::diffOnly(size_t id)
+bool DagFun::diffOnly(const Variable& v)
 {
-   ASSERT(dependsOn(id),
-          "Node " << rootNode()->index()
-                  << " does not depend on variable " << id << ".");
+   ASSERT(dependsOn(v), "Node " << rootNode()->index()
+                           << " does not depend on variable " << v.getName());
 
    Interval e = rootNode()->val();
 
-   if (e.isEmpty() || e.isInf())
-      return false;
+   if (e.isEmpty() || e.isInf()) return false;
 
    // initializes the derivatives
    rootNode()->setDv(Interval::one());
@@ -1474,13 +1517,13 @@ bool DagFun::diffOnly(size_t id)
       node_[i]->setDv(Interval::zero());
    
    // differentiation
-   return rootNode()->diffOnly(id);
+   return rootNode()->diffOnly(v);
 }
 
-bool DagFun::diffOnly(size_t id, const Interval& x)
+bool DagFun::diffOnly(const Variable& v, const Interval& x)
 {
-   evalOnly(id, x);
-   return diffOnly(id);
+   evalOnly(v, x);
+   return diffOnly(v);
 }
 
 double DagFun::reval(const RealVector& P)
@@ -1579,9 +1622,9 @@ size_t DagFun::ifunArity() const
    return scope().size();   
 }
 
-Interval DagFun::ifunEval(const IntervalVector& x)
+Interval DagFun::ifunEval(const IntervalRegion& reg)
 {
-   return eval(x);
+   return eval(reg);
 }
 
 Interval DagFun::ifunEvalPoint(const RealVector& x)
@@ -1589,18 +1632,18 @@ Interval DagFun::ifunEvalPoint(const RealVector& x)
    return eval(x);
 }
 
-void DagFun::ifunDiff(const IntervalVector& x, IntervalVector& g)
+void DagFun::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
 {
-   diff(x);
+   diff(reg);
    toGrad(g);
 }
 
-void DagFun::ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
-                          Interval& valf)
+void DagFun::ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
+                          Interval& e)
 {
-   diff(x);
+   diff(reg);
    toGrad(g);
-   valf = val();
+   e = val();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1811,10 +1854,10 @@ void Dag::reval(const RealVector& P)
       node_[i]->reval(P);
 }
 
-void Dag::eval(const IntervalVector& X)
+void Dag::eval(const IntervalRegion& reg)
 {
    for (size_t i=0; i<nbNode(); ++i)
-      node_[i]->eval(X);
+      node_[i]->eval(reg);
 }
 
 void Dag::print(std::ostream& os) const

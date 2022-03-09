@@ -75,7 +75,7 @@ public:
    bool dependsOn(const Bitset& bs) const;
 
    // tests if this node depends on a variable id
-   bool dependsOn(size_t id) const;
+   bool dependsOn(const Variable& v) const;
 
    // getter/setter of the interval value
    const Interval& val() const;
@@ -112,7 +112,7 @@ public:
 
    // interval evaluation given the vector of variable domains X
    // assigns the result in val_
-   virtual void eval(const IntervalVector& X) = 0;
+   virtual void eval(const IntervalRegion& reg) = 0;
 
    // interval evaluation given the vector of variable values P
    // assigns the result in val_
@@ -121,11 +121,11 @@ public:
    // interval evaluation given a new domain x for the variable id
    // this node is evaluated only if it depends on this variable
    // assigns the result in val_
-   virtual void evalOnly(size_t id, const Interval& x) = 0;
+   virtual void evalOnly(const Variable& v, const Interval& x) = 0;
 
    // interval projection
    // assumes that an interval evaluation has been done
-   virtual void proj(IntervalVector& X) = 0;
+   virtual void proj(IntervalRegion& reg) = 0;
 
    // interval differentiation in reverse mode
    // assumes that an interval evaluation has been done
@@ -136,7 +136,7 @@ public:
    // differentiates only the nodes depending on variable id
    // assumes that an interval evaluation has been done
    // returns false if some operation at this node is not continuous
-   virtual bool diffOnly(size_t id) = 0;
+   virtual bool diffOnly(const Variable& v) = 0;
 
    // point evaluation given the vector of variable values P
    // assigns the result in rval_
@@ -169,30 +169,27 @@ public:
    // constructor
    DagConst(Dag* dag, size_t index, const Interval& x);
 
-   // Override
+   ///@{
+   /// Overrides (DagNode)
    size_t nbOcc(size_t id) const;
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
-   void eval(const IntervalVector& X);
+   void eval(const IntervalRegion& reg);
    void eval(const RealVector& P);
-   void evalOnly(size_t id, const Interval& x);
-   void proj(IntervalVector& X);
+   void evalOnly(const Variable& v, const Interval& x);
+   void proj(IntervalRegion& reg);
    bool diff();
-   bool diffOnly(size_t id);
+   bool diffOnly(const Variable& v);
    void reval(const RealVector& P);
    bool rdiff();
+   ///@}
 
    // returns the constant interval value
-   const Interval& getConst() const;
+   Interval getConst() const;
 
 private:
    Interval x_;
 };
-
-inline const Interval& DagConst::getConst() const
-{
-   return x_;
-}
 
 /*****************************************************************************
  * Class of variable DAG nodes.
@@ -205,27 +202,24 @@ public:
    // returns the variable enclosed
    Variable getVar() const;
 
-   // Override
+   ///@{
+   /// Overrides (DagNode)
    size_t nbOcc(size_t id) const;
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
-   void eval(const IntervalVector& X);
+   void eval(const IntervalRegion& reg);
    void eval(const RealVector& P);
-   void evalOnly(size_t id, const Interval& x);
-   void proj(IntervalVector& X);
+   void evalOnly(const Variable& v, const Interval& x);
+   void proj(IntervalRegion& reg);
    bool diff();
-   bool diffOnly(size_t id);
+   bool diffOnly(const Variable& v);
    void reval(const RealVector& P);
    bool rdiff();
+   ///@}
 
 private:
    Variable v_;
 };
-
-inline Variable DagVar::getVar() const
-{
-   return v_;
-}
 
 /*****************************************************************************
  * Base class of DAG nodes representing an operation.
@@ -257,38 +251,20 @@ public:
    // evaluates this node using the point values of the children nodes
    virtual void reval() = 0;
 
-   // Override
+   ///@{
+   /// Overrides (DagNode)
    size_t nbOcc(size_t id) const;
    virtual void print(std::ostream& os) const;
-   void eval(const IntervalVector& X);
+   void eval(const IntervalRegion& reg);
    void eval(const RealVector& P);
-   void evalOnly(size_t id, const Interval& x);
-   bool diffOnly(size_t id);
+   void evalOnly(const Variable& v, const Interval& x);
+   bool diffOnly(const Variable& v);
    void reval(const RealVector& P);
+   ///@}
 
 private:
    OpSymbol symb_;
 };
-
-inline OpSymbol DagOp::getSymbol() const
-{
-   return symb_;
-}
-
-inline void DagOp::eval(const IntervalVector& X)
-{
-   eval();
-}
-
-inline void DagOp::eval(const RealVector& P)
-{
-   eval();
-}
-
-inline void DagOp::reval(const RealVector& P)
-{
-   reval();
-}
 
 /*****************************************************************************
  * Class of DAG nodes: binary addition.
@@ -298,13 +274,15 @@ public:
    // constructor
    DagAdd(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
  
 /*****************************************************************************
@@ -315,13 +293,15 @@ public:
    // constructor
    DagSub(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -332,13 +312,15 @@ public:
    // constructor
    DagMul(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -349,13 +331,15 @@ public:
    // constructor
    DagDiv(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -366,13 +350,15 @@ public:
    // constructor
    DagMin(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -383,13 +369,15 @@ public:
    // constructor
    DagMax(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -400,13 +388,15 @@ public:
    // constructor
    DagUsb(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -417,13 +407,15 @@ public:
    // constructor
    DagAbs(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -434,13 +426,15 @@ public:
    // constructor
    DagSgn(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -451,13 +445,15 @@ public:
    // constructor
    DagSqr(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -468,13 +464,15 @@ public:
    // constructor
    DagSqrt(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -488,24 +486,21 @@ public:
    // returns the exponent
    int exponent() const;
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    bool eqSymbol(const DagOp* other) const;
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 
 private:
    int n_;
 };
-
-inline int DagPow::exponent() const
-{
-   return n_;
-}
 
 /*****************************************************************************
  * Class of DAG nodes: exponential function.
@@ -515,13 +510,15 @@ public:
    // constructor
    DagExp(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -532,13 +529,15 @@ public:
    // constructor
    DagLog(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -549,13 +548,15 @@ public:
    // constructor
    DagCos(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -566,13 +567,15 @@ public:
    // constructor
    DagSin(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -583,13 +586,15 @@ public:
    // constructor
    DagTan(Dag* dag, const IndexList& lsub);
 
-   // Override
+   ///@{
+   /// Overrides (DagOp)
    void acceptVisitor(DagVisitor& vis) const;
    void eval();
-   void proj(IntervalVector& X);
+   void proj(IntervalRegion& reg);
    bool diff();
    void reval();
    bool rdiff();
+   ///@}
 };
 
 /*****************************************************************************
@@ -603,7 +608,7 @@ public:
    DagFun(Dag* dag, size_t root, const Interval& image);
 
    // image of the function
-   const Interval& getImage() const;
+   Interval getImage() const;
    void setImage(const Interval& x);
 
    // returns the dag
@@ -629,9 +634,6 @@ public:
    // tests if this function depends on a variable
    bool dependsOn(const Variable& v) const;
 
-   // tests if this function depends on a variable of identifier id
-   bool dependsOn(size_t id) const;
-
    // access to the bitset
    const Bitset& bitset() const;
 
@@ -649,30 +651,30 @@ public:
    void setScope(const Scope& s);
 
    // interval evaluation
-   Interval eval(const IntervalVector& X);
+   Interval eval(const IntervalRegion& reg);
    Interval eval(const RealVector& P);
 
    // access to the result of the interval evaluation
    Interval val() const;
 
    // interval evaluation given a new domain x for v
-   // only the nodes depending on the variable id are evaluated
-   Interval evalOnly(size_t id, const Interval& x);
+   // only the nodes depending on the variable v are evaluated
+   Interval evalOnly(const Variable& v, const Interval& x);
 
    // Hc4Revise contractor
-   Proof hc4Revise(IntervalVector& X);
+   Proof hc4Revise(IntervalRegion& reg);
 
    // Hc4Revise contractor on the constraint negation
-   Proof hc4ReviseNeg(IntervalVector& X);
+   Proof hc4ReviseNeg(IntervalRegion& reg);
 
    // Hc4Revise contractor with node sharing
    // assumes that a DagContext has been initialized
-   Proof sharedHc4Revise(IntervalVector& X);
+   Proof sharedHc4Revise(IntervalRegion& reg);
 
    // interval differentiation in reverse mode
    // evaluates first this function
    // returns false if this function is discontinuous, true otherwise
-   bool diff(const IntervalVector& X);
+   bool diff(const IntervalRegion& reg);
 
    // interval differentiation in reverse mode
    // assumes that this function has been evaluated
@@ -681,8 +683,8 @@ public:
 
    // interval evaluation of a partial derivative in forward mode
    // only the nodes depending on the considered variable are evaluated
-   bool diffOnly(size_t id);
-   bool diffOnly(size_t id, const Interval& x);
+   bool diffOnly(const Variable& v);
+   bool diffOnly(const Variable& v, const Interval& x);
 
    // access to the gradient
    IntervalVector grad() const;
@@ -727,14 +729,14 @@ public:
    double rderiv(const Variable& v) const;
 
    ///@{
-   /// Overrides the methods of IntervalFunction
+   /// Overrides (IntervalFunction)
    Scope ifunScope() const;
    size_t ifunArity() const;
-   Interval ifunEval(const IntervalVector& x);
+   Interval ifunEval(const IntervalRegion& reg);
    Interval ifunEvalPoint(const RealVector& x);
-   void ifunDiff(const IntervalVector& x, IntervalVector& g);
-   void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
-                      Interval& valf);
+   void ifunDiff(const IntervalRegion& reg, IntervalVector& g);
+   void ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
+                     Interval& e);
    ///@}
 
    ///@{
@@ -766,10 +768,10 @@ private:
 
    // backward phase of the Hc4Revise contractor
    // to be called after the assignment of the projection over the root node 
-   Proof hc4ReviseBack(IntervalVector& X);
+   Proof hc4ReviseBack(IntervalRegion& reg);
 };
 
-inline const Interval& DagFun::getImage() const
+inline Interval DagFun::getImage() const
 {
    return image_;
 }
@@ -821,12 +823,7 @@ inline bool DagFun::dependsOn(const Bitset& bs) const
 
 inline bool DagFun::dependsOn(const Variable& v) const
 {
-   return rootNode()->dependsOn(v.getId());
-}
-
-inline bool DagFun::dependsOn(size_t id) const
-{
-   return rootNode()->dependsOn(id);
+   return rootNode()->dependsOn(v);
 }
 
 inline const Interval& DagFun::deriv(size_t i) const
@@ -970,7 +967,7 @@ public:
    void reduceDom(size_t i, const Interval& x);
 
    // interval evaluation
-   void eval(const IntervalVector& X);
+   void eval(const IntervalRegion& reg);
 
    // point evaluation
    void reval(const RealVector& P);

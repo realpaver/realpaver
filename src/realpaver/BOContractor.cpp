@@ -14,7 +14,7 @@ namespace realpaver {
 
 BOContractor::BOContractor(Dag* dag, size_t i, const Variable& v,
                            const SharedContractor& op, 
-                           const SharedIntervalVector& init)
+                           const SharedIntervalRegion& init)
       : f_(dag->fun(i)),
         v_(v),
         op_(op),
@@ -31,13 +31,13 @@ Scope BOContractor::scope() const
    return f_->scope();
 }
 
-Proof BOContractor::contract(IntervalVector& X)
+Proof BOContractor::contract(IntervalRegion& reg)
 {
-   // true if X  crosses the initial boundary at the left bound of v_
-   bool initLB = X[v_].left() == init_->operator[](v_).left();
+   // true if the region crosses the initial boundary at the left bound of v_
+   bool initLB = reg.get(v_).left() == init_->get(v_).left();
 
-   // true if X crosses the initial boundary at the right bound of v_
-   bool initRB = X[v_].right() == init_->operator[](v_).right();
+   // true if the region crosses the initial boundary at the right bound of v_
+   bool initRB = reg.get(v_).right() == init_->get(v_).right();
 
    // true if X crosses the initial boundary
    bool initB  = initLB || initRB;
@@ -45,36 +45,36 @@ Proof BOContractor::contract(IntervalVector& X)
    // just finds stationary points if X does not cross the initial region
    if (!initB)
    {
-      return op_->contract(X);
+      return op_->contract(reg);
    }
 
    // copies the box
-   IntervalVector copy(X);
+   IntervalRegion copy(reg);
 
    // applies the contractor to find stationary points
-   Proof proof = op_->contract(X);
+   Proof proof = op_->contract(reg);
 
    if (proof == Proof::Empty)
    {
       // monotone function => finds the sign of the derivative at some
-      // point of X
+      // point of the region
       RealVector P( copy.midpoint() );
       Interval ef = f_->eval(P);
 
-      // resets X
-      X.setOnScope(copy, scope());
+      // resets the region
+      reg.setOnScope(copy, scope());
 
       // instanciates the variable
       if (ef.isCertainlyLeZero())
       {
-         double val = copy[v_].right();
-         X.set(v_, val);
+         double val = copy.get(v_).right();
+         reg.set(v_, val);
       }
 
       else if (ef.isCertainlyGeZero())
       {
-         double val = copy[v_].left();
-         X.set(v_, val);
+         double val = copy.get(v_).left();
+         reg.set(v_, val);
       }
 
       //else
@@ -85,37 +85,31 @@ Proof BOContractor::contract(IntervalVector& X)
       bool keepLB = false,
            keepRB = false;
 
-      if (initLB && X[v_].left() != copy[v_].left())
+      if (initLB && reg.get(v_).left() != copy.get(v_).left())
       {
          RealVector P( copy.lCorner() );
          Interval ef = f_->eval(P);
-         if (ef.isCertainlyGeZero())
-            keepLB = true;
+         if (ef.isCertainlyGeZero()) keepLB = true;
       }
 
-      if (initRB && X[v_].right() != copy[v_].right())
+      if (initRB && reg.get(v_).right() != copy.get(v_).right())
       {
          RealVector P( copy.rCorner() );
          Interval ef = f_->eval(P);
-         if (ef.isCertainlyLeZero())
-            keepRB = true;
+         if (ef.isCertainlyLeZero()) keepRB = true;
       }
 
       if (keepLB || keepRB)
       {
-         X.setOnScope(copy, scope());
-         Interval dom = X[v_];
+         reg.setOnScope(copy, scope());
+         Interval dom = reg.get(v_);
 
-         if (keepLB)
-            dom.setLeft(copy[v_].left()); 
-
-         if (keepRB)
-            dom.setRight(copy[v_].right());
-
-         X.set(v_, dom);
+         if (keepLB) dom.setLeft(copy.get(v_).left()); 
+         if (keepRB) dom.setRight(copy.get(v_).right());
+         reg.set(v_, dom);
       }
    }
-   
+
    return Proof::Maybe;
 }
 

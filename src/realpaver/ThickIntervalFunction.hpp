@@ -11,6 +11,7 @@
 #define REALPAVER_THICK_INTERVAL_FUNCTION_HPP
 
 #include "realpaver/dag.hpp"
+#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/UniIntervalFunction.hpp"
 
 namespace realpaver {
@@ -30,8 +31,8 @@ public:
    /// Creates a thick function
    /// @param dag a DAG
    /// @param i index of a function in the DAG
-   /// @param iv the index of a variable occurring in the function
-   ThickIntervalFunction(Dag* dag, size_t i, size_t iv);
+   /// @param v a variable occurring in the function
+   ThickIntervalFunction(Dag* dag, size_t i, Variable v);
 
    /// Default copy constructor
    ThickIntervalFunction(const ThickIntervalFunction&) = default;
@@ -51,24 +52,24 @@ public:
    bool dependsOn(const Bitset& bs) const;
 
    ///@{
-   /// Overrides the methods of UniIntervalFunction
+   /// Overrides (UniIntervalFunction)
    Interval eval(const Interval& x);
    Interval diff(const Interval& x);
    std::pair<Interval, Interval> evalDiff(const Interval& x);
    ///@}
 
-   /// Thicken the associated function in the DAG
-   /// @param X a region
-   /// @return interval evaluation of this at X
-   Interval update(const IntervalVector& X);
+   /// Updates the associated function in the DAG
+   /// @param reg domains of variables
+   /// @return interval evaluation of this at reg
+   Interval update(const IntervalRegion& reg);
 
    /// @return the index of the variable of this
-   size_t getVarIndex() const;
+   Variable getVar() const;
 
 private:
    DagFun* f_;    // function in the dag
    size_t if_;    // function index in the dag
-   size_t iv_;    // variable index
+   Variable v_;   // variable index
 };
 
 } // namespace

@@ -10,13 +10,11 @@
 #ifndef REALPAVER_INTERVAL_VECTOR_HPP
 #define REALPAVER_INTERVAL_VECTOR_HPP
 
-#include <memory>
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Interval.hpp"
 #include "realpaver/LinumIntervalTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealVector.hpp"
-#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
@@ -42,26 +40,17 @@ public:
    /// No assignment
    IntervalVector& operator=(const IntervalVector&) = delete;
 
-   /// Default destructor
-   ~IntervalVector() = default;
+   /// Virtual destructor
+   virtual ~IntervalVector();
 
    /// @param i an index between 0 and size()-1
    /// @return the i-th element of this
-   Interval operator[](size_t i) const;
-
-   /// @param v a variable
-   /// @return the i-th element of this where i is the identifier of v
-   Interval operator[](Variable v) const;
+   Interval get(size_t i) const;
 
    /// Sets an element of this
    /// @param i an index between 0 and size()-1
    /// @param x an interval
    void set(size_t i, const Interval& x);
-
-   /// Sets an element of this
-   /// @param v a variable
-   /// @param x an interval
-   void set(Variable v, const Interval& x);
 
    /// @return true if one element of this is empty
    bool isEmpty() const;
@@ -158,26 +147,9 @@ public:
    /// this is assigned to the hull of this and X
    void hullAssign(const IntervalVector& X);
 
-   /// Hull with assignment on a scope
-   /// @param X an interval vector
-   /// @param s a scope
-   ///
-   /// this[s] is assigned to the hull of this[s] and X[s]
-   void hullAssignOnScope(const IntervalVector& X, const Scope& s);
-
-   /// Assignment on a scope
-   /// @param X an interval vector
-   /// @param s a scope
-   ///
-   /// this[s] is assigned to X[s]
-   void setOnScope(const IntervalVector& X, const Scope& s);
-
    /// @return a clone of this
-   IntervalVector* clone() const;
+   virtual IntervalVector* clone() const;
 };
-
-/// This is a shared interval vector.
-typedef std::shared_ptr<IntervalVector> SharedIntervalVector;
 
 } // namespace
 

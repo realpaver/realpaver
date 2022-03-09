@@ -33,7 +33,7 @@ public:
    /// @param op contractor for the equation df/dv = 0
    /// @param init initial region of the BO problem
    BOContractor(Dag* dag, size_t i, const Variable& v,
-                const SharedContractor& op, const SharedIntervalVector& init);
+                const SharedContractor& op, const SharedIntervalRegion& init);
 
    /// Default copy constructor
    BOContractor(const BOContractor&) = default;
@@ -45,10 +45,10 @@ public:
    ~BOContractor() = default;
 
    ///@{
-   /// Overrides the methods of Contractor
+   /// Overrides (Contractor)
    bool dependsOn(const Bitset& bs) const;
    Scope scope() const;
-   Proof contract(IntervalVector& X);
+   Proof contract(IntervalRegion& reg);
    void print(std::ostream& os) const;
    ///@}
 
@@ -56,7 +56,7 @@ private:
    DagFun* f_;                   // derivative df/dv in a dag
    Variable v_;                  // the considered variable
    SharedContractor op_;         // contractor for the equation df/dv = 0
-   SharedIntervalVector init_;   // initial region
+   SharedIntervalRegion init_;   // initial region
 };
 
 } // namespace

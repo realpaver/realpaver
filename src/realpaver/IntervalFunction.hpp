@@ -10,7 +10,7 @@
 #ifndef REALPAVER_INTERVAL_FUNCTION_HPP
 #define REALPAVER_INTERVAL_FUNCTION_HPP
 
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/RealVector.hpp"
 #include "realpaver/Scope.hpp"
 
@@ -33,26 +33,26 @@ public:
    virtual size_t ifunArity() const = 0;
 
    /// Evaluates this
-   /// @param x argument of this
-   /// @return value of this at x
-   virtual Interval ifunEval(const IntervalVector& x) = 0;
+   /// @param reg domains of variables
+   /// @return interval value of this at r
+   virtual Interval ifunEval(const IntervalRegion& reg) = 0;
 
    /// Evaluates this
-   /// @param x argument of this
+   /// @param x values of variables
    /// @return value of this at x
    virtual Interval ifunEvalPoint(const RealVector& x) = 0;
 
    /// Differentiates this, i.e. evaluates its gradient
-   /// @param x argument of this
-   /// @param g gradient of this at x (output)
-   virtual void ifunDiff(const IntervalVector& x, IntervalVector& g) = 0;
+   /// @param reg domains of variables
+   /// @param g interval gradient of this at r (output)
+   virtual void ifunDiff(const IntervalRegion& reg, IntervalVector& g) = 0;
 
    /// Evaluates and differentiates this
-   /// @param x argument of this
-   /// @param g gradient of this at x (output)
-   /// @param val value of this at x
-   virtual void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
-                              Interval& val) = 0;
+   /// @param reg domains of variables
+   /// @param g interval gradient of this at r (output)
+   /// @param e interval value of this at r (output)
+   virtual void ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
+                             Interval& e) = 0;
 };
 
 } // namespace

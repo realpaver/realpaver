@@ -24,7 +24,7 @@ int main(void)
 
       z.setTolerance(Tolerance::makeAbs(30.0));
 
-      IntervalVector initRegion = P.getDomains();
+      IntervalRegion initRegion = P.getDomains();
 
 
       Dag D;

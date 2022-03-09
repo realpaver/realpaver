@@ -12,7 +12,7 @@
 
 #include <unordered_map>
 #include <vector>
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -66,9 +66,9 @@ public:
    virtual Interval evalConst() const = 0;
 
    /// Interval evaluation
-   /// @param X a vector of variable domains
-   /// @return the interval evaluation of this at X
-   virtual Interval eval(const IntervalVector& X) const = 0;
+   /// @param reg domains of variables
+   /// @return the interval evaluation of this at reg
+   virtual Interval eval(const IntervalRegion& reg) const = 0;
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -140,9 +140,9 @@ public:
    Interval evalConst() const;
 
    /// Interval evaluation
-   /// @param X a vector of variable domains
-   /// @return the interval evaluation of this at X
-   Interval eval(const IntervalVector& X) const;
+   /// @param reg domains of variables
+   /// @return the interval evaluation of this at reg
+   Interval eval(const IntervalRegion& reg) const;
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -235,7 +235,7 @@ public:
    /// Overrides
    void print(std::ostream& os) const;
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isZero() const;
    bool isOne() const;
@@ -264,7 +264,7 @@ public:
    /// Overrides
    void print(std::ostream& os) const;
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool dependsOn(const Variable& v) const;
    bool isLinear() const;
@@ -349,7 +349,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -370,7 +370,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -391,7 +391,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -412,7 +412,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isDiv() const;
@@ -432,7 +432,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -450,7 +450,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -467,7 +467,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
    bool isUsb() const;
@@ -486,7 +486,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -503,7 +503,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -520,7 +520,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -537,7 +537,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -558,7 +558,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
@@ -579,7 +579,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -596,7 +596,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -613,7 +613,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -630,7 +630,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };
@@ -647,7 +647,7 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalVector& X) const;
+   Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
    ///@}
 };

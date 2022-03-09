@@ -22,14 +22,14 @@ RealVector::RealVector(const std::initializer_list<double>& l)
       push(x);
 }
 
-double RealVector::operator[](size_t i) const
+double RealVector::get(size_t i) const
 {
-   return at(i);
+   return operator[](i);
 }
 
 void RealVector::set(size_t i, double x)
 {
-   setAt(i, x);
+   operator[](i) = x;
 }
 
 RealVector& RealVector::operator=(const RealVector& V)
@@ -46,7 +46,7 @@ RealVector& RealVector::operator=(const RealVector& V)
 bool RealVector::isNan() const
 {
    for (size_t i=0; i<size(); ++i)
-      if (Double::isNan(at(i))) return true;
+      if (Double::isNan(get(i))) return true;
 
    return false;
 }
@@ -59,7 +59,7 @@ double RealVector::scalarProduct(const RealVector& V) const
    double res = 0.0;
 
    for (size_t i=0; i<size(); ++i)
-      Double::addAssign(res, Double::mul(at(i), V[i]));
+      Double::addAssign(res, Double::mul(get(i), V[i]));
 
    return res;
 }
@@ -69,7 +69,7 @@ double RealVector::euclideanNorm() const
    double sq = 0.0;
 
    for (size_t i=0; i<size(); ++i)
-      Double::addAssign(sq, Double::sqr(at(i)));
+      Double::addAssign(sq, Double::sqr(get(i)));
 
    return Double::sqrt(sq);
 }
@@ -79,7 +79,7 @@ double RealVector::oneNorm() const
    double norm = 0.0;
 
    for (size_t i=0; i<size(); ++i)
-      Double::addAssign(norm, Double::abs(at(i)));
+      Double::addAssign(norm, Double::abs(get(i)));
 
    return norm;
 }
@@ -90,7 +90,7 @@ double RealVector::infNorm() const
 
    for (size_t i=0; i<size(); ++i)
    {
-      double m = Double::abs(at(i));
+      double m = Double::abs(get(i));
       if (m > norm) norm = m;
    }
 

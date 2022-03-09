@@ -36,10 +36,10 @@ public:
    /// Creates a contractor
    /// @param dag a DAG
    /// @param i index of a function in the DAG
-   /// @param iv index of a variable occurring in the function
+   /// @param v a variable occurring in the function
    ///
    /// This does not own the dag.
-   BC3Contractor(Dag* dag, size_t i, size_t iv);
+   BC3Contractor(Dag* dag, size_t i, Variable v);
 
    /// Destructor
    ~BC3Contractor();
@@ -70,10 +70,10 @@ public:
    IntervalNewton* getNewton() const;
 
    ///@{
-   /// Overrides the methods of Contractor
+   /// Overrides (Contractor)
    bool dependsOn(const Bitset& bs) const;
    Scope scope() const;
-   Proof contract(IntervalVector& X);
+   Proof contract(IntervalRegion& reg);
    void print(std::ostream& os) const;
    ///@}
 

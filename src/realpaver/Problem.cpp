@@ -122,37 +122,31 @@ void Problem::addObjective(const Objective& obj)
    obj_ = obj;
 }
 
-IntervalVector Problem::getDomains() const
+IntervalRegion Problem::getDomains() const
 {
-   IntervalVector X(vars_.size());
-   
-   for(size_t i=0; i<vars_.size(); ++i)
-      X.set(i, getDomain(vars_[i]));
-
-   return X;
+   IntervalRegion r(scope_);
+   for (auto v : scope_) r.set(v, getDomain(v));
+   return r;
 }
 
 Interval Problem::getDomain(const Variable& v) const
 {
-   ASSERT(scope_.contains(v), "Variable " << v.getName()
-                               << "does not belong to the problem");
+   ASSERT(scope_.contains(v),
+          "Variable " << v.getName() << "does not belong to the problem");
 
    auto it = dom_.find(v);
    return it->second;
 }
 
-void Problem::setDomains(const IntervalVector& X)
+void Problem::setDomains(const IntervalRegion& reg)
 {
-   ASSERT(nbVars() == X.size(), "bad assignment of domains");
-
-   for(size_t i=0; i<vars_.size(); ++i)
-      setDomain(vars_[i], X[i]);
+   for (auto v : reg.scope()) setDomain(v, reg.get(v));
 }
 
 void Problem::setDomain(const Variable& v, const Interval& x)
 {
-   ASSERT(scope_.contains(v), "Variable " << v.getName()
-                               << "does not belong to the problem");
+   ASSERT(scope_.contains(v),
+          "Variable " << v.getName() << "does not belong to the problem");
 
    auto it = dom_.find(v);
    it->second = x;

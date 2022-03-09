@@ -56,10 +56,10 @@ public:
    void setPool(ContractorPool* pool);
 
    ///@{
-   /// Overrides the methods of Contractor
+   /// Overrides (Contractor)
    bool dependsOn(const Bitset& bs) const;
    Scope scope() const;
-   Proof contract(IntervalVector& X);
+   Proof contract(IntervalRegion& reg);
    void print(std::ostream& os) const;
    ///@}
 

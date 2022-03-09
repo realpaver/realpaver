@@ -40,7 +40,7 @@ void BOLocalSolver::setFinalObjVal(double& val)
 }
 
 OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
-                                           IntervalVector& region,
+                                           const IntervalRegion& reg,
                                            const RealVector& initialPoint,
                                            RealVector& finalPoint)
 {

@@ -69,7 +69,7 @@ public:
    Scope getFullScope() const;
 
    /// @return returns the initial region
-   IntervalVector getInitRegion() const;
+   IntervalRegion getInitRegion() const;
 
    /// Sets a variable as a boundary variable
    /// @param v a variable of this
@@ -93,11 +93,11 @@ public:
    /// Overrides the methods of IntervalFunction
    Scope ifunScope() const;
    size_t ifunArity() const;
-   Interval ifunEval(const IntervalVector& x);
+   Interval ifunEval(const IntervalRegion& reg);
    Interval ifunEvalPoint(const RealVector& x);
-   void ifunDiff(const IntervalVector& x, IntervalVector& g);
-   void ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
-                      Interval& valf);
+   void ifunDiff(const IntervalRegion& reg, IntervalVector& g);
+   void ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
+                     Interval& e);
    ///@}
 
    ///@{
@@ -111,7 +111,7 @@ public:
 
 private:
    Dag* dag_;
-   IntervalVector initreg_;
+   IntervalRegion* init_;
    Variable z_;
    Scope objscope_;     // scope of the objective function
    Scope fullscope_;    // objscope_ union {z_}

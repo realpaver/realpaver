@@ -48,7 +48,7 @@ public:
 
    /// @param i an index between 0 and size()-1
    /// @return the i-th element of this
-   double operator[](size_t i) const;
+   double get(size_t i) const;
 
    /// Sets an element of this
    /// @param i an index between 0 and size()-1

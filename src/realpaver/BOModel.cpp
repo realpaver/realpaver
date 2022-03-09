@@ -14,7 +14,7 @@ namespace realpaver {
 
 BOModel::BOModel(Problem& problem, bool withobj)
       : dag_(nullptr),
-        initreg_(problem.nbVars()),
+        init_(nullptr),
         z_(""),
         objscope_(),
         fullscope_(),
@@ -46,7 +46,6 @@ BOModel::BOModel(Problem& problem, bool withobj)
       objscope_.insert(v);
       boundary_.insert(v);
       fullscope_.insert(v);
-      initreg_.set(v, problem.getDomain(v));
    }
 
    // objective function
@@ -54,7 +53,6 @@ BOModel::BOModel(Problem& problem, bool withobj)
    {
       z_ = problem.addRealVar(Interval::universe(), "_z");
       fullscope_.insert(z_);
-      initreg_.push(Interval::universe());
 
       //LOG_INFO("   > creates an objective variable " << z_.name());
 
@@ -64,10 +62,25 @@ BOModel::BOModel(Problem& problem, bool withobj)
       else
          dag_->insert( z_ + to == 0 );
    }
+
+   // initial region
+   init_ = new IntervalRegion(fullscope_);
+
+   for (size_t i=0; i<problem.nbVars(); ++i)
+   {
+      Variable v = problem.varAt(i);
+      init_->set(v, problem.getDomain(v));
+   }
+
+   if (withobj)
+   {
+      init_->set(z_, Interval::universe());
+   }
 }
 
 BOModel::~BOModel()
 {
+   delete init_;
    delete dag_;
 }
 
@@ -113,9 +126,9 @@ bool BOModel::isInteriorVar(const Variable& v) const
    return !boundary_.contains(v);
 }
 
-IntervalVector BOModel::getInitRegion() const
+IntervalRegion BOModel::getInitRegion() const
 {
-   return initreg_;
+   return *init_;
 }
 
 size_t BOModel::dim() const
@@ -179,11 +192,11 @@ size_t BOModel::ifunArity() const
    return objscope_.size();
 }
 
-Interval BOModel::ifunEval(const IntervalVector& x)
+Interval BOModel::ifunEval(const IntervalRegion& reg)
 {
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
-   f->eval(x);
+   f->eval(reg);
 
    // finds the root node of the objective function
    return f->node(f->nbNode() - 2)->val();
@@ -199,23 +212,23 @@ Interval BOModel::ifunEvalPoint(const RealVector& x)
    return f->node(f->nbNode() - 2)->val();
 }
 
-void BOModel::ifunDiff(const IntervalVector& x, IntervalVector& g)
+void BOModel::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
    // evaluates the dag
-   dag_->eval(x);
+   dag_->eval(reg);
 
    // fills the gradient
    for (size_t i=0; i<dim(); ++i)
       g.set(i, dag_->fun(i)->val());      
 }
 
-void BOModel::ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
-                           Interval& valf)
+void BOModel::ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
+                           Interval& e)
 {
    // evaluates the dag
-   dag_->eval(x);
+   dag_->eval(reg);
 
    // fills the gradient
    for (size_t i=0; i<dim(); ++i)
@@ -223,7 +236,7 @@ void BOModel::ifunEvalDiff(const IntervalVector& x, IntervalVector& g,
 
    // finds the value
    DagFun* f = dag_->fun(dim());
-   valf = f->node(f->nbNode() - 2)->val();
+   e = f->node(f->nbNode() - 2)->val();
 }
 
 } // namespace

@@ -1,5 +1,5 @@
 #include "realpaver/dag.hpp"
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver_test.hpp"
 
 class DagTest : public CppUnit::TestFixture

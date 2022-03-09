@@ -119,9 +119,9 @@ void Constraint::acceptVisitor(ConstraintVisitor& vis) const
    rep_->acceptVisitor(vis);
 }
 
-Proof Constraint::isSatisfied(const IntervalVector& X) const
+Proof Constraint::isSatisfied(const IntervalRegion& reg) const
 {
-   return rep_->isSatisfied(X);
+   return rep_->isSatisfied(reg);
 }
 
 bool Constraint::dependsOn(const Variable& v) const
@@ -231,10 +231,10 @@ void ConstraintEq::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintEq::isSatisfied(const IntervalVector& X) const
+Proof ConstraintEq::isSatisfied(const IntervalRegion& reg) const
 {
-   Interval l = left().eval(X),
-            r = right().eval(X);
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -265,10 +265,10 @@ void ConstraintLe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLe::isSatisfied(const IntervalVector& X) const
+Proof ConstraintLe::isSatisfied(const IntervalRegion& reg) const
 {
-   Interval l = left().eval(X),
-            r = right().eval(X);
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -299,10 +299,10 @@ void ConstraintLt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLt::isSatisfied(const IntervalVector& X) const
+Proof ConstraintLt::isSatisfied(const IntervalRegion& reg) const
 {
-   Interval l = left().eval(X),
-            r = right().eval(X);
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -333,10 +333,10 @@ void ConstraintGe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGe::isSatisfied(const IntervalVector& X) const
+Proof ConstraintGe::isSatisfied(const IntervalRegion& reg) const
 {
-   Interval l = left().eval(X),
-            r = right().eval(X);
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -367,10 +367,10 @@ void ConstraintGt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGt::isSatisfied(const IntervalVector& X) const
+Proof ConstraintGt::isSatisfied(const IntervalRegion& reg) const
 {
-   Interval l = left().eval(X),
-            r = right().eval(X);
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -414,9 +414,9 @@ void ConstraintIn::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintIn::isSatisfied(const IntervalVector& X) const
+Proof ConstraintIn::isSatisfied(const IntervalRegion& reg) const
 {
-   Interval e = term().eval(X);
+   Interval e = term().eval(reg);
 
    if (e.isEmpty())
       return Proof::Empty;

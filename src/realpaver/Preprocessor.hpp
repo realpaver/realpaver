@@ -52,13 +52,13 @@ public:
 
    /// Creates a simplified problem from an initial problem
    /// @param src initial problem
-   /// @param X the variable domains
+   /// @param reg domains of variables
    /// @param dest simplified problem
    /// @return false if the problem given X is proved to be unsatisfiable
    ///
    /// It removes the fixed variables and the inactive constraints and it
    /// creates a new problem with a new set of variables.
-   bool apply(const Problem& src, const IntervalVector& X, Problem& dest);
+   bool apply(const Problem& src, const IntervalRegion& reg, Problem& dest);
 
    /// Tests if a variable of the source problem is fixed
    /// @param v a variable of the source problem

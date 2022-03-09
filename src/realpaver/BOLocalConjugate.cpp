@@ -90,10 +90,10 @@ double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
    return res;
 }
 
-OptimizationStatus
-BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
-                           const RealVector& initialPoint,
-                           RealVector& finalPoint)
+OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
+                                              const IntervalRegion& reg,
+                                              const RealVector& initialPoint,
+                                              RealVector& finalPoint)
 {
    size_t dim = f.rfunArity();
 
@@ -126,7 +126,7 @@ BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
    if (step > 0.0)
       xk_1 = xk + step * pk;
 
-   if (step < 0.0 || (!region.contains(xk_1)))
+   if (step < 0.0 || (!reg.contains(xk_1)))
       return OptimizationStatus::Other;
 
    // loop
@@ -169,7 +169,7 @@ BOLocalConjugate::minimize(RealFunction& f, IntervalVector& region,
          iter = false;  // no improvement of the upper bound
       }
 
-      if (iter && (!region.contains(xk_1)))
+      if (iter && (!reg.contains(xk_1)))
       {
          xk_1 = xk;
          uk_1 = uk;

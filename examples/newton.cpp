@@ -19,7 +19,7 @@ int main(void)
 
    Dag dag;
    size_t idx = dag.insert(c);
-   ThickIntervalFunction f(&dag, idx, x.getId());
+   ThickIntervalFunction f(&dag, idx, x);
 
    IntervalNewton newton;
    Interval I( x.getDomain() );

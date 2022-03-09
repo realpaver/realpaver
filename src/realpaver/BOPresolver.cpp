@@ -19,7 +19,7 @@ BOPresolver::BOPresolver(BOModel& model)
         init_(nullptr),
         region_(model.getInitRegion())
 {
-   init_ = std::make_shared<IntervalVector>(model.getInitRegion());
+   init_ = std::make_shared<IntervalRegion>(model.getInitRegion());
 
    Dag* dag = model.getDag();
    size_t i = 0;
@@ -54,7 +54,7 @@ bool BOPresolver::presolve()
    return proof != Proof::Empty;
 }
 
-IntervalVector BOPresolver::getContractedRegion() const
+IntervalRegion BOPresolver::getContractedRegion() const
 {
    return region_;
 }

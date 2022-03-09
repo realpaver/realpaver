@@ -14,8 +14,8 @@
 
 namespace realpaver {
 
-BC3Contractor::BC3Contractor(Dag* dag, size_t i, size_t iv)
-      : f_(dag, i, iv),
+BC3Contractor::BC3Contractor(Dag* dag, size_t i, Variable v)
+      : f_(dag, i, v),
         peeler_(Param::getDblParam("BC3_PEEL_FACTOR")),
         maxiter_(Param::getIntParam("BC3_ITER_LIMIT"))
 {
@@ -178,16 +178,16 @@ Proof BC3Contractor::shrink(const Interval& x, Interval& res,
    return Proof::Empty;
 }
 
-Proof BC3Contractor::contract(IntervalVector& X)
+Proof BC3Contractor::contract(IntervalRegion& reg)
 {
    Interval lsol, rsol;
    Proof proof, certif;
 
-   size_t iv = f_.getVarIndex();
+   Variable v = f_.getVar();
    const Interval& img = f_.getFun()->getImage();
 
    // first interval evaluation that also thickens the function
-   Interval e = f_.update(X);
+   Interval e = f_.update(reg);
 
    // consistency checking
    if (e.isEmpty())
@@ -200,17 +200,17 @@ Proof BC3Contractor::contract(IntervalVector& X)
       return Proof::Inner;
 
    // shrinks the left bound
-   proof = shrinkLeft(X[iv], lsol);
+   proof = shrinkLeft(reg.get(v), lsol);
 
    if (proof == Proof::Empty)
       return Proof::Empty;
 
    // shrinks the right bound
-   Interval y(lsol.left(), X[iv].right());
+   Interval y(lsol.left(), reg.get(v).right());
    certif = shrinkRight(y, rsol);
 
    // assigns the contracted domain in V
-   X.set(iv, lsol | rsol);
+   reg.set(v, lsol | rsol);
 
    return std::max(proof,certif);
 }

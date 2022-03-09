@@ -54,6 +54,7 @@ Param::Param()
    strmap_.insert(std::make_pair("SPLIT_SELECTOR",       "MaxDom"));
    strmap_.insert(std::make_pair("SPLIT_SLICER",         "Bisection"));
    strmap_.insert(std::make_pair("PROPAGATOR_ALGORITHM", "HC4"));
+   strmap_.insert(std::make_pair("LOCAL_SOLVER",         "MIDPOINT"));
 }
 
 Param::~Param()

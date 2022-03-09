@@ -22,8 +22,9 @@ public:
    BOLocalConjugate();
 
 
-   /// Overrides the method of BOLocalSolver
-   OptimizationStatus minimize(RealFunction& f, IntervalVector& region,
+   /// Overrides (BOLocalSolver)
+   OptimizationStatus minimize(RealFunction& f,
+                               const IntervalRegion& reg,
                                const RealVector& initialPoint,
                                RealVector& finalPoint);
 

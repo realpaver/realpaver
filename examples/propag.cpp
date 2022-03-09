@@ -19,9 +19,9 @@ int main(void)
       Variable x = problem.addRealVar(-10,  4, "x"),
                y = problem.addRealVar( -3,  7, "y");
 
-      IntervalVector V = problem.getDomains();
+      IntervalRegion reg = problem.getDomains();
 
-      cout << "Region:     " << V << endl;
+      cout << "Region:     " << reg << endl;
 
       Dag dag;
       size_t i = dag.insert( y == 0.5*x );
@@ -34,12 +34,12 @@ int main(void)
       Propagator tor(&pool);
       tor.setDistTol(Tolerance::makeRel(1.0e-2));
 
-      Proof proof = tor.contract(V);
+      Proof proof = tor.contract(reg);
 
       cout << "Proof:      " << proof << endl;
 
       if (proof != Proof::Empty)
-         cout << "New region: " << V << endl;      
+         cout << "New region: " << reg << endl;      
 
    }
    catch(Exception e) {

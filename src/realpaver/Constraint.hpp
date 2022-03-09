@@ -56,9 +56,9 @@ public:
    virtual bool isConstant() const = 0;
 
    /// Satisfaction test
-   /// @param X a vector of domains
+   /// @param reg domains of variables
    /// @return a certificate of proof
-   virtual Proof isSatisfied(const IntervalVector& X) const = 0;
+   virtual Proof isSatisfied(const IntervalRegion& reg) const = 0;
 
    /// Output on a stream
    /// @param os a stream
@@ -119,9 +119,9 @@ public:
    bool isConstant() const;
 
    /// Satisfaction test
-   /// @param X a vector of domains
+   /// @param reg domains of variables
    /// @return a certificate of proof
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
 
    /// Output on a stream
    /// @param os a stream
@@ -210,9 +210,9 @@ public:
    ConstraintEq(const Term& l, const Term& r);
    
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
    ///@}
 };
 
@@ -233,9 +233,9 @@ public:
    ConstraintLe(const Term& l, const Term& r);
    
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
    ///@}
 };
 
@@ -256,9 +256,9 @@ public:
    ConstraintLt(const Term& l, const Term& r);
    
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
    ///@}
 };
 
@@ -279,9 +279,9 @@ public:
    ConstraintGe(const Term& l, const Term& r);
    
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
    ///@}
 };
 
@@ -302,9 +302,9 @@ public:
    ConstraintGt(const Term& l, const Term& r);
 
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
    ///@}
 };
 
@@ -333,9 +333,9 @@ public:
    Term term() const;
 
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalVector& X) const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
    ///@}
 
 private:

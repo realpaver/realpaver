@@ -26,9 +26,9 @@ bool HC4Contractor::dependsOn(const Bitset& bs) const
    return f_->dependsOn(bs);
 }
 
-Proof HC4Contractor::contract(IntervalVector& X)
+Proof HC4Contractor::contract(IntervalRegion& reg)
 {
-   return f_->hc4Revise(X);
+   return f_->hc4Revise(reg);
 }
 
 void HC4Contractor::print(std::ostream& os) const

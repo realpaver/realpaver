@@ -11,10 +11,10 @@
 
 namespace realpaver {
 
-ThickIntervalFunction::ThickIntervalFunction(Dag* dag, size_t i, size_t iv)
+ThickIntervalFunction::ThickIntervalFunction(Dag* dag, size_t i, Variable v)
       : f_(nullptr),
         if_(i),
-        iv_(iv)
+        v_(v)
 {
    f_ = dag->fun(i);
 }
@@ -31,31 +31,31 @@ bool ThickIntervalFunction::dependsOn(const Bitset& bs) const
 
 Interval ThickIntervalFunction::eval(const Interval& x)
 {
-   return f_->evalOnly(iv_, x);
+   return f_->evalOnly(v_, x);
 }
 
 Interval ThickIntervalFunction::diff(const Interval& x)
 {
-   return f_->diffOnly(iv_, x) ? f_->deriv(iv_) : Interval::universe();
+   return f_->diffOnly(v_, x) ? f_->deriv(v_) : Interval::universe();
 }
 
 std::pair<Interval, Interval>
 ThickIntervalFunction::evalDiff(const Interval& x)
 {
-   Interval e = f_->evalOnly(iv_, x),
-            dv = f_->diffOnly(iv_) ? f_->deriv(iv_) : Interval::universe();
+   Interval e = f_->evalOnly(v_, x),
+            dv = f_->diffOnly(v_) ? f_->deriv(v_) : Interval::universe();
 
    return std::make_pair(e, dv);
 }
 
-Interval ThickIntervalFunction::update(const IntervalVector& X)
+Interval ThickIntervalFunction::update(const IntervalRegion& reg)
 {
-   return f_->eval(X);
+   return f_->eval(reg);
 }
 
-size_t ThickIntervalFunction::getVarIndex() const
+Variable ThickIntervalFunction::getVar() const
 {
-   return iv_;
+   return v_;
 }
 
 } // namespace

@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/BOContractor.hpp"
+#include "realpaver/BOLocalConjugate.hpp"
 #include "realpaver/BOPresolver.hpp"
 #include "realpaver/BOSolver.hpp"
 #include "realpaver/HC4Contractor.hpp"
@@ -28,7 +29,7 @@ BOSolver::BOSolver(Problem& problem)
         pool_(nullptr),
         init_(nullptr),
         status_(OptimizationStatus::Other),
-        sol_(problem.nbVars()),
+        sol_(problem.scope()),
         objval_(Interval::universe()),
         vmap21_(),
         vmap31_(),
@@ -108,8 +109,13 @@ size_t BOSolver::getNbPendingNodes() const
 
 void BOSolver::makeLocalSolver()
 {
-   // default local solver
-   localSolver_ = new BOLocalSolver();
+   std::string strategy = Param::getStrParam("LOCAL_SOLVER");
+
+   if (strategy == "CONJUGATE")
+      localSolver_ = new BOLocalConjugate();
+
+   if (strategy == "MIDPOINT" || localSolver_ == nullptr)
+      localSolver_ = new BOLocalSolver();
 }
 
 void BOSolver::makeSplit()
@@ -180,7 +186,7 @@ void BOSolver::makeHC4()
 
 void BOSolver::makeContractor()
 {
-   init_ = std::make_shared<IntervalVector>(model_->getInitRegion());
+   init_ = std::make_shared<IntervalRegion>(model_->getInitRegion());
 
    std::string algo = Param::getStrParam("PROPAGATOR_ALGORITHM");
 
@@ -306,12 +312,14 @@ void BOSolver::saveIncumbent(const RealVector& P)
 void BOSolver::calculateUpper(SharedBONode& node, double U)
 {
 DEBUG("calculateUpper given U:" << U);
-   IntervalVector* X = node->getRegion();
-   RealVector m = X->midpoint();
-   RealVector p(X->size());
+   IntervalRegion* X = node->getRegion();
+   RealVector m = X->midpointOnScope(model_->getObjScope());
+   RealVector p(m);
+
+DEBUG("midpoint = " << m);
 
    // domain of the objective variable after propagation
-   Interval z(X->operator[](model_->getObjVar()));
+   Interval z(X->get(model_->getObjVar()));
    node->setUpper(z.right());
 
    if (z.left() > U) return;
@@ -329,6 +337,8 @@ DEBUG("final point " << p);
 
       // safe interval evaluation at the final point
       Interval e = model_->ifunEvalPoint(p);
+
+DEBUG("e = " << e);
 
       if (!e.isEmpty())
       {
@@ -358,7 +368,7 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 
    SharedBONode node = space.extractNode();
 
-DEBUG("NODE : " << *node->getRegion() << " l: " << node->getLower()
+DEBUG("\n#########\nNODE : " << *node->getRegion() << " l: " << node->getLower()
                << " u: " << node->getUpper());
 
    // splits the node
@@ -379,7 +389,10 @@ DEBUG("   sol NODE !");
          ++nbnodes_;
 
          SharedBONode subnode = *it;
-         IntervalVector* X = subnode->getRegion();
+         IntervalRegion* X = subnode->getRegion();
+
+         Interval z(X->get(model_->getObjVar()));
+         if (z.left() > U) continue;
 
 DEBUG("sub NODE : " << *X);
 
@@ -414,9 +427,9 @@ DEBUG("    ... u : " << subnode->getUpper());
 
 void BOSolver::findInitialBounds(SharedBONode& node)
 {
-   IntervalVector* region = node->getRegion();
+   IntervalRegion* r = node->getRegion();
 
-   Interval val = model_->ifunEval(*region);
+   Interval val = model_->ifunEval(*r);
 
    if (val.isEmpty())
    {
@@ -427,7 +440,7 @@ void BOSolver::findInitialBounds(SharedBONode& node)
    node->setLower(val.left());
    node->setUpper(val.right());
 
-   region->set(model_->getObjVar(), val);
+   r->set(model_->getObjVar(), val);
 
    DEBUG("Node bounds : " << node->getLower() << ", " << node->getUpper());
 

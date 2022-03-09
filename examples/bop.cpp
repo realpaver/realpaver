@@ -38,50 +38,78 @@ int main(void)
    try {
       Problem problem;
 
-      Variable x = problem.addRealVar(-4.5,  4.5, "x"),
-               y = problem.addRealVar(-4.5,  4.5, "y");
+      //~ Beale
+      //~ Variable x = problem.addRealVar(-4.5,  4.5, "x"),
+               //~ y = problem.addRealVar(-4.5,  4.5, "y");
+      //~ Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
 
-      Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
+
+      //~ Colville
+      //~ Variable x1 = problem.addRealVar(-10,  10, "x1"),
+               //~ x2 = problem.addRealVar(-10,  10, "x2"),
+               //~ x3 = problem.addRealVar(-10,  10, "x3"),
+               //~ x4 = problem.addRealVar(-10,  10, "x4");
+      //~ Term to = 100.0*sqr(sqr(x1)-x2) + sqr(x1-1.0) + sqr(x3-1.0) +
+                //~ 90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
+                //~ 19.8*(x2-1.0)*(x4-1.0);
+
+      Variable x = problem.addRealVar(-10,  10, "x"),
+               y = problem.addRealVar(-10,  10, "y");
+      Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
 
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
+      solver.setNodeLimit(10);
 
       solver.optimize();
       OptimizationStatus status = solver.getStatus();
 
-      cout << "----------------------------------------" << endl;
+      std::string sep = "##################################################";
+      std::string indent = "   ";
+
+      cout << sep << endl;
       cout << std::setprecision(prec)
-           << "Preprocessing time: " << solver.getPreprocessingTime() << " (s)"
-           << endl
-           << "Solving time:       " << solver.getSolvingTime() << " (s)"
-           << endl
-           << "Number of nodes:    " << solver.getNbNodes() << endl
-           << "----------------------------------------"
+           << indent << "Preprocessing time.......... "
+           << solver.getPreprocessingTime() << " (s)"
            << endl;
+      
+      if (solver.getNbNodes() > 0)
+      {
+         cout << indent << "Solving time................ "
+              << solver.getSolvingTime() << " (s)"
+              << endl
+              << indent << "Number of nodes............. "
+              << solver.getNbNodes() << endl;
+      }
+      
+      cout << sep << endl;
 
       if (status == OptimizationStatus::Infeasible)
       {
-         cout << "PROBLEM INFEASIBLE" << endl;
+         cout << indent << "PROBLEM INFEASIBLE" << endl;
       }
       else
       {
          if (status == OptimizationStatus::Optimal)
          {
-            cout << "GLOBAL OPTIMUM FOUND | " << solver.getObjTol() << endl;
+            cout << indent << "GLOBAL OPTIMUM FOUND | "
+                 << solver.getObjTol() << endl;
          }
          else
          {
-            cout << "GLOBAL OPTIMUM NOT FOUND " << endl;
+            cout << indent << "GLOBAL OPTIMUM NOT FOUND " << endl;
 
             if (status == OptimizationStatus::StopOnTimeLimit)
             {
-               cout << "TIME LIMIT REACHED: " << solver.getTimeLimit() << endl;
+               cout << indent << "TIME LIMIT REACHED: "
+                    << solver.getTimeLimit() << endl;
             }
             
             if (status == OptimizationStatus::StopOnNodeLimit)
             {
-               cout << "NODE LIMIT REACHED: " << solver.getNodeLimit() << endl;
+               cout << indent << "NODE LIMIT REACHED: "
+                    << solver.getNodeLimit() << endl;
             }
          }
    
@@ -90,14 +118,19 @@ int main(void)
          std::string objname = "obj";
          size_t lmax = std::max(maxSizeVarName(problem), objname.size());
 
-         cout << objname;
+         cout << endl << indent << objname;
          for (size_t j=objname.size(); j<lmax; ++j) cout << " ";
-         cout << " = " << solver.getObjEnclosure() << endl;
+         
+         Interval z = solver.getObjEnclosure();
+         if (z.isSingleton())
+            cout << " = " << z.left() << endl << endl;
+         else
+            cout << " = " << z << endl << endl;
 
          for (size_t i=0; i<problem.nbVars(); ++i)
          {
             Variable v = problem.varAt(i);
-            cout << v.getName();
+            cout <<  indent << v.getName();
 
             for (size_t j=v.getName().size(); j<lmax; ++j) cout << " ";
             
@@ -105,7 +138,7 @@ int main(void)
                  << endl;
          }
       }
-      cout << "----------------------------------------" << endl;
+      cout << sep << endl;
    }
    catch(Exception e) {
       cout << e.what() << endl;

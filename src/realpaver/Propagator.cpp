@@ -71,7 +71,7 @@ Scope Propagator::scope() const
    return pool_->scope();
 }
 
-Proof Propagator::contract(IntervalVector& X)
+Proof Propagator::contract(IntervalRegion& reg)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
@@ -94,7 +94,7 @@ Proof Propagator::contract(IntervalVector& X)
    Bitset modified(1 + scope.maxIndex());
 
    // copy used to check the domain modifications
-   IntervalVector* copy = X.clone();
+   IntervalRegion* copy = reg.clone();
 
    // result of the algorithm
    Proof proof;
@@ -109,7 +109,7 @@ Proof Propagator::contract(IntervalVector& X)
    {
       // apply the next contractor from the queue
       size_t j = queue[next];
-      proof = pool_->contractorAt(j)->contract(X);
+      proof = pool_->contractorAt(j)->contract(reg);
       certif_[j] = proof;
 
       if (proof != Proof::Empty)
@@ -131,9 +131,8 @@ Proof Propagator::contract(IntervalVector& X)
 
                for (auto v : scope)
                {
-                  size_t iv = v.getId();
-                  const Interval& prev = copy->at(iv);
-                  const Interval& curr = X.at(iv);
+                  const Interval& prev = copy->get(v);
+                  const Interval& curr = reg.get(v);
 
                   if (!dtol_.hasTolerance(prev, curr))
                   {
@@ -159,7 +158,7 @@ Proof Propagator::contract(IntervalVector& X)
                   // save the current box for the next propagation step
                   if (count != 0)
                   {
-                     copy->setOnScope(X, scope);
+                     copy->setOnScope(reg, scope);
                   }
                }
             }

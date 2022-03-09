@@ -28,26 +28,26 @@ BOSplit::~BOSplit()
 
 bool BOSplit::applyImpl(SharedBONode node)
 {
-   IntervalVector* X = node->getRegion();
+   IntervalRegion* reg = node->getRegion();
 
-   std::pair<bool, Variable> p = selector_->selectVar(*X);
+   std::pair<bool, Variable> p = selector_->selectVar(*reg);
    if (!p.first) return false;
 
-   size_t id = p.second.getId();
+   Variable v = p.second;
 
-   size_t n = slicer_->apply(X->at(id));
+   size_t n = slicer_->apply(reg->get(v));
    if (n < 2) return false;
 
    // reuses the input node
    auto it = slicer_->begin();
-   X->set(id, *it);
+   reg->set(v, *it);
    push(node);
 
    // generates the other nodes
    while (++it != slicer_->end())
    {
       SharedBONode aux = std::make_shared<BONode>(*node);
-      aux->getRegion()->set(id, *it);
+      aux->getRegion()->set(v, *it);
       push(aux);
    }
 

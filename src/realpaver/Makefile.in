@@ -149,15 +149,16 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	ConstraintFixer.cpp ConstraintRelaxor.cpp Contractor.cpp \
 	ContractorPool.cpp dag.cpp Exception.cpp HC4Contractor.cpp \
 	Inflator.cpp IntContractor.cpp Interval.cpp \
-	IntervalFunction.cpp IntervalNewton.cpp IntervalSlicer.cpp \
-	IntervalVector.cpp IntervalUnion.cpp Logger.cpp LPModel.cpp \
-	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
-	parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
-	RealFunction.cpp RealVector.cpp Scope.cpp ScopeMap.cpp \
-	SearchNode.cpp Selector.cpp Term.cpp TermDeriver.cpp \
-	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
-	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
-	LPSolverClp.cpp LPSolverGurobi.cpp
+	IntervalFunction.cpp IntervalNewton.cpp IntervalRegion.cpp \
+	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
+	Logger.cpp LPModel.cpp Objective.cpp Param.cpp \
+	parser_bison.ypp parser_flex.lpp parser.cpp Preprocessor.cpp \
+	Problem.cpp Propagator.cpp RealFunction.cpp RealVector.cpp \
+	Scope.cpp ScopeMap.cpp SearchNode.cpp Selector.cpp Term.cpp \
+	TermDeriver.cpp TermFixer.cpp Timer.cpp \
+	ThickIntervalFunction.cpp Tolerance.cpp \
+	UniIntervalFunction.cpp Variable.cpp LPSolverClp.cpp \
+	LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
@@ -167,14 +168,15 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	Constraint.lo ConstraintFixer.lo ConstraintRelaxor.lo \
 	Contractor.lo ContractorPool.lo dag.lo Exception.lo \
 	HC4Contractor.lo Inflator.lo IntContractor.lo Interval.lo \
-	IntervalFunction.lo IntervalNewton.lo IntervalSlicer.lo \
-	IntervalVector.lo IntervalUnion.lo Logger.lo LPModel.lo \
-	Objective.lo Param.lo parser_bison.lo parser_flex.lo parser.lo \
-	Preprocessor.lo Problem.lo Propagator.lo RealFunction.lo \
-	RealVector.lo Scope.lo ScopeMap.lo SearchNode.lo Selector.lo \
-	Term.lo TermDeriver.lo TermFixer.lo Timer.lo \
-	ThickIntervalFunction.lo Tolerance.lo UniIntervalFunction.lo \
-	Variable.lo $(am__objects_1) $(am__objects_2)
+	IntervalFunction.lo IntervalNewton.lo IntervalRegion.lo \
+	IntervalSlicer.lo IntervalVector.lo IntervalUnion.lo Logger.lo \
+	LPModel.lo Objective.lo Param.lo parser_bison.lo \
+	parser_flex.lo parser.lo Preprocessor.lo Problem.lo \
+	Propagator.lo RealFunction.lo RealVector.lo Scope.lo \
+	ScopeMap.lo SearchNode.lo Selector.lo Term.lo TermDeriver.lo \
+	TermFixer.lo Timer.lo ThickIntervalFunction.lo Tolerance.lo \
+	UniIntervalFunction.lo Variable.lo $(am__objects_1) \
+	$(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -265,8 +267,8 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	ContractorPool.hpp dag.hpp Double.hpp Exception.hpp \
 	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Interval.hpp \
 	IntervalFunction.hpp IntervalImpl.hpp IntervalNewton.hpp \
-	IntervalSlicer.hpp IntervalTraits.hpp IntervalVector.hpp \
-	IntervalUnion.hpp LinumDoubleTraits.hpp \
+	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
+	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp Logger.hpp LPModel.hpp \
 	LPSolver.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
@@ -453,8 +455,8 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	dag.hpp Double.hpp Exception.hpp HC4Contractor.hpp \
 	Inflator.hpp IntContractor.hpp Interval.hpp \
 	IntervalFunction.hpp IntervalImpl.hpp IntervalNewton.hpp \
-	IntervalSlicer.hpp IntervalTraits.hpp IntervalVector.hpp \
-	IntervalUnion.hpp LinumDoubleTraits.hpp \
+	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
+	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp Logger.hpp LPModel.hpp \
 	LPSolver.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
@@ -472,15 +474,15 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	ConstraintRelaxor.cpp Contractor.cpp ContractorPool.cpp \
 	dag.cpp Exception.cpp HC4Contractor.cpp Inflator.cpp \
 	IntContractor.cpp Interval.cpp IntervalFunction.cpp \
-	IntervalNewton.cpp IntervalSlicer.cpp IntervalVector.cpp \
-	IntervalUnion.cpp Logger.cpp LPModel.cpp Objective.cpp \
-	Param.cpp parser_bison.ypp parser_flex.lpp parser.cpp \
-	Preprocessor.cpp Problem.cpp Propagator.cpp RealFunction.cpp \
-	RealVector.cpp Scope.cpp ScopeMap.cpp SearchNode.cpp \
-	Selector.cpp Term.cpp TermDeriver.cpp TermFixer.cpp Timer.cpp \
-	ThickIntervalFunction.cpp Tolerance.cpp \
-	UniIntervalFunction.cpp Variable.cpp $(am__append_4) \
-	$(am__append_5)
+	IntervalNewton.cpp IntervalRegion.cpp IntervalSlicer.cpp \
+	IntervalVector.cpp IntervalUnion.cpp Logger.cpp LPModel.cpp \
+	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
+	parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
+	RealFunction.cpp RealVector.cpp Scope.cpp ScopeMap.cpp \
+	SearchNode.cpp Selector.cpp Term.cpp TermDeriver.cpp \
+	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
+	$(am__append_4) $(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = parser_bison.hpp
@@ -614,6 +616,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interval.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalNewton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalRegion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalSlicer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalUnion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalVector.Plo@am__quote@

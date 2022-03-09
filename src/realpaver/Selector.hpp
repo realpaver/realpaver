@@ -12,7 +12,6 @@
 
 #include <vector>
 #include "realpaver/IntervalFunction.hpp"
-#include "realpaver/IntervalVector.hpp"
 #include "realpaver/Scope.hpp"
 #include "realpaver/Tolerance.hpp"
 
@@ -40,10 +39,10 @@ public:
    Scope scope() const;
 
    /// Selection method
-   /// @param X a region
+   /// @param reg domains of variables
    /// @return a pair <b, v> such that no variable is selected if b = false,
    ///         otherwise v is the selected variable
-   virtual std::pair<bool, Variable> selectVar(const IntervalVector& X) = 0;
+   virtual std::pair<bool, Variable> selectVar(const IntervalRegion& reg) = 0;
 
 private:
    Scope scope_;
@@ -67,11 +66,8 @@ public:
    /// No assignment
    SelectorMaxDom& operator=(const SelectorMaxDom&) = delete;
 
-   /// Overrides
-   /// @param X a region
-   /// @return a pair <b, v> such that no variable is selected if b = false,
-   ///         otherwise v is the selected variable
-   std::pair<bool, Variable> selectVar(const IntervalVector& X);
+   /// Overrides (Selector)
+   std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,11 +89,8 @@ public:
    /// No assignment
    SelectorMaxSmear& operator=(const SelectorMaxSmear&) = delete;
 
-   /// Overrides
-   /// @param X a region
-   /// @return a pair <b, v> such that no variable is selected if b = false,
-   ///         otherwise v is the selected variable
-   std::pair<bool, Variable> selectVar(const IntervalVector& X);
+   /// Overrides (Selector)
+   std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
 
 private:
    IntervalFunction* f_;

@@ -1,5 +1,5 @@
 #include "realpaver/dag.hpp"
-#include "realpaver/problem.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver_test.hpp"
 
 class Hc4ReviseTest : public CppUnit::TestFixture
@@ -13,71 +13,77 @@ class Hc4ReviseTest : public CppUnit::TestFixture
 
    Problem* prob;
    Dag* dag;
+   IntervalRegion* reg;
+   Variable x, y, z;
 
 public:
    void setUp()
    {
       prob = new Problem();
+      x = prob->addRealVar(0, 0, "x");
+      y = prob->addRealVar(0, 0, "y");
+      z = prob->addRealVar(0, 0, "z");
+
       dag = new Dag();
-      Variable x = prob->addRealVar(0, 0, "x"),
-               y = prob->addRealVar(0, 0, "y"),
-               z = prob->addRealVar(0, 0, "z");
       dag->insert( sqr(x + y) - 2*z + 2 == 0 );
       dag->insert( sqr(x + y) - 2*z + 2 >= 0 );
+
+      reg = new IntervalRegion(prob->getDomains());
    }
 
    void tearDown()
    {
+      delete reg;
       delete dag;
       delete prob;
    }
 
    void testA()
    {
-      Box V = { Interval(-10, 15),
-                Interval(-20, 5),
-                Interval(-10, 5.5) };
+      reg->set(x, Interval(-10, 15));
+      reg->set(y, Interval(-20, 5));
+      reg->set(z, Interval(-10, 5.5));
 
-      Proof p = dag->fun(0)->hc4Revise(V);
+      Proof p = dag->fun(0)->hc4Revise(*reg);
 
       TEST_TRUE( p == Proof::Maybe );
-      TEST_TRUE( V[0].isSetEq(Interval(-8, 15)) );
-      TEST_TRUE( V[1].isSetEq(Interval(-18, 5)) );
-      TEST_TRUE( V[2].isSetEq(Interval(1, 5.5)) );
+      TEST_TRUE( reg->get(x).isSetEq(Interval(-8, 15)) );
+      TEST_TRUE( reg->get(y).isSetEq(Interval(-18, 5)) );
+      TEST_TRUE( reg->get(z).isSetEq(Interval(1, 5.5)) );
    }
 
    void testB()
    {
-      Box V = { Interval::universe(),
-                           Interval(-20, 5),
-                           Interval(-10, 5.5) };
+      reg->set(x, Interval::universe());
+      reg->set(y, Interval(-20, 5));
+      reg->set(z, Interval(-10, 5.5));
 
-      Proof p = dag->fun(0)->hc4Revise(V);
+      Proof p = dag->fun(0)->hc4Revise(*reg);
 
       TEST_TRUE( p == Proof::Maybe );
-      TEST_TRUE( V[0].isSetEq(Interval(-8, 23)) );
-      TEST_TRUE( V[1].isSetEq(Interval(-20, 5)) );
-      TEST_TRUE( V[2].isSetEq(Interval(1, 5.5)) );
+      TEST_TRUE( reg->get(x).isSetEq(Interval(-8, 23)) );
+      TEST_TRUE( reg->get(y).isSetEq(Interval(-20, 5)) );
+      TEST_TRUE( reg->get(z).isSetEq(Interval(1, 5.5)) );
    }
 
    void testC()
    {
-      Box V = { Interval(-10, 15),
-                Interval(-20, 5),
-                Interval(-10, 0) };
+      reg->set(x, Interval(-10, 15));
+      reg->set(y, Interval(-20, 5));
+      reg->set(z, Interval(-10, 0));
 
-      Proof p = dag->fun(0)->hc4Revise(V);
+      Proof p = dag->fun(0)->hc4Revise(*reg);
 
       TEST_TRUE( p == Proof::Empty );
    }
 
    void testD()
    {
-      Box V = { Interval(2, 4),
-                Interval(3, 10),
-                Interval(0, 6) };
+      reg->set(x, Interval(2, 4));
+      reg->set(y, Interval(3, 10));
+      reg->set(z, Interval(0, 6));
 
-      Proof p = dag->fun(1)->hc4Revise(V);
+      Proof p = dag->fun(1)->hc4Revise(*reg);
 
       TEST_TRUE( p == Proof::Inner );
    }

@@ -54,6 +54,7 @@ librealpaver_la_include_HEADERS = \
 		IntervalFunction.hpp \
 		IntervalImpl.hpp \
 		IntervalNewton.hpp \
+		IntervalRegion.hpp \
 		IntervalSlicer.hpp \
 		IntervalTraits.hpp \
 		IntervalVector.hpp \
@@ -129,6 +130,7 @@ librealpaver_la_SOURCES = \
 		Interval.cpp \
 		IntervalFunction.cpp \
 		IntervalNewton.cpp \
+		IntervalRegion.cpp \
 		IntervalSlicer.cpp \
 		IntervalVector.cpp \
 		IntervalUnion.cpp \

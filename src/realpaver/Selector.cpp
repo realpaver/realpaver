@@ -31,7 +31,7 @@ SelectorMaxDom::SelectorMaxDom(const Scope& s) : Selector(s)
    ASSERT(!s.isEmpty(), "Empty scope in a selector");
 }
 
-std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalVector& X)
+std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
 {
    bool found = false;
    double wmax, w;
@@ -39,11 +39,11 @@ std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalVector& X)
 
    for (auto v : scope())
    {
-      const Interval& I = X[v];
+      const Interval& I = reg.get(v);
 
       if (!v.getTolerance().hasTolerance(I))
       {
-         w = X[v].width();
+         w = I.width();
          if (found)
          {
             if (w > wmax)
@@ -74,13 +74,14 @@ SelectorMaxSmear::SelectorMaxSmear(IntervalFunction* f, const Scope& s)
    ASSERT(f != nullptr, "Null function n a MaxSmear selector");
 }
 
-std::pair<bool, Variable> SelectorMaxSmear::selectVar(const IntervalVector& X)
+std::pair<bool, Variable>
+SelectorMaxSmear::selectVar(const IntervalRegion& reg)
 {
    Scope S = scope();
    Scope fscope = f_->ifunScope();
 
    IntervalVector grad(fscope.size());
-   f_->ifunDiff(X, grad);
+   f_->ifunDiff(reg, grad);
 
    bool found = false;
    double smax, s, w;
@@ -88,17 +89,17 @@ std::pair<bool, Variable> SelectorMaxSmear::selectVar(const IntervalVector& X)
 
    for (auto v : S)
    {
-      const Interval& I = X[v];
+      Interval I = reg.get(v);;
 
       if (!v.getTolerance().hasTolerance(I))
       {
-         w = X[v].width();
+         w = I.width();
 
          if (fscope.contains(v))
          {
             size_t pos = fscope.index(v);
-            const Interval& G = grad[pos];
-            s = G.isZero() ? w : w * G.mag();
+            Interval dv = grad[pos];
+            s = dv.isZero() ? w : w * dv.mag();
          }
          else
          {

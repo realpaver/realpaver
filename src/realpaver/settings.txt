@@ -98,18 +98,23 @@ BC3_ITER_LIMIT = 30
 PROPAGATOR_ALGORITHM = HC4
 
 ###############################################################################
-## LOCAL OPTIMiZATION BASED ON LINE SEARCH                                   ##
+## LOCAL OPTIMiZATION                                                        ##
 ###############################################################################
 
 # Coefficient of the Armijo rule used to stop a line search optimization
 # > 0.0 and < 1.0
 LS_ARMIJO_COEF = 0.125
 
-# Smallest value of the step length
+# Smallest value of the step length of line search algorithm
 LS_STEP_TOL = 1.0e-8
 
-# Iteration limit
+# Iteration limit of line search algorithm
 LS_ITER_LIMIT = 20
+
+# Local optimization technique
+# - CONJUGATE: conjugate gradient method
+# - MIDPOINT: simple test at the midpoint of a region
+LOCAL_SOLVER = CONJUGATE
 
 ###############################################################################
 ## LINEAR PROGRAMMING                                                        ##

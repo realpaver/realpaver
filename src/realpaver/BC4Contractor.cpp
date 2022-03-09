@@ -22,7 +22,7 @@ BC4Contractor::BC4Contractor(Dag* dag, size_t i)
    for (auto v : s)
    {
       if (s.count(v) > 1)
-         bc3_.push_back(new BC3Contractor(f_->dag(), f_->index(), v.getId()));
+         bc3_.push_back(new BC3Contractor(f_->dag(), f_->index(), v));
    }
 }
 
@@ -43,18 +43,18 @@ bool BC4Contractor::dependsOn(const Bitset& bs) const
   return f_->dependsOn(bs); 
 }
 
-Proof BC4Contractor::contract(IntervalVector& X)
+Proof BC4Contractor::contract(IntervalRegion& reg)
 {
    // HC4
    HC4Contractor hc4(f_->dag(), f_->index());
-   Proof proof = hc4.contract(X);
+   Proof proof = hc4.contract(reg);
 
    if (proof != Proof::Maybe) return proof;
 
    // BC3
    for (size_t i=0; i<bc3_.size(); ++i)
    {
-      Proof certif = bc3_[i]->contract(X);
+      Proof certif = bc3_[i]->contract(reg);
 
       if (certif == Proof::Empty)
          return certif;      

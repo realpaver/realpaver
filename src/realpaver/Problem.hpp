@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 #include "realpaver/Constraint.hpp"
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
 
 namespace realpaver {
@@ -118,7 +118,7 @@ public:
    ///
    /// The i-th component of the vector is th domain of the i-th variable
    /// for each i;.
-   IntervalVector getDomains() const;
+   IntervalRegion getDomains() const;
 
    /// Gets the domain of a variable
    /// @param v a variable
@@ -126,8 +126,8 @@ public:
    Interval getDomain(const Variable& v) const;
 
    /// Sets the initial region
-   /// @param X vector of domains
-   void setDomains(const IntervalVector& X);
+   /// @param reg domains of variables
+   void setDomains(const IntervalRegion& reg);
 
    /// Sets a domain in the initial region
    /// @param v variable

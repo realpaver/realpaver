@@ -91,11 +91,11 @@ private:
    Contractor* contractor_;
    ContractorPool* pool_;
 
-   SharedIntervalVector init_;   // initial region
+   SharedIntervalRegion init_;   // initial region
 
    // Result of optimization
    OptimizationStatus status_;
-   IntervalVector sol_;
+   IntervalRegion sol_;
    Interval objval_;
 
    // Auxiliary methods

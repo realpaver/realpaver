@@ -46,15 +46,14 @@ bool IntContractor::dependsOn(const Bitset& bs) const
    return b_.overlaps(bs);
 }
 
-Proof IntContractor::contract(IntervalVector& X)
+Proof IntContractor::contract(IntervalRegion& reg)
 {
    for (auto v : s_)
    {
-      Interval rnd = round(X[v.getId()]);
-      X.set(v.getId(), rnd);
+      Interval rnd = round(reg.get(v));
+      reg.set(v, rnd);
 
-      if (rnd.isEmpty())
-         return Proof::Empty;
+      if (rnd.isEmpty()) return Proof::Empty;
    }
    return Proof::Maybe;
 }
@@ -62,8 +61,7 @@ Proof IntContractor::contract(IntervalVector& X)
 void IntContractor::print(std::ostream& os) const
 {
    os << "integral: ";
-   for (auto v : s_)
-      os << v.getName() << " ";
+   for (auto v : s_) os << v.getName() << " ";
 }
 
 Scope IntContractor::scope() const
