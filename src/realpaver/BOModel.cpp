@@ -63,9 +63,6 @@ BOModel::BOModel(Problem& problem, bool withobj)
          dag_->insert( to + z_ == 0 );
    }
 
-
-DEBUG("DAG\n" << *dag_);
-
    // initial region
    init_ = new IntervalRegion(fullscope_);
 
@@ -235,31 +232,18 @@ Interval BOModel::ifunEval(const IntervalRegion& reg)
 }
 
 Interval BOModel::ifunEvalPoint(const RealPoint& pt)
-{
-   DEBUG("ifunEvalPoint @ " << pt);
-   DEBUG("dim = " << dim());
-   
+{   
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
-
-   DEBUG("nb nodes : " << f->nbNode());
-
 
    // index of the root node of the objective function
    size_t iroot = f->nbNode() - 3;
 
-   DEBUG("iroot " << iroot);
-
-
    // evaluates the nodes from the leaves to the root
    for (size_t i=0; i<=iroot; ++i)
    {
-   DEBUG("i " << i);
       DagNode* node = f->node(i);
       node->eval(pt);
-
-   DEBUG("apres");
-
    }
 
    return f->node(iroot)->val();

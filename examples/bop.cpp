@@ -43,8 +43,18 @@ int main(void)
                //~ y = problem.addRealVar(-4.5,  4.5, "y");
       //~ Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
 
+      // 3-hump camel
+      //~ Variable x = problem.addRealVar(-5,  5, "x"),
+               //~ y = problem.addRealVar(-5,  5, "y");
+      //~ Term to = 2.0*sqr(x) - 1.05*pow(x, 4) + pow(x, 6)/6.0 + x*y + sqr(y);
 
-      //~ Colville
+      // 6-hump camel
+      Variable x = problem.addRealVar(-3,  3, "x"),
+               y = problem.addRealVar(-2,  2, "y");
+      Term to = (4.0-2.1*sqr(x)+pow(x,4)/3.0)*sqr(x) + x*y +
+                (4.0*sqr(y)-4.0)*sqr(y);
+
+      // Colville
       //~ Variable x1 = problem.addRealVar(-10,  10, "x1"),
                //~ x2 = problem.addRealVar(-10,  10, "x2"),
                //~ x3 = problem.addRealVar(-10,  10, "x3"),
@@ -53,9 +63,9 @@ int main(void)
                 //~ 90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
                 //~ 19.8*(x2-1.0)*(x4-1.0);
 
-      Variable x = problem.addRealVar(-10,  10, "x"),
-               y = problem.addRealVar(-10,  10, "y");
-      Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
+      //~ Variable x = problem.addRealVar(-10,  10, "x"),
+               //~ y = problem.addRealVar(-10,  10, "y");
+      //~ Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
 
       //~ Variable x = problem.addRealVar(-10,  10, "x"),
                //~ y = problem.addRealVar(-10,  10, "y");
@@ -65,7 +75,9 @@ int main(void)
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
+      solver.setSplitableObj(false);
       solver.setNodeLimit(10);
+      Interval::precision(3);
 
       solver.optimize();
       OptimizationStatus status = solver.getStatus();
@@ -74,14 +86,15 @@ int main(void)
       std::string indent = "   ";
 
       cout << sep << endl;
-      cout << std::setprecision(prec)
+      cout << std::fixed << std::setprecision(2)
            << indent << "Preprocessing time.......... "
            << solver.getPreprocessingTime() << " (s)"
            << endl;
-      
+
       if (solver.getNbNodes() > 0)
       {
          cout << indent << "Solving time................ "
+              << std::fixed << std::setprecision(2)
               << solver.getSolvingTime() << " (s)"
               << endl
               << indent << "Number of nodes............. "
@@ -117,6 +130,8 @@ int main(void)
                     << solver.getNodeLimit() << endl;
             }
          }
+
+         cout << std::scientific << std::setprecision(prec);
    
          RealVector sol = solver.getBestSolution();
 

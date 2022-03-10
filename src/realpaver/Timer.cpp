@@ -39,7 +39,7 @@ void Timer::reset()
    total_ = DurationType(0);
 }
 
-size_t Timer::elapsedTime() const
+double Timer::elapsedTime() const
 {
    DurationType d = total_;
    if (on_)
@@ -47,7 +47,7 @@ size_t Timer::elapsedTime() const
       PointType now = std::chrono::system_clock::now();
       d += (now - start_);
    }
-   return std::chrono::duration_cast<UnitType>(d).count();      
+   return std::chrono::duration_cast<UnitType>(d).count() / 1000.0;
 }
 
 } // namespace

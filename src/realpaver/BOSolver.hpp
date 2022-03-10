@@ -126,6 +126,8 @@ private:
    // variable in the initial problem
    VarVarMapType vmap31_;
 
+   double upper_;      // upper bound of the global minimum
+
    size_t nbnodes_;    // number of nodes processed
    size_t nbpending_;  // number of pending nodes
 

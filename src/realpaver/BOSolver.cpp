@@ -33,6 +33,7 @@ BOSolver::BOSolver(Problem& problem)
         objval_(Interval::universe()),
         vmap21_(),
         vmap31_(),
+        upper_(Double::inf())
         nbnodes_(0),
         nbpending_(0),
         ptimer_(),
@@ -294,6 +295,12 @@ bool BOSolver::presolve()
 
 void BOSolver::calculateLower(SharedBONode& node)
 {
+   IntervalRegion* reg = node->getRegion();
+
+   // domain of the objective variable after propagation
+   Interval z = reg->get(model_->getObjVar());
+   if (z.left() > node->getLower()) node->setLower(z.left());
+
    // TODO
 }
 
@@ -320,12 +327,6 @@ DEBUG("\ncalculateUpper, current upper bound " << upper);
 
 DEBUG("   src = " << src);
 
-   // domain of the objective variable after propagation
-   Interval z(reg->get(model_->getObjVar()));
-   node->setUpper(z.right());
-
-   if (z.left() > upper) return;
-
    // local optimization
    OptimizationStatus status = localSolver_->minimize(*model_, *reg, src, dest);
 
@@ -345,14 +346,14 @@ DEBUG("   e = " << e);
       if (!e.isEmpty())
       {
          double u = e.right();
-         if (u < z.right())
-         {
-            node->setUpper(u);
-            z.setRight(u);
-            reg->set(model_->getObjVar(), z);
+         node->setUpper(u);
+
+         Variable v = model_->getObjVar();
+         Interval z = reg->get(v);
+         z.setRight(u);
+         reg->set(v, z);
 
       DEBUG("   UPPER BOUND " << u);
-         }
 
          // new upper bound of the global minimum?
          if (u < upper) saveIncumbent(dest);
@@ -366,7 +367,8 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
    if (space.isEmpty()) return false;
 
    // current upper bound of the global minimum
-   double U = std::min(space.getLowestUpperBound(), sol.getLowestUpperBound());
+   double upper = std::min(space.getLowestUpperBound(),
+                           sol.getLowestUpperBound());
 
    SharedBONode node = space.extractNode();
 
@@ -394,7 +396,7 @@ DEBUG("   sol NODE !");
          IntervalRegion* X = subnode->getRegion();
 
          Interval z(X->get(model_->getObjVar()));
-         if (z.left() > U) continue;
+         if (z.left() > upper) continue;
 
 DEBUG("sub NODE : " << *X);
 
@@ -405,9 +407,9 @@ DEBUG("proof : " << proof << "  -> " << *X);
          if (proof != Proof::Empty)
          {
             calculateLower(subnode);
-            calculateUpper(subnode, U);
+            calculateUpper(subnode, upper);
 
-            if (U > subnode->getUpper()) U = subnode->getUpper();
+            if (upper > subnode->getUpper()) upper = subnode->getUpper();
 
 DEBUG("    ... l : " << subnode->getLower());
 DEBUG("    ... u : " << subnode->getUpper());
@@ -420,8 +422,8 @@ DEBUG("    ... u : " << subnode->getUpper());
          
       }
 
-      space.simplify(U);
-      sol.simplify(U);
+      space.simplify(upper);
+      sol.simplify(upper);
 
       return true;
    }
@@ -429,6 +431,14 @@ DEBUG("    ... u : " << subnode->getUpper());
 
 void BOSolver::findInitialBounds(SharedBONode& node)
 {
+   // upper bound of the global minimum
+   upper_ = Double::inf();
+   
+
+   TODO : GERER CETTE UPPER BOUND !!!
+
+
+
    IntervalRegion* r = node->getRegion();
 
    Interval val = model_->ifunEval(*r);
@@ -520,7 +530,7 @@ DEBUG("OBJ ENCLOSURE : " << objval_);
          status_ = OptimizationStatus::StopOnTimeLimit;
       }
 
-      if (iter && space.getNbNodes() > nodelimit_)
+      if (iter && nbnodes_ > nodelimit_)
       {
          iter = false;
          status_ = OptimizationStatus::StopOnNodeLimit;

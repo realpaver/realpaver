@@ -34,12 +34,12 @@ public:
    void reset();
 
    /// @return the accumulated elapsed time in seconds
-   size_t elapsedTime() const;
+   double elapsedTime() const;
 
 private:
    typedef std::chrono::time_point<std::chrono::system_clock> PointType;
    typedef std::chrono::duration<double> DurationType;
-   typedef std::chrono::seconds UnitType;
+   typedef std::chrono::milliseconds UnitType;
 
    bool on_;                  // true if this is started
    PointType start_;          // last starting time point
