@@ -10,7 +10,7 @@
 #ifndef REALPAVER_REAL_FUNCTION_HPP
 #define REALPAVER_REAL_FUNCTION_HPP
 
-#include "realpaver/RealVector.hpp"
+#include "realpaver/RealPoint.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -32,21 +32,21 @@ public:
    virtual size_t rfunArity() const = 0;
 
    /// Evaluates this
-   /// @param x argument of this
-   /// @return value of this at x
-   virtual double rfunEval(const RealVector& x) = 0;
+   /// @param pt values of variables
+   /// @return value of this at pt
+   virtual double rfunEval(const RealPoint& pt) = 0;
 
    /// Differentiates this, i.e. evaluates its gradient
-   /// @param x argument of this
-   /// @param g gradient of this at x (output)
-   virtual void rfunDiff(const RealVector& x, RealVector& g) = 0;
+   /// @param pt values of variables
+   /// @param g gradient of this at pt
+   virtual void rfunDiff(const RealPoint& pt, RealVector& g) = 0;
 
    /// Evaluates and differentiates this
-   /// @param x argument of this
-   /// @param g gradient of this at x (output)
-   /// @param val value of this at x (output)
-   virtual void rfunEvalDiff(const RealVector& x, RealVector& g,
-                             double& val) = 0;
+   /// @param pt values of variables
+   /// @param g gradient of this at pt
+   /// @param e value of this at pt
+   virtual void rfunEvalDiff(const RealPoint& pt, RealVector& g,
+                             double& e) = 0;
 };
 
 } // namespace

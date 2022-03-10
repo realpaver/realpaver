@@ -54,9 +54,10 @@ void BOLocalConjugate::setStepTol(double val)
    tolstep_ = val;
 }
 
-double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
-                                  RealVector& p, RealVector& s, double fx)
+double BOLocalConjugate::findStep(RealFunction& f, RealPoint& x,
+                                  RealPoint& p, RealPoint& s, double fx)
 {
+/*
    double step = 1.0,   // initial step
           res = -1.0,   // resulting step
           p_s = p.scalarProduct(s);
@@ -87,14 +88,16 @@ double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
       if (step < tolstep_) iter = false;
    }
 
-   return res;
+   return res;*/
 }
 
 OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
                                               const IntervalRegion& reg,
-                                              const RealVector& initialPoint,
-                                              RealVector& finalPoint)
+                                              const RealPoint& src,
+                                              RealPoint& dest)
 {
+   // TODO
+/*
    size_t dim = f.rfunArity();
 
    double uk, uk_1, step;
@@ -181,6 +184,8 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
 
    finalPoint = xk_1;
    setFinalObjVal(uk_1);
+
+*/
 
    return OptimizationStatus::Optimal;
 }

@@ -12,6 +12,7 @@
 
 #include <memory>
 #include "realpaver/IntervalVector.hpp"
+#include "realpaver/RealPoint.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -25,6 +26,13 @@ public:
    /// s scope of this
    /// x interval assigned to each element of this
    IntervalRegion(const Scope& s, const Interval& x = Interval::universe());
+
+   /// Creates an interval region
+   /// s scope of this
+   /// X interval vector having the same size than s
+   ///
+   /// The i-th variable in s is assigned to X[i] for each i.
+   IntervalRegion(const Scope& s, const IntervalVector& X);
 
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
@@ -52,6 +60,15 @@ public:
    /// This masks the access by index.
    void set(Variable v, const Interval& x);
 
+   ///@{
+   /// Masks (IntervalVector)
+   RealPoint midpoint() const;
+   RealPoint lCorner() const;
+   RealPoint rCorner() const;
+   RealPoint corner(const Bitset& bs) const;
+   RealPoint oppositeCorner(const Bitset& bs) const;
+   ///@}
+
    /// Hull with assignment on a scope
    /// @param reg an interval region
    /// @param s a scope included in the scope of this and reg
@@ -69,12 +86,12 @@ public:
    /// Midpoint of this on a scope
    /// @param s a scope included in the scope of this
    /// @return midpoint of this restricted to s
-   RealVector midpointOnScope(const Scope& s) const;
+   RealPoint midpointOnScope(const Scope& s) const;
 
-   /// Calculates the midpoint of this on a scope
+   /// Gets a sub-region
    /// @param s a scope included in the scope of this
-   /// @param mid vector assigned to the midpoint of this[s]
-   void toMidpointOnScope(const Scope& s, RealVector& mid) const;
+   /// @return this restricted to s
+   IntervalRegion subRegion(const Scope& s) const;
 
    /// Overrides (IntervalVector)
    /// @return a clone of this

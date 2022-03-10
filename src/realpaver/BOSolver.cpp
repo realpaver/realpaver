@@ -297,48 +297,50 @@ void BOSolver::calculateLower(SharedBONode& node)
    // TODO
 }
 
-void BOSolver::saveIncumbent(const RealVector& P)
+void BOSolver::saveIncumbent(const RealPoint& pt)
 {
    for (auto it = vmap31_.begin(); it != vmap31_.end(); ++it)
-   {   
+   {
       Variable sv = it->first;
       Variable v = it->second;
 
-      double val = P[sv.getId()];
+      double val = pt.get(sv);
       sol_.set(v, Interval(val));
    }
 }
 
-void BOSolver::calculateUpper(SharedBONode& node, double U)
+void BOSolver::calculateUpper(SharedBONode& node, double upper)
 {
-DEBUG("calculateUpper given U:" << U);
-   IntervalRegion* X = node->getRegion();
-   RealVector m = X->midpointOnScope(model_->getObjScope());
-   RealVector p(m);
+DEBUG("\ncalculateUpper, current upper bound " << upper);
 
-DEBUG("midpoint = " << m);
+   IntervalRegion* reg = node->getRegion();
+
+   RealPoint src = reg->midpointOnScope(model_->getObjScope());
+   RealPoint dest(src);
+
+DEBUG("   src = " << src);
 
    // domain of the objective variable after propagation
-   Interval z(X->get(model_->getObjVar()));
+   Interval z(reg->get(model_->getObjVar()));
    node->setUpper(z.right());
 
-   if (z.left() > U) return;
+   if (z.left() > upper) return;
 
    // local optimization
-   OptimizationStatus status = localSolver_->minimize(*model_, *X, m, p);
+   OptimizationStatus status = localSolver_->minimize(*model_, *reg, src, dest);
 
-DEBUG("local optim -> " << status);
+DEBUG("   local optim -> " << status);
 
 
    if (status == OptimizationStatus::Optimal)
    {
-DEBUG("final point " << p);
+DEBUG("   dest = " << dest);
 
 
       // safe interval evaluation at the final point
-      Interval e = model_->ifunEvalPoint(p);
+      Interval e = model_->ifunEvalPoint(dest);
 
-DEBUG("e = " << e);
+DEBUG("   e = " << e);
 
       if (!e.isEmpty())
       {
@@ -347,13 +349,13 @@ DEBUG("e = " << e);
          {
             node->setUpper(u);
             z.setRight(u);
-            X->set(model_->getObjVar(), z);
+            reg->set(model_->getObjVar(), z);
 
       DEBUG("   UPPER BOUND " << u);
          }
 
          // new upper bound of the global minimum?
-         if (u < U) saveIncumbent(p);
+         if (u < upper) saveIncumbent(dest);
       }
    }
 }

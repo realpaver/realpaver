@@ -27,6 +27,10 @@ int main(void)
       IntervalRegion initRegion = P.getDomains();
 
 
+      RealPoint mp = initRegion.midpoint();
+      cout << mp << endl;
+
+
       Dag D;
       size_t i = D.insert( sqr(y) - 3.0*u );
 

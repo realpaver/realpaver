@@ -100,9 +100,9 @@ public:
    void setRdv(const double& x);
    void addRdv(const double& x);
 
-   // returns the number of occurrences of the variable id in the sub-tree
+   // returns the number of occurrences of the variable v in the sub-tree
    // rooted by this
-   virtual size_t nbOcc(size_t id) const = 0;
+   virtual size_t nbOcc(const Variable& v) const = 0;
 
    // visitor pattern
    virtual void acceptVisitor(DagVisitor& vis) const = 0;
@@ -116,7 +116,7 @@ public:
 
    // interval evaluation given the vector of variable values P
    // assigns the result in val_
-   virtual void eval(const RealVector& P) = 0;
+   virtual void eval(const RealPoint& pt) = 0;
 
    // interval evaluation given a new domain x for the variable id
    // this node is evaluated only if it depends on this variable
@@ -140,7 +140,7 @@ public:
 
    // point evaluation given the vector of variable values P
    // assigns the result in rval_
-   virtual void reval(const RealVector& P) = 0;
+   virtual void reval(const RealPoint& pt) = 0;
 
    // point differentiation in reverse mode
    // assumes that a point evaluation has been done
@@ -171,16 +171,16 @@ public:
 
    ///@{
    /// Overrides (DagNode)
-   size_t nbOcc(size_t id) const;
+   size_t nbOcc(const Variable& v) const;
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval(const IntervalRegion& reg);
-   void eval(const RealVector& P);
+   void eval(const RealPoint& pt);
    void evalOnly(const Variable& v, const Interval& x);
    void proj(IntervalRegion& reg);
    bool diff();
    bool diffOnly(const Variable& v);
-   void reval(const RealVector& P);
+   void reval(const RealPoint& pt);
    bool rdiff();
    ///@}
 
@@ -204,16 +204,16 @@ public:
 
    ///@{
    /// Overrides (DagNode)
-   size_t nbOcc(size_t id) const;
+   size_t nbOcc(const Variable& v) const;
    void print(std::ostream& os) const;
    void acceptVisitor(DagVisitor& vis) const;
    void eval(const IntervalRegion& reg);
-   void eval(const RealVector& P);
+   void eval(const RealPoint& pt);
    void evalOnly(const Variable& v, const Interval& x);
    void proj(IntervalRegion& reg);
    bool diff();
    bool diffOnly(const Variable& v);
-   void reval(const RealVector& P);
+   void reval(const RealPoint& pt);
    bool rdiff();
    ///@}
 
@@ -253,13 +253,13 @@ public:
 
    ///@{
    /// Overrides (DagNode)
-   size_t nbOcc(size_t id) const;
+   size_t nbOcc(const Variable& v) const;
    virtual void print(std::ostream& os) const;
    void eval(const IntervalRegion& reg);
-   void eval(const RealVector& P);
+   void eval(const RealPoint& pt);
    void evalOnly(const Variable& v, const Interval& x);
    bool diffOnly(const Variable& v);
-   void reval(const RealVector& P);
+   void reval(const RealPoint& pt);
    ///@}
 
 private:
@@ -638,7 +638,7 @@ public:
    const Bitset& bitset() const;
 
    // returns the number of occurrences of the variable id in this
-   size_t nbOcc(size_t id) const;
+   size_t nbOcc(const Variable& v) const;
 
    // assigns the index of this function in the dag
    void setIndex(size_t i);
@@ -652,7 +652,7 @@ public:
 
    // interval evaluation
    Interval eval(const IntervalRegion& reg);
-   Interval eval(const RealVector& P);
+   Interval eval(const RealPoint& pt);
 
    // access to the result of the interval evaluation
    Interval val() const;
@@ -700,7 +700,7 @@ public:
    const Interval& deriv(const Variable& v) const;
 
    // point evaluation
-   double reval(const RealVector& P);
+   double reval(const RealPoint& pt);
 
    // access to the result of the point evaluation
    double rval() const;
@@ -708,7 +708,7 @@ public:
    // point differentiation in reverse mode
    // evaluates first this function
    // returns false if this function is discontinuous, true otherwise
-   bool rdiff(const RealVector& P);
+   bool rdiff(const RealPoint& pt);
 
    // point differentiation in reverse mode
    // assumes that this function has been evaluated
@@ -733,19 +733,19 @@ public:
    Scope ifunScope() const;
    size_t ifunArity() const;
    Interval ifunEval(const IntervalRegion& reg);
-   Interval ifunEvalPoint(const RealVector& x);
+   Interval ifunEvalPoint(const RealPoint& pt);
    void ifunDiff(const IntervalRegion& reg, IntervalVector& g);
    void ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
                      Interval& e);
    ///@}
 
    ///@{
-   /// Overrides the methods of RealFunction
+   /// Overrides (RealFunction)
    Scope rfunScope() const;
    size_t rfunArity() const;
-   double rfunEval(const RealVector& x);
-   void rfunDiff(const RealVector& x, RealVector& g);
-   void rfunEvalDiff(const RealVector& x, RealVector& g, double& valf);
+   double rfunEval(const RealPoint& pt);
+   void rfunDiff(const RealPoint& pt, RealVector& g);
+   void rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e);
    ///@}
 
 private:
@@ -841,9 +841,9 @@ inline size_t DagFun::index() const
    return idx_;
 }
 
-inline size_t DagFun::nbOcc(size_t id) const
+inline size_t DagFun::nbOcc(const Variable& v) const
 {
-   return rootNode()->nbOcc(id);
+   return rootNode()->nbOcc(v);
 }
 
 inline Scope DagFun::scope() const
@@ -970,7 +970,7 @@ public:
    void eval(const IntervalRegion& reg);
 
    // point evaluation
-   void reval(const RealVector& P);
+   void reval(const RealPoint& pt);
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

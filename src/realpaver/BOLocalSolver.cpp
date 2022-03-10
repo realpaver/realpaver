@@ -41,11 +41,11 @@ void BOLocalSolver::setFinalObjVal(double& val)
 
 OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
                                            const IntervalRegion& reg,
-                                           const RealVector& initialPoint,
-                                           RealVector& finalPoint)
+                                           const RealPoint& src,
+                                           RealPoint& dest)
 {
-   finalPoint = initialPoint;
-   initObjVal_ = finalObjVal_ = f.rfunEval(initialPoint);
+   dest.setAll(src);
+   initObjVal_ = finalObjVal_ = f.rfunEval(src);
 
    return (Double::isInf(initObjVal_) ||
            Double::isNan(initObjVal_)) ? OptimizationStatus::Other :

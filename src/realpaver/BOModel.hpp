@@ -90,23 +90,23 @@ public:
    bool isInteriorVar(const Variable& v) const;
 
    ///@{
-   /// Overrides the methods of IntervalFunction
+   /// Overrides (IntervalFunction)
    Scope ifunScope() const;
    size_t ifunArity() const;
    Interval ifunEval(const IntervalRegion& reg);
-   Interval ifunEvalPoint(const RealVector& x);
+   Interval ifunEvalPoint(const RealPoint& pt);
    void ifunDiff(const IntervalRegion& reg, IntervalVector& g);
    void ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
                      Interval& e);
    ///@}
 
    ///@{
-   /// Overrides the methods of RealFunction
+   /// Overrides (RealFunction)
    Scope rfunScope() const;
    size_t rfunArity() const;
-   double rfunEval(const RealVector& x);
-   void rfunDiff(const RealVector& x, RealVector& g);
-   void rfunEvalDiff(const RealVector& x, RealVector& g, double& val);
+   double rfunEval(const RealPoint& pt);
+   void rfunDiff(const RealPoint& pt, RealVector& g);
+   void rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e);
    ///@}
 
 private:

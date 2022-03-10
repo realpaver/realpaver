@@ -58,8 +58,8 @@ Proof BOContractor::contract(IntervalRegion& reg)
    {
       // monotone function => finds the sign of the derivative at some
       // point of the region
-      RealVector P( copy.midpoint() );
-      Interval ef = f_->eval(P);
+      RealPoint pt( copy.midpoint() );
+      Interval ef = f_->eval(pt);
 
       // resets the region
       reg.setOnScope(copy, scope());
@@ -87,15 +87,15 @@ Proof BOContractor::contract(IntervalRegion& reg)
 
       if (initLB && reg.get(v_).left() != copy.get(v_).left())
       {
-         RealVector P( copy.lCorner() );
-         Interval ef = f_->eval(P);
+         RealPoint lc( copy.lCorner() );
+         Interval ef = f_->eval(lc);
          if (ef.isCertainlyGeZero()) keepLB = true;
       }
 
       if (initRB && reg.get(v_).right() != copy.get(v_).right())
       {
-         RealVector P( copy.rCorner() );
-         Interval ef = f_->eval(P);
+         RealPoint rc( copy.rCorner() );
+         Interval ef = f_->eval(rc);
          if (ef.isCertainlyLeZero()) keepRB = true;
       }
 

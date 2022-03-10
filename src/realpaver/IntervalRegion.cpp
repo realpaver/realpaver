@@ -12,9 +12,19 @@
 namespace realpaver {
 
 IntervalRegion::IntervalRegion(const Scope& s, const Interval& x)
-   : IntervalVector(s.size(), x),
-     scope_(s)
-{}
+      : IntervalVector(s.size(), x),
+        scope_(s)
+{
+   ASSERT(!s.isEmpty(), "Empty scope used to create an interval region");   
+}
+
+IntervalRegion::IntervalRegion(const Scope& s, const IntervalVector& X)
+      : IntervalVector(X),
+        scope_(s)
+{
+   ASSERT(!s.isEmpty(), "Empty scope used to create an interval region");      
+   ASSERT(s.size() == X.size(), "Bad initialization of an interval region");      
+}
 
 Scope IntervalRegion::scope() const
 {
@@ -35,6 +45,31 @@ void IntervalRegion::set(Variable v, const Interval& x)
    operator[](scope_.index(v)) = x;
 }
 
+RealPoint IntervalRegion::midpoint() const
+{
+   return RealPoint(scope_, IntervalVector::midpoint());
+}
+
+RealPoint IntervalRegion::lCorner() const
+{
+   return RealPoint(scope_, IntervalVector::lCorner());   
+}
+
+RealPoint IntervalRegion::rCorner() const
+{
+   return RealPoint(scope_, IntervalVector::rCorner());   
+}
+
+RealPoint IntervalRegion::corner(const Bitset& bs) const
+{
+   return RealPoint(scope_, IntervalVector::corner(bs));
+}
+
+RealPoint IntervalRegion::oppositeCorner(const Bitset& bs) const
+{
+   return RealPoint(scope_, IntervalVector::oppositeCorner(bs));
+}
+
 void IntervalRegion::hullAssignOnScope(const IntervalRegion& reg,
                                        const Scope& s)
 {
@@ -46,16 +81,20 @@ void IntervalRegion::setOnScope(const IntervalRegion& reg, const Scope& s)
    for (auto v : s) set(v, reg.get(v));
 }
 
-RealVector IntervalRegion::midpointOnScope(const Scope& s) const
+RealPoint IntervalRegion::midpointOnScope(const Scope& s) const
 {
-   RealVector v(s.size());
-   toMidpointOnScope(s, v);
-   return v;
+   RealPoint pt(s);
+   for (auto v : s) pt.set(v, get(v).midpoint());
+   return pt;
 }
 
-void IntervalRegion::toMidpointOnScope(const Scope& s, RealVector& mid) const
+IntervalRegion IntervalRegion::subRegion(const Scope& s) const
 {
-   for (auto v : s) mid.set(s.index(v), get(v).midpoint());
+   ASSERT(scope_.contains(s), "Bad scope used to create a sub-region " << s);
+
+   IntervalRegion reg(s);
+   for (auto v : s) reg.set(v, get(v));
+   return reg;
 }
 
 IntervalRegion* IntervalRegion::clone() const

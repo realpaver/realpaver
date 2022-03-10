@@ -13,7 +13,6 @@
 #include "realpaver/Common.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/RealFunction.hpp"
-#include "realpaver/RealVector.hpp"
 
 namespace realpaver {
 
@@ -40,16 +39,16 @@ public:
    /// Minimization of a function
    /// @param f a real function
    /// @param reg interval region in the search space
-   /// @param initialPoint starting point that belongs to the region
-   /// @param finalPoint final point found by the optimization procedure
+   /// @param src starting point that belongs to the region
+   /// @param dest final point found by the optimization procedure
    /// @return an optimization status
    ///
    /// Moreover, the values of the function at the initial and final points
    /// must be computed and stored in this.
    virtual OptimizationStatus minimize(RealFunction& f,
                                        const IntervalRegion& reg,
-                                       const RealVector& initialPoint,
-                                       RealVector& finalPoint);
+                                       const RealPoint& src,
+                                       RealPoint& dest);
 
    /// @return the value of the objective function at the initial point
    double getInitObjVal() const;

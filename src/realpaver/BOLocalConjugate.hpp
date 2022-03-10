@@ -25,8 +25,8 @@ public:
    /// Overrides (BOLocalSolver)
    OptimizationStatus minimize(RealFunction& f,
                                const IntervalRegion& reg,
-                               const RealVector& initialPoint,
-                               RealVector& finalPoint);
+                               const RealPoint& src,
+                               RealPoint& dest);
 
    /// Gets the limit on the number of iterations
    size_t getIterLimit() const;
@@ -57,8 +57,8 @@ private:
    /// @param s steepest descent direction
    /// @param fx f(x)
    /// @return a positive step in case of success, a negative value otherwise
-   double findStep(RealFunction& f, RealVector& x, RealVector& p,
-                   RealVector& s, double fx);
+   double findStep(RealFunction& f, RealPoint& x, RealPoint& p,
+                   RealPoint& s, double fx);
 
    size_t maxiter_;  // limit on the number of iterations
    double carmijo_;  // coefficient used in the Armijo rule

@@ -170,7 +170,7 @@ DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
         x_(x)
 {}
 
-size_t DagConst::nbOcc(size_t id) const
+size_t DagConst::nbOcc(const Variable& v) const
 {
    return 0;
 }
@@ -193,7 +193,7 @@ void DagConst::eval(const IntervalRegion& reg)
    setVal(x_);
 }
 
-void DagConst::eval(const RealVector& P)
+void DagConst::eval(const RealPoint& pt)
 {
    setVal(x_);
 }
@@ -218,7 +218,7 @@ bool DagConst::diffOnly(const Variable& v)
    return true;
 }
 
-void DagConst::reval(const RealVector& P)
+void DagConst::reval(const RealPoint& pt)
 {
    setRval(x_.midpoint());
 }
@@ -243,9 +243,9 @@ DagVar::DagVar(Dag* dag, size_t index, const Variable& v)
    bitset_.setOne(v.getId());
 }
 
-size_t DagVar::nbOcc(size_t id) const
+size_t DagVar::nbOcc(const Variable& v) const
 {
-   return (id == v_.getId()) ? 1 : 0;
+   return (v.getId() == v_.getId()) ? 1 : 0;
 }
 
 void DagVar::print(std::ostream& os) const
@@ -263,9 +263,9 @@ void DagVar::eval(const IntervalRegion& reg)
    setVal(reg.get(v_));
 }
 
-void DagVar::eval(const RealVector& P)
+void DagVar::eval(const RealPoint& pt)
 {
-   setVal(P[v_.getId()]);
+   setVal(pt.get(v_));
 }
 
 void DagVar::evalOnly(const Variable& v, const Interval& x)
@@ -289,9 +289,9 @@ bool DagVar::diffOnly(const Variable& v)
    return true;
 }
 
-void DagVar::reval(const RealVector& P)
+void DagVar::reval(const RealPoint& pt)
 {
-   setRval(P[v_.getId()]);
+   setRval(pt.get(v_));
 }
 
 bool DagVar::rdiff()
@@ -348,12 +348,12 @@ bool DagOp::eq(const DagOp* other) const
    return true;
 }
 
-size_t DagOp::nbOcc(size_t id) const
+size_t DagOp::nbOcc(const Variable& v) const
 {
    size_t n = 0;
 
    for (size_t i=0; i<subArity(); ++i)
-      n += subNode(i)->nbOcc(id);
+      n += subNode(i)->nbOcc(v);
 
    return n;
 }
@@ -399,12 +399,12 @@ void DagOp::eval(const IntervalRegion& reg)
    eval();
 }
 
-void DagOp::eval(const RealVector& P)
+void DagOp::eval(const RealPoint& pt)
 {
    eval();
 }
 
-void DagOp::reval(const RealVector& P)
+void DagOp::reval(const RealPoint& pt)
 {
    reval();
 }
@@ -1292,10 +1292,10 @@ Interval DagFun::eval(const IntervalRegion& reg)
    return rootNode()->val();
 }
 
-Interval DagFun::eval(const RealVector& P)
+Interval DagFun::eval(const RealPoint& pt)
 {
    for (size_t i=0; i<nbNode(); ++i)
-      node_[i]->eval(P);
+      node_[i]->eval(pt);
 
    return rootNode()->val();
 }
@@ -1526,19 +1526,19 @@ bool DagFun::diffOnly(const Variable& v, const Interval& x)
    return diffOnly(v);
 }
 
-double DagFun::reval(const RealVector& P)
+double DagFun::reval(const RealPoint& pt)
 {
    Double::rndNear();
 
    for (size_t i=0; i<nbNode(); ++i)
-      node_[i]->reval(P);
+      node_[i]->reval(pt);
 
    return rootNode()->rval();
 }
 
-bool DagFun::rdiff(const RealVector& P)
+bool DagFun::rdiff(const RealPoint& pt)
 {
-   reval(P);
+   reval(pt);
    return rdiff();
 }
 
@@ -1594,22 +1594,22 @@ size_t DagFun::rfunArity() const
    return scope().size();   
 }
 
-double DagFun::rfunEval(const RealVector& x)
+double DagFun::rfunEval(const RealPoint& pt)
 {
-   return reval(x);
+   return reval(pt);
 }
 
-void DagFun::rfunDiff(const RealVector& x, RealVector& g)
+void DagFun::rfunDiff(const RealPoint& pt, RealVector& g)
 {
-   rdiff(x);
+   rdiff(pt);
    toRgrad(g);
 }
 
-void DagFun::rfunEvalDiff(const RealVector& x, RealVector& g, double& valf)
+void DagFun::rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e)
 {
-   rdiff(x);
+   rdiff(pt);
    toRgrad(g);
-   valf = rval();
+   e = rval();
 }
 
 Scope DagFun::ifunScope() const
@@ -1627,9 +1627,9 @@ Interval DagFun::ifunEval(const IntervalRegion& reg)
    return eval(reg);
 }
 
-Interval DagFun::ifunEvalPoint(const RealVector& x)
+Interval DagFun::ifunEvalPoint(const RealPoint& pt)
 {
-   return eval(x);
+   return eval(pt);
 }
 
 void DagFun::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
@@ -1846,12 +1846,12 @@ Scope Dag::scope() const
    return res;
 }
 
-void Dag::reval(const RealVector& P)
+void Dag::reval(const RealPoint& pt)
 {
    Double::rndNear();
 
    for (size_t i=0; i<nbNode(); ++i)
-      node_[i]->reval(P);
+      node_[i]->reval(pt);
 }
 
 void Dag::eval(const IntervalRegion& reg)

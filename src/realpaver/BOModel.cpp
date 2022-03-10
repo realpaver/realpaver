@@ -57,11 +57,14 @@ BOModel::BOModel(Problem& problem, bool withobj)
       //LOG_INFO("   > creates an objective variable " << z_.name());
 
       if (problem.getObjective().isMinimization())
-         dag_->insert( z_ - to == 0 );
+         dag_->insert( to - z_ == 0 );
 
       else
-         dag_->insert( z_ + to == 0 );
+         dag_->insert( to + z_ == 0 );
    }
+
+
+DEBUG("DAG\n" << *dag_);
 
    // initial region
    init_ = new IntervalRegion(fullscope_);
@@ -146,40 +149,61 @@ size_t BOModel::rfunArity() const
    return objscope_.size();
 }
 
-double BOModel::rfunEval(const RealVector& x)
+double BOModel::rfunEval(const RealPoint& pt)
 {
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
-   f->reval(x);
 
-   // finds the root node of the objective function
-   return f->node(f->nbNode() - 2)->rval();
+   // index of the root node of the objective function
+   size_t iroot = f->nbNode() - 3;
+
+   // evaluates the nodes from the leaves to the root
+   for (size_t i=0; i<=iroot; ++i)
+   {
+      DagNode* node = f->node(i);
+      node->reval(pt);
+   }
+
+   return f->node(iroot)->rval();
 }
 
-void BOModel::rfunDiff(const RealVector& x, RealVector& g)
+void BOModel::rfunDiff(const RealPoint& pt, RealVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   // evaluates the dag
-   dag_->reval(x);
+   // index in the DAG of the root node of the last partial derivative
+   size_t iroot = dag_->fun(dim()-1)->rootNode()->index();
+
+   // evaluates the nodes of the partial derivatives
+   for (size_t i=0; i<=iroot; ++i)
+   {
+      DagNode* node = dag_->node(i);
+      node->reval(pt);
+   }
 
    // fills the gradient
    for (size_t i=0; i<dim(); ++i)
       g.set(i, dag_->fun(i)->rval());   
 }
 
-void BOModel::rfunEvalDiff(const RealVector& x, RealVector& g, double& val)
+void BOModel::rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e)
 {
-   // evaluates the dag
-   dag_->reval(x);
+   // index in the DAG of the root node of the objective function
+   size_t iroot = dag_->nbNode() - 3;
+
+   // evaluates the nodes of the partial derivatives and the objective function
+   for (size_t i=0; i<=iroot; ++i)
+   {
+      DagNode* node = dag_->node(i);
+      node->reval(pt);
+   }
 
    // fills the gradient
    for (size_t i=0; i<dim(); ++i)
       g.set(i, dag_->fun(i)->rval());   
 
    // finds the value
-   DagFun* f = dag_->fun(dim());
-   val = f->node(f->nbNode() - 2)->rval();
+   e = dag_->node(iroot)->rval();
 }
 
 Scope BOModel::ifunScope() const
@@ -196,28 +220,64 @@ Interval BOModel::ifunEval(const IntervalRegion& reg)
 {
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
-   f->eval(reg);
+   
+   // index of the root node of the objective function
+   size_t iroot = f->nbNode() - 3;
 
-   // finds the root node of the objective function
-   return f->node(f->nbNode() - 2)->val();
+   // evaluates the nodes from the leaves to the root
+   for (size_t i=0; i<=iroot; ++i)
+   {
+      DagNode* node = f->node(i);
+      node->eval(reg);
+   }
+
+   return f->node(iroot)->val();
 }
 
-Interval BOModel::ifunEvalPoint(const RealVector& x)
+Interval BOModel::ifunEvalPoint(const RealPoint& pt)
 {
+   DEBUG("ifunEvalPoint @ " << pt);
+   DEBUG("dim = " << dim());
+   
    // equation representing the objective function z +/- obj = 0
    DagFun* f = dag_->fun(dim());
-   f->eval(x);
 
-   // finds the root node of the objective function
-   return f->node(f->nbNode() - 2)->val();
+   DEBUG("nb nodes : " << f->nbNode());
+
+
+   // index of the root node of the objective function
+   size_t iroot = f->nbNode() - 3;
+
+   DEBUG("iroot " << iroot);
+
+
+   // evaluates the nodes from the leaves to the root
+   for (size_t i=0; i<=iroot; ++i)
+   {
+   DEBUG("i " << i);
+      DagNode* node = f->node(i);
+      node->eval(pt);
+
+   DEBUG("apres");
+
+   }
+
+   return f->node(iroot)->val();
 }
 
 void BOModel::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   // evaluates the dag
-   dag_->eval(reg);
+   // index in the DAG of the root node of the last partial derivative
+   size_t iroot = dag_->fun(dim()-1)->rootNode()->index();
+
+   // evaluates the nodes of the partial derivatives
+   for (size_t i=0; i<=iroot; ++i)
+   {
+      DagNode* node = dag_->node(i);
+      node->eval(reg);
+   }
 
    // fills the gradient
    for (size_t i=0; i<dim(); ++i)
@@ -227,16 +287,22 @@ void BOModel::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
 void BOModel::ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
                            Interval& e)
 {
-   // evaluates the dag
-   dag_->eval(reg);
+   // index in the DAG of the root node of the objective function
+   size_t iroot = dag_->nbNode() - 3;
+
+   // evaluates the nodes of the partial derivatives and the objective function
+   for (size_t i=0; i<=iroot; ++i)
+   {
+      DagNode* node = dag_->node(i);
+      node->eval(reg);
+   }
 
    // fills the gradient
    for (size_t i=0; i<dim(); ++i)
       g.set(i, dag_->fun(i)->val());   
 
    // finds the value
-   DagFun* f = dag_->fun(dim());
-   e = f->node(f->nbNode() - 2)->val();
+   e = dag_->node(iroot)->val();
 }
 
 } // namespace

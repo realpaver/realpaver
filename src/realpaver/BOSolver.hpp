@@ -108,8 +108,8 @@ private:
    bool presolve();
 
    void calculateLower(SharedBONode& node);
-   void calculateUpper(SharedBONode& node, double U);
-   void saveIncumbent(const RealVector& P);
+   void calculateUpper(SharedBONode& node, double upper);
+   void saveIncumbent(const RealPoint& pt);
 
    void solve();
    void branchAndBound();

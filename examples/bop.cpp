@@ -57,6 +57,11 @@ int main(void)
                y = problem.addRealVar(-10,  10, "y");
       Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
 
+      //~ Variable x = problem.addRealVar(-10,  10, "x"),
+               //~ y = problem.addRealVar(-10,  10, "y");
+      //~ Term to = sqr(x + y);
+
+
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
@@ -118,14 +123,14 @@ int main(void)
          std::string objname = "obj";
          size_t lmax = std::max(maxSizeVarName(problem), objname.size());
 
-         cout << endl << indent << objname;
+         cout << indent << objname;
          for (size_t j=objname.size(); j<lmax; ++j) cout << " ";
          
          Interval z = solver.getObjEnclosure();
          if (z.isSingleton())
-            cout << " = " << z.left() << endl << endl;
+            cout << " = " << z.left() << endl;
          else
-            cout << " = " << z << endl << endl;
+            cout << " = " << z << endl;
 
          for (size_t i=0; i<problem.nbVars(); ++i)
          {

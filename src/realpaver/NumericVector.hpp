@@ -66,11 +66,15 @@ public:
    /// @return a reference to the i-th element of this
    RefType operator[](size_t i);
 
-   /// Modification of all the element of this
+   /// Modification of all the elements of this
    /// @param x a number
    ///
    /// Assigns x to all the element of this
    void setAll(ConstRefType x);
+
+   /// Assigns another vector to this
+   /// @param V a vector having the same size than this
+   void setAll(const NumericVector& V);
 
    /// Insertion of one element at the end of this
    /// @param x a number inserted at the end
@@ -174,6 +178,16 @@ NumericVector<T>::setAll(ConstRefType x)
 {
    for (size_t i=0; i<elems_.size(); ++i)
       elems_[i] = x;
+}
+
+template <typename T>
+void
+NumericVector<T>::setAll(const NumericVector& V)
+{
+   ASSERT(size() == V.size(), "Bad assignemnt of numeric vectors");
+
+   for (size_t i=0; i<elems_.size(); ++i)
+      elems_[i] = V.elems_[i];
 }
 
 template <typename T>
