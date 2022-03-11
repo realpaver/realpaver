@@ -80,13 +80,19 @@ public:
    Tolerance getObjTol() const;
    void setObjTol(Tolerance tol);
 
+   /// Assigns the local optimization strategy
+   void setLocalStrategy(const std::string& s);
+
 private:
    Problem problem_;    // initial problem
    Problem preprob_;    // problem resulting from preprocessing
    Problem solprob_;    // problem resulting from presolving
 
    BOModel* model_;
+
    BOLocalSolver* localSolver_;
+   std::string localStrategy_;
+   
    BOSplit* split_;
    Contractor* contractor_;
    ContractorPool* pool_;
@@ -108,7 +114,7 @@ private:
    bool presolve();
 
    void calculateLower(SharedBONode& node);
-   void calculateUpper(SharedBONode& node, double upper);
+   void calculateUpper(SharedBONode& node);
    void saveIncumbent(const RealPoint& pt);
 
    void solve();

@@ -24,6 +24,7 @@ BOSolver::BOSolver(Problem& problem)
         solprob_(),
         model_(nullptr),
         localSolver_(nullptr),
+        localStrategy_(Param::getStrParam("LOCAL_SOLVER")),
         split_(nullptr),
         contractor_(nullptr),
         pool_(nullptr),
@@ -33,7 +34,7 @@ BOSolver::BOSolver(Problem& problem)
         objval_(Interval::universe()),
         vmap21_(),
         vmap31_(),
-        upper_(Double::inf())
+        upper_(Double::inf()),
         nbnodes_(0),
         nbpending_(0),
         ptimer_(),
@@ -108,14 +109,17 @@ size_t BOSolver::getNbPendingNodes() const
    return nbpending_;
 }
 
+void BOSolver::setLocalStrategy(const std::string& s)
+{
+   localStrategy_ = s;
+}
+
 void BOSolver::makeLocalSolver()
 {
-   std::string strategy = Param::getStrParam("LOCAL_SOLVER");
-
-   if (strategy == "CONJUGATE")
+   if (localStrategy_ == "CONJUGATE")
       localSolver_ = new BOLocalConjugate();
 
-   if (strategy == "MIDPOINT" || localSolver_ == nullptr)
+   if (localStrategy_ == "MIDPOINT" || localSolver_ == nullptr)
       localSolver_ = new BOLocalSolver();
 }
 
@@ -316,22 +320,19 @@ void BOSolver::saveIncumbent(const RealPoint& pt)
    }
 }
 
-void BOSolver::calculateUpper(SharedBONode& node, double upper)
+void BOSolver::calculateUpper(SharedBONode& node)
 {
-DEBUG("\ncalculateUpper, current upper bound " << upper);
+DEBUG("\ncalculateUpper, current upper bound " << upper_);
 
    IntervalRegion* reg = node->getRegion();
-
    RealPoint src = reg->midpointOnScope(model_->getObjScope());
    RealPoint dest(src);
-
-DEBUG("   src = " << src);
 
    // local optimization
    OptimizationStatus status = localSolver_->minimize(*model_, *reg, src, dest);
 
+DEBUG("   src = " << src);
 DEBUG("   local optim -> " << status);
-
 
    if (status == OptimizationStatus::Optimal)
    {
@@ -348,15 +349,14 @@ DEBUG("   e = " << e);
          double u = e.right();
          node->setUpper(u);
 
-         Variable v = model_->getObjVar();
-         Interval z = reg->get(v);
-         z.setRight(u);
-         reg->set(v, z);
-
       DEBUG("   UPPER BOUND " << u);
 
          // new upper bound of the global minimum?
-         if (u < upper) saveIncumbent(dest);
+         if (u < upper_)
+         {
+            upper_ = u;
+            saveIncumbent(dest);
+         }
       }
    }
 }
@@ -366,14 +366,11 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
    // stops the search if the space is empty
    if (space.isEmpty()) return false;
 
-   // current upper bound of the global minimum
-   double upper = std::min(space.getLowestUpperBound(),
-                           sol.getLowestUpperBound());
-
    SharedBONode node = space.extractNode();
 
-DEBUG("\n#########\nNODE : " << *node->getRegion() << " l: " << node->getLower()
-               << " u: " << node->getUpper());
+DEBUG("\n#########\nNODE : " << *node->getRegion() << " l: "
+                             << node->getLower()
+                             << " u: " << node->getUpper());
 
    // splits the node
    split_->apply(node);
@@ -382,34 +379,40 @@ DEBUG("\n#########\nNODE : " << *node->getRegion() << " l: " << node->getLower()
    {
 DEBUG("   sol NODE !");
 
-
       sol.insertNode(node);
       return true;
    }
    else
    {
+      Variable v = model_->getObjVar();
+
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
          ++nbnodes_;
 
          SharedBONode subnode = *it;
-         IntervalRegion* X = subnode->getRegion();
+         IntervalRegion* reg = subnode->getRegion();
 
-         Interval z(X->get(model_->getObjVar()));
-         if (z.left() > upper) continue;
+         // BB theorem
+         Interval z(reg->get(v));
+         if (z.left() > upper_) continue;
 
-DEBUG("sub NODE : " << *X);
+         // assigns the upper bound before propagation
+         if (z.right() > upper_)
+         {
+            z.setRight(upper_);
+            reg->set(v, z);
+         }
+DEBUG("sub NODE : " << *reg);
 
-         Proof proof = contractor_->contract(*X);
+         Proof proof = contractor_->contract(*reg);
 
-DEBUG("proof : " << proof << "  -> " << *X);
+DEBUG("proof : " << proof << "  -> " << *reg);
 
          if (proof != Proof::Empty)
          {
             calculateLower(subnode);
-            calculateUpper(subnode, upper);
-
-            if (upper > subnode->getUpper()) upper = subnode->getUpper();
+            calculateUpper(subnode);
 
 DEBUG("    ... l : " << subnode->getLower());
 DEBUG("    ... u : " << subnode->getUpper());
@@ -419,11 +422,10 @@ DEBUG("    ... u : " << subnode->getUpper());
 
             space.insertNode(subnode);
          }
-         
       }
 
-      space.simplify(upper);
-      sol.simplify(upper);
+      space.simplify(upper_);
+      sol.simplify(upper_);
 
       return true;
    }
@@ -433,34 +435,24 @@ void BOSolver::findInitialBounds(SharedBONode& node)
 {
    // upper bound of the global minimum
    upper_ = Double::inf();
-   
 
-   TODO : GERER CETTE UPPER BOUND !!!
+   calculateLower(node);
+   calculateUpper(node);
 
+   Interval z(node->getLower(), node->getUpper());
 
-
-   IntervalRegion* r = node->getRegion();
-
-   Interval val = model_->ifunEval(*r);
-
-   if (val.isEmpty())
+   if (z.isEmpty())
    {
       status_ = OptimizationStatus::Infeasible;
       return;
    }
 
-   node->setLower(val.left());
-   node->setUpper(val.right());
+   node->getRegion()->set(model_->getObjVar(), z);
 
-   r->set(model_->getObjVar(), val);
-
-   DEBUG("Node bounds : " << node->getLower() << ", " << node->getUpper());
+   DEBUG("Node bounds : " << z);
 
    // TODO, local optimization
-
-
-   // TODO, first relaxation
-   
+   // restart, ...   
 }
 
 void BOSolver::branchAndBound()
@@ -503,17 +495,14 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
 
    // creates the space of solution nodes, i.e. nodes that cannot be split
    BOSpace sol;
-   double L, U;
 
    bool iter = true;
-
    do
    {
       iter = bbStep(space, sol);
 
-      L = std::min(space.getLowestLowerBound(), sol.getLowestLowerBound());
-      U = std::min(space.getLowestUpperBound(), sol.getLowestUpperBound());
-      objval_ = Interval(L, U);
+      double L = std::min(space.getLowestLowerBound(), sol.getLowestLowerBound());
+      objval_ = Interval(L, upper_);
 
 DEBUG("OBJ ENCLOSURE : " << objval_);
 

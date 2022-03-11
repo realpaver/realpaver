@@ -57,8 +57,8 @@ private:
    /// @param s steepest descent direction
    /// @param fx f(x)
    /// @return a positive step in case of success, a negative value otherwise
-   double findStep(RealFunction& f, RealPoint& x, RealPoint& p,
-                   RealPoint& s, double fx);
+   double findStep(RealFunction& f, RealVector& x, RealVector& p,
+                   RealVector& s, double fx);
 
    size_t maxiter_;  // limit on the number of iterations
    double carmijo_;  // coefficient used in the Armijo rule

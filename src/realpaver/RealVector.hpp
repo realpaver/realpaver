@@ -38,10 +38,8 @@ public:
    /// Default copy constructor
    RealVector(const RealVector&) = default;
 
-   /// Assignment operator
-   /// @param V a vector assigned to this
-   /// @return a reference to this
-   RealVector& operator=(const RealVector& V);
+   /// Default assignment operator
+   RealVector& operator=(const RealVector& V) = default;
 
    /// Default destructor
    ~RealVector() = default;

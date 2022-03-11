@@ -37,8 +37,8 @@ public:
    /// Default copy constructor
    IntervalVector(const IntervalVector&) = default;
 
-   /// No assignment
-   IntervalVector& operator=(const IntervalVector&) = delete;
+   /// Default assignment operator
+   IntervalVector& operator=(const IntervalVector&) = default;
 
    /// Virtual destructor
    virtual ~IntervalVector();
@@ -60,10 +60,6 @@ public:
 
    /// @return the midpoint of this
    RealVector midpoint() const;
-
-   /// Calculates the midpoint of this
-   /// @param mid vector assigned to the midpoint of this
-   void toMidpoint(RealVector& mid) const;
 
    /// @return the corner of this made from all the left bounds
    RealVector lCorner() const;
@@ -88,26 +84,22 @@ public:
    RealVector oppositeCorner(const Bitset& bs) const;
 
    /// Set containment test
-   /// @param X a vector whose size is smaller than or equal to the size
-   ///        of this
+   /// @param X a vector having the same size than this
    /// @return true if each X[i] is included in this[i]
    bool contains(const IntervalVector& X) const;
 
    /// Set containment test
-   /// @param X a vector whose size is smaller than or equal to the size
-   ///        of this
+   /// @param X a vector having the same size than this
    /// @return true if each X[i] is strictly included in this[i]
    bool strictlyContains(const IntervalVector& X) const;
 
    /// Set containment test
-   /// @param X a vector whose size is smaller than or equal to the size
-   ///        of this
+   /// @param X a vector having the same size than this
    /// @return true if each X[i] belongs to this[i]
    bool contains(const RealVector& X) const;
 
    /// Set containment test
-   /// @param X a vector whose size is smaller than or equal to the size
-   ///        of this
+   /// @param X a vector having the same size than this
    /// @return true if each X[i] strictly belongs to this[i]
    bool strictlyContains(const RealVector& X) const;
 
@@ -119,11 +111,6 @@ public:
    /// @return true if this strictly contains 0.0
    bool strictlyContainsZero() const;
 
-   /// Tests if two intervals are disjoint
-   /// @param X a vector having the same size than this
-   /// @return true if this and X are disjoint
-   bool isDisjoint(const IntervalVector& X) const;
-
    /// Tests if two intervals overlap
    /// @param X a vector having the same size than this
    /// @return true if this and X overlap
@@ -134,18 +121,6 @@ public:
 
    /// @return the infinite-norm of this
    double infNorm() const;
-
-   /// Intersection with assignment
-   /// @param X an interval vector
-   ///
-   /// this is assigned to the intersection of this and X
-   void interAssign(const IntervalVector& X);
-
-   /// Hull with assignment
-   /// @param X an interval vector
-   ///
-   /// this is assigned to the hull of this and X
-   void hullAssign(const IntervalVector& X);
 
    /// @return a clone of this
    virtual IntervalVector* clone() const;

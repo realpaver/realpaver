@@ -35,8 +35,8 @@ public:
    /// Default copy constructor
    RealPoint(const RealPoint&) = default;
 
-   /// No assignment
-   RealPoint& operator=(const RealPoint&) = delete;
+   /// Default assignment operator
+   RealPoint& operator=(const RealPoint&) = default;
 
    /// Default destructor
    ~RealPoint() = default;

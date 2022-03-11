@@ -67,16 +67,13 @@ int main(void)
                //~ y = problem.addRealVar(-10,  10, "y");
       //~ Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
 
-      //~ Variable x = problem.addRealVar(-10,  10, "x"),
-               //~ y = problem.addRealVar(-10,  10, "y");
-      //~ Term to = sqr(x + y);
-
 
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
       solver.setSplitableObj(false);
-      solver.setNodeLimit(10);
+      solver.setNodeLimit(1000);
+      solver.setLocalStrategy("CONJUGATE");
       Interval::precision(3);
 
       solver.optimize();

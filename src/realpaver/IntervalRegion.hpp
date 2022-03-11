@@ -37,8 +37,8 @@ public:
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
 
-   /// No assignment
-   IntervalRegion& operator=(const IntervalRegion&) = delete;
+   /// Default assignment operator
+   IntervalRegion& operator=(const IntervalRegion&) = default;
 
    /// Default destructor
    ~IntervalRegion() = default;
@@ -60,14 +60,56 @@ public:
    /// This masks the access by index.
    void set(Variable v, const Interval& x);
 
-   ///@{
-   /// Masks (IntervalVector)
+   /// @return the midpoint of this
    RealPoint midpoint() const;
+
+   /// @return the corner of this made from all the left bounds
    RealPoint lCorner() const;
+
+   /// @return the corner of this made from all the right bounds
    RealPoint rCorner() const;
+
+  /// Gets a corner of this
+   /// @param bs a bitset having the same size than this
+   /// @return a corner of this defined by 'bs'
+   ///
+   /// Let res be the result. For each i, res[i] is equal to the left bound of
+   /// the i-th component of this if bs[i] is true, the right bound otherwise.
    RealPoint corner(const Bitset& bs) const;
+
+   /// Gets a corner of this
+   /// @param bs a bitset having the same size than this
+   /// @return a corner of this defined by 'bs'
+   ///
+   /// Let res be the result. For each i, res[i] is equal to the right bound of
+   /// the i-th component of this if bs[i] is true, the left bound otherwise.
    RealPoint oppositeCorner(const Bitset& bs) const;
-   ///@}
+
+   /// Set containment test
+   /// @param reg a region whose scope is contained in the scope of this
+   /// @return true if reg[v] is included in this[v] for each variable v
+   bool contains(const IntervalRegion& reg) const;
+
+   /// Set containment test
+   /// @param reg a region whose scope is contained in the scope of this
+   /// @return true if reg[v] is strictly included in this[v] for each
+   ///         variable v
+   bool strictlyContains(const IntervalRegion& reg) const;
+
+   /// Set containment test
+   /// @param pt a point whose scope is contained in the scope of this
+   /// @return true if pt[v] belongs to this[v] for each variable v
+   bool contains(const RealPoint& pt) const;
+
+   /// Set containment test
+   /// @param pt a point whose scope is contained in the scope of this
+   /// @return true if pt[v] strictly belongs to this[v] for each variable v
+   bool strictlyContains(const RealPoint& pt) const;
+
+      /// Tests if two regions overlap
+   /// @param reg a region having the same scope than this
+   /// @return true if this and reg overlap
+   bool overlaps(const IntervalRegion& reg) const;
 
    /// Hull with assignment on a scope
    /// @param reg an interval region

@@ -54,20 +54,20 @@ void BOLocalConjugate::setStepTol(double val)
    tolstep_ = val;
 }
 
-double BOLocalConjugate::findStep(RealFunction& f, RealPoint& x,
-                                  RealPoint& p, RealPoint& s, double fx)
+double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
+                                  RealVector& p, RealVector& s, double fx)
 {
-/*
    double step = 1.0,   // initial step
           res = -1.0,   // resulting step
           p_s = p.scalarProduct(s);
 
    bool iter = true;
+   Scope scope = f.rfunScope();
 
    while (iter)
    {
       RealVector y = x + step * p;
-      double fy = f.rfunEval(y);
+      double fy = f.rfunEval(RealPoint(scope, y));
 
       if (!Double::isNan(fy))
       {
@@ -88,7 +88,7 @@ double BOLocalConjugate::findStep(RealFunction& f, RealPoint& x,
       if (step < tolstep_) iter = false;
    }
 
-   return res;*/
+   return res;
 }
 
 OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
@@ -96,13 +96,12 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
                                               const RealPoint& src,
                                               RealPoint& dest)
 {
-   // TODO
-/*
    size_t dim = f.rfunArity();
+   Scope scope = f.rfunScope();
 
    double uk, uk_1, step;
 
-   RealVector xk(initialPoint),  // current point
+   RealVector xk(src),           // current point
               grad(dim),         // gradient
               sk(dim),           // steepest descent direction
               pk(dim),           // search direction
@@ -111,7 +110,7 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
               pk_1(dim);         // next value of pk
 
    // evaluates and differentiates f at xk
-   f.rfunEvalDiff(xk, grad, uk);
+   f.rfunEvalDiff(RealPoint(scope, xk), grad, uk);
    setInitObjVal(uk);
 
    DEBUG("\npoint : " << xk << "   " << "grad : " << grad << "   val : " << uk);
@@ -126,19 +125,19 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
 
    DEBUG("dir : " << pk << "   step : " << step);
 
-   if (step > 0.0)
-      xk_1 = xk + step * pk;
+   if (step > 0.0) xk_1 = xk + step * pk;
 
-   if (step < 0.0 || (!reg.contains(xk_1)))
+   if (step < 0.0 || (!reg.contains(RealPoint(scope, xk_1))))
       return OptimizationStatus::Other;
 
    // loop
    size_t nbiter = 0;
    bool iter = true;
 
+
    while (iter)
    {
-      f.rfunEvalDiff(xk_1, grad, uk_1);
+      f.rfunEvalDiff(RealPoint(scope, xk_1), grad, uk_1);
       sk_1 = -grad;
 
    DEBUG("\npoint : " << xk_1 << "   " << "grad : " << grad << "   val : " << uk_1);
@@ -172,7 +171,7 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
          iter = false;  // no improvement of the upper bound
       }
 
-      if (iter && (!reg.contains(xk_1)))
+      if (iter && (!reg.contains(RealPoint(scope, xk_1))))
       {
          xk_1 = xk;
          uk_1 = uk;
@@ -182,10 +181,8 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
       if (++nbiter > maxiter_) iter = false;
    }
 
-   finalPoint = xk_1;
+   dest = RealPoint(scope, xk_1);
    setFinalObjVal(uk_1);
-
-*/
 
    return OptimizationStatus::Optimal;
 }

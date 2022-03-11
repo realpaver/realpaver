@@ -70,6 +70,48 @@ RealPoint IntervalRegion::oppositeCorner(const Bitset& bs) const
    return RealPoint(scope_, IntervalVector::oppositeCorner(bs));
 }
 
+bool IntervalRegion::contains(const IntervalRegion& reg) const
+{
+   for (auto v : reg.scope())
+      if (!get(v).contains(reg.get(v))) return false;
+
+   return true;
+}
+
+bool IntervalRegion::strictlyContains(const IntervalRegion& reg) const
+{
+   for (auto v : reg.scope())
+      if (!get(v).strictlyContains(reg.get(v))) return false;
+
+   return true;
+}
+
+bool IntervalRegion::contains(const RealPoint& pt) const
+{
+   for (auto v : pt.scope())
+      if (!get(v).contains(pt.get(v))) return false;
+
+   return true;
+}
+
+bool IntervalRegion::strictlyContains(const RealPoint& pt) const
+{
+   for (auto v : pt.scope())
+      if (!get(v).strictlyContains(pt.get(v))) return false;
+
+   return true;
+}
+
+bool IntervalRegion::overlaps(const IntervalRegion& reg) const
+{
+   if (size() != reg.size()) return false;
+
+   for (auto v : scope_)
+      if (!get(v).overlaps(reg.get(v))) return false;
+
+   return true;
+}
+
 void IntervalRegion::hullAssignOnScope(const IntervalRegion& reg,
                                        const Scope& s)
 {
