@@ -29,115 +29,152 @@ Param::Param()
              tol6 = Tolerance::makeRel(1.0e-6),
              tol8 = Tolerance::makeRel(1.0e-8);
 
-   tolmap_.insert(std::make_pair("XTOL",                  tol8));
-   tolmap_.insert(std::make_pair("DTOL",                  tol6));
-   tolmap_.insert(std::make_pair("OBJ_TOL",               tol6));
-   tolmap_.insert(std::make_pair("PROPAGATOR_DTOL",       tol3));
+   tolmap_.insert(std::make_pair("XTOL",                    tol8));
+   tolmap_.insert(std::make_pair("DTOL",                    tol6));
+   tolmap_.insert(std::make_pair("OBJ_TOL",                 tol6));
+   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",        tol3));
 
-   intmap_.insert(std::make_pair("NODE_LIMIT",            100000));
-   intmap_.insert(std::make_pair("LS_ITER_LIMIT",         20));
-   intmap_.insert(std::make_pair("PROPAGATOR_ITER_LIMIT", 50));
-   intmap_.insert(std::make_pair("BC3_ITER_LIMIT",        30));
-   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",     20));
-   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",       5));
-   intmap_.insert(std::make_pair("LP_ITER_LIMIT",         50));
-   intmap_.insert(std::make_pair("FLOAT_PRECISION",       8));
+   intmap_.insert(std::make_pair("NODE_LIMIT",              100000));
+   intmap_.insert(std::make_pair("LS_ITER_LIMIT",           20));
+   intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",  50));
+   intmap_.insert(std::make_pair("BC3_ITER_LIMIT",          30));
+   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",       20));
+   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",         5));
+   intmap_.insert(std::make_pair("LP_ITER_LIMIT",           50));
+   intmap_.insert(std::make_pair("FLOAT_PRECISION",         8));
 
-   dblmap_.insert(std::make_pair("TIME_LIMIT",            100.0));
-   dblmap_.insert(std::make_pair("LS_ARMIJO_COEF",        0.125));
-   dblmap_.insert(std::make_pair("LS_STEP_TOL",           1.0e-8));
-   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",       2.0));
-   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",     10.0));
-   dblmap_.insert(std::make_pair("LP_TIME_LIMIT",         10.0));
+   dblmap_.insert(std::make_pair("TIME_LIMIT",              100.0));
+   dblmap_.insert(std::make_pair("LS_ARMIJO_COEF",          0.125));
+   dblmap_.insert(std::make_pair("LS_STEP_TOL",             1.0e-8));
+   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",         2.0));
+   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",       10.0));
+   dblmap_.insert(std::make_pair("LP_TIME_LIMIT",           10.0));
 
-   strmap_.insert(std::make_pair("SPLIT_OBJ",            "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR",       "MaxDom"));
-   strmap_.insert(std::make_pair("SPLIT_SLICER",         "Bisection"));
-   strmap_.insert(std::make_pair("PROPAGATOR_ALGORITHM", "HC4"));
-   strmap_.insert(std::make_pair("LOCAL_SOLVER",         "MIDPOINT"));
+   strmap_.insert(std::make_pair("SPLIT_OBJ",               "NO"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTOR",          "MaxDom"));
+   strmap_.insert(std::make_pair("SPLIT_SLICER",            "Bisection"));
+   strmap_.insert(std::make_pair("PROPAGATION_ALGORITHM",   "HC4"));
+   strmap_.insert(std::make_pair("LOCAL_SOLVER",            "MIDPOINT"));
 }
-
-Param::~Param()
-{}
 
 int Param::getIntParam(const string& name)
 {
-   auto it = instance_.intmap_.find(name);
+   auto it = intmap_.find(name);
 
-   if (it == instance_.intmap_.end())
+   if (it == intmap_.end())
       THROW("'" << name << "' is not an integral parameter");
 
    return it->second;
 }
 
+int Param::GetIntParam(const string& name)
+{
+   return instance_.getIntParam(name);
+}
+
 void Param::setIntParam(const string& name, int val)
 {
-   auto it = instance_.intmap_.find(name);
+   auto it = intmap_.find(name);
 
-   if (it == instance_.intmap_.end())
+   if (it == intmap_.end())
       THROW("'" << name << "' is not an integral parameter");
 
-   instance_.intmap_[name] = val;
+   intmap_[name] = val;
+}
+
+void Param::SetIntParam(const string& name, int val)
+{
+   instance_.setIntParam(name, val);
 }
 
 double Param::getDblParam(const string& name)
 {
-   auto it = instance_.dblmap_.find(name);
+   auto it = dblmap_.find(name);
 
-   if (it == instance_.dblmap_.end())
+   if (it == dblmap_.end())
       THROW("'" << name << "' is not a real parameter");
 
    return it->second;   
 }
 
+double Param::GetDblParam(const string& name)
+{
+   return instance_.getDblParam(name);
+}
+
 void Param::setDblParam(const string& name, double val)
 {
-   auto it = instance_.dblmap_.find(name);
+   auto it = dblmap_.find(name);
 
-   if (it == instance_.dblmap_.end())
+   if (it == dblmap_.end())
       THROW("'" << name << "' is not a real parameter");
 
-   instance_.dblmap_[name] = val;
+   dblmap_[name] = val;
+}
+
+void Param::SetDblParam(const string& name, double val)
+{
+   instance_.setDblParam(name, val);
 }
 
 std::string Param::getStrParam(const string& name)
 {
-   auto it = instance_.strmap_.find(name);
+   auto it = strmap_.find(name);
 
-   if (it == instance_.strmap_.end())
+   if (it == strmap_.end())
       THROW("'" << name << "' is not a string parameter");
 
    return it->second;      
 }
 
+std::string Param::GetStrParam(const string& name)
+{
+   return instance_.getStrParam(name);
+}
+
 void Param::setStrParam(const string& name, const std::string& val)
 {
-   auto it = instance_.strmap_.find(name);
+   auto it = strmap_.find(name);
 
-   if (it == instance_.strmap_.end())
+   if (it == strmap_.end())
       THROW("'" << name << "' is not a string parameter");
 
-   instance_.strmap_[name] = val;   
+   strmap_[name] = val;   
+}
+
+void Param::SetStrParam(const string& name, const std::string& val)
+{
+   instance_.setStrParam(name, val);
 }
 
 Tolerance Param::getTolParam(const string& name)
 {
-   auto it = instance_.tolmap_.find(name);
+   auto it = tolmap_.find(name);
 
-   if (it == instance_.tolmap_.end())
+   if (it == tolmap_.end())
       THROW("'" << name << "' is not a tolerance parameter");
 
    return it->second;
 }
 
+Tolerance Param::GetTolParam(const string& name)
+{
+   return instance_.getTolParam(name);
+}
+
 void Param::setTolParam(const string& name, const Tolerance& val)
 {
-   auto it = instance_.tolmap_.find(name);
+   auto it = tolmap_.find(name);
 
-   if (it == instance_.tolmap_.end())
+   if (it == tolmap_.end())
       THROW("'" << name << "' is not a tolerance parameter");
 
-   instance_.tolmap_[name] = val;
+   tolmap_[name] = val;
+}
+
+void Param::SetTolParam(const string& name, const Tolerance& val)
+{
+   instance_.setTolParam(name, val);
 }
 
 void Param::throwEx()
@@ -263,8 +300,7 @@ void Param::readParam(const std::string& line, size_t first)
 {
    size_t i = first;
 
-   while (i < line.size() && isCharName(line[i]))
-      ++i;
+   while (i < line.size() && isCharName(line[i])) ++i;
 
    if (i == line.size()) throwEx();
 
@@ -285,8 +321,7 @@ void Param::readParam(const std::string& line, size_t first)
 
    size_t l = k;
 
-   while (l < line.size() && (!isSpace(line[l])))
-      ++l;
+   while (l < line.size() && (!isSpace(line[l]))) ++l;
 
    std::string val = line.substr(k, l - k);
 
@@ -314,27 +349,27 @@ void Param::processLine(const std::string& line)
       throwEx();
 }
 
-void Param::init(const std::string& filename)
+void Param::loadParam(const std::string& filename)
 {
-   instance_.path_ = filename;
+   path_ = filename;
    std::ifstream f(filename);
 
    if (f)
    {
       std::string line;
-      instance_.lineno_ = 0;
+      lineno_ = 0;
       
       while (getline(f, line))
       {
-         ++ instance_.lineno_;
-         instance_.processLine(line);
+         ++ lineno_;
+         processLine(line);
       }
    }
    else
       THROW("file open error '" << filename << "'");
 }
 
-void Param::print(std::ostream& os)
+void Param::printParam(std::ostream& os)
 {
    os << "# List of registered parameters\n\n";
 
@@ -373,6 +408,16 @@ void Param::print(std::ostream& os)
       os << it-> first << " = " << tol.getVal() << "\n";
    }
    os << "\n";
+}
+
+void Param::PrintParam(std::ostream& os)
+{
+   instance_.printParam(os);
+}
+
+void Param::LoadParam(const std::string& filename)
+{
+   instance_.loadParam(filename);
 }
 
 } // namespace

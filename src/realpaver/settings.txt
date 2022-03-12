@@ -75,12 +75,12 @@ SPLIT_NB_SLICES = 5
 # iteration and Xk' the reduced domain, the variable is considered as modified
 # if the distance between Xk and Xk' is greater than this tolerance and it
 # leads to a propagation step with respect to this variable.
-# ABS_PROPAGATOR_DTOL: absolute tolerance
-# REL_PROPAGATOR_DTOL: relative tolerance
-REL_PROPAGATOR_DTOL = 1.0e-3
+# ABS_PROPAGATION_DTOL: absolute tolerance
+# REL_PROPAGATION_DTOL: relative tolerance
+REL_PROPAGATION_DTOL = 1.0e-3
 
 # Iteration limit for the main constraint propagation loop
-PROPAGATOR_ITER_LIMIT = 50
+PROPAGATION_ITER_LIMIT = 50
 
 # Peel factor for the BC3 contractor >= 0.0 and <= 100.0
 # Given an interval [a, b] and the peel factor f let w = (b - a) * (p / 100)
@@ -95,7 +95,7 @@ BC3_ITER_LIMIT = 30
 # Propagation strategy
 # - HC4
 # - BC4
-PROPAGATOR_ALGORITHM = HC4
+PROPAGATION_ALGORITHM = HC4
 
 ###############################################################################
 ## LOCAL OPTIMiZATION                                                        ##
@@ -105,7 +105,7 @@ PROPAGATOR_ALGORITHM = HC4
 # > 0.0 and < 1.0
 LS_ARMIJO_COEF = 0.125
 
-# Smallest value of the step length of line search algorithm
+# Smallest value of the step length of line search algorithm (absolute value)
 LS_STEP_TOL = 1.0e-8
 
 # Iteration limit of line search algorithm

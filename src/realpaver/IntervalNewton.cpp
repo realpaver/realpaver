@@ -17,10 +17,10 @@
 namespace realpaver {
 
 IntervalNewton::IntervalNewton() :
-   maxiter_(Param::getIntParam("NEWTON_ITER_LIMIT")),
-   xtol_(Param::getTolParam("XTOL")),
-   dtol_(Param::getTolParam("DTOL")),
-   ldtol_(Param::getTolParam("DTOL")),
+   maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
+   xtol_(Param::GetTolParam("XTOL")),
+   dtol_(Param::GetTolParam("DTOL")),
+   ldtol_(Param::GetTolParam("DTOL")),
    inflator_()
 {}
 

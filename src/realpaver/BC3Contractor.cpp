@@ -16,8 +16,8 @@ namespace realpaver {
 
 BC3Contractor::BC3Contractor(Dag* dag, size_t i, Variable v)
       : f_(dag, i, v),
-        peeler_(Param::getDblParam("BC3_PEEL_FACTOR")),
-        maxiter_(Param::getIntParam("BC3_ITER_LIMIT"))
+        peeler_(Param::GetDblParam("BC3_PEEL_FACTOR")),
+        maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))
 {
    newton_ = new IntervalNewton();
 }

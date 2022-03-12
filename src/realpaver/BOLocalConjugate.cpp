@@ -13,9 +13,9 @@
 namespace realpaver {
 
 BOLocalConjugate::BOLocalConjugate()
-      : maxiter_(Param::getIntParam("LS_ITER_LIMIT")),
-        carmijo_(Param::getDblParam("LS_ARMIJO_COEF")),
-        tolstep_(Param::getDblParam("LS_STEP_TOL"))
+      : maxiter_(Param::GetIntParam("LS_ITER_LIMIT")),
+        carmijo_(Param::GetDblParam("LS_ARMIJO_COEF")),
+        tol_(Param::GetDblParam("LS_STEP_TOL"))
 {}
 
 size_t BOLocalConjugate::getIterLimit() const
@@ -43,15 +43,15 @@ void BOLocalConjugate::setArmijoCoefficient(double val)
 
 double BOLocalConjugate::getStepTol() const
 {
-   return tolstep_;
+   return tol_;
 }
 
-void BOLocalConjugate::setStepTol(double val)
+void BOLocalConjugate::setStepTol(double tol)
 {
-   ASSERT(val > 0.0 && val < 1.0,
+   ASSERT(tol > 0.0 && tol < 1.0,
           "Bad limit on the step length of the conjugate gradient method");
 
-   tolstep_ = val;
+   tol_ = tol;
 }
 
 double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
@@ -85,7 +85,7 @@ double BOLocalConjugate::findStep(RealFunction& f, RealVector& x,
       }
 
       step /= 2.0;
-      if (step < tolstep_) iter = false;
+      if (step < tol_) iter = false;
    }
 
    return res;

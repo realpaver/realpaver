@@ -46,8 +46,8 @@ public:
    double getStepTol() const;
 
    /// Sets the tolerance on the step length
-   /// @param val new value of the smalllest step length with 0.0 < val < 1.0
-   void setStepTol(double val);
+   /// @param tol new value of the smalllest step length with 0.0 < tol < 1.0
+   void setStepTol(double tol);
 
 private:
    /// Component of a line search procedure that finds a step length
@@ -60,9 +60,9 @@ private:
    double findStep(RealFunction& f, RealVector& x, RealVector& p,
                    RealVector& s, double fx);
 
-   size_t maxiter_;  // limit on the number of iterations
-   double carmijo_;  // coefficient used in the Armijo rule
-   double tolstep_;  // minimal value of the step length
+   size_t maxiter_;     // limit on the number of iterations
+   double carmijo_;     // coefficient used in the Armijo rule
+   double tol_;         // minimal value of the step length
 };
 
 } // namespace

@@ -388,8 +388,8 @@ LPModel::LPModel() :
    obj_(),
    minimization_(true),
    objval_(0.0),
-   maxseconds_(Param::getDblParam("LP_TIME_LIMIT")),
-   maxiter_(Param::getIntParam("LP_ITER_LIMIT")),
+   maxseconds_(Param::GetDblParam("LP_TIME_LIMIT")),
+   maxiter_(Param::GetIntParam("LP_ITER_LIMIT")),
    status_(OptimizationStatus::Other)
 {}
 

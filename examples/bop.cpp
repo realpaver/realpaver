@@ -25,17 +25,6 @@ int main(void)
    Logger::init(LogLevel::internal, "bop.log");
 
    try {
-      Param::init("../src/realpaver/settings.txt");
-      Param::print(cout);
-   }
-   catch (Exception ex) {
-      cout << ex.what() << endl;
-   }
-
-   int prec = Param::getIntParam("FLOAT_PRECISION");
-   Interval::precision(prec);
-
-   try {
       Problem problem;
 
       //~ Beale
@@ -71,10 +60,12 @@ int main(void)
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
-      solver.setSplitableObj(false);
-      solver.setNodeLimit(1000);
-      solver.setLocalStrategy("CONJUGATE");
-      Interval::precision(3);
+      solver.setIntParam("NODE_LIMIT",   10);
+      solver.setStrParam("SPLIT_OBJ",    "NO");
+      solver.setStrParam("LOCAL_SOLVER", "CONJUGATE");
+
+      int prec = solver.getIntParam("FLOAT_PRECISION");
+      Interval::precision(prec);
 
       solver.optimize();
       OptimizationStatus status = solver.getStatus();
@@ -109,7 +100,7 @@ int main(void)
          if (status == OptimizationStatus::Optimal)
          {
             cout << indent << "GLOBAL OPTIMUM FOUND | "
-                 << solver.getObjTol() << endl;
+                 << solver.getTolParam("OBJ_TOL") << endl;
          }
          else
          {
@@ -118,19 +109,19 @@ int main(void)
             if (status == OptimizationStatus::StopOnTimeLimit)
             {
                cout << indent << "TIME LIMIT REACHED: "
-                    << solver.getTimeLimit() << endl;
+                    << solver.getDblParam("TIME_LIMIT") << "(s)" << endl;
             }
             
             if (status == OptimizationStatus::StopOnNodeLimit)
             {
                cout << indent << "NODE LIMIT REACHED: "
-                    << solver.getNodeLimit() << endl;
+                    << solver.getIntParam("NODE_LIMIT") << endl;
             }
          }
 
          cout << std::scientific << std::setprecision(prec);
    
-         RealVector sol = solver.getBestSolution();
+         RealPoint sol = solver.getBestSolution();
 
          std::string objname = "obj";
          size_t lmax = std::max(maxSizeVarName(problem), objname.size());
@@ -150,9 +141,8 @@ int main(void)
             cout <<  indent << v.getName();
 
             for (size_t j=v.getName().size(); j<lmax; ++j) cout << " ";
-            
-            cout << " = " << sol[v.getId()]
-                 << endl;
+
+            cout << " = " << sol.get(v) << endl;
          }
       }
       cout << sep << endl;

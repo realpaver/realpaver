@@ -103,7 +103,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    v.setId(id)
     .setDomain(x)
     .setContinuous()
-    .setTolerance(Param::getTolParam("XTOL"));
+    .setTolerance(Param::GetTolParam("XTOL"));
 
    vars_.push_back(v);
    scope_.insert(v);

@@ -13,7 +13,6 @@
 #include "realpaver/BOSolver.hpp"
 #include "realpaver/HC4Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/Param.hpp"
 #include "realpaver/Selector.hpp"
 
 namespace realpaver {
@@ -22,9 +21,9 @@ BOSolver::BOSolver(Problem& problem)
       : problem_(problem),
         preprob_(),
         solprob_(),
+        param_(),
         model_(nullptr),
         localSolver_(nullptr),
-        localStrategy_(Param::getStrParam("LOCAL_SOLVER")),
         split_(nullptr),
         contractor_(nullptr),
         pool_(nullptr),
@@ -32,17 +31,13 @@ BOSolver::BOSolver(Problem& problem)
         status_(OptimizationStatus::Other),
         sol_(problem.scope()),
         objval_(Interval::universe()),
-        vmap21_(),
-        vmap31_(),
         upper_(Double::inf()),
         nbnodes_(0),
         nbpending_(0),
+        vmap21_(),
+        vmap31_(),
         ptimer_(),
-        stimer_(),
-        timelimit_(Param::getDblParam("TIME_LIMIT")),
-        nodelimit_(Param::getIntParam("NODE_LIMIT")),
-        splitobj_(Param::getStrParam("SPLIT_OBJ") == "YES"),
-        otol_(Param::getTolParam("OBJ_TOL"))
+        stimer_()
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
@@ -67,60 +62,89 @@ double BOSolver::getSolvingTime() const
    return stimer_.elapsedTime();
 }
 
-size_t BOSolver::getNodeLimit() const
+void BOSolver::loadParam(const std::string& filename)
 {
-   return nodelimit_;
+   param_.loadParam(filename);
 }
 
-void BOSolver::setNodeLimit(size_t n)
+int BOSolver::getIntParam(const string& name)
 {
-   ASSERT(n > 0, "Bad node limit in a BO solver");
-
-   nodelimit_ = n;
+   return param_.getIntParam(name);
 }
 
-bool BOSolver::isSplitableObj() const
+void BOSolver::setIntParam(const string& name, int val)
 {
-   return splitobj_;
+   param_.setIntParam(name, val);
 }
 
-void BOSolver::setSplitableObj(bool split)
+double BOSolver::getDblParam(const string& name)
 {
-   splitobj_ = split;
+   return param_.getDblParam(name);
 }
 
-Tolerance BOSolver::getObjTol() const
+void BOSolver::setDblParam(const string& name, double val)
 {
-   return otol_;
+   param_.setDblParam(name, val);
 }
 
-void BOSolver::setObjTol(Tolerance tol)
+Tolerance BOSolver::getTolParam(const string& name)
 {
-   otol_ = tol;
+   return param_.getTolParam(name);
 }
 
-size_t BOSolver::getNbNodes() const
+void BOSolver::setTolParam(const string& name, const Tolerance& val)
+{
+   param_.setTolParam(name, val);
+}
+
+std::string BOSolver::getStrParam(const string& name)
+{
+   return param_.getStrParam(name);
+}
+
+void BOSolver::setStrParam(const string& name, const std::string& val)
+{
+   param_.setStrParam(name, val);
+}
+
+void BOSolver::printParam(std::ostream& os)
+{
+   param_.printParam(os);
+}
+
+int BOSolver::getNbNodes() const
 {
    return nbnodes_;
 }
 
-size_t BOSolver::getNbPendingNodes() const
+int BOSolver::getNbPendingNodes() const
 {
    return nbpending_;
 }
 
-void BOSolver::setLocalStrategy(const std::string& s)
-{
-   localStrategy_ = s;
-}
-
 void BOSolver::makeLocalSolver()
 {
-   if (localStrategy_ == "CONJUGATE")
-      localSolver_ = new BOLocalConjugate();
+   std::string stra = param_.getStrParam("LOCAL_SOLVER");
 
-   if (localStrategy_ == "MIDPOINT" || localSolver_ == nullptr)
+   if (stra == "CONJUGATE")
+   {
+      BOLocalConjugate* solver = new BOLocalConjugate();
+
+      solver->setIterLimit(param_.getIntParam("LS_ITER_LIMIT"));
+      solver->setArmijoCoefficient(param_.getDblParam("LS_ARMIJO_COEF"));
+      solver->setStepTol(param_.getDblParam("LS_STEP_TOL"));
+
+      localSolver_ = solver;
+      
+   }
+   if (stra == "MIDPOINT")
+   {
       localSolver_ = new BOLocalSolver();
+   }
+   if (localSolver_ == nullptr)
+   {
+      localSolver_ = new BOLocalSolver();
+   }
 }
 
 void BOSolver::makeSplit()
@@ -128,23 +152,24 @@ void BOSolver::makeSplit()
    Selector* selector = nullptr;
    IntervalSlicer* slicer = nullptr;
 
-   const Scope& S = isSplitableObj() ? model_->getFullScope() :
-                                       model_->getObjScope();
+   bool osplit = (param_.getStrParam("SPLIT_OBJ") == "YES");
 
-   std::string sel = Param::getStrParam("SPLIT_SELECTOR");
+   const Scope& S = osplit ? model_->getFullScope() : model_->getObjScope();
+
+   std::string sel = param_.getStrParam("SPLIT_SELECTOR");
    if (sel == "MaxDom") selector = new SelectorMaxDom(S);
    if (sel == "MaxSmear") selector = new SelectorMaxSmear(model_, S);
 
-   std::string sli = Param::getStrParam("SPLIT_SLICER");
+   std::string sli = param_.getStrParam("SPLIT_SLICER");
    if (sli == "Bisection") slicer = new IntervalBisecter();
    if (sli == "Peeling")
    {
-      double f = Param::getDblParam("SPLIT_PEEL_FACTOR");
+      double f = param_.getDblParam("SPLIT_PEEL_FACTOR");
       slicer = new IntervalPeeler(f);
    }
    if (sli == "Partition")
    {
-      size_t n = Param::getIntParam("SPLIT_NB_SLICES");
+      size_t n = param_.getIntParam("SPLIT_NB_SLICES");
       slicer = new IntervalPartitioner(n);
    }
 
@@ -186,14 +211,19 @@ void BOSolver::makeHC4()
    vpool->push(op);
 
    pool_ = vpool;
-   contractor_ = new Propagator(pool_);
+   Propagator* propagator = new Propagator(pool_);
+
+   propagator->setDistTol(param_.getTolParam("PROPAGATION_DTOL"));
+   propagator->setMaxIter(param_.getIntParam("PROPAGATION_ITER_LIMIT"));
+
+   contractor_ = propagator;
 }
 
 void BOSolver::makeContractor()
 {
    init_ = std::make_shared<IntervalRegion>(model_->getInitRegion());
 
-   std::string algo = Param::getStrParam("PROPAGATOR_ALGORITHM");
+   std::string algo = param_.getStrParam("PROPAGATION_ALGORITHM");
 
    if (algo == "HC4") makeHC4();
 
@@ -467,7 +497,9 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
    // creates the initial node
    SharedBONode node;
  
-   if (isSplitableObj())
+   bool osplit = (param_.getStrParam("SPLIT_OBJ") == "YES");
+
+   if (osplit)
    {
       node = std::make_shared<BONode>(model_->getFullScope(),
                                       model_->getObjVar(),
@@ -496,6 +528,11 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
    // creates the space of solution nodes, i.e. nodes that cannot be split
    BOSpace sol;
 
+   // parameters
+   double timelimit = param_.getDblParam("TIME_LIMIT");
+   int nodelimit = param_.getIntParam("NODE_LIMIT");
+   Tolerance otol = param_.getTolParam("OBJ_TOL");
+
    bool iter = true;
    do
    {
@@ -506,20 +543,20 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
 
 DEBUG("OBJ ENCLOSURE : " << objval_);
 
-      if (iter && otol_.hasTolerance(objval_))
+      if (iter && otol.hasTolerance(objval_))
       {
          iter = false;
          status_ = OptimizationStatus::Optimal;         
       }
 
       if (iter &&
-          ptimer_.elapsedTime() + stimer_.elapsedTime() > getTimeLimit())
+          ptimer_.elapsedTime() + stimer_.elapsedTime() > timelimit)
       {
          iter = false;
          status_ = OptimizationStatus::StopOnTimeLimit;
       }
 
-      if (iter && nbnodes_ > nodelimit_)
+      if (iter && nbnodes_ > nodelimit)
       {
          iter = false;
          status_ = OptimizationStatus::StopOnNodeLimit;
@@ -610,24 +647,12 @@ OptimizationStatus BOSolver::getStatus() const
    return status_;
 }
 
-void BOSolver::setTimeLimit(double t)
-{
-   ASSERT(t > 0.0, "Bad time limit for a BO solver");
-
-   timelimit_ = t;
-}
-
-double BOSolver::getTimeLimit() const
-{
-   return timelimit_;
-}
-
 Interval BOSolver::getObjEnclosure() const
 {
    return objval_;
 }
 
-RealVector BOSolver::getBestSolution() const
+RealPoint BOSolver::getBestSolution() const
 {
    return sol_.midpoint();
 }

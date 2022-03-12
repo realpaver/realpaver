@@ -16,8 +16,8 @@ namespace realpaver {
 Propagator::Propagator(ContractorPool* pool)
       : Contractor(),
         pool_(pool),
-        dtol_(Param::getTolParam("PROPAGATOR_DTOL")),
-        maxiter_(Param::getIntParam("PROPAGATOR_ITER_LIMIT")),
+        dtol_(Param::GetTolParam("PROPAGATION_DTOL")),
+        maxiter_(Param::GetIntParam("PROPAGATION_ITER_LIMIT")),
         certif_()
 {}
 
@@ -181,7 +181,7 @@ Proof Propagator::contract(IntervalRegion& reg)
 
 void Propagator::print(std::ostream& os) const
 {
-   os << "Propagator";
+   os << "Propagator on " << pool_->poolSize() << "contractors";
 }
 
 } // namespace

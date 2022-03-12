@@ -18,85 +18,129 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This registers the parameters of the application.
+/// This registers the parameters of an application.
 ///
-/// The design of this class follows the singleton design pattern.
+/// This class has a static instance storing the default values of the
+/// parameters used to initialize the components of the library.
 ///////////////////////////////////////////////////////////////////////////////
 class Param {
 public:
+   /// Creates an instance
+   Param();
+
+   /// Default destructor
+   ~Param() = default;
+
+   /// Default copy constructor
+   Param(const Param&) = default;
+
+   /// Default assignment operator
+   Param& operator=(const Param&) = default;
+
    /// Loads settings from a file
    /// @param name of the file
-   static void init(const std::string& filename);
+   void loadParam(const std::string& filename);
 
    /// Gets the value of an integral parameter
    /// @param name name of parameter
    /// @return value of parameter
-   static int getIntParam(const string& name);
+   int getIntParam(const string& name);
 
    /// Sets the value of an integral parameter
    /// @param name name of parameter
    /// @param val value assigned
-   static void setIntParam(const string& name, int val);
+   void setIntParam(const string& name, int val);
 
    /// Gets the value of a real parameter
    /// @param name name of parameter
    /// @return value of parameter
-   static double getDblParam(const string& name);
+   double getDblParam(const string& name);
 
    /// Sets the value of a real parameter
    /// @param name name of parameter
    /// @param val value assigned
-   static void setDblParam(const string& name, double val);
+   void setDblParam(const string& name, double val);
 
    /// Gets the value of a tolerance parameter
    /// @param name name of parameter
    /// @return value of parameter
-   static Tolerance getTolParam(const string& name);
+   Tolerance getTolParam(const string& name);
 
    /// Sets the value of a tolerance parameter
    /// @param name name of parameter
    /// @param val value assigned
-   static void setTolParam(const string& name, const Tolerance& val);
+   void setTolParam(const string& name, const Tolerance& val);
 
    /// Gets the value of a string parameter
    /// @param name name of parameter
    /// @return value of parameter
-   static std::string getStrParam(const string& name);
+   std::string getStrParam(const string& name);
 
    /// Sets the value of a string parameter
    /// @param name name of parameter
    /// @param val value assigned
-   static void setStrParam(const string& name, const std::string& val);
+   void setStrParam(const string& name, const std::string& val);
 
-   /// Writes the parameters onna stream
+   /// Writes the parameters on a stream
    /// @param os output stream
-   static void print(std::ostream& os);
+   void printParam(std::ostream& os);
+
+   /// Loads settings from a file in the static instance
+   /// @param name of the file
+   static void LoadParam(const std::string& filename);
+
+   /// Gets the value of an integral parameter in the static instance
+   /// @param name name of parameter
+   /// @return value of parameter
+   static int GetIntParam(const string& name);
+
+   /// Sets the value of an integral parameter in the static instance
+   /// @param name name of parameter
+   /// @param val value assigned
+   static void SetIntParam(const string& name, int val);
+
+   /// Gets the value of a real parameter in the static instance
+   /// @param name name of parameter
+   /// @return value of parameter
+   static double GetDblParam(const string& name);
+
+   /// Sets the value of a real parameter in the static instance
+   /// @param name name of parameter
+   /// @param val value assigned
+   static void SetDblParam(const string& name, double val);
+
+   /// Gets the value of a tolerance parameter in the static instance
+   /// @param name name of parameter
+   /// @return value of parameter
+   static Tolerance GetTolParam(const string& name);
+
+   /// Sets the value of a tolerance parameter in the static instance
+   /// @param name name of parameter
+   /// @param val value assigned
+   static void SetTolParam(const string& name, const Tolerance& val);
+
+   /// Gets the value of a string parameter in the static instance
+   /// @param name name of parameter
+   /// @return value of parameter
+   static std::string GetStrParam(const string& name);
+
+   /// Sets the value of a string parameter in the static instance
+   /// @param name name of parameter
+   /// @param val value assigned
+   static void SetStrParam(const string& name, const std::string& val);
+
+   /// Writes the parameters of the static instance on a stream
+   /// @param os output stream
+   static void PrintParam(std::ostream& os);
 
 private:
-   static Param instance_;    // singleton
-   std::string path_;         // file name
-   int lineno_;               // line number in this file
+   static Param instance_;  // default instance
 
-   // creates the instance
-   Param();
-
-   // destroys the instance
-   ~Param();
-
-   // Copy and assignment protection
-   Param(const Param&) = delete;
-   Param& operator=(const Param&) = delete;
-
-   // map of tolerances
+   std::string path_;
+   int lineno_;
    std::unordered_map<std::string, Tolerance> tolmap_;
-
-   // map of integers
    std::unordered_map<std::string, int> intmap_;
-
-   // map of doubles
    std::unordered_map<std::string, double> dblmap_;
-
-   // map of strings
    std::unordered_map<std::string, std::string> strmap_;
 
    // processing of lines in a settings file
