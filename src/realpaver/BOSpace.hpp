@@ -35,8 +35,7 @@ namespace realpaver {
 class BOSpace {
 public:
    /// Creates a space
-   /// @param frequency frequency used for the selection of nodes
-   BOSpace(size_t frequency = 2);
+   BOSpace();
 
    /// No copy
    BOSpace(const BOSpace&) = delete;

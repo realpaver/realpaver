@@ -21,6 +21,8 @@ namespace realpaver {
 /// Given a region R, a variable v, a slicer and a contractor, the domain of
 /// v in R is divided by the slicer, each slice is reduced by the contractor,
 /// and the hull of the contracted slices is returned.
+///
+/// The scope of this corresponds to the scope of the given contractor.
 ///////////////////////////////////////////////////////////////////////////////
 class CIDContractor : public Contractor {
 public:
@@ -33,6 +35,13 @@ public:
    CIDContractor(const SharedContractor& op, const Variable& v,
                  IntervalSlicer* slicer);
 
+   /// Creates a contractor without any variable (to be fixed later)
+   /// @param op a contractor
+   /// @param a slicer
+   ///
+   /// This owns the slicer, hence the slicer is destroyed with this.
+   CIDContractor(const SharedContractor& op, IntervalSlicer* slicer);
+
    /// Destructor
    ~CIDContractor();
 
@@ -41,6 +50,13 @@ public:
 
    /// No assignment
    CIDContractor& operator=(const CIDContractor&) = delete;
+
+   /// @return the variable whose domain is sliced
+   Variable getVar() const;
+
+   /// Assigns the variable whose domain is sliced
+   /// @param v a variable that belongs to the scope of this
+   void setVar(const Variable& v);
 
    ///@{
    /// Overrides (Contractor)

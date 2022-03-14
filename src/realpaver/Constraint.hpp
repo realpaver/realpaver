@@ -185,7 +185,7 @@ public:
    RelSymbol relSymbol() const;
 
    ///@{
-   /// Overrides the methods of ConstraintRep
+   /// Overrides (ConstraintRep)
    void print(std::ostream& os) const;
    bool isConstant() const;
    bool dependsOn(const Variable& v) const;

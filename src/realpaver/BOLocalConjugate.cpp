@@ -9,13 +9,14 @@
 
 #include "realpaver/BOLocalConjugate.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Timer.hpp"
 
 namespace realpaver {
 
 BOLocalConjugate::BOLocalConjugate()
-      : maxiter_(Param::GetIntParam("LS_ITER_LIMIT")),
-        carmijo_(Param::GetDblParam("LS_ARMIJO_COEF")),
-        tol_(Param::GetDblParam("LS_STEP_TOL"))
+      : maxiter_(Param::GetIntParam("LINE_SEARCH_ITER_LIMIT")),
+        carmijo_(Param::GetDblParam("LINE_SEARCH_ARMIJO")),
+        tol_(Param::GetDblParam("LINE_SEARCH_STEP_TOL"))
 {}
 
 size_t BOLocalConjugate::getIterLimit() const
@@ -109,6 +110,9 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
               sk_1(dim),         // next value of sk
               pk_1(dim);         // next value of pk
 
+   Timer tim;
+   tim.start();
+
    // evaluates and differentiates f at xk
    f.rfunEvalDiff(RealPoint(scope, xk), grad, uk);
    setInitObjVal(uk);
@@ -179,10 +183,14 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
       }
 
       if (++nbiter > maxiter_) iter = false;
+
+      if (tim.elapsedTime() > getTimeLimit()) iter = false;
    }
 
    dest = RealPoint(scope, xk_1);
    setFinalObjVal(uk_1);
+
+   tim.stop();
 
    return OptimizationStatus::Optimal;
 }

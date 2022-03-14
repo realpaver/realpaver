@@ -151,14 +151,14 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	Inflator.cpp IntContractor.cpp Interval.cpp \
 	IntervalFunction.cpp IntervalNewton.cpp IntervalRegion.cpp \
 	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
-	Logger.cpp LPModel.cpp Objective.cpp Param.cpp \
-	parser_bison.ypp parser_flex.lpp parser.cpp Preprocessor.cpp \
-	Problem.cpp Propagator.cpp RealFunction.cpp RealPoint.cpp \
-	RealVector.cpp Scope.cpp ScopeMap.cpp SearchNode.cpp \
-	Selector.cpp Term.cpp TermDeriver.cpp TermFixer.cpp Timer.cpp \
-	ThickIntervalFunction.cpp Tolerance.cpp \
-	UniIntervalFunction.cpp Variable.cpp LPSolverClp.cpp \
-	LPSolverGurobi.cpp
+	Logger.cpp LPModel.cpp MaxCIDContractor.cpp Objective.cpp \
+	Param.cpp parser_bison.ypp parser_flex.lpp parser.cpp \
+	Preprocessor.cpp Problem.cpp Propagator.cpp RealFunction.cpp \
+	RealPoint.cpp RealVector.cpp Scope.cpp ScopeMap.cpp \
+	SearchNode.cpp Selector.cpp Term.cpp TermDeriver.cpp \
+	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
+	LPSolverClp.cpp LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
@@ -170,13 +170,13 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	HC4Contractor.lo Inflator.lo IntContractor.lo Interval.lo \
 	IntervalFunction.lo IntervalNewton.lo IntervalRegion.lo \
 	IntervalSlicer.lo IntervalVector.lo IntervalUnion.lo Logger.lo \
-	LPModel.lo Objective.lo Param.lo parser_bison.lo \
-	parser_flex.lo parser.lo Preprocessor.lo Problem.lo \
-	Propagator.lo RealFunction.lo RealPoint.lo RealVector.lo \
-	Scope.lo ScopeMap.lo SearchNode.lo Selector.lo Term.lo \
-	TermDeriver.lo TermFixer.lo Timer.lo ThickIntervalFunction.lo \
-	Tolerance.lo UniIntervalFunction.lo Variable.lo \
-	$(am__objects_1) $(am__objects_2)
+	LPModel.lo MaxCIDContractor.lo Objective.lo Param.lo \
+	parser_bison.lo parser_flex.lo parser.lo Preprocessor.lo \
+	Problem.lo Propagator.lo RealFunction.lo RealPoint.lo \
+	RealVector.lo Scope.lo ScopeMap.lo SearchNode.lo Selector.lo \
+	Term.lo TermDeriver.lo TermFixer.lo Timer.lo \
+	ThickIntervalFunction.lo Tolerance.lo UniIntervalFunction.lo \
+	Variable.lo $(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -270,14 +270,14 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
 	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp Logger.hpp LPModel.hpp \
-	LPSolver.hpp NumericVector.hpp Objective.hpp Param.hpp \
-	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
-	Propagator.hpp RealFunction.hpp RealPoint.hpp RealVector.hpp \
-	Scope.hpp ScopeMap.hpp SearchNode.hpp Selector.hpp \
-	SplitStrategy.hpp Term.hpp TermDeriver.hpp TermFixer.hpp \
-	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
-	UniIntervalFunction.hpp Variable.hpp IntervalGaol.hpp \
-	LPSolverClp.hpp LPSolverGurobi.hpp
+	LPSolver.hpp MaxCIDContractor.hpp NumericVector.hpp \
+	Objective.hpp Param.hpp parser.hpp parser_bison.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp RealFunction.hpp \
+	RealPoint.hpp RealVector.hpp Scope.hpp ScopeMap.hpp \
+	SearchNode.hpp Selector.hpp SplitStrategy.hpp Term.hpp \
+	TermDeriver.hpp TermFixer.hpp ThickIntervalFunction.hpp \
+	Timer.hpp Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
+	IntervalGaol.hpp LPSolverClp.hpp LPSolverGurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
 	$(LISP)configure.hpp.in
@@ -458,14 +458,14 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
 	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp Logger.hpp LPModel.hpp \
-	LPSolver.hpp NumericVector.hpp Objective.hpp Param.hpp \
-	parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
-	Propagator.hpp RealFunction.hpp RealPoint.hpp RealVector.hpp \
-	Scope.hpp ScopeMap.hpp SearchNode.hpp Selector.hpp \
-	SplitStrategy.hpp Term.hpp TermDeriver.hpp TermFixer.hpp \
-	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
-	UniIntervalFunction.hpp Variable.hpp $(am__append_1) \
-	$(am__append_2) $(am__append_3)
+	LPSolver.hpp MaxCIDContractor.hpp NumericVector.hpp \
+	Objective.hpp Param.hpp parser.hpp parser_bison.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp RealFunction.hpp \
+	RealPoint.hpp RealVector.hpp Scope.hpp ScopeMap.hpp \
+	SearchNode.hpp Selector.hpp SplitStrategy.hpp Term.hpp \
+	TermDeriver.hpp TermFixer.hpp ThickIntervalFunction.hpp \
+	Timer.hpp Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
+	$(am__append_1) $(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	BC4Contractor.cpp BOContractor.cpp BOLocalConjugate.cpp \
 	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
@@ -476,10 +476,10 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	IntContractor.cpp Interval.cpp IntervalFunction.cpp \
 	IntervalNewton.cpp IntervalRegion.cpp IntervalSlicer.cpp \
 	IntervalVector.cpp IntervalUnion.cpp Logger.cpp LPModel.cpp \
-	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
-	parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
-	RealFunction.cpp RealPoint.cpp RealVector.cpp Scope.cpp \
-	ScopeMap.cpp SearchNode.cpp Selector.cpp Term.cpp \
+	MaxCIDContractor.cpp Objective.cpp Param.cpp parser_bison.ypp \
+	parser_flex.lpp parser.cpp Preprocessor.cpp Problem.cpp \
+	Propagator.cpp RealFunction.cpp RealPoint.cpp RealVector.cpp \
+	Scope.cpp ScopeMap.cpp SearchNode.cpp Selector.cpp Term.cpp \
 	TermDeriver.cpp TermFixer.cpp Timer.cpp \
 	ThickIntervalFunction.cpp Tolerance.cpp \
 	UniIntervalFunction.cpp Variable.cpp $(am__append_4) \
@@ -625,6 +625,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LPSolverClp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LPSolverGurobi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MaxCIDContractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Objective.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preprocessor.Plo@am__quote@

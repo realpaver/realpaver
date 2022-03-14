@@ -13,6 +13,7 @@
 #include "realpaver/BOSolver.hpp"
 #include "realpaver/HC4Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/Selector.hpp"
 
 namespace realpaver {
@@ -45,7 +46,7 @@ BOSolver::BOSolver(Problem& problem)
 
 BOSolver::~BOSolver()
 {
-   if (contractor_ != nullptr)  delete contractor_;
+   //~ if (contractor_ != nullptr)  delete contractor_;
    if (pool_ != nullptr)        delete pool_;
    if (split_ != nullptr)       delete split_;
    if (localSolver_ != nullptr) delete localSolver_;
@@ -124,27 +125,23 @@ int BOSolver::getNbPendingNodes() const
 
 void BOSolver::makeLocalSolver()
 {
-   std::string stra = param_.getStrParam("LOCAL_SOLVER");
+   std::string stra = param_.getStrParam("LOCAL_SOLVER_ALGORITHM");
 
    if (stra == "CONJUGATE")
    {
       BOLocalConjugate* solver = new BOLocalConjugate();
-
-      solver->setIterLimit(param_.getIntParam("LS_ITER_LIMIT"));
-      solver->setArmijoCoefficient(param_.getDblParam("LS_ARMIJO_COEF"));
-      solver->setStepTol(param_.getDblParam("LS_STEP_TOL"));
-
+      solver->setIterLimit(param_.getIntParam("LINE_SEARCH_ITER_LIMIT"));
+      solver->setArmijoCoefficient(param_.getDblParam("LINE_SEARCH_ARMIJO"));
+      solver->setStepTol(param_.getDblParam("LINE_SEARCH_STEP_TOL"));
       localSolver_ = solver;
-      
    }
-   if (stra == "MIDPOINT")
+
+   if (stra == "MIDPOINT" || localSolver_ == nullptr)
    {
       localSolver_ = new BOLocalSolver();
    }
-   if (localSolver_ == nullptr)
-   {
-      localSolver_ = new BOLocalSolver();
-   }
+
+   localSolver_->setTimeLimit(param_.getDblParam("LOCAL_SOLVER_TIME_LIMIT"));
 }
 
 void BOSolver::makeSplit()
@@ -152,7 +149,7 @@ void BOSolver::makeSplit()
    Selector* selector = nullptr;
    IntervalSlicer* slicer = nullptr;
 
-   bool osplit = (param_.getStrParam("SPLIT_OBJ") == "YES");
+   bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
 
    const Scope& S = osplit ? model_->getFullScope() : model_->getObjScope();
 
@@ -211,12 +208,36 @@ void BOSolver::makeHC4()
    vpool->push(op);
 
    pool_ = vpool;
+
+/*
    Propagator* propagator = new Propagator(pool_);
 
    propagator->setDistTol(param_.getTolParam("PROPAGATION_DTOL"));
    propagator->setMaxIter(param_.getIntParam("PROPAGATION_ITER_LIMIT"));
+*/
+
+   SharedContractor propagator = std::make_shared<Propagator>(pool_);
+
+   Propagator* ptr = static_cast<Propagator*>(propagator.get());
+   ptr->setDistTol(param_.getTolParam("PROPAGATION_DTOL"));
+   ptr->setMaxIter(param_.getIntParam("PROPAGATION_ITER_LIMIT"));
 
    contractor_ = propagator;
+}
+
+void BOSolver::makeMaxCIDHC4()
+{
+   makeHC4();
+
+   Selector* selector = new SelectorMaxDom(model_->getObjScope());
+
+   int nb = param_.getIntParam("SPLIT_NB_SLICES");
+   IntervalSlicer* slicer = new IntervalPartitioner(nb);
+
+   SharedContractor op =
+      std::make_shared<MaxCIDContractor>(contractor_, selector, slicer);
+
+   contractor_ = op;
 }
 
 void BOSolver::makeContractor()
@@ -226,6 +247,7 @@ void BOSolver::makeContractor()
    std::string algo = param_.getStrParam("PROPAGATION_ALGORITHM");
 
    if (algo == "HC4") makeHC4();
+   if (algo == "MAX_CID_HC4") makeMaxCIDHC4();
 
    THROW_IF(contractor_ == nullptr, "No contractor in a BO solver");
 }
@@ -497,7 +519,7 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
    // creates the initial node
    SharedBONode node;
  
-   bool osplit = (param_.getStrParam("SPLIT_OBJ") == "YES");
+   bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
 
    if (osplit)
    {
@@ -524,6 +546,7 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
    // creates the space of nodes to be processed
    BOSpace space;
    space.insertNode(node);
+   space.setFrequency(param_.getIntParam("BB_SPACE_FREQUENCY"));
 
    // creates the space of solution nodes, i.e. nodes that cannot be split
    BOSpace sol;

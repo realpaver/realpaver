@@ -19,6 +19,8 @@ namespace realpaver {
 ///
 /// A pool manages a set of contractors. Its scopes is the union of the scopes
 /// of those contractors.
+///
+/// The contractors must be accessed through shared pointers.
 ///////////////////////////////////////////////////////////////////////////////
 class ContractorPool {
 public:
@@ -77,7 +79,7 @@ public:
    void push(const SharedContractor& op);
 
    ///@{
-   /// Overrides the methods of ContractorPool
+   /// Overrides (ContractorPool)
    size_t poolSize() const;
    Scope scope() const;
    bool dependsOn(const Bitset& bs) const;

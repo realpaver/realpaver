@@ -28,9 +28,9 @@ int main(void)
       Problem problem;
 
       //~ Beale
-      //~ Variable x = problem.addRealVar(-4.5,  4.5, "x"),
-               //~ y = problem.addRealVar(-4.5,  4.5, "y");
-      //~ Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
+      Variable x = problem.addRealVar(-4.5,  4.5, "x"),
+               y = problem.addRealVar(-4.5,  4.5, "y");
+      Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
 
       // 3-hump camel
       //~ Variable x = problem.addRealVar(-5,  5, "x"),
@@ -38,10 +38,10 @@ int main(void)
       //~ Term to = 2.0*sqr(x) - 1.05*pow(x, 4) + pow(x, 6)/6.0 + x*y + sqr(y);
 
       // 6-hump camel
-      Variable x = problem.addRealVar(-3,  3, "x"),
-               y = problem.addRealVar(-2,  2, "y");
-      Term to = (4.0-2.1*sqr(x)+pow(x,4)/3.0)*sqr(x) + x*y +
-                (4.0*sqr(y)-4.0)*sqr(y);
+      //~ Variable x = problem.addRealVar(-3,  3, "x"),
+               //~ y = problem.addRealVar(-2,  2, "y");
+      //~ Term to = (4.0-2.1*sqr(x)+pow(x,4)/3.0)*sqr(x) + x*y +
+                //~ (4.0*sqr(y)-4.0)*sqr(y);
 
       // Colville
       //~ Variable x1 = problem.addRealVar(-10,  10, "x1"),
@@ -60,9 +60,10 @@ int main(void)
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
-      solver.setIntParam("NODE_LIMIT",   10);
-      solver.setStrParam("SPLIT_OBJ",    "NO");
-      solver.setStrParam("LOCAL_SOLVER", "CONJUGATE");
+      solver.setIntParam("NODE_LIMIT", 200);
+      solver.setIntParam("BB_SPACE_FREQUENCY", 5);
+      solver.setStrParam("SPLIT_OBJECTIVE", "NO");
+      solver.setStrParam("LOCAL_SOLVER_ALGORITHM", "CONJUGATE");
 
       int prec = solver.getIntParam("FLOAT_PRECISION");
       Interval::precision(prec);

@@ -9,10 +9,11 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BOSpace.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
-BOSpace::BOSpace(size_t frequency)
+BOSpace::BOSpace()
       : lo_(),
         up_(),
         ma_(),
@@ -20,7 +21,7 @@ BOSpace::BOSpace(size_t frequency)
         ex_(0),
         nbNodes_(0)
 {
-   setFrequency(frequency);
+   setFrequency(Param::GetIntParam("BB_SPACE_FREQUENCY"));
 }
 
 void BOSpace::setFrequency(size_t frequency)

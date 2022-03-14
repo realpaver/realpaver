@@ -27,6 +27,19 @@ CIDContractor::CIDContractor(const SharedContractor& op, const Variable& v,
    bs_ = op->scope().toBitset();
 }
 
+CIDContractor::CIDContractor(const SharedContractor& op,
+                             IntervalSlicer* slicer)
+         : op_(op),
+           v_(),
+           slicer_(slicer),
+           bs_()
+{
+   ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
+   ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
+
+   bs_ = op->scope().toBitset();   
+}
+
 CIDContractor::~CIDContractor()
 {
    delete slicer_;
@@ -40,6 +53,18 @@ bool CIDContractor::dependsOn(const Bitset& bs) const
 Scope CIDContractor::scope() const
 {
    return op_->scope();
+}
+
+Variable CIDContractor::getVar() const
+{
+   return v_;
+}
+
+void CIDContractor::setVar(const Variable& v)
+{
+   ASSERT(scope().contains(v), "Bad variable " << v << " in a CID contractor");
+
+   v_ = v;
 }
 
 Proof CIDContractor::contract(IntervalRegion& reg)

@@ -8,12 +8,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/BOLocalSolver.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
 BOLocalSolver::BOLocalSolver()
       : initObjVal_(Double::neginf()),
-        finalObjVal_(Double::neginf())
+        finalObjVal_(Double::neginf()),
+        timelimit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT"))
 {}
 
 BOLocalSolver::~BOLocalSolver()
@@ -37,6 +39,16 @@ void BOLocalSolver::setInitObjVal(double& val)
 void BOLocalSolver::setFinalObjVal(double& val)
 {
    finalObjVal_ = val;
+}
+
+double BOLocalSolver::getTimeLimit() const
+{
+   return timelimit_;
+}
+
+void BOLocalSolver::setTimeLimit(double val)
+{
+   timelimit_ = val;
 }
 
 OptimizationStatus BOLocalSolver::minimize(RealFunction& f,

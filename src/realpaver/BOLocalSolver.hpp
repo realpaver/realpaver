@@ -56,6 +56,13 @@ public:
    /// @return the value of the objective function at the final point
    double getFinalObjVal() const;
 
+   /// @return the time limit for a run of minimize
+   double getTimeLimit() const;
+
+   /// Assigns the time limit for a run of minimize
+   /// @param val time limit in seconds
+   void setTimeLimit(double val);
+
 protected:
    // management of the values of the objective functions
    void setInitObjVal(double& val);
@@ -64,6 +71,7 @@ protected:
 private:
    double initObjVal_;
    double finalObjVal_;
+   double timelimit_;
 };
 
 } // namespace

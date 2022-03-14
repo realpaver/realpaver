@@ -65,6 +65,7 @@ librealpaver_la_include_HEADERS = \
 		Logger.hpp \
 		LPModel.hpp \
 		LPSolver.hpp \
+		MaxCIDContractor.hpp \
 		NumericVector.hpp \
 		Objective.hpp \
 		Param.hpp \
@@ -137,6 +138,7 @@ librealpaver_la_SOURCES = \
 		IntervalUnion.cpp \
 		Logger.cpp \
 		LPModel.cpp \
+		MaxCIDContractor.cpp \
 		Objective.cpp \
 		Param.cpp \
 		parser_bison.ypp \

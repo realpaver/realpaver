@@ -81,7 +81,7 @@ private:
    BOModel* model_;              // solving model
    BOLocalSolver* localSolver_;  // local optimization
    BOSplit* split_;              // splitting strategy
-   Contractor* contractor_;      // contraction strategy
+   SharedContractor contractor_; // contraction strategy
    ContractorPool* pool_;        // pool used by the contraction strategy
 
    SharedIntervalRegion init_;   // initial region
@@ -110,6 +110,7 @@ private:
    void makeSplit();
    void makeContractor();
    void makeHC4();
+   void makeMaxCIDHC4();
 
    // Solving methods
    bool preprocess();
