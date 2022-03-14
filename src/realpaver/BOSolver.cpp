@@ -209,13 +209,6 @@ void BOSolver::makeHC4()
 
    pool_ = vpool;
 
-/*
-   Propagator* propagator = new Propagator(pool_);
-
-   propagator->setDistTol(param_.getTolParam("PROPAGATION_DTOL"));
-   propagator->setMaxIter(param_.getIntParam("PROPAGATION_ITER_LIMIT"));
-*/
-
    SharedContractor propagator = std::make_shared<Propagator>(pool_);
 
    Propagator* ptr = static_cast<Propagator*>(propagator.get());
@@ -229,13 +222,17 @@ void BOSolver::makeMaxCIDHC4()
 {
    makeHC4();
 
-   Selector* selector = new SelectorMaxDom(model_->getObjScope());
+   std::unique_ptr<Selector> selector =
+      std::make_unique<SelectorMaxDom>(model_->getObjScope());
 
    int nb = param_.getIntParam("SPLIT_NB_SLICES");
-   IntervalSlicer* slicer = new IntervalPartitioner(nb);
+   std::unique_ptr<IntervalSlicer> slicer =
+      std::make_unique<IntervalPartitioner>(nb);
 
    SharedContractor op =
-      std::make_shared<MaxCIDContractor>(contractor_, selector, slicer);
+      std::make_shared<MaxCIDContractor>(contractor_,
+                                         std::move(selector),
+                                         std::move(slicer));
 
    contractor_ = op;
 }

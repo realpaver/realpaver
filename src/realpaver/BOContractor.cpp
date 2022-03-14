@@ -13,8 +13,8 @@
 namespace realpaver {
 
 BOContractor::BOContractor(Dag* dag, size_t i, const Variable& v,
-                           const SharedContractor& op, 
-                           const SharedIntervalRegion& init)
+                           SharedContractor op, 
+                           SharedIntervalRegion init)
       : f_(dag->fun(i)),
         v_(v),
         op_(op),

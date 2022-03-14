@@ -25,11 +25,9 @@ public:
    /// @param op a contractor
    /// @param selector object used to select a variable
    /// @param slicer object used to slice a variable domain
-   ///
-   /// This owns the slicer and the selector, hence they are destroyed with
-   /// this.
-   MaxCIDContractor(const SharedContractor& op, Selector* selector,
-                    IntervalSlicer* slicer);
+   MaxCIDContractor(SharedContractor op,
+                    std::unique_ptr<Selector> selector,
+                    std::unique_ptr<IntervalSlicer> slicer);
 
    /// Destructor
    ~MaxCIDContractor();
@@ -50,7 +48,7 @@ public:
 
 private:
    CIDContractor* op_;
-   Selector* selector_;
+   std::unique_ptr<Selector> selector_;
 };
 
 } // namespace

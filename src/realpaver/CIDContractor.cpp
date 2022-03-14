@@ -12,11 +12,11 @@
 
 namespace realpaver {
 
-CIDContractor::CIDContractor(const SharedContractor& op, const Variable& v,
-                             IntervalSlicer* slicer)
+CIDContractor::CIDContractor(SharedContractor op, const Variable& v,
+                             std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(v),
-           slicer_(slicer),
+           slicer_(std::move(slicer)),
            bs_()
 {
    ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
@@ -27,11 +27,11 @@ CIDContractor::CIDContractor(const SharedContractor& op, const Variable& v,
    bs_ = op->scope().toBitset();
 }
 
-CIDContractor::CIDContractor(const SharedContractor& op,
-                             IntervalSlicer* slicer)
+CIDContractor::CIDContractor(SharedContractor op,
+                             std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(),
-           slicer_(slicer),
+           slicer_(std::move(slicer)),
            bs_()
 {
    ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
@@ -41,9 +41,7 @@ CIDContractor::CIDContractor(const SharedContractor& op,
 }
 
 CIDContractor::~CIDContractor()
-{
-   delete slicer_;
-}
+{}
 
 bool CIDContractor::dependsOn(const Bitset& bs) const
 {

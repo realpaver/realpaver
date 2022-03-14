@@ -76,7 +76,7 @@ public:
 
    /// Inserts a contractor at the end of this
    /// @param op a contractor
-   void push(const SharedContractor& op);
+   void push(SharedContractor op);
 
    ///@{
    /// Overrides (ContractorPool)

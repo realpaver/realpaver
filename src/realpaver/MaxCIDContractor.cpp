@@ -11,21 +11,20 @@
 
 namespace realpaver {
 
-MaxCIDContractor::MaxCIDContractor(const SharedContractor& op,
-                                   Selector* selector,
-                                   IntervalSlicer* slicer)
+MaxCIDContractor::MaxCIDContractor(SharedContractor op,
+                                   std::unique_ptr<Selector> selector,
+                                   std::unique_ptr<IntervalSlicer> slicer)
       : op_(nullptr),
-        selector_(selector)
+        selector_(std::move(selector))
 {
-   ASSERT(selector != nullptr, "No selector in a MaxCID contractor");
+   ASSERT(selector_ != nullptr, "No selector in a MaxCID contractor");
 
-   op_ = new CIDContractor(op, slicer);
+   op_ = new CIDContractor(op, std::move(slicer));
 }
 
 MaxCIDContractor::~MaxCIDContractor()
 {
    if (op_ != nullptr) delete op_;
-   if (selector_ != nullptr) delete selector_;
 }
 
 bool MaxCIDContractor::dependsOn(const Bitset& bs) const

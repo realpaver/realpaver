@@ -28,9 +28,9 @@ int main(void)
       Problem problem;
 
       //~ Beale
-      Variable x = problem.addRealVar(-4.5,  4.5, "x"),
-               y = problem.addRealVar(-4.5,  4.5, "y");
-      Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
+      //~ Variable x = problem.addRealVar(-4.5,  4.5, "x"),
+               //~ y = problem.addRealVar(-4.5,  4.5, "y");
+      //~ Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
 
       // 3-hump camel
       //~ Variable x = problem.addRealVar(-5,  5, "x"),
@@ -44,13 +44,13 @@ int main(void)
                 //~ (4.0*sqr(y)-4.0)*sqr(y);
 
       // Colville
-      //~ Variable x1 = problem.addRealVar(-10,  10, "x1"),
-               //~ x2 = problem.addRealVar(-10,  10, "x2"),
-               //~ x3 = problem.addRealVar(-10,  10, "x3"),
-               //~ x4 = problem.addRealVar(-10,  10, "x4");
-      //~ Term to = 100.0*sqr(sqr(x1)-x2) + sqr(x1-1.0) + sqr(x3-1.0) +
-                //~ 90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
-                //~ 19.8*(x2-1.0)*(x4-1.0);
+      Variable x1 = problem.addRealVar(-10,  10, "x1"),
+               x2 = problem.addRealVar(-10,  10, "x2"),
+               x3 = problem.addRealVar(-10,  10, "x3"),
+               x4 = problem.addRealVar(-10,  10, "x4");
+      Term to = 100.0*sqr(sqr(x1)-x2) + sqr(x1-1.0) + sqr(x3-1.0) +
+                90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
+                19.8*(x2-1.0)*(x4-1.0);
 
       //~ Variable x = problem.addRealVar(-10,  10, "x"),
                //~ y = problem.addRealVar(-10,  10, "y");
@@ -60,10 +60,11 @@ int main(void)
       problem.addObjective(minimize(to));
 
       BOSolver solver(problem);
-      solver.setIntParam("NODE_LIMIT", 200);
+      solver.setIntParam("NODE_LIMIT", 400);
       solver.setIntParam("BB_SPACE_FREQUENCY", 5);
       solver.setStrParam("SPLIT_OBJECTIVE", "NO");
       solver.setStrParam("LOCAL_SOLVER_ALGORITHM", "CONJUGATE");
+      solver.setStrParam("PROPAGATION_ALGORITHM", "MAX_CID_HC4");
 
       int prec = solver.getIntParam("FLOAT_PRECISION");
       Interval::precision(prec);

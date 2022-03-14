@@ -33,7 +33,7 @@ public:
    /// @param op contractor for the equation df/dv = 0
    /// @param init initial region of the BO problem
    BOContractor(Dag* dag, size_t i, const Variable& v,
-                const SharedContractor& op, const SharedIntervalRegion& init);
+                SharedContractor op, SharedIntervalRegion init);
 
    /// Default copy constructor
    BOContractor(const BOContractor&) = default;

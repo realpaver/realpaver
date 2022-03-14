@@ -34,7 +34,7 @@ Scope ContractorVector::scope() const
    return s_;
 }
 
-void ContractorVector::push(const SharedContractor& op)
+void ContractorVector::push(SharedContractor op)
 {
    ASSERT(op != nullptr, "Bad insertion in a vector of contractors");
 

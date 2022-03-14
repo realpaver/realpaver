@@ -30,17 +30,13 @@ public:
    /// @param op a contractor
    /// @param v a variable
    /// @param a slicer
-   ///
-   /// This owns the slicer, hence the slicer is destroyed with this.
-   CIDContractor(const SharedContractor& op, const Variable& v,
-                 IntervalSlicer* slicer);
+   CIDContractor(SharedContractor op, const Variable& v,
+                 std::unique_ptr<IntervalSlicer> slicer);
 
    /// Creates a contractor without any variable (to be fixed later)
    /// @param op a contractor
    /// @param a slicer
-   ///
-   /// This owns the slicer, hence the slicer is destroyed with this.
-   CIDContractor(const SharedContractor& op, IntervalSlicer* slicer);
+   CIDContractor(SharedContractor op, std::unique_ptr<IntervalSlicer> slicer);
 
    /// Destructor
    ~CIDContractor();
@@ -69,7 +65,7 @@ public:
 private:
    SharedContractor op_;
    Variable v_;
-   IntervalSlicer* slicer_;
+   std::unique_ptr<IntervalSlicer> slicer_;
    Bitset bs_;
 };
 
