@@ -150,8 +150,7 @@ void BOSolver::makeSplit()
    IntervalSlicer* slicer = nullptr;
 
    bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
-
-   const Scope& S = osplit ? model_->getFullScope() : model_->getObjScope();
+   Scope S = osplit ? model_->getFullScope() : model_->getObjScope();
 
    std::string sel = param_.getStrParam("SPLIT_SELECTOR");
    if (sel == "MaxDom") selector = new SelectorMaxDom(S);

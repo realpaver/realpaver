@@ -1,4 +1,4 @@
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver_test.hpp"
 

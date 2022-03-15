@@ -11,14 +11,14 @@
 
 namespace realpaver {
 
-RealPoint::RealPoint(const Scope& s, double a)
+RealPoint::RealPoint(Scope s, double a)
       : RealVector(s.size(), a),
         scope_(s)
 {
    ASSERT(!s.isEmpty(), "Empty scope used to create a real point");   
 }
 
-RealPoint::RealPoint(const Scope& s, const RealVector& X)
+RealPoint::RealPoint(Scope s, const RealVector& X)
       : RealVector(X),
         scope_(s)
 {
@@ -45,12 +45,12 @@ void RealPoint::set(Variable v, double a)
    operator[](scope_.index(v)) = a;
 }
 
-void RealPoint::setOnScope(const RealPoint& pt, const Scope& s)
+void RealPoint::setOnScope(const RealPoint& pt, Scope s)
 {
    for (auto v : s) set(v, pt.get(v));
 }
 
-RealPoint RealPoint::subPoint(const Scope& s) const
+RealPoint RealPoint::subPoint(Scope s) const
 {
    ASSERT(scope_.contains(s), "Bad scope used to create a sub-point " << s);
 

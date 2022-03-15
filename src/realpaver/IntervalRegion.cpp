@@ -11,14 +11,14 @@
 
 namespace realpaver {
 
-IntervalRegion::IntervalRegion(const Scope& s, const Interval& x)
+IntervalRegion::IntervalRegion(Scope s, const Interval& x)
       : IntervalVector(s.size(), x),
         scope_(s)
 {
    ASSERT(!s.isEmpty(), "Empty scope used to create an interval region");   
 }
 
-IntervalRegion::IntervalRegion(const Scope& s, const IntervalVector& X)
+IntervalRegion::IntervalRegion(Scope s, const IntervalVector& X)
       : IntervalVector(X),
         scope_(s)
 {
@@ -112,25 +112,24 @@ bool IntervalRegion::overlaps(const IntervalRegion& reg) const
    return true;
 }
 
-void IntervalRegion::hullAssignOnScope(const IntervalRegion& reg,
-                                       const Scope& s)
+void IntervalRegion::hullAssignOnScope(const IntervalRegion& reg, Scope s)
 {
    for (auto v : s) set(v, get(v) | reg.get(v));
 }
 
-void IntervalRegion::setOnScope(const IntervalRegion& reg, const Scope& s)
+void IntervalRegion::setOnScope(const IntervalRegion& reg, Scope s)
 {
    for (auto v : s) set(v, reg.get(v));
 }
 
-RealPoint IntervalRegion::midpointOnScope(const Scope& s) const
+RealPoint IntervalRegion::midpointOnScope(Scope s) const
 {
    RealPoint pt(s);
    for (auto v : s) pt.set(v, get(v).midpoint());
    return pt;
 }
 
-IntervalRegion IntervalRegion::subRegion(const Scope& s) const
+IntervalRegion IntervalRegion::subRegion(Scope s) const
 {
    ASSERT(scope_.contains(s), "Bad scope used to create a sub-region " << s);
 

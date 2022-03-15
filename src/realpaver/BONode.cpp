@@ -12,8 +12,7 @@
 
 namespace realpaver {
 
-BONode::BONode(const Scope& scope, const Variable& objvar,
-               const IntervalRegion& reg)
+BONode::BONode(Scope scope, Variable objvar, const IntervalRegion& reg)
       : SearchNode(0),
         scope_(scope),
         objvar_(objvar),
@@ -45,7 +44,7 @@ double BONode::getLower() const
    return lower_;
 }
 
-void BONode::setLower(const double& val)
+void BONode::setLower(double val)
 {
    lower_ = val;
 }
@@ -55,7 +54,7 @@ double BONode::getUpper() const
    return upper_;
 }
 
-void BONode::setUpper(const double& val)
+void BONode::setUpper(double val)
 {
    upper_ = val;
 }
@@ -74,7 +73,6 @@ Variable BONode::getObjVar() const
 {
    return objvar_;
 }
-
 
 std::ostream& operator<<(std::ostream& os, const BONode& node)
 {

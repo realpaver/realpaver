@@ -1,5 +1,5 @@
 #include <iostream>
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Problem.hpp"

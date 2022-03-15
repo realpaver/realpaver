@@ -17,13 +17,13 @@ bool Preprocessor::areAllVarFixed() const
    return vvm_.empty();
 }
 
-bool Preprocessor::hasFixedDomain(const Variable& v) const
+bool Preprocessor::hasFixedDomain(Variable v) const
 {
    auto it = vim_.find(v);
    return it != vim_.end();
 }
 
-Interval Preprocessor::getFixedDomain(const Variable& v) const
+Interval Preprocessor::getFixedDomain(Variable v) const
 {
    ASSERT(hasFixedDomain(v), "Domain of " << v.getName() << " is not fixed");
 

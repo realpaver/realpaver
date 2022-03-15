@@ -24,7 +24,7 @@ class Selector {
 public:
    /// Creates a selector on a set of variables
    ///@param s a scope
-   Selector(const Scope& s);
+   Selector(Scope s);
 
    /// Virtual destructor
    virtual ~Selector();
@@ -55,7 +55,7 @@ class SelectorMaxDom : public Selector {
 public:
    /// Creates a selector on a set of variables
    ///@param s a scope
-   SelectorMaxDom(const Scope& s);
+   SelectorMaxDom(Scope s);
 
    /// Destructor
    ~SelectorMaxDom() = default;
@@ -78,7 +78,7 @@ public:
    /// Creates a selector on a set of variables
    ///@param f a function
    ///@param s a scope
-   SelectorMaxSmear(IntervalFunction* f, const Scope& s);
+   SelectorMaxSmear(IntervalFunction* f, Scope s);
 
    /// Destructor
    ~SelectorMaxSmear() = default;

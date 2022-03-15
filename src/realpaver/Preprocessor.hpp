@@ -63,7 +63,7 @@ public:
    /// Tests if a variable of the source problem is fixed
    /// @param v a variable of the source problem
    /// @return true if the domain of 'v' is fixed
-   bool hasFixedDomain(const Variable& v) const;
+   bool hasFixedDomain(Variable v) const;
 
    /// @return true if all the variables of the source problem are fixed
    bool areAllVarFixed() const;
@@ -71,7 +71,7 @@ public:
    /// Gets the domain of a fixed variable
    /// @param v a variable
    /// @return the domain of v
-   Interval getFixedDomain(const Variable& v) const;
+   Interval getFixedDomain(Variable v) const;
 
    /// Gets a variable of the destination problem that is associated
    /// to a variable of the source problem

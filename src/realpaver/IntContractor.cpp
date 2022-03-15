@@ -17,7 +17,7 @@ IntContractor::IntContractor()
         b_()
 {}
 
-IntContractor::IntContractor(const Variable& v)
+IntContractor::IntContractor(Variable v)
       : s_(),
         b_()
 {
@@ -32,7 +32,7 @@ IntContractor::IntContractor(const std::initializer_list<Variable>& l)
       insert(v);
 }
 
-void IntContractor::insert(const Variable& v)
+void IntContractor::insert(Variable v)
 {
    ASSERT(v.isDiscrete(),
           "IntContractor applied to a continuous variable " << v.getName());

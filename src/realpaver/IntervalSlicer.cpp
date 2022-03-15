@@ -59,7 +59,7 @@ void IntervalBisecter::applyImpl(const Interval& x)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-IntervalPeeler::IntervalPeeler(const double& f) : IntervalSlicer()
+IntervalPeeler::IntervalPeeler(double f) : IntervalSlicer()
 {
    setFactor(f);
 }
@@ -69,7 +69,7 @@ double IntervalPeeler::getFactor() const
    return f_;
 }
 
-void IntervalPeeler::setFactor(const double& f)
+void IntervalPeeler::setFactor(double f)
 {
    ASSERT(f>=0.0 && f<=100.0, "Bad width factor " << f
                                                   << " in an interval peeler");

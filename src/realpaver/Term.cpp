@@ -12,9 +12,9 @@
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, const OpSymbol& s)
+std::ostream& operator<<(std::ostream& os, OpSymbol op)
 {
-   switch(s)
+   switch(op)
    {
       case OpSymbol::Add:  return os << "+";
       case OpSymbol::Sub:  return os << "-";
@@ -116,13 +116,13 @@ bool TermRep::isConstant() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Term::Term(const double& a) : rep_(std::make_shared<TermConst>(a))
+Term::Term(double a) : rep_(std::make_shared<TermConst>(a))
 {}
 
 Term::Term(const Interval& x) : rep_(std::make_shared<TermConst>(x))
 {}
 
-Term::Term(const Variable& v) : rep_(std::make_shared<TermVar>(v))
+Term::Term(Variable v) : rep_(std::make_shared<TermVar>(v))
 {}
 
 Term::Term(const SharedRep& rep): rep_(rep)
@@ -228,41 +228,41 @@ bool Term::isDiv() const
    return rep_->isDiv();
 }
 
-std::ostream& operator<<(std::ostream& os, const Term& t)
+std::ostream& operator<<(std::ostream& os, Term t)
 {
    t.print(os);
    return os;
 }
 
-Term& Term::operator+=(const Term& other)
+Term& Term::operator+=(Term other)
 {
    Term t( (*this) + other );
    rep_ = t.rep_;
    return *this;
 }
 
-Term& Term::operator-=(const Term& other)
+Term& Term::operator-=(Term other)
 {
    Term t( (*this) - other );
    rep_ = t.rep_;
    return *this;
 }
 
-Term& Term::operator*=(const Term& other)
+Term& Term::operator*=(Term other)
 {
    Term t( (*this) * other );
    rep_ = t.rep_;
    return *this;
 }
 
-Term& Term::operator/=(const Term& other)
+Term& Term::operator/=(Term other)
 {
    Term t( (*this) / other );
    rep_ = t.rep_;
    return *this;
 }
 
-Term operator+(const Term& l, const Term& r)
+Term operator+(Term l, Term r)
 {
    if (l.isZero())
       return r;
@@ -465,7 +465,7 @@ Term operator+(const Term& l, const Term& r)
       return Term(std::make_shared<TermAdd>(l.rep(),r.rep()));
 }
 
-Term operator-(const Term& l, const Term& r)
+Term operator-(Term l, Term r)
 {
    if (r.isZero())
       return l;
@@ -674,7 +674,7 @@ Term operator-(const Term& l, const Term& r)
       return Term(std::make_shared<TermSub>(l.rep(), r.rep()));
 }
 
-Term operator*(const Term& l, const Term& r)
+Term operator*(Term l, Term r)
 {
    if (l.isZero())
       return l;
@@ -872,7 +872,7 @@ Term operator*(const Term& l, const Term& r)
       return Term(std::make_shared<TermMul>(l.rep(),r.rep()));
 }
 
-Term operator/(const Term& l, const Term& r)
+Term operator/(Term l, Term r)
 {
    ASSERT(!r.isZero(), "Term divided by zero");
 
@@ -1061,7 +1061,7 @@ Term operator/(const Term& l, const Term& r)
       return Term(std::make_shared<TermDiv>(l.rep(),r.rep()));
 }
 
-Term mini(const Term& l, const Term& r)
+Term mini(Term l, Term r)
 {
    if (l.isConstant() && r.isConstant())
    {
@@ -1072,7 +1072,7 @@ Term mini(const Term& l, const Term& r)
       return Term(std::make_shared<TermMin>(l.rep(),r.rep()));
 }
 
-Term maxi(const Term& l, const Term& r)
+Term maxi(Term l, Term r)
 {
    if (l.isConstant() && r.isConstant())
    {
@@ -1083,7 +1083,7 @@ Term maxi(const Term& l, const Term& r)
       return Term(std::make_shared<TermMax>(l.rep(),r.rep()));
 }
 
-Term operator-(const Term& t)
+Term operator-(Term t)
 {
    if (t.isZero())
       return t;
@@ -1104,7 +1104,7 @@ Term operator-(const Term& t)
       return Term(std::make_shared<TermUsb>(t.rep()));
 }
 
-Term abs(const Term& t)
+Term abs(Term t)
 {
    if (t.isConstant())
    {
@@ -1115,7 +1115,7 @@ Term abs(const Term& t)
       return Term(std::make_shared<TermAbs>(t.rep()));
 }
 
-Term sgn(const Term& t)
+Term sgn(Term t)
 {
    if (t.isConstant())
    {
@@ -1126,7 +1126,7 @@ Term sgn(const Term& t)
       return Term(std::make_shared<TermSgn>(t.rep()));
 }
 
-Term sqr(const Term& t)
+Term sqr(Term t)
 {
    if (t.isConstant())
    {
@@ -1137,7 +1137,7 @@ Term sqr(const Term& t)
       return Term(std::make_shared<TermSqr>(t.rep()));
 }
 
-Term sqrt(const Term& t)
+Term sqrt(Term t)
 {
    if (t.isConstant())
    {
@@ -1148,7 +1148,7 @@ Term sqrt(const Term& t)
       return Term(std::make_shared<TermSqrt>(t.rep()));
 }
 
-Term pow(const Term& t, int n)
+Term pow(Term t, int n)
 {
    if (t.isConstant())
    {
@@ -1174,7 +1174,7 @@ Term pow(const Term& t, int n)
    }
 }
 
-Term pow(const Term& t, const double& d)
+Term pow(Term t, double d)
 {
    if (d == 0.0)
       return Term(1.0);
@@ -1206,7 +1206,7 @@ Term pow(const Term& t, const double& d)
    }
 }
 
-Term exp(const Term& t)
+Term exp(Term t)
 {
    if (t.isConstant())
    {
@@ -1217,7 +1217,7 @@ Term exp(const Term& t)
       return Term(std::make_shared<TermExp>(t.rep()));
 }
 
-Term log(const Term& t)
+Term log(Term t)
 {
    if (t.isConstant())
    {
@@ -1228,7 +1228,7 @@ Term log(const Term& t)
       return Term(std::make_shared<TermLog>(t.rep()));
 }
 
-Term cos(const Term& t)
+Term cos(Term t)
 {
    if (t.isConstant())
    {
@@ -1239,7 +1239,7 @@ Term cos(const Term& t)
       return Term(std::make_shared<TermCos>(t.rep()));
 }
 
-Term sin(const Term& t)
+Term sin(Term t)
 {
    if (t.isConstant())
    {
@@ -1250,7 +1250,7 @@ Term sin(const Term& t)
       return Term(std::make_shared<TermSin>(t.rep()));
 }
 
-Term tan(const Term& t)
+Term tan(Term t)
 {
    if (t.isConstant())
    {
@@ -1328,7 +1328,7 @@ void TermConst::makeScope(Scope& s) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TermVar::TermVar(const Variable& v)
+TermVar::TermVar(Variable v)
       : TermRep(OpPriority::Low),
         v_(v)
 {

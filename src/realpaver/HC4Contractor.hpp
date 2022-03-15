@@ -11,7 +11,7 @@
 #define REALPAVER_HC4_CONTRACTOR_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 
 namespace realpaver {
 

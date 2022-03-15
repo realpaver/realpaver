@@ -58,12 +58,12 @@ struct IntervalTraits<RawInterval> {
       return interval();
    }
 
-   static inline interval create(const double& a)
+   static inline interval create(double a)
    {
       return interval(a);
    }
 
-   static inline interval create(const double& l, const double& r)
+   static inline interval create(double l, double r)
    {
       return interval(l,r);
    }
@@ -292,13 +292,12 @@ struct IntervalTraits<RawInterval> {
       return x.is_zero();
    }
 
-   static inline bool contains(const interval& x, const double& a)
+   static inline bool contains(const interval& x, double a)
    {
       return x.set_contains(a);      
    }
 
-   static inline bool strictlyContains(const interval& x,
-                                       const double& a)
+   static inline bool strictlyContains(const interval& x, double a)
    {
       return x.set_strictly_contains(a);
    }

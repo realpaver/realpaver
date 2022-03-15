@@ -22,9 +22,9 @@ struct IntervalTraits
 
    static interval create();
 
-   static interval create(const double& a);
+   static interval create(double a);
 
-   static interval create(const double& l, const double& r);
+   static interval create(double l, double r);
 
    static interval create(const char* s);
 
@@ -96,9 +96,9 @@ struct IntervalTraits
 
    static bool isZero(const interval& x);
 
-   static bool contains(const interval& x, const double& a);
+   static bool contains(const interval& x, double a);
 
-   static bool strictlyContains(const interval& x, const double& a);
+   static bool strictlyContains(const interval& x, double a);
 
    static bool containsZero(const interval& x);
 

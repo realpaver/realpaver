@@ -15,7 +15,51 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is the shared representation of an objective function
+///////////////////////////////////////////////////////////////////////////////
+class ObjectiveRep {
+public:
+   /// Creates the representation of an objective function
+   /// @param f expression of the function
+   /// @param minimization sense
+   ///        - true for minimization
+   ///        - false for maximization
+   ObjectiveRep(Term f, bool minimization);
+
+   /// No copy
+   ObjectiveRep(const ObjectiveRep&) = delete;
+
+   /// No assignment
+   ObjectiveRep& operator=(const ObjectiveRep&) = delete;
+
+   /// Default destructor
+   ~ObjectiveRep() = default;
+
+   /// @return the expression of this
+   Term getTerm() const;
+
+   /// @return true if this is constant (variable free)
+   bool isConstant() const;
+
+   /// @return true if this is linear
+   bool isLinear() const;
+
+   /// @return true if this has to be minimized
+   bool isMinimization() const;
+
+   /// @return true if this has to be maximized
+   bool isMaximization() const;
+
+private:
+   Term f_;
+   bool minimization_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is an objective function.
+///
+/// This encloses a shared pointer to its representation. It is a lightweight
+/// object that can be copied and assigned.
 ///////////////////////////////////////////////////////////////////////////////
 class Objective {
 public:
@@ -43,29 +87,27 @@ public:
    /// @return true if this has to be maximized
    bool isMaximization() const;
 
-   friend Objective minimize(const Term& f);
-   friend Objective maximize(const Term& f);
+   friend Objective minimize(Term f);
+   friend Objective maximize(Term f);
 
 private:
-   Term f_;
-   bool minimization_;
+   std::shared_ptr<ObjectiveRep> rep_;
 
-   // Creates an objective function
-   Objective(const Term& f, bool minimization = true);
+   Objective(Term f, bool minimization);
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Objective& obj);
+std::ostream& operator<<(std::ostream& os, Objective obj);
 
 /// Creates an objective function
 /// @param f expression
 /// @return minimize f
-Objective minimize(const Term& f);
+Objective minimize(Term f);
 
 /// Creates an objective function
 /// @param f expression
 /// @return maximize f
-Objective maximize(const Term& f);
+Objective maximize(Term f);
 
 } // namespace
 

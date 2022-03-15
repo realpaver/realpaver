@@ -10,7 +10,7 @@
 #ifndef REALPAVER_BO_MODEL_HPP
 #define REALPAVER_BO_MODEL_HPP
 
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/IntervalFunction.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/RealFunction.hpp"
@@ -73,21 +73,21 @@ public:
 
    /// Sets a variable as a boundary variable
    /// @param v a variable of this
-   void setBoundaryVar(const Variable& v);
+   void setBoundaryVar(Variable v);
 
    /// Sets a variable as an interior variable
    /// @param v a variable of this
-   void setInteriorVar(const Variable& v);
+   void setInteriorVar(Variable v);
 
    /// Tests if a variable is a boundary variable
    /// @param v a variable of this
    /// @return true if v is a boundary variable
-   bool isBoundaryVar(const Variable& v) const;
+   bool isBoundaryVar(Variable v) const;
 
    /// Tests if a variable is an interior variable
    /// @param v a variable of this
    /// @return true if v is an interior variable
-   bool isInteriorVar(const Variable& v) const;
+   bool isInteriorVar(Variable v) const;
 
    ///@{
    /// Overrides (IntervalFunction)

@@ -21,7 +21,7 @@ class TermDeriver : public TermVisitor {
 public:
    /// Creates a deriver
    /// @param v a variable
-   TermDeriver(const Variable& v);
+   TermDeriver(Variable v);
 
    /// Creates a deriver
    /// @param id an identifier of variable

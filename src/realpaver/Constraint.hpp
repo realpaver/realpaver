@@ -24,7 +24,7 @@ enum class RelSymbol {
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const RelSymbol& s);
+std::ostream& operator<<(std::ostream& os, RelSymbol rel);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the base class of the hierarchy of representations of constraints.
@@ -71,7 +71,7 @@ public:
    /// Dependency test
    /// @param v a variable
    /// @return true if this depends on v
-   virtual bool dependsOn(const Variable& v) const = 0;
+   virtual bool dependsOn(Variable v) const = 0;
 
    /// @return true if this is an equation
    virtual bool isEquation() const;
@@ -88,7 +88,7 @@ protected:
 
    /// Scope assignment
    /// @param s scope assigned to this
-   void setScope(const Scope& s);
+   void setScope(Scope s);
 
 private:
    Scope scope_;
@@ -134,7 +134,7 @@ public:
    /// Dependency test
    /// @param v a variable
    /// @return true if this depends on v
-   bool dependsOn(const Variable& v) const;
+   bool dependsOn(Variable v) const;
 
    /// @return true if this is an equation
    bool isEquation() const;
@@ -159,7 +159,7 @@ public:
 };
 
 /// output on a stream
-std::ostream& operator<<(std::ostream& os, const Constraint& c);
+std::ostream& operator<<(std::ostream& os, Constraint c);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a base class of constraints between two terms.
@@ -170,7 +170,7 @@ public:
    /// @param l left-hand side
    /// @param r right-hand side
    /// @param rel relation symbol
-   ConstraintBin(const Term& l, const Term& r, RelSymbol rel);
+   ConstraintBin(Term l, Term r, RelSymbol rel);
 
    /// Virtual destructor
    virtual ~ConstraintBin();
@@ -188,7 +188,7 @@ public:
    /// Overrides (ConstraintRep)
    void print(std::ostream& os) const;
    bool isConstant() const;
-   bool dependsOn(const Variable& v) const;
+   bool dependsOn(Variable v) const;
    bool isEquation() const;
    bool isInequality() const;
    bool isLinear() const;
@@ -207,7 +207,7 @@ public:
    /// Creates an equation
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintEq(const Term& l, const Term& r);
+   ConstraintEq(Term l, Term r);
    
    ///@{
    /// Overrides (ConstraintRep)
@@ -220,7 +220,7 @@ public:
 /// @param l left-hand side
 /// @param r right-hand side
 /// @return l = r
-Constraint operator==(const Term& l, const Term& r);
+Constraint operator==(Term l, Term r);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l <= r.
@@ -230,7 +230,7 @@ public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintLe(const Term& l, const Term& r);
+   ConstraintLe(Term l, Term r);
    
    ///@{
    /// Overrides (ConstraintRep)
@@ -243,7 +243,7 @@ public:
 /// @param l left-hand side
 /// @param r right-hand side
 /// @return l <= r
-Constraint operator<=(const Term& l, const Term& r);
+Constraint operator<=(Term l, Term r);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l < r.
@@ -253,7 +253,7 @@ public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintLt(const Term& l, const Term& r);
+   ConstraintLt(Term l, Term r);
    
    ///@{
    /// Overrides (ConstraintRep)
@@ -266,7 +266,7 @@ public:
 /// @param l left-hand side
 /// @param r right-hand side
 /// @return l < r
-Constraint operator< (const Term& l, const Term& r);
+Constraint operator< (Term l, Term r);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l >= r.
@@ -276,7 +276,7 @@ public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintGe(const Term& l, const Term& r);
+   ConstraintGe(Term l, Term r);
    
    ///@{
    /// Overrides (ConstraintRep)
@@ -289,7 +289,7 @@ public:
 /// @param l left-hand side
 /// @param r right-hand side
 /// @return l >= r
-Constraint operator>=(const Term& l, const Term& r);
+Constraint operator>=(Term l, Term r);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l > r.
@@ -299,7 +299,7 @@ public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintGt(const Term& l, const Term& r);
+   ConstraintGt(Term l, Term r);
 
    ///@{
    /// Overrides (ConstraintRep)
@@ -312,7 +312,7 @@ public:
 /// @param l left-hand side
 /// @param r right-hand side
 /// @return l > r
-Constraint operator>(const Term& l, const Term& r);
+Constraint operator>(Term l, Term r);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a double inequality constraint of the form f in I.
@@ -324,7 +324,7 @@ public:
    /// Creates a double inequality constraint
    /// @param t term representing a function
    /// @param x the bounds
-   ConstraintIn(const Term& t, const Interval& x);
+   ConstraintIn(Term t, const Interval& x);
 
    /// @return the bounds of the function
    Interval image() const;
@@ -346,14 +346,14 @@ private:
 /// @param t term representing a function
 /// @param x the bounds
 /// @return l in x
-Constraint in(const Term& t, const Interval& x);
+Constraint in(Term t, const Interval& x);
 
 /// Creates a double inequality constraint
 /// @param t term representing a function
 /// @param a the lower bound
 /// @param b the upper bound
 /// @return l in [a, b]
-Constraint in(const Term& t, const double& a, const double& b);
+Constraint in(Term t, double a, double b);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a visitor of constraint representations.

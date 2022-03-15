@@ -23,14 +23,14 @@ public:
    /// Creates a real pooint
    /// s scope of this
    /// a value assigned to each element of this
-   RealPoint(const Scope& s, double a = 0.0);
+   RealPoint(Scope s, double a = 0.0);
 
    /// Creates a real point
    /// s scope of this
    /// X real vector having the same size than s
    ///
    /// The i-th variable in s is assigned to X[i] for each i.
-   RealPoint(const Scope& s, const RealVector& X);
+   RealPoint(Scope s, const RealVector& X);
 
    /// Default copy constructor
    RealPoint(const RealPoint&) = default;
@@ -63,12 +63,12 @@ public:
    /// @param s a scope included in the scope of this and pt
    ///
    /// this[s] is assigned to pt[s]
-   void setOnScope(const RealPoint& pt, const Scope& s);
+   void setOnScope(const RealPoint& pt, Scope s);
 
    /// Gets a sub-point
    /// @param s a scope included in the scope of this
    /// @return this restricted to s
-   RealPoint subPoint(const Scope& s) const;
+   RealPoint subPoint(Scope s) const;
 
    /// Overrides (RealVector)
    /// @return a clone of this

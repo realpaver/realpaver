@@ -10,7 +10,7 @@
 #ifndef REALPAVER_THICK_INTERVAL_FUNCTION_HPP
 #define REALPAVER_THICK_INTERVAL_FUNCTION_HPP
 
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/UniIntervalFunction.hpp"
 

@@ -44,7 +44,7 @@ librealpaver_la_include_HEADERS = \
 		ConstraintRelaxor.hpp \
 		Contractor.hpp \
 		ContractorPool.hpp \
-		dag.hpp \
+		Dag.hpp \
 		Double.hpp \
 		Exception.hpp \
 		HC4Contractor.hpp \
@@ -82,6 +82,7 @@ librealpaver_la_include_HEADERS = \
 		SearchNode.hpp \
 		Selector.hpp \
 		SplitStrategy.hpp \
+		SymbolTable.hpp \
 		Term.hpp \
 		TermDeriver.hpp \
 		TermFixer.hpp \
@@ -124,7 +125,7 @@ librealpaver_la_SOURCES = \
 		ConstraintRelaxor.cpp \
 		Contractor.cpp \
 		ContractorPool.cpp \
-		dag.cpp \
+		Dag.cpp \
 		Exception.cpp \
 		HC4Contractor.cpp \
 		Inflator.cpp \
@@ -154,6 +155,7 @@ librealpaver_la_SOURCES = \
 		ScopeMap.cpp \
 		SearchNode.cpp \
 		Selector.cpp \
+		SymbolTable.cpp \
 		Term.cpp \
 		TermDeriver.cpp \
 		TermFixer.cpp \

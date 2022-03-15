@@ -2,7 +2,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/BOLocalConjugate.hpp"
 #include "realpaver/BOSplit.hpp"
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/Problem.hpp"
 
 using namespace std;
@@ -14,7 +14,6 @@ int main(void)
    Interval::precision( 16 );
 
    try {
-
       Problem P;
       Variable x = P.addRealVar(-4, 6, "x");
       Variable y = P.addRealVar(-3, 8, "y");

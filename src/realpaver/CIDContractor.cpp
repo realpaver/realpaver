@@ -12,7 +12,7 @@
 
 namespace realpaver {
 
-CIDContractor::CIDContractor(SharedContractor op, const Variable& v,
+CIDContractor::CIDContractor(SharedContractor op, Variable v,
                              std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(v),
@@ -58,7 +58,7 @@ Variable CIDContractor::getVar() const
    return v_;
 }
 
-void CIDContractor::setVar(const Variable& v)
+void CIDContractor::setVar(Variable v)
 {
    ASSERT(scope().contains(v), "Bad variable " << v << " in a CID contractor");
 

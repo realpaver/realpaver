@@ -12,9 +12,9 @@
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, const RelSymbol& s)
+std::ostream& operator<<(std::ostream& os, RelSymbol rel)
 {
-   switch(s)
+   switch(rel)
    {
       case RelSymbol::Eq: return os << "==";
       case RelSymbol::Le: return os << "<=";
@@ -53,7 +53,7 @@ Scope ConstraintRep::scope() const
    return scope_;
 }
 
-void ConstraintRep::setScope(const Scope& s)
+void ConstraintRep::setScope(Scope s)
 {
    scope_ = s;
    
@@ -124,7 +124,7 @@ Proof Constraint::isSatisfied(const IntervalRegion& reg) const
    return rep_->isSatisfied(reg);
 }
 
-bool Constraint::dependsOn(const Variable& v) const
+bool Constraint::dependsOn(Variable v) const
 {
    return rep_->dependsOn(v);
 }
@@ -144,7 +144,7 @@ bool Constraint::isLinear() const
    return rep_->isLinear();
 }
 
-std::ostream& operator<<(std::ostream& os, const Constraint& c)
+std::ostream& operator<<(std::ostream& os, Constraint c)
 {
    c.print(os);
    return os;
@@ -152,7 +152,7 @@ std::ostream& operator<<(std::ostream& os, const Constraint& c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintBin::ConstraintBin(const Term& l, const Term& r, RelSymbol rel)
+ConstraintBin::ConstraintBin(Term l, Term r, RelSymbol rel)
       : ConstraintRep(),
         l_(l),
         r_(r),
@@ -198,7 +198,7 @@ void ConstraintBin::print(std::ostream& os) const
    r_.print(os);
 }
 
-bool ConstraintBin::dependsOn(const Variable& v) const
+bool ConstraintBin::dependsOn(Variable v) const
 {
    return l_.dependsOn(v) || r_.dependsOn(v);
 }
@@ -222,7 +222,7 @@ bool ConstraintBin::isLinear() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintEq::ConstraintEq(const Term& l, const Term& r)
+ConstraintEq::ConstraintEq(Term l, Term r)
       : ConstraintBin(l, r, RelSymbol::Eq)
 {}
 
@@ -249,14 +249,14 @@ Proof ConstraintEq::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
-Constraint operator==(const Term& l, const Term& r)
+Constraint operator==(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintEq>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintLe::ConstraintLe(const Term& l, const Term& r)
+ConstraintLe::ConstraintLe(Term l, Term r)
       : ConstraintBin(l, r, RelSymbol::Le)
 {}
 
@@ -283,14 +283,14 @@ Proof ConstraintLe::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
-Constraint operator<=(const Term& l, const Term& r)
+Constraint operator<=(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintLe>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintLt::ConstraintLt(const Term& l, const Term& r)
+ConstraintLt::ConstraintLt(Term l, Term r)
       : ConstraintBin(l, r, RelSymbol::Lt)
 {}
 
@@ -317,14 +317,14 @@ Proof ConstraintLt::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
-Constraint operator<(const Term& l, const Term& r)
+Constraint operator<(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintLt>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintGe::ConstraintGe(const Term& l, const Term& r)
+ConstraintGe::ConstraintGe(Term l, Term r)
       : ConstraintBin(l, r, RelSymbol::Ge)
 {}
 
@@ -351,14 +351,14 @@ Proof ConstraintGe::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
-Constraint operator>=(const Term& l, const Term& r)
+Constraint operator>=(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintGe>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintGt::ConstraintGt(const Term& l, const Term& r)
+ConstraintGt::ConstraintGt(Term l, Term r)
       : ConstraintBin(l, r, RelSymbol::Gt)
 {}
 
@@ -385,14 +385,14 @@ Proof ConstraintGt::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
-Constraint operator>(const Term& l, const Term& r)
+Constraint operator>(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintGt>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintIn::ConstraintIn(const Term& t, const Interval& x)
+ConstraintIn::ConstraintIn(Term t, const Interval& x)
       : ConstraintBin(t, x, RelSymbol::In), x_(x)
 {
    ASSERT(!(x.isEmpty() || x.isUniverse()),
@@ -431,7 +431,7 @@ Proof ConstraintIn::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
-Constraint in(const Term& t, const Interval& x)
+Constraint in(Term t, const Interval& x)
 {
    if (x.isSingleton())
       return t == x;
@@ -446,7 +446,7 @@ Constraint in(const Term& t, const Interval& x)
       return Constraint(std::make_shared<ConstraintIn>(t.rep(), x));
 }
 
-Constraint in(const Term& t, const double& a, const double& b)
+Constraint in(Term t, double a, double b)
 {
    return in(t, Interval(a,b));
 }

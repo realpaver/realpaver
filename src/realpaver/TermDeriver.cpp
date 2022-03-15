@@ -12,7 +12,7 @@
 
 namespace realpaver {
 
-TermDeriver::TermDeriver(const Variable& v)
+TermDeriver::TermDeriver(Variable v)
       : id_(v.getId()),
         dt_()
 {}

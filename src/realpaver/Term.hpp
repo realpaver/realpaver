@@ -28,7 +28,7 @@ enum class OpSymbol {
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const OpSymbol& s);
+std::ostream& operator<<(std::ostream& os, OpSymbol op);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an enumeration of priority levels of expression nodes.
@@ -124,9 +124,9 @@ class Term {
 public:
    ///@{
    /// Constructors
-   Term(const double& a = 0.0);
+   Term(double a = 0.0);
    Term(const Interval& x);
-   Term(const Variable& v);
+   Term(Variable v);
    ///@}
 
    /// @return the hash code of this
@@ -179,10 +179,10 @@ public:
 
    ///@{
    /// Arithmetic operations with assignment
-   Term& operator+=(const Term& other);
-   Term& operator-=(const Term& other);
-   Term& operator*=(const Term& other);
-   Term& operator/=(const Term& other);
+   Term& operator+=(Term other);
+   Term& operator-=(Term other);
+   Term& operator*=(Term other);
+   Term& operator/=(Term other);
    ///@}
 
 private:
@@ -199,28 +199,28 @@ public:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Term& t);
+std::ostream& operator<<(std::ostream& os, Term t);
 
 ///@{
 /// Creation of terms
-Term operator+(const Term& l, const Term& r);
-Term operator-(const Term& l, const Term& r);
-Term operator*(const Term& l, const Term& r);
-Term operator/(const Term& l, const Term& r);
-Term mini(const Term& l, const Term& r);
-Term maxi(const Term& l, const Term& r);
-Term operator-(const Term& t);
-Term abs(const Term& t);
-Term sgn(const Term& t);
-Term sqr(const Term& t);
-Term sqrt(const Term& t);
-Term pow(const Term& t, int n);
-Term pow(const Term& t, const double& d);
-Term exp(const Term& t);
-Term log(const Term& t);
-Term cos(const Term& t);
-Term sin(const Term& t);
-Term tan(const Term& t);
+Term operator+(Term l, Term r);
+Term operator-(Term l, Term r);
+Term operator*(Term l, Term r);
+Term operator/(Term l, Term r);
+Term mini(Term l, Term r);
+Term maxi(Term l, Term r);
+Term operator-(Term t);
+Term abs(Term t);
+Term sgn(Term t);
+Term sqr(Term t);
+Term sqrt(Term t);
+Term pow(Term t, int n);
+Term pow(Term t, double d);
+Term exp(Term t);
+Term log(Term t);
+Term cos(Term t);
+Term sin(Term t);
+Term tan(Term t);
 ///@}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,8 @@ private:
 class TermVar : public TermRep {
 public:
    /// Constructor
-   TermVar(const Variable& v);
+   /// @param v the variable enclosed
+   TermVar(Variable v);
 
    ///@{
    /// Overrides

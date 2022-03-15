@@ -112,12 +112,12 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    return v;
 }
 
-void Problem::addCtr(const Constraint& c)
+void Problem::addCtr(Constraint c)
 {
    ctrs_.push_back(c);
 }
 
-void Problem::addObjective(const Objective& obj)
+void Problem::addObjective(Objective obj)
 {
    obj_ = obj;
 }
@@ -129,7 +129,7 @@ IntervalRegion Problem::getDomains() const
    return r;
 }
 
-Interval Problem::getDomain(const Variable& v) const
+Interval Problem::getDomain(Variable v) const
 {
    ASSERT(scope_.contains(v),
           "Variable " << v.getName() << "does not belong to the problem");
@@ -143,7 +143,7 @@ void Problem::setDomains(const IntervalRegion& reg)
    for (auto v : reg.scope()) setDomain(v, reg.get(v));
 }
 
-void Problem::setDomain(const Variable& v, const Interval& x)
+void Problem::setDomain(Variable v, const Interval& x)
 {
    ASSERT(scope_.contains(v),
           "Variable " << v.getName() << "does not belong to the problem");
@@ -207,7 +207,7 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
    return os;
 }
 
-bool Problem::isFakeVar(const Variable& v) const
+bool Problem::isFakeVar(Variable v) const
 {
    if (obj_.getTerm().dependsOn(v))
       return false;

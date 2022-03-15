@@ -67,7 +67,7 @@ enum class OptimizationStatus {
 };
 
 /// Output on a stream of an optimization status
-std::ostream& operator<<(std::ostream& os, const OptimizationStatus& status);
+std::ostream& operator<<(std::ostream& os, OptimizationStatus status);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a certificate returned by interval solvers.
@@ -80,7 +80,7 @@ enum class Proof {
 };
 
 /// Output on a stream of a certificate of proof
-std::ostream& operator<<(std::ostream& os, const Proof& p);
+std::ostream& operator<<(std::ostream& os, Proof proof);
 
 } // namespace
 

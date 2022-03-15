@@ -31,7 +31,7 @@ public:
 
    /// Creates a contractor for one variable
    /// @param v an integer variable
-   IntContractor(const Variable& v);
+   IntContractor(Variable v);
 
    /// Creates a contractor for a list of variables
    /// @param l list of integer variables
@@ -39,7 +39,7 @@ public:
 
    /// Inserts a variable in the list of variables
    /// @param v an integer variable
-   void insert(const Variable& v);
+   void insert(Variable v);
 
    ///@{
    /// Overrides (Contractor)

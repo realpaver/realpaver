@@ -11,11 +11,9 @@
 #define REALPAVER_BO_CONTRACTOR_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 
 namespace realpaver {
-   
-   // TODO : Assumes that we have to minimize the objective function
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is contractor for bound-constrained optimization problems.
@@ -32,8 +30,8 @@ public:
    /// @param v variable considered
    /// @param op contractor for the equation df/dv = 0
    /// @param init initial region of the BO problem
-   BOContractor(Dag* dag, size_t i, const Variable& v,
-                SharedContractor op, SharedIntervalRegion init);
+   BOContractor(Dag* dag, size_t i, Variable v, SharedContractor op,
+                SharedIntervalRegion init);
 
    /// Default copy constructor
    BOContractor(const BOContractor&) = default;

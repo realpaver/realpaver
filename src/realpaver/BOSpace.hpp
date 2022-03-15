@@ -77,7 +77,7 @@ public:
 
    /// Simplifies this given an upper bound of the minimum
    /// u upper bound of the optimal value (we seek for minimum)
-   void simplify(const double& u);
+   void simplify(double u);
 
    /// @return the number of nodes inserted in this
    size_t getNbNodes() const;

@@ -25,14 +25,14 @@ public:
    /// Creates an interval region
    /// s scope of this
    /// x interval assigned to each element of this
-   IntervalRegion(const Scope& s, const Interval& x = Interval::universe());
+   IntervalRegion(Scope s, const Interval& x = Interval::universe());
 
    /// Creates an interval region
    /// s scope of this
    /// X interval vector having the same size than s
    ///
    /// The i-th variable in s is assigned to X[i] for each i.
-   IntervalRegion(const Scope& s, const IntervalVector& X);
+   IntervalRegion(Scope s, const IntervalVector& X);
 
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
@@ -116,24 +116,24 @@ public:
    /// @param s a scope included in the scope of this and reg
    ///
    /// this[s] is assigned to the hull of this[s] and reg[s]
-   void hullAssignOnScope(const IntervalRegion& reg, const Scope& s);
+   void hullAssignOnScope(const IntervalRegion& reg, Scope s);
 
    /// Assignment on a scope
    /// @param reg an interval region
    /// @param s a scope included in the scope of this and reg
    ///
    /// this[s] is assigned to reg[s]
-   void setOnScope(const IntervalRegion& reg, const Scope& s);
+   void setOnScope(const IntervalRegion& reg, Scope s);
 
    /// Midpoint of this on a scope
    /// @param s a scope included in the scope of this
    /// @return midpoint of this restricted to s
-   RealPoint midpointOnScope(const Scope& s) const;
+   RealPoint midpointOnScope(Scope s) const;
 
    /// Gets a sub-region
    /// @param s a scope included in the scope of this
    /// @return this restricted to s
-   IntervalRegion subRegion(const Scope& s) const;
+   IntervalRegion subRegion(Scope s) const;
 
    /// Overrides (IntervalVector)
    /// @return a clone of this

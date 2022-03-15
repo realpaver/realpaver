@@ -91,14 +91,14 @@ class IntervalPeeler : public IntervalSlicer {
 public:
    /// Creates a slicer
    /// @param f width factor
-   IntervalPeeler(const double& f);
+   IntervalPeeler(double f);
 
    /// @return the width factor
    double getFactor() const;
 
    /// Sets the width factor
    /// @param f width factor
-   void setFactor(const double& f);
+   void setFactor(double f);
 
    /// Peeling method
    /// @param interval x

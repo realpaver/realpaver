@@ -24,7 +24,7 @@ class ConstraintRelaxor : public ConstraintVisitor {
 public:
    /// Creates a visitor
    /// @param nu relaxation value
-   ConstraintRelaxor(const double& nu);
+   ConstraintRelaxor(double nu);
 
    /// Default copy constructor
    ConstraintRelaxor(const ConstraintRelaxor&) = default;

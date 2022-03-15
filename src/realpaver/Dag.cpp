@@ -1,7 +1,14 @@
-// This file is part of Realpaver. License: see COPYING file.
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/dag.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
 
 namespace realpaver {
@@ -113,7 +120,7 @@ bool DagNode::dependsOn(const Variable& v) const
    return bitset_.get(v.getId());
 }
 
-const Interval& DagNode::val() const
+Interval DagNode::val() const
 {
    return val_;
 }
@@ -123,7 +130,7 @@ void DagNode::setVal(const Interval& x)
    val_ = x;
 }
 
-const Interval& DagNode::dv() const
+Interval DagNode::dv() const
 {
    return dv_;
 }
@@ -138,27 +145,27 @@ void DagNode::addDv(const Interval& x)
    dv_ += x;
 }
 
-const double& DagNode::rval() const
+double DagNode::rval() const
 {
    return rval_;
 }
 
-void DagNode::setRval(const double& x)
+void DagNode::setRval(double x)
 {
    rval_ = x;
 }
 
-const double& DagNode::rdv() const
+double DagNode::rdv() const
 {
    return rdv_;
 }
 
-void DagNode::setRdv(const double& x)
+void DagNode::setRdv(double x)
 {
    rdv_ = x;
 }
 
-void DagNode::addRdv(const double& x)
+void DagNode::addRdv(double x)
 {
    rdv_ = Double::add(rdv_, x);
 }
@@ -169,11 +176,6 @@ DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
       : DagNode(dag, index),
         x_(x)
 {}
-
-size_t DagConst::nbOcc(const Variable& v) const
-{
-   return 0;
-}
 
 void DagConst::acceptVisitor(DagVisitor& vis) const
 {
@@ -235,17 +237,12 @@ Interval DagConst::getConst() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagVar::DagVar(Dag* dag, size_t index, const Variable& v)
+DagVar::DagVar(Dag* dag, size_t index, Variable v)
       : DagNode(dag, index),
         v_(v)
 {
    bitset_ = Bitset(1 + v.getId(), 0);
    bitset_.setOne(v.getId());
-}
-
-size_t DagVar::nbOcc(const Variable& v) const
-{
-   return (v.getId() == v_.getId()) ? 1 : 0;
 }
 
 void DagVar::print(std::ostream& os) const
@@ -346,16 +343,6 @@ bool DagOp::eq(const DagOp* other) const
          return false;
 
    return true;
-}
-
-size_t DagOp::nbOcc(const Variable& v) const
-{
-   size_t n = 0;
-
-   for (size_t i=0; i<subArity(); ++i)
-      n += subNode(i)->nbOcc(v);
-
-   return n;
 }
 
 void DagOp::print(std::ostream& os) const
@@ -1233,12 +1220,113 @@ bool DagTan::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagFun::DagFun(Dag* dag, size_t root, const Interval& image):
-   dag_(dag), node_(), vnode_(), scope_(), image_(image), idx_(0), inode_()
+DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
+      : dag_(dag),
+        node_(),
+        vnode_(),
+        scope_(),
+        image_(image),
+        idx_(0),
+        inode_()
 {
    DagFunCreator vis(this);
    DagNode* node = dag->node(root);
    node->acceptVisitor(vis);
+}
+
+Interval DagFun::getImage() const
+{
+   return image_;
+}
+
+void DagFun::setImage(const Interval& x)
+{
+   image_ = x;
+}
+
+Dag* DagFun::dag() const
+{
+   return dag_;
+}
+
+size_t DagFun::nbNode() const
+{
+   return node_.size();
+}
+
+DagNode* DagFun::node(size_t i) const
+{
+   return node_[i];
+}
+
+DagNode* DagFun::rootNode() const
+{
+   return node_.back();
+}
+
+size_t DagFun::nbVar() const
+{
+   return vnode_.size();
+}
+
+DagVar* DagFun::varNode(size_t i) const
+{
+   return vnode_[i];
+}
+
+const Bitset& DagFun::bitset() const
+{
+   return rootNode()->bitset();
+}
+
+bool DagFun::dependsOn(const Bitset& bs) const
+{
+   return rootNode()->dependsOn(bs);
+}
+
+bool DagFun::dependsOn(const Variable& v) const
+{
+   return rootNode()->dependsOn(v);
+}
+
+Interval DagFun::deriv(size_t i) const
+{
+   return varNode(i)->dv();
+}
+
+void DagFun::setIndex(size_t i)
+{
+   idx_ = i;
+}
+
+size_t DagFun::index() const
+{
+   return idx_;
+}
+
+Scope DagFun::scope() const
+{
+   return scope_;
+}
+
+void DagFun::setScope(Scope s)
+{
+   scope_ = s;
+}
+
+double DagFun::rderiv(size_t i) const
+{
+   return varNode(i)->rdv();
+}
+
+double DagFun::rval() const
+{
+   return rootNode()->rval();
+}
+
+Interval DagFun::val() const
+{
+   return rootNode()->val();
 }
 
 bool DagFun::hasNode(DagNode* node) const
@@ -1496,7 +1584,7 @@ void DagFun::toGrad(IntervalVector& G) const
       G.set(i, deriv(i));
 }
 
-const Interval& DagFun::deriv(const Variable& v) const
+Interval DagFun::deriv(const Variable& v) const
 {
    return dag_->findVarNode(v.getId())->dv();
 }
@@ -1667,7 +1755,14 @@ DagContext* DagContext::clone() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Dag::Dag(): node_(), cnode_(), vnode_(), onode_(), fun_(), vmap_(), omap_()
+Dag::Dag()
+      : node_(),
+        cnode_(),
+        vnode_(),
+        onode_(),
+        fun_(),
+        vmap_(),
+        omap_()
 {
    defaultContext_ = new DagContext();
    context_ = defaultContext_;
@@ -1684,28 +1779,79 @@ Dag::~Dag()
    delete defaultContext_;
 }
 
+size_t Dag::nbNode() const
+{
+   return node_.size();
+}
+
+DagNode* Dag::node(size_t i) const
+{
+   return node_[i];
+}
+
+size_t Dag::nbFun() const
+{
+   return fun_.size();
+}
+
+void Dag::pushNode(DagNode* node)
+{
+   node_.push_back(node);
+   defaultContext_->extend(1);
+}
+
+Interval Dag::dom(size_t i) const
+{
+   return context_->dom[i];
+}
+
+void Dag::setDom(size_t i, const Interval& x)
+{
+   context_->dom.set(i, x);
+}
+
+void Dag::reduceDom(size_t i, const Interval& x)
+{
+   Interval aux( x & context_->dom[i]);
+   context_->dom.set(i, aux);
+}
+
+DagContext* Dag::cloneDefaultContext() const
+{
+   return defaultContext_->clone();
+}
+
+size_t Dag::nbVar() const
+{
+   return vnode_.size();
+}
+
+DagVar* Dag::varNode(size_t i) const
+{
+   return vnode_[i];
+}
+
 DagFun* Dag::fun(size_t i) const
 {
-   ASSERT(i < nbFun(), "access out of range of a dag function");
+   ASSERT(i < nbFun(), "Access out of range to a DAG function");
 
    return fun_[i];
 }
 
-size_t Dag::insert(const Constraint& c)
+size_t Dag::insert(Constraint c)
 {
    DagCreator creator(this, c);
    c.acceptVisitor(creator);
    return creator.index();
 }
 
-size_t Dag::insert(const Term& t, const Interval& img)
+size_t Dag::insert(Term t, const Interval& img)
 {
    Constraint c( t == 0.0 );
    size_t idx = insert(c);
    fun_[idx]->setImage(img);
    return idx;
 }
-
 
 size_t Dag::insertFun(DagFun* f)
 {
@@ -2171,9 +2317,16 @@ void DagFunCreator::apply(const DagTan* d)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagCreator::DagCreator(Dag* dag, const Constraint& c):
-   dag_(dag), c_(c), index_(0)
+DagCreator::DagCreator(Dag* dag, Constraint c)
+      : dag_(dag),
+        c_(c),
+        index_(0)
 {}
+
+size_t DagCreator::index()
+{
+   return index_;
+}
 
 void DagCreator::apply(const ConstraintEq* c)
 {
@@ -2254,9 +2407,16 @@ void DagCreator::apply(const ConstraintIn* c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DagTermCreator::DagTermCreator(Dag* dag):
-   dag_(dag), lsub_(), index_(0)
+DagTermCreator::DagTermCreator(Dag* dag)
+      : dag_(dag),
+        lsub_(),
+        index_(0)
 {}
+
+size_t DagTermCreator::index()
+{
+   return index_;
+}
 
 void DagTermCreator::visitSubnodes(const TermOp* t)
 {

@@ -11,7 +11,7 @@
 
 namespace realpaver {
 
-Selector::Selector(const Scope& s) : scope_(s)
+Selector::Selector(Scope s) : scope_(s)
 {
    ASSERT(s.size() > 0, "Creation of a selector with an empty scope");
 }
@@ -26,7 +26,7 @@ Scope Selector::scope() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SelectorMaxDom::SelectorMaxDom(const Scope& s) : Selector(s)
+SelectorMaxDom::SelectorMaxDom(Scope s) : Selector(s)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a selector");
 }
@@ -66,7 +66,7 @@ std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SelectorMaxSmear::SelectorMaxSmear(IntervalFunction* f, const Scope& s)
+SelectorMaxSmear::SelectorMaxSmear(IntervalFunction* f, Scope s)
       : Selector(s),
         f_(f)
 {

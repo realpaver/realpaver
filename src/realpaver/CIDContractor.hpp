@@ -30,7 +30,7 @@ public:
    /// @param op a contractor
    /// @param v a variable
    /// @param a slicer
-   CIDContractor(SharedContractor op, const Variable& v,
+   CIDContractor(SharedContractor op, Variable v,
                  std::unique_ptr<IntervalSlicer> slicer);
 
    /// Creates a contractor without any variable (to be fixed later)
@@ -52,7 +52,7 @@ public:
 
    /// Assigns the variable whose domain is sliced
    /// @param v a variable that belongs to the scope of this
-   void setVar(const Variable& v);
+   void setVar(Variable v);
 
    ///@{
    /// Overrides (Contractor)

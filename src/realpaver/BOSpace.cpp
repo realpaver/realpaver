@@ -116,7 +116,7 @@ SharedBONode BOSpace::extractNode(size_t i)
    return node;   
 }
 
-void BOSpace::simplify(const double& u)
+void BOSpace::simplify(double u)
 {
    while (true)
    {

@@ -19,7 +19,7 @@ size_t hash4(size_t h1, size_t h2, size_t h3, size_t h4)
    return hash2(h1, hash3(h2,h3,h4));
 }
 
-std::ostream& operator<<(std::ostream& os, const OptimizationStatus& status)
+std::ostream& operator<<(std::ostream& os, OptimizationStatus status)
 {
    switch(status)
    {
@@ -33,9 +33,9 @@ std::ostream& operator<<(std::ostream& os, const OptimizationStatus& status)
    return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Proof& p)
+std::ostream& operator<<(std::ostream& os, Proof proof)
 {
-   switch(p)
+   switch(proof)
    {
       case Proof::Empty:    return os << "empty";
       case Proof::Maybe:    return os << "maybe";

@@ -15,6 +15,7 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
+#include "realpaver/SymbolTable.hpp"
 
 namespace realpaver {
 
@@ -89,18 +90,18 @@ public:
    /// Checks if a variable is involved in this
    /// @param v a variable
    /// @return true if v a variable of this but it does not occur anywhere
-   bool isFakeVar(const Variable& v) const;
+   bool isFakeVar(Variable v) const;
 
    /// @return the scope of this (sorted set of variables)
    Scope scope() const;
 
    /// Inserts a constraint
    /// @param c constraint inserted
-   void addCtr(const Constraint& c);
+   void addCtr(Constraint c);
 
    /// Adds an objective function
    /// @param obj objective function
-   void addObjective(const Objective& obj);
+   void addObjective(Objective obj);
 
    /// @return the objective function
    Objective getObjective() const;
@@ -123,7 +124,7 @@ public:
    /// Gets the domain of a variable
    /// @param v a variable
    /// @return the domain of v
-   Interval getDomain(const Variable& v) const;
+   Interval getDomain(Variable v) const;
 
    /// Sets the initial region
    /// @param reg domains of variables
@@ -132,7 +133,7 @@ public:
    /// Sets a domain in the initial region
    /// @param v variable
    /// @param x new initial domain of v
-   void setDomain(const Variable& v, const Interval& x);
+   void setDomain(Variable v, const Interval& x);
 
    /// @return true if this is a CSP
    bool isCSP() const;
@@ -186,6 +187,8 @@ private:
    std::vector<Constraint> ctrs_;   // vector of constraints
    Objective obj_;                  // objective function
    Scope scope_;                    // set of variables
+
+   SymbolTable symtable_;           // table of symbols
 
    std::unordered_map<Variable, Interval, VariableHasher> dom_;
 };

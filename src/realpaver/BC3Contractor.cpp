@@ -184,7 +184,7 @@ Proof BC3Contractor::contract(IntervalRegion& reg)
    Proof proof, certif;
 
    Variable v = f_.getVar();
-   const Interval& img = f_.getFun()->getImage();
+   Interval img = f_.getFun()->getImage();
 
    // first interval evaluation that also thickens the function
    Interval e = f_.update(reg);

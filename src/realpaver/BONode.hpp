@@ -31,8 +31,7 @@ public:
    /// @param scope set of variables of the optimization problem
    /// @param variable representing the objective function
    /// @param reg domains of variables
-   BONode(const Scope& scope, const Variable& objvar,
-          const IntervalRegion& reg);
+   BONode(Scope scope, Variable objvar, const IntervalRegion& reg);
 
    /// Copy constructor
    BONode(const BONode& node);
@@ -48,14 +47,14 @@ public:
 
    /// Sets the lower bound of the objective function
    /// @param val new lower bound
-   void setLower(const double& val);
+   void setLower(double val);
 
    /// @return the upper bound of the objective function
    double getUpper() const;
 
    /// Sets the upper bound of the objective function
    /// @param val new upper bound
-   void setUpper(const double& val);
+   void setUpper(double val);
 
    /// @return the vector of domains of this
    IntervalRegion* getRegion() const;

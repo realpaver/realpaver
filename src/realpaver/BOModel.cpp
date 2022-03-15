@@ -104,24 +104,22 @@ Dag* BOModel::getDag()
    return dag_;
 }
 
-void BOModel::setBoundaryVar(const Variable& v)
+void BOModel::setBoundaryVar(Variable v)
 {
    if (!boundary_.contains(v)) boundary_.insert(v);
 }
 
-
-void BOModel::setInteriorVar(const Variable& v)
+void BOModel::setInteriorVar(Variable v)
 {
    if (boundary_.contains(v)) boundary_.remove(v);
-   
 }
 
-bool BOModel::isBoundaryVar(const Variable& v) const
+bool BOModel::isBoundaryVar(Variable v) const
 {
    return boundary_.contains(v);
 }
 
-bool BOModel::isInteriorVar(const Variable& v) const
+bool BOModel::isInteriorVar(Variable v) const
 {
    return !boundary_.contains(v);
 }

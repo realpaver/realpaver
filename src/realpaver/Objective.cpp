@@ -11,46 +11,78 @@
 
 namespace realpaver {
 
-Objective::Objective(const Term& f, bool minimization)
-      : f_(f), minimization_(minimization)
+ObjectiveRep::ObjectiveRep(Term f, bool minimization)
+      : f_(f),
+        minimization_(minimization)
 {}
 
-Term Objective::getTerm() const
+Term ObjectiveRep::getTerm() const
 {
    return f_;
 }
 
-bool Objective::isConstant() const
+bool ObjectiveRep::isConstant() const
 {
    return f_.isConstant();
 }
 
-bool Objective::isLinear() const
+bool ObjectiveRep::isLinear() const
 {
    return f_.isLinear();
 }
 
-bool Objective::isMinimization() const
+bool ObjectiveRep::isMinimization() const
 {
    return minimization_;
 }
 
-bool Objective::isMaximization() const
+bool ObjectiveRep::isMaximization() const
 {
    return !minimization_; 
 }
 
-Objective minimize(const Term& f)
+///////////////////////////////////////////////////////////////////////////////
+
+Objective::Objective(Term f, bool minimization)
+      : rep_(std::make_shared<ObjectiveRep>(f, minimization))
+{}
+
+Term Objective::getTerm() const
+{
+   return rep_->getTerm();
+}
+
+bool Objective::isConstant() const
+{
+   return rep_->isConstant();
+}
+
+bool Objective::isLinear() const
+{
+   return rep_->isLinear();
+}
+
+bool Objective::isMinimization() const
+{
+   return rep_->isMinimization();
+}
+
+bool Objective::isMaximization() const
+{
+   return rep_->isMaximization(); 
+}
+
+Objective minimize(Term f)
 {
    return Objective(f, true);
 }
 
-Objective maximize(const Term& f)
+Objective maximize(Term f)
 {
    return Objective(f, false);
 }
 
-std::ostream& operator<<(std::ostream& os, const Objective& obj)
+std::ostream& operator<<(std::ostream& os, Objective obj)
 {
    if (obj.isMaximization())
       os << "maximize ";

@@ -12,7 +12,7 @@
 
 namespace realpaver {
 
-ConstraintRelaxor::ConstraintRelaxor(const double& nu)
+ConstraintRelaxor::ConstraintRelaxor(double nu)
       : nu_(nu),
         relaxed_(nullptr)
 {
