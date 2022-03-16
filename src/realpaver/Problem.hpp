@@ -11,11 +11,11 @@
 #define REALPAVER_PROBLEM_HPP
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
-#include "realpaver/SymbolTable.hpp"
 
 namespace realpaver {
 
@@ -188,9 +188,12 @@ private:
    Objective obj_;                  // objective function
    Scope scope_;                    // set of variables
 
-   SymbolTable symtable_;           // table of symbols
+   std::unordered_set<std::string> vname_;
 
    std::unordered_map<Variable, Interval, VariableHasher> dom_;
+
+   // throws an exception if a name is already used as the name of a symbol
+   void checkSymbol(const std::string& name);
 };
 
 /// Output on a stream

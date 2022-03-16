@@ -11,6 +11,7 @@
 #define REALPAVER_SYMBOL_TABLE_HPP
 
 #include <unordered_map>
+#include <unordered_set>
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
@@ -38,6 +39,8 @@ class ConstantSymbol : public ParsingSymbol {
 public:
    ConstantSymbol(const std::string& name, const Interval& x);
 
+   Interval getValue() const;
+
 private:
    Interval x_;
 };
@@ -48,6 +51,8 @@ private:
 class VariableSymbol : public ParsingSymbol {
 public:
    VariableSymbol(Variable v);
+
+   Variable getVar() const;
 
 private:
    Variable v_;
@@ -62,11 +67,20 @@ public:
 
    ~SymbolTable();
 
+   bool hasSymbol(const std::string& name) const;
+
    void clear();
+
+   ConstantSymbol* findConstant(const std::string& name) const;
+   VariableSymbol* findVariable(const std::string& name) const;
+
+   void insertKeyword(const std::string& name);
+   void insertConstant(const std::string& name, const Interval& x);
 
 private:
    std::unordered_map<std::string, ConstantSymbol*> cmap_;
    std::unordered_map<std::string, VariableSymbol*> vmap_;
+   std::unordered_set<std::string> keywords_;
 };
 
 } // namespace

@@ -2,34 +2,41 @@
 #include <stdio.h>
 #include <string.h>
 #include "realpaver/Problem.hpp"
+#include "realpaver/SymbolTable.hpp"
 
 #undef YYINITDEPTH
 #define YYINITDEPTH 5000
 
-extern char* parser_bison_text;
-extern int parser_bison_lineno;
-extern char parser_error[256];
-extern realpaver::Problem* parser_bison_problem;
+extern char* realpaver_bison_text;
+extern int realpaver_bison_lineno;
+extern char realpaver_parse_error[256];
+extern realpaver::Problem* realpaver_bison_problem;
+extern realpaver::SymbolTable* realpaver_bison_symtable;
 
-extern int parser_bison_lex(void);
-int parser_bison_error(const char* str);
+extern int realpaver_bison_lex(void);
+int realpaver_bison_error(const char* str);
 %}
 
-%define api.prefix {parser_bison_}
+%define api.prefix {realpaver_bison_}
 
 %code requires
 {
+#include "realpaver/Constraint.hpp"
+#include "realpaver/Exception.hpp"
 }
 
 %union
 {
    char u_str[256];
+   realpaver::TermRep* u_term;
 }
 
-%type <u_str> ident
+%type <u_str>  ident
+%type <u_term> expr
+%type <u_term> const_expr
 
 %token TK_IDENT TK_INT TK_REAL
-%token TK_STR_VAR TK_STR_CONST TK_STR_INT TK_STR_REAL
+%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_INT TK_STR_REAL
 %token TK_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
@@ -47,23 +54,77 @@ int parser_bison_error(const char* str);
 
 %%
 model
-   : expr;
+   : 
+   | statement TK_SCOLON model
+   ;
+
+statement
+   : const_statement
+   ;
+
+const_statement
+   : TK_STR_CONST const_list;
+
+const_list
+   : const_def const_tail;
+
+const_tail
+   :
+   | TK_COMMA const_list;
+
+const_def
+   : ident TK_EQ const_expr;
 
 expr
-   : ident
+   : expr TK_PLUS expr
      {
-     };
+         $$ = new realpaver::TermAdd(std::shared_ptr<realpaver::TermRep>($1),
+                                     std::shared_ptr<realpaver::TermRep>($3));
+     }
+   | ident
+     {
+        
+     }
+   | TK_INT
+     {
+         try {
+            realpaver::Interval x(realpaver_bison_text);
+            $$ = new realpaver::TermConst(x);
+         }
+         catch(realpaver::Exception e) {
+             throw realpaver::Exception("xxx");
+         }
+     }
+   | TK_REAL
+     {
+         try {
+            realpaver::Interval x(realpaver_bison_text);
+            $$ = new realpaver::TermConst(x);
+         }
+         catch(realpaver::Exception e) {
+             throw realpaver::Exception("xxx");
+         }       
+     }
+   ;
 
 ident
    : TK_IDENT
      {
-        strcpy($$, parser_bison_text);
+        strcpy($$, realpaver_bison_text);
+     }
+   ;
+
+const_expr
+   : expr
+     {
+        
      }
    ;
 %%
 
-int parser_bison_error(const char* str)
+int realpaver_bison_error(const char* str)
 {
-   snprintf(parser_error, 255, "l%d: %s", parser_bison_lineno, str);
+   snprintf(realpaver_parse_error, 255, "l%d: %s",
+            realpaver_bison_lineno, str);
    return 0;
 }

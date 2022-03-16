@@ -2,11 +2,12 @@
 #include <stdio.h>
 #include "realpaver/parser_bison.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/SymbolTable.hpp"
 
-extern int parser_bison_lineno;
+extern int realpaver_bison_lineno;
 %}
 
-%option prefix = "parser_bison_"
+%option prefix = "realpaver_bison_"
 %option nounput
 
 SPACE       [ \t\r]+
@@ -17,46 +18,52 @@ E           [eE][+-]?{DIG}+
 REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 
 %%
-{INT}       return TK_INT;
-{REAL}      return TK_REAL;
+{INT}           return TK_INT;
+{REAL}          return TK_REAL;
 
-"var"       return TK_STR_VAR;
-"const"     return TK_STR_CONST;
-"real"      return TK_STR_REAL;
-"int"       return TK_STR_INT;
-"min"       return TK_MIN;
-"max"       return TK_MAX;
-"sqrt"      return TK_SQRT;
-"log"       return TK_LOG;
-"exp"       return TK_EXP;
-"tan"       return TK_TAN;
-"cos"       return TK_COS;
-"sin"       return TK_SIN;
-"sgn"       return TK_SGN;
-"abs"       return TK_ABS;
-"in"        return TK_IN;
+"Variables"     return TK_STR_VAR;
+"Constants"     return TK_STR_CONST;
+"Constraints"   return TK_STR_CTR;
 
-"+"         return TK_PLUS;
-"-"         return TK_MINUS;
-"*"         return TK_MUL;
-"/"         return TK_DIV;
-"^"         return TK_POW;
-"("         return TK_LPAR;
-")"         return TK_RPAR;
-"["         return TK_LSBR;
-"]"         return TK_RSBR;
-","         return TK_COMMA;
-";"         return TK_SCOLON;
-":"         return TK_COLON;
-">"         return TK_GT;
-"<"         return TK_LT;
-"="         return TK_EQ;
-">="        return TK_GE;
-"<="        return TK_LE;
+"real"   return TK_STR_REAL;
+"int"    return TK_STR_INT;
 
-{IDENT}     return TK_IDENT;
+"min"    return TK_MIN;
+"max"    return TK_MAX;
+"MIN"    return TK_MIN;
+"MAX"	   return TK_MAX;
+"sqrt"	return TK_SQRT;
+"log"    return TK_LOG;
+"exp"    return TK_EXP;
+"tan"    return TK_TAN;
+"cos"    return TK_COS;
+"sin"    return TK_SIN;
+"sgn"    return TK_SGN;
+"abs"    return TK_ABS;
 
-"\n"     { ++parser_bison_lineno; }
+"in"     return TK_IN;
+
+"+"      return TK_PLUS;
+"-"      return TK_MINUS;
+"*"      return TK_MUL;
+"/"      return TK_DIV;
+"^"      return TK_POW;
+"("      return TK_LPAR;
+")"      return TK_RPAR;
+"["      return TK_LSBR;
+"]"      return TK_RSBR;
+","      return TK_COMMA;
+";"      return TK_SCOLON;
+":"      return TK_COLON;
+">"      return TK_GT;
+"<"      return TK_LT;
+"="      return TK_EQ;
+">="     return TK_GE;
+"<="     return TK_LE;
+
+{IDENT}     	return TK_IDENT;
+
+"\n"     { ++realpaver_bison_lineno; }
 
 {SPACE}  {}
 
@@ -66,18 +73,18 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
             {
                while( (c=getchar()) != '*' && c!=EOF )
                {
-                  if( c=='\n' ) ++parser_bison_lineno;
+                  if( c=='\n' ) ++realpaver_bison_lineno;
                }
 
                if( c=='*' )
                {
                   while( (c=getchar()) == '*' )
                   {
-                     if( c=='\n' ) ++parser_bison_lineno;
+                     if( c=='\n' ) ++realpaver_bison_lineno;
                   }
 
                   if( c=='/' ) break;
-                  if( c=='\n' ) ++parser_bison_lineno;
+                  if( c=='\n' ) ++realpaver_bison_lineno;
                }
                if( c==EOF ) break;
             }
@@ -87,65 +94,72 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
             int c;
             while( (c=getchar()) != '\n' && (c!=EOF) )
             {}
-            if( c=='\n' ) ++parser_bison_lineno;
+            if( c=='\n' ) ++realpaver_bison_lineno;
          }
 %%
 
-realpaver::Problem* parser_bison_problem;
+realpaver::Problem* realpaver_bison_problem;
+realpaver::SymbolTable* realpaver_bison_symtable;
 
-YY_BUFFER_STATE parser_bison_buffer;
-char parser_error[256];
+YY_BUFFER_STATE realpaver_bison_buffer;
+char realpaver_parse_error[256];
 
-void parser_flex_init(realpaver::Problem * prob)
+void realpaver_flex_init(realpaver::Problem* prob,
+							    realpaver::SymbolTable* symtab)
 {
-   parser_bison_lineno = 1;
-   parser_bison_problem = prob;
-   strcpy(parser_error, "");
-
+   realpaver_bison_lineno = 1;
+   realpaver_bison_problem = prob;
+   realpaver_bison_symtable = symtab;
+   strcpy(realpaver_parse_error, "");
 }
 
-void parser_flex_init_str(realpaver::Problem * prob, const char *str)
+void realpaver_flex_init_str(realpaver::Problem* prob,
+								     realpaver::SymbolTable* symtab, const char* str)
 {
-   parser_flex_init(prob);
-   parser_bison_buffer = parser_bison__scan_string(str);
+   realpaver_flex_init(prob, symtab);
+   realpaver_bison_buffer = realpaver_bison__scan_string(str);
 }
 
-int parser_flex_init_file(realpaver::Problem * prob, const char *filename)
+int realpaver_flex_init_file(realpaver::Problem* prob,
+								     realpaver::SymbolTable* symtab,
+								     const char* filename)
 {
    int res = 0;
-   parser_bison_in = fopen(filename, "r");
-   if (!parser_bison_in)
+   realpaver_bison_in = fopen(filename, "r");
+   if (!realpaver_bison_in)
    {
-      strcpy(parser_error, "file not found");
+      strcpy(realpaver_parse_error, "file not found");
       res = 1;
    }
    else
    {
-      parser_flex_init(prob);
-      parser_bison_buffer =
-         parser_bison__create_buffer(parser_bison_in, YY_BUF_SIZE);
-      parser_bison__switch_to_buffer(parser_bison_buffer);
+      realpaver_flex_init(prob, symtab);
+      realpaver_bison_buffer =
+         realpaver_bison__create_buffer(realpaver_bison_in, YY_BUF_SIZE);
+      realpaver_bison__switch_to_buffer(realpaver_bison_buffer);
    }
    return res;
 }
 
-void parser_flex_cleanup_str()
+void realpaver_flex_cleanup_str()
 {
-   parser_bison_problem = NULL;
-   parser_bison__delete_buffer(parser_bison_buffer);
+   realpaver_bison_problem = NULL;
+   realpaver_bison_symtable = NULL;
+   realpaver_bison__delete_buffer(realpaver_bison_buffer);
 }
 
-void parser_flex_cleanup_file()
+void realpaver_flex_cleanup_file()
 {
-   parser_bison_problem = NULL;
-   if (parser_bison_in)
+   realpaver_bison_problem = NULL;
+   realpaver_bison_symtable = NULL;
+   if (realpaver_bison_in)
    {
-      fclose(parser_bison_in);
-      parser_bison__delete_buffer(parser_bison_buffer);
+      fclose(realpaver_bison_in);
+      realpaver_bison__delete_buffer(realpaver_bison_buffer);
    }
 }
 
-int parser_bison_wrap(void)
+int realpaver_bison_wrap(void)
 {
    return 1;
 }

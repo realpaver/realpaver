@@ -96,7 +96,7 @@ void TermFixer::apply(const TermMin* t)
    TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
 
-   t_ = mini(vl.t_, vr.t_);
+   t_ = MIN(vl.t_, vr.t_);
 }
 
 void TermFixer::apply(const TermMax* t)
@@ -107,7 +107,7 @@ void TermFixer::apply(const TermMax* t)
    TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
 
-   t_ = maxi(vl.t_, vr.t_);
+   t_ = MAX(vl.t_, vr.t_);
 }
 
 void TermFixer::apply(const TermUsb* t)

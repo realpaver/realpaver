@@ -1061,7 +1061,7 @@ Term operator/(Term l, Term r)
       return Term(std::make_shared<TermDiv>(l.rep(),r.rep()));
 }
 
-Term mini(Term l, Term r)
+Term MIN(Term l, Term r)
 {
    if (l.isConstant() && r.isConstant())
    {
@@ -1072,7 +1072,7 @@ Term mini(Term l, Term r)
       return Term(std::make_shared<TermMin>(l.rep(),r.rep()));
 }
 
-Term maxi(Term l, Term r)
+Term MAX(Term l, Term r)
 {
    if (l.isConstant() && r.isConstant())
    {

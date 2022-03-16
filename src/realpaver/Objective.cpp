@@ -72,12 +72,12 @@ bool Objective::isMaximization() const
    return rep_->isMaximization(); 
 }
 
-Objective minimize(Term f)
+Objective MIN(Term f)
 {
    return Objective(f, true);
 }
 
-Objective maximize(Term f)
+Objective MAX(Term f)
 {
    return Objective(f, false);
 }
@@ -85,9 +85,9 @@ Objective maximize(Term f)
 std::ostream& operator<<(std::ostream& os, Objective obj)
 {
    if (obj.isMaximization())
-      os << "maximize ";
+      os << "MAX ";
    else
-      os << "minimize ";
+      os << "MIN ";
 
    return os << obj.getTerm();
 }

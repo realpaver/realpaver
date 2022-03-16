@@ -87,8 +87,8 @@ public:
    /// @return true if this has to be maximized
    bool isMaximization() const;
 
-   friend Objective minimize(Term f);
-   friend Objective maximize(Term f);
+   friend Objective MIN(Term f);
+   friend Objective MAX(Term f);
 
 private:
    std::shared_ptr<ObjectiveRep> rep_;
@@ -102,12 +102,12 @@ std::ostream& operator<<(std::ostream& os, Objective obj);
 /// Creates an objective function
 /// @param f expression
 /// @return minimize f
-Objective minimize(Term f);
+Objective MIN(Term f);
 
 /// Creates an objective function
 /// @param f expression
 /// @return maximize f
-Objective maximize(Term f);
+Objective MAX(Term f);
 
 } // namespace
 

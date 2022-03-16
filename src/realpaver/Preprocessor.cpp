@@ -146,10 +146,10 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
    else
    {
       if (obj.isMinimization())
-         dest.addObjective(minimize(fixer.getTerm()));
+         dest.addObjective(MIN(fixer.getTerm()));
 
       else
-         dest.addObjective(maximize(fixer.getTerm()));
+         dest.addObjective(MAX(fixer.getTerm()));
    }
 
    // detects fake variables

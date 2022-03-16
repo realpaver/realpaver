@@ -57,7 +57,7 @@ int main(void)
       //~ Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
 
 
-      problem.addObjective(minimize(to));
+      problem.addObjective(MIN(to));
 
       BOSolver solver(problem);
       solver.setIntParam("NODE_LIMIT", 400);

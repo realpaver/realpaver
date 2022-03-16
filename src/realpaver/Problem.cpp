@@ -20,8 +20,9 @@ Problem::Problem(const std::string& name)
       : name_(),
         vars_(),
         ctrs_(),
-        obj_(minimize(0)),
+        obj_(MIN(Term(0))),
         scope_(),
+        vname_(),
         dom_()
 {}
 
@@ -31,11 +32,11 @@ Variable Problem::addBoolVar(const std::string& name)
 
    std::ostringstream os;
 
-   if (name == "")
-      os << "_b" << id;
-   else
-      os << name;
-   
+   if (name == "") os << "_b" << id;
+   else            os << name;
+
+   checkSymbol(os.str());
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(Interval(0,1))
@@ -57,16 +58,16 @@ Variable Problem::addIntVar(int lo, int up, const std::string& name)
 Variable Problem::addIntVar(const Interval& x, const std::string& name)
 {
    Interval y = round(x);
-   ASSERT(!y.isEmpty(), "integer variable with an empty domain");
+   THROW_IF(y.isEmpty(), "Integer variable with an empty domain");
    
    size_t id = vars_.size();
 
    std::ostringstream os;
 
-   if (name == "")
-      os << "_i" << id;
-   else
-      os << name;
+   if (name == "") os << "_i" << id;
+   else            os << name;
+
+   checkSymbol(os.str());
 
    Variable v(os.str());
    v.setId(id)
@@ -88,17 +89,17 @@ Variable Problem::addRealVar(double lo, double up, const std::string& name)
 
 Variable Problem::addRealVar(const Interval& x, const std::string& name)
 {
-   ASSERT(!x.isEmpty(), "real variable with an empty domain");
+   THROW_IF(x.isEmpty(), "Real variable with an empty domain");
 
    size_t id = vars_.size();
 
    std::ostringstream os;
 
-   if (name == "")
-      os << "_x" << id;
-   else
-      os << name;
+   if (name == "") os << "_x" << id;
+   else            os << name;
    
+   checkSymbol(os.str());
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(x)
@@ -313,7 +314,7 @@ size_t Problem::nbVars() const
 
 Variable Problem::varAt(size_t i) const
 {
-   ASSERT(i < vars_.size(), "bad access to a variable in a problem");
+   ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
 
    return vars_[i];
 }
@@ -325,7 +326,7 @@ size_t Problem::nbCtrs() const
 
 Constraint Problem::ctrAt(size_t i) const
 {
-   ASSERT(i < ctrs_.size(), "bad access to a constraint in a problem");
+   ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
 
    return ctrs_[i];
 }
@@ -373,6 +374,15 @@ bool Problem::isCOP() const
 bool Problem::isEmpty() const
 {
    return (nbVars() == 0) && (nbCtrs() == 0) && (!hasObjective()); 
+}
+
+void Problem::checkSymbol(const std::string& name)
+{
+   auto it = vname_.find(name);
+   if (it != vname_.end())
+      THROW("Symbol [" << name << "] already defined");
+   else
+      vname_.insert(name);
 }
 
 } // namespace

@@ -30,71 +30,74 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_PARSER_BISON_PARSER_BISON_HPP_INCLUDED
-# define YY_PARSER_BISON_PARSER_BISON_HPP_INCLUDED
+#ifndef YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
+# define YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
 /* Debug traces.  */
-#ifndef PARSER_BISON_DEBUG
+#ifndef REALPAVER_BISON_DEBUG
 # if defined YYDEBUG
 #if YYDEBUG
-#   define PARSER_BISON_DEBUG 1
+#   define REALPAVER_BISON_DEBUG 1
 #  else
-#   define PARSER_BISON_DEBUG 0
+#   define REALPAVER_BISON_DEBUG 0
 #  endif
 # else /* ! defined YYDEBUG */
-#  define PARSER_BISON_DEBUG 0
+#  define REALPAVER_BISON_DEBUG 0
 # endif /* ! defined YYDEBUG */
-#endif  /* ! defined PARSER_BISON_DEBUG */
-#if PARSER_BISON_DEBUG
-extern int parser_bison_debug;
+#endif  /* ! defined REALPAVER_BISON_DEBUG */
+#if REALPAVER_BISON_DEBUG
+extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 21 "parser_bison.ypp" /* yacc.c:1909  */
+#line 23 "parser_bison.ypp" /* yacc.c:1909  */
 
+#include "realpaver/Constraint.hpp"
+#include "realpaver/Exception.hpp"
 
-#line 55 "parser_bison.hpp" /* yacc.c:1909  */
+#line 57 "parser_bison.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
-#ifndef PARSER_BISON_TOKENTYPE
-# define PARSER_BISON_TOKENTYPE
-  enum parser_bison_tokentype
+#ifndef REALPAVER_BISON_TOKENTYPE
+# define REALPAVER_BISON_TOKENTYPE
+  enum realpaver_bison_tokentype
   {
     TK_IDENT = 258,
     TK_INT = 259,
     TK_REAL = 260,
     TK_STR_VAR = 261,
     TK_STR_CONST = 262,
-    TK_STR_INT = 263,
-    TK_STR_REAL = 264,
-    TK_EQ = 265,
-    TK_LE = 266,
-    TK_GE = 267,
-    TK_IN = 268,
-    TK_LT = 269,
-    TK_GT = 270,
-    TK_PLUS = 271,
-    TK_MINUS = 272,
-    TK_MUL = 273,
-    TK_DIV = 274,
-    TK_POW = 275,
-    TK_SQRT = 276,
-    TK_LOG = 277,
-    TK_EXP = 278,
-    TK_TAN = 279,
-    TK_COS = 280,
-    TK_SIN = 281,
-    TK_LPAR = 282,
-    TK_RPAR = 283,
-    TK_LSBR = 284,
-    TK_RSBR = 285,
-    TK_COMMA = 286,
-    TK_SCOLON = 287,
-    TK_COLON = 288,
-    TK_SGN = 289,
-    TK_ABS = 290,
-    TK_MIN = 291,
-    TK_MAX = 292,
-    TK_UMINUS = 293,
-    TK_UPLUS = 294
+    TK_STR_CTR = 263,
+    TK_STR_INT = 264,
+    TK_STR_REAL = 265,
+    TK_EQ = 266,
+    TK_LE = 267,
+    TK_GE = 268,
+    TK_IN = 269,
+    TK_LT = 270,
+    TK_GT = 271,
+    TK_PLUS = 272,
+    TK_MINUS = 273,
+    TK_MUL = 274,
+    TK_DIV = 275,
+    TK_POW = 276,
+    TK_SQRT = 277,
+    TK_LOG = 278,
+    TK_EXP = 279,
+    TK_TAN = 280,
+    TK_COS = 281,
+    TK_SIN = 282,
+    TK_LPAR = 283,
+    TK_RPAR = 284,
+    TK_LSBR = 285,
+    TK_RSBR = 286,
+    TK_COMMA = 287,
+    TK_SCOLON = 288,
+    TK_COLON = 289,
+    TK_SGN = 290,
+    TK_ABS = 291,
+    TK_MIN = 292,
+    TK_MAX = 293,
+    TK_UMINUS = 294,
+    TK_UPLUS = 295
   };
 #endif
 /* Tokens.  */
@@ -103,59 +106,61 @@ extern int parser_bison_debug;
 #define TK_REAL 260
 #define TK_STR_VAR 261
 #define TK_STR_CONST 262
-#define TK_STR_INT 263
-#define TK_STR_REAL 264
-#define TK_EQ 265
-#define TK_LE 266
-#define TK_GE 267
-#define TK_IN 268
-#define TK_LT 269
-#define TK_GT 270
-#define TK_PLUS 271
-#define TK_MINUS 272
-#define TK_MUL 273
-#define TK_DIV 274
-#define TK_POW 275
-#define TK_SQRT 276
-#define TK_LOG 277
-#define TK_EXP 278
-#define TK_TAN 279
-#define TK_COS 280
-#define TK_SIN 281
-#define TK_LPAR 282
-#define TK_RPAR 283
-#define TK_LSBR 284
-#define TK_RSBR 285
-#define TK_COMMA 286
-#define TK_SCOLON 287
-#define TK_COLON 288
-#define TK_SGN 289
-#define TK_ABS 290
-#define TK_MIN 291
-#define TK_MAX 292
-#define TK_UMINUS 293
-#define TK_UPLUS 294
+#define TK_STR_CTR 263
+#define TK_STR_INT 264
+#define TK_STR_REAL 265
+#define TK_EQ 266
+#define TK_LE 267
+#define TK_GE 268
+#define TK_IN 269
+#define TK_LT 270
+#define TK_GT 271
+#define TK_PLUS 272
+#define TK_MINUS 273
+#define TK_MUL 274
+#define TK_DIV 275
+#define TK_POW 276
+#define TK_SQRT 277
+#define TK_LOG 278
+#define TK_EXP 279
+#define TK_TAN 280
+#define TK_COS 281
+#define TK_SIN 282
+#define TK_LPAR 283
+#define TK_RPAR 284
+#define TK_LSBR 285
+#define TK_RSBR 286
+#define TK_COMMA 287
+#define TK_SCOLON 288
+#define TK_COLON 289
+#define TK_SGN 290
+#define TK_ABS 291
+#define TK_MIN 292
+#define TK_MAX 293
+#define TK_UMINUS 294
+#define TK_UPLUS 295
 
 /* Value type.  */
-#if ! defined PARSER_BISON_STYPE && ! defined PARSER_BISON_STYPE_IS_DECLARED
+#if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
 
-union PARSER_BISON_STYPE
+union REALPAVER_BISON_STYPE
 {
-#line 25 "parser_bison.ypp" /* yacc.c:1909  */
+#line 29 "parser_bison.ypp" /* yacc.c:1909  */
 
    char u_str[256];
+   realpaver::TermRep* u_term;
 
-#line 149 "parser_bison.hpp" /* yacc.c:1909  */
+#line 154 "parser_bison.hpp" /* yacc.c:1909  */
 };
 
-typedef union PARSER_BISON_STYPE PARSER_BISON_STYPE;
-# define PARSER_BISON_STYPE_IS_TRIVIAL 1
-# define PARSER_BISON_STYPE_IS_DECLARED 1
+typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
+# define REALPAVER_BISON_STYPE_IS_TRIVIAL 1
+# define REALPAVER_BISON_STYPE_IS_DECLARED 1
 #endif
 
 
-extern PARSER_BISON_STYPE parser_bison_lval;
+extern REALPAVER_BISON_STYPE realpaver_bison_lval;
 
-int parser_bison_parse (void);
+int realpaver_bison_parse (void);
 
-#endif /* !YY_PARSER_BISON_PARSER_BISON_HPP_INCLUDED  */
+#endif /* !YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED  */

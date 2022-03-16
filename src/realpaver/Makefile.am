@@ -69,7 +69,7 @@ librealpaver_la_include_HEADERS = \
 		NumericVector.hpp \
 		Objective.hpp \
 		Param.hpp \
-		parser.hpp \
+		Parser.hpp \
 		parser_bison.hpp \
 		Preprocessor.hpp \
 		Problem.hpp \
@@ -144,7 +144,7 @@ librealpaver_la_SOURCES = \
 		Param.cpp \
 		parser_bison.ypp \
 		parser_flex.lpp \
-		parser.cpp \
+		Parser.cpp \
 		Preprocessor.cpp \
 		Problem.cpp \
 		Propagator.cpp \

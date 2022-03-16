@@ -59,16 +59,16 @@
 #define YYPULL 1
 
 /* Substitute the type names.  */
-#define YYSTYPE         PARSER_BISON_STYPE
+#define YYSTYPE         REALPAVER_BISON_STYPE
 /* Substitute the variable and function names.  */
-#define yyparse         parser_bison_parse
-#define yylex           parser_bison_lex
-#define yyerror         parser_bison_error
-#define yydebug         parser_bison_debug
-#define yynerrs         parser_bison_nerrs
+#define yyparse         realpaver_bison_parse
+#define yylex           realpaver_bison_lex
+#define yyerror         realpaver_bison_error
+#define yydebug         realpaver_bison_debug
+#define yynerrs         realpaver_bison_nerrs
 
-#define yylval          parser_bison_lval
-#define yychar          parser_bison_char
+#define yylval          realpaver_bison_lval
+#define yychar          realpaver_bison_char
 
 /* Copy the first part of user declarations.  */
 #line 1 "parser_bison.ypp" /* yacc.c:339  */
@@ -76,19 +76,21 @@
 #include <stdio.h>
 #include <string.h>
 #include "realpaver/Problem.hpp"
+#include "realpaver/SymbolTable.hpp"
 
 #undef YYINITDEPTH
 #define YYINITDEPTH 5000
 
-extern char* parser_bison_text;
-extern int parser_bison_lineno;
-extern char parser_error[256];
-extern realpaver::Problem* parser_bison_problem;
+extern char* realpaver_bison_text;
+extern int realpaver_bison_lineno;
+extern char realpaver_parse_error[256];
+extern realpaver::Problem* realpaver_bison_problem;
+extern realpaver::SymbolTable* realpaver_bison_symtable;
 
-extern int parser_bison_lex(void);
-int parser_bison_error(const char* str);
+extern int realpaver_bison_lex(void);
+int realpaver_bison_error(const char* str);
 
-#line 92 "parser_bison.cpp" /* yacc.c:339  */
+#line 94 "parser_bison.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -108,71 +110,74 @@ int parser_bison_error(const char* str);
 
 /* In a future release of Bison, this section will be replaced
    by #include "y.tab.h".  */
-#ifndef YY_PARSER_BISON_PARSER_BISON_HPP_INCLUDED
-# define YY_PARSER_BISON_PARSER_BISON_HPP_INCLUDED
+#ifndef YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
+# define YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
 /* Debug traces.  */
-#ifndef PARSER_BISON_DEBUG
+#ifndef REALPAVER_BISON_DEBUG
 # if defined YYDEBUG
 #if YYDEBUG
-#   define PARSER_BISON_DEBUG 1
+#   define REALPAVER_BISON_DEBUG 1
 #  else
-#   define PARSER_BISON_DEBUG 0
+#   define REALPAVER_BISON_DEBUG 0
 #  endif
 # else /* ! defined YYDEBUG */
-#  define PARSER_BISON_DEBUG 0
+#  define REALPAVER_BISON_DEBUG 0
 # endif /* ! defined YYDEBUG */
-#endif  /* ! defined PARSER_BISON_DEBUG */
-#if PARSER_BISON_DEBUG
-extern int parser_bison_debug;
+#endif  /* ! defined REALPAVER_BISON_DEBUG */
+#if REALPAVER_BISON_DEBUG
+extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 21 "parser_bison.ypp" /* yacc.c:355  */
+#line 23 "parser_bison.ypp" /* yacc.c:355  */
 
+#include "realpaver/Constraint.hpp"
+#include "realpaver/Exception.hpp"
 
-#line 133 "parser_bison.cpp" /* yacc.c:355  */
+#line 137 "parser_bison.cpp" /* yacc.c:355  */
 
 /* Token type.  */
-#ifndef PARSER_BISON_TOKENTYPE
-# define PARSER_BISON_TOKENTYPE
-  enum parser_bison_tokentype
+#ifndef REALPAVER_BISON_TOKENTYPE
+# define REALPAVER_BISON_TOKENTYPE
+  enum realpaver_bison_tokentype
   {
     TK_IDENT = 258,
     TK_INT = 259,
     TK_REAL = 260,
     TK_STR_VAR = 261,
     TK_STR_CONST = 262,
-    TK_STR_INT = 263,
-    TK_STR_REAL = 264,
-    TK_EQ = 265,
-    TK_LE = 266,
-    TK_GE = 267,
-    TK_IN = 268,
-    TK_LT = 269,
-    TK_GT = 270,
-    TK_PLUS = 271,
-    TK_MINUS = 272,
-    TK_MUL = 273,
-    TK_DIV = 274,
-    TK_POW = 275,
-    TK_SQRT = 276,
-    TK_LOG = 277,
-    TK_EXP = 278,
-    TK_TAN = 279,
-    TK_COS = 280,
-    TK_SIN = 281,
-    TK_LPAR = 282,
-    TK_RPAR = 283,
-    TK_LSBR = 284,
-    TK_RSBR = 285,
-    TK_COMMA = 286,
-    TK_SCOLON = 287,
-    TK_COLON = 288,
-    TK_SGN = 289,
-    TK_ABS = 290,
-    TK_MIN = 291,
-    TK_MAX = 292,
-    TK_UMINUS = 293,
-    TK_UPLUS = 294
+    TK_STR_CTR = 263,
+    TK_STR_INT = 264,
+    TK_STR_REAL = 265,
+    TK_EQ = 266,
+    TK_LE = 267,
+    TK_GE = 268,
+    TK_IN = 269,
+    TK_LT = 270,
+    TK_GT = 271,
+    TK_PLUS = 272,
+    TK_MINUS = 273,
+    TK_MUL = 274,
+    TK_DIV = 275,
+    TK_POW = 276,
+    TK_SQRT = 277,
+    TK_LOG = 278,
+    TK_EXP = 279,
+    TK_TAN = 280,
+    TK_COS = 281,
+    TK_SIN = 282,
+    TK_LPAR = 283,
+    TK_RPAR = 284,
+    TK_LSBR = 285,
+    TK_RSBR = 286,
+    TK_COMMA = 287,
+    TK_SCOLON = 288,
+    TK_COLON = 289,
+    TK_SGN = 290,
+    TK_ABS = 291,
+    TK_MIN = 292,
+    TK_MAX = 293,
+    TK_UMINUS = 294,
+    TK_UPLUS = 295
   };
 #endif
 /* Tokens.  */
@@ -181,66 +186,68 @@ extern int parser_bison_debug;
 #define TK_REAL 260
 #define TK_STR_VAR 261
 #define TK_STR_CONST 262
-#define TK_STR_INT 263
-#define TK_STR_REAL 264
-#define TK_EQ 265
-#define TK_LE 266
-#define TK_GE 267
-#define TK_IN 268
-#define TK_LT 269
-#define TK_GT 270
-#define TK_PLUS 271
-#define TK_MINUS 272
-#define TK_MUL 273
-#define TK_DIV 274
-#define TK_POW 275
-#define TK_SQRT 276
-#define TK_LOG 277
-#define TK_EXP 278
-#define TK_TAN 279
-#define TK_COS 280
-#define TK_SIN 281
-#define TK_LPAR 282
-#define TK_RPAR 283
-#define TK_LSBR 284
-#define TK_RSBR 285
-#define TK_COMMA 286
-#define TK_SCOLON 287
-#define TK_COLON 288
-#define TK_SGN 289
-#define TK_ABS 290
-#define TK_MIN 291
-#define TK_MAX 292
-#define TK_UMINUS 293
-#define TK_UPLUS 294
+#define TK_STR_CTR 263
+#define TK_STR_INT 264
+#define TK_STR_REAL 265
+#define TK_EQ 266
+#define TK_LE 267
+#define TK_GE 268
+#define TK_IN 269
+#define TK_LT 270
+#define TK_GT 271
+#define TK_PLUS 272
+#define TK_MINUS 273
+#define TK_MUL 274
+#define TK_DIV 275
+#define TK_POW 276
+#define TK_SQRT 277
+#define TK_LOG 278
+#define TK_EXP 279
+#define TK_TAN 280
+#define TK_COS 281
+#define TK_SIN 282
+#define TK_LPAR 283
+#define TK_RPAR 284
+#define TK_LSBR 285
+#define TK_RSBR 286
+#define TK_COMMA 287
+#define TK_SCOLON 288
+#define TK_COLON 289
+#define TK_SGN 290
+#define TK_ABS 291
+#define TK_MIN 292
+#define TK_MAX 293
+#define TK_UMINUS 294
+#define TK_UPLUS 295
 
 /* Value type.  */
-#if ! defined PARSER_BISON_STYPE && ! defined PARSER_BISON_STYPE_IS_DECLARED
+#if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
 
-union PARSER_BISON_STYPE
+union REALPAVER_BISON_STYPE
 {
-#line 25 "parser_bison.ypp" /* yacc.c:355  */
+#line 29 "parser_bison.ypp" /* yacc.c:355  */
 
    char u_str[256];
+   realpaver::TermRep* u_term;
 
-#line 227 "parser_bison.cpp" /* yacc.c:355  */
+#line 234 "parser_bison.cpp" /* yacc.c:355  */
 };
 
-typedef union PARSER_BISON_STYPE PARSER_BISON_STYPE;
-# define PARSER_BISON_STYPE_IS_TRIVIAL 1
-# define PARSER_BISON_STYPE_IS_DECLARED 1
+typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
+# define REALPAVER_BISON_STYPE_IS_TRIVIAL 1
+# define REALPAVER_BISON_STYPE_IS_DECLARED 1
 #endif
 
 
-extern PARSER_BISON_STYPE parser_bison_lval;
+extern REALPAVER_BISON_STYPE realpaver_bison_lval;
 
-int parser_bison_parse (void);
+int realpaver_bison_parse (void);
 
-#endif /* !YY_PARSER_BISON_PARSER_BISON_HPP_INCLUDED  */
+#endif /* !YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 244 "parser_bison.cpp" /* yacc.c:358  */
+#line 251 "parser_bison.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -421,7 +428,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-         || (defined PARSER_BISON_STYPE_IS_TRIVIAL && PARSER_BISON_STYPE_IS_TRIVIAL)))
+         || (defined REALPAVER_BISON_STYPE_IS_TRIVIAL && REALPAVER_BISON_STYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -480,23 +487,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  5
+#define YYFINAL  9
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   1
+#define YYLAST   14
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  40
+#define YYNTOKENS  41
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  4
+#define YYNNTS  10
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  4
+#define YYNRULES  15
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  6
+#define YYNSTATES  23
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   294
+#define YYMAXUTOK   295
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -534,29 +541,32 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39
+      35,    36,    37,    38,    39,    40
 };
 
-#if PARSER_BISON_DEBUG
+#if REALPAVER_BISON_DEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    50,    50,    53,    58
+       0,    56,    56,    58,    62,    66,    69,    71,    73,    76,
+      79,    84,    88,    98,   111,   118
 };
 #endif
 
-#if PARSER_BISON_DEBUG || YYERROR_VERBOSE || 0
+#if REALPAVER_BISON_DEBUG || YYERROR_VERBOSE || 0
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "TK_IDENT", "TK_INT", "TK_REAL",
-  "TK_STR_VAR", "TK_STR_CONST", "TK_STR_INT", "TK_STR_REAL", "TK_EQ",
-  "TK_LE", "TK_GE", "TK_IN", "TK_LT", "TK_GT", "TK_PLUS", "TK_MINUS",
-  "TK_MUL", "TK_DIV", "TK_POW", "TK_SQRT", "TK_LOG", "TK_EXP", "TK_TAN",
-  "TK_COS", "TK_SIN", "TK_LPAR", "TK_RPAR", "TK_LSBR", "TK_RSBR",
+  "TK_STR_VAR", "TK_STR_CONST", "TK_STR_CTR", "TK_STR_INT", "TK_STR_REAL",
+  "TK_EQ", "TK_LE", "TK_GE", "TK_IN", "TK_LT", "TK_GT", "TK_PLUS",
+  "TK_MINUS", "TK_MUL", "TK_DIV", "TK_POW", "TK_SQRT", "TK_LOG", "TK_EXP",
+  "TK_TAN", "TK_COS", "TK_SIN", "TK_LPAR", "TK_RPAR", "TK_LSBR", "TK_RSBR",
   "TK_COMMA", "TK_SCOLON", "TK_COLON", "TK_SGN", "TK_ABS", "TK_MIN",
-  "TK_MAX", "TK_UMINUS", "TK_UPLUS", "$accept", "model", "expr", "ident", YY_NULLPTR
+  "TK_MAX", "TK_UMINUS", "TK_UPLUS", "$accept", "model", "statement",
+  "const_statement", "const_list", "const_tail", "const_def", "expr",
+  "ident", "const_expr", YY_NULLPTR
 };
 #endif
 
@@ -568,14 +578,15 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+     295
 };
 # endif
 
-#define YYPACT_NINF -4
+#define YYPACT_NINF -27
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-4)))
+  (!!((Yystate) == (-27)))
 
 #define YYTABLE_NINF -1
 
@@ -586,7 +597,9 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -4,     1,    -4,    -4,    -4
+      -3,     2,     6,   -26,   -27,   -27,   -27,   -23,    -1,   -27,
+      -3,     2,   -27,    -2,   -27,   -27,   -27,   -27,    -6,   -27,
+     -27,    -2,   -27
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -594,19 +607,21 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     4,     0,     2,     3,     1
+       2,     0,     0,     0,     4,    14,     5,     7,     0,     1,
+       2,     0,     6,     0,     3,     8,    12,    13,    15,    11,
+       9,     0,    10
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,    -4
+     -27,     3,   -27,   -27,     1,   -27,   -27,    -7,   -13,   -27
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4
+      -1,     2,     3,     4,     6,    12,     7,    18,     8,    20
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -614,31 +629,37 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,     5
+      19,     5,    16,    17,     1,     5,     9,    10,    19,    11,
+      13,    21,    15,    14,    22
 };
 
 static const yytype_uint8 yycheck[] =
 {
-       3,     0
+      13,     3,     4,     5,     7,     3,     0,    33,    21,    32,
+      11,    17,    11,    10,    21
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    41,    42,    43,     0
+       0,     7,    42,    43,    44,     3,    45,    47,    49,     0,
+      33,    32,    46,    11,    42,    45,     4,     5,    48,    49,
+      50,    17,    48
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    40,    41,    42,    43
+       0,    41,    42,    42,    43,    44,    45,    46,    46,    47,
+      48,    48,    48,    48,    49,    50
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     1
+       0,     2,     0,     3,     1,     2,     2,     0,     2,     3,
+       3,     1,     1,     1,     1,     1
 };
 
 
@@ -678,7 +699,7 @@ while (0)
 
 
 /* Enable debugging if requested.  */
-#if PARSER_BISON_DEBUG
+#if REALPAVER_BISON_DEBUG
 
 # ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
@@ -799,12 +820,12 @@ do {                                    \
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
 int yydebug;
-#else /* !PARSER_BISON_DEBUG */
+#else /* !REALPAVER_BISON_DEBUG */
 # define YYDPRINTF(Args)
 # define YY_SYMBOL_PRINT(Title, Type, Value, Location)
 # define YY_STACK_PRINT(Bottom, Top)
 # define YY_REDUCE_PRINT(Rule)
-#endif /* !PARSER_BISON_DEBUG */
+#endif /* !REALPAVER_BISON_DEBUG */
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
@@ -1314,23 +1335,69 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 3:
-#line 54 "parser_bison.ypp" /* yacc.c:1646  */
+        case 10:
+#line 80 "parser_bison.ypp" /* yacc.c:1646  */
     {
+         (yyval.u_term) = new realpaver::TermAdd(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term)),
+                                     std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
      }
-#line 1322 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1345 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 4:
-#line 59 "parser_bison.ypp" /* yacc.c:1646  */
+  case 11:
+#line 85 "parser_bison.ypp" /* yacc.c:1646  */
     {
-        strcpy((yyval.u_str), parser_bison_text);
+        
      }
-#line 1330 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1353 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 89 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+         try {
+            realpaver::Interval x(realpaver_bison_text);
+            (yyval.u_term) = new realpaver::TermConst(x);
+         }
+         catch(realpaver::Exception e) {
+             throw realpaver::Exception("xxx");
+         }
+     }
+#line 1367 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 13:
+#line 99 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+         try {
+            realpaver::Interval x(realpaver_bison_text);
+            (yyval.u_term) = new realpaver::TermConst(x);
+         }
+         catch(realpaver::Exception e) {
+             throw realpaver::Exception("xxx");
+         }       
+     }
+#line 1381 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 112 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+        strcpy((yyval.u_str), realpaver_bison_text);
+     }
+#line 1389 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 119 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+        
+     }
+#line 1397 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1334 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1401 "parser_bison.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1558,11 +1625,12 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 63 "parser_bison.ypp" /* yacc.c:1906  */
+#line 123 "parser_bison.ypp" /* yacc.c:1906  */
 
 
-int parser_bison_error(const char* str)
+int realpaver_bison_error(const char* str)
 {
-   snprintf(parser_error, 255, "l%d: %s", parser_bison_lineno, str);
+   snprintf(realpaver_parse_error, 255, "l%d: %s",
+            realpaver_bison_lineno, str);
    return 0;
 }

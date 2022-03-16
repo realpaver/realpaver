@@ -152,7 +152,7 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	IntervalFunction.cpp IntervalNewton.cpp IntervalRegion.cpp \
 	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
 	Logger.cpp LPModel.cpp MaxCIDContractor.cpp Objective.cpp \
-	Param.cpp parser_bison.ypp parser_flex.lpp parser.cpp \
+	Param.cpp parser_bison.ypp parser_flex.lpp Parser.cpp \
 	Preprocessor.cpp Problem.cpp Propagator.cpp RealFunction.cpp \
 	RealPoint.cpp RealVector.cpp Scope.cpp ScopeMap.cpp \
 	SearchNode.cpp Selector.cpp SymbolTable.cpp Term.cpp \
@@ -172,7 +172,7 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	IntervalFunction.lo IntervalNewton.lo IntervalRegion.lo \
 	IntervalSlicer.lo IntervalVector.lo IntervalUnion.lo Logger.lo \
 	LPModel.lo MaxCIDContractor.lo Objective.lo Param.lo \
-	parser_bison.lo parser_flex.lo parser.lo Preprocessor.lo \
+	parser_bison.lo parser_flex.lo Parser.lo Preprocessor.lo \
 	Problem.lo Propagator.lo RealFunction.lo RealPoint.lo \
 	RealVector.lo Scope.lo ScopeMap.lo SearchNode.lo Selector.lo \
 	SymbolTable.lo Term.lo TermDeriver.lo TermFixer.lo Timer.lo \
@@ -272,7 +272,7 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp Logger.hpp LPModel.hpp \
 	LPSolver.hpp MaxCIDContractor.hpp NumericVector.hpp \
-	Objective.hpp Param.hpp parser.hpp parser_bison.hpp \
+	Objective.hpp Param.hpp Parser.hpp parser_bison.hpp \
 	Preprocessor.hpp Problem.hpp Propagator.hpp RealFunction.hpp \
 	RealPoint.hpp RealVector.hpp Scope.hpp ScopeMap.hpp \
 	SearchNode.hpp Selector.hpp SplitStrategy.hpp SymbolTable.hpp \
@@ -461,7 +461,7 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp Logger.hpp LPModel.hpp \
 	LPSolver.hpp MaxCIDContractor.hpp NumericVector.hpp \
-	Objective.hpp Param.hpp parser.hpp parser_bison.hpp \
+	Objective.hpp Param.hpp Parser.hpp parser_bison.hpp \
 	Preprocessor.hpp Problem.hpp Propagator.hpp RealFunction.hpp \
 	RealPoint.hpp RealVector.hpp Scope.hpp ScopeMap.hpp \
 	SearchNode.hpp Selector.hpp SplitStrategy.hpp SymbolTable.hpp \
@@ -480,7 +480,7 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	IntervalNewton.cpp IntervalRegion.cpp IntervalSlicer.cpp \
 	IntervalVector.cpp IntervalUnion.cpp Logger.cpp LPModel.cpp \
 	MaxCIDContractor.cpp Objective.cpp Param.cpp parser_bison.ypp \
-	parser_flex.lpp parser.cpp Preprocessor.cpp Problem.cpp \
+	parser_flex.lpp Parser.cpp Preprocessor.cpp Problem.cpp \
 	Propagator.cpp RealFunction.cpp RealPoint.cpp RealVector.cpp \
 	Scope.cpp ScopeMap.cpp SearchNode.cpp Selector.cpp \
 	SymbolTable.cpp Term.cpp TermDeriver.cpp TermFixer.cpp \
@@ -632,6 +632,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MaxCIDContractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Objective.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Param.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Propagator.Plo@am__quote@
@@ -651,7 +652,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tolerance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UniIntervalFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_bison.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_flex.Plo@am__quote@
 
