@@ -11,19 +11,19 @@
 #include "realpaver/Parser.hpp"
 
 extern int realpaver_flex_init_file(realpaver::Problem* prob,
-                                 realpaver::SymbolTable* symtab,
-                                 const char* filename);
-
+                                    realpaver::SymbolTable* symtab,
+                                    const char* filename);
 extern void realpaver_flex_cleanup_file(void);
-
 extern int realpaver_bison_parse(void);
-
 extern std::string realpaver_parse_error;
 
+///////////////////////////////////////////////////////////////////////////////
 
 namespace realpaver {
 
 static std::vector<std::string> keywords = {
+   "Variables", "Constants", "Constraints",
+   "int", "real", "in",
    "MIN", "MAX", "min", "max", "abs", "sgn", "sqr", "sqrt", "pow",
    "log", "exp", "cos", "sin", "tan"
 };
@@ -37,7 +37,8 @@ void Parser::initSymbolTable()
    for (auto k : keywords) symtab_.insertKeyword(k);
 
    // constants
-   symtab_.insertConstant("PI", Interval::pi());
+   symtab_.insertConstant("pi", Interval::pi());
+   symtab_.insertConstant("e",  exp(Interval(1.0)));
 }
 
 std::string Parser::getParseError() const

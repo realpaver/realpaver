@@ -21,6 +21,8 @@ int main(void)
 
       if (!res)
          cout << "Parse error: " << parser.getParseError() << endl;
+      else
+         cout << problem << endl;
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

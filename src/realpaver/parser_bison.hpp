@@ -149,8 +149,9 @@ union REALPAVER_BISON_STYPE
 
   char u_str[256];
   realpaver::TermRep* u_term;
+  int u_integer;
 
-#line 154 "parser_bison.hpp" /* yacc.c:1909  */
+#line 155 "parser_bison.hpp" /* yacc.c:1909  */
 };
 
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;

@@ -30,11 +30,18 @@ int realpaver_bison_error(const char* str);
 {
   char u_str[256];
   realpaver::TermRep* u_term;
+  int u_integer;
 }
 
-%type <u_str>  ident
-%type <u_term> expr
-%type <u_term> const_expr
+%type <u_str>     ident
+%type <u_term>    expr
+%type <u_term>    const_expr
+%type <u_term>    integer
+%type <u_term>    real
+%type <u_term>    number
+%type <u_term>    itv
+%type <u_term>    domain
+%type <u_integer> var_type
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_INT TK_STR_REAL
@@ -61,6 +68,7 @@ model
 
 statement
   : const_statement
+  | var_statement
   ;
 
 const_statement
@@ -76,18 +84,93 @@ const_tail
 const_def
   : ident TK_EQ const_expr
     {
-      realpaver::Term e(std::shared_ptr<realpaver::TermRep>($3));
+      std::shared_ptr<realpaver::TermRep> e($3);
 
-      realpaver::Interval x = e.evalConst();
+      realpaver::Interval x = e->evalConst();
       if (x.isEmpty())
       {
         std::ostringstream os;
-        os << "Constant [" << $1 << "] defined from an empty interval";
+        os << "Constant [" << $1 << "] equal to an empty interval";
         realpaver_bison_error(os.str().c_str());
         YYABORT;
       }
 
+      if (realpaver_bison_symtab->hasSymbol($1))
+      {
+        std::ostringstream os;
+        os << "Symbol [" << $1 << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
       realpaver_bison_symtab->insertConstant($1, x);
+    }
+  ;
+
+var_statement
+  : TK_STR_VAR var_list;
+
+var_list
+  : var_def var_tail;
+
+var_tail
+  :
+  | TK_COMMA var_list;
+
+var_def
+  : var_type ident domain
+    {
+      std::shared_ptr<realpaver::TermRep> e($3);
+      realpaver::Interval x = e->evalConst();
+
+      if (realpaver_bison_symtab->hasSymbol($2))
+      {
+        std::ostringstream os;
+        os << "Symbol [" << $2 << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      if ($1 == 0)
+      {
+        realpaver::Variable v = realpaver_bison_problem->addIntVar(x, $2);
+        realpaver_bison_symtab->insertVariable($2, v);
+      }
+      else
+      {
+        realpaver::Variable v = realpaver_bison_problem->addRealVar(x, $2);
+        realpaver_bison_symtab->insertVariable($2, v);
+      }
+    }
+  ;
+
+var_type
+  :
+    {
+       $$ = 1;
+    }
+  | TK_STR_INT
+    {
+       $$ = 0;       
+    }
+  | TK_STR_REAL
+    {
+       $$ = 1;
+    }
+  ;
+
+const_expr
+  : expr
+    {
+      realpaver::TermRep* t = $1;
+
+      if (t->isConstant()) $$ = $1;
+      else
+      {
+         delete t;
+         realpaver_bison_error("Expression not constant");
+         YYABORT;
+      }
     }
   ;
 
@@ -96,6 +179,103 @@ expr
     {
       $$ = new realpaver::TermAdd(std::shared_ptr<realpaver::TermRep>($1),
                                   std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | expr TK_MINUS expr
+    {
+      $$ = new realpaver::TermSub(std::shared_ptr<realpaver::TermRep>($1),
+                                  std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | expr TK_MUL expr
+    {
+      $$ = new realpaver::TermMul(std::shared_ptr<realpaver::TermRep>($1),
+                                  std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | expr TK_DIV expr
+    {
+      $$ = new realpaver::TermDiv(std::shared_ptr<realpaver::TermRep>($1),
+                                  std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | expr TK_POW number
+    {
+      std::shared_ptr<realpaver::TermRep> t($1);
+      std::shared_ptr<realpaver::TermRep> e($3);
+      realpaver::Interval x = e->evalConst();
+
+      if (x.isEmpty())
+      {
+        realpaver_bison_error("Bad exponent");
+        YYABORT;
+      }
+      if (x.isZero())
+      {
+        realpaver_bison_error("Bad exponent equal to 0");
+        YYABORT;
+      }
+
+      int n = (int)x.left();
+      if (n == x.right() && n > 0)
+      {
+        $$ = new realpaver::TermPow(t, n);
+      }
+      else
+      {
+        // t^e = exp(e*log(t))
+        realpaver::TermLog* log = new realpaver::TermLog(t);
+        realpaver::TermMul* mul =
+          new realpaver::TermMul(e, std::shared_ptr<realpaver::TermRep>(log));
+
+        $$ = new realpaver::TermExp(std::shared_ptr<realpaver::TermRep>(mul));
+      }
+    }
+  | TK_MINUS expr %prec TK_UMINUS
+    {
+      $$ = new realpaver::TermUsb(std::shared_ptr<realpaver::TermRep>($2));
+    }
+  | TK_PLUS expr %prec TK_UPLUS
+    {
+       $$ = $2;
+    }
+  | TK_SQRT TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermSqrt(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_SGN TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermSgn(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_ABS TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermAbs(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_LOG TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermLog(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_EXP TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermExp(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_COS TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermCos(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_SIN TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermSin(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_TAN TK_LPAR expr TK_RPAR
+    {
+      $$ = new realpaver::TermTan(std::shared_ptr<realpaver::TermRep>($3));
+    }
+  | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR
+    {
+      $$ = new realpaver::TermMin(std::shared_ptr<realpaver::TermRep>($3),
+                                  std::shared_ptr<realpaver::TermRep>($5));
+    }
+  | TK_MAX TK_LPAR expr TK_COMMA expr TK_RPAR
+    {
+      $$ = new realpaver::TermMax(std::shared_ptr<realpaver::TermRep>($3),
+                                  std::shared_ptr<realpaver::TermRep>($5));
     }
   | ident
     {
@@ -130,7 +310,29 @@ expr
         YYABORT;
       }
     }
-  | TK_INT
+  | integer
+    {
+      $$ = $1;
+    }
+  | real
+    {
+      $$ = $1;
+    }
+  ;
+
+number
+  : integer
+    {
+      $$ = $1;
+    }
+  | real
+    {
+      $$ = $1;
+    }
+  ;
+
+integer
+  : TK_INT
     {
       try
       {
@@ -141,9 +343,12 @@ expr
       {
         realpaver_bison_error("Bad integer value");
         YYABORT;
-      }
+      }       
     }
-  | TK_REAL
+  ;
+
+real
+  : TK_REAL
     {
       try
       {
@@ -155,30 +360,71 @@ expr
         realpaver_bison_error("Bad real number");
         YYABORT;
       }       
-   }
-   ;
+    }
+  ;
+
+itv
+  : TK_LSBR const_expr TK_COMMA const_expr TK_RSBR
+    {
+      std::shared_ptr<realpaver::TermRep> lo($2);
+      std::shared_ptr<realpaver::TermRep> up($4);
+
+      realpaver::Interval x = lo->evalConst();
+      realpaver::Interval y = up->evalConst();
+      realpaver::Interval z(x.left(), y.right());
+
+      if (z.isEmpty())
+      {
+        realpaver_bison_error("Empty interval");
+        YYABORT;
+      }
+
+      $$ = new realpaver::TermConst(z);
+    }
+  ;
+
+domain
+  :
+    {
+      $$ = new realpaver::TermConst(realpaver::Interval::universe());
+    }
+  | TK_LE const_expr
+    {
+      std::shared_ptr<realpaver::TermRep> e($2);
+      realpaver::Interval up = e->evalConst();
+      realpaver::Interval domain = realpaver::Interval::lessThan(up.right());
+
+      $$ = new realpaver::TermConst(domain);
+    }
+  | TK_GE const_expr
+    {
+      std::shared_ptr<realpaver::TermRep> e($2);
+      realpaver::Interval lo = e->evalConst();
+      realpaver::Interval domain = realpaver::Interval::moreThan(lo.left());
+
+      $$ = new realpaver::TermConst(domain);
+    }
+  | TK_IN itv
+    {
+      std::shared_ptr<realpaver::TermRep> e($2);
+      realpaver::Interval domain = e->evalConst();
+
+      if (domain.isEmpty())
+      {
+         realpaver_bison_error("Empty domain");
+         YYABORT;
+      }
+
+      $$ = new realpaver::TermConst(domain);
+    }
+  ;
 
 ident
  : TK_IDENT
-    {
-      strcpy($$, realpaver_bison_text);
-    }
+   {
+     strcpy($$, realpaver_bison_text);
+   }
    ;
-
-const_expr
-  : expr
-    {
-      realpaver::TermRep* t = $1;
-
-      if (t->isConstant()) $$ = $1;
-      else
-      {
-         delete t;
-         realpaver_bison_error("Expression not constant");
-         YYABORT;
-      }
-    }
-  ;
 %%
 
 int realpaver_bison_error(const char* str)
