@@ -99,67 +99,67 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 %%
 
 realpaver::Problem* realpaver_bison_problem;
-realpaver::SymbolTable* realpaver_bison_symtable;
+realpaver::SymbolTable* realpaver_bison_symtab;
 
 YY_BUFFER_STATE realpaver_bison_buffer;
-char realpaver_parse_error[256];
+std::string realpaver_parse_error;
 
 void realpaver_flex_init(realpaver::Problem* prob,
 							    realpaver::SymbolTable* symtab)
 {
-   realpaver_bison_lineno = 1;
-   realpaver_bison_problem = prob;
-   realpaver_bison_symtable = symtab;
-   strcpy(realpaver_parse_error, "");
+  realpaver_bison_lineno = 1;
+  realpaver_bison_problem = prob;
+  realpaver_bison_symtab = symtab;
+  realpaver_parse_error = "";
 }
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
 								     realpaver::SymbolTable* symtab, const char* str)
 {
-   realpaver_flex_init(prob, symtab);
-   realpaver_bison_buffer = realpaver_bison__scan_string(str);
+  realpaver_flex_init(prob, symtab);
+  realpaver_bison_buffer = realpaver_bison__scan_string(str);
 }
 
 int realpaver_flex_init_file(realpaver::Problem* prob,
 								     realpaver::SymbolTable* symtab,
 								     const char* filename)
 {
-   int res = 0;
-   realpaver_bison_in = fopen(filename, "r");
-   if (!realpaver_bison_in)
-   {
-      strcpy(realpaver_parse_error, "file not found");
-      res = 1;
-   }
-   else
-   {
-      realpaver_flex_init(prob, symtab);
-      realpaver_bison_buffer =
-         realpaver_bison__create_buffer(realpaver_bison_in, YY_BUF_SIZE);
-      realpaver_bison__switch_to_buffer(realpaver_bison_buffer);
-   }
-   return res;
+  int res = 0;
+  realpaver_bison_in = fopen(filename, "r");
+  if (!realpaver_bison_in)
+  {
+    realpaver_parse_error = "File not found";
+    res = 1;
+  }
+  else
+  {
+    realpaver_flex_init(prob, symtab);
+    realpaver_bison_buffer =
+      realpaver_bison__create_buffer(realpaver_bison_in, YY_BUF_SIZE);
+    realpaver_bison__switch_to_buffer(realpaver_bison_buffer);
+  }
+  return res;
 }
 
 void realpaver_flex_cleanup_str()
 {
-   realpaver_bison_problem = NULL;
-   realpaver_bison_symtable = NULL;
-   realpaver_bison__delete_buffer(realpaver_bison_buffer);
+  realpaver_bison_problem = NULL;
+  realpaver_bison_symtab = NULL;
+  realpaver_bison__delete_buffer(realpaver_bison_buffer);
 }
 
 void realpaver_flex_cleanup_file()
 {
-   realpaver_bison_problem = NULL;
-   realpaver_bison_symtable = NULL;
-   if (realpaver_bison_in)
-   {
-      fclose(realpaver_bison_in);
-      realpaver_bison__delete_buffer(realpaver_bison_buffer);
-   }
+  realpaver_bison_problem = NULL;
+  realpaver_bison_symtab = NULL;
+  if (realpaver_bison_in)
+  {
+    fclose(realpaver_bison_in);
+    realpaver_bison__delete_buffer(realpaver_bison_buffer);
+  }
 }
 
 int realpaver_bison_wrap(void)
 {
-   return 1;
+  return 1;
 }

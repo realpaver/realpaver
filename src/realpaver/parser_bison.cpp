@@ -73,8 +73,9 @@
 /* Copy the first part of user declarations.  */
 #line 1 "parser_bison.ypp" /* yacc.c:339  */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstring>
+#include <sstream>
+#include <string>
 #include "realpaver/Problem.hpp"
 #include "realpaver/SymbolTable.hpp"
 
@@ -83,14 +84,14 @@
 
 extern char* realpaver_bison_text;
 extern int realpaver_bison_lineno;
-extern char realpaver_parse_error[256];
+extern std::string realpaver_parse_error;
 extern realpaver::Problem* realpaver_bison_problem;
-extern realpaver::SymbolTable* realpaver_bison_symtable;
+extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
 
-#line 94 "parser_bison.cpp" /* yacc.c:339  */
+#line 95 "parser_bison.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -128,12 +129,12 @@ int realpaver_bison_error(const char* str);
 extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 23 "parser_bison.ypp" /* yacc.c:355  */
+#line 24 "parser_bison.ypp" /* yacc.c:355  */
 
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Exception.hpp"
 
-#line 137 "parser_bison.cpp" /* yacc.c:355  */
+#line 138 "parser_bison.cpp" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef REALPAVER_BISON_TOKENTYPE
@@ -225,12 +226,12 @@ extern int realpaver_bison_debug;
 
 union REALPAVER_BISON_STYPE
 {
-#line 29 "parser_bison.ypp" /* yacc.c:355  */
+#line 30 "parser_bison.ypp" /* yacc.c:355  */
 
-   char u_str[256];
-   realpaver::TermRep* u_term;
+  char u_str[256];
+  realpaver::TermRep* u_term;
 
-#line 234 "parser_bison.cpp" /* yacc.c:355  */
+#line 235 "parser_bison.cpp" /* yacc.c:355  */
 };
 
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
@@ -247,7 +248,7 @@ int realpaver_bison_parse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 251 "parser_bison.cpp" /* yacc.c:358  */
+#line 252 "parser_bison.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -548,8 +549,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    56,    56,    58,    62,    66,    69,    71,    73,    76,
-      79,    84,    88,    98,   111,   118
+       0,    57,    57,    59,    63,    67,    70,    72,    74,    77,
+      95,   100,   133,   146,   162,   169
 };
 #endif
 
@@ -1335,69 +1336,131 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 10:
-#line 80 "parser_bison.ypp" /* yacc.c:1646  */
+        case 9:
+#line 78 "parser_bison.ypp" /* yacc.c:1646  */
     {
-         (yyval.u_term) = new realpaver::TermAdd(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term)),
-                                     std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
-     }
-#line 1345 "parser_bison.cpp" /* yacc.c:1646  */
+      realpaver::Term e(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+
+      realpaver::Interval x = e.evalConst();
+      if (x.isEmpty())
+      {
+        std::ostringstream os;
+        os << "Constant [" << (yyvsp[-2].u_str) << "] defined from an empty interval";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;
+      }
+
+      realpaver_bison_symtab->insertConstant((yyvsp[-2].u_str), x);
+    }
+#line 1356 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 96 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      (yyval.u_term) = new realpaver::TermAdd(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term)),
+                                  std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+    }
+#line 1365 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 85 "parser_bison.ypp" /* yacc.c:1646  */
+#line 101 "parser_bison.ypp" /* yacc.c:1646  */
     {
-        
-     }
-#line 1353 "parser_bison.cpp" /* yacc.c:1646  */
+      bool found = false;
+
+      // Constant ?
+      realpaver::ConstantSymbol* cs =
+        realpaver_bison_symtab->findConstant(realpaver_bison_text);
+
+      if (cs != nullptr)
+      {
+         (yyval.u_term) = new realpaver::TermConst(cs->getValue());
+         found = true;
+      }
+
+      // Variable ?
+      realpaver::VariableSymbol* vs =
+        realpaver_bison_symtab->findVariable(realpaver_bison_text);
+
+      if (vs != nullptr)
+      {
+         (yyval.u_term) = new realpaver::TermVar(vs->getVar());
+         found = true;
+      }
+
+      // Not found
+      if (!found)
+      {
+        std::ostringstream os;
+        os << "Identifier [" << realpaver_bison_text << "] not found";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;
+      }
+    }
+#line 1402 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 89 "parser_bison.ypp" /* yacc.c:1646  */
+#line 134 "parser_bison.ypp" /* yacc.c:1646  */
     {
-         try {
-            realpaver::Interval x(realpaver_bison_text);
-            (yyval.u_term) = new realpaver::TermConst(x);
-         }
-         catch(realpaver::Exception e) {
-             throw realpaver::Exception("xxx");
-         }
-     }
-#line 1367 "parser_bison.cpp" /* yacc.c:1646  */
+      try
+      {
+        realpaver::Interval x(realpaver_bison_text);
+        (yyval.u_term) = new realpaver::TermConst(x);
+      }
+      catch(realpaver::Exception e)
+      {
+        realpaver_bison_error("Bad integer value");
+        YYABORT;
+      }
+    }
+#line 1419 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 99 "parser_bison.ypp" /* yacc.c:1646  */
+#line 147 "parser_bison.ypp" /* yacc.c:1646  */
     {
-         try {
-            realpaver::Interval x(realpaver_bison_text);
-            (yyval.u_term) = new realpaver::TermConst(x);
-         }
-         catch(realpaver::Exception e) {
-             throw realpaver::Exception("xxx");
-         }       
-     }
-#line 1381 "parser_bison.cpp" /* yacc.c:1646  */
+      try
+      {
+        realpaver::Interval x(realpaver_bison_text);
+        (yyval.u_term) = new realpaver::TermConst(x);
+      }
+      catch(realpaver::Exception e)
+      {
+        realpaver_bison_error("Bad real number");
+        YYABORT;
+      }       
+   }
+#line 1436 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 112 "parser_bison.ypp" /* yacc.c:1646  */
+#line 163 "parser_bison.ypp" /* yacc.c:1646  */
     {
-        strcpy((yyval.u_str), realpaver_bison_text);
-     }
-#line 1389 "parser_bison.cpp" /* yacc.c:1646  */
+      strcpy((yyval.u_str), realpaver_bison_text);
+    }
+#line 1444 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 119 "parser_bison.ypp" /* yacc.c:1646  */
+#line 170 "parser_bison.ypp" /* yacc.c:1646  */
     {
-        
-     }
-#line 1397 "parser_bison.cpp" /* yacc.c:1646  */
+      realpaver::TermRep* t = (yyvsp[0].u_term);
+
+      if (t->isConstant()) (yyval.u_term) = (yyvsp[0].u_term);
+      else
+      {
+         delete t;
+         realpaver_bison_error("Expression not constant");
+         YYABORT;
+      }
+    }
+#line 1460 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1401 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1464 "parser_bison.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1625,12 +1688,15 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 123 "parser_bison.ypp" /* yacc.c:1906  */
+#line 182 "parser_bison.ypp" /* yacc.c:1906  */
 
 
 int realpaver_bison_error(const char* str)
 {
-   snprintf(realpaver_parse_error, 255, "l%d: %s",
-            realpaver_bison_lineno, str);
-   return 0;
+  std::ostringstream os;   
+  os << "l" << realpaver_bison_lineno << ": " << str;
+
+  realpaver_parse_error = os.str();
+
+  return 0;
 }

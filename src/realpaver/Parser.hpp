@@ -25,7 +25,6 @@ public:
 
 private:
    SymbolTable symtab_;
-   std::string error_;
 
    void initSymbolTable();
 };

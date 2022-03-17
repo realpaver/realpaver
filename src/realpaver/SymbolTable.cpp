@@ -90,18 +90,26 @@ VariableSymbol* SymbolTable::findVariable(const std::string& name) const
 void SymbolTable::insertKeyword(const std::string& name)
 {
    keywords_.insert(name);
+
+DEBUG("Insert keyword : " << name);
 }
 
 void SymbolTable::insertConstant(const std::string& name, const Interval& x)
 {
    ConstantSymbol* symbol = new ConstantSymbol(name, x);
    cmap_.insert(std::make_pair(name, symbol));
+
+
+DEBUG("Insert constant : " << name << " = " << x);
 }
 
 void SymbolTable::clear()
 {
    for (auto entry : cmap_) delete entry.second;
+   cmap_.clear();
+
    for (auto entry : vmap_) delete entry.second;
+   vmap_.clear();
 }
 
 } // namespace

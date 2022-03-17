@@ -18,7 +18,7 @@ extern void realpaver_flex_cleanup_file(void);
 
 extern int realpaver_bison_parse(void);
 
-extern char* realpaver_parse_error;
+extern std::string realpaver_parse_error;
 
 
 namespace realpaver {
@@ -28,9 +28,7 @@ static std::vector<std::string> keywords = {
    "log", "exp", "cos", "sin", "tan"
 };
 
-Parser::Parser()
-      : symtab_(),
-        error_("")
+Parser::Parser() : symtab_()
 {}
 
 void Parser::initSymbolTable()
@@ -44,7 +42,7 @@ void Parser::initSymbolTable()
 
 std::string Parser::getParseError() const
 {
-   return error_;
+   return realpaver_parse_error;
 }
 
 bool Parser::parseFile(const std::string& filename, Problem& problem)
@@ -52,12 +50,7 @@ bool Parser::parseFile(const std::string& filename, Problem& problem)
    initSymbolTable();
 
    int res = realpaver_flex_init_file(&problem, &symtab_, filename.c_str());
-
-   if (res == 0)
-   {
-      res = realpaver_bison_parse();
-      error_ = realpaver_parse_error;
-   }
+   if (res == 0) res = realpaver_bison_parse();
 
    realpaver_flex_cleanup_file();
    symtab_.clear();
