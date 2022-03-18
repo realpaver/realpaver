@@ -228,6 +228,11 @@ bool Term::isDiv() const
    return rep_->isDiv();
 }
 
+TermRep* Term::cloneRoot() const
+{
+   return rep_->cloneRoot();
+}
+
 std::ostream& operator<<(std::ostream& os, Term t)
 {
    t.print(os);
@@ -1170,7 +1175,7 @@ Term pow(Term t, int n)
          return pow(t,double(n));
 
       else
-         return Term(std::make_shared<TermPow>(t.rep(),n));
+         return Term(std::make_shared<TermPow>(t.rep(), n));
    }
 }
 
@@ -1204,6 +1209,15 @@ Term pow(Term t, double d)
       else
          return exp(d*log(t));
    }
+}
+
+Term pow(Term t, const Interval& x)
+{
+   if (x.isSingleton())
+      return pow(t, x.left());
+
+   else
+      return exp(x*log(t));
 }
 
 Term exp(Term t)
@@ -1326,6 +1340,11 @@ bool TermConst::isLinear() const
 void TermConst::makeScope(Scope& s) const
 {}
 
+TermRep* TermConst::cloneRoot() const
+{
+   return new TermConst(x_);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermVar::TermVar(Variable v)
@@ -1380,6 +1399,11 @@ void TermVar::makeScope(Scope& s) const
 bool TermVar::isVar() const
 {
    return true;
+}
+
+TermRep* TermVar::cloneRoot() const
+{
+   return new TermVar(v_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1529,6 +1553,11 @@ bool TermAdd::isAdd() const
    return true;
 }
 
+TermRep* TermAdd::cloneRoot() const
+{
+   return new TermAdd(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermSub::TermSub(const SharedRep& l, const SharedRep& r)
@@ -1578,6 +1607,11 @@ bool TermSub::isLinear() const
 bool TermSub::isSub() const
 {
    return true;
+}
+
+TermRep* TermSub::cloneRoot() const
+{
+   return new TermSub(left(), right());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1638,6 +1672,11 @@ bool TermMul::isMul() const
    return true;
 }
 
+TermRep* TermMul::cloneRoot() const
+{
+   return new TermMul(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 TermDiv::TermDiv(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Div, OpPriority::MulDiv)
@@ -1689,6 +1728,11 @@ bool TermDiv::isDiv() const
    return true;
 }
 
+TermRep* TermDiv::cloneRoot() const
+{
+   return new TermDiv(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermMin::TermMin(const SharedRep& l, const SharedRep& r)
@@ -1710,6 +1754,11 @@ void TermMin::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+TermRep* TermMin::cloneRoot() const
+{
+   return new TermMin(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermMax::TermMax(const SharedRep& l, const SharedRep& r)
@@ -1729,6 +1778,11 @@ Interval TermMax::eval(const IntervalRegion& reg) const
 void TermMax::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+TermRep* TermMax::cloneRoot() const
+{
+   return new TermMax(left(), right());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1762,6 +1816,11 @@ bool TermUsb::isUsb() const
    return true;
 }
 
+TermRep* TermUsb::cloneRoot() const
+{
+   return new TermUsb(child());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermAbs::TermAbs(const SharedRep& t)
@@ -1781,6 +1840,11 @@ Interval TermAbs::eval(const IntervalRegion& reg) const
 void TermAbs::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+TermRep* TermAbs::cloneRoot() const
+{
+   return new TermAbs(child());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1804,6 +1868,11 @@ void TermSgn::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+TermRep* TermSgn::cloneRoot() const
+{
+   return new TermSgn(child());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermSqr::TermSqr(const SharedRep& t)
@@ -1825,6 +1894,11 @@ void TermSqr::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+TermRep* TermSqr::cloneRoot() const
+{
+   return new TermSqr(child());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermSqrt::TermSqrt(const SharedRep& t)
@@ -1844,6 +1918,11 @@ Interval TermSqrt::eval(const IntervalRegion& reg) const
 void TermSqrt::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+TermRep* TermSqrt::cloneRoot() const
+{
+   return new TermSqrt(child());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1885,6 +1964,11 @@ void TermPow::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+TermRep* TermPow::cloneRoot() const
+{
+   return new TermPow(child(), n_);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermExp::TermExp(const SharedRep& t)
@@ -1904,6 +1988,11 @@ Interval TermExp::eval(const IntervalRegion& reg) const
 void TermExp::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+TermRep* TermExp::cloneRoot() const
+{
+   return new TermExp(child());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1927,6 +2016,11 @@ void TermLog::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+TermRep* TermLog::cloneRoot() const
+{
+   return new TermLog(child());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermCos::TermCos(const SharedRep& t)
@@ -1946,6 +2040,11 @@ Interval TermCos::eval(const IntervalRegion& reg) const
 void TermCos::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+TermRep* TermCos::cloneRoot() const
+{
+   return new TermCos(child());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1969,6 +2068,11 @@ void TermSin::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+TermRep* TermSin::cloneRoot() const
+{
+   return new TermSin(child());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermTan::TermTan(const SharedRep& t)
@@ -1988,6 +2092,11 @@ Interval TermTan::eval(const IntervalRegion& reg) const
 void TermTan::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+TermRep* TermTan::cloneRoot() const
+{
+   return new TermTan(child());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

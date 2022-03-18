@@ -137,6 +137,7 @@ public:
    bool isInfRight() const;
    bool isSingleton() const;
    bool isZero() const;
+   bool isAnInt() const;
    ///@}
 
    ///@{

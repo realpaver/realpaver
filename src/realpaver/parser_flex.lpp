@@ -24,6 +24,8 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "Variables"     return TK_STR_VAR;
 "Constants"     return TK_STR_CONST;
 "Constraints"   return TK_STR_CTR;
+"Objectives"    return TK_STR_OBJ;
+"Functions"     return TK_STR_FUN;
 
 "real"   return TK_STR_REAL;
 "int"    return TK_STR_INT;

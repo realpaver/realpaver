@@ -38,13 +38,14 @@ int realpaver_bison_error(const char* str);
 %type <u_term>    const_expr
 %type <u_term>    integer
 %type <u_term>    real
-%type <u_term>    number
+%type <u_term>    exponent
 %type <u_term>    itv
 %type <u_term>    domain
 %type <u_integer> var_type
 
 %token TK_IDENT TK_INT TK_REAL
-%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_INT TK_STR_REAL
+%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN
+%token TK_STR_INT TK_STR_REAL
 %token TK_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
@@ -69,6 +70,9 @@ model
 statement
   : const_statement
   | var_statement
+  | ctr_statement
+  | obj_statement
+  | fun_statement
   ;
 
 const_statement
@@ -159,6 +163,95 @@ var_type
     }
   ;
 
+ctr_statement
+  : TK_STR_CTR ctr_list;
+
+ctr_list
+  : ctr_def ctr_tail;
+
+ctr_tail
+  :
+  | TK_COMMA ctr_list;
+
+ctr_def
+  : expr TK_EQ expr
+    {
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1));
+      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>($3));
+
+      realpaver::Constraint c(lhs == rhs);
+      realpaver_bison_problem->addCtr(c);
+    }
+  | expr TK_LE expr
+    {
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1));
+      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>($3));
+
+      realpaver::Constraint c(lhs <= rhs);
+      realpaver_bison_problem->addCtr(c);
+    }
+  | expr TK_GE expr
+    {
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1));
+      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>($3));
+
+      realpaver::Constraint c(lhs >= rhs);
+      realpaver_bison_problem->addCtr(c);
+    }
+  ;
+
+obj_statement
+  : TK_STR_OBJ obj_list;
+
+obj_list
+  : obj_def obj_tail;
+
+obj_tail
+  :
+  | TK_COMMA obj_list;
+
+obj_def
+  : TK_MIN expr
+    {
+      realpaver::Term f(std::shared_ptr<realpaver::TermRep>($2));
+      if (f.isConstant())
+      {
+        realpaver_bison_error("Constant objective function");
+        YYABORT;
+      }
+
+      realpaver_bison_problem->addObjective(MIN(f));
+    }
+  | TK_MAX expr
+    {
+      realpaver::Term f(std::shared_ptr<realpaver::TermRep>($2));
+      if (f.isConstant())
+      {
+        realpaver_bison_error("Constant objective function");
+        YYABORT;
+      }
+
+      realpaver_bison_problem->addObjective(MAX(f));       
+    }
+  ;
+
+fun_statement
+  : TK_STR_FUN fun_list;
+
+fun_list
+  : fun_def fun_tail;
+
+fun_tail
+  :
+  | TK_COMMA fun_list;
+
+fun_def
+  : expr
+    {
+      // TODO
+    }
+  ;
+
 const_expr
   : expr
     {
@@ -167,9 +260,9 @@ const_expr
       if (t->isConstant()) $$ = $1;
       else
       {
-         delete t;
-         realpaver_bison_error("Expression not constant");
-         YYABORT;
+        delete t;
+        realpaver_bison_error("Expression not constant");
+        YYABORT;
       }
     }
   ;
@@ -177,59 +270,44 @@ const_expr
 expr
   : expr TK_PLUS expr
     {
-      $$ = new realpaver::TermAdd(std::shared_ptr<realpaver::TermRep>($1),
-                                  std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
+                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(lhs + rhs);
+      $$ = res.cloneRoot();
     }
   | expr TK_MINUS expr
     {
-      $$ = new realpaver::TermSub(std::shared_ptr<realpaver::TermRep>($1),
-                                  std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
+                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(lhs - rhs);
+      $$ = res.cloneRoot();
     }
   | expr TK_MUL expr
     {
-      $$ = new realpaver::TermMul(std::shared_ptr<realpaver::TermRep>($1),
-                                  std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
+                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(lhs * rhs);
+      $$ = res.cloneRoot();
     }
   | expr TK_DIV expr
     {
-      $$ = new realpaver::TermDiv(std::shared_ptr<realpaver::TermRep>($1),
-                                  std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
+                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(lhs / rhs);
+      $$ = res.cloneRoot();
     }
-  | expr TK_POW number
+  | expr TK_POW exponent
     {
-      std::shared_ptr<realpaver::TermRep> t($1);
-      std::shared_ptr<realpaver::TermRep> e($3);
-      realpaver::Interval x = e->evalConst();
-
-      if (x.isEmpty())
-      {
-        realpaver_bison_error("Bad exponent");
-        YYABORT;
-      }
-      if (x.isZero())
-      {
-        realpaver_bison_error("Bad exponent equal to 0");
-        YYABORT;
-      }
-
-      int n = (int)x.left();
-      if (n == x.right() && n > 0)
-      {
-        $$ = new realpaver::TermPow(t, n);
-      }
-      else
-      {
-        // t^e = exp(e*log(t))
-        realpaver::TermLog* log = new realpaver::TermLog(t);
-        realpaver::TermMul* mul =
-          new realpaver::TermMul(e, std::shared_ptr<realpaver::TermRep>(log));
-
-        $$ = new realpaver::TermExp(std::shared_ptr<realpaver::TermRep>(mul));
-      }
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($1)),
+                      d(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(pow(t, d.evalConst()));
+      $$ = res.cloneRoot();
     }
   | TK_MINUS expr %prec TK_UMINUS
     {
-      $$ = new realpaver::TermUsb(std::shared_ptr<realpaver::TermRep>($2));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($2)),
+                      res(-t);
+      $$ = res.cloneRoot();
     }
   | TK_PLUS expr %prec TK_UPLUS
     {
@@ -237,45 +315,69 @@ expr
     }
   | TK_SQRT TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermSqrt(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(sqrt(t));
+      $$ = res.cloneRoot();
     }
   | TK_SGN TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermSgn(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(sgn(t));
+      $$ = res.cloneRoot();
     }
   | TK_ABS TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermAbs(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(abs(t));
+      $$ = res.cloneRoot();
     }
   | TK_LOG TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermLog(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(log(t));
+      $$ = res.cloneRoot();
     }
   | TK_EXP TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermExp(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(exp(t));
+      $$ = res.cloneRoot();
     }
   | TK_COS TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermCos(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(cos(t));
+      $$ = res.cloneRoot();
     }
   | TK_SIN TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermSin(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(sin(t));
+      $$ = res.cloneRoot();
     }
   | TK_TAN TK_LPAR expr TK_RPAR
     {
-      $$ = new realpaver::TermTan(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+                      res(tan(t));
+      $$ = res.cloneRoot();
     }
   | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR
     {
-      $$ = new realpaver::TermMin(std::shared_ptr<realpaver::TermRep>($3),
-                                  std::shared_ptr<realpaver::TermRep>($5));
+      realpaver::Term fst(std::shared_ptr<realpaver::TermRep>($3)),
+                      snd(std::shared_ptr<realpaver::TermRep>($5)),
+                      res(MIN(fst, snd));
+      $$ = res.cloneRoot();
     }
   | TK_MAX TK_LPAR expr TK_COMMA expr TK_RPAR
     {
-      $$ = new realpaver::TermMax(std::shared_ptr<realpaver::TermRep>($3),
-                                  std::shared_ptr<realpaver::TermRep>($5));
+      realpaver::Term fst(std::shared_ptr<realpaver::TermRep>($3)),
+                      snd(std::shared_ptr<realpaver::TermRep>($5)),
+                      res(MAX(fst, snd));
+      $$ = res.cloneRoot();
+    }
+  | TK_LPAR expr TK_RPAR
+    {
+      $$ = $2;
     }
   | ident
     {
@@ -301,7 +403,7 @@ expr
          found = true;
       }
 
-      // Not found
+      // symbol not found
       if (!found)
       {
         std::ostringstream os;
@@ -320,7 +422,7 @@ expr
     }
   ;
 
-number
+exponent
   : integer
     {
       $$ = $1;

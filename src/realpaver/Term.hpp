@@ -103,6 +103,10 @@ public:
    /// @param s the set of variables occurring in this
    virtual void makeScope(Scope& s) const = 0;
 
+   /// @return a new representation such that the root of this is cloned and
+   ///         its sub-terms are shared
+   virtual TermRep* cloneRoot() const = 0;
+
 protected:
    typedef std::shared_ptr<TermRep> SharedRep;
    friend class Term;
@@ -196,6 +200,11 @@ public:
 
    /// @return the representation of this
    SharedRep rep() const;
+
+
+   /// @return a new representation such that the root of this is cloned and
+   ///         its sub-terms are shared
+   TermRep* cloneRoot() const;
 };
 
 /// Output on a stream
@@ -216,6 +225,7 @@ Term sqr(Term t);
 Term sqrt(Term t);
 Term pow(Term t, int n);
 Term pow(Term t, double d);
+Term pow(Term t, const Interval& x);
 Term exp(Term t);
 Term log(Term t);
 Term cos(Term t);
@@ -243,6 +253,7 @@ public:
    bool dependsOn(const Variable& v) const;
    bool isLinear() const;
    void makeScope(Scope& s) const;
+   TermRep* cloneRoot() const;
    ///@}
 
    /// @returns the value enclosed
@@ -271,6 +282,7 @@ public:
    bool isLinear() const;
    void makeScope(Scope& s) const;
    bool isVar() const;
+   TermRep* cloneRoot() const;
    ///@}
 
    /// @return the variable enclosed
@@ -355,6 +367,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
    bool isAdd() const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -376,6 +389,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
    bool isSub() const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -397,6 +411,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
    bool isMul() const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -417,6 +432,7 @@ public:
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isDiv() const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -435,6 +451,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -453,6 +470,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -472,6 +490,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
    bool isUsb() const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -489,6 +508,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -506,6 +526,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -523,6 +544,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -540,6 +562,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -562,6 +585,7 @@ public:
    Interval eval(const IntervalRegion& reg) const;
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 
 private:
@@ -582,6 +606,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -599,6 +624,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -616,6 +642,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -633,6 +660,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 
@@ -650,6 +678,7 @@ public:
    Interval evalConst() const;
    Interval eval(const IntervalRegion& reg) const;
    void acceptVisitor(TermVisitor& vis) const;
+   TermRep* cloneRoot() const;
    ///@}
 };
 

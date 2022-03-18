@@ -96,6 +96,8 @@ struct IntervalTraits
 
    static bool isZero(const interval& x);
 
+   static bool isAnInt(const interval& x);
+
    static bool contains(const interval& x, double a);
 
    static bool strictlyContains(const interval& x, double a);

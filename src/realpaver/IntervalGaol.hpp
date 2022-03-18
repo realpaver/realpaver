@@ -292,6 +292,11 @@ struct IntervalTraits<RawInterval> {
       return x.is_zero();
    }
 
+   static inline bool isAnInt(const interval& x)
+   {
+      return x.is_an_int();
+   }
+
    static inline bool contains(const interval& x, double a)
    {
       return x.set_contains(a);      

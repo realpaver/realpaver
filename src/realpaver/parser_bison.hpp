@@ -66,38 +66,40 @@ extern int realpaver_bison_debug;
     TK_STR_VAR = 261,
     TK_STR_CONST = 262,
     TK_STR_CTR = 263,
-    TK_STR_INT = 264,
-    TK_STR_REAL = 265,
-    TK_EQ = 266,
-    TK_LE = 267,
-    TK_GE = 268,
-    TK_IN = 269,
-    TK_LT = 270,
-    TK_GT = 271,
-    TK_PLUS = 272,
-    TK_MINUS = 273,
-    TK_MUL = 274,
-    TK_DIV = 275,
-    TK_POW = 276,
-    TK_SQRT = 277,
-    TK_LOG = 278,
-    TK_EXP = 279,
-    TK_TAN = 280,
-    TK_COS = 281,
-    TK_SIN = 282,
-    TK_LPAR = 283,
-    TK_RPAR = 284,
-    TK_LSBR = 285,
-    TK_RSBR = 286,
-    TK_COMMA = 287,
-    TK_SCOLON = 288,
-    TK_COLON = 289,
-    TK_SGN = 290,
-    TK_ABS = 291,
-    TK_MIN = 292,
-    TK_MAX = 293,
-    TK_UMINUS = 294,
-    TK_UPLUS = 295
+    TK_STR_OBJ = 264,
+    TK_STR_FUN = 265,
+    TK_STR_INT = 266,
+    TK_STR_REAL = 267,
+    TK_EQ = 268,
+    TK_LE = 269,
+    TK_GE = 270,
+    TK_IN = 271,
+    TK_LT = 272,
+    TK_GT = 273,
+    TK_PLUS = 274,
+    TK_MINUS = 275,
+    TK_MUL = 276,
+    TK_DIV = 277,
+    TK_POW = 278,
+    TK_SQRT = 279,
+    TK_LOG = 280,
+    TK_EXP = 281,
+    TK_TAN = 282,
+    TK_COS = 283,
+    TK_SIN = 284,
+    TK_LPAR = 285,
+    TK_RPAR = 286,
+    TK_LSBR = 287,
+    TK_RSBR = 288,
+    TK_COMMA = 289,
+    TK_SCOLON = 290,
+    TK_COLON = 291,
+    TK_SGN = 292,
+    TK_ABS = 293,
+    TK_MIN = 294,
+    TK_MAX = 295,
+    TK_UMINUS = 296,
+    TK_UPLUS = 297
   };
 #endif
 /* Tokens.  */
@@ -107,38 +109,40 @@ extern int realpaver_bison_debug;
 #define TK_STR_VAR 261
 #define TK_STR_CONST 262
 #define TK_STR_CTR 263
-#define TK_STR_INT 264
-#define TK_STR_REAL 265
-#define TK_EQ 266
-#define TK_LE 267
-#define TK_GE 268
-#define TK_IN 269
-#define TK_LT 270
-#define TK_GT 271
-#define TK_PLUS 272
-#define TK_MINUS 273
-#define TK_MUL 274
-#define TK_DIV 275
-#define TK_POW 276
-#define TK_SQRT 277
-#define TK_LOG 278
-#define TK_EXP 279
-#define TK_TAN 280
-#define TK_COS 281
-#define TK_SIN 282
-#define TK_LPAR 283
-#define TK_RPAR 284
-#define TK_LSBR 285
-#define TK_RSBR 286
-#define TK_COMMA 287
-#define TK_SCOLON 288
-#define TK_COLON 289
-#define TK_SGN 290
-#define TK_ABS 291
-#define TK_MIN 292
-#define TK_MAX 293
-#define TK_UMINUS 294
-#define TK_UPLUS 295
+#define TK_STR_OBJ 264
+#define TK_STR_FUN 265
+#define TK_STR_INT 266
+#define TK_STR_REAL 267
+#define TK_EQ 268
+#define TK_LE 269
+#define TK_GE 270
+#define TK_IN 271
+#define TK_LT 272
+#define TK_GT 273
+#define TK_PLUS 274
+#define TK_MINUS 275
+#define TK_MUL 276
+#define TK_DIV 277
+#define TK_POW 278
+#define TK_SQRT 279
+#define TK_LOG 280
+#define TK_EXP 281
+#define TK_TAN 282
+#define TK_COS 283
+#define TK_SIN 284
+#define TK_LPAR 285
+#define TK_RPAR 286
+#define TK_LSBR 287
+#define TK_RSBR 288
+#define TK_COMMA 289
+#define TK_SCOLON 290
+#define TK_COLON 291
+#define TK_SGN 292
+#define TK_ABS 293
+#define TK_MIN 294
+#define TK_MAX 295
+#define TK_UMINUS 296
+#define TK_UPLUS 297
 
 /* Value type.  */
 #if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
@@ -151,7 +155,7 @@ union REALPAVER_BISON_STYPE
   realpaver::TermRep* u_term;
   int u_integer;
 
-#line 155 "parser_bison.hpp" /* yacc.c:1909  */
+#line 159 "parser_bison.hpp" /* yacc.c:1909  */
 };
 
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;

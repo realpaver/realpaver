@@ -374,6 +374,11 @@ bool Interval::isZero() const
    return Interval::Traits::isZero(impl_);
 }
 
+bool Interval::isAnInt() const
+{
+  return Interval::Traits::isAnInt(impl_);   
+}
+
 bool Interval::contains(double a) const
 {
    return Interval::Traits::contains(impl_, a);
