@@ -91,7 +91,9 @@ extern realpaver::SymbolTable* realpaver_bison_symtab;
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
 
-#line 95 "parser_bison.cpp" /* yacc.c:339  */
+extern realpaver::FunctionSymbol* realpaver_fun_symbol;
+
+#line 97 "parser_bison.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -129,12 +131,12 @@ int realpaver_bison_error(const char* str);
 extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 24 "parser_bison.ypp" /* yacc.c:355  */
+#line 26 "parser_bison.ypp" /* yacc.c:355  */
 
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Exception.hpp"
 
-#line 138 "parser_bison.cpp" /* yacc.c:355  */
+#line 140 "parser_bison.cpp" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef REALPAVER_BISON_TOKENTYPE
@@ -149,38 +151,40 @@ extern int realpaver_bison_debug;
     TK_STR_CTR = 263,
     TK_STR_OBJ = 264,
     TK_STR_FUN = 265,
-    TK_STR_INT = 266,
-    TK_STR_REAL = 267,
-    TK_EQ = 268,
-    TK_LE = 269,
-    TK_GE = 270,
-    TK_IN = 271,
-    TK_LT = 272,
-    TK_GT = 273,
-    TK_PLUS = 274,
-    TK_MINUS = 275,
-    TK_MUL = 276,
-    TK_DIV = 277,
-    TK_POW = 278,
-    TK_SQRT = 279,
-    TK_LOG = 280,
-    TK_EXP = 281,
-    TK_TAN = 282,
-    TK_COS = 283,
-    TK_SIN = 284,
-    TK_LPAR = 285,
-    TK_RPAR = 286,
-    TK_LSBR = 287,
-    TK_RSBR = 288,
-    TK_COMMA = 289,
-    TK_SCOLON = 290,
-    TK_COLON = 291,
-    TK_SGN = 292,
-    TK_ABS = 293,
-    TK_MIN = 294,
-    TK_MAX = 295,
-    TK_UMINUS = 296,
-    TK_UPLUS = 297
+    TK_STR_ALIAS = 266,
+    TK_STR_INT = 267,
+    TK_STR_REAL = 268,
+    TK_EQ = 269,
+    TK_EQ_EQ = 270,
+    TK_LE = 271,
+    TK_GE = 272,
+    TK_IN = 273,
+    TK_LT = 274,
+    TK_GT = 275,
+    TK_PLUS = 276,
+    TK_MINUS = 277,
+    TK_MUL = 278,
+    TK_DIV = 279,
+    TK_POW = 280,
+    TK_SQRT = 281,
+    TK_LOG = 282,
+    TK_EXP = 283,
+    TK_TAN = 284,
+    TK_COS = 285,
+    TK_SIN = 286,
+    TK_LPAR = 287,
+    TK_RPAR = 288,
+    TK_LSBR = 289,
+    TK_RSBR = 290,
+    TK_COMMA = 291,
+    TK_SCOLON = 292,
+    TK_COLON = 293,
+    TK_SGN = 294,
+    TK_ABS = 295,
+    TK_MIN = 296,
+    TK_MAX = 297,
+    TK_UMINUS = 298,
+    TK_UPLUS = 299
   };
 #endif
 /* Tokens.  */
@@ -192,51 +196,53 @@ extern int realpaver_bison_debug;
 #define TK_STR_CTR 263
 #define TK_STR_OBJ 264
 #define TK_STR_FUN 265
-#define TK_STR_INT 266
-#define TK_STR_REAL 267
-#define TK_EQ 268
-#define TK_LE 269
-#define TK_GE 270
-#define TK_IN 271
-#define TK_LT 272
-#define TK_GT 273
-#define TK_PLUS 274
-#define TK_MINUS 275
-#define TK_MUL 276
-#define TK_DIV 277
-#define TK_POW 278
-#define TK_SQRT 279
-#define TK_LOG 280
-#define TK_EXP 281
-#define TK_TAN 282
-#define TK_COS 283
-#define TK_SIN 284
-#define TK_LPAR 285
-#define TK_RPAR 286
-#define TK_LSBR 287
-#define TK_RSBR 288
-#define TK_COMMA 289
-#define TK_SCOLON 290
-#define TK_COLON 291
-#define TK_SGN 292
-#define TK_ABS 293
-#define TK_MIN 294
-#define TK_MAX 295
-#define TK_UMINUS 296
-#define TK_UPLUS 297
+#define TK_STR_ALIAS 266
+#define TK_STR_INT 267
+#define TK_STR_REAL 268
+#define TK_EQ 269
+#define TK_EQ_EQ 270
+#define TK_LE 271
+#define TK_GE 272
+#define TK_IN 273
+#define TK_LT 274
+#define TK_GT 275
+#define TK_PLUS 276
+#define TK_MINUS 277
+#define TK_MUL 278
+#define TK_DIV 279
+#define TK_POW 280
+#define TK_SQRT 281
+#define TK_LOG 282
+#define TK_EXP 283
+#define TK_TAN 284
+#define TK_COS 285
+#define TK_SIN 286
+#define TK_LPAR 287
+#define TK_RPAR 288
+#define TK_LSBR 289
+#define TK_RSBR 290
+#define TK_COMMA 291
+#define TK_SCOLON 292
+#define TK_COLON 293
+#define TK_SGN 294
+#define TK_ABS 295
+#define TK_MIN 296
+#define TK_MAX 297
+#define TK_UMINUS 298
+#define TK_UPLUS 299
 
 /* Value type.  */
 #if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
 
 union REALPAVER_BISON_STYPE
 {
-#line 30 "parser_bison.ypp" /* yacc.c:355  */
+#line 32 "parser_bison.ypp" /* yacc.c:355  */
 
   char u_str[256];
   realpaver::TermRep* u_term;
   int u_integer;
 
-#line 240 "parser_bison.cpp" /* yacc.c:355  */
+#line 246 "parser_bison.cpp" /* yacc.c:355  */
 };
 
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
@@ -253,7 +259,7 @@ int realpaver_bison_parse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 257 "parser_bison.cpp" /* yacc.c:358  */
+#line 263 "parser_bison.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -493,23 +499,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  50
+#define YYFINAL  56
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   195
+#define YYLAST   230
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  43
+#define YYNTOKENS  45
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  32
+#define YYNNTS  45
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  71
+#define YYNRULES  89
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  142
+#define YYNSTATES  173
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   297
+#define YYMAXUTOK   299
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -547,21 +553,22 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44
 };
 
 #if REALPAVER_BISON_DEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    65,    65,    67,    71,    72,    73,    74,    75,    79,
-      82,    84,    86,    89,   115,   118,   120,   122,   125,   153,
-     156,   160,   167,   170,   172,   174,   177,   185,   193,   204,
-     207,   209,   211,   214,   225,   239,   242,   244,   246,   249,
-     256,   271,   278,   285,   292,   299,   306,   312,   316,   322,
-     328,   334,   340,   346,   352,   358,   364,   371,   378,   382,
-     415,   419,   426,   430,   437,   453,   469,   490,   493,   501,
-     509,   525
+       0,    68,    68,    70,    74,    75,    76,    77,    78,    79,
+      83,    87,    90,    92,    96,   122,   126,   129,   131,   135,
+     163,   166,   170,   177,   181,   184,   186,   190,   207,   211,
+     214,   216,   220,   228,   236,   247,   251,   254,   256,   260,
+     271,   285,   289,   292,   294,   299,   298,   325,   328,   330,
+     334,   349,   364,   371,   378,   385,   392,   399,   405,   409,
+     415,   421,   427,   433,   439,   445,   451,   457,   464,   471,
+     475,   479,   539,   543,   551,   550,   584,   583,   591,   593,
+     597,   601,   608,   624,   640,   661,   664,   672,   680,   696
 };
 #endif
 
@@ -572,17 +579,20 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "TK_IDENT", "TK_INT", "TK_REAL",
   "TK_STR_VAR", "TK_STR_CONST", "TK_STR_CTR", "TK_STR_OBJ", "TK_STR_FUN",
-  "TK_STR_INT", "TK_STR_REAL", "TK_EQ", "TK_LE", "TK_GE", "TK_IN", "TK_LT",
-  "TK_GT", "TK_PLUS", "TK_MINUS", "TK_MUL", "TK_DIV", "TK_POW", "TK_SQRT",
-  "TK_LOG", "TK_EXP", "TK_TAN", "TK_COS", "TK_SIN", "TK_LPAR", "TK_RPAR",
-  "TK_LSBR", "TK_RSBR", "TK_COMMA", "TK_SCOLON", "TK_COLON", "TK_SGN",
-  "TK_ABS", "TK_MIN", "TK_MAX", "TK_UMINUS", "TK_UPLUS", "$accept",
-  "model", "statement", "const_statement", "const_list", "const_tail",
-  "const_def", "var_statement", "var_list", "var_tail", "var_def",
-  "var_type", "ctr_statement", "ctr_list", "ctr_tail", "ctr_def",
-  "obj_statement", "obj_list", "obj_tail", "obj_def", "fun_statement",
-  "fun_list", "fun_tail", "fun_def", "const_expr", "expr", "exponent",
-  "integer", "real", "itv", "domain", "ident", YY_NULLPTR
+  "TK_STR_ALIAS", "TK_STR_INT", "TK_STR_REAL", "TK_EQ", "TK_EQ_EQ",
+  "TK_LE", "TK_GE", "TK_IN", "TK_LT", "TK_GT", "TK_PLUS", "TK_MINUS",
+  "TK_MUL", "TK_DIV", "TK_POW", "TK_SQRT", "TK_LOG", "TK_EXP", "TK_TAN",
+  "TK_COS", "TK_SIN", "TK_LPAR", "TK_RPAR", "TK_LSBR", "TK_RSBR",
+  "TK_COMMA", "TK_SCOLON", "TK_COLON", "TK_SGN", "TK_ABS", "TK_MIN",
+  "TK_MAX", "TK_UMINUS", "TK_UPLUS", "$accept", "model", "statement",
+  "const_statement", "const_list", "const_tail", "const_def",
+  "var_statement", "var_list", "var_tail", "var_def", "var_type",
+  "alias_statement", "alias_list", "alias_tail", "alias_def",
+  "ctr_statement", "ctr_list", "ctr_tail", "ctr_def", "obj_statement",
+  "obj_list", "obj_tail", "obj_def", "fun_statement", "fun_list",
+  "fun_tail", "fun_def", "$@1", "arg_list", "arg_tail", "arg_def",
+  "const_expr", "expr", "fun_call", "$@2", "expr_list", "$@3", "expr_tail",
+  "exponent", "integer", "real", "itv", "domain", "ident", YY_NULLPTR
 };
 #endif
 
@@ -595,14 +605,14 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297
+     295,   296,   297,   298,   299
 };
 # endif
 
-#define YYPACT_NINF -87
+#define YYPACT_NINF -88
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-87)))
+  (!!((Yystate) == (-88)))
 
 #define YYTABLE_NINF -1
 
@@ -613,21 +623,24 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      82,    12,    32,    74,    -2,    74,    15,     4,   -87,   -87,
-     -87,   -87,   -87,   -87,   -87,   -87,    16,    32,   -87,   -87,
-      18,    40,   -87,   -87,    74,    74,    26,    33,    39,    50,
-      51,    66,    74,    67,    80,    85,    88,   -87,    98,   167,
-     -87,   -87,   -87,    74,    74,   -87,    99,   -87,   101,   172,
-     -87,    82,    12,   -87,     3,    32,   -87,    74,    93,    93,
-      74,    74,    74,    74,    74,    74,    11,    74,    74,    74,
-      74,    74,   -87,    74,    74,    74,    74,    74,    74,    74,
-      44,   172,   172,    -2,   -87,    74,   -87,   -87,   -87,    74,
-      74,   102,   -87,   -87,   -87,   172,    24,    64,    86,   100,
-     105,   118,   -87,   123,   136,   -14,    -9,   -87,   172,   172,
-     172,     5,     5,    93,    93,   -87,   -87,   -87,   -87,   -87,
-     -87,   -87,    74,   -87,   -87,   -87,   -87,   -87,   -87,   -87,
-     -87,   -87,    74,    74,   113,   141,   154,    74,   -87,   -87,
-     115,   -87
+     214,    -9,    -2,     6,   -34,    -2,    -2,    12,   -19,   -88,
+     -88,   -88,   -88,   -88,   -88,   -88,   -88,   -88,   -16,    -2,
+     -88,   -88,   -11,    15,   -88,   -88,     6,     6,    -6,    10,
+      19,    20,    21,    27,     6,    28,    30,    56,    57,   -88,
+      13,   194,   -88,   -88,   -88,    58,     6,     6,   -88,    55,
+     -88,    60,    61,   -88,    73,    98,   -88,   214,    -9,   -88,
+      -1,    -2,   -88,     6,     5,     5,     6,     6,     6,     6,
+       6,     6,    78,     6,     6,     6,     6,     6,   -88,     6,
+       6,     6,     6,     6,     6,     6,    17,   -88,   205,   205,
+     -34,   -88,    -2,   -88,   -88,    -2,   -88,     6,   -88,   -88,
+       6,     6,    63,   -88,   -88,   -88,   205,    83,    96,   113,
+     118,   132,   145,   -88,   150,   163,    33,    62,   -88,   205,
+     205,   205,    16,    16,     5,     5,   -88,   -88,   -88,     6,
+     -88,   -88,    -2,   -88,   205,   -88,   -88,     6,   -88,   -88,
+     -88,   -88,   -88,   -88,   -88,   -88,   -88,     6,     6,   205,
+      77,    80,    79,   -88,    86,   168,   181,    87,   -88,   100,
+      -2,   -88,     6,   -88,   -88,     6,   -88,     6,   -88,    89,
+     -88,   205,   -88
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -635,39 +648,44 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,    19,     0,     0,     0,     0,     0,     0,     4,     5,
-       6,     7,     8,    20,    21,    14,    16,     0,    71,     9,
-      11,     0,    64,    65,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,    22,    24,     0,
-      60,    61,    59,     0,     0,    29,    31,    35,    37,    39,
-       1,     2,    19,    15,    67,     0,    10,     0,    47,    46,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    23,     0,     0,     0,     0,     0,     0,     0,
-       0,    33,    34,     0,    30,     0,    36,     3,    17,     0,
-       0,     0,    18,    12,    13,    40,     0,     0,     0,     0,
-       0,     0,    58,     0,     0,     0,     0,    25,    26,    27,
-      28,    41,    42,    43,    44,    45,    62,    63,    32,    38,
-      68,    69,     0,    70,    48,    51,    52,    55,    53,    54,
-      49,    50,     0,     0,     0,     0,     0,     0,    56,    57,
-       0,    66
+       2,    20,     0,     0,     0,     0,     0,     0,     0,     4,
+       5,     6,     7,     8,     9,    21,    22,    15,    17,     0,
+      89,    10,    12,     0,    82,    83,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    28,
+      30,     0,    70,    72,    73,    71,     0,     0,    35,    37,
+      41,    43,     0,    23,    25,     0,     1,     2,    20,    16,
+      85,     0,    11,     0,    58,    57,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,    29,     0,
+       0,     0,     0,     0,     0,     0,     0,    74,    39,    40,
+       0,    36,     0,    42,    45,     0,    24,     0,     3,    18,
+       0,     0,     0,    19,    13,    14,    51,     0,     0,     0,
+       0,     0,     0,    69,     0,     0,     0,     0,    31,    32,
+      33,    34,    52,    53,    54,    55,    56,    80,    81,     0,
+      38,    44,     0,    26,    27,    86,    87,     0,    88,    59,
+      62,    63,    66,    64,    65,    60,    61,     0,     0,    76,
+       0,     0,    48,    50,     0,     0,     0,    78,    75,     0,
+       0,    47,     0,    67,    68,     0,    77,     0,    49,     0,
+      79,    46,    84
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -87,   114,   -87,   -87,    95,   -87,   -87,   -87,   116,   -87,
-     -87,   -87,   -87,    81,   -87,   -87,   -87,    68,   -87,   -87,
-     -87,    84,   -87,   -87,   -86,    -3,   -87,    73,    90,   -87,
-     -87,    -1
+     -88,    68,   -88,   -88,    66,   -88,   -88,   -88,    70,   -88,
+     -88,   -88,   -88,    35,   -88,   -88,   -88,    54,   -88,   -88,
+     -88,    43,   -88,   -88,   -88,    67,   -88,   -88,   -88,   -13,
+     -88,   -88,   -87,    -3,   -88,   -88,   -17,   -88,   -88,   -88,
+      64,    72,   -88,   -88,     0
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_int16 yydefgoto[] =
 {
-      -1,     6,     7,     8,    19,    56,    20,     9,    15,    53,
-      16,    17,    10,    37,    72,    38,    11,    45,    84,    46,
-      12,    47,    86,    48,    94,    95,   115,    40,    41,   123,
-      92,    42
+      -1,     7,     8,     9,    21,    62,    22,    10,    17,    59,
+      18,    19,    11,    53,    96,    54,    12,    39,    78,    40,
+      13,    48,    91,    49,    14,    50,    93,    51,   132,   151,
+     161,   152,   105,   106,    42,   129,   150,   157,   166,   126,
+      43,    44,   138,   103,    45
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -675,97 +693,110 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      39,    21,    49,   120,   121,    76,    77,    78,    79,    80,
-      76,    77,    78,    79,    80,    50,    54,    89,    90,    91,
-     132,    58,    59,    13,    14,   133,    78,    79,    80,    66,
-      76,    77,    78,    79,    80,    18,   134,    43,    44,    51,
-      81,    82,   102,    76,    77,    78,    79,    80,    22,    23,
-      52,   140,    55,    57,    21,   124,    60,    96,    97,    98,
-      99,   100,   101,    61,   103,   104,   105,   106,    39,    62,
-     108,   109,   110,   111,   112,   113,   114,    18,    22,    23,
-      63,    64,    49,    76,    77,    78,    79,    80,     1,     2,
-       3,     4,     5,    24,    25,   125,    65,    67,    26,    27,
-      28,    29,    30,    31,    32,    76,    77,    78,    79,    80,
-      68,    33,    34,    35,    36,    69,    80,   126,    70,    76,
-      77,    78,    79,    80,    76,    77,    78,    79,    80,   135,
-     136,   127,    71,    83,   122,    85,   128,    76,    77,    78,
-      79,    80,    76,    77,    78,    79,    80,   137,   141,   129,
-      93,   118,   107,   116,   130,    76,    77,    78,    79,    80,
-      76,    77,    78,    79,    80,    87,     0,   131,    88,   119,
-     117,     0,   138,    76,    77,    78,    79,    80,     0,     0,
-      73,    74,    75,     0,     0,   139,    76,    77,    78,    79,
-      80,    76,    77,    78,    79,    80
+      41,    20,    23,    15,    16,    52,    55,    46,    47,    20,
+      24,    25,    56,   135,   136,   100,   101,   102,    57,    60,
+      58,    24,    25,    64,    65,    61,    66,    26,    27,    63,
+      86,    72,    28,    29,    30,    31,    32,    33,    34,    84,
+      85,    86,    67,    88,    89,    35,    36,    37,    38,    77,
+     154,    68,    69,    70,    82,    83,    84,    85,    86,    71,
+      73,    23,    74,   107,   108,   109,   110,   111,   112,   147,
+     114,   115,   116,   117,    41,   169,   119,   120,   121,   122,
+     123,   124,   125,    82,    83,    84,    85,    86,    75,    76,
+      87,    90,    52,    94,   134,    55,    92,   137,   148,    82,
+      83,    84,    85,    86,    82,    83,    84,    85,    86,    95,
+     158,   113,    97,   159,   167,   160,   139,    82,    83,    84,
+      85,    86,   162,   165,   172,    98,   149,   104,    99,   140,
+     133,   118,   153,   130,    82,    83,    84,    85,    86,    82,
+      83,    84,    85,    86,   155,   156,   141,   168,   170,     0,
+     127,   142,     0,    82,    83,    84,    85,    86,   128,   131,
+     153,     0,   149,     0,   171,   143,    82,    83,    84,    85,
+      86,    82,    83,    84,    85,    86,     0,     0,   144,     0,
+       0,     0,     0,   145,    82,    83,    84,    85,    86,    82,
+      83,    84,    85,    86,     0,     0,   146,     0,     0,     0,
+       0,   163,    82,    83,    84,    85,    86,     0,     0,    79,
+      80,    81,     0,     0,   164,    82,    83,    84,    85,    86,
+       1,     2,     3,     4,     5,     6,    82,    83,    84,    85,
+      86
 };
 
 static const yytype_int16 yycheck[] =
 {
-       3,     2,     5,    89,    90,    19,    20,    21,    22,    23,
-      19,    20,    21,    22,    23,     0,    17,    14,    15,    16,
-      34,    24,    25,    11,    12,    34,    21,    22,    23,    32,
-      19,    20,    21,    22,    23,     3,   122,    39,    40,    35,
-      43,    44,    31,    19,    20,    21,    22,    23,     4,     5,
-      34,   137,    34,    13,    55,    31,    30,    60,    61,    62,
-      63,    64,    65,    30,    67,    68,    69,    70,    71,    30,
-      73,    74,    75,    76,    77,    78,    79,     3,     4,     5,
-      30,    30,    85,    19,    20,    21,    22,    23,     6,     7,
-       8,     9,    10,    19,    20,    31,    30,    30,    24,    25,
-      26,    27,    28,    29,    30,    19,    20,    21,    22,    23,
-      30,    37,    38,    39,    40,    30,    23,    31,    30,    19,
-      20,    21,    22,    23,    19,    20,    21,    22,    23,   132,
-     133,    31,    34,    34,    32,    34,    31,    19,    20,    21,
-      22,    23,    19,    20,    21,    22,    23,    34,    33,    31,
-      55,    83,    71,    80,    31,    19,    20,    21,    22,    23,
-      19,    20,    21,    22,    23,    51,    -1,    31,    52,    85,
-      80,    -1,    31,    19,    20,    21,    22,    23,    -1,    -1,
-      13,    14,    15,    -1,    -1,    31,    19,    20,    21,    22,
-      23,    19,    20,    21,    22,    23
+       3,     3,     2,    12,    13,     5,     6,    41,    42,     3,
+       4,     5,     0,   100,   101,    16,    17,    18,    37,    19,
+      36,     4,     5,    26,    27,    36,    32,    21,    22,    14,
+      25,    34,    26,    27,    28,    29,    30,    31,    32,    23,
+      24,    25,    32,    46,    47,    39,    40,    41,    42,    36,
+     137,    32,    32,    32,    21,    22,    23,    24,    25,    32,
+      32,    61,    32,    66,    67,    68,    69,    70,    71,    36,
+      73,    74,    75,    76,    77,   162,    79,    80,    81,    82,
+      83,    84,    85,    21,    22,    23,    24,    25,    32,    32,
+      32,    36,    92,    32,    97,    95,    36,    34,    36,    21,
+      22,    23,    24,    25,    21,    22,    23,    24,    25,    36,
+      33,    33,    14,    33,    14,    36,    33,    21,    22,    23,
+      24,    25,    36,    36,    35,    57,   129,    61,    58,    33,
+      95,    77,   132,    90,    21,    22,    23,    24,    25,    21,
+      22,    23,    24,    25,   147,   148,    33,   160,   165,    -1,
+      86,    33,    -1,    21,    22,    23,    24,    25,    86,    92,
+     160,    -1,   165,    -1,   167,    33,    21,    22,    23,    24,
+      25,    21,    22,    23,    24,    25,    -1,    -1,    33,    -1,
+      -1,    -1,    -1,    33,    21,    22,    23,    24,    25,    21,
+      22,    23,    24,    25,    -1,    -1,    33,    -1,    -1,    -1,
+      -1,    33,    21,    22,    23,    24,    25,    -1,    -1,    15,
+      16,    17,    -1,    -1,    33,    21,    22,    23,    24,    25,
+       6,     7,     8,     9,    10,    11,    21,    22,    23,    24,
+      25
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     6,     7,     8,     9,    10,    44,    45,    46,    50,
-      55,    59,    63,    11,    12,    51,    53,    54,     3,    47,
-      49,    74,     4,     5,    19,    20,    24,    25,    26,    27,
-      28,    29,    30,    37,    38,    39,    40,    56,    58,    68,
-      70,    71,    74,    39,    40,    60,    62,    64,    66,    68,
-       0,    35,    34,    52,    74,    34,    48,    13,    68,    68,
-      30,    30,    30,    30,    30,    30,    68,    30,    30,    30,
-      30,    34,    57,    13,    14,    15,    19,    20,    21,    22,
-      23,    68,    68,    34,    61,    34,    65,    44,    51,    14,
-      15,    16,    73,    47,    67,    68,    68,    68,    68,    68,
-      68,    68,    31,    68,    68,    68,    68,    56,    68,    68,
-      68,    68,    68,    68,    68,    69,    70,    71,    60,    64,
-      67,    67,    32,    72,    31,    31,    31,    31,    31,    31,
-      31,    31,    34,    34,    67,    68,    68,    34,    31,    31,
-      67,    33
+       0,     6,     7,     8,     9,    10,    11,    46,    47,    48,
+      52,    57,    61,    65,    69,    12,    13,    53,    55,    56,
+       3,    49,    51,    89,     4,     5,    21,    22,    26,    27,
+      28,    29,    30,    31,    32,    39,    40,    41,    42,    62,
+      64,    78,    79,    85,    86,    89,    41,    42,    66,    68,
+      70,    72,    89,    58,    60,    89,     0,    37,    36,    54,
+      89,    36,    50,    14,    78,    78,    32,    32,    32,    32,
+      32,    32,    78,    32,    32,    32,    32,    36,    63,    15,
+      16,    17,    21,    22,    23,    24,    25,    32,    78,    78,
+      36,    67,    36,    71,    32,    36,    59,    14,    46,    53,
+      16,    17,    18,    88,    49,    77,    78,    78,    78,    78,
+      78,    78,    78,    33,    78,    78,    78,    78,    62,    78,
+      78,    78,    78,    78,    78,    78,    84,    85,    86,    80,
+      66,    70,    73,    58,    78,    77,    77,    34,    87,    33,
+      33,    33,    33,    33,    33,    33,    33,    36,    36,    78,
+      81,    74,    76,    89,    77,    78,    78,    82,    33,    33,
+      36,    75,    36,    33,    33,    36,    83,    14,    74,    77,
+      81,    78,    35
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    43,    44,    44,    45,    45,    45,    45,    45,    46,
-      47,    48,    48,    49,    50,    51,    52,    52,    53,    54,
-      54,    54,    55,    56,    57,    57,    58,    58,    58,    59,
-      60,    61,    61,    62,    62,    63,    64,    65,    65,    66,
-      67,    68,    68,    68,    68,    68,    68,    68,    68,    68,
-      68,    68,    68,    68,    68,    68,    68,    68,    68,    68,
-      68,    68,    69,    69,    70,    71,    72,    73,    73,    73,
-      73,    74
+       0,    45,    46,    46,    47,    47,    47,    47,    47,    47,
+      48,    49,    50,    50,    51,    52,    53,    54,    54,    55,
+      56,    56,    56,    57,    58,    59,    59,    60,    61,    62,
+      63,    63,    64,    64,    64,    65,    66,    67,    67,    68,
+      68,    69,    70,    71,    71,    73,    72,    74,    75,    75,
+      76,    77,    78,    78,    78,    78,    78,    78,    78,    78,
+      78,    78,    78,    78,    78,    78,    78,    78,    78,    78,
+      78,    78,    78,    78,    80,    79,    82,    81,    83,    83,
+      84,    84,    85,    86,    87,    88,    88,    88,    88,    89
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,     3,     1,     1,     1,     1,     1,     2,
-       2,     0,     2,     3,     2,     2,     0,     2,     3,     0,
-       1,     1,     2,     2,     0,     2,     3,     3,     3,     2,
-       2,     0,     2,     2,     2,     2,     2,     0,     2,     1,
-       1,     3,     3,     3,     3,     3,     2,     2,     4,     4,
-       4,     4,     4,     4,     4,     4,     6,     6,     3,     1,
-       1,     1,     1,     1,     1,     1,     5,     0,     2,     2,
-       2,     1
+       0,     2,     0,     3,     1,     1,     1,     1,     1,     1,
+       2,     2,     0,     2,     3,     2,     2,     0,     2,     3,
+       0,     1,     1,     2,     2,     0,     2,     3,     2,     2,
+       0,     2,     3,     3,     3,     2,     2,     0,     2,     2,
+       2,     2,     2,     0,     2,     0,     7,     2,     0,     2,
+       1,     1,     3,     3,     3,     3,     3,     2,     2,     4,
+       4,     4,     4,     4,     4,     4,     4,     6,     6,     3,
+       1,     1,     1,     1,     0,     5,     0,     3,     0,     2,
+       1,     1,     1,     1,     5,     0,     2,     2,     2,     1
 };
 
 
@@ -1441,10 +1472,10 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 13:
-#line 90 "parser_bison.ypp" /* yacc.c:1646  */
+        case 14:
+#line 97 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      std::shared_ptr<realpaver::TermRep> e((yyvsp[0].u_term));
+      realpaver::Term::SharedRep e((yyvsp[0].u_term));
 
       realpaver::Interval x = e->evalConst();
       if (x.isEmpty())
@@ -1465,13 +1496,13 @@ yyreduce:
 
       realpaver_bison_symtab->insertConstant((yyvsp[-2].u_str), x);
     }
-#line 1469 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1500 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 126 "parser_bison.ypp" /* yacc.c:1646  */
+  case 19:
+#line 136 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      std::shared_ptr<realpaver::TermRep> e((yyvsp[0].u_term));
+      realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval x = e->evalConst();
 
       if (realpaver_bison_symtab->hasSymbol((yyvsp[-1].u_str)))
@@ -1493,73 +1524,91 @@ yyreduce:
         realpaver_bison_symtab->insertVariable((yyvsp[-1].u_str), v);
       }
     }
-#line 1497 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 19:
-#line 153 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-       (yyval.u_integer) = 1;
-    }
-#line 1505 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1528 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 157 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-       (yyval.u_integer) = 0;       
-    }
-#line 1513 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 161 "parser_bison.ypp" /* yacc.c:1646  */
+#line 163 "parser_bison.ypp" /* yacc.c:1646  */
     {
        (yyval.u_integer) = 1;
     }
-#line 1521 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1536 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 178 "parser_bison.ypp" /* yacc.c:1646  */
+  case 21:
+#line 167 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term)));
-      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+       (yyval.u_integer) = 0;       
+    }
+#line 1544 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 171 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+       (yyval.u_integer) = 1;
+    }
+#line 1552 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 191 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term)));
+
+      if (realpaver_bison_symtab->hasSymbol((yyvsp[-2].u_str)))
+      {
+        std::ostringstream os;
+        os << "Symbol [" << (yyvsp[-2].u_str) << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      realpaver_bison_symtab->insertAlias((yyvsp[-2].u_str), t);
+    }
+#line 1570 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 221 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term)));
+      realpaver::Term rhs(realpaver::Term::SharedRep((yyvsp[0].u_term)));
 
       realpaver::Constraint c(lhs == rhs);
       realpaver_bison_problem->addCtr(c);
     }
-#line 1533 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1582 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 186 "parser_bison.ypp" /* yacc.c:1646  */
+  case 33:
+#line 229 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term)));
-      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term)));
+      realpaver::Term rhs(realpaver::Term::SharedRep((yyvsp[0].u_term)));
 
       realpaver::Constraint c(lhs <= rhs);
       realpaver_bison_problem->addCtr(c);
     }
-#line 1545 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1594 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 194 "parser_bison.ypp" /* yacc.c:1646  */
+  case 34:
+#line 237 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term)));
-      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term)));
+      realpaver::Term rhs(realpaver::Term::SharedRep((yyvsp[0].u_term)));
 
       realpaver::Constraint c(lhs >= rhs);
       realpaver_bison_problem->addCtr(c);
     }
-#line 1557 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1606 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 215 "parser_bison.ypp" /* yacc.c:1646  */
+  case 39:
+#line 261 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term f(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+      realpaver::Term f(realpaver::Term::SharedRep((yyvsp[0].u_term)));
       if (f.isConstant())
       {
         realpaver_bison_error("Constant objective function");
@@ -1568,13 +1617,13 @@ yyreduce:
 
       realpaver_bison_problem->addObjective(MIN(f));
     }
-#line 1572 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1621 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 226 "parser_bison.ypp" /* yacc.c:1646  */
+  case 40:
+#line 272 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term f(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term)));
+      realpaver::Term f(realpaver::Term::SharedRep((yyvsp[0].u_term)));
       if (f.isConstant())
       {
         realpaver_bison_error("Constant objective function");
@@ -1583,19 +1632,59 @@ yyreduce:
 
       realpaver_bison_problem->addObjective(MAX(f));       
     }
-#line 1587 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1636 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 39:
-#line 250 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      // TODO
+  case 45:
+#line 299 "parser_bison.ypp" /* yacc.c:1646  */
+    {       
+      if (realpaver_bison_symtab->hasSymbol((yyvsp[-1].u_str)))
+      {
+        std::ostringstream os;
+        os << "Symbol [" << (yyvsp[-1].u_str) << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      realpaver_fun_symbol = realpaver_bison_symtab->insertFunction((yyvsp[-1].u_str));
     }
-#line 1595 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1652 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 40:
-#line 257 "parser_bison.ypp" /* yacc.c:1646  */
+  case 46:
+#line 311 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term)));
+      bool ok = realpaver_fun_symbol->setTerm(t);      
+      realpaver_fun_symbol = nullptr;
+
+      if (!ok)
+      {
+        realpaver_bison_error("Bad variable in a function expression");
+        YYABORT;                  
+      }
+    }
+#line 1668 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 50:
+#line 335 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      if (realpaver_fun_symbol->hasArgument((yyvsp[0].u_str)))
+      {
+        std::ostringstream os;
+        os << "Argument [" << (yyvsp[0].u_str) << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      realpaver_fun_symbol->addArgument((yyvsp[0].u_str));
+    }
+#line 1684 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 51:
+#line 350 "parser_bison.ypp" /* yacc.c:1646  */
     {
       realpaver::TermRep* t = (yyvsp[0].u_term);
 
@@ -1607,263 +1696,345 @@ yyreduce:
         YYABORT;
       }
     }
-#line 1611 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 41:
-#line 272 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term))),
-                      rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term))),
-                      res(lhs + rhs);
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1622 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 42:
-#line 279 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term))),
-                      rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term))),
-                      res(lhs - rhs);
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1633 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 43:
-#line 286 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term))),
-                      rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term))),
-                      res(lhs * rhs);
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1644 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 44:
-#line 293 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term))),
-                      rhs(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term))),
-                      res(lhs / rhs);
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1655 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 45:
-#line 300 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-2].u_term))),
-                      d(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term))),
-                      res(pow(t, d.evalConst()));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1666 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 46:
-#line 307 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[0].u_term))),
-                      res(-t);
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1676 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 47:
-#line 313 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-       (yyval.u_term) = (yyvsp[0].u_term);
-    }
-#line 1684 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 48:
-#line 317 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(sqrt(t));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1694 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 49:
-#line 323 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(sgn(t));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1704 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 50:
-#line 329 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(abs(t));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1714 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 51:
-#line 335 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(log(t));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1724 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1700 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 341 "parser_bison.ypp" /* yacc.c:1646  */
+#line 365 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(exp(t));
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
+                      rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
+                      res(lhs + rhs);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1734 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1711 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 347 "parser_bison.ypp" /* yacc.c:1646  */
+#line 372 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(cos(t));
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
+                      rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
+                      res(lhs - rhs);
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1722 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 54:
+#line 379 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
+                      rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
+                      res(lhs * rhs);
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1733 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 55:
+#line 386 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
+                      rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
+                      res(lhs / rhs);
       (yyval.u_term) = res.cloneRoot();
     }
 #line 1744 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 54:
-#line 353 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(sin(t));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1754 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
-  case 55:
-#line 359 "parser_bison.ypp" /* yacc.c:1646  */
-    {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(tan(t));
-      (yyval.u_term) = res.cloneRoot();
-    }
-#line 1764 "parser_bison.cpp" /* yacc.c:1646  */
-    break;
-
   case 56:
-#line 365 "parser_bison.ypp" /* yacc.c:1646  */
+#line 393 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term fst(std::shared_ptr<realpaver::TermRep>((yyvsp[-3].u_term))),
-                      snd(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(MIN(fst, snd));
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
+                      d(realpaver::Term::SharedRep((yyvsp[0].u_term))),
+                      res(pow(t, d.evalConst()));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1775 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1755 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 372 "parser_bison.ypp" /* yacc.c:1646  */
+#line 400 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      realpaver::Term fst(std::shared_ptr<realpaver::TermRep>((yyvsp[-3].u_term))),
-                      snd(std::shared_ptr<realpaver::TermRep>((yyvsp[-1].u_term))),
-                      res(MAX(fst, snd));
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term))),
+                      res(-t);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1786 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1765 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 379 "parser_bison.ypp" /* yacc.c:1646  */
+#line 406 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      (yyval.u_term) = (yyvsp[-1].u_term);
+       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1794 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1773 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 383 "parser_bison.ypp" /* yacc.c:1646  */
+#line 410 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(sqrt(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1783 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 60:
+#line 416 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(sgn(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1793 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 61:
+#line 422 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(abs(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1803 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 62:
+#line 428 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(log(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1813 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 63:
+#line 434 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(exp(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1823 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 64:
+#line 440 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(cos(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1833 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 65:
+#line 446 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(sin(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1843 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 66:
+#line 452 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(tan(t));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1853 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 67:
+#line 458 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term fst(realpaver::Term::SharedRep((yyvsp[-3].u_term))),
+                      snd(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(MIN(fst, snd));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1864 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 68:
+#line 465 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term fst(realpaver::Term::SharedRep((yyvsp[-3].u_term))),
+                      snd(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
+                      res(MAX(fst, snd));
+      (yyval.u_term) = res.cloneRoot();
+    }
+#line 1875 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 69:
+#line 472 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+    (yyval.u_term) = (yyvsp[-1].u_term);
+  }
+#line 1883 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 70:
+#line 476 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      (yyval.u_term) = (yyvsp[0].u_term);
+    }
+#line 1891 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 71:
+#line 480 "parser_bison.ypp" /* yacc.c:1646  */
     {
       bool found = false;
 
-      // Constant ?
-      realpaver::ConstantSymbol* cs =
-        realpaver_bison_symtab->findConstant(realpaver_bison_text);
-
-      if (cs != nullptr)
+      // an argument?
+      if (realpaver_fun_symbol != nullptr &&
+          realpaver_fun_symbol->hasArgument((yyvsp[0].u_str)))
       {
-         (yyval.u_term) = new realpaver::TermConst(cs->getValue());
-         found = true;
+        realpaver::Variable v = realpaver_fun_symbol->getVar((yyvsp[0].u_str));
+        (yyval.u_term) = new realpaver::TermVar(v);
+        found = true;
       }
 
-      // Variable ?
-      realpaver::VariableSymbol* vs =
-        realpaver_bison_symtab->findVariable(realpaver_bison_text);
-
-      if (vs != nullptr)
+      if (!found)
       {
-         (yyval.u_term) = new realpaver::TermVar(vs->getVar());
-         found = true;
+        // a constant?
+        realpaver::ConstantSymbol* cs =
+          realpaver_bison_symtab->findConstant((yyvsp[0].u_str));
+
+        if (cs != nullptr)
+        {
+           (yyval.u_term) = new realpaver::TermConst(cs->getValue());
+           found = true;
+        }
+     }
+
+      if (!found)
+      {
+        // a variable?
+        realpaver::VariableSymbol* vs =
+          realpaver_bison_symtab->findVariable((yyvsp[0].u_str));
+
+        if (vs != nullptr)
+        {
+           (yyval.u_term) = new realpaver::TermVar(vs->getVar());
+           found = true;
+        }
+      }
+
+      if (!found)
+      {
+        // an alias?
+        realpaver::AliasSymbol* as = realpaver_bison_symtab->findAlias((yyvsp[0].u_str));
+
+        if (as != nullptr)
+        {
+           (yyval.u_term) = as->getTerm().cloneRoot();
+           found = true;
+        }
       }
 
       // symbol not found
       if (!found)
       {
         std::ostringstream os;
-        os << "Identifier [" << realpaver_bison_text << "] not found";
+        os << "Identifier [" << (yyvsp[0].u_str) << "] not found";
         realpaver_bison_error(os.str().c_str());
         YYABORT;
       }
     }
-#line 1831 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1955 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 416 "parser_bison.ypp" /* yacc.c:1646  */
+  case 72:
+#line 540 "parser_bison.ypp" /* yacc.c:1646  */
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1839 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1963 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 420 "parser_bison.ypp" /* yacc.c:1646  */
+  case 73:
+#line 544 "parser_bison.ypp" /* yacc.c:1646  */
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1847 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1971 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 427 "parser_bison.ypp" /* yacc.c:1646  */
+  case 74:
+#line 551 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::FunctionSymbol* fs =
+          realpaver_bison_symtab->findFunction((yyvsp[-1].u_str));
+
+      if (fs == nullptr)
+      {
+        std::ostringstream os;
+        os << "Function [" << (yyvsp[-1].u_str) << "] not found";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;
+      }
+
+      realpaver_bison_symtab->pushFunctionCall(fs);
+    }
+#line 1990 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 75:
+#line 566 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+       std::pair<bool, realpaver::Term> res =
+         realpaver_bison_symtab->processFunCall();
+
+       if (res.first)
+       {
+         (yyval.u_term) = res.second.cloneRoot();
+       }
+       else
+       {
+         realpaver_bison_error("Function call invalid");
+         YYABORT;          
+       }
+    }
+#line 2009 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 76:
+#line 584 "parser_bison.ypp" /* yacc.c:1646  */
+    {
+      realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term)));
+      realpaver_bison_symtab->addFunctionArgument(t);
+    }
+#line 2018 "parser_bison.cpp" /* yacc.c:1646  */
+    break;
+
+  case 80:
+#line 598 "parser_bison.ypp" /* yacc.c:1646  */
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1855 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2026 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 431 "parser_bison.ypp" /* yacc.c:1646  */
+  case 81:
+#line 602 "parser_bison.ypp" /* yacc.c:1646  */
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1863 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2034 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 64:
-#line 438 "parser_bison.ypp" /* yacc.c:1646  */
+  case 82:
+#line 609 "parser_bison.ypp" /* yacc.c:1646  */
     {
       try
       {
@@ -1876,11 +2047,11 @@ yyreduce:
         YYABORT;
       }       
     }
-#line 1880 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2051 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 454 "parser_bison.ypp" /* yacc.c:1646  */
+  case 83:
+#line 625 "parser_bison.ypp" /* yacc.c:1646  */
     {
       try
       {
@@ -1893,14 +2064,14 @@ yyreduce:
         YYABORT;
       }       
     }
-#line 1897 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2068 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 66:
-#line 470 "parser_bison.ypp" /* yacc.c:1646  */
+  case 84:
+#line 641 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      std::shared_ptr<realpaver::TermRep> lo((yyvsp[-3].u_term));
-      std::shared_ptr<realpaver::TermRep> up((yyvsp[-1].u_term));
+      realpaver::Term::SharedRep lo((yyvsp[-3].u_term));
+      realpaver::Term::SharedRep up((yyvsp[-1].u_term));
 
       realpaver::Interval x = lo->evalConst();
       realpaver::Interval y = up->evalConst();
@@ -1914,45 +2085,45 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(z);
     }
-#line 1918 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2089 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 67:
-#line 490 "parser_bison.ypp" /* yacc.c:1646  */
+  case 85:
+#line 661 "parser_bison.ypp" /* yacc.c:1646  */
     {
       (yyval.u_term) = new realpaver::TermConst(realpaver::Interval::universe());
     }
-#line 1926 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2097 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 68:
-#line 494 "parser_bison.ypp" /* yacc.c:1646  */
+  case 86:
+#line 665 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      std::shared_ptr<realpaver::TermRep> e((yyvsp[0].u_term));
+      realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval up = e->evalConst();
       realpaver::Interval domain = realpaver::Interval::lessThan(up.right());
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 1938 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2109 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 69:
-#line 502 "parser_bison.ypp" /* yacc.c:1646  */
+  case 87:
+#line 673 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      std::shared_ptr<realpaver::TermRep> e((yyvsp[0].u_term));
+      realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval lo = e->evalConst();
       realpaver::Interval domain = realpaver::Interval::moreThan(lo.left());
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 1950 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2121 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 70:
-#line 510 "parser_bison.ypp" /* yacc.c:1646  */
+  case 88:
+#line 681 "parser_bison.ypp" /* yacc.c:1646  */
     {
-      std::shared_ptr<realpaver::TermRep> e((yyvsp[0].u_term));
+      realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval domain = e->evalConst();
 
       if (domain.isEmpty())
@@ -1963,19 +2134,19 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 1967 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2138 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
-  case 71:
-#line 526 "parser_bison.ypp" /* yacc.c:1646  */
+  case 89:
+#line 697 "parser_bison.ypp" /* yacc.c:1646  */
     {
      strcpy((yyval.u_str), realpaver_bison_text);
    }
-#line 1975 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2146 "parser_bison.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1979 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2150 "parser_bison.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2203,7 +2374,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 530 "parser_bison.ypp" /* yacc.c:1906  */
+#line 701 "parser_bison.ypp" /* yacc.c:1906  */
 
 
 int realpaver_bison_error(const char* str)

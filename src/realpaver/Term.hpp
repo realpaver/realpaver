@@ -189,11 +189,9 @@ public:
    Term& operator/=(Term other);
    ///@}
 
-private:
+   /// Type of shared representation
    typedef TermRep::SharedRep SharedRep;
-   SharedRep rep_;   // shared representation
 
-public:
    /// Creates a term
    /// @param rep the representation of this
    Term(const SharedRep& rep);
@@ -201,10 +199,12 @@ public:
    /// @return the representation of this
    SharedRep rep() const;
 
-
    /// @return a new representation such that the root of this is cloned and
    ///         its sub-terms are shared
    TermRep* cloneRoot() const;
+
+private:
+   SharedRep rep_;   // shared representation
 };
 
 /// Output on a stream
@@ -257,7 +257,7 @@ public:
    ///@}
 
    /// @returns the value enclosed
-   const Interval& getVal() const;
+   Interval getVal() const;
 
 private:
    Interval x_;

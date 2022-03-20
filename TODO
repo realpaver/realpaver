@@ -1,3 +1,17 @@
 BOSolver, setParam, loadParam avec les tolerances
 
 Maximisation
+
+
+
+FunctionSymbol setTerm
+
+verifier que le terme ne contient pas de variables autres que des arguments
+(avec un visiteur)
+
+en cas d'erreur, penser à remove le FunctionSymbol de la table
+
+
+
+
+en cas d'erreur de parsing, vider la table des symboles du probleme

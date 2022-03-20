@@ -16,6 +16,8 @@ extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
+
+extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %}
 
 %define api.prefix {realpaver_bison_}
@@ -36,6 +38,7 @@ int realpaver_bison_error(const char* str);
 %type <u_str>     ident
 %type <u_term>    expr
 %type <u_term>    const_expr
+%type <u_term>    fun_call
 %type <u_term>    integer
 %type <u_term>    real
 %type <u_term>    exponent
@@ -44,9 +47,9 @@ int realpaver_bison_error(const char* str);
 %type <u_integer> var_type
 
 %token TK_IDENT TK_INT TK_REAL
-%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN
+%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT TK_STR_REAL
-%token TK_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
+%token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
 %token TK_LPAR TK_RPAR TK_LSBR TK_RSBR
@@ -70,25 +73,29 @@ model
 statement
   : const_statement
   | var_statement
+  | alias_statement
   | ctr_statement
   | obj_statement
   | fun_statement
   ;
 
 const_statement
-  : TK_STR_CONST const_list;
+  : TK_STR_CONST const_list
+  ;
 
 const_list
-  : const_def const_tail;
+  : const_def const_tail
+  ;
 
 const_tail
   :
-  | TK_COMMA const_list;
+  | TK_COMMA const_list
+  ;
 
 const_def
   : ident TK_EQ const_expr
     {
-      std::shared_ptr<realpaver::TermRep> e($3);
+      realpaver::Term::SharedRep e($3);
 
       realpaver::Interval x = e->evalConst();
       if (x.isEmpty())
@@ -112,19 +119,22 @@ const_def
   ;
 
 var_statement
-  : TK_STR_VAR var_list;
+  : TK_STR_VAR var_list
+  ;
 
 var_list
-  : var_def var_tail;
+  : var_def var_tail
+  ;
 
 var_tail
   :
-  | TK_COMMA var_list;
+  | TK_COMMA var_list
+  ;
 
 var_def
   : var_type ident domain
     {
-      std::shared_ptr<realpaver::TermRep> e($3);
+      realpaver::Term::SharedRep e($3);
       realpaver::Interval x = e->evalConst();
 
       if (realpaver_bison_symtab->hasSymbol($2))
@@ -163,37 +173,70 @@ var_type
     }
   ;
 
+alias_statement
+  : TK_STR_ALIAS alias_list
+  ;
+
+alias_list
+  : alias_def alias_tail
+  ;
+
+alias_tail
+  :
+  | TK_COMMA alias_list
+  ;
+
+alias_def
+  : ident TK_EQ expr
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3));
+
+      if (realpaver_bison_symtab->hasSymbol($1))
+      {
+        std::ostringstream os;
+        os << "Symbol [" << $1 << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      realpaver_bison_symtab->insertAlias($1, t);
+    }
+  ;
+
 ctr_statement
-  : TK_STR_CTR ctr_list;
+  : TK_STR_CTR ctr_list
+  ;
 
 ctr_list
-  : ctr_def ctr_tail;
+  : ctr_def ctr_tail
+  ;
 
 ctr_tail
   :
-  | TK_COMMA ctr_list;
+  | TK_COMMA ctr_list
+  ;
 
 ctr_def
-  : expr TK_EQ expr
+  : expr TK_EQ_EQ expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1));
-      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(realpaver::Term::SharedRep($1));
+      realpaver::Term rhs(realpaver::Term::SharedRep($3));
 
       realpaver::Constraint c(lhs == rhs);
       realpaver_bison_problem->addCtr(c);
     }
   | expr TK_LE expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1));
-      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(realpaver::Term::SharedRep($1));
+      realpaver::Term rhs(realpaver::Term::SharedRep($3));
 
       realpaver::Constraint c(lhs <= rhs);
       realpaver_bison_problem->addCtr(c);
     }
   | expr TK_GE expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1));
-      realpaver::Term rhs(std::shared_ptr<realpaver::TermRep>($3));
+      realpaver::Term lhs(realpaver::Term::SharedRep($1));
+      realpaver::Term rhs(realpaver::Term::SharedRep($3));
 
       realpaver::Constraint c(lhs >= rhs);
       realpaver_bison_problem->addCtr(c);
@@ -201,19 +244,22 @@ ctr_def
   ;
 
 obj_statement
-  : TK_STR_OBJ obj_list;
+  : TK_STR_OBJ obj_list
+  ;
 
 obj_list
-  : obj_def obj_tail;
+  : obj_def obj_tail
+  ;
 
 obj_tail
   :
-  | TK_COMMA obj_list;
+  | TK_COMMA obj_list
+  ;
 
 obj_def
   : TK_MIN expr
     {
-      realpaver::Term f(std::shared_ptr<realpaver::TermRep>($2));
+      realpaver::Term f(realpaver::Term::SharedRep($2));
       if (f.isConstant())
       {
         realpaver_bison_error("Constant objective function");
@@ -224,7 +270,7 @@ obj_def
     }
   | TK_MAX expr
     {
-      realpaver::Term f(std::shared_ptr<realpaver::TermRep>($2));
+      realpaver::Term f(realpaver::Term::SharedRep($2));
       if (f.isConstant())
       {
         realpaver_bison_error("Constant objective function");
@@ -236,19 +282,66 @@ obj_def
   ;
 
 fun_statement
-  : TK_STR_FUN fun_list;
+  : TK_STR_FUN fun_list
+  ;
 
 fun_list
-  : fun_def fun_tail;
+  : fun_def fun_tail
+  ;
 
 fun_tail
   :
-  | TK_COMMA fun_list;
+  | TK_COMMA fun_list
+  ;
 
 fun_def
-  : expr
+  : ident TK_LPAR
+    {       
+      if (realpaver_bison_symtab->hasSymbol($1))
+      {
+        std::ostringstream os;
+        os << "Symbol [" << $1 << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      realpaver_fun_symbol = realpaver_bison_symtab->insertFunction($1);
+    }
+    arg_list TK_RPAR TK_EQ expr
     {
-      // TODO
+      realpaver::Term t(realpaver::Term::SharedRep($7));
+      bool ok = realpaver_fun_symbol->setTerm(t);      
+      realpaver_fun_symbol = nullptr;
+
+      if (!ok)
+      {
+        realpaver_bison_error("Bad variable in a function expression");
+        YYABORT;                  
+      }
+    }
+  ;
+
+arg_list
+  : arg_def arg_tail
+  ;
+
+arg_tail
+  :
+  | TK_COMMA arg_list
+  ;
+
+arg_def
+  : ident
+    {
+      if (realpaver_fun_symbol->hasArgument($1))
+      {
+        std::ostringstream os;
+        os << "Argument [" << $1 << "] already used";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;         
+      }
+
+      realpaver_fun_symbol->addArgument($1);
     }
   ;
 
@@ -270,42 +363,42 @@ const_expr
 expr
   : expr TK_PLUS expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
-                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term lhs(realpaver::Term::SharedRep($1)),
+                      rhs(realpaver::Term::SharedRep($3)),
                       res(lhs + rhs);
       $$ = res.cloneRoot();
     }
   | expr TK_MINUS expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
-                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term lhs(realpaver::Term::SharedRep($1)),
+                      rhs(realpaver::Term::SharedRep($3)),
                       res(lhs - rhs);
       $$ = res.cloneRoot();
     }
   | expr TK_MUL expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
-                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term lhs(realpaver::Term::SharedRep($1)),
+                      rhs(realpaver::Term::SharedRep($3)),
                       res(lhs * rhs);
       $$ = res.cloneRoot();
     }
   | expr TK_DIV expr
     {
-      realpaver::Term lhs(std::shared_ptr<realpaver::TermRep>($1)),
-                      rhs(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term lhs(realpaver::Term::SharedRep($1)),
+                      rhs(realpaver::Term::SharedRep($3)),
                       res(lhs / rhs);
       $$ = res.cloneRoot();
     }
   | expr TK_POW exponent
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($1)),
-                      d(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($1)),
+                      d(realpaver::Term::SharedRep($3)),
                       res(pow(t, d.evalConst()));
       $$ = res.cloneRoot();
     }
   | TK_MINUS expr %prec TK_UMINUS
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($2)),
+      realpaver::Term t(realpaver::Term::SharedRep($2)),
                       res(-t);
       $$ = res.cloneRoot();
     }
@@ -315,99 +408,130 @@ expr
     }
   | TK_SQRT TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(sqrt(t));
       $$ = res.cloneRoot();
     }
   | TK_SGN TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(sgn(t));
       $$ = res.cloneRoot();
     }
   | TK_ABS TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(abs(t));
       $$ = res.cloneRoot();
     }
   | TK_LOG TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(log(t));
       $$ = res.cloneRoot();
     }
   | TK_EXP TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(exp(t));
       $$ = res.cloneRoot();
     }
   | TK_COS TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(cos(t));
       $$ = res.cloneRoot();
     }
   | TK_SIN TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(sin(t));
       $$ = res.cloneRoot();
     }
   | TK_TAN TK_LPAR expr TK_RPAR
     {
-      realpaver::Term t(std::shared_ptr<realpaver::TermRep>($3)),
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(tan(t));
       $$ = res.cloneRoot();
     }
   | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR
     {
-      realpaver::Term fst(std::shared_ptr<realpaver::TermRep>($3)),
-                      snd(std::shared_ptr<realpaver::TermRep>($5)),
+      realpaver::Term fst(realpaver::Term::SharedRep($3)),
+                      snd(realpaver::Term::SharedRep($5)),
                       res(MIN(fst, snd));
       $$ = res.cloneRoot();
     }
   | TK_MAX TK_LPAR expr TK_COMMA expr TK_RPAR
     {
-      realpaver::Term fst(std::shared_ptr<realpaver::TermRep>($3)),
-                      snd(std::shared_ptr<realpaver::TermRep>($5)),
+      realpaver::Term fst(realpaver::Term::SharedRep($3)),
+                      snd(realpaver::Term::SharedRep($5)),
                       res(MAX(fst, snd));
       $$ = res.cloneRoot();
     }
   | TK_LPAR expr TK_RPAR
+  {
+    $$ = $2;
+  }
+  | fun_call
     {
-      $$ = $2;
+      $$ = $1;
     }
   | ident
     {
       bool found = false;
 
-      // Constant ?
-      realpaver::ConstantSymbol* cs =
-        realpaver_bison_symtab->findConstant(realpaver_bison_text);
-
-      if (cs != nullptr)
+      // an argument?
+      if (realpaver_fun_symbol != nullptr &&
+          realpaver_fun_symbol->hasArgument($1))
       {
-         $$ = new realpaver::TermConst(cs->getValue());
-         found = true;
+        realpaver::Variable v = realpaver_fun_symbol->getVar($1);
+        $$ = new realpaver::TermVar(v);
+        found = true;
       }
 
-      // Variable ?
-      realpaver::VariableSymbol* vs =
-        realpaver_bison_symtab->findVariable(realpaver_bison_text);
-
-      if (vs != nullptr)
+      if (!found)
       {
-         $$ = new realpaver::TermVar(vs->getVar());
-         found = true;
+        // a constant?
+        realpaver::ConstantSymbol* cs =
+          realpaver_bison_symtab->findConstant($1);
+
+        if (cs != nullptr)
+        {
+           $$ = new realpaver::TermConst(cs->getValue());
+           found = true;
+        }
+     }
+
+      if (!found)
+      {
+        // a variable?
+        realpaver::VariableSymbol* vs =
+          realpaver_bison_symtab->findVariable($1);
+
+        if (vs != nullptr)
+        {
+           $$ = new realpaver::TermVar(vs->getVar());
+           found = true;
+        }
+      }
+
+      if (!found)
+      {
+        // an alias?
+        realpaver::AliasSymbol* as = realpaver_bison_symtab->findAlias($1);
+
+        if (as != nullptr)
+        {
+           $$ = as->getTerm().cloneRoot();
+           found = true;
+        }
       }
 
       // symbol not found
       if (!found)
       {
         std::ostringstream os;
-        os << "Identifier [" << realpaver_bison_text << "] not found";
+        os << "Identifier [" << $1 << "] not found";
         realpaver_bison_error(os.str().c_str());
         YYABORT;
       }
@@ -420,6 +544,53 @@ expr
     {
       $$ = $1;
     }
+  ;
+
+fun_call
+  : ident TK_LPAR
+    {
+      realpaver::FunctionSymbol* fs =
+          realpaver_bison_symtab->findFunction($1);
+
+      if (fs == nullptr)
+      {
+        std::ostringstream os;
+        os << "Function [" << $1 << "] not found";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;
+      }
+
+      realpaver_bison_symtab->pushFunctionCall(fs);
+    }
+    expr_list TK_RPAR
+    {
+       std::pair<bool, realpaver::Term> res =
+         realpaver_bison_symtab->processFunCall();
+
+       if (res.first)
+       {
+         $$ = res.second.cloneRoot();
+       }
+       else
+       {
+         realpaver_bison_error("Function call invalid");
+         YYABORT;          
+       }
+    }
+  ;
+
+expr_list
+  : expr
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($1));
+      realpaver_bison_symtab->addFunctionArgument(t);
+    }
+    expr_tail
+  ;
+
+expr_tail
+  :
+  | TK_COMMA expr_list
   ;
 
 exponent
@@ -468,8 +639,8 @@ real
 itv
   : TK_LSBR const_expr TK_COMMA const_expr TK_RSBR
     {
-      std::shared_ptr<realpaver::TermRep> lo($2);
-      std::shared_ptr<realpaver::TermRep> up($4);
+      realpaver::Term::SharedRep lo($2);
+      realpaver::Term::SharedRep up($4);
 
       realpaver::Interval x = lo->evalConst();
       realpaver::Interval y = up->evalConst();
@@ -492,7 +663,7 @@ domain
     }
   | TK_LE const_expr
     {
-      std::shared_ptr<realpaver::TermRep> e($2);
+      realpaver::Term::SharedRep e($2);
       realpaver::Interval up = e->evalConst();
       realpaver::Interval domain = realpaver::Interval::lessThan(up.right());
 
@@ -500,7 +671,7 @@ domain
     }
   | TK_GE const_expr
     {
-      std::shared_ptr<realpaver::TermRep> e($2);
+      realpaver::Term::SharedRep e($2);
       realpaver::Interval lo = e->evalConst();
       realpaver::Interval domain = realpaver::Interval::moreThan(lo.left());
 
@@ -508,7 +679,7 @@ domain
     }
   | TK_IN itv
     {
-      std::shared_ptr<realpaver::TermRep> e($2);
+      realpaver::Term::SharedRep e($2);
       realpaver::Interval domain = e->evalConst();
 
       if (domain.isEmpty())

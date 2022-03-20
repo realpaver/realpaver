@@ -1287,7 +1287,7 @@ TermConst::TermConst(const Interval& x)
    constant_ = true;
 }
 
-const Interval& TermConst::getVal() const
+Interval TermConst::getVal() const
 {
    return x_;
 }

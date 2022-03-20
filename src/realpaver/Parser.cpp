@@ -23,6 +23,7 @@ namespace realpaver {
 
 static std::vector<std::string> keywords = {
    "Variables", "Constants", "Constraints",
+   "Aliases", "Functions", "Objectives",
    "int", "real", "in",
    "MIN", "MAX", "min", "max", "abs", "sgn", "sqr", "sqrt", "pow",
    "log", "exp", "cos", "sin", "tan"

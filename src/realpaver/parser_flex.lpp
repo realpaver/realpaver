@@ -23,6 +23,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 
 "Variables"     return TK_STR_VAR;
 "Constants"     return TK_STR_CONST;
+"Aliases"       return TK_STR_ALIAS;
 "Constraints"   return TK_STR_CTR;
 "Objectives"    return TK_STR_OBJ;
 "Functions"     return TK_STR_FUN;
@@ -59,6 +60,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 ":"      return TK_COLON;
 ">"      return TK_GT;
 "<"      return TK_LT;
+"=="     return TK_EQ_EQ;
 "="      return TK_EQ;
 ">="     return TK_GE;
 "<="     return TK_LE;
@@ -69,39 +71,16 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 
 {SPACE}  {}
 
-"/*"     {
-            int c;
-            for( ;; )
-            {
-               while( (c=getchar()) != '*' && c!=EOF )
-               {
-                  if( c=='\n' ) ++realpaver_bison_lineno;
-               }
-
-               if( c=='*' )
-               {
-                  while( (c=getchar()) == '*' )
-                  {
-                     if( c=='\n' ) ++realpaver_bison_lineno;
-                  }
-
-                  if( c=='/' ) break;
-                  if( c=='\n' ) ++realpaver_bison_lineno;
-               }
-               if( c==EOF ) break;
-            }
-         }
-
-"//"     {
-            int c;
-            while( (c=getchar()) != '\n' && (c!=EOF) )
-            {}
-            if( c=='\n' ) ++realpaver_bison_lineno;
+"#"      {
+           int c;
+           while( (c=getchar()) != '\n' && (c!=EOF) ) {}
+           if( c=='\n' ) ++realpaver_bison_lineno;
          }
 %%
 
 realpaver::Problem* realpaver_bison_problem;
 realpaver::SymbolTable* realpaver_bison_symtab;
+realpaver::FunctionSymbol* realpaver_fun_symbol;
 
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;
@@ -113,6 +92,7 @@ void realpaver_flex_init(realpaver::Problem* prob,
   realpaver_bison_problem = prob;
   realpaver_bison_symtab = symtab;
   realpaver_parse_error = "";
+  realpaver_fun_symbol = nullptr;
 }
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
