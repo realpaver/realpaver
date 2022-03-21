@@ -102,7 +102,12 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
       }
    }
 
-   IntervalRegion Y = dest.getDomains();
+   // this region is useful if some variables are not fixed, i.e. we have
+   // nb_ < src.nbVars(), and in this case Y is assigned to dest.getDomains();
+   // otherwise it is useless and it is assigned to src.getDomains() in order
+   // to prevent errors
+   IntervalRegion Y = (nbv_ < src.nbVars()) ? dest.getDomains() :
+                                              src.getDomains();
 
    // rewrites the constraints
    for (size_t i=0; i<src.nbCtrs(); ++i)

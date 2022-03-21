@@ -26,7 +26,7 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class IntContractor : public Contractor {
 public:
-   /// Creates acontractor with no variable
+   /// Creates a contractor with no variable
    IntContractor();
 
    /// Creates a contractor for one variable
@@ -39,7 +39,10 @@ public:
 
    /// Inserts a variable in the list of variables
    /// @param v an integer variable
-   void insert(Variable v);
+   void insertVar(Variable v);
+
+   /// @return the number of variables
+   size_t nbVars() const;
 
    ///@{
    /// Overrides (Contractor)
@@ -53,6 +56,9 @@ private:
    Scope s_;
    Bitset b_;
 };
+
+/// Type of shared pointers on contractors
+typedef std::shared_ptr<IntContractor> SharedIntContractor;
 
 } // namespace
 

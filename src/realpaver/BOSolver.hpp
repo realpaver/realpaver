@@ -82,7 +82,6 @@ private:
    BOLocalSolver* localSolver_;  // local optimization
    BOSplit* split_;              // splitting strategy
    SharedContractor contractor_; // contraction strategy
-   ContractorPool* pool_;        // pool used by the contraction strategy
 
    SharedIntervalRegion init_;   // initial region
    OptimizationStatus status_;   // status resulting from an optimization

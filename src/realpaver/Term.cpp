@@ -116,6 +116,25 @@ bool TermRep::isConstant() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool Term::simplify_ = true;
+
+bool Term::isSimplificationOn()
+{
+   return simplify_;
+}
+
+bool Term::isSimplificationOff()
+{
+   return !simplify_;
+}
+
+bool Term::simplification(bool simplify)
+{
+   bool status = simplify_;
+   simplify_ = simplify;
+   return status;
+}
+   
 Term::Term(double a) : rep_(std::make_shared<TermConst>(a))
 {}
 
@@ -269,6 +288,9 @@ Term& Term::operator/=(Term other)
 
 Term operator+(Term l, Term r)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
+
    if (l.isZero())
       return r;
 
@@ -462,16 +484,19 @@ Term operator+(Term l, Term r)
 
       else
       {
-         return Term(std::make_shared<TermAdd>(l.rep(),r.rep()));
+         return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
       }
    }
 
    else
-      return Term(std::make_shared<TermAdd>(l.rep(),r.rep()));
+      return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
 }
 
 Term operator-(Term l, Term r)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermSub>(l.rep(), r.rep()));
+
    if (r.isZero())
       return l;
 
@@ -681,6 +706,9 @@ Term operator-(Term l, Term r)
 
 Term operator*(Term l, Term r)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermMul>(l.rep(), r.rep()));
+
    if (l.isZero())
       return l;
 
@@ -881,6 +909,9 @@ Term operator/(Term l, Term r)
 {
    ASSERT(!r.isZero(), "Term divided by zero");
 
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermDiv>(l.rep(), r.rep()));
+
    if (l.isZero() || r.isOne())
       return l;
 
@@ -1058,27 +1089,33 @@ Term operator/(Term l, Term r)
 
       else
       {
-         return Term(std::make_shared<TermDiv>(l.rep(),r.rep()));
+         return Term(std::make_shared<TermDiv>(l.rep(), r.rep()));
       }
    }
 
    else
-      return Term(std::make_shared<TermDiv>(l.rep(),r.rep()));
+      return Term(std::make_shared<TermDiv>(l.rep(), r.rep()));
 }
 
 Term MIN(Term l, Term r)
 {
+   if (Term::isSimplificationOff())
+      return  Term(std::make_shared<TermMin>(l.rep(), r.rep()));
+
    if (l.isConstant() && r.isConstant())
    {
       Interval x( min(l.evalConst(), r.evalConst()) );
       return Term(x);
    }
    else
-      return Term(std::make_shared<TermMin>(l.rep(),r.rep()));
+      return Term(std::make_shared<TermMin>(l.rep(), r.rep()));
 }
 
 Term MAX(Term l, Term r)
 {
+   if (Term::isSimplificationOff())
+      return  Term(std::make_shared<TermMax>(l.rep(), r.rep()));
+
    if (l.isConstant() && r.isConstant())
    {
       Interval x( max(l.evalConst(), r.evalConst()) );
@@ -1090,6 +1127,9 @@ Term MAX(Term l, Term r)
 
 Term operator-(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermUsb>(t.rep()));
+
    if (t.isZero())
       return t;
 
@@ -1111,6 +1151,9 @@ Term operator-(Term t)
 
 Term abs(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermAbs>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( abs(t.evalConst()) );
@@ -1122,6 +1165,9 @@ Term abs(Term t)
 
 Term sgn(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermSgn>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( sgn(t.evalConst()) );
@@ -1133,6 +1179,9 @@ Term sgn(Term t)
 
 Term sqr(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermSqr>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( sqr(t.evalConst()) );
@@ -1144,6 +1193,9 @@ Term sqr(Term t)
 
 Term sqrt(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermSqrt>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( sqrt(t.evalConst()) );
@@ -1155,6 +1207,9 @@ Term sqrt(Term t)
 
 Term pow(Term t, int n)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermPow>(t.rep(), n));
+
    if (t.isConstant())
    {
       Interval x( pow(t.evalConst(),n) );
@@ -1181,6 +1236,9 @@ Term pow(Term t, int n)
 
 Term pow(Term t, double d)
 {
+   if (Term::isSimplificationOff())
+      return exp(d*log(t));
+
    if (d == 0.0)
       return Term(1.0);
 
@@ -1213,6 +1271,9 @@ Term pow(Term t, double d)
 
 Term pow(Term t, const Interval& x)
 {
+   if (Term::isSimplificationOff())
+      return exp(x*log(t));
+
    if (x.isSingleton())
       return pow(t, x.left());
 
@@ -1222,6 +1283,9 @@ Term pow(Term t, const Interval& x)
 
 Term exp(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermExp>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( exp(t.evalConst()) );
@@ -1233,6 +1297,9 @@ Term exp(Term t)
 
 Term log(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermLog>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( log(t.evalConst()) );
@@ -1244,6 +1311,9 @@ Term log(Term t)
 
 Term cos(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermCos>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( cos(t.evalConst()) );
@@ -1255,6 +1325,9 @@ Term cos(Term t)
 
 Term sin(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermSin>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( sin(t.evalConst()) );
@@ -1266,6 +1339,9 @@ Term sin(Term t)
 
 Term tan(Term t)
 {
+   if (Term::isSimplificationOff())
+      return Term(std::make_shared<TermTan>(t.rep()));
+
    if (t.isConstant())
    {
       Interval x( tan(t.evalConst()) );

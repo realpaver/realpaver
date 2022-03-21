@@ -32,9 +32,7 @@ class Propagator : public Contractor {
 public:
    /// Creates a propagator over a pool of contractors
    /// @param pool a pool of contractors
-   ///
-   /// This propagator does not own the pool.
-   Propagator(ContractorPool* pool = nullptr);
+   Propagator(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
    Propagator(const Propagator&) = default;
@@ -49,11 +47,11 @@ public:
    size_t poolSize() const;
 
    /// @return the pool
-   ContractorPool* getPool() const;
+   SharedContractorPool getPool() const;
 
    /// Sets the pool
    /// @param pool new pool of contractors   
-   void setPool(ContractorPool* pool);
+   void setPool(SharedContractorPool pool);
 
    ///@{
    /// Overrides (Contractor)
@@ -83,11 +81,14 @@ public:
    Proof proofAt(size_t i) const;
 
 private:
-   ContractorPool* pool_;        // pool of contractors
+   SharedContractorPool pool_;   // pool of contractors
    Tolerance dtol_;              // tolerance used for propagation
    size_t maxiter_;              // maximum number of propagation steps
    std::vector<Proof> certif_;   // proof certificates of contractors
 };
+
+/// Type of shared pointers on propagators
+typedef std::shared_ptr<Propagator> SharedPropagator;
 
 } // namespace
 

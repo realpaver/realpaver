@@ -1,17 +1,20 @@
+REVOIR BOModel pour le calcul de la fonction objectif, ......
+
+retester ./bop, avec des min, des max, ...
+
+
+
+
+
 BOSolver, setParam, loadParam avec les tolerances
+
+
+round Robin donc sauver la var splittée dans noeud
+
 
 Maximisation
 
 
 
-FunctionSymbol setTerm
+TODO : Conjugate, si cela plante, retourner par defaut l'evaluation midpoint
 
-verifier que le terme ne contient pas de variables autres que des arguments
-(avec un visiteur)
-
-en cas d'erreur, penser à remove le FunctionSymbol de la table
-
-
-
-
-en cas d'erreur de parsing, vider la table des symboles du probleme

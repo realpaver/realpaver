@@ -12,7 +12,9 @@
 #include "realpaver/BOPresolver.hpp"
 #include "realpaver/BOSolver.hpp"
 #include "realpaver/HC4Contractor.hpp"
+#include "realpaver/IntContractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/ListContractor.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/Selector.hpp"
 
@@ -27,7 +29,6 @@ BOSolver::BOSolver(Problem& problem)
         localSolver_(nullptr),
         split_(nullptr),
         contractor_(nullptr),
-        pool_(nullptr),
         init_(nullptr),
         status_(OptimizationStatus::Other),
         sol_(problem.scope()),
@@ -46,8 +47,6 @@ BOSolver::BOSolver(Problem& problem)
 
 BOSolver::~BOSolver()
 {
-   //~ if (contractor_ != nullptr)  delete contractor_;
-   if (pool_ != nullptr)        delete pool_;
    if (split_ != nullptr)       delete split_;
    if (localSolver_ != nullptr) delete localSolver_;
    if (model_ != nullptr)       delete model_;
@@ -177,10 +176,12 @@ void BOSolver::makeSplit()
 
 void BOSolver::makeHC4()
 {
-   ContractorVector* vpool = new ContractorVector();
+   SharedContractorVector vpool = std::make_shared<ContractorVector>();
 
    Dag* dag = model_->getDag();
    size_t i = 0;
+
+   SharedIntContractor ic = std::make_shared<IntContractor>();
 
    // contractors associated with df / dv = 0
    for (Variable v : model_->getObjScope())
@@ -199,6 +200,8 @@ void BOSolver::makeHC4()
          vpool->push(op);
       }
 
+      if (v.isDiscrete()) ic->insertVar(v);
+
       i = i+1;
    }
 
@@ -206,15 +209,24 @@ void BOSolver::makeHC4()
    SharedContractor op = std::make_shared<HC4Contractor>(dag, dag->nbFun()-1);
    vpool->push(op);
 
-   pool_ = vpool;
+   SharedPropagator propagator = std::make_shared<Propagator>(vpool);
+   propagator->setDistTol(param_.getTolParam("PROPAGATION_DTOL"));
+   propagator->setMaxIter(param_.getIntParam("PROPAGATION_ITER_LIMIT"));
 
-   SharedContractor propagator = std::make_shared<Propagator>(pool_);
+   if (ic->nbVars() > 0)
+   {
+      SharedContractorVector ipool = std::make_shared<ContractorVector>();
+      //~ ipool->push(std::static_pointer_cast<Contractor>(propagator));
+      ipool->push(propagator);
+      ipool->push(ic);
 
-   Propagator* ptr = static_cast<Propagator*>(propagator.get());
-   ptr->setDistTol(param_.getTolParam("PROPAGATION_DTOL"));
-   ptr->setMaxIter(param_.getIntParam("PROPAGATION_ITER_LIMIT"));
-
-   contractor_ = propagator;
+      SharedListContractor lc = std::make_shared<ListContractor>(ipool);
+      contractor_ = lc;
+   }
+   else
+   {
+      contractor_ = propagator;
+   }
 }
 
 void BOSolver::makeMaxCIDHC4()
@@ -229,8 +241,7 @@ void BOSolver::makeMaxCIDHC4()
       std::make_unique<IntervalPartitioner>(nb);
 
    SharedContractor op =
-      std::make_shared<MaxCIDContractor>(contractor_,
-                                         std::move(selector),
+      std::make_shared<MaxCIDContractor>(contractor_, std::move(selector),
                                          std::move(slicer));
 
    contractor_ = op;
@@ -668,7 +679,10 @@ OptimizationStatus BOSolver::getStatus() const
 
 Interval BOSolver::getObjEnclosure() const
 {
-   return objval_;
+   if (problem_.getObjective().isMinimization())
+      return objval_;
+   else
+      return -objval_;
 }
 
 RealPoint BOSolver::getBestSolution() const

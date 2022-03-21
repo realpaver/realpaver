@@ -27,11 +27,11 @@ int main(void)
       size_t i = dag.insert( y == 0.5*x );
       size_t j = dag.insert( y == 2*x );
 
-      ContractorVector pool;
-      pool.push(std::make_shared<HC4Contractor>(&dag, i));
-      pool.push(std::make_shared<HC4Contractor>(&dag, j));
+      SharedContractorVector pool = std::make_shared<ContractorVector>();
+      pool->push(std::make_shared<HC4Contractor>(&dag, i));
+      pool->push(std::make_shared<HC4Contractor>(&dag, j));
 
-      Propagator tor(&pool);
+      Propagator tor(pool);
       tor.setDistTol(Tolerance::makeRel(1.0e-2));
 
       Proof proof = tor.contract(reg);

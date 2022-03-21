@@ -62,6 +62,7 @@ librealpaver_la_include_HEADERS = \
 		LinumDoubleTraits.hpp \
 		LinumIntervalTraits.hpp \
 		LinumTraits.hpp \
+		ListContractor.hpp \
 		Logger.hpp \
 		LPModel.hpp \
 		LPSolver.hpp \
@@ -137,6 +138,7 @@ librealpaver_la_SOURCES = \
 		IntervalSlicer.cpp \
 		IntervalVector.cpp \
 		IntervalUnion.cpp \
+		ListContractor.cpp \
 		Logger.cpp \
 		LPModel.cpp \
 		MaxCIDContractor.cpp \

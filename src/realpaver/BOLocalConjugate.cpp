@@ -127,7 +127,7 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
    pk = sk;
    step = findStep(f, xk, pk, sk, uk);
 
-   DEBUG("dir : " << pk << "   step : " << step);
+//   DEBUG("dir : " << pk << "   step : " << step);
 
    if (step > 0.0) xk_1 = xk + step * pk;
 
@@ -144,7 +144,7 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
       f.rfunEvalDiff(RealPoint(scope, xk_1), grad, uk_1);
       sk_1 = -grad;
 
-   DEBUG("\npoint : " << xk_1 << "   " << "grad : " << grad << "   val : " << uk_1);
+//   DEBUG("\npoint : " << xk_1 << "   " << "grad : " << grad << "   val : " << uk_1);
     
       if (Double::isNan(uk_1) || grad.isNan())
       {
@@ -160,7 +160,7 @@ OptimizationStatus BOLocalConjugate::minimize(RealFunction& f,
       pk_1 = sk_1 + beta * pk;
       step = findStep(f, xk_1, pk_1, sk_1, uk_1);
 
-   DEBUG("dir : " << pk_1 << "   step : " << step);
+//   DEBUG("dir : " << pk_1 << "   step : " << step);
 
       if (step > 0.0)
       {

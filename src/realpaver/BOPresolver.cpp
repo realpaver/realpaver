@@ -14,12 +14,12 @@
 namespace realpaver {
 
 BOPresolver::BOPresolver(BOModel& model)
-      : pool_(),
-        propagator_(),
+      : propagator_(),
         init_(nullptr),
         region_(model.getInitRegion())
 {
    init_ = std::make_shared<IntervalRegion>(model.getInitRegion());
+   SharedContractorVector pool = std::make_shared<ContractorVector>();
 
    Dag* dag = model.getDag();
    size_t i = 0;
@@ -34,17 +34,17 @@ BOPresolver::BOPresolver(BOModel& model)
          SharedContractor bop =
             std::make_shared<BOContractor>(dag, i, v, op, init_);
 
-         pool_.push(bop);
+         pool->push(bop);
       }
       else
       {
-         pool_.push(op);
+         pool->push(op);
       }
 
       i = i+1;
    }
 
-   propagator_.setPool(&pool_);
+   propagator_.setPool(pool);
 }
 
 bool BOPresolver::presolve()

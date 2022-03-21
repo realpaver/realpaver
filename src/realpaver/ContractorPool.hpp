@@ -10,6 +10,7 @@
 #ifndef REALPAVER_CONTRACTOR_POOL_HPP
 #define REALPAVER_CONTRACTOR_POOL_HPP
 
+#include <memory>
 #include "realpaver/Contractor.hpp"
 
 namespace realpaver {
@@ -57,6 +58,9 @@ public:
    virtual void removeContractorAt(size_t i) = 0;
 };
 
+/// Type of shared contractor pools.
+typedef std::shared_ptr<ContractorPool> SharedContractorPool;
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a pool of contractors implemented as a vector.
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,6 +96,9 @@ private:
    Scope s_;
    Bitset bs_;
 };
+
+/// Type of shared contractor vectors.
+typedef std::shared_ptr<ContractorVector> SharedContractorVector;
 
 } // namespace
 

@@ -203,8 +203,22 @@ public:
    ///         its sub-terms are shared
    TermRep* cloneRoot() const;
 
+   /// @return true if terms are automatically simplified when they are created
+   static bool isSimplificationOn();
+
+   /// @return true if terms are not simplified when they are created
+   static bool isSimplificationOff();
+
+   /// Assigns the simplification status of terms
+   /// @param simplify true in order to simplify terms when they are created,
+   ///        false otherwise
+   /// @return the previous status before its assignment
+   static bool simplification(bool simplify);
+
 private:
-   SharedRep rep_;   // shared representation
+   SharedRep rep_;         // shared representation
+
+   static bool simplify_;  // true if terms are automatically simplified
 };
 
 /// Output on a stream

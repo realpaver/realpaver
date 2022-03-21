@@ -46,7 +46,6 @@ public:
    IntervalRegion getContractedRegion() const;
 
 private:
-   ContractorVector pool_;       // pool of contractors
    Propagator propagator_;       // propagator based on the pool of contractors
    SharedIntervalRegion init_;   // initial region
    IntervalRegion region_;       // contracted region

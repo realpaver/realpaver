@@ -21,11 +21,13 @@ namespace realpaver {
 /// Given a function f and a variable v, a BO contractor reduces a box with
 /// respect to the constraint df / dv = 0, i.e. it aims at finding stationary
 /// points but it also checks the bounds of the initial region.
+///
+/// Assumption: the problem is a minimization problem.
 ///////////////////////////////////////////////////////////////////////////////
 class BOContractor : public Contractor {
 public:
    /// Creates a contractor associated with a partial derivative df/dv
-   /// @param dag dag representong a BO problem
+   /// @param dag dag representing a BO problem
    /// @param i index of the partial derivative in the dag
    /// @param v variable considered
    /// @param op contractor for the equation df/dv = 0
