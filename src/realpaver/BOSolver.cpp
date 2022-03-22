@@ -154,6 +154,7 @@ void BOSolver::makeSplit()
    std::string sel = param_.getStrParam("SPLIT_SELECTOR");
    if (sel == "MaxDom") selector = new SelectorMaxDom(S);
    if (sel == "MaxSmear") selector = new SelectorMaxSmear(model_, S);
+   if (sel == "RoundRobin") selector = new SelectorRoundRobin(S);
 
    std::string sli = param_.getStrParam("SPLIT_SLICER");
    if (sli == "Bisection") slicer = new IntervalBisecter();
@@ -186,7 +187,8 @@ void BOSolver::makeHC4()
    // contractors associated with df / dv = 0
    for (Variable v : model_->getObjScope())
    {
-      SharedContractor op = std::make_shared<HC4Contractor>(dag, i);
+      DagFun* dv = model_->getDerivative(i);
+      SharedContractor op = std::make_shared<HC4Contractor>(dag, dv->index());
 
       if (model_->isBoundaryVar(v))
       {
@@ -206,7 +208,8 @@ void BOSolver::makeHC4()
    }
 
    // contractor associated with the objective constraint
-   SharedContractor op = std::make_shared<HC4Contractor>(dag, dag->nbFun()-1);
+   DagFun* of = model_->getObjConstraint();
+   SharedContractor op = std::make_shared<HC4Contractor>(dag, of->index());
    vpool->push(op);
 
    SharedPropagator propagator = std::make_shared<Propagator>(vpool);
@@ -216,7 +219,6 @@ void BOSolver::makeHC4()
    if (ic->nbVars() > 0)
    {
       SharedContractorVector ipool = std::make_shared<ContractorVector>();
-      //~ ipool->push(std::static_pointer_cast<Contractor>(propagator));
       ipool->push(propagator);
       ipool->push(ic);
 
@@ -679,10 +681,7 @@ OptimizationStatus BOSolver::getStatus() const
 
 Interval BOSolver::getObjEnclosure() const
 {
-   if (problem_.getObjective().isMinimization())
-      return objval_;
-   else
-      return -objval_;
+   return problem_.getObjective().isMinimization() ? objval_ : (-objval_);
 }
 
 RealPoint BOSolver::getBestSolution() const

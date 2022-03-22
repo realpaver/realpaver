@@ -1,20 +1,4 @@
-REVOIR BOModel pour le calcul de la fonction objectif, ......
-
-retester ./bop, avec des min, des max, ...
-
-
-
-
-
 BOSolver, setParam, loadParam avec les tolerances
 
-
-round Robin donc sauver la var splittée dans noeud
-
-
-Maximisation
-
-
-
-TODO : Conjugate, si cela plante, retourner par defaut l'evaluation midpoint
+Conjugate à tester
 

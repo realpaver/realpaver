@@ -168,6 +168,10 @@ public:
    /// @return true if this and other have the same identifier, false otherwise
    bool operator==(const Variable& other) const;
 
+   /// @return true if this has no representation, i.e. it has been created
+   ///         with the default constructor
+   bool isNull() const;
+
 private:
    std::shared_ptr<VariableRep> rep_;
 };

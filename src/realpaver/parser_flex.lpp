@@ -27,9 +27,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "Constraints"   return TK_STR_CTR;
 "Objectives"    return TK_STR_OBJ;
 "Functions"     return TK_STR_FUN;
-
-"real"   return TK_STR_REAL;
-"int"    return TK_STR_INT;
+"Integer"       return TK_STR_INT;
 
 "min"    return TK_MIN;
 "max"    return TK_MAX;

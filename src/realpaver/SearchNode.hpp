@@ -10,6 +10,8 @@
 #ifndef REALPAVER_SEARCH_NODE_HPP
 #define REALPAVER_SEARCH_NODE_HPP
 
+#include "realpaver/IntervalRegion.hpp"
+
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,16 +23,16 @@ class SearchNode {
 public:
    /// Creates a node
    /// @param depth depth of this
-   SearchNode(int depth = 0);
+   SearchNode(const Scope& scope, const IntervalRegion& reg,  int depth = 0);
 
    /// Virtual destructor
    virtual ~SearchNode();
 
-   /// Default copy constructor
-   SearchNode(const SearchNode&) = default;
+   /// Copy constructor
+   SearchNode(const SearchNode& node);
 
-   /// Default assignment operator
-   SearchNode& operator=(const SearchNode&) = default;
+   /// No assignment
+   SearchNode& operator=(const SearchNode&) = delete;
 
    /// @return the depth of this in the search tree
    int getDepth() const;
@@ -42,8 +44,24 @@ public:
    /// Increments the depth of this
    void incrementDepth();
 
+   /// @return the vector of domains of this
+   IntervalRegion* getRegion() const;
+
+   /// @return the scope of this
+   Scope getScope() const;
+
+   /// @return the variable chosen by the last splitting step
+   Variable getSplitVariable() const;
+
+   /// Assigns the variable whose domain has been split
+   /// @param v a variablein the scope of this
+   void setSplitVariable(Variable v);
+
 private:
+   Scope scope_;
+   IntervalRegion* reg_;
    int depth_;
+   Variable v_;
 };
 
 } // namespace

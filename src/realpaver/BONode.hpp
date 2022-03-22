@@ -10,9 +10,7 @@
 #ifndef REALPAVER_BO_NODE_HPP
 #define REALPAVER_BO_NODE_HPP
 
-#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/SearchNode.hpp"
-#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
@@ -33,14 +31,14 @@ public:
    /// @param reg domains of variables
    BONode(Scope scope, Variable objvar, const IntervalRegion& reg);
 
-   /// Copy constructor
-   BONode(const BONode& node);
+   /// Default copy constructor
+   BONode(const BONode& node) = default;
 
    /// No assignment
    BONode& operator=(const BONode& node) = delete;
 
-   /// Destructor
-   ~BONode();
+   /// Default destructor
+   ~BONode() = default;
 
    /// @return the lower bound of the objective function
    double getLower() const;
@@ -56,19 +54,11 @@ public:
    /// @param val new upper bound
    void setUpper(double val);
 
-   /// @return the vector of domains of this
-   IntervalRegion* getRegion() const;
-
-   /// @return the scope of this
-   Scope getScope() const;
-
    /// @return the objective variable of this
    Variable getObjVar() const;
 
 private:
-   Scope scope_;
    Variable objvar_;
-   IntervalRegion* reg_;
    double lower_;
    double upper_;
 };

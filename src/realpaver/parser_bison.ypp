@@ -32,7 +32,6 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 {
   char u_str[256];
   realpaver::TermRep* u_term;
-  int u_integer;
 }
 
 %type <u_str>     ident
@@ -44,11 +43,10 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    exponent
 %type <u_term>    itv
 %type <u_term>    domain
-%type <u_integer> var_type
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
-%token TK_STR_INT TK_STR_REAL
+%token TK_STR_INT
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
@@ -77,6 +75,7 @@ statement
   | ctr_statement
   | obj_statement
   | fun_statement
+  | int_statement
   ;
 
 const_statement
@@ -132,44 +131,21 @@ var_tail
   ;
 
 var_def
-  : var_type ident domain
+  : ident domain
     {
-      realpaver::Term::SharedRep e($3);
+      realpaver::Term::SharedRep e($2);
       realpaver::Interval x = e->evalConst();
 
-      if (realpaver_bison_symtab->hasSymbol($2))
+      if (realpaver_bison_symtab->hasSymbol($1))
       {
         std::ostringstream os;
-        os << "Symbol [" << $2 << "] already used";
+        os << "Symbol [" << $1 << "] already used";
         realpaver_bison_error(os.str().c_str());
         YYABORT;         
       }
 
-      if ($1 == 0)
-      {
-        realpaver::Variable v = realpaver_bison_problem->addIntVar(x, $2);
-        realpaver_bison_symtab->insertVariable($2, v);
-      }
-      else
-      {
-        realpaver::Variable v = realpaver_bison_problem->addRealVar(x, $2);
-        realpaver_bison_symtab->insertVariable($2, v);
-      }
-    }
-  ;
-
-var_type
-  :
-    {
-       $$ = 1;
-    }
-  | TK_STR_INT
-    {
-       $$ = 0;       
-    }
-  | TK_STR_REAL
-    {
-       $$ = 1;
+      realpaver::Variable v = realpaver_bison_problem->addRealVar(x, $1);
+      realpaver_bison_symtab->insertVariable($1, v);
     }
   ;
 
@@ -342,6 +318,38 @@ arg_def
       }
 
       realpaver_fun_symbol->addArgument($1);
+    }
+  ;
+
+int_statement
+  : TK_STR_INT int_list
+  ;
+
+int_list
+  : int_def int_tail
+  ;
+
+int_tail
+  :
+  | TK_COMMA int_list
+  ;
+
+int_def
+  : ident
+    {
+      realpaver::VariableSymbol* vs = realpaver_bison_symtab->findVariable($1);
+
+      if (vs != nullptr)
+      {
+         vs->getVar().setDiscrete();
+      }
+      else
+      {
+        std::ostringstream os;
+        os << "Variable [" << $1 << "] not found";
+        realpaver_bison_error(os.str().c_str());
+        YYABORT;
+      }
     }
   ;
 

@@ -24,6 +24,16 @@ Scope Selector::scope() const
    return scope_;
 }
 
+std::pair<bool, Variable> Selector::selectVar(const SearchNode& node)
+{
+   return selectVar(*node.getRegion());
+}
+
+std::pair<bool, Variable> Selector::selectVar(const IntervalRegion& reg)
+{
+   return std::make_pair(false, Variable());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 SelectorMaxDom::SelectorMaxDom(Scope s) : Selector(s)
@@ -37,7 +47,7 @@ std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
    double wmax, w;
    Variable vmax;
 
-   for (auto v : scope())
+   for (auto v : scope_)
    {
       const Interval& I = reg.get(v);
 
@@ -61,7 +71,7 @@ std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
       }
    }
 
-   return std::make_pair(found, vmax);
+   return std::make_pair(found, vmax);   
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,7 +87,6 @@ SelectorMaxSmear::SelectorMaxSmear(IntervalFunction* f, Scope s)
 std::pair<bool, Variable>
 SelectorMaxSmear::selectVar(const IntervalRegion& reg)
 {
-   Scope S = scope();
    Scope fscope = f_->ifunScope();
 
    IntervalVector grad(fscope.size());
@@ -87,7 +96,7 @@ SelectorMaxSmear::selectVar(const IntervalRegion& reg)
    double smax, s, w;
    Variable vmax;
 
-   for (auto v : S)
+   for (auto v : scope_)
    {
       Interval I = reg.get(v);;
 
@@ -124,6 +133,46 @@ SelectorMaxSmear::selectVar(const IntervalRegion& reg)
    }
 
    return std::make_pair(found, vmax);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+SelectorRoundRobin::SelectorRoundRobin(Scope s) : Selector(s)
+{}
+
+std::pair<bool, Variable> SelectorRoundRobin::selectVar(const SearchNode& node)
+{
+   IntervalRegion* reg = node.getRegion();
+   Variable v = node.getSplitVariable();
+   auto it = scope_.begin();
+
+   if (!v.isNull())
+   {
+      it = scope_.find(v);
+      ++it;
+      if (it == scope_.end()) it = scope_.begin();
+   }
+
+   bool found = false;
+   size_t nb = 0;
+
+   while (!found && nb<scope_.size())
+   {
+      v = *it;
+
+      if (!v.getTolerance().hasTolerance(reg->get(v)))
+      {
+         found = true;
+      }
+      else
+      {
+         ++nb;
+         ++it;
+         if (it == scope_.end()) it = scope_.begin();
+      }
+   }
+
+   return std::make_pair(found, v);
 }
 
 } // namespace

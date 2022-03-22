@@ -159,14 +159,14 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
       return os << "empty problem";
    
    std::string indent = "   ",
-               s_int  = "int  ",
-               s_real = "real ",
                s_var  = "Variables",
                s_ctr  = "Constraints",
-               s_obj  = "Objective";
+               s_int  = "Integer",
+               s_obj  = "Objectives";
 
    // variables
    bool first = true;
+   bool intvar = false;
    os << s_var << std::endl;
    for (size_t i=0; i<p.nbVars(); ++i)
    {
@@ -174,14 +174,47 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
       else first = false;
 
       Variable v = p.varAt(i);
-      os << indent;
-      if (v.isDiscrete())
-         os << s_int;
-      else
-         os << s_real;
-      os << v.getName() << " in " << v.getDomain();
+      Interval I = v.getDomain();
+
+      if (v.isDiscrete()) intvar = true;
+   
+      os << indent << v.getName();
+      
+      if (!I.isUniverse())
+      {
+         if (I.isInfLeft())
+         {
+            os << " <= " << I.right();
+         }
+         else if (I.isInfRight())
+         {
+            os << " >= " << I.left();
+         }
+         else
+         {
+            os << " in " << I;
+         }
+      }
    }
-   os << ";" << std::endl;
+   os << std::endl << ";" << std::endl;
+
+   // integer variables
+   if (intvar)
+   {
+      os << std::endl << s_int << std::endl << indent;
+      first = true;
+      for (size_t i=0; i<p.nbVars(); ++i)
+      {
+         Variable v = p.varAt(i);
+         if (v.isDiscrete())
+         {
+            if (!first) os << ", ";
+            else first = false;
+            os << v.getName();
+         }
+      }
+      os << std::endl << ";" << std::endl;
+   }
 
    // constraints
    if (p.nbCtrs() > 0)
@@ -195,14 +228,14 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
 
          os << indent << p.ctrAt(i);
       }
-      os << ";" << std::endl;
+      os << std::endl << ";" << std::endl;
    }
 
    // objective function
    if (p.hasObjective())
    {
       os << std::endl << s_obj << std::endl;
-      os << indent << p.getObjective() << ";" << std::endl;
+      os << indent << p.getObjective() << std::endl << ";" << std::endl;
    }
 
    return os;

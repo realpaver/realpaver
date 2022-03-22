@@ -117,10 +117,16 @@ private:
    Scope fullscope_;    // objscope_ union {z_}
    Scope boundary_;     // subset of objscope_
 
+   size_t if_;          // index of the objective function in the DAG
+   size_t ic_;          // index of the objective constraint in the DAG
+   size_t id_;          // node index of the last derivative node in the DAG
+
    // size of the scope of the objective function
    size_t dim() const;
 
    Dag* getDag();
+   DagFun* getDerivative(size_t i) const;
+   DagFun* getObjConstraint() const;
 
    friend class BOPresolver;
    friend class BOSolver;

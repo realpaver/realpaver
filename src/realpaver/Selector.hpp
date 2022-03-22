@@ -12,7 +12,7 @@
 
 #include <vector>
 #include "realpaver/IntervalFunction.hpp"
-#include "realpaver/Scope.hpp"
+#include "realpaver/SearchNode.hpp"
 #include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
@@ -39,12 +39,22 @@ public:
    Scope scope() const;
 
    /// Selection method
-   /// @param reg domains of variables
+   /// @param node a search node
    /// @return a pair <b, v> such that no variable is selected if b = false,
    ///         otherwise v is the selected variable
-   virtual std::pair<bool, Variable> selectVar(const IntervalRegion& reg) = 0;
+   ///
+   /// The default implementation calls selecVar on the region of the node.
+   virtual std::pair<bool, Variable> selectVar(const SearchNode& node);
 
-private:
+   /// Selection method
+   /// @param reg variable domains
+   /// @return a pair <b, v> such that no variable is selected if b = false,
+   ///         otherwise v is the selected variable
+   ///
+   /// The default implementation returns <false, >
+   virtual std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
+
+protected:
    Scope scope_;
 };
 
@@ -94,6 +104,28 @@ public:
 
 private:
    IntervalFunction* f_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a selector of the variable following a round-robin strategy.
+///////////////////////////////////////////////////////////////////////////////
+class SelectorRoundRobin : public Selector {
+public:
+   /// Creates a selector on a set of variables
+   ///@param s a scope
+   SelectorRoundRobin(Scope s);
+
+   /// Destructor
+   ~SelectorRoundRobin() = default;
+
+   /// Default copy constructor
+   SelectorRoundRobin(const SelectorRoundRobin&) = default;
+
+   /// No assignment
+   SelectorRoundRobin& operator=(const SelectorRoundRobin&) = delete;
+
+   /// Overrides (Selector)
+   std::pair<bool, Variable> selectVar(const SearchNode& node);
 };
 
 } // namespace

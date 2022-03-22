@@ -12,13 +12,32 @@
 
 namespace realpaver {
 
-SearchNode::SearchNode(int depth)
+SearchNode::SearchNode(const Scope& scope, const IntervalRegion& reg,
+                       int depth)
+      : scope_(scope),
+        reg_(nullptr),
+        depth_(depth),
+        v_()
 {
-   setDepth(depth);
+   ASSERT(depth >= 0, "Bad depth of a search node " << depth);
+   ASSERT(reg.scope().contains(scope), "Bad scopes in a search node");
+
+   reg_ = new IntervalRegion(reg);
+}
+
+SearchNode::SearchNode(const SearchNode& node)
+      : scope_(node.scope_),
+        reg_(nullptr),
+        depth_(node.depth_),
+        v_(node.v_)
+{
+   reg_ = node.reg_->clone();
 }
 
 SearchNode::~SearchNode()
-{}
+{
+   delete reg_;
+}
 
 int SearchNode::getDepth() const
 {
@@ -35,6 +54,28 @@ void SearchNode::setDepth(int depth)
 void SearchNode::incrementDepth()
 {
    ++depth_;
+}
+
+IntervalRegion* SearchNode::getRegion() const
+{
+   return reg_;
+}
+
+Scope SearchNode::getScope() const
+{
+   return scope_;
+}
+
+Variable SearchNode::getSplitVariable() const
+{
+   return v_;
+}
+
+void SearchNode::setSplitVariable(Variable v)
+{
+   ASSERT(scope_.contains(v), "Bad assignment of the last split variable");
+
+   v_ = v;
 }
 
 } // namespace

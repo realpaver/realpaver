@@ -60,8 +60,9 @@ BB_SPACE_FREQUENCY = 1
 SPLIT_OBJECTIVE = NO
 
 # Variable selection strategy that chooses the next variable to split
-# - MaxDom:   largest domain
-# - MaxSmear: maximum smear
+# - MaxDom:     largest domain
+# - MaxSmear:   maximum smear
+# - RoundRobin: round-robin strategy
 SPLIT_SELECTOR = MaxDom
 
 # Domain splitting strategy
