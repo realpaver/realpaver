@@ -7,20 +7,20 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BO_LOCAL_CONJUGATE_HPP
-#define REALPAVER_BO_LOCAL_CONJUGATE_HPP
+#ifndef REALPAVER_BO_LOCAL_GRADIENT_HPP
+#define REALPAVER_BO_LOCAL_GRADIENT_HPP
 
 #include "realpaver/BOLocalSolver.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This implements the conjugate gradient method.
+/// This implements the steepest descent method.
 ///////////////////////////////////////////////////////////////////////////////
-class BOLocalConjugate : public BOLocalSolver {
+class BOLocalGradient : public BOLocalSolver {
 public:
-   BOLocalConjugate();
-
+   /// Constructor
+   BOLocalGradient();
 
    /// Overrides (BOLocalSolver)
    OptimizationStatus minimize(RealFunction& f,
@@ -53,15 +53,15 @@ private:
    /// Component of a line search procedure that finds a step length
    /// @param f a real function
    /// @param x current point
+   /// @param g gradient of f at x
    /// @param p descent direction
-   /// @param s steepest descent direction
    /// @param fx f(x)
    /// @return a positive step in case of success, a negative value otherwise
-   double findStep(RealFunction& f, RealVector& x, RealVector& p,
-                   RealVector& s, double fx);
+   double findStep(RealFunction& f, RealVector& x, RealVector& g,
+                   RealVector& p, double fx);
 
-   size_t maxiter_;     // limit on the number of iterations
-   double carmijo_;     // coefficient used in the Armijo rule
+   size_t max_iter_;    // limit on the number of iterations
+   double alpha_;       // coefficient used in the Armijo rule
    double tol_;         // minimal value of the step length
 };
 

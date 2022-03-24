@@ -28,7 +28,7 @@ librealpaver_la_include_HEADERS = \
 		BC3Contractor.hpp \
 		BC4Contractor.hpp \
 		BOContractor.hpp \
-		BOLocalConjugate.hpp \
+		BOLocalGradient.hpp \
 		BOLocalSolver.hpp \
 		BOModel.hpp \
 		BONode.hpp \
@@ -111,7 +111,7 @@ librealpaver_la_SOURCES = \
 		BC3Contractor.cpp \
 		BC4Contractor.cpp \
 		BOContractor.cpp \
-		BOLocalConjugate.cpp \
+		BOLocalGradient.cpp \
 		BOLocalSolver.cpp \
 		BOModel.cpp \
 		BONode.cpp \

@@ -198,8 +198,10 @@ void BOModel::rfunDiff(const RealPoint& pt, RealVector& g)
 
 void BOModel::rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e)
 {
-   // evaluates the DAG
-   for (size_t i=0; i<dag_->nbNode(); ++i)
+   // evaluates the DAG but the objective constraint
+   size_t imax = dag_->fun(if_)->rootNode()->index();
+
+   for (size_t i=0; i<=imax; ++i)
    {
       DagNode* node = dag_->node(i);
       node->reval(pt);
@@ -252,8 +254,9 @@ void BOModel::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
 void BOModel::ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
                            Interval& e)
 {
-   // evaluates the DAG
-   for (size_t i=0; i<dag_->nbNode(); ++i)
+   // evaluates the DAG but the objective constraint
+   size_t imax = dag_->fun(if_)->rootNode()->index();
+   for (size_t i=0; i<=imax; ++i)
    {
       DagNode* node = dag_->node(i);
       node->eval(reg);

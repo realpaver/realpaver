@@ -41,6 +41,7 @@ public:
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
    /// @param dest final point found by the optimization procedure
+   /// @param
    /// @return an optimization status
    ///
    /// Moreover, the values of the function at the initial and final points
@@ -50,12 +51,6 @@ public:
                                        const RealPoint& src,
                                        RealPoint& dest);
 
-   /// @return the value of the objective function at the initial point
-   double getInitObjVal() const;
-
-   /// @return the value of the objective function at the final point
-   double getFinalObjVal() const;
-
    /// @return the time limit for a run of minimize
    double getTimeLimit() const;
 
@@ -63,15 +58,8 @@ public:
    /// @param val time limit in seconds
    void setTimeLimit(double val);
 
-protected:
-   // management of the values of the objective functions
-   void setInitObjVal(double& val);
-   void setFinalObjVal(double& val);
-
 private:
-   double initObjVal_;
-   double finalObjVal_;
-   double timelimit_;
+   double time_limit_;
 };
 
 } // namespace

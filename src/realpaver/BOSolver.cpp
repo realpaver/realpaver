@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/BOContractor.hpp"
-#include "realpaver/BOLocalConjugate.hpp"
+#include "realpaver/BOLocalGradient.hpp"
 #include "realpaver/BOPresolver.hpp"
 #include "realpaver/BOSolver.hpp"
 #include "realpaver/HC4Contractor.hpp"
@@ -126,16 +126,16 @@ void BOSolver::makeLocalSolver()
 {
    std::string stra = param_.getStrParam("LOCAL_SOLVER_ALGORITHM");
 
-   if (stra == "CONJUGATE")
+   if (stra == "GRADIENT")
    {
-      BOLocalConjugate* solver = new BOLocalConjugate();
+      BOLocalGradient* solver = new BOLocalGradient();
       solver->setIterLimit(param_.getIntParam("LINE_SEARCH_ITER_LIMIT"));
       solver->setArmijoCoefficient(param_.getDblParam("LINE_SEARCH_ARMIJO"));
       solver->setStepTol(param_.getDblParam("LINE_SEARCH_STEP_TOL"));
       localSolver_ = solver;
    }
 
-   if (stra == "MIDPOINT" || localSolver_ == nullptr)
+   if (stra == "EVALUATION" || localSolver_ == nullptr)
    {
       localSolver_ = new BOLocalSolver();
    }
@@ -152,18 +152,18 @@ void BOSolver::makeSplit()
    Scope S = osplit ? model_->getFullScope() : model_->getObjScope();
 
    std::string sel = param_.getStrParam("SPLIT_SELECTOR");
-   if (sel == "MaxDom") selector = new SelectorMaxDom(S);
-   if (sel == "MaxSmear") selector = new SelectorMaxSmear(model_, S);
-   if (sel == "RoundRobin") selector = new SelectorRoundRobin(S);
+   if (sel == "MAX_DOM") selector = new SelectorMaxDom(S);
+   if (sel == "MAX_SMEAR") selector = new SelectorMaxSmear(model_, S);
+   if (sel == "ROUND_ROBIN") selector = new SelectorRoundRobin(S);
 
    std::string sli = param_.getStrParam("SPLIT_SLICER");
-   if (sli == "Bisection") slicer = new IntervalBisecter();
-   if (sli == "Peeling")
+   if (sli == "BISECTION") slicer = new IntervalBisecter();
+   if (sli == "PEELING")
    {
       double f = param_.getDblParam("SPLIT_PEEL_FACTOR");
       slicer = new IntervalPeeler(f);
    }
-   if (sli == "Partition")
+   if (sli == "PARTITION")
    {
       size_t n = param_.getIntParam("SPLIT_NB_SLICES");
       slicer = new IntervalPartitioner(n);

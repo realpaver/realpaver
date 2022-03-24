@@ -143,7 +143,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	BC3Contractor.cpp BC4Contractor.cpp BOContractor.cpp \
-	BOLocalConjugate.cpp BOLocalSolver.cpp BOModel.cpp BONode.cpp \
+	BOLocalGradient.cpp BOLocalSolver.cpp BOModel.cpp BONode.cpp \
 	BOPresolver.cpp BOSolver.cpp BOSpace.cpp BOSplit.cpp \
 	CIDContractor.cpp Common.cpp Constraint.cpp \
 	ConstraintFixer.cpp ConstraintRelaxor.cpp Contractor.cpp \
@@ -163,7 +163,7 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
-	BC4Contractor.lo BOContractor.lo BOLocalConjugate.lo \
+	BC4Contractor.lo BOContractor.lo BOLocalGradient.lo \
 	BOLocalSolver.lo BOModel.lo BONode.lo BOPresolver.lo \
 	BOSolver.lo BOSpace.lo BOSplit.lo CIDContractor.lo Common.lo \
 	Constraint.lo ConstraintFixer.lo ConstraintRelaxor.lo \
@@ -262,7 +262,7 @@ am__can_run_installinfo = \
   esac
 am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	BC3Contractor.hpp BC4Contractor.hpp BOContractor.hpp \
-	BOLocalConjugate.hpp BOLocalSolver.hpp BOModel.hpp BONode.hpp \
+	BOLocalGradient.hpp BOLocalSolver.hpp BOModel.hpp BONode.hpp \
 	BOPresolver.hpp BOSolver.hpp BOSpace.hpp BOSplit.hpp \
 	CIDContractor.hpp Common.hpp config.hpp Constraint.hpp \
 	ConstraintFixer.hpp ConstraintRelaxor.hpp Contractor.hpp \
@@ -450,7 +450,7 @@ EXTRA_DIST = \
 lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir = $(includedir)/realpaver
 librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
-	BC4Contractor.hpp BOContractor.hpp BOLocalConjugate.hpp \
+	BC4Contractor.hpp BOContractor.hpp BOLocalGradient.hpp \
 	BOLocalSolver.hpp BOModel.hpp BONode.hpp BOPresolver.hpp \
 	BOSolver.hpp BOSpace.hpp BOSplit.hpp CIDContractor.hpp \
 	Common.hpp config.hpp Constraint.hpp ConstraintFixer.hpp \
@@ -471,7 +471,7 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	UniIntervalFunction.hpp Variable.hpp $(am__append_1) \
 	$(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
-	BC4Contractor.cpp BOContractor.cpp BOLocalConjugate.cpp \
+	BC4Contractor.cpp BOContractor.cpp BOLocalGradient.cpp \
 	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
 	BOSolver.cpp BOSpace.cpp BOSplit.cpp CIDContractor.cpp \
 	Common.cpp Constraint.cpp ConstraintFixer.cpp \
@@ -599,7 +599,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BC3Contractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BC4Contractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOContractor.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalConjugate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalGradient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOModel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BONode.Plo@am__quote@

@@ -53,10 +53,10 @@ Param::Param()
    dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT", 10.0));
 
    strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",         "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR",          "MaxDom"));
-   strmap_.insert(std::make_pair("SPLIT_SLICER",            "Bisection"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTOR",          "MAX_DOM"));
+   strmap_.insert(std::make_pair("SPLIT_SLICER",            "BISECTION"));
    strmap_.insert(std::make_pair("PROPAGATION_ALGORITHM",   "HC4"));
-   strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",  "MIDPOINT"));
+   strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",  "GRADIENT"));
 }
 
 int Param::getIntParam(const string& name)

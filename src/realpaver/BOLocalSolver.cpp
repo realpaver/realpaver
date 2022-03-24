@@ -13,42 +13,20 @@
 namespace realpaver {
 
 BOLocalSolver::BOLocalSolver()
-      : initObjVal_(Double::neginf()),
-        finalObjVal_(Double::neginf()),
-        timelimit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT"))
+      : time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT"))
 {}
 
 BOLocalSolver::~BOLocalSolver()
 {}
 
-double BOLocalSolver::getInitObjVal() const
-{
-   return initObjVal_;
-}
-
-double BOLocalSolver::getFinalObjVal() const
-{
-   return finalObjVal_;
-}
-
-void BOLocalSolver::setInitObjVal(double& val)
-{
-   initObjVal_ = val;
-}
-
-void BOLocalSolver::setFinalObjVal(double& val)
-{
-   finalObjVal_ = val;
-}
-
 double BOLocalSolver::getTimeLimit() const
 {
-   return timelimit_;
+   return time_limit_;
 }
 
 void BOLocalSolver::setTimeLimit(double val)
 {
-   timelimit_ = val;
+   time_limit_ = val;
 }
 
 OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
@@ -57,11 +35,11 @@ OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
                                            RealPoint& dest)
 {
    dest.setAll(src);
-   initObjVal_ = finalObjVal_ = f.rfunEval(src);
 
-   return (Double::isInf(initObjVal_) ||
-           Double::isNan(initObjVal_)) ? OptimizationStatus::Other :
-                                         OptimizationStatus::Optimal;
+   double u = f.rfunEval(src);
+
+   return (Double::isInf(u) || Double::isNan(u)) ? OptimizationStatus::Other :
+                                                   OptimizationStatus::Optimal;
 }
 
 } // namespace

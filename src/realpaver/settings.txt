@@ -60,18 +60,18 @@ BB_SPACE_FREQUENCY = 1
 SPLIT_OBJECTIVE = NO
 
 # Variable selection strategy that chooses the next variable to split
-# - MaxDom:     largest domain
-# - MaxSmear:   maximum smear
-# - RoundRobin: round-robin strategy
-SPLIT_SELECTOR = MaxDom
+# - MAX_DOM:     largest domain
+# - MAX_SMEAR:   maximum smear
+# - ROUND_ROBIN: round-robin strategy
+SPLIT_SELECTOR = MAX_DOM
 
 # Domain splitting strategy
-# - Bisection: divides a domain in two equal parts
-# - Peeling:   divides a domain in three parts
+# - BISECTION: divides a domain in two equal parts
+# - PEELING:   divides a domain in three parts
 #              the width of peels is fixed using SPLIT_PEEL_FACTOR
-# - Partition: divides a domain in N slices of equal size
+# - PARTITION: divides a domain in N slices of equal size
 #              N is fixed using SPLIT_NB_SLICES
-SPLIT_SLICER = Bisection
+SPLIT_SLICER = BISECTION
 
 # Peel width factor in [0, 100] used by the Peeling-based slicer
 SPLIT_PEEL_FACTOR = 10.0
@@ -129,9 +129,9 @@ LINE_SEARCH_ITER_LIMIT = 20
 LOCAL_SOLVER_TIME_LIMIT = 10.0
 
 # Local optimization technique
-# - CONJUGATE: conjugate gradient method
-# - MIDPOINT: simple test at the midpoint of a region
-LOCAL_SOLVER_ALGORITHM = CONJUGATE
+# - GRADIENT:   gradient descent method
+# - EVALUATION: simple test at the midpoint of a region
+LOCAL_SOLVER_ALGORITHM = GRADIENT
 
 ###############################################################################
 ## LINEAR PROGRAMMING                                                        ##
