@@ -15,8 +15,8 @@ namespace realpaver {
 HC4Contractor::HC4Contractor(Dag* dag, size_t i) : f_(nullptr)
 {
    ASSERT(dag != nullptr, "Creation of an HC4Contractor from a null pointer");
-   ASSERT(i < dag->nbFun(), "Creation of an HC4Contractor given a bad " <<
-                            " function index " << i);
+   ASSERT(i < dag->nbFuns(), "Creation of an HC4Contractor given a bad " <<
+                             " function index " << i);
 
    f_ = dag->fun(i);
 }

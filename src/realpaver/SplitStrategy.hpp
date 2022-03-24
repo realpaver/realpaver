@@ -63,8 +63,8 @@ private:
    typedef std::list<NodeType> ContainerType;
 
    ContainerType cont_;
-   size_t nbNodes_;
-   size_t nbSplits_;
+   size_t nb_nodes_;
+   size_t nb_splits_;
 
 protected:
    /// Inserts a node in this container
@@ -87,8 +87,8 @@ public:
 template <typename T>
 SplitStrategy<T>::SplitStrategy()
       : cont_(),
-        nbNodes_(0),
-        nbSplits_(0)
+        nb_nodes_(0),
+        nb_splits_(0)
 {}
 
 template <typename T>
@@ -98,20 +98,20 @@ SplitStrategy<T>::~SplitStrategy()
 template <typename T>
 size_t SplitStrategy<T>::getNbNodes() const
 {
-   return nbNodes_;
+   return nb_nodes_;
 }
 
 template <typename T>
 size_t SplitStrategy<T>::getNbSplits() const
 {
-   return nbSplits_;
+   return nb_splits_;
 }
 
 template <typename T>
 bool SplitStrategy<T>::apply(NodeType node)
 {
    cont_.clear();
-   ++nbSplits_;
+   ++nb_splits_;
    return applyImpl(node);
 }
 
@@ -119,8 +119,8 @@ template <typename T>
 void SplitStrategy<T>::reset()
 {
    cont_.clear();
-   nbNodes_ = 0;
-   nbSplits_ = 0;
+   nb_nodes_ = 0;
+   nb_splits_ = 0;
 }
 
 template <typename T>
@@ -128,7 +128,7 @@ void SplitStrategy<T>::push(NodeType node)
 {
    cont_.push_back(node);
    node->incrementDepth();
-   ++nbNodes_;
+   ++nb_nodes_;
 }
 
 template <typename T>

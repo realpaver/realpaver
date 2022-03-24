@@ -30,7 +30,7 @@ public:
    /// @param dag a DAG
    /// @param i index of a function / constraint in the dag
    ///
-   /// We have 0 <= i < dag->nbFun().
+   /// We have 0 <= i < dag->nbFuns().
    /// This does not own the dag.
    HC4Contractor(Dag* dag, size_t i);
 

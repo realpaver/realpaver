@@ -1249,7 +1249,7 @@ Dag* DagFun::dag() const
    return dag_;
 }
 
-size_t DagFun::nbNode() const
+size_t DagFun::nbNodes() const
 {
    return node_.size();
 }
@@ -1264,7 +1264,7 @@ DagNode* DagFun::rootNode() const
    return node_.back();
 }
 
-size_t DagFun::nbVar() const
+size_t DagFun::nbVars() const
 {
    return vnode_.size();
 }
@@ -1374,7 +1374,7 @@ void DagFun::insertOpNode(DagOp* node)
 
 Interval DagFun::eval(const IntervalRegion& reg)
 {
-   for (size_t i=0; i<nbNode(); ++i)
+   for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(reg);
 
    return rootNode()->val();
@@ -1382,7 +1382,7 @@ Interval DagFun::eval(const IntervalRegion& reg)
 
 Interval DagFun::eval(const RealPoint& pt)
 {
-   for (size_t i=0; i<nbNode(); ++i)
+   for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(pt);
 
    return rootNode()->val();
@@ -1401,7 +1401,7 @@ Interval DagFun::evalOnly(const Variable& v, const Interval& x)
 Proof DagFun::hc4Revise(IntervalRegion& reg)
 {
    // assigns the projections to the universe
-   for (size_t i=0; i<nbNode(); ++i)
+   for (size_t i=0; i<nbNodes(); ++i)
          node_[i]->setDom(Interval::universe());
 
    return sharedHc4Revise(reg);
@@ -1428,7 +1428,7 @@ Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
       else if (image_.isInfLeft())
       {
          // assigns the projections to the universe
-         for (size_t i=0; i<nbNode()-1; ++i)
+         for (size_t i=0; i<nbNodes()-1; ++i)
             node_[i]->setDom(Interval::universe());
 
          // projection over the root node
@@ -1440,7 +1440,7 @@ Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
       else if (image_.isInfRight())
       {
          // assigns the projections to the universe
-         for (size_t i=0; i<nbNode()-1; ++i)
+         for (size_t i=0; i<nbNodes()-1; ++i)
             node_[i]->setDom(Interval::universe());
 
          // projection over the root node
@@ -1454,7 +1454,7 @@ Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
          // part [-oo, a] and [b, +oo] and makes the interval disjunction
 
          // assigns the projections to the universe
-         for (size_t i=0; i<nbNode()-1; ++i)
+         for (size_t i=0; i<nbNodes()-1; ++i)
             node_[i]->setDom(Interval::universe());
 
          IntervalRegion Xl(reg);
@@ -1462,7 +1462,7 @@ Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
          Proof pl = hc4ReviseBack(Xl);
 
          // assigns the projections to the universe
-         for (size_t i=0; i<nbNode(); ++i)
+         for (size_t i=0; i<nbNodes(); ++i)
             node_[i]->setDom(Interval::universe());
 
          IntervalRegion Xr(reg);
@@ -1482,7 +1482,7 @@ Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
 
          if (proof != Proof::Empty)
          {
-            for (size_t i=0; i<nbVar(); ++i)
+            for (size_t i=0; i<nbVars(); ++i)
             {
                Variable v = varNode(i)->getVar();
 
@@ -1524,13 +1524,13 @@ Proof DagFun::sharedHc4Revise(IntervalRegion& reg)
 
 Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
 {
-   for (int i=nbNode()-1; i>=0; --i)
+   for (int i=nbNodes()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
       node_[j]->proj(reg);
    }
 
-   for (size_t i=0; i<nbVar(); ++i)
+   for (size_t i=0; i<nbVars(); ++i)
    {
       Variable v = varNode(i)->getVar();
 
@@ -1557,12 +1557,12 @@ bool DagFun::diff()
    // initializes the derivatives
    rootNode()->setDv(Interval::one());
 
-   for (size_t i=0; i<nbNode()-1; ++i)
+   for (size_t i=0; i<nbNodes()-1; ++i)
       node_[i]->setDv(Interval::zero());
 
    // differentiation
    bool res = true;
-   for (int i=nbNode()-1; i>=0; --i)
+   for (int i=nbNodes()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
       res = res & node_[j]->diff();
@@ -1573,14 +1573,14 @@ bool DagFun::diff()
 
 IntervalVector DagFun::grad() const
 {
-   IntervalVector G(nbVar());
+   IntervalVector G(nbVars());
    toGrad(G);
    return G;
 }
 
 void DagFun::toGrad(IntervalVector& G) const
 {
-   for (size_t i=0; i<nbVar(); ++i)
+   for (size_t i=0; i<nbVars(); ++i)
       G.set(i, deriv(i));
 }
 
@@ -1601,7 +1601,7 @@ bool DagFun::diffOnly(const Variable& v)
    // initializes the derivatives
    rootNode()->setDv(Interval::one());
 
-   for (size_t i=0; i<nbNode()-1; ++i)
+   for (size_t i=0; i<nbNodes()-1; ++i)
       node_[i]->setDv(Interval::zero());
    
    // differentiation
@@ -1618,7 +1618,7 @@ double DagFun::reval(const RealPoint& pt)
 {
    Double::rndNear();
 
-   for (size_t i=0; i<nbNode(); ++i)
+   for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->reval(pt);
 
    return rootNode()->rval();
@@ -1640,12 +1640,12 @@ bool DagFun::rdiff()
    // initializes the derivatives
    rootNode()->setRdv(1.0);
 
-   for (size_t i=0; i<nbNode()-1; ++i)
+   for (size_t i=0; i<nbNodes()-1; ++i)
       node_[i]->setRdv(0.0);
 
    // differentiation
    bool res = true;
-   for (int i=nbNode()-1; i>=0; --i)
+   for (int i=nbNodes()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
       res = res & node_[j]->rdiff();
@@ -1656,14 +1656,14 @@ bool DagFun::rdiff()
 
 RealVector DagFun::rgrad() const
 {
-   RealVector G(nbVar());
+   RealVector G(nbVars());
    toRgrad(G);
    return G;
 }
 
 void DagFun::toRgrad(RealVector& G) const
 {
-   for (size_t i=0; i<nbVar(); ++i)
+   for (size_t i=0; i<nbVars(); ++i)
       G.set(i, rderiv(i));
 }
 
@@ -1779,7 +1779,7 @@ Dag::~Dag()
    delete defaultContext_;
 }
 
-size_t Dag::nbNode() const
+size_t Dag::nbNodes() const
 {
    return node_.size();
 }
@@ -1789,7 +1789,7 @@ DagNode* Dag::node(size_t i) const
    return node_[i];
 }
 
-size_t Dag::nbFun() const
+size_t Dag::nbFuns() const
 {
    return fun_.size();
 }
@@ -1821,7 +1821,7 @@ DagContext* Dag::cloneDefaultContext() const
    return defaultContext_->clone();
 }
 
-size_t Dag::nbVar() const
+size_t Dag::nbVars() const
 {
    return vnode_.size();
 }
@@ -1833,7 +1833,7 @@ DagVar* Dag::varNode(size_t i) const
 
 DagFun* Dag::fun(size_t i) const
 {
-   ASSERT(i < nbFun(), "Access out of range to a DAG function");
+   ASSERT(i < nbFuns(), "Access out of range to a DAG function");
 
    return fun_[i];
 }
@@ -2000,25 +2000,25 @@ void Dag::reval(const RealPoint& pt)
 {
    Double::rndNear();
 
-   for (size_t i=0; i<nbNode(); ++i)
+   for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->reval(pt);
 }
 
 void Dag::eval(const IntervalRegion& reg)
 {
-   for (size_t i=0; i<nbNode(); ++i)
+   for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(reg);
 }
 
 void Dag::print(std::ostream& os) const
 {
-   for (size_t i=0; i<nbFun(); ++i)
+   for (size_t i=0; i<nbFuns(); ++i)
    {
       DagFun* f = fun(i);
       os << "fun " << i << ": ";
 
       os << "[";
-      for (size_t j=0; j<f->nbNode(); ++j)
+      for (size_t j=0; j<f->nbNodes(); ++j)
       {
          DagNode* node = f->node(j);
          if (j != 0) os << " ";

@@ -88,8 +88,8 @@ private:
    IntervalRegion sol_;          // best solution found (incumbent solution)
    Interval objval_;             // enclosure of the global minimum
    double upper_;                // upper bound of the global minimum
-   int nbnodes_;                 // number of nodes processed (BB algorithm)
-   int nbpending_;               // number of pending nodes (BB algorithm)
+   int nb_nodes_;                // number of nodes processed (BB algorithm)
+   int nb_pending_;              // number of pending nodes (BB algorithm)
 
    typedef Preprocessor::VarVarMapType VarVarMapType;
 

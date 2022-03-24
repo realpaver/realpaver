@@ -55,7 +55,7 @@ BOModel::BOModel(Problem& problem, bool withobj)
       boundary_.insert(v);
       fullscope_.insert(v);
    }
-   id_ = dag_->nbNode() - 1;
+   id_ = dag_->nbNodes() - 1;
 
    // objective function
    if (withobj)

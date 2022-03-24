@@ -748,10 +748,10 @@ public:
    void insertOpNode(DagOp* node);
 
    /// @return the number of nodes of this
-   size_t nbNode() const;
+   size_t nbNodes() const;
 
    /// Gets a node of this
-   /// @param i index of a node with 0 <= i < nbNode()
+   /// @param i index of a node with 0 <= i < nbNodes()
    /// @return the i-th node of this
    DagNode* node(size_t i) const;
 
@@ -759,10 +759,10 @@ public:
    DagNode* rootNode() const;
 
    /// @return the number of variables occurring in this
-   size_t nbVar() const;
+   size_t nbVars() const;
 
    /// Gets a variable
-   /// @param i index of a variable with 0 <= i < nbVar()
+   /// @param i index of a variable with 0 <= i < nbVars()
    /// @return the i-th variable of this
    DagVar* varNode(size_t i) const;
 
@@ -875,7 +875,7 @@ public:
    void toGrad(IntervalVector& G) const;
 
    /// Gets an interval derivative
-   /// @param i index of a variable in this with 0 <= i < nbVar()
+   /// @param i index of a variable in this with 0 <= i < nbVars()
    /// @return the partial derivative with respect to the i-th variable
    ///
    /// This is useful after a call to diff() and diffOnly(...).
@@ -917,7 +917,7 @@ public:
    void toRgrad(RealVector& G) const;
 
    /// Gets a real derivative
-   /// @param i index of a variable in this with 0 <= i < nbVar()
+   /// @param i index of a variable in this with 0 <= i < nbVars()
    /// @return the partial derivative with respect to the i-th variable
    ///
    /// This is useful after a call to rdiff() and rdiffOnly(...).
@@ -1020,26 +1020,26 @@ public:
    Dag& operator=(const Dag&) =delete;
 
    /// @return the number of nodes
-   size_t nbNode() const;
+   size_t nbNodes() const;
 
    /// Gets a node
-   /// @param i a node index with 0 <= i < nbNode()
+   /// @param i a node index with 0 <= i < nbNodes()
    /// @return the i-th node
    DagNode* node(size_t i) const;
 
    /// @return the number of functions
-   size_t nbFun() const;
+   size_t nbFuns() const;
 
    /// Gets a function
-   /// @param i a function index with 0 <= i < nbFun()
+   /// @param i a function index with 0 <= i < nbFuns()
    /// @return the i-th function
    DagFun* fun(size_t i) const;
 
    /// @return the number of variables
-   size_t nbVar() const;
+   size_t nbVars() const;
 
    /// Gets a variable
-   /// @param i an variable index with 0 <= i < nbVar()
+   /// @param i an variable index with 0 <= i < nbVars()
    /// @return the i-th variable node
    DagVar* varNode(size_t i) const;
 
