@@ -43,6 +43,10 @@ public:
    /// method of Gurobi is executed.
    bool optimize();
 
+   /// Overrides the optimization method
+   /// @return true if an optimal solution is found
+   bool reOptimize();
+
 private:
   GRBEnv* env_;
   GRBModel* simplex_;
@@ -53,6 +57,8 @@ private:
   void makeCtrs();
   void makeObj();
   void makeGurobiSimplex();
+
+   bool run();
 };
 
 } // namespace

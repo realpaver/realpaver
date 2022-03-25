@@ -13,14 +13,11 @@ namespace realpaver {
 
 LPSolver::LPSolver() :
    simplex_(nullptr)
-{
-   simplex_ = new ClpSimplex();
-}
+{}
 
 LPSolver::~LPSolver()
 {
-   if (simplex_!= nullptr)
-   delete simplex_;
+   if (simplex_!= nullptr) delete simplex_;
 }
 
 void LPSolver::makeVars()
@@ -69,20 +66,22 @@ void LPSolver::makeObj()
 
 void LPSolver::makeClpSimplex()
 {
-   simplex_->setMaximumSeconds(getMaxSeconds());
-   simplex_->setMaximumIterations(getMaxIter());
-  
+   if (simplex_ != nullptr) delete simplex_;
+   simplex_ = new ClpSimplex();
+
    makeVars();
    makeCtrs();
    makeObj();
 }
 
-bool LPSolver::optimize()
+bool LPSolver::run()
 {
-   makeClpSimplex();
-
+   simplex_->setMaximumSeconds(getMaxSeconds());
+   simplex_->setMaximumIterations(getMaxIter());
    simplex_->setLogLevel(0);
+
    simplex_->initialSolve();
+
    if (simplex_->isProvenOptimal())
    {
       setObjVal(simplex_->getObjValue());
@@ -115,6 +114,18 @@ bool LPSolver::optimize()
 
       return false;
    }
+}
+
+bool LPSolver::optimize()
+{
+   makeClpSimplex();
+   return run();
+}
+
+bool LPSolver::reOptimize()
+{
+   makeObj();
+   return run();
 }
 
 } // namespace

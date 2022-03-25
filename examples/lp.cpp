@@ -29,8 +29,38 @@ int main(void)
    solver.setObj(eo);
    solver.setMaximization();
 
+   // SOLUTION: f* = 34 at (6, 4)
+
    // solving
    bool optimal = solver.optimize();
+
+   if (optimal)
+   {
+      cout << "OPTIMAL" << endl;
+      cout << "Objective value: " << solver.getObjVal() << endl;
+
+      for (int i=0; i<solver.getNbLinVars(); ++i)
+      {
+         LinVar v = solver.getLinVar(i);
+         cout << v.getName() << "*: " << v.getObjVal() << endl;
+      }
+   }
+   else
+   {
+      cout << "NOT OPTIMAL" << endl;
+   }
+
+   cout << endl;
+
+   // maximize 0.25*x + y
+   LinExpr neo = { {0.25, 1.0}, {x, y} };
+   solver.setObj(neo);
+   solver.setMaximization();
+
+   // SOLUTION: f* = 6.5 at (2, 6)
+
+   // solving
+   optimal = solver.reOptimize();
 
    if (optimal)
    {

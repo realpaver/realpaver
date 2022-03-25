@@ -536,6 +536,11 @@ bool LPModel::optimize()
    return false;
 }
 
+bool LPModel::reOptimize()
+{
+   return false;
+}
+
 int LPModel::getNbLinVars() const
 {
    return vars_.size();

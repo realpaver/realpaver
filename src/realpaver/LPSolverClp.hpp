@@ -35,12 +35,17 @@ public:
    /// No assignment
    LPSolver& operator=(const LPSolver&) = delete;
 
-   /// Overrides the optimization method
-   /// @return true if an optimal solution is found
+   /// Overrides
    ///
    /// A Clp model is created first from the LP model. Then the initialSolve
    /// method of Clp is executed.
    bool optimize();
+
+   /// Overrides
+   ///
+   /// Only the objective function is generated again from the LP model.
+   /// Then the initialSolve method of Clp is executed.
+   bool reOptimize();
 
 private:
    ClpSimplex* simplex_;
@@ -49,6 +54,8 @@ private:
    void makeCtrs();
    void makeObj();
    void makeClpSimplex();
+
+   bool run();
 };
 
 } // namespace

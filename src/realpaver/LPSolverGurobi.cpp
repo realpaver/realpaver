@@ -17,16 +17,12 @@ LPSolver::LPSolver() :
    vars_()
 {
    env_ = new GRBEnv();
-   simplex_ = new GRBModel(env_);
 }
 
 LPSolver::~LPSolver()
 {
-   if (simplex_ != nullptr)
-      delete simplex_;
-
-   if (env_ != nullptr)
-      delete env_;
+   if (simplex_ != nullptr) delete simplex_;
+   if (env_ != nullptr) delete env_;
 }
 
 void LPSolver::makeVars()
@@ -98,17 +94,18 @@ void LPSolver::makeObj()
 
 void LPSolver::makeGurobiSimplex()
 {
-   env_->set(GRB_DoubleParam_TimeLimit, getMaxSeconds());  
-   env_->set(GRB_DoubleParam_IterationLimit, getMaxIter());  
+   if (simplex_ != nullptr) delete simplex_;
+   simplex_ = new GRBModel(env_);
 
    makeVars();
    makeCtrs();
    makeObj();
 }
 
-bool LPSolver::optimize()
+bool LPSolver::run()
 {
-   makeGurobiSimplex();
+   env_->set(GRB_DoubleParam_TimeLimit, getMaxSeconds());  
+   env_->set(GRB_DoubleParam_IterationLimit, getMaxIter());  
 
    simplex_->optimize();
 
@@ -144,5 +141,17 @@ bool LPSolver::optimize()
 
    return optimal;
 }
+
+bool LPSolver::optimize()
+{
+   makeGurobiSimplex();
+   return run();
+}
+
+bool LPSolver::reOptimize()
+{
+   makeObj();
+   return run();
+}   
 
 } // namespace

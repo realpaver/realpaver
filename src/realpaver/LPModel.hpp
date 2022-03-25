@@ -496,6 +496,18 @@ public:
    /// The default implementation does nothing.
    virtual bool optimize();
 
+   /// Optimization method after a change of the objective function
+   /// @return true if an optimal solution is found
+   ///
+   /// Assume that a LP model with objective function F and constraints C
+   /// has been solved and that we want to solve a new LP model with
+   /// objective function G and constraints C. Then it suffices to change
+   /// F by G in the model and to call reOptimize(). It saves much effort
+   /// since the constraint part is in a solved form.
+   ///
+   /// The default implementation does nothing.
+   virtual bool reOptimize();
+
    /// Gets the value of a variable in an optimal solution
    /// @param v a variable of this
    /// @return the value of v in the last computed optimal solution
