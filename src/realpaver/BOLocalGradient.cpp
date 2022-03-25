@@ -55,20 +55,20 @@ void BOLocalGradient::setStepTol(double tol)
    tol_ = tol;
 }
 
-double BOLocalGradient::findStep(RealFunction& f, RealVector& x, RealVector& g,
-                                 RealVector& p, double fx)
+double BOLocalGradient::findStep(DiffRealFunction& f, RealVector& x,
+                                 RealVector& g, RealVector& p, double fx)
 {
    double step = 1.0,   // initial step
           res = -1.0,   // resulting step
           gp = g.scalarProduct(p);
 
    bool iter = true;
-   Scope scope = f.rfunScope();
+   Scope scope = f.funScope();
 
    while (iter)
    {
       RealVector y = x + step * p;
-      double fy = f.rfunEval(RealPoint(scope, y));
+      double fy = f.realEval(RealPoint(scope, y));
 
       if (!Double::isNan(fy))
       {
@@ -92,13 +92,13 @@ double BOLocalGradient::findStep(RealFunction& f, RealVector& x, RealVector& g,
    return res;
 }
 
-OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
+OptimizationStatus BOLocalGradient::minimize(DiffRealFunction& f,
                                              const IntervalRegion& reg,
                                              const RealPoint& src,
                                              RealPoint& dest)
 {
-   size_t dim = f.rfunArity();
-   Scope scope = f.rfunScope();
+   size_t dim = f.funArity();
+   Scope scope = f.funScope();
 
    RealVector xk(src),           // current point
               gk(dim),           // gradient
@@ -116,7 +116,7 @@ OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
 
    do
    {
-      f.rfunEvalDiff(RealPoint(scope, xk), gk, uk);
+      uk = f.realEvalDiff(RealPoint(scope, xk), gk);
       if (Double::isNan(uk) || gk.isNan())
       {
          status = OptimizationStatus::Other;

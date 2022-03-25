@@ -135,10 +135,8 @@ void BOSolver::makeLocalSolver()
       localSolver_ = solver;
    }
 
-   if (stra == "EVALUATION" || localSolver_ == nullptr)
-   {
-      localSolver_ = new BOLocalSolver();
-   }
+   THROW_IF(localSolver_ == nullptr,
+            "Unable to make the local solver in a BO solver");
 
    localSolver_->setTimeLimit(param_.getDblParam("LOCAL_SOLVER_TIME_LIMIT"));
 }
@@ -360,7 +358,7 @@ bool BOSolver::presolve()
 
 void BOSolver::calculateLower(SharedBONode& node)
 {
-   IntervalRegion* reg = node->getRegion();
+   IntervalRegion* reg = node->region();
 
    // domain of the objective variable after propagation
    Interval z = reg->get(model_->getObjVar());
@@ -385,7 +383,7 @@ void BOSolver::calculateUpper(SharedBONode& node)
 {
 DEBUG("\ncalculateUpper, current upper bound " << upper_);
 
-   IntervalRegion* reg = node->getRegion();
+   IntervalRegion* reg = node->region();
    RealPoint src = reg->midpointOnScope(model_->getObjScope());
    RealPoint dest(src);
 
@@ -401,7 +399,7 @@ DEBUG("   dest = " << dest);
 
 
       // safe interval evaluation at the final point
-      Interval e = model_->ifunEvalPoint(dest);
+      Interval e = model_->intervalPointEval(dest);
 
 DEBUG("   e = " << e);
 
@@ -429,7 +427,7 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 
    SharedBONode node = space.extractNode();
 
-DEBUG("\n#########\nNODE : " << *node->getRegion() << " l: "
+DEBUG("\n#########\nNODE : " << *node->region() << " l: "
                              << node->getLower()
                              << " u: " << node->getUpper());
 
@@ -452,7 +450,7 @@ DEBUG("   sol NODE !");
          ++nb_nodes_;
 
          SharedBONode subnode = *it;
-         IntervalRegion* reg = subnode->getRegion();
+         IntervalRegion* reg = subnode->region();
 
          // BB theorem
          Interval z(reg->get(v));
@@ -508,7 +506,7 @@ void BOSolver::findInitialBounds(SharedBONode& node)
       return;
    }
 
-   node->getRegion()->set(model_->getObjVar(), z);
+   node->region()->set(model_->getObjVar(), z);
 
    DEBUG("Node bounds : " << z);
 

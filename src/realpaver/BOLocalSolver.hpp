@@ -18,9 +18,6 @@ namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interface for local optimization solvers.
-///
-/// The default implementation is trivial. Given a region, it simply returns
-/// its midpoint.
 ///////////////////////////////////////////////////////////////////////////////
 class BOLocalSolver {
 public:
@@ -41,15 +38,11 @@ public:
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
    /// @param dest final point found by the optimization procedure
-   /// @param
    /// @return an optimization status
-   ///
-   /// Moreover, the values of the function at the initial and final points
-   /// must be computed and stored in this.
-   virtual OptimizationStatus minimize(RealFunction& f,
+   virtual OptimizationStatus minimize(DiffRealFunction& f,
                                        const IntervalRegion& reg,
                                        const RealPoint& src,
-                                       RealPoint& dest);
+                                       RealPoint& dest) = 0;
 
    /// @return the time limit for a run of minimize
    double getTimeLimit() const;

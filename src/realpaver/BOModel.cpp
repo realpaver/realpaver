@@ -165,109 +165,76 @@ size_t BOModel::dim() const
    return objscope_.size();
 }
 
-Scope BOModel::rfunScope() const
+Scope BOModel::funScope() const
 {
    return objscope_;
 }
 
-size_t BOModel::rfunArity() const
+size_t BOModel::funArity() const
 {
    return objscope_.size();
 }
 
-double BOModel::rfunEval(const RealPoint& pt)
+double BOModel::realEval(const RealPoint& pt)
 {
    return dag_->fun(if_)->reval(pt);
 }
 
-void BOModel::rfunDiff(const RealPoint& pt, RealVector& g)
+void BOModel::realDiff(const RealPoint& pt, RealVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   // evaluates the nodes of the partial derivatives
-   for (size_t i=0; i<=id_; ++i)
-   {
-      DagNode* node = dag_->node(i);
-      node->reval(pt);
-   }
+   DagFun* f = dag_->fun(if_);
 
-   // fills the gradient
-   for (size_t i=0; i<dim(); ++i)
-      g.set(i, dag_->fun(i)->rval());
+   f->reval(pt);
+   f->rdiff();
+   f->toRealGradient(g);
 }
 
-void BOModel::rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e)
+double BOModel::realEvalDiff(const RealPoint& pt, RealVector& g)
 {
-   // evaluates the DAG but the objective constraint
-   size_t imax = dag_->fun(if_)->rootNode()->index();
+   ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   for (size_t i=0; i<=imax; ++i)
-   {
-      DagNode* node = dag_->node(i);
-      node->reval(pt);
-   }
+   DagFun* f = dag_->fun(if_);
 
-   // fills the gradient
-   for (size_t i=0; i<dim(); ++i)
-      g.set(i, dag_->fun(i)->rval());   
-
-   // finds the value
-   e = dag_->fun(if_)->rootNode()->rval();
+   double e = f->reval(pt);
+   f->rdiff();
+   f->toRealGradient(g);
+   return e;
 }
 
-Scope BOModel::ifunScope() const
-{
-   return objscope_;
-}
-
-size_t BOModel::ifunArity() const
-{
-   return objscope_.size();
-}
-
-Interval BOModel::ifunEval(const IntervalRegion& reg)
+Interval BOModel::intervalEval(const IntervalRegion& reg)
 {
    return dag_->fun(if_)->eval(reg);
 }
 
-Interval BOModel::ifunEvalPoint(const RealPoint& pt)
+Interval BOModel::intervalPointEval(const RealPoint& pt)
 {   
    return dag_->fun(if_)->eval(pt);
 }
 
-void BOModel::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
+void BOModel::intervalDiff(const IntervalRegion& reg, IntervalVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   // evaluates the nodes of the partial derivatives
-   for (size_t i=0; i<=id_; ++i)
-   {
-      DagNode* node = dag_->node(i);
-      node->eval(reg);
-   }
+   DagFun* f = dag_->fun(if_);
 
-   // fills the gradient
-   for (size_t i=0; i<dim(); ++i)
-      g.set(i, dag_->fun(i)->val());      
+   f->eval(reg);
+   f->diff();
+   f->toIntervalGradient(g);
 }
 
-void BOModel::ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
-                           Interval& e)
+Interval BOModel::intervalEvalDiff(const IntervalRegion& reg,
+                                   IntervalVector& g)
 {
-   // evaluates the DAG but the objective constraint
-   size_t imax = dag_->fun(if_)->rootNode()->index();
-   for (size_t i=0; i<=imax; ++i)
-   {
-      DagNode* node = dag_->node(i);
-      node->eval(reg);
-   }
+   ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   // fills the gradient
-   for (size_t i=0; i<dim(); ++i)
-      g.set(i, dag_->fun(i)->val());   
+   DagFun* f = dag_->fun(if_);
 
-   // finds the value
-   e = dag_->fun(if_)->rootNode()->val();
+   Interval e = f->eval(reg);
+   f->diff();
+   f->toIntervalGradient(g);
+   return e;
 }
 
 } // namespace

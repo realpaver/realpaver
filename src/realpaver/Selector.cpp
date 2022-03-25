@@ -26,7 +26,7 @@ Scope Selector::scope() const
 
 std::pair<bool, Variable> Selector::selectVar(const SearchNode& node)
 {
-   return selectVar(*node.getRegion());
+   return selectVar(*node.region());
 }
 
 std::pair<bool, Variable> Selector::selectVar(const IntervalRegion& reg)
@@ -76,7 +76,7 @@ std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SelectorMaxSmear::SelectorMaxSmear(IntervalFunction* f, Scope s)
+SelectorMaxSmear::SelectorMaxSmear(DiffIntervalFunction* f, Scope s)
       : Selector(s),
         f_(f)
 {
@@ -87,10 +87,10 @@ SelectorMaxSmear::SelectorMaxSmear(IntervalFunction* f, Scope s)
 std::pair<bool, Variable>
 SelectorMaxSmear::selectVar(const IntervalRegion& reg)
 {
-   Scope fscope = f_->ifunScope();
+   Scope fscope = f_->funScope();
 
    IntervalVector grad(fscope.size());
-   f_->ifunDiff(reg, grad);
+   f_->intervalDiff(reg, grad);
 
    bool found = false;
    double smax, s, w;
@@ -142,8 +142,8 @@ SelectorRoundRobin::SelectorRoundRobin(Scope s) : Selector(s)
 
 std::pair<bool, Variable> SelectorRoundRobin::selectVar(const SearchNode& node)
 {
-   IntervalRegion* reg = node.getRegion();
-   Variable v = node.getSplitVariable();
+   IntervalRegion* reg = node.region();
+   Variable v = node.splitVariable();
    auto it = scope_.begin();
 
    if (!v.isNull())

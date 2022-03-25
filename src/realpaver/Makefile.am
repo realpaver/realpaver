@@ -47,6 +47,7 @@ librealpaver_la_include_HEADERS = \
 		Dag.hpp \
 		Double.hpp \
 		Exception.hpp \
+		Function.hpp \
 		HC4Contractor.hpp \
 		Inflator.hpp \
 		IntContractor.hpp \
@@ -128,6 +129,7 @@ librealpaver_la_SOURCES = \
 		ContractorPool.cpp \
 		Dag.cpp \
 		Exception.cpp \
+		Function.cpp \
 		HC4Contractor.cpp \
 		Inflator.cpp \
 		IntContractor.cpp \

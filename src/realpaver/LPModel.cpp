@@ -14,8 +14,7 @@
 
 namespace realpaver {
 
-LinVarRep::LinVarRep(int index,
-                     double lb, double ub,
+LinVarRep::LinVarRep(int index, double lb, double ub,
                      bool continuous, const std::string& name) :
    index_(index),
    lb_(lb),
@@ -94,6 +93,9 @@ double LinVarRep::getObjVal() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+LinVar::LinVar() : rep_(nullptr)
+{}
 
 LinVar::LinVar(int index, double lb, double ub,
                bool continuous, const std::string& name):

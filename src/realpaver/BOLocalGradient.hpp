@@ -23,7 +23,7 @@ public:
    BOLocalGradient();
 
    /// Overrides (BOLocalSolver)
-   OptimizationStatus minimize(RealFunction& f,
+   OptimizationStatus minimize(DiffRealFunction& f,
                                const IntervalRegion& reg,
                                const RealPoint& src,
                                RealPoint& dest);
@@ -57,7 +57,7 @@ private:
    /// @param p descent direction
    /// @param fx f(x)
    /// @return a positive step in case of success, a negative value otherwise
-   double findStep(RealFunction& f, RealVector& x, RealVector& g,
+   double findStep(DiffRealFunction& f, RealVector& x, RealVector& g,
                    RealVector& p, double fx);
 
    size_t max_iter_;    // limit on the number of iterations

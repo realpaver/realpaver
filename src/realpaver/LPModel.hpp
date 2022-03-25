@@ -103,7 +103,7 @@ private:
 class LinVar {
 public:
    /// Default constructor
-   LinVar() = default;
+   LinVar();
 
    /// Default copy constructor
    LinVar(const LinVar&) = default;

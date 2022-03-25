@@ -19,7 +19,11 @@ DagNode::DagNode(Dag* dag, size_t index)
         index_(index),
         vpar_(),
         vsub_(),
-        val_()
+        val_(),
+        dv_(),
+        rval_(0.0),
+        rdv_(0.0),
+        ilv_(-1)
 {}
 
 DagNode::~DagNode()
@@ -118,6 +122,16 @@ bool DagNode::dependsOn(const Bitset& bs) const
 bool DagNode::dependsOn(const Variable& v) const
 {
    return bitset_.get(v.getId());
+}
+
+int DagNode::indexLinVar() const
+{
+   return ilv_;
+}
+
+void DagNode::setIndexLinVar(int i)
+{
+   ilv_ = i;
 }
 
 Interval DagNode::val() const
@@ -1289,7 +1303,7 @@ bool DagFun::dependsOn(const Variable& v) const
    return rootNode()->dependsOn(v);
 }
 
-Interval DagFun::deriv(size_t i) const
+Interval DagFun::intervalDeriv(size_t i) const
 {
    return varNode(i)->dv();
 }
@@ -1314,7 +1328,7 @@ void DagFun::setScope(Scope s)
    scope_ = s;
 }
 
-double DagFun::rderiv(size_t i) const
+double DagFun::realDeriv(size_t i) const
 {
    return varNode(i)->rdv();
 }
@@ -1571,20 +1585,20 @@ bool DagFun::diff()
    return res;
 }
 
-IntervalVector DagFun::grad() const
+IntervalVector DagFun::intervalGradient() const
 {
    IntervalVector G(nbVars());
-   toGrad(G);
+   toIntervalGradient(G);
    return G;
 }
 
-void DagFun::toGrad(IntervalVector& G) const
+void DagFun::toIntervalGradient(IntervalVector& G) const
 {
    for (size_t i=0; i<nbVars(); ++i)
-      G.set(i, deriv(i));
+      G.set(i, intervalDeriv(i));
 }
 
-Interval DagFun::deriv(const Variable& v) const
+Interval DagFun::intervalDeriv(const Variable& v) const
 {
    return dag_->findVarNode(v.getId())->dv();
 }
@@ -1654,84 +1668,73 @@ bool DagFun::rdiff()
    return res;
 }
 
-RealVector DagFun::rgrad() const
+RealVector DagFun::realGradient() const
 {
    RealVector G(nbVars());
-   toRgrad(G);
+   toRealGradient(G);
    return G;
 }
 
-void DagFun::toRgrad(RealVector& G) const
+void DagFun::toRealGradient(RealVector& G) const
 {
    for (size_t i=0; i<nbVars(); ++i)
-      G.set(i, rderiv(i));
+      G.set(i, realDeriv(i));
 }
 
-double DagFun::rderiv(const Variable& v) const
+double DagFun::realDeriv(const Variable& v) const
 {
    return dag_->findVarNode(v.getId())->rdv();
 }
 
-Scope DagFun::rfunScope() const
+Scope DagFun::funScope() const
 {
    return scope();
 }
 
-size_t DagFun::rfunArity() const
+size_t DagFun::funArity() const
 {
    return scope().size();   
 }
 
-double DagFun::rfunEval(const RealPoint& pt)
+double DagFun::realEval(const RealPoint& pt)
 {
    return reval(pt);
 }
 
-void DagFun::rfunDiff(const RealPoint& pt, RealVector& g)
+void DagFun::realDiff(const RealPoint& pt, RealVector& g)
 {
    rdiff(pt);
-   toRgrad(g);
+   toRealGradient(g);
 }
 
-void DagFun::rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e)
+double DagFun::realEvalDiff(const RealPoint& pt, RealVector& g)
 {
    rdiff(pt);
-   toRgrad(g);
-   e = rval();
+   toRealGradient(g);
+   return rval();
 }
 
-Scope DagFun::ifunScope() const
-{
-   return scope();
-}
-
-size_t DagFun::ifunArity() const
-{
-   return scope().size();   
-}
-
-Interval DagFun::ifunEval(const IntervalRegion& reg)
+Interval DagFun::intervalEval(const IntervalRegion& reg)
 {
    return eval(reg);
 }
 
-Interval DagFun::ifunEvalPoint(const RealPoint& pt)
+Interval DagFun::intervalPointEval(const RealPoint& pt)
 {
    return eval(pt);
 }
 
-void DagFun::ifunDiff(const IntervalRegion& reg, IntervalVector& g)
+void DagFun::intervalDiff(const IntervalRegion& reg, IntervalVector& g)
 {
    diff(reg);
-   toGrad(g);
+   toIntervalGradient(g);
 }
 
-void DagFun::ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
-                          Interval& e)
+Interval DagFun::intervalEvalDiff(const IntervalRegion& reg, IntervalVector& g)
 {
    diff(reg);
-   toGrad(g);
-   e = val();
+   toIntervalGradient(g);
+   return val();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

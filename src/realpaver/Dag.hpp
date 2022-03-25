@@ -16,6 +16,7 @@
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalFunction.hpp"
+#include "realpaver/LPModel.hpp"
 #include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
@@ -155,6 +156,13 @@ public:
    /// @param x real value added in the real derivative
    void addRdv(double x);
 
+   /// @return the index of a linear variable representing this in a LP model
+   int indexLinVar() const;
+
+   /// Assigns the index of a linear variable representing this in a LP model
+   /// @param i index of a linear variable
+   void setIndexLinVar(int i);
+
    /// Visitor pattern
    /// @param vis a visitor
    virtual void acceptVisitor(DagVisitor& vis) const = 0;
@@ -225,6 +233,7 @@ private:
    Interval dv_;     // interval derivative
    double rval_;     // result of a point evaluation
    double rdv_;      // point derivative
+   int ilv_;         // index of a linear variable in a LP model
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -717,7 +726,7 @@ public:
 ///
 /// To every function is associated an image, i.e. we have L <= f(x) <= U.
 ///////////////////////////////////////////////////////////////////////////////
-class DagFun : public IntervalFunction, public RealFunction {
+class DagFun : public DiffIntervalFunction, public DiffRealFunction {
 public:
    /// Creates a function
    /// @param dag owner of this
@@ -867,27 +876,6 @@ public:
    /// Only the nodes depending on the considered variable are differentiated.   
    bool diffOnly(const Variable& v, const Interval& x);
 
-   /// @return the interval gradient after a differentiation
-   IntervalVector grad() const;
-
-   /// Assigns the interval gradient after a differentiation
-   /// @param G the gradient assigned
-   void toGrad(IntervalVector& G) const;
-
-   /// Gets an interval derivative
-   /// @param i index of a variable in this with 0 <= i < nbVars()
-   /// @return the partial derivative with respect to the i-th variable
-   ///
-   /// This is useful after a call to diff() and diffOnly(...).
-   Interval deriv(size_t i) const;
-
-   /// Gets an interval derivative
-   /// @param v a variable occurring in this
-   /// @return the partial derivative of this with respect to v
-   ///
-   /// This is useful after a call to diff() and diffOnly(...).
-   Interval deriv(const Variable& v) const;
-
    /// Real (point) evaluation
    /// @param pt variable values
    /// @return the evaluation of this at pt
@@ -909,46 +897,54 @@ public:
    /// It assumes that this function has been evaluated.
    bool rdiff();
 
+   ///@{
+   /// Overrides
+   Scope  funScope() const;
+   size_t funArity() const;
+
+   Interval intervalEval     (const IntervalRegion& reg);
+   Interval intervalPointEval(const RealPoint& pt);
+   void     intervalDiff     (const IntervalRegion& reg, IntervalVector& g);
+   Interval intervalEvalDiff (const IntervalRegion& reg, IntervalVector& g);
+
+   double realEval    (const RealPoint& pt);
+   void   realDiff    (const RealPoint& pt, RealVector& g);
+   double realEvalDiff(const RealPoint& pt, RealVector& g);
+   ///@}
+
+   /// @return the interval gradient after a differentiation
+   IntervalVector intervalGradient() const;
+
+   /// Assigns the interval gradient after a differentiation
+   /// @param G the gradient assigned
+   void toIntervalGradient(IntervalVector& G) const;
+
+   /// Gets an interval derivative after a differentiation
+   /// @param i index of a variable in this with 0 <= i < nbVars()
+   /// @return the partial derivative with respect to the i-th variable
+   Interval intervalDeriv(size_t i) const;
+
+   /// Gets an interval derivative after a differentiation
+   /// @param v a variable occurring in this
+   /// @return the partial derivative of this with respect to v
+   Interval intervalDeriv(const Variable& v) const;
+
    /// @return the real gradient after a differentiation
-   RealVector rgrad() const;
+   RealVector realGradient() const;
 
    /// Assigns the real gradient after a differentiation
    /// @param G the gradient assigned
-   void toRgrad(RealVector& G) const;
+   void toRealGradient(RealVector& G) const;
 
-   /// Gets a real derivative
+   /// Gets a real derivative after a differentiation
    /// @param i index of a variable in this with 0 <= i < nbVars()
    /// @return the partial derivative with respect to the i-th variable
-   ///
-   /// This is useful after a call to rdiff() and rdiffOnly(...).
-   double rderiv(size_t i) const;
+   double realDeriv(size_t i) const;
 
-   /// Gets a real derivative
+   /// Gets a real derivative after a differentiation
    /// @param v a variable occurring in this
    /// @return the partial derivative of this with respect to v
-   ///
-   /// This is useful after a call to rdiff() and rdiffOnly(...).
-   double rderiv(const Variable& v) const;
-
-   ///@{
-   /// Overrides (IntervalFunction)
-   Scope ifunScope() const;
-   size_t ifunArity() const;
-   Interval ifunEval(const IntervalRegion& reg);
-   Interval ifunEvalPoint(const RealPoint& pt);
-   void ifunDiff(const IntervalRegion& reg, IntervalVector& g);
-   void ifunEvalDiff(const IntervalRegion& reg, IntervalVector& g,
-                     Interval& e);
-   ///@}
-
-   ///@{
-   /// Overrides (RealFunction)
-   Scope rfunScope() const;
-   size_t rfunArity() const;
-   double rfunEval(const RealPoint& pt);
-   void rfunDiff(const RealPoint& pt, RealVector& g);
-   void rfunEvalDiff(const RealPoint& pt, RealVector& g, double& e);
-   ///@}
+   double realDeriv(const Variable& v) const;
 
 private:
    Dag* dag_;                    // the DAG

@@ -36,14 +36,15 @@ Interval ThickIntervalFunction::eval(const Interval& x)
 
 Interval ThickIntervalFunction::diff(const Interval& x)
 {
-   return f_->diffOnly(v_, x) ? f_->deriv(v_) : Interval::universe();
+   return f_->diffOnly(v_, x) ? f_->intervalDeriv(v_) : Interval::universe();
 }
 
 std::pair<Interval, Interval>
 ThickIntervalFunction::evalDiff(const Interval& x)
 {
    Interval e = f_->evalOnly(v_, x),
-            dv = f_->diffOnly(v_) ? f_->deriv(v_) : Interval::universe();
+            dv = f_->diffOnly(v_) ? f_->intervalDeriv(v_) :
+                                    Interval::universe();
 
    return std::make_pair(e, dv);
 }

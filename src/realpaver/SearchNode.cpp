@@ -39,7 +39,7 @@ SearchNode::~SearchNode()
    delete reg_;
 }
 
-int SearchNode::getDepth() const
+int SearchNode::depth() const
 {
    return depth_;
 }
@@ -56,17 +56,17 @@ void SearchNode::incrementDepth()
    ++depth_;
 }
 
-IntervalRegion* SearchNode::getRegion() const
+IntervalRegion* SearchNode::region() const
 {
    return reg_;
 }
 
-Scope SearchNode::getScope() const
+Scope SearchNode::scope() const
 {
    return scope_;
 }
 
-Variable SearchNode::getSplitVariable() const
+Variable SearchNode::splitVariable() const
 {
    return v_;
 }

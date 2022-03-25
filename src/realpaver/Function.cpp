@@ -7,14 +7,11 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/RealFunction.hpp"
+#include "realpaver/Function.hpp"
 
 namespace realpaver {
 
-RealFunction::~RealFunction()
-{}
-
-DiffRealFunction::~DiffRealFunction()
+Function::~Function()
 {}
 
 } // namespace

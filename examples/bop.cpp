@@ -38,19 +38,19 @@ int main(void)
       //~ Term to = 2.0*sqr(x) - 1.05*pow(x, 4) + pow(x, 6)/6.0 + x*y + sqr(y);
 
       // 6-hump camel
-      //~ Variable x = problem.addRealVar(-3,  3, "x"),
-               //~ y = problem.addRealVar(-2,  2, "y");
-      //~ Term to = (4.0-2.1*sqr(x)+pow(x,4)/3.0)*sqr(x) + x*y +
-                //~ (4.0*sqr(y)-4.0)*sqr(y);
+      Variable x = problem.addRealVar(-3,  3, "x"),
+               y = problem.addRealVar(-2,  2, "y");
+      Term to = (4.0-2.1*sqr(x)+pow(x,4)/3.0)*sqr(x) + x*y +
+                (4.0*sqr(y)-4.0)*sqr(y);
 
       // Colville
-      Variable x1 = problem.addRealVar(-10,  10, "x1"),
-               x2 = problem.addRealVar(-10,  10, "x2"),
-               x3 = problem.addRealVar(-10,  10, "x3"),
-               x4 = problem.addRealVar(-10,  10, "x4");
-      Term to = 100.0*sqr(sqr(x1)-x2) + sqr(x1-1.0) + sqr(x3-1.0) +
-                90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
-                19.8*(x2-1.0)*(x4-1.0);
+      //~ Variable x1 = problem.addRealVar(-10,  10, "x1"),
+               //~ x2 = problem.addRealVar(-10,  10, "x2"),
+               //~ x3 = problem.addRealVar(-10,  10, "x3"),
+               //~ x4 = problem.addRealVar(-10,  10, "x4");
+      //~ Term to = 100.0*sqr(sqr(x1)-x2) + sqr(x1-1.0) + sqr(x3-1.0) +
+                //~ 90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
+                //~ 19.8*(x2-1.0)*(x4-1.0);
 
       //~ Variable x = problem.addRealVar(-10,  10, "x"),
                //~ y = problem.addRealVar(-10,  10, "y");
@@ -62,8 +62,8 @@ int main(void)
 
       BOSolver solver(problem);
       solver.setIntParam("NODE_LIMIT", 400);
-      solver.setIntParam("BB_SPACE_FREQUENCY", 5);
-      solver.setStrParam("SPLIT_OBJECTIVE", "YES");
+      solver.setIntParam("BB_SPACE_FREQUENCY", 2);
+      solver.setStrParam("SPLIT_OBJECTIVE", "NO");
       solver.setStrParam("LOCAL_SOLVER_ALGORITHM", "GRADIENT");
       solver.setStrParam("PROPAGATION_ALGORITHM", "MAX_CID_HC4");
       solver.setStrParam("SPLIT_SELECTOR", "ROUND_ROBIN");

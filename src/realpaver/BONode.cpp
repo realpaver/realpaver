@@ -46,8 +46,8 @@ Variable BONode::getObjVar() const
 
 std::ostream& operator<<(std::ostream& os, const BONode& node)
 {
-   os << *node.getRegion()
-      << " d: " << node.getDepth()
+   os << *node.region()
+      << " d: " << node.depth()
       << " L: " << node.getLower()
       << " U: " << node.getUpper();
 

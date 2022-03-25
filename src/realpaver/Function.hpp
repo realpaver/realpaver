@@ -7,14 +7,28 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/RealFunction.hpp"
+#ifndef REALPAVER_FUNCTION_HPP
+#define REALPAVER_FUNCTION_HPP
+
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
-RealFunction::~RealFunction()
-{}
+///////////////////////////////////////////////////////////////////////////////
+/// This is a base class for functions.
+///////////////////////////////////////////////////////////////////////////////
+class Function {
+public:
+   /// Virtual destructor
+   virtual ~Function();
 
-DiffRealFunction::~DiffRealFunction()
-{}
+   /// @return the scopeof this, i.e. the set of variables
+   virtual Scope funScope() const = 0;
+
+   /// @return the number of variables in this
+   virtual size_t funArity() const = 0;
+};
 
 } // namespace
+
+#endif

@@ -29,17 +29,4 @@ void BOLocalSolver::setTimeLimit(double val)
    time_limit_ = val;
 }
 
-OptimizationStatus BOLocalSolver::minimize(RealFunction& f,
-                                           const IntervalRegion& reg,
-                                           const RealPoint& src,
-                                           RealPoint& dest)
-{
-   dest.setAll(src);
-
-   double u = f.rfunEval(src);
-
-   return (Double::isInf(u) || Double::isNan(u)) ? OptimizationStatus::Other :
-                                                   OptimizationStatus::Optimal;
-}
-
 } // namespace

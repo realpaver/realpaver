@@ -35,7 +35,7 @@ public:
    SearchNode& operator=(const SearchNode&) = delete;
 
    /// @return the depth of this in the search tree
-   int getDepth() const;
+   int depth() const;
 
    /// Sets the depth of this in the search tree
    /// @param depth new depth
@@ -45,13 +45,13 @@ public:
    void incrementDepth();
 
    /// @return the vector of domains of this
-   IntervalRegion* getRegion() const;
+   IntervalRegion* region() const;
 
    /// @return the scope of this
-   Scope getScope() const;
+   Scope scope() const;
 
    /// @return the variable chosen by the last splitting step
-   Variable getSplitVariable() const;
+   Variable splitVariable() const;
 
    /// Assigns the variable whose domain has been split
    /// @param v a variablein the scope of this

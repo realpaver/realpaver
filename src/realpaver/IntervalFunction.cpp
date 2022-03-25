@@ -14,4 +14,7 @@ namespace realpaver {
 IntervalFunction::~IntervalFunction()
 {}
 
+DiffIntervalFunction::~DiffIntervalFunction()
+{}
+
 } // namespace

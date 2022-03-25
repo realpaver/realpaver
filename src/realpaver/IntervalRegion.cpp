@@ -144,4 +144,3 @@ IntervalRegion* IntervalRegion::clone() const
 }
 
 } // namespace
-

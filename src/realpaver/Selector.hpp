@@ -88,7 +88,7 @@ public:
    /// Creates a selector on a set of variables
    ///@param f a function
    ///@param s a scope
-   SelectorMaxSmear(IntervalFunction* f, Scope s);
+   SelectorMaxSmear(DiffIntervalFunction* f, Scope s);
 
    /// Destructor
    ~SelectorMaxSmear() = default;
@@ -103,7 +103,7 @@ public:
    std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
 
 private:
-   IntervalFunction* f_;
+   DiffIntervalFunction* f_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
