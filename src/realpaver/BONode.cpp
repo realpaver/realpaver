@@ -12,9 +12,10 @@
 
 namespace realpaver {
 
-BONode::BONode(Scope scope, Variable objvar, const IntervalRegion& reg)
-      : SearchNode(scope, reg, 0),
-        objvar_(objvar),
+BONode::BONode(const Scope& sco, const Variable& ovar,
+               const IntervalRegion& reg)
+      : SearchNode(sco, reg, 0),
+        objvar_(ovar),
         lower_(Double::neginf()),
         upper_(Double::inf())
 {}

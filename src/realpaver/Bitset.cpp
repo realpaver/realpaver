@@ -175,7 +175,7 @@ void Bitset::flipAll()
    keepShadowBits();
 }
 
-size_t Bitset::nbZero() const
+size_t Bitset::nbZeros() const
 {
    size_t nb = 0;
 
@@ -185,7 +185,7 @@ size_t Bitset::nbZero() const
    return nb;
 }
 
-size_t Bitset::nbOne() const
+size_t Bitset::nbOnes() const
 {
    size_t nb = 0;
 

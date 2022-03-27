@@ -30,10 +30,11 @@ public:
    typedef SharedBONode NodeType;
 
    /// Creates a splitting object
-   BOSplit(Selector* selector, IntervalSlicer* slicer);
+   BOSplit(std::unique_ptr<Selector> selector,
+           std::unique_ptr<IntervalSlicer> slicer);
 
-   /// Destructor
-   ~BOSplit();
+   /// Default destructor
+   ~BOSplit() = default;
 
    /// No copy
    BOSplit(const BOSplit&) = delete;
@@ -45,8 +46,8 @@ public:
    bool applyImpl(SharedBONode node);
 
 private:
-   Selector* selector_;
-   IntervalSlicer* slicer_;
+   std::unique_ptr<Selector> selector_;
+   std::unique_ptr<IntervalSlicer> slicer_;
 };
 
 } // namespace

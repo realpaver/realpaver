@@ -23,7 +23,7 @@ public:
    BOLocalGradient();
 
    /// Overrides (BOLocalSolver)
-   OptimizationStatus minimize(DiffRealFunction& f,
+   OptimizationStatus minimize(RealFunction& f,
                                const IntervalRegion& reg,
                                const RealPoint& src,
                                RealPoint& dest);

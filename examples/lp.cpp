@@ -60,7 +60,7 @@ int main(void)
    // SOLUTION: f* = 6.5 at (2, 6)
 
    // solving
-   optimal = solver.reOptimize();
+   optimal = solver.reoptimize();
 
    if (optimal)
    {

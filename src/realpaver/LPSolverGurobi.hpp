@@ -45,7 +45,7 @@ public:
 
    /// Overrides the optimization method
    /// @return true if an optimal solution is found
-   bool reOptimize();
+   bool reoptimize();
 
 private:
   GRBEnv* env_;

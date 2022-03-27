@@ -79,10 +79,10 @@ public:
    void flipAll();
 
    /// @return the number of 0 in this
-   size_t nbZero() const;
+   size_t nbZeros() const;
 
    /// @return the number of 1 in this
-   size_t nbOne() const;
+   size_t nbOnes() const;
 
    /// Output on a stream
    /// @param os output stream

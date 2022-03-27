@@ -23,16 +23,16 @@ namespace realpaver {
 class IntervalRegion : public IntervalVector {
 public:
    /// Creates an interval region
-   /// s scope of this
+   /// sco scope of this
    /// x interval assigned to each element of this
-   IntervalRegion(Scope s, const Interval& x = Interval::universe());
+   IntervalRegion(const Scope& sco, const Interval& x = Interval::universe());
 
    /// Creates an interval region
-   /// s scope of this
-   /// X interval vector having the same size than s
+   /// sco scope of this
+   /// X interval vector having the same size than sco
    ///
-   /// The i-th variable in s is assigned to X[i] for each i.
-   IntervalRegion(Scope s, const IntervalVector& X);
+   /// The i-th variable in sco is assigned to X[i] for each i.
+   IntervalRegion(const Scope& sco, const IntervalVector& X);
 
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
@@ -51,14 +51,14 @@ public:
    /// @return the interval value of v in this
    ///
    /// This masks the access by index.
-   Interval get(Variable v) const;
+   Interval get(const Variable& v) const;
 
    /// Sets an element of this
    /// @param v a variable that belongs to the scope of this
    /// @param x interval assigned to v ion this
    ///
    /// This masks the access by index.
-   void set(Variable v, const Interval& x);
+   void set(const Variable& v, const Interval& x);
 
    /// @return the midpoint of this
    RealPoint midpoint() const;
@@ -113,27 +113,27 @@ public:
 
    /// Hull with assignment on a scope
    /// @param reg an interval region
-   /// @param s a scope included in the scope of this and reg
+   /// @param sco a scope included in the scope of this and reg
    ///
-   /// this[s] is assigned to the hull of this[s] and reg[s]
-   void hullAssignOnScope(const IntervalRegion& reg, Scope s);
+   /// this[sco] is assigned to the hull of this[sco] and reg[sco]
+   void hullAssignOnScope(const IntervalRegion& reg, const Scope& sco);
 
    /// Assignment on a scope
    /// @param reg an interval region
-   /// @param s a scope included in the scope of this and reg
+   /// @param sco a scope included in the scope of this and reg
    ///
-   /// this[s] is assigned to reg[s]
-   void setOnScope(const IntervalRegion& reg, Scope s);
+   /// this[sco] is assigned to reg[sco]
+   void setOnScope(const IntervalRegion& reg, const Scope& sco);
 
    /// Midpoint of this on a scope
-   /// @param s a scope included in the scope of this
-   /// @return midpoint of this restricted to s
-   RealPoint midpointOnScope(Scope s) const;
+   /// @param sco a scope included in the scope of this
+   /// @return midpoint of this restricted to sco
+   RealPoint midpointOnScope(const Scope& sco) const;
 
    /// Gets a sub-region
-   /// @param s a scope included in the scope of this
-   /// @return this restricted to s
-   IntervalRegion subRegion(Scope s) const;
+   /// @param sco a scope included in the scope of this
+   /// @return this restricted to sco
+   IntervalRegion subRegion(const Scope& sco) const;
 
    /// Overrides (IntervalVector)
    /// @return a clone of this

@@ -92,13 +92,17 @@ double BOLocalGradient::findStep(DiffRealFunction& f, RealVector& x,
    return res;
 }
 
-OptimizationStatus BOLocalGradient::minimize(DiffRealFunction& f,
+OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
                                              const IntervalRegion& reg,
                                              const RealPoint& src,
                                              RealPoint& dest)
 {
-   size_t dim = f.funArity();
-   Scope scope = f.funScope();
+   DiffRealFunction* h = dynamic_cast<DiffRealFunction*>(&f);
+
+   THROW_IF(h == nullptr, "Function not differentiable in a local solver");
+
+   size_t dim = h->funArity();
+   Scope scope = h->funScope();
 
    RealVector xk(src),           // current point
               gk(dim),           // gradient
@@ -116,7 +120,7 @@ OptimizationStatus BOLocalGradient::minimize(DiffRealFunction& f,
 
    do
    {
-      uk = f.realEvalDiff(RealPoint(scope, xk), gk);
+      uk = h->realEvalDiff(RealPoint(scope, xk), gk);
       if (Double::isNan(uk) || gk.isNan())
       {
          status = OptimizationStatus::Other;
@@ -125,7 +129,7 @@ OptimizationStatus BOLocalGradient::minimize(DiffRealFunction& f,
       else
       {
          pk = -gk;
-         step = findStep(f, xk, gk, pk, uk);
+         step = findStep(*h, xk, gk, pk, uk);
 
          if (step > 0.0)
          {

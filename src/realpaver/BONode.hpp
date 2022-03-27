@@ -26,10 +26,10 @@ namespace realpaver {
 class BONode : public SearchNode {
 public:
    /// Creates a node
-   /// @param scope set of variables of the optimization problem
-   /// @param variable representing the objective function
+   /// @param sco set of variables of the optimization problem
+   /// @param ovar variable representing the objective function
    /// @param reg domains of variables
-   BONode(Scope scope, Variable objvar, const IntervalRegion& reg);
+   BONode(const Scope& sco, const Variable& ovar, const IntervalRegion& reg);
 
    /// Default copy constructor
    BONode(const BONode& node) = default;

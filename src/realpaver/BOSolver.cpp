@@ -147,12 +147,12 @@ void BOSolver::makeSplit()
    IntervalSlicer* slicer = nullptr;
 
    bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
-   Scope S = osplit ? model_->getFullScope() : model_->getObjScope();
+   Scope sco = osplit ? model_->getFullScope() : model_->getObjScope();
 
    std::string sel = param_.getStrParam("SPLIT_SELECTOR");
-   if (sel == "MAX_DOM") selector = new SelectorMaxDom(S);
-   if (sel == "MAX_SMEAR") selector = new SelectorMaxSmear(model_, S);
-   if (sel == "ROUND_ROBIN") selector = new SelectorRoundRobin(S);
+   if (sel == "MAX_DOM") selector = new SelectorMaxDom(sco);
+   if (sel == "MAX_SMEAR") selector = new SelectorMaxSmear(model_, sco);
+   if (sel == "ROUND_ROBIN") selector = new SelectorRoundRobin(sco);
 
    std::string sli = param_.getStrParam("SPLIT_SLICER");
    if (sli == "BISECTION") slicer = new IntervalBisecter();
@@ -170,7 +170,10 @@ void BOSolver::makeSplit()
    THROW_IF(selector == nullptr || slicer == nullptr,
             "Unable to make the split object in a BO solver");
 
-   split_ = new BOSplit(selector, slicer);
+   std::unique_ptr<Selector> pselector(selector);
+   std::unique_ptr<IntervalSlicer> pslicer(slicer);
+
+   split_ = new BOSplit(std::move(pselector), std::move(pslicer));
 }
 
 void BOSolver::makeHC4()

@@ -148,7 +148,7 @@ bool LPSolver::optimize()
    return run();
 }
 
-bool LPSolver::reOptimize()
+bool LPSolver::reoptimize()
 {
    makeObj();
    return run();

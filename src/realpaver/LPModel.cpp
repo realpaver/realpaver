@@ -536,7 +536,7 @@ bool LPModel::optimize()
    return false;
 }
 
-bool LPModel::reOptimize()
+bool LPModel::reoptimize()
 {
    return false;
 }

@@ -11,19 +11,14 @@
 
 namespace realpaver {
 
-BOSplit::BOSplit(Selector* selector, IntervalSlicer* slicer)
+BOSplit::BOSplit(std::unique_ptr<Selector> selector,
+                 std::unique_ptr<IntervalSlicer> slicer)
       : SplitStrategy<SharedBONode>(),
-        selector_(selector),
-        slicer_(slicer)
+        selector_(std::move(selector)),
+        slicer_(std::move(slicer))
 {
-   ASSERT(selector != nullptr, "No selector in a split object");
-   ASSERT(slicer != nullptr, "No slicer in a split object");
-}
-
-BOSplit::~BOSplit()
-{
-   if (selector_ != nullptr) delete selector_;
-   if (slicer_ != nullptr) delete slicer_;
+   ASSERT(selector_ != nullptr, "No selector in a split object");
+   ASSERT(slicer_ != nullptr, "No slicer in a split object");
 }
 
 bool BOSplit::applyImpl(SharedBONode node)

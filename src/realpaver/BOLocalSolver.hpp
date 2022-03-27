@@ -39,7 +39,7 @@ public:
    /// @param src starting point that belongs to the region
    /// @param dest final point found by the optimization procedure
    /// @return an optimization status
-   virtual OptimizationStatus minimize(DiffRealFunction& f,
+   virtual OptimizationStatus minimize(RealFunction& f,
                                        const IntervalRegion& reg,
                                        const RealPoint& src,
                                        RealPoint& dest) = 0;

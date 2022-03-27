@@ -45,7 +45,7 @@ public:
    ///
    /// Only the objective function is generated again from the LP model.
    /// Then the initialSolve method of Clp is executed.
-   bool reOptimize();
+   bool reoptimize();
 
 private:
    ClpSimplex* simplex_;

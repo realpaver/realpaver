@@ -55,7 +55,7 @@ public:
    /// Evaluates and differentiates this
    /// @param reg domains of variables
    /// @param g interval gradient of this at r (output)
-   /// @return result of interval evaluationof this at reg
+   /// @return result of interval evaluation of this at reg
    virtual Interval intervalEvalDiff(const IntervalRegion& reg,
                                      IntervalVector& g) = 0;
 };
