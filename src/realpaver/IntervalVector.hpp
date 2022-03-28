@@ -117,10 +117,10 @@ public:
    bool overlaps(const IntervalVector& X) const;
 
    /// @return the one-norm of this
-   double oneNorm() const;
+   double l1Norm() const;
 
    /// @return the infinite-norm of this
-   double infNorm() const;
+   double linfNorm() const;
 
    /// @return a clone of this
    virtual IntervalVector* clone() const;

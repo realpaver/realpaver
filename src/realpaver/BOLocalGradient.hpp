@@ -15,7 +15,7 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This implements the steepest descent method.
+/// This implements the steepest descent method with Armijo line search.
 ///////////////////////////////////////////////////////////////////////////////
 class BOLocalGradient : public BOLocalSolver {
 public:
@@ -49,6 +49,13 @@ public:
    /// @param tol new value of the smalllest step length with 0.0 < tol < 1.0
    void setStepTol(double tol);
 
+   /// Gets the tolerance on the L2-norm of the gradient
+   double getGradientTol() const;
+
+   /// Sets the tolerance on the L2-norm of the gradient
+   /// @param tol new value with 0.0 < tol
+   void setGradientTol(double tol);
+
 private:
    /// Component of a line search procedure that finds a step length
    /// @param f a real function
@@ -60,9 +67,10 @@ private:
    double findStep(DiffRealFunction& f, RealVector& x, RealVector& g,
                    RealVector& p, double fx);
 
-   size_t max_iter_;    // limit on the number of iterations
-   double alpha_;       // coefficient used in the Armijo rule
-   double tol_;         // minimal value of the step length
+   size_t maxiter_;  // limit on the number of iterations
+   double alpha_;    // coefficient used in the Armijo rule
+   double stol_;     // minimal value of the step length
+   double gtol_;     // tolerance on the norm of the gradient
 };
 
 } // namespace

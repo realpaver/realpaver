@@ -61,14 +61,14 @@ public:
    /// @return the scalar product of this and V
    double scalarProduct(const RealVector& V) const;
 
-   /// @return the Euclidean norm of this
-   double euclideanNorm() const;
+   /// @return the L1-norm of this
+   double l1Norm() const;
 
-   /// @return the one-norm of this
-   double oneNorm() const;
+   /// @return the L2-norm (Euclidean-norm) of this
+   double l2Norm() const;
 
    /// @return the infinite-norm of this
-   double infNorm() const;
+   double linfNorm() const;
 
    /// Addition with assignment
    /// @param V a vector

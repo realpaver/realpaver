@@ -14,19 +14,20 @@
 namespace realpaver {
 
 BOLocalGradient::BOLocalGradient()
-      : max_iter_(Param::GetIntParam("LINE_SEARCH_ITER_LIMIT")),
+      : maxiter_(Param::GetIntParam("LINE_SEARCH_ITER_LIMIT")),
         alpha_(Param::GetDblParam("LINE_SEARCH_ARMIJO")),
-        tol_(Param::GetDblParam("LINE_SEARCH_STEP_TOL"))
+        stol_(Param::GetDblParam("LINE_SEARCH_STEP_TOL")),
+        gtol_(Param::GetDblParam("GRADIENT_DESCENT_TOL"))
 {}
 
 size_t BOLocalGradient::getIterLimit() const
 {
-   return max_iter_;
+   return maxiter_;
 }
 
 void BOLocalGradient::setIterLimit(size_t n)
 {
-   max_iter_ = n;
+   maxiter_ = n;
 }
 
 double BOLocalGradient::getArmijoCoefficient() const
@@ -44,15 +45,28 @@ void BOLocalGradient::setArmijoCoefficient(double val)
 
 double BOLocalGradient::getStepTol() const
 {
-   return tol_;
+   return stol_;
 }
 
 void BOLocalGradient::setStepTol(double tol)
 {
    ASSERT(tol > 0.0 && tol < 1.0,
-          "Bad limit on the step length of the conjugate gradient method");
+          "Bad limit on the step length of the local solver");
 
-   tol_ = tol;
+   stol_ = tol;
+}
+
+double BOLocalGradient::getGradientTol() const
+{
+   return gtol_;
+}
+
+void BOLocalGradient::setGradientTol(double tol)
+{
+   ASSERT(tol > 0.0 && tol < 1.0,
+          "Bad limit on the L2-norm of the gradient of the local solver");
+
+   gtol_ = tol;
 }
 
 double BOLocalGradient::findStep(DiffRealFunction& f, RealVector& x,
@@ -86,7 +100,11 @@ double BOLocalGradient::findStep(DiffRealFunction& f, RealVector& x,
       }
 
       step /= 2.0;
-      if (step < tol_) iter = false;
+
+DEBUG("STEP :  " << step);
+
+
+      if (step < stol_) iter = false;
    }
 
    return res;
@@ -131,6 +149,9 @@ OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
          pk = -gk;
          step = findStep(*h, xk, gk, pk, uk);
 
+DEBUG("pk norm : " << pk.l2Norm());
+
+
          if (step > 0.0)
          {
             xk_next = xk + step * pk;
@@ -148,7 +169,8 @@ OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
             iter = false;
          }
 
-         if (++nb_iter > max_iter_) iter = false;
+         if (pk.l2Norm() < gtol_) iter = false;
+         if (++nb_iter > maxiter_) iter = false;
          if (tim.elapsedTime() > getTimeLimit()) iter = false;
       }
    }

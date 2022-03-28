@@ -53,7 +53,7 @@ double RealVector::scalarProduct(const RealVector& V) const
    return res;
 }
 
-double RealVector::euclideanNorm() const
+double RealVector::l2Norm() const
 {
    double sq = 0.0;
 
@@ -63,7 +63,7 @@ double RealVector::euclideanNorm() const
    return Double::sqrt(sq);
 }
 
-double RealVector::oneNorm() const
+double RealVector::l1Norm() const
 {
    double norm = 0.0;
 
@@ -73,7 +73,7 @@ double RealVector::oneNorm() const
    return norm;
 }
 
-double RealVector::infNorm() const
+double RealVector::linfNorm() const
 {
    double norm = 0.0;
 

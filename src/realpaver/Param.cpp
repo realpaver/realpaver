@@ -45,12 +45,13 @@ Param::Param()
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",      1));
 
    dblmap_.insert(std::make_pair("TIME_LIMIT",              100.0));
-   dblmap_.insert(std::make_pair("LINE_SEARCH_ARMIJO",      0.125));
+   dblmap_.insert(std::make_pair("LINE_SEARCH_ARMIJO",      0.09375));
    dblmap_.insert(std::make_pair("LINE_SEARCH_STEP_TOL",    1.0e-8));
    dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",         2.0));
    dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",       10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",           10.0));
    dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT", 10.0));
+   dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",    1.0e-3));
 
    strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",         "NO"));
    strmap_.insert(std::make_pair("SPLIT_SELECTOR",          "MAX_DOM"));

@@ -117,13 +117,16 @@ PROPAGATION_ALGORITHM = HC4
 
 # Coefficient of the Armijo rule used to stop a line search optimization
 # > 0.0 and < 1.0
-LINE_SEARCH_ARMIJO = 0.125
+LINE_SEARCH_ARMIJO = 0.09375
 
 # Smallest value of the step length of line search algorithm (absolute value)
 LINE_SEARCH_STEP_TOL = 1.0e-8
 
 # Iteration limit of line search algorithm
 LINE_SEARCH_ITER_LIMIT = 20
+
+# Tolerance on the norm of the gradient in the steepest descent method
+GRADIENT_DESCENT_TOL = 1.0e-3
 
 # Time limit in seconds
 LOCAL_SOLVER_TIME_LIMIT = 10.0

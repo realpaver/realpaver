@@ -187,7 +187,7 @@ bool IntervalVector::overlaps(const IntervalVector& X) const
    return true;
 }
 
-double IntervalVector::oneNorm() const
+double IntervalVector::l1Norm() const
 {
    double norm = 0.0;
 
@@ -197,7 +197,7 @@ double IntervalVector::oneNorm() const
    return norm;
 }
 
-double IntervalVector::infNorm() const
+double IntervalVector::linfNorm() const
 {
    double norm = 0.0;
 
