@@ -33,6 +33,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "max"    return TK_MAX;
 "MIN"    return TK_MIN;
 "MAX"	   return TK_MAX;
+"sqr"	   return TK_SQR;
 "sqrt"	return TK_SQRT;
 "log"    return TK_LOG;
 "exp"    return TK_EXP;
@@ -41,6 +42,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "sin"    return TK_SIN;
 "sgn"    return TK_SGN;
 "abs"    return TK_ABS;
+"pow"		return TK_POW;
 
 "in"     return TK_IN;
 
@@ -48,7 +50,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "-"      return TK_MINUS;
 "*"      return TK_MUL;
 "/"      return TK_DIV;
-"^"      return TK_POW;
+"^"      return TK_CARET;
 "("      return TK_LPAR;
 ")"      return TK_RPAR;
 "["      return TK_LSBR;
@@ -62,6 +64,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "="      return TK_EQ;
 ">="     return TK_GE;
 "<="     return TK_LE;
+"|"		return TK_PIPE;
 
 {IDENT}     	return TK_IDENT;
 
@@ -69,11 +72,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 
 {SPACE}  {}
 
-"#"      {
-           int c;
-           while( (c=getchar()) != '\n' && (c!=EOF) ) {}
-           if( c=='\n' ) ++realpaver_bison_lineno;
-         }
+"#".*    {}
 %%
 
 realpaver::Problem* realpaver_bison_problem;

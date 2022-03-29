@@ -48,9 +48,10 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
-%token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_POW TK_SQRT TK_LOG TK_EXP
+%token TK_PLUS TK_MINUS TK_MUL TK_DIV
+%token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
-%token TK_LPAR TK_RPAR TK_LSBR TK_RSBR
+%token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
 
@@ -397,10 +398,17 @@ expr
                       res(lhs / rhs);
       $$ = res.cloneRoot();
     }
-  | expr TK_POW exponent
+  | expr TK_CARET exponent
     {
       realpaver::Term t(realpaver::Term::SharedRep($1)),
                       d(realpaver::Term::SharedRep($3)),
+                      res(pow(t, d.evalConst()));
+      $$ = res.cloneRoot();
+    }
+  | TK_POW TK_LPAR expr TK_COMMA exponent TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      d(realpaver::Term::SharedRep($5)),
                       res(pow(t, d.evalConst()));
       $$ = res.cloneRoot();
     }
@@ -420,6 +428,12 @@ expr
                       res(sqrt(t));
       $$ = res.cloneRoot();
     }
+  | TK_SQR TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(sqr(t));
+      $$ = res.cloneRoot();
+    }
   | TK_SGN TK_LPAR expr TK_RPAR
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
@@ -429,6 +443,12 @@ expr
   | TK_ABS TK_LPAR expr TK_RPAR
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(abs(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_PIPE expr TK_PIPE
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($2)),
                       res(abs(t));
       $$ = res.cloneRoot();
     }

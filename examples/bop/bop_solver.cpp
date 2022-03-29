@@ -3,6 +3,7 @@
 #include "realpaver/BOSolver.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Parser.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -22,43 +23,24 @@ size_t maxSizeVarName(const Problem& p)
 
 int main(void)
 {
-   Logger::init(LogLevel::internal, "bop.log");
+   Logger::init(LogLevel::internal, "bop_solver.log");
 
    try {
+      //~ string filename = "Beale.bop";
+      //~ string filename = "Colville.bop";
+      //~ string filename = "SixHumpCamel.bop";
+      string filename = "ThreeHumpCamel.bop";
+
       Problem problem;
+      Parser parser;
 
-      //~ Beale
-      //~ Variable x = problem.addRealVar(-4.5,  4.5, "x"),
-               //~ y = problem.addRealVar(-4.5,  4.5, "y");
-      //~ Term to = sqr(1.5-x+x*y) + sqr(2.25-x+x*sqr(y)) + sqr(2.625-x+x*pow(y,3));
+      bool res = parser.parseFile(filename, problem);
 
-      // 3-hump camel
-      //~ Variable x = problem.addRealVar(-5,  5, "x"),
-               //~ y = problem.addRealVar(-5,  5, "y");
-      //~ Term to = 2.0*sqr(x) - 1.05*pow(x, 4) + pow(x, 6)/6.0 + x*y + sqr(y);
+      if (!res)
+         THROW("Parse error: " << parser.getParseError());
 
-      // 6-hump camel
-      Variable x = problem.addRealVar(-3,  3, "x"),
-               y = problem.addRealVar(-2,  2, "y");
-      Term to = (4.0-2.1*sqr(x)+pow(x,4)/3.0)*sqr(x) + x*y +
-                (4.0*sqr(y)-4.0)*sqr(y);
-
-      // Colville
-      //~ Variable x1 = problem.addRealVar(-10,  10, "x1"),
-               //~ x2 = problem.addRealVar(-10,  10, "x2"),
-               //~ x3 = problem.addRealVar(-10,  10, "x3"),
-               //~ x4 = problem.addRealVar(-10,  10, "x4");
-      //~ Term to = 100.0*sqr(sqr(x1)-x2) + sqr(x1-1.0) + sqr(x3-1.0) +
-                //~ 90.0*sqr(sqr(x3)-x4) + 10.1*(sqr(x2-1.0) + sqr(x4-1.0)) +
-                //~ 19.8*(x2-1.0)*(x4-1.0);
-
-      //~ Variable x = problem.addRealVar(-10,  10, "x"),
-               //~ y = problem.addRealVar(-10,  10, "y");
-      //~ Term to = sqr(x + 2*y - 7) + sqr(2*x + y - 5);
-
-
-//      problem.addObjective(MAX(to));
-      problem.addObjective(MIN(to));
+      if (!problem.isBOP())
+         THROW("Not a box-constrained optimization problem");
 
       BOSolver solver(problem);
       solver.setIntParam("NODE_LIMIT", 400);

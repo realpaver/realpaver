@@ -34,8 +34,8 @@ BOSolver::BOSolver(Problem& problem)
         sol_(problem.scope()),
         objval_(Interval::universe()),
         upper_(Double::inf()),
-        nb_nodes_(0),
-        nb_pending_(0),
+        nbnodes_(0),
+        nbpending_(0),
         vmap21_(),
         vmap31_(),
         ptimer_(),
@@ -114,12 +114,12 @@ void BOSolver::printParam(std::ostream& os)
 
 int BOSolver::getNbNodes() const
 {
-   return nb_nodes_;
+   return nbnodes_;
 }
 
 int BOSolver::getNbPendingNodes() const
 {
-   return nb_pending_;
+   return nbpending_;
 }
 
 void BOSolver::makeLocalSolver()
@@ -450,7 +450,7 @@ DEBUG("   sol NODE !");
 
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
-         ++nb_nodes_;
+         ++nbnodes_;
 
          SharedBONode subnode = *it;
          IntervalRegion* reg = subnode->region();
@@ -549,7 +549,7 @@ DEBUG("-- branchAndBound with sol_ : " << sol_);
 
    if (status_ == OptimizationStatus::Infeasible)
    {
-      nb_nodes_ = 1;
+      nbnodes_ = 1;
       return;
    }
 
@@ -589,7 +589,7 @@ DEBUG("OBJ ENCLOSURE : " << objval_);
          status_ = OptimizationStatus::StopOnTimeLimit;
       }
 
-      if (iter && nb_nodes_ > nodelimit)
+      if (iter && nbnodes_ > nodelimit)
       {
          iter = false;
          status_ = OptimizationStatus::StopOnNodeLimit;
@@ -597,7 +597,7 @@ DEBUG("OBJ ENCLOSURE : " << objval_);
    }
    while (iter);
 
-   nb_pending_ = space.getNbNodes();
+   nbpending_ = space.getNbNodes();
 }
 
 void BOSolver::solve()

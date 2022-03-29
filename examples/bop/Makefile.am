@@ -9,12 +9,18 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-ACLOCAL_AMFLAGS = -I m4
+LDADD = ../../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 
-SUBDIRS = realpaver
-DIST_SUBDIRS = realpaver
+AM_CPPFLAGS = -I.. -I../../src
 
-includesrcdir = $(includedir)
-includesrc_HEADERS = realpaver_api.hpp
-      
-CLEANFILES = *~
+CLEANFILES = *~ *.log
+
+noinst_PROGRAMS = bop_solver
+
+bop_solver_SOURCES = bop_solver.cpp
+
+EXTRA_DIST = \
+	Beale.bop \
+	Colville.bop \
+	SixHumpCamel.bop \
+	ThreeHumpCamel.bop

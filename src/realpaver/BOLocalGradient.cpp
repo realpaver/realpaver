@@ -133,7 +133,7 @@ OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
    tim.start();
 
    bool iter = true;
-   size_t nb_iter = 0;
+   size_t nbiter = 0;
    OptimizationStatus status = OptimizationStatus::Optimal;
 
    do
@@ -170,7 +170,7 @@ DEBUG("pk norm : " << pk.l2Norm());
          }
 
          if (pk.l2Norm() < gtol_) iter = false;
-         if (++nb_iter > maxiter_) iter = false;
+         if (++nbiter > maxiter_) iter = false;
          if (tim.elapsedTime() > getTimeLimit()) iter = false;
       }
    }

@@ -19,7 +19,7 @@ BOSpace::BOSpace()
         ma_(),
         id_(0),
         ex_(0),
-        nb_nodes_(0)
+        nbnod_(0)
 {
    setFrequency(Param::GetIntParam("BB_SPACE_FREQUENCY"));
 }
@@ -69,13 +69,13 @@ Interval BOSpace::getObjEnclosure() const
 
 size_t BOSpace::getNbNodes() const
 {
-   return nb_nodes_;
+   return nbnod_;
 }
 
 void BOSpace::insertNode(const SharedBONode& node)
 {
    // one mode node
-   ++nb_nodes_;
+   ++nbnod_;
 
    // new item
    size_t i = id_++;

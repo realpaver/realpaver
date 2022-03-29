@@ -351,6 +351,7 @@ AC_CONFIG_FILES([Makefile
                  doc/Doxyfile
                  doc/Makefile
                  examples/Makefile
+                 examples/bop/Makefile
                  src/Makefile
                  src/realpaver/Makefile
                  work/Makefile])

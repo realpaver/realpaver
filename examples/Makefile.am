@@ -9,15 +9,17 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+SUBDIRS = bop
+DIST_SUBDIRS = bop
+
 LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 
 AM_CPPFLAGS = -I.. -I../src
 
-CLEANFILES = *~
+CLEANFILES = *~ *.log
 
-noinst_PROGRAMS = bop lp newton propag
+noinst_PROGRAMS = lp newton propag
 
-bop_SOURCES = bop.cpp
 lp_SOURCES = lp.cpp
 newton_SOURCES = newton.cpp
 propag_SOURCES = propag.cpp

@@ -1,0 +1,7 @@
+Variables
+   x in [-3, 3],
+   y in [-2, 2]
+;
+
+Objectives
+   MIN (4.0-2.1*x^2+x^4/3.0)*x^2 + x*y + (4.0*y^2-4.0)*y^2;
