@@ -15,6 +15,7 @@
 #include "realpaver/IntContractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/ListContractor.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/Selector.hpp"
 
@@ -525,6 +526,8 @@ void BOSolver::findInitialBounds(SharedBONode& node)
 void BOSolver::branchAndBound()
 {
 DEBUG("-- branchAndBound with sol_ : " << sol_);
+
+LOG_MAIN("Branch-and-bound algorithm");
 
    // creates the algorithmic components
    makeLocalSolver();

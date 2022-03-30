@@ -35,7 +35,7 @@ REL_OBJ_TOL = 1.0e-6
 FLOAT_PRECISION = 12
 
 # Log level
-LOG_LEVEL = SEARCH
+LOG_LEVEL = VERBOSE
 
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##

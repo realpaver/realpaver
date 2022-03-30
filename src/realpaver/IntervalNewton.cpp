@@ -78,8 +78,8 @@ void IntervalNewton::setInflator(const Inflator& inflator)
 
 Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
 {
-   LOG_INTERNAL("\nInterval Newton: contract " << x);
-   LOG_INTERNAL("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
+   LOG_LOW("\nInterval Newton: contract " << x);
+   LOG_LOW("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
 
    Proof proof = Proof::Maybe;
    Interval y = x;
@@ -91,7 +91,7 @@ Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
       Interval prev(y);
       Proof p = step(f, y);
 
-      LOG_INTERNAL("  step > " << p << " " << y);
+      LOG_LOW("  step > " << p << " " << y);
 
       if (p == Proof::Empty)
       {
@@ -116,7 +116,7 @@ Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
    }
    while (iter);
 
-   LOG_INTERNAL("> " << proof << " " << y);
+   LOG_LOW("> " << proof << " " << y);
 
    x = y;
    return proof;

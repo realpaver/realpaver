@@ -42,8 +42,8 @@ int main(int argc, char** argv)
          Logger::init(loglevel, log);
       }
 
-      LOG_SEARCH("Bound-constrained optimization" << filename);
-      LOG_SEARCH("Input file: " << filename);
+      LOG_MAIN("Bound-constrained optimization");
+      LOG_MAIN("Input file > " << filename);
 
       // parsing
       ok = parser.parseFile(filename, problem);

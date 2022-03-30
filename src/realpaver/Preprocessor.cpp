@@ -61,7 +61,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
 
-   LOG_COMPONENT("-- Preprocessing of problem --");
+   LOG_MAIN("Preprocessing");
 
    vvm_.clear();
    vim_.clear();
@@ -76,7 +76,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (domain.isEmpty())
       {
-         LOG_COMPONENT("   empty variable domain: " << v.getName());
+//         LOG_COMPONENT("   empty variable domain: " << v.getName());
          return false;
       }
 
@@ -85,7 +85,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (isFixed)
       {
-         LOG_COMPONENT("   replaces " << v.getName() << " by " << domain);
+//         LOG_COMPONENT("   replaces " << v.getName() << " by " << domain);
          vim_.insert(std::make_pair(v, domain));
          nbv_ = nbv_ + 1;
       }
@@ -120,12 +120,12 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (proof == Proof::Empty)
       {
-         LOG_COMPONENT("   constraint violated " << c);
+//         LOG_COMPONENT("   constraint violated " << c);
          return false;
       }
       else if (proof == Proof::Inner)
       {
-         LOG_COMPONENT("   inactive constraint " << c);
+//         LOG_COMPONENT("   inactive constraint " << c);
          nbc_ = nbc_ + 1;
       }
       else
@@ -146,7 +146,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
    if ((!obj.isConstant()) && fixer.getTerm().isConstant())
    {
-      LOG_COMPONENT("   fixed objective " << fixer.getTerm());
+//      LOG_COMPONENT("   fixed objective " << fixer.getTerm());
    }
    else
    {
@@ -161,8 +161,10 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
    for (size_t i=0; i<dest.nbVars(); ++i)
    {
       Variable v = dest.varAt(i);
-      if (dest.isFakeVar(v))
-         LOG_COMPONENT("   unconstrained variable " << v.getName());
+      
+      
+      //if (dest.isFakeVar(v))
+      //   LOG_COMPONENT("   unconstrained variable " << v.getName());
    }
 
    return true;

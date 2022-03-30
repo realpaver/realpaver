@@ -23,11 +23,11 @@ namespace realpaver {
 
 /// Logging levels
 enum class LogLevel {
-   none,       ///< no log
-   search,     ///< node level in a search algorithm
-   component,  ///< component level in a search algorithm
-   internal,   ///< internal level of components and algorithms
-   verbose     ///< verbose mode
+   none    ,    ///< no log
+   main    ,    ///< main level e.g. display results of first-class algorithms
+   inter   ,    ///< intermediary level e.g. display nodes in a search algorithm
+   low     ,    ///< low level e.g. display quantities in iterative methods
+   verbose      ///< verbose mode
 };
 
 std::string LogLevelToString(LogLevel level);
@@ -104,10 +104,10 @@ private:
 #  define LOG(level, msg)
 #endif
 
-#define LOG_SEARCH(msg)    LOG(LogLevel::search, msg)
-#define LOG_COMPONENT(msg) LOG(LogLevel::component, msg)
-#define LOG_INTERNAL(msg)  LOG(LogLevel::internal, msg)
-#define LOG_VERBOSE(msg)   LOG(LogLevel::verbose, msg)
+#define LOG_MAIN(msg)    LOG(LogLevel::main, msg)
+#define LOG_INTER(msg)   LOG(LogLevel::inter, msg)
+#define LOG_LOW(msg)     LOG(LogLevel::low, msg)
+#define LOG_VERBOSE(msg) LOG(LogLevel::verbose, msg)
 
 } // namespace
 
