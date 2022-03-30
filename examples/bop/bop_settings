@@ -35,7 +35,7 @@ REL_OBJ_TOL = 1.0e-6
 FLOAT_PRECISION = 12
 
 # Log level
-LOG_LEVEL = NONE
+LOG_LEVEL = SEARCH
 
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##
@@ -50,7 +50,7 @@ NODE_LIMIT = 120000
 # - 1 means that the node with the lowest lower bound is always selected;
 # - a value > 1 means that the node with the lowest upper bound is selected
 #   when the node counter modulo the frequency is equal to 0.
-BB_SPACE_FREQUENCY = 1
+BB_SPACE_FREQUENCY = 2
 
 ###############################################################################
 ## SPLITTING STRATEGIES                                                      ##
@@ -66,7 +66,7 @@ SPLIT_OBJECTIVE = NO
 # - MAX_DOM:     largest domain
 # - MAX_SMEAR:   maximum smear
 # - ROUND_ROBIN: round-robin strategy
-SPLIT_SELECTOR = MAX_DOM
+SPLIT_SELECTOR = ROUND_ROBIN
 
 # Domain splitting strategy
 # - BISECTION: divides a domain in two equal parts
@@ -112,7 +112,7 @@ BC3_ITER_LIMIT = 30
 # - HC4
 # - BC4
 # - MAX_CID_HC4
-PROPAGATION_ALGORITHM = HC4
+PROPAGATION_ALGORITHM = MAX_CID_HC4
 
 ###############################################################################
 ## LOCAL OPTIMiZATION                                                        ##

@@ -58,6 +58,7 @@ Param::Param()
    strmap_.insert(std::make_pair("SPLIT_SLICER",            "BISECTION"));
    strmap_.insert(std::make_pair("PROPAGATION_ALGORITHM",   "HC4"));
    strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",  "GRADIENT"));
+   strmap_.insert(std::make_pair("LOG_LEVEL",               "NONE"));
 }
 
 int Param::getIntParam(const string& name)
@@ -95,7 +96,7 @@ double Param::getDblParam(const string& name)
    auto it = dblmap_.find(name);
 
    if (it == dblmap_.end())
-      THROW("'" << name << "' is not a real parameter");
+      THROW("Symbol '" << name << "' is not a real parameter");
 
    return it->second;   
 }
@@ -110,7 +111,7 @@ void Param::setDblParam(const string& name, double val)
    auto it = dblmap_.find(name);
 
    if (it == dblmap_.end())
-      THROW("'" << name << "' is not a real parameter");
+      THROW("Symbol '" << name << "' is not a real parameter");
 
    dblmap_[name] = val;
 }
@@ -125,7 +126,7 @@ std::string Param::getStrParam(const string& name)
    auto it = strmap_.find(name);
 
    if (it == strmap_.end())
-      THROW("'" << name << "' is not a string parameter");
+      THROW("Symbol '" << name << "' is not a string parameter");
 
    return it->second;      
 }
@@ -140,7 +141,7 @@ void Param::setStrParam(const string& name, const std::string& val)
    auto it = strmap_.find(name);
 
    if (it == strmap_.end())
-      THROW("'" << name << "' is not a string parameter");
+      THROW("Symbol '" << name << "' is not a string parameter");
 
    strmap_[name] = val;   
 }
@@ -155,7 +156,7 @@ Tolerance Param::getTolParam(const string& name)
    auto it = tolmap_.find(name);
 
    if (it == tolmap_.end())
-      THROW("'" << name << "' is not a tolerance parameter");
+      THROW("Symbol '" << name << "' is not a tolerance parameter");
 
    return it->second;
 }
@@ -170,7 +171,7 @@ void Param::setTolParam(const string& name, const Tolerance& val)
    auto it = tolmap_.find(name);
 
    if (it == tolmap_.end())
-      THROW("'" << name << "' is not a tolerance parameter");
+      THROW("Symbol '" << name << "' is not a tolerance parameter");
 
    tolmap_[name] = val;
 }
@@ -182,7 +183,7 @@ void Param::SetTolParam(const string& name, const Tolerance& val)
 
 void Param::throwEx()
 {
-   THROW( "settings error in file '" << path_ << "' at line " << lineno_);
+   THROW("Settings error in file '" << path_ << "' at line " << lineno_);
 }
 
 bool Param::isInt(const std::string& s)

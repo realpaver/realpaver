@@ -57,6 +57,10 @@ public:
    /// @return the number of nodes that remains in the optimization space
    int getNbPendingNodes() const;
 
+   /// Assigns the parameters in this
+   /// @param prm parameters
+   void setParam(const Param& prm);
+
    ///@{
    /// Management of parameters
    /// Each method is delegated to the Param instance enclosed in this.

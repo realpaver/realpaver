@@ -67,18 +67,18 @@ Logger* Logger::getInstance()
 
 void Logger::init(LogLevel level, const std::string& path)
 {
-   THROW_IF(instance_.connected_, "the logger is already connected");
+   THROW_IF(instance_.connected_, "The logger is already connected");
 
    instance_.ofs_.open(path, std::ofstream::out);
 
-   THROW_IF(!instance_.ofs_.is_open(), "the log file cannot be open");
+   THROW_IF(!instance_.ofs_.is_open(), "The log file cannot be open");
 
    instance_.path_      = path;
    instance_.connected_ = true;
    instance_.level_     = level;
 
    std::time_t now = time(nullptr);
-   instance_.ofs_ << "log file "
+   instance_.ofs_ << "Log file "
                   << REALPAVER_STRING
                   << " @ "
                   << std::asctime(std::localtime(&now))
@@ -87,10 +87,33 @@ void Logger::init(LogLevel level, const std::string& path)
 
 void Logger::log(LogLevel level, const std::string& msg)
 {
-   THROW_IF(!instance_.connected_, "the logger is not connected");
+   THROW_IF(!instance_.connected_, "The logger is not connected");
 
    if (getSize() < getMaxSize())
       instance_.ofs_ << msg << std::endl;
+}
+
+std::string LogLevelToString(LogLevel level)
+{
+   switch(level)
+   {
+      case LogLevel::none:      return "NONE";
+      case LogLevel::search:    return "SEARCH";
+      case LogLevel::component: return "COMPONENT";
+      case LogLevel::internal:  return "INTERNAL";
+      case LogLevel::verbose:   return "VERBOSE";
+   }
+   return "NONE";
+}
+
+LogLevel StringToLogLevel(const std::string& s)
+{
+   if (s == "NONE")      return LogLevel::none;
+   if (s == "SEARCH")    return LogLevel::search;
+   if (s == "COMPONENT") return LogLevel::component;
+   if (s == "INTERNAL")  return LogLevel::internal;
+   if (s == "VERBOSE")   return LogLevel::verbose;
+   THROW("Symbol '" << s << "' is not a log level");
 }
 
 } // namespace

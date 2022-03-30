@@ -62,6 +62,11 @@ double BOSolver::getSolvingTime() const
    return stimer_.elapsedTime();
 }
 
+void BOSolver::setParam(const Param& prm)
+{
+   param_ = prm;
+}
+
 void BOSolver::loadParam(const std::string& filename)
 {
    param_.loadParam(filename);

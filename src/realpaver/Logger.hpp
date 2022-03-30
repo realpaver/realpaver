@@ -30,6 +30,9 @@ enum class LogLevel {
    verbose     ///< verbose mode
 };
 
+std::string LogLevelToString(LogLevel level);
+LogLevel StringToLogLevel(const std::string& s);
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a logger.
 ///
