@@ -9,6 +9,13 @@
 using namespace realpaver;
 using namespace std;
 
+#define BLACK(s) "\033[30m" << s << "\033[39m"
+#define RED(s)   "\033[31m" << s << "\033[39m"
+#define BLUE(s)  "\033[34m" << s << "\033[39m"
+#define GRAY(s)  "\033[37m" << s << "\033[39m"
+#define GREEN(s) "\033[32m" << s << "\033[39m"
+#define ORANGE(s) "\033[33m" << s << "\033[39m"
+
 size_t lengthVarName(const Problem& p);
 string logFilename(const std::string& filename);
 bool processArgs(int argc, char** argv, string& filename, string& pfilename);
@@ -36,10 +43,11 @@ int main(int argc, char** argv)
 
       // logger
       LogLevel loglevel = StringToLogLevel(prm.getStrParam("LOG_LEVEL"));
+      string flog = "";
       if (loglevel != LogLevel::none)
       {
-         string log = logFilename(filename);
-         Logger::init(loglevel, log);
+         flog = logFilename(filename);
+         Logger::init(loglevel, flog);
       }
 
       LOG_MAIN("Bound-constrained optimization");
@@ -61,55 +69,65 @@ int main(int argc, char** argv)
       solver.optimize();
       OptimizationStatus status = solver.getStatus();
 
-      std::string sep = "##################################################";
+      std::string sep =
+         "############################################################";
       std::string indent = "   ";
 
-      cout << sep << endl;
+      cout << GRAY(sep) << endl;
+      cout << BLUE("Realpaver BOUND CONSTRAINED GLOBAL OPTIMIZATION") << endl;
+      cout << indent << "Input file: " << filename << endl;
+      if (loglevel != LogLevel::none)
+      {
+         cout << indent << "Log file:   " << flog << endl;         
+      }
+      cout << indent << "Tolerance on the global optimum: "
+           << ORANGE(solver.getTolParam("OBJ_TOL")) << endl;
+
+      cout << GRAY(sep) << endl;
+      cout << BLUE("Solving effort") << endl;
       cout << std::fixed << std::setprecision(2)
            << indent << "Preprocessing time.......... "
-           << solver.getPreprocessingTime() << " (s)"
+           << ORANGE(solver.getPreprocessingTime() << "s")
            << endl;
 
       if (solver.getNbNodes() > 0)
       {
          cout << indent << "Solving time................ "
               << std::fixed << std::setprecision(2)
-              << solver.getSolvingTime() << " (s)"
+              << ORANGE(solver.getSolvingTime() << "s")
               << endl
               << indent << "Number of nodes............. "
-              << solver.getNbNodes() << endl;
+              << ORANGE(solver.getNbNodes()) << endl;
       }
       
-      cout << sep << endl;
+      cout << indent << "Status...................... ";
 
       if (status == OptimizationStatus::Infeasible)
       {
-         cout << indent << "PROBLEM INFEASIBLE" << endl;
+         cout << ORANGE("infeasible") << endl;
       }
       else
       {
          if (status == OptimizationStatus::Optimal)
          {
-            cout << indent << "GLOBAL OPTIMUM FOUND | "
-                 << solver.getTolParam("OBJ_TOL") << endl;
+            cout << ORANGE("optimal") << endl;
          }
          else
          {
-            cout << indent << "GLOBAL OPTIMUM NOT FOUND " << endl;
 
             if (status == OptimizationStatus::StopOnTimeLimit)
             {
-               cout << indent << "TIME LIMIT REACHED: "
-                    << solver.getDblParam("TIME_LIMIT") << "(s)" << endl;
+               cout << ORANGE("time limit reached") << endl;
             }
             
             if (status == OptimizationStatus::StopOnNodeLimit)
             {
-               cout << indent << "NODE LIMIT REACHED: "
-                    << solver.getIntParam("NODE_LIMIT") << endl;
+               cout << ORANGE("node limit reached") << endl;
             }
          }
 
+         cout << GRAY(sep) << endl;
+         cout << BLUE("Solution found") << endl;
          cout << std::scientific << std::setprecision(prec);
    
          RealPoint sol = solver.getBestSolution();
@@ -126,9 +144,8 @@ int main(int argc, char** argv)
          else
             cout << " = " << z << endl;
 
-         for (size_t i=0; i<problem.nbVars(); ++i)
+         for (auto v : sol.scope())
          {
-            Variable v = problem.varAt(i);
             cout <<  indent << v.getName();
 
             for (size_t j=v.getName().size(); j<lmax; ++j) cout << " ";
@@ -136,7 +153,7 @@ int main(int argc, char** argv)
             cout << " = " << sol.get(v) << endl;
          }
       }
-      cout << sep << endl;
+      cout << GRAY(sep) << endl;
    }
    catch(Exception e) {
       cout << e.what() << endl;

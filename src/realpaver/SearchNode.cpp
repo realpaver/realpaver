@@ -17,6 +17,7 @@ SearchNode::SearchNode(const Scope& scope, const IntervalRegion& reg,
       : scope_(scope),
         reg_(nullptr),
         depth_(depth),
+        index_(0),
         v_()
 {
    ASSERT(depth >= 0, "Bad depth of a search node " << depth);
@@ -49,6 +50,16 @@ void SearchNode::setDepth(int depth)
    ASSERT(depth >= 0, "Bad node depth " << depth);
 
    depth_ = depth;
+}
+
+int SearchNode::index() const
+{
+   return index_;
+}
+
+void SearchNode::setIndex(int id)
+{
+   index_ = id;
 }
 
 void SearchNode::incrementDepth()

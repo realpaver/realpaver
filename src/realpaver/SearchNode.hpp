@@ -41,6 +41,13 @@ public:
    /// @param depth new depth
    void setDepth(int depth);
 
+   /// @return the index of this in the search tree
+   int index() const;
+
+   /// Sets the index of this in the search tree
+   /// @param id new index
+   void setIndex(int id);
+
    /// Increments the depth of this
    void incrementDepth();
 
@@ -60,7 +67,7 @@ public:
 private:
    Scope scope_;
    IntervalRegion* reg_;
-   int depth_;
+   int depth_, index_;
    Variable v_;
 };
 

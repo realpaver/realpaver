@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/BOLocalGradient.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Timer.hpp"
 
@@ -101,9 +102,6 @@ double BOLocalGradient::findStep(DiffRealFunction& f, RealVector& x,
 
       step /= 2.0;
 
-DEBUG("STEP :  " << step);
-
-
       if (step < stol_) iter = false;
    }
 
@@ -136,11 +134,17 @@ OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
    size_t nbiter = 0;
    OptimizationStatus status = OptimizationStatus::Optimal;
 
+
+   LOG_LOW("Local solver based on gradient descent");
+   LOG_LOW("Starting point: " << src);
+
    do
    {
       uk = h->realEvalDiff(RealPoint(scope, xk), gk);
       if (Double::isNan(uk) || gk.isNan())
       {
+         LOG_LOW("Failure on NaN");
+         
          status = OptimizationStatus::Other;
          iter = false;
       }
@@ -149,35 +153,57 @@ OptimizationStatus BOLocalGradient::minimize(RealFunction& f,
          pk = -gk;
          step = findStep(*h, xk, gk, pk, uk);
 
-DEBUG("pk norm : " << pk.l2Norm());
-
-
          if (step > 0.0)
          {
             xk_next = xk + step * pk;
+            LOG_FULL("Next point: " << xk_next);
+
             if (reg.contains(RealPoint(scope, xk_next)))
             {
                xk = xk_next;
             }
             else
             {
+               LOG_FULL("Next point outside the given region > Stop");
+
                iter = false;
             }
          }
          else
          {
+            LOG_FULL("Failure of Armijo line search > Stop");
+
             iter = false;
          }
 
-         if (pk.l2Norm() < gtol_) iter = false;
-         if (++nbiter > maxiter_) iter = false;
-         if (tim.elapsedTime() > getTimeLimit()) iter = false;
+         if (pk.l2Norm() < gtol_)
+         {
+            LOG_LOW("Stop on tolerance on the norm of the gradient ("
+                    << gtol_ << ")");
+
+            iter = false;
+         }
+         if (++nbiter > maxiter_)
+         {
+            LOG_LOW("Stop on iteration limit (" << maxiter_ << ")");
+
+            iter = false;
+         }
+         if (tim.elapsedTime() > getTimeLimit())
+         {
+            LOG_LOW("Stop on time limit (" << getTimeLimit() << "s)");
+
+            iter = false;
+         }
       }
    }
    while(iter);
 
    tim.stop();
    dest = RealPoint(scope, xk);
+
+   LOG_LOW("Final point: " << dest);
+
    return status;
 }
 

@@ -27,7 +27,7 @@ enum class LogLevel {
    main    ,    ///< main level e.g. display results of first-class algorithms
    inter   ,    ///< intermediary level e.g. display nodes in a search algorithm
    low     ,    ///< low level e.g. display quantities in iterative methods
-   verbose      ///< verbose mode
+   full         ///< verbose mode
 };
 
 std::string LogLevelToString(LogLevel level);
@@ -104,10 +104,10 @@ private:
 #  define LOG(level, msg)
 #endif
 
-#define LOG_MAIN(msg)    LOG(LogLevel::main, msg)
-#define LOG_INTER(msg)   LOG(LogLevel::inter, msg)
-#define LOG_LOW(msg)     LOG(LogLevel::low, msg)
-#define LOG_VERBOSE(msg) LOG(LogLevel::verbose, msg)
+#define LOG_MAIN(msg)  LOG(LogLevel::main, msg)
+#define LOG_INTER(msg) LOG(LogLevel::inter, msg)
+#define LOG_LOW(msg)   LOG(LogLevel::low, msg)
+#define LOG_FULL(msg)  LOG(LogLevel::full, msg)
 
 } // namespace
 

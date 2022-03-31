@@ -118,6 +118,8 @@ private:
    // Solving methods
    bool preprocess();
    bool presolve();
+   void calculateLowerInit(SharedBONode& node);
+   void calculateUpperInit(SharedBONode& node);
    void calculateLower(SharedBONode& node);
    void calculateUpper(SharedBONode& node);
    void saveIncumbent(const RealPoint& pt);

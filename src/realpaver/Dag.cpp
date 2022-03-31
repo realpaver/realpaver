@@ -1906,10 +1906,6 @@ size_t Dag::insertVarNode(const Variable& v)
    else
       index = it->second;
 
-DEBUG("insert var node : " << v.getName() << " @ " << index);
-
-
-
    return index;
 }
 

@@ -185,7 +185,7 @@ void ScopeRep::print(std::ostream& os) const
       if (first) first = false;
       else os << ", ";
 
-      os << it.first.getName() << "|" << it.second;
+      os << it.first.getName();
    }
    os << "}";
 }

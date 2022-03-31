@@ -10,6 +10,7 @@
 #ifndef REALPAVER_PREPROCESSOR_HPP
 #define REALPAVER_PREPROCESSOR_HPP
 
+#include <unordered_set>
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Problem.hpp"
 
@@ -65,8 +66,11 @@ public:
    /// @return true if the domain of 'v' is fixed
    bool hasFixedDomain(Variable v) const;
 
-   /// @return true if all the variables of the source problem are fixed
-   bool areAllVarFixed() const;
+   /// Tests if a variable of the source problem is fake
+   /// @param v a variable of the source problem
+   /// @return true if 'v' does not occur in the constraints or the
+   ///         objective function
+   bool isFake(Variable v) const;
 
    /// Gets the domain of a fixed variable
    /// @param v a variable
@@ -79,19 +83,18 @@ public:
    /// @return the variable of the destination problem associated with 'v'
    Variable srcToDestVar(Variable v) const;
 
-   /// @return the number of variables fixed in the last problem preprocessed
-   size_t getNbVarFixed() const;
+   /// @return true if all the variables from the source problem are
+   ///         either fake or fixed
+   bool allVarsRemoved() const;
 
-   /// @return the number of constraints removed from the last problem
-   ///         preprocessed
-   size_t getNbCtrRemoved() const;
+   /// @return the scope of the source problem minus the fake variables
+   Scope trueScope() const;
 
 private:
-   VarVarMapType vvm_;
-   VarIntervalMapType vim_;
-
-   size_t nbv_;   // number of variables fixed
-   size_t nbc_;   // number of variables removed
+   VarVarMapType vvm_;                 // map for non fixed variables
+   VarIntervalMapType vim_;            // map for fixed variables
+   std::unordered_set<size_t> fake_;   // indexes of fake variables
+   size_t nbc_;                        // number of constraints removed
 };
 
 } // namespace

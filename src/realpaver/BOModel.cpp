@@ -41,9 +41,8 @@ BOModel::BOModel(Problem& problem, bool withobj)
    for (size_t i=0; i<problem.nbVars(); ++i)
    {
       Variable v = problem.varAt(i);
-      THROW_IF(!to.dependsOn(v), "Variable " << v.getName()
-                                             << " does not occur "
-                                             << "in the objective function");
+
+      if (!to.dependsOn(v)) continue;
 
       TermDeriver deriver(v);
       tomin.acceptVisitor(deriver);
@@ -81,22 +80,14 @@ BOModel::BOModel(Problem& problem, bool withobj)
       Term::simplification(simpl);
    }
 
-DEBUG("DAG : \n " << *dag_);
-
-
    // initial region
    init_ = new IntervalRegion(fullscope_);
 
-   for (size_t i=0; i<problem.nbVars(); ++i)
-   {
-      Variable v = problem.varAt(i);
+   for (Variable v : objscope_)
       init_->set(v, problem.getDomain(v));
-   }
 
    if (withobj)
-   {
       init_->set(z_, Interval::universe());
-   }
 }
 
 BOModel::~BOModel()

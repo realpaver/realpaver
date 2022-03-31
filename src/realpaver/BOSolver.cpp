@@ -279,8 +279,14 @@ bool BOSolver::preprocess()
       return false;
    }
 
+   // Recreates the solution and eliminates the fake variables
+   Scope sco = preproc.trueScope(); 
+   sol_ = IntervalRegion(sco);
+
+   LOG_INTER("Scope of the solution: " << sco);
+
    // assigns the fixed domains in the solution
-   for (auto v : problem_.scope())
+   for (auto v : sco)
    {
       if (preproc.hasFixedDomain(v))
          sol_.set(v, preproc.getFixedDomain(v));
@@ -292,10 +298,12 @@ bool BOSolver::preprocess()
       }
    }
 
-   if (preproc.areAllVarFixed())
+   if (preproc.allVarsRemoved())
    {
       Term t = problem_.getObjective().getTerm();
       objval_ = t.eval(sol_);
+
+      LOG_MAIN("All the variables are fixed");
 
       status_ = objval_.isEmpty() ? OptimizationStatus::Infeasible :
                                     OptimizationStatus::Optimal;
@@ -365,6 +373,16 @@ bool BOSolver::presolve()
    return true;
 }
 
+void BOSolver::calculateLowerInit(SharedBONode& node)
+{
+   IntervalRegion* reg = node->region();
+   Interval e = model_->intervalEval(*reg);
+
+   node->setLower(e.left());
+   
+   // TODO
+}
+
 void BOSolver::calculateLower(SharedBONode& node)
 {
    IntervalRegion* reg = node->region();
@@ -388,10 +406,13 @@ void BOSolver::saveIncumbent(const RealPoint& pt)
    }
 }
 
+void BOSolver::calculateUpperInit(SharedBONode& node)
+{
+   calculateUpper(node);
+}
+
 void BOSolver::calculateUpper(SharedBONode& node)
 {
-DEBUG("\ncalculateUpper, current upper bound " << upper_);
-
    IntervalRegion* reg = node->region();
    RealPoint src = reg->midpointOnScope(model_->getObjScope());
    RealPoint dest(src);
@@ -399,31 +420,24 @@ DEBUG("\ncalculateUpper, current upper bound " << upper_);
    // local optimization
    OptimizationStatus status = localSolver_->minimize(*model_, *reg, src, dest);
 
-DEBUG("   src = " << src);
-DEBUG("   local optim -> " << status);
-
    if (status == OptimizationStatus::Optimal)
    {
-DEBUG("   dest = " << dest);
-
-
       // safe interval evaluation at the final point
       Interval e = model_->intervalPointEval(dest);
-
-DEBUG("   e = " << e);
 
       if (!e.isEmpty())
       {
          double u = e.right();
          node->setUpper(u);
 
-      DEBUG("   UPPER BOUND " << u);
-
          // new upper bound of the global minimum?
          if (u < upper_)
          {
             upper_ = u;
             saveIncumbent(dest);
+
+            LOG_INTER("New upper bound of the global optimum: " << upper_);
+            LOG_INTER("New incumbent solution: " << getBestSolution());
          }
       }
    }
@@ -436,16 +450,14 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 
    SharedBONode node = space.extractNode();
 
-DEBUG("\n#########\nNODE : " << *node->region() << " l: "
-                             << node->getLower()
-                             << " u: " << node->getUpper());
+   LOG_INTER("Extracts node " << node->index());
 
    // splits the node
    split_->apply(node);
 
    if (split_->getNbNodes() == 1)
    {
-DEBUG("   sol NODE !");
+      LOG_INTER("Node small enough");
 
       sol.insertNode(node);
       return true;
@@ -454,6 +466,9 @@ DEBUG("   sol NODE !");
    {
       Variable v = model_->getObjVar();
 
+      LOG_INTER("Splits node " << node->index() << " > "
+                               << split_->getNbNodes() << " sub-nodes");
+
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
          ++nbnodes_;
@@ -461,9 +476,17 @@ DEBUG("   sol NODE !");
          SharedBONode subnode = *it;
          IntervalRegion* reg = subnode->region();
 
+         node->setIndex(nbnodes_);
+
+         LOG_INTER("Node " << node->index() << ": " << *reg);
+
          // BB theorem
          Interval z(reg->get(v));
-         if (z.left() > upper_) continue;
+         if (z.left() > upper_)
+         {
+            LOG_INTER("Node fathomed by BB theorem");
+            continue;
+         }
 
          // assigns the upper bound before propagation
          if (z.right() > upper_)
@@ -471,19 +494,16 @@ DEBUG("   sol NODE !");
             z.setRight(upper_);
             reg->set(v, z);
          }
-DEBUG("sub NODE : " << *reg);
 
          Proof proof = contractor_->contract(*reg);
-
-DEBUG("proof : " << proof << "  -> " << *reg);
+         LOG_INTER("Contraction -> " << proof);
 
          if (proof != Proof::Empty)
          {
+            LOG_INTER("New region: " << *reg);
+
             calculateLower(subnode);
             calculateUpper(subnode);
-
-DEBUG("    ... l : " << subnode->getLower());
-DEBUG("    ... u : " << subnode->getUpper());
 
             THROW_IF(subnode->getLower() > subnode->getUpper(),
                      "Lower bound greater than upper bound in a BO node");
@@ -501,33 +521,32 @@ DEBUG("    ... u : " << subnode->getUpper());
 
 void BOSolver::findInitialBounds(SharedBONode& node)
 {
+   LOG_INTER("Node " << node->index() << ": " << *node->region());
+
    // upper bound of the global minimum
    upper_ = Double::inf();
 
-   calculateLower(node);
-   calculateUpper(node);
+   calculateLowerInit(node);
+   calculateUpperInit(node);
+
+   LOG_INTER("Upper bound: " << node->getUpper());
+   LOG_INTER("Lower bound: " << node->getLower());
 
    Interval z(node->getLower(), node->getUpper());
 
    if (z.isEmpty())
    {
+      LOG_MAIN("Lower bound > upper bound");
       status_ = OptimizationStatus::Infeasible;
       return;
    }
 
    node->region()->set(model_->getObjVar(), z);
-
-   DEBUG("Node bounds : " << z);
-
-   // TODO, local optimization
-   // restart, ...   
 }
 
 void BOSolver::branchAndBound()
 {
-DEBUG("-- branchAndBound with sol_ : " << sol_);
-
-LOG_MAIN("Branch-and-bound algorithm");
+   LOG_MAIN("Branch-and-bound algorithm");
 
    // creates the algorithmic components
    makeLocalSolver();
@@ -551,6 +570,8 @@ LOG_MAIN("Branch-and-bound algorithm");
                                       model_->getObjVar(),
                                       model_->getInitRegion());
    }
+
+   node->setIndex(0);
 
    // finds bounds of the objective in the initial node
    findInitialBounds(node);
@@ -582,10 +603,9 @@ LOG_MAIN("Branch-and-bound algorithm");
       double L = std::min(space.getLowestLowerBound(), sol.getLowestLowerBound());
       objval_ = Interval(L, upper_);
 
-DEBUG("OBJ ENCLOSURE : " << objval_);
-
       if (iter && otol.hasTolerance(objval_))
       {
+         LOG_MAIN("Stop on global optimum at desired tolerance");
          iter = false;
          status_ = OptimizationStatus::Optimal;         
       }
@@ -593,12 +613,14 @@ DEBUG("OBJ ENCLOSURE : " << objval_);
       if (iter &&
           ptimer_.elapsedTime() + stimer_.elapsedTime() > timelimit)
       {
+         LOG_MAIN("Stop on time limit (" << timelimit << "s)");
          iter = false;
          status_ = OptimizationStatus::StopOnTimeLimit;
       }
 
       if (iter && nbnodes_ > nodelimit)
       {
+         LOG_MAIN("Stop on node limit (" << nodelimit << ")");
          iter = false;
          status_ = OptimizationStatus::StopOnNodeLimit;
       }
@@ -606,14 +628,20 @@ DEBUG("OBJ ENCLOSURE : " << objval_);
    while (iter);
 
    nbpending_ = space.getNbNodes();
+
+   LOG_MAIN("Number of nodes processed: " << nbnodes_+1);
 }
 
 void BOSolver::solve()
 {
    delete model_;
 
+   LOG_INTER("Creates the solving model");
+
    // creates the solving model
    model_ = new BOModel(solprob_, true);
+
+   LOG_LOW("DAG of presolved problem\n" << *model_->getDag());
 
    // manages the status of every variable: interior or boundary
    for (auto it = vmap31_.begin(); it != vmap31_.end(); ++it)
@@ -626,10 +654,12 @@ void BOSolver::solve()
 
       if (dv.strictlyContains(dsv))
       {
+         LOG_INTER("Interior variable: " << v.getName());
          model_->setInteriorVar(sv);
       }
       else
       {
+         LOG_INTER("Boundary variable: " << v.getName());
          model_->setBoundaryVar(sv);
       }
    }
@@ -640,7 +670,7 @@ void BOSolver::solve()
 
 bool BOSolver::optimize()
 {
-   DEBUG("---------- Input problem\n" << problem_);
+   LOG_MAIN("Input problem\n" << problem_);
 
    status_ = OptimizationStatus::Other;
    ptimer_.start();
@@ -648,24 +678,32 @@ bool BOSolver::optimize()
    // first phase: preprocessing
    bool pfeasible = preprocess();
 
-DEBUG("\n---------- Simplified problem\n" << preprob_);
+   LOG_MAIN("Simplified problem\n" << preprob_);
 
    if (status_ == OptimizationStatus::Infeasible ||
        status_ == OptimizationStatus::Optimal)
    {
       ptimer_.stop();
+
+      LOG_MAIN("Problem solved after the preprocessing phase");
+      LOG_MAIN("Preprocessing time: " << ptimer_.elapsedTime() << "s");
+
       return pfeasible;
    }
 
    // second phase: presolving
    bool sfeasible = presolve();
 
-DEBUG("\n---------- Presolved problem\n" << solprob_);
+   LOG_MAIN("Presolved problem\n" << solprob_);
 
    if (status_ == OptimizationStatus::Infeasible ||
        status_ == OptimizationStatus::Optimal)
    {
       ptimer_.stop();
+
+      LOG_MAIN("Problem solved after the presolving phase");
+      LOG_MAIN("Preprocessing time: " << ptimer_.elapsedTime() << "s");
+
       return sfeasible;
    }
 
@@ -677,8 +715,15 @@ DEBUG("\n---------- Presolved problem\n" << solprob_);
 
    stimer_.stop();
 
-DEBUG("\nEND OF OPTIMIZATION");
-DEBUG("sol = " << sol_ << "\n\n");
+   LOG_MAIN("Preprocessing time: " << ptimer_.elapsedTime() << "s");
+   LOG_MAIN("Solving time: " << stimer_.elapsedTime() << "s");
+   LOG_MAIN("Optimization status: " << status_);
+
+   if (status_ == OptimizationStatus::Optimal)
+   {
+      LOG_MAIN("Best point found: " << getBestSolution());
+      LOG_MAIN("Global optimum: " << getObjEnclosure());
+   }
 
    return true;
 }

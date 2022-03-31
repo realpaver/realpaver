@@ -92,8 +92,8 @@ void Logger::log(LogLevel level, const std::string& msg)
 
    if (getSize() < getMaxSize())
    {
-      std::string s = LogLevelToString(level) + ":";
-      instance_.ofs_ << std::setw(6) << std::left << s;
+      std::string s = LogLevelToString(level) + ".";
+      instance_.ofs_ << std::setw(7) << std::left << s;
       instance_.ofs_ << msg << std::endl;
    }
 }
@@ -102,22 +102,22 @@ std::string LogLevelToString(LogLevel level)
 {
    switch(level)
    {
-      case LogLevel::none:    return "NONE";
-      case LogLevel::main:    return "MAIN";
-      case LogLevel::inter:   return "INTER";
-      case LogLevel::low:     return "LOW";
-      case LogLevel::verbose: return "VERBOSE";
+      case LogLevel::none:  return "NONE";
+      case LogLevel::main:  return "MAIN";
+      case LogLevel::inter: return "INTER";
+      case LogLevel::low:   return "LOW";
+      case LogLevel::full:  return "FULL";
    }
    return "NONE";
 }
 
 LogLevel StringToLogLevel(const std::string& s)
 {
-   if (s == "NONE")    return LogLevel::none;
-   if (s == "MAIN")    return LogLevel::main;
-   if (s == "INTER")   return LogLevel::inter;
-   if (s == "LOW")     return LogLevel::low;
-   if (s == "VERBOSE") return LogLevel::verbose;
+   if (s == "NONE")  return LogLevel::none;
+   if (s == "MAIN")  return LogLevel::main;
+   if (s == "INTER") return LogLevel::inter;
+   if (s == "LOW")   return LogLevel::low;
+   if (s == "FULL")  return LogLevel::full;
    THROW("Symbol '" << s << "' is not a log level");
 }
 

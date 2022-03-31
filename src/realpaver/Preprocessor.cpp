@@ -12,9 +12,15 @@
 
 namespace realpaver {
 
-bool Preprocessor::areAllVarFixed() const
+bool Preprocessor::allVarsRemoved() const
 {
    return vvm_.empty();
+}
+
+bool Preprocessor::isFake(Variable v) const
+{
+   auto it = fake_.find(v.getId());
+   return it != fake_.end();
 }
 
 bool Preprocessor::hasFixedDomain(Variable v) const
@@ -38,16 +44,6 @@ Variable Preprocessor::srcToDestVar(Variable v) const
    auto it = vvm_.find(v);
    return it->second;
 }
-
-size_t Preprocessor::getNbVarFixed() const
-{
-   return nbv_;
-}
-
-size_t Preprocessor::getNbCtrRemoved() const
-{
-   return nbc_;
-}
    
 bool Preprocessor::apply(const Problem& src, Problem& dest)
 {
@@ -65,7 +61,8 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
    vvm_.clear();
    vim_.clear();
-   nbv_ = nbc_ = 0;
+   fake_.clear();
+   nbc_ = 0;
 
    for (size_t i=0; i<src.nbVars(); ++i)
    {
@@ -76,8 +73,15 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (domain.isEmpty())
       {
-//         LOG_COMPONENT("   empty variable domain: " << v.getName());
+         LOG_MAIN("Empty domain of variable: " << v.getName());
          return false;
+      }
+
+      if (src.isFakeVar(v))
+      {
+         LOG_INTER("Useless variable: " << v.getName());
+         fake_.insert(v.getId());
+         continue;
       }
 
       bool isFixed = isContinuous ? domain.isCanonical() :
@@ -85,9 +89,8 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (isFixed)
       {
-//         LOG_COMPONENT("   replaces " << v.getName() << " by " << domain);
+         LOG_INTER("Fixes " << v.getName() << " := " << domain);
          vim_.insert(std::make_pair(v, domain));
-         nbv_ = nbv_ + 1;
       }
       else
       {
@@ -102,12 +105,13 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
       }
    }
 
-   // this region is useful if some variables are not fixed, i.e. we have
-   // nb_ < src.nbVars(), and in this case Y is assigned to dest.getDomains();
-   // otherwise it is useless and it is assigned to src.getDomains() in order
-   // to prevent errors
-   IntervalRegion Y = (nbv_ < src.nbVars()) ? dest.getDomains() :
-                                              src.getDomains();
+   LOG_MAIN("Number of fixed variables: " << vim_.size());
+   LOG_MAIN("Number of fake variables: " << fake_.size());
+
+   // this region is useful if some variables are not fixed and in this case
+   // Y is assigned to dest.getDomains(); otherwise it is useless and it is
+   // assigned to src.getDomains() in order to prevent errors
+   IntervalRegion Y = (vvm_.empty()) ? src.getDomains() : dest.getDomains();
 
    // rewrites the constraints
    for (size_t i=0; i<src.nbCtrs(); ++i)
@@ -120,12 +124,12 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (proof == Proof::Empty)
       {
-//         LOG_COMPONENT("   constraint violated " << c);
+         LOG_MAIN("Constraint violated: " << c);
          return false;
       }
       else if (proof == Proof::Inner)
       {
-//         LOG_COMPONENT("   inactive constraint " << c);
+         LOG_INTER("Inactive constraint: " << c);
          nbc_ = nbc_ + 1;
       }
       else
@@ -134,11 +138,17 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
       }
    }
 
+   LOG_MAIN("Number of inactive constraints: " << nbc_);
+
    Objective obj = src.getObjective();
 
    // checks the range of the objective function
    Interval dobj = obj.getTerm().eval(src.getDomains());
-   if (dobj.isEmpty()) return false;
+   if (dobj.isEmpty())
+   {
+      LOG_MAIN("Empty range of the objective function");
+      return false;
+   }
 
    // simplifies the objective function
    TermFixer fixer(&vvm_, &vim_);
@@ -146,7 +156,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
    if ((!obj.isConstant()) && fixer.getTerm().isConstant())
    {
-//      LOG_COMPONENT("   fixed objective " << fixer.getTerm());
+      LOG_INTER("Fixed objective function: " << fixer.getTerm());
    }
    else
    {
@@ -157,17 +167,17 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
          dest.addObjective(MAX(fixer.getTerm()));
    }
 
-   // detects fake variables
-   for (size_t i=0; i<dest.nbVars(); ++i)
-   {
-      Variable v = dest.varAt(i);
-      
-      
-      //if (dest.isFakeVar(v))
-      //   LOG_COMPONENT("   unconstrained variable " << v.getName());
-   }
-
    return true;
+}
+
+Scope Preprocessor::trueScope() const
+{
+   Scope sco;
+
+   for (auto p : vim_) sco.insert(p.first);
+   for (auto p : vvm_) sco.insert(p.first);
+
+   return sco;
 }
 
 } // namespace

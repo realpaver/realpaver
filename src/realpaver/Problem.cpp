@@ -155,8 +155,7 @@ void Problem::setDomain(Variable v, const Interval& x)
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
-   if (p.isEmpty())
-      return os << "empty problem";
+   if (p.isEmpty()) return os << "Nothing in this problem";
    
    std::string indent = "   ",
                s_var  = "Variables",
@@ -196,7 +195,7 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
          }
       }
    }
-   os << std::endl << ";" << std::endl;
+   os << std::endl << ";";
 
    // integer variables
    if (intvar)
@@ -213,7 +212,7 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
             os << v.getName();
          }
       }
-      os << std::endl << ";" << std::endl;
+      os << std::endl << ";";
    }
 
    // constraints
@@ -228,14 +227,14 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
 
          os << indent << p.ctrAt(i);
       }
-      os << std::endl << ";" << std::endl;
+      os << std::endl << ";";
    }
 
    // objective function
    if (p.hasObjective())
    {
       os << std::endl << s_obj << std::endl;
-      os << indent << p.getObjective() << std::endl << ";" << std::endl;
+      os << indent << p.getObjective() << std::endl << ";";
    }
 
    return os;
