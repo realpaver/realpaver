@@ -84,6 +84,12 @@ public:
    /// @return the number of 1 in this
    size_t nbOnes() const;
 
+   /// @return true if all the bits are equal to 1
+   bool areAllOnes() const;
+
+   /// @return true if all the bits are equal to 0
+   bool areAllZeros() const;
+
    /// Output on a stream
    /// @param os output stream
    void print(std::ostream& os) const;

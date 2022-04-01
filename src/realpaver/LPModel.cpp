@@ -47,6 +47,12 @@ void LinVarRep::setUB(double ub)
    ub_ = ub;
 }
 
+void LinVarRep::setDomain(const Interval& x)
+{
+   lb_ = x.left();
+   ub_ = x.right();
+}
+
 void LinVarRep::setName(const std::string& name)
 {
    name_ = name;
@@ -122,6 +128,11 @@ void LinVar::setLB(double lb)
 void LinVar::setUB(double ub)
 {
    rep_->setUB(ub);
+}
+
+void LinVar::setDomain(const Interval& x)
+{
+   rep_->setDomain(x);
 }
 
 void LinVar::setName(const std::string& name)
@@ -222,9 +233,10 @@ LinExpr::LinExpr(const std::initializer_list<double>& lc,
       addTerm(*ic, *iv);
 }
 
-void LinExpr::addTerm(double a, LinVar v)
+LinExpr& LinExpr::addTerm(double a, LinVar v)
 {
    rep_->addTerm(a, v);
+   return *this;
 }
 
 int LinExpr::getNbTerms() const
@@ -404,6 +416,11 @@ LinVar LPModel::makeVar(double lb, double ub, const std::string& name)
    bool continuous = true;
    vars_.push_back(LinVar(index, lb, ub, continuous, name));
    return vars_.back();
+}
+
+void LPModel::addCtr(LinCtr c)
+{
+   ctrs_.push_back(c);
 }
 
 void LPModel::addCtr(double lb, LinExpr e, double ub)

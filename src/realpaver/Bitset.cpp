@@ -195,6 +195,31 @@ size_t Bitset::nbOnes() const
    return nb;
 }
 
+bool Bitset::areAllOnes() const
+{
+   size_t last = wcount_ - 1, w;
+
+   for (size_t i=0; i<last; ++i)
+   {
+      w = ~word_[i];
+      if (w != 0) return false;
+   }
+
+   // last word
+   w = (~word_[last]) & shadow_word_;
+   if (w != 0) return false;
+
+   return true;
+}
+
+bool Bitset::areAllZeros() const
+{
+   for (size_t i=0; i<wcount_; ++i)
+      if (word_[i]!=0) return false;
+
+   return true;
+}
+
 void Bitset::print(std::ostream& os) const
 {
    if (size_ == 0)

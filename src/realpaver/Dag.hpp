@@ -163,6 +163,10 @@ public:
    /// @param i index of a linear variable
    void setIndexLinVar(int i);
 
+   /// Linearizes this node
+   /// @param lm output LP model
+   void linearize(LPModel& lm);
+
    /// Visitor pattern
    /// @param vis a visitor
    virtual void acceptVisitor(DagVisitor& vis) const = 0;
@@ -224,6 +228,9 @@ public:
 protected:
    Bitset bitset_;   // set of variables occurring in this
 
+   // inserts constraints for this node in a LP model
+   virtual void linearizeImpl(LPModel& lm) = 0;
+
 private:
    Dag* dag_;        // the DAG
    size_t index_;    // index of this node in the DAG
@@ -259,6 +266,7 @@ public:
    bool diffOnly(const Variable& v);
    void reval(const RealPoint& pt);
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 
    /// @return the constant interval value
@@ -294,6 +302,7 @@ public:
    bool diffOnly(const Variable& v);
    void reval(const RealPoint& pt);
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 
 private:
@@ -373,6 +382,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
  
@@ -394,6 +404,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -415,6 +426,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -436,6 +448,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -457,6 +470,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -478,6 +492,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -499,6 +514,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -520,6 +536,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -541,6 +558,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -562,6 +580,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -583,6 +602,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -610,6 +630,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 
 private:
@@ -634,6 +655,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -655,6 +677,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -676,6 +699,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -697,6 +721,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -718,6 +743,7 @@ public:
    bool diff();
    void reval();
    bool rdiff();
+   void linearizeImpl(LPModel& lm);
    ///@}
 };
 
@@ -946,6 +972,13 @@ public:
    /// @return the partial derivative of this with respect to v
    double realDeriv(const Variable& v) const;
 
+   /// Linearizes this function
+   /// @param lm output LP model
+   ///
+   /// Each node of this such that the index of the corresponding linear
+   /// variable is less than 0 is linearized
+   void linearize(LPModel& lm);
+
 private:
    Dag* dag_;                    // the DAG
    std::vector<DagNode*> node_;  // vector of nodes of the function sorted by
@@ -1124,6 +1157,15 @@ public:
    /// Real (point) evaluation
    /// @param pt values of variables
    void reval(const RealPoint& pt);
+
+   /// Linearizes the DAG
+   /// @param lm output LP model
+   void linearize(LPModel& lm);
+
+   /// Linearizes a part of the DAG
+   /// @param lm output LP model
+   /// @param bs bitset such that bs[i] = 1 if the i-th function is linearized
+   void linearize(LPModel& lm, const Bitset& bs);
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

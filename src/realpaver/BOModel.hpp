@@ -89,6 +89,17 @@ public:
    /// @return true if v is an interior variable
    bool isInteriorVar(Variable v) const;
 
+   /// Makes a bitset stating which functions to relax
+   /// @param reg domains of variables
+   /// @return a bitset such that the i-th bit is equal to 1 if the i-th
+   ///         function in the DAG has to be relaxed
+   Bitset makeRelaxationBitset(const IntervalRegion& reg);
+
+   /// Linearizes this model in a region
+   /// @param reg the given region
+   /// @param lpm output LP model
+   void linearize(const IntervalRegion& reg, LPModel& lpm);
+
    ///@{
    /// Overrides
    Scope  funScope() const;
@@ -103,6 +114,8 @@ public:
    void   realDiff    (const RealPoint& pt, RealVector& g);
    double realEvalDiff(const RealPoint& pt, RealVector& g);
    ///@}
+
+   Dag* getDag();
 
 private:
    Dag* dag_;
@@ -119,7 +132,8 @@ private:
    // size of the scope of the objective function
    size_t dim() const;
 
-   Dag* getDag();
+// TODO
+//   Dag* getDag();
    DagFun* getDerivative(size_t i) const;
    DagFun* getObjConstraint() const;
 

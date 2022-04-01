@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 #include "realpaver/Common.hpp"
+#include "realpaver/Interval.hpp"
 
 namespace realpaver {
 
@@ -57,6 +58,10 @@ public:
    /// Sets the upper bound of this
    /// @param ub the new value of the upper bound
    void setUB(double ub);
+
+   /// Sets the domain of this
+   /// @param x new domain
+   void setDomain(const Interval& x);
 
    /// Sets the name of this
    /// @param name the new name
@@ -127,6 +132,10 @@ public:
    /// Sets the upper bound of this
    /// @param ub the new value of the upper bound
    void setUB(double ub);
+
+   /// Sets the domain of this
+   /// @param x new domain
+   void setDomain(const Interval& x);
 
    /// Sets the name of this
    /// @param name the new name
@@ -246,11 +255,12 @@ public:
    /// Adds a new term in this
    /// @param a coefficient of the new term
    /// @param v variable of the new term
+   /// @return a reference to this
    ///
    /// The new term is inserted at the end, after the other terms that were
    /// previously inserted.<br>
    /// Assumes that the variable **v** is not already present in this.
-   void addTerm(double a, LinVar v);
+   LinExpr& addTerm(double a, LinVar v);
 
    /// @return the number of terms in this
    int getNbTerms() const;
@@ -462,6 +472,10 @@ public:
    /// @param name name of the new variable
    /// @return the new variable
    LinVar makeVar(double lb, double ub, const std::string& name="");
+
+   /// Inserts a new constraint in this
+   /// @param c constraint inserted
+   void addCtr(LinCtr c);
 
    /// Inserts a new constraint in this
    /// @param lb lower bound of the new constraint

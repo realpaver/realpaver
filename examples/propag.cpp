@@ -10,7 +10,7 @@ using namespace std;
 
 int main(void)
 {
-   Logger::init(LogLevel::internal, "bop.log");
+   Logger::init(LogLevel::full, "propag.log");
    Interval::precision( 8 );
 
    try {

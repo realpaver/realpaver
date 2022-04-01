@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <sstream>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
@@ -184,6 +185,26 @@ void DagNode::addRdv(double x)
    rdv_ = Double::add(rdv_, x);
 }
 
+void DagNode::linearize(LPModel& lm)
+{
+   ASSERT(!val_.isEmpty(), "Linearization of a DAG node with an empty domain");
+
+   // creation of a linear variable for this node
+   LinVar v = lm.makeVar(val_.left(), val_.right());
+   setIndexLinVar(v.getIndex());
+
+// TODO
+   std::ostringstream os;
+   os << "x" << v.getIndex();
+   v.setName(os.str());
+
+DEBUG("Node : " << index_ << " -> var " << v.getIndex());
+
+
+   // insertion of constraints
+   linearizeImpl(lm);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
@@ -247,6 +268,11 @@ bool DagConst::rdiff()
 Interval DagConst::getConst() const
 {
    return x_;
+}
+
+void DagConst::linearizeImpl(LPModel& lm)
+{
+   // nothing to do
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -313,6 +339,15 @@ bool DagVar::rdiff()
 Variable DagVar::getVar() const
 {
    return v_;
+}
+
+void DagVar::linearizeImpl(LPModel& lm)
+{
+   if (v_.isDiscrete())
+   {
+      LinVar lv = lm.getLinVar(indexLinVar());
+      lv.setInteger();
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -455,6 +490,19 @@ bool DagAdd::rdiff()
    return true;
 }
 
+void DagAdd::linearizeImpl(LPModel& lm)
+{
+   LinVar z = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(left()->indexLinVar()),
+          y = lm.getLinVar(right()->indexLinVar());
+
+   // z = x + y => z - x - y = 0
+   LinExpr e( {1.0, -1.0, -1.0},
+              {  z,    x,    y} );
+
+   lm.addCtr(0.0, e, 0.0);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSub::DagSub(Dag* dag, const IndexList& lsub)
@@ -498,6 +546,19 @@ bool DagSub::rdiff()
    right()->addRdv(-rdv());
 
    return true;
+}
+
+void DagSub::linearizeImpl(LPModel& lm)
+{
+   LinVar z = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(left()->indexLinVar()),
+          y = lm.getLinVar(right()->indexLinVar());
+
+   // z = x - y => z - x + y = 0
+   LinExpr e( {1.0, -1.0, 1.0},
+              {  z,    x,   y} );
+
+   lm.addCtr(0.0, e, 0.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -545,6 +606,11 @@ bool DagMul::rdiff()
    return true;
 }
 
+void DagMul::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagDiv::DagDiv(Dag* dag, const IndexList& lsub)
@@ -589,6 +655,11 @@ bool DagDiv::rdiff()
                    Double::sqr(right()->rval())));
 
    return right()->rval() != 0.0;
+}
+
+void DagDiv::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -661,6 +732,11 @@ bool DagMin::rdiff()
    }
 }
 
+void DagMin::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagMax::DagMax(Dag* dag, const IndexList& lsub)
@@ -731,6 +807,11 @@ bool DagMax::rdiff()
    }
 }
 
+void DagMax::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagUsb::DagUsb(Dag* dag, const IndexList& lsub)
@@ -771,6 +852,11 @@ bool DagUsb::rdiff()
    child()->addRdv(Double::usb(rdv()));
 
    return true;
+}
+
+void DagUsb::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -833,6 +919,11 @@ bool DagAbs::rdiff()
    }
 }
 
+void DagAbs::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSgn::DagSgn(Dag* dag, const IndexList& lsub)
@@ -869,6 +960,11 @@ bool DagSgn::rdiff()
 {
    // d(sgn(u))/du = 0 except at 0
    return true;
+}
+
+void DagSgn::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -913,6 +1009,11 @@ bool DagSqr::rdiff()
    return true;
 }
 
+void DagSqr::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub)
@@ -953,6 +1054,11 @@ bool DagSqrt::rdiff()
    child()->addRdv(Double::div(Double::mul(0.5, rdv()), rval()));
 
    return true;
+}
+
+void DagSqrt::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1021,6 +1127,11 @@ bool DagPow::rdiff()
    return true;
 }
 
+void DagPow::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagExp::DagExp(Dag* dag, const IndexList& lsub)
@@ -1063,6 +1174,11 @@ bool DagExp::rdiff()
    return true;
 }
 
+void DagExp::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagLog::DagLog(Dag* dag, const IndexList& lsub)
@@ -1103,6 +1219,11 @@ bool DagLog::rdiff()
    child()->addRdv(Double::div(rdv(), child()->rval()));
 
    return child()->val().isCertainlyGtZero();
+}
+
+void DagLog::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1148,6 +1269,11 @@ bool DagCos::rdiff()
    return true;
 }
 
+void DagCos::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSin::DagSin(Dag* dag, const IndexList& lsub)
@@ -1190,6 +1316,11 @@ bool DagSin::rdiff()
    return true;
 }
 
+void DagSin::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagTan::DagTan(Dag* dag, const IndexList& lsub)
@@ -1230,6 +1361,11 @@ bool DagTan::rdiff()
    child()->addRdv(Double::mul(rdv(), Double::add(1.0, Double::sqr(rval()))));
 
    return val().isFinite();
+}
+
+void DagTan::linearizeImpl(LPModel& lm)
+{
+   // LINEARIZE TODO
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1737,6 +1873,15 @@ Interval DagFun::intervalEvalDiff(const IntervalRegion& reg, IntervalVector& g)
    return val();
 }
 
+void DagFun::linearize(LPModel& lm)
+{
+   for (size_t i=0; i<nbNodes(); ++i)
+   {
+      DagNode* node = node_[i];
+      if (node->indexLinVar() < 0) node->linearize(lm);
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagContext::DagContext() : dom()
@@ -2007,6 +2152,51 @@ void Dag::eval(const IntervalRegion& reg)
 {
    for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(reg);
+}
+
+void Dag::linearize(LPModel& lm)
+{
+   // linearizes all the nodes
+   for (size_t i=0; i<nbNodes(); ++i) node_[i]->linearize(lm);
+
+   for (size_t j=0; j<nbFuns(); ++j)
+   {
+      // assigns the domain of the linear variable associated with the root
+      // node of a function of this Dag
+      DagFun* f = fun(j);
+      LinVar lv = lm.getLinVar(f->rootNode()->indexLinVar());
+      lv.setDomain(f->getImage());
+   }
+}
+
+void Dag::linearize(LPModel& lm, const Bitset& bs)
+{
+   ASSERT(nbFuns() == bs.size(), "Bad bitset used to linearize a DAG");
+
+   if (bs.areAllOnes())
+   {
+      linearize(lm);
+   }
+   else
+   {
+      // resets the indexes of all the linear variables
+      for (size_t i=0; i<nbNodes(); ++i) node_[i]->setIndexLinVar(-1);
+
+      for (size_t j=0; j<bs.size(); ++j)
+      {
+         if (bs.get(j))
+         {
+            // linearizes the function
+            DagFun* f = fun(j);
+            f->linearize(lm);
+
+            // assigns the domain of the linear variable associated with
+            // its root node
+            LinVar lv = lm.getLinVar(f->rootNode()->indexLinVar());
+            lv.setDomain(f->getImage());
+         }
+      }
+   }
 }
 
 void Dag::print(std::ostream& os) const

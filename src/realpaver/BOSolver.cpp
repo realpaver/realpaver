@@ -15,6 +15,7 @@
 #include "realpaver/IntContractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/ListContractor.hpp"
+#include "realpaver/LPSolver.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/Selector.hpp"
@@ -376,11 +377,13 @@ bool BOSolver::presolve()
 void BOSolver::calculateLowerInit(SharedBONode& node)
 {
    IntervalRegion* reg = node->region();
-   Interval e = model_->intervalEval(*reg);
 
+   // first: interval evaluation
+   Interval e = model_->intervalEval(*reg);
    node->setLower(e.left());
-   
-   // TODO
+
+   // second: relaxation
+   calculateLower(node);
 }
 
 void BOSolver::calculateLower(SharedBONode& node)
@@ -391,7 +394,17 @@ void BOSolver::calculateLower(SharedBONode& node)
    Interval z = reg->get(model_->getObjVar());
    if (z.left() > node->getLower()) node->setLower(z.left());
 
-   // TODO
+   // linear relaxation
+   LPSolver lpsolver;
+   model_->linearize(*reg, lpsolver);
+
+   // solving
+   bool optimal = lpsolver.optimize();
+   if (optimal)
+   {
+      double lb = lpsolver.getObjVal();
+      if (lb > node->getLower()) node->setLower(lb);
+   }
 }
 
 void BOSolver::saveIncumbent(const RealPoint& pt)

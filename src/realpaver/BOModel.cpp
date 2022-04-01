@@ -146,6 +146,48 @@ bool BOModel::isInteriorVar(Variable v) const
    return !boundary_.contains(v);
 }
 
+Bitset BOModel::makeRelaxationBitset(const IntervalRegion& reg)
+{
+   Bitset bs(dag_->nbFuns());
+   bs.setAllOne();
+
+   if (boundary_.isEmpty()) return bs;
+
+   size_t i = 0;
+
+   for (Variable v : objscope_)
+   {
+      if (isBoundaryVar(v))
+      {
+         Interval x(init_->get(v));
+         Interval y(reg.get(v));
+         if (!x.strictlyContains(y)) bs.setZero(i);
+      }
+      i = i + 1;
+   }
+
+   return bs;
+}
+
+void BOModel::linearize(const IntervalRegion& reg, LPModel& lpm)
+{
+   // evaluates the DAG => every node has a domain
+   dag_->eval(reg);
+   
+   // linearizes the functions
+   Bitset bs = makeRelaxationBitset(reg);
+   dag_->linearize(lpm, bs);
+
+   // defines the objective function
+   // assumes that the objective variable is the last variable in the DAG
+   DagVar* node = dag_->varNode(dag_->nbVars()-1);
+   LinVar z = lpm.getLinVar(node->indexLinVar());
+
+   LinExpr e = { {1.0}, {z} };
+   lpm.setObj(e);
+   lpm.setMinimization();
+}
+
 IntervalRegion BOModel::getInitRegion() const
 {
    return *init_;

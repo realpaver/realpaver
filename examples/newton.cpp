@@ -10,7 +10,7 @@ using namespace std;
 
 int main(void)
 {
-   Logger::init(LogLevel::internal, "interval_newton.log");
+   Logger::init(LogLevel::full, "interval_newton.log");
    Interval::precision( 16 );
    
    Problem problem;
