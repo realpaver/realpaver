@@ -92,6 +92,7 @@ private:
    IntervalRegion sol_;          // best solution found (incumbent solution)
    Interval objval_;             // enclosure of the global minimum
    double upper_;                // upper bound of the global minimum
+   double upobj_;                // upper bound of the global minimum
    int nbnodes_;                 // number of nodes processed (BB algorithm)
    int nbpending_;               // number of pending nodes (BB algorithm)
 
@@ -127,6 +128,7 @@ private:
    void branchAndBound();
    bool bbStep(BOSpace& space, BOSpace& sol);
    void findInitialBounds(SharedBONode& node);
+   void refineUpperBound();
 };
 
 } // namespace

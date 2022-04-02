@@ -106,6 +106,10 @@ int main(int argc, char** argv)
       {
          cout << ORANGE("infeasible") << endl;
       }
+      else if (status == OptimizationStatus::Other)
+      {
+         cout << ORANGE("other") << endl;
+      }
       else
       {
          if (status == OptimizationStatus::Optimal)
@@ -114,7 +118,6 @@ int main(int argc, char** argv)
          }
          else
          {
-
             if (status == OptimizationStatus::StopOnTimeLimit)
             {
                cout << ORANGE("time limit reached") << endl;

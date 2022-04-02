@@ -497,9 +497,7 @@ void DagAdd::linearizeImpl(LPModel& lm)
           y = lm.getLinVar(right()->indexLinVar());
 
    // z = x + y => z - x - y = 0
-   LinExpr e( {1.0, -1.0, -1.0},
-              {  z,    x,    y} );
-
+   LinExpr e( {1.0, -1.0, -1.0}, {z, x, y} );
    lm.addCtr(0.0, e, 0.0);
 }
 
@@ -555,9 +553,7 @@ void DagSub::linearizeImpl(LPModel& lm)
           y = lm.getLinVar(right()->indexLinVar());
 
    // z = x - y => z - x + y = 0
-   LinExpr e( {1.0, -1.0, 1.0},
-              {  z,    x,   y} );
-
+   LinExpr e( {1.0, -1.0, 1.0}, {z, x, y} );
    lm.addCtr(0.0, e, 0.0);
 }
 
@@ -608,7 +604,56 @@ bool DagMul::rdiff()
 
 void DagMul::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   LinVar z = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(left()->indexLinVar()),
+          y = lm.getLinVar(right()->indexLinVar());
+
+   // z = x*y, a <= x <= b, c <= y <= d
+   double a = left()->val().left(),
+          b = left()->val().right(),
+          c = right()->val().left(),
+          d = right()->val().right();
+
+   bool xvar = (a != b),   // left subterm not fixed?
+        yvar = (c != d);   // right subterm not fixed?
+
+   if (xvar && yvar)
+   {
+      // Mc Cormick relaxation
+      Interval A(a), B(b), C(c), D(d);
+
+      // first constraint: (x-a)*(y-c) >= 0, z - c*x - a*y >= -a*c
+      Interval I1 = -A*C;
+      LinExpr e1( {1.0, -c, -a}, {z, x, y} );
+      lm.addCtr(I1.left(), e1);
+
+      // second constraint: (x-a)*(y-d) <= 0, z - d*x - a*y <= -a*d
+      Interval I2 = -A*D;
+      LinExpr e2( {1.0, -d, -a}, {z, x, y} );
+      lm.addCtr(e2, I2.right());
+
+      // third constraint: (x-b)*(y-c) <= 0, z - c*x - b*y <= -b*c
+      Interval I3 = -B*C;
+      LinExpr e3( {1.0, -c, -b}, {z, x, y} );
+      lm.addCtr(e3, I3.right());
+
+      // fourth constraint: (x-b)*(y-d) >= 0, z - d*x - b*y >= -b*d
+      Interval I4 = -B*D;
+      LinExpr e4( {1.0, -d, -b}, {z, x, y} );
+      lm.addCtr(I4.left(), e4);
+   }
+   else if (yvar)
+   {
+      // z = x*y with x fixed => z - a*y = 0
+      LinExpr e( {1.0, -a}, {z, y} );
+      lm.addCtr(0.0, e, 0.0);
+   }
+   else if (xvar)
+   {
+      // z = x*y with y fixed => z - c*x = 0
+      LinExpr e( {1.0, -c}, {z, x} );
+      lm.addCtr(0.0, e, 0.0);      
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -659,7 +704,52 @@ bool DagDiv::rdiff()
 
 void DagDiv::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   LinVar z = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(left()->indexLinVar()),
+          y = lm.getLinVar(right()->indexLinVar());
+
+   // z = x/y <=> a <= x <= b, c <= y <= d
+   double a = left()->val().left(),
+          b = left()->val().right(),
+          c = right()->val().left(),
+          d = right()->val().right(),
+          u = val().left(),
+          v = val().right();
+
+   bool xvar = (a != b),   // left subterm not fixed?
+        yvar = (c != d);   // right subterm not fixed?
+
+   if (yvar)
+   {
+      // Mc Cormick relaxation on x = y*z, c <= y <= d, u <= z <= v
+      Interval C(c), D(d), U(u), V(v);
+
+      // first constraint: (y-c)*(z-u) >= 0, x -cz -uy >= -cu
+      Interval I1 = -C*U;
+      LinExpr e1( {1.0, -c, -u}, {x, z, y} );
+      lm.addCtr(I1.left(), e1);
+
+      // second constraint: (y-c)*(z-v) <= 0, x -cz -vy <= -cv
+      Interval I2 = -C*V;
+      LinExpr e2( {1.0, -c, -v}, {x, z, y} );
+      lm.addCtr(e2, I2.right());
+
+      // third constraint: (y-d)*(z-u) <= 0, x -dz -uy <= -du
+      Interval I3 = -D*U;
+      LinExpr e3( {1.0, -d, -u}, {x, z, y} );
+      lm.addCtr(e3, I3.right());
+
+      // fourth constraint: (y-d)*(z-v) >= 0, x -dz -vy >= -dv
+      Interval I4 = -D*V;
+      LinExpr e4( {1.0, -d, -v}, {x, z, y} );
+      lm.addCtr(I4.left(), e4);
+   }
+   else if (xvar)
+   {
+      // y fixed => x = y*z with y = c => x -cz = 0
+      LinExpr e( {1.0, -c}, {x, z} );
+      lm.addCtr(0.0, e, 0.0);      
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -734,7 +824,38 @@ bool DagMin::rdiff()
 
 void DagMin::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   LinVar z = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(left()->indexLinVar()),
+          y = lm.getLinVar(right()->indexLinVar());
+
+   // z = min(x, y), a <= x <= b, c <= y <= d
+   double a = left()->val().left(),
+          b = left()->val().right(),
+          c = right()->val().left(),
+          d = right()->val().right();
+
+   if (b < c)
+   {
+      // z = x => z - x = 0
+      LinExpr e( {1.0, -1.0}, {z, x} );
+      lm.addCtr(0.0, e, 0.0);
+   }
+   else if (d < a)
+   {
+      // z = y => z - y = 0
+      LinExpr f( {1.0, -1.0}, {z, y} );
+      lm.addCtr(0.0, f, 0.0);
+   }
+   else
+   {
+      // z <= x => z - x <= 0
+      LinExpr e( {1.0, -1.0}, {z, x} );
+      lm.addCtr(e, 0.0);
+
+      // z <= y => z - y <= 0
+      LinExpr f( {1.0, -1.0}, {z, y} );
+      lm.addCtr(f, 0.0);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -809,7 +930,38 @@ bool DagMax::rdiff()
 
 void DagMax::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   LinVar z = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(left()->indexLinVar()),
+          y = lm.getLinVar(right()->indexLinVar());
+
+   // z = max(x, y), a <= x <= b, c <= y <= d
+   double a = left()->val().left(),
+          b = left()->val().right(),
+          c = right()->val().left(),
+          d = right()->val().right();
+
+   if (d < a)
+   {
+      // z = x => z - x = 0
+      LinExpr e( {1.0, -1.0}, {z, x} );
+      lm.addCtr(0.0, e, 0.0);
+   }
+   else if (b < c)
+   {
+      // z = y => z - y = 0
+      LinExpr f( {1.0, -1.0}, {z, y} );
+      lm.addCtr(0.0, f, 0.0);
+   }
+   else
+   {
+      // z >= x => z - x >= 0
+      LinExpr e( {1.0, -1.0}, {z, x} );
+      lm.addCtr(0.0, e);
+      
+      // z >= y => z - y >= 0
+      LinExpr f( {1.0, -1.0}, {z, y} );
+      lm.addCtr(0.0, f);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -856,7 +1008,12 @@ bool DagUsb::rdiff()
 
 void DagUsb::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   LinVar y = lm.getLinVar(indexLinVar()),
+          x = lm.getLinVar(child()->indexLinVar());
+
+   // y = -x => y + x = 0
+   LinExpr e( {1.0, 1.0}, {y, x} );
+   lm.addCtr(0.0, e, 0.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -184,8 +184,7 @@ void BOModel::linearize(const IntervalRegion& reg, LPModel& lpm)
    LinVar z = lpm.getLinVar(node->indexLinVar());
 
    LinExpr e = { {1.0}, {z} };
-   lpm.setObj(e);
-   lpm.setMinimization();
+   lpm.setObj(e, true);
 }
 
 IntervalRegion BOModel::getInitRegion() const

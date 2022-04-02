@@ -36,6 +36,7 @@ BOSolver::BOSolver(Problem& problem)
         sol_(problem.scope()),
         objval_(Interval::universe()),
         upper_(Double::inf()),
+        upobj_(Double::inf()),
         nbnodes_(0),
         nbpending_(0),
         vmap21_(),
@@ -424,6 +425,57 @@ void BOSolver::calculateUpperInit(SharedBONode& node)
    calculateUpper(node);
 }
 
+void BOSolver::refineUpperBound()
+{
+   // Let u be the new upper bound of the global minimum and let L be the
+   // current lower bound. If [L, u] has the desired tolerance then the
+   // algorithm will stop. Otherwise, it is possible to decrease the value
+   // of the upper bound to v. Why? If there is no solution in [L, v] then
+   // a minimizer has been found in [L, u] (since the upper bound has been
+   // updated). Otherwise, a new solution will be found in [L, v]. There is
+   // no problem.
+
+   // Now, let tol be the magnitude of the tolerance.
+   // If the tolerance is an absolute one, the width of [v, u] lmust be equal
+   // to tol. It comes v := u - tol (rounded upward).
+   //
+   // If the tolerance is a relative one and if u belongs to [-1+tol, +1]
+   // it also comes v := u - tol (rounded upward). (since the relative width
+   // of such an interval corresponds to its absolute width.
+   //
+   // Otherwise, the relative width of [v, u] must be equal to tol.
+   // We must have (u-v) / (|u+|v|) = tol.
+   //
+   // If u >= 1 and tol <= 1 we have: v = u(1-tol)/(1+tol).
+   // Otherwise we have v = u(1+tol)(1-tol).
+
+
+DEBUG("upobj : " << upobj_);
+
+   Tolerance otol = param_.getTolParam("OBJ_TOL");
+   double u = upobj_, tol = otol.getVal();
+   Interval TOL(tol), U(u);
+
+   if (Interval::minusOnePlusOne().contains(u) || tol >= 1.0)
+   {
+      Interval V = U - TOL;      
+      upper_ = V.right();
+   }
+   else if (u > 1.0)
+   {
+      Interval V = U * (1.0 - TOL) / (1.0 + TOL);
+      upper_ = V.right();
+   }
+   else
+   {
+      Interval V = U * (1.0 + TOL) / (1.0 - TOL);
+      upper_ = V.right();
+   }
+
+
+DEBUG("upper_ : " << upper_);
+}
+
 void BOSolver::calculateUpper(SharedBONode& node)
 {
    IntervalRegion* reg = node->region();
@@ -446,10 +498,12 @@ void BOSolver::calculateUpper(SharedBONode& node)
          // new upper bound of the global minimum?
          if (u < upper_)
          {
-            upper_ = u;
+            upobj_ = u;
             saveIncumbent(dest);
+            refineUpperBound();
 
-            LOG_INTER("New upper bound of the global optimum: " << upper_);
+            LOG_INTER("New upper bound of the global optimum: " << u);
+            LOG_INTER("Refined upper bound: " << upper_);
             LOG_INTER("New incumbent solution: " << getBestSolution());
          }
       }
@@ -459,7 +513,11 @@ void BOSolver::calculateUpper(SharedBONode& node)
 bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 {
    // stops the search if the space is empty
-   if (space.isEmpty()) return false;
+   if (space.isEmpty())
+   {
+      LOG_INTER("Empty space in branch-and-bound step");
+      return false;
+   }
 
    SharedBONode node = space.extractNode();
 
@@ -613,8 +671,16 @@ void BOSolver::branchAndBound()
    {
       iter = bbStep(space, sol);
 
-      double L = std::min(space.getLowestLowerBound(), sol.getLowestLowerBound());
-      objval_ = Interval(L, upper_);
+      double L = std::min(space.getLowestLowerBound(),
+                          sol.getLowestLowerBound());
+      objval_ = Interval(L, upobj_);
+
+      if (space.isEmpty())
+      {
+         // iter must be false
+         LOG_MAIN("Stop on global optimum with an empty space");
+         status_ = OptimizationStatus::Optimal;         
+      }
 
       if (iter && otol.hasTolerance(objval_))
       {
