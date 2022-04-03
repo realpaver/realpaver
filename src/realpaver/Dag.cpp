@@ -193,13 +193,12 @@ void DagNode::linearize(LPModel& lm)
    LinVar v = lm.makeVar(val_.left(), val_.right());
    setIndexLinVar(v.getIndex());
 
-// TODO
-   std::ostringstream os;
-   os << "x" << v.getIndex();
-   v.setName(os.str());
-
-DEBUG("Node : " << index_ << " -> var " << v.getIndex());
-
+   if (LOG_ON)
+   {
+      std::ostringstream os;
+      os << "x" << v.getIndex();
+      v.setName(os.str());
+   }
 
    // insertion of constraints
    linearizeImpl(lm);

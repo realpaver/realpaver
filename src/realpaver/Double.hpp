@@ -74,6 +74,20 @@ struct Double {
       return x != x;
    }
 
+   /// @param x a number
+   /// @return the double before x
+   static inline ValueType prevDouble(ValueType x)
+   {
+      return std::nextafter(x, neginf());
+   }
+
+   /// @param x a number
+   /// @return the double after x
+   static inline ValueType nextDouble(ValueType x)
+   {
+      return std::nextafter(x, inf());
+   }
+
    /// Sets the rounding downward mode of the FP unit
    static inline void rndDn()
    {

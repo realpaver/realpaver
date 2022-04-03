@@ -35,6 +35,11 @@ REL_OBJ_TOL = 1.0e-6
 FLOAT_PRECISION = 12
 
 # Log level
+# NONE:  no log
+# MAIN:  main level e.g. display results of first-class algorithms
+# INTER: intermediary level e.g. display nodes in a search algorithm
+# LOW:   low level e.g. display quantities in iterative methods
+# FULL:  verbose mode
 LOG_LEVEL = LOW
 
 ###############################################################################

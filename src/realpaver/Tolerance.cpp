@@ -89,7 +89,7 @@ bool Tolerance::hasTolerance(double x, double y) const
                     hasTolerance(Interval(y, x));
 }
 
-bool Tolerance::hasTolerance(const Interval& x, const Interval& y) const
+bool Tolerance::haveDistTolerance(const Interval& x, const Interval& y) const
 {
    if (x.isEmpty() || y.isEmpty() || x.isInf() || y.isInf())
       return false;
@@ -99,6 +99,64 @@ bool Tolerance::hasTolerance(const Interval& x, const Interval& y) const
 
    return (u > v) ? hasTolerance(x.left(), y.left()) :
                     hasTolerance(x.right(), y.right());
+}
+
+Interval Tolerance::maxIntervalDn(double ub) const
+{
+   if (Double::isInf(ub)) return Interval::universe();
+
+   if (val_ == 0.0) return Interval(Double::prevDouble(ub), ub);
+
+   if (isAbsolute())
+   {
+      Double::rndUp();
+      return Interval(ub - val_, ub);
+   }
+   else if (ub > 1.0)
+   {
+      Interval v(val_), lb(ub*(1.0-v)/(1.0+v));
+      return Interval(lb.right(), ub);
+   }
+   else if (ub <= -1.0)
+   {
+      if (val_ == 1.0)
+      {
+         return Interval(Double::lowest(), ub);
+      }
+      else
+      {
+         Interval v(val_), lb(ub*(1.0+v)/(1.0-v));
+         return Interval(lb.right(), ub);
+      }
+   }
+   else
+   {
+      Double::rndUp();
+      double lb = ub - val_;
+
+      if (lb >= -1.0)
+      {
+         return Interval(lb, ub);
+      }
+      else
+      {
+         // we have ub < 0.0 since val_ <= 1.0
+         if (val_ == 1.0)
+         {
+            return Interval(Double::lowest(), ub);
+         }
+         else
+         {
+            Interval v(val_), lb(ub*(1.0+v)/(1.0-v));
+            return Interval(lb.right(), ub);
+         }
+      }
+   }
+}
+
+Interval Tolerance::maxIntervalUp(double lb) const
+{
+   return -maxIntervalDn(-lb); 
 }
 
 std::ostream& operator<<(std::ostream& os, const Tolerance& tol)

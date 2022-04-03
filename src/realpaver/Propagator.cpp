@@ -135,7 +135,7 @@ Proof Propagator::contract(IntervalRegion& reg)
                   const Interval& prev = copy->get(v);
                   const Interval& curr = reg.get(v);
 
-                  if (!dtol_.hasTolerance(prev, curr))
+                  if (!dtol_.haveDistTolerance(prev, curr))
                   {
                      isModified = true;
                      modified.setOne(v.getId());

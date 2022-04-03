@@ -12,6 +12,15 @@ int main(void)
    Logger::init(LogLevel::full, "work.log");
    Interval::precision( 16 );
 
+   Tolerance tol = Tolerance::makeRel(1.0e-6);
+   Interval k = tol.maxIntervalUp(2.0);
+   cout << "k = " << k << endl;
+   
+   if (tol.hasTolerance(k)) cout << "ok" << endl;
+   else cout << "non" << endl;
+   
+return 0;
+
    try {
       Problem* prob = new Problem();
       Dag* dag = new Dag();

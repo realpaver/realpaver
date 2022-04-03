@@ -75,12 +75,12 @@ int main(int argc, char** argv)
 
       cout << GRAY(sep) << endl;
       cout << BLUE("Realpaver BOUND CONSTRAINED GLOBAL OPTIMIZATION") << endl;
-      cout << indent << "Input file: " << filename << endl;
+      cout << indent << "Input file.................. " << filename << endl;
       if (loglevel != LogLevel::none)
       {
-         cout << indent << "Log file:   " << flog << endl;         
+         cout << indent << "Log file.................... " << flog << endl;         
       }
-      cout << indent << "Tolerance on the global optimum: "
+      cout << indent << "Tolerance global optimum.... "
            << ORANGE(solver.getTolParam("OBJ_TOL")) << endl;
 
       cout << GRAY(sep) << endl;

@@ -110,7 +110,7 @@ Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
          if (xtol_.hasTolerance(y))
             iter = false;
  
-         if (dtol_.hasTolerance(prev, y))
+         if (dtol_.haveDistTolerance(prev, y))
             iter = false;
       }
    }
@@ -219,7 +219,7 @@ Proof IntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)
          iter = false;
       }
 
-      else if (ldtol_.hasTolerance(prev, y))
+      else if (ldtol_.haveDistTolerance(prev, y))
       {
          y = x;
          iter = false;

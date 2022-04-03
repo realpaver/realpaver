@@ -20,6 +20,7 @@ noinst_PROGRAMS = bop_solver
 bop_solver_SOURCES = bop_solver.cpp
 
 EXTRA_DIST = \
+	bop_config \
 	Beale.bop \
 	Colville.bop \
 	SixHumpCamel.bop \

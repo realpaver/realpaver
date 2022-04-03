@@ -37,10 +37,12 @@ BOModel::BOModel(Problem& problem, bool withobj)
    // DAG
    dag_ = new Dag();
    
-   // for each variable but z_creates the equation df / dv = 0
+   // for each variable but z_creates the equation df / dv = 0 and assigns its
+   // tolerance to 0, i.e. its domain is split whenever it is possible
    for (size_t i=0; i<problem.nbVars(); ++i)
    {
       Variable v = problem.varAt(i);
+      v.setTolerance(Tolerance::makeAbs(0.0));
 
       if (!to.dependsOn(v)) continue;
 

@@ -89,7 +89,17 @@ public:
    /// @param x an interval
    /// @param y an interval
    /// @return true if the distance between 'x' and 'y' is less than this
-   bool hasTolerance(const Interval& x, const Interval& y) const;
+   bool haveDistTolerance(const Interval& x, const Interval& y) const;
+
+   /// Gets the largest interval having this tolerance given its upper bound
+   /// @param ub upper of the resulting interval
+   /// @return the largest interval [lb, ub] having this tolerance
+   Interval maxIntervalDn(double ub) const;
+
+   /// Gets the largest interval having this tolerance given its lower bound
+   /// @param lb lower of the resulting interval
+   /// @return the largest interval [lb, ub] having this tolerance
+   Interval maxIntervalUp(double lb) const;
 
 private:
    double val_;   // magnitude
