@@ -120,7 +120,7 @@ BC3_ITER_LIMIT = 30
 PROPAGATION_ALGORITHM = HC4
 
 ###############################################################################
-## LOCAL OPTIMiZATION                                                        ##
+## LOCAL OPTIMIZATION                                                        ##
 ###############################################################################
 
 # Coefficient of the Armijo rule used to stop a line search optimization

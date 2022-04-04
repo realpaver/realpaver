@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=160
+current_page=161
 FILE_NAME_0=11028;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fconfigure.ac;0;3
 FILE_NAME_1=337;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fwork%2Fwork.cpp;0;3
 FILE_NAME_2=207;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fwork%2FMakefile.am;0;3
@@ -44,7 +44,7 @@ FILE_NAME_11=1110;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver
 FILE_NAME_12=640;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fdoc%2Frealpaver_template.hpp.cpp;0;3
 FILE_NAME_13=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2FMakefile.am;0;3
 FILE_NAME_14=1064;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Flp.cpp;0;3
-FILE_NAME_15=1377;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FMakefile.am;0;3
+FILE_NAME_15=2581;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FMakefile.am;0;3
 FILE_NAME_16=641;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2FMakefile.am;0;3
 FILE_NAME_17=1651;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FException.hpp;0;3
 FILE_NAME_18=640;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FException.cpp;0;3
@@ -73,7 +73,7 @@ FILE_NAME_40=2569;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%
 FILE_NAME_41=13619;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FIntervalGaol.hpp;0;3
 FILE_NAME_42=1085;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FTimer.cpp;0;3
 FILE_NAME_43=1465;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FTimer.hpp;0;3
-FILE_NAME_44=1798;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2Fsettings.txt;0;3
+FILE_NAME_44=3713;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2Fsettings.txt;0;3
 FILE_NAME_45=2066;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FParam.cpp;0;3
 FILE_NAME_46=4876;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FParam.hpp;0;3
 FILE_NAME_47=1143;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FObjective.cpp;0;3
@@ -126,7 +126,7 @@ FILE_NAME_93=1730;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%
 FILE_NAME_94=2225;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FScopeMap.cpp;0;3
 FILE_NAME_95=1547;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FScopeMap.hpp;0;3
 FILE_NAME_96=3585;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FScope.cpp;0;3
-FILE_NAME_97=9138;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FScope.hpp;0;3
+FILE_NAME_97=9162;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FScope.hpp;0;3
 FILE_NAME_98=885;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FIntContractor.cpp;0;3
 FILE_NAME_99=1774;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FIntContractor.hpp;0;3
 FILE_NAME_100=1139;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FContractorPool.cpp;0;3
@@ -189,7 +189,9 @@ FILE_NAME_156=106;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver
 FILE_NAME_157=117;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FSixHumpCamel.bop;0;3
 FILE_NAME_158=248;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FColville.bop;0;3
 FILE_NAME_159=125;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FTest.bop;0;3
-FILE_NAME_160=0;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2Fbop_config;0;3
+FILE_NAME_160=17;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2Fbop_config;0;3
+FILE_NAME_161=1675;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FReformulation.cpp;0;3
+FILE_NAME_162=1048;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FReformulation.hpp;0;3
 
 [VTE]
 last_dir=/home/granvilliers-l
