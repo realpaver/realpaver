@@ -11,6 +11,8 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/Param.hpp"
+#include "realpaver/Reformulation.hpp"
 
 namespace realpaver {
 
@@ -1077,7 +1079,41 @@ bool DagAbs::rdiff()
 
 void DagAbs::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+
+   LinVar y = lm.getLinVar(iy),
+          x = lm.getLinVar(ix);
+
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   if (a >= 0.0)
+   {
+      // y = x => y - x = 0
+      LinExpr e( {1.0, -1.0}, {y, x} );
+      lm.addCtr(0.0, e, 0.0);
+   }
+   else if (b <= 0.0)
+   {
+      // y = -x => y + x = 0
+      LinExpr e( {1.0, 1.0}, {y, x} );
+      lm.addCtr(0.0, e, 0.0);
+   }
+   else
+   {
+      // lower-bound constraint: y >= x <=> y - x >= 0
+      LinExpr e1( {1.0, -1.0}, {y, x} );
+      lm.addCtr(0.0, e1);
+
+      // lower-bound constraint: y >= -x <=> y + x >= 0
+      LinExpr e2( {1.0, 1.0}, {y, x} );
+      lm.addCtr(0.0, e2);
+
+      // overestimation
+      auto f  = [](const Interval& x) { return abs(x); };
+      overConvex(lm, iy, ix, a, b, f);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1120,7 +1156,7 @@ bool DagSgn::rdiff()
 
 void DagSgn::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   // nothing to do
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1167,7 +1203,22 @@ bool DagSqr::rdiff()
 
 void DagSqr::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+   
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   auto f  = [](const Interval& x) { return sqr(x); };
+   auto df = [](const Interval& x) { return 2.0*x; };
+
+   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+   underConvex(lm, iy, ix, a, b, a, f, df);
+   underConvex(lm, iy, ix, a, b, b, f, df);
+   underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+   // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
+   overConvex(lm, iy, ix, a, b, f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1214,7 +1265,24 @@ bool DagSqrt::rdiff()
 
 void DagSqrt::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   if (a < 0.0) return;
+
+   auto f  = [](const Interval& x) { return sqrt(x); };
+   auto df = [](const Interval& x) { return 1.0/(2.0*sqrt(x)); };
+
+   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+   overConcave(lm, iy, ix, a, b, a, f, df);
+   overConcave(lm, iy, ix, a, b, b, f, df);
+   overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+   // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
+   underConcave(lm, iy, ix, a, b, f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1332,7 +1400,22 @@ bool DagExp::rdiff()
 
 void DagExp::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+   
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   auto f  = [](const Interval& x) { return exp(x); };
+   auto df = [](const Interval& x) { return exp(x); };
+
+   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+   underConvex(lm, iy, ix, a, b, a, f, df);
+   underConvex(lm, iy, ix, a, b, b, f, df);
+   underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+   // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
+   overConvex(lm, iy, ix, a, b, f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1379,7 +1462,24 @@ bool DagLog::rdiff()
 
 void DagLog::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   if (a <= 0.0) return;
+
+   auto f  = [](const Interval& x) { return log(x); };
+   auto df = [](const Interval& x) { return 1.0/x; };
+
+   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+   overConcave(lm, iy, ix, a, b, a, f, df);
+   overConcave(lm, iy, ix, a, b, b, f, df);
+   overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+   // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
+   underConcave(lm, iy, ix, a, b, f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

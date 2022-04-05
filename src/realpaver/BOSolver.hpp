@@ -95,6 +95,9 @@ private:
    int nbnodes_;                 // number of nodes processed (BB algorithm)
    int nbpending_;               // number of pending nodes (BB algorithm)
 
+   Tolerance otol_;
+   double relaxval_;
+
    typedef Preprocessor::VarVarMapType VarVarMapType;
 
    // Maps every variable of the preprocessed problem to the associated

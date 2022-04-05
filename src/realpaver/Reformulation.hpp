@@ -17,9 +17,22 @@
 namespace realpaver {
 
 void underConvex(LPModel& lm, size_t iy, size_t ix,
-                 double a, double b, double c, double tol,
+                 double a, double b, double c,
                  std::function<Interval(Interval)> f, 
                  std::function<Interval(Interval)> df);
+
+void overConvex(LPModel& lm, size_t iy, size_t ix,
+                double a, double b,
+                std::function<Interval(Interval)> f);
+
+void overConcave(LPModel& lm, size_t iy, size_t ix,
+                 double a, double b, double c,
+                 std::function<Interval(Interval)> f, 
+                 std::function<Interval(Interval)> df);
+
+void underConcave(LPModel& lm, size_t iy, size_t ix,
+                  double a, double b,
+                  std::function<Interval(Interval)> f);
 
 } // namespace
 

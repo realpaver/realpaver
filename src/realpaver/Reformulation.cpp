@@ -14,16 +14,13 @@
 
 namespace realpaver {
 
-// underestimation y >= mx + p of a convex function f tangent at x=c
-// slope m = df(c)
-// ordinate at the origin p = f(c) - mc
 void underConvex(LPModel& lm, size_t iy, size_t ix,
-                 double a, double b, double c, double tol,
+                 double a, double b, double c,
                  std::function<Interval(Interval)> f, 
                  std::function<Interval(Interval)> df)
 {
    ASSERT(a <= c && c <= b,
-          "Bad values for the underestimation of a convex function");
+          "Bad values for the relaxation of a convex function");
 
    if (a == b) return;
 
@@ -32,29 +29,203 @@ void underConvex(LPModel& lm, size_t iy, size_t ix,
 
    Interval C(c), M(df(C));
 
-   if (c == 0.0 || M.containsZero())
+   // if the slope is null then f has a minimum at x=c and the domain of
+   // of y must be already constrained
+   if (M.containsZero()) return;
+
+   // calculates the ordinate at the origin
+   Interval P(f(C) - M*C);
+   double p = P.left();
+
+   // calculates the slope
+   double m;
+   if (c < 0.0 || c == b)
    {
-      LOG_FULL("Perturbed approximation point for the underestimation of a "
-               << "convex function");
+      m = M.right();
+   }
+   else if (c > 0.0 || c == a)
+   {
+      m = M.left();
+   }
+   else
+   {
+      // c = 0 and a < c < b
+      m = M.left();
 
-      // perturbation
-      c = (c-a > b-c) ? c - tol : c + tol;;
-      C = c;
-      M = df(C);
+      // deviation between f and the line at x=a
+      Interval da = f(a) - Interval(m)*a - p;
 
-      if (c < a || c > b || c == 0.0 || M.containsZero())
-      {
-         LOG_FULL("Generation of an underestimation of a convex function "
-                  << "impossible in " << Interval(a, b));
-         return;
-      }
+      // deviation between f and the line at x=b
+      Interval db = f(b) - Interval(m)*b - p;
+
+      // deviation
+      double d = std::min(0.0, std::min(da.left(), db.left()));
+      Double::rndDn();
+      p += d;
    }
 
-   Interval P(f(C) - M*C);
-   double m = (c > 0.0) ? M.left() : M.right();
-
+   // y - mx >= p
    LinExpr e( {1.0, -m}, {y, x} );
-   lm.addCtr(P.left(), e);
+   lm.addCtr(p, e);
+}
+
+void overConvex(LPModel& lm, size_t iy, size_t ix,
+                double a, double b,
+                std::function<Interval(Interval)> f)
+{
+   if (a == b) return;
+
+   LinVar x = lm.getLinVar(ix),
+          y = lm.getLinVar(iy);
+
+   Interval fa = f(a),
+            fb = f(b);
+
+   // slope null?
+   if (fa.overlaps(fb)) return;
+
+   Interval M = (fb - fa) / (Interval(a,b).width()),
+            P = fa - M*a;
+   double p = P.right();
+
+   //calculates the slope
+   double m;
+
+   if (a > 0.0)
+   {
+      m = M.right();
+   }
+   else if (b < 0.0)
+   {
+      m = M.left();
+   }
+   else
+   {
+      // a < 0 < b
+      m = M.left();
+
+      // deviation between f and the line at x=a
+      Interval da = Interval(m)*a + p - f(a);
+
+      // deviation between f and the line at x=b
+      Interval db = Interval(m)*b + p - f(b);
+
+      // deviation
+      double d = std::min(0.0, std::min(da.left(), db.left()));
+      Double::rndUp();
+      p -= d;
+   }
+
+   // y - mx <= p
+   LinExpr e( {1.0, -m}, {y, x} );
+   lm.addCtr(e, p);
+}
+
+void overConcave(LPModel& lm, size_t iy, size_t ix,
+                 double a, double b, double c,
+                 std::function<Interval(Interval)> f, 
+                 std::function<Interval(Interval)> df)
+{
+   ASSERT(a <= c && c <= b,
+          "Bad values for the relaxation of a concave function");
+
+   if (a == b) return;
+
+   LinVar x = lm.getLinVar(ix),
+          y = lm.getLinVar(iy);
+
+   Interval C(c), M(df(C));
+
+   // if the slope is null then f has a maximum at x=c and the domain of
+   // of y must be already constrained
+   if (M.containsZero()) return;
+
+   // calculates the ordinate at the origin
+   Interval P(f(C) - M*C);
+   double p = P.right();
+
+   // calculates the slope
+   double m;
+   if (c < 0.0 || c == b)
+   {
+      m = M.left();
+   }
+   else if (c > 0.0 || c == a)
+   {
+      m = M.right();
+   }
+   else
+   {
+      // c = 0 and a < c < b
+      m = M.left();
+
+      // deviation between f and the line at x=a
+      Interval da = f(a) - Interval(m)*a - p;
+
+      // deviation between f and the line at x=b
+      Interval db = f(b) - Interval(m)*b - p;
+
+      // deviation
+      double d = std::min(0.0, std::min(da.left(), db.left()));
+      Double::rndUp();
+      p -= d;
+   }
+
+   // y - mx <= p
+   LinExpr e( {1.0, -m}, {y, x} );
+   lm.addCtr(e, p);
+}
+
+void underConcave(LPModel& lm, size_t iy, size_t ix,
+                  double a, double b,
+                  std::function<Interval(Interval)> f)
+{
+   if (a == b) return;
+
+   LinVar x = lm.getLinVar(ix),
+          y = lm.getLinVar(iy);
+
+   Interval fa = f(a),
+            fb = f(b);
+
+   // slope null?
+   if (fa.overlaps(fb)) return;
+
+   Interval M = (fb - fa) / (Interval(a,b).width()),
+            P = fa - M*a;
+   double p = P.left();
+
+   //calculates the slope
+   double m;
+
+   if (a > 0.0)
+   {
+      m = M.left();
+   }
+   else if (b < 0.0)
+   {
+      m = M.right();
+   }
+   else
+   {
+      // a < 0 < b
+      m = M.left();
+
+      // deviation between f and the line at x=a
+      Interval da = Interval(m)*a + p - f(a);
+
+      // deviation between f and the line at x=b
+      Interval db = Interval(m)*b + p - f(b);
+
+      // deviation
+      double d = std::min(0.0, std::min(da.left(), db.left()));
+      Double::rndDn();
+      p += d;
+   }
+
+   // y - mx >= p
+   LinExpr e( {1.0, -m}, {y, x} );
+   lm.addCtr(p, e);
 }
 
 } // namespace

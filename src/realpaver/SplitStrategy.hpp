@@ -63,7 +63,6 @@ private:
    typedef std::list<NodeType> ContainerType;
 
    ContainerType cont_;
-   size_t nbnodes_;
    size_t nbsplits_;
 
 protected:
@@ -87,7 +86,6 @@ public:
 template <typename T>
 SplitStrategy<T>::SplitStrategy()
       : cont_(),
-        nbnodes_(0),
         nbsplits_(0)
 {}
 
@@ -98,7 +96,7 @@ SplitStrategy<T>::~SplitStrategy()
 template <typename T>
 size_t SplitStrategy<T>::getNbNodes() const
 {
-   return nbnodes_;
+   return cont_.size();
 }
 
 template <typename T>
@@ -119,7 +117,6 @@ template <typename T>
 void SplitStrategy<T>::reset()
 {
    cont_.clear();
-   nbnodes_ = 0;
    nbsplits_ = 0;
 }
 
@@ -128,7 +125,6 @@ void SplitStrategy<T>::push(NodeType node)
 {
    cont_.push_back(node);
    node->incrementDepth();
-   ++nbnodes_;
 }
 
 template <typename T>

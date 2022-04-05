@@ -1,2 +1,12 @@
 - Create a DAG from a .nl file
 
+- Convergence tres lente sur le probleme suivant car la propagation
+  est inoperante. (on a les derivees 2x - 2y = 2y - 2x = 0)
+
+Variables
+   x in [-1, 2],
+   y in [-3, 7]
+;
+
+Objectives
+   MIN x^2 - 2*x*y + y^2;

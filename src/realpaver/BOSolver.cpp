@@ -38,6 +38,8 @@ BOSolver::BOSolver(Problem& problem)
         upper_(Double::inf()),
         nbnodes_(0),
         nbpending_(0),
+        otol_(),
+        relaxval_(0.0),
         vmap21_(),
         vmap31_(),
         ptimer_(),
@@ -398,12 +400,29 @@ void BOSolver::calculateLower(SharedBONode& node)
    LPSolver lpsolver;
    model_->linearize(*reg, lpsolver);
 
+DEBUG("LINEAR RELAXATION\n" << lpsolver);
+
    // solving
    bool optimal = lpsolver.optimize();
    if (optimal)
    {
+ 
       double lb = lpsolver.getObjVal();
-      if (lb > node->getLower()) node->setLower(lb);
+
+      if (lb > node->getLower())
+      {
+         LOG_INTER("Lower bound found for node " << node->index()
+                                                 << ": " << lb);
+         node->setLower(lb);
+      }
+      else
+      {
+         LOG_INTER("Bug");
+      }
+   }
+   else
+   {
+      LOG_INTER("Lower bound not found for node " << node->index());
    }
 }
 
@@ -447,9 +466,7 @@ void BOSolver::calculateUpper(SharedBONode& node)
          if (u < upper_)
          {
             saveIncumbent(dest);
-
-            Tolerance otol = param_.getTolParam("OBJ_TOL");
-            objval_ = otol.maxIntervalDn(u);
+            objval_ = otol_.maxIntervalDn(u);
             upper_ = objval_.left();
 
             LOG_INTER("New upper bound of the global optimum: " << u);
@@ -497,9 +514,9 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
          SharedBONode subnode = *it;
          IntervalRegion* reg = subnode->region();
 
-         node->setIndex(nbnodes_);
+         subnode->setIndex(nbnodes_);
 
-         LOG_INTER("Node " << node->index() << ": " << *reg);
+         LOG_INTER("Node " << subnode->index() << ": " << *reg);
 
          // BB theorem
          Interval z(reg->get(v));
@@ -529,6 +546,7 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
             THROW_IF(subnode->getLower() > subnode->getUpper(),
                      "Lower bound greater than upper bound in a BO node");
 
+            LOG_INTER("Inserts node " << subnode->index() << " in the space");
             space.insertNode(subnode);
          }
       }
@@ -575,8 +593,7 @@ void BOSolver::branchAndBound()
    makeContractor();
 
    // creates the initial node
-   SharedBONode node;
- 
+   SharedBONode node; 
    bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
 
    if (osplit)
@@ -593,7 +610,7 @@ void BOSolver::branchAndBound()
    }
 
    node->setIndex(0);
-
+   
    // finds bounds of the objective in the initial node
    findInitialBounds(node);
 
@@ -614,7 +631,7 @@ void BOSolver::branchAndBound()
    // parameters
    double timelimit = param_.getDblParam("TIME_LIMIT");
    int nodelimit = param_.getIntParam("NODE_LIMIT");
-   Tolerance otol = param_.getTolParam("OBJ_TOL");
+   otol_ = param_.getTolParam("OBJ_TOL");
 
    bool iter = true;
    do
