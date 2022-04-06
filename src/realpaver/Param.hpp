@@ -44,7 +44,7 @@ public:
    /// Gets the value of an integral parameter
    /// @param name name of parameter
    /// @return value of parameter
-   int getIntParam(const string& name);
+   int getIntParam(const string& name) const;
 
    /// Sets the value of an integral parameter
    /// @param name name of parameter
@@ -54,7 +54,7 @@ public:
    /// Gets the value of a real parameter
    /// @param name name of parameter
    /// @return value of parameter
-   double getDblParam(const string& name);
+   double getDblParam(const string& name) const;
 
    /// Sets the value of a real parameter
    /// @param name name of parameter
@@ -64,7 +64,7 @@ public:
    /// Gets the value of a tolerance parameter
    /// @param name name of parameter
    /// @return value of parameter
-   Tolerance getTolParam(const string& name);
+   Tolerance getTolParam(const string& name) const;
 
    /// Sets the value of a tolerance parameter
    /// @param name name of parameter
@@ -74,7 +74,7 @@ public:
    /// Gets the value of a string parameter
    /// @param name name of parameter
    /// @return value of parameter
-   std::string getStrParam(const string& name);
+   std::string getStrParam(const string& name) const;
 
    /// Sets the value of a string parameter
    /// @param name name of parameter

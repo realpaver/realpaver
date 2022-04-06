@@ -79,15 +79,27 @@ public:
    /// @param v a variable of this
    void setInteriorVar(Variable v);
 
-   /// Tests if a variable is a boundary variable
+   /// Tests if a variable is a boundary variable when the model is created
    /// @param v a variable of this
    /// @return true if v is a boundary variable
    bool isBoundaryVar(Variable v) const;
 
-   /// Tests if a variable is an interior variable
+   /// Tests if a variable is a boundary variable in a given region
+   /// @param v a variable of this
+   /// @param reg domains of variables
+   /// @return true if v is a boundary variable in reg
+   bool isBoundaryVar(Variable v, const IntervalRegion& reg) const;
+
+   /// Tests if a variable is an interior variable when the model is created
    /// @param v a variable of this
    /// @return true if v is an interior variable
    bool isInteriorVar(Variable v) const;
+
+   /// Tests if a variable is an interior variable in a given region
+   /// @param v a variable of this
+   /// @param reg domains of variables
+   /// @return true if v is an interior variable in reg
+   bool isInteriorVar(Variable v, const IntervalRegion& reg) const;
 
    /// Makes a bitset stating which functions to relax
    /// @param reg domains of variables
@@ -97,8 +109,8 @@ public:
 
    /// Linearizes this model in a region
    /// @param reg the given region
-   /// @param lpm output LP model
-   void linearize(const IntervalRegion& reg, LPModel& lpm);
+   /// @param lm output LP model
+   void linearize(const IntervalRegion& reg, LPModel& lm);
 
    ///@{
    /// Overrides
@@ -125,15 +137,13 @@ private:
    Scope fullscope_;    // objscope_ union {z_}
    Scope boundary_;     // subset of objscope_
 
-   size_t if_;          // index of the objective function in the DAG
    size_t ic_;          // index of the objective constraint in the DAG
-   size_t id_;          // node index of the last derivative node in the DAG
+
+   Dag* odag_;          // DAG used to evaluate the objective function
 
    // size of the scope of the objective function
    size_t dim() const;
 
-// TODO
-//   Dag* getDag();
    DagFun* getDerivative(size_t i) const;
    DagFun* getObjConstraint() const;
 

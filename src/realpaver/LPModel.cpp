@@ -532,9 +532,9 @@ void LPModel::printCtrs(std::ostream& os) const
 void LPModel::printObj(std::ostream& os) const
 {
    if (minimization_)
-      os << "minimize ";
+      os << "MIN ";
    else
-      os << "maximize ";
+      os << "MAX ";
 
    printLinExpr(os, obj_);
    os << std::endl;

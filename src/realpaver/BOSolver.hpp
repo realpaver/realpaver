@@ -16,6 +16,7 @@
 #include "realpaver/BOSplit.hpp"
 #include "realpaver/Contractor.hpp"
 #include "realpaver/ContractorPool.hpp"
+#include "realpaver/LPSolver.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
@@ -87,6 +88,8 @@ private:
    BOSplit* split_;              // splitting strategy
    SharedContractor contractor_; // contraction strategy
 
+   LPSolver* lpsolver_;
+
    SharedIntervalRegion init_;   // initial region
    OptimizationStatus status_;   // status resulting from an optimization
    IntervalRegion sol_;          // best solution found (incumbent solution)
@@ -94,9 +97,7 @@ private:
    double upper_;                // refined upper bound of the global minimum
    int nbnodes_;                 // number of nodes processed (BB algorithm)
    int nbpending_;               // number of pending nodes (BB algorithm)
-
-   Tolerance otol_;
-   double relaxval_;
+   Tolerance otol_;              // tolerance on the global optimum
 
    typedef Preprocessor::VarVarMapType VarVarMapType;
 
@@ -130,6 +131,7 @@ private:
    void branchAndBound();
    bool bbStep(BOSpace& space, BOSpace& sol);
    void findInitialBounds(SharedBONode& node);
+   Proof reducePolytope(SharedBONode& node);
 };
 
 } // namespace

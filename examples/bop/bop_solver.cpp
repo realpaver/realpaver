@@ -39,7 +39,10 @@ int main(int argc, char** argv)
 
       // reads the parameters
       Param prm;
-      if (pfilename != "") prm.loadParam(pfilename);
+      if (pfilename != "")
+      {
+         prm.loadParam(pfilename);
+      }
 
       // logger
       LogLevel loglevel = StringToLogLevel(prm.getStrParam("LOG_LEVEL"));

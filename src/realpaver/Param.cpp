@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <limits>
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/Exception.hpp"
 #include "realpaver/Param.hpp"
@@ -61,7 +62,7 @@ Param::Param()
    strmap_.insert(std::make_pair("LOG_LEVEL",               "NONE"));
 }
 
-int Param::getIntParam(const string& name)
+int Param::getIntParam(const string& name) const
 {
    auto it = intmap_.find(name);
 
@@ -91,7 +92,7 @@ void Param::SetIntParam(const string& name, int val)
    instance_.setIntParam(name, val);
 }
 
-double Param::getDblParam(const string& name)
+double Param::getDblParam(const string& name) const
 {
    auto it = dblmap_.find(name);
 
@@ -121,7 +122,7 @@ void Param::SetDblParam(const string& name, double val)
    instance_.setDblParam(name, val);
 }
 
-std::string Param::getStrParam(const string& name)
+std::string Param::getStrParam(const string& name) const
 {
    auto it = strmap_.find(name);
 
@@ -151,7 +152,7 @@ void Param::SetStrParam(const string& name, const std::string& val)
    instance_.setStrParam(name, val);
 }
 
-Tolerance Param::getTolParam(const string& name)
+Tolerance Param::getTolParam(const string& name) const
 {
    auto it = tolmap_.find(name);
 
@@ -235,7 +236,7 @@ size_t Param::eatSpaces(const std::string& line, size_t first)
 void Param::processParam(const std::string& name, const std::string& val)
 {
    // Double
-   auto itd = instance_.dblmap_.find(name);
+   auto itd = dblmap_.find(name);
    if (itd != dblmap_.end())
    {
       Interval x(val.c_str());
@@ -246,7 +247,7 @@ void Param::processParam(const std::string& name, const std::string& val)
    }
 
    // Int
-   auto iti = instance_.intmap_.find(name);
+   auto iti = intmap_.find(name);
    if (iti != intmap_.end())
    {
       if (!isInt(val)) throwEx();
@@ -262,7 +263,7 @@ void Param::processParam(const std::string& name, const std::string& val)
    }
 
    // String
-   auto its = instance_.strmap_.find(name);
+   auto its = strmap_.find(name);
    if (its != strmap_.end())
    {
       strmap_[name] = val;
@@ -275,29 +276,29 @@ void Param::processParam(const std::string& name, const std::string& val)
       std::string prefix = name.substr(0, 4);
       std::string s = name.substr(4, name.size() - 4);
 
-      auto it = instance_.tolmap_.find(s);
+      auto it = tolmap_.find(s);
       Interval x(val.c_str());
 
-      if ((it != instance_.tolmap_.end()) && (!x.isEmpty()) && x.isPositive())
+      if ((it != tolmap_.end()) && (!x.isEmpty()) && x.isPositive())
       {
          if (prefix == "ABS_")
          {
             Tolerance tol = Tolerance::makeAbs(x.right());
-            instance_.tolmap_[s] = tol;
+            tolmap_[s] = tol;
             return;
          }
 
          if (prefix == "REL_")
          {
             Tolerance tol = Tolerance::makeRel(x.right());
-            instance_.tolmap_[s] = tol;
+            tolmap_[s] = tol;
             return;
          }
       }
    }
 
    // no parameter found
-   instance_.throwEx();
+   throwEx();
 }
 
 void Param::readParam(const std::string& line, size_t first)

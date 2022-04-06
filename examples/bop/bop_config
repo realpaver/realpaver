@@ -14,7 +14,7 @@
 ###############################################################################
 
 # Time limit in seconds
-TIME_LIMIT = 100.0
+TIME_LIMIT = 60.0
 
 # Tolerance on the width of an interval domain of a constrained variable
 # ABS_XTOL: absolute tolerance
@@ -29,7 +29,7 @@ REL_DTOL = 1.0e-6
 # Tolerance on the width of the enclosure of a global optimum
 # ABS_OBJ_TOL: absolute tolerance
 # REL_OBJ_TOL: relative tolerance
-REL_OBJ_TOL = 1.0e-6
+REL_OBJ_TOL = 1.0e-4
 
 # Number of digits used to print floating-point numbers and intervals
 FLOAT_PRECISION = 12
@@ -98,7 +98,7 @@ SPLIT_NB_SLICES = 5
 # leads to a propagation step with respect to this variable.
 # ABS_PROPAGATION_DTOL: absolute tolerance
 # REL_PROPAGATION_DTOL: relative tolerance
-REL_PROPAGATION_DTOL = 1.0e-3
+REL_PROPAGATION_DTOL = 1.0e-4
 
 # Iteration limit for the main constraint propagation loop
 PROPAGATION_ITER_LIMIT = 50

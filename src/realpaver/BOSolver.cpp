@@ -15,7 +15,6 @@
 #include "realpaver/IntContractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/ListContractor.hpp"
-#include "realpaver/LPSolver.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/Selector.hpp"
@@ -31,6 +30,7 @@ BOSolver::BOSolver(Problem& problem)
         localSolver_(nullptr),
         split_(nullptr),
         contractor_(nullptr),
+        lpsolver_(nullptr),
         init_(nullptr),
         status_(OptimizationStatus::Other),
         sol_(problem.scope()),
@@ -39,7 +39,6 @@ BOSolver::BOSolver(Problem& problem)
         nbnodes_(0),
         nbpending_(0),
         otol_(),
-        relaxval_(0.0),
         vmap21_(),
         vmap31_(),
         ptimer_(),
@@ -54,6 +53,7 @@ BOSolver::~BOSolver()
    if (split_ != nullptr)       delete split_;
    if (localSolver_ != nullptr) delete localSolver_;
    if (model_ != nullptr)       delete model_;
+   if (lpsolver_ != nullptr)    delete lpsolver_;
 }
 
 double BOSolver::getPreprocessingTime() const
@@ -396,34 +396,91 @@ void BOSolver::calculateLower(SharedBONode& node)
    Interval z = reg->get(model_->getObjVar());
    if (z.left() > node->getLower()) node->setLower(z.left());
 
-   // linear relaxation
-   LPSolver lpsolver;
-   model_->linearize(*reg, lpsolver);
+   LOG_LOW("Lower bound for node " << node->index()
+                                   << " after  propagation: "
+                                   << node->getLower());
 
-DEBUG("LINEAR RELAXATION\n" << lpsolver);
+   // linear relaxation
+   if (lpsolver_ != nullptr) delete lpsolver_;
+   lpsolver_ = new LPSolver;
+
+   model_->linearize(*reg, *lpsolver_);
 
    // solving
-   bool optimal = lpsolver.optimize();
+   bool optimal = lpsolver_->optimize();
    if (optimal)
    {
- 
-      double lb = lpsolver.getObjVal();
+      double lb = lpsolver_->getObjVal();
 
       if (lb > node->getLower())
       {
-         LOG_INTER("Lower bound found for node " << node->index()
-                                                 << ": " << lb);
+         LOG_INTER("Lower bound improved for node " << node->index()
+                                                    << ": " << lb);
          node->setLower(lb);
       }
       else
       {
-         LOG_INTER("Bug");
+         LOG_INTER("Lower bound not improved for node " << node->index()
+                                                        << " (" << lb << ")");
       }
    }
    else
    {
       LOG_INTER("Lower bound not found for node " << node->index());
    }
+}
+
+Proof BOSolver::reducePolytope(SharedBONode& node)
+{
+   IntervalRegion* reg = node->region();
+   Scope sco = model_->getObjScope();
+   Dag* dag = model_->getDag();
+
+   for (Variable v : sco)
+   {
+      if (model_->isInteriorVar(v, *reg))
+      {
+         DagNode* node = dag->findVarNode(v.getId());
+
+         size_t iv = node->indexLinVar();
+         LinVar lv = lpsolver_->getLinVar(iv);
+
+         // minimize v
+         LinExpr e( {1.0}, {lv} );
+         lpsolver_->setObj(e, true);
+
+         lpsolver_->optimize();
+         OptimizationStatus status = lpsolver_->getStatus();
+
+         if (status == OptimizationStatus::Infeasible) return Proof::Empty;
+
+         if (status == OptimizationStatus::Optimal)
+         {
+            Interval x = Interval::moreThan(lpsolver_->getObjVal() - 1.0e-8);
+            Interval y = reg->get(v) & x;
+
+            if (y.isEmpty()) return Proof::Empty;
+            else reg->set(v, y);
+         }
+
+         // maximize v
+         lpsolver_->setObj(e, false);
+         lpsolver_->optimize();
+         status = lpsolver_->getStatus();
+
+         if (status == OptimizationStatus::Infeasible) return Proof::Empty;
+
+         if (status == OptimizationStatus::Optimal)
+         {
+            Interval x = Interval::lessThan(lpsolver_->getObjVal() + 1.0e-8);
+            Interval y = reg->get(v) & x;
+
+            if (y.isEmpty()) return Proof::Empty;
+            else reg->set(v, y);
+         }
+      }
+   }
+   return Proof::Maybe;
 }
 
 void BOSolver::saveIncumbent(const RealPoint& pt)
@@ -486,6 +543,9 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
       return false;
    }
 
+   LOG_INTER("Current enclosure of the optimum: " << objval_);
+   LOG_INTER("Current lowest lower bound: " << space.getLowestLowerBound());
+
    SharedBONode node = space.extractNode();
 
    LOG_INTER("Extracts node " << node->index());
@@ -546,8 +606,16 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
             THROW_IF(subnode->getLower() > subnode->getUpper(),
                      "Lower bound greater than upper bound in a BO node");
 
-            LOG_INTER("Inserts node " << subnode->index() << " in the space");
-            space.insertNode(subnode);
+            // must be called after calculateLower
+            proof = reducePolytope(subnode);
+            LOG_INTER("Polytope reduction -> " << proof);
+
+            if (proof != Proof::Empty)
+            {
+               LOG_INTER("New region:  " << *subnode->region());
+               LOG_INTER("Inserts node " << subnode->index() << " in the space");
+               space.insertNode(subnode);
+            }
          }
       }
 
@@ -560,8 +628,6 @@ bool BOSolver::bbStep(BOSpace& space, BOSpace& sol)
 
 void BOSolver::findInitialBounds(SharedBONode& node)
 {
-   LOG_INTER("Node " << node->index() << ": " << *node->region());
-
    // upper bound of the global minimum
    upper_ = Double::inf();
 
@@ -592,6 +658,11 @@ void BOSolver::branchAndBound()
    makeSplit();
    makeContractor();
 
+   // parameters
+   double timelimit = param_.getDblParam("TIME_LIMIT");
+   int nodelimit = param_.getIntParam("NODE_LIMIT");
+   otol_ = param_.getTolParam("OBJ_TOL");
+
    // creates the initial node
    SharedBONode node; 
    bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
@@ -610,7 +681,9 @@ void BOSolver::branchAndBound()
    }
 
    node->setIndex(0);
-   
+
+   LOG_INTER("Node " << node->index() << ": " << *node->region());
+
    // finds bounds of the objective in the initial node
    findInitialBounds(node);
 
@@ -628,10 +701,9 @@ void BOSolver::branchAndBound()
    // creates the space of solution nodes, i.e. nodes that cannot be split
    BOSpace sol;
 
-   // parameters
-   double timelimit = param_.getDblParam("TIME_LIMIT");
-   int nodelimit = param_.getIntParam("NODE_LIMIT");
-   otol_ = param_.getTolParam("OBJ_TOL");
+   LOG_INTER("Tolerance on the global optimum: " << otol_);
+   LOG_INTER("Time limit: " << timelimit << "s");
+   LOG_INTER("Node limit: " << nodelimit);
 
    bool iter = true;
    do
@@ -641,7 +713,14 @@ void BOSolver::branchAndBound()
       double L = std::min(space.getLowestLowerBound(),
                           sol.getLowestLowerBound());
 
-      if (space.isEmpty() || L >= objval_.left())
+      if (space.isEmpty())
+      {
+         LOG_MAIN("Stop since the space is empty");
+         iter = false;
+         status_ = OptimizationStatus::Optimal;         
+      }
+
+      if (iter && L >= objval_.left())
       {
          LOG_MAIN("Stop on global optimum at desired tolerance");
          iter = false;

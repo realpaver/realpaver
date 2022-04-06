@@ -19,9 +19,8 @@ BOModel::BOModel(Problem& problem, bool withobj)
         objscope_(),
         fullscope_(),
         boundary_(),
-        if_(0),
         ic_(0),
-        id_(0)
+        odag_(nullptr)
 {
    bool ismin = problem.getObjective().isMinimization();
 
@@ -36,6 +35,7 @@ BOModel::BOModel(Problem& problem, bool withobj)
 
    // DAG
    dag_ = new Dag();
+   odag_ = new Dag();
    
    // for each variable but z_creates the equation df / dv = 0 and assigns its
    // tolerance to 0, i.e. its domain is split whenever it is possible
@@ -56,13 +56,12 @@ BOModel::BOModel(Problem& problem, bool withobj)
       boundary_.insert(v);
       fullscope_.insert(v);
    }
-   id_ = dag_->nbNodes() - 1;
 
    // objective function
    if (withobj)
    {
       // objective function
-      if_ = dag_->insert(tomin);
+      odag_->insert(tomin);
 
       // new variable representing the objective function
       z_ = problem.addRealVar(Interval::universe(), "_z");
@@ -95,6 +94,7 @@ BOModel::BOModel(Problem& problem, bool withobj)
 BOModel::~BOModel()
 {
    delete init_;
+   delete odag_;
    delete dag_;
 }
 
@@ -143,9 +143,28 @@ bool BOModel::isBoundaryVar(Variable v) const
    return boundary_.contains(v);
 }
 
+bool BOModel::isBoundaryVar(Variable v, const IntervalRegion& reg) const
+{
+   bool res = false;
+
+   if (isBoundaryVar(v))
+   {
+      Interval x(init_->get(v));
+      Interval y(reg.get(v));
+      if (!x.strictlyContains(y)) res = true;
+   }
+
+   return res;   
+}
+
 bool BOModel::isInteriorVar(Variable v) const
 {
    return !boundary_.contains(v);
+}
+
+bool BOModel::isInteriorVar(Variable v, const IntervalRegion& reg) const
+{
+   return !isBoundaryVar(v, reg);
 }
 
 Bitset BOModel::makeRelaxationBitset(const IntervalRegion& reg)
@@ -159,34 +178,29 @@ Bitset BOModel::makeRelaxationBitset(const IntervalRegion& reg)
 
    for (Variable v : objscope_)
    {
-      if (isBoundaryVar(v))
-      {
-         Interval x(init_->get(v));
-         Interval y(reg.get(v));
-         if (!x.strictlyContains(y)) bs.setZero(i);
-      }
+      if (isBoundaryVar(v, reg)) bs.setZero(i);
       i = i + 1;
    }
 
    return bs;
 }
 
-void BOModel::linearize(const IntervalRegion& reg, LPModel& lpm)
+void BOModel::linearize(const IntervalRegion& reg, LPModel& lm)
 {
    // evaluates the DAG => every node has a domain
    dag_->eval(reg);
    
    // linearizes the functions
    Bitset bs = makeRelaxationBitset(reg);
-   dag_->linearize(lpm, bs);
+   dag_->linearize(lm, bs);
 
    // defines the objective function
    // assumes that the objective variable is the last variable in the DAG
    DagVar* node = dag_->varNode(dag_->nbVars()-1);
-   LinVar z = lpm.getLinVar(node->indexLinVar());
+   LinVar z = lm.getLinVar(node->indexLinVar());
 
    LinExpr e = { {1.0}, {z} };
-   lpm.setObj(e, true);
+   lm.setObj(e, true);
 }
 
 IntervalRegion BOModel::getInitRegion() const
@@ -211,14 +225,14 @@ size_t BOModel::funArity() const
 
 double BOModel::realEval(const RealPoint& pt)
 {
-   return dag_->fun(if_)->reval(pt);
+   return odag_->fun(0)->reval(pt);
 }
 
 void BOModel::realDiff(const RealPoint& pt, RealVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   DagFun* f = dag_->fun(if_);
+   DagFun* f = odag_->fun(0);
 
    f->reval(pt);
    f->rdiff();
@@ -229,7 +243,7 @@ double BOModel::realEvalDiff(const RealPoint& pt, RealVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   DagFun* f = dag_->fun(if_);
+   DagFun* f = odag_->fun(0);
 
    double e = f->reval(pt);
    f->rdiff();
@@ -239,19 +253,19 @@ double BOModel::realEvalDiff(const RealPoint& pt, RealVector& g)
 
 Interval BOModel::intervalEval(const IntervalRegion& reg)
 {
-   return dag_->fun(if_)->eval(reg);
+   return odag_->fun(0)->eval(reg);
 }
 
 Interval BOModel::intervalPointEval(const RealPoint& pt)
 {   
-   return dag_->fun(if_)->eval(pt);
+   return odag_->fun(0)->eval(pt);
 }
 
 void BOModel::intervalDiff(const IntervalRegion& reg, IntervalVector& g)
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   DagFun* f = dag_->fun(if_);
+   DagFun* f = odag_->fun(0);
 
    f->eval(reg);
    f->diff();
@@ -263,7 +277,7 @@ Interval BOModel::intervalEvalDiff(const IntervalRegion& reg,
 {
    ASSERT(g.size() == dim(), "Gradient with a bad dimension");
 
-   DagFun* f = dag_->fun(if_);
+   DagFun* f = odag_->fun(0);
 
    Interval e = f->eval(reg);
    f->diff();
