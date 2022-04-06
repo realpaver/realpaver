@@ -449,7 +449,7 @@ Proof BOSolver::reducePolytope(SharedBONode& node)
          LinExpr e( {1.0}, {lv} );
          lpsolver_->setObj(e, true);
 
-         lpsolver_->optimize();
+         lpsolver_->reoptimize();
          OptimizationStatus status = lpsolver_->getStatus();
 
          if (status == OptimizationStatus::Infeasible) return Proof::Empty;
@@ -465,7 +465,7 @@ Proof BOSolver::reducePolytope(SharedBONode& node)
 
          // maximize v
          lpsolver_->setObj(e, false);
-         lpsolver_->optimize();
+         lpsolver_->reoptimize();
          status = lpsolver_->getStatus();
 
          if (status == OptimizationStatus::Infeasible) return Proof::Empty;

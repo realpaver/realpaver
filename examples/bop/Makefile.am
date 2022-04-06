@@ -24,4 +24,5 @@ EXTRA_DIST = \
 	Beale.bop \
 	Colville.bop \
 	SixHumpCamel.bop \
+	Shubert.bop \
 	ThreeHumpCamel.bop

@@ -124,6 +124,11 @@ bool LPSolver::optimize()
 
 bool LPSolver::reoptimize()
 {
+   int n = getNbLinVars();
+
+   for (int i=0; i<n; ++i)
+      simplex_->setObjectiveCoefficient(i, 0.0);
+
    makeObj();
    return run();
 }
