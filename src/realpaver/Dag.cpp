@@ -1526,8 +1526,46 @@ bool DagCos::rdiff()
 }
 
 void DagCos::linearizeImpl(LPModel& lm)
-{
-   // LINEARIZE TODO
+{   
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   auto f  = [](const Interval& x) { return cos(x); };
+   auto df = [](const Interval& x) { return -sin(x); };
+
+   // concave function ?
+   if (val().isStrictlyPositive())
+   {
+      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
+      underConcave(lm, iy, ix, a, b, f);      
+   }
+
+   // convex function ?
+   else if (val().isStrictlyNegative())
+   {
+      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
+      overConvex(lm, iy, ix, a, b, f);
+   }
+
+   // the curve of cos(x) crosses the x-axis => concave and convex
+   // relaxation if there is no stationary point, i.e. value in (-1, +1)
+   else if (Interval::minusOnePlusOne().strictlyContains(val()))
+   {
+      relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1574,7 +1612,45 @@ bool DagSin::rdiff()
 
 void DagSin::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   auto f  = [](const Interval& x) { return sin(x); };
+   auto df = [](const Interval& x) { return cos(x); };
+
+   // concave function?
+   if (val().isStrictlyPositive())
+   {
+      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
+      underConcave(lm, iy, ix, a, b, f);      
+   }
+
+   // convex function?
+   else if (val().isStrictlyNegative())
+   {
+      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
+      overConvex(lm, iy, ix, a, b, f);
+   }
+
+   // the curve of sin(x) crosses the x-axis => concave and convex
+   // relaxation if there is no stationary point, i.e. value in (-1, +1)
+   else if (Interval::minusOnePlusOne().strictlyContains(val()))
+   {
+      relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

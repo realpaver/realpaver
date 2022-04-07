@@ -29,7 +29,7 @@ REL_DTOL = 1.0e-6
 # Tolerance on the width of the enclosure of a global optimum
 # ABS_OBJ_TOL: absolute tolerance
 # REL_OBJ_TOL: relative tolerance
-REL_OBJ_TOL = 1.0e-4
+REL_OBJ_TOL = 1.0e-6
 
 # Number of digits used to print floating-point numbers and intervals
 FLOAT_PRECISION = 12

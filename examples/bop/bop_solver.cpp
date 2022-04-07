@@ -134,7 +134,8 @@ int main(int argc, char** argv)
 
          cout << GRAY(sep) << endl;
          cout << BLUE("Solution found") << endl;
-         cout << std::scientific << std::setprecision(prec);
+//         cout << std::scientific << std::setprecision(prec);
+         cout << std::setprecision(prec);
    
          RealPoint sol = solver.getBestSolution();
 

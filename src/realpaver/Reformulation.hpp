@@ -34,6 +34,11 @@ void underConcave(LPModel& lm, size_t iy, size_t ix,
                   double a, double b,
                   std::function<Interval(Interval)> f);
 
+void relaxConcavoConvexCosSin(LPModel& lm, size_t iy, size_t ix,
+                              double a, double b,
+                              std::function<Interval(Interval)> f, 
+                              std::function<Interval(Interval)> df);
+
 } // namespace
 
 #endif

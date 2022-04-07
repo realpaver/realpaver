@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=163
+current_page=153
 FILE_NAME_0=11028;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fconfigure.ac;0;3
 FILE_NAME_1=755;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fwork%2Fwork.cpp;0;3
 FILE_NAME_2=207;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fwork%2FMakefile.am;0;3
@@ -167,7 +167,7 @@ FILE_NAME_134=1591;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver
 FILE_NAME_135=1067;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FRealPoint.hpp;0;3
 FILE_NAME_136=1097;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FMaxCIDContractor.cpp;0;3
 FILE_NAME_137=1497;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FMaxCIDContractor.hpp;0;3
-FILE_NAME_138=23124;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FDag.cpp;0;3
+FILE_NAME_138=30083;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FDag.cpp;0;3
 FILE_NAME_139=36166;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FDag.hpp;0;3
 FILE_NAME_140=3836;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FSymbolTable.cpp;0;3
 FILE_NAME_141=1381;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FSymbolTable.hpp;0;3
@@ -182,16 +182,16 @@ FILE_NAME_149=724;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%
 FILE_NAME_150=1221;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FFunction.hpp;0;3
 FILE_NAME_151=1750;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FLPSolverGurobi.hpp;0;3
 FILE_NAME_152=1760;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FLPSolverClp.hpp;0;3
-FILE_NAME_153=1296;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2Fbop_solver.cpp;0;3
+FILE_NAME_153=4258;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2Fbop_solver.cpp;0;3
 FILE_NAME_154=958;Make;0;EUTF-8;1;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FMakefile.am;0;3
 FILE_NAME_155=138;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FBeale.bop;0;3
 FILE_NAME_156=106;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FThreeHumpCamel.bop;0;3
 FILE_NAME_157=117;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FSixHumpCamel.bop;0;3
 FILE_NAME_158=248;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FColville.bop;0;3
 FILE_NAME_159=83;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FTest.bop;0;3
-FILE_NAME_160=4438;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2Fbop_config;0;3
-FILE_NAME_161=4385;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FReformulation.cpp;0;3
-FILE_NAME_162=997;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FReformulation.hpp;0;3
+FILE_NAME_160=1785;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2Fbop_config;0;3
+FILE_NAME_161=5659;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FReformulation.cpp;0;3
+FILE_NAME_162=1791;C++;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fsrc%2Frealpaver%2FReformulation.hpp;0;3
 FILE_NAME_163=235;None;0;EUTF-8;0;1;0;%2Fhome%2Fgranvilliers-l%2Fdev%2Frealpaver%2Fexamples%2Fbop%2FShubert.bop;0;3
 
 [VTE]
