@@ -23,6 +23,10 @@ EXTRA_DIST = \
 	bop_config \
 	Beale.bop \
 	Colville.bop \
+	DropWave.bop \
+	GoldsteinPrice.bop \
+	Rastrigin.bop \
+	Schwefel.bop \
 	SixHumpCamel.bop \
 	Shubert.bop \
 	ThreeHumpCamel.bop

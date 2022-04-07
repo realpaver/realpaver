@@ -81,44 +81,7 @@ void overConvex(LPModel& lm, size_t iy, size_t ix,
    Interval fa = f(a),
             fb = f(b);
 
-   // slope null?
-   if (fa.overlaps(fb)) return;
-
-   Interval M = (fb - fa) / (Interval(a,b).width()),
-            P = fa - M*a;
-   double p = P.right();
-
-   //calculates the slope
-   double m;
-
-   if (a > 0.0)
-   {
-      m = M.right();
-   }
-   else if (b < 0.0)
-   {
-      m = M.left();
-   }
-   else
-   {
-      // a < 0 < b
-      m = M.left();
-
-      // deviation between f and the line at x=a
-      Interval da = Interval(m)*a + p - f(a);
-
-      // deviation between f and the line at x=b
-      Interval db = Interval(m)*b + p - f(b);
-
-      // deviation
-      double d = std::min(0.0, std::min(da.left(), db.left()));
-      Double::rndUp();
-      p -= d;
-   }
-
-   // y - mx <= p
-   LinExpr e( {1.0, -m}, {y, x} );
-   lm.addCtr(e, p);
+   return overLine(lm, iy, ix, a, fa.right(), b, fb.right());
 }
 
 void overConcave(LPModel& lm, size_t iy, size_t ix,
@@ -180,52 +143,10 @@ void underConcave(LPModel& lm, size_t iy, size_t ix,
                   double a, double b,
                   std::function<Interval(Interval)> f)
 {
-   if (a == b) return;
-
-   LinVar x = lm.getLinVar(ix),
-          y = lm.getLinVar(iy);
-
    Interval fa = f(a),
             fb = f(b);
 
-   // slope null?
-   if (fa.overlaps(fb)) return;
-
-   Interval M = (fb - fa) / (Interval(a,b).width()),
-            P = fa - M*a;
-   double p = P.left();
-
-   //calculates the slope
-   double m;
-
-   if (a > 0.0)
-   {
-      m = M.left();
-   }
-   else if (b < 0.0)
-   {
-      m = M.right();
-   }
-   else
-   {
-      // a < 0 < b
-      m = M.left();
-
-      // deviation between f and the line at x=a
-      Interval da = Interval(m)*a + p - f(a);
-
-      // deviation between f and the line at x=b
-      Interval db = Interval(m)*b + p - f(b);
-
-      // deviation
-      double d = std::min(0.0, std::min(da.left(), db.left()));
-      Double::rndDn();
-      p += d;
-   }
-
-   // y - mx >= p
-   LinExpr e( {1.0, -m}, {y, x} );
-   lm.addCtr(p, e);
+   return underLine(lm, iy, ix, a, fa.left(), b, fb.left());
 }
 
 void relaxConcavoConvexCosSin(LPModel& lm, size_t iy, size_t ix,
@@ -264,6 +185,120 @@ void relaxConcavoConvexCosSin(LPModel& lm, size_t iy, size_t ix,
       Interval p2 = fb + b;
       LinExpr e2( {1.0, 1.0}, {y, x} );
       lm.addCtr(e2, p2.right());
+   }
+}
+
+void overLine(LPModel& lm, size_t iy, size_t ix,
+              double x1, double y1, double x2, double y2)
+{
+   if (x1 == x2) return;
+
+   if (x2 < x1)
+   {
+      std::swap(x1, x2);
+      std::swap(y1, y2);
+   }
+
+   LinVar x = lm.getLinVar(ix),
+          y = lm.getLinVar(iy);
+
+   // slope
+   Interval M((Interval(y2) - y1) / (Interval(x2) - x1));
+
+   if (M.containsZero())
+   {
+      LinExpr e( {1.0}, {y} );
+      lm.addCtr(e, std::max(y1, y2));
+   }
+   else
+   {
+      Interval P(y1 - M*x1);
+      double p = P.right(), m;
+
+      if (x2 <= 0.0)
+      {
+         m = M.left();
+      }
+      else if (x1 >= 0.0)
+      {
+         m = M.right();         
+      }
+      else
+      {
+         m = M.left();
+
+         Interval v1(y1 - Interval(m)*x1 - P),
+                  v2(y2 - Interval(m)*x2 - P);
+
+         double d = std::max(v1.right(), v2.right());
+
+         if (d > 0.0)
+         {
+            Double::rndUp();
+            p += d;
+         }
+      }
+
+      // y <= mx + p
+      LinExpr e( {1.0, -m}, {y, x} );
+      lm.addCtr(e, p);         
+   }
+}
+
+void underLine(LPModel& lm, size_t iy, size_t ix,
+              double x1, double y1, double x2, double y2)
+{
+   if (x1 == x2) return;
+
+   if (x2 < x1)
+   {
+      std::swap(x1, x2);
+      std::swap(y1, y2);
+   }
+
+   LinVar x = lm.getLinVar(ix),
+          y = lm.getLinVar(iy);
+
+   // slope
+   Interval M((Interval(y2) - y1) / (Interval(x2) - x1));
+
+   if (M.containsZero())
+   {
+      LinExpr e( {1.0}, {y} );
+      lm.addCtr(std::min(y1, y2), e);
+   }
+   else
+   {
+      Interval P(y1 - M*x1);
+      double p = P.left(), m;
+
+      if (x2 <= 0.0)
+      {
+         m = M.right();
+      }
+      else if (x1 >= 0.0)
+      {
+         m = M.left();         
+      }
+      else
+      {
+         m = M.left();
+
+         Interval v1(Interval(m)*x1 + P - y1),
+                  v2(Interval(m)*x2 + P - y2);
+
+         double d = std::max(v1.right(), v2.right());
+
+         if (d > 0.0)
+         {
+            Double::rndDn();
+            p -= d;
+         }
+      }
+
+      // y >= mx + p
+      LinExpr e( {1.0, -m}, {y, x} );
+      lm.addCtr(p, e);         
    }
 }
 

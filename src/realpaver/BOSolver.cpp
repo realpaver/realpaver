@@ -725,6 +725,7 @@ void BOSolver::branchAndBound()
          LOG_MAIN("Stop on global optimum at desired tolerance");
          iter = false;
          status_ = OptimizationStatus::Optimal;         
+         objval_.setLeft(L);
       }
 
       if (iter &&
@@ -733,6 +734,7 @@ void BOSolver::branchAndBound()
          LOG_MAIN("Stop on time limit (" << timelimit << "s)");
          iter = false;
          status_ = OptimizationStatus::StopOnTimeLimit;
+         objval_.setLeft(L);
       }
 
       if (iter && nbnodes_ > nodelimit)
@@ -740,6 +742,7 @@ void BOSolver::branchAndBound()
          LOG_MAIN("Stop on node limit (" << nodelimit << ")");
          iter = false;
          status_ = OptimizationStatus::StopOnNodeLimit;
+         objval_.setLeft(L);
       }
    }
    while (iter);

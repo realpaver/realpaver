@@ -1102,11 +1102,11 @@ void DagAbs::linearizeImpl(LPModel& lm)
    }
    else
    {
-      // lower-bound constraint: y >= x <=> y - x >= 0
+      // underestimation: y >= x <=> y - x >= 0
       LinExpr e1( {1.0, -1.0}, {y, x} );
       lm.addCtr(0.0, e1);
 
-      // lower-bound constraint: y >= -x <=> y + x >= 0
+      // underestimation: y >= -x <=> y + x >= 0
       LinExpr e2( {1.0, 1.0}, {y, x} );
       lm.addCtr(0.0, e2);
 
@@ -1212,12 +1212,10 @@ void DagSqr::linearizeImpl(LPModel& lm)
    auto f  = [](const Interval& x) { return sqr(x); };
    auto df = [](const Interval& x) { return 2.0*x; };
 
-   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
    underConvex(lm, iy, ix, a, b, a, f, df);
    underConvex(lm, iy, ix, a, b, b, f, df);
    underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-   // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
    overConvex(lm, iy, ix, a, b, f);
 }
 
@@ -1276,12 +1274,10 @@ void DagSqrt::linearizeImpl(LPModel& lm)
    auto f  = [](const Interval& x) { return sqrt(x); };
    auto df = [](const Interval& x) { return 1.0/(2.0*sqrt(x)); };
 
-   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
    overConcave(lm, iy, ix, a, b, a, f, df);
    overConcave(lm, iy, ix, a, b, b, f, df);
    overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-   // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
    underConcave(lm, iy, ix, a, b, f);
 }
 
@@ -1353,7 +1349,47 @@ bool DagPow::rdiff()
 
 void DagPow::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+   
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   int n = exponent();
+
+   auto f  = [&n](const Interval& x) { return pow(x, n); };
+   auto df = [&n](const Interval& x) { return n*pow(x, n-1); };
+
+   if (n % 2 == 0 || a >= 0.0)
+   {
+      // convex function
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      overConvex(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      if (b <= 0.0)
+      {
+         // odd power, concave function
+         overConcave(lm, iy, ix, a, b, a, f, df);
+         overConcave(lm, iy, ix, a, b, b, f, df);
+         overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+         underConcave(lm, iy, ix, a, b, f);         
+      }
+      else
+      {
+         // odd power, concave over [a, 0] and convex in [0, b]
+         LinVar y = lm.getLinVar(iy),
+                x = lm.getLinVar(ix);
+
+         // TODO
+
+      }
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1409,12 +1445,10 @@ void DagExp::linearizeImpl(LPModel& lm)
    auto f  = [](const Interval& x) { return exp(x); };
    auto df = [](const Interval& x) { return exp(x); };
 
-   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
    underConvex(lm, iy, ix, a, b, a, f, df);
    underConvex(lm, iy, ix, a, b, b, f, df);
    underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-   // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
    overConvex(lm, iy, ix, a, b, f);
 }
 
@@ -1462,23 +1496,21 @@ bool DagLog::rdiff()
 
 void DagLog::linearizeImpl(LPModel& lm)
 {
+   if (val().isInf()) return;
+
    size_t iy = indexLinVar(),
           ix = child()->indexLinVar();
 
    double a = child()->val().left(),
           b = child()->val().right();
 
-   if (a <= 0.0) return;
-
    auto f  = [](const Interval& x) { return log(x); };
    auto df = [](const Interval& x) { return 1.0/x; };
 
-   // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
    overConcave(lm, iy, ix, a, b, a, f, df);
    overConcave(lm, iy, ix, a, b, b, f, df);
    overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-   // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
    underConcave(lm, iy, ix, a, b, f);
 }
 
@@ -1536,36 +1568,30 @@ void DagCos::linearizeImpl(LPModel& lm)
    auto f  = [](const Interval& x) { return cos(x); };
    auto df = [](const Interval& x) { return -sin(x); };
 
-   // concave function ?
-   if (val().isStrictlyPositive())
+   if (val().isPositive())
    {
-      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      // concave function
       overConcave(lm, iy, ix, a, b, a, f, df);
       overConcave(lm, iy, ix, a, b, b, f, df);
       overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-      // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
       underConcave(lm, iy, ix, a, b, f);      
    }
-
-   // convex function ?
-   else if (val().isStrictlyNegative())
+   else if (val().isNegative())
    {
-      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      // convex function
       underConvex(lm, iy, ix, a, b, a, f, df);
       underConvex(lm, iy, ix, a, b, b, f, df);
       underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-      // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
       overConvex(lm, iy, ix, a, b, f);
    }
-
-   // the curve of cos(x) crosses the x-axis => concave and convex
-   // relaxation if there is no stationary point, i.e. value in (-1, +1)
    else if (Interval::minusOnePlusOne().strictlyContains(val()))
    {
+      // concavo-convex function
       relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
    }
+   // else there is a stationaty point => no relaxation
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1621,36 +1647,30 @@ void DagSin::linearizeImpl(LPModel& lm)
    auto f  = [](const Interval& x) { return sin(x); };
    auto df = [](const Interval& x) { return cos(x); };
 
-   // concave function?
-   if (val().isStrictlyPositive())
+   if (val().isPositive())
    {
-      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+   // concave function
       overConcave(lm, iy, ix, a, b, a, f, df);
       overConcave(lm, iy, ix, a, b, b, f, df);
       overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-      // lower-bound constraint: line passing through (a, f(a)) and (b, f(b))
       underConcave(lm, iy, ix, a, b, f);      
    }
-
-   // convex function?
-   else if (val().isStrictlyNegative())
+   else if (val().isNegative())
    {
-      // lower-bound constraints: tangents at x = a and x = b and x = (a+b)/2
+      // convex function
       underConvex(lm, iy, ix, a, b, a, f, df);
       underConvex(lm, iy, ix, a, b, b, f, df);
       underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 
-      // upper-bound constraint: line passing through (a, f(a)) and (b, f(b))
       overConvex(lm, iy, ix, a, b, f);
    }
-
-   // the curve of sin(x) crosses the x-axis => concave and convex
-   // relaxation if there is no stationary point, i.e. value in (-1, +1)
    else if (Interval::minusOnePlusOne().strictlyContains(val()))
    {
+      // concavo-convex function
       relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
    }
+   // else there is a stationary point => no relaxation
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1697,7 +1717,53 @@ bool DagTan::rdiff()
 
 void DagTan::linearizeImpl(LPModel& lm)
 {
-   // LINEARIZE TODO
+   if (val().isInf()) return;
+
+   size_t iy = indexLinVar(),
+          ix = child()->indexLinVar();
+
+   double a = child()->val().left(),
+          b = child()->val().right();
+
+   auto f  = [](const Interval& x) { return tan(x); };
+   auto df = [](const Interval& x) { return 1.0/sqr(cos(x)); };
+
+   if (val().isNegative())
+   {
+      // convex function
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      overConvex(lm, iy, ix, a, b, f);
+   }
+   else if (val().isPositive())
+   {
+      // concave function
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      underConcave(lm, iy, ix, a, b, f);         
+   }
+   else
+   {
+      // concavo-convex function
+      LinVar x = lm.getLinVar(ix),
+             y = lm.getLinVar(iy);
+
+      // underestimation: under the line passing through
+      // (b, tan(b)) with slope 1, i.e. y <= x + p
+      Interval p1(val().right() - Interval(b));
+      LinExpr e1( {1.0, -1.0}, {y, x} );
+      lm.addCtr(e1, p1.right());
+
+      // overestimation: over the line passing through
+      // (a, tan(a)) with slope 1, i.e. y >= x + p
+      Interval p2(val().left() - Interval(a));
+      LinExpr e2( {1.0, -1.0}, {y, x} );
+      lm.addCtr(p2.left(), e2);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

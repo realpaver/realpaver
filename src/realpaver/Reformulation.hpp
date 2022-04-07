@@ -39,6 +39,12 @@ void relaxConcavoConvexCosSin(LPModel& lm, size_t iy, size_t ix,
                               std::function<Interval(Interval)> f, 
                               std::function<Interval(Interval)> df);
 
+void overLine(LPModel& lm, size_t iy, size_t ix,
+              double x1, double y1, double x2, double y2);
+
+void underLine(LPModel& lm, size_t iy, size_t ix,
+              double x1, double y1, double x2, double y2);
+
 } // namespace
 
 #endif

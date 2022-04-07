@@ -10,3 +10,5 @@ Variables
 
 Objectives
    MIN x^2 - 2*x*y + y^2;
+
+- Clause interval dans expr
