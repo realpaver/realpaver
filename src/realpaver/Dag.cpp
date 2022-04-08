@@ -11,6 +11,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Reformulation.hpp"
 
@@ -124,7 +125,7 @@ bool DagNode::dependsOn(const Bitset& bs) const
 
 bool DagNode::dependsOn(const Variable& v) const
 {
-   return bitset_.get(v.getId());
+   return bitset_.get(v.id());
 }
 
 int DagNode::indexLinVar() const
@@ -282,8 +283,8 @@ DagVar::DagVar(Dag* dag, size_t index, Variable v)
       : DagNode(dag, index),
         v_(v)
 {
-   bitset_ = Bitset(1 + v.getId(), 0);
-   bitset_.setOne(v.getId());
+   bitset_ = Bitset(1 + v.id(), 0);
+   bitset_.setOne(v.id());
 }
 
 void DagVar::print(std::ostream& os) const
@@ -308,7 +309,7 @@ void DagVar::eval(const RealPoint& pt)
 
 void DagVar::evalOnly(const Variable& v, const Interval& x)
 {
-   if (v_.getId() == v.getId())
+   if (v_.id() == v.id())
       setVal(x);
 }
 
@@ -1386,8 +1387,17 @@ void DagPow::linearizeImpl(LPModel& lm)
          LinVar y = lm.getLinVar(iy),
                 x = lm.getLinVar(ix);
 
-         // TODO
+         // best way, not implemented: find a tangent at point c in [0, b]
+         // (c unknown) passing through (a, f(a)); find another tangent
+         // at point c' in [a, 0] (c unknown) passing through (b, f(b))
 
+         // underestimation
+         Interval fa(f(a));
+         underLine(lm, iy, ix, a, fa.left(), b, 0.0);
+
+         // overestimation
+         Interval fb(f(b));
+         overLine(lm, iy, ix, a, 0.0, b, fb.right());
       }
    }
 }
@@ -1894,7 +1904,7 @@ void DagFun::insertConstNode(DagConst* node)
 
 void DagFun::insertVarNode(DagVar* node)
 {
-   size_t id = node->getVar().getId();
+   size_t id = node->getVar().id();
 
    if (!hasNode(node))
    {
@@ -1904,7 +1914,7 @@ void DagFun::insertVarNode(DagVar* node)
       // insertion in the vector of variables sorted by
       // an ascending ordering of the variable identifiers
       auto it = vnode_.begin();
-      while ((it!=vnode_.end() && (id > (*it)->getVar().getId())))
+      while ((it!=vnode_.end() && (id > (*it)->getVar().id())))
          ++it;
 
       vnode_.insert(it, node);
@@ -2134,7 +2144,7 @@ void DagFun::toIntervalGradient(IntervalVector& G) const
 
 Interval DagFun::intervalDeriv(const Variable& v) const
 {
-   return dag_->findVarNode(v.getId())->dv();
+   return dag_->findVarNode(v.id())->dv();
 }
 
 bool DagFun::diffOnly(const Variable& v)
@@ -2217,7 +2227,7 @@ void DagFun::toRealGradient(RealVector& G) const
 
 double DagFun::realDeriv(const Variable& v) const
 {
-   return dag_->findVarNode(v.getId())->rdv();
+   return dag_->findVarNode(v.id())->rdv();
 }
 
 Scope DagFun::funScope() const
@@ -2425,7 +2435,7 @@ size_t Dag::insertConstNode(const Interval& x)
 
 size_t Dag::insertVarNode(const Variable& v)
 {
-   auto it = vmap_.find(v.getId());
+   auto it = vmap_.find(v.id());
    size_t index;
 
    if (it == vmap_.end())
@@ -2437,11 +2447,11 @@ size_t Dag::insertVarNode(const Variable& v)
       pushNode(node);
 
       // insertion in the map
-      vmap_.insert(std::make_pair(v.getId(), index));
+      vmap_.insert(std::make_pair(v.id(), index));
 
       // insertion in the vector of variables
       auto it = vnode_.begin();
-      while ((it!=vnode_.end() && (v.getId() > (*it)->getVar().getId())))
+      while ((it!=vnode_.end() && (v.id() > (*it)->getVar().id())))
          ++it;
 
       vnode_.insert(it, node);

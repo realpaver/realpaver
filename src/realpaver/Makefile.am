@@ -73,6 +73,7 @@ librealpaver_la_include_HEADERS = \
 		Param.hpp \
 		Parser.hpp \
 		parser_bison.hpp \
+		PolytopeHullContractor.hpp \
 		Preprocessor.hpp \
 		Problem.hpp \
 		Propagator.hpp \
@@ -150,6 +151,7 @@ librealpaver_la_SOURCES = \
 		parser_bison.ypp \
 		parser_flex.lpp \
 		Parser.cpp \
+		PolytopeHullContractor.cpp \
 		Preprocessor.cpp \
 		Problem.cpp \
 		Propagator.cpp \

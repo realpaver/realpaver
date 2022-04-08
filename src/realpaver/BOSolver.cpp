@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <iomanip>
 #include "realpaver/BOContractor.hpp"
 #include "realpaver/BOLocalGradient.hpp"
 #include "realpaver/BOPresolver.hpp"
@@ -42,7 +43,8 @@ BOSolver::BOSolver(Problem& problem)
         vmap21_(),
         vmap31_(),
         ptimer_(),
-        stimer_()
+        stimer_(),
+        trace_(Param::GetStrParam("TRACE") == "YES")
 {
    THROW_IF(!problem.isBOP(), "BO solver applied to a problem" <<
                               "that is not a BO problem");
@@ -440,7 +442,7 @@ Proof BOSolver::reducePolytope(SharedBONode& node)
    {
       if (model_->isInteriorVar(v, *reg))
       {
-         DagNode* node = dag->findVarNode(v.getId());
+         DagNode* node = dag->findVarNode(v.id());
 
          size_t iv = node->indexLinVar();
          LinVar lv = lpsolver_->getLinVar(iv);
@@ -525,6 +527,11 @@ void BOSolver::calculateUpper(SharedBONode& node)
             saveIncumbent(dest);
             objval_ = otol_.maxIntervalDn(u);
             upper_ = objval_.left();
+
+            if (trace_)
+            {
+               std::cout << "\t\t\t\tup: " << u << std::endl;
+            }
 
             LOG_INTER("New upper bound of the global optimum: " << u);
             LOG_INTER("Refined upper bound: " << upper_);
@@ -662,6 +669,7 @@ void BOSolver::branchAndBound()
    double timelimit = param_.getDblParam("TIME_LIMIT");
    int nodelimit = param_.getIntParam("NODE_LIMIT");
    otol_ = param_.getTolParam("OBJ_TOL");
+   trace_ = (param_.getStrParam("TRACE") == "YES");
 
    // creates the initial node
    SharedBONode node; 
@@ -706,12 +714,21 @@ void BOSolver::branchAndBound()
    LOG_INTER("Node limit: " << nodelimit);
 
    bool iter = true;
+
+   double Lprev = Double::neginf(),
+          L = Double::neginf();
+
    do
    {
       iter = bbStep(space, sol);
 
-      double L = std::min(space.getLowestLowerBound(),
-                          sol.getLowestLowerBound());
+      Lprev = L;
+      L = std::min(space.getLowestLowerBound(), sol.getLowestLowerBound());
+
+      if (trace_ && (L != Lprev) && (!space.isEmpty()))
+      {
+         std::cout << std::setprecision(12) << "\tlo: " << L << std::endl;
+      }
 
       if (space.isEmpty())
       {

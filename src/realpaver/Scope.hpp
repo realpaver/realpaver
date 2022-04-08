@@ -81,7 +81,7 @@ private:
    struct comp {
       bool operator()(Variable x, Variable y)
       {
-         return x.getId() < y.getId();
+         return x.id() < y.id();
       }
    };
 

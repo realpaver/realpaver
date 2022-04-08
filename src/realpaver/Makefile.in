@@ -153,13 +153,14 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
 	ListContractor.cpp Logger.cpp LPModel.cpp MaxCIDContractor.cpp \
 	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
-	Parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
-	RealFunction.cpp RealPoint.cpp RealVector.cpp \
-	Reformulation.cpp Scope.cpp ScopeMap.cpp SearchNode.cpp \
-	Selector.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
-	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
-	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
-	LPSolverClp.cpp LPSolverGurobi.cpp
+	Parser.cpp PolytopeHullContractor.cpp Preprocessor.cpp \
+	Problem.cpp Propagator.cpp RealFunction.cpp RealPoint.cpp \
+	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
+	SearchNode.cpp Selector.cpp SymbolTable.cpp Term.cpp \
+	TermDeriver.cpp TermFixer.cpp Timer.cpp \
+	ThickIntervalFunction.cpp Tolerance.cpp \
+	UniIntervalFunction.cpp Variable.cpp LPSolverClp.cpp \
+	LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
@@ -173,13 +174,13 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	IntervalRegion.lo IntervalSlicer.lo IntervalVector.lo \
 	IntervalUnion.lo ListContractor.lo Logger.lo LPModel.lo \
 	MaxCIDContractor.lo Objective.lo Param.lo parser_bison.lo \
-	parser_flex.lo Parser.lo Preprocessor.lo Problem.lo \
-	Propagator.lo RealFunction.lo RealPoint.lo RealVector.lo \
-	Reformulation.lo Scope.lo ScopeMap.lo SearchNode.lo \
-	Selector.lo SymbolTable.lo Term.lo TermDeriver.lo TermFixer.lo \
-	Timer.lo ThickIntervalFunction.lo Tolerance.lo \
-	UniIntervalFunction.lo Variable.lo $(am__objects_1) \
-	$(am__objects_2)
+	parser_flex.lo Parser.lo PolytopeHullContractor.lo \
+	Preprocessor.lo Problem.lo Propagator.lo RealFunction.lo \
+	RealPoint.lo RealVector.lo Reformulation.lo Scope.lo \
+	ScopeMap.lo SearchNode.lo Selector.lo SymbolTable.lo Term.lo \
+	TermDeriver.lo TermFixer.lo Timer.lo ThickIntervalFunction.lo \
+	Tolerance.lo UniIntervalFunction.lo Variable.lo \
+	$(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -275,13 +276,14 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	LinumDoubleTraits.hpp LinumIntervalTraits.hpp LinumTraits.hpp \
 	ListContractor.hpp Logger.hpp LPModel.hpp LPSolver.hpp \
 	MaxCIDContractor.hpp NumericVector.hpp Objective.hpp Param.hpp \
-	Parser.hpp parser_bison.hpp Preprocessor.hpp Problem.hpp \
-	Propagator.hpp RealFunction.hpp RealPoint.hpp RealVector.hpp \
-	Reformulation.hpp Scope.hpp ScopeMap.hpp SearchNode.hpp \
-	Selector.hpp SplitStrategy.hpp SymbolTable.hpp Term.hpp \
-	TermDeriver.hpp TermFixer.hpp ThickIntervalFunction.hpp \
-	Timer.hpp Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
-	IntervalGaol.hpp LPSolverClp.hpp LPSolverGurobi.hpp
+	Parser.hpp parser_bison.hpp PolytopeHullContractor.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp RealFunction.hpp \
+	RealPoint.hpp RealVector.hpp Reformulation.hpp Scope.hpp \
+	ScopeMap.hpp SearchNode.hpp Selector.hpp SplitStrategy.hpp \
+	SymbolTable.hpp Term.hpp TermDeriver.hpp TermFixer.hpp \
+	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
+	UniIntervalFunction.hpp Variable.hpp IntervalGaol.hpp \
+	LPSolverClp.hpp LPSolverGurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
 	$(LISP)configure.hpp.in
@@ -464,13 +466,14 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp ListContractor.hpp \
 	Logger.hpp LPModel.hpp LPSolver.hpp MaxCIDContractor.hpp \
 	NumericVector.hpp Objective.hpp Param.hpp Parser.hpp \
-	parser_bison.hpp Preprocessor.hpp Problem.hpp Propagator.hpp \
-	RealFunction.hpp RealPoint.hpp RealVector.hpp \
-	Reformulation.hpp Scope.hpp ScopeMap.hpp SearchNode.hpp \
-	Selector.hpp SplitStrategy.hpp SymbolTable.hpp Term.hpp \
-	TermDeriver.hpp TermFixer.hpp ThickIntervalFunction.hpp \
-	Timer.hpp Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
-	$(am__append_1) $(am__append_2) $(am__append_3)
+	parser_bison.hpp PolytopeHullContractor.hpp Preprocessor.hpp \
+	Problem.hpp Propagator.hpp RealFunction.hpp RealPoint.hpp \
+	RealVector.hpp Reformulation.hpp Scope.hpp ScopeMap.hpp \
+	SearchNode.hpp Selector.hpp SplitStrategy.hpp SymbolTable.hpp \
+	Term.hpp TermDeriver.hpp TermFixer.hpp \
+	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
+	UniIntervalFunction.hpp Variable.hpp $(am__append_1) \
+	$(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	BC4Contractor.cpp BOContractor.cpp BOLocalGradient.cpp \
 	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
@@ -483,13 +486,14 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
 	ListContractor.cpp Logger.cpp LPModel.cpp MaxCIDContractor.cpp \
 	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
-	Parser.cpp Preprocessor.cpp Problem.cpp Propagator.cpp \
-	RealFunction.cpp RealPoint.cpp RealVector.cpp \
-	Reformulation.cpp Scope.cpp ScopeMap.cpp SearchNode.cpp \
-	Selector.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
-	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
-	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
-	$(am__append_4) $(am__append_5)
+	Parser.cpp PolytopeHullContractor.cpp Preprocessor.cpp \
+	Problem.cpp Propagator.cpp RealFunction.cpp RealPoint.cpp \
+	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
+	SearchNode.cpp Selector.cpp SymbolTable.cpp Term.cpp \
+	TermDeriver.cpp TermFixer.cpp Timer.cpp \
+	ThickIntervalFunction.cpp Tolerance.cpp \
+	UniIntervalFunction.cpp Variable.cpp $(am__append_4) \
+	$(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = parser_bison.hpp
@@ -638,6 +642,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Objective.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PolytopeHullContractor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Problem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Propagator.Plo@am__quote@

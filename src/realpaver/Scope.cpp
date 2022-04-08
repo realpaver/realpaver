@@ -56,7 +56,7 @@ void ScopeRep::makeMap()
    else
    {
       ScopeHashMap* aux = new ScopeHashMap();
-      for (auto it : m_) aux->insert(it.first.getId());
+      for (auto it : m_) aux->insert(it.first.id());
       scopeMap_ = aux;
    }
 }
@@ -68,7 +68,7 @@ size_t ScopeRep::size() const
 
 size_t ScopeRep::index(const Variable& v) const
 {
-   return scopeMap_->index(v.getId());
+   return scopeMap_->index(v.id());
 }
 
 size_t ScopeRep::minIndex() const
@@ -103,7 +103,7 @@ void ScopeRep::insert(const Variable& v, size_t n)
    else
    {
       m_.insert(std::make_pair(v,n));
-      size_t id = v.getId();
+      size_t id = v.id();
 
       if (size() == 1)
       {
@@ -137,10 +137,10 @@ void ScopeRep::remove(const Variable& v)
       else
       {
          auto jt = m_.cbegin();
-         minid_ = maxid_ = jt->first.getId();
+         minid_ = maxid_ = jt->first.id();
          for (++jt; jt!=m_.cend(); ++jt)
          {
-            size_t id = jt->first.getId();
+            size_t id = jt->first.id();
             if (minid_ > id) minid_ = id;
             if (maxid_ < id) maxid_ = id;
          }
@@ -309,7 +309,7 @@ Bitset Scope::toBitset() const
    Bitset b(1+maxIndex(), 0);
 
    for (auto it = begin(); it != end(); ++it)
-      b.setOne(it.var().getId());
+      b.setOne(it.var().id());
 
    return b;
 }

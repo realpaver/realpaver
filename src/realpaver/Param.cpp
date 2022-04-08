@@ -60,6 +60,7 @@ Param::Param()
    strmap_.insert(std::make_pair("PROPAGATION_ALGORITHM",   "HC4"));
    strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",  "GRADIENT"));
    strmap_.insert(std::make_pair("LOG_LEVEL",               "NONE"));
+   strmap_.insert(std::make_pair("TRACE",                   "NO"));
 }
 
 int Param::getIntParam(const string& name) const

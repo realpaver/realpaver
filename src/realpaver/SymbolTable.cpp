@@ -147,7 +147,7 @@ void FunctionSymbol::print(std::ostream& os) const
 size_t FunctionSymbol::getIndexVar(const Variable& v) const
 {
    for (size_t i=0; i<args_.size(); ++i)
-      if (args_[i].getId() == v.getId()) return i;
+      if (args_[i].id() == v.id()) return i;
 
    return 0;
 }

@@ -109,8 +109,9 @@ private:
    // variable in the initial problem
    VarVarMapType vmap31_;
 
-   Timer ptimer_;      // timer for the preprocessing phase
-   Timer stimer_;      // timer for the solving phase
+   Timer ptimer_;       // timer for the preprocessing phase
+   Timer stimer_;       // timer for the solving phase
+   bool trace_;         // trace displayed
 
    // Methods that make the solving components
    void makeLocalSolver();

@@ -13,7 +13,7 @@
 namespace realpaver {
 
 TermDeriver::TermDeriver(Variable v)
-      : id_(v.getId()),
+      : id_(v.id()),
         dt_()
 {}
 
@@ -34,7 +34,7 @@ void TermDeriver::apply(const TermConst* t)
 
 void TermDeriver::apply(const TermVar* t)
 {
-   if (t->var().getId() == id_)
+   if (t->var().id() == id_)
       dt_ = Term(1);
 
    else

@@ -35,7 +35,7 @@ public:
    ~VariableRep() = default;
 
    /// @return the unique identifier of this
-   size_t getId() const;
+   size_t id() const;
 
    /// Sets the unique identifier of this
    /// @param id new identifier of this
@@ -110,7 +110,7 @@ public:
    ~Variable() = default;
 
    /// @return the unique identifier of this
-   size_t getId() const;
+   size_t id() const;
 
    /// Sets the unique identifier of this
    /// @param id new identifier of this

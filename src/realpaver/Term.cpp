@@ -1459,7 +1459,7 @@ void TermVar::acceptVisitor(TermVisitor& vis) const
 
 bool TermVar::dependsOn(const Variable& v) const
 {
-   return v_.getId() == v.getId();
+   return v_.id() == v.id();
 }
 
 bool TermVar::isLinear() const

@@ -1160,11 +1160,15 @@ public:
 
    /// Linearizes the DAG
    /// @param lm output LP model
+   ///
+   /// Assumes that the DAG has been evaluated.
    void linearize(LPModel& lm);
 
    /// Linearizes a part of the DAG
    /// @param lm output LP model
    /// @param bs bitset such that bs[i] = 1 if the i-th function is linearized
+   ///
+   /// Assumes that the functions in the DAG have been evaluated.
    void linearize(LPModel& lm, const Bitset& bs);
 
 private:

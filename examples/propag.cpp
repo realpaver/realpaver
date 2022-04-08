@@ -16,16 +16,22 @@ int main(void)
    try {
       Problem problem;
 
-      Variable x = problem.addRealVar(-10,  4, "x"),
-               y = problem.addRealVar( -3,  7, "y");
+      //~ Variable x = problem.addRealVar(-10,  4, "x"),
+               //~ y = problem.addRealVar( -3,  7, "y");
+
+      Variable x = problem.addRealVar(-7,  3, "x"),
+               y = problem.addRealVar( -3, 6, "y");
 
       IntervalRegion reg = problem.getDomains();
 
       cout << "Region:     " << reg << endl;
 
       Dag dag;
-      size_t i = dag.insert( y == 0.5*x );
-      size_t j = dag.insert( y == 2*x );
+      //~ size_t i = dag.insert( y == 0.5*x );
+      //~ size_t j = dag.insert( y == 2*x );
+
+      size_t i = dag.insert( y - sqr(x) == 0 );
+      size_t j = dag.insert( sqr(x) + sqr(y) - 2.0 == 0 );
 
       SharedContractorVector pool = std::make_shared<ContractorVector>();
       pool->push(std::make_shared<HC4Contractor>(&dag, i));

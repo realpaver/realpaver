@@ -61,6 +61,12 @@ public:
    /// @return a certificate of proof
    Proof contract(UniIntervalFunction& f, Interval& x);
 
+   /// Combines the contraction method with search
+   /// @param f a univariate function
+   /// @param x an interval that is possibly contracted
+   /// @return a certificate of proof
+   Proof search(UniIntervalFunction& f, Interval& x);
+
    /// Step of the contraction method
    /// @param f a univariate function
    /// @param x an interval that is possibly contracted
@@ -128,6 +134,9 @@ private:
    Tolerance dtol_;
    Tolerance ldtol_;
    Inflator inflator_;
+
+   Proof shrinkLeft(UniIntervalFunction& f, Interval& x);
+   Proof shrinkRight(UniIntervalFunction& f, Interval& x);
 };
 
 } // namespace

@@ -19,7 +19,7 @@ bool Preprocessor::allVarsRemoved() const
 
 bool Preprocessor::isFake(Variable v) const
 {
-   auto it = fake_.find(v.getId());
+   auto it = fake_.find(v.id());
    return it != fake_.end();
 }
 
@@ -80,7 +80,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
       if (src.isFakeVar(v))
       {
          LOG_INTER("Useless variable: " << v.getName());
-         fake_.insert(v.getId());
+         fake_.insert(v.id());
          continue;
       }
 

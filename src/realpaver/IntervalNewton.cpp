@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <limits>
+#include <stack>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/IntervalNewton.hpp"
@@ -176,6 +177,90 @@ Proof IntervalNewton::step(UniIntervalFunction& f, Interval& x)
    }
 
    return proof;
+}
+
+Proof IntervalNewton::search(UniIntervalFunction& f, Interval& x)
+{
+   Proof proof = contract(f, x);
+   if (proof != Proof::Maybe) return proof;
+   if (x.isCanonical()) return proof;
+
+   Proof pl = shrinkLeft(f, x);
+   if (pl == Proof::Empty) return proof;
+
+   Proof pr = shrinkRight(f, x);
+
+   if (pl == Proof::Feasible) proof = pl;
+   if (pr == Proof::Feasible) proof = pr;
+   return proof;
+}
+
+Proof IntervalNewton::shrinkLeft(UniIntervalFunction& f, Interval& x)
+{
+   std::stack<Interval> stak;
+   stak.push(x);
+   Proof proof;
+
+   while (!stak.empty())
+   {
+      Interval y = stak.top();
+      stak.pop();
+      proof = contract(f, y);
+      
+      if (proof == Proof::Empty) continue;
+
+      if (proof == Proof::Feasible)
+      {
+         x.setLeft(y.left());
+         return proof;
+      }
+
+      if (y.isCanonical())
+      {
+         x.setLeft(y.left());
+         return Proof::Maybe;
+      }
+
+      double c = y.midpoint();
+      stak.push(Interval(c, y.right()));
+      stak.push(Interval(y.left(), c));
+   }
+
+   return Proof::Empty;
+}
+
+Proof IntervalNewton::shrinkRight(UniIntervalFunction& f, Interval& x)
+{
+   std::stack<Interval> stak;
+   stak.push(x);
+   Proof proof;
+
+   while (!stak.empty())
+   {
+      Interval y = stak.top();
+      stak.pop();
+      proof = contract(f, y);
+
+      if (proof == Proof::Empty) continue;
+
+      if (proof == Proof::Feasible)
+      {
+         x.setRight(y.right());
+         return proof;
+      }
+
+      if (y.isCanonical())
+      {
+         x.setRight(y.right());
+         return Proof::Maybe;
+      }
+
+      double c = y.midpoint();
+      stak.push(Interval(y.left(), c));
+      stak.push(Interval(c, y.right()));
+   }
+
+   return Proof::Empty;   
 }
 
 Proof IntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)

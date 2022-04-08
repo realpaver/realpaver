@@ -19,7 +19,7 @@ VariableRep::VariableRep(const std::string& name) :
       tol_(Tolerance::makeAbs(0.0))
 {}
 
-size_t VariableRep::getId() const
+size_t VariableRep::id() const
 {
    return id_;
 }
@@ -93,9 +93,9 @@ Variable::Variable(const std::string& name) :
 Variable::Variable() : rep_(nullptr)
 {}
 
-size_t Variable::getId() const
+size_t Variable::id() const
 {
-   return rep_->getId();
+   return rep_->id();
 }
 
 Variable& Variable::setId(size_t id)
@@ -183,7 +183,7 @@ std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
    os << v.getName()
       << " #"
-      << v.getId()
+      << v.id()
       << " "
       << (v.isContinuous() ? "(C)" : "(D)")
       << " in "
@@ -198,7 +198,7 @@ Variable Variable::clone() const
 {
    Variable v(getName());
 
-   v.setId(getId())
+   v.setId(id())
     .setDomain(getDomain())
     .setTolerance(getTolerance());
 

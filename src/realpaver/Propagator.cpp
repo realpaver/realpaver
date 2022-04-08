@@ -138,7 +138,7 @@ Proof Propagator::contract(IntervalRegion& reg)
                   if (!dtol_.haveDistTolerance(prev, curr))
                   {
                      isModified = true;
-                     modified.setOne(v.getId());
+                     modified.setOne(v.id());
                   }
                }
 

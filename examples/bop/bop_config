@@ -42,6 +42,9 @@ FLOAT_PRECISION = 12
 # FULL:  verbose mode
 LOG_LEVEL = LOW
 
+# Trace displayed in a terminal (YES or NO)
+TRACE = YES
+
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##
 ###############################################################################
