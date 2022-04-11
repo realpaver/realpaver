@@ -163,6 +163,7 @@ public:
 
    ///@{
    /// Tests
+   bool isSumOfSquares() const;
    bool isLinear() const;
    bool isConstant() const;
    bool isVar() const;
@@ -726,6 +727,56 @@ public:
    virtual void apply(const TermSin* t);
    virtual void apply(const TermTan* t);
    ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a visitor used to transform (or not) a term into a sum of squares.
+///
+/// If the visited term has the form t1^2 + t2^2 + ... + tk^2 then the terms
+/// t1^2, t2^2, ..., tk^2 are stored in a vector.
+///////////////////////////////////////////////////////////////////////////////
+class SumOfSquaresCreator : public TermVisitor {
+public:
+   /// Constructor
+   SumOfSquaresCreator();
+
+   /// @return true if this has visited a term representing a sum of squares
+   bool sumOfSquaresVisited() const;
+
+   /// @return the number of squares after a visit
+   size_t nbSquares() const;
+
+   /// Gets a square in this after a visit
+   /// @param i an index between 0 and nbSquares()-1
+   /// @return the i-th square in this
+   Term getSquare(size_t i) const;
+
+   ///@{
+   /// Overrides
+   virtual void apply(const TermConst* t);
+   virtual void apply(const TermVar* t);
+   virtual void apply(const TermAdd* t);
+   virtual void apply(const TermSub* t);
+   virtual void apply(const TermMul* t);
+   virtual void apply(const TermDiv* t);
+   virtual void apply(const TermMin* t);
+   virtual void apply(const TermMax* t);
+   virtual void apply(const TermUsb* t);
+   virtual void apply(const TermAbs* t);
+   virtual void apply(const TermSgn* t);
+   virtual void apply(const TermSqr* t);
+   virtual void apply(const TermSqrt* t);
+   virtual void apply(const TermPow* t);
+   virtual void apply(const TermExp* t);
+   virtual void apply(const TermLog* t);
+   virtual void apply(const TermCos* t);
+   virtual void apply(const TermSin* t);
+   virtual void apply(const TermTan* t);
+   ///@}
+
+private:
+   bool sos_;              // true if this has visited a sum of squares
+   std::vector<Term> v_;   // vector of squares
 };
 
 } // namespace

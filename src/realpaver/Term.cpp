@@ -247,6 +247,13 @@ bool Term::isDiv() const
    return rep_->isDiv();
 }
 
+bool Term::isSumOfSquares() const
+{
+   SumOfSquaresCreator creator;
+   rep_->acceptVisitor(creator);
+   return creator.sumOfSquaresVisited();
+}
+
 TermRep* Term::cloneRoot() const
 {
    return rep_->cloneRoot();
@@ -2274,5 +2281,104 @@ void TermVisitor::apply(const TermTan* t)
 {
    THROW("Visit method not implemented");
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+SumOfSquaresCreator::SumOfSquaresCreator()
+      : sos_(false),
+        v_()
+{}
+
+bool SumOfSquaresCreator::sumOfSquaresVisited() const
+{
+   return sos_;
+}
+
+size_t SumOfSquaresCreator::nbSquares() const
+{
+   return v_.size();
+}
+
+Term SumOfSquaresCreator::getSquare(size_t i) const
+{
+   return v_[i];
+}
+
+void SumOfSquaresCreator::apply(const TermConst* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermVar* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermAdd* t)
+{
+   SumOfSquaresCreator vl;
+   t->left()->acceptVisitor(vl);
+
+   SumOfSquaresCreator vr;
+   t->right()->acceptVisitor(vr);
+
+   if (vl.sos_ && vr.sos_)
+   {
+      sos_ = true;
+      
+      for (auto t : vl.v_) v_.push_back(t);
+      for (auto t : vr.v_) v_.push_back(t);
+   }
+}
+
+void SumOfSquaresCreator::apply(const TermSub* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermMul* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermDiv* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermMin* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermMax* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermUsb* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermAbs* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermSgn* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermSqr* t)
+{
+   if (!t->child()->isConstant())
+   {
+      sos_ = true;
+      v_.push_back(sqr(Term(t->child())));
+   }
+}
+
+void SumOfSquaresCreator::apply(const TermSqrt* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermPow* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermExp* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermLog* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermCos* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermSin* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermTan* t)
+{}
 
 } // namespace

@@ -20,6 +20,19 @@ int main(void)
       Variable x = prob->addRealVar(-1.19, 1.19, "x"),
                y = prob->addRealVar(0.76, 1.42, "y");
 
+      Term t(sqr(x) + cos(sqr(log(y))) + sqr(x - y));
+      if (t.isSumOfSquares())
+      {
+         SumOfSquaresCreator creator;
+         t.acceptVisitor(creator);
+         
+         cout << "sum sq : " << t << endl;
+         for (size_t i=0; i<creator.nbSquares(); ++i)
+         cout << creator.getSquare(i) << endl;
+      }
+
+
+/*
       dag->insert( y - sqr(x) == 0 );
       dag->insert( sqr(x) + sqr(y) - 2.0 == 0 );
       cout << *dag << endl;
@@ -31,7 +44,7 @@ int main(void)
 
       Proof proof = op.contract(reg);
       cout << proof << endl << reg << endl;
-
+*/
 /*
       dag->eval(reg);
 
