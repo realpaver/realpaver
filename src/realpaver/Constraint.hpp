@@ -60,6 +60,11 @@ public:
    /// @return a certificate of proof
    virtual Proof isSatisfied(const IntervalRegion& reg) const = 0;
 
+   /// Contraction of domains
+   /// @param reg domains of variables
+   /// @return a certificate of proof
+   virtual Proof contract(IntervalRegion& reg) = 0;
+
    /// Output on a stream
    /// @param os a stream
    virtual void print(std::ostream& os) const = 0;
@@ -122,6 +127,11 @@ public:
    /// @param reg domains of variables
    /// @return a certificate of proof
    Proof isSatisfied(const IntervalRegion& reg) const;
+
+   /// Contraction of domains
+   /// @param reg domains of variables
+   /// @return a certificate of proof
+   Proof contract(IntervalRegion& reg);
 
    /// Output on a stream
    /// @param os a stream
@@ -213,6 +223,7 @@ public:
    /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
    Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
    ///@}
 };
 
@@ -236,6 +247,7 @@ public:
    /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
    Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
    ///@}
 };
 
@@ -259,6 +271,7 @@ public:
    /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
    Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
    ///@}
 };
 
@@ -282,6 +295,7 @@ public:
    /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
    Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
    ///@}
 };
 
@@ -305,6 +319,7 @@ public:
    /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
    Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
    ///@}
 };
 
@@ -336,6 +351,7 @@ public:
    /// Overrides (ConstraintRep)
    void acceptVisitor(ConstraintVisitor& vis) const;
    Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
    ///@}
 
 private:

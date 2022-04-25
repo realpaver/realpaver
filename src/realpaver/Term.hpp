@@ -67,8 +67,14 @@ public:
 
    /// Interval evaluation
    /// @param reg domains of variables
-   /// @return the interval evaluation of this at reg
-   virtual Interval eval(const IntervalRegion& reg) const = 0;
+   ///
+   /// The result is assigned in the interval value enclosed.
+   virtual void eval(const IntervalRegion& reg) = 0;
+
+   /// Contraction of domains
+   /// @param reg domains of variables
+   /// @return a certificate of proof
+   virtual Proof contract(IntervalRegion& reg) = 0;
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -107,12 +113,20 @@ public:
    ///         its sub-terms are shared
    virtual TermRep* cloneRoot() const = 0;
 
+   /// @return the interval value enclosed
+   Interval ival() const;
+
+   /// Assigns the interval value enclosed
+   /// @param x new interval value
+   void setIval(const Interval& x);
+
 protected:
    typedef std::shared_ptr<TermRep> SharedRep;
    friend class Term;
 
    size_t hcode_;
    bool constant_;
+   Interval ival_;
 
 private:
    OpPriority priority_;
@@ -147,6 +161,29 @@ public:
    /// @param reg domains of variables
    /// @return the interval evaluation of this at reg
    Interval eval(const IntervalRegion& reg) const;
+
+   /// Reduction of domains using the HC4 Revise contractor
+   /// @param reg domains of variables
+   /// @param img image or bounds of this considered as a function
+   /// @return a certificate of proof
+   ///
+   /// This algorithm first evaluates the nodes from the leaves to the root
+   /// (forward phase) and then calculates the projections from the root to
+   /// the leaves (backward phase).
+   Proof contract(IntervalRegion& reg, const Interval& img);
+
+   /// Forward phase of the HC4 Revise contractor
+   /// @param reg domains of variables
+   /// @return the interval evaluation of this at reg
+   Interval hc4ReviseForward(const IntervalRegion& reg) const;
+
+   /// Backward phase of the HC4 Revise contractor
+   /// @param reg domains of variables
+   /// @param img image or bounds of this considered as a function
+   /// @return a certificate of proof
+   ///
+   /// Assumes that the forward phase has been executed using hc4ReviseForward.
+   Proof hc4ReviseBackward(IntervalRegion& reg, const Interval& img);
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -260,7 +297,8 @@ public:
    /// Overrides
    void print(std::ostream& os) const;
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void eval(const IntervalRegion& reg);
+   Proof contract(IntervalRegion& reg);
    void acceptVisitor(TermVisitor& vis) const;
    bool isZero() const;
    bool isOne() const;
@@ -291,7 +329,8 @@ public:
    /// Overrides
    void print(std::ostream& os) const;
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void eval(const IntervalRegion& reg);
+   Proof contract(IntervalRegion& reg);
    void acceptVisitor(TermVisitor& vis) const;
    bool dependsOn(const Variable& v) const;
    bool isLinear() const;
@@ -353,11 +392,17 @@ public:
 
    ///@{
    /// Overrides
+   void eval(const IntervalRegion& reg);
+   Proof contract(IntervalRegion& reg);
    virtual void print(std::ostream& os) const;
    bool dependsOn(const Variable& v) const;
    virtual bool isLinear() const;
    void makeScope(Scope& s) const;
    ///@}
+
+protected:
+   virtual void evalRoot() = 0;
+   virtual void contractRoot() = 0;
 
 private:
    std::vector<SharedRep> v_;    // sub-terms
@@ -377,7 +422,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -399,7 +445,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -416,12 +463,13 @@ public:
    /// Creates a term with form l * r
    /// @param l left-hand term
    /// @param r right-hand term
-      TermMul(const SharedRep& l, const SharedRep& r);
+   TermMul(const SharedRep& l, const SharedRep& r);
 
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
@@ -443,7 +491,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    bool isDiv() const;
@@ -464,7 +513,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -483,7 +533,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -501,7 +552,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    bool isLinear() const;
    bool isUsb() const;
@@ -521,7 +573,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -539,7 +592,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -557,7 +611,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -575,7 +630,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -597,7 +653,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
@@ -619,7 +676,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -637,7 +695,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -655,7 +714,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -673,7 +733,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
@@ -691,7 +752,8 @@ public:
    ///@{
    /// Overrides
    Interval evalConst() const;
-   Interval eval(const IntervalRegion& reg) const;
+   void evalRoot();
+   void contractRoot();
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}

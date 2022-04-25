@@ -124,6 +124,11 @@ Proof Constraint::isSatisfied(const IntervalRegion& reg) const
    return rep_->isSatisfied(reg);
 }
 
+Proof Constraint::contract(IntervalRegion& reg)
+{
+   return rep_->contract(reg);
+}
+
 bool Constraint::dependsOn(Variable v) const
 {
    return rep_->dependsOn(v);
@@ -249,6 +254,31 @@ Proof ConstraintEq::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
+Proof ConstraintEq::contract(IntervalRegion& reg)
+{
+   Interval l = left().hc4ReviseForward(reg),
+            r = right().hc4ReviseForward(reg);
+
+   if (l.isEmpty() || r.isEmpty())
+      return Proof::Empty;
+
+   else if (l.isCertainlyEq(r))
+      return Proof::Inner;
+
+   else if (l.isPossiblyEq(r))
+   {
+      Interval img = l & r;
+
+      Proof pl = left().hc4ReviseBackward(reg, img),
+            pr = right().hc4ReviseBackward(reg, img);
+
+      return std::min(pl, pr);
+   }
+
+   else
+      return Proof::Empty;
+}
+
 Constraint operator==(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintEq>(l.rep(), r.rep()));
@@ -278,6 +308,32 @@ Proof ConstraintLe::isSatisfied(const IntervalRegion& reg) const
 
    else if (l.isPossiblyLe(r))
       return Proof::Maybe;
+
+   else
+      return Proof::Empty;
+}
+
+Proof ConstraintLe::contract(IntervalRegion& reg)
+{
+   Interval l = left().hc4ReviseForward(reg),
+            r = right().hc4ReviseForward(reg);
+
+   if (l.isEmpty() || r.isEmpty())
+      return Proof::Empty;
+
+   else if (l.isCertainlyLe(r))
+      return Proof::Inner;
+
+   else if (l.isPossiblyLe(r))
+   {
+      Interval imgl = Interval::lessThan(r.right()),
+               imgr = Interval::moreThan(l.left());
+
+      Proof pl = left().hc4ReviseBackward(reg, imgl),
+            pr = right().hc4ReviseBackward(reg, imgr);
+
+      return std::min(pl, pr);
+   }
 
    else
       return Proof::Empty;
@@ -317,6 +373,32 @@ Proof ConstraintLt::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
+Proof ConstraintLt::contract(IntervalRegion& reg)
+{
+   Interval l = left().hc4ReviseForward(reg),
+            r = right().hc4ReviseForward(reg);
+
+   if (l.isEmpty() || r.isEmpty())
+      return Proof::Empty;
+
+   else if (l.isCertainlyLt(r))
+      return Proof::Inner;
+
+   else if (l.isPossiblyLt(r))
+   {
+      Interval imgl = Interval::lessThan(r.right()),
+               imgr = Interval::moreThan(l.left());
+
+      Proof pl = left().hc4ReviseBackward(reg, imgl),
+            pr = right().hc4ReviseBackward(reg, imgr);
+
+      return std::min(pl, pr);
+   }
+
+   else
+      return Proof::Empty;
+}
+
 Constraint operator<(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintLt>(l.rep(), r.rep()));
@@ -351,6 +433,32 @@ Proof ConstraintGe::isSatisfied(const IntervalRegion& reg) const
       return Proof::Empty;
 }
 
+Proof ConstraintGe::contract(IntervalRegion& reg)
+{
+   Interval l = left().hc4ReviseForward(reg),
+            r = right().hc4ReviseForward(reg);
+
+   if (l.isEmpty() || r.isEmpty())
+      return Proof::Empty;
+
+   else if (l.isCertainlyGe(r))
+      return Proof::Inner;
+
+   else if (l.isPossiblyGe(r))
+   {
+      Interval imgl = Interval::moreThan(r.left()),
+               imgr = Interval::lessThan(l.right());
+
+      Proof pl = left().hc4ReviseBackward(reg, imgl),
+            pr = right().hc4ReviseBackward(reg, imgr);
+
+      return std::min(pl, pr);
+   }
+
+   else
+      return Proof::Empty;
+}
+
 Constraint operator>=(Term l, Term r)
 {
    return Constraint(std::make_shared<ConstraintGe>(l.rep(), r.rep()));
@@ -380,6 +488,32 @@ Proof ConstraintGt::isSatisfied(const IntervalRegion& reg) const
 
    else if (l.isPossiblyGt(r))
       return Proof::Maybe;
+
+   else
+      return Proof::Empty;
+}
+
+Proof ConstraintGt::contract(IntervalRegion& reg)
+{
+   Interval l = left().hc4ReviseForward(reg),
+            r = right().hc4ReviseForward(reg);
+
+   if (l.isEmpty() || r.isEmpty())
+      return Proof::Empty;
+
+   else if (l.isCertainlyGt(r))
+      return Proof::Inner;
+
+   else if (l.isPossiblyGt(r))
+   {
+      Interval imgl = Interval::moreThan(r.left()),
+               imgr = Interval::lessThan(l.right());
+
+      Proof pl = left().hc4ReviseBackward(reg, imgl),
+            pr = right().hc4ReviseBackward(reg, imgr);
+
+      return std::min(pl, pr);
+   }
 
    else
       return Proof::Empty;
@@ -426,6 +560,27 @@ Proof ConstraintIn::isSatisfied(const IntervalRegion& reg) const
 
    else if (x_.overlaps(e))
       return Proof::Maybe;
+
+   else
+      return Proof::Empty;
+}
+
+Proof ConstraintIn::contract(IntervalRegion& reg)
+{
+   Interval e = term().hc4ReviseForward(reg);
+
+   if (e.isEmpty())
+      return Proof::Empty;
+
+   else if (x_.contains(e))
+      return Proof::Inner;
+
+   else if (x_.overlaps(e))
+   {
+      Interval img = e & x_;
+
+      return term().hc4ReviseBackward(reg, img);
+   }
 
    else
       return Proof::Empty;

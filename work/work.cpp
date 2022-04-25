@@ -24,6 +24,28 @@ int main(void)
                //~ lambda = prob->addRealVar(10, 23, "lambda"),
                //~ beta = prob->addRealVar(0.0136, 0.5, "beta"),
 
+
+
+
+Variable x = prob->addRealVar(2, 6, "x"),
+         y = prob->addRealVar(1, 3, "y"),
+         z = prob->addRealVar(0, 10, "z");
+   
+Constraint c(z >= sqr(y) + 2*x);
+IntervalRegion Z = prob->getDomains();
+cout << c.contract(Z) << endl;
+cout << Z << endl;
+
+
+
+return 0;
+
+
+
+
+
+
+
       Variable ksi_1 = prob->addRealVar(-1.1997, -1.0, "ksi_1"),
                ksi_2 = prob->addRealVar(3, 4, "ksi_2"),
                ksi_3 = prob->addRealVar(5, 6, "ksi_3"),

@@ -114,6 +114,16 @@ bool TermRep::isConstant() const
    return constant_;
 }
 
+Interval TermRep::ival() const
+{
+   return ival_;
+}
+
+void TermRep::setIval(const Interval& x)
+{
+   ival_ = x;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 bool Term::simplify_ = true;
@@ -164,7 +174,24 @@ Interval Term::evalConst() const
 
 Interval Term::eval(const IntervalRegion& reg) const
 {
-   return rep_->eval(reg);
+   rep_->eval(reg);
+   return rep_->ival_;
+}
+
+Interval Term::hc4ReviseForward(const IntervalRegion& reg) const
+{
+   return eval(reg);
+}
+
+Proof Term::hc4ReviseBackward(IntervalRegion& reg, const Interval& img)
+{
+   if (rep_->ival_.isEmpty())       return Proof::Empty;
+   if (img.isDisjoint(rep_->ival_)) return Proof::Empty;
+   if (img.contains(rep_->ival_))   return Proof::Inner;
+
+   rep_->ival_ &= img;
+
+   return rep_->contract(reg);   
 }
 
 void Term::acceptVisitor(TermVisitor& vis) const
@@ -257,6 +284,12 @@ bool Term::isSumOfSquares() const
 TermRep* Term::cloneRoot() const
 {
    return rep_->cloneRoot();
+}
+
+Proof Term::contract(IntervalRegion& reg, const Interval& img)
+{
+   hc4ReviseForward(reg);
+   return hc4ReviseBackward(reg, img);
 }
 
 std::ostream& operator<<(std::ostream& os, Term t)
@@ -1368,6 +1401,7 @@ TermConst::TermConst(const Interval& x)
 
    hcode_ = x.hashCode();
    constant_ = true;
+   ival_ = x_;
 }
 
 Interval TermConst::getVal() const
@@ -1380,9 +1414,14 @@ Interval TermConst::evalConst() const
    return x_;
 }
 
-Interval TermConst::eval(const IntervalRegion& reg) const
+void TermConst::eval(const IntervalRegion& reg)
 {
-   return x_;
+   ival_ = x_;
+}
+
+Proof TermConst::contract(IntervalRegion& reg)
+{
+   return Proof::Maybe;
 }
 
 void TermConst::print(std::ostream& os) const
@@ -1449,9 +1488,15 @@ Interval TermVar::evalConst() const
    return Interval::universe();
 }
 
-Interval TermVar::eval(const IntervalRegion& reg) const
+void TermVar::eval(const IntervalRegion& reg)
 {
-   return reg.get(v_);
+   ival_ = reg.get(v_);
+}
+
+Proof TermVar::contract(IntervalRegion& reg)
+{
+   reg.set(v_, ival_);
+   return ival_.isEmpty() ? Proof::Empty : Proof::Maybe;
 }
 
 void TermVar::print(std::ostream& os) const
@@ -1531,13 +1576,32 @@ void TermOp::print(std::ostream& os) const
    // default implementation in prefix operation
    os << opSymbol() << "(";
    bool first = false;
-   for (auto sub: v_)
+   for (auto sub : v_)
    {
       if (first) os << ",";
       sub->print(os);
       first = true;
    }
    os << ")";
+}
+
+void TermOp::eval(const IntervalRegion& reg)
+{
+   for (auto sub : v_) sub->eval(reg);
+
+   evalRoot();
+}
+
+Proof TermOp::contract(IntervalRegion& reg)
+{
+   if (ival_.isEmpty()) return Proof::Empty;
+
+   contractRoot();
+
+   for (auto sub : v_)
+      if (sub->contract(reg) == Proof::Empty) return Proof::Empty;
+
+   return Proof::Maybe;
 }
 
 bool TermOp::dependsOn(const Variable& v) const
@@ -1609,9 +1673,15 @@ Interval TermAdd::evalConst() const
    return left()->evalConst() + right()->evalConst();
 }
 
-Interval TermAdd::eval(const IntervalRegion& reg) const
+void TermAdd::evalRoot()
 {
-   return left()->eval(reg) + right()->eval(reg);
+   ival_ = left()->ival() + right()->ival();
+}
+
+void TermAdd::contractRoot()
+{
+   left()->setIval(addPX(left()->ival(), right()->ival(), ival_));
+   right()->setIval(addPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermAdd::print(std::ostream& os) const
@@ -1652,9 +1722,15 @@ Interval TermSub::evalConst() const
    return left()->evalConst() - right()->evalConst();
 }
 
-Interval TermSub::eval(const IntervalRegion& reg) const
+void TermSub::evalRoot()
 {
-   return left()->eval(reg) - right()->eval(reg);
+   ival_ = left()->ival() - right()->ival();
+}
+
+void TermSub::contractRoot()
+{
+   left()->setIval(subPX(left()->ival(), right()->ival(), ival_));
+   right()->setIval(subPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermSub::print(std::ostream& os) const
@@ -1708,9 +1784,15 @@ Interval TermMul::evalConst() const
    return left()->evalConst() * right()->evalConst();
 }
 
-Interval TermMul::eval(const IntervalRegion& reg) const
+void TermMul::evalRoot()
 {
-   return left()->eval(reg) * right()->eval(reg);
+   ival_ = left()->ival() * right()->ival();
+}
+
+void TermMul::contractRoot()
+{
+   left()->setIval(mulPX(left()->ival(), right()->ival(), ival_));
+   right()->setIval(mulPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermMul::print(std::ostream& os) const
@@ -1770,9 +1852,15 @@ Interval TermDiv::evalConst() const
    return left()->evalConst() / right()->evalConst();
 }
 
-Interval TermDiv::eval(const IntervalRegion& reg) const
+void TermDiv::evalRoot()
 {
-   return left()->eval(reg) / right()->eval(reg);
+   ival_ = left()->ival() / right()->ival();
+}
+
+void TermDiv::contractRoot()
+{
+   left()->setIval(divPX(left()->ival(), right()->ival(), ival_));
+   right()->setIval(divPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermDiv::print(std::ostream& os) const
@@ -1827,9 +1915,15 @@ Interval TermMin::evalConst() const
    return min(left()->evalConst(), right()->evalConst());
 }
 
-Interval TermMin::eval(const IntervalRegion& reg) const
+void TermMin::evalRoot()
 {
-   return min(left()->eval(reg), right()->eval(reg));
+   ival_ = min(left()->ival(), right()->ival());
+}
+
+void TermMin::contractRoot()
+{
+   left()->setIval(minPX(left()->ival(), right()->ival(), ival_));
+   right()->setIval(minPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermMin::acceptVisitor(TermVisitor& vis) const
@@ -1853,9 +1947,15 @@ Interval TermMax::evalConst() const
    return max(left()->evalConst(), right()->evalConst());
 }
 
-Interval TermMax::eval(const IntervalRegion& reg) const
+void TermMax::evalRoot()
 {
-   return max(left()->eval(reg), right()->eval(reg));
+   ival_ = max(left()->ival(), right()->ival());
+}
+
+void TermMax::contractRoot()
+{
+   left()->setIval(maxPX(left()->ival(), right()->ival(), ival_));
+   right()->setIval(maxPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermMax::acceptVisitor(TermVisitor& vis) const
@@ -1879,9 +1979,14 @@ Interval TermUsb::evalConst() const
    return -child()->evalConst();
 }
 
-Interval TermUsb::eval(const IntervalRegion& reg) const
+void TermUsb::evalRoot()
 {
-   return -child()->eval(reg);
+   ival_ = -child()->ival();
+}
+
+void TermUsb::contractRoot()
+{
+   child()->setIval(usubPX(child()->ival(), ival_));
 }
 
 void TermUsb::acceptVisitor(TermVisitor& vis) const
@@ -1915,9 +2020,14 @@ Interval TermAbs::evalConst() const
    return abs(child()->evalConst());
 }
 
-Interval TermAbs::eval(const IntervalRegion& reg) const
+void TermAbs::evalRoot()
 {
-   return abs(child()->eval(reg));
+   ival_ = abs(child()->ival());
+}
+
+void TermAbs::contractRoot()
+{
+   child()->setIval(absPX(child()->ival(), ival_));
 }
 
 void TermAbs::acceptVisitor(TermVisitor& vis) const
@@ -1941,9 +2051,14 @@ Interval TermSgn::evalConst() const
    return sgn(child()->evalConst());
 }
 
-Interval TermSgn::eval(const IntervalRegion& reg) const
+void TermSgn::evalRoot()
 {
-   return sgn(child()->eval(reg));
+   ival_ = sgn(child()->ival());
+}
+
+void TermSgn::contractRoot()
+{
+   child()->setIval(sgnPX(child()->ival(), ival_));
 }
 
 void TermSgn::acceptVisitor(TermVisitor& vis) const
@@ -1967,9 +2082,14 @@ Interval TermSqr::evalConst() const
    return sqr(child()->evalConst());
 }
 
-Interval TermSqr::eval(const IntervalRegion& reg) const
+void TermSqr::evalRoot()
 {
-   return sqr(child()->eval(reg));
+   ival_ = sqr(child()->ival());
+}
+
+void TermSqr::contractRoot()
+{
+   child()->setIval(sqrPX(child()->ival(), ival_));
 }
 
 void TermSqr::acceptVisitor(TermVisitor& vis) const
@@ -1993,9 +2113,14 @@ Interval TermSqrt::evalConst() const
    return sqrt(child()->evalConst());
 }
 
-Interval TermSqrt::eval(const IntervalRegion& reg) const
+void TermSqrt::evalRoot()
 {
-   return sqrt(child()->eval(reg));
+   ival_ = sqrt(child()->ival());
+}
+
+void TermSqrt::contractRoot()
+{
+   child()->setIval(sqrtPX(child()->ival(), ival_));
 }
 
 void TermSqrt::acceptVisitor(TermVisitor& vis) const
@@ -2030,9 +2155,14 @@ Interval TermPow::evalConst() const
    return pow(child()->evalConst(), n_);
 }
 
-Interval TermPow::eval(const IntervalRegion& reg) const
+void TermPow::evalRoot()
 {
-   return pow(child()->eval(reg), n_);
+   ival_ = pow(child()->ival(), n_);
+}
+
+void TermPow::contractRoot()
+{
+   child()->setIval(powPX(child()->ival(), n_, ival_));
 }
 
 void TermPow::print(std::ostream& os) const
@@ -2063,9 +2193,14 @@ Interval TermExp::evalConst() const
    return exp(child()->evalConst());
 }
 
-Interval TermExp::eval(const IntervalRegion& reg) const
+void TermExp::evalRoot()
 {
-   return exp(child()->eval(reg));
+   ival_ = exp(child()->ival());
+}
+
+void TermExp::contractRoot()
+{
+   child()->setIval(expPX(child()->ival(), ival_));
 }
 
 void TermExp::acceptVisitor(TermVisitor& vis) const
@@ -2089,9 +2224,14 @@ Interval TermLog::evalConst() const
    return log(child()->evalConst());
 }
 
-Interval TermLog::eval(const IntervalRegion& reg) const
+void TermLog::evalRoot()
 {
-   return log(child()->eval(reg));
+   ival_ = log(child()->ival());
+}
+
+void TermLog::contractRoot()
+{
+   child()->setIval(logPX(child()->ival(), ival_));
 }
 
 void TermLog::acceptVisitor(TermVisitor& vis) const
@@ -2115,9 +2255,14 @@ Interval TermCos::evalConst() const
    return cos(child()->evalConst());
 }
 
-Interval TermCos::eval(const IntervalRegion& reg) const
+void TermCos::evalRoot()
 {
-   return cos(child()->eval(reg));
+   ival_ = cos(child()->ival());
+}
+
+void TermCos::contractRoot()
+{
+   child()->setIval(cosPX(child()->ival(), ival_));
 }
 
 void TermCos::acceptVisitor(TermVisitor& vis) const
@@ -2141,9 +2286,14 @@ Interval TermSin::evalConst() const
    return sin(child()->evalConst());
 }
 
-Interval TermSin::eval(const IntervalRegion& reg) const
+void TermSin::evalRoot()
 {
-   return sin(child()->eval(reg));
+   ival_ = sin(child()->ival());
+}
+
+void TermSin::contractRoot()
+{
+   child()->setIval(sinPX(child()->ival(), ival_));
 }
 
 void TermSin::acceptVisitor(TermVisitor& vis) const
@@ -2167,9 +2317,14 @@ Interval TermTan::evalConst() const
    return tan(child()->evalConst());
 }
 
-Interval TermTan::eval(const IntervalRegion& reg) const
+void TermTan::evalRoot()
 {
-   return tan(child()->eval(reg));
+   ival_ = tan(child()->ival());
+}
+
+void TermTan::contractRoot()
+{
+   child()->setIval(tanPX(child()->ival(), ival_));
 }
 
 void TermTan::acceptVisitor(TermVisitor& vis) const
