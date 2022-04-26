@@ -54,6 +54,7 @@ librealpaver_la_include_HEADERS = \
 		Interval.hpp \
 		IntervalFunction.hpp \
 		IntervalImpl.hpp \
+		IntervalMatrix.hpp \
 		IntervalNewton.hpp \
 		IntervalRegion.hpp \
 		IntervalSlicer.hpp \
@@ -68,6 +69,7 @@ librealpaver_la_include_HEADERS = \
 		LPModel.hpp \
 		LPSolver.hpp \
 		MaxCIDContractor.hpp \
+		NumericMatrix.hpp \
 		NumericVector.hpp \
 		Objective.hpp \
 		Param.hpp \
@@ -78,6 +80,7 @@ librealpaver_la_include_HEADERS = \
 		Problem.hpp \
 		Propagator.hpp \
 		RealFunction.hpp \
+		RealMatrix.hpp \
 		RealPoint.hpp \
 		RealVector.hpp \
 		Reformulation.hpp \
@@ -137,6 +140,7 @@ librealpaver_la_SOURCES = \
 		IntContractor.cpp \
 		Interval.cpp \
 		IntervalFunction.cpp \
+		IntervalMatrix.cpp \
 		IntervalNewton.cpp \
 		IntervalRegion.cpp \
 		IntervalSlicer.cpp \
@@ -156,6 +160,7 @@ librealpaver_la_SOURCES = \
 		Problem.cpp \
 		Propagator.cpp \
 		RealFunction.cpp \
+		RealMatrix.cpp \
 		RealPoint.cpp \
 		RealVector.cpp \
 		Reformulation.cpp \

@@ -5,6 +5,7 @@
 #include "realpaver/BOModel.hpp"
 
 #include "realpaver/PolytopeHullContractor.hpp"
+#include "realpaver/RealMatrix.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -13,6 +14,15 @@ int main(void)
 {
    Logger::init(LogLevel::full, "work.log");
    Interval::precision( 4 );
+
+   RealMatrix A = {{1, 2}, {3, 4}, {5, 6}};
+   cout << "A:" << endl << A << endl;
+
+   RealMatrix B = {{1, 0, 1, 0}, {3, 0, 3, 0}};
+   cout << "B:" << endl << B << endl;
+
+   cout << "A*B:" << endl << A*B << endl;
+   
    
    try {
       Problem* prob = new Problem;
