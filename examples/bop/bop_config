@@ -123,7 +123,7 @@ BC3_ITER_LIMIT = 30
 PROPAGATION_ALGORITHM = MAX_CID_HC4
 
 ###############################################################################
-## LOCAL OPTIMiZATION                                                        ##
+## LOCAL OPTIMIZATION                                                        ##
 ###############################################################################
 
 # Coefficient of the Armijo rule used to stop a line search optimization
@@ -152,10 +152,10 @@ LOCAL_SOLVER_ALGORITHM = GRADIENT
 ###############################################################################
 
 # Time limit in seconds
-LP_TIME_LIMIT = 10.0
+LP_TIME_LIMIT = 50.0
 
 # Iteration limit
-LP_ITER_LIMIT = 50
+LP_ITER_LIMIT = 500
 
 ###############################################################################
 ## INTERVAL NEWTON                                                           ##

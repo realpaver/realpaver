@@ -1,0 +1,495 @@
+Log file Realpaver 1.0 @ Fri Apr 29 17:46:53 2022
+
+MAIN.  Bound-constrained optimization
+MAIN.  Input file > Eggholder.bop
+MAIN.  Input problem
+Variables
+   x in [-512, 512],
+   y in [-512, 512]
+;
+Objectives
+   MIN ((-(y+47))*sin(sqrt(abs(y+<0.5, 0.5>*x+47))))-x*sin(sqrt(abs(((x)-y)-(47))))
+;
+MAIN.  Preprocessing
+MAIN.  Number of fixed variables: 0
+MAIN.  Number of fake variables: 0
+MAIN.  Number of inactive constraints: 0
+INTER. Scope of the solution: {x, y}
+MAIN.  Simplified problem
+Variables
+   x in [-512, 512],
+   y in [-512, 512]
+;
+Objectives
+   MIN ((-(y+47))*sin(sqrt(abs(y+<0.5, 0.5>*x+47))))-x*sin(sqrt(abs(((x)-y)-(47))))
+;
+MAIN.  Preprocessing
+MAIN.  Number of fixed variables: 0
+MAIN.  Number of fake variables: 0
+MAIN.  Number of inactive constraints: 0
+MAIN.  Presolved problem
+Variables
+   x in [-512, 512],
+   y in [-512, 512]
+;
+Objectives
+   MIN ((-(y+47))*sin(sqrt(abs(y+<0.5, 0.5>*x+47))))-x*sin(sqrt(abs(((x)-y)-(47))))
+;
+INTER. Creates the solving model
+LOW.   DAG of presolved problem
+fun 0: [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30] in 0 bitset: 11
+fun 1: [1 0 2 3 4 5 6 10 11 31 32 7 8 33 13 34 15 16 35 36 18 19 23 37 38 20 21 39 26 40 41 42] in 0 bitset: 11
+fun 2: [1 5 15 16 0 2 3 4 6 10 11 31 43 18 19 20 21 22 44 45 46 47] in 0 bitset: 111
+node 0: 0.5 sub[] par[3 8 9 24 38] depends on empty bitset
+node 1: y sub[] par[4 15 18] depends on 01
+node 2: x sub[] par[3 18 28 41 44] depends on 1
+node 3: * sub[0 2] par[4] depends on 1
+node 4: + sub[1 3] par[6] depends on 11
+node 5: 47 sub[] par[6 15 19] depends on empty bitset
+node 6: + sub[4 5] par[7 10] depends on 11
+node 7: sgn sub[6] par[8] depends on 11
+node 8: * sub[0 7] par[9 33] depends on 11
+node 9: * sub[0 8] par[12] depends on 11
+node 10: abs sub[6] par[11] depends on 11
+node 11: sqrt sub[10] par[12 13 31 33] depends on 11
+node 12: / sub[9 11] par[14] depends on 11
+node 13: cos sub[11] par[14 34] depends on 11
+node 14: * sub[12 13] par[17] depends on 11
+node 15: + sub[1 5] par[16] depends on 01
+node 16: - sub[15] par[17 35 43] depends on 01
+node 17: * sub[14 16] par[30] depends on 11
+node 18: - sub[2 1] par[19] depends on 11
+node 19: - sub[18 5] par[20 23] depends on 11
+node 20: abs sub[19] par[21] depends on 11
+node 21: sqrt sub[20] par[22 25 26 39] depends on 11
+node 22: sin sub[21] par[29 44] depends on 11
+node 23: sgn sub[19] par[24 37] depends on 11
+node 24: * sub[0 23] par[25] depends on 11
+node 25: / sub[24 21] par[27] depends on 11
+node 26: cos sub[21] par[27 40] depends on 11
+node 27: * sub[25 26] par[28] depends on 11
+node 28: * sub[27 2] par[29] depends on 11
+node 29: + sub[22 28] par[30] depends on 11
+node 30: - sub[17 29] par[] depends on 11
+node 31: sin sub[11] par[32 43] depends on 11
+node 32: - sub[31] par[36] depends on 11
+node 33: / sub[8 11] par[34] depends on 11
+node 34: * sub[33 13] par[35] depends on 11
+node 35: * sub[34 16] par[36] depends on 11
+node 36: + sub[32 35] par[42] depends on 11
+node 37: - sub[23] par[38] depends on 11
+node 38: * sub[0 37] par[39] depends on 11
+node 39: / sub[38 21] par[40] depends on 11
+node 40: * sub[39 26] par[41] depends on 11
+node 41: * sub[40 2] par[42] depends on 11
+node 42: - sub[36 41] par[] depends on 11
+node 43: * sub[16 31] par[45] depends on 11
+node 44: * sub[2 22] par[45] depends on 11
+node 45: - sub[43 44] par[47] depends on 11
+node 46: _z sub[] par[47] depends on 001
+node 47: - sub[45 46] par[] depends on 111
+
+INTER. Boundary variable: y
+INTER. Boundary variable: x
+MAIN.  Branch-and-bound algorithm
+INTER. Node 0: ([-512, 512], [-512, 512], [-inf, inf])
+LOW.   Lower bound for node 0 after  propagation: -1071
+INTER. Lower bound not found for node 0
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (0, 0)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (8.37604, 15.665)
+INTER. New upper bound of the global optimum: -66.8432
+INTER. Refined upper bound: -66.8434
+INTER. New incumbent solution: (8.37604, 15.665)
+INTER. Upper bound: -66.8432
+INTER. Lower bound: -1071
+INTER. Tolerance on the global optimum: 1e-06 (rel)
+INTER. Time limit: 100s
+INTER. Node limit: 100000
+INTER. Current enclosure of the optimum: [-66.8433727551, -66.8432390684]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 0
+INTER. Splits node 0 > 2 sub-nodes
+INTER. Node 1: ([-512, 0], [-512, 512], [-1071, -66.8432390684])
+INTER. Contraction -> maybe
+INTER. New region: ([-512, 0], [-512, 512], [-1071, -66.843372755])
+LOW.   Lower bound for node 1 after  propagation: -1071
+INTER. Lower bound not improved for node 1 (-1071)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-256, 0)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-243.563, 13.0154)
+INTER. New upper bound of the global optimum: -301.031
+INTER. Refined upper bound: -301.031
+INTER. New incumbent solution: (-243.563, 13.0154)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-512, 0], [-512, 512], [-1071, -66.843372755])
+INTER. Inserts node 1 in the space
+INTER. Node 2: ([0, 512], [-512, 512], [-1071, -66.8432390684])
+INTER. Contraction -> maybe
+INTER. New region: ([0, 512], [-512, 512], [-1071, -301.031300519])
+LOW.   Lower bound for node 2 after  propagation: -1071
+INTER. Lower bound not improved for node 2 (-1071)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (256, 0)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (273.779, 26.2391)
+INTER. New upper bound of the global optimum: -342.279
+INTER. Refined upper bound: -342.28
+INTER. New incumbent solution: (273.779, 26.2391)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([0, 512], [-512, 512], [-1071, -301.031300519])
+INTER. Inserts node 2 in the space
+INTER. Current enclosure of the optimum: [-342.279781091, -342.279096531]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 2
+INTER. Splits node 2 > 2 sub-nodes
+INTER. Node 3: ([0, 512], [-512, 0], [-1071, -301.031300519])
+INTER. Contraction -> maybe
+INTER. New region: ([0, 512], [-512, 0], [-977, -342.27978109])
+LOW.   Lower bound for node 3 after  propagation: -977
+INTER. Lower bound not improved for node 3 (-977)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (256, -256)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (203.249, -269.486)
+INTER. New upper bound of the global optimum: -421.142
+INTER. Refined upper bound: -421.142
+INTER. New incumbent solution: (203.249, -269.486)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([0, 512], [-512, 0], [-977, -342.27978109])
+INTER. Inserts node 3 in the space
+INTER. Node 4: ([0, 512], [0, 512], [-1071, -301.031300519])
+INTER. Contraction -> maybe
+INTER. New region: ([0, 512], [0, 512], [-1071, -421.142470638])
+LOW.   Lower bound for node 4 after  propagation: -1071
+INTER. Lower bound not improved for node 4 (-1071)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (256, 256)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (242.133, 256.468)
+INTER. New upper bound of the global optimum: -540.425
+INTER. Refined upper bound: -540.426
+INTER. New incumbent solution: (242.133, 256.468)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([0, 512], [0, 512], [-1071, -421.142470638])
+INTER. Inserts node 4 in the space
+INTER. Current enclosure of the optimum: [-540.425690075, -540.424609224]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 1
+INTER. Splits node 1 > 2 sub-nodes
+INTER. Node 5: ([-512, 0], [-512, 0], [-1071, -66.843372755])
+INTER. Contraction -> maybe
+INTER. New region: ([-512, -109.453198976], [-512, 0], [-977, -540.425690074])
+LOW.   Lower bound for node 5 after  propagation: -977
+INTER. Lower bound not improved for node 5 (-977)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-310.726, -256)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-288.068, -213.432)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-512, -109.453198976], [-512, 0], [-977, -540.425690074])
+INTER. Inserts node 5 in the space
+INTER. Node 6: ([-512, 0], [0, 512], [-1071, -66.843372755])
+INTER. Contraction -> maybe
+INTER. New region: ([-512, -102.399999999], [0, 512], [-1012.96041396, -540.425690074])
+LOW.   Lower bound for node 6 after  propagation: -1012.96
+INTER. Lower bound not improved for node 6 (-1012.96)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-307.199, 256)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-243.718, 274.594)
+INTER. New upper bound of the global optimum: -559.732
+INTER. Refined upper bound: -559.733
+INTER. New incumbent solution: (-243.718, 274.594)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-512, -102.399999999], [0, 512], [-1012.96041396, -540.425690074])
+INTER. Inserts node 6 in the space
+INTER. Current enclosure of the optimum: [-559.732740292, -559.731620826]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 6
+INTER. Splits node 6 > 2 sub-nodes
+INTER. Node 7: ([-512, -307.199999999], [0, 512], [-1012.96041396, -540.425690074])
+INTER. Contraction -> maybe
+INTER. New region: ([-512, -307.199999999], [0.732740291314, 512], [-1012.96041396, -559.732740291])
+LOW.   Lower bound for node 7 after  propagation: -1012.96
+INTER. Lower bound not improved for node 7 (-1012.96)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-409.6, 256.367)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-334.832, 181.954)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-512, -307.199999999], [0.732740291314, 512], [-1012.96041396, -559.732740291])
+INTER. Inserts node 7 in the space
+INTER. Node 8: ([-307.2, -102.399999999], [0, 512], [-1012.96041396, -540.425690074])
+INTER. Contraction -> maybe
+INTER. New region: ([-307.2, -102.399999999], [234.258386073, 512], [-865.186908402, -559.732740291])
+LOW.   Lower bound for node 8 after  propagation: -865.187
+INTER. Lower bound not improved for node 8 (-865.187)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-204.8, 373.129)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-114.343, 426.54)
+INTER. New upper bound of the global optimum: -562.081
+INTER. Refined upper bound: -562.083
+INTER. New incumbent solution: (-114.343, 426.54)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-307.2, -102.399999999], [234.258386073, 512], [-865.186908402, -559.732740291])
+INTER. Inserts node 8 in the space
+INTER. Current enclosure of the optimum: [-562.082601865, -562.0814777]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 4
+INTER. Splits node 4 > 2 sub-nodes
+INTER. Node 9: ([0, 256], [0, 512], [-1071, -421.142470638])
+INTER. Contraction -> empty
+INTER. Node 10: ([256, 512], [0, 512], [-1071, -421.142470638])
+INTER. Contraction -> maybe
+INTER. New region: ([256, 512], [102.4, 512], [-1071, -562.082601864])
+LOW.   Lower bound for node 10 after  propagation: -1071
+INTER. Lower bound not improved for node 10 (-1071)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (384, 307.2)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (342.301, 231.172)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([256, 512], [102.4, 512], [-1071, -562.082601864])
+INTER. Inserts node 10 in the space
+INTER. Current enclosure of the optimum: [-562.082601865, -562.0814777]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 8
+INTER. Splits node 8 > 2 sub-nodes
+INTER. Node 11: ([-307.2, -102.399999999], [234.258386073, 373.129193037], [-865.186908402, -559.732740291])
+INTER. Contraction -> maybe
+INTER. New region: ([-266.24, -225.279999999], [250.149630287, 300.818317912], [-614.058317912, -562.082601864])
+LOW.   Lower bound for node 11 after  propagation: -614.058
+INTER. Lower bound improved for node 11: -562.1
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-245.76, 275.484)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-243.016, 274.391)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-242.172218042, -232.611422607], [272.970574672, 282.5178051], [-614.058317912, -562.082601864])
+INTER. Inserts node 11 in the space
+INTER. Node 12: ([-307.2, -102.399999999], [373.129193036, 512], [-865.186908402, -559.732740291])
+INTER. Contraction -> maybe
+INTER. New region: ([-138.908616664, -102.399999999], [417.886556381, 441.22879885], [-622.632609039, -562.082601864])
+LOW.   Lower bound for node 12 after  propagation: -622.633
+INTER. Lower bound improved for node 12: -570.341
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (-120.654, 429.558)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (-107.751, 423.9)
+INTER. New upper bound of the global optimum: -565.808
+INTER. Refined upper bound: -565.809
+INTER. New incumbent solution: (-107.751, 423.9)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([-112.36994804, -103.239625429], [421.208232198, 427.372511332], [-622.632609039, -562.082601864])
+INTER. Inserts node 12 in the space
+INTER. Current enclosure of the optimum: [-565.809383553, -565.808251934]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 10
+INTER. Splits node 10 > 2 sub-nodes
+INTER. Node 13: ([256, 512], [102.4, 307.2], [-1071, -562.082601864])
+INTER. Contraction -> maybe
+INTER. New region: ([256, 460.800000001], [159.534481885, 266.982298321], [-721.552635838, -565.809383552])
+LOW.   Lower bound for node 13 after  propagation: -721.553
+INTER. Lower bound not improved for node 13 (-721.552)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (358.4, 213.259)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (325.772, 216.577)
+INTER. New upper bound of the global optimum: -582.199
+INTER. Refined upper bound: -582.2
+INTER. New incumbent solution: (325.772, 216.577)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([256, 460.800000001], [159.534481885, 266.982298321], [-721.552635838, -565.809383552])
+INTER. Inserts node 13 in the space
+INTER. Node 14: ([256, 512], [307.199999999, 512], [-1071, -562.082601864])
+INTER. Contraction -> maybe
+INTER. New region: ([307.2, 512], [334.9996871, 512], [-1071, -582.200340368])
+LOW.   Lower bound for node 14 after  propagation: -1071
+INTER. Lower bound not improved for node 14 (-1071)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (409.601, 423.5)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (436.96, 451.781)
+INTER. New upper bound of the global optimum: -934.2
+INTER. Refined upper bound: -934.202
+INTER. New incumbent solution: (436.96, 451.781)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([307.2, 512], [334.9996871, 512], [-1071, -582.200340368])
+INTER. Inserts node 14 in the space
+INTER. Current enclosure of the optimum: [-934.202241142, -934.200372738]
+INTER. Current lowest lower bound: -1071
+INTER. Extracts node 14
+INTER. Splits node 14 > 2 sub-nodes
+INTER. Node 15: ([307.2, 409.600000001], [334.9996871, 512], [-1071, -582.200340368])
+INTER. Contraction -> empty
+INTER. Node 16: ([409.6, 512], [334.9996871, 512], [-1071, -582.200340368])
+INTER. Contraction -> maybe
+INTER. New region: ([416.048222022, 512], [390.469549069, 476.599937421], [-1035.59993743, -934.202241141])
+LOW.   Lower bound for node 16 after  propagation: -1035.6
+INTER. Lower bound improved for node 16: -998.416
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (464.025, 433.535)
+LOW.   Final point: (508.352, 402.314)
+INTER. New upper bound of the global optimum: -943.038
+INTER. Refined upper bound: -943.039
+INTER. New incumbent solution: (508.352, 402.314)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([416.048222022, 512], [390.469549069, 476.599937421], [-1035.59993743, -934.202241141])
+INTER. Inserts node 16 in the space
+INTER. Current enclosure of the optimum: [-943.039443845, -943.037557767]
+INTER. Current lowest lower bound: -1012.96
+INTER. Extracts node 7
+INTER. Splits node 7 > 2 sub-nodes
+INTER. Node 17: ([-512, -307.199999999], [0.732740291314, 256.366370146], [-1012.96041396, -559.732740291])
+INTER. Contraction -> empty
+INTER. Node 18: ([-512, -307.199999999], [256.366370145, 512], [-1012.96041396, -559.732740291])
+INTER. Contraction -> empty
+INTER. Current enclosure of the optimum: [-943.039443845, -943.037557767]
+INTER. Current lowest lower bound: -998.416
+INTER. Extracts node 16
+INTER. Splits node 16 > 2 sub-nodes
+INTER. Node 19: ([416.048222022, 512], [390.469549069, 433.534743246], [-1035.59993743, -934.202241141])
+INTER. Contraction -> maybe
+INTER. New region: ([466.371506018, 512], [393.578008629, 433.534743246], [-964.567108053, -943.039443844])
+LOW.   Lower bound for node 19 after  propagation: -964.567
+INTER. Lower bound not improved for node 19 (-964.567)
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (489.186, 413.557)
+LOW.   Final point: (489.186, 413.556)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([466.371506018, 512], [396.351709855, 433.534743246], [-964.567108053, -943.039443844])
+INTER. Inserts node 19 in the space
+INTER. Node 20: ([416.048222022, 512], [433.534743245, 476.599937421], [-1035.59993743, -934.202241141])
+INTER. Contraction -> maybe
+INTER. New region: ([476.554051322, 492.809644405], [433.534743245, 449.790336327], [-986.752655376, -943.039443844])
+LOW.   Lower bound for node 20 after  propagation: -986.753
+INTER. Lower bound improved for node 20: -960.679
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (484.682, 441.663)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (487.379, 437.912)
+INTER. New upper bound of the global optimum: -952.17
+INTER. Refined upper bound: -952.171
+INTER. New incumbent solution: (487.379, 437.912)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([476.554051322, 492.809644405], [433.534743245, 445.555465084], [-986.752655376, -943.039443844])
+INTER. Inserts node 20 in the space
+INTER. Current enclosure of the optimum: [-952.17144278, -952.169538438]
+INTER. Current lowest lower bound: -977
+INTER. Extracts node 3
+INTER. Splits node 3 > 2 sub-nodes
+INTER. Node 21: ([0, 256], [-512, 0], [-977, -342.27978109])
+INTER. Contraction -> empty
+INTER. Node 22: ([256, 512], [-512, 0], [-977, -342.27978109])
+INTER. Contraction -> empty
+INTER. Current enclosure of the optimum: [-952.17144278, -952.169538438]
+INTER. Current lowest lower bound: -977
+INTER. Extracts node 20
+INTER. Splits node 20 > 2 sub-nodes
+INTER. Node 23: ([476.554051322, 484.681847864], [433.534743245, 445.555465084], [-986.752655376, -943.039443844])
+INTER. Contraction -> maybe
+INTER. New region: ([477.306882234, 484.681847864], [433.534743245, 438.343031981], [-964.478041342, -952.171442779])
+LOW.   Lower bound for node 23 after  propagation: -960.68
+INTER. Lower bound improved for node 23: -957.244
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (480.995, 435.939)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (480.597, 436.068)
+INTER. New upper bound of the global optimum: -954.794
+INTER. Refined upper bound: -954.796
+INTER. New incumbent solution: (480.597, 436.068)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([477.306882234, 484.681847864], [433.534743245, 438.343031981], [-964.478041342, -952.171442779])
+INTER. Inserts node 23 in the space
+INTER. Node 24: ([484.681847863, 492.809644405], [433.534743245, 445.555465084], [-986.752655376, -943.039443844])
+INTER. Contraction -> maybe
+INTER. New region: ([484.703686041, 488.333529316], [435.220378824, 438.343031981], [-960.917922014, -954.796017724])
+LOW.   Lower bound for node 24 after  propagation: -960.68
+INTER. Lower bound improved for node 24: -956.009
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (486.519, 436.782)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (486.053, 436.589)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([484.703686041, 488.333529316], [435.220378824, 436.407178586], [-960.917922014, -954.796017724])
+INTER. Inserts node 24 in the space
+INTER. Current enclosure of the optimum: [-954.796017725, -954.794108134]
+INTER. Current lowest lower bound: -977
+INTER. Extracts node 5
+INTER. Splits node 5 > 2 sub-nodes
+INTER. Node 25: ([-512, -310.726599488], [-512, 0], [-977, -540.425690074])
+INTER. Contraction -> empty
+INTER. Node 26: ([-310.726599489, -109.453198976], [-512, 0], [-977, -540.425690074])
+INTER. Contraction -> empty
+INTER. Current enclosure of the optimum: [-954.796017725, -954.794108134]
+INTER. Current lowest lower bound: -964.567
+INTER. Extracts node 23
+INTER. Splits node 23 > 2 sub-nodes
+INTER. Node 27: ([477.306882234, 484.681847864], [433.534743245, 435.938887613], [-964.478041342, -952.171442779])
+INTER. Contraction -> maybe
+INTER. New region: ([478.073221731, 484.680796927], [433.534743245, 435.922356652], [-959.70472845, -954.796017724])
+LOW.   Lower bound for node 27 after  propagation: -957.245
+INTER. Lower bound improved for node 27: -957.23
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (481.378, 434.729)
+LOW.   Final point: (481.377, 434.729)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([478.073221731, 484.680796927], [433.534743245, 435.922356652], [-959.70472845, -954.796017724])
+INTER. Inserts node 27 in the space
+INTER. Node 28: ([477.306882234, 484.681847864], [435.938887612, 438.343031981], [-964.478041342, -952.171442779])
+INTER. Contraction -> maybe
+INTER. New region: ([480.487477499, 481.72592295], [435.944826275, 437.183271726], [-957.320963138, -954.796017724])
+LOW.   Lower bound for node 28 after  propagation: -957.245
+INTER. Lower bound improved for node 28: -954.879
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (481.107, 436.564)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (480.582, 436.047)
+INTER. New upper bound of the global optimum: -954.807
+INTER. Refined upper bound: -954.809
+INTER. New incumbent solution: (480.582, 436.047)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([480.487477499, 480.720375867], [435.944826275, 436.097570162], [-957.320963138, -954.796017724])
+INTER. Inserts node 28 in the space
+INTER. Current enclosure of the optimum: [-954.809151676, -954.807242058]
+INTER. Current lowest lower bound: -964.567
+INTER. Extracts node 19
+INTER. Splits node 19 > 2 sub-nodes
+INTER. Node 29: ([466.371506018, 489.18575301], [396.351709855, 433.534743246], [-964.567108053, -943.039443844])
+INTER. Contraction -> maybe
+INTER. New region: ([474.27440843, 483.661271165], [426.098136567, 433.534743246], [-964.202329928, -954.809151675])
+LOW.   Lower bound for node 29 after  propagation: -964.202
+INTER. Lower bound improved for node 29: -958.701
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (478.968, 429.817)
+LOW.   Stop on iteration limit (20)
+LOW.   Final point: (479.407, 429.923)
+INTER. New upper bound of the global optimum: -955.275
+INTER. Refined upper bound: -955.277
+INTER. New incumbent solution: (479.407, 429.923)
+INTER. Polytope reduction -> maybe
+INTER. New region:  ([476.468610549, 483.661271165], [426.098136567, 433.534743246], [-964.202329928, -954.809151675])
+INTER. Inserts node 29 in the space
+INTER. Node 30: ([489.185753009, 512], [396.351709855, 433.534743246], [-964.567108053, -943.039443844])
+INTER. Contraction -> maybe
+INTER. New region: (512, [404.228706457, 404.232278579], [-959.6475212, -959.633793072])
+LOW.   Lower bound for node 30 after  propagation: -959.648
+INTER. Lower bound not found for node 30
+LOW.   Local solver based on gradient descent
+LOW.   Starting point: (512, 404.23)
+LOW.   Final point: (512, 404.23)
+INTER. New upper bound of the global optimum: -959.641
+INTER. Refined upper bound: -959.643
+INTER. New incumbent solution: (512, 404.23)
+INTER. Polytope reduction -> empty
+MAIN.  Stop since the space is empty
+MAIN.  Number of nodes processed: 31
+MAIN.  Preprocessing time: 0.006s
+MAIN.  Solving time: 0.173s
+MAIN.  Optimization status: Optimal
+MAIN.  Best point found: (512, 404.23)
+MAIN.  Global optimum: [-959.642580046, -959.640660762]

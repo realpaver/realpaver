@@ -22,11 +22,17 @@ bop_solver_SOURCES = bop_solver.cpp
 EXTRA_DIST = \
 	bop_config \
 	Beale.bop \
+	Bukin.bop \
 	Colville.bop \
 	DropWave.bop \
+	Eggholder.bop \
 	GoldsteinPrice.bop \
+	Hartmann_3.bop \
+	McCormick.bop \
 	Rastrigin.bop \
 	Schwefel.bop \
 	SixHumpCamel.bop \
 	Shubert.bop \
+	StyblinskiTang_2.bop \
+	StyblinskiTang_10.bop \
 	ThreeHumpCamel.bop

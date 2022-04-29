@@ -1,0 +1,14 @@
+Variables
+   x in [-512, 512],
+   y in [-512, 512]
+#   x in [510, 512],
+#   y in [400, 405]
+;
+
+Objectives
+   MIN -(y+47)*sin(sqrt(abs(y+0.5*x+47))) - x*sin(sqrt(abs(x-y-47)))
+#   MIN -(y+47)*sin(sqrt(y+0.5*x+47)) - x*sin(sqrt(x-y-47))
+;
+
+# f* = -959.6407
+# x* = (512, 404.2319)

@@ -50,10 +50,10 @@
 #define LOG_ON 1
 
 /* Define to 1 to use the Clp solver. */
-#define LP_LIB_CLP 1
+/* #undef LP_LIB_CLP */
 
 /* Define to 1 to use Gurobi. */
-/* #undef LP_LIB_GUROBI */
+#define LP_LIB_GUROBI 1
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"

@@ -49,6 +49,9 @@ BOModel::BOModel(Problem& problem, bool withobj)
       TermDeriver deriver(v);
       tomin.acceptVisitor(deriver);
 
+DEBUG("DV : " << deriver.getDerivative());
+
+
       // insertion of the equation in the dag
       dag_->insert(deriver.getDerivative() == 0);
 

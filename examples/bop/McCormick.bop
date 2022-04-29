@@ -1,0 +1,8 @@
+Variables
+   x in [-1.5, 4],
+   y in [-3, 4]
+;
+
+Objectives
+   MIN sin(x+y) + (x-y)^2 - 1.5*x + 2.5*y + 1
+;

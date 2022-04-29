@@ -456,7 +456,7 @@ Proof BOSolver::reducePolytope(SharedBONode& node)
 
          if (status == OptimizationStatus::Infeasible) return Proof::Empty;
 
-         if (status == OptimizationStatus::Optimal)
+         else if (status == OptimizationStatus::Optimal)
          {
             Interval x = Interval::moreThan(lpsolver_->getObjVal() - 1.0e-8);
             Interval y = reg->get(v) & x;
@@ -464,6 +464,8 @@ Proof BOSolver::reducePolytope(SharedBONode& node)
             if (y.isEmpty()) return Proof::Empty;
             else reg->set(v, y);
          }
+
+         else return Proof::Maybe;
 
          // maximize v
          lpsolver_->setObj(e, false);

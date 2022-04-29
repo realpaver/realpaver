@@ -104,7 +104,9 @@ void TermDeriver::apply(const TermUsb* t)
 
 void TermDeriver::apply(const TermAbs* t)
 {
-   dt_ = sgn(t->child());
+   TermDeriver vis(id_);
+   t->child()->acceptVisitor(vis);
+   dt_ = sgn(t->child())*vis.dt_;
 }
 
 void TermDeriver::apply(const TermSgn* t)

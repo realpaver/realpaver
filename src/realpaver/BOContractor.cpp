@@ -68,34 +68,54 @@ Proof BOContractor::contract(IntervalRegion& reg)
       {
          double val = copy.get(v_).right();
          reg.set(v_, val);
-      }
+     }
 
       else if (ef.isCertainlyGeZero())
       {
          double val = copy.get(v_).left();
          reg.set(v_, val);
-      }
+     }
 
       //else
          //LOG_INFO("!!! unable to fix " << v_.name() << " but monotone");
    }
    else
-   {
+   { 
       bool keepLB = false,
            keepRB = false;
 
-      if (initLB && reg.get(v_).left() != copy.get(v_).left())
+      if (initLB)
       {
-         RealPoint lc( copy.lCorner() );
-         Interval ef = f_->eval(lc);
-         if (ef.isCertainlyGeZero()) keepLB = true;
+         if (reg.get(v_).left() == copy.get(v_).left())
+         {
+            // keeps the initial left facet if it has not been removed
+            keepLB = true;
+         }
+         else
+         {
+            // keeps the initial left facet if it has been removed
+            // but the function is increasing
+            RealPoint lc( copy.lCorner() );
+            Interval ef = f_->eval(lc);
+            if (ef.isCertainlyGeZero()) keepLB = true;
+         }
       }
 
-      if (initRB && reg.get(v_).right() != copy.get(v_).right())
+      if (initRB)
       {
-         RealPoint rc( copy.rCorner() );
-         Interval ef = f_->eval(rc);
-         if (ef.isCertainlyLeZero()) keepRB = true;
+            // keeps the initial right facet if it has not been removed
+         if (reg.get(v_).right() == copy.get(v_).right())
+         {
+            keepRB = true;
+         }
+         else
+         {
+            // keeps the initial right facet if it has been removed
+            // but the function is decreasing
+            RealPoint rc( copy.rCorner() );
+            Interval ef = f_->eval(rc);
+            if (ef.isCertainlyLeZero()) keepRB = true;
+         }
       }
 
       if (keepLB || keepRB)
@@ -107,6 +127,8 @@ Proof BOContractor::contract(IntervalRegion& reg)
          if (keepRB) dom.setRight(copy.get(v_).right());
          reg.set(v_, dom);
       }
+
+      // else we keep the box that contains the stationary points
    }
 
    return Proof::Maybe;

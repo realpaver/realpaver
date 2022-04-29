@@ -204,7 +204,7 @@ void DagNode::linearize(LPModel& lm)
    }
 
    // insertion of constraints
-   linearizeImpl(lm);
+   if (val_.isFinite() && (!val_.isSingleton())) linearizeImpl(lm);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -644,13 +644,13 @@ void DagMul::linearizeImpl(LPModel& lm)
       LinExpr e4( {1.0, -d, -b}, {z, x, y} );
       lm.addCtr(I4.left(), e4);
    }
-   else if (yvar)
+   else if (!xvar)
    {
       // z = x*y with x fixed => z - a*y = 0
       LinExpr e( {1.0, -a}, {z, y} );
       lm.addCtr(0.0, e, 0.0);
    }
-   else if (xvar)
+   else if (!yvar)
    {
       // z = x*y with y fixed => z - c*x = 0
       LinExpr e( {1.0, -c}, {z, x} );
@@ -1275,7 +1275,9 @@ void DagSqrt::linearizeImpl(LPModel& lm)
    auto f  = [](const Interval& x) { return sqrt(x); };
    auto df = [](const Interval& x) { return 1.0/(2.0*sqrt(x)); };
 
-   overConcave(lm, iy, ix, a, b, a, f, df);
+   if (a > 0.0)
+      overConcave(lm, iy, ix, a, b, a, f, df);
+
    overConcave(lm, iy, ix, a, b, b, f, df);
    overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
 

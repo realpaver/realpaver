@@ -241,7 +241,7 @@ void overLine(LPModel& lm, size_t iy, size_t ix,
 
       // y <= mx + p
       LinExpr e( {1.0, -m}, {y, x} );
-      lm.addCtr(e, p);         
+      lm.addCtr(e, p);
    }
 }
 

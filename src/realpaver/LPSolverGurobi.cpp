@@ -7,6 +7,9 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/Double.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/LPSolverGurobi.hpp"
 
 namespace realpaver {
@@ -48,6 +51,10 @@ GRBLinExpr LPSolver::makeGrbLinExpr(LinExpr e)
    {
       int j = e.getIndexVar(i);
       double coef = e.getCoef(i);
+
+if (Double::isNan(coef)) DEBUG("IS NAN ....................." << i << " " << j);
+if (Double::isInf(coef)) DEBUG("IS INF .....................");
+
 
       GRBVar gv = vars_[j];
       ge += coef*gv;
@@ -144,14 +151,30 @@ bool LPSolver::run()
 
 bool LPSolver::optimize()
 {
-   makeGurobiSimplex();
-   return run();
+   try
+   {
+      makeGurobiSimplex();
+      return run();
+   }
+   catch (GRBException e)
+   {
+      LOG_INTER("Error in Gurobi" << e.getMessage());
+      return false;
+   }
 }
 
 bool LPSolver::reoptimize()
 {
-   makeObj();
-   return run();
+   try
+   {
+      makeObj();
+      return run();
+   }
+   catch (GRBException e)
+   {
+      LOG_INTER("Error in Gurobi" << e.getMessage());
+      return false;
+   }
 }   
 
 } // namespace

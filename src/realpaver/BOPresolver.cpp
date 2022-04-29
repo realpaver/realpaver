@@ -48,7 +48,7 @@ BOPresolver::BOPresolver(BOModel& model)
 }
 
 bool BOPresolver::presolve()
-{   
+{
    Proof proof = propagator_.contract(region_);
 
    return proof != Proof::Empty;
