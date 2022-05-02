@@ -15,17 +15,21 @@ int main(void)
    Logger::init(LogLevel::full, "work.log");
    Interval::precision( 4 );
 
-   RealMatrix A = {{1, 2}, {3, 4}, {5, 6}};
-   cout << "A:" << endl << A << endl;
-
-   RealMatrix B = {{1, 0, 1, 0}, {3, 0, 3, 0}};
-   cout << "B:" << endl << B << endl;
-
-   cout << "A*B:" << endl << A*B << endl;
-   
-   
    try {
-      Problem* prob = new Problem;
+      Problem prob;
+      Parser parser;
+
+      bool ok = parser.parseFile("Rapha.bop", prob);
+
+      Term f = prob.getObjective().getTerm();
+      cout << f << endl;
+
+      SumOfSquaresCreator creator;
+      f.acceptVisitor(creator);
+
+      for (size_t i=0; i<creator.nbSquares(); ++i)
+         cout << creator.getSquare(i) << " <= 0.01," << endl;
+
       //~ Variable ksi_1 = prob->addRealVar(-1.199700000000001, -0.8532, "ksi_1"),
                //~ ksi_2 = prob->addRealVar(1, 5, "ksi_2"),
                //~ ksi_3 = prob->addRealVar(3.6, 9.800000000000001, "ksi_3"),
@@ -36,7 +40,7 @@ int main(void)
 
 
 
-
+/*
 Variable x = prob->addRealVar(2, 6, "x"),
          y = prob->addRealVar(1, 3, "y"),
          z = prob->addRealVar(0, 10, "z");
@@ -176,7 +180,7 @@ return 0;
    proof = ph.contract(X);
       cout << proof << endl;
       cout << "reg = " << X << endl;
-
+*/
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

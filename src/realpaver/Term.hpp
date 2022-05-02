@@ -242,10 +242,8 @@ public:
    TermRep* cloneRoot() const;
 
    /// @return true if terms are automatically simplified when they are created
-   static bool isSimplificationOn();
-
-   /// @return true if terms are not simplified when they are created
-   static bool isSimplificationOff();
+   ///         and false otherwise
+   static bool simplification();
 
    /// Assigns the simplification status of terms
    /// @param simplify true in order to simplify terms when they are created,
@@ -253,10 +251,21 @@ public:
    /// @return the previous status before its assignment
    static bool simplification(bool simplify);
 
+   /// Gets the display status of constants
+   /// @return true if the constants are displayed as intervals, false
+   ///         if the midpoints are displayed
+   static bool idisplay();
+
+   /// Assigns the display status of constants
+   /// @param ok true in order to display the constants as intervals
+   /// @return the previous status before its assignment
+   static bool idisplay(bool ok);
+
 private:
    SharedRep rep_;         // shared representation
 
    static bool simplify_;  // true if terms are automatically simplified
+   static bool idisplay_;  // true if constants are displayed as intervals
 };
 
 /// Output on a stream
@@ -613,6 +622,7 @@ public:
    Interval evalConst() const;
    void evalRoot();
    void contractRoot();
+   void print(std::ostream& os) const;
    void acceptVisitor(TermVisitor& vis) const;
    TermRep* cloneRoot() const;
    ///@}
