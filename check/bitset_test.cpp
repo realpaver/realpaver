@@ -27,7 +27,7 @@ public:
       size_t n = 5;
       Bitset b(n, 0);
       TEST_TRUE( b.size() == n );
-      TEST_TRUE( b.nbZero() == n );
+      TEST_TRUE( b.nbZeros() == n );
    }
 
    void testInitB()
@@ -35,7 +35,7 @@ public:
       size_t n = 5;
       Bitset b(n, 1);
       TEST_TRUE( b.size() == n );
-      TEST_TRUE( b.nbOne() == n );
+      TEST_TRUE( b.nbOnes() == n );
    }
 
    void testSet()
@@ -44,7 +44,7 @@ public:
       Bitset b(n, 0);
       b.setOne(i);
       TEST_TRUE( b.get(i) != 0 );
-      TEST_TRUE( b.nbOne() == 1 );
+      TEST_TRUE( b.nbOnes() == 1 );
    }
 
    void testFlip()
@@ -64,7 +64,7 @@ public:
       b.setOne(i);
       b.flipAll();
       TEST_TRUE( b.get(i) == 0 );
-      TEST_TRUE( b.nbOne() == n-1 );
+      TEST_TRUE( b.nbOnes() == n-1 );
    }
 
    void testAnd()
@@ -80,7 +80,7 @@ public:
       TEST_TRUE( b3.get(j) == 0 );
       TEST_TRUE( b3.get(k) == 0 );
       TEST_TRUE( b3.get(l) == 0 );
-      TEST_TRUE( b3.nbOne() == 1 );
+      TEST_TRUE( b3.nbOnes() == 1 );
    }
 
    void testOr()
@@ -96,7 +96,7 @@ public:
       TEST_TRUE( b3.get(j) != 0 );
       TEST_TRUE( b3.get(k) == 0 );
       TEST_TRUE( b3.get(l) != 0 );
-      TEST_TRUE( b3.nbOne() == 3 );
+      TEST_TRUE( b3.nbOnes() == 3 );
    }
 
    void testOverlaps()
@@ -120,8 +120,8 @@ public:
       Bitset b2( ~b1 );
       TEST_TRUE( b2.get(i) == 0 );
       TEST_TRUE( b2.get(j) == 0 );
-      TEST_TRUE( b2.nbZero() == 2 );
-      TEST_TRUE( b2.nbOne() == n-2 );
+      TEST_TRUE( b2.nbZeros() == 2 );
+      TEST_TRUE( b2.nbOnes() == n-2 );
    }
 };
 

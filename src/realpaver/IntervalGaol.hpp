@@ -74,7 +74,7 @@ struct IntervalTraits<RawInterval> {
          interval res(s);
          return res;
       }
-      catch(std::exception e)
+      catch(std::exception& e)
       {}
       return interval::emptyset();
    }
@@ -85,7 +85,7 @@ struct IntervalTraits<RawInterval> {
          interval res(sl, sr);
          return res;
       }
-      catch(std::exception e)
+      catch(std::exception& e)
       {}
       return interval::emptyset();
    }

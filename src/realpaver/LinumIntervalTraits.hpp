@@ -14,6 +14,16 @@
 #include "LinumTraits.hpp"
 
 namespace realpaver {
+   
+static inline Interval itv_sqr(const Interval& x)
+{
+   return sqr(x);
+}
+
+static inline Interval itv_sqrt(const Interval& x)
+{
+   return sqrt(x);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a specialization of a traits class for intervals.
@@ -91,7 +101,7 @@ struct LinumTraits<Interval>
    /// @return square of x
    static inline ValueType sqr(ConstRefType x)
    {
-      return sqr(x);
+      return itv_sqr(x);
    }
 
    /// Square root
@@ -99,7 +109,7 @@ struct LinumTraits<Interval>
    /// @return square root of x
    static inline ValueType sqrt(ConstRefType x)
    {
-      return sqrt(x);
+      return itv_sqrt(x);
    }
 
    /// Addition with assignment

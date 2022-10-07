@@ -22,7 +22,7 @@ std::ostream& operator<<(std::ostream& os, OpSymbol op)
       case OpSymbol::Div:  return os << "/";
       case OpSymbol::Min:  return os << "min";
       case OpSymbol::Max:  return os << "max";
-      case OpSymbol::Usb: return os << "-";
+      case OpSymbol::Usb:  return os << "-";
       case OpSymbol::Abs:  return os << "abs";
       case OpSymbol::Sgn:  return os << "sgn";
       case OpSymbol::Sqr:  return os << "sqr";

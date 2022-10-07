@@ -79,7 +79,7 @@ public:
 
 private:
    struct comp {
-      bool operator()(Variable x, Variable y)
+      bool operator()(Variable x, Variable y) const
       {
          return x.id() < y.id();
       }

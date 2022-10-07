@@ -34,7 +34,7 @@ LT_INIT
 
 
 # flex / bison
-AM_PROG_LEX
+AC_PROG_LEX(noyywrap)
 AC_PROG_YACC
 
 
@@ -111,13 +111,24 @@ CXXFLAGS="$CXXFLAGS ${libpath}"
 
 # --with-itvlib
 AC_ARG_WITH([itvlib],
-            [AS_HELP_STRING([--with-itvlib=(Gaol)],
-            [Specify the interval library to use @<:@default=Gaol@:>@])],
+            [AS_HELP_STRING([--with-itvlib=(GaolApmathlib, GaolCrlibm)],
+            [Specify the interval library to use @<:@default=GaolApmathlib@:>@])],
             use_itvlib="${with_itvlib}",
-            use_itvlib="Gaol")
+            use_itvlib="GaolApmathlib")
 
-# Gaol with apmathlib
-if test "${use_itvlib}" = "Gaol"; then
+case "$use_itvlib" in
+GaolApmathlib)
+   name_itvlib="Gaol"
+   gaol_mathlib="apmathlib"
+;;
+GaolCrlibm)
+   name_itvlib="Gaol"
+   gaol_mathlib="crlibm"
+esac
+
+
+# Gaol
+if test "${name_itvlib}" = "Gaol"; then
    AC_LANG_PUSH([C++])
    AC_MSG_CHECKING([for Gaol headers])
    AC_COMPILE_IFELSE([
@@ -128,7 +139,12 @@ if test "${use_itvlib}" = "Gaol"; then
    AC_MSG_RESULT(${have_gaol_headers})
 
    OLD_LIBS=$LIBS
-   LIBS="-lgaol -lultim -lm"
+
+   if test "${use_itvlib}" = "GaolApmathlib"; then
+      LIBS="-lgaol -lultim -lm"
+   else
+      LIBS="-lgaol -lcrlibm -lm"
+   fi
 
    AC_MSG_CHECKING([for libgaol])
    AC_RUN_IFELSE( [
@@ -151,9 +167,10 @@ if test "${use_itvlib}" = "Gaol"; then
    AC_LANG_POP([C++])
 fi
 
+
 AC_SUBST(INTERVAL_LIB)
-AC_CONFIG_LINKS([src/realpaver/IntervalImpl.hpp:src/realpaver/Interval${use_itvlib}.hpp])
-AM_CONDITIONAL([COND_INTERVAL_GAOL], [test ${use_itvlib} = "Gaol"])
+AC_CONFIG_LINKS([src/realpaver/IntervalImpl.hpp:src/realpaver/Interval${name_itvlib}.hpp])
+AM_CONDITIONAL([COND_INTERVAL_GAOL], [test ${name_itvlib} = "Gaol"])
 
 
 # --with-lplib
@@ -361,7 +378,7 @@ AC_OUTPUT
 # options display
 echo ""
 printf "Realpaver v. realpaver_version configured\n"
-printf "\tInterval library   : ${use_itvlib}\n"
+printf "\tInterval library   : ${name_itvlib}\n"
 printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
@@ -376,4 +393,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=Gaol --with-lplib=Clp --enable-debug --enable-assert --enable-log
+# ./configure --prefix=/home/granvilliers-l/local/ --with-include-path=/home/granvilliers-l/local/include --with-lib-path=/home/granvilliers-l/local/lib --with-itvlib=GaolCrlibm --with-lplib=Clp --enable-debug --enable-assert --enable-log

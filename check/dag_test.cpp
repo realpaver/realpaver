@@ -34,8 +34,8 @@ public:
 
    void testA()
    {
-      TEST_TRUE( dag->nbVar() == 3 );
-      TEST_TRUE( dag->nbNode() == 8 );
+      TEST_TRUE( dag->nbVars() == 3 );
+      TEST_TRUE( dag->nbNodes() == 8 );
    }
 
    void testB()

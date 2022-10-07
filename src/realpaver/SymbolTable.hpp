@@ -26,7 +26,7 @@ public:
    /// Constructor
    /// @param name symbol name
    ///
-   /// Thorws an exception if name is empty.
+   /// Throws an exception if name is empty.
    ParsingSymbol(const std::string& name);
 
    /// Virtual destructor
