@@ -17,11 +17,21 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a base class for search nodes.
 ///
-/// It just manages the tree depth.
+/// A node has a scope, an interval region, an index, a tree depth, and it is
+/// possible to register a variable, e.g. the selected variable in the parent
+/// node whose domain has been split.
+///
+/// The scope is shared. It may be the set of variables considered by some
+/// splitting component.
+///
+/// The interval region is owned by this. Its scope is assumed to contain
+/// the scope of this.
 ///////////////////////////////////////////////////////////////////////////////
 class SearchNode {
 public:
    /// Creates a node
+   /// @param scope set of variables
+   /// @param reg domains of variables
    /// @param depth depth of this
    SearchNode(const Scope& scope, const IntervalRegion& reg,  int depth = 0);
 
