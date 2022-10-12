@@ -18,7 +18,7 @@
 #include "realpaver/ListContractor.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
-#include "realpaver/Selector.hpp"
+#include "realpaver/VariableSelector.hpp"
 
 namespace realpaver {
 
@@ -154,16 +154,16 @@ void BOSolver::makeLocalSolver()
 
 void BOSolver::makeSplit()
 {
-   Selector* selector = nullptr;
+   VariableSelector* selector = nullptr;
    IntervalSlicer* slicer = nullptr;
 
    bool osplit = (param_.getStrParam("SPLIT_OBJECTIVE") == "YES");
    Scope sco = osplit ? model_->getFullScope() : model_->getObjScope();
 
    std::string sel = param_.getStrParam("SPLIT_SELECTOR");
-   if (sel == "MAX_DOM") selector = new SelectorMaxDom(sco);
-   if (sel == "MAX_SMEAR") selector = new SelectorMaxSmear(model_, sco);
-   if (sel == "ROUND_ROBIN") selector = new SelectorRoundRobin(sco);
+   if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
+   if (sel == "MAX_SMEAR") selector = new MaxSmearSelector(model_, sco);
+   if (sel == "ROUND_ROBIN") selector = new RoundRobinSelector(sco);
 
    std::string sli = param_.getStrParam("SPLIT_SLICER");
    if (sli == "BISECTION") slicer = new IntervalBisecter();
@@ -175,13 +175,13 @@ void BOSolver::makeSplit()
    if (sli == "PARTITION")
    {
       size_t n = param_.getIntParam("SPLIT_NB_SLICES");
-      slicer = new IntervalPartitioner(n);
+      slicer = new IntervalPartitionMaker(n);
    }
 
    THROW_IF(selector == nullptr || slicer == nullptr,
             "Unable to make the split object in a BO solver");
 
-   std::unique_ptr<Selector> pselector(selector);
+   std::unique_ptr<VariableSelector> pselector(selector);
    std::unique_ptr<IntervalSlicer> pslicer(slicer);
 
    split_ = new BOSplit(std::move(pselector), std::move(pslicer));
@@ -247,12 +247,12 @@ void BOSolver::makeMaxCIDHC4()
 {
    makeHC4();
 
-   std::unique_ptr<Selector> selector =
-      std::make_unique<SelectorMaxDom>(model_->getObjScope());
+   std::unique_ptr<VariableSelector> selector =
+      std::make_unique<MaxDomSelector>(model_->getObjScope());
 
    int nb = param_.getIntParam("SPLIT_NB_SLICES");
    std::unique_ptr<IntervalSlicer> slicer =
-      std::make_unique<IntervalPartitioner>(nb);
+      std::make_unique<IntervalPartitionMaker>(nb);
 
    SharedContractor op =
       std::make_shared<MaxCIDContractor>(contractor_, std::move(selector),

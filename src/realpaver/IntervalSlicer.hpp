@@ -125,11 +125,11 @@ private:
 /// [a,a+h], [a+h,a+2h], ..., [b-h,b] where h is obtained as the width of [a,b]
 /// divided by n. The number n is called arity.
 ///////////////////////////////////////////////////////////////////////////////
-class IntervalPartitioner : public IntervalSlicer {
+class IntervalPartitionMaker : public IntervalSlicer {
 public:
    /// Creates a slicer
    /// @param n number of slices
-   IntervalPartitioner(size_t n = 2);
+   IntervalPartitionMaker(size_t n = 2);
 
    /// @return the arity of this
    size_t getArity() const;

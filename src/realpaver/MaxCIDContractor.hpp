@@ -11,7 +11,7 @@
 #define REALPAVER_MAX_CID_CONTRACTOR_HPP
 
 #include "realpaver/CIDContractor.hpp"
-#include "realpaver/Selector.hpp"
+#include "realpaver/VariableSelector.hpp"
 
 namespace realpaver {
 
@@ -26,7 +26,7 @@ public:
    /// @param selector object used to select a variable
    /// @param slicer object used to slice a variable domain
    MaxCIDContractor(SharedContractor op,
-                    std::unique_ptr<Selector> selector,
+                    std::unique_ptr<VariableSelector> selector,
                     std::unique_ptr<IntervalSlicer> slicer);
 
    /// Destructor
@@ -48,7 +48,7 @@ public:
 
 private:
    CIDContractor* op_;
-   std::unique_ptr<Selector> selector_;
+   std::unique_ptr<VariableSelector> selector_;
 };
 
 } // namespace

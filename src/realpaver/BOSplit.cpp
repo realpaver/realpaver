@@ -11,7 +11,7 @@
 
 namespace realpaver {
 
-BOSplit::BOSplit(std::unique_ptr<Selector> selector,
+BOSplit::BOSplit(std::unique_ptr<VariableSelector> selector,
                  std::unique_ptr<IntervalSlicer> slicer)
       : SplitStrategy<SharedBONode>(),
         selector_(std::move(selector)),

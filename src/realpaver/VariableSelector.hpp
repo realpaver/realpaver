@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_SELECTOR_HPP
-#define REALPAVER_SELECTOR_HPP
+#ifndef REALPAVER_VARIABLE_SELECTOR_HPP
+#define REALPAVER_VARIABLE_SELECTOR_HPP
 
 #include <vector>
 #include "realpaver/IntervalFunction.hpp"
@@ -20,20 +20,20 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of variables used by splitting strategies.
 ///////////////////////////////////////////////////////////////////////////////
-class Selector {
+class VariableSelector {
 public:
    /// Creates a selector on a set of variables
    ///@param s a scope
-   Selector(Scope s);
+   VariableSelector(Scope s);
 
    /// Virtual destructor
-   virtual ~Selector();
+   virtual ~VariableSelector();
 
    /// Default copy constructor
-   Selector(const Selector&) = default;
+   VariableSelector(const VariableSelector&) = default;
 
    /// No assignment
-   Selector& operator=(const Selector&) = delete;
+   VariableSelector& operator=(const VariableSelector&) = delete;
 
    /// @return the scope of this
    Scope scope() const;
@@ -61,20 +61,20 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable with largest domain.
 ///////////////////////////////////////////////////////////////////////////////
-class SelectorMaxDom : public Selector {
+class MaxDomSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
    ///@param s a scope
-   SelectorMaxDom(Scope s);
+   MaxDomSelector(Scope s);
 
    /// Destructor
-   ~SelectorMaxDom() = default;
+   ~MaxDomSelector() = default;
 
    /// Default copy constructor
-   SelectorMaxDom(const SelectorMaxDom&) = default;
+   MaxDomSelector(const MaxDomSelector&) = default;
 
    /// No assignment
-   SelectorMaxDom& operator=(const SelectorMaxDom&) = delete;
+   MaxDomSelector& operator=(const MaxDomSelector&) = delete;
 
    /// Overrides (Selector)
    std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
@@ -83,21 +83,21 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable with maximum smear.
 ///////////////////////////////////////////////////////////////////////////////
-class SelectorMaxSmear : public Selector {
+class MaxSmearSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
    ///@param f a function
    ///@param s a scope
-   SelectorMaxSmear(DiffIntervalFunction* f, Scope s);
+   MaxSmearSelector(DiffIntervalFunction* f, Scope s);
 
    /// Destructor
-   ~SelectorMaxSmear() = default;
+   ~MaxSmearSelector() = default;
 
    /// Default copy constructor
-   SelectorMaxSmear(const SelectorMaxSmear&) = default;
+   MaxSmearSelector(const MaxSmearSelector&) = default;
 
    /// No assignment
-   SelectorMaxSmear& operator=(const SelectorMaxSmear&) = delete;
+   MaxSmearSelector& operator=(const MaxSmearSelector&) = delete;
 
    /// Overrides (Selector)
    std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
@@ -109,20 +109,20 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable following a round-robin strategy.
 ///////////////////////////////////////////////////////////////////////////////
-class SelectorRoundRobin : public Selector {
+class RoundRobinSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
    ///@param s a scope
-   SelectorRoundRobin(Scope s);
+   RoundRobinSelector(Scope s);
 
    /// Destructor
-   ~SelectorRoundRobin() = default;
+   ~RoundRobinSelector() = default;
 
    /// Default copy constructor
-   SelectorRoundRobin(const SelectorRoundRobin&) = default;
+   RoundRobinSelector(const RoundRobinSelector&) = default;
 
    /// No assignment
-   SelectorRoundRobin& operator=(const SelectorRoundRobin&) = delete;
+   RoundRobinSelector& operator=(const RoundRobinSelector&) = delete;
 
    /// Overrides (Selector)
    std::pair<bool, Variable> selectVar(const SearchNode& node);

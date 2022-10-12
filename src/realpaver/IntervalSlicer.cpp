@@ -139,24 +139,24 @@ Interval IntervalPeeler::peelRight(const Interval& x) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-IntervalPartitioner::IntervalPartitioner(size_t n)
+IntervalPartitionMaker::IntervalPartitionMaker(size_t n)
 {
    setArity(n);
 }
 
-size_t IntervalPartitioner::getArity() const
+size_t IntervalPartitionMaker::getArity() const
 {
    return n_;
 }
 
-void IntervalPartitioner::setArity(size_t n)
+void IntervalPartitionMaker::setArity(size_t n)
 {
    ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
 
    n_ = n;
 }
 
-void IntervalPartitioner::applyImpl(const Interval& x)
+void IntervalPartitionMaker::applyImpl(const Interval& x)
 {
    if (n_ == 2)
    {

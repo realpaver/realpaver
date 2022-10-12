@@ -7,28 +7,28 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/NcspDfsSpace.hpp"
+#include "realpaver/NcspSpaceDFS.hpp"
 
 namespace realpaver {
 
-size_t NcspDfsSpace::nbPendingNodes() const
+size_t NcspSpaceDFS::nbPendingNodes() const
 {
    return vnode_.size();
 }
 
-SharedNcspNode NcspDfsSpace::getPendingNode() const
+SharedNcspNode NcspSpaceDFS::getPendingNode() const
 {
    return vnode_.back();
 }
 
-SharedNcspNode NcspDfsSpace::popPendingNode()
+SharedNcspNode NcspSpaceDFS::popPendingNode()
 {
    SharedNcspNode node = vnode_.back();
    vnode_.pop_back();
    return node;
 }
 
-void NcspDfsSpace::insertPendingNode(const SharedNcspNode& node)
+void NcspSpaceDFS::insertPendingNode(const SharedNcspNode& node)
 {
    vnode_.push_back(node);
 }

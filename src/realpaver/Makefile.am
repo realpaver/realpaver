@@ -69,9 +69,9 @@ librealpaver_la_include_HEADERS = \
 		LPModel.hpp \
 		LPSolver.hpp \
 		MaxCIDContractor.hpp \
-		NcspDfsSpace.hpp \
 		NcspNode.hpp \
 		NcspSpace.hpp \
+		NcspSpaceDFS.hpp \
 		NcspSolver.hpp \
 		NumericMatrix.hpp \
 		NumericVector.hpp \
@@ -91,7 +91,6 @@ librealpaver_la_include_HEADERS = \
 		Scope.hpp \
 		ScopeMap.hpp \
 		SearchNode.hpp \
-		Selector.hpp \
 		SplitStrategy.hpp \
 		SymbolTable.hpp \
 		Term.hpp \
@@ -101,7 +100,8 @@ librealpaver_la_include_HEADERS = \
 		Timer.hpp \
 		Tolerance.hpp \
 		UniIntervalFunction.hpp \
-		Variable.hpp
+		Variable.hpp \
+		VariableSelector.hpp
 
 if COND_INTERVAL_GAOL
 librealpaver_la_include_HEADERS += IntervalGaol.hpp
@@ -154,9 +154,9 @@ librealpaver_la_SOURCES = \
 		Logger.cpp \
 		LPModel.cpp \
 		MaxCIDContractor.cpp \
-		NcspDfsSpace.cpp \
 		NcspNode.cpp \
 		NcspSpace.cpp \
+		NcspSpaceDFS.cpp \
 		NcspSolver.cpp \
 		Objective.cpp \
 		Param.cpp \
@@ -175,7 +175,6 @@ librealpaver_la_SOURCES = \
 		Scope.cpp \
 		ScopeMap.cpp \
 		SearchNode.cpp \
-		Selector.cpp \
 		SymbolTable.cpp \
 		Term.cpp \
 		TermDeriver.cpp \
@@ -184,7 +183,8 @@ librealpaver_la_SOURCES = \
 		ThickIntervalFunction.cpp \
 		Tolerance.cpp \
 		UniIntervalFunction.cpp \
-		Variable.cpp
+		Variable.cpp \
+		VariableSelector.cpp
 
 if COND_LP_CLP
 librealpaver_la_SOURCES += LPSolverClp.cpp

@@ -13,8 +13,8 @@
 #include <list>
 #include "realpaver/BONode.hpp"
 #include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/Selector.hpp"
 #include "realpaver/SplitStrategy.hpp"
+#include "realpaver/VariableSelector.hpp"
 
 namespace realpaver {
 
@@ -30,7 +30,7 @@ public:
    typedef SharedBONode NodeType;
 
    /// Creates a splitting object
-   BOSplit(std::unique_ptr<Selector> selector,
+   BOSplit(std::unique_ptr<VariableSelector> selector,
            std::unique_ptr<IntervalSlicer> slicer);
 
    /// Default destructor
@@ -46,7 +46,7 @@ public:
    bool applyImpl(SharedBONode node);
 
 private:
-   std::unique_ptr<Selector> selector_;
+   std::unique_ptr<VariableSelector> selector_;
    std::unique_ptr<IntervalSlicer> slicer_;
 };
 

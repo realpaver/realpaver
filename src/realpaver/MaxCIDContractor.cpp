@@ -12,7 +12,7 @@
 namespace realpaver {
 
 MaxCIDContractor::MaxCIDContractor(SharedContractor op,
-                                   std::unique_ptr<Selector> selector,
+                                   std::unique_ptr<VariableSelector> selector,
                                    std::unique_ptr<IntervalSlicer> slicer)
       : op_(nullptr),
         selector_(std::move(selector))

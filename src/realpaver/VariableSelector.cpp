@@ -7,41 +7,41 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/Selector.hpp"
+#include "realpaver/VariableSelector.hpp"
 
 namespace realpaver {
 
-Selector::Selector(Scope s) : scope_(s)
+VariableSelector::VariableSelector(Scope s) : scope_(s)
 {
    ASSERT(s.size() > 0, "Creation of a selector with an empty scope");
 }
 
-Selector::~Selector()
+VariableSelector::~VariableSelector()
 {}
 
-Scope Selector::scope() const
+Scope VariableSelector::scope() const
 {
    return scope_;
 }
 
-std::pair<bool, Variable> Selector::selectVar(const SearchNode& node)
+std::pair<bool, Variable> VariableSelector::selectVar(const SearchNode& node)
 {
    return selectVar(*node.region());
 }
 
-std::pair<bool, Variable> Selector::selectVar(const IntervalRegion& reg)
+std::pair<bool, Variable> VariableSelector::selectVar(const IntervalRegion& reg)
 {
    return std::make_pair(false, Variable());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SelectorMaxDom::SelectorMaxDom(Scope s) : Selector(s)
+MaxDomSelector::MaxDomSelector(Scope s) : VariableSelector(s)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a selector");
 }
 
-std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
+std::pair<bool, Variable> MaxDomSelector::selectVar(const IntervalRegion& reg)
 {
    bool found = false;
    double wmax, w;
@@ -76,8 +76,8 @@ std::pair<bool, Variable> SelectorMaxDom::selectVar(const IntervalRegion& reg)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SelectorMaxSmear::SelectorMaxSmear(DiffIntervalFunction* f, Scope s)
-      : Selector(s),
+MaxSmearSelector::MaxSmearSelector(DiffIntervalFunction* f, Scope s)
+      : VariableSelector(s),
         f_(f)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a MaxSmear selector");
@@ -85,7 +85,7 @@ SelectorMaxSmear::SelectorMaxSmear(DiffIntervalFunction* f, Scope s)
 }
 
 std::pair<bool, Variable>
-SelectorMaxSmear::selectVar(const IntervalRegion& reg)
+MaxSmearSelector::selectVar(const IntervalRegion& reg)
 {
    Scope fscope = f_->funScope();
 
@@ -137,10 +137,10 @@ SelectorMaxSmear::selectVar(const IntervalRegion& reg)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SelectorRoundRobin::SelectorRoundRobin(Scope s) : Selector(s)
+RoundRobinSelector::RoundRobinSelector(Scope s) : VariableSelector(s)
 {}
 
-std::pair<bool, Variable> SelectorRoundRobin::selectVar(const SearchNode& node)
+std::pair<bool, Variable> RoundRobinSelector::selectVar(const SearchNode& node)
 {
    IntervalRegion* reg = node.region();
    Variable v = node.splitVariable();

@@ -152,17 +152,16 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	IntervalFunction.cpp IntervalMatrix.cpp IntervalNewton.cpp \
 	IntervalRegion.cpp IntervalSlicer.cpp IntervalVector.cpp \
 	IntervalUnion.cpp ListContractor.cpp Logger.cpp LPModel.cpp \
-	MaxCIDContractor.cpp NcspDfsSpace.cpp NcspNode.cpp \
-	NcspSpace.cpp NcspSolver.cpp Objective.cpp Param.cpp \
+	MaxCIDContractor.cpp NcspNode.cpp NcspSpace.cpp \
+	NcspSpaceDFS.cpp NcspSolver.cpp Objective.cpp Param.cpp \
 	parser_bison.ypp parser_flex.lpp Parser.cpp \
 	PolytopeHullContractor.cpp Preprocessor.cpp Problem.cpp \
 	Propagator.cpp RealFunction.cpp RealMatrix.cpp RealPoint.cpp \
 	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
-	SearchNode.cpp Selector.cpp SymbolTable.cpp Term.cpp \
-	TermDeriver.cpp TermFixer.cpp Timer.cpp \
-	ThickIntervalFunction.cpp Tolerance.cpp \
-	UniIntervalFunction.cpp Variable.cpp LPSolverClp.cpp \
-	LPSolverGurobi.cpp
+	SearchNode.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
+	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
+	VariableSelector.cpp LPSolverClp.cpp LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
@@ -175,15 +174,15 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	Interval.lo IntervalFunction.lo IntervalMatrix.lo \
 	IntervalNewton.lo IntervalRegion.lo IntervalSlicer.lo \
 	IntervalVector.lo IntervalUnion.lo ListContractor.lo Logger.lo \
-	LPModel.lo MaxCIDContractor.lo NcspDfsSpace.lo NcspNode.lo \
-	NcspSpace.lo NcspSolver.lo Objective.lo Param.lo \
+	LPModel.lo MaxCIDContractor.lo NcspNode.lo NcspSpace.lo \
+	NcspSpaceDFS.lo NcspSolver.lo Objective.lo Param.lo \
 	parser_bison.lo parser_flex.lo Parser.lo \
 	PolytopeHullContractor.lo Preprocessor.lo Problem.lo \
 	Propagator.lo RealFunction.lo RealMatrix.lo RealPoint.lo \
 	RealVector.lo Reformulation.lo Scope.lo ScopeMap.lo \
-	SearchNode.lo Selector.lo SymbolTable.lo Term.lo \
-	TermDeriver.lo TermFixer.lo Timer.lo ThickIntervalFunction.lo \
-	Tolerance.lo UniIntervalFunction.lo Variable.lo \
+	SearchNode.lo SymbolTable.lo Term.lo TermDeriver.lo \
+	TermFixer.lo Timer.lo ThickIntervalFunction.lo Tolerance.lo \
+	UniIntervalFunction.lo Variable.lo VariableSelector.lo \
 	$(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -226,8 +225,8 @@ am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
 	./$(DEPDIR)/LPModel.Plo ./$(DEPDIR)/LPSolverClp.Plo \
 	./$(DEPDIR)/LPSolverGurobi.Plo ./$(DEPDIR)/ListContractor.Plo \
 	./$(DEPDIR)/Logger.Plo ./$(DEPDIR)/MaxCIDContractor.Plo \
-	./$(DEPDIR)/NcspDfsSpace.Plo ./$(DEPDIR)/NcspNode.Plo \
-	./$(DEPDIR)/NcspSolver.Plo ./$(DEPDIR)/NcspSpace.Plo \
+	./$(DEPDIR)/NcspNode.Plo ./$(DEPDIR)/NcspSolver.Plo \
+	./$(DEPDIR)/NcspSpace.Plo ./$(DEPDIR)/NcspSpaceDFS.Plo \
 	./$(DEPDIR)/Objective.Plo ./$(DEPDIR)/Param.Plo \
 	./$(DEPDIR)/Parser.Plo ./$(DEPDIR)/PolytopeHullContractor.Plo \
 	./$(DEPDIR)/Preprocessor.Plo ./$(DEPDIR)/Problem.Plo \
@@ -235,13 +234,13 @@ am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
 	./$(DEPDIR)/RealMatrix.Plo ./$(DEPDIR)/RealPoint.Plo \
 	./$(DEPDIR)/RealVector.Plo ./$(DEPDIR)/Reformulation.Plo \
 	./$(DEPDIR)/Scope.Plo ./$(DEPDIR)/ScopeMap.Plo \
-	./$(DEPDIR)/SearchNode.Plo ./$(DEPDIR)/Selector.Plo \
-	./$(DEPDIR)/SymbolTable.Plo ./$(DEPDIR)/Term.Plo \
-	./$(DEPDIR)/TermDeriver.Plo ./$(DEPDIR)/TermFixer.Plo \
+	./$(DEPDIR)/SearchNode.Plo ./$(DEPDIR)/SymbolTable.Plo \
+	./$(DEPDIR)/Term.Plo ./$(DEPDIR)/TermDeriver.Plo \
+	./$(DEPDIR)/TermFixer.Plo \
 	./$(DEPDIR)/ThickIntervalFunction.Plo ./$(DEPDIR)/Timer.Plo \
 	./$(DEPDIR)/Tolerance.Plo ./$(DEPDIR)/UniIntervalFunction.Plo \
-	./$(DEPDIR)/Variable.Plo ./$(DEPDIR)/parser_bison.Plo \
-	./$(DEPDIR)/parser_flex.Plo
+	./$(DEPDIR)/Variable.Plo ./$(DEPDIR)/VariableSelector.Plo \
+	./$(DEPDIR)/parser_bison.Plo ./$(DEPDIR)/parser_flex.Plo
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -317,15 +316,15 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	IntervalUnion.hpp LinumDoubleTraits.hpp \
 	LinumIntervalTraits.hpp LinumTraits.hpp ListContractor.hpp \
 	Logger.hpp LPModel.hpp LPSolver.hpp MaxCIDContractor.hpp \
-	NcspDfsSpace.hpp NcspNode.hpp NcspSpace.hpp NcspSolver.hpp \
+	NcspNode.hpp NcspSpace.hpp NcspSpaceDFS.hpp NcspSolver.hpp \
 	NumericMatrix.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	Parser.hpp parser_bison.hpp PolytopeHullContractor.hpp \
 	Preprocessor.hpp Problem.hpp Propagator.hpp RealFunction.hpp \
 	RealMatrix.hpp RealPoint.hpp RealVector.hpp Reformulation.hpp \
-	Scope.hpp ScopeMap.hpp SearchNode.hpp Selector.hpp \
-	SplitStrategy.hpp SymbolTable.hpp Term.hpp TermDeriver.hpp \
-	TermFixer.hpp ThickIntervalFunction.hpp Timer.hpp \
-	Tolerance.hpp UniIntervalFunction.hpp Variable.hpp \
+	Scope.hpp ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp \
+	SymbolTable.hpp Term.hpp TermDeriver.hpp TermFixer.hpp \
+	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
+	UniIntervalFunction.hpp Variable.hpp VariableSelector.hpp \
 	IntervalGaol.hpp LPSolverClp.hpp LPSolverGurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP) \
@@ -508,17 +507,17 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	IntervalTraits.hpp IntervalVector.hpp IntervalUnion.hpp \
 	LinumDoubleTraits.hpp LinumIntervalTraits.hpp LinumTraits.hpp \
 	ListContractor.hpp Logger.hpp LPModel.hpp LPSolver.hpp \
-	MaxCIDContractor.hpp NcspDfsSpace.hpp NcspNode.hpp \
-	NcspSpace.hpp NcspSolver.hpp NumericMatrix.hpp \
+	MaxCIDContractor.hpp NcspNode.hpp NcspSpace.hpp \
+	NcspSpaceDFS.hpp NcspSolver.hpp NumericMatrix.hpp \
 	NumericVector.hpp Objective.hpp Param.hpp Parser.hpp \
 	parser_bison.hpp PolytopeHullContractor.hpp Preprocessor.hpp \
 	Problem.hpp Propagator.hpp RealFunction.hpp RealMatrix.hpp \
 	RealPoint.hpp RealVector.hpp Reformulation.hpp Scope.hpp \
-	ScopeMap.hpp SearchNode.hpp Selector.hpp SplitStrategy.hpp \
-	SymbolTable.hpp Term.hpp TermDeriver.hpp TermFixer.hpp \
+	ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp SymbolTable.hpp \
+	Term.hpp TermDeriver.hpp TermFixer.hpp \
 	ThickIntervalFunction.hpp Timer.hpp Tolerance.hpp \
-	UniIntervalFunction.hpp Variable.hpp $(am__append_1) \
-	$(am__append_2) $(am__append_3)
+	UniIntervalFunction.hpp Variable.hpp VariableSelector.hpp \
+	$(am__append_1) $(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	BC4Contractor.cpp BOContractor.cpp BOLocalGradient.cpp \
 	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
@@ -530,17 +529,16 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	IntervalFunction.cpp IntervalMatrix.cpp IntervalNewton.cpp \
 	IntervalRegion.cpp IntervalSlicer.cpp IntervalVector.cpp \
 	IntervalUnion.cpp ListContractor.cpp Logger.cpp LPModel.cpp \
-	MaxCIDContractor.cpp NcspDfsSpace.cpp NcspNode.cpp \
-	NcspSpace.cpp NcspSolver.cpp Objective.cpp Param.cpp \
+	MaxCIDContractor.cpp NcspNode.cpp NcspSpace.cpp \
+	NcspSpaceDFS.cpp NcspSolver.cpp Objective.cpp Param.cpp \
 	parser_bison.ypp parser_flex.lpp Parser.cpp \
 	PolytopeHullContractor.cpp Preprocessor.cpp Problem.cpp \
 	Propagator.cpp RealFunction.cpp RealMatrix.cpp RealPoint.cpp \
 	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
-	SearchNode.cpp Selector.cpp SymbolTable.cpp Term.cpp \
-	TermDeriver.cpp TermFixer.cpp Timer.cpp \
-	ThickIntervalFunction.cpp Tolerance.cpp \
-	UniIntervalFunction.cpp Variable.cpp $(am__append_4) \
-	$(am__append_5)
+	SearchNode.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
+	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
+	VariableSelector.cpp $(am__append_4) $(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
 BUILT_SOURCES = parser_bison.hpp
@@ -687,10 +685,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ListContractor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MaxCIDContractor.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NcspDfsSpace.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NcspNode.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NcspSolver.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NcspSpace.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NcspSpaceDFS.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Objective.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Param.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Parser.Plo@am__quote@ # am--include-marker
@@ -706,7 +704,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Scope.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ScopeMap.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SearchNode.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SymbolTable.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Term.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermDeriver.Plo@am__quote@ # am--include-marker
@@ -716,6 +713,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tolerance.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UniIntervalFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VariableSelector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_bison.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser_flex.Plo@am__quote@ # am--include-marker
 
@@ -955,10 +953,10 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/ListContractor.Plo
 	-rm -f ./$(DEPDIR)/Logger.Plo
 	-rm -f ./$(DEPDIR)/MaxCIDContractor.Plo
-	-rm -f ./$(DEPDIR)/NcspDfsSpace.Plo
 	-rm -f ./$(DEPDIR)/NcspNode.Plo
 	-rm -f ./$(DEPDIR)/NcspSolver.Plo
 	-rm -f ./$(DEPDIR)/NcspSpace.Plo
+	-rm -f ./$(DEPDIR)/NcspSpaceDFS.Plo
 	-rm -f ./$(DEPDIR)/Objective.Plo
 	-rm -f ./$(DEPDIR)/Param.Plo
 	-rm -f ./$(DEPDIR)/Parser.Plo
@@ -974,7 +972,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/Scope.Plo
 	-rm -f ./$(DEPDIR)/ScopeMap.Plo
 	-rm -f ./$(DEPDIR)/SearchNode.Plo
-	-rm -f ./$(DEPDIR)/Selector.Plo
 	-rm -f ./$(DEPDIR)/SymbolTable.Plo
 	-rm -f ./$(DEPDIR)/Term.Plo
 	-rm -f ./$(DEPDIR)/TermDeriver.Plo
@@ -984,6 +981,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/Tolerance.Plo
 	-rm -f ./$(DEPDIR)/UniIntervalFunction.Plo
 	-rm -f ./$(DEPDIR)/Variable.Plo
+	-rm -f ./$(DEPDIR)/VariableSelector.Plo
 	-rm -f ./$(DEPDIR)/parser_bison.Plo
 	-rm -f ./$(DEPDIR)/parser_flex.Plo
 	-rm -f Makefile
@@ -1070,10 +1068,10 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/ListContractor.Plo
 	-rm -f ./$(DEPDIR)/Logger.Plo
 	-rm -f ./$(DEPDIR)/MaxCIDContractor.Plo
-	-rm -f ./$(DEPDIR)/NcspDfsSpace.Plo
 	-rm -f ./$(DEPDIR)/NcspNode.Plo
 	-rm -f ./$(DEPDIR)/NcspSolver.Plo
 	-rm -f ./$(DEPDIR)/NcspSpace.Plo
+	-rm -f ./$(DEPDIR)/NcspSpaceDFS.Plo
 	-rm -f ./$(DEPDIR)/Objective.Plo
 	-rm -f ./$(DEPDIR)/Param.Plo
 	-rm -f ./$(DEPDIR)/Parser.Plo
@@ -1089,7 +1087,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/Scope.Plo
 	-rm -f ./$(DEPDIR)/ScopeMap.Plo
 	-rm -f ./$(DEPDIR)/SearchNode.Plo
-	-rm -f ./$(DEPDIR)/Selector.Plo
 	-rm -f ./$(DEPDIR)/SymbolTable.Plo
 	-rm -f ./$(DEPDIR)/Term.Plo
 	-rm -f ./$(DEPDIR)/TermDeriver.Plo
@@ -1099,6 +1096,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/Tolerance.Plo
 	-rm -f ./$(DEPDIR)/UniIntervalFunction.Plo
 	-rm -f ./$(DEPDIR)/Variable.Plo
+	-rm -f ./$(DEPDIR)/VariableSelector.Plo
 	-rm -f ./$(DEPDIR)/parser_bison.Plo
 	-rm -f ./$(DEPDIR)/parser_flex.Plo
 	-rm -f Makefile
