@@ -7,31 +7,35 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/CSPNode.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/NcspSpace.hpp"
 
 namespace realpaver {
 
-CSPNode::CSPNode(const Scope& scope, const IntervalRegion& reg,  int depth)
-      : SearchNode(scope, reg, 0),
-        proof_(Proof::Maybe)
-{}
+NcspSpace::~NcspSpace() {}
 
-Proof CSPNode::getProof() const
+size_t NcspSpace::nbFinalNodes() const
 {
-   return proof_;
+   return vnode_.size();
 }
 
-void CSPNode::setproof(Proof p)
+SharedNcspNode NcspSpace::getFinalNode(size_t i) const
 {
-   proof_ = p;
+   ASSERT(i < vnode_.size(), "Bad access to a final node in a CSP space");
+
+   return vnode_[i];
 }
 
-std::ostream& operator<<(std::ostream& os, const CSPNode& node)
+void NcspSpace::pushFinalNode(const SharedNcspNode& node)
 {
-   os << *node.region()
-      << " proof: " << node.getProof();
+   vnode_.push_back(node);
+}
 
-   return os;
+SharedNcspNode NcspSpace::popFinalNode()
+{
+   SharedNcspNode node = vnode_.back();
+   vnode_.pop_back();
+   return node;
 }
 
 } // namespace

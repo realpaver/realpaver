@@ -44,9 +44,6 @@ librealpaver_la_include_HEADERS = \
 		ConstraintRelaxor.hpp \
 		Contractor.hpp \
 		ContractorPool.hpp \
-		CSPNode.hpp \
-		CSPSpace.hpp \
-		CSPSpaceDFS.hpp \
 		Dag.hpp \
 		Double.hpp \
 		Exception.hpp \
@@ -72,6 +69,10 @@ librealpaver_la_include_HEADERS = \
 		LPModel.hpp \
 		LPSolver.hpp \
 		MaxCIDContractor.hpp \
+		NcspDfsSpace.hpp \
+		NcspNode.hpp \
+		NcspSpace.hpp \
+		NcspSolver.hpp \
 		NumericMatrix.hpp \
 		NumericVector.hpp \
 		Objective.hpp \
@@ -135,9 +136,6 @@ librealpaver_la_SOURCES = \
 		ConstraintRelaxor.cpp \
 		Contractor.cpp \
 		ContractorPool.cpp \
-		CSPNode.cpp \
-		CSPSpace.cpp \
-		CSPSpaceDFS.cpp \
 		Dag.cpp \
 		Exception.cpp \
 		Function.cpp \
@@ -156,6 +154,10 @@ librealpaver_la_SOURCES = \
 		Logger.cpp \
 		LPModel.cpp \
 		MaxCIDContractor.cpp \
+		NcspDfsSpace.cpp \
+		NcspNode.cpp \
+		NcspSpace.cpp \
+		NcspSolver.cpp \
 		Objective.cpp \
 		Param.cpp \
 		parser_bison.ypp \

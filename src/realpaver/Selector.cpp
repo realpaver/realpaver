@@ -146,7 +146,7 @@ std::pair<bool, Variable> SelectorRoundRobin::selectVar(const SearchNode& node)
    Variable v = node.splitVariable();
    auto it = scope_.begin();
 
-   if (!v.isNull())
+   if (!v.hasNullPointer())
    {
       it = scope_.find(v);
       ++it;

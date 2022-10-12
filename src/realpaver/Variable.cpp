@@ -210,10 +210,9 @@ Variable Variable::clone() const
    return v;
 }
 
-bool Variable::isNull() const
+bool Variable::hasNullPointer() const
 {
    return rep_ == nullptr;
 }
-
 
 } // namespace

@@ -7,30 +7,31 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/CSPSpaceDFS.hpp"
+#include "realpaver/NcspNode.hpp"
 
 namespace realpaver {
 
-size_t CSPSpaceDFS::nbPendingNodes() const
+NcspNode::NcspNode(const Scope& scope, const IntervalRegion& reg,  int depth)
+      : SearchNode(scope, reg, 0),
+        proof_(Proof::Maybe)
+{}
+
+Proof NcspNode::getProof() const
 {
-   return vnode_.size();
+   return proof_;
 }
 
-SharedCSPNode CSPSpaceDFS::getPendingNode() const
+void NcspNode::setproof(Proof p)
 {
-   return vnode_.back();
+   proof_ = p;
 }
 
-SharedCSPNode CSPSpaceDFS::popPendingNode()
+std::ostream& operator<<(std::ostream& os, const NcspNode& node)
 {
-   SharedCSPNode node = vnode_.back();
-   vnode_.pop_back();
-   return node;
-}
+   os << *node.region()
+      << " proof: " << node.getProof();
 
-void CSPSpaceDFS::insertPendingNode(const SharedCSPNode& node)
-{
-   vnode_.push_back(node);
+   return os;
 }
 
 } // namespace

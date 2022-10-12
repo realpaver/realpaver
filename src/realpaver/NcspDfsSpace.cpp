@@ -7,35 +7,30 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/CSPSpace.hpp"
+#include "realpaver/NcspDfsSpace.hpp"
 
 namespace realpaver {
 
-CSPSpace::~CSPSpace() {}
-
-size_t CSPSpace::nbFinalNodes() const
+size_t NcspDfsSpace::nbPendingNodes() const
 {
    return vnode_.size();
 }
 
-SharedCSPNode CSPSpace::getFinalNode(size_t i) const
+SharedNcspNode NcspDfsSpace::getPendingNode() const
 {
-   ASSERT(i < vnode_.size(), "Bad access to a final node in a CSP space");
-
-   return vnode_[i];
+   return vnode_.back();
 }
 
-void CSPSpace::pushFinalNode(const SharedCSPNode& node)
+SharedNcspNode NcspDfsSpace::popPendingNode()
 {
-   vnode_.push_back(node);
-}
-
-SharedCSPNode CSPSpace::popFinalNode()
-{
-   SharedCSPNode node = vnode_.back();
+   SharedNcspNode node = vnode_.back();
    vnode_.pop_back();
    return node;
+}
+
+void NcspDfsSpace::insertPendingNode(const SharedNcspNode& node)
+{
+   vnode_.push_back(node);
 }
 
 } // namespace
