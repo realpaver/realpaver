@@ -10,6 +10,7 @@
 #ifndef REALPAVER_DAG_HPP
 #define REALPAVER_DAG_HPP
 
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -1210,6 +1211,9 @@ private:
    // extends the size of the default context
    void pushNode(DagNode* node);
 };
+
+/// Type of shared pointers to dags
+typedef std::shared_ptr<Dag> SharedDag;
 
 /// Output on a stream
 /// @param os an output stream

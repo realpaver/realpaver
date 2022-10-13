@@ -26,16 +26,16 @@ int main(void)
 
       cout << "Region:     " << reg << endl;
 
-      Dag dag;
+      SharedDag dag = std::make_shared<Dag>();
       //~ size_t i = dag.insert( y == 0.5*x );
       //~ size_t j = dag.insert( y == 2*x );
 
-      size_t i = dag.insert( y - sqr(x) == 0 );
-      size_t j = dag.insert( sqr(x) + sqr(y) - 2.0 == 0 );
+      size_t i = dag->insert( y - sqr(x) == 0 );
+      size_t j = dag->insert( sqr(x) + sqr(y) - 2.0 == 0 );
 
       SharedContractorVector pool = std::make_shared<ContractorVector>();
-      pool->push(std::make_shared<HC4Contractor>(&dag, i));
-      pool->push(std::make_shared<HC4Contractor>(&dag, j));
+      pool->push(std::make_shared<HC4Contractor>(dag, i));
+      pool->push(std::make_shared<HC4Contractor>(dag, j));
 
       Propagator tor(pool);
       tor.setDistTol(Tolerance::makeRel(1.0e-2));

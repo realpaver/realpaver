@@ -7,41 +7,33 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_HC4_CONTRACTOR_HPP
-#define REALPAVER_HC4_CONTRACTOR_HPP
+#ifndef REALPAVER_CONSTRAINT_CONTRACTOR_HPP
+#define REALPAVER_CONSTRAINT_CONTRACTOR_HPP
 
+#include "realpaver/Constraint.hpp"
 #include "realpaver/Contractor.hpp"
-#include "realpaver/Dag.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This implements the HC4Revise operator.
+/// This is a contractor associated with a constraint.
 ///
-/// This contractor traverses the tree-representation of a constraint.
-/// The first phase is an interval evaluation from the leaves to the root.
-/// The second phase calculates the projections from the root to the leaves.
-///
-/// The expression of the constraint comes from a DAG.
+/// This contractor simply calls the default contraction of the constraint.
 ///////////////////////////////////////////////////////////////////////////////
-class HC4Contractor : public Contractor {
+class ConstraintContractor : public Contractor {
 public:
-   /// Creates a contractor
-   /// @param dag a DAG
-   /// @param i index of a function / constraint in the dag
-   ///
-   /// We have 0 <= i < dag->nbFuns().
-   /// This does not own the dag.
-   HC4Contractor(SharedDag dag, size_t i);
+   /// Constructor
+   /// @param c constraint of this
+   ConstraintContractor(const Constraint& c);
 
    /// Default copy constructor
-   HC4Contractor(const HC4Contractor&) = default;
+   ConstraintContractor(const ConstraintContractor&) = default;
 
-   /// Default assignment operator
-   HC4Contractor& operator=(const HC4Contractor&) = default;
+   /// No assignment
+   ConstraintContractor& operator=(const ConstraintContractor&) = delete;
 
    /// Default destructor
-   ~HC4Contractor() = default;
+   ~ConstraintContractor() = default;
 
    ///@{
    /// Overrides (Contractor)
@@ -51,15 +43,11 @@ public:
    void print(std::ostream& os) const;
    ///@}
 
-   /// @return the dag
-   SharedDag getDag() const;
-
-   /// @return the function index in the dag
-   size_t getFunIndex() const;
+   /// @return the constraint enclosed in this
+   Constraint getConstrant() const;
 
 private:
-   SharedDag dag_;   // dag
-   size_t if_;       // function index in the dag
+   Constraint c_;
 };
 
 } // namespace

@@ -29,7 +29,7 @@ public:
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param sco set of variables to be contracted by this
-   PolytopeHullContractor(Dag* dag, const Scope& sco);
+   PolytopeHullContractor(SharedDag dag, Scope sco);
 
    ///@{
    /// Overrides
@@ -40,9 +40,9 @@ public:
    ///@}
 
 private:
-   Dag* dag_;
-   Scope sco_;    // set of variables to be contracted
-   Bitset bs_;    // bitset view of the scope
+   SharedDag dag_;   // a dag
+   Scope sco_;       // set of variables to be contracted
+   Bitset bs_;       // bitset view of the scope
 };
 
 } // namespace

@@ -32,7 +32,7 @@ public:
    /// @param dag a DAG
    /// @param i index of a function in the DAG
    /// @param v a variable occurring in the function
-   ThickIntervalFunction(Dag* dag, size_t i, Variable v);
+   ThickIntervalFunction(SharedDag dag, size_t i, Variable v);
 
    /// Default copy constructor
    ThickIntervalFunction(const ThickIntervalFunction&) = default;
@@ -42,9 +42,6 @@ public:
 
    /// Default destructor
    ~ThickIntervalFunction() = default;
-
-   /// @return the function object in the DAG
-   DagFun* getFun() const;
 
    /// Dependency test
    /// @param bs a bitset
@@ -66,10 +63,14 @@ public:
    /// @return the index of the variable of this
    Variable getVar() const;
 
+   /// @return the function in the dag
+   DagFun* getFun() const;
+
 private:
-   DagFun* f_;    // function in the dag
-   size_t if_;    // function index in the dag
-   Variable v_;   // variable index
+   SharedDag dag_;   // dag
+   DagFun* f_;       // function in the dag
+   size_t if_;       // function index in the dag
+   Variable v_;      // variable index
 };
 
 } // namespace

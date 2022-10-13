@@ -36,7 +36,8 @@ public:
    /// Creates a contractor without any variable (to be fixed later)
    /// @param op a contractor
    /// @param a slicer
-   CIDContractor(SharedContractor op, std::unique_ptr<IntervalSlicer> slicer);
+   CIDContractor(SharedContractor op,
+                 std::unique_ptr<IntervalSlicer> slicer);
 
    /// Destructor
    ~CIDContractor();

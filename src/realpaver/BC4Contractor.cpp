@@ -11,18 +11,19 @@
 
 namespace realpaver {
 
-BC4Contractor::BC4Contractor(Dag* dag, size_t i)
-      : f_(dag->fun(i)),
+BC4Contractor::BC4Contractor(SharedDag dag, size_t i)
+      : dag_(dag),
+        if_(i),
         hc4_(nullptr),
         bc3_()
 {
-   hc4_ = new HC4Contractor(f_->dag(), f_->index());
+   hc4_ = new HC4Contractor(dag, i);
 
-   Scope s = f_->scope();
+   Scope s = dag->fun(i)->scope();
    for (auto v : s)
    {
       if (s.count(v) > 1)
-         bc3_.push_back(new BC3Contractor(f_->dag(), f_->index(), v));
+         bc3_.push_back(new BC3Contractor(dag_, if_, v));
    }
 }
 
@@ -35,19 +36,18 @@ BC4Contractor::~BC4Contractor()
 
 Scope BC4Contractor::scope() const
 {
-   return f_->scope();
+   return dag_->fun(if_)->scope();
 }
 
 bool BC4Contractor::dependsOn(const Bitset& bs) const
 {
-  return f_->dependsOn(bs); 
+  return dag_->fun(if_)->dependsOn(bs); 
 }
 
 Proof BC4Contractor::contract(IntervalRegion& reg)
 {
    // HC4
-   HC4Contractor hc4(f_->dag(), f_->index());
-   Proof proof = hc4.contract(reg);
+   Proof proof = hc4_->contract(reg);
 
    if (proof != Proof::Maybe) return proof;
 
@@ -67,7 +67,7 @@ Proof BC4Contractor::contract(IntervalRegion& reg)
 
 void BC4Contractor::print(std::ostream& os) const
 {
-   os << "BC4 contractor #" << f_->index();
+   os << "BC4 contractor #" << if_;
 }
 
 } // namespace

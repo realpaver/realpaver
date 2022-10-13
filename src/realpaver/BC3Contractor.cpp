@@ -14,7 +14,7 @@
 
 namespace realpaver {
 
-BC3Contractor::BC3Contractor(Dag* dag, size_t i, Variable v)
+BC3Contractor::BC3Contractor(SharedDag dag, size_t i, Variable v)
       : f_(dag, i, v),
         peeler_(Param::GetDblParam("BC3_PEEL_FACTOR")),
         maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))

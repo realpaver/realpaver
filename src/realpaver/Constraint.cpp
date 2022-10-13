@@ -64,6 +64,16 @@ void ConstraintRep::setScope(Scope s)
       bs_ = scope_.toBitset();
 }
 
+bool ConstraintRep::dependsOn(Variable v) const
+{
+   return scope_.contains(v);
+}
+
+bool ConstraintRep::dependsOn(const Bitset& bs) const
+{
+   return bs_.overlaps(bs);
+}
+
 bool ConstraintRep::isEquation() const
 {
    return false;
@@ -134,6 +144,11 @@ bool Constraint::dependsOn(Variable v) const
    return rep_->dependsOn(v);
 }
 
+bool Constraint::dependsOn(const Bitset& bs) const
+{
+   return rep_->dependsOn(bs);
+}
+
 bool Constraint::isEquation() const
 {
    return rep_->isEquation();
@@ -201,11 +216,6 @@ void ConstraintBin::print(std::ostream& os) const
    l_.print(os);
    os << " " << rel_ << " ";
    r_.print(os);
-}
-
-bool ConstraintBin::dependsOn(Variable v) const
-{
-   return l_.dependsOn(v) || r_.dependsOn(v);
 }
 
 bool ConstraintBin::isEquation() const

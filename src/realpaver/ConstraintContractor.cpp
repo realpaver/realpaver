@@ -7,35 +7,37 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspSpace.hpp"
+#include "realpaver/ConstraintContractor.hpp"
 
 namespace realpaver {
 
-NcspSpace::~NcspSpace() {}
+ConstraintContractor::ConstraintContractor(const Constraint& c)
+      : c_(c)
+{}
 
-size_t NcspSpace::nbSolutionNodes() const
+bool ConstraintContractor::dependsOn(const Bitset& bs) const
 {
-   return vnode_.size();
+   return c_.dependsOn(bs);
 }
 
-SharedNcspNode NcspSpace::getSolutionNode(size_t i) const
+Scope ConstraintContractor::scope() const
 {
-   ASSERT(i < vnode_.size(), "Bad access to a final node in a CSP space");
 
-   return vnode_[i];
 }
 
-void NcspSpace::pushSolutionNode(const SharedNcspNode& node)
+Proof ConstraintContractor::contract(IntervalRegion& reg)
 {
-   vnode_.push_back(node);
+
 }
 
-SharedNcspNode NcspSpace::popSolutionNode()
+void ConstraintContractor::print(std::ostream& os) const
 {
-   SharedNcspNode node = vnode_.back();
-   vnode_.pop_back();
-   return node;
+
+}
+
+Constraint ConstraintContractor::getConstrant() const
+{
+
 }
 
 } // namespace

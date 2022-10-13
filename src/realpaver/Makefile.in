@@ -92,9 +92,29 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+
+#		BOContractor.hpp \
+#		BOLocalGradient.hpp \
+#		BOLocalSolver.hpp \
+#		BOModel.hpp \
+#		BONode.hpp \
+#		BOPresolver.hpp \
+#		BOSolver.hpp \
+#		BOSpace.hpp \
+#		BOSplit.hpp
 @COND_INTERVAL_GAOL_TRUE@am__append_1 = IntervalGaol.hpp
 @COND_LP_CLP_TRUE@am__append_2 = LPSolverClp.hpp
 @COND_LP_GUROBI_TRUE@am__append_3 = LPSolverGurobi.hpp
+
+#		BOContractor.cpp \
+#		BOLocalGradient.cpp \
+#		BOLocalSolver.cpp \
+#		BOModel.cpp \
+#		BONode.cpp \
+#		BOPresolver.cpp \
+#		BOSolver.cpp \
+#		BOSpace.cpp \
+#		BOSplit.cpp
 @COND_LP_CLP_TRUE@am__append_4 = LPSolverClp.cpp
 @COND_LP_GUROBI_TRUE@am__append_5 = LPSolverGurobi.cpp
 subdir = src/realpaver
@@ -142,10 +162,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(librealpaver_la_includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
-	BC3Contractor.cpp BC4Contractor.cpp BOContractor.cpp \
-	BOLocalGradient.cpp BOLocalSolver.cpp BOModel.cpp BONode.cpp \
-	BOPresolver.cpp BOSolver.cpp BOSpace.cpp BOSplit.cpp \
-	CIDContractor.cpp Common.cpp Constraint.cpp \
+	BC3Contractor.cpp BC4Contractor.cpp CIDContractor.cpp \
+	Common.cpp Constraint.cpp ConstraintContractor.cpp \
 	ConstraintFixer.cpp ConstraintRelaxor.cpp Contractor.cpp \
 	ContractorPool.cpp Dag.cpp Exception.cpp Function.cpp \
 	HC4Contractor.cpp Inflator.cpp IntContractor.cpp Interval.cpp \
@@ -159,29 +177,27 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	Propagator.cpp RealFunction.cpp RealMatrix.cpp RealPoint.cpp \
 	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
 	SearchNode.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
-	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	TermFixer.cpp ThickIntervalFunction.cpp Timer.cpp \
 	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
 	VariableSelector.cpp LPSolverClp.cpp LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
 am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
-	BC4Contractor.lo BOContractor.lo BOLocalGradient.lo \
-	BOLocalSolver.lo BOModel.lo BONode.lo BOPresolver.lo \
-	BOSolver.lo BOSpace.lo BOSplit.lo CIDContractor.lo Common.lo \
-	Constraint.lo ConstraintFixer.lo ConstraintRelaxor.lo \
-	Contractor.lo ContractorPool.lo Dag.lo Exception.lo \
-	Function.lo HC4Contractor.lo Inflator.lo IntContractor.lo \
-	Interval.lo IntervalFunction.lo IntervalMatrix.lo \
-	IntervalNewton.lo IntervalRegion.lo IntervalSlicer.lo \
-	IntervalVector.lo IntervalUnion.lo ListContractor.lo Logger.lo \
-	LPModel.lo MaxCIDContractor.lo NcspNode.lo NcspSpace.lo \
-	NcspSpaceDFS.lo NcspSolver.lo Objective.lo Param.lo \
-	parser_bison.lo parser_flex.lo Parser.lo \
+	BC4Contractor.lo CIDContractor.lo Common.lo Constraint.lo \
+	ConstraintContractor.lo ConstraintFixer.lo \
+	ConstraintRelaxor.lo Contractor.lo ContractorPool.lo Dag.lo \
+	Exception.lo Function.lo HC4Contractor.lo Inflator.lo \
+	IntContractor.lo Interval.lo IntervalFunction.lo \
+	IntervalMatrix.lo IntervalNewton.lo IntervalRegion.lo \
+	IntervalSlicer.lo IntervalVector.lo IntervalUnion.lo \
+	ListContractor.lo Logger.lo LPModel.lo MaxCIDContractor.lo \
+	NcspNode.lo NcspSpace.lo NcspSpaceDFS.lo NcspSolver.lo \
+	Objective.lo Param.lo parser_bison.lo parser_flex.lo Parser.lo \
 	PolytopeHullContractor.lo Preprocessor.lo Problem.lo \
 	Propagator.lo RealFunction.lo RealMatrix.lo RealPoint.lo \
 	RealVector.lo Reformulation.lo Scope.lo ScopeMap.lo \
 	SearchNode.lo SymbolTable.lo Term.lo TermDeriver.lo \
-	TermFixer.lo Timer.lo ThickIntervalFunction.lo Tolerance.lo \
+	TermFixer.lo ThickIntervalFunction.lo Timer.lo Tolerance.lo \
 	UniIntervalFunction.lo Variable.lo VariableSelector.lo \
 	$(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
@@ -205,13 +221,10 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
-	./$(DEPDIR)/BC4Contractor.Plo ./$(DEPDIR)/BOContractor.Plo \
-	./$(DEPDIR)/BOLocalGradient.Plo ./$(DEPDIR)/BOLocalSolver.Plo \
-	./$(DEPDIR)/BOModel.Plo ./$(DEPDIR)/BONode.Plo \
-	./$(DEPDIR)/BOPresolver.Plo ./$(DEPDIR)/BOSolver.Plo \
-	./$(DEPDIR)/BOSpace.Plo ./$(DEPDIR)/BOSplit.Plo \
-	./$(DEPDIR)/Bitset.Plo ./$(DEPDIR)/CIDContractor.Plo \
-	./$(DEPDIR)/Common.Plo ./$(DEPDIR)/Constraint.Plo \
+	./$(DEPDIR)/BC4Contractor.Plo ./$(DEPDIR)/Bitset.Plo \
+	./$(DEPDIR)/CIDContractor.Plo ./$(DEPDIR)/Common.Plo \
+	./$(DEPDIR)/Constraint.Plo \
+	./$(DEPDIR)/ConstraintContractor.Plo \
 	./$(DEPDIR)/ConstraintFixer.Plo \
 	./$(DEPDIR)/ConstraintRelaxor.Plo ./$(DEPDIR)/Contractor.Plo \
 	./$(DEPDIR)/ContractorPool.Plo ./$(DEPDIR)/Dag.Plo \
@@ -303,10 +316,8 @@ am__can_run_installinfo = \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
-	BC3Contractor.hpp BC4Contractor.hpp BOContractor.hpp \
-	BOLocalGradient.hpp BOLocalSolver.hpp BOModel.hpp BONode.hpp \
-	BOPresolver.hpp BOSolver.hpp BOSpace.hpp BOSplit.hpp \
-	CIDContractor.hpp Common.hpp config.hpp Constraint.hpp \
+	BC3Contractor.hpp BC4Contractor.hpp CIDContractor.hpp \
+	Common.hpp config.hpp Constraint.hpp ConstraintContractor.hpp \
 	ConstraintFixer.hpp ConstraintRelaxor.hpp Contractor.hpp \
 	ContractorPool.hpp Dag.hpp Double.hpp Exception.hpp \
 	Function.hpp HC4Contractor.hpp Inflator.hpp IntContractor.hpp \
@@ -490,15 +501,13 @@ EXTRA_DIST = \
 		configure.hpp \
 		parser_flex.lpp \
 		parser_bison.ypp \
-		settings.txt
+		param_settings.txt
 
 lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir = $(includedir)/realpaver
 librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
-	BC4Contractor.hpp BOContractor.hpp BOLocalGradient.hpp \
-	BOLocalSolver.hpp BOModel.hpp BONode.hpp BOPresolver.hpp \
-	BOSolver.hpp BOSpace.hpp BOSplit.hpp CIDContractor.hpp \
-	Common.hpp config.hpp Constraint.hpp ConstraintFixer.hpp \
+	BC4Contractor.hpp CIDContractor.hpp Common.hpp config.hpp \
+	Constraint.hpp ConstraintContractor.hpp ConstraintFixer.hpp \
 	ConstraintRelaxor.hpp Contractor.hpp ContractorPool.hpp \
 	Dag.hpp Double.hpp Exception.hpp Function.hpp \
 	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Interval.hpp \
@@ -519,10 +528,8 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	UniIntervalFunction.hpp Variable.hpp VariableSelector.hpp \
 	$(am__append_1) $(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
-	BC4Contractor.cpp BOContractor.cpp BOLocalGradient.cpp \
-	BOLocalSolver.cpp BOModel.cpp BONode.cpp BOPresolver.cpp \
-	BOSolver.cpp BOSpace.cpp BOSplit.cpp CIDContractor.cpp \
-	Common.cpp Constraint.cpp ConstraintFixer.cpp \
+	BC4Contractor.cpp CIDContractor.cpp Common.cpp Constraint.cpp \
+	ConstraintContractor.cpp ConstraintFixer.cpp \
 	ConstraintRelaxor.cpp Contractor.cpp ContractorPool.cpp \
 	Dag.cpp Exception.cpp Function.cpp HC4Contractor.cpp \
 	Inflator.cpp IntContractor.cpp Interval.cpp \
@@ -536,7 +543,7 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	Propagator.cpp RealFunction.cpp RealMatrix.cpp RealPoint.cpp \
 	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
 	SearchNode.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
-	TermFixer.cpp Timer.cpp ThickIntervalFunction.cpp \
+	TermFixer.cpp ThickIntervalFunction.cpp Timer.cpp \
 	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
 	VariableSelector.cpp $(am__append_4) $(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
@@ -648,19 +655,11 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BC3Contractor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BC4Contractor.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOContractor.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalGradient.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOLocalSolver.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOModel.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BONode.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOPresolver.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOSolver.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOSpace.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BOSplit.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Bitset.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CIDContractor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Common.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Constraint.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConstraintContractor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConstraintFixer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConstraintRelaxor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Contractor.Plo@am__quote@ # am--include-marker
@@ -916,19 +915,11 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/BC3Contractor.Plo
 	-rm -f ./$(DEPDIR)/BC4Contractor.Plo
-	-rm -f ./$(DEPDIR)/BOContractor.Plo
-	-rm -f ./$(DEPDIR)/BOLocalGradient.Plo
-	-rm -f ./$(DEPDIR)/BOLocalSolver.Plo
-	-rm -f ./$(DEPDIR)/BOModel.Plo
-	-rm -f ./$(DEPDIR)/BONode.Plo
-	-rm -f ./$(DEPDIR)/BOPresolver.Plo
-	-rm -f ./$(DEPDIR)/BOSolver.Plo
-	-rm -f ./$(DEPDIR)/BOSpace.Plo
-	-rm -f ./$(DEPDIR)/BOSplit.Plo
 	-rm -f ./$(DEPDIR)/Bitset.Plo
 	-rm -f ./$(DEPDIR)/CIDContractor.Plo
 	-rm -f ./$(DEPDIR)/Common.Plo
 	-rm -f ./$(DEPDIR)/Constraint.Plo
+	-rm -f ./$(DEPDIR)/ConstraintContractor.Plo
 	-rm -f ./$(DEPDIR)/ConstraintFixer.Plo
 	-rm -f ./$(DEPDIR)/ConstraintRelaxor.Plo
 	-rm -f ./$(DEPDIR)/Contractor.Plo
@@ -1031,19 +1022,11 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/BC3Contractor.Plo
 	-rm -f ./$(DEPDIR)/BC4Contractor.Plo
-	-rm -f ./$(DEPDIR)/BOContractor.Plo
-	-rm -f ./$(DEPDIR)/BOLocalGradient.Plo
-	-rm -f ./$(DEPDIR)/BOLocalSolver.Plo
-	-rm -f ./$(DEPDIR)/BOModel.Plo
-	-rm -f ./$(DEPDIR)/BONode.Plo
-	-rm -f ./$(DEPDIR)/BOPresolver.Plo
-	-rm -f ./$(DEPDIR)/BOSolver.Plo
-	-rm -f ./$(DEPDIR)/BOSpace.Plo
-	-rm -f ./$(DEPDIR)/BOSplit.Plo
 	-rm -f ./$(DEPDIR)/Bitset.Plo
 	-rm -f ./$(DEPDIR)/CIDContractor.Plo
 	-rm -f ./$(DEPDIR)/Common.Plo
 	-rm -f ./$(DEPDIR)/Constraint.Plo
+	-rm -f ./$(DEPDIR)/ConstraintContractor.Plo
 	-rm -f ./$(DEPDIR)/ConstraintFixer.Plo
 	-rm -f ./$(DEPDIR)/ConstraintRelaxor.Plo
 	-rm -f ./$(DEPDIR)/Contractor.Plo

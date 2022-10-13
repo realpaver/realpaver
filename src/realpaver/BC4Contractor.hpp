@@ -30,7 +30,7 @@ public:
    /// @param i index of a function in the DAG
    ///
    /// This contractor does not own the dag.
-   BC4Contractor(Dag* dag, size_t i);
+   BC4Contractor(SharedDag dag, size_t i);
 
    /// Destructor
    ~BC4Contractor();
@@ -50,11 +50,12 @@ public:
    ///@}
 
 private:
-   DagFun* f_;                         // function in a dag
-   HC4Contractor* hc4_;                // hc4 contractor associated with f_
+   SharedDag dag_;                     // a dag
+   size_t if_;                         // index of a function f in the dag
+   HC4Contractor* hc4_;                // hc4 contractor associated with f
    std::vector<BC3Contractor*> bc3_;   // bc3 contractors associated with
                                        // the variables having multiple
-                                       // occurrences in f_
+                                       // occurrences in f
 };
 
 } // namespace

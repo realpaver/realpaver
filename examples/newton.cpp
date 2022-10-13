@@ -17,9 +17,9 @@ int main(void)
    Variable x = problem.addRealVar(1.0, 10.0, "x");
    Constraint c( sqr(x) - 2.0 == 0.0 );
 
-   Dag dag;
-   size_t idx = dag.insert(c);
-   ThickIntervalFunction f(&dag, idx, x);
+   SharedDag dag = std::make_shared<Dag>();
+   size_t idx = dag->insert(c);
+   ThickIntervalFunction f(dag, idx, x);
 
    IntervalNewton newton;
    Interval I( x.getDomain() );

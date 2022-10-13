@@ -10,7 +10,9 @@
 #ifndef REALPAVER_NCSP_SOLVER_HPP
 #define REALPAVER_NCSP_SOLVER_HPP
 
+#include "realpaver/Contractor.hpp"
 #include "realpaver/NcspSpace.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
 
@@ -26,7 +28,7 @@ class NcspSolver {
 public:
    /// Creates a solver
    /// @param problem a numerical constraint satisfaction problem
-   NcspSolver(Problem& problem);
+   NcspSolver(const Problem& problem);
 
    /// Destructor
    ~NcspSolver();
@@ -37,20 +39,37 @@ public:
    /// No assignment
    NcspSolver& operator=(const NcspSolver&) = delete;
 
+   /// Assigns the parameters in this
+   /// @param prm parameters
+   void setParam(const Param& prm);
+
+   /// @return the object that manages the parameter settings
+   Param* getParam() const;
+
+   /// Assigns the contractor of this
+   /// @param contractor new contractor
+   void setContractor(const SharedContractor& contractor);
+
    /// Solving method
    /// @return true if a solution is found, false otherwise
    bool solve();
 
 private:
-   Problem problem_;    // initial problem
-   Problem preprob_;    // problem resulting from preprocessing
-   NcspSpace* space_;   // search tree
+   Problem problem_;             // initial problem
+   Problem preprob_;             // problem resulting from preprocessing
+   Param* param_;                // parameters
 
-   Timer ptimer_;    // timer for the preprocessing phase
-   Timer stimer_;    // timer for the solving phase
+   NcspSpace* space_;            // search tree
+   SharedDag dag_;               // 
+   SharedContractor contractor_; // contraction operator
+
+   Timer ptimer_;                // timer for the preprocessing phase
+   Timer stimer_;              // timer for the solving phase
 
    bool preprocess();
-   void branchAndPrune();
+   bool branchAndPrune();
+   void makeSpace();
+   void makeContractor();
 };
 
 } // namespace

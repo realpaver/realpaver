@@ -17,7 +17,7 @@ EXTRA_DIST = \
 		configure.hpp \
 		parser_flex.lpp \
 		parser_bison.ypp \
-		settings.txt
+		param_settings.txt
 
 lib_LTLIBRARIES = librealpaver.la
 
@@ -27,19 +27,11 @@ librealpaver_la_include_HEADERS = \
 		Bitset.hpp \
 		BC3Contractor.hpp \
 		BC4Contractor.hpp \
-		BOContractor.hpp \
-		BOLocalGradient.hpp \
-		BOLocalSolver.hpp \
-		BOModel.hpp \
-		BONode.hpp \
-		BOPresolver.hpp \
-		BOSolver.hpp \
-		BOSpace.hpp \
-		BOSplit.hpp \
 		CIDContractor.hpp \
 		Common.hpp \
 		config.hpp \
 		Constraint.hpp \
+		ConstraintContractor.hpp \
 		ConstraintFixer.hpp \
 		ConstraintRelaxor.hpp \
 		Contractor.hpp \
@@ -103,6 +95,16 @@ librealpaver_la_include_HEADERS = \
 		Variable.hpp \
 		VariableSelector.hpp
 
+#		BOContractor.hpp \
+#		BOLocalGradient.hpp \
+#		BOLocalSolver.hpp \
+#		BOModel.hpp \
+#		BONode.hpp \
+#		BOPresolver.hpp \
+#		BOSolver.hpp \
+#		BOSpace.hpp \
+#		BOSplit.hpp
+
 if COND_INTERVAL_GAOL
 librealpaver_la_include_HEADERS += IntervalGaol.hpp
 endif
@@ -120,18 +122,10 @@ librealpaver_la_SOURCES = \
 		Bitset.cpp \
 		BC3Contractor.cpp \
 		BC4Contractor.cpp \
-		BOContractor.cpp \
-		BOLocalGradient.cpp \
-		BOLocalSolver.cpp \
-		BOModel.cpp \
-		BONode.cpp \
-		BOPresolver.cpp \
-		BOSolver.cpp \
-		BOSpace.cpp \
-		BOSplit.cpp \
 		CIDContractor.cpp \
 		Common.cpp \
 		Constraint.cpp \
+		ConstraintContractor.cpp \
 		ConstraintFixer.cpp \
 		ConstraintRelaxor.cpp \
 		Contractor.cpp \
@@ -179,12 +173,22 @@ librealpaver_la_SOURCES = \
 		Term.cpp \
 		TermDeriver.cpp \
 		TermFixer.cpp \
-		Timer.cpp \
 		ThickIntervalFunction.cpp \
+		Timer.cpp \
 		Tolerance.cpp \
 		UniIntervalFunction.cpp \
 		Variable.cpp \
 		VariableSelector.cpp
+
+#		BOContractor.cpp \
+#		BOLocalGradient.cpp \
+#		BOLocalSolver.cpp \
+#		BOModel.cpp \
+#		BONode.cpp \
+#		BOPresolver.cpp \
+#		BOSolver.cpp \
+#		BOSpace.cpp \
+#		BOSplit.cpp
 
 if COND_LP_CLP
 librealpaver_la_SOURCES += LPSolverClp.cpp

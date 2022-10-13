@@ -15,9 +15,9 @@ AM_CPPFLAGS = -I.. -I../../src
 
 CLEANFILES = *~ *.log
 
-noinst_PROGRAMS = bop_solver
+#noinst_PROGRAMS = bop_solver
 
-bop_solver_SOURCES = bop_solver.cpp
+#bop_solver_SOURCES = bop_solver.cpp
 
 EXTRA_DIST = \
 	bop_config \

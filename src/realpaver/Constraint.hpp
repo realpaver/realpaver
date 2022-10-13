@@ -52,6 +52,16 @@ public:
    /// @return a bitset this depends on
    Bitset bitset() const;
 
+   /// Dependency test
+   /// @param v a variable
+   /// @return true if this depends on v
+   bool dependsOn(Variable v) const;
+
+   /// Tests if this constraint depends on a variable referenced in a bitset
+   /// @param bs a bitset
+   /// @return the result of the test
+   bool dependsOn(const Bitset& bs) const;
+
    /// @return true if this constraint is variable free
    virtual bool isConstant() const = 0;
 
@@ -72,11 +82,6 @@ public:
    /// Visitor pattern
    /// @param vis a visitor
    virtual void acceptVisitor(ConstraintVisitor& vis) const = 0;
-
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if this depends on v
-   virtual bool dependsOn(Variable v) const = 0;
 
    /// @return true if this is an equation
    virtual bool isEquation() const;
@@ -146,6 +151,11 @@ public:
    /// @return true if this depends on v
    bool dependsOn(Variable v) const;
 
+   /// Tests if this constraint depends on a variable referenced in a bitset
+   /// @param bs a bitset
+   /// @return the result of the test
+   bool dependsOn(const Bitset& bs) const;
+
    /// @return true if this is an equation
    bool isEquation() const;
 
@@ -198,7 +208,6 @@ public:
    /// Overrides (ConstraintRep)
    void print(std::ostream& os) const;
    bool isConstant() const;
-   bool dependsOn(Variable v) const;
    bool isEquation() const;
    bool isInequality() const;
    bool isLinear() const;

@@ -16,12 +16,7 @@ size_t NcspSpaceDFS::nbPendingNodes() const
    return vnode_.size();
 }
 
-SharedNcspNode NcspSpaceDFS::getPendingNode() const
-{
-   return vnode_.back();
-}
-
-SharedNcspNode NcspSpaceDFS::popPendingNode()
+SharedNcspNode NcspSpaceDFS::extractPendingNode()
 {
    SharedNcspNode node = vnode_.back();
    vnode_.pop_back();

@@ -12,7 +12,7 @@
 
 namespace realpaver {
 
-PolytopeHullContractor::PolytopeHullContractor(Dag* dag, const Scope& sco)
+PolytopeHullContractor::PolytopeHullContractor(SharedDag dag, Scope sco)
       :  dag_(dag),
          sco_(sco),
          bs_()

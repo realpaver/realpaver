@@ -38,30 +38,27 @@ public:
    /// Default copy constructor
    NcspSpace(const NcspSpace&) = default;
 
-   /// @return the number of final nodes of this
-   size_t nbFinalNodes() const;
+   /// @return the number of solution nodes of this
+   size_t nbSolutionNodes() const;
 
-   /// @param i a final node index with 0 <= i < nbFinalNodes()
+   /// @param i a solution node index with 0 <= i < nbSolutionNodes()
    /// @return the i-th final node
-   SharedNcspNode getFinalNode(size_t i) const;
+   SharedNcspNode getSolutionNode(size_t i) const;
 
-   /// Inserts a final node in this following a FIFO strategy
+   /// Inserts a solution node in this following a FIFO strategy
    /// @para node node inserted
-   void pushFinalNode(const SharedNcspNode& node);
+   void pushSolutionNode(const SharedNcspNode& node);
 
-   /// Removes the last final node from this
-   /// @return the last final node
-   SharedNcspNode popFinalNode();
+   /// Removes the last soliution node from this
+   /// @return the last solution node
+   SharedNcspNode popSolutionNode();
 
    /// @return the number of pending nodes of this
    virtual size_t nbPendingNodes() const = 0;
 
-   /// @return the next pending node of this
-   virtual SharedNcspNode getPendingNode() const = 0;
-
-   /// Removes the next pending node from this
-   /// @return the next pending node
-   virtual SharedNcspNode popPendingNode() = 0;
+   /// Extracts the next pending node from this
+   /// @return the pending node extracted from this
+   virtual SharedNcspNode extractPendingNode() = 0;
 
    /// Inserts a pending node in this
    virtual void insertPendingNode(const SharedNcspNode& node) = 0;

@@ -12,43 +12,43 @@
 
 namespace realpaver {
 
-HC4Contractor::HC4Contractor(Dag* dag, size_t i) : f_(nullptr)
+HC4Contractor::HC4Contractor(SharedDag dag, size_t i)
+      : dag_(dag),
+        if_(i)
 {
    ASSERT(dag != nullptr, "Creation of an HC4Contractor from a null pointer");
    ASSERT(i < dag->nbFuns(), "Creation of an HC4Contractor given a bad " <<
                              " function index " << i);
-
-   f_ = dag->fun(i);
 }
 
 bool HC4Contractor::dependsOn(const Bitset& bs) const
 {
-   return f_->dependsOn(bs);
+   return dag_->fun(if_)->dependsOn(bs);
 }
 
 Proof HC4Contractor::contract(IntervalRegion& reg)
 {
-   return f_->hc4Revise(reg);
+   return dag_->fun(if_)->hc4Revise(reg);
 }
 
 void HC4Contractor::print(std::ostream& os) const
 {
-   os << "HC4 contractor / function " << " @ " << f_->index();
+   os << "HC4 contractor / function " << " @ " << if_;
 }
 
-DagFun* HC4Contractor::getFun() const
+size_t HC4Contractor::getFunIndex() const
 {
-   return f_;
+   return if_;
 }
 
-Dag* HC4Contractor::getDag() const
+SharedDag HC4Contractor::getDag() const
 {
-   return f_->dag();
+   return dag_;
 }
 
 Scope HC4Contractor::scope() const
 {
-   return f_->scope();
+   return dag_->fun(if_)->scope();
 }
 
 } // namespace

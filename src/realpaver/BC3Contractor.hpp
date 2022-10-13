@@ -39,7 +39,7 @@ public:
    /// @param v a variable occurring in the function
    ///
    /// This does not own the dag.
-   BC3Contractor(Dag* dag, size_t i, Variable v);
+   BC3Contractor(SharedDag dag, size_t i, Variable v);
 
    /// Destructor
    ~BC3Contractor();

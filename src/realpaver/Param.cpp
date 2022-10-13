@@ -30,37 +30,45 @@ Param::Param()
              tol6 = Tolerance::makeRel(1.0e-6),
              tol8 = Tolerance::makeRel(1.0e-8);
 
-   tolmap_.insert(std::make_pair("XTOL",                    tol8));
-   tolmap_.insert(std::make_pair("DTOL",                    tol6));
-   tolmap_.insert(std::make_pair("OBJ_TOL",                 tol6));
-   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",        tol3));
+   // tolerance
+   tolmap_.insert(std::make_pair("XTOL",                      tol8));
+   tolmap_.insert(std::make_pair("DTOL",                      tol6));
+   tolmap_.insert(std::make_pair("OBJ_TOL",                   tol6));
+   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",          tol3));
 
-   intmap_.insert(std::make_pair("NODE_LIMIT",              100000));
-   intmap_.insert(std::make_pair("LINE_SEARCH_ITER_LIMIT",  20));
-   intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",  50));
-   intmap_.insert(std::make_pair("BC3_ITER_LIMIT",          30));
-   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",       20));
-   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",         5));
-   intmap_.insert(std::make_pair("LP_ITER_LIMIT",           50));
-   intmap_.insert(std::make_pair("FLOAT_PRECISION",         8));
-   intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",      1));
+   // integer
+   intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
+   intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
+   intmap_.insert(std::make_pair("LINE_SEARCH_ITER_LIMIT",    20));
+   intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
+   intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
+   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         20));
+   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",           5));
+   intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
+   intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
+   intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
 
-   dblmap_.insert(std::make_pair("TIME_LIMIT",              100.0));
-   dblmap_.insert(std::make_pair("LINE_SEARCH_ARMIJO",      0.09375));
-   dblmap_.insert(std::make_pair("LINE_SEARCH_STEP_TOL",    1.0e-8));
-   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",         2.0));
-   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",       10.0));
-   dblmap_.insert(std::make_pair("LP_TIME_LIMIT",           10.0));
-   dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT", 10.0));
-   dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",    1.0e-3));
+   // double
+   dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
+   dblmap_.insert(std::make_pair("LINE_SEARCH_ARMIJO",        0.09375));
+   dblmap_.insert(std::make_pair("LINE_SEARCH_STEP_TOL",      1.0e-8));
+   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",           2.0));
+   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",         10.0));
+   dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
+   dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT",   10.0));
+   dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",      1.0e-3));
 
-   strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",         "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR",          "MAX_DOM"));
-   strmap_.insert(std::make_pair("SPLIT_SLICER",            "BISECTION"));
-   strmap_.insert(std::make_pair("PROPAGATION_ALGORITHM",   "HC4"));
-   strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",  "GRADIENT"));
-   strmap_.insert(std::make_pair("LOG_LEVEL",               "NONE"));
-   strmap_.insert(std::make_pair("TRACE",                   "NO"));
+   // string
+   strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
+   strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",           "NO"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTOR",            "MAX_DOM"));
+   strmap_.insert(std::make_pair("SPLIT_SLICER",              "BISECTION"));
+   strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_MAX_CID",  "YES"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
+   strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",    "GRADIENT"));
+   strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
+   strmap_.insert(std::make_pair("TRACE",                     "NO"));
 }
 
 int Param::getIntParam(const string& name) const

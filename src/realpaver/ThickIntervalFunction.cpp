@@ -11,17 +11,14 @@
 
 namespace realpaver {
 
-ThickIntervalFunction::ThickIntervalFunction(Dag* dag, size_t i, Variable v)
-      : f_(nullptr),
+ThickIntervalFunction::ThickIntervalFunction(SharedDag dag, size_t i,
+                                             Variable v)
+      : dag_(dag),
+        f_(nullptr),
         if_(i),
         v_(v)
 {
    f_ = dag->fun(i);
-}
-
-DagFun* ThickIntervalFunction::getFun() const
-{
-   return f_;
 }
 
 bool ThickIntervalFunction::dependsOn(const Bitset& bs) const
@@ -58,5 +55,11 @@ Variable ThickIntervalFunction::getVar() const
 {
    return v_;
 }
+
+DagFun* ThickIntervalFunction::getFun() const
+{
+   return f_;
+}
+
 
 } // namespace
