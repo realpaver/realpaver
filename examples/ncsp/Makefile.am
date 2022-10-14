@@ -9,17 +9,16 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = bop ncsp
-DIST_SUBDIRS = bop ncsp
+LDADD = ../../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 
-LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
-
-AM_CPPFLAGS = -I.. -I../src
+AM_CPPFLAGS = -I.. -I../../src
 
 CLEANFILES = *~ *.log
 
-noinst_PROGRAMS = lp newton propag
+noinst_PROGRAMS = ncsp_solver
 
-lp_SOURCES = lp.cpp
-newton_SOURCES = newton.cpp
-propag_SOURCES = propag.cpp
+ncsp_solver_SOURCES = ncsp_solver.cpp
+
+EXTRA_DIST = \
+	ParamFile \
+	Parabola

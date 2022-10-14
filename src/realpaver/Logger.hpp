@@ -36,7 +36,7 @@ LogLevel StringToLogLevel(const std::string& s);
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a logger.
 ///
-/// A logger can write log messages to the console or a log file.
+/// A logger can write log messages to a log file.
 /// The design of this class follows the singleton design pattern.
 ///
 /// LOG(msg) writes a log.

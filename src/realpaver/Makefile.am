@@ -17,7 +17,7 @@ EXTRA_DIST = \
 		configure.hpp \
 		parser_flex.lpp \
 		parser_bison.ypp \
-		param_settings.txt
+		ParamFile
 
 lib_LTLIBRARIES = librealpaver.la
 
@@ -65,6 +65,7 @@ librealpaver_la_include_HEADERS = \
 		NcspSpace.hpp \
 		NcspSpaceDFS.hpp \
 		NcspSolver.hpp \
+		NcspSplit.hpp \
 		NumericMatrix.hpp \
 		NumericVector.hpp \
 		Objective.hpp \
@@ -152,6 +153,7 @@ librealpaver_la_SOURCES = \
 		NcspSpace.cpp \
 		NcspSpaceDFS.cpp \
 		NcspSolver.cpp \
+		NcspSplit.cpp \
 		Objective.cpp \
 		Param.cpp \
 		parser_bison.ypp \

@@ -124,7 +124,6 @@ template <typename T>
 void SplitStrategy<T>::push(NodeType node)
 {
    cont_.push_back(node);
-   node->incrementDepth();
 }
 
 template <typename T>

@@ -79,7 +79,7 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
 
       if (src.isFakeVar(v))
       {
-         LOG_INTER("Useless variable: " << v.getName());
+         LOG_INTER("Fake variable (defined but not used): " << v.getName());
          fake_.insert(v.id());
          continue;
       }

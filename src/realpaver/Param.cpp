@@ -47,6 +47,7 @@ Param::Param()
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
    intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
+   intmap_.insert(std::make_pair("BP_SOLUTION_LIMIT",         100));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));

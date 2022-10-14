@@ -1,4 +1,15 @@
 -------------------------------------------------------------------------------
+- NCSP Solver
+
+tester des problèmes résolus au preprocessing (feasible et infeasible)
+et gérer l'output
+
+gérer la sortie des solutions... hiérarchie de IntervalRegionFormat
+
+créer un Env et une sous-classe NcspEnv pour gérer les Param, les flags
+de sortie, un IntervalRegionFormat, ...
+
+-------------------------------------------------------------------------------
 - Create a DAG from a .nl file
 
 -------------------------------------------------------------------------------
@@ -26,7 +37,7 @@
   Dans le BOSolver, on n'a quand même pas besoin de preuve d'existence
   pour mettre à jour la upper bound.
 
-  Idée plus générale dérrière: comment décomposer un DAG? Quels noeuds
+  Idée plus générale derrière: comment décomposer un DAG? Quels noeuds
   faut-il considérer comme des variables?
   
   
@@ -36,7 +47,8 @@
 - Comparaison des relaxations
 
 -------------------------------------------------------------------------------
-- Relaxations quadratiques et résolution par Gurobi : arithmétique affine vers quadratique ou formes de Taylor ordre 2 ? Ou appliquer RLT sur formes quadratiques ?
+- Relaxations quadratiques et résolution par Gurobi : arithmétique affine vers
+  quadratique ou formes de Taylor ordre 2 ? Ou appliquer RLT sur formes quadratiques ?
 
 -------------------------------------------------------------------------------
 - Tester autres solveurs locaux (Raphael ?)

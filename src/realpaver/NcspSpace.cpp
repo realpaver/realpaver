@@ -12,6 +12,9 @@
 
 namespace realpaver {
 
+NcspSpace::NcspSpace() : vnode_(), feasible_(false)
+{}
+
 NcspSpace::~NcspSpace() {}
 
 size_t NcspSpace::nbSolutionNodes() const
@@ -29,6 +32,10 @@ SharedNcspNode NcspSpace::getSolutionNode(size_t i) const
 void NcspSpace::pushSolutionNode(const SharedNcspNode& node)
 {
    vnode_.push_back(node);
+
+   Proof p = node->getProof();
+   if (p == Proof::Inner || p == Proof::Feasible)
+      feasible_ = true;
 }
 
 SharedNcspNode NcspSpace::popSolutionNode()
@@ -37,5 +44,11 @@ SharedNcspNode NcspSpace::popSolutionNode()
    vnode_.pop_back();
    return node;
 }
+
+bool NcspSpace::proofFeasible() const
+{
+   return feasible_;
+}
+
 
 } // namespace

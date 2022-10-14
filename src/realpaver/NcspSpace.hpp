@@ -26,8 +26,8 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class NcspSpace {
 public:
-   /// Default constructor
-   NcspSpace() = default;
+   /// Constructor
+   NcspSpace();
 
    /// Virtual destructor
    virtual ~NcspSpace();
@@ -53,6 +53,9 @@ public:
    /// @return the last solution node
    SharedNcspNode popSolutionNode();
 
+   /// @return true if there is a feasible or inner solution node
+   bool proofFeasible() const;
+
    /// @return the number of pending nodes of this
    virtual size_t nbPendingNodes() const = 0;
 
@@ -62,9 +65,10 @@ public:
 
    /// Inserts a pending node in this
    virtual void insertPendingNode(const SharedNcspNode& node) = 0;
-   
+
 private:
-   std::vector<SharedNcspNode> vnode_;   // vector of final nodes
+   std::vector<SharedNcspNode> vnode_;        // vector of solution nodes
+   bool feasible_;  // true if there is a feasible or inner solution node
 };
 
 } // namespace

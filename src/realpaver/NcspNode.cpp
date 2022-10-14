@@ -21,7 +21,7 @@ Proof NcspNode::getProof() const
    return proof_;
 }
 
-void NcspNode::setproof(Proof p)
+void NcspNode::setProof(Proof p)
 {
    proof_ = p;
 }

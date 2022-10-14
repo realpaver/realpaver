@@ -42,7 +42,7 @@ public:
 
    /// Sets the proof certificate
    /// @param p new proof certificate
-   void setproof(Proof p);
+   void setProof(Proof p);
 
 private:
    Proof proof_;
