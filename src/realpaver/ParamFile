@@ -55,6 +55,9 @@ NODE_LIMIT = 120000
 # Limit on the depth of nodes of search trees
 DEPTH_LIMIT = 100
 
+# Limit on the number of solutions
+SOLUTION_LIMIT = 100
+
 # In a branch-and-bound algorithm, the next node can be either the node with
 # the lowest lower bound or the node with the lowest upper bound (diving).
 # The frequency manages the selection of the next node:
@@ -68,9 +71,6 @@ BB_SPACE_FREQUENCY = 1
 # - BFS: Breadth-First-Search
 # - DMDFS: Distant-Most Depth-First-Search
 BP_NODE_SELECTION = DFS
-
-# Limit on the number of solutions found by branch-and-prune algorithms
-BP_SOLUTION_LIMIT = 100
 
 ###############################################################################
 ## SPLITTING STRATEGIES                                                      ##

@@ -38,6 +38,7 @@ librealpaver_la_include_HEADERS = \
 		ContractorPool.hpp \
 		Dag.hpp \
 		Double.hpp \
+		Env.hpp \
 		Exception.hpp \
 		Function.hpp \
 		HC4Contractor.hpp \
@@ -61,6 +62,7 @@ librealpaver_la_include_HEADERS = \
 		LPModel.hpp \
 		LPSolver.hpp \
 		MaxCIDContractor.hpp \
+		NcspEnv.hpp \
 		NcspNode.hpp \
 		NcspSpace.hpp \
 		NcspSpaceDFS.hpp \
@@ -132,6 +134,7 @@ librealpaver_la_SOURCES = \
 		Contractor.cpp \
 		ContractorPool.cpp \
 		Dag.cpp \
+		Env.cpp \
 		Exception.cpp \
 		Function.cpp \
 		HC4Contractor.cpp \
@@ -149,6 +152,7 @@ librealpaver_la_SOURCES = \
 		Logger.cpp \
 		LPModel.cpp \
 		MaxCIDContractor.cpp \
+		NcspEnv.cpp \
 		NcspNode.cpp \
 		NcspSpace.cpp \
 		NcspSpaceDFS.cpp \

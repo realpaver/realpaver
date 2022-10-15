@@ -4,10 +4,10 @@
 tester des problèmes résolus au preprocessing (feasible et infeasible)
 et gérer l'output
 
-gérer la sortie des solutions... hiérarchie de IntervalRegionFormat
+il faut que tous les PARAM soient pris en compte : les tolerances,
+les param des contracteurs, etc.
 
-créer un Env et une sous-classe NcspEnv pour gérer les Param, les flags
-de sortie, un IntervalRegionFormat, ...
+gérer la sortie des solutions... hiérarchie de IntervalRegionWriter ?
 
 -------------------------------------------------------------------------------
 - Create a DAG from a .nl file

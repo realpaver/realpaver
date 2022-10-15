@@ -49,7 +49,7 @@ public:
    /// @para node node inserted
    void pushSolutionNode(const SharedNcspNode& node);
 
-   /// Removes the last soliution node from this
+   /// Removes the last solution node from this
    /// @return the last solution node
    SharedNcspNode popSolutionNode();
 

@@ -39,6 +39,7 @@ Param::Param()
    // integer
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
    intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
+   intmap_.insert(std::make_pair("SOLUTION_LIMIT",            100));
    intmap_.insert(std::make_pair("LINE_SEARCH_ITER_LIMIT",    20));
    intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
@@ -47,7 +48,6 @@ Param::Param()
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
    intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
-   intmap_.insert(std::make_pair("BP_SOLUTION_LIMIT",         100));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));

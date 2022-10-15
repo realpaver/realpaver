@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 
       // solving
       NcspSolver solver(problem);
-      solver.setParam(prm);
+      solver.getEnv()->setParam(prm);
 
       int prec = prm.getIntParam("FLOAT_PRECISION");
       Interval::precision(prec);
@@ -108,16 +108,19 @@ int main(int argc, char** argv)
       cout << BLUE("Results") << endl;
 
       cout << indent << "Search...................... ";
-      if (solver.proofComplete())
+      bool complete = solver.getEnv()->usedNoLimit() &&
+                      (solver.getNbPendingNodes() == 0);
+      
+      if (complete)
          cout << ORANGE("complete") << endl;
       else
-         cout << ORANGE("uncomplete") << endl;
+         cout << ORANGE("partial") << endl;
    
       cout << indent << "Status...................... ";
 
       if (solver.getNbSolutions() == 0)
       {
-         if (solver.proofComplete())
+         if (complete)
             cout << ORANGE("infeasible") << endl;
          else
             cout << ORANGE("no solution found") << endl;
@@ -150,10 +153,23 @@ int main(int argc, char** argv)
            << ORANGE(solver.getNbPendingNodes()) << endl;
 
 
-
-      // TODO, les limites voir avec Env, NcspEnv
-      if (solver.overNodeLimit())
-         cout << "Over the limit........... ";
+      // limits
+      if (solver.getEnv()->usedTimeLimit())
+      {
+         cout << indent << "Time limit reached.......... "
+              << solver.getEnv()->getParam()->getDblParam("TIME_LIMIT") << endl;
+      }
+      if (solver.getEnv()->usedNodeLimit())
+      {
+         cout << indent << "Node limit reached.......... "
+              << solver.getEnv()->getParam()->getIntParam("NODE_LIMIT") << endl;
+      }
+      if (solver.getEnv()->usedNodeLimit())
+      {
+         cout << indent << "Solution limit reached...... "
+              << solver.getEnv()->getParam()->getIntParam("SOLUTION_LIMIT")
+              << endl;
+      }
 
       cout << GRAY(sep) << endl;
    }

@@ -26,40 +26,25 @@ namespace realpaver {
 NcspSolver::NcspSolver(const Problem& problem)
       : problem_(problem),
         preprob_(),
-        param_(nullptr),
+        env_(nullptr),
         space_(nullptr),
         contractor_(nullptr),
         split_(nullptr),
         ptimer_(),
         stimer_(),
-        nbnodes_(0),
-        isComplete_(true),
-        tlim_(false),
-        nlim_(false),
-        slim_(false)
+        nbnodes_(0)
 {
    THROW_IF(!problem.isCSP(), "Ncsp solver applied to a problem that is " <<
                               "not a constraint satisfaction problem");
 
-   param_ = new Param();
+   env_ = new NcspEnv();
 }
 
 NcspSolver::~NcspSolver()
 {
-   if (param_ != nullptr) delete param_;
+   if (env_ != nullptr) delete env_;
    if (space_ != nullptr) delete space_;
    if (split_ != nullptr) delete split_;
-}
-
-void NcspSolver::setParam(const Param& prm)
-{
-   if (param_ != nullptr) delete param_;
-   param_ = new Param(prm);
-}
-
-Param* NcspSolver::getParam() const
-{
-   return param_;
 }
 
 double NcspSolver::getPreprocessingTime() const
@@ -116,7 +101,7 @@ bool NcspSolver::preprocess()
    return feasible;
 }
 
-void NcspSolver::setContractor(const SharedContractor& contractor)
+void NcspSolver::setContractor(SharedContractor contractor)
 {
    ASSERT(contractor != nullptr, "Null contractor assigned in a Ncsp solver");
    contractor_ = contractor;
@@ -125,7 +110,7 @@ void NcspSolver::setContractor(const SharedContractor& contractor)
 void NcspSolver::makeSpace()
 {
    // gets the strategy from the parameters
-   std::string s = param_->getStrParam("BP_NODE_SELECTION");
+   std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS") space_ = new NcspSpaceDFS();
 
    THROW_IF(space_ == nullptr,
@@ -148,7 +133,7 @@ void NcspSolver::makeContractor()
    // main pool of contractors, the pool of this's contractor
    SharedContractorVector mainpool = std::make_shared<ContractorVector>();
 
-   std::string base = param_->getStrParam("PROPAGATION_BASE");
+   std::string base = env_->getParam()->getStrParam("PROPAGATION_BASE");
 
    // creates a propagator with one default contractor per constraint
    SharedContractorVector pool = std::make_shared<ContractorVector>();
@@ -186,13 +171,14 @@ void NcspSolver::makeContractor()
    SharedPropagator propagator = std::make_shared<Propagator>(pool);
 
    // propagator or propagator + max CID ?
-   std::string with_max_cid = param_->getStrParam("PROPAGATION_WITH_MAX_CID");
+   std::string with_max_cid =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_MAX_CID");
    if (with_max_cid == "YES")
    {
       std::unique_ptr<VariableSelector> selector =
          std::make_unique<MaxDomSelector>(preprob_.scope());
 
-      int nb = param_->getIntParam("SPLIT_NB_SLICES");
+      int nb = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
       std::unique_ptr<IntervalSlicer> slicer =
          std::make_unique<IntervalPartitionMaker>(nb);
 
@@ -208,7 +194,8 @@ void NcspSolver::makeContractor()
    }
 
    // polytope hull contractor ?
-   std::string with_polytope = param_->getStrParam("PROPAGATION_WITH_POLYTOPE");
+   std::string with_polytope =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
    if (with_polytope == "YES")
    {
       SharedContractor op =
@@ -240,21 +227,21 @@ void NcspSolver::makeSplit()
 
    Scope sco = preprob_.scope();
 
-   std::string sel = param_->getStrParam("SPLIT_SELECTOR");
+   std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
    if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
    if (sel == "ROUND_ROBIN") selector = new RoundRobinSelector(sco);
    // TODO: max smear strategy not handled
 
-   std::string sli = param_->getStrParam("SPLIT_SLICER");
+   std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
    if (sli == "BISECTION") slicer = new IntervalBisecter();
    if (sli == "PEELING")
    {
-      double f = param_->getDblParam("SPLIT_PEEL_FACTOR");
+      double f = env_->getParam()->getDblParam("SPLIT_PEEL_FACTOR");
       slicer = new IntervalPeeler(f);
    }
    if (sli == "PARTITION")
    {
-      size_t n = param_->getIntParam("SPLIT_NB_SLICES");
+      size_t n = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
       slicer = new IntervalPartitionMaker(n);
    }
 
@@ -312,7 +299,7 @@ void NcspSolver::bpStep(int depthlimit)
    if (depth >= depthlimit)
    {
       LOG_INTER("Node fathomed due to the depth limit");
-      isComplete_ = false;
+      env_->setDepthLimit(true);
       return;
    }
 
@@ -354,10 +341,16 @@ bool NcspSolver::branchAndPrune()
    makeSplit();
 
    // parameters
-   double timelimit = param_->getDblParam("TIME_LIMIT");
-   int nodelimit = param_->getIntParam("NODE_LIMIT");
-   int depthlimit = param_->getIntParam("DEPTH_LIMIT");
-   int sollimit = param_->getIntParam("BP_SOLUTION_LIMIT");
+   double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");
+   env_->setTimeLimit(false);
+
+   int nodelimit = env_->getParam()->getIntParam("NODE_LIMIT");
+   env_->setNodeLimit(false);
+
+   int sollimit = env_->getParam()->getIntParam("SOLUTION_LIMIT");
+   env_->setSolutionLimit(false);
+
+   int depthlimit = env_->getParam()->getIntParam("DEPTH_LIMIT");
 
    LOG_INTER("Time limit:  " << timelimit << "s");
    LOG_INTER("Node limit:  " << nodelimit);
@@ -380,30 +373,25 @@ bool NcspSolver::branchAndPrune()
           ptimer_.elapsedTime() + stimer_.elapsedTime() > timelimit)
       {
          LOG_MAIN("Stops on time limit (" << timelimit << "s)");
-         isComplete_ = false;
-         tlim_ = true;
+         env_->setTimeLimit(true);
          iter = false;
       }
 
       if (iter && nbnodes_ > nodelimit)
       {
          LOG_MAIN("Stops on node limit (" << nodelimit << ")");
-         isComplete_ = false;
-         nlim_ = true;
+         env_->setNodeLimit(true);
          iter = false;
       }
 
       if (iter && space_->nbSolutionNodes() >= sollimit)
       {
          LOG_MAIN("Stops on solution limit (" << sollimit << ")");
-         isComplete_ = false;
-         slim_ = true;
+         env_->setSolutionLimit(true);
          iter = false;         
       }
    }
    while (iter);
-
-   isComplete_ = isComplete_ && (space_->nbPendingNodes() == 0);
 
    stimer_.stop();
    return space_->nbSolutionNodes() > 0;
@@ -418,29 +406,14 @@ IntervalRegion NcspSolver::getSolution(size_t i) const
    return *reg;
 }
 
-bool NcspSolver::proofComplete() const
-{
-   return isComplete_;
-}
-
 bool NcspSolver::proofFeasible() const
 {
    return space_->proofFeasible();
 }
 
-bool NcspSolver::overTimeLimit() const
+NcspEnv* NcspSolver::getEnv() const
 {
-   return tlim_;
-}
-
-bool NcspSolver::overNodeLimit() const
-{
-   return nlim_;
-}
-
-bool NcspSolver::overSolutionLimit() const
-{
-   return slim_;
+   return env_;
 }
 
 } // namespace

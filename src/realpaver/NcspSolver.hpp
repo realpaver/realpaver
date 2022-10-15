@@ -12,9 +12,10 @@
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/Dag.hpp"
+#include "realpaver/Env.hpp"
+#include "realpaver/NcspEnv.hpp"
 #include "realpaver/NcspSpace.hpp"
 #include "realpaver/NcspSplit.hpp"
-#include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
 
@@ -41,16 +42,9 @@ public:
    /// No assignment
    NcspSolver& operator=(const NcspSolver&) = delete;
 
-   /// Assigns the parameters in this
-   /// @param prm parameters
-   void setParam(const Param& prm);
-
-   /// @return the object that manages the parameter settings
-   Param* getParam() const;
-
    /// Assigns the contractor of this
    /// @param contractor new contractor
-   void setContractor(const SharedContractor& contractor);
+   void setContractor(SharedContractor contractor);
 
    /// Solving method
    /// @return true if a solution is found, false otherwise
@@ -76,28 +70,18 @@ public:
    /// @return the i-th solution
    IntervalRegion getSolution(size_t i) const;
 
-   /// @return true if the branch-and-prune algorithm implemented a complete
-   ///         search, false otherwise (i.e. a limit has been reached)
-   bool proofComplete() const;
-
    /// @return true if a feasible or inner region has been found, false
    ///         otherwise
    bool proofFeasible() const;
 
-   /// @return true if the time limit is exceeded
-   bool overTimeLimit() const;
-
-   /// @return true if the node limit is exceeded
-   bool overNodeLimit() const;
-
-   /// @return true if the solution limit is exceeded
-   bool overSolutionLimit() const;
+   /// @return the environment of this
+   NcspEnv* getEnv() const;
 
 private:
    Problem problem_;             // initial problem
    Problem preprob_;             // problem resulting from preprocessing
-   Param* param_;                // parameters
-
+   
+   NcspEnv* env_;                // environment
    NcspSpace* space_;            // search tree
    SharedDag dag_;               // dag
    SharedContractor contractor_; // contraction operator
@@ -107,10 +91,6 @@ private:
    Timer stimer_;                // timer for the solving phase
 
    int nbnodes_;                 // number of nodes processed
-   bool isComplete_;             // true if the search is complete
-   bool tlim_;                   // true if time limit exceeded
-   bool nlim_;                   // true if node limit exceeded
-   bool slim_;                   // true if node limit exceeded
 
    bool preprocess();
    bool branchAndPrune();
