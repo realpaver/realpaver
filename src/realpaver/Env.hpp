@@ -49,14 +49,31 @@ public:
    /// Sets a flag that informs on the termination of a solving process
    /// @param b true if the solving process is aborted due a node limit
    void setNodeLimit(bool b = true);
-   
+
    /// @return true if a solving process is aborted due a node limit
    bool usedNodeLimit() const;
+
+   /// Sets a flag related to the preprocessing
+   /// @param b true if a problem is solved at preprocessing
+   void setPresolved(bool b = false);
+
+   /// @return true if a problem is solved at preprocessing
+   bool isPresolved() const;
+
+   /// Sets a flag related to the preprocessing
+   /// @param b true if a constraint is violated at preprocessing
+   void setConstraintViolated(bool b = false);
+
+   /// @return true if a constraint is violated at preprocessing
+   bool hasConstraintViolated() const;
+
 
 private:
    Param* param_;    // management of parameters
    bool tlim_;       // time limit reached
    bool nlim_;       // node limit reached
+   bool presolved_;  // true if a problem is solved at preprocessing
+   bool cviol_;      // true if a constraint is violated at preprocessing
 };
 
 } // namespace

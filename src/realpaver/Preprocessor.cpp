@@ -19,7 +19,7 @@ bool Preprocessor::allVarsRemoved() const
 
 bool Preprocessor::isFake(Variable v) const
 {
-   auto it = fake_.find(v.id());
+   auto it = fake_.find(v);
    return it != fake_.end();
 }
 
@@ -47,18 +47,64 @@ Variable Preprocessor::srcToDestVar(Variable v) const
    
 bool Preprocessor::apply(const Problem& src, Problem& dest)
 {
-   return apply(src, src.getDomains(), dest);
+   IntervalRegion reg = src.getDomains();
+   return apply(src, reg, dest);
 }
 
-bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
-                         Problem& dest)
+bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
 {
    ASSERT(src.nbVars() == reg.size(), "Preprocessing error");
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
 
+   Objective obj = src.getObjective();
+
    LOG_MAIN("Preprocessing");
 
+   // test empty domains
+   for (size_t i=0; i<src.nbVars(); ++i)
+   {
+      Variable v        = src.varAt(i);
+      Interval domain   = reg.get(v);
+
+      if (domain.isEmpty())
+      {
+         LOG_MAIN("Empty domain of variable: " << v.getName());
+         return false;
+      }
+   }
+
+   // propagation
+   bool ok = propagate(src, reg);
+   if (!ok) return false;
+
+   // satisfaction tests
+   for (size_t i=0; i<src.nbCtrs(); ++i)
+   {
+      Constraint c = src.ctrAt(i);
+      Proof proof = c.isSatisfied(reg);
+
+      if (proof == Proof::Empty)
+      {
+         LOG_INTER("Constraint violated (normally does not arise): " << c);
+         return false;
+      }
+
+      else if (proof == Proof::Inner)
+      {
+         LOG_INTER("Inactive constraint: " << c);
+         nbc_ = nbc_ + 1;
+      }
+      
+      else
+      {
+         active_.push_back(c);
+      }
+   }
+
+   LOG_MAIN("Number of inactive constraints: " << nbc_);
+
+   // rewrites the variables
    vvm_.clear();
    vim_.clear();
    fake_.clear();
@@ -71,25 +117,19 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
       bool isContinuous = v.isContinuous();
       Tolerance tol     = v.getTolerance();
 
-      if (domain.isEmpty())
-      {
-         LOG_MAIN("Empty domain of variable: " << v.getName());
-         return false;
-      }
-
-      if (src.isFakeVar(v))
-      {
-         LOG_INTER("Fake variable (defined but not used): " << v.getName());
-         fake_.insert(v.id());
-         continue;
-      }
-
       bool isFixed = isContinuous ? domain.isCanonical() :
                                     domain.isSingleton();
 
-      if (isFixed)
+      bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
+   
+      if (isFake)
       {
-         LOG_INTER("Fixes " << v.getName() << " := " << domain);
+         LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
+         fake_.insert(std::make_pair(v, domain));
+      }
+      else if (isFixed)
+      {
+         LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
          vim_.insert(std::make_pair(v, domain));
       }
       else
@@ -105,42 +145,22 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
       }
    }
 
-   LOG_MAIN("Number of fixed variables: " << vim_.size());
-   LOG_MAIN("Number of fake variables: " << fake_.size());
-
-   // this region is useful if some variables are not fixed and in this case
-   // Y is assigned to dest.getDomains(); otherwise it is useless and it is
-   // assigned to src.getDomains() in order to prevent errors
-   IntervalRegion Y = (vvm_.empty()) ? src.getDomains() : dest.getDomains();
+   LOG_MAIN("Number of removed variables: " << vim_.size() + fake_.size());
 
    // rewrites the constraints
-   for (size_t i=0; i<src.nbCtrs(); ++i)
+   for (Constraint input : active_)
    {
       ConstraintFixer fixer(&vvm_, &vim_);
-      src.ctrAt(i).acceptVisitor(fixer);
+      input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
-
-      Proof proof = c.isSatisfied(Y);
-
-      if (proof == Proof::Empty)
+      
+      if (c.isConstant())
       {
-         LOG_MAIN("Constraint violated: " << c);
-         return false;
+         LOG_INTER("Constraint with no variable: " << c);
       }
-      else if (proof == Proof::Inner)
-      {
-         LOG_INTER("Inactive constraint: " << c);
-         nbc_ = nbc_ + 1;
-      }
-      else
-      {
-         dest.addCtr(c);
-      }
+      
+      else dest.addCtr(c);
    }
-
-   LOG_MAIN("Number of inactive constraints: " << nbc_);
-
-   Objective obj = src.getObjective();
 
    // checks the range of the objective function
    Interval dobj = obj.getTerm().eval(src.getDomains());
@@ -170,14 +190,67 @@ bool Preprocessor::apply(const Problem& src, const IntervalRegion& reg,
    return true;
 }
 
+bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
+{
+   // AC1 propagation algorithm
+   bool modified;
+   do
+   {
+      modified = false;
+      IntervalRegion save(reg);
+
+      for (size_t i=0; i<problem.nbCtrs(); ++i)
+      {
+         Constraint c = problem.ctrAt(i);
+         Proof proof = c.contract(reg);
+         if (proof == Proof::Empty)
+         {
+            LOG_INTER("Constraint violated: " << c);
+            return false;
+         }
+      }
+
+      if (!save.equals(reg)) modified = true;
+   }
+   while (modified);
+   return true;
+}
+
+bool Preprocessor::occursInActiveConstraint(const Variable& v) const
+{
+   for (Constraint c : active_)
+      if (c.dependsOn(v)) return true;
+
+   return false;
+}
+
 Scope Preprocessor::trueScope() const
 {
    Scope sco;
-
    for (auto p : vim_) sco.insert(p.first);
    for (auto p : vvm_) sco.insert(p.first);
-
    return sco;
+}
+
+Scope Preprocessor::fixedScope() const
+{
+   Scope sco;
+   for (auto p : vim_) sco.insert(p.first);
+   return sco;
+}
+
+Scope Preprocessor::unfixedScope() const
+{
+   Scope sco;
+   for (auto p : vvm_) sco.insert(p.first);
+   return sco;
+}
+
+Scope Preprocessor::fakeScope() const
+{
+   Scope sco;
+   for (auto p : fake_) sco.insert(p.first);
+   return sco;   
 }
 
 } // namespace

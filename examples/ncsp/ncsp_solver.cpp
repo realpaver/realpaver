@@ -86,86 +86,125 @@ int main(int argc, char** argv)
       cout << meslog << endl;
 
       cout << indent << "Output file................. " << fsol << endl;
-
-      // solving effort
       cout << GRAY(sep) << endl;
-      cout << BLUE("Solving effort") << endl;
+
+      // preprocessing
+      cout << BLUE("Preprocessing") << endl;
       cout << std::fixed << std::setprecision(2)
-           << indent << "Preprocessing time.......... "
+           << indent << "Time........................ "
            << ORANGE(solver.getPreprocessingTime() << "s")
            << endl;
 
-      cout << indent << "Solving time................ "
-           << std::fixed << std::setprecision(2)
-           << ORANGE(solver.getSolvingTime() << "s")
-           << endl
-           << indent << "Number of nodes............. "
-           << ORANGE(solver.getTotalNodes()) << endl;
+      if (solver.getEnv()->isPresolved())
+      {
+         cout << std::fixed << std::setprecision(2)
+              << indent << "Status...................... ";
 
-      // results
+         if (solver.getEnv()->hasConstraintViolated())
+            cout << ORANGE("solved infeasible") << endl;
+
+         else
+         {
+            cout << ORANGE("solved feasible") << endl;
+         }
+
+      }
+
       cout << GRAY(sep) << endl;
-      cout << BLUE("Results") << endl;
 
-cerr << "LA" << solver.getSpace()->nbPendingNodes() << endl;
+      // solving
+      if (!solver.getEnv()->isPresolved())
+      {
+         cout << BLUE("Solving") << endl;
 
-// TODO : plante car le space n'a pas été créé car probleme
-// resolu au preprocessing
+         cout << indent << "Time........................ "
+              << std::fixed << std::setprecision(2)
+              << ORANGE(solver.getSolvingTime() << "s")
+              << endl
+              << indent << "Number of nodes............. "
+              << ORANGE(solver.getTotalNodes()) << endl;
+         
+         
+      }
 
-      cout << indent << "Search status............... ";
-      bool complete = solver.getEnv()->usedNoLimit() &&
-                      (solver.getSpace()->nbPendingNodes() == 0);
+
+      //~ // solving effort
+      //~ cout << GRAY(sep) << endl;
+      //~ cout << BLUE("Solving effort") << endl;
+      //~ cout << std::fixed << std::setprecision(2)
+           //~ << indent << "Preprocessing time.......... "
+           //~ << ORANGE(solver.getPreprocessingTime() << "s")
+           //~ << endl;
+
+      //~ cout << indent << "Solving time................ "
+           //~ << std::fixed << std::setprecision(2)
+           //~ << ORANGE(solver.getSolvingTime() << "s")
+           //~ << endl
+           //~ << indent << "Number of nodes............. "
+           //~ << ORANGE(solver.getTotalNodes()) << endl;
+
+      //~ // results
+      //~ cout << GRAY(sep) << endl;
+      //~ cout << BLUE("Results") << endl;
+
+//~ cerr << "LA" << solver.getSpace()->nbPendingNodes() << endl;
+
+//~ // TODO : plante car le space n'a pas été créé car probleme
+//~ // resolu au preprocessing
+
+      //~ cout << indent << "Search status............... ";
+      //~ bool complete = solver.getEnv()->usedNoLimit() &&
+                      //~ (solver.getSpace()->nbPendingNodes() == 0);
 
 
-cerr << "ICI" << endl;
+//~ cerr << "ICI" << endl;
 
-      if (complete)
-         cout << ORANGE("complete") << endl;
-      else
-         cout << ORANGE("partial") << endl;
+      //~ if (complete)
+         //~ cout << ORANGE("complete") << endl;
+      //~ else
+         //~ cout << ORANGE("partial") << endl;
    
-      cout << indent << "Solution status............. ";
+      //~ cout << indent << "Solution status............. ";
 
-      if (solver.getSpace()->nbSolutionNodes() == 0)
-      {
-         string s = complete ? "infeasible" : "no solution found";
-         cout << ORANGE(s) << endl;
-      }
-      else
-      {
-         string s = solver.getSpace()->hasFeasibleSolutionNode() ? "feasible" :
-                                                       "no proof certificate";
-         cout << ORANGE(s) << endl;
+      //~ if (solver.getSpace()->nbSolutionNodes() == 0)
+      //~ {
+         //~ string s = complete ? "infeasible" : "no solution found";
+         //~ cout << ORANGE(s) << endl;
+      //~ }
+      //~ else
+      //~ {
+         //~ string s = solver.getSpace()->hasFeasibleSolutionNode() ? "feasible" :
+                                                       //~ "no proof certificate";
+         //~ cout << ORANGE(s) << endl;
 
-         cout << indent << "Number of solutions......... "
-              << ORANGE(solver.getSpace()->nbSolutionNodes()) << endl;
-      }
+         //~ cout << indent << "Number of solutions......... "
+              //~ << ORANGE(solver.getSpace()->nbSolutionNodes()) << endl;
+      //~ }
 
-      // Writes the space / solutions in a file
-      NcspSpaceFileWriter writer(fsol);
-      writer.write(*solver.getSpace());
+      //~ // Writes the space / solutions in a file
+      //~ NcspSpaceFileWriter writer(fsol);
+      //~ writer.write(*solver.getSpace());
       
-      cout << indent << "Number of pending nodes..... "
-           << ORANGE(solver.getSpace()->nbPendingNodes()) << endl;
+      //~ cout << indent << "Number of pending nodes..... "
+           //~ << ORANGE(solver.getSpace()->nbPendingNodes()) << endl;
 
-      // limits
-      if (solver.getEnv()->usedTimeLimit())
-      {
-         cout << indent << "Time limit reached.......... "
-              << solver.getEnv()->getParam()->getDblParam("TIME_LIMIT") << endl;
-      }
-      if (solver.getEnv()->usedNodeLimit())
-      {
-         cout << indent << "Node limit reached.......... "
-              << solver.getEnv()->getParam()->getIntParam("NODE_LIMIT") << endl;
-      }
-      if (solver.getEnv()->usedNodeLimit())
-      {
-         cout << indent << "Solution limit reached...... "
-              << solver.getEnv()->getParam()->getIntParam("SOLUTION_LIMIT")
-              << endl;
-      }
-
-      cout << GRAY(sep) << endl;
+      //~ // limits
+      //~ if (solver.getEnv()->usedTimeLimit())
+      //~ {
+         //~ cout << indent << "Time limit reached.......... "
+              //~ << solver.getEnv()->getParam()->getDblParam("TIME_LIMIT") << endl;
+      //~ }
+      //~ if (solver.getEnv()->usedNodeLimit())
+      //~ {
+         //~ cout << indent << "Node limit reached.......... "
+              //~ << solver.getEnv()->getParam()->getIntParam("NODE_LIMIT") << endl;
+      //~ }
+      //~ if (solver.getEnv()->usedNodeLimit())
+      //~ {
+         //~ cout << indent << "Solution limit reached...... "
+              //~ << solver.getEnv()->getParam()->getIntParam("SOLUTION_LIMIT")
+              //~ << endl;
+      //~ }
    }
    catch(Exception e) {
       cout << e.what() << endl;

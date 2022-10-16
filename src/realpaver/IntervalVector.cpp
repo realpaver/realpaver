@@ -26,6 +26,17 @@ IntervalVector::IntervalVector(const std::initializer_list<Interval>& l)
 IntervalVector::~IntervalVector()
 {}
 
+bool IntervalVector::equals(const IntervalVector& X) const
+{
+   if (isEmpty() || X.isEmpty()) return false;
+   if (size() != X.size()) return false;
+
+   for (size_t i=0; i<size(); ++i)
+      if (get(i).isSetNeq(X.get(i))) return false;
+
+   return true;
+}
+
 Interval IntervalVector::get(size_t i) const
 {
    return operator[](i);

@@ -17,7 +17,6 @@
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
-#include "realpaver/Preprocessor.hpp"
 #include "realpaver/Propagator.hpp"
 #include "realpaver/VariableSelector.hpp"
 
@@ -26,6 +25,7 @@ namespace realpaver {
 NcspSolver::NcspSolver(const Problem& problem)
       : problem_(problem),
         preprob_(),
+        preproc_(),
         env_(nullptr),
         space_(nullptr),
         contractor_(nullptr),
@@ -62,33 +62,32 @@ int NcspSolver::getTotalNodes() const
    return nbnodes_;
 }
 
-bool NcspSolver::solve()
+void NcspSolver::solve()
 {
    LOG_MAIN("Input problem\n" << problem_);
 
-   ptimer_.start();
-
    // first phase: preprocessing
-   bool feasible = preprocess();
-   if (!feasible) return false;
-   
-   
-   // TODO : solved ?
-
-
+   preprocess();
+   if (env_->isPresolved()) return;
 
    return branchAndPrune();
 }
 
-bool NcspSolver::preprocess()
+void NcspSolver::preprocess()
 {
-   Preprocessor proc;
+   env_->setPresolved(false);
+   env_->setConstraintViolated(false);
 
    ptimer_.start();
-   bool feasible = proc.apply(problem_, preprob_);
+   bool feasible = preproc_.apply(problem_, preprob_);
    ptimer_.stop();
 
-   return feasible;
+   if (!feasible)
+   {
+      env_->setPresolved(true);
+      env_->setConstraintViolated(true);
+   }
+   if (preproc_.allVarsRemoved()) env_->setPresolved(true);
 }
 
 void NcspSolver::setContractor(SharedContractor contractor)
@@ -321,9 +320,10 @@ void NcspSolver::bpStep(int depthlimit)
    }
 }
 
-bool NcspSolver::branchAndPrune()
+void NcspSolver::branchAndPrune()
 {
-   LOG_MAIN("Branch-and-prune algorithm");
+   LOG_MAIN("Branch-and-prune algorithm on problem\n" << preprob_);
+
    stimer_.start();
 
    makeSpace();
@@ -384,7 +384,6 @@ bool NcspSolver::branchAndPrune()
    while (iter);
 
    stimer_.stop();
-   return space_->nbSolutionNodes() > 0;
 }
 
 NcspEnv* NcspSolver::getEnv() const

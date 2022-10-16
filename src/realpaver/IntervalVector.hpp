@@ -43,6 +43,12 @@ public:
    /// Virtual destructor
    virtual ~IntervalVector();
 
+   /// Equality test
+   /// @param X a vector
+   /// @return true if this == X and both intervals are non empty,
+   ///         false otherwise
+   bool equals(const IntervalVector& X) const;
+
    /// @param i an index between 0 and size()-1
    /// @return the i-th element of this
    Interval get(size_t i) const;

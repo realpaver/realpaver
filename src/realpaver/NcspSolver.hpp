@@ -16,6 +16,7 @@
 #include "realpaver/NcspEnv.hpp"
 #include "realpaver/NcspSpace.hpp"
 #include "realpaver/NcspSplit.hpp"
+#include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
 
@@ -47,8 +48,7 @@ public:
    void setContractor(SharedContractor contractor);
 
    /// Solving method
-   /// @return true if a solution is found, false otherwise
-   bool solve();
+   void solve();
 
    /// @return the preprocessing time in seconds
    double getPreprocessingTime() const;
@@ -68,6 +68,7 @@ public:
 private:
    Problem problem_;             // initial problem
    Problem preprob_;             // problem resulting from preprocessing
+   Preprocessor preproc_;        // preprocessor
    
    NcspEnv* env_;                // environment
    NcspSpace* space_;            // search tree
@@ -80,8 +81,8 @@ private:
 
    int nbnodes_;                 // number of nodes processed
 
-   bool preprocess();
-   bool branchAndPrune();
+   void preprocess();
+   void branchAndPrune();
    void makeSpace();
    void makeContractor();
    void makeSplit();

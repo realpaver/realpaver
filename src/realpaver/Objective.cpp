@@ -26,6 +26,11 @@ bool ObjectiveRep::isConstant() const
    return f_.isConstant();
 }
 
+bool ObjectiveRep::dependsOn(const Variable& v) const
+{
+   return f_.dependsOn(v);
+}
+
 bool ObjectiveRep::isLinear() const
 {
    return f_.isLinear();
@@ -55,6 +60,11 @@ Term Objective::getTerm() const
 bool Objective::isConstant() const
 {
    return rep_->isConstant();
+}
+
+bool Objective::dependsOn(const Variable& v) const
+{
+   return rep_->dependsOn(v);
 }
 
 bool Objective::isLinear() const

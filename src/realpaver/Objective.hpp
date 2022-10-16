@@ -41,6 +41,11 @@ public:
    /// @return true if this is constant (variable free)
    bool isConstant() const;
 
+   /// Dependency test
+   /// @param v a variable
+   /// @return true if this depends on v
+   bool dependsOn(const Variable& v) const;
+
    /// @return true if this is linear
    bool isLinear() const;
 
@@ -77,6 +82,11 @@ public:
 
    /// @return true if this is constant (variable free)
    bool isConstant() const;
+
+   /// Dependency test
+   /// @param v a variable
+   /// @return true if this depends on v
+   bool dependsOn(const Variable& v) const;
 
    /// @return true if this is linear
    bool isLinear() const;

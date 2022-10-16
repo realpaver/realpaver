@@ -11,6 +11,7 @@
 #define REALPAVER_PREPROCESSOR_HPP
 
 #include <unordered_set>
+#include <vector>
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Problem.hpp"
 
@@ -59,7 +60,7 @@ public:
    ///
    /// It removes the fixed variables and the inactive constraints and it
    /// creates a new problem with a new set of variables.
-   bool apply(const Problem& src, const IntervalRegion& reg, Problem& dest);
+   bool apply(const Problem& src, IntervalRegion& reg, Problem& dest);
 
    /// Tests if a variable of the source problem is fixed
    /// @param v a variable of the source problem
@@ -73,7 +74,7 @@ public:
    bool isFake(Variable v) const;
 
    /// Gets the domain of a fixed variable
-   /// @param v a variable
+   /// @param v a variable of the source problem
    /// @return the domain of v
    Interval getFixedDomain(Variable v) const;
 
@@ -90,11 +91,25 @@ public:
    /// @return the scope of the source problem minus the fake variables
    Scope trueScope() const;
 
+   /// @return the fixed variables of the source problem
+   Scope fixedScope() const;
+
+   /// @return the fixed variables of the source problem
+   Scope unfixedScope() const;
+
+   /// @return the fake variables of the source problem
+   Scope fakeScope() const;
+
 private:
    VarVarMapType vvm_;                 // map for non fixed variables
    VarIntervalMapType vim_;            // map for fixed variables
-   std::unordered_set<size_t> fake_;   // indexes of fake variables
+   VarIntervalMapType fake_;           // map for fake variables
+
+   std::vector<Constraint> active_;    // constraints not removed
    size_t nbc_;                        // number of constraints removed
+
+   bool occursInActiveConstraint(const Variable& v) const;
+   bool propagate(const Problem& problem, IntervalRegion& reg);
 };
 
 } // namespace
