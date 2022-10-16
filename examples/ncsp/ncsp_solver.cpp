@@ -3,6 +3,7 @@
 #include <iostream>
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
+#include "realpaver/NcspSpaceWriter.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
 
@@ -35,15 +36,12 @@ int main(int argc, char** argv)
 
       // tries to open the problem file
       ifstream infile(filename);
-      if (!infile.is_open()) THROW("Bad problem filename");
+      if (!infile.is_open()) THROW("Bad problem filename: " << filename);
       else infile.close();
 
       // reads the parameters
       Param prm;
-      if (pfilename != "")
-      {
-         prm.loadParam(pfilename);
-      }
+      if (pfilename != "") prm.loadParam(pfilename);
 
       // logger
       LogLevel loglevel = StringToLogLevel(prm.getStrParam("LOG_LEVEL"));
@@ -60,8 +58,7 @@ int main(int argc, char** argv)
       // parsing
       ok = parser.parseFile(filename, problem);
       if (!ok) THROW("Parse error: " << parser.getParseError());
-      if (!problem.isCSP())
-         THROW("Not a NCSP");
+      if (!problem.isCSP()) THROW("Not a NCSP");
 
       // solving
       NcspSolver solver(problem);
@@ -74,22 +71,23 @@ int main(int argc, char** argv)
 
       string fsol = solFilename(filename);
 
-      std::string sep =
-         "############################################################";
+      std::string sep = "##############################";
+      sep += sep;
       std::string indent = "   ";
 
+      // preliminaries
       cout << GRAY(sep) << endl;
       cout << BLUE("Realpaver NCSP solving") << endl;
-      cout << indent << "Input file.................. " << filename << endl;
-      if (loglevel != LogLevel::none)
-      {
-         cout << indent << "Log file.................... " << flog << endl;
-      }
-      if (solver.getNbSolutions() > 0)
-      {
-         cout << indent << "Solution file............... " << fsol << endl;
-      }
 
+      cout << indent << "Input file.................. " << filename << endl;
+
+      cout << indent << "Log file.................... ";
+      string meslog = (loglevel != LogLevel::none) ? flog : "no log";
+      cout << meslog << endl;
+
+      cout << indent << "Output file................. " << fsol << endl;
+
+      // solving effort
       cout << GRAY(sep) << endl;
       cout << BLUE("Solving effort") << endl;
       cout << std::fixed << std::setprecision(2)
@@ -104,54 +102,50 @@ int main(int argc, char** argv)
            << indent << "Number of nodes............. "
            << ORANGE(solver.getTotalNodes()) << endl;
 
+      // results
       cout << GRAY(sep) << endl;
       cout << BLUE("Results") << endl;
 
-      cout << indent << "Search...................... ";
+cerr << "LA" << solver.getSpace()->nbPendingNodes() << endl;
+
+// TODO : plante car le space n'a pas été créé car probleme
+// resolu au preprocessing
+
+      cout << indent << "Search status............... ";
       bool complete = solver.getEnv()->usedNoLimit() &&
-                      (solver.getNbPendingNodes() == 0);
-      
+                      (solver.getSpace()->nbPendingNodes() == 0);
+
+
+cerr << "ICI" << endl;
+
       if (complete)
          cout << ORANGE("complete") << endl;
       else
          cout << ORANGE("partial") << endl;
    
-      cout << indent << "Status...................... ";
+      cout << indent << "Solution status............. ";
 
-      if (solver.getNbSolutions() == 0)
+      if (solver.getSpace()->nbSolutionNodes() == 0)
       {
-         if (complete)
-            cout << ORANGE("infeasible") << endl;
-         else
-            cout << ORANGE("no solution found") << endl;
+         string s = complete ? "infeasible" : "no solution found";
+         cout << ORANGE(s) << endl;
       }
       else
       {
-         if (solver.proofFeasible())
-            cout << ORANGE("feasible") << endl;
-         else
-            cout << ORANGE("no proof certificate") << endl;
+         string s = solver.getSpace()->hasFeasibleSolutionNode() ? "feasible" :
+                                                       "no proof certificate";
+         cout << ORANGE(s) << endl;
 
          cout << indent << "Number of solutions......... "
-              << ORANGE(solver.getNbSolutions()) << endl;
-
-         // Writes the solutions in a file
-         ofstream sf;
-         sf.open(fsol, std::ofstream::out);
-
-         if (sf.bad()) THROW("Bad solution filename");
-         else
-         {
-            for (size_t i=0; i<solver.getNbSolutions(); ++i)
-               sf << solver.getSolution(i) << endl;
-
-            sf.close();
-         }
+              << ORANGE(solver.getSpace()->nbSolutionNodes()) << endl;
       }
+
+      // Writes the space / solutions in a file
+      NcspSpaceFileWriter writer(fsol);
+      writer.write(*solver.getSpace());
       
       cout << indent << "Number of pending nodes..... "
-           << ORANGE(solver.getNbPendingNodes()) << endl;
-
+           << ORANGE(solver.getSpace()->nbPendingNodes()) << endl;
 
       // limits
       if (solver.getEnv()->usedTimeLimit())

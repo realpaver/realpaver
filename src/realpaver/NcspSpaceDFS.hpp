@@ -37,6 +37,7 @@ public:
    size_t nbPendingNodes() const;
    SharedNcspNode extractPendingNode();
    void insertPendingNode(const SharedNcspNode& node);
+   SharedNcspNode getPendingNode(size_t i) const;
    ///@}
 
 private:

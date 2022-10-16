@@ -42,11 +42,11 @@ public:
    size_t nbSolutionNodes() const;
 
    /// @param i a solution node index with 0 <= i < nbSolutionNodes()
-   /// @return the i-th final node
+   /// @return the i-th solution node
    SharedNcspNode getSolutionNode(size_t i) const;
 
    /// Inserts a solution node in this following a FIFO strategy
-   /// @para node node inserted
+   /// @param node node inserted
    void pushSolutionNode(const SharedNcspNode& node);
 
    /// Removes the last solution node from this
@@ -54,7 +54,7 @@ public:
    SharedNcspNode popSolutionNode();
 
    /// @return true if there is a feasible or inner solution node
-   bool proofFeasible() const;
+   bool hasFeasibleSolutionNode() const;
 
    /// @return the number of pending nodes of this
    virtual size_t nbPendingNodes() const = 0;
@@ -65,6 +65,10 @@ public:
 
    /// Inserts a pending node in this
    virtual void insertPendingNode(const SharedNcspNode& node) = 0;
+
+   /// @param i a pending node index with 0 <= i < nbPendingNodes()
+   /// @return the i-th pending node
+   virtual SharedNcspNode getPendingNode(size_t i) const = 0;
 
 private:
    std::vector<SharedNcspNode> vnode_;        // vector of solution nodes

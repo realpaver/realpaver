@@ -5,5 +5,5 @@ Variables
 
 Constraints
    y - x^2 == 0,
-   x^2 + y^2 - 2 == 0
+   x^2 + y^2 - 100 == 0
 ;

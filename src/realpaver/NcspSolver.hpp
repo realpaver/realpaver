@@ -59,23 +59,11 @@ public:
    /// @return the number of nodes processed
    int getTotalNodes() const;
 
-   /// @return the number of nodes that remains in the search tree
-   int getNbPendingNodes() const;
-
-   /// @return the number of solutions found
-   int getNbSolutions() const;
-
-   /// Access to a solution
-   /// @param i index of solution between 0 and getNbSolutions()-1
-   /// @return the i-th solution
-   IntervalRegion getSolution(size_t i) const;
-
-   /// @return true if a feasible or inner region has been found, false
-   ///         otherwise
-   bool proofFeasible() const;
-
    /// @return the environment of this
    NcspEnv* getEnv() const;
+
+   /// @return the space of this
+   NcspSpace* getSpace() const;
 
 private:
    Problem problem_;             // initial problem

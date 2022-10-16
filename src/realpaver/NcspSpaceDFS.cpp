@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
 
 namespace realpaver {
@@ -26,6 +27,13 @@ SharedNcspNode NcspSpaceDFS::extractPendingNode()
 void NcspSpaceDFS::insertPendingNode(const SharedNcspNode& node)
 {
    vnode_.push_back(node);
+}
+
+SharedNcspNode NcspSpaceDFS::getPendingNode(size_t i) const
+{
+   ASSERT(i < vnode_.size(), "Bad access to a pending node in a CSP space");
+
+   return vnode_[i];
 }
 
 } // namespace

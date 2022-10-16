@@ -24,7 +24,7 @@ size_t NcspSpace::nbSolutionNodes() const
 
 SharedNcspNode NcspSpace::getSolutionNode(size_t i) const
 {
-   ASSERT(i < vnode_.size(), "Bad access to a final node in a CSP space");
+   ASSERT(i < vnode_.size(), "Bad access to a solution node in a CSP space");
 
    return vnode_[i];
 }
@@ -45,7 +45,7 @@ SharedNcspNode NcspSpace::popSolutionNode()
    return node;
 }
 
-bool NcspSpace::proofFeasible() const
+bool NcspSpace::hasFeasibleSolutionNode() const
 {
    return feasible_;
 }

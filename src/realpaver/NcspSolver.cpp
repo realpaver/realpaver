@@ -62,16 +62,6 @@ int NcspSolver::getTotalNodes() const
    return nbnodes_;
 }
 
-int NcspSolver::getNbPendingNodes() const
-{
-   return space_->nbPendingNodes();
-}
-
-int NcspSolver::getNbSolutions() const
-{
-   return space_->nbSolutionNodes();
-}
-
 bool NcspSolver::solve()
 {
    LOG_MAIN("Input problem\n" << problem_);
@@ -397,23 +387,14 @@ bool NcspSolver::branchAndPrune()
    return space_->nbSolutionNodes() > 0;
 }
 
-IntervalRegion NcspSolver::getSolution(size_t i) const
-{
-   ASSERT(i < space_->nbSolutionNodes(), "Bad access to a solution @ " << i);
-
-   SharedNcspNode node = space_->getSolutionNode(i);
-   IntervalRegion* reg = node->region();
-   return *reg;
-}
-
-bool NcspSolver::proofFeasible() const
-{
-   return space_->proofFeasible();
-}
-
 NcspEnv* NcspSolver::getEnv() const
 {
    return env_;
+}
+
+NcspSpace* NcspSolver::getSpace() const
+{
+   return space_;
 }
 
 } // namespace

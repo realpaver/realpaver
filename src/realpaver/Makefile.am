@@ -66,6 +66,7 @@ librealpaver_la_include_HEADERS = \
 		NcspNode.hpp \
 		NcspSpace.hpp \
 		NcspSpaceDFS.hpp \
+		NcspSpaceWriter.hpp \
 		NcspSolver.hpp \
 		NcspSplit.hpp \
 		NumericMatrix.hpp \
@@ -156,6 +157,7 @@ librealpaver_la_SOURCES = \
 		NcspNode.cpp \
 		NcspSpace.cpp \
 		NcspSpaceDFS.cpp \
+		NcspSpaceWriter.cpp \
 		NcspSolver.cpp \
 		NcspSplit.cpp \
 		Objective.cpp \
