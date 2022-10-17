@@ -50,9 +50,6 @@ public:
    /// Solving method
    void solve();
 
-   /// @return the preprocessing time in seconds
-   double getPreprocessingTime() const;
-
    /// @return the solving time in seconds
    double getSolvingTime() const;
 
@@ -65,10 +62,13 @@ public:
    /// @return the space of this
    NcspSpace* getSpace() const;
 
+   /// @return the preprocessor used by this
+   Preprocessor* getPreprocessor() const;
+
 private:
    Problem problem_;             // initial problem
    Problem preprob_;             // problem resulting from preprocessing
-   Preprocessor preproc_;        // preprocessor
+   Preprocessor* preproc_;       // preprocessor
    
    NcspEnv* env_;                // environment
    NcspSpace* space_;            // search tree
@@ -76,12 +76,9 @@ private:
    SharedContractor contractor_; // contraction operator
    NcspSplit* split_;            // splitting strategy
 
-   Timer ptimer_;                // timer for the preprocessing phase
    Timer stimer_;                // timer for the solving phase
-
    int nbnodes_;                 // number of nodes processed
 
-   void preprocess();
    void branchAndPrune();
    void makeSpace();
    void makeContractor();

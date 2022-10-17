@@ -113,7 +113,7 @@ SPLIT_NB_SLICES = 5
 # leads to a propagation step with respect to this variable.
 # ABS_PROPAGATION_DTOL: absolute tolerance
 # REL_PROPAGATION_DTOL: relative tolerance
-REL_PROPAGATION_DTOL = 1.0e-3
+REL_PROPAGATION_DTOL = 1.0e-8
 
 # Iteration limit for the main constraint propagation loop
 PROPAGATION_ITER_LIMIT = 50

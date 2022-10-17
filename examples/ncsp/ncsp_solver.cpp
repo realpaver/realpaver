@@ -17,12 +17,16 @@ using namespace std;
 #define GREEN(s) "\033[32m" << s << "\033[39m"
 #define ORANGE(s) "\033[33m" << s << "\033[39m"
 
-size_t lengthVarName(const Problem& p);
-string logFilename(const std::string& filename);
-string solFilename(const std::string& filename);
+// returns the filename without its extension
+string baseFilename(const std::string& filename);
+
+// processes the argulments on the command line
 bool processArgs(int argc, char** argv, string& filename, string& pfilename);
 
-// ./ncsp_solver Parabola -p ParamFile
+// inserts points at the end of a string
+string WP(const string& s, int n);
+
+// main function
 int main(int argc, char** argv)
 {
    try {
@@ -33,6 +37,7 @@ int main(int argc, char** argv)
       // processes the arguments
       bool ok = processArgs(argc, argv, filename, pfilename);
       if (!ok) THROW("Bad arguments on the command line");
+      string basefname = baseFilename(filename);
 
       // tries to open the problem file
       ifstream infile(filename);
@@ -43,17 +48,20 @@ int main(int argc, char** argv)
       Param prm;
       if (pfilename != "") prm.loadParam(pfilename);
 
+      // assigns the default tolerance of the real variables (before parsing)
+      Param::SetTolParam("XTOL", prm.getTolParam("XTOL"));
+
       // logger
       LogLevel loglevel = StringToLogLevel(prm.getStrParam("LOG_LEVEL"));
       string flog = "";
       if (loglevel != LogLevel::none)
       {
-         flog = logFilename(filename);
+         flog = basefname + ".log";
          Logger::init(loglevel, flog);
       }
 
       LOG_MAIN("NCSP solving");
-      LOG_MAIN("Input file > " << filename);
+      LOG_MAIN("Input file: " << filename);
 
       // parsing
       ok = parser.parseFile(filename, problem);
@@ -69,62 +77,78 @@ int main(int argc, char** argv)
 
       solver.solve();      
 
-      string fsol = solFilename(filename);
+      string fsol = basefname + ".sol";
 
       std::string sep = "##############################";
       sep += sep;
       std::string indent = "   ";
+      int wpl = 36;
 
       // preliminaries
       cout << GRAY(sep) << endl;
       cout << BLUE("Realpaver NCSP solving") << endl;
 
-      cout << indent << "Input file.................. " << filename << endl;
+      cout << indent << WP("Input file", wpl) << ORANGE(filename) << endl;
 
-      cout << indent << "Log file.................... ";
+      cout << indent << WP("Log file", wpl);
       string meslog = (loglevel != LogLevel::none) ? flog : "no log";
-      cout << meslog << endl;
+      cout << ORANGE(meslog) << endl;
 
-      cout << indent << "Output file................. " << fsol << endl;
+      cout << indent << WP("Output file", wpl) << ORANGE(fsol) << endl;
       cout << GRAY(sep) << endl;
 
       // preprocessing
+      Preprocessor* preproc = solver.getPreprocessor();
+
       cout << BLUE("Preprocessing") << endl;
       cout << std::fixed << std::setprecision(2)
-           << indent << "Time........................ "
-           << ORANGE(solver.getPreprocessingTime() << "s")
+           << indent << WP("Time", wpl)
+           << ORANGE(preproc->elapsedTime() << "s")
            << endl;
 
-      if (solver.getEnv()->isPresolved())
+      cout << std::fixed << std::setprecision(2)
+           << indent << WP("Status", wpl);
+
+      if (preproc->isSolved())
       {
-         cout << std::fixed << std::setprecision(2)
-              << indent << "Status...................... ";
-
-         if (solver.getEnv()->hasConstraintViolated())
-            cout << ORANGE("solved infeasible") << endl;
-
+         if (preproc->isUnfeasible())
+            cout << ORANGE("solved unfeasible") << endl;
          else
-         {
             cout << ORANGE("solved feasible") << endl;
-         }
+      }
+      else
+         cout << ORANGE("not solved") << endl;
 
+      if (!preproc->isSolved())
+      {
+         cout << indent << WP("Number of variables fixed", wpl)
+              << ORANGE(preproc->nbFixedVars()) << endl
+              << indent << WP("Number of inactive constraints", wpl)
+              << ORANGE(preproc->nbInactiveCtrs()) << endl;
       }
 
       cout << GRAY(sep) << endl;
 
+      if (preproc->nbFixedVars() > 0)
+      {
+         IntervalRegion reg(preproc->fixedRegion());
+         
+         // TODO: writes it
+      }
+
+
       // solving
-      if (!solver.getEnv()->isPresolved())
+      if (!preproc->isSolved())
       {
          cout << BLUE("Solving") << endl;
 
-         cout << indent << "Time........................ "
+         cout << indent << WP("Time", wpl)
               << std::fixed << std::setprecision(2)
               << ORANGE(solver.getSolvingTime() << "s")
               << endl
-              << indent << "Number of nodes............. "
+              << indent << WP("Number of nodes", wpl)
               << ORANGE(solver.getTotalNodes()) << endl;
-         
-         
+
       }
 
 
@@ -213,19 +237,6 @@ int main(int argc, char** argv)
    return 0;
 }
 
-size_t lengthVarName(const Problem& p)
-{
-   size_t res = 0;
-
-   for (size_t i=0; i<p.nbVars(); ++i)
-   {
-      Variable v = p.varAt(i);
-      size_t n = v.getName().size();
-      if (n > res) res = n;
-   }
-   return res;
-}
-
 bool processArgs(int argc, char** argv, string& filename, string& pfilename)
 {
    bool hasfile = false;
@@ -256,10 +267,10 @@ bool processArgs(int argc, char** argv, string& filename, string& pfilename)
    return hasfile;
 }
 
-string logFilename(const std::string& filename)
+string baseFilename(const std::string& filename)
 {
-   string log = "";
-   if (filename[0] == '.') return log;
+   string str = "";
+   if (filename[0] == '.') return str;
 
    bool hasPoint = false;
 
@@ -270,36 +281,21 @@ string logFilename(const std::string& filename)
       if (filename[i] == '.')
       {
          hasPoint = true;
-         log = filename.substr(0, i);
+         str = filename.substr(0, i);
       }
       i = i-1;
    }
 
-   if (!hasPoint) log = filename;
+   if (!hasPoint) str = filename;
 
-   return log + ".log";
+   return str;
 }
 
-string solFilename(const std::string& filename)
+string WP(const string& s, int n)
 {
-   string log = "";
-   if (filename[0] == '.') return log;
-
-   bool hasPoint = false;
-
-   // finds an extension if any
-   int i = filename.length() - 1;
-   while (i>=0 and !hasPoint)
-   {
-      if (filename[i] == '.')
-      {
-         hasPoint = true;
-         log = filename.substr(0, i);
-      }
-      i = i-1;
-   }
-
-   if (!hasPoint) log = filename;
-
-   return log + ".sol";
+   string str = s;
+   int m = n - s.length();
+   while (--m >= 0) str += ".";
+   str += " ";
+   return str;
 }

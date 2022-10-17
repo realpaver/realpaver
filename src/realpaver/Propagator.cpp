@@ -106,6 +106,9 @@ Proof Propagator::contract(IntervalRegion& reg)
    // number of propagation steps
    size_t num_steps = 0;
 
+   LOG_LOW("Propagator on region: " << reg);
+   LOG_LOW("Tolerance on the distance between regions: " << dtol_);
+
    do
    {
       // apply the next contractor from the queue
@@ -119,7 +122,9 @@ Proof Propagator::contract(IntervalRegion& reg)
 
          // propagation when the queue is empty
          if (next == count)
-         {
+         {            
+            LOG_LOW("Region after inner step: " << reg);
+            
             if (++num_steps > maxiter_)
             {
                count = 0;
@@ -137,6 +142,8 @@ Proof Propagator::contract(IntervalRegion& reg)
 
                   if (!dtol_.haveDistTolerance(prev, curr))
                   {
+                     LOG_LOW("Propagation on variable: " << v.getName());
+                     
                      isModified = true;
                      modified.setOne(v.id());
                   }

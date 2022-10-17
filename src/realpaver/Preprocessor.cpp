@@ -12,15 +12,18 @@
 
 namespace realpaver {
 
-bool Preprocessor::allVarsRemoved() const
+Preprocessor::Preprocessor()
+      : vvm_(),
+        vim_(),
+        active_(),
+        nbc_(0),
+        unfeasible_(false),
+        timer_()
+{}
+
+bool Preprocessor::allVarsFixed() const
 {
    return vvm_.empty();
-}
-
-bool Preprocessor::isFake(Variable v) const
-{
-   auto it = fake_.find(v);
-   return it != fake_.end();
 }
 
 bool Preprocessor::hasFixedDomain(Variable v) const
@@ -45,19 +48,34 @@ Variable Preprocessor::srcToDestVar(Variable v) const
    return it->second;
 }
    
-bool Preprocessor::apply(const Problem& src, Problem& dest)
+void Preprocessor::apply(const Problem& src, Problem& dest)
 {
    IntervalRegion reg = src.getDomains();
-   return apply(src, reg, dest);
+   apply(src, reg, dest);
 }
 
-bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
+void Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
+{
+   timer_.reset();
+   timer_.start();
+   applyImpl(src, reg, dest);
+   timer_.stop();
+}
+
+void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg, Problem& dest)
 {
    ASSERT(src.nbVars() == reg.size(), "Preprocessing error");
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
 
    Objective obj = src.getObjective();
+
+   // resets this
+   vvm_.clear();
+   vim_.clear();
+   active_.clear();
+   nbc_ = 0;
+   unfeasible_ = false;
 
    LOG_MAIN("Preprocessing");
 
@@ -70,13 +88,18 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
       if (domain.isEmpty())
       {
          LOG_MAIN("Empty domain of variable: " << v.getName());
-         return false;
+         unfeasible_ = true;
+         return;
       }
    }
 
    // propagation
    bool ok = propagate(src, reg);
-   if (!ok) return false;
+   if (!ok)
+   {
+      unfeasible_ = true;
+      return;
+   }
 
    // satisfaction tests
    for (size_t i=0; i<src.nbCtrs(); ++i)
@@ -87,7 +110,8 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
       if (proof == Proof::Empty)
       {
          LOG_INTER("Constraint violated (normally does not arise): " << c);
-         return false;
+         unfeasible_ = true;
+         return;
       }
 
       else if (proof == Proof::Inner)
@@ -105,11 +129,6 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
    LOG_MAIN("Number of inactive constraints: " << nbc_);
 
    // rewrites the variables
-   vvm_.clear();
-   vim_.clear();
-   fake_.clear();
-   nbc_ = 0;
-
    for (size_t i=0; i<src.nbVars(); ++i)
    {
       Variable v        = src.varAt(i);
@@ -125,7 +144,7 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
       if (isFake)
       {
          LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
-         fake_.insert(std::make_pair(v, domain));
+         vim_.insert(std::make_pair(v, domain));
       }
       else if (isFixed)
       {
@@ -145,7 +164,7 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
       }
    }
 
-   LOG_MAIN("Number of removed variables: " << vim_.size() + fake_.size());
+   LOG_MAIN("Number of removed variables: " << vim_.size());
 
    // rewrites the constraints
    for (Constraint input : active_)
@@ -157,8 +176,9 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
       if (c.isConstant())
       {
          LOG_INTER("Constraint with no variable: " << c);
+         nbc_ = nbc_ + 1;
       }
-      
+
       else dest.addCtr(c);
    }
 
@@ -167,7 +187,8 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");
-      return false;
+      unfeasible_ = true;
+      return;
    }
 
    // simplifies the objective function
@@ -186,8 +207,6 @@ bool Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
       else
          dest.addObjective(MAX(fixer.getTerm()));
    }
-
-   return true;
 }
 
 bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
@@ -224,14 +243,6 @@ bool Preprocessor::occursInActiveConstraint(const Variable& v) const
    return false;
 }
 
-Scope Preprocessor::trueScope() const
-{
-   Scope sco;
-   for (auto p : vim_) sco.insert(p.first);
-   for (auto p : vvm_) sco.insert(p.first);
-   return sco;
-}
-
 Scope Preprocessor::fixedScope() const
 {
    Scope sco;
@@ -246,11 +257,40 @@ Scope Preprocessor::unfixedScope() const
    return sco;
 }
 
-Scope Preprocessor::fakeScope() const
+size_t Preprocessor::nbInactiveCtrs() const
 {
-   Scope sco;
-   for (auto p : fake_) sco.insert(p.first);
-   return sco;   
+   return nbc_;
+}
+
+size_t Preprocessor::nbFixedVars() const
+{
+   return vim_.size();
+}
+
+IntervalRegion Preprocessor::fixedRegion() const
+{
+   ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
+
+   IntervalRegion reg(fixedScope());
+   for (auto p : vim_)
+      reg.set(p.first, p.second);
+
+   return reg;
+}
+
+bool Preprocessor::isUnfeasible() const
+{
+   return unfeasible_;
+}
+
+bool Preprocessor::isSolved() const
+{
+   return unfeasible_ || allVarsFixed();
+}
+
+double Preprocessor::elapsedTime() const
+{
+   return timer_.elapsedTime();
 }
 
 } // namespace

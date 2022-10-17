@@ -25,12 +25,11 @@ namespace realpaver {
 NcspSolver::NcspSolver(const Problem& problem)
       : problem_(problem),
         preprob_(),
-        preproc_(),
+        preproc_(nullptr),
         env_(nullptr),
         space_(nullptr),
         contractor_(nullptr),
         split_(nullptr),
-        ptimer_(),
         stimer_(),
         nbnodes_(0)
 {
@@ -38,18 +37,15 @@ NcspSolver::NcspSolver(const Problem& problem)
                               "not a constraint satisfaction problem");
 
    env_ = new NcspEnv();
+   preproc_ = new Preprocessor();
 }
 
 NcspSolver::~NcspSolver()
 {
    if (env_ != nullptr) delete env_;
+   if (preproc_ != nullptr) delete preproc_;
    if (space_ != nullptr) delete space_;
    if (split_ != nullptr) delete split_;
-}
-
-double NcspSolver::getPreprocessingTime() const
-{
-   return ptimer_.elapsedTime();
 }
 
 double NcspSolver::getSolvingTime() const
@@ -67,27 +63,10 @@ void NcspSolver::solve()
    LOG_MAIN("Input problem\n" << problem_);
 
    // first phase: preprocessing
-   preprocess();
-   if (env_->isPresolved()) return;
+   preproc_->apply(problem_, preprob_);
+   if (preproc_->isSolved()) return;
 
    return branchAndPrune();
-}
-
-void NcspSolver::preprocess()
-{
-   env_->setPresolved(false);
-   env_->setConstraintViolated(false);
-
-   ptimer_.start();
-   bool feasible = preproc_.apply(problem_, preprob_);
-   ptimer_.stop();
-
-   if (!feasible)
-   {
-      env_->setPresolved(true);
-      env_->setConstraintViolated(true);
-   }
-   if (preproc_.allVarsRemoved()) env_->setPresolved(true);
 }
 
 void NcspSolver::setContractor(SharedContractor contractor)
@@ -156,8 +135,14 @@ void NcspSolver::makeContractor()
             std::make_shared<ConstraintContractor>(c);
          pool->push(op);         
       }
-   }   
+   }
+
    SharedPropagator propagator = std::make_shared<Propagator>(pool);
+   Tolerance dtol = env_->getParam()->getTolParam("PROPAGATION_DTOL");
+   propagator->setDistTol(dtol);
+
+   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
+   propagator->setMaxIter(niter);
 
    // propagator or propagator + max CID ?
    std::string with_max_cid =
@@ -267,7 +252,7 @@ void NcspSolver::bpStep(int depthlimit)
    Proof proof = contractor_->contract(*reg);
    
    LOG_INTER("Contraction -> " << proof);
-   LOG_LOW("Contracted region: " << *reg);
+   LOG_INTER("Contracted region: " << *reg);
 
    if (proof == Proof::Empty)
    {
@@ -277,7 +262,7 @@ void NcspSolver::bpStep(int depthlimit)
 
    if (isAnInnerRegion(*reg))
    {
-      LOG_INTER("Solution node with an inner region");
+      LOG_INTER("Solution node (inner region)");
       node->setProof(Proof::Inner);
       space_->pushSolutionNode(node);
       return;
@@ -297,7 +282,7 @@ void NcspSolver::bpStep(int depthlimit)
 
    if (split_->getNbNodes() == 1)
    {
-      LOG_INTER("Soliution node with a small enough region");
+      LOG_INTER("Soliution node (small enough)");
       node->setProof(Proof::Maybe);
       space_->pushSolutionNode(node);
    }
@@ -360,7 +345,7 @@ void NcspSolver::branchAndPrune()
       }
 
       if (iter &&
-          ptimer_.elapsedTime() + stimer_.elapsedTime() > timelimit)
+          preproc_->elapsedTime() + stimer_.elapsedTime() > timelimit)
       {
          LOG_MAIN("Stops on time limit (" << timelimit << "s)");
          env_->setTimeLimit(true);
@@ -395,5 +380,11 @@ NcspSpace* NcspSolver::getSpace() const
 {
    return space_;
 }
+
+Preprocessor* NcspSolver::getPreprocessor() const
+{
+   return preproc_;
+}
+
 
 } // namespace
