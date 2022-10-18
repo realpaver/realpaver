@@ -212,16 +212,20 @@ int main(int argc, char** argv)
 
          // limits
          if (env->usedTimeLimit())
-            cout << indent << WP("Time limit reached", wpl)
+            cout << indent << WP("Time limit enabled", wpl)
                  << env->getParam()->getDblParam("TIME_LIMIT") << endl;
          
          if (env->usedSolutionLimit())
-            cout << indent << WP("Solution limit reached", wpl)
+            cout << indent << WP("Solution limit enabled", wpl)
                  << env->getParam()->getIntParam("SOLUTION_LIMIT") << endl;
 
          if (env->usedNodeLimit())
-            cout << indent << WP("Node limit reached", wpl)
+            cout << indent << WP("Node limit enabled", wpl)
                  << env->getParam()->getIntParam("NODE_LIMIT") << endl;
+
+         if (env->usedDepthLimit())
+            cout << indent << WP("Depth limit enabled", wpl)
+                 << env->getParam()->getIntParam("DEPTH_LIMIT") << endl;
 
          cout << GRAY(sep) << endl;
       }

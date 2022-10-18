@@ -320,7 +320,7 @@ arg_def
         std::ostringstream os;
         os << "Argument [" << $1 << "] already used";
         realpaver_bison_error(os.str().c_str());
-        YYABORT;         
+        YYABORT;
       }
 
       realpaver_fun_symbol->addArgument($1);

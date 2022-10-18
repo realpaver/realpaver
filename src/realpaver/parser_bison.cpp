@@ -1658,7 +1658,7 @@ yyreduce:
         std::ostringstream os;
         os << "Argument [" << (yyvsp[0].u_str) << "] already used";
         realpaver_bison_error(os.str().c_str());
-        YYABORT;         
+        YYABORT;
       }
 
       realpaver_fun_symbol->addArgument((yyvsp[0].u_str));

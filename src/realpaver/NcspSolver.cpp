@@ -15,6 +15,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/NcspSolver.hpp"
+#include "realpaver/NcspSpaceBFS.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/Propagator.hpp"
@@ -80,6 +81,7 @@ void NcspSolver::makeSpace()
    // gets the strategy from the parameters
    std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS") space_ = new NcspSpaceDFS();
+   if (s == "BFS") space_ = new NcspSpaceBFS();
 
    THROW_IF(space_ == nullptr,
             "Unable to make the space object in a Ncsp solver");
