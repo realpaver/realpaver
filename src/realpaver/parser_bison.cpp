@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,6 +34,10 @@
 /* C LALR(1) parser skeleton written by Richard Stallman, by
    simplifying the original so-called "semantic" parser.  */
 
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
 /* All symbols defined below should begin with yy or YY, to avoid
    infringing on user name space.  This should be done even for local
    variables, as they might otherwise be expanded by user macros.
@@ -40,11 +45,11 @@
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
-/* Identify Bison output.  */
-#define YYBISON 1
+/* Identify Bison output, and Bison version.  */
+#define YYBISON 30802
 
-/* Bison version.  */
-#define YYBISON_VERSION "3.0.4"
+/* Bison version string.  */
+#define YYBISON_VERSION "3.8.2"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -66,16 +71,16 @@
 #define yyerror         realpaver_bison_error
 #define yydebug         realpaver_bison_debug
 #define yynerrs         realpaver_bison_nerrs
-
 #define yylval          realpaver_bison_lval
 #define yychar          realpaver_bison_char
 
-/* Copy the first part of user declarations.  */
-#line 1 "parser_bison.ypp" /* yacc.c:339  */
+/* First part of user prologue.  */
+#line 1 "parser_bison.ypp"
 
 #include <cstring>
 #include <sstream>
 #include <string>
+#include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/SymbolTable.hpp"
 
@@ -86,6 +91,7 @@ extern char* realpaver_bison_text;
 extern int realpaver_bison_lineno;
 extern std::string realpaver_parse_error;
 extern realpaver::Problem* realpaver_bison_problem;
+extern realpaver::Param* realpaver_bison_param;
 extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern int realpaver_bison_lex(void);
@@ -93,26 +99,31 @@ int realpaver_bison_error(const char* str);
 
 extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 
-#line 97 "parser_bison.cpp" /* yacc.c:339  */
+#line 103 "parser_bison.cpp"
 
-# ifndef YY_NULLPTR
-#  if defined __cplusplus && 201103L <= __cplusplus
-#   define YY_NULLPTR nullptr
+# ifndef YY_CAST
+#  ifdef __cplusplus
+#   define YY_CAST(Type, Val) static_cast<Type> (Val)
+#   define YY_REINTERPRET_CAST(Type, Val) reinterpret_cast<Type> (Val)
 #  else
-#   define YY_NULLPTR 0
+#   define YY_CAST(Type, Val) ((Type) (Val))
+#   define YY_REINTERPRET_CAST(Type, Val) ((Type) (Val))
+#  endif
+# endif
+# ifndef YY_NULLPTR
+#  if defined __cplusplus
+#   if 201103L <= __cplusplus
+#    define YY_NULLPTR nullptr
+#   else
+#    define YY_NULLPTR 0
+#   endif
+#  else
+#   define YY_NULLPTR ((void*)0)
 #  endif
 # endif
 
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 0
-#endif
-
-/* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
+/* Use api.header.include to #include this header
+   instead of duplicating it here.  */
 #ifndef YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
 # define YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
 /* Debug traces.  */
@@ -131,65 +142,74 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 26 "parser_bison.ypp" /* yacc.c:355  */
+#line 28 "parser_bison.ypp"
 
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Exception.hpp"
 
-#line 140 "parser_bison.cpp" /* yacc.c:355  */
+#line 151 "parser_bison.cpp"
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef REALPAVER_BISON_TOKENTYPE
 # define REALPAVER_BISON_TOKENTYPE
   enum realpaver_bison_tokentype
   {
-    TK_IDENT = 258,
-    TK_INT = 259,
-    TK_REAL = 260,
-    TK_STR_VAR = 261,
-    TK_STR_CONST = 262,
-    TK_STR_CTR = 263,
-    TK_STR_OBJ = 264,
-    TK_STR_FUN = 265,
-    TK_STR_ALIAS = 266,
-    TK_STR_INT = 267,
-    TK_EQ = 268,
-    TK_EQ_EQ = 269,
-    TK_LE = 270,
-    TK_GE = 271,
-    TK_IN = 272,
-    TK_LT = 273,
-    TK_GT = 274,
-    TK_PLUS = 275,
-    TK_MINUS = 276,
-    TK_MUL = 277,
-    TK_DIV = 278,
-    TK_POW = 279,
-    TK_CARET = 280,
-    TK_SQR = 281,
-    TK_SQRT = 282,
-    TK_LOG = 283,
-    TK_EXP = 284,
-    TK_TAN = 285,
-    TK_COS = 286,
-    TK_SIN = 287,
-    TK_LPAR = 288,
-    TK_RPAR = 289,
-    TK_LSBR = 290,
-    TK_RSBR = 291,
-    TK_PIPE = 292,
-    TK_COMMA = 293,
-    TK_SCOLON = 294,
-    TK_COLON = 295,
-    TK_SGN = 296,
-    TK_ABS = 297,
-    TK_MIN = 298,
-    TK_MAX = 299,
-    TK_UMINUS = 300,
-    TK_UPLUS = 301
+    REALPAVER_BISON_EMPTY = -2,
+    REALPAVER_BISON_EOF = 0,       /* "end of file"  */
+    REALPAVER_BISON_error = 256,   /* error  */
+    REALPAVER_BISON_UNDEF = 257,   /* "invalid token"  */
+    TK_IDENT = 258,                /* TK_IDENT  */
+    TK_INT = 259,                  /* TK_INT  */
+    TK_REAL = 260,                 /* TK_REAL  */
+    TK_STR_VAR = 261,              /* TK_STR_VAR  */
+    TK_STR_CONST = 262,            /* TK_STR_CONST  */
+    TK_STR_CTR = 263,              /* TK_STR_CTR  */
+    TK_STR_OBJ = 264,              /* TK_STR_OBJ  */
+    TK_STR_FUN = 265,              /* TK_STR_FUN  */
+    TK_STR_ALIAS = 266,            /* TK_STR_ALIAS  */
+    TK_STR_INT = 267,              /* TK_STR_INT  */
+    TK_EQ = 268,                   /* TK_EQ  */
+    TK_EQ_EQ = 269,                /* TK_EQ_EQ  */
+    TK_LE = 270,                   /* TK_LE  */
+    TK_GE = 271,                   /* TK_GE  */
+    TK_IN = 272,                   /* TK_IN  */
+    TK_LT = 273,                   /* TK_LT  */
+    TK_GT = 274,                   /* TK_GT  */
+    TK_PLUS = 275,                 /* TK_PLUS  */
+    TK_MINUS = 276,                /* TK_MINUS  */
+    TK_MUL = 277,                  /* TK_MUL  */
+    TK_DIV = 278,                  /* TK_DIV  */
+    TK_POW = 279,                  /* TK_POW  */
+    TK_CARET = 280,                /* TK_CARET  */
+    TK_SQR = 281,                  /* TK_SQR  */
+    TK_SQRT = 282,                 /* TK_SQRT  */
+    TK_LOG = 283,                  /* TK_LOG  */
+    TK_EXP = 284,                  /* TK_EXP  */
+    TK_TAN = 285,                  /* TK_TAN  */
+    TK_COS = 286,                  /* TK_COS  */
+    TK_SIN = 287,                  /* TK_SIN  */
+    TK_LPAR = 288,                 /* TK_LPAR  */
+    TK_RPAR = 289,                 /* TK_RPAR  */
+    TK_LSBR = 290,                 /* TK_LSBR  */
+    TK_RSBR = 291,                 /* TK_RSBR  */
+    TK_PIPE = 292,                 /* TK_PIPE  */
+    TK_COMMA = 293,                /* TK_COMMA  */
+    TK_SCOLON = 294,               /* TK_SCOLON  */
+    TK_COLON = 295,                /* TK_COLON  */
+    TK_SGN = 296,                  /* TK_SGN  */
+    TK_ABS = 297,                  /* TK_ABS  */
+    TK_MIN = 298,                  /* TK_MIN  */
+    TK_MAX = 299,                  /* TK_MAX  */
+    TK_UMINUS = 300,               /* TK_UMINUS  */
+    TK_UPLUS = 301                 /* TK_UPLUS  */
   };
+  typedef enum realpaver_bison_tokentype realpaver_bison_token_kind_t;
 #endif
-/* Tokens.  */
+/* Token kinds.  */
+#define REALPAVER_BISON_EMPTY -2
+#define REALPAVER_BISON_EOF 0
+#define REALPAVER_BISON_error 256
+#define REALPAVER_BISON_UNDEF 257
 #define TK_IDENT 258
 #define TK_INT 259
 #define TK_REAL 260
@@ -237,17 +257,16 @@ extern int realpaver_bison_debug;
 
 /* Value type.  */
 #if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
-
 union REALPAVER_BISON_STYPE
 {
-#line 32 "parser_bison.ypp" /* yacc.c:355  */
+#line 34 "parser_bison.ypp"
 
   char u_str[256];
   realpaver::TermRep* u_term;
 
-#line 249 "parser_bison.cpp" /* yacc.c:355  */
-};
+#line 268 "parser_bison.cpp"
 
+};
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
 # define REALPAVER_BISON_STYPE_IS_TRIVIAL 1
 # define REALPAVER_BISON_STYPE_IS_DECLARED 1
@@ -256,40 +275,201 @@ typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
 
 extern REALPAVER_BISON_STYPE realpaver_bison_lval;
 
+
 int realpaver_bison_parse (void);
 
+
 #endif /* !YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED  */
+/* Symbol kind.  */
+enum yysymbol_kind_t
+{
+  YYSYMBOL_YYEMPTY = -2,
+  YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
+  YYSYMBOL_YYerror = 1,                    /* error  */
+  YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
+  YYSYMBOL_TK_IDENT = 3,                   /* TK_IDENT  */
+  YYSYMBOL_TK_INT = 4,                     /* TK_INT  */
+  YYSYMBOL_TK_REAL = 5,                    /* TK_REAL  */
+  YYSYMBOL_TK_STR_VAR = 6,                 /* TK_STR_VAR  */
+  YYSYMBOL_TK_STR_CONST = 7,               /* TK_STR_CONST  */
+  YYSYMBOL_TK_STR_CTR = 8,                 /* TK_STR_CTR  */
+  YYSYMBOL_TK_STR_OBJ = 9,                 /* TK_STR_OBJ  */
+  YYSYMBOL_TK_STR_FUN = 10,                /* TK_STR_FUN  */
+  YYSYMBOL_TK_STR_ALIAS = 11,              /* TK_STR_ALIAS  */
+  YYSYMBOL_TK_STR_INT = 12,                /* TK_STR_INT  */
+  YYSYMBOL_TK_EQ = 13,                     /* TK_EQ  */
+  YYSYMBOL_TK_EQ_EQ = 14,                  /* TK_EQ_EQ  */
+  YYSYMBOL_TK_LE = 15,                     /* TK_LE  */
+  YYSYMBOL_TK_GE = 16,                     /* TK_GE  */
+  YYSYMBOL_TK_IN = 17,                     /* TK_IN  */
+  YYSYMBOL_TK_LT = 18,                     /* TK_LT  */
+  YYSYMBOL_TK_GT = 19,                     /* TK_GT  */
+  YYSYMBOL_TK_PLUS = 20,                   /* TK_PLUS  */
+  YYSYMBOL_TK_MINUS = 21,                  /* TK_MINUS  */
+  YYSYMBOL_TK_MUL = 22,                    /* TK_MUL  */
+  YYSYMBOL_TK_DIV = 23,                    /* TK_DIV  */
+  YYSYMBOL_TK_POW = 24,                    /* TK_POW  */
+  YYSYMBOL_TK_CARET = 25,                  /* TK_CARET  */
+  YYSYMBOL_TK_SQR = 26,                    /* TK_SQR  */
+  YYSYMBOL_TK_SQRT = 27,                   /* TK_SQRT  */
+  YYSYMBOL_TK_LOG = 28,                    /* TK_LOG  */
+  YYSYMBOL_TK_EXP = 29,                    /* TK_EXP  */
+  YYSYMBOL_TK_TAN = 30,                    /* TK_TAN  */
+  YYSYMBOL_TK_COS = 31,                    /* TK_COS  */
+  YYSYMBOL_TK_SIN = 32,                    /* TK_SIN  */
+  YYSYMBOL_TK_LPAR = 33,                   /* TK_LPAR  */
+  YYSYMBOL_TK_RPAR = 34,                   /* TK_RPAR  */
+  YYSYMBOL_TK_LSBR = 35,                   /* TK_LSBR  */
+  YYSYMBOL_TK_RSBR = 36,                   /* TK_RSBR  */
+  YYSYMBOL_TK_PIPE = 37,                   /* TK_PIPE  */
+  YYSYMBOL_TK_COMMA = 38,                  /* TK_COMMA  */
+  YYSYMBOL_TK_SCOLON = 39,                 /* TK_SCOLON  */
+  YYSYMBOL_TK_COLON = 40,                  /* TK_COLON  */
+  YYSYMBOL_TK_SGN = 41,                    /* TK_SGN  */
+  YYSYMBOL_TK_ABS = 42,                    /* TK_ABS  */
+  YYSYMBOL_TK_MIN = 43,                    /* TK_MIN  */
+  YYSYMBOL_TK_MAX = 44,                    /* TK_MAX  */
+  YYSYMBOL_TK_UMINUS = 45,                 /* TK_UMINUS  */
+  YYSYMBOL_TK_UPLUS = 46,                  /* TK_UPLUS  */
+  YYSYMBOL_YYACCEPT = 47,                  /* $accept  */
+  YYSYMBOL_model = 48,                     /* model  */
+  YYSYMBOL_statement = 49,                 /* statement  */
+  YYSYMBOL_const_statement = 50,           /* const_statement  */
+  YYSYMBOL_const_list = 51,                /* const_list  */
+  YYSYMBOL_const_tail = 52,                /* const_tail  */
+  YYSYMBOL_const_def = 53,                 /* const_def  */
+  YYSYMBOL_var_statement = 54,             /* var_statement  */
+  YYSYMBOL_var_list = 55,                  /* var_list  */
+  YYSYMBOL_var_tail = 56,                  /* var_tail  */
+  YYSYMBOL_var_def = 57,                   /* var_def  */
+  YYSYMBOL_alias_statement = 58,           /* alias_statement  */
+  YYSYMBOL_alias_list = 59,                /* alias_list  */
+  YYSYMBOL_alias_tail = 60,                /* alias_tail  */
+  YYSYMBOL_alias_def = 61,                 /* alias_def  */
+  YYSYMBOL_ctr_statement = 62,             /* ctr_statement  */
+  YYSYMBOL_ctr_list = 63,                  /* ctr_list  */
+  YYSYMBOL_ctr_tail = 64,                  /* ctr_tail  */
+  YYSYMBOL_ctr_def = 65,                   /* ctr_def  */
+  YYSYMBOL_obj_statement = 66,             /* obj_statement  */
+  YYSYMBOL_obj_list = 67,                  /* obj_list  */
+  YYSYMBOL_obj_tail = 68,                  /* obj_tail  */
+  YYSYMBOL_obj_def = 69,                   /* obj_def  */
+  YYSYMBOL_fun_statement = 70,             /* fun_statement  */
+  YYSYMBOL_fun_list = 71,                  /* fun_list  */
+  YYSYMBOL_fun_tail = 72,                  /* fun_tail  */
+  YYSYMBOL_fun_def = 73,                   /* fun_def  */
+  YYSYMBOL_74_1 = 74,                      /* $@1  */
+  YYSYMBOL_arg_list = 75,                  /* arg_list  */
+  YYSYMBOL_arg_tail = 76,                  /* arg_tail  */
+  YYSYMBOL_arg_def = 77,                   /* arg_def  */
+  YYSYMBOL_int_statement = 78,             /* int_statement  */
+  YYSYMBOL_int_list = 79,                  /* int_list  */
+  YYSYMBOL_int_tail = 80,                  /* int_tail  */
+  YYSYMBOL_int_def = 81,                   /* int_def  */
+  YYSYMBOL_const_expr = 82,                /* const_expr  */
+  YYSYMBOL_expr = 83,                      /* expr  */
+  YYSYMBOL_fun_call = 84,                  /* fun_call  */
+  YYSYMBOL_85_2 = 85,                      /* $@2  */
+  YYSYMBOL_expr_list = 86,                 /* expr_list  */
+  YYSYMBOL_87_3 = 87,                      /* $@3  */
+  YYSYMBOL_expr_tail = 88,                 /* expr_tail  */
+  YYSYMBOL_exponent = 89,                  /* exponent  */
+  YYSYMBOL_integer = 90,                   /* integer  */
+  YYSYMBOL_real = 91,                      /* real  */
+  YYSYMBOL_itv = 92,                       /* itv  */
+  YYSYMBOL_domain = 93,                    /* domain  */
+  YYSYMBOL_ident = 94                      /* ident  */
+};
+typedef enum yysymbol_kind_t yysymbol_kind_t;
 
-/* Copy the second part of user declarations.  */
 
-#line 266 "parser_bison.cpp" /* yacc.c:358  */
+
 
 #ifdef short
 # undef short
 #endif
 
-#ifdef YYTYPE_UINT8
-typedef YYTYPE_UINT8 yytype_uint8;
-#else
-typedef unsigned char yytype_uint8;
+/* On compilers that do not define __PTRDIFF_MAX__ etc., make sure
+   <limits.h> and (if available) <stdint.h> are included
+   so that the code can choose integer types of a good width.  */
+
+#ifndef __PTRDIFF_MAX__
+# include <limits.h> /* INFRINGES ON USER NAME SPACE */
+# if defined __STDC_VERSION__ && 199901 <= __STDC_VERSION__
+#  include <stdint.h> /* INFRINGES ON USER NAME SPACE */
+#  define YY_STDINT_H
+# endif
 #endif
 
-#ifdef YYTYPE_INT8
-typedef YYTYPE_INT8 yytype_int8;
+/* Narrow types that promote to a signed type and that can represent a
+   signed or unsigned integer of at least N bits.  In tables they can
+   save space and decrease cache pressure.  Promoting to a signed type
+   helps avoid bugs in integer arithmetic.  */
+
+#ifdef __INT_LEAST8_MAX__
+typedef __INT_LEAST8_TYPE__ yytype_int8;
+#elif defined YY_STDINT_H
+typedef int_least8_t yytype_int8;
 #else
 typedef signed char yytype_int8;
 #endif
 
-#ifdef YYTYPE_UINT16
-typedef YYTYPE_UINT16 yytype_uint16;
+#ifdef __INT_LEAST16_MAX__
+typedef __INT_LEAST16_TYPE__ yytype_int16;
+#elif defined YY_STDINT_H
+typedef int_least16_t yytype_int16;
 #else
-typedef unsigned short int yytype_uint16;
+typedef short yytype_int16;
 #endif
 
-#ifdef YYTYPE_INT16
-typedef YYTYPE_INT16 yytype_int16;
+/* Work around bug in HP-UX 11.23, which defines these macros
+   incorrectly for preprocessor constants.  This workaround can likely
+   be removed in 2023, as HPE has promised support for HP-UX 11.23
+   (aka HP-UX 11i v2) only through the end of 2022; see Table 2 of
+   <https://h20195.www2.hpe.com/V2/getpdf.aspx/4AA4-7673ENW.pdf>.  */
+#ifdef __hpux
+# undef UINT_LEAST8_MAX
+# undef UINT_LEAST16_MAX
+# define UINT_LEAST8_MAX 255
+# define UINT_LEAST16_MAX 65535
+#endif
+
+#if defined __UINT_LEAST8_MAX__ && __UINT_LEAST8_MAX__ <= __INT_MAX__
+typedef __UINT_LEAST8_TYPE__ yytype_uint8;
+#elif (!defined __UINT_LEAST8_MAX__ && defined YY_STDINT_H \
+       && UINT_LEAST8_MAX <= INT_MAX)
+typedef uint_least8_t yytype_uint8;
+#elif !defined __UINT_LEAST8_MAX__ && UCHAR_MAX <= INT_MAX
+typedef unsigned char yytype_uint8;
 #else
-typedef short int yytype_int16;
+typedef short yytype_uint8;
+#endif
+
+#if defined __UINT_LEAST16_MAX__ && __UINT_LEAST16_MAX__ <= __INT_MAX__
+typedef __UINT_LEAST16_TYPE__ yytype_uint16;
+#elif (!defined __UINT_LEAST16_MAX__ && defined YY_STDINT_H \
+       && UINT_LEAST16_MAX <= INT_MAX)
+typedef uint_least16_t yytype_uint16;
+#elif !defined __UINT_LEAST16_MAX__ && USHRT_MAX <= INT_MAX
+typedef unsigned short yytype_uint16;
+#else
+typedef int yytype_uint16;
+#endif
+
+#ifndef YYPTRDIFF_T
+# if defined __PTRDIFF_TYPE__ && defined __PTRDIFF_MAX__
+#  define YYPTRDIFF_T __PTRDIFF_TYPE__
+#  define YYPTRDIFF_MAXIMUM __PTRDIFF_MAX__
+# elif defined PTRDIFF_MAX
+#  ifndef ptrdiff_t
+#   include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#  endif
+#  define YYPTRDIFF_T ptrdiff_t
+#  define YYPTRDIFF_MAXIMUM PTRDIFF_MAX
+# else
+#  define YYPTRDIFF_T long
+#  define YYPTRDIFF_MAXIMUM LONG_MAX
+# endif
 #endif
 
 #ifndef YYSIZE_T
@@ -297,15 +477,28 @@ typedef short int yytype_int16;
 #  define YYSIZE_T __SIZE_TYPE__
 # elif defined size_t
 #  define YYSIZE_T size_t
-# elif ! defined YYSIZE_T
+# elif defined __STDC_VERSION__ && 199901 <= __STDC_VERSION__
 #  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYSIZE_T size_t
 # else
-#  define YYSIZE_T unsigned int
+#  define YYSIZE_T unsigned
 # endif
 #endif
 
-#define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
+#define YYSIZE_MAXIMUM                                  \
+  YY_CAST (YYPTRDIFF_T,                                 \
+           (YYPTRDIFF_MAXIMUM < YY_CAST (YYSIZE_T, -1)  \
+            ? YYPTRDIFF_MAXIMUM                         \
+            : YY_CAST (YYSIZE_T, -1)))
+
+#define YYSIZEOF(X) YY_CAST (YYPTRDIFF_T, sizeof (X))
+
+
+/* Stored state numbers (used for stacks). */
+typedef yytype_uint8 yy_state_t;
+
+/* State numbers in computations.  */
+typedef int yy_state_fast_t;
 
 #ifndef YY_
 # if defined YYENABLE_NLS && YYENABLE_NLS
@@ -319,47 +512,43 @@ typedef short int yytype_int16;
 # endif
 #endif
 
-#ifndef YY_ATTRIBUTE
-# if (defined __GNUC__                                               \
-      && (2 < __GNUC__ || (__GNUC__ == 2 && 96 <= __GNUC_MINOR__)))  \
-     || defined __SUNPRO_C && 0x5110 <= __SUNPRO_C
-#  define YY_ATTRIBUTE(Spec) __attribute__(Spec)
+
+#ifndef YY_ATTRIBUTE_PURE
+# if defined __GNUC__ && 2 < __GNUC__ + (96 <= __GNUC_MINOR__)
+#  define YY_ATTRIBUTE_PURE __attribute__ ((__pure__))
 # else
-#  define YY_ATTRIBUTE(Spec) /* empty */
+#  define YY_ATTRIBUTE_PURE
 # endif
 #endif
 
-#ifndef YY_ATTRIBUTE_PURE
-# define YY_ATTRIBUTE_PURE   YY_ATTRIBUTE ((__pure__))
-#endif
-
 #ifndef YY_ATTRIBUTE_UNUSED
-# define YY_ATTRIBUTE_UNUSED YY_ATTRIBUTE ((__unused__))
-#endif
-
-#if !defined _Noreturn \
-     && (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112)
-# if defined _MSC_VER && 1200 <= _MSC_VER
-#  define _Noreturn __declspec (noreturn)
+# if defined __GNUC__ && 2 < __GNUC__ + (7 <= __GNUC_MINOR__)
+#  define YY_ATTRIBUTE_UNUSED __attribute__ ((__unused__))
 # else
-#  define _Noreturn YY_ATTRIBUTE ((__noreturn__))
+#  define YY_ATTRIBUTE_UNUSED
 # endif
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YY_USE(E) ((void) (E))
 #else
-# define YYUSE(E) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
-    _Pragma ("GCC diagnostic push") \
-    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")\
+#if defined __GNUC__ && ! defined __ICC && 406 <= __GNUC__ * 100 + __GNUC_MINOR__
+# if __GNUC__ * 100 + __GNUC_MINOR__ < 407
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")
+# else
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")              \
     _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
-# define YY_IGNORE_MAYBE_UNINITIALIZED_END \
+# endif
+# define YY_IGNORE_MAYBE_UNINITIALIZED_END      \
     _Pragma ("GCC diagnostic pop")
 #else
 # define YY_INITIAL_VALUE(Value) Value
@@ -372,8 +561,22 @@ typedef short int yytype_int16;
 # define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
+#if defined __cplusplus && defined __GNUC__ && ! defined __ICC && 6 <= __GNUC__
+# define YY_IGNORE_USELESS_CAST_BEGIN                          \
+    _Pragma ("GCC diagnostic push")                            \
+    _Pragma ("GCC diagnostic ignored \"-Wuseless-cast\"")
+# define YY_IGNORE_USELESS_CAST_END            \
+    _Pragma ("GCC diagnostic pop")
+#endif
+#ifndef YY_IGNORE_USELESS_CAST_BEGIN
+# define YY_IGNORE_USELESS_CAST_BEGIN
+# define YY_IGNORE_USELESS_CAST_END
+#endif
 
-#if ! defined yyoverflow || YYERROR_VERBOSE
+
+#define YY_ASSERT(E) ((void) (0 && (E)))
+
+#if !defined yyoverflow
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
@@ -438,8 +641,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 # endif
-#endif /* ! defined yyoverflow || YYERROR_VERBOSE */
-
+#endif /* !defined yyoverflow */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
@@ -448,17 +650,17 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss_alloc;
+  yy_state_t yyss_alloc;
   YYSTYPE yyvs_alloc;
 };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
-# define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
+# define YYSTACK_GAP_MAXIMUM (YYSIZEOF (union yyalloc) - 1)
 
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
+     ((N) * (YYSIZEOF (yy_state_t) + YYSIZEOF (YYSTYPE)) \
       + YYSTACK_GAP_MAXIMUM)
 
 # define YYCOPY_NEEDED 1
@@ -471,11 +673,11 @@ union yyalloc
 # define YYSTACK_RELOCATE(Stack_alloc, Stack)                           \
     do                                                                  \
       {                                                                 \
-        YYSIZE_T yynewbytes;                                            \
+        YYPTRDIFF_T yynewbytes;                                         \
         YYCOPY (&yyptr->Stack_alloc, Stack, yysize);                    \
         Stack = &yyptr->Stack_alloc;                                    \
-        yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-        yyptr += yynewbytes / sizeof (*yyptr);                          \
+        yynewbytes = yystacksize * YYSIZEOF (*Stack) + YYSTACK_GAP_MAXIMUM; \
+        yyptr += yynewbytes / YYSIZEOF (*yyptr);                        \
       }                                                                 \
     while (0)
 
@@ -487,12 +689,12 @@ union yyalloc
 # ifndef YYCOPY
 #  if defined __GNUC__ && 1 < __GNUC__
 #   define YYCOPY(Dst, Src, Count) \
-      __builtin_memcpy (Dst, Src, (Count) * sizeof (*(Src)))
+      __builtin_memcpy (Dst, Src, YY_CAST (YYSIZE_T, (Count)) * sizeof (*(Src)))
 #  else
 #   define YYCOPY(Dst, Src, Count)              \
       do                                        \
         {                                       \
-          YYSIZE_T yyi;                         \
+          YYPTRDIFF_T yyi;                      \
           for (yyi = 0; yyi < (Count); yyi++)   \
             (Dst)[yyi] = (Src)[yyi];            \
         }                                       \
@@ -515,17 +717,20 @@ union yyalloc
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  192
 
-/* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
-   by yylex, with out-of-bounds checking.  */
-#define YYUNDEFTOK  2
+/* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   301
 
-#define YYTRANSLATE(YYX)                                                \
-  ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+
+/* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
+   as returned by yylex, with out-of-bounds checking.  */
+#define YYTRANSLATE(YYX)                                \
+  (0 <= (YYX) && (YYX) <= YYMAXUTOK                     \
+   ? YY_CAST (yysymbol_kind_t, yytranslate[YYX])        \
+   : YYSYMBOL_YYUNDEF)
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
-   as returned by yylex, without out-of-bounds checking.  */
-static const yytype_uint8 yytranslate[] =
+   as returned by yylex.  */
+static const yytype_int8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -561,33 +766,40 @@ static const yytype_uint8 yytranslate[] =
 };
 
 #if REALPAVER_BISON_DEBUG
-  /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint16 yyrline[] =
+/* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
+static const yytype_int16 yyrline[] =
 {
-       0,    67,    67,    69,    73,    74,    75,    76,    77,    78,
-      79,    83,    87,    90,    92,    96,   122,   126,   129,   131,
-     135,   154,   158,   161,   163,   167,   184,   188,   191,   193,
-     197,   205,   213,   224,   228,   231,   233,   237,   248,   262,
-     266,   269,   271,   276,   275,   302,   305,   307,   311,   326,
-     330,   333,   335,   339,   358,   373,   380,   387,   394,   401,
-     408,   415,   421,   425,   431,   437,   443,   449,   455,   461,
-     467,   473,   479,   485,   492,   499,   503,   507,   567,   571,
-     575,   583,   582,   616,   615,   623,   625,   629,   633,   640,
-     656,   672,   693,   696,   704,   712,   728
+       0,    70,    70,    71,    75,    76,    77,    78,    79,    80,
+      81,    85,    89,    93,    94,    98,   124,   128,   132,   133,
+     137,   159,   163,   167,   168,   172,   189,   193,   197,   198,
+     202,   210,   218,   229,   233,   237,   238,   242,   253,   267,
+     271,   275,   276,   281,   280,   307,   311,   312,   316,   331,
+     335,   339,   340,   344,   363,   378,   385,   392,   399,   406,
+     413,   420,   426,   430,   436,   442,   448,   454,   460,   466,
+     472,   478,   484,   490,   497,   504,   508,   512,   572,   576,
+     580,   588,   587,   621,   620,   629,   630,   634,   638,   645,
+     661,   677,   698,   701,   709,   717,   733
 };
 #endif
 
-#if REALPAVER_BISON_DEBUG || YYERROR_VERBOSE || 0
+/** Accessing symbol of state STATE.  */
+#define YY_ACCESSING_SYMBOL(State) YY_CAST (yysymbol_kind_t, yystos[State])
+
+#if REALPAVER_BISON_DEBUG || 0
+/* The user-facing name of the symbol whose (internal) number is
+   YYSYMBOL.  No bounds checking.  */
+static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
+
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "TK_IDENT", "TK_INT", "TK_REAL",
-  "TK_STR_VAR", "TK_STR_CONST", "TK_STR_CTR", "TK_STR_OBJ", "TK_STR_FUN",
-  "TK_STR_ALIAS", "TK_STR_INT", "TK_EQ", "TK_EQ_EQ", "TK_LE", "TK_GE",
-  "TK_IN", "TK_LT", "TK_GT", "TK_PLUS", "TK_MINUS", "TK_MUL", "TK_DIV",
-  "TK_POW", "TK_CARET", "TK_SQR", "TK_SQRT", "TK_LOG", "TK_EXP", "TK_TAN",
-  "TK_COS", "TK_SIN", "TK_LPAR", "TK_RPAR", "TK_LSBR", "TK_RSBR",
+  "\"end of file\"", "error", "\"invalid token\"", "TK_IDENT", "TK_INT",
+  "TK_REAL", "TK_STR_VAR", "TK_STR_CONST", "TK_STR_CTR", "TK_STR_OBJ",
+  "TK_STR_FUN", "TK_STR_ALIAS", "TK_STR_INT", "TK_EQ", "TK_EQ_EQ", "TK_LE",
+  "TK_GE", "TK_IN", "TK_LT", "TK_GT", "TK_PLUS", "TK_MINUS", "TK_MUL",
+  "TK_DIV", "TK_POW", "TK_CARET", "TK_SQR", "TK_SQRT", "TK_LOG", "TK_EXP",
+  "TK_TAN", "TK_COS", "TK_SIN", "TK_LPAR", "TK_RPAR", "TK_LSBR", "TK_RSBR",
   "TK_PIPE", "TK_COMMA", "TK_SCOLON", "TK_COLON", "TK_SGN", "TK_ABS",
   "TK_MIN", "TK_MAX", "TK_UMINUS", "TK_UPLUS", "$accept", "model",
   "statement", "const_statement", "const_list", "const_tail", "const_def",
@@ -600,33 +812,26 @@ static const char *const yytname[] =
   "expr_list", "$@3", "expr_tail", "exponent", "integer", "real", "itv",
   "domain", "ident", YY_NULLPTR
 };
+
+static const char *
+yysymbol_name (yysymbol_kind_t yysymbol)
+{
+  return yytname[yysymbol];
+}
 #endif
 
-# ifdef YYPRINT
-/* YYTOKNUM[NUM] -- (External) token number corresponding to the
-   (internal) symbol number NUM (which must be that of a token).  */
-static const yytype_uint16 yytoknum[] =
-{
-       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301
-};
-# endif
+#define YYPACT_NINF (-95)
 
-#define YYPACT_NINF -95
+#define yypact_value_is_default(Yyn) \
+  ((Yyn) == YYPACT_NINF)
 
-#define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-95)))
+#define YYTABLE_NINF (-1)
 
-#define YYTABLE_NINF -1
-
-#define yytable_value_is_error(Yytable_value) \
+#define yytable_value_is_error(Yyn) \
   0
 
-  /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
-     STATE-NUM.  */
+/* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
+   STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
      252,    17,    17,    10,   -32,    17,    17,    17,    22,   -12,
@@ -651,10 +856,10 @@ static const yytype_int16 yypact[] =
      -95,    -4
 };
 
-  /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
-     Performed when YYTABLE does not specify something else to do.  Zero
-     means the default is an error.  */
-static const yytype_uint8 yydefact[] =
+/* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
+   Performed when YYTABLE does not specify something else to do.  Zero
+   means the default is an error.  */
+static const yytype_int8 yydefact[] =
 {
        2,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        4,     5,     6,     7,     8,     9,    10,    96,    16,    18,
@@ -678,7 +883,7 @@ static const yytype_uint8 yydefact[] =
       86,    44
 };
 
-  /* YYPGOTO[NTERM-NUM].  */
+/* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
      -95,    95,   -95,   -95,    89,   -95,   -95,   -95,    96,   -95,
@@ -688,19 +893,19 @@ static const yytype_int16 yypgoto[] =
      -95,   -95,    37,   -94,   -92,   129,   -95,     0
 };
 
-  /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int16 yydefgoto[] =
+/* YYDEFGOTO[NTERM-NUM].  */
+static const yytype_uint8 yydefgoto[] =
 {
-      -1,     8,     9,    10,    21,    73,    22,    11,    18,    67,
+       0,     8,     9,    10,    21,    73,    22,    11,    18,    67,
       19,    12,    58,   112,    59,    13,    43,    94,    44,    14,
       53,   107,    54,    15,    55,   109,    56,   152,   171,   182,
      172,    16,    61,   115,    62,    86,    87,    46,   149,   170,
      178,   187,   146,    47,    48,    49,    71,    50
 };
 
-  /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
-     positive, shift that token.  If negative, reduce the rule whose
-     number is the opposite.  If YYTABLE_NINF, syntax error.  */
+/* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
+   positive, shift that token.  If negative, reduce the rule whose
+   number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
       45,    20,    23,   118,   119,    57,    60,    63,   147,   122,
@@ -763,9 +968,9 @@ static const yytype_int16 yycheck[] =
        8,     9,    10,    11,    12
 };
 
-  /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
-     symbol of state STATE-NUM.  */
-static const yytype_uint8 yystos[] =
+/* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
+   state STATE-NUM.  */
+static const yytype_int8 yystos[] =
 {
        0,     6,     7,     8,     9,    10,    11,    12,    48,    49,
       50,    54,    58,    62,    66,    70,    78,     3,    55,    57,
@@ -789,8 +994,8 @@ static const yytype_uint8 yystos[] =
       86,    83
 };
 
-  /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
-static const yytype_uint8 yyr1[] =
+/* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
+static const yytype_int8 yyr1[] =
 {
        0,    47,    48,    48,    49,    49,    49,    49,    49,    49,
       49,    50,    51,    52,    52,    53,    54,    55,    56,    56,
@@ -804,8 +1009,8 @@ static const yytype_uint8 yyr1[] =
       91,    92,    93,    93,    93,    93,    94
 };
 
-  /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
-static const yytype_uint8 yyr2[] =
+/* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
+static const yytype_int8 yyr2[] =
 {
        0,     2,     0,     3,     1,     1,     1,     1,     1,     1,
        1,     2,     2,     0,     2,     3,     2,     2,     0,     2,
@@ -820,39 +1025,39 @@ static const yytype_uint8 yyr2[] =
 };
 
 
+enum { YYENOMEM = -2 };
+
 #define yyerrok         (yyerrstatus = 0)
-#define yyclearin       (yychar = YYEMPTY)
-#define YYEMPTY         (-2)
-#define YYEOF           0
+#define yyclearin       (yychar = REALPAVER_BISON_EMPTY)
 
 #define YYACCEPT        goto yyacceptlab
 #define YYABORT         goto yyabortlab
 #define YYERROR         goto yyerrorlab
+#define YYNOMEM         goto yyexhaustedlab
 
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)                                  \
-do                                                              \
-  if (yychar == YYEMPTY)                                        \
-    {                                                           \
-      yychar = (Token);                                         \
-      yylval = (Value);                                         \
-      YYPOPSTACK (yylen);                                       \
-      yystate = *yyssp;                                         \
-      goto yybackup;                                            \
-    }                                                           \
-  else                                                          \
-    {                                                           \
-      yyerror (YY_("syntax error: cannot back up")); \
-      YYERROR;                                                  \
-    }                                                           \
-while (0)
+#define YYBACKUP(Token, Value)                                    \
+  do                                                              \
+    if (yychar == REALPAVER_BISON_EMPTY)                                        \
+      {                                                           \
+        yychar = (Token);                                         \
+        yylval = (Value);                                         \
+        YYPOPSTACK (yylen);                                       \
+        yystate = *yyssp;                                         \
+        goto yybackup;                                            \
+      }                                                           \
+    else                                                          \
+      {                                                           \
+        yyerror (YY_("syntax error: cannot back up")); \
+        YYERROR;                                                  \
+      }                                                           \
+  while (0)
 
-/* Error token number */
-#define YYTERROR        1
-#define YYERRCODE       256
-
+/* Backward compatibility with an undocumented macro.
+   Use REALPAVER_BISON_error or REALPAVER_BISON_UNDEF. */
+#define YYERRCODE REALPAVER_BISON_UNDEF
 
 
 /* Enable debugging if requested.  */
@@ -869,55 +1074,52 @@ do {                                            \
     YYFPRINTF Args;                             \
 } while (0)
 
-/* This macro is provided for backward compatibility. */
-#ifndef YY_LOCATION_PRINT
-# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
-#endif
 
 
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)                    \
+
+# define YY_SYMBOL_PRINT(Title, Kind, Value, Location)                    \
 do {                                                                      \
   if (yydebug)                                                            \
     {                                                                     \
       YYFPRINTF (stderr, "%s ", Title);                                   \
       yy_symbol_print (stderr,                                            \
-                  Type, Value); \
+                  Kind, Value); \
       YYFPRINTF (stderr, "\n");                                           \
     }                                                                     \
 } while (0)
 
 
-/*----------------------------------------.
-| Print this symbol's value on YYOUTPUT.  |
-`----------------------------------------*/
+/*-----------------------------------.
+| Print this symbol's value on YYO.  |
+`-----------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyo,
+                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep)
 {
-  FILE *yyo = yyoutput;
-  YYUSE (yyo);
+  FILE *yyoutput = yyo;
+  YY_USE (yyoutput);
   if (!yyvaluep)
     return;
-# ifdef YYPRINT
-  if (yytype < YYNTOKENS)
-    YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
-# endif
-  YYUSE (yytype);
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  YY_USE (yykind);
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
 
-/*--------------------------------.
-| Print this symbol on YYOUTPUT.  |
-`--------------------------------*/
+/*---------------------------.
+| Print this symbol on YYO.  |
+`---------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyo,
+                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep)
 {
-  YYFPRINTF (yyoutput, "%s %s (",
-             yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
+  YYFPRINTF (yyo, "%s %s (",
+             yykind < YYNTOKENS ? "token" : "nterm", yysymbol_name (yykind));
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
-  YYFPRINTF (yyoutput, ")");
+  yy_symbol_value_print (yyo, yykind, yyvaluep);
+  YYFPRINTF (yyo, ")");
 }
 
 /*------------------------------------------------------------------.
@@ -926,7 +1128,7 @@ yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
 `------------------------------------------------------------------*/
 
 static void
-yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
+yy_stack_print (yy_state_t *yybottom, yy_state_t *yytop)
 {
   YYFPRINTF (stderr, "Stack now");
   for (; yybottom <= yytop; yybottom++)
@@ -949,21 +1151,21 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
+                 int yyrule)
 {
-  unsigned long int yylno = yyrline[yyrule];
+  int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
   int yyi;
-  YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
+  YYFPRINTF (stderr, "Reducing stack by rule %d (line %d):\n",
              yyrule - 1, yylno);
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr,
-                       yystos[yyssp[yyi + 1 - yynrhs]],
-                       &(yyvsp[(yyi + 1) - (yynrhs)])
-                                              );
+                       YY_ACCESSING_SYMBOL (+yyssp[yyi + 1 - yynrhs]),
+                       &yyvsp[(yyi + 1) - (yynrhs)]);
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -978,8 +1180,8 @@ do {                                    \
    multiple parsers can coexist.  */
 int yydebug;
 #else /* !REALPAVER_BISON_DEBUG */
-# define YYDPRINTF(Args)
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)
+# define YYDPRINTF(Args) ((void) 0)
+# define YY_SYMBOL_PRINT(Title, Kind, Value, Location)
 # define YY_STACK_PRINT(Bottom, Top)
 # define YY_REDUCE_PRINT(Rule)
 #endif /* !REALPAVER_BISON_DEBUG */
@@ -1002,255 +1204,38 @@ int yydebug;
 #endif
 
 
-#if YYERROR_VERBOSE
 
-# ifndef yystrlen
-#  if defined __GLIBC__ && defined _STRING_H
-#   define yystrlen strlen
-#  else
-/* Return the length of YYSTR.  */
-static YYSIZE_T
-yystrlen (const char *yystr)
-{
-  YYSIZE_T yylen;
-  for (yylen = 0; yystr[yylen]; yylen++)
-    continue;
-  return yylen;
-}
-#  endif
-# endif
 
-# ifndef yystpcpy
-#  if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
-#   define yystpcpy stpcpy
-#  else
-/* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
-   YYDEST.  */
-static char *
-yystpcpy (char *yydest, const char *yysrc)
-{
-  char *yyd = yydest;
-  const char *yys = yysrc;
 
-  while ((*yyd++ = *yys++) != '\0')
-    continue;
-
-  return yyd - 1;
-}
-#  endif
-# endif
-
-# ifndef yytnamerr
-/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
-   quotes and backslashes, so that it's suitable for yyerror.  The
-   heuristic is that double-quoting is unnecessary unless the string
-   contains an apostrophe, a comma, or backslash (other than
-   backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
-   null, do not copy; instead, return the length of what the result
-   would have been.  */
-static YYSIZE_T
-yytnamerr (char *yyres, const char *yystr)
-{
-  if (*yystr == '"')
-    {
-      YYSIZE_T yyn = 0;
-      char const *yyp = yystr;
-
-      for (;;)
-        switch (*++yyp)
-          {
-          case '\'':
-          case ',':
-            goto do_not_strip_quotes;
-
-          case '\\':
-            if (*++yyp != '\\')
-              goto do_not_strip_quotes;
-            /* Fall through.  */
-          default:
-            if (yyres)
-              yyres[yyn] = *yyp;
-            yyn++;
-            break;
-
-          case '"':
-            if (yyres)
-              yyres[yyn] = '\0';
-            return yyn;
-          }
-    do_not_strip_quotes: ;
-    }
-
-  if (! yyres)
-    return yystrlen (yystr);
-
-  return yystpcpy (yyres, yystr) - yyres;
-}
-# endif
-
-/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
-   about the unexpected token YYTOKEN for the state stack whose top is
-   YYSSP.
-
-   Return 0 if *YYMSG was successfully written.  Return 1 if *YYMSG is
-   not large enough to hold the message.  In that case, also set
-   *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
-   required number of bytes is too large to store.  */
-static int
-yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
-                yytype_int16 *yyssp, int yytoken)
-{
-  YYSIZE_T yysize0 = yytnamerr (YY_NULLPTR, yytname[yytoken]);
-  YYSIZE_T yysize = yysize0;
-  enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-  /* Internationalized format string. */
-  const char *yyformat = YY_NULLPTR;
-  /* Arguments of yyformat. */
-  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-  /* Number of reported tokens (one for the "unexpected", one per
-     "expected"). */
-  int yycount = 0;
-
-  /* There are many possibilities here to consider:
-     - If this state is a consistent state with a default action, then
-       the only way this function was invoked is if the default action
-       is an error action.  In that case, don't check for expected
-       tokens because there are none.
-     - The only way there can be no lookahead present (in yychar) is if
-       this state is a consistent state with a default action.  Thus,
-       detecting the absence of a lookahead is sufficient to determine
-       that there is no unexpected or expected token to report.  In that
-       case, just report a simple "syntax error".
-     - Don't assume there isn't a lookahead just because this state is a
-       consistent state with a default action.  There might have been a
-       previous inconsistent state, consistent state with a non-default
-       action, or user semantic action that manipulated yychar.
-     - Of course, the expected token list depends on states to have
-       correct lookahead information, and it depends on the parser not
-       to perform extra reductions after fetching a lookahead from the
-       scanner and before detecting a syntax error.  Thus, state merging
-       (from LALR or IELR) and default reductions corrupt the expected
-       token list.  However, the list is correct for canonical LR with
-       one exception: it will still contain any token that will not be
-       accepted due to an error action in a later state.
-  */
-  if (yytoken != YYEMPTY)
-    {
-      int yyn = yypact[*yyssp];
-      yyarg[yycount++] = yytname[yytoken];
-      if (!yypact_value_is_default (yyn))
-        {
-          /* Start YYX at -YYN if negative to avoid negative indexes in
-             YYCHECK.  In other words, skip the first -YYN actions for
-             this state because they are default actions.  */
-          int yyxbegin = yyn < 0 ? -yyn : 0;
-          /* Stay within bounds of both yycheck and yytname.  */
-          int yychecklim = YYLAST - yyn + 1;
-          int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-          int yyx;
-
-          for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR
-                && !yytable_value_is_error (yytable[yyx + yyn]))
-              {
-                if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-                  {
-                    yycount = 1;
-                    yysize = yysize0;
-                    break;
-                  }
-                yyarg[yycount++] = yytname[yyx];
-                {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
-                  if (! (yysize <= yysize1
-                         && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-                    return 2;
-                  yysize = yysize1;
-                }
-              }
-        }
-    }
-
-  switch (yycount)
-    {
-# define YYCASE_(N, S)                      \
-      case N:                               \
-        yyformat = S;                       \
-      break
-      YYCASE_(0, YY_("syntax error"));
-      YYCASE_(1, YY_("syntax error, unexpected %s"));
-      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
-      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
-      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
-      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
-# undef YYCASE_
-    }
-
-  {
-    YYSIZE_T yysize1 = yysize + yystrlen (yyformat);
-    if (! (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-      return 2;
-    yysize = yysize1;
-  }
-
-  if (*yymsg_alloc < yysize)
-    {
-      *yymsg_alloc = 2 * yysize;
-      if (! (yysize <= *yymsg_alloc
-             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
-        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
-      return 1;
-    }
-
-  /* Avoid sprintf, as that infringes on the user's name space.
-     Don't have undefined behavior even if the translation
-     produced a string with the wrong number of "%s"s.  */
-  {
-    char *yyp = *yymsg;
-    int yyi = 0;
-    while ((*yyp = *yyformat) != '\0')
-      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
-        {
-          yyp += yytnamerr (yyp, yyarg[yyi++]);
-          yyformat += 2;
-        }
-      else
-        {
-          yyp++;
-          yyformat++;
-        }
-  }
-  return 0;
-}
-#endif /* YYERROR_VERBOSE */
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg,
+            yysymbol_kind_t yykind, YYSTYPE *yyvaluep)
 {
-  YYUSE (yyvaluep);
+  YY_USE (yyvaluep);
   if (!yymsg)
     yymsg = "Deleting";
-  YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
+  YY_SYMBOL_PRINT (yymsg, yykind, yyvaluep, yylocationp);
 
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-  YYUSE (yytype);
+  YY_USE (yykind);
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
 
-
-
-/* The lookahead symbol.  */
+/* Lookahead token kind.  */
 int yychar;
 
 /* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
 /* Number of syntax errors so far.  */
 int yynerrs;
+
+
 
 
 /*----------.
@@ -1260,43 +1245,36 @@ int yynerrs;
 int
 yyparse (void)
 {
-    int yystate;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
+    int yyerrstatus = 0;
 
-    /* The stacks and their tools:
-       'yyss': related to states.
-       'yyvs': related to semantic values.
-
-       Refer to the stacks through separate pointers, to allow yyoverflow
+    /* Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
-    /* The state stack.  */
-    yytype_int16 yyssa[YYINITDEPTH];
-    yytype_int16 *yyss;
-    yytype_int16 *yyssp;
+    /* Their size.  */
+    YYPTRDIFF_T yystacksize = YYINITDEPTH;
 
-    /* The semantic value stack.  */
+    /* The state stack: array, bottom, top.  */
+    yy_state_t yyssa[YYINITDEPTH];
+    yy_state_t *yyss = yyssa;
+    yy_state_t *yyssp = yyss;
+
+    /* The semantic value stack: array, bottom, top.  */
     YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
-
-    YYSIZE_T yystacksize;
+    YYSTYPE *yyvs = yyvsa;
+    YYSTYPE *yyvsp = yyvs;
 
   int yyn;
+  /* The return value of yyparse.  */
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  /* Lookahead symbol kind.  */
+  yysymbol_kind_t yytoken = YYSYMBOL_YYEMPTY;
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
 
-#if YYERROR_VERBOSE
-  /* Buffer for error messages, and its allocated size.  */
-  char yymsgbuf[128];
-  char *yymsg = yymsgbuf;
-  YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
-#endif
+
 
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
 
@@ -1304,71 +1282,75 @@ yyparse (void)
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
-  yystacksize = YYINITDEPTH;
-
   YYDPRINTF ((stderr, "Starting parse\n"));
 
-  yystate = 0;
-  yyerrstatus = 0;
-  yynerrs = 0;
-  yychar = YYEMPTY; /* Cause a token to be read.  */
+  yychar = REALPAVER_BISON_EMPTY; /* Cause a token to be read.  */
+
   goto yysetstate;
 
+
 /*------------------------------------------------------------.
-| yynewstate -- Push a new state, which is found in yystate.  |
+| yynewstate -- push a new state, which is found in yystate.  |
 `------------------------------------------------------------*/
- yynewstate:
+yynewstate:
   /* In all cases, when you get here, the value and location stacks
      have just been pushed.  So pushing a state here evens the stacks.  */
   yyssp++;
 
- yysetstate:
-  *yyssp = yystate;
+
+/*--------------------------------------------------------------------.
+| yysetstate -- set current state (the top of the stack) to yystate.  |
+`--------------------------------------------------------------------*/
+yysetstate:
+  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
+  YY_ASSERT (0 <= yystate && yystate < YYNSTATES);
+  YY_IGNORE_USELESS_CAST_BEGIN
+  *yyssp = YY_CAST (yy_state_t, yystate);
+  YY_IGNORE_USELESS_CAST_END
+  YY_STACK_PRINT (yyss, yyssp);
 
   if (yyss + yystacksize - 1 <= yyssp)
+#if !defined yyoverflow && !defined YYSTACK_RELOCATE
+    YYNOMEM;
+#else
     {
       /* Get the current used size of the three stacks, in elements.  */
-      YYSIZE_T yysize = yyssp - yyss + 1;
+      YYPTRDIFF_T yysize = yyssp - yyss + 1;
 
-#ifdef yyoverflow
+# if defined yyoverflow
       {
         /* Give user a chance to reallocate the stack.  Use copies of
            these so that the &'s don't force the real ones into
            memory.  */
+        yy_state_t *yyss1 = yyss;
         YYSTYPE *yyvs1 = yyvs;
-        yytype_int16 *yyss1 = yyss;
 
         /* Each stack pointer address is followed by the size of the
            data in use in that stack, in bytes.  This used to be a
            conditional around just the two extra args, but that might
            be undefined if yyoverflow is a macro.  */
         yyoverflow (YY_("memory exhausted"),
-                    &yyss1, yysize * sizeof (*yyssp),
-                    &yyvs1, yysize * sizeof (*yyvsp),
+                    &yyss1, yysize * YYSIZEOF (*yyssp),
+                    &yyvs1, yysize * YYSIZEOF (*yyvsp),
                     &yystacksize);
-
         yyss = yyss1;
         yyvs = yyvs1;
       }
-#else /* no yyoverflow */
-# ifndef YYSTACK_RELOCATE
-      goto yyexhaustedlab;
-# else
+# else /* defined YYSTACK_RELOCATE */
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-        goto yyexhaustedlab;
+        YYNOMEM;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
         yystacksize = YYMAXDEPTH;
 
       {
-        yytype_int16 *yyss1 = yyss;
+        yy_state_t *yyss1 = yyss;
         union yyalloc *yyptr =
-          (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+          YY_CAST (union yyalloc *,
+                   YYSTACK_ALLOC (YY_CAST (YYSIZE_T, YYSTACK_BYTES (yystacksize))));
         if (! yyptr)
-          goto yyexhaustedlab;
+          YYNOMEM;
         YYSTACK_RELOCATE (yyss_alloc, yyss);
         YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
@@ -1376,30 +1358,31 @@ yyparse (void)
           YYSTACK_FREE (yyss1);
       }
 # endif
-#endif /* no yyoverflow */
 
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
-      YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-                  (unsigned long int) yystacksize));
+      YY_IGNORE_USELESS_CAST_BEGIN
+      YYDPRINTF ((stderr, "Stack size increased to %ld\n",
+                  YY_CAST (long, yystacksize)));
+      YY_IGNORE_USELESS_CAST_END
 
       if (yyss + yystacksize - 1 <= yyssp)
         YYABORT;
     }
+#endif /* !defined yyoverflow && !defined YYSTACK_RELOCATE */
 
-  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
   if (yystate == YYFINAL)
     YYACCEPT;
 
   goto yybackup;
 
+
 /*-----------.
 | yybackup.  |
 `-----------*/
 yybackup:
-
   /* Do appropriate processing given the current state.  Read a
      lookahead token if we need one and don't already have one.  */
 
@@ -1410,17 +1393,28 @@ yybackup:
 
   /* Not known => get a lookahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
-  if (yychar == YYEMPTY)
+  /* YYCHAR is either empty, or end-of-input, or a valid lookahead.  */
+  if (yychar == REALPAVER_BISON_EMPTY)
     {
-      YYDPRINTF ((stderr, "Reading a token: "));
+      YYDPRINTF ((stderr, "Reading a token\n"));
       yychar = yylex ();
     }
 
-  if (yychar <= YYEOF)
+  if (yychar <= REALPAVER_BISON_EOF)
     {
-      yychar = yytoken = YYEOF;
+      yychar = REALPAVER_BISON_EOF;
+      yytoken = YYSYMBOL_YYEOF;
       YYDPRINTF ((stderr, "Now at end of input.\n"));
+    }
+  else if (yychar == REALPAVER_BISON_error)
+    {
+      /* The scanner already issued an error message, process directly
+         to error recovery.  But do not keep the error token as
+         lookahead, it is too special and may lead us to an endless
+         loop in error recovery. */
+      yychar = REALPAVER_BISON_UNDEF;
+      yytoken = YYSYMBOL_YYerror;
+      goto yyerrlab1;
     }
   else
     {
@@ -1449,15 +1443,13 @@ yybackup:
 
   /* Shift the lookahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
-
-  /* Discard the shifted token.  */
-  yychar = YYEMPTY;
-
   yystate = yyn;
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 
+  /* Discard the shifted token.  */
+  yychar = REALPAVER_BISON_EMPTY;
   goto yynewstate;
 
 
@@ -1472,7 +1464,7 @@ yydefault:
 
 
 /*-----------------------------.
-| yyreduce -- Do a reduction.  |
+| yyreduce -- do a reduction.  |
 `-----------------------------*/
 yyreduce:
   /* yyn is the number of a rule to reduce with.  */
@@ -1492,8 +1484,8 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 15:
-#line 97 "parser_bison.ypp" /* yacc.c:1646  */
+  case 15: /* const_def: ident TK_EQ const_expr  */
+#line 99 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
 
@@ -1516,11 +1508,11 @@ yyreduce:
 
       realpaver_bison_symtab->insertConstant((yyvsp[-2].u_str), x);
     }
-#line 1520 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1512 "parser_bison.cpp"
     break;
 
-  case 20:
-#line 136 "parser_bison.ypp" /* yacc.c:1646  */
+  case 20: /* var_def: ident domain  */
+#line 138 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval x = e->evalConst();
@@ -1534,13 +1526,16 @@ yyreduce:
       }
 
       realpaver::Variable v = realpaver_bison_problem->addRealVar(x, (yyvsp[-1].u_str));
+      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
+      v.setTolerance(tol);
+      
       realpaver_bison_symtab->insertVariable((yyvsp[-1].u_str), v);
     }
-#line 1540 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1535 "parser_bison.cpp"
     break;
 
-  case 25:
-#line 168 "parser_bison.ypp" /* yacc.c:1646  */
+  case 25: /* alias_def: ident TK_EQ expr  */
+#line 173 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term)));
 
@@ -1554,11 +1549,11 @@ yyreduce:
 
       realpaver_bison_symtab->insertAlias((yyvsp[-2].u_str), t);
     }
-#line 1558 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1553 "parser_bison.cpp"
     break;
 
-  case 30:
-#line 198 "parser_bison.ypp" /* yacc.c:1646  */
+  case 30: /* ctr_def: expr TK_EQ_EQ expr  */
+#line 203 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term)));
       realpaver::Term rhs(realpaver::Term::SharedRep((yyvsp[0].u_term)));
@@ -1566,11 +1561,11 @@ yyreduce:
       realpaver::Constraint c(lhs == rhs);
       realpaver_bison_problem->addCtr(c);
     }
-#line 1570 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1565 "parser_bison.cpp"
     break;
 
-  case 31:
-#line 206 "parser_bison.ypp" /* yacc.c:1646  */
+  case 31: /* ctr_def: expr TK_LE expr  */
+#line 211 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term)));
       realpaver::Term rhs(realpaver::Term::SharedRep((yyvsp[0].u_term)));
@@ -1578,11 +1573,11 @@ yyreduce:
       realpaver::Constraint c(lhs <= rhs);
       realpaver_bison_problem->addCtr(c);
     }
-#line 1582 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1577 "parser_bison.cpp"
     break;
 
-  case 32:
-#line 214 "parser_bison.ypp" /* yacc.c:1646  */
+  case 32: /* ctr_def: expr TK_GE expr  */
+#line 219 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term)));
       realpaver::Term rhs(realpaver::Term::SharedRep((yyvsp[0].u_term)));
@@ -1590,11 +1585,11 @@ yyreduce:
       realpaver::Constraint c(lhs >= rhs);
       realpaver_bison_problem->addCtr(c);
     }
-#line 1594 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1589 "parser_bison.cpp"
     break;
 
-  case 37:
-#line 238 "parser_bison.ypp" /* yacc.c:1646  */
+  case 37: /* obj_def: TK_MIN expr  */
+#line 243 "parser_bison.ypp"
     {
       realpaver::Term f(realpaver::Term::SharedRep((yyvsp[0].u_term)));
       if (f.isConstant())
@@ -1605,11 +1600,11 @@ yyreduce:
 
       realpaver_bison_problem->addObjective(MIN(f));
     }
-#line 1609 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1604 "parser_bison.cpp"
     break;
 
-  case 38:
-#line 249 "parser_bison.ypp" /* yacc.c:1646  */
+  case 38: /* obj_def: TK_MAX expr  */
+#line 254 "parser_bison.ypp"
     {
       realpaver::Term f(realpaver::Term::SharedRep((yyvsp[0].u_term)));
       if (f.isConstant())
@@ -1620,11 +1615,11 @@ yyreduce:
 
       realpaver_bison_problem->addObjective(MAX(f));       
     }
-#line 1624 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1619 "parser_bison.cpp"
     break;
 
-  case 43:
-#line 276 "parser_bison.ypp" /* yacc.c:1646  */
+  case 43: /* $@1: %empty  */
+#line 281 "parser_bison.ypp"
     {       
       if (realpaver_bison_symtab->hasSymbol((yyvsp[-1].u_str)))
       {
@@ -1636,11 +1631,11 @@ yyreduce:
 
       realpaver_fun_symbol = realpaver_bison_symtab->insertFunction((yyvsp[-1].u_str));
     }
-#line 1640 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1635 "parser_bison.cpp"
     break;
 
-  case 44:
-#line 288 "parser_bison.ypp" /* yacc.c:1646  */
+  case 44: /* fun_def: ident TK_LPAR $@1 arg_list TK_RPAR TK_EQ expr  */
+#line 293 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term)));
       bool ok = realpaver_fun_symbol->setTerm(t);      
@@ -1652,11 +1647,11 @@ yyreduce:
         YYABORT;                  
       }
     }
-#line 1656 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1651 "parser_bison.cpp"
     break;
 
-  case 48:
-#line 312 "parser_bison.ypp" /* yacc.c:1646  */
+  case 48: /* arg_def: ident  */
+#line 317 "parser_bison.ypp"
     {
       if (realpaver_fun_symbol->hasArgument((yyvsp[0].u_str)))
       {
@@ -1668,11 +1663,11 @@ yyreduce:
 
       realpaver_fun_symbol->addArgument((yyvsp[0].u_str));
     }
-#line 1672 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1667 "parser_bison.cpp"
     break;
 
-  case 53:
-#line 340 "parser_bison.ypp" /* yacc.c:1646  */
+  case 53: /* int_def: ident  */
+#line 345 "parser_bison.ypp"
     {
       realpaver::VariableSymbol* vs = realpaver_bison_symtab->findVariable((yyvsp[0].u_str));
 
@@ -1688,11 +1683,11 @@ yyreduce:
         YYABORT;
       }
     }
-#line 1692 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1687 "parser_bison.cpp"
     break;
 
-  case 54:
-#line 359 "parser_bison.ypp" /* yacc.c:1646  */
+  case 54: /* const_expr: expr  */
+#line 364 "parser_bison.ypp"
     {
       realpaver::TermRep* t = (yyvsp[0].u_term);
 
@@ -1704,233 +1699,233 @@ yyreduce:
         YYABORT;
       }
     }
-#line 1708 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1703 "parser_bison.cpp"
     break;
 
-  case 55:
-#line 374 "parser_bison.ypp" /* yacc.c:1646  */
+  case 55: /* expr: expr TK_PLUS expr  */
+#line 379 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
                       rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
                       res(lhs + rhs);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1719 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1714 "parser_bison.cpp"
     break;
 
-  case 56:
-#line 381 "parser_bison.ypp" /* yacc.c:1646  */
+  case 56: /* expr: expr TK_MINUS expr  */
+#line 386 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
                       rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
                       res(lhs - rhs);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1730 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1725 "parser_bison.cpp"
     break;
 
-  case 57:
-#line 388 "parser_bison.ypp" /* yacc.c:1646  */
+  case 57: /* expr: expr TK_MUL expr  */
+#line 393 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
                       rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
                       res(lhs * rhs);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1741 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1736 "parser_bison.cpp"
     break;
 
-  case 58:
-#line 395 "parser_bison.ypp" /* yacc.c:1646  */
+  case 58: /* expr: expr TK_DIV expr  */
+#line 400 "parser_bison.ypp"
     {
       realpaver::Term lhs(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
                       rhs(realpaver::Term::SharedRep((yyvsp[0].u_term))),
                       res(lhs / rhs);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1752 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1747 "parser_bison.cpp"
     break;
 
-  case 59:
-#line 402 "parser_bison.ypp" /* yacc.c:1646  */
+  case 59: /* expr: expr TK_CARET exponent  */
+#line 407 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-2].u_term))),
                       d(realpaver::Term::SharedRep((yyvsp[0].u_term))),
                       res(pow(t, d.evalConst()));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1763 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1758 "parser_bison.cpp"
     break;
 
-  case 60:
-#line 409 "parser_bison.ypp" /* yacc.c:1646  */
+  case 60: /* expr: TK_POW TK_LPAR expr TK_COMMA exponent TK_RPAR  */
+#line 414 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-3].u_term))),
                       d(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(pow(t, d.evalConst()));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1774 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1769 "parser_bison.cpp"
     break;
 
-  case 61:
-#line 416 "parser_bison.ypp" /* yacc.c:1646  */
+  case 61: /* expr: TK_MINUS expr  */
+#line 421 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term))),
                       res(-t);
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1784 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1779 "parser_bison.cpp"
     break;
 
-  case 62:
-#line 422 "parser_bison.ypp" /* yacc.c:1646  */
+  case 62: /* expr: TK_PLUS expr  */
+#line 427 "parser_bison.ypp"
     {
        (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1792 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1787 "parser_bison.cpp"
     break;
 
-  case 63:
-#line 426 "parser_bison.ypp" /* yacc.c:1646  */
+  case 63: /* expr: TK_SQRT TK_LPAR expr TK_RPAR  */
+#line 431 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(sqrt(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1802 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1797 "parser_bison.cpp"
     break;
 
-  case 64:
-#line 432 "parser_bison.ypp" /* yacc.c:1646  */
+  case 64: /* expr: TK_SQR TK_LPAR expr TK_RPAR  */
+#line 437 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(sqr(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1812 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1807 "parser_bison.cpp"
     break;
 
-  case 65:
-#line 438 "parser_bison.ypp" /* yacc.c:1646  */
+  case 65: /* expr: TK_SGN TK_LPAR expr TK_RPAR  */
+#line 443 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(sgn(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1822 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1817 "parser_bison.cpp"
     break;
 
-  case 66:
-#line 444 "parser_bison.ypp" /* yacc.c:1646  */
+  case 66: /* expr: TK_ABS TK_LPAR expr TK_RPAR  */
+#line 449 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(abs(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1832 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1827 "parser_bison.cpp"
     break;
 
-  case 67:
-#line 450 "parser_bison.ypp" /* yacc.c:1646  */
+  case 67: /* expr: TK_PIPE expr TK_PIPE  */
+#line 455 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(abs(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1842 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1837 "parser_bison.cpp"
     break;
 
-  case 68:
-#line 456 "parser_bison.ypp" /* yacc.c:1646  */
+  case 68: /* expr: TK_LOG TK_LPAR expr TK_RPAR  */
+#line 461 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(log(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1852 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1847 "parser_bison.cpp"
     break;
 
-  case 69:
-#line 462 "parser_bison.ypp" /* yacc.c:1646  */
+  case 69: /* expr: TK_EXP TK_LPAR expr TK_RPAR  */
+#line 467 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(exp(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1862 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1857 "parser_bison.cpp"
     break;
 
-  case 70:
-#line 468 "parser_bison.ypp" /* yacc.c:1646  */
+  case 70: /* expr: TK_COS TK_LPAR expr TK_RPAR  */
+#line 473 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(cos(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1872 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1867 "parser_bison.cpp"
     break;
 
-  case 71:
-#line 474 "parser_bison.ypp" /* yacc.c:1646  */
+  case 71: /* expr: TK_SIN TK_LPAR expr TK_RPAR  */
+#line 479 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(sin(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1882 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1877 "parser_bison.cpp"
     break;
 
-  case 72:
-#line 480 "parser_bison.ypp" /* yacc.c:1646  */
+  case 72: /* expr: TK_TAN TK_LPAR expr TK_RPAR  */
+#line 485 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(tan(t));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1892 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1887 "parser_bison.cpp"
     break;
 
-  case 73:
-#line 486 "parser_bison.ypp" /* yacc.c:1646  */
+  case 73: /* expr: TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR  */
+#line 491 "parser_bison.ypp"
     {
       realpaver::Term fst(realpaver::Term::SharedRep((yyvsp[-3].u_term))),
                       snd(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(MIN(fst, snd));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1903 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1898 "parser_bison.cpp"
     break;
 
-  case 74:
-#line 493 "parser_bison.ypp" /* yacc.c:1646  */
+  case 74: /* expr: TK_MAX TK_LPAR expr TK_COMMA expr TK_RPAR  */
+#line 498 "parser_bison.ypp"
     {
       realpaver::Term fst(realpaver::Term::SharedRep((yyvsp[-3].u_term))),
                       snd(realpaver::Term::SharedRep((yyvsp[-1].u_term))),
                       res(MAX(fst, snd));
       (yyval.u_term) = res.cloneRoot();
     }
-#line 1914 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1909 "parser_bison.cpp"
     break;
 
-  case 75:
-#line 500 "parser_bison.ypp" /* yacc.c:1646  */
-    {
+  case 75: /* expr: TK_LPAR expr TK_RPAR  */
+#line 505 "parser_bison.ypp"
+  {
     (yyval.u_term) = (yyvsp[-1].u_term);
   }
-#line 1922 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1917 "parser_bison.cpp"
     break;
 
-  case 76:
-#line 504 "parser_bison.ypp" /* yacc.c:1646  */
+  case 76: /* expr: fun_call  */
+#line 509 "parser_bison.ypp"
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 1930 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1925 "parser_bison.cpp"
     break;
 
-  case 77:
-#line 508 "parser_bison.ypp" /* yacc.c:1646  */
+  case 77: /* expr: ident  */
+#line 513 "parser_bison.ypp"
     {
       bool found = false;
 
@@ -1990,35 +1985,35 @@ yyreduce:
         YYABORT;
       }
     }
-#line 1994 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1989 "parser_bison.cpp"
     break;
 
-  case 78:
-#line 568 "parser_bison.ypp" /* yacc.c:1646  */
+  case 78: /* expr: integer  */
+#line 573 "parser_bison.ypp"
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 2002 "parser_bison.cpp" /* yacc.c:1646  */
+#line 1997 "parser_bison.cpp"
     break;
 
-  case 79:
-#line 572 "parser_bison.ypp" /* yacc.c:1646  */
+  case 79: /* expr: real  */
+#line 577 "parser_bison.ypp"
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 2010 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2005 "parser_bison.cpp"
     break;
 
-  case 80:
-#line 576 "parser_bison.ypp" /* yacc.c:1646  */
+  case 80: /* expr: itv  */
+#line 581 "parser_bison.ypp"
     {
        (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 2018 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2013 "parser_bison.cpp"
     break;
 
-  case 81:
-#line 583 "parser_bison.ypp" /* yacc.c:1646  */
+  case 81: /* $@2: %empty  */
+#line 588 "parser_bison.ypp"
     {
       realpaver::FunctionSymbol* fs =
           realpaver_bison_symtab->findFunction((yyvsp[-1].u_str));
@@ -2033,11 +2028,11 @@ yyreduce:
 
       realpaver_bison_symtab->pushFunctionCall(fs);
     }
-#line 2037 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2032 "parser_bison.cpp"
     break;
 
-  case 82:
-#line 598 "parser_bison.ypp" /* yacc.c:1646  */
+  case 82: /* fun_call: ident TK_LPAR $@2 expr_list TK_RPAR  */
+#line 603 "parser_bison.ypp"
     {
        std::pair<bool, realpaver::Term> res =
          realpaver_bison_symtab->processFunCall();
@@ -2052,36 +2047,36 @@ yyreduce:
          YYABORT;          
        }
     }
-#line 2056 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2051 "parser_bison.cpp"
     break;
 
-  case 83:
-#line 616 "parser_bison.ypp" /* yacc.c:1646  */
+  case 83: /* $@3: %empty  */
+#line 621 "parser_bison.ypp"
     {
       realpaver::Term t(realpaver::Term::SharedRep((yyvsp[0].u_term)));
       realpaver_bison_symtab->addFunctionArgument(t);
     }
-#line 2065 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2060 "parser_bison.cpp"
     break;
 
-  case 87:
-#line 630 "parser_bison.ypp" /* yacc.c:1646  */
+  case 87: /* exponent: integer  */
+#line 635 "parser_bison.ypp"
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 2073 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2068 "parser_bison.cpp"
     break;
 
-  case 88:
-#line 634 "parser_bison.ypp" /* yacc.c:1646  */
+  case 88: /* exponent: real  */
+#line 639 "parser_bison.ypp"
     {
       (yyval.u_term) = (yyvsp[0].u_term);
     }
-#line 2081 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2076 "parser_bison.cpp"
     break;
 
-  case 89:
-#line 641 "parser_bison.ypp" /* yacc.c:1646  */
+  case 89: /* integer: TK_INT  */
+#line 646 "parser_bison.ypp"
     {
       try
       {
@@ -2094,11 +2089,11 @@ yyreduce:
         YYABORT;
       }       
     }
-#line 2098 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2093 "parser_bison.cpp"
     break;
 
-  case 90:
-#line 657 "parser_bison.ypp" /* yacc.c:1646  */
+  case 90: /* real: TK_REAL  */
+#line 662 "parser_bison.ypp"
     {
       try
       {
@@ -2111,11 +2106,11 @@ yyreduce:
         YYABORT;
       }       
     }
-#line 2115 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2110 "parser_bison.cpp"
     break;
 
-  case 91:
-#line 673 "parser_bison.ypp" /* yacc.c:1646  */
+  case 91: /* itv: TK_LSBR const_expr TK_COMMA const_expr TK_RSBR  */
+#line 678 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep lo((yyvsp[-3].u_term));
       realpaver::Term::SharedRep up((yyvsp[-1].u_term));
@@ -2132,19 +2127,19 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(z);
     }
-#line 2136 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2131 "parser_bison.cpp"
     break;
 
-  case 92:
-#line 693 "parser_bison.ypp" /* yacc.c:1646  */
+  case 92: /* domain: %empty  */
+#line 698 "parser_bison.ypp"
     {
       (yyval.u_term) = new realpaver::TermConst(realpaver::Interval::universe());
     }
-#line 2144 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2139 "parser_bison.cpp"
     break;
 
-  case 93:
-#line 697 "parser_bison.ypp" /* yacc.c:1646  */
+  case 93: /* domain: TK_LE const_expr  */
+#line 702 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval up = e->evalConst();
@@ -2152,11 +2147,11 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 2156 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2151 "parser_bison.cpp"
     break;
 
-  case 94:
-#line 705 "parser_bison.ypp" /* yacc.c:1646  */
+  case 94: /* domain: TK_GE const_expr  */
+#line 710 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval lo = e->evalConst();
@@ -2164,11 +2159,11 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 2168 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2163 "parser_bison.cpp"
     break;
 
-  case 95:
-#line 713 "parser_bison.ypp" /* yacc.c:1646  */
+  case 95: /* domain: TK_IN itv  */
+#line 718 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval domain = e->evalConst();
@@ -2181,19 +2176,20 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 2185 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2180 "parser_bison.cpp"
     break;
 
-  case 96:
-#line 729 "parser_bison.ypp" /* yacc.c:1646  */
-    {
+  case 96: /* ident: TK_IDENT  */
+#line 734 "parser_bison.ypp"
+   {
      strcpy((yyval.u_str), realpaver_bison_text);
    }
-#line 2193 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2188 "parser_bison.cpp"
     break;
 
 
-#line 2197 "parser_bison.cpp" /* yacc.c:1646  */
+#line 2192 "parser_bison.cpp"
+
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2207,25 +2203,23 @@ yyreduce:
      case of YYERROR or YYBACKUP, subsequent parser actions might lead
      to an incorrect destructor call or verbose syntax error message
      before the lookahead is translated.  */
-  YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
+  YY_SYMBOL_PRINT ("-> $$ =", YY_CAST (yysymbol_kind_t, yyr1[yyn]), &yyval, &yyloc);
 
   YYPOPSTACK (yylen);
   yylen = 0;
-  YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
 
   /* Now 'shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
      number reduced by.  */
-
-  yyn = yyr1[yyn];
-
-  yystate = yypgoto[yyn - YYNTOKENS] + *yyssp;
-  if (0 <= yystate && yystate <= YYLAST && yycheck[yystate] == *yyssp)
-    yystate = yytable[yystate];
-  else
-    yystate = yydefgoto[yyn - YYNTOKENS];
+  {
+    const int yylhs = yyr1[yyn] - YYNTOKENS;
+    const int yyi = yypgoto[yylhs] + *yyssp;
+    yystate = (0 <= yyi && yyi <= YYLAST && yycheck[yyi] == *yyssp
+               ? yytable[yyi]
+               : yydefgoto[yylhs]);
+  }
 
   goto yynewstate;
 
@@ -2236,66 +2230,30 @@ yyreduce:
 yyerrlab:
   /* Make sure we have latest lookahead translation.  See comments at
      user semantic actions for why this is necessary.  */
-  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
-
+  yytoken = yychar == REALPAVER_BISON_EMPTY ? YYSYMBOL_YYEMPTY : YYTRANSLATE (yychar);
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
       ++yynerrs;
-#if ! YYERROR_VERBOSE
       yyerror (YY_("syntax error"));
-#else
-# define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
-                                        yyssp, yytoken)
-      {
-        char const *yymsgp = YY_("syntax error");
-        int yysyntax_error_status;
-        yysyntax_error_status = YYSYNTAX_ERROR;
-        if (yysyntax_error_status == 0)
-          yymsgp = yymsg;
-        else if (yysyntax_error_status == 1)
-          {
-            if (yymsg != yymsgbuf)
-              YYSTACK_FREE (yymsg);
-            yymsg = (char *) YYSTACK_ALLOC (yymsg_alloc);
-            if (!yymsg)
-              {
-                yymsg = yymsgbuf;
-                yymsg_alloc = sizeof yymsgbuf;
-                yysyntax_error_status = 2;
-              }
-            else
-              {
-                yysyntax_error_status = YYSYNTAX_ERROR;
-                yymsgp = yymsg;
-              }
-          }
-        yyerror (yymsgp);
-        if (yysyntax_error_status == 2)
-          goto yyexhaustedlab;
-      }
-# undef YYSYNTAX_ERROR
-#endif
     }
-
-
 
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
          error, discard it.  */
 
-      if (yychar <= YYEOF)
+      if (yychar <= REALPAVER_BISON_EOF)
         {
           /* Return failure if at end of input.  */
-          if (yychar == YYEOF)
+          if (yychar == REALPAVER_BISON_EOF)
             YYABORT;
         }
       else
         {
           yydestruct ("Error: discarding",
                       yytoken, &yylval);
-          yychar = YYEMPTY;
+          yychar = REALPAVER_BISON_EMPTY;
         }
     }
 
@@ -2308,12 +2266,11 @@ yyerrlab:
 | yyerrorlab -- error raised explicitly by YYERROR.  |
 `---------------------------------------------------*/
 yyerrorlab:
-
-  /* Pacify compilers like GCC when the user code never invokes
-     YYERROR and the label yyerrorlab therefore never appears in user
-     code.  */
-  if (/*CONSTCOND*/ 0)
-     goto yyerrorlab;
+  /* Pacify compilers when the user code never invokes YYERROR and the
+     label yyerrorlab therefore never appears in user code.  */
+  if (0)
+    YYERROR;
+  ++yynerrs;
 
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYERROR.  */
@@ -2330,13 +2287,14 @@ yyerrorlab:
 yyerrlab1:
   yyerrstatus = 3;      /* Each real token shifted decrements this.  */
 
+  /* Pop stack until we find a state that shifts the error token.  */
   for (;;)
     {
       yyn = yypact[yystate];
       if (!yypact_value_is_default (yyn))
         {
-          yyn += YYTERROR;
-          if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+          yyn += YYSYMBOL_YYerror;
+          if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYSYMBOL_YYerror)
             {
               yyn = yytable[yyn];
               if (0 < yyn)
@@ -2350,7 +2308,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-                  yystos[yystate], yyvsp);
+                  YY_ACCESSING_SYMBOL (yystate), yyvsp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -2362,7 +2320,7 @@ yyerrlab1:
 
 
   /* Shift the error token.  */
-  YY_SYMBOL_PRINT ("Shifting", yystos[yyn], yyvsp, yylsp);
+  YY_SYMBOL_PRINT ("Shifting", YY_ACCESSING_SYMBOL (yyn), yyvsp, yylsp);
 
   yystate = yyn;
   goto yynewstate;
@@ -2373,27 +2331,31 @@ yyerrlab1:
 `-------------------------------------*/
 yyacceptlab:
   yyresult = 0;
-  goto yyreturn;
+  goto yyreturnlab;
+
 
 /*-----------------------------------.
 | yyabortlab -- YYABORT comes here.  |
 `-----------------------------------*/
 yyabortlab:
   yyresult = 1;
-  goto yyreturn;
+  goto yyreturnlab;
 
-#if !defined yyoverflow || YYERROR_VERBOSE
-/*-------------------------------------------------.
-| yyexhaustedlab -- memory exhaustion comes here.  |
-`-------------------------------------------------*/
+
+/*-----------------------------------------------------------.
+| yyexhaustedlab -- YYNOMEM (memory exhaustion) comes here.  |
+`-----------------------------------------------------------*/
 yyexhaustedlab:
   yyerror (YY_("memory exhausted"));
   yyresult = 2;
-  /* Fall through.  */
-#endif
+  goto yyreturnlab;
 
-yyreturn:
-  if (yychar != YYEMPTY)
+
+/*----------------------------------------------------------.
+| yyreturnlab -- parsing is finished, clean up and return.  |
+`----------------------------------------------------------*/
+yyreturnlab:
+  if (yychar != REALPAVER_BISON_EMPTY)
     {
       /* Make sure we have latest lookahead translation.  See comments at
          user semantic actions for why this is necessary.  */
@@ -2408,20 +2370,18 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-                  yystos[*yyssp], yyvsp);
+                  YY_ACCESSING_SYMBOL (+*yyssp), yyvsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
   if (yyss != yyssa)
     YYSTACK_FREE (yyss);
 #endif
-#if YYERROR_VERBOSE
-  if (yymsg != yymsgbuf)
-    YYSTACK_FREE (yymsg);
-#endif
+
   return yyresult;
 }
-#line 733 "parser_bison.ypp" /* yacc.c:1906  */
+
+#line 738 "parser_bison.ypp"
 
 
 int realpaver_bison_error(const char* str)

@@ -280,7 +280,7 @@ void NcspSolver::bpStep(int depthlimit)
    // splits the node
    split_->apply(node);
 
-   if (split_->getNbNodes() == 1)
+   if (split_->getNbNodes() <= 1)
    {
       LOG_INTER("Soliution node (small enough)");
       node->setProof(Proof::Maybe);

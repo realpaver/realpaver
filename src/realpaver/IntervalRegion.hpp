@@ -139,6 +139,11 @@ public:
    /// @return a clone of this
    IntervalRegion* clone() const;
 
+   /// Overrides
+   /// Output on a stream
+   /// @param os an output stream
+   void print(std::ostream& os) const;
+
 private:
    Scope scope_;
 };

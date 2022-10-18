@@ -145,4 +145,9 @@ IntervalRegion* IntervalRegion::clone() const
    return new IntervalRegion(*this);
 }
 
+void IntervalRegion::print(std::ostream& os) const
+{
+   IntervalVector::print(os);
+}
+
 } // namespace

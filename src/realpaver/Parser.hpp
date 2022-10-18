@@ -10,6 +10,7 @@
 #ifndef REALPAVER_PARSER_HPP
 #define REALPAVER_PARSER_HPP
 
+#include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/SymbolTable.hpp"
 
@@ -23,6 +24,10 @@ public:
    /// Constructor
    Parser();
 
+   /// Constructor
+   /// @param prm parameter settings
+   Parser(const Param& prm);
+
    /// Parses a model from a file
    /// @param filename input file
    /// @param problem output problem
@@ -34,6 +39,7 @@ public:
 
 private:
    SymbolTable symtab_;
+   Param param_;
 
    void initSymbolTable();
 };

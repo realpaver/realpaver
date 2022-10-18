@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,6 +30,10 @@
 
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
+
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
 # define YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED
@@ -48,65 +53,74 @@
 extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 26 "parser_bison.ypp" /* yacc.c:1909  */
+#line 28 "parser_bison.ypp"
 
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Exception.hpp"
 
-#line 57 "parser_bison.hpp" /* yacc.c:1909  */
+#line 62 "parser_bison.hpp"
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef REALPAVER_BISON_TOKENTYPE
 # define REALPAVER_BISON_TOKENTYPE
   enum realpaver_bison_tokentype
   {
-    TK_IDENT = 258,
-    TK_INT = 259,
-    TK_REAL = 260,
-    TK_STR_VAR = 261,
-    TK_STR_CONST = 262,
-    TK_STR_CTR = 263,
-    TK_STR_OBJ = 264,
-    TK_STR_FUN = 265,
-    TK_STR_ALIAS = 266,
-    TK_STR_INT = 267,
-    TK_EQ = 268,
-    TK_EQ_EQ = 269,
-    TK_LE = 270,
-    TK_GE = 271,
-    TK_IN = 272,
-    TK_LT = 273,
-    TK_GT = 274,
-    TK_PLUS = 275,
-    TK_MINUS = 276,
-    TK_MUL = 277,
-    TK_DIV = 278,
-    TK_POW = 279,
-    TK_CARET = 280,
-    TK_SQR = 281,
-    TK_SQRT = 282,
-    TK_LOG = 283,
-    TK_EXP = 284,
-    TK_TAN = 285,
-    TK_COS = 286,
-    TK_SIN = 287,
-    TK_LPAR = 288,
-    TK_RPAR = 289,
-    TK_LSBR = 290,
-    TK_RSBR = 291,
-    TK_PIPE = 292,
-    TK_COMMA = 293,
-    TK_SCOLON = 294,
-    TK_COLON = 295,
-    TK_SGN = 296,
-    TK_ABS = 297,
-    TK_MIN = 298,
-    TK_MAX = 299,
-    TK_UMINUS = 300,
-    TK_UPLUS = 301
+    REALPAVER_BISON_EMPTY = -2,
+    REALPAVER_BISON_EOF = 0,       /* "end of file"  */
+    REALPAVER_BISON_error = 256,   /* error  */
+    REALPAVER_BISON_UNDEF = 257,   /* "invalid token"  */
+    TK_IDENT = 258,                /* TK_IDENT  */
+    TK_INT = 259,                  /* TK_INT  */
+    TK_REAL = 260,                 /* TK_REAL  */
+    TK_STR_VAR = 261,              /* TK_STR_VAR  */
+    TK_STR_CONST = 262,            /* TK_STR_CONST  */
+    TK_STR_CTR = 263,              /* TK_STR_CTR  */
+    TK_STR_OBJ = 264,              /* TK_STR_OBJ  */
+    TK_STR_FUN = 265,              /* TK_STR_FUN  */
+    TK_STR_ALIAS = 266,            /* TK_STR_ALIAS  */
+    TK_STR_INT = 267,              /* TK_STR_INT  */
+    TK_EQ = 268,                   /* TK_EQ  */
+    TK_EQ_EQ = 269,                /* TK_EQ_EQ  */
+    TK_LE = 270,                   /* TK_LE  */
+    TK_GE = 271,                   /* TK_GE  */
+    TK_IN = 272,                   /* TK_IN  */
+    TK_LT = 273,                   /* TK_LT  */
+    TK_GT = 274,                   /* TK_GT  */
+    TK_PLUS = 275,                 /* TK_PLUS  */
+    TK_MINUS = 276,                /* TK_MINUS  */
+    TK_MUL = 277,                  /* TK_MUL  */
+    TK_DIV = 278,                  /* TK_DIV  */
+    TK_POW = 279,                  /* TK_POW  */
+    TK_CARET = 280,                /* TK_CARET  */
+    TK_SQR = 281,                  /* TK_SQR  */
+    TK_SQRT = 282,                 /* TK_SQRT  */
+    TK_LOG = 283,                  /* TK_LOG  */
+    TK_EXP = 284,                  /* TK_EXP  */
+    TK_TAN = 285,                  /* TK_TAN  */
+    TK_COS = 286,                  /* TK_COS  */
+    TK_SIN = 287,                  /* TK_SIN  */
+    TK_LPAR = 288,                 /* TK_LPAR  */
+    TK_RPAR = 289,                 /* TK_RPAR  */
+    TK_LSBR = 290,                 /* TK_LSBR  */
+    TK_RSBR = 291,                 /* TK_RSBR  */
+    TK_PIPE = 292,                 /* TK_PIPE  */
+    TK_COMMA = 293,                /* TK_COMMA  */
+    TK_SCOLON = 294,               /* TK_SCOLON  */
+    TK_COLON = 295,                /* TK_COLON  */
+    TK_SGN = 296,                  /* TK_SGN  */
+    TK_ABS = 297,                  /* TK_ABS  */
+    TK_MIN = 298,                  /* TK_MIN  */
+    TK_MAX = 299,                  /* TK_MAX  */
+    TK_UMINUS = 300,               /* TK_UMINUS  */
+    TK_UPLUS = 301                 /* TK_UPLUS  */
   };
+  typedef enum realpaver_bison_tokentype realpaver_bison_token_kind_t;
 #endif
-/* Tokens.  */
+/* Token kinds.  */
+#define REALPAVER_BISON_EMPTY -2
+#define REALPAVER_BISON_EOF 0
+#define REALPAVER_BISON_error 256
+#define REALPAVER_BISON_UNDEF 257
 #define TK_IDENT 258
 #define TK_INT 259
 #define TK_REAL 260
@@ -154,17 +168,16 @@ extern int realpaver_bison_debug;
 
 /* Value type.  */
 #if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
-
 union REALPAVER_BISON_STYPE
 {
-#line 32 "parser_bison.ypp" /* yacc.c:1909  */
+#line 34 "parser_bison.ypp"
 
   char u_str[256];
   realpaver::TermRep* u_term;
 
-#line 166 "parser_bison.hpp" /* yacc.c:1909  */
-};
+#line 179 "parser_bison.hpp"
 
+};
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
 # define REALPAVER_BISON_STYPE_IS_TRIVIAL 1
 # define REALPAVER_BISON_STYPE_IS_DECLARED 1
@@ -173,6 +186,8 @@ typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;
 
 extern REALPAVER_BISON_STYPE realpaver_bison_lval;
 
+
 int realpaver_bison_parse (void);
+
 
 #endif /* !YY_REALPAVER_BISON_PARSER_BISON_HPP_INCLUDED  */

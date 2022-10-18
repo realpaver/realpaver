@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "realpaver/parser_bison.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/SymbolTable.hpp"
 
@@ -77,30 +78,36 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 
 realpaver::Problem* realpaver_bison_problem;
 realpaver::SymbolTable* realpaver_bison_symtab;
+realpaver::Param* realpaver_bison_param;
 realpaver::FunctionSymbol* realpaver_fun_symbol;
 
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;
 
 void realpaver_flex_init(realpaver::Problem* prob,
-							    realpaver::SymbolTable* symtab)
+							    realpaver::SymbolTable* symtab,
+                         realpaver::Param* prm)
 {
   realpaver_bison_lineno = 1;
   realpaver_bison_problem = prob;
   realpaver_bison_symtab = symtab;
+  realpaver_bison_param = prm;
   realpaver_parse_error = "";
   realpaver_fun_symbol = nullptr;
 }
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
-								     realpaver::SymbolTable* symtab, const char* str)
+								     realpaver::SymbolTable* symtab,
+                             realpaver::Param* prm,
+                             const char* str)
 {
-  realpaver_flex_init(prob, symtab);
+  realpaver_flex_init(prob, symtab, prm);
   realpaver_bison_buffer = realpaver_bison__scan_string(str);
 }
 
 int realpaver_flex_init_file(realpaver::Problem* prob,
 								     realpaver::SymbolTable* symtab,
+                             realpaver::Param* prm,
 								     const char* filename)
 {
   int res = 0;
@@ -112,7 +119,7 @@ int realpaver_flex_init_file(realpaver::Problem* prob,
   }
   else
   {
-    realpaver_flex_init(prob, symtab);
+    realpaver_flex_init(prob, symtab, prm);
     realpaver_bison_buffer =
       realpaver_bison__create_buffer(realpaver_bison_in, YY_BUF_SIZE);
     realpaver_bison__switch_to_buffer(realpaver_bison_buffer);
@@ -124,6 +131,7 @@ void realpaver_flex_cleanup_str()
 {
   realpaver_bison_problem = NULL;
   realpaver_bison_symtab = NULL;
+  realpaver_bison_param = NULL;
   realpaver_bison__delete_buffer(realpaver_bison_buffer);
 }
 
@@ -131,6 +139,7 @@ void realpaver_flex_cleanup_file()
 {
   realpaver_bison_problem = NULL;
   realpaver_bison_symtab = NULL;
+  realpaver_bison_param = NULL;
   if (realpaver_bison_in)
   {
     fclose(realpaver_bison_in);

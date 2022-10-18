@@ -2,6 +2,7 @@
 #include <cstring>
 #include <sstream>
 #include <string>
+#include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/SymbolTable.hpp"
 
@@ -12,6 +13,7 @@ extern char* realpaver_bison_text;
 extern int realpaver_bison_lineno;
 extern std::string realpaver_parse_error;
 extern realpaver::Problem* realpaver_bison_problem;
+extern realpaver::Param* realpaver_bison_param;
 extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern int realpaver_bison_lex(void);
@@ -146,6 +148,9 @@ var_def
       }
 
       realpaver::Variable v = realpaver_bison_problem->addRealVar(x, $1);
+      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
+      v.setTolerance(tol);
+      
       realpaver_bison_symtab->insertVariable($1, v);
     }
   ;
