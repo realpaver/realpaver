@@ -70,6 +70,7 @@ Param::Param()
    strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",    "GRADIENT"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
+   strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));   
 }
 
 int Param::getIntParam(const string& name) const
@@ -266,7 +267,7 @@ void Param::processParam(const std::string& name, const std::string& val)
          intmap_[name] = std::stoi(val);
          return;
       }
-      catch(std::exception e)
+      catch(std::exception& e)
       {
          throwEx();
       }
@@ -275,8 +276,8 @@ void Param::processParam(const std::string& name, const std::string& val)
    // String
    auto its = strmap_.find(name);
    if (its != strmap_.end())
-   {
-      strmap_[name] = val;
+   {      
+      strmap_[name] = val;      
       return;
    }
 
@@ -375,7 +376,7 @@ void Param::loadParam(const std::string& filename)
       lineno_ = 0;
       
       while (getline(f, line))
-      {
+      {         
          ++ lineno_;
          processLine(line);
       }
@@ -384,34 +385,25 @@ void Param::loadParam(const std::string& filename)
       THROW("file open error '" << filename << "'");
 }
 
-void Param::printParam(std::ostream& os)
+void Param::print(std::ostream& os) const
 {
-   os << "# List of registered parameters\n\n";
-
-   os << "# Integral parameters\n";
-   for (auto it = instance_.intmap_.begin();
-             it != instance_.intmap_.end();
+   for (auto it = intmap_.begin();
+             it != intmap_.end();
              ++it)
       os << it-> first << " = " << it->second << "\n";
-   os << "\n";
 
-   os << "# Double parameters\n";
-   for (auto it = instance_.dblmap_.begin();
-             it != instance_.dblmap_.end();
+   for (auto it = dblmap_.begin();
+             it != dblmap_.end();
              ++it)
       os << it-> first << " = " << it->second << "\n";
-   os << "\n";
 
-   os << "# String parameters\n";
-   for (auto it = instance_.strmap_.begin();
-             it != instance_.strmap_.end();
+   for (auto it = strmap_.begin();
+             it != strmap_.end();
              ++it)
       os << it-> first << " = " << it->second << "\n";
-   os << "\n";
 
-   os << "# Tolerances\n";
-   for (auto it = instance_.tolmap_.begin();
-             it != instance_.tolmap_.end();
+   for (auto it = tolmap_.begin();
+             it != tolmap_.end();
              ++it)
    {
       Tolerance tol = it->second;
@@ -422,17 +414,22 @@ void Param::printParam(std::ostream& os)
 
       os << it-> first << " = " << tol.getVal() << "\n";
    }
-   os << "\n";
 }
 
 void Param::PrintParam(std::ostream& os)
 {
-   instance_.printParam(os);
+   instance_.print(os);
 }
 
 void Param::LoadParam(const std::string& filename)
 {
    instance_.loadParam(filename);
+}
+
+std::ostream& operator<<(std::ostream& os, const Param& prm)
+{
+   prm.print(os);
+   return os;
 }
 
 } // namespace

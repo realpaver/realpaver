@@ -17,6 +17,7 @@
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/NcspSpaceBFS.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
+#include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/Propagator.hpp"
 #include "realpaver/VariableSelector.hpp"
@@ -82,6 +83,7 @@ void NcspSolver::makeSpace()
    std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS") space_ = new NcspSpaceDFS();
    if (s == "BFS") space_ = new NcspSpaceBFS();
+   if (s == "DMDFS") space_ = new NcspSpaceDMDFS();
 
    THROW_IF(space_ == nullptr,
             "Unable to make the space object in a Ncsp solver");
@@ -243,7 +245,7 @@ bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
 
 void NcspSolver::bpStep(int depthlimit)
 {
-   SharedNcspNode node = space_->extractPendingNode();
+   SharedNcspNode node = space_->nextPendingNode();
    IntervalRegion* reg = node->region();
 
    LOG_INTER("Extracts node " << node->index() << " (depth "
@@ -264,10 +266,18 @@ void NcspSolver::bpStep(int depthlimit)
 
    if (isAnInnerRegion(*reg))
    {
-      LOG_INTER("Solution node (inner region)");
-      node->setProof(Proof::Inner);
-      space_->pushSolutionNode(node);
-      return;
+      string str = env_->getParam()->getStrParam("SPLIT_INNER");
+      if (str == "NO")
+      {
+         LOG_INTER("Solution node (inner region)");
+         node->setProof(Proof::Inner);
+         space_->pushSolNode(node);
+         return;
+      }
+      else
+      {
+         LOG_INTER("Inner region detected but split required");        
+      }
    }
 
    // node depth
@@ -286,7 +296,7 @@ void NcspSolver::bpStep(int depthlimit)
    {
       LOG_INTER("Soliution node (small enough)");
       node->setProof(Proof::Maybe);
-      space_->pushSolutionNode(node);
+      space_->pushSolNode(node);
    }
    else
    {
@@ -310,6 +320,7 @@ void NcspSolver::bpStep(int depthlimit)
 void NcspSolver::branchAndPrune()
 {
    LOG_MAIN("Branch-and-prune algorithm on problem\n" << preprob_);
+   LOG_INTER("Parameters\n" << env_->getParam());
 
    stimer_.start();
 
@@ -328,11 +339,6 @@ void NcspSolver::branchAndPrune()
    env_->setSolutionLimit(false);
 
    int depthlimit = env_->getParam()->getIntParam("DEPTH_LIMIT");
-
-   LOG_INTER("Time limit:  " << timelimit << "s");
-   LOG_INTER("Node limit:  " << nodelimit);
-   LOG_INTER("Depth limit: " << depthlimit);
-   LOG_INTER("Solution limit: " << sollimit);
 
    bool iter = true;
    
@@ -361,7 +367,7 @@ void NcspSolver::branchAndPrune()
          iter = false;
       }
 
-      if (iter && space_->nbSolutionNodes() >= sollimit)
+      if (iter && (int)space_->nbSolNodes() >= sollimit)
       {
          LOG_MAIN("Stops on solution limit (" << sollimit << ")");
          env_->setSolutionLimit(true);

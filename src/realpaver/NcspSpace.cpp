@@ -12,43 +12,6 @@
 
 namespace realpaver {
 
-NcspSpace::NcspSpace() : vnode_(), feasible_(false)
-{}
-
 NcspSpace::~NcspSpace() {}
-
-size_t NcspSpace::nbSolutionNodes() const
-{
-   return vnode_.size();
-}
-
-SharedNcspNode NcspSpace::getSolutionNode(size_t i) const
-{
-   ASSERT(i < vnode_.size(), "Bad access to a solution node in a CSP space");
-
-   return vnode_[i];
-}
-
-void NcspSpace::pushSolutionNode(const SharedNcspNode& node)
-{
-   vnode_.push_back(node);
-
-   Proof p = node->getProof();
-   if (p == Proof::Inner || p == Proof::Feasible)
-      feasible_ = true;
-}
-
-SharedNcspNode NcspSpace::popSolutionNode()
-{
-   SharedNcspNode node = vnode_.back();
-   vnode_.pop_back();
-   return node;
-}
-
-bool NcspSpace::hasFeasibleSolutionNode() const
-{
-   return feasible_;
-}
-
 
 } // namespace

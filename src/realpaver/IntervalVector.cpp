@@ -132,7 +132,7 @@ RealVector IntervalVector::oppositeCorner(const Bitset& bs) const
 
 bool IntervalVector::contains(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(), "Bad test " << (*this) << " contains " << X);
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i=0; i<size(); ++i)
       if (!get(i).contains(X[i])) return false;
@@ -142,8 +142,7 @@ bool IntervalVector::contains(const IntervalVector& X) const
 
 bool IntervalVector::strictlyContains(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(), "Bad test " << (*this) <<
-                              " strictly contains " << X);
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i=0; i<size(); ++i)
       if (!get(i).strictlyContains(X[i])) return false;
@@ -153,7 +152,7 @@ bool IntervalVector::strictlyContains(const IntervalVector& X) const
 
 bool IntervalVector::contains(const RealVector& X) const
 {
-   ASSERT(size() == X.size(), "Bad test " << (*this) << " contains " << X);
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i=0; i<size(); ++i)
       if (!get(i).contains(X[i])) return false;
@@ -163,8 +162,7 @@ bool IntervalVector::contains(const RealVector& X) const
 
 bool IntervalVector::strictlyContains(const RealVector& X) const
 {
-   ASSERT(size() == X.size(), "Bad test " << (*this) <<
-                              " strictly contains " << X);
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i=0; i<size(); ++i)
       if (!get(i).strictlyContains(X[i])) return false;
@@ -190,7 +188,7 @@ bool IntervalVector::strictlyContainsZero() const
 
 bool IntervalVector::overlaps(const IntervalVector& X) const
 {
-   ASSERT(size() == X.size(), "Bad test " << (*this) << " overlaps " << X);
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i=0; i<size(); ++i)
       if (!get(i).overlaps(X[i])) return false;
@@ -225,5 +223,19 @@ IntervalVector* IntervalVector::clone() const
 {
    return new IntervalVector(*this);
 }
+
+double IntervalVector::distance(const IntervalVector& X) const
+{
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   
+   double d = 0.0;
+   for (size_t i=0; i<size(); ++i)
+   {
+      double e = get(i).distance(X.get(i));
+      if (e > d) d = e;
+   }
+   return d;
+}
+
 
 } // namespace

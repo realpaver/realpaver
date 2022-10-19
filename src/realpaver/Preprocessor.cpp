@@ -232,6 +232,20 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
       if (!save.equals(reg)) modified = true;
    }
    while (modified);
+   
+   // integer variables
+   Scope sco = reg.scope();
+   for (auto v : sco)
+   {
+      if (v.isDiscrete())
+      {
+         Interval rnd = round(reg.get(v));
+         reg.set(v, rnd);
+
+         if (rnd.isEmpty()) return false;
+      }
+   }
+   
    return true;
 }
 

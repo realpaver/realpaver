@@ -26,8 +26,8 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class NcspSpace {
 public:
-   /// Constructor
-   NcspSpace();
+   /// Default constructor
+   NcspSpace() = default;
 
    /// Virtual destructor
    virtual ~NcspSpace();
@@ -38,30 +38,36 @@ public:
    /// Default copy constructor
    NcspSpace(const NcspSpace&) = default;
 
+   /// Management of solution nodes
+   ///@{
    /// @return the number of solution nodes of this
-   size_t nbSolutionNodes() const;
+   virtual size_t nbSolNodes() const = 0;
 
-   /// @param i a solution node index with 0 <= i < nbSolutionNodes()
-   /// @return the i-th solution node
-   SharedNcspNode getSolutionNode(size_t i) const;
-
-   /// Inserts a solution node in this following a FIFO strategy
+   /// Inserts a solution node in this
    /// @param node node inserted
-   void pushSolutionNode(const SharedNcspNode& node);
+   virtual void pushSolNode(const SharedNcspNode& node) = 0;
 
-   /// Removes the last solution node from this
-   /// @return the last solution node
-   SharedNcspNode popSolutionNode();
+   /// Removes a solution node from this
+   /// @return a solution node
+   virtual SharedNcspNode popSolNode() = 0;
 
-   /// @return true if there is a feasible or inner solution node
-   bool hasFeasibleSolutionNode() const;
+   /// @param i a solution node index with 0 <= i < nbSolNodes()
+   /// @return the i-th solution node
+   virtual SharedNcspNode getSolNode(size_t i) const = 0;
 
+   /// @return true if there is a soltion node whose region is an inner region
+   ///         or a feasible region
+   virtual bool hasFeasibleSolNode() const = 0;
+   ///@}
+
+   /// Management of pending nodes
+   ///@{
    /// @return the number of pending nodes of this
    virtual size_t nbPendingNodes() const = 0;
 
    /// Extracts the next pending node from this
    /// @return the pending node extracted from this
-   virtual SharedNcspNode extractPendingNode() = 0;
+   virtual SharedNcspNode nextPendingNode() = 0;
 
    /// Inserts a pending node in this
    virtual void insertPendingNode(const SharedNcspNode& node) = 0;
@@ -69,10 +75,7 @@ public:
    /// @param i a pending node index with 0 <= i < nbPendingNodes()
    /// @return the i-th pending node
    virtual SharedNcspNode getPendingNode(size_t i) const = 0;
-
-private:
-   std::vector<SharedNcspNode> vnode_;        // vector of solution nodes
-   bool feasible_;  // true if there is a feasible or inner solution node
+   ///@}
 };
 
 } // namespace

@@ -33,16 +33,22 @@ public:
    /// Default copy constructor
    NcspSpaceBFS(const NcspSpaceBFS&) = default;
 
-   ///@{
    /// Overrides
+   ///@{
+   size_t nbSolNodes() const;
+   void pushSolNode(const SharedNcspNode& node);
+   SharedNcspNode popSolNode();
+   SharedNcspNode getSolNode(size_t i) const;
+   bool hasFeasibleSolNode() const;
    size_t nbPendingNodes() const;
-   SharedNcspNode extractPendingNode();
+   SharedNcspNode nextPendingNode();
    void insertPendingNode(const SharedNcspNode& node);
    SharedNcspNode getPendingNode(size_t i) const;
    ///@}
 
 private:
-   std::list<SharedNcspNode> lnode_;   // list of pending nodes
+   std::vector<SharedNcspNode> vsol_;    // vector of solution nodes
+   std::list<SharedNcspNode> lnode_;     // list of pending nodes
 };
 
 } // namespace

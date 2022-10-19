@@ -165,7 +165,7 @@ int main(int argc, char** argv)
             cout << ORANGE("partial") << endl;
 
          cout << indent << WP("Solution status", wpl);
-         if (space->nbSolutionNodes() == 0)
+         if (space->nbSolNodes() == 0)
          {
             if (complete)
                cout << ORANGE("unfeasible") << endl;
@@ -174,13 +174,13 @@ int main(int argc, char** argv)
          }
          else
          {
-            if (space->hasFeasibleSolutionNode())
+            if (space->hasFeasibleSolNode())
                cout << ORANGE("feasible") << endl;
             else
                cout << ORANGE("no proof certificate") << endl;
 
             cout << indent << WP("Number of solutions", wpl)
-                 << ORANGE(space->nbSolutionNodes()) << endl;
+                 << ORANGE(space->nbSolNodes()) << endl;
 
             if (!complete)
                cout << indent << WP("Number of pending nodes", wpl)
@@ -191,9 +191,9 @@ int main(int argc, char** argv)
             Scope sco = preproc->unfixedScope();
             fsol << sco << endl;
 
-            for (size_t i=0; i<space->nbSolutionNodes(); ++i)
+            for (size_t i=0; i<space->nbSolNodes(); ++i)
             {
-               SharedNcspNode node = space->getSolutionNode(i);
+               SharedNcspNode node = space->getSolNode(i);
                IntervalRegion* reg = node->region();
                Proof proof = node->getProof();
 
@@ -213,19 +213,20 @@ int main(int argc, char** argv)
          // limits
          if (env->usedTimeLimit())
             cout << indent << WP("Time limit enabled", wpl)
-                 << env->getParam()->getDblParam("TIME_LIMIT") << endl;
+                 << ORANGE(env->getParam()->getDblParam("TIME_LIMIT")) << endl;
          
          if (env->usedSolutionLimit())
             cout << indent << WP("Solution limit enabled", wpl)
-                 << env->getParam()->getIntParam("SOLUTION_LIMIT") << endl;
+                 << ORANGE(env->getParam()->getIntParam("SOLUTION_LIMIT"))
+                 << endl;
 
          if (env->usedNodeLimit())
             cout << indent << WP("Node limit enabled", wpl)
-                 << env->getParam()->getIntParam("NODE_LIMIT") << endl;
+                 << ORANGE(env->getParam()->getIntParam("NODE_LIMIT")) << endl;
 
          if (env->usedDepthLimit())
             cout << indent << WP("Depth limit enabled", wpl)
-                 << env->getParam()->getIntParam("DEPTH_LIMIT") << endl;
+                 << ORANGE(env->getParam()->getIntParam("DEPTH_LIMIT")) << endl;
 
          cout << GRAY(sep) << endl;
       }

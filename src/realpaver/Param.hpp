@@ -83,7 +83,7 @@ public:
 
    /// Writes the parameters on a stream
    /// @param os output stream
-   void printParam(std::ostream& os);
+   void print(std::ostream& os) const;
 
    /// Loads settings from a file in the static instance
    /// @param name of the file
@@ -157,6 +157,9 @@ private:
    static bool isCharName(char c);
    static bool isInt(const std::string& s);
 };
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, const Param& prm);
 
 } // namespace
 
