@@ -20,7 +20,7 @@ class ConstraintVisitor;   // forward declaration
 /// Enumeration of relation symbols.
 ///////////////////////////////////////////////////////////////////////////////
 enum class RelSymbol {
-   Eq, Le, Lt, Ge, Gt, In
+   Eq, Le, Lt, Ge, Gt, In, Table
 };
 
 /// Output on a stream

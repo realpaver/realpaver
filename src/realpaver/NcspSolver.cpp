@@ -320,7 +320,7 @@ void NcspSolver::bpStep(int depthlimit)
 void NcspSolver::branchAndPrune()
 {
    LOG_MAIN("Branch-and-prune algorithm on problem\n" << preprob_);
-   LOG_INTER("Parameters\n" << env_->getParam());
+   LOG_INTER("Parameters\n" << *env_->getParam());
 
    stimer_.start();
 

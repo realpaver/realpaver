@@ -9,6 +9,8 @@
 
 #include <fstream>
 #include <limits>
+#include <map>
+#include <sstream>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/Exception.hpp"
@@ -387,34 +389,94 @@ void Param::loadParam(const std::string& filename)
 
 void Param::print(std::ostream& os) const
 {
-   for (auto it = intmap_.begin();
-             it != intmap_.end();
-             ++it)
-      os << it-> first << " = " << it->second << "\n";
+   std::map<std::string, std::string> smap;
+   size_t lmax = 0;
 
-   for (auto it = dblmap_.begin();
-             it != dblmap_.end();
-             ++it)
-      os << it-> first << " = " << it->second << "\n";
+   // integers
+   for (auto it = intmap_.begin(); it != intmap_.end(); ++it)
+   {
+      std::ostringstream ostr;
+      ostr << it->second;
+      smap.insert(std::make_pair(it->first, ostr.str()));
+      size_t l = it->first.length();
+      if (l > lmax) lmax = l;
+   }
+   
+   // doubles
+   for (auto it = dblmap_.begin(); it != dblmap_.end(); ++it)
+   {
+      std::ostringstream ostr;
+      ostr << it->second;
+      smap.insert(std::make_pair(it->first, ostr.str()));
+      size_t l = it->first.length();
+      if (l > lmax) lmax = l;
+   }
 
-   for (auto it = strmap_.begin();
-             it != strmap_.end();
-             ++it)
-      os << it-> first << " = " << it->second << "\n";
+   // strings
+   for (auto it = strmap_.begin(); it != strmap_.end(); ++it)
+   {
+      smap.insert(std::make_pair(it->first, it->second));
+      size_t l = it->first.length();
+      if (l > lmax) lmax = l;
+   }
 
-   for (auto it = tolmap_.begin();
-             it != tolmap_.end();
-             ++it)
+   // tolerances
+   for (auto it = tolmap_.begin(); it != tolmap_.end(); ++it)
    {
       Tolerance tol = it->second;
-      if (tol.isAbsolute())
-         os << "ABS_";
-      else
-         os << "REL_";
+      std::ostringstream ostr;
+      ostr << tol.getVal();
 
-      os << it-> first << " = " << tol.getVal() << "\n";
+      std::string name = "";
+      if (tol.isAbsolute()) name += "ABS_";
+      else name += "REL_";
+      name += it->first;
+
+      smap.insert(std::make_pair(name, ostr.str()));
+      size_t l = it->first.length();
+      if (l > lmax) lmax = l;
+   }
+
+   // prints the parameters
+   for (auto it = smap.begin(); it != smap.end(); ++it)
+   {
+      os << it->first;
+      size_t l = it->first.length();
+      for (size_t i=0; i<lmax-l; ++i) os << " ";
+      os << " = " << it->second << "\n";
    }
 }
+
+//~ void Param::print(std::ostream& os) const
+//~ {
+   //~ for (auto it = intmap_.begin();
+             //~ it != intmap_.end();
+             //~ ++it)
+      //~ os << it-> first << " = " << it->second << "\n";
+
+   //~ for (auto it = dblmap_.begin();
+             //~ it != dblmap_.end();
+             //~ ++it)
+      //~ os << it-> first << " = " << it->second << "\n";
+
+   //~ for (auto it = strmap_.begin();
+             //~ it != strmap_.end();
+             //~ ++it)
+      //~ os << it-> first << " = " << it->second << "\n";
+
+   //~ for (auto it = tolmap_.begin();
+             //~ it != tolmap_.end();
+             //~ ++it)
+   //~ {
+      //~ Tolerance tol = it->second;
+      //~ if (tol.isAbsolute())
+         //~ os << "ABS_";
+      //~ else
+         //~ os << "REL_";
+
+      //~ os << it-> first << " = " << tol.getVal() << "\n";
+   //~ }
+//~ }
 
 void Param::PrintParam(std::ostream& os)
 {
