@@ -690,8 +690,6 @@ ConstraintTable::ConstraintTable(
       }
       vcol_.push_back(col);
    }
-
-   // TODO
 }
 
 size_t ConstraintTable::nbCols() const
