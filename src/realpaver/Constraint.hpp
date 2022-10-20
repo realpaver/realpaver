@@ -381,6 +381,88 @@ Constraint in(Term t, const Interval& x);
 Constraint in(Term t, double a, double b);
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a column of a table constraint.
+///////////////////////////////////////////////////////////////////////////////
+class ConstraintTableCol {
+public:
+   /// Constructor
+   /// @param v a variable
+   ConstraintTableCol(Variable v);
+
+   /// Constructor
+   /// @param v a variable
+   /// @param l list of values of the variable
+   ConstraintTableCol(Variable v, const std::initializer_list<Interval>& l);
+
+   /// @return the number of assignments of the variable
+   size_t size() const;
+
+   /// @return the variable
+   Variable getVar() const;
+
+   /// Adds a value at the end
+   /// @param x value added
+   void addValue(const Interval& x);
+
+private:
+   Variable v_;
+   std::vector<Interval> vval_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a table constraint.
+///
+/// Example: x  y  z
+///          0  1  2
+///          3  4  5
+///
+/// In this example, we have 3 variables and 2 assignments.
+/// Each column is represented by an instance of ConstraintTableCol.
+///////////////////////////////////////////////////////////////////////////////
+class ConstraintTable : public ConstraintRep {
+public:
+   /// Constructor
+   /// @param l list of columns of this
+   ConstraintTable(const std::initializer_list<ConstraintTableCol>& l);
+
+   /// Constructor
+   /// @param vars a list of variables
+   /// @param values list of values representing a row oriented matrix
+   ConstraintTable(const std::initializer_list<Variable>& vars,
+                   const std::initializer_list<std::string>& values);
+
+   /// @return the number of columns (variables)
+   size_t nbCols() const;
+
+   /// @return the number of assignments of the variables
+   size_t colSize() const;
+
+   /// Column access
+   /// @param i a column index between 0 and nbCols()
+   /// @return the i-th column of this
+   ConstraintTableCol getCol(size_t i) const;
+
+   ///@{
+   /// Overrides
+   bool isConstant() const;
+   Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof contract(IntervalRegion& reg);
+   void print(std::ostream& os) const;
+   void acceptVisitor(ConstraintVisitor& vis) const;
+   ///@}
+
+private:
+   std::vector<ConstraintTableCol> vcol_;
+};
+
+/// Creates a table constraint
+/// @param vars a list of variables
+/// @param values list of values representing a row oriented matrix
+/// @return the constraint
+Constraint table(const std::initializer_list<Variable>& vars,
+                 const std::initializer_list<std::string>& values);
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is a visitor of constraint representations.
 ///////////////////////////////////////////////////////////////////////////////
 class ConstraintVisitor {
@@ -396,6 +478,7 @@ public:
    virtual void apply(const ConstraintGe* c);
    virtual void apply(const ConstraintGt* c);
    virtual void apply(const ConstraintIn* c);
+   virtual void apply(const ConstraintTable* c);
    ///@}
 };
 

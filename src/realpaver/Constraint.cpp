@@ -16,12 +16,13 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel)
 {
    switch(rel)
    {
-      case RelSymbol::Eq: return os << "==";
-      case RelSymbol::Le: return os << "<=";
-      case RelSymbol::Lt: return os << "<";
-      case RelSymbol::Ge: return os << ">=";
-      case RelSymbol::Gt: return os << ">";
-      case RelSymbol::In: return os << "in";
+      case RelSymbol::Eq:     return os << "==";
+      case RelSymbol::Le:     return os << "<=";
+      case RelSymbol::Lt:     return os << "<";
+      case RelSymbol::Ge:     return os << ">=";
+      case RelSymbol::Gt:     return os << ">";
+      case RelSymbol::In:     return os << "in";
+      case RelSymbol::Table:  return os << "table";
       default:            os.setstate(std::ios::failbit);
    }
    return os;
@@ -618,6 +619,130 @@ Constraint in(Term t, double a, double b)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConstraintTableCol::ConstraintTableCol(Variable v)
+      : v_(v),
+      vval_()
+{}
+
+ConstraintTableCol::ConstraintTableCol(Variable v,
+                                       const std::initializer_list<Interval>& l)
+      : v_(v),
+        vval_(l)
+{}
+
+size_t ConstraintTableCol::size() const
+{
+   return vval_.size();
+}
+
+Variable ConstraintTableCol::getVar() const
+{
+   return v_;
+}
+
+void ConstraintTableCol::addValue(const Interval& x)
+{
+   vval_.push_back(x);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConstraintTable::ConstraintTable(
+   const std::initializer_list<ConstraintTableCol>& l)
+      : ConstraintRep(),
+        vcol_(l)
+{
+   ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
+   ASSERT(colSize() > 0, "Bad initialization of a constraint table");
+}
+
+ConstraintTable::ConstraintTable(
+   const std::initializer_list<Variable>& vars,
+   const std::initializer_list<std::string>& values)
+      : ConstraintRep(),
+        vcol_()
+{
+   size_t nbvar = vars.size();
+   size_t nbstr = values.size();
+   
+   ASSERT(nbvar > 0 && nbstr > nbvar && (nbstr % nbvar == 0),
+          "Bad initialization of a constraint table");
+
+   size_t colsize = nbstr / nbvar;
+   auto itstr = values.begin();
+
+   for (auto itv=vars.begin(); itv != vars.end(); ++itv)
+   {
+      ConstraintTableCol col(*itv);
+      
+      for (size_t j=0; j<colsize; ++j, ++itstr)
+      {
+         std::string str = *itstr;
+         try
+         {
+            Interval x(str.c_str());
+            col.addValue(x);
+         }
+         catch(Exception& e)
+         {
+            THROW("Bad initialization of a constraint table: " << str);
+         }
+      }
+      vcol_.push_back(col);
+   }
+
+   // TODO
+}
+
+size_t ConstraintTable::nbCols() const
+{
+   return vcol_.size();
+}
+
+size_t ConstraintTable::colSize() const
+{
+   return vcol_.empty() ? 0 : vcol_[0].size();
+}
+
+ConstraintTableCol ConstraintTable::getCol(size_t i) const
+{
+   ASSERT(i < nbCols(), "Bad access to a column in a table constraint @ " << i);
+   return vcol_[i];
+}
+
+bool ConstraintTable::isConstant() const
+{
+   return vcol_.empty();
+}
+
+Proof ConstraintTable::isSatisfied(const IntervalRegion& reg) const
+{
+   // TODO
+}
+
+Proof ConstraintTable::contract(IntervalRegion& reg)
+{
+   // TODO   
+}
+
+void ConstraintTable::print(std::ostream& os) const
+{
+   // TODO
+}
+
+void ConstraintTable::acceptVisitor(ConstraintVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+Constraint table(const std::initializer_list<Variable>& vars,
+                 const std::initializer_list<std::string>& values)
+{
+   return Constraint(std::make_shared<ConstraintTable>(vars, values));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ConstraintVisitor::~ConstraintVisitor()
 {}
 
@@ -647,6 +772,11 @@ void ConstraintVisitor::apply(const ConstraintGt* c)
 }
 
 void ConstraintVisitor::apply(const ConstraintIn* c)
+{
+   THROW("Visit method not implemented");
+}
+
+void ConstraintVisitor::apply(const ConstraintTable* c)
 {
    THROW("Visit method not implemented");
 }
