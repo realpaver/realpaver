@@ -397,6 +397,10 @@ public:
    /// @return the number of assignments of the variable
    size_t size() const;
 
+   ///@param i an index between 0 and size()
+   /// @return the i-th value of this
+   Interval getVal(size_t i) const;
+
    /// @return the variable
    Variable getVar() const;
 
@@ -429,7 +433,7 @@ public:
    /// @param vars a list of variables
    /// @param values list of values representing a row oriented matrix
    ConstraintTable(const std::initializer_list<Variable>& vars,
-                   const std::initializer_list<std::string>& values);
+                   const std::initializer_list<Interval>& values);
 
    /// @return the number of columns (variables)
    size_t nbCols() const;
@@ -460,7 +464,7 @@ private:
 /// @param values list of values representing a row oriented matrix
 /// @return the constraint
 Constraint table(const std::initializer_list<Variable>& vars,
-                 const std::initializer_list<std::string>& values);
+                 const std::initializer_list<Interval>& values);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a visitor of constraint representations.

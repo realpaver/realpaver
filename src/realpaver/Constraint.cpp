@@ -645,6 +645,12 @@ void ConstraintTableCol::addValue(const Interval& x)
    vval_.push_back(x);
 }
 
+Interval ConstraintTableCol::getVal(size_t i) const
+{
+   ASSERT(i < size(), "Bad access in a column of a table constraint @ " << i);
+   return vval_[i];
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ConstraintTable::ConstraintTable(
@@ -658,37 +664,36 @@ ConstraintTable::ConstraintTable(
 
 ConstraintTable::ConstraintTable(
    const std::initializer_list<Variable>& vars,
-   const std::initializer_list<std::string>& values)
+   const std::initializer_list<Interval>& values)
       : ConstraintRep(),
         vcol_()
 {
    size_t nbvar = vars.size();
-   size_t nbstr = values.size();
-   
-   ASSERT(nbvar > 0 && nbstr > nbvar && (nbstr % nbvar == 0),
+   size_t nbitv = values.size();
+
+   ASSERT(nbvar > 0 && nbitv > nbvar && (nbitv % nbvar == 0),
           "Bad initialization of a constraint table");
 
-   size_t colsize = nbstr / nbvar;
-   auto itstr = values.begin();
-
+   // creates the columns
    for (auto itv=vars.begin(); itv != vars.end(); ++itv)
    {
       ConstraintTableCol col(*itv);
-      
-      for (size_t j=0; j<colsize; ++j, ++itstr)
-      {
-         std::string str = *itstr;
-         try
-         {
-            Interval x(str.c_str());
-            col.addValue(x);
-         }
-         catch(Exception& e)
-         {
-            THROW("Bad initialization of a constraint table: " << str);
-         }
-      }
       vcol_.push_back(col);
+   }
+
+   auto itv = values.begin();
+   size_t nrows = nbitv / nbvar;
+
+   for (size_t i=0; i<nrows; ++i)
+   {
+      for (size_t j=0; j<nbvar; ++j, ++itv)
+      {
+         Interval x = *itv;
+         if (x.isEmpty())
+            THROW("Bad initialization of a constraint table: " << x);
+
+         vcol_[j].addValue(x);
+      }
    }
 }
 
@@ -725,7 +730,26 @@ Proof ConstraintTable::contract(IntervalRegion& reg)
 
 void ConstraintTable::print(std::ostream& os) const
 {
-   // TODO
+   // prints the variables
+   os << "(";
+   for (size_t i=0; i<nbCols(); ++i)
+   {
+      if (i > 0) os << ", \t";
+      os << vcol_[i].getVar().getName();
+   }
+   os << ")" << std::endl;
+
+   // prints the rows
+   for (size_t j=0; j<colSize(); ++j)
+   {
+      os << "(";
+      for (size_t i=0; i<nbCols(); ++i)
+      {
+         if (i> 0) os << ", \t";
+         os << vcol_[i].getVal(j);
+      }
+      os << ")" << std::endl;
+   }
 }
 
 void ConstraintTable::acceptVisitor(ConstraintVisitor& vis) const
@@ -734,7 +758,7 @@ void ConstraintTable::acceptVisitor(ConstraintVisitor& vis) const
 }
 
 Constraint table(const std::initializer_list<Variable>& vars,
-                 const std::initializer_list<std::string>& values)
+                 const std::initializer_list<Interval>& values)
 {
    return Constraint(std::make_shared<ConstraintTable>(vars, values));
 }
