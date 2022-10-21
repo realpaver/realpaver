@@ -85,4 +85,9 @@ void ConstraintFixer::apply(const ConstraintIn* c)
    c_ = in(vis.getTerm(), c->image());
 }
 
+void ConstraintFixer::apply(const ConstraintITable* c)
+{
+   // TODO
+}
+
 } // namespace

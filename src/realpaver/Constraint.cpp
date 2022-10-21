@@ -659,7 +659,20 @@ ConstraintTable::ConstraintTable(
         vcol_(l)
 {
    ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
-   ASSERT(colSize() > 0, "Bad initialization of a constraint table");
+   ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
+
+   // scope and hash code
+   Scope s;
+   hcode_ = static_cast<size_t>(RelSymbol::Table);
+
+   for (auto& col : vcol_)
+   {
+      Variable v = col.getVar();
+      s.insert(v);
+      hcode_ = hash2(v.hashCode(), hcode_);      
+   }
+
+   setScope(s);
 }
 
 ConstraintTable::ConstraintTable(
@@ -695,6 +708,19 @@ ConstraintTable::ConstraintTable(
          vcol_[j].addValue(x);
       }
    }
+
+   // scope and hash code
+   Scope s;
+   hcode_ = static_cast<size_t>(RelSymbol::Table);
+
+   for (auto& col : vcol_)
+   {
+      Variable v = col.getVar();
+      s.insert(v);
+      hcode_ = hash2(v.hashCode(), hcode_);      
+   }
+
+   setScope(s);
 }
 
 size_t ConstraintTable::nbCols() const
@@ -702,7 +728,7 @@ size_t ConstraintTable::nbCols() const
    return vcol_.size();
 }
 
-size_t ConstraintTable::colSize() const
+size_t ConstraintTable::nbRows() const
 {
    return vcol_.empty() ? 0 : vcol_[0].size();
 }
@@ -718,14 +744,58 @@ bool ConstraintTable::isConstant() const
    return vcol_.empty();
 }
 
+bool ConstraintTable::isRowConsistent(size_t i, const IntervalRegion& reg) const
+{
+   for (size_t j=0; j<nbCols(); ++j)
+   {      
+      Variable v = vcol_[j].getVar();
+      if (reg.get(v).isDisjoint(vcol_[j].getVal(i)))
+         return false;
+   }
+   return true;
+}
+
 Proof ConstraintTable::isSatisfied(const IntervalRegion& reg) const
 {
-   // TODO
+   for (size_t i=0; i<nbRows(); ++i)
+      if (isRowConsistent(i, reg))
+         return Proof::Maybe;
+
+   return Proof::Empty;
 }
 
 Proof ConstraintTable::contract(IntervalRegion& reg)
 {
-   // TODO   
+   Bitset consistent(nbRows(), 1);
+   size_t nbc = nbRows();     // number of consistent rows
+
+   // checks consistency
+   for (size_t i=0; i<nbRows(); ++i)
+      if (!isRowConsistent(i, reg))
+      {
+         consistent.setZero(i);
+         --nbc;
+      }
+
+   if (nbc == 0) return Proof::Empty;
+
+   // contracts the domains
+   for (size_t j=0; j<nbCols(); ++j)
+   {
+      Variable v = vcol_[j].getVar();
+
+      // hull of values of this variable occurring in the consistent rows
+      Interval h = Interval::emptyset();
+      for (size_t i=0; i<nbRows(); ++i)
+         if (consistent.get(i))
+            h |= vcol_[j].getVal(i);
+
+      Interval x = h & reg.get(v);
+      if (x.isEmpty()) return Proof::Empty;
+      reg.set(v, x);
+   }
+
+   return (nbc == 1) ? Proof::Inner : Proof::Maybe;
 }
 
 void ConstraintTable::print(std::ostream& os) const
@@ -740,7 +810,7 @@ void ConstraintTable::print(std::ostream& os) const
    os << ")" << std::endl;
 
    // prints the rows
-   for (size_t j=0; j<colSize(); ++j)
+   for (size_t j=0; j<nbRows(); ++j)
    {
       os << "(";
       for (size_t i=0; i<nbCols(); ++i)

@@ -74,6 +74,10 @@ public:
    /// @param c constraint visited
    void apply(const ConstraintIn* c);
 
+   /// Visits a constraint
+   /// @param c constraint visited
+   void apply(const ConstraintTable* c);
+
 private:
    VarVarMapType* vvm_;
    VarIntervalMapType* vim_;

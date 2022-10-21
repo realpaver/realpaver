@@ -1,13 +1,11 @@
--------------------------------------------------------------------------------
-- NCSP Solver
+TABLE CONSTRAINT
 
-tester des problèmes résolus au preprocessing (feasible et infeasible)
-et gérer l'output
+constraints visitors
 
-il faut que tous les PARAM soient pris en compte : les tolerances,
-les param des contracteurs, etc.
+ConstraintFixer
+ConstraintRelaxor
 
-gérer la sortie des solutions... hiérarchie de IntervalRegionWriter ?
+peut etre faire une méthode de clonage dans Cnstraint, ConstraintRep ?
 
 -------------------------------------------------------------------------------
 - Create a DAG from a .nl file

@@ -43,6 +43,7 @@ public:
    void apply(const ConstraintGe* c);
    void apply(const ConstraintGt* c);
    void apply(const ConstraintIn* c);
+   void apply(const ConstraintTable* c);
    ///@}
 
    /// @return the relaxed constraint after a visit

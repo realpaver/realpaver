@@ -438,8 +438,8 @@ public:
    /// @return the number of columns (variables)
    size_t nbCols() const;
 
-   /// @return the number of assignments of the variables
-   size_t colSize() const;
+   /// @return the number of rows (assignments)
+   size_t nbRows() const;
 
    /// Column access
    /// @param i a column index between 0 and nbCols()
@@ -456,7 +456,9 @@ public:
    ///@}
 
 private:
-   std::vector<ConstraintTableCol> vcol_;
+   std::vector<ConstraintTableCol> vcol_; // vector of columns
+
+   bool isRowConsistent(size_t i, const IntervalRegion& reg) const;
 };
 
 /// Creates a table constraint

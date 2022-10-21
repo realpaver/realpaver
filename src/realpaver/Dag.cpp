@@ -12,6 +12,7 @@
 #include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Reformulation.hpp"
 

@@ -13,17 +13,27 @@ int main(void)
 
    try {
       Problem prob;
-      Variable x = prob.addRealVar(1, 2, "x");
-      Variable y = prob.addBoolVar("y");
-      Variable z = prob.addIntVar(3, 7, "z");
+      Variable x = prob.addRealVar(0,  3, "x");
+      Variable y = prob.addIntVar (4,  7, "y");
+      Variable z = prob.addIntVar (-2, 10, "z");
 
       Constraint c = table( {x, y, z},
                             {1, 2, 3,
-                             4, 5, 6,
-                             7, 8, 9,
-                             10, 11, 12,
-                             13, 14, "1.1"} );
-      cout << c;
+                             1, 5, 0.0,
+                             2, 8, 3,
+                             3, 6, 11} );
+      cout << c << c.scope() << endl;
+
+      IntervalRegion reg = prob.getDomains();
+      cout << "reg : " << reg << endl;
+      
+      if (c.isSatisfied(reg) != Proof::Empty)
+         cout << "satisfied" << endl;
+      else
+         cout << "not satisfied" << endl;
+
+
+      cout << c.contract(reg) << endl << reg << endl;
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

@@ -54,4 +54,10 @@ void ConstraintRelaxor::apply(const ConstraintIn* c)
    relaxed_ = in(c->term(), c->image());
 }
 
+void ConstraintRelaxor::apply(const ConstraintTable* c)
+{
+   // TODO
+
+}
+
 } // namespace
