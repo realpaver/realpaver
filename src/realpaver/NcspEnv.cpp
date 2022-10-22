@@ -12,7 +12,7 @@
 
 namespace realpaver {
 
-NcspEnv::NcspEnv() : Env(), slim_(false)
+NcspEnv::NcspEnv() : Env(), slim_(false), dlim_(false)
 {}
 
 void NcspEnv::setSolutionLimit(bool b)

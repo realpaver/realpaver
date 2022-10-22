@@ -2338,6 +2338,11 @@ Dag::~Dag()
    delete defaultContext_;
 }
 
+bool Dag::isEmpty() const
+{
+   return node_.empty();
+}
+
 size_t Dag::nbNodes() const
 {
    return node_.size();

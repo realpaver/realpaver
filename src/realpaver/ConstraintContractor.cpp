@@ -11,8 +11,7 @@
 
 namespace realpaver {
 
-ConstraintContractor::ConstraintContractor(const Constraint& c)
-      : c_(c)
+ConstraintContractor::ConstraintContractor(Constraint c) : c_(c)
 {}
 
 bool ConstraintContractor::dependsOn(const Bitset& bs) const
@@ -22,22 +21,22 @@ bool ConstraintContractor::dependsOn(const Bitset& bs) const
 
 Scope ConstraintContractor::scope() const
 {
-
+   return c_.scope();
 }
 
 Proof ConstraintContractor::contract(IntervalRegion& reg)
 {
-
+   return c_.contract(reg);
 }
 
 void ConstraintContractor::print(std::ostream& os) const
 {
-
+   os << "contractor of " << c_;
 }
 
-Constraint ConstraintContractor::getConstrant() const
+Constraint ConstraintContractor::getConstraint() const
 {
-
+   return c_;
 }
 
 } // namespace

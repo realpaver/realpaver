@@ -24,7 +24,7 @@ class ConstraintContractor : public Contractor {
 public:
    /// Constructor
    /// @param c constraint of this
-   ConstraintContractor(const Constraint& c);
+   ConstraintContractor(Constraint c);
 
    /// Default copy constructor
    ConstraintContractor(const ConstraintContractor&) = default;
@@ -44,7 +44,7 @@ public:
    ///@}
 
    /// @return the constraint enclosed in this
-   Constraint getConstrant() const;
+   Constraint getConstraint() const;
 
 private:
    Constraint c_;

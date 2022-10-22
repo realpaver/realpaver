@@ -16,6 +16,9 @@ extern realpaver::Problem* realpaver_bison_problem;
 extern realpaver::Param* realpaver_bison_param;
 extern realpaver::SymbolTable* realpaver_bison_symtab;
 
+extern std::vector<realpaver::Variable>* realpaver_var_vector;
+extern std::vector<realpaver::Interval>* realpaver_itv_vector;
+
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
 
@@ -45,6 +48,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    exponent
 %type <u_term>    itv
 %type <u_term>    domain
+%type <u_term>    table_list_val_def
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
@@ -224,10 +228,35 @@ ctr_def
       realpaver::Constraint c(lhs >= rhs);
       realpaver_bison_problem->addCtr(c);
     }
-  | TK_TABLE TK_LPAR TK_LCBR table_list_var TK_RCBR TK_COMMA
-    TK_LCBR table_list_val TK_RCBR TK_RPAR
+  | TK_TABLE
     {
-       // TODO
+      if (realpaver_var_vector != nullptr)
+         realpaver_var_vector->clear();
+      else
+        realpaver_var_vector = new std::vector<realpaver::Variable>();
+
+      if (realpaver_itv_vector != nullptr)
+         realpaver_itv_vector->clear();
+      else
+        realpaver_itv_vector = new std::vector<realpaver::Interval>();
+    }
+    TK_LPAR TK_LCBR table_list_var TK_RCBR TK_COMMA    
+                     TK_LCBR table_list_val TK_RCBR TK_RPAR
+    {
+
+      if (realpaver_var_vector->size() == 0 ||
+          realpaver_itv_vector->size() % realpaver_var_vector->size() != 0)
+      {
+         realpaver_bison_error("Bad initialization of a table constraint");
+         YYABORT;
+      }
+
+      realpaver::Constraint c( table(realpaver_var_vector->data(),
+                                     realpaver_var_vector->size(),
+                                     realpaver_itv_vector->data(),
+                                     realpaver_itv_vector->size()) );
+
+      realpaver_bison_problem->addCtr(c);
     }
   ;
 
@@ -382,8 +411,7 @@ table_list_var_def
 
       if (vs != nullptr)
       {
-        // TODO
-
+         realpaver_var_vector->push_back(vs->getVar());
       }
       else
       {
@@ -396,7 +424,23 @@ table_list_var_def
   ;
 
 table_list_val
-  : table_list_val_def table_list_val_tail
+  : table_list_val_def
+    {
+      realpaver::TermConst* cst = static_cast<realpaver::TermConst*>($1);
+      realpaver::Interval x(cst->evalConst());
+      delete cst;
+      
+      if (x.isEmpty())
+      {
+        realpaver_bison_error("Empty interval in a table constraint");
+        YYABORT;
+      }
+      else
+      {
+        realpaver_itv_vector->push_back(x);
+      }
+    }
+    table_list_val_tail
   ;
 
 table_list_val_tail
@@ -407,15 +451,15 @@ table_list_val_tail
 table_list_val_def
   : itv
     {
-       // TODO
+       $$ = $1;
     }
   | real
     {
-       // TODO
+       $$ = $1;
     }  
   | integer
     {
-       // TODO
+       $$ = $1;
     }
   ;
 

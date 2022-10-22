@@ -482,10 +482,23 @@ private:
 
 /// Creates a table constraint
 /// @param vars a list of variables
-/// @param values list of values representing a row oriented matrix
+/// @param values a list of values representing the list of tuples assigned
+///               to the variables, i.e. we have the first tuple in the list,
+///               followed by the second tuple, and so on
 /// @return the constraint
 Constraint table(const std::initializer_list<Variable>& vars,
                  const std::initializer_list<Interval>& values);
+
+/// Creates a table constraint
+/// @param vars an array of variables
+/// @param nvars the size of vars
+/// @param values an array of values representing the list of tuples assigned
+///               to the variables, i.e. we have the first tuple in the list,
+///               followed by the second tuple, and so on
+/// @param nvalues the size if values
+/// @return the constraint
+Constraint table(const Variable* vars, size_t nvars,
+                 const Interval* values, size_t nvalues);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a visitor of constraint representations.

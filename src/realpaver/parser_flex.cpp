@@ -2316,6 +2316,10 @@ realpaver::SymbolTable* realpaver_bison_symtab;
 realpaver::Param* realpaver_bison_param;
 realpaver::FunctionSymbol* realpaver_fun_symbol;
 
+// vectors used to parse the table constraints
+std::vector<realpaver::Variable>* realpaver_var_vector;
+std::vector<realpaver::Interval>* realpaver_itv_vector;
+
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;
 
@@ -2329,6 +2333,8 @@ void realpaver_flex_init(realpaver::Problem* prob,
   realpaver_bison_param = prm;
   realpaver_parse_error = "";
   realpaver_fun_symbol = nullptr;
+  realpaver_var_vector = nullptr;
+  realpaver_itv_vector = nullptr;
 }
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
@@ -2367,14 +2373,22 @@ void realpaver_flex_cleanup_str()
   realpaver_bison_problem = NULL;
   realpaver_bison_symtab = NULL;
   realpaver_bison_param = NULL;
+
+  if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
+  if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
+
   realpaver_bison__delete_buffer(realpaver_bison_buffer);
 }
 
 void realpaver_flex_cleanup_file()
 {
-  realpaver_bison_problem = NULL;
-  realpaver_bison_symtab = NULL;
-  realpaver_bison_param = NULL;
+  realpaver_bison_problem = nullptr;
+  realpaver_bison_symtab = nullptr;
+  realpaver_bison_param = nullptr;
+
+  if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
+  if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
+
   if (realpaver_bison_in)
   {
     fclose(realpaver_bison_in);

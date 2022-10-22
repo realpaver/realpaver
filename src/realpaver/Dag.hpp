@@ -1049,6 +1049,9 @@ public:
    /// No assignment
    Dag& operator=(const Dag&) =delete;
 
+   /// @return true if this dag is empty
+   bool isEmpty() const;
+
    /// @return the number of nodes
    size_t nbNodes() const;
 

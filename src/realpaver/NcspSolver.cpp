@@ -112,6 +112,7 @@ void NcspSolver::makeContractor()
    for (size_t i=0; i<preprob_.nbCtrs(); ++i)
    {
       Constraint c = preprob_.ctrAt(i);
+      std::shared_ptr<Contractor> op;
 
       try
       {
@@ -119,26 +120,21 @@ void NcspSolver::makeContractor()
          std::shared_ptr<Contractor> op;
          
          if (base == "HC4")
-         {
             op = std::make_shared<HC4Contractor>(dag_, j);
-         }
+
          else if (base == "BC4")
-         {
             op = std::make_shared<BC4Contractor>(dag_, j);
-         }
+
          else
-         {
             THROW("bad assignment of parameter PROPAGATION_BASE");
-         }
-         
-         pool->push(op);
+
       }
       catch(Exception e)
       {
-         std::shared_ptr<ConstraintContractor> op =
-            std::make_shared<ConstraintContractor>(c);
-         pool->push(op);         
+         op = std::make_shared<ConstraintContractor>(c);
       }
+
+      pool->push(op);
    }
 
    SharedPropagator propagator = std::make_shared<Propagator>(pool);
@@ -166,15 +162,14 @@ void NcspSolver::makeContractor()
 
       mainpool->push(op);
    }
-   else
-   {
-      mainpool->push(propagator);
-   }
 
-   // polytope hull contractor ?
+   else
+      mainpool->push(propagator);
+
+   // polytope hull contractor and non empty dag ?
    std::string with_polytope =
       env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
-   if (with_polytope == "YES")
+   if (with_polytope == "YES" && !dag_->isEmpty())
    {
       SharedContractor op =
          std::make_shared<PolytopeHullContractor>(dag_, preprob_.scope());
@@ -185,13 +180,10 @@ void NcspSolver::makeContractor()
    // integer variables
    std::shared_ptr<IntContractor> iop = std::make_shared<IntContractor>();
    for (Variable v : preprob_.scope())
-   {
       if (v.isDiscrete()) iop->insertVar(v);
-   }
+
    if (iop->nbVars() > 0)
-   {
       mainpool->push(iop);
-   }
 
    // creates the contractor of this solver applying the contractors of
    // the main pool in sequence
@@ -294,7 +286,7 @@ void NcspSolver::bpStep(int depthlimit)
 
    if (split_->getNbNodes() <= 1)
    {
-      LOG_INTER("Soliution node (small enough)");
+      LOG_INTER("Solution node (small enough)");
       node->setProof(Proof::Maybe);
       space_->pushSolNode(node);
    }
@@ -327,6 +319,8 @@ void NcspSolver::branchAndPrune()
    makeSpace();
    makeContractor();
    makeSplit();
+
+std::cout << "apres les makers" << std::endl;
 
    // parameters
    double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");

@@ -53,7 +53,7 @@
 extern int realpaver_bison_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 28 "parser_bison.ypp"
+#line 31 "parser_bison.ypp"
 
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Exception.hpp"
@@ -176,7 +176,7 @@ extern int realpaver_bison_debug;
 #if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
 union REALPAVER_BISON_STYPE
 {
-#line 34 "parser_bison.ypp"
+#line 37 "parser_bison.ypp"
 
   char u_str[256];
   realpaver::TermRep* u_term;

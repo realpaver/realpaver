@@ -862,6 +862,31 @@ Constraint table(const std::initializer_list<Variable>& vars,
    return Constraint(std::make_shared<ConstraintTable>(vars, values));
 }
 
+Constraint table(const Variable* vars, size_t nvars,
+                 const Interval* values, size_t nvalues)
+{
+   if (nvars == 0 || nvalues % nvars != 0)
+      THROW("Bad initialization of a table constraint");
+
+   size_t nrows = nvalues / nvars;
+   
+   Constraint::SharedRep srep = std::make_shared<ConstraintTable>();
+   ConstraintTable* rep = static_cast<ConstraintTable*>(srep.get());
+
+   for (size_t j=0; j<nvars; ++j)
+   {
+      ConstraintTableCol col(vars[j]);
+      for (size_t i=0; i<nrows; ++i)
+      {
+         Interval x = values[i*nvars + j];
+         col.addValue(x);
+      }
+      rep->addCol(col);
+   }
+   return Constraint(srep);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ConstraintVisitor::~ConstraintVisitor()

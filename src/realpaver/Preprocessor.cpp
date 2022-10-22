@@ -101,6 +101,8 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg, Problem& d
       return;
    }
 
+   LOG_INTER("Contracted region: " << reg);
+
    // satisfaction tests
    for (size_t i=0; i<src.nbCtrs(); ++i)
    {
