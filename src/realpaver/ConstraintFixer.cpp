@@ -85,9 +85,25 @@ void ConstraintFixer::apply(const ConstraintIn* c)
    c_ = in(vis.getTerm(), c->image());
 }
 
-void ConstraintFixer::apply(const ConstraintITable* c)
+void ConstraintFixer::apply(const ConstraintTable* c)
 {
-   // TODO
+   Constraint::SharedRep srep = std::make_shared<ConstraintTable>();
+   ConstraintTable* rep = static_cast<ConstraintTable*>(srep.get());
+
+   for (size_t j=0; j<c->nbCols(); ++j)
+   {
+      auto it = vvm_->find(c->getVar(j));
+      if (it != vvm_->end())
+      {
+         ConstraintTableCol col(it->second);
+         
+         for (size_t i=0; i<c->nbRows(); ++i)
+            col.addValue(c->getVal(i, j));
+
+         rep->addCol(col);
+      }
+   }
+   c_ = Constraint(srep);
 }
 
 } // namespace

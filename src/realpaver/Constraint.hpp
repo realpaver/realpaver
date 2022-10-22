@@ -165,17 +165,19 @@ public:
    /// @return true if this is linear
    bool isLinear() const;
 
-private:
-   typedef ConstraintRep::SharedRep SharedRep;
-   SharedRep rep_;   // shared representation
-
 public:
+   /// type of the shared representation
+   typedef ConstraintRep::SharedRep SharedRep;
+
    /// Creates a constraint
    /// @param rep the representation of this
    Constraint(const SharedRep& rep = nullptr);
 
    /// @return the representation of this
    SharedRep rep() const;
+
+private:
+   SharedRep rep_;   // shared representation
 };
 
 /// output on a stream
@@ -425,6 +427,9 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 class ConstraintTable : public ConstraintRep {
 public:
+   /// Constructor that creates an empty constraint
+   ConstraintTable();
+
    /// Constructor
    /// @param l list of columns of this
    ConstraintTable(const std::initializer_list<ConstraintTableCol>& l);
@@ -441,10 +446,23 @@ public:
    /// @return the number of rows (assignments)
    size_t nbRows() const;
 
+   /// @param a column index between 0 and nbCols
+   /// @return the j-th variable
+   Variable getVar(size_t j) const;
+
+   /// @param i a row index between 0 and nbRows()
+   /// @param a column index between 0 and nbCols
+   /// @return the value at position (i, j)
+   Interval getVal(size_t i, size_t j) const;
+
    /// Column access
-   /// @param i a column index between 0 and nbCols()
-   /// @return the i-th column of this
-   ConstraintTableCol getCol(size_t i) const;
+   /// @param j a column index between 0 and nbCols()
+   /// @return the j-th column of this
+   ConstraintTableCol getCol(size_t j) const;
+
+   /// Inserts a column in the last place
+   /// @param col column added to this
+   void addCol(const ConstraintTableCol& col);
 
    ///@{
    /// Overrides
@@ -458,6 +476,7 @@ public:
 private:
    std::vector<ConstraintTableCol> vcol_; // vector of columns
 
+   void makeScopeAndHashCode();
    bool isRowConsistent(size_t i, const IntervalRegion& reg) const;
 };
 

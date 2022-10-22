@@ -18,7 +18,8 @@ namespace realpaver {
 /// This is a visitor used to relax a constraint.
 ///
 /// Given a real number nu>0, every equation f(x) = 0 is relaxed as
-/// f(x) in [-nu, +nu]. Every other constraint is left unchanged.
+/// f(x) in [-nu, +nu]. Every other constraint is not handled and the apply
+/// method must raise an exception.
 ///////////////////////////////////////////////////////////////////////////////
 class ConstraintRelaxor : public ConstraintVisitor {
 public:
@@ -38,12 +39,6 @@ public:
    ///@{
    /// Overrides
    void apply(const ConstraintEq* c);
-   void apply(const ConstraintLe* c);
-   void apply(const ConstraintLt* c);
-   void apply(const ConstraintGe* c);
-   void apply(const ConstraintGt* c);
-   void apply(const ConstraintIn* c);
-   void apply(const ConstraintTable* c);
    ///@}
 
    /// @return the relaxed constraint after a visit

@@ -49,11 +49,12 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT
+%token TK_TABLE
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN
-%token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_PIPE
+%token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_LCBR TK_RCBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
 
@@ -223,6 +224,11 @@ ctr_def
       realpaver::Constraint c(lhs >= rhs);
       realpaver_bison_problem->addCtr(c);
     }
+  | TK_TABLE TK_LPAR TK_LCBR table_list_var TK_RCBR TK_COMMA
+    TK_LCBR table_list_val TK_RCBR TK_RPAR
+    {
+       // TODO
+    }
   ;
 
 obj_statement
@@ -356,6 +362,60 @@ int_def
         realpaver_bison_error(os.str().c_str());
         YYABORT;
       }
+    }
+  ;
+
+table_list_var
+  : table_list_var_def table_list_var_tail
+  ;
+
+table_list_var_tail
+  :
+  | TK_COMMA table_list_var
+  ;
+
+table_list_var_def
+  : ident
+    {
+      realpaver::VariableSymbol* vs =
+         realpaver_bison_symtab->findVariable($1);
+
+      if (vs != nullptr)
+      {
+        // TODO
+
+      }
+      else
+      {
+         std::ostringstream os;
+         os << "Identifier [" << $1 << "] not found";
+         realpaver_bison_error(os.str().c_str());
+         YYABORT;
+      }
+    }
+  ;
+
+table_list_val
+  : table_list_val_def table_list_val_tail
+  ;
+
+table_list_val_tail
+  :
+  | TK_COMMA table_list_val
+  ;
+
+table_list_val_def
+  : itv
+    {
+       // TODO
+    }
+  | real
+    {
+       // TODO
+    }  
+  | integer
+    {
+       // TODO
     }
   ;
 

@@ -30,6 +30,9 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "Functions"     return TK_STR_FUN;
 "Integer"       return TK_STR_INT;
 
+
+"table"  return TK_TABLE;
+
 "min"    return TK_MIN;
 "max"    return TK_MAX;
 "MIN"    return TK_MIN;
@@ -56,6 +59,8 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 ")"      return TK_RPAR;
 "["      return TK_LSBR;
 "]"      return TK_RSBR;
+"{"      return TK_LCBR;
+"}"      return TK_RCBR;
 ","      return TK_COMMA;
 ";"      return TK_SCOLON;
 ":"      return TK_COLON;

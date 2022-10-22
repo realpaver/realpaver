@@ -653,6 +653,11 @@ Interval ConstraintTableCol::getVal(size_t i) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConstraintTable::ConstraintTable()
+      : ConstraintRep(),
+        vcol_()
+{}
+
 ConstraintTable::ConstraintTable(
    const std::initializer_list<ConstraintTableCol>& l)
       : ConstraintRep(),
@@ -661,18 +666,8 @@ ConstraintTable::ConstraintTable(
    ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
    ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
 
-   // scope and hash code
-   Scope s;
-   hcode_ = static_cast<size_t>(RelSymbol::Table);
-
-   for (auto& col : vcol_)
-   {
-      Variable v = col.getVar();
-      s.insert(v);
-      hcode_ = hash2(v.hashCode(), hcode_);      
-   }
-
-   setScope(s);
+   // makes the scope and calculates the hash code
+   makeScopeAndHashCode();
 }
 
 ConstraintTable::ConstraintTable(
@@ -709,7 +704,12 @@ ConstraintTable::ConstraintTable(
       }
    }
 
-   // scope and hash code
+   // makes the scope and calculates the hash code
+   makeScopeAndHashCode();
+}
+
+void ConstraintTable::makeScopeAndHashCode()
+{
    Scope s;
    hcode_ = static_cast<size_t>(RelSymbol::Table);
 
@@ -717,10 +717,10 @@ ConstraintTable::ConstraintTable(
    {
       Variable v = col.getVar();
       s.insert(v);
-      hcode_ = hash2(v.hashCode(), hcode_);      
+      hcode_ = hash2(v.hashCode(), hcode_);
    }
 
-   setScope(s);
+   setScope(s);   
 }
 
 size_t ConstraintTable::nbCols() const
@@ -733,10 +733,39 @@ size_t ConstraintTable::nbRows() const
    return vcol_.empty() ? 0 : vcol_[0].size();
 }
 
-ConstraintTableCol ConstraintTable::getCol(size_t i) const
+Variable ConstraintTable::getVar(size_t j) const
 {
-   ASSERT(i < nbCols(), "Bad access to a column in a table constraint @ " << i);
-   return vcol_[i];
+   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   return vcol_[j].getVar();
+}
+
+Interval ConstraintTable::getVal(size_t i, size_t j) const
+{
+   ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
+   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   return vcol_[j].getVal(i);   
+}
+
+
+ConstraintTableCol ConstraintTable::getCol(size_t j) const
+{
+   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   return vcol_[j];
+}
+
+void ConstraintTable::addCol(const ConstraintTableCol& col)
+{
+   ASSERT(vcol_.empty() || col.size() == nbRows(),
+          "Bad insertion of a new column in a table constraint");
+
+   ASSERT(!dependsOn(col.getVar()),
+          "Variable already present in a table constraint: " <<
+          col.getVar().getName());
+
+   vcol_.push_back(col);
+
+   // makes the scope and calculates the hash code
+   makeScopeAndHashCode();
 }
 
 bool ConstraintTable::isConstant() const

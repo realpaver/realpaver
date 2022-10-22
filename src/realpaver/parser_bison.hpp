@@ -79,40 +79,43 @@ extern int realpaver_bison_debug;
     TK_STR_FUN = 265,              /* TK_STR_FUN  */
     TK_STR_ALIAS = 266,            /* TK_STR_ALIAS  */
     TK_STR_INT = 267,              /* TK_STR_INT  */
-    TK_EQ = 268,                   /* TK_EQ  */
-    TK_EQ_EQ = 269,                /* TK_EQ_EQ  */
-    TK_LE = 270,                   /* TK_LE  */
-    TK_GE = 271,                   /* TK_GE  */
-    TK_IN = 272,                   /* TK_IN  */
-    TK_LT = 273,                   /* TK_LT  */
-    TK_GT = 274,                   /* TK_GT  */
-    TK_PLUS = 275,                 /* TK_PLUS  */
-    TK_MINUS = 276,                /* TK_MINUS  */
-    TK_MUL = 277,                  /* TK_MUL  */
-    TK_DIV = 278,                  /* TK_DIV  */
-    TK_POW = 279,                  /* TK_POW  */
-    TK_CARET = 280,                /* TK_CARET  */
-    TK_SQR = 281,                  /* TK_SQR  */
-    TK_SQRT = 282,                 /* TK_SQRT  */
-    TK_LOG = 283,                  /* TK_LOG  */
-    TK_EXP = 284,                  /* TK_EXP  */
-    TK_TAN = 285,                  /* TK_TAN  */
-    TK_COS = 286,                  /* TK_COS  */
-    TK_SIN = 287,                  /* TK_SIN  */
-    TK_LPAR = 288,                 /* TK_LPAR  */
-    TK_RPAR = 289,                 /* TK_RPAR  */
-    TK_LSBR = 290,                 /* TK_LSBR  */
-    TK_RSBR = 291,                 /* TK_RSBR  */
-    TK_PIPE = 292,                 /* TK_PIPE  */
-    TK_COMMA = 293,                /* TK_COMMA  */
-    TK_SCOLON = 294,               /* TK_SCOLON  */
-    TK_COLON = 295,                /* TK_COLON  */
-    TK_SGN = 296,                  /* TK_SGN  */
-    TK_ABS = 297,                  /* TK_ABS  */
-    TK_MIN = 298,                  /* TK_MIN  */
-    TK_MAX = 299,                  /* TK_MAX  */
-    TK_UMINUS = 300,               /* TK_UMINUS  */
-    TK_UPLUS = 301                 /* TK_UPLUS  */
+    TK_TABLE = 268,                /* TK_TABLE  */
+    TK_EQ = 269,                   /* TK_EQ  */
+    TK_EQ_EQ = 270,                /* TK_EQ_EQ  */
+    TK_LE = 271,                   /* TK_LE  */
+    TK_GE = 272,                   /* TK_GE  */
+    TK_IN = 273,                   /* TK_IN  */
+    TK_LT = 274,                   /* TK_LT  */
+    TK_GT = 275,                   /* TK_GT  */
+    TK_PLUS = 276,                 /* TK_PLUS  */
+    TK_MINUS = 277,                /* TK_MINUS  */
+    TK_MUL = 278,                  /* TK_MUL  */
+    TK_DIV = 279,                  /* TK_DIV  */
+    TK_POW = 280,                  /* TK_POW  */
+    TK_CARET = 281,                /* TK_CARET  */
+    TK_SQR = 282,                  /* TK_SQR  */
+    TK_SQRT = 283,                 /* TK_SQRT  */
+    TK_LOG = 284,                  /* TK_LOG  */
+    TK_EXP = 285,                  /* TK_EXP  */
+    TK_TAN = 286,                  /* TK_TAN  */
+    TK_COS = 287,                  /* TK_COS  */
+    TK_SIN = 288,                  /* TK_SIN  */
+    TK_LPAR = 289,                 /* TK_LPAR  */
+    TK_RPAR = 290,                 /* TK_RPAR  */
+    TK_LSBR = 291,                 /* TK_LSBR  */
+    TK_RSBR = 292,                 /* TK_RSBR  */
+    TK_LCBR = 293,                 /* TK_LCBR  */
+    TK_RCBR = 294,                 /* TK_RCBR  */
+    TK_PIPE = 295,                 /* TK_PIPE  */
+    TK_COMMA = 296,                /* TK_COMMA  */
+    TK_SCOLON = 297,               /* TK_SCOLON  */
+    TK_COLON = 298,                /* TK_COLON  */
+    TK_SGN = 299,                  /* TK_SGN  */
+    TK_ABS = 300,                  /* TK_ABS  */
+    TK_MIN = 301,                  /* TK_MIN  */
+    TK_MAX = 302,                  /* TK_MAX  */
+    TK_UMINUS = 303,               /* TK_UMINUS  */
+    TK_UPLUS = 304                 /* TK_UPLUS  */
   };
   typedef enum realpaver_bison_tokentype realpaver_bison_token_kind_t;
 #endif
@@ -131,40 +134,43 @@ extern int realpaver_bison_debug;
 #define TK_STR_FUN 265
 #define TK_STR_ALIAS 266
 #define TK_STR_INT 267
-#define TK_EQ 268
-#define TK_EQ_EQ 269
-#define TK_LE 270
-#define TK_GE 271
-#define TK_IN 272
-#define TK_LT 273
-#define TK_GT 274
-#define TK_PLUS 275
-#define TK_MINUS 276
-#define TK_MUL 277
-#define TK_DIV 278
-#define TK_POW 279
-#define TK_CARET 280
-#define TK_SQR 281
-#define TK_SQRT 282
-#define TK_LOG 283
-#define TK_EXP 284
-#define TK_TAN 285
-#define TK_COS 286
-#define TK_SIN 287
-#define TK_LPAR 288
-#define TK_RPAR 289
-#define TK_LSBR 290
-#define TK_RSBR 291
-#define TK_PIPE 292
-#define TK_COMMA 293
-#define TK_SCOLON 294
-#define TK_COLON 295
-#define TK_SGN 296
-#define TK_ABS 297
-#define TK_MIN 298
-#define TK_MAX 299
-#define TK_UMINUS 300
-#define TK_UPLUS 301
+#define TK_TABLE 268
+#define TK_EQ 269
+#define TK_EQ_EQ 270
+#define TK_LE 271
+#define TK_GE 272
+#define TK_IN 273
+#define TK_LT 274
+#define TK_GT 275
+#define TK_PLUS 276
+#define TK_MINUS 277
+#define TK_MUL 278
+#define TK_DIV 279
+#define TK_POW 280
+#define TK_CARET 281
+#define TK_SQR 282
+#define TK_SQRT 283
+#define TK_LOG 284
+#define TK_EXP 285
+#define TK_TAN 286
+#define TK_COS 287
+#define TK_SIN 288
+#define TK_LPAR 289
+#define TK_RPAR 290
+#define TK_LSBR 291
+#define TK_RSBR 292
+#define TK_LCBR 293
+#define TK_RCBR 294
+#define TK_PIPE 295
+#define TK_COMMA 296
+#define TK_SCOLON 297
+#define TK_COLON 298
+#define TK_SGN 299
+#define TK_ABS 300
+#define TK_MIN 301
+#define TK_MAX 302
+#define TK_UMINUS 303
+#define TK_UPLUS 304
 
 /* Value type.  */
 #if ! defined REALPAVER_BISON_STYPE && ! defined REALPAVER_BISON_STYPE_IS_DECLARED
@@ -175,7 +181,7 @@ union REALPAVER_BISON_STYPE
   char u_str[256];
   realpaver::TermRep* u_term;
 
-#line 179 "parser_bison.hpp"
+#line 185 "parser_bison.hpp"
 
 };
 typedef union REALPAVER_BISON_STYPE REALPAVER_BISON_STYPE;

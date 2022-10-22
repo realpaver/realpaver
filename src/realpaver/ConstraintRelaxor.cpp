@@ -29,35 +29,4 @@ void ConstraintRelaxor::apply(const ConstraintEq* c)
    relaxed_ = in(c->left() - c->right(), Interval(-nu_, nu_));
 }
 
-void ConstraintRelaxor::apply(const ConstraintLe* c)
-{
-   relaxed_ = (c->left() <= c->right());
-}
-
-void ConstraintRelaxor::apply(const ConstraintLt* c)
-{
-   relaxed_ = (c->left() < c->right());
-}
-
-void ConstraintRelaxor::apply(const ConstraintGe* c)
-{
-   relaxed_ = (c->left() >= c->right());
-}
-
-void ConstraintRelaxor::apply(const ConstraintGt* c)
-{
-   relaxed_ = (c->left() > c->right());
-}
-
-void ConstraintRelaxor::apply(const ConstraintIn* c)
-{
-   relaxed_ = in(c->term(), c->image());
-}
-
-void ConstraintRelaxor::apply(const ConstraintTable* c)
-{
-   // TODO
-
-}
-
 } // namespace
