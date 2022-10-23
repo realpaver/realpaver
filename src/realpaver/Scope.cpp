@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -207,22 +208,24 @@ Scope::Scope(std::shared_ptr<ScopeRep> rep) : rep_(rep)
 
 void Scope::insert(const Variable& v)
 {
-   rep_->insert(v,1);
+   insert(v, 1);
 }
 
 void Scope::insert(const Variable& v, size_t n)
 {
-   rep_->insert(v,n);
+   if (isShared()) LOG_MAIN("NEED A COW POINTER FOR SCOPES");
+
+   rep_->insert(v, n);
 }
 
 void Scope::remove(const Variable& v)
 {
-   rep_->remove(v);
+   remove(v, 1);
 }
 
 void Scope::remove(const Variable& v, size_t n)
 {
-   rep_->remove(v,n);
+   rep_->remove(v, n);
 }
 
 size_t Scope::size() const
@@ -283,7 +286,7 @@ size_t Scope::index(const Variable& v) const
 void Scope::insert(const std::initializer_list<Variable>& l)
 {
    for (Variable v : l)
-      insert(v);   
+      insert(v);
 }
 
 void Scope::insert(const Scope& other)
@@ -329,6 +332,11 @@ Scope Scope::clone() const
       s.insert(it.var(), it.count());
 
    return s;
+}
+
+bool Scope::isShared() const
+{
+   return rep_ != nullptr && rep_.use_count() > 1;
 }
 
 std::ostream& operator<<(std::ostream& os, const Scope& s)

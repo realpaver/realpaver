@@ -289,6 +289,9 @@ public:
    /// no representation with this.
    Scope clone() const;
 
+   /// @return true if this scope is shared, false otherwise
+   bool isShared() const;
+
 private:
    std::shared_ptr<ScopeRep> rep_;
 

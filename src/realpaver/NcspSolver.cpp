@@ -112,12 +112,11 @@ void NcspSolver::makeContractor()
    for (size_t i=0; i<preprob_.nbCtrs(); ++i)
    {
       Constraint c = preprob_.ctrAt(i);
-      std::shared_ptr<Contractor> op;
+      std::shared_ptr<Contractor> op = nullptr;
 
       try
       {
          size_t j = dag_->insert(c);
-         std::shared_ptr<Contractor> op;
          
          if (base == "HC4")
             op = std::make_shared<HC4Contractor>(dag_, j);
@@ -126,10 +125,12 @@ void NcspSolver::makeContractor()
             op = std::make_shared<BC4Contractor>(dag_, j);
 
          else
-            THROW("bad assignment of parameter PROPAGATION_BASE");
-
+         {
+            LOG_INTER("Bad assignment of PROPAGATION_BASE");
+            THROW("-");  // exception just catched below
+         }
       }
-      catch(Exception e)
+      catch(Exception& e)
       {
          op = std::make_shared<ConstraintContractor>(c);
       }
