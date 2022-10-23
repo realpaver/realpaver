@@ -16,7 +16,19 @@ int main(void)
       Variable x = prob.addRealVar(0,  3, "x");
       Variable y = prob.addIntVar (4,  7, "y");
       Variable z = prob.addIntVar (-2, 10, "z");
+      
+      Scope s1 = {x, y};
+      cout << s1 << endl;
 
+      Scope s2 = s1;
+      cout << s2 << endl;
+
+      s2.insert(z);
+      cout << s1 << endl;
+      cout << s2 << endl;
+      
+
+      /*
       Constraint c = table( {x, y, z},
                             {1, 2, 3,
                              1, 5, 0.0,
@@ -34,6 +46,7 @@ int main(void)
 
 
       cout << c.contract(reg) << endl << reg << endl;
+      */
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

@@ -60,13 +60,6 @@ public:
    /// @param n number of occurrences of v
    void remove(const Variable& v, size_t n);
 
-   /// Assigns the counter of occurrences of a variable to 1
-   /// @param v considered variable
-   void resetCount(const Variable& v);
-
-   /// Assigns the counters of occurrences of all the variables to 1
-   void resetCountAll();
-
    /// Output on a stream
    /// @param os output stream
    void print(std::ostream& os) const;
@@ -162,6 +155,11 @@ public:
 ///
 /// This encloses a shared pointer to its representation. It is a lightweight
 /// object that can be copied and assigned.
+///
+/// The behaviour of the shared pointer follows a copy-on-write (cow) pointer.
+/// If the scope is modified by insert or remove and if its representation is
+/// shared by several pointers, then its pointer is first detached and a new
+/// representation is created. There is no consequence for the other pointers.
 ///////////////////////////////////////////////////////////////////////////////
 class Scope {
 public:
@@ -242,13 +240,6 @@ public:
    ///
    ///For every couple (v,n) from other, calls remove(v,n)
    void remove(const Scope& other);
-
-   /// Assigns the counter of occurrences of a variable to 1
-   /// @param v considered variable
-   void resetCount(const Variable& v);
-
-   /// Assigns the counters of occurrences of all the variables to 1
-   void resetCountAll();
 
    /// Output on a stream
    /// @param os output stream

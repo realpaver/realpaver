@@ -164,19 +164,6 @@ void ScopeRep::remove(const Variable& v, size_t n)
    }
 }
 
-void ScopeRep::resetCount(const Variable& v)
-{
-   auto it = m_.find(v);
-   if (it != m_.cend())
-      m_[v] = 1;
-}
-
-void ScopeRep::resetCountAll()
-{
-   for (auto it = m_.cbegin(); it != m_.cend(); ++it)
-      resetCount(it->first);
-}
-
 void ScopeRep::print(std::ostream& os) const
 {
    os << "{";
@@ -213,8 +200,11 @@ void Scope::insert(const Variable& v)
 
 void Scope::insert(const Variable& v, size_t n)
 {
-   if (isShared()) LOG_MAIN("NEED A COW POINTER FOR SCOPES");
-
+   if (isShared())
+   {
+      // copy-on-write (cow) pointer
+      rep_ = std::make_shared<ScopeRep>(*rep_.get());
+   }
    rep_->insert(v, n);
 }
 
@@ -225,6 +215,12 @@ void Scope::remove(const Variable& v)
 
 void Scope::remove(const Variable& v, size_t n)
 {
+   if (isShared())
+   {
+      // copy-on-write (cow) pointer
+      rep_ = std::make_shared<ScopeRep>(*rep_.get());
+   }
+
    rep_->remove(v, n);
 }
 
@@ -251,11 +247,6 @@ size_t Scope::minIndex() const
 size_t Scope::maxIndex() const
 {
    return rep_->maxIndex();
-}
-
-void Scope::resetCountAll()
-{
-   rep_->resetCountAll();
 }
 
 void Scope::print(std::ostream& os) const
@@ -315,14 +306,6 @@ Bitset Scope::toBitset() const
       b.setOne(it.var().id());
 
    return b;
-}
-
-void Scope::resetCount(const Variable& v)
-{
-   ASSERT(contains(v),
-          "Variable " << v.getName() << " does not belong to this scope");
-
-   rep_->resetCount(v);
 }
 
 Scope Scope::clone() const
