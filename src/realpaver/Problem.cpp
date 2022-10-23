@@ -157,7 +157,7 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
    if (p.isEmpty()) return os << "Nothing in this problem";
    
-   std::string indent = "   ",
+   std::string indent = "",
                s_var  = "Variables",
                s_ctr  = "Constraints",
                s_int  = "Integer",

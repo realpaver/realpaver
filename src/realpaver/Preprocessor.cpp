@@ -171,7 +171,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg, Problem& d
    // rewrites the constraints
    for (Constraint input : active_)
    {
-      ConstraintFixer fixer(&vvm_, &vim_);
+      ConstraintFixer fixer(&vvm_, &vim_, reg);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
       

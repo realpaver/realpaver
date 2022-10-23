@@ -786,11 +786,16 @@ bool ConstraintTable::isRowConsistent(size_t i, const IntervalRegion& reg) const
 
 Proof ConstraintTable::isSatisfied(const IntervalRegion& reg) const
 {
+   size_t nbc = 0;
+
    for (size_t i=0; i<nbRows(); ++i)
       if (isRowConsistent(i, reg))
-         return Proof::Maybe;
+      {
+         ++nbc;
+         if (nbc > 1) return Proof::Maybe;
+      }
 
-   return Proof::Empty;
+   return (nbc == 1) ? Proof::Inner : Proof::Empty;
 }
 
 Proof ConstraintTable::contract(IntervalRegion& reg)
@@ -829,26 +834,28 @@ Proof ConstraintTable::contract(IntervalRegion& reg)
 
 void ConstraintTable::print(std::ostream& os) const
 {
+   os << "table(";
    // prints the variables
-   os << "(";
+   os << "{";
    for (size_t i=0; i<nbCols(); ++i)
    {
-      if (i > 0) os << ", \t";
+      if (i > 0) os << ", ";
       os << vcol_[i].getVar().getName();
    }
-   os << ")" << std::endl;
+   os << "}, ";
 
    // prints the rows
+   os << "{";
    for (size_t j=0; j<nbRows(); ++j)
    {
-      os << "(";
+      if (j > 0) os << ", ";
       for (size_t i=0; i<nbCols(); ++i)
       {
-         if (i> 0) os << ", \t";
+         if (i> 0) os << ", ";
          os << vcol_[i].getVal(j);
       }
-      os << ")" << std::endl;
    }
+   os << "})";
 }
 
 void ConstraintTable::acceptVisitor(ConstraintVisitor& vis) const

@@ -232,6 +232,7 @@ bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
       if (c.isSatisfied(reg) != Proof::Inner)
          return false;
    }
+
    return true;
 }
 
@@ -244,6 +245,8 @@ void NcspSolver::bpStep(int depthlimit)
                               << node->depth() << ")");
    LOG_LOW("Region: " << *reg);
 
+   node->setProof(Proof::Maybe);
+
    // contracts the region
    Proof proof = contractor_->contract(*reg);
    
@@ -252,17 +255,18 @@ void NcspSolver::bpStep(int depthlimit)
 
    if (proof == Proof::Empty)
    {
-      node->setProof(proof);
+      node->setProof(Proof::Empty);
       return;
    }
 
    if (isAnInnerRegion(*reg))
    {
+      node->setProof(Proof::Inner);
+      
       string str = env_->getParam()->getStrParam("SPLIT_INNER");
       if (str == "NO")
       {
          LOG_INTER("Solution node (inner region)");
-         node->setProof(Proof::Inner);
          space_->pushSolNode(node);
          return;
       }
@@ -287,7 +291,6 @@ void NcspSolver::bpStep(int depthlimit)
    if (split_->getNbNodes() <= 1)
    {
       LOG_INTER("Solution node (small enough)");
-      node->setProof(Proof::Maybe);
       space_->pushSolNode(node);
    }
    else

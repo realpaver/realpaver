@@ -36,7 +36,9 @@ public:
    /// Creates a fixer given two maps
    /// @param vvm map Variable -> Variable
    /// @param vim map Variable -> Interval
-   ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim);
+   /// @param reg domains of the variables in vvm
+   ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
+                   const IntervalRegion& reg);
 
    /// No copy
    ConstraintFixer(const ConstraintFixer&) = delete;
@@ -81,6 +83,7 @@ public:
 private:
    VarVarMapType* vvm_;
    VarIntervalMapType* vim_;
+   IntervalRegion reg_;
    Constraint c_;
 };
 

@@ -440,43 +440,13 @@ void Param::print(std::ostream& os) const
    // prints the parameters
    for (auto it = smap.begin(); it != smap.end(); ++it)
    {
+      if (it != smap.begin()) os << "\n";
       os << it->first;
       size_t l = it->first.length();
       for (size_t i=0; i<lmax-l; ++i) os << " ";
-      os << " = " << it->second << "\n";
+      os << " = " << it->second;
    }
 }
-
-//~ void Param::print(std::ostream& os) const
-//~ {
-   //~ for (auto it = intmap_.begin();
-             //~ it != intmap_.end();
-             //~ ++it)
-      //~ os << it-> first << " = " << it->second << "\n";
-
-   //~ for (auto it = dblmap_.begin();
-             //~ it != dblmap_.end();
-             //~ ++it)
-      //~ os << it-> first << " = " << it->second << "\n";
-
-   //~ for (auto it = strmap_.begin();
-             //~ it != strmap_.end();
-             //~ ++it)
-      //~ os << it-> first << " = " << it->second << "\n";
-
-   //~ for (auto it = tolmap_.begin();
-             //~ it != tolmap_.end();
-             //~ ++it)
-   //~ {
-      //~ Tolerance tol = it->second;
-      //~ if (tol.isAbsolute())
-         //~ os << "ABS_";
-      //~ else
-         //~ os << "REL_";
-
-      //~ os << it-> first << " = " << tol.getVal() << "\n";
-   //~ }
-//~ }
 
 void Param::PrintParam(std::ostream& os)
 {

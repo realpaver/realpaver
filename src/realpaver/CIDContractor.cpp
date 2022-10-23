@@ -29,10 +29,10 @@ CIDContractor::CIDContractor(SharedContractor op, Variable v,
 
 CIDContractor::CIDContractor(SharedContractor op,
                              std::unique_ptr<IntervalSlicer> slicer)
-         : op_(op),
-           v_(),
-           slicer_(std::move(slicer)),
-           bs_()
+      : op_(op),
+        v_(),
+        slicer_(std::move(slicer)),
+        bs_()
 {
    ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
    ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
@@ -92,7 +92,6 @@ Proof CIDContractor::contract(IntervalRegion& reg)
             reg.hullAssignOnScope(*slice, scope());
             proof = std::min(proof, certif);
          }
-
       }
       delete slice;
    }

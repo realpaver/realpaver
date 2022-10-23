@@ -11,9 +11,11 @@
 
 namespace realpaver {
 
-ConstraintFixer::ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim)
+ConstraintFixer::ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
+                                 const IntervalRegion& reg)
       : vvm_(vvm),
         vim_(vim),
+        reg_(reg),
         c_()
 {}
 
@@ -87,6 +89,28 @@ void ConstraintFixer::apply(const ConstraintIn* c)
 
 void ConstraintFixer::apply(const ConstraintTable* c)
 {
+   // checks the consistent assignments with respect to the variable domains
+   Bitset consistent(c->nbRows(), 0);
+
+   for (size_t i=0; i<c->nbRows(); ++i)
+   {
+      size_t j = 0;
+      bool cons = true;
+      while (cons && j < c->nbCols())
+      {
+         auto it = vvm_->find(c->getVar(j));
+         if (it != vvm_->end())
+         {
+            Variable v = it->first;
+            if (c->getVal(i, j).isDisjoint(reg_.get(v)))
+               cons= false;
+         }
+         ++j;
+      }
+      if (cons) consistent.setOne(i);
+   }
+
+   // rewrites the constraint
    Constraint::SharedRep srep = std::make_shared<ConstraintTable>();
    ConstraintTable* rep = static_cast<ConstraintTable*>(srep.get());
 
@@ -96,9 +120,10 @@ void ConstraintFixer::apply(const ConstraintTable* c)
       if (it != vvm_->end())
       {
          ConstraintTableCol col(it->second);
-         
+
          for (size_t i=0; i<c->nbRows(); ++i)
-            col.addValue(c->getVal(i, j));
+            if (consistent.get(i))
+               col.addValue(c->getVal(i, j));
 
          rep->addCol(col);
       }

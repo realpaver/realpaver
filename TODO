@@ -1,12 +1,3 @@
-TABLE CONSTRAINT
-
-constraints visitors
-
-ConstraintFixer
-ConstraintRelaxor
-
-peut etre faire une méthode de clonage dans Cnstraint, ConstraintRep ?
-
 -------------------------------------------------------------------------------
 - Create a DAG from a .nl file
 
@@ -38,8 +29,7 @@ peut etre faire une méthode de clonage dans Cnstraint, ConstraintRep ?
   Idée plus générale derrière: comment décomposer un DAG? Quels noeuds
   faut-il considérer comme des variables?
   
-  
-  Introduction de variables intermédiaires et contacteurs et splits
+  Introduction de variables intermédiaires et contracteurs et splits
 
 -------------------------------------------------------------------------------
 - Comparaison des relaxations
