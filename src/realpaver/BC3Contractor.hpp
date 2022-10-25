@@ -37,8 +37,6 @@ public:
    /// @param dag a DAG
    /// @param i index of a function in the DAG
    /// @param v a variable occurring in the function
-   ///
-   /// This does not own the dag.
    BC3Contractor(SharedDag dag, size_t i, Variable v);
 
    /// Destructor

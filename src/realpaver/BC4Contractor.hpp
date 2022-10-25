@@ -19,17 +19,15 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the BC4Revise contractor.
 ///
-/// Given a <= f(x1, ..., xn) <= n, it applied first an HC4 contractor. Then
-/// it applies a BC3 contractor for each variable with multiple occurrences
-/// in f, this contractor processing the corresponding thick interval function.
+/// Given a constraint a <= f(x1, ..., xn) <= b, it applies first an HC4
+/// contractor. Then it applies a BC3 contractor for each variable with multiple
+/// occurrences in f.
 ///////////////////////////////////////////////////////////////////////////////
 class BC4Contractor : public Contractor {
 public:
    /// Creates a contractor
    /// @param dag a DAG
    /// @param i index of a function in the DAG
-   ///
-   /// This contractor does not own the dag.
    BC4Contractor(SharedDag dag, size_t i);
 
    /// Destructor

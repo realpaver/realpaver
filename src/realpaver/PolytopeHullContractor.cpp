@@ -8,50 +8,111 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 
 namespace realpaver {
 
-PolytopeHullContractor::PolytopeHullContractor(SharedDag dag, Scope sco)
-      :  dag_(dag),
-         sco_(sco),
-         bs_()
+std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style)
 {
-   ASSERT(dag_ != nullptr, "Null pointer in a Polytope Hull contractor");
-
-   ASSERT(!sco.isEmpty(), "Empty scope in a Polytope Hull contractor");
-
-   ASSERT(dag->scope().contains(sco),
-          "Bad scope in a Polytope Hull contractor");
-
-   bs_ = sco.toBitset();
+   switch(style)
+   {
+      case PolytopeCreatorStyle::Affine: return os << "affine maker";
+      case PolytopeCreatorStyle::RLT:    return os << "rlt maker";
+      case PolytopeCreatorStyle::Taylor: return os << "taylor maker";
+      default:                           os.setstate(std::ios::failbit);
+   }
+   return os;
 }
 
-bool PolytopeHullContractor::dependsOn(const Bitset& bs) const
+///////////////////////////////////////////////////////////////////////////////
+
+PolytopeCreator::PolytopeCreator(SharedDag dag, Scope scope)
+      : dag_(dag),
+        scope_(scope),
+        bs_()
+{
+   ASSERT(dag_ != nullptr, "No dag in a polytope maker");
+   ASSERT(!scope.isEmpty(), "Empty scope in a polytope maker");
+   ASSERT(dag->scope().contains(scope), "Bad scope in a polytope maker");
+
+   bs_ = scope.toBitset();
+}
+
+PolytopeCreator::~PolytopeCreator()
+{}
+
+SharedDag PolytopeCreator::dag() const
+{
+   return dag_;
+}
+
+Scope PolytopeCreator::scope() const
+{
+   return scope_;
+}
+
+bool PolytopeCreator::dependsOn(const Bitset& bs) const
 {
    return bs_.overlaps(bs);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+PolytopeRLTCreator::PolytopeRLTCreator(SharedDag dag, Scope scope)
+      : PolytopeCreator(dag, scope)
+{}
+
+void PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
+{
+   dag_->eval(reg);
+   dag_->linearize(lpm);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PolytopeHullContractor::PolytopeHullContractor(SharedDag dag, Scope sco,
+                                               PolytopeCreatorStyle style)
+      : creator_(nullptr)
+{
+   if (style == PolytopeCreatorStyle::RLT)
+      creator_ = new PolytopeRLTCreator(dag, sco);
+
+   else
+      THROW("Polytope maker not yet implemented: " << style);
+}
+
+PolytopeHullContractor::~PolytopeHullContractor()
+{
+   if (creator_ != nullptr) delete creator_;
+}
+
+bool PolytopeHullContractor::dependsOn(const Bitset& bs) const
+{
+   return creator_->dependsOn(bs);
+}
+
 Scope PolytopeHullContractor::scope() const
 {
-   return sco_;
+   return creator_->scope();
 }
 
 Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 {
+   LOG_LOW("Polytope hull contractor on: " << reg);
+
    LPSolver solver;
 
    // linearizes the constraints
-   dag_->eval(reg);
-   dag_->linearize(solver);
+   creator_->make(solver, reg);
 
    bool first = true;
    OptimizationStatus status;
 
-   for (auto v : sco_)
+   for (auto v : creator_->scope())
    {
       Interval x = reg.get(v);
-      DagNode* node = dag_->findVarNode(v.id());
+      DagNode* node = creator_->dag()->findVarNode(v.id());
 
       LinVar lv = solver.getLinVar(node->indexLinVar());
       LinExpr e({1.0}, {lv});
@@ -60,9 +121,9 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       // reduction of the left bound
       solver.setMinimization();
       if (first) solver.optimize();
-      else       solver.reoptimize();
-      status = solver.getStatus();
+      else solver.reoptimize();
 
+      status = solver.getStatus();
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
@@ -74,8 +135,8 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       // reduction of the right bound
       solver.setMaximization();
       solver.reoptimize();
-      status = solver.getStatus();
 
+      status = solver.getStatus();
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
@@ -85,6 +146,7 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       reg.set(v, x);
    }
 
+   LOG_LOW("Reduced region: " << reg);
    return Proof::Maybe;
 }
 

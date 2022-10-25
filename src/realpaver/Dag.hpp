@@ -1043,7 +1043,7 @@ public:
    /// Destructor
    ~Dag();
 
-   /// no copy
+   /// No copy
    Dag(const Dag&) =delete;
 
    /// No assignment
@@ -1072,7 +1072,7 @@ public:
    size_t nbVars() const;
 
    /// Gets a variable
-   /// @param i an variable index with 0 <= i < nbVars()
+   /// @param i a variable index with 0 <= i < nbVars()
    /// @return the i-th variable node
    DagVar* varNode(size_t i) const;
 
@@ -1149,7 +1149,7 @@ public:
    /// @patam x new domain for the i-th node
    void setDom(size_t i, const Interval& x);
 
-   /// Reducesthe domain of a node
+   /// Reduces the domain of a node
    /// @param i a node index
    /// @patam x an interval intersected with the domain of the i-th node
    void reduceDom(size_t i, const Interval& x);
@@ -1187,7 +1187,7 @@ private:
    // of the variable identifiers
    std::vector<DagVar*> vnode_;
 
-   // vector of operation nodes by a topological ordering from the leaves
+   // vector of operation nodes sorted by a topological ordering from the leaves
    // to the roots
    std::vector<DagOp*> onode_;
 
@@ -1234,7 +1234,7 @@ public:
 
    ///@{
    /// Visit methods
-   /// The default impementations raise exceptions.
+   /// The default implementations raise exceptions.
    virtual void apply(const DagConst* d);
    virtual void apply(const DagVar* d);
    virtual void apply(const DagAdd* d);

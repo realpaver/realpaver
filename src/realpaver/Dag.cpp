@@ -205,7 +205,8 @@ void DagNode::linearize(LPModel& lm)
    }
 
    // insertion of constraints
-   if (val_.isFinite() && (!val_.isSingleton())) linearizeImpl(lm);
+   if (val_.isFinite() && (!val_.isSingleton()))
+      linearizeImpl(lm);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

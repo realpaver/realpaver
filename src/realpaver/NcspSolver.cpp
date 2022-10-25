@@ -173,7 +173,8 @@ void NcspSolver::makeContractor()
    if (with_polytope == "YES" && !dag_->isEmpty())
    {
       SharedContractor op =
-         std::make_shared<PolytopeHullContractor>(dag_, preprob_.scope());
+         std::make_shared<PolytopeHullContractor>(dag_, preprob_.scope(),
+                                                  PolytopeCreatorStyle::RLT);
 
       mainpool->push(op);
    }
