@@ -31,26 +31,25 @@ public:
    Term getDerivative() const;
 
    ///@{
-   /// Overrides TermVisitor methods
-   void apply(const TermConst* t);
-   void apply(const TermVar* t);
-   void apply(const TermAdd* t);
-   void apply(const TermSub* t);
-   void apply(const TermMul* t);
-   void apply(const TermDiv* t);
-   void apply(const TermMin* t);
-   void apply(const TermMax* t);
-   void apply(const TermUsb* t);
-   void apply(const TermAbs* t);
-   void apply(const TermSgn* t);
-   void apply(const TermSqr* t);
-   void apply(const TermSqrt* t);
-   void apply(const TermPow* t);
-   void apply(const TermExp* t);
-   void apply(const TermLog* t);
-   void apply(const TermCos* t);
-   void apply(const TermSin* t);
-   void apply(const TermTan* t);
+   void apply(const TermConst* t) override;
+   void apply(const TermVar* t) override;
+   void apply(const TermAdd* t) override;
+   void apply(const TermSub* t) override;
+   void apply(const TermMul* t) override;
+   void apply(const TermDiv* t) override;
+   void apply(const TermMin* t) override;
+   void apply(const TermMax* t) override;
+   void apply(const TermUsb* t) override;
+   void apply(const TermAbs* t) override;
+   void apply(const TermSgn* t) override;
+   void apply(const TermSqr* t) override;
+   void apply(const TermSqrt* t) override;
+   void apply(const TermPow* t) override;
+   void apply(const TermExp* t) override;
+   void apply(const TermLog* t) override;
+   void apply(const TermCos* t) override;
+   void apply(const TermSin* t) override;
+   void apply(const TermTan* t) override;
    ///@}
 
 private:

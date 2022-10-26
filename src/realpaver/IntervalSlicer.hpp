@@ -75,8 +75,9 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalBisecter : public IntervalSlicer {
 public:
-   /// Overrides
-   void applyImpl(const Interval& x);
+   ///@{
+   void applyImpl(const Interval& x) override;
+   ///@}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,8 +111,9 @@ public:
    /// @return the right peel of x
    Interval peelRight(const Interval& x) const;
 
-   /// Overrides
-   void applyImpl(const Interval& x);
+   ///@{
+   void applyImpl(const Interval& x) override;
+   ///@}
 
 private:
    double f_;     // factor
@@ -138,8 +140,9 @@ public:
    /// @param n arity of this with n >= 2
    void setArity(size_t n);
 
-   /// Overrides
-   void applyImpl(const Interval& x);
+   ///@{
+   void applyImpl(const Interval& x) override;
+   ///@}
 
 private:
    size_t n_;

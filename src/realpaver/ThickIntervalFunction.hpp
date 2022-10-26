@@ -49,10 +49,9 @@ public:
    bool dependsOn(const Bitset& bs) const;
 
    ///@{
-   /// Overrides (UniIntervalFunction)
-   Interval eval(const Interval& x);
-   Interval diff(const Interval& x);
-   std::pair<Interval, Interval> evalDiff(const Interval& x);
+   Interval eval(const Interval& x) override;
+   Interval diff(const Interval& x) override;
+   std::pair<Interval, Interval> evalDiff(const Interval& x) override;
    ///@}
 
    /// Updates the associated function in the DAG

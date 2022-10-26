@@ -22,11 +22,12 @@ public:
    /// Constructor
    BOLocalGradient();
 
-   /// Overrides (BOLocalSolver)
+   ///@{
    OptimizationStatus minimize(RealFunction& f,
                                const IntervalRegion& reg,
                                const RealPoint& src,
-                               RealPoint& dest);
+                               RealPoint& dest) override;
+   ///@}
 
    /// Gets the limit on the number of iterations
    size_t getIterLimit() const;

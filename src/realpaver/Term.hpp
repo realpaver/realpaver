@@ -303,19 +303,18 @@ public:
    TermConst(const Interval& x);
 
    ///@{
-   /// Overrides
-   void print(std::ostream& os) const;
-   Interval evalConst() const;
-   void eval(const IntervalRegion& reg);
-   Proof contract(IntervalRegion& reg);
-   void acceptVisitor(TermVisitor& vis) const;
-   bool isZero() const;
-   bool isOne() const;
-   bool isMinusOne() const;
-   bool dependsOn(const Variable& v) const;
-   bool isLinear() const;
-   void makeScope(Scope& s) const;
-   TermRep* cloneRoot() const;
+   void print(std::ostream& os) const override;
+   Interval evalConst() const override;
+   void eval(const IntervalRegion& reg) override;
+   Proof contract(IntervalRegion& reg) override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isZero() const override;
+   bool isOne() const override;
+   bool isMinusOne() const override;
+   bool dependsOn(const Variable& v) const override;
+   bool isLinear() const override;
+   void makeScope(Scope& s) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 
    /// @returns the value enclosed
@@ -335,17 +334,16 @@ public:
    TermVar(Variable v);
 
    ///@{
-   /// Overrides
-   void print(std::ostream& os) const;
-   Interval evalConst() const;
-   void eval(const IntervalRegion& reg);
-   Proof contract(IntervalRegion& reg);
-   void acceptVisitor(TermVisitor& vis) const;
-   bool dependsOn(const Variable& v) const;
-   bool isLinear() const;
-   void makeScope(Scope& s) const;
-   bool isVar() const;
-   TermRep* cloneRoot() const;
+   void print(std::ostream& os) const override;
+   Interval evalConst() const override;
+   void eval(const IntervalRegion& reg) override;
+   Proof contract(IntervalRegion& reg) override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool dependsOn(const Variable& v) const override;
+   bool isLinear() const override;
+   void makeScope(Scope& s) const override;
+   bool isVar() const override;
+   TermRep* cloneRoot() const override;
    ///@}
 
    /// @return the variable enclosed
@@ -400,13 +398,12 @@ public:
    void insert(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   void eval(const IntervalRegion& reg);
-   Proof contract(IntervalRegion& reg);
-   virtual void print(std::ostream& os) const;
-   bool dependsOn(const Variable& v) const;
-   virtual bool isLinear() const;
-   void makeScope(Scope& s) const;
+   void eval(const IntervalRegion& reg) override;
+   Proof contract(IntervalRegion& reg) override;
+   virtual void print(std::ostream& os) const override;
+   bool dependsOn(const Variable& v) const override;
+   virtual bool isLinear() const override;
+   void makeScope(Scope& s) const override;
    ///@}
 
 protected:
@@ -429,15 +426,14 @@ public:
    TermAdd(const SharedRep& l, const SharedRep& r);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void print(std::ostream& os) const;
-   void acceptVisitor(TermVisitor& vis) const;
-   bool isLinear() const;
-   bool isAdd() const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isLinear() const override;
+   bool isAdd() const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -452,15 +448,14 @@ public:
    TermSub(const SharedRep& l, const SharedRep& r);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void print(std::ostream& os) const;
-   void acceptVisitor(TermVisitor& vis) const;
-   bool isLinear() const;
-   bool isSub() const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isLinear() const override;
+   bool isSub() const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -475,15 +470,14 @@ public:
    TermMul(const SharedRep& l, const SharedRep& r);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void print(std::ostream& os) const;
-   void acceptVisitor(TermVisitor& vis) const;
-   bool isLinear() const;
-   bool isMul() const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isLinear() const override;
+   bool isMul() const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -498,14 +492,13 @@ public:
    TermDiv(const SharedRep& l, const SharedRep& r);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void print(std::ostream& os) const;
-   void acceptVisitor(TermVisitor& vis) const;
-   bool isDiv() const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isDiv() const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -520,12 +513,11 @@ public:
    TermMin(const SharedRep& l, const SharedRep& r);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -540,12 +532,11 @@ public:
    TermMax(const SharedRep& l, const SharedRep& r);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -559,14 +550,13 @@ public:
    TermUsb(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   bool isLinear() const;
-   bool isUsb() const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isLinear() const override;
+   bool isUsb() const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -580,12 +570,11 @@ public:
    TermAbs(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -599,12 +588,11 @@ public:
    TermSgn(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -618,13 +606,12 @@ public:
    TermSqr(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void print(std::ostream& os) const;
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -638,12 +625,11 @@ public:
    TermSqrt(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -661,13 +647,12 @@ public:
    int exponent() const;
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void print(std::ostream& os) const;
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 
 private:
@@ -684,12 +669,11 @@ public:
    TermExp(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -703,12 +687,11 @@ public:
    TermLog(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -722,12 +705,11 @@ public:
    TermCos(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -741,12 +723,11 @@ public:
    TermSin(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -760,12 +741,11 @@ public:
    TermTan(const SharedRep& t);
 
    ///@{
-   /// Overrides
-   Interval evalConst() const;
-   void evalRoot();
-   void contractRoot();
-   void acceptVisitor(TermVisitor& vis) const;
-   TermRep* cloneRoot() const;
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
    ///@}
 };
 
@@ -778,7 +758,6 @@ public:
    virtual ~TermVisitor();
 
    ///@{
-   /// Visit methods
    virtual void apply(const TermConst* t);
    virtual void apply(const TermVar* t);
    virtual void apply(const TermAdd* t);
@@ -824,26 +803,25 @@ public:
    Term getSquare(size_t i) const;
 
    ///@{
-   /// Overrides
-   virtual void apply(const TermConst* t);
-   virtual void apply(const TermVar* t);
-   virtual void apply(const TermAdd* t);
-   virtual void apply(const TermSub* t);
-   virtual void apply(const TermMul* t);
-   virtual void apply(const TermDiv* t);
-   virtual void apply(const TermMin* t);
-   virtual void apply(const TermMax* t);
-   virtual void apply(const TermUsb* t);
-   virtual void apply(const TermAbs* t);
-   virtual void apply(const TermSgn* t);
-   virtual void apply(const TermSqr* t);
-   virtual void apply(const TermSqrt* t);
-   virtual void apply(const TermPow* t);
-   virtual void apply(const TermExp* t);
-   virtual void apply(const TermLog* t);
-   virtual void apply(const TermCos* t);
-   virtual void apply(const TermSin* t);
-   virtual void apply(const TermTan* t);
+   virtual void apply(const TermConst* t) override;
+   virtual void apply(const TermVar* t) override;
+   virtual void apply(const TermAdd* t) override;
+   virtual void apply(const TermSub* t) override;
+   virtual void apply(const TermMul* t) override;
+   virtual void apply(const TermDiv* t) override;
+   virtual void apply(const TermMin* t) override;
+   virtual void apply(const TermMax* t) override;
+   virtual void apply(const TermUsb* t) override;
+   virtual void apply(const TermAbs* t) override;
+   virtual void apply(const TermSgn* t) override;
+   virtual void apply(const TermSqr* t) override;
+   virtual void apply(const TermSqrt* t) override;
+   virtual void apply(const TermPow* t) override;
+   virtual void apply(const TermExp* t) override;
+   virtual void apply(const TermLog* t) override;
+   virtual void apply(const TermCos* t) override;
+   virtual void apply(const TermSin* t) override;
+   virtual void apply(const TermTan* t) override;
    ///@}
 
 private:

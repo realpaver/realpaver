@@ -135,14 +135,10 @@ public:
    /// @return this restricted to sco
    IntervalRegion subRegion(const Scope& sco) const;
 
-   /// Overrides (IntervalVector)
-   /// @return a clone of this
-   IntervalRegion* clone() const;
-
-   /// Overrides
-   /// Output on a stream
-   /// @param os an output stream
-   void print(std::ostream& os) const;
+   ///@{
+   IntervalRegion* clone() const override;
+   void print(std::ostream& os) const override;
+   ///@}
 
 private:
    Scope scope_;

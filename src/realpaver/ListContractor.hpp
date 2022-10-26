@@ -43,11 +43,10 @@ public:
    void setPool(SharedContractorPool pool);
 
    ///@{
-   /// Overrides (Contractor)
-   bool dependsOn(const Bitset& bs) const;
-   Scope scope() const;
-   Proof contract(IntervalRegion& reg);
-   void print(std::ostream& os) const;
+   bool dependsOn(const Bitset& bs) const override;
+   Scope scope() const override;
+   Proof contract(IntervalRegion& reg) override;
+   void print(std::ostream& os) const override;
    ///@}
 
 private:

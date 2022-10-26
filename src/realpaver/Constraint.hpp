@@ -207,12 +207,11 @@ public:
    RelSymbol relSymbol() const;
 
    ///@{
-   /// Overrides (ConstraintRep)
-   void print(std::ostream& os) const;
-   bool isConstant() const;
-   bool isEquation() const;
-   bool isInequality() const;
-   bool isLinear() const;
+   void print(std::ostream& os) const override;
+   bool isConstant() const override;
+   bool isEquation() const override;
+   bool isInequality() const override;
+   bool isLinear() const override;
    ///@}
 
 private:
@@ -229,12 +228,11 @@ public:
    /// @param l left-hand side
    /// @param r right-hand side
    ConstraintEq(Term l, Term r);
-   
+
    ///@{
-   /// Overrides (ConstraintRep)
-   void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
    ///@}
 };
 
@@ -255,10 +253,9 @@ public:
    ConstraintLe(Term l, Term r);
    
    ///@{
-   /// Overrides (ConstraintRep)
-   void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
    ///@}
 };
 
@@ -279,10 +276,9 @@ public:
    ConstraintLt(Term l, Term r);
    
    ///@{
-   /// Overrides (ConstraintRep)
-   void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
    ///@}
 };
 
@@ -303,10 +299,9 @@ public:
    ConstraintGe(Term l, Term r);
    
    ///@{
-   /// Overrides (ConstraintRep)
-   void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
    ///@}
 };
 
@@ -327,10 +322,9 @@ public:
    ConstraintGt(Term l, Term r);
 
    ///@{
-   /// Overrides (ConstraintRep)
-   void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
    ///@}
 };
 
@@ -359,10 +353,9 @@ public:
    Term term() const;
 
    ///@{
-   /// Overrides (ConstraintRep)
-   void acceptVisitor(ConstraintVisitor& vis) const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
    ///@}
 
 private:
@@ -465,12 +458,11 @@ public:
    void addCol(const ConstraintTableCol& col);
 
    ///@{
-   /// Overrides
-   bool isConstant() const;
-   Proof isSatisfied(const IntervalRegion& reg) const;
-   Proof contract(IntervalRegion& reg);
-   void print(std::ostream& os) const;
-   void acceptVisitor(ConstraintVisitor& vis) const;
+   bool isConstant() const override;
+   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof contract(IntervalRegion& reg) override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(ConstraintVisitor& vis) const override;
    ///@}
 
 private:
@@ -509,7 +501,6 @@ public:
    virtual ~ConstraintVisitor();
 
    ///@{
-   /// Visit methods
    virtual void apply(const ConstraintEq* c);
    virtual void apply(const ConstraintLe* c);
    virtual void apply(const ConstraintLt* c);

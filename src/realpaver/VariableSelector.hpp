@@ -76,8 +76,7 @@ public:
    /// No assignment
    MaxDomSelector& operator=(const MaxDomSelector&) = delete;
 
-   /// Overrides (Selector)
-   std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
+   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,8 +98,7 @@ public:
    /// No assignment
    MaxSmearSelector& operator=(const MaxSmearSelector&) = delete;
 
-   /// Overrides (Selector)
-   std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
+   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
 
 private:
    DiffIntervalFunction* f_;
@@ -124,8 +122,7 @@ public:
    /// No assignment
    RoundRobinSelector& operator=(const RoundRobinSelector&) = delete;
 
-   /// Overrides (Selector)
-   std::pair<bool, Variable> selectVar(const SearchNode& node);
+   std::pair<bool, Variable> selectVar(const SearchNode& node) override;
 };
 
 } // namespace

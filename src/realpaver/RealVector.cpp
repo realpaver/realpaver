@@ -145,4 +145,10 @@ RealVector operator/(const RealVector& V, double a)
    return res;
 }
 
+RealVector* RealVector::clone() const
+{
+   return new RealVector(*this);
+}
+
+
 } // namespace

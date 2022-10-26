@@ -39,8 +39,9 @@ public:
    /// No assignment
    NcspSplit& operator=(const NcspSplit&) = delete;
 
-   /// Overrides
-   bool applyImpl(SharedNcspNode node);
+   ///@
+   bool applyImpl(SharedNcspNode node) override;
+   ///@}
 
 private:
    std::unique_ptr<VariableSelector> selector_;

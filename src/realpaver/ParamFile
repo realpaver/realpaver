@@ -145,7 +145,11 @@ PROPAGATION_BASE = HC4
 # Propagation with a max CID contractor (YES or NO)
 PROPAGATION_WITH_MAX_CID = YES
 
-# Propagation with a polytope hull contractor (YES or NO)
+# Propagation with a polytope hull contractor
+# - NO: contractor not used
+# - RLT: contractor based on a RLT-based relaxation
+# - AFFINE: contractor based an an affine relaxation
+# - TAYLOR: contractor based on a Taylor relaxation
 PROPAGATION_WITH_POLYTOPE = NO
 
 ###############################################################################

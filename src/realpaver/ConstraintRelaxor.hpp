@@ -37,8 +37,7 @@ public:
    ~ConstraintRelaxor() = default;
 
    ///@{
-   /// Overrides
-   void apply(const ConstraintEq* c);
+   void apply(const ConstraintEq* c) override;
    ///@}
 
    /// @return the relaxed constraint after a visit

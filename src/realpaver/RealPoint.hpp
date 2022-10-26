@@ -70,9 +70,9 @@ public:
    /// @return this restricted to s
    RealPoint subPoint(Scope s) const;
 
-   /// Overrides (RealVector)
-   /// @return a clone of this
-   RealPoint* clone() const;
+   ///@{
+   RealPoint* clone() const override;
+   ///@}
 
 private:
    Scope scope_;

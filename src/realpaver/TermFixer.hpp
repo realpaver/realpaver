@@ -53,81 +53,27 @@ public:
    /// @return the new term after a visit
    Term getTerm() const;
 
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermConst* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermVar* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermAdd* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermSub* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermMul* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermDiv* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermMin* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermMax* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermUsb* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermAbs* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermSgn* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermSqr* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermSqrt* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermPow* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermExp* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermLog* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermCos* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermSin* t);
-
-   /// Visits a term
-   /// @param t term visited
-   void apply(const TermTan* t);
+   ///@{
+   void apply(const TermConst* t) override;
+   void apply(const TermVar* t) override;
+   void apply(const TermAdd* t) override;
+   void apply(const TermSub* t) override;
+   void apply(const TermMul* t) override;
+   void apply(const TermDiv* t) override;
+   void apply(const TermMin* t) override;
+   void apply(const TermMax* t) override;
+   void apply(const TermUsb* t) override;
+   void apply(const TermAbs* t) override;
+   void apply(const TermSgn* t) override;
+   void apply(const TermSqr* t) override;
+   void apply(const TermSqrt* t) override;
+   void apply(const TermPow* t) override;
+   void apply(const TermExp* t) override;
+   void apply(const TermLog* t) override;
+   void apply(const TermCos* t) override;
+   void apply(const TermSin* t) override;
+   void apply(const TermTan* t) override;
+   ///@}
 
 private:
    VarVarMapType* vvm_;

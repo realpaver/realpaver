@@ -19,7 +19,7 @@ namespace realpaver {
 /// @brief This is a wrapper class for the LP solver Clp.
 ///
 /// It inherits the methods for creating a model from its base class.
-/// It overrides the optimization method.
+/// It implements the optimization method.
 ///////////////////////////////////////////////////////////////////////////////
 class LPSolver : public LPModel {
 public:
@@ -35,13 +35,16 @@ public:
    /// No assignment
    LPSolver& operator=(const LPSolver&) = delete;
 
-   /// Overrides
+   /// Optimization method
+   /// @return true if an optimal solution is found
    ///
-   /// A Clp model is created first from the LP model. Then the initialSolve
+   /// A Gurobi model is created first from the LP model. Then the initialSolve
    /// method of Clp is executed.
    bool optimize();
 
-   /// Overrides
+   /// Optimization method which requires that optimize() has been called at
+   /// least once
+   /// @return true if an optimal solution is found
    ///
    /// Only the objective function is generated again from the LP model.
    /// Then the initialSolve method of Clp is executed.

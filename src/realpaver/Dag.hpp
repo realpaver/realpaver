@@ -256,18 +256,17 @@ public:
    DagConst(Dag* dag, size_t index, const Interval& x);
 
    ///@{
-   /// Overrides (DagNode)
-   void print(std::ostream& os) const;
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval(const IntervalRegion& reg);
-   void eval(const RealPoint& pt);
-   void evalOnly(const Variable& v, const Interval& x);
-   void proj(IntervalRegion& reg);
-   bool diff();
-   bool diffOnly(const Variable& v);
-   void reval(const RealPoint& pt);
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void print(std::ostream& os) const override;
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval(const IntervalRegion& reg) override;
+   void eval(const RealPoint& pt) override;
+   void evalOnly(const Variable& v, const Interval& x) override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   bool diffOnly(const Variable& v) override;
+   void reval(const RealPoint& pt) override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 
    /// @return the constant interval value
@@ -292,18 +291,17 @@ public:
    Variable getVar() const;
 
    ///@{
-   /// Overrides (DagNode)
-   void print(std::ostream& os) const;
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval(const IntervalRegion& reg);
-   void eval(const RealPoint& pt);
-   void evalOnly(const Variable& v, const Interval& x);
-   void proj(IntervalRegion& reg);
-   bool diff();
-   bool diffOnly(const Variable& v);
-   void reval(const RealPoint& pt);
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void print(std::ostream& os) const override;
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval(const IntervalRegion& reg) override;
+   void eval(const RealPoint& pt) override;
+   void evalOnly(const Variable& v, const Interval& x) override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   bool diffOnly(const Variable& v) override;
+   void reval(const RealPoint& pt) override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 
 private:
@@ -352,13 +350,12 @@ public:
    virtual void reval() = 0;
 
    ///@{
-   /// Overrides (DagNode)
-   virtual void print(std::ostream& os) const;
-   void eval(const IntervalRegion& reg);
-   void eval(const RealPoint& pt);
-   void evalOnly(const Variable& v, const Interval& x);
-   bool diffOnly(const Variable& v);
-   void reval(const RealPoint& pt);
+   virtual void print(std::ostream& os) const override;
+   void eval(const IntervalRegion& reg) override;
+   void eval(const RealPoint& pt) override;
+   void evalOnly(const Variable& v, const Interval& x) override;
+   bool diffOnly(const Variable& v) override;
+   void reval(const RealPoint& pt) override;
    ///@}
 
 private:
@@ -376,14 +373,13 @@ public:
    DagAdd(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
  
@@ -398,14 +394,13 @@ public:
    DagSub(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -420,14 +415,13 @@ public:
    DagMul(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -442,14 +436,13 @@ public:
    DagDiv(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -464,14 +457,13 @@ public:
    DagMin(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -486,14 +478,13 @@ public:
    DagMax(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -508,14 +499,13 @@ public:
    DagUsb(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -530,14 +520,13 @@ public:
    DagAbs(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -552,14 +541,13 @@ public:
    DagSgn(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -574,14 +562,13 @@ public:
    DagSqr(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -596,14 +583,13 @@ public:
    DagSqrt(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -622,16 +608,15 @@ public:
    int exponent() const;
 
    ///@{
-   /// Overrides (DagOp)
-   bool eqSymbol(const DagOp* other) const;
-   void print(std::ostream& os) const;
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   bool eqSymbol(const DagOp* other) const override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 
 private:
@@ -649,14 +634,13 @@ public:
    DagExp(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -671,14 +655,13 @@ public:
    DagLog(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -693,14 +676,13 @@ public:
    DagCos(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -715,14 +697,13 @@ public:
    DagSin(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -737,14 +718,13 @@ public:
    DagTan(Dag* dag, const IndexList& lsub);
 
    ///@{
-   /// Overrides (DagOp)
-   void acceptVisitor(DagVisitor& vis) const;
-   void eval();
-   void proj(IntervalRegion& reg);
-   bool diff();
-   void reval();
-   bool rdiff();
-   void linearizeImpl(LPModel& lm);
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -925,18 +905,17 @@ public:
    bool rdiff();
 
    ///@{
-   /// Overrides
-   Scope  funScope() const;
-   size_t funArity() const;
+   Scope  funScope() const override;
+   size_t funArity() const override;
 
-   Interval intervalEval     (const IntervalRegion& reg);
-   Interval intervalPointEval(const RealPoint& pt);
-   void     intervalDiff     (const IntervalRegion& reg, IntervalVector& g);
-   Interval intervalEvalDiff (const IntervalRegion& reg, IntervalVector& g);
+   Interval intervalEval     (const IntervalRegion& reg) override;
+   Interval intervalPointEval(const RealPoint& pt) override;
+   void     intervalDiff     (const IntervalRegion& reg, IntervalVector& g) override;
+   Interval intervalEvalDiff (const IntervalRegion& reg, IntervalVector& g) override;
 
-   double realEval    (const RealPoint& pt);
-   void   realDiff    (const RealPoint& pt, RealVector& g);
-   double realEvalDiff(const RealPoint& pt, RealVector& g);
+   double realEval    (const RealPoint& pt) override;
+   void   realDiff    (const RealPoint& pt, RealVector& g) override;
+   double realEvalDiff(const RealPoint& pt, RealVector& g) override;
    ///@}
 
    /// @return the interval gradient after a differentiation
@@ -1233,8 +1212,6 @@ public:
    virtual ~DagVisitor();
 
    ///@{
-   /// Visit methods
-   /// The default implementations raise exceptions.
    virtual void apply(const DagConst* d);
    virtual void apply(const DagVar* d);
    virtual void apply(const DagAdd* d);
@@ -1267,26 +1244,25 @@ public:
    DagFunCreator(DagFun* f);
 
    ///@{
-   /// Overrides
-   virtual void apply(const DagConst* d);
-   virtual void apply(const DagVar* d);
-   virtual void apply(const DagAdd* d);
-   virtual void apply(const DagSub* d);
-   virtual void apply(const DagMul* d);
-   virtual void apply(const DagDiv* d);
-   virtual void apply(const DagMin* d);
-   virtual void apply(const DagMax* d);
-   virtual void apply(const DagUsb* d);
-   virtual void apply(const DagAbs* d);
-   virtual void apply(const DagSgn* d);
-   virtual void apply(const DagSqr* d);
-   virtual void apply(const DagSqrt* d);
-   virtual void apply(const DagPow* d);
-   virtual void apply(const DagExp* d);
-   virtual void apply(const DagLog* d);
-   virtual void apply(const DagCos* d);
-   virtual void apply(const DagSin* d);
-   virtual void apply(const DagTan* d);
+   virtual void apply(const DagConst* d) override;
+   virtual void apply(const DagVar* d) override;
+   virtual void apply(const DagAdd* d) override;
+   virtual void apply(const DagSub* d) override;
+   virtual void apply(const DagMul* d) override;
+   virtual void apply(const DagDiv* d) override;
+   virtual void apply(const DagMin* d) override;
+   virtual void apply(const DagMax* d) override;
+   virtual void apply(const DagUsb* d) override;
+   virtual void apply(const DagAbs* d) override;
+   virtual void apply(const DagSgn* d) override;
+   virtual void apply(const DagSqr* d) override;
+   virtual void apply(const DagSqrt* d) override;
+   virtual void apply(const DagPow* d) override;
+   virtual void apply(const DagExp* d) override;
+   virtual void apply(const DagLog* d) override;
+   virtual void apply(const DagCos* d) override;
+   virtual void apply(const DagSin* d) override;
+   virtual void apply(const DagTan* d) override;
    ///@}
 
 private:
@@ -1309,13 +1285,12 @@ public:
    size_t index();
 
    ///@{
-   /// Overrides
-   void apply(const ConstraintEq* c);
-   void apply(const ConstraintLe* c);
-   void apply(const ConstraintLt* c);
-   void apply(const ConstraintGe* c);
-   void apply(const ConstraintGt* c);
-   void apply(const ConstraintIn* c);
+   void apply(const ConstraintEq* c) override;
+   void apply(const ConstraintLe* c) override;
+   void apply(const ConstraintLt* c) override;
+   void apply(const ConstraintGe* c) override;
+   void apply(const ConstraintGt* c) override;
+   void apply(const ConstraintIn* c) override;
    ///@}
 
 private:
@@ -1337,26 +1312,25 @@ public:
    size_t index();
 
    ///@{
-   /// Overrides
-   void apply(const TermConst* t);
-   void apply(const TermVar* t);
-   void apply(const TermAdd* t);
-   void apply(const TermSub* t);
-   void apply(const TermMul* t);
-   void apply(const TermDiv* t);
-   void apply(const TermMin* t);
-   void apply(const TermMax* t);
-   void apply(const TermUsb* t);
-   void apply(const TermAbs* t);
-   void apply(const TermSgn* t);
-   void apply(const TermSqr* t);
-   void apply(const TermSqrt* t);
-   void apply(const TermPow* t);
-   void apply(const TermExp* t);
-   void apply(const TermLog* t);
-   void apply(const TermCos* t);
-   void apply(const TermSin* t);
-   void apply(const TermTan* t);
+   void apply(const TermConst* t) override;
+   void apply(const TermVar* t) override;
+   void apply(const TermAdd* t) override;
+   void apply(const TermSub* t) override;
+   void apply(const TermMul* t) override;
+   void apply(const TermDiv* t) override;
+   void apply(const TermMin* t) override;
+   void apply(const TermMax* t) override;
+   void apply(const TermUsb* t) override;
+   void apply(const TermAbs* t) override;
+   void apply(const TermSgn* t) override;
+   void apply(const TermSqr* t) override;
+   void apply(const TermSqrt* t) override;
+   void apply(const TermPow* t) override;
+   void apply(const TermExp* t) override;
+   void apply(const TermLog* t) override;
+   void apply(const TermCos* t) override;
+   void apply(const TermSin* t) override;
+   void apply(const TermTan* t) override;
    ///@}
 
 private:

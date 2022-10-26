@@ -69,8 +69,7 @@ public:
    /// @param scope set of variables of the system
    PolytopeRLTCreator(SharedDag dag, Scope scope);
 
-   /// Overrides
-   void make(LPModel& lpm, const IntervalRegion& reg);
+   void make(LPModel& lpm, const IntervalRegion& reg) override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,7 +77,7 @@ public:
 ///
 /// Given a constraint system S, and a region R, it generates an outer
 /// approximation A of the set of solutions to S in R defined by a polytope.
-/// Now, for each variable x, two LPs are solved: min or max x s.t. A in
+/// For each variable x, two LPs are solved: min or max x s.t. A in
 /// order to contract of the domain of x in R.
 ///
 /// This contractor is parameterized by the relaxation method.
@@ -94,13 +93,16 @@ public:
    /// Destructor
    ~PolytopeHullContractor();
 
-   ///@{
-   /// Overrides
-   bool dependsOn(const Bitset& bs) const;
-   Scope scope() const;
-   Proof contract(IntervalRegion& reg);
-   void print(std::ostream& os) const;
-   ///@}
+   /// No copy
+   PolytopeHullContractor(const PolytopeHullContractor&) = delete;
+
+   /// No assignment
+   PolytopeHullContractor& operator=(const PolytopeHullContractor&) = delete;
+
+   bool dependsOn(const Bitset& bs) const override;
+   Scope scope() const override;
+   Proof contract(IntervalRegion& reg) override;
+   void print(std::ostream& os) const override;
 
 private:
    PolytopeCreator* creator_;

@@ -32,17 +32,16 @@ public:
    /// Default copy constructor
    NcspSpaceDFS(const NcspSpaceDFS&) = default;
 
-   /// Overrides
    ///@{
-   size_t nbSolNodes() const;
-   void pushSolNode(const SharedNcspNode& node);
-   SharedNcspNode popSolNode();
-   SharedNcspNode getSolNode(size_t i) const;
-   bool hasFeasibleSolNode() const;
-   size_t nbPendingNodes() const;
-   SharedNcspNode nextPendingNode();
-   void insertPendingNode(const SharedNcspNode& node);
-   SharedNcspNode getPendingNode(size_t i) const;
+   size_t nbSolNodes() const override;
+   void pushSolNode(const SharedNcspNode& node) override;
+   SharedNcspNode popSolNode() override;
+   SharedNcspNode getSolNode(size_t i) const override;
+   bool hasFeasibleSolNode() const override;
+   size_t nbPendingNodes() const override;
+   SharedNcspNode nextPendingNode() override;
+   void insertPendingNode(const SharedNcspNode& node) override;
+   SharedNcspNode getPendingNode(size_t i) const override;
    ///@}
 
 private:

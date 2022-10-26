@@ -52,33 +52,15 @@ public:
    /// @return the new constraint after a visit
    Constraint getConstraint() const;
 
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintEq* c);
-
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintLe* c);
-
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintLt* c);
-
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintGe* c);
-
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintGt* c);
-
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintIn* c);
-
-   /// Visits a constraint
-   /// @param c constraint visited
-   void apply(const ConstraintTable* c);
+   ///@{
+   void apply(const ConstraintEq* c) override;
+   void apply(const ConstraintLe* c) override;
+   void apply(const ConstraintLt* c) override;
+   void apply(const ConstraintGe* c) override;
+   void apply(const ConstraintGt* c) override;
+   void apply(const ConstraintIn* c) override;
+   void apply(const ConstraintTable* c) override;
+   ///@}
 
 private:
    VarVarMapType* vvm_;

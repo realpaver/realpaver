@@ -54,9 +54,8 @@ public:
    ScopeIdMap(const ScopeIdMap& other);
 
    ///@{
-   /// Overrides
-   size_t index(size_t id) const;
-   ScopeIdMap* clone() const;
+   size_t index(size_t id) const override;
+   ScopeIdMap* clone() const override;
    ///@}
 
 private:
@@ -79,9 +78,8 @@ public:
    ScopeSeqMap(const ScopeSeqMap& other);
 
    ///@{
-   /// Overrides
-   size_t index(size_t id) const;
-   ScopeSeqMap* clone() const;
+   size_t index(size_t id) const override;
+   ScopeSeqMap* clone() const override;
    ///@}
 
 private:
@@ -106,9 +104,8 @@ public:
    void insert(size_t id);
 
    ///@{
-   /// Overrides
-   size_t index(size_t id) const;
-   ScopeHashMap* clone() const;
+   size_t index(size_t id) const override;
+   ScopeHashMap* clone() const override;
    ///@}
 
 private:

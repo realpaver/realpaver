@@ -83,12 +83,11 @@ public:
    void push(SharedContractor op);
 
    ///@{
-   /// Overrides (ContractorPool)
-   size_t poolSize() const;
-   Scope scope() const;
-   bool dependsOn(const Bitset& bs) const;
-   SharedContractor contractorAt(size_t i) const;
-   void removeContractorAt(size_t i);
+   size_t poolSize() const override;
+   Scope scope() const override;
+   bool dependsOn(const Bitset& bs) const override;
+   SharedContractor contractorAt(size_t i) const override;
+   void removeContractorAt(size_t i) override;
    ///@}
 
 private:

@@ -113,18 +113,17 @@ public:
    void linearize(const IntervalRegion& reg, LPModel& lm);
 
    ///@{
-   /// Overrides
-   Scope  funScope() const;
-   size_t funArity() const;
+   Scope  funScope() const override;
+   size_t funArity() const override;
 
-   Interval intervalEval     (const IntervalRegion& reg);
-   Interval intervalPointEval(const RealPoint& pt);
-   void     intervalDiff     (const IntervalRegion& reg, IntervalVector& g);
-   Interval intervalEvalDiff (const IntervalRegion& reg, IntervalVector& g);
+   Interval intervalEval     (const IntervalRegion& reg) override;
+   Interval intervalPointEval(const RealPoint& pt) override;
+   void     intervalDiff     (const IntervalRegion& reg, IntervalVector& g) override;
+   Interval intervalEvalDiff (const IntervalRegion& reg, IntervalVector& g) override;
 
-   double realEval    (const RealPoint& pt);
-   void   realDiff    (const RealPoint& pt, RealVector& g);
-   double realEvalDiff(const RealPoint& pt, RealVector& g);
+   double realEval    (const RealPoint& pt) override;
+   void   realDiff    (const RealPoint& pt, RealVector& g) override;
+   double realEvalDiff(const RealPoint& pt, RealVector& g) override;
    ///@}
 
    Dag* getDag();

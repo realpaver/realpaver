@@ -42,8 +42,7 @@ public:
    /// No assignment
    BOSplit& operator=(const BOSplit&) = delete;
 
-   /// Overrides
-   bool applyImpl(SharedBONode node);
+   bool applyImpl(SharedBONode node) override;
 
 private:
    std::unique_ptr<VariableSelector> selector_;

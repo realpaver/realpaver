@@ -97,6 +97,9 @@ public:
    ///
    /// this is assigned to this / a
    RealVector& operator/=(double a);
+
+   /// @return a clone of this
+   virtual RealVector* clone() const;
 };
 
 ///@{
