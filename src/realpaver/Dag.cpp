@@ -2557,18 +2557,142 @@ Scope Dag::scope() const
    return res;
 }
 
-void Dag::reval(const RealPoint& pt)
+bool Dag::realEval(const RealPoint& pt)
 {
    Double::rndNear();
 
    for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->reval(pt);
+
+   for (size_t i=0; i<nbFuns(); ++i)
+      if (Double::isNan(fun_[i]->rval()))
+         return false;
+
+   return true;
 }
 
-void Dag::eval(const IntervalRegion& reg)
+bool Dag::realEval(const RealPoint& pt, RealVector& v)
+{
+   ASSERT(v.size() == nbFuns(), "Evaluation of dag, bad vector size");
+
+   Double::rndNear();
+
+   for (size_t i=0; i<nbNodes(); ++i)
+      node_[i]->reval(pt);
+
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      DagFun* f = fun_[i];
+      double x = f->rval();
+
+      if (Double::isNan(x)) return false;
+      v.set(i, x);
+   }
+
+   return true;
+}
+
+bool Dag::intervalEval(const IntervalRegion& reg)
 {
    for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(reg);
+
+   for (size_t i=0; i<nbFuns(); ++i)
+      if (fun_[i]->val().isEmpty())
+         return false;
+
+   return true;
+}
+
+bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& v)
+{
+   ASSERT(v.size() == nbFuns(), "Evaluation of dag, bad vector size");
+
+   for (size_t i=0; i<nbNodes(); ++i)
+      node_[i]->eval(reg);
+
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      DagFun* f = fun_[i];
+      Interval x = f->val();
+
+      if (x.isEmpty()) return false;
+      v.set(i, x);
+   }
+
+   return true;
+}
+
+bool Dag::intervalDiff(IntervalMatrix& J)
+{
+   ASSERT(nbVars() == J.ncols(), "Bad number of columns of a Jacobian matrix");
+   ASSERT(nbFuns() == J.nrows(), "Bad number of rows of a Jacobian matrix");
+
+   bool res = true;
+   Scope scodag = scope();
+
+   // differentiates each function
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      // differentiates the function
+      DagFun* f = fun_[i];
+      res = res && f->diff();
+
+      // fills the matrix
+      size_t j = 0;
+      for (auto v : scodag)
+      {
+         if (f->dependsOn(v))
+            J.set(i, j, f->intervalDeriv(v));
+         else
+            J.set(i, j, Interval::zero());
+
+         ++j;
+      }
+   }
+   return res;
+}
+
+bool Dag::intervalDiff(const IntervalRegion& reg, IntervalMatrix& J)
+{
+   if (!intervalEval(reg)) return false;
+   intervalDiff(J);
+}
+
+bool Dag::realDiff(RealMatrix& J)
+{
+   ASSERT(nbVars() == J.ncols(), "Bad number of columns of a Jacobian matrix");
+   ASSERT(nbFuns() == J.nrows(), "Bad number of rows of a Jacobian matrix");
+
+   bool res = true;
+   Scope scodag = scope();
+
+   // differentiates each function
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      // differentiates the function
+      DagFun* f = fun_[i];
+      res = res && f->rdiff();
+
+      // fills the matrix
+      size_t j = 0;
+      for (auto v : scodag)
+      {
+         if (f->dependsOn(v))
+            J.set(i, j, f->realDeriv(v));
+         else
+            J.set(i, j, 0.0);
+
+         ++j;
+      }
+   }
+   return res;
+}
+
+bool Dag::realDiff(const RealPoint& pt, RealMatrix& J)
+{
+   if (!realEval(pt)) return false;
+   realDiff(J);
 }
 
 void Dag::linearize(LPModel& lm)

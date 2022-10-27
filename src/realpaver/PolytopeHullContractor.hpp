@@ -50,7 +50,8 @@ public:
    /// Makes the linear relaxation
    /// @param lpm resulting linear model
    /// @param reg input region
-   virtual void make(LPModel& lpm, const IntervalRegion& reg) = 0;
+   /// @return true in case of sucess, false otherwise
+   virtual bool make(LPModel& lpm, const IntervalRegion& reg) = 0;
 
 protected:
    SharedDag dag_;
@@ -69,7 +70,7 @@ public:
    /// @param scope set of variables of the system
    PolytopeRLTCreator(SharedDag dag, Scope scope);
 
-   void make(LPModel& lpm, const IntervalRegion& reg) override;
+   bool make(LPModel& lpm, const IntervalRegion& reg) override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

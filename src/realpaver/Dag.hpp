@@ -17,8 +17,10 @@
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalFunction.hpp"
+#include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/RealFunction.hpp"
+#include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {
 
@@ -1105,8 +1107,6 @@ public:
    size_t insertFun(DagFun* f);
 
    /// @return the scope of this
-   ///
-   /// The scope is created.
    Scope scope() const;
 
    /// Output on a stream
@@ -1135,11 +1135,69 @@ public:
 
    /// Interval evaluation
    /// @param reg domains of variables
-   void eval(const IntervalRegion& reg);
+   /// @return false if at least one intermediary result is empty, true othewise
+   bool intervalEval(const IntervalRegion& reg);
+
+   /// Interval evaluation
+   /// @param reg domains of variables
+   /// @param v vector such that v[i] is the value of the i-th function in case
+   ///          of success (i.e. the result is true)
+   /// @return false if at least one intermediary result is empty, true othewise
+   bool intervalEval(const IntervalRegion& reg, IntervalVector& v);
 
    /// Real (point) evaluation
    /// @param pt values of variables
-   void reval(const RealPoint& pt);
+   /// @return false if a NaN occurs, true othewise
+   bool realEval(const RealPoint& pt);
+
+   /// Real (point) evaluation
+   /// @param pt values of variables
+   /// @param v vector such that v[i] is the value of the i-th function in case
+   ///          of success (i.e. the result is true)
+   /// @return false if a NaN occurs, true othewise
+   bool realEval(const RealPoint& pt, RealVector& v);
+
+   /// Interval differentiation in reverse mode
+   /// @param J resulting matrix such that J(i, k) corresponds to the partial
+   ///          derivative of the i-th function of this with respect to the
+   ///          k-th variable of the scope of) this
+   /// @return false if at least one function is discontinuous or not defined,
+   ///         true otherwise
+   ///
+   /// It assumes that this dag has been evaluated.
+   bool intervalDiff(IntervalMatrix& J);
+
+   /// Interval differentiation in reverse mode
+   /// @param reg the variable domains
+   /// @param J resulting matrix such that J(i, k) corresponds to the partial
+   ///          derivative of the i-th function of this with respect to the
+   ///          k-th variable of the scope of) this
+   /// @return false if at least one function is discontinuous or not defined,
+   ///         true otherwise
+   ///
+   /// It evaluates first this dag and then calculates the derivatives.
+   bool intervalDiff(const IntervalRegion& reg, IntervalMatrix& J);
+
+   /// Real (point) differentiation in reverse mode
+   /// @param J resulting matrix such that J(i, k) corresponds to the partial
+   ///          derivative of the i-th function of this with respect to the
+   ///          k-th variable of the scope of) this
+   /// @return false if at least one function is discontinuous or not defined,
+   ///         true otherwise
+   ///
+   /// It assumes that this dag has been evaluated.
+   bool realDiff(RealMatrix& J);
+
+   /// Real (point) differentiation in reverse mode
+   /// @param pt the variable domains
+   /// @param J resulting matrix such that J(i, k) corresponds to the partial
+   ///          derivative of the i-th function of this with respect to the
+   ///          k-th variable of the scope of) this
+   /// @return false if at least one function is discontinuous or not defined,
+   ///         true otherwise
+   ///
+   /// It evaluates first this dag and then calculates the derivatives.
+   bool realDiff(const RealPoint& pt, RealMatrix& J);
 
    /// Linearizes the DAG
    /// @param lm output LP model

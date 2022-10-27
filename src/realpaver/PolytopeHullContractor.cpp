@@ -63,10 +63,12 @@ PolytopeRLTCreator::PolytopeRLTCreator(SharedDag dag, Scope scope)
       : PolytopeCreator(dag, scope)
 {}
 
-void PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
+bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
 {
-   dag_->eval(reg);
+   if (!dag_->intervalEval(reg)) return false;
+
    dag_->linearize(lpm);
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,7 +106,7 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
    LPSolver solver;
 
    // linearizes the constraints
-   creator_->make(solver, reg);
+   if (!creator_->make(solver, reg)) return Proof::Maybe;
 
    bool first = true;
    OptimizationStatus status;

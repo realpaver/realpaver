@@ -1,4 +1,5 @@
 #include <iostream>
+#include "realpaver/Dag.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
@@ -16,18 +17,24 @@ int main(void)
       Variable x = prob.addRealVar(0,  3, "x");
       Variable y = prob.addIntVar (4,  7, "y");
       Variable z = prob.addIntVar (-2, 10, "z");
+
+      IntervalRegion reg = prob.getDomains();
+
+      Dag dag;
+      dag.insert(sqr(x) - sqr(y));
+      dag.insert(3.0*x + sqr(z));
+      dag.insert(sqr(z) + z);
       
-      Scope s1 = {x, y};
-      cout << s1 << endl;
+      cout << dag << endl;
+      IntervalMatrix J(3, 3);
+      dag.intervalDiff(reg, J);
+      cout << J << endl;
 
-      Scope s2 = s1;
-      cout << s2 << endl;
-
-      s2.insert(z);
-      cout << s1 << endl;
-      cout << s2 << endl;
-      
-
+      RealPoint pt = reg.midpoint();
+      RealMatrix R(3, 3);
+      dag.realDiff(pt, R);
+      cout << R << endl;
+   
       /*
       Constraint c = table( {x, y, z},
                             {1, 2, 3,
