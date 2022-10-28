@@ -18,6 +18,7 @@ int main(void)
       Variable y = prob.addIntVar (4,  7, "y");
       Variable z = prob.addIntVar (-2, 10, "z");
 
+/*
       IntervalRegion reg = prob.getDomains();
 
       Dag dag;
@@ -34,11 +35,11 @@ int main(void)
       RealMatrix R(3, 3);
       dag.realDiff(pt, R);
       cout << R << endl;
-   
-      /*
+*/
+
       Constraint c = table( {x, y, z},
                             {1, 2, 3,
-                             1, 5, 0.0,
+                             1, 5, 0,
                              2, 8, 3,
                              3, 6, 11} );
       cout << c << c.scope() << endl;
@@ -53,7 +54,6 @@ int main(void)
 
 
       cout << c.contract(reg) << endl << reg << endl;
-      */
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

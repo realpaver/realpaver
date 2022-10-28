@@ -10,6 +10,7 @@
 #ifndef REALPAVER_INTERVAL_HPP
 #define REALPAVER_INTERVAL_HPP
 
+#include <string>
 #include <utility>
 #include "realpaver/Common.hpp"
 #include "realpaver/IntervalImpl.hpp"
@@ -48,12 +49,12 @@ public:
 
    /// Creates an interval fron a string
    /// @param s string representation of a floating-point number
-   Interval(const char* s);
+   Interval(const std::string& s);
 
    /// Creates an interval given its bounds
    /// @param sl string representation of the left bound 
    /// @param sr string representation of the right bound 
-   Interval(const char* sl, const char* sr);
+   Interval(const std::string& sl, const std::string& sr);
 
    /// Default copy constructor
    Interval(const Interval&) = default;

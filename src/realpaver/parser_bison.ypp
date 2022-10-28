@@ -750,7 +750,8 @@ integer
     {
       try
       {
-        realpaver::Interval x(realpaver_bison_text);
+        std::string str(realpaver_bison_text);
+        realpaver::Interval x(str);
         $$ = new realpaver::TermConst(x);
       }
       catch(realpaver::Exception e)
@@ -766,7 +767,8 @@ real
     {
       try
       {
-        realpaver::Interval x(realpaver_bison_text);
+        std::string str(realpaver_bison_text);
+        realpaver::Interval x(str);
         $$ = new realpaver::TermConst(x);
       }
       catch(realpaver::Exception e)

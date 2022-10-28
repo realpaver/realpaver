@@ -252,7 +252,7 @@ void Param::processParam(const std::string& name, const std::string& val)
    auto itd = dblmap_.find(name);
    if (itd != dblmap_.end())
    {
-      Interval x(val.c_str());
+      Interval x(val);
       if (x.isEmpty()) throwEx();
 
       dblmap_[name] = x.right();
@@ -290,7 +290,7 @@ void Param::processParam(const std::string& name, const std::string& val)
       std::string s = name.substr(4, name.size() - 4);
 
       auto it = tolmap_.find(s);
-      Interval x(val.c_str());
+      Interval x(val);
 
       if ((it != tolmap_.end()) && (!x.isEmpty()) && x.isPositive())
       {

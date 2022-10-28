@@ -799,7 +799,7 @@ static const yytype_int16 yyrline[] =
      496,   503,   510,   517,   524,   530,   534,   540,   546,   552,
      558,   564,   570,   576,   582,   588,   594,   601,   608,   612,
      616,   676,   680,   684,   692,   691,   725,   724,   733,   734,
-     738,   742,   749,   765,   781,   802,   805,   813,   821,   837
+     738,   742,   749,   766,   783,   804,   807,   815,   823,   839
 };
 #endif
 
@@ -2226,7 +2226,8 @@ yyreduce:
     {
       try
       {
-        realpaver::Interval x(realpaver_bison_text);
+        std::string str(realpaver_bison_text);
+        realpaver::Interval x(str);
         (yyval.u_term) = new realpaver::TermConst(x);
       }
       catch(realpaver::Exception e)
@@ -2235,15 +2236,16 @@ yyreduce:
         YYABORT;
       }       
     }
-#line 2239 "parser_bison.cpp"
+#line 2240 "parser_bison.cpp"
     break;
 
   case 103: /* real: TK_REAL  */
-#line 766 "parser_bison.ypp"
+#line 767 "parser_bison.ypp"
     {
       try
       {
-        realpaver::Interval x(realpaver_bison_text);
+        std::string str(realpaver_bison_text);
+        realpaver::Interval x(str);
         (yyval.u_term) = new realpaver::TermConst(x);
       }
       catch(realpaver::Exception e)
@@ -2252,11 +2254,11 @@ yyreduce:
         YYABORT;
       }       
     }
-#line 2256 "parser_bison.cpp"
+#line 2258 "parser_bison.cpp"
     break;
 
   case 104: /* itv: TK_LSBR const_expr TK_COMMA const_expr TK_RSBR  */
-#line 782 "parser_bison.ypp"
+#line 784 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep lo((yyvsp[-3].u_term));
       realpaver::Term::SharedRep up((yyvsp[-1].u_term));
@@ -2273,19 +2275,19 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(z);
     }
-#line 2277 "parser_bison.cpp"
+#line 2279 "parser_bison.cpp"
     break;
 
   case 105: /* domain: %empty  */
-#line 802 "parser_bison.ypp"
+#line 804 "parser_bison.ypp"
     {
       (yyval.u_term) = new realpaver::TermConst(realpaver::Interval::universe());
     }
-#line 2285 "parser_bison.cpp"
+#line 2287 "parser_bison.cpp"
     break;
 
   case 106: /* domain: TK_LE const_expr  */
-#line 806 "parser_bison.ypp"
+#line 808 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval up = e->evalConst();
@@ -2293,11 +2295,11 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 2297 "parser_bison.cpp"
+#line 2299 "parser_bison.cpp"
     break;
 
   case 107: /* domain: TK_GE const_expr  */
-#line 814 "parser_bison.ypp"
+#line 816 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval lo = e->evalConst();
@@ -2305,11 +2307,11 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 2309 "parser_bison.cpp"
+#line 2311 "parser_bison.cpp"
     break;
 
   case 108: /* domain: TK_IN itv  */
-#line 822 "parser_bison.ypp"
+#line 824 "parser_bison.ypp"
     {
       realpaver::Term::SharedRep e((yyvsp[0].u_term));
       realpaver::Interval domain = e->evalConst();
@@ -2322,19 +2324,19 @@ yyreduce:
 
       (yyval.u_term) = new realpaver::TermConst(domain);
     }
-#line 2326 "parser_bison.cpp"
+#line 2328 "parser_bison.cpp"
     break;
 
   case 109: /* ident: TK_IDENT  */
-#line 838 "parser_bison.ypp"
+#line 840 "parser_bison.ypp"
    {
      strcpy((yyval.u_str), realpaver_bison_text);
    }
-#line 2334 "parser_bison.cpp"
+#line 2336 "parser_bison.cpp"
     break;
 
 
-#line 2338 "parser_bison.cpp"
+#line 2340 "parser_bison.cpp"
 
       default: break;
     }
@@ -2527,7 +2529,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 842 "parser_bison.ypp"
+#line 844 "parser_bison.ypp"
 
 
 int realpaver_bison_error(const char* str)

@@ -22,11 +22,12 @@ Interval::Interval(double l, double r)
 Interval::Interval(double a) : Interval(Interval::Traits::create(a))
 {}
 
-Interval::Interval(const char* s) : Interval(Interval::Traits::create(s))
+Interval::Interval(const std::string& s)
+   : Interval(Interval::Traits::create(s.c_str()))
 {}
 
-Interval::Interval(const char* sl, const char* sr)
-      : Interval(Interval::Traits::create(sl, sr))
+Interval::Interval(const std::string& sl, const std::string& sr)
+      : Interval(Interval::Traits::create(sl.c_str(), sr.c_str()))
 {}
 
 Interval Interval::lessThan(double a)
