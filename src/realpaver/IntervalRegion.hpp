@@ -25,14 +25,14 @@ public:
    /// Creates an interval region
    /// sco scope of this
    /// x interval assigned to each element of this
-   IntervalRegion(const Scope& sco, const Interval& x = Interval::universe());
+   IntervalRegion(Scope sco, const Interval& x = Interval::universe());
 
    /// Creates an interval region
    /// sco scope of this
    /// X interval vector having the same size than sco
    ///
    /// The i-th variable in sco is assigned to X[i] for each i.
-   IntervalRegion(const Scope& sco, const IntervalVector& X);
+   IntervalRegion(Scope sco, const IntervalVector& X);
 
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;

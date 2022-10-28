@@ -33,7 +33,7 @@ public:
    /// @param scope set of variables
    /// @param reg domains of variables
    /// @param depth depth of this
-   SearchNode(const Scope& scope, const IntervalRegion& reg,  int depth = 0);
+   SearchNode(Scope scope, const IntervalRegion& reg,  int depth = 0);
 
    /// Virtual destructor
    virtual ~SearchNode();

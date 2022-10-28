@@ -12,7 +12,7 @@
 
 namespace realpaver {
 
-SearchNode::SearchNode(const Scope& scope, const IntervalRegion& reg,
+SearchNode::SearchNode(Scope scope, const IntervalRegion& reg,
                        int depth)
       : scope_(scope),
         reg_(nullptr),

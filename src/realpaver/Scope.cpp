@@ -94,7 +94,7 @@ ScopeRep::end() const
    return const_iterator(m_.cend());   
 }
 
-void ScopeRep::insert(const Variable& v, size_t n)
+void ScopeRep::insert(Variable v, size_t n)
 {
    auto it = m_.find(v);
 
@@ -193,12 +193,12 @@ Scope::Scope(const std::initializer_list<Variable>& l)
 Scope::Scope(std::shared_ptr<ScopeRep> rep) : rep_(rep)
 {}
 
-void Scope::insert(const Variable& v)
+void Scope::insert(Variable v)
 {
    insert(v, 1);
 }
 
-void Scope::insert(const Variable& v, size_t n)
+void Scope::insert(Variable v, size_t n)
 {
    if (isShared())
    {

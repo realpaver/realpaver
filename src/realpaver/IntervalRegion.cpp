@@ -11,14 +11,14 @@
 
 namespace realpaver {
 
-IntervalRegion::IntervalRegion(const Scope& sco, const Interval& x)
+IntervalRegion::IntervalRegion(Scope sco, const Interval& x)
       : IntervalVector(sco.size(), x),
         scope_(sco)
 {
    ASSERT(!sco.isEmpty(), "Empty scope used to create an interval region");   
 }
 
-IntervalRegion::IntervalRegion(const Scope& sco, const IntervalVector& X)
+IntervalRegion::IntervalRegion(Scope sco, const IntervalVector& X)
       : IntervalVector(X),
         scope_(sco)
 {

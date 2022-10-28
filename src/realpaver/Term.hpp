@@ -113,6 +113,9 @@ public:
    ///         its sub-terms are shared
    virtual TermRep* cloneRoot() const = 0;
 
+   /// @return a clone of this (deep copy)
+   virtual TermRep* clone() const = 0;
+
    /// @return the interval value enclosed
    Interval ival() const;
 
@@ -241,6 +244,9 @@ public:
    ///         its sub-terms are shared
    TermRep* cloneRoot() const;
 
+   /// @return a clone of this (deep copy)
+   Term clone() const;
+
    /// @return true if terms are automatically simplified when they are created
    ///         and false otherwise
    static bool simplification();
@@ -315,6 +321,7 @@ public:
    bool isLinear() const override;
    void makeScope(Scope& s) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 
    /// @returns the value enclosed
@@ -344,6 +351,7 @@ public:
    void makeScope(Scope& s) const override;
    bool isVar() const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 
    /// @return the variable enclosed
@@ -434,6 +442,7 @@ public:
    bool isLinear() const override;
    bool isAdd() const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -456,6 +465,7 @@ public:
    bool isLinear() const override;
    bool isSub() const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -478,6 +488,7 @@ public:
    bool isLinear() const override;
    bool isMul() const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -499,6 +510,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const override;
    bool isDiv() const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -518,6 +530,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -537,6 +550,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -557,6 +571,7 @@ public:
    bool isLinear() const override;
    bool isUsb() const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -575,6 +590,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -593,6 +609,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -612,6 +629,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -630,6 +648,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -653,6 +672,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 
 private:
@@ -674,6 +694,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -692,6 +713,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -710,6 +732,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -728,6 +751,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 
@@ -746,6 +770,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
    ///@}
 };
 

@@ -49,7 +49,7 @@ public:
    /// Inserts a variable with a given number of occurrences in this
    /// @param v a variable
    /// @param n number of occurrences of v
-   void insert(const Variable& v, size_t n);
+   void insert(Variable v, size_t n);
 
    /// Removes a variable from this
    /// @param v variable removed
@@ -211,12 +211,12 @@ public:
 
    /// Inserts a variable in this
    /// @param v a variable
-   void insert(const Variable& v);
+   void insert(Variable v);
 
    /// Inserts a variable with a given number of occurrences in this
    /// @param v a variable
    /// @param n number of occurrences of v
-   void insert(const Variable& v, size_t n);
+   void insert(Variable v, size_t n);
 
    /// Inserts a list of variables in this
    /// @param l list of variables

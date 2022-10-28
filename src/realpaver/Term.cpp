@@ -152,7 +152,7 @@ bool Term::idisplay(bool ok)
    idisplay_ = ok;
    return status;
 }
-   
+
 Term::Term(double a) : rep_(std::make_shared<TermConst>(a))
 {}
 
@@ -292,6 +292,12 @@ bool Term::isSumOfSquares() const
 TermRep* Term::cloneRoot() const
 {
    return rep_->cloneRoot();
+}
+
+Term Term::clone() const
+{
+   SharedRep srep(rep_->clone());
+   return Term(srep);
 }
 
 Proof Term::contract(IntervalRegion& reg, const Interval& img)
@@ -1478,6 +1484,11 @@ TermRep* TermConst::cloneRoot() const
    return new TermConst(x_);
 }
 
+TermRep* TermConst::clone() const
+{
+   return new TermConst(x_);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermVar::TermVar(Variable v)
@@ -1541,6 +1552,11 @@ bool TermVar::isVar() const
 }
 
 TermRep* TermVar::cloneRoot() const
+{
+   return new TermVar(v_);
+}
+
+TermRep* TermVar::clone() const
 {
    return new TermVar(v_);
 }
@@ -1722,6 +1738,13 @@ TermRep* TermAdd::cloneRoot() const
    return new TermAdd(left(), right());
 }
 
+TermRep* TermAdd::clone() const
+{
+   SharedRep sl(left()->clone()),
+             sr(right()->clone());
+   return new TermAdd(sl, sr);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermSub::TermSub(const SharedRep& l, const SharedRep& r)
@@ -1782,6 +1805,13 @@ bool TermSub::isSub() const
 TermRep* TermSub::cloneRoot() const
 {
    return new TermSub(left(), right());
+}
+
+TermRep* TermSub::clone() const
+{
+   SharedRep sl(left()->clone()),
+             sr(right()->clone());
+   return new TermSub(sl, sr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1853,6 +1883,13 @@ TermRep* TermMul::cloneRoot() const
    return new TermMul(left(), right());
 }
 
+TermRep* TermMul::clone() const
+{
+   SharedRep sl(left()->clone()),
+             sr(right()->clone());
+   return new TermMul(sl, sr);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 TermDiv::TermDiv(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Div, OpPriority::MulDiv)
@@ -1915,6 +1952,13 @@ TermRep* TermDiv::cloneRoot() const
    return new TermDiv(left(), right());
 }
 
+TermRep* TermDiv::clone() const
+{
+   SharedRep sl(left()->clone()),
+             sr(right()->clone());
+   return new TermDiv(sl, sr);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermMin::TermMin(const SharedRep& l, const SharedRep& r)
@@ -1947,6 +1991,13 @@ TermRep* TermMin::cloneRoot() const
    return new TermMin(left(), right());
 }
 
+TermRep* TermMin::clone() const
+{
+   SharedRep sl(left()->clone()),
+             sr(right()->clone());
+   return new TermMin(sl, sr);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermMax::TermMax(const SharedRep& l, const SharedRep& r)
@@ -1977,6 +2028,13 @@ void TermMax::acceptVisitor(TermVisitor& vis) const
 TermRep* TermMax::cloneRoot() const
 {
    return new TermMax(left(), right());
+}
+
+TermRep* TermMax::clone() const
+{
+   SharedRep sl(left()->clone()),
+             sr(right()->clone());
+   return new TermMax(sl, sr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2020,6 +2078,12 @@ TermRep* TermUsb::cloneRoot() const
    return new TermUsb(child());
 }
 
+TermRep* TermUsb::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermUsb(sc);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermAbs::TermAbs(const SharedRep& t)
@@ -2051,6 +2115,12 @@ TermRep* TermAbs::cloneRoot() const
    return new TermAbs(child());
 }
 
+TermRep* TermAbs::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAbs(sc);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermSgn::TermSgn(const SharedRep& t)
@@ -2080,6 +2150,12 @@ void TermSgn::acceptVisitor(TermVisitor& vis) const
 TermRep* TermSgn::cloneRoot() const
 {
    return new TermSgn(child());
+}
+
+TermRep* TermSgn::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermSgn(sc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2120,6 +2196,12 @@ TermRep* TermSqr::cloneRoot() const
    return new TermSqr(child());
 }
 
+TermRep* TermSqr::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermSqr(sc);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermSqrt::TermSqrt(const SharedRep& t)
@@ -2149,6 +2231,12 @@ void TermSqrt::acceptVisitor(TermVisitor& vis) const
 TermRep* TermSqrt::cloneRoot() const
 {
    return new TermSqrt(child());
+}
+
+TermRep* TermSqrt::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermSqrt(sc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2200,6 +2288,12 @@ TermRep* TermPow::cloneRoot() const
    return new TermPow(child(), n_);
 }
 
+TermRep* TermPow::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermPow(sc, n_);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermExp::TermExp(const SharedRep& t)
@@ -2229,6 +2323,12 @@ void TermExp::acceptVisitor(TermVisitor& vis) const
 TermRep* TermExp::cloneRoot() const
 {
    return new TermExp(child());
+}
+
+TermRep* TermExp::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermExp(sc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2262,6 +2362,12 @@ TermRep* TermLog::cloneRoot() const
    return new TermLog(child());
 }
 
+TermRep* TermLog::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermLog(sc);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermCos::TermCos(const SharedRep& t)
@@ -2291,6 +2397,12 @@ void TermCos::acceptVisitor(TermVisitor& vis) const
 TermRep* TermCos::cloneRoot() const
 {
    return new TermCos(child());
+}
+
+TermRep* TermCos::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermCos(sc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2324,6 +2436,12 @@ TermRep* TermSin::cloneRoot() const
    return new TermSin(child());
 }
 
+TermRep* TermSin::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermSin(sc);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TermTan::TermTan(const SharedRep& t)
@@ -2353,6 +2471,12 @@ void TermTan::acceptVisitor(TermVisitor& vis) const
 TermRep* TermTan::cloneRoot() const
 {
    return new TermTan(child());
+}
+
+TermRep* TermTan::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermTan(sc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
