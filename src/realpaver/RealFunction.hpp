@@ -43,14 +43,15 @@ public:
 
    /// Differentiates this, i.e. evaluates its gradient
    /// @param pt values of variables
-   /// @param g gradient of this at pt
-   virtual void realDiff(const RealPoint& pt, RealVector& g) = 0;
+   /// @param grad gradient of this at pt
+   virtual void realDiff(const RealPoint& pt, RealVector& grad) = 0;
 
    /// Evaluates and differentiates this
    /// @param pt values of variables
-   /// @param g gradient of this at pt
-   /// @return result of evaluation of this at pt
-   virtual double realEvalDiff(const RealPoint& pt, RealVector& g) = 0;
+   /// @param val result of evaluation of this at pt
+   /// @param grad gradient of this at pt
+   virtual void realEvalDiff(const RealPoint& pt, double& val,
+                             RealVector& grad) = 0;
 };
 
 } // namespace

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------------------
+- Interfaces IntervalFunctionVector, RealFunctionVector,
+  DiffIntervalFunctionVector, DiffRealFunctionVector implemented by Dag
+
+-------------------------------------------------------------------------------
+- Manage tolerances in parser
+
+-------------------------------------------------------------------------------
 - Create a DAG from a .nl file
 
 -------------------------------------------------------------------------------

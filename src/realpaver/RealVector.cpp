@@ -40,6 +40,15 @@ bool RealVector::isNan() const
    return false;
 }
 
+bool RealVector::isFinite() const
+{
+   for (size_t i=0; i<size(); ++i)
+      if (Double::isNan(get(i)) || Double::isInf(get(i))) return false;
+
+   return true;
+}
+
+
 double RealVector::scalarProduct(const RealVector& V) const
 {
    ASSERT(size() == V.size(),

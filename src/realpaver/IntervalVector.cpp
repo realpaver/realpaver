@@ -55,6 +55,14 @@ bool IntervalVector::isEmpty() const
    return false;
 }
 
+bool IntervalVector::isFinite() const
+{
+   for (size_t i=0; i<size(); ++i)
+      if (!get(i).isFinite()) return false;
+
+   return true;
+}
+
 double IntervalVector::width() const
 {
    double wid = 0.0, w;

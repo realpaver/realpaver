@@ -56,6 +56,9 @@ public:
    /// @return true if at least one component is a NaN
    bool isNan() const;
 
+   /// @return true if every component is not a NaN and is finite
+   bool isFinite() const;
+
    /// Scalar product
    /// @param V a vector having the same size than this
    /// @return the scalar product of this and V

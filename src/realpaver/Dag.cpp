@@ -2103,18 +2103,15 @@ Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
    return Proof::Maybe;
 }
 
-bool DagFun::diff(const IntervalRegion& reg)
+void DagFun::diff(const IntervalRegion& reg)
 {
    eval(reg);
-   return diff();
+   diff();
 }
 
-bool DagFun::diff()
+void DagFun::diff()
 {
    Interval e = rootNode()->val();
-
-   if (e.isEmpty() || e.isInf())
-      return false;
 
    // initializes the derivatives
    rootNode()->setDv(Interval::one());
@@ -2123,14 +2120,11 @@ bool DagFun::diff()
       node_[i]->setDv(Interval::zero());
 
    // differentiation
-   bool res = true;
    for (int i=nbNodes()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
-      res = res & node_[j]->diff();
+      node_[j]->diff();
    }
-
-   return res;
 }
 
 IntervalVector DagFun::intervalGradient() const
@@ -2249,17 +2243,17 @@ double DagFun::realEval(const RealPoint& pt)
    return reval(pt);
 }
 
-void DagFun::realDiff(const RealPoint& pt, RealVector& g)
+void DagFun::realDiff(const RealPoint& pt, RealVector& grad)
 {
    rdiff(pt);
-   toRealGradient(g);
+   toRealGradient(grad);
 }
 
-double DagFun::realEvalDiff(const RealPoint& pt, RealVector& g)
+void DagFun::realEvalDiff(const RealPoint& pt, double& val, RealVector& grad)
 {
    rdiff(pt);
-   toRealGradient(g);
-   return rval();
+   val = rootNode()->rval();
+   toRealGradient(grad);
 }
 
 Interval DagFun::intervalEval(const IntervalRegion& reg)
@@ -2272,17 +2266,18 @@ Interval DagFun::intervalPointEval(const RealPoint& pt)
    return eval(pt);
 }
 
-void DagFun::intervalDiff(const IntervalRegion& reg, IntervalVector& g)
+void DagFun::intervalDiff(const IntervalRegion& reg, IntervalVector& grad)
 {
    diff(reg);
-   toIntervalGradient(g);
+   toIntervalGradient(grad);
 }
 
-Interval DagFun::intervalEvalDiff(const IntervalRegion& reg, IntervalVector& g)
+void DagFun::intervalEvalDiff(const IntervalRegion& reg, Interval& val,
+                              IntervalVector& grad)
 {
    diff(reg);
-   toIntervalGradient(g);
-   return val();
+   val = rootNode()->val();
+   toIntervalGradient(grad);
 }
 
 void DagFun::linearize(LPModel& lm)
@@ -2623,12 +2618,11 @@ bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& v)
    return true;
 }
 
-bool Dag::intervalDiff(IntervalMatrix& J)
+void Dag::intervalDiff(IntervalMatrix& jac)
 {
-   ASSERT(nbVars() == J.ncols(), "Bad number of columns of a Jacobian matrix");
-   ASSERT(nbFuns() == J.nrows(), "Bad number of rows of a Jacobian matrix");
+   ASSERT(nbVars() == jac.ncols(), "Bad number of columns of a Jacobian matrix");
+   ASSERT(nbFuns() == jac.nrows(), "Bad number of rows of a Jacobian matrix");
 
-   bool res = true;
    Scope scodag = scope();
 
    // differentiates each function
@@ -2636,35 +2630,33 @@ bool Dag::intervalDiff(IntervalMatrix& J)
    {
       // differentiates the function
       DagFun* f = fun_[i];
-      res = res && f->diff();
+      f->diff();
 
       // fills the matrix
       size_t j = 0;
       for (auto v : scodag)
       {
          if (f->dependsOn(v))
-            J.set(i, j, f->intervalDeriv(v));
+            jac.set(i, j, f->intervalDeriv(v));
          else
-            J.set(i, j, Interval::zero());
+            jac.set(i, j, Interval::zero());
 
          ++j;
       }
    }
-   return res;
 }
 
-bool Dag::intervalDiff(const IntervalRegion& reg, IntervalMatrix& J)
+void Dag::intervalDiff(const IntervalRegion& reg, IntervalMatrix& jac)
 {
-   if (!intervalEval(reg)) return false;
-   intervalDiff(J);
+   intervalEval(reg);
+   intervalDiff(jac);
 }
 
-bool Dag::realDiff(RealMatrix& J)
+void Dag::realDiff(RealMatrix& jac)
 {
-   ASSERT(nbVars() == J.ncols(), "Bad number of columns of a Jacobian matrix");
-   ASSERT(nbFuns() == J.nrows(), "Bad number of rows of a Jacobian matrix");
+   ASSERT(nbVars() == jac.ncols(), "Bad number of columns of a Jacobian matrix");
+   ASSERT(nbFuns() == jac.nrows(), "Bad number of rows of a Jacobian matrix");
 
-   bool res = true;
    Scope scodag = scope();
 
    // differentiates each function
@@ -2672,27 +2664,26 @@ bool Dag::realDiff(RealMatrix& J)
    {
       // differentiates the function
       DagFun* f = fun_[i];
-      res = res && f->rdiff();
+      f->rdiff();
 
       // fills the matrix
       size_t j = 0;
       for (auto v : scodag)
       {
          if (f->dependsOn(v))
-            J.set(i, j, f->realDeriv(v));
+            jac.set(i, j, f->realDeriv(v));
          else
-            J.set(i, j, 0.0);
+            jac.set(i, j, 0.0);
 
          ++j;
       }
    }
-   return res;
 }
 
-bool Dag::realDiff(const RealPoint& pt, RealMatrix& J)
+void Dag::realDiff(const RealPoint& pt, RealMatrix& jac)
 {
-   if (!realEval(pt)) return false;
-   realDiff(J);
+   realEval(pt);
+   realDiff(jac);
 }
 
 void Dag::linearize(LPModel& lm)

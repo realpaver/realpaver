@@ -49,15 +49,17 @@ public:
 
    /// Differentiates this, i.e. evaluates its gradient
    /// @param reg domains of variables
-   /// @param g interval gradient of this at reg (output)
-   virtual void intervalDiff(const IntervalRegion& reg, IntervalVector& g) = 0;
+   /// @param grad interval gradient of this at reg (output)
+   virtual void intervalDiff(const IntervalRegion& reg,
+                             IntervalVector& grad) = 0;
 
    /// Evaluates and differentiates this
    /// @param reg domains of variables
-   /// @param g interval gradient of this at r (output)
-   /// @return result of interval evaluation of this at reg
-   virtual Interval intervalEvalDiff(const IntervalRegion& reg,
-                                     IntervalVector& g) = 0;
+   /// @param value of this at reg
+   /// @param grad interval gradient of this at reg
+   virtual void intervalEvalDiff(const IntervalRegion& reg,
+                                 Interval& val,
+                                 IntervalVector& grad) = 0;
 };
 
 } // namespace

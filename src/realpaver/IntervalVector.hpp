@@ -61,6 +61,9 @@ public:
    /// @return true if one element of this is empty
    bool isEmpty() const;
 
+   /// @return true every component of this is finite and non empty
+   bool isFinite() const;
+
    /// @return the width of this
    double width() const;
 

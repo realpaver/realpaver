@@ -859,16 +859,14 @@ public:
 
    /// Interval differentiation in reverse mode
    /// @param reg the variable domains
-   /// @return false if this function is discontinuous, true otherwise
    ///
    /// It evaluates first this function and then calculates the derivatives.
-   bool diff(const IntervalRegion& reg);
+   void diff(const IntervalRegion& reg);
 
    /// Interval differentiation in reverse mode
-   /// @return false if this function is discontinuous, true otherwise
    ///
    /// It assumes that this function has been evaluated.
-   bool diff();
+   void diff();
 
    /// Restricted interval differentiation in forward mode
    /// @param v a variable
@@ -907,17 +905,18 @@ public:
    bool rdiff();
 
    ///@{
-   Scope  funScope() const override;
-   size_t funArity() const override;
-
-   Interval intervalEval     (const IntervalRegion& reg) override;
-   Interval intervalPointEval(const RealPoint& pt) override;
-   void     intervalDiff     (const IntervalRegion& reg, IntervalVector& g) override;
-   Interval intervalEvalDiff (const IntervalRegion& reg, IntervalVector& g) override;
-
-   double realEval    (const RealPoint& pt) override;
-   void   realDiff    (const RealPoint& pt, RealVector& g) override;
-   double realEvalDiff(const RealPoint& pt, RealVector& g) override;
+   Scope    funScope          () const override;
+   size_t   funArity          () const override;
+   Interval intervalEval      (const IntervalRegion& reg) override;
+   Interval intervalPointEval (const RealPoint& pt) override;
+   void     intervalDiff      (const IntervalRegion& reg,
+                               IntervalVector& grad) override;
+   void     intervalEvalDiff  (const IntervalRegion& reg, Interval& val,
+                               IntervalVector& grad) override;
+   double   realEval          (const RealPoint& pt) override;
+   void     realDiff          (const RealPoint& pt, RealVector& grad) override;
+   void     realEvalDiff      (const RealPoint& pt, double& val,
+                               RealVector& grad) override;
    ///@}
 
    /// @return the interval gradient after a differentiation
@@ -1158,46 +1157,38 @@ public:
    bool realEval(const RealPoint& pt, RealVector& v);
 
    /// Interval differentiation in reverse mode
-   /// @param J resulting matrix such that J(i, k) corresponds to the partial
-   ///          derivative of the i-th function of this with respect to the
-   ///          k-th variable of the scope of) this
-   /// @return false if at least one function is discontinuous or not defined,
-   ///         true otherwise
+   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
+   ///            derivative of the i-th function of this with respect to the
+   ///            k-th variable of the scope of) this
    ///
    /// It assumes that this dag has been evaluated.
-   bool intervalDiff(IntervalMatrix& J);
+   void intervalDiff(IntervalMatrix& jac);
 
    /// Interval differentiation in reverse mode
    /// @param reg the variable domains
-   /// @param J resulting matrix such that J(i, k) corresponds to the partial
-   ///          derivative of the i-th function of this with respect to the
-   ///          k-th variable of the scope of) this
-   /// @return false if at least one function is discontinuous or not defined,
-   ///         true otherwise
+   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
+   ///            derivative of the i-th function of this with respect to the
+   ///            k-th variable of the scope of) this
    ///
    /// It evaluates first this dag and then calculates the derivatives.
-   bool intervalDiff(const IntervalRegion& reg, IntervalMatrix& J);
+   void intervalDiff(const IntervalRegion& reg, IntervalMatrix& jac);
 
    /// Real (point) differentiation in reverse mode
-   /// @param J resulting matrix such that J(i, k) corresponds to the partial
-   ///          derivative of the i-th function of this with respect to the
-   ///          k-th variable of the scope of) this
-   /// @return false if at least one function is discontinuous or not defined,
-   ///         true otherwise
+   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
+   ///            derivative of the i-th function of this with respect to the
+   ///            k-th variable of the scope of) this
    ///
    /// It assumes that this dag has been evaluated.
-   bool realDiff(RealMatrix& J);
+   void realDiff(RealMatrix& jac);
 
    /// Real (point) differentiation in reverse mode
    /// @param pt the variable domains
-   /// @param J resulting matrix such that J(i, k) corresponds to the partial
-   ///          derivative of the i-th function of this with respect to the
-   ///          k-th variable of the scope of) this
-   /// @return false if at least one function is discontinuous or not defined,
-   ///         true otherwise
+   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
+   ///            derivative of the i-th function of this with respect to the
+   ///            k-th variable of the scope of) this
    ///
    /// It evaluates first this dag and then calculates the derivatives.
-   bool realDiff(const RealPoint& pt, RealMatrix& J);
+   void realDiff(const RealPoint& pt, RealMatrix& jac);
 
    /// Linearizes the DAG
    /// @param lm output LP model
