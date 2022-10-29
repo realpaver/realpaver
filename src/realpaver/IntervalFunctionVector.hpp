@@ -7,59 +7,58 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_INTERVAL_FUNCTION_HPP
-#define REALPAVER_INTERVAL_FUNCTION_HPP
+#ifndef REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
+#define REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 
 #include "realpaver/Function.hpp"
+#include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for interval-valued functions.
+/// This is an interface for vectors of interval-valued functions.
 ///
 /// This class is a pure abstract class.
 ///////////////////////////////////////////////////////////////////////////////
-class IntervalFunction : public virtual Function {
+class IntervalFunctionVector : public virtual FunctionVector {
 public:
    /// Virtual destructor
-   virtual ~IntervalFunction();
+   virtual ~IntervalFunctionVector();
 
    /// Evaluates this
    /// @param reg domains of variables
-   /// @return interval value of this at reg
-   virtual Interval intervalEval(const IntervalRegion& reg) = 0;
+   /// @param val interval value of this at reg
+   virtual void intervalEval(const IntervalRegion& reg, IntervalVector& val) = 0;
 
    /// Evaluates this
-   /// @param  pt values of variables
-   /// @return value of this at pt
-   virtual Interval intervalPointEval(const RealPoint& pt) = 0;
+   /// @param pt values of variables
+   /// @param val value of this at pt
+   virtual void intervalPointEval(const RealPoint& pt, IntervalVector& val) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for differentiable interval-valued functions.
+/// This is an interface for vectors of differentiable interval-valued functions.
 ///
 /// This class is a pure abstract class.
 ///////////////////////////////////////////////////////////////////////////////
-class DiffIntervalFunction : public IntervalFunction {
+class DiffIntervalFunctionVector : public IntervalFunctionVector {
 public:
    /// Virtual destructor
-   virtual ~DiffIntervalFunction();
+   virtual ~DiffIntervalFunctionVector();
 
-   /// Differentiates this, i.e. evaluates its gradient
+   /// Differentiates this, i.e. evaluates its jacobian matrix
    /// @param reg domains of variables
-   /// @param grad interval gradient of this at reg (output)
-   virtual void intervalDiff(const IntervalRegion& reg,
-                             IntervalVector& grad) = 0;
+   /// @param jac interval jacobian matrix of this at reg (output)
+   virtual void intervalDiff(const IntervalRegion& reg, IntervalMatrix& jac) = 0;
 
    /// Evaluates and differentiates this
    /// @param reg domains of variables
    /// @param val value of this at reg
-   /// @param grad interval gradient of this at reg
+   /// @param jac interval jacobian matrix of this at reg (output)
    virtual void intervalEvalDiff(const IntervalRegion& reg,
-                                 Interval& val,
-                                 IntervalVector& grad) = 0;
+                                 IntervalVector& val, IntervalMatrix& jac) = 0;
 };
 
 } // namespace

@@ -29,6 +29,18 @@ public:
    virtual size_t funArity() const = 0;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// This is a base class for vectors of functions.
+///////////////////////////////////////////////////////////////////////////////
+class FunctionVector : public virtual Function {
+public:
+   /// Virtual destructor
+   virtual ~FunctionVector();
+
+   /// @return the number of functions in this
+   virtual size_t funSize() const = 0;
+};
+
 } // namespace
 
 #endif

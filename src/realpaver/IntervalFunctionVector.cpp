@@ -7,14 +7,14 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/Function.hpp"
+#include "realpaver/IntervalFunctionVector.hpp"
 
 namespace realpaver {
 
-Function::~Function()
+IntervalFunctionVector::~IntervalFunctionVector()
 {}
 
-FunctionVector::~FunctionVector()
+DiffIntervalFunctionVector::~DiffIntervalFunctionVector()
 {}
 
 } // namespace

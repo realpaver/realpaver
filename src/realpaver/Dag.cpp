@@ -2317,7 +2317,8 @@ Dag::Dag()
         onode_(),
         fun_(),
         vmap_(),
-        omap_()
+        omap_(),
+        scope_()
 {
    defaultContext_ = new DagContext();
    context_ = defaultContext_;
@@ -2463,6 +2464,9 @@ size_t Dag::insertVarNode(const Variable& v)
    else
       index = it->second;
 
+   // insertion in the scope
+   scope_.insert(v);
+
    return index;
 }
 
@@ -2508,7 +2512,7 @@ DagConst* Dag::findConstNode(const Interval& x) const
    }
    return nullptr;
 }
-   
+
 DagOp* Dag::findOpNode(size_t hcode, DagOp* node) const
 {
    auto it = omap_.find(hcode);
@@ -2546,10 +2550,43 @@ DagVar* Dag::findVarNode(size_t id) const
 
 Scope Dag::scope() const
 {
-   Scope res;
-   for (DagVar* node : vnode_)
-      res.insert(node->getVar());
-   return res;
+   return scope_;
+}
+
+Scope Dag::funScope() const
+{
+   return scope_;
+}
+
+size_t Dag::funArity() const
+{
+   return nbVars();
+}
+
+size_t Dag::funSize() const
+{
+   return nbFuns();
+}
+
+void Dag::intervalPointEval(const RealPoint& pt, IntervalVector& val)
+{
+   ASSERT(val.size() == nbFuns(), "Evaluation of dag, bad vector size");
+
+   for (size_t i=0; i<nbNodes(); ++i)
+      node_[i]->eval(pt);
+
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      DagFun* f = fun_[i];
+      val.set(i, f->val());
+   }
+}
+
+void Dag::intervalEvalDiff(const IntervalRegion& reg, IntervalVector& val,
+                           IntervalMatrix& jac)
+{
+   intervalEval(reg, val);
+   intervalDiff(jac);
 }
 
 bool Dag::realEval(const RealPoint& pt)
@@ -2599,9 +2636,9 @@ bool Dag::intervalEval(const IntervalRegion& reg)
    return true;
 }
 
-bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& v)
+void Dag::intervalEval(const IntervalRegion& reg, IntervalVector& val)
 {
-   ASSERT(v.size() == nbFuns(), "Evaluation of dag, bad vector size");
+   ASSERT(val.size() == nbFuns(), "Evaluation of dag, bad vector size");
 
    for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(reg);
@@ -2609,13 +2646,8 @@ bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& v)
    for (size_t i=0; i<nbFuns(); ++i)
    {
       DagFun* f = fun_[i];
-      Interval x = f->val();
-
-      if (x.isEmpty()) return false;
-      v.set(i, x);
+      val.set(i, f->val());
    }
-
-   return true;
 }
 
 void Dag::intervalDiff(IntervalMatrix& jac)

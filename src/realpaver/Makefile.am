@@ -46,6 +46,7 @@ librealpaver_la_include_HEADERS = \
 		IntContractor.hpp \
 		Interval.hpp \
 		IntervalFunction.hpp \
+		IntervalFunctionVector.hpp \
 		IntervalImpl.hpp \
 		IntervalMatrix.hpp \
 		IntervalNewton.hpp \
@@ -144,6 +145,7 @@ librealpaver_la_SOURCES = \
 		IntContractor.cpp \
 		Interval.cpp \
 		IntervalFunction.cpp \
+		IntervalFunctionVector.cpp \
 		IntervalMatrix.cpp \
 		IntervalNewton.cpp \
 		IntervalRegion.cpp \

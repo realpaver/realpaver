@@ -17,6 +17,7 @@
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalFunction.hpp"
+#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/RealFunction.hpp"
@@ -1015,7 +1016,7 @@ struct DagContext
 /// An expression graph represents a constraint system L <= f(x) <= U with
 /// a function vector f : Rn -> Rm and bounds U and L in Rm.
 ///////////////////////////////////////////////////////////////////////////////
-class Dag {
+class Dag : public DiffIntervalFunctionVector {
 public:
    /// Creates an empty DAG
    Dag();
@@ -1137,13 +1138,6 @@ public:
    /// @return false if at least one intermediary result is empty, true othewise
    bool intervalEval(const IntervalRegion& reg);
 
-   /// Interval evaluation
-   /// @param reg domains of variables
-   /// @param v vector such that v[i] is the value of the i-th function in case
-   ///          of success (i.e. the result is true)
-   /// @return false if at least one intermediary result is empty, true othewise
-   bool intervalEval(const IntervalRegion& reg, IntervalVector& v);
-
    /// Real (point) evaluation
    /// @param pt values of variables
    /// @return false if a NaN occurs, true othewise
@@ -1163,15 +1157,6 @@ public:
    ///
    /// It assumes that this dag has been evaluated.
    void intervalDiff(IntervalMatrix& jac);
-
-   /// Interval differentiation in reverse mode
-   /// @param reg the variable domains
-   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
-   ///            derivative of the i-th function of this with respect to the
-   ///            k-th variable of the scope of) this
-   ///
-   /// It evaluates first this dag and then calculates the derivatives.
-   void intervalDiff(const IntervalRegion& reg, IntervalMatrix& jac);
 
    /// Real (point) differentiation in reverse mode
    /// @param jac resulting matrix such that J(i, k) corresponds to the partial
@@ -1203,6 +1188,33 @@ public:
    /// Assumes that the functions in the DAG have been evaluated.
    void linearize(LPModel& lm, const Bitset& bs);
 
+
+   ///@{
+   Scope funScope() const override;
+   size_t funArity() const override;
+   size_t funSize() const override;
+
+   /// Interval evaluation
+   /// @param reg domains of variables
+   /// @param val vector such that v[i] is the value of the i-th function
+   void intervalEval(const IntervalRegion& reg, IntervalVector& val) override;
+
+   void intervalPointEval(const RealPoint& pt, IntervalVector& val) override;
+
+   /// Interval differentiation in reverse mode
+   /// @param reg the variable domains
+   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
+   ///            derivative of the i-th function of this with respect to the
+   ///            k-th variable of the scope of) this
+   ///
+   /// It evaluates first this dag and then calculates the derivatives.
+   void intervalDiff(const IntervalRegion& reg, IntervalMatrix& jac) override;
+
+   void intervalEvalDiff(const IntervalRegion& reg, IntervalVector& val,
+                         IntervalMatrix& jac) override;
+   ///@}
+
+
 private:
    // vector of nodes sorted by a topological ordering from the leaves
    // to the roots
@@ -1227,6 +1239,9 @@ private:
 
    // map (hash code of an operation node -> list of node indexes)
    std::unordered_map<size_t, IndexList> omap_;
+
+   // scope
+   Scope scope_;
 
    // current context that stores an interval domain for each node of this dag
    DagContext* context_;
