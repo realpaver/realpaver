@@ -82,6 +82,7 @@ librealpaver_la_include_HEADERS = \
 		Problem.hpp \
 		Propagator.hpp \
 		RealFunction.hpp \
+		RealFunctionVector.hpp \
 		RealMatrix.hpp \
 		RealPoint.hpp \
 		RealVector.hpp \
@@ -174,6 +175,7 @@ librealpaver_la_SOURCES = \
 		Problem.cpp \
 		Propagator.cpp \
 		RealFunction.cpp \
+		RealFunctionVector.cpp \
 		RealMatrix.cpp \
 		RealPoint.cpp \
 		RealVector.cpp \

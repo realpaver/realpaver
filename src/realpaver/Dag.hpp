@@ -17,7 +17,6 @@
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalFunction.hpp"
-#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/RealFunction.hpp"
@@ -1016,7 +1015,7 @@ struct DagContext
 /// An expression graph represents a constraint system L <= f(x) <= U with
 /// a function vector f : Rn -> Rm and bounds U and L in Rm.
 ///////////////////////////////////////////////////////////////////////////////
-class Dag : public DiffIntervalFunctionVector {
+class Dag {
 public:
    /// Creates an empty DAG
    Dag();
@@ -1135,45 +1134,39 @@ public:
 
    /// Interval evaluation
    /// @param reg domains of variables
-   /// @return false if at least one intermediary result is empty, true othewise
+   /// @return false if an empty interval occurs in the computation
    bool intervalEval(const IntervalRegion& reg);
+
+   /// Interval evaluation
+   /// @param reg domains of variables
+   /// @param val output vector such that v[i] is the value of the i-th function
+   /// @return false if the output vector is empty
+   bool intervalEval(const IntervalRegion& reg, IntervalVector& val);
+
+   /// Interval evaluation
+   /// @param reg domains of variables
+   /// @param val output vector such that v[i] is the value of the i-th function
+   /// @return false if the output vector is empty
+   bool intervalPointEval(const RealPoint& pt, IntervalVector& val);
+
+   /// Interval differentiation in reverse mode to be called after an evaluation
+   /// @param jac resulting matrix of partial derivatives of this
+   void intervalDiff(IntervalMatrix& jac);
 
    /// Real (point) evaluation
    /// @param pt values of variables
-   /// @return false if a NaN occurs, true othewise
+   /// @return false if a NaN occurs in the computation, true othewise
    bool realEval(const RealPoint& pt);
 
    /// Real (point) evaluation
    /// @param pt values of variables
-   /// @param v vector such that v[i] is the value of the i-th function in case
-   ///          of success (i.e. the result is true)
+   /// @param val output vector such that v[i] is the value of the i-th function
    /// @return false if a NaN occurs, true othewise
-   bool realEval(const RealPoint& pt, RealVector& v);
+   bool realEval(const RealPoint& pt, RealVector& val);
 
-   /// Interval differentiation in reverse mode
-   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
-   ///            derivative of the i-th function of this with respect to the
-   ///            k-th variable of the scope of) this
-   ///
-   /// It assumes that this dag has been evaluated.
-   void intervalDiff(IntervalMatrix& jac);
-
-   /// Real (point) differentiation in reverse mode
-   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
-   ///            derivative of the i-th function of this with respect to the
-   ///            k-th variable of the scope of) this
-   ///
-   /// It assumes that this dag has been evaluated.
+   /// Point differentiation in reverse mode to be called after an evaluation
+   /// @param jac resulting matrix of partial derivatives of this
    void realDiff(RealMatrix& jac);
-
-   /// Real (point) differentiation in reverse mode
-   /// @param pt the variable domains
-   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
-   ///            derivative of the i-th function of this with respect to the
-   ///            k-th variable of the scope of) this
-   ///
-   /// It evaluates first this dag and then calculates the derivatives.
-   void realDiff(const RealPoint& pt, RealMatrix& jac);
 
    /// Linearizes the DAG
    /// @param lm output LP model
@@ -1187,33 +1180,6 @@ public:
    ///
    /// Assumes that the functions in the DAG have been evaluated.
    void linearize(LPModel& lm, const Bitset& bs);
-
-
-   ///@{
-   Scope funScope() const override;
-   size_t funArity() const override;
-   size_t funSize() const override;
-
-   /// Interval evaluation
-   /// @param reg domains of variables
-   /// @param val vector such that v[i] is the value of the i-th function
-   void intervalEval(const IntervalRegion& reg, IntervalVector& val) override;
-
-   void intervalPointEval(const RealPoint& pt, IntervalVector& val) override;
-
-   /// Interval differentiation in reverse mode
-   /// @param reg the variable domains
-   /// @param jac resulting matrix such that J(i, k) corresponds to the partial
-   ///            derivative of the i-th function of this with respect to the
-   ///            k-th variable of the scope of) this
-   ///
-   /// It evaluates first this dag and then calculates the derivatives.
-   void intervalDiff(const IntervalRegion& reg, IntervalMatrix& jac) override;
-
-   void intervalEvalDiff(const IntervalRegion& reg, IntervalVector& val,
-                         IntervalMatrix& jac) override;
-   ///@}
-
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

@@ -7,30 +7,30 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
-#define REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
+#ifndef REALPAVER_REAL_FUNCTION_VECTOR_HPP
+#define REALPAVER_REAL_FUNCTION_VECTOR_HPP
 
 #include "realpaver/Dag.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a vector of interval-valued functions based on a DAG.
+/// This is a vector of real-valued functions based on a DAG.
 ///////////////////////////////////////////////////////////////////////////////
-class IntervalFunctionVector {
+class RealFunctionVector {
 public:
    /// Constructor
    /// @param dag expression DAG representing a vector of functions
-   IntervalFunctionVector(SharedDag dag);
+   RealFunctionVector(SharedDag dag);
 
    /// Virtual destructor
-   virtual ~IntervalFunctionVector();
+   virtual ~RealFunctionVector();
 
    /// Default copy
-   IntervalFunctionVector(IntervalFunctionVector&) = default;
+   RealFunctionVector(RealFunctionVector&) = default;
 
    /// No assignment
-   IntervalFunctionVector& operator=(IntervalFunctionVector&) = delete;
+   RealFunctionVector& operator=(RealFunctionVector&) = delete;
 
    /// @return the dag
    SharedDag dag() const;
@@ -46,34 +46,28 @@ public:
 
    /// @return the vector of values after an evaluation or a differentiation
    ///         of this
-   const IntervalVector& values() const;
+   const RealVector& values() const;
 
    /// @return the interval jacobian matrix after a differentiation of this
-   const IntervalMatrix& jacobian() const;
-
-   /// Evaluates this
-   /// @param reg domains of variables
-   ///
-   /// values() returns the vector of values
-   void eval(const IntervalRegion& reg);
+   const RealMatrix& jacobian() const;
 
    /// Evaluates this
    /// @param pt values of variables
    ///
    /// values() returns the vector of values
-   void pointEval(const RealPoint& pt);
+   void eval(const RealPoint& pt);
 
    /// Differentiates this
-   /// @param reg domains of variables
+   /// @param pt values of variables
    ///
    /// values() returns the vector of values
    /// jacobian() return the jacobian matrix
-   void diff(const IntervalRegion& reg);
+   void diff(const RealPoint& pt);
 
 private:
    SharedDag dag_;
-   IntervalVector val_;
-   IntervalMatrix jac_;
+   RealVector val_;
+   RealMatrix jac_;
 };
 
 } // namespace

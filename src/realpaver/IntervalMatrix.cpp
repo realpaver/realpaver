@@ -40,6 +40,23 @@ IntervalMatrix::IntervalMatrix(
    }
 }
 
+IntervalMatrix::IntervalMatrix(const RealMatrix& A)
+      : NumericMatrix<Interval>(A.nrows(), A.ncols())
+{
+   for (size_t i=0; i<nrows(); ++i)
+      for (size_t j=0; j<ncols(); ++j)
+         set(i, j, A.get(i, j));
+}
+
+bool IntervalMatrix::isEmpty() const
+{
+   for (size_t i=0; i<nrows(); ++i)
+      for (size_t j=0; j<ncols(); ++j)
+         if (get(i, j).isEmpty()) return true;
+
+   return false;
+}
+
 Interval IntervalMatrix::get(size_t i, size_t j) const
 {
    return operator()(i, j);
@@ -156,6 +173,12 @@ IntervalMatrix operator*(const IntervalMatrix& A, const IntervalMatrix& B)
    IntervalMatrix res(A.nrows(), B.ncols());
    IntervalMatrix::BaseType::mul(A, B, res);
    return res;   
+}
+
+IntervalMatrix operator*(const RealMatrix& A, const IntervalMatrix& B)
+{
+   IntervalMatrix tmp(A);
+   return tmp*B; 
 }
 
 } // namespace

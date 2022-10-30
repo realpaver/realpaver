@@ -7,63 +7,58 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/IntervalFunctionVector.hpp"
+#include "realpaver/RealFunctionVector.hpp"
 
 namespace realpaver {
 
-IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
+RealFunctionVector::RealFunctionVector(SharedDag dag)
       : dag_(dag),
         val_(dag->nbFuns()),
         jac_(dag->nbFuns(), dag->nbVars())
 {}
 
-IntervalFunctionVector::~IntervalFunctionVector()
+RealFunctionVector::~RealFunctionVector()
 {}
 
-SharedDag IntervalFunctionVector::dag() const
+SharedDag RealFunctionVector::dag() const
 {
    return dag_;
 }
 
-Scope IntervalFunctionVector::scope() const
+Scope RealFunctionVector::scope() const
 {
    return dag_->scope();
 }
 
-size_t IntervalFunctionVector::nbVars() const
+size_t RealFunctionVector::nbVars() const
 {
    return dag_->nbVars();
 }
 
-size_t IntervalFunctionVector::nbFuns() const
+size_t RealFunctionVector::nbFuns() const
 {
    return dag_->nbFuns();
 }
 
-const IntervalVector& IntervalFunctionVector::values() const
+const RealVector& RealFunctionVector::values() const
 {
    return val_;
 }
 
-const IntervalMatrix& IntervalFunctionVector::jacobian() const
+const RealMatrix& RealFunctionVector::jacobian() const
 {
    return jac_;
 }
 
-void IntervalFunctionVector::eval(const IntervalRegion& reg)
+void RealFunctionVector::eval(const RealPoint& pt)
 {
-   dag_->intervalEval(reg, val_);
+   dag_->realEval(pt, val_);
 }
 
-void IntervalFunctionVector::pointEval(const RealPoint& pt)
+void RealFunctionVector::diff(const RealPoint& pt)
 {
-   dag_->intervalPointEval(pt, val_);
-}
-
-void IntervalFunctionVector::diff(const IntervalRegion& reg)
-{
-   dag_->intervalEval(reg, val_);
-   dag_->intervalDiff(jac_);
+   dag_->realEval(pt, val_);
+   dag_->realDiff(jac_);
 }
 
 } // namespace

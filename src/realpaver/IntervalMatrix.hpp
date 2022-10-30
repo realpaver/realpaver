@@ -10,10 +10,8 @@
 #ifndef REALPAVER_INTERVAL_MATRIX_HPP
 #define REALPAVER_INTERVAL_MATRIX_HPP
 
-#include "realpaver/Double.hpp"
-#include "realpaver/LinumDoubleTraits.hpp"
 #include "realpaver/LinumIntervalTraits.hpp"
-#include "realpaver/NumericMatrix.hpp"
+#include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {
 
@@ -40,6 +38,10 @@ public:
    IntervalMatrix(const std::initializer_list<
                            std::initializer_list<Interval>>& l);
 
+   /// Creates a matrix
+   /// @param A matrix copied in this
+   IntervalMatrix(const RealMatrix& A);
+
    /// Default copy constructor
    IntervalMatrix(const IntervalMatrix&) = default;
 
@@ -48,6 +50,9 @@ public:
 
    /// Default destructor
    ~IntervalMatrix() = default;
+
+   /// @return true if this is empty
+   bool isEmpty() const;
 
    /// Constant access
    /// @param i a row index between 0 and nrows()-1
@@ -110,6 +115,8 @@ IntervalMatrix operator-(const IntervalMatrix& A);
 IntervalMatrix operator*(double a, const IntervalMatrix& B);
 IntervalMatrix operator*(const IntervalMatrix& B, double a);
 IntervalMatrix operator*(const IntervalMatrix& A, const IntervalMatrix& B);
+
+IntervalMatrix operator*(const RealMatrix& A, const IntervalMatrix& B);
 
 IntervalMatrix operator/(const IntervalMatrix& B, double a);
 ///@}
