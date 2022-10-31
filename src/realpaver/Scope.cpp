@@ -72,6 +72,13 @@ size_t ScopeRep::index(const Variable& v) const
    return scopeMap_->index(v.id());
 }
 
+Variable ScopeRep::var(size_t i) const
+{
+   auto it = m_.begin();
+   std::advance(it, i);
+   return it->first;
+}
+
 size_t ScopeRep::minIndex() const
 {
    return minid_;
@@ -272,6 +279,12 @@ typename Scope::const_iterator Scope::find(const Variable& v) const
 size_t Scope::index(const Variable& v) const
 {
    return rep_->index(v);
+}
+
+Variable Scope::var(size_t i) const
+{
+   ASSERT(i < size(), "Bad access to a variable in a scope @ " << i);
+   return rep_->var(i);
 }
 
 void Scope::insert(const std::initializer_list<Variable>& l)

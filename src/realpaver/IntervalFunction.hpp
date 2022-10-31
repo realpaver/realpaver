@@ -10,56 +10,68 @@
 #ifndef REALPAVER_INTERVAL_FUNCTION_HPP
 #define REALPAVER_INTERVAL_FUNCTION_HPP
 
-#include "realpaver/Function.hpp"
-#include "realpaver/IntervalRegion.hpp"
-#include "realpaver/RealPoint.hpp"
+#include "realpaver/Dag.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for interval-valued functions.
+/// This is an interval-valued function.
 ///
-/// This class is a pure abstract class.
+/// This class is an adapter of the DagFun class.
 ///////////////////////////////////////////////////////////////////////////////
-class IntervalFunction : public virtual Function {
+class IntervalFunction {
 public:
+   /// Constructor
+   /// @param dag expression graph
+   /// @param i index of function in the DAG
+   IntervalFunction(SharedDag dag, size_t i);
+
    /// Virtual destructor
    virtual ~IntervalFunction();
 
+   /// Copy constructor
+   IntervalFunction(const IntervalFunction&) = default;
+
+   /// No asssignment
+   IntervalFunction& operator=(const IntervalFunction&) = delete;
+
+   /// @return the dag
+   SharedDag dag() const;
+
+   /// @return the scope of this, i.e. the set of variables
+   Scope scope() const;
+
+   /// @return the number of arguments of this
+   size_t nbVars() const;
+
+   /// @return the value obtained from the last evaluation
+   Interval value() const;
+
+   /// @return the gradient after a differentiation
+   const IntervalVector& gradient() const;
+
    /// Evaluates this
    /// @param reg domains of variables
-   /// @return interval value of this at reg
-   virtual Interval intervalEval(const IntervalRegion& reg) = 0;
+   /// @return value of this at reg
+   Interval eval(const IntervalRegion& reg);
 
    /// Evaluates this
    /// @param  pt values of variables
    /// @return value of this at pt
-   virtual Interval intervalPointEval(const RealPoint& pt) = 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for differentiable interval-valued functions.
-///
-/// This class is a pure abstract class.
-///////////////////////////////////////////////////////////////////////////////
-class DiffIntervalFunction : public IntervalFunction {
-public:
-   /// Virtual destructor
-   virtual ~DiffIntervalFunction();
-
-   /// Differentiates this, i.e. evaluates its gradient
-   /// @param reg domains of variables
-   /// @param grad interval gradient of this at reg (output)
-   virtual void intervalDiff(const IntervalRegion& reg,
-                             IntervalVector& grad) = 0;
+   Interval pointEval(const RealPoint& pt);
 
    /// Evaluates and differentiates this
    /// @param reg domains of variables
-   /// @param val value of this at reg
-   /// @param grad interval gradient of this at reg
-   virtual void intervalEvalDiff(const IntervalRegion& reg,
-                                 Interval& val,
-                                 IntervalVector& grad) = 0;
+   ///
+   /// value() returns the value of this
+   /// gradient() returns the gradient of this
+   void diff(const IntervalRegion& reg);
+
+private:
+   SharedDag dag_;         // DAG
+   size_t index_;          // index of function
+   Interval val_;          // value
+   IntervalVector grad_;   // gradient
 };
 
 } // namespace

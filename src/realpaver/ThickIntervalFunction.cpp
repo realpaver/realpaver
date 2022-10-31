@@ -28,27 +28,28 @@ bool ThickIntervalFunction::dependsOn(const Bitset& bs) const
 
 Interval ThickIntervalFunction::eval(const Interval& x)
 {
-   return f_->evalOnly(v_, x);
+   return f_->intervalEvalOnly(v_, x);
 }
 
 Interval ThickIntervalFunction::diff(const Interval& x)
 {
-   return f_->diffOnly(v_, x) ? f_->intervalDeriv(v_) : Interval::universe();
+   return f_->intervalDiffOnly(v_, x) ? f_->intervalDeriv(v_) :
+                                        Interval::universe();
 }
 
 std::pair<Interval, Interval>
 ThickIntervalFunction::evalDiff(const Interval& x)
 {
-   Interval e = f_->evalOnly(v_, x),
-            dv = f_->diffOnly(v_) ? f_->intervalDeriv(v_) :
-                                    Interval::universe();
+   Interval e = f_->intervalEvalOnly(v_, x),
+            dv = f_->intervalDiffOnly(v_) ? f_->intervalDeriv(v_) :
+                                            Interval::universe();
 
    return std::make_pair(e, dv);
 }
 
 Interval ThickIntervalFunction::update(const IntervalRegion& reg)
 {
-   return f_->eval(reg);
+   return f_->intervalEval(reg);
 }
 
 Variable ThickIntervalFunction::getVar() const

@@ -18,6 +18,10 @@ int main(void)
       Variable y = prob.addIntVar (4,  7, "y");
       Variable z = prob.addIntVar (-2, 10, "z");
 
+
+      Scope sco = {z, x};
+      cout << sco.var(1).getName() << endl;
+
 /*
       IntervalRegion reg = prob.getDomains();
 

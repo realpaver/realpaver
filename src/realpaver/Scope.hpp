@@ -46,6 +46,11 @@ public:
    /// @return index of v
    size_t index(const Variable& v) const;
 
+   /// Access to a variable
+   /// @param i an index between 0 and size()-1
+   /// @return the i-th variable in this
+   Variable var(size_t i) const;
+
    /// Inserts a variable with a given number of occurrences in this
    /// @param v a variable
    /// @param n number of occurrences of v
@@ -189,6 +194,11 @@ public:
    /// @param v a variable
    /// @return index of 'v' in 0..size()-1
    size_t index(const Variable& v) const;
+
+   /// Access to a variable
+   /// @param i an index between 0 and size()-1
+   /// @return the i-th variable in this
+   Variable var(size_t i) const;
 
    /// Gets the occurrence counter of a variable
    /// @param v a variable

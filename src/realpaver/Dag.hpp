@@ -16,10 +16,8 @@
 #include <vector>
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
-#include "realpaver/IntervalFunction.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/LPModel.hpp"
-#include "realpaver/RealFunction.hpp"
 #include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {
@@ -735,7 +733,7 @@ public:
 ///
 /// To every function is associated an image, i.e. we have L <= f(x) <= U.
 ///////////////////////////////////////////////////////////////////////////////
-class DagFun : public DiffIntervalFunction, public DiffRealFunction {
+class DagFun {
 public:
    /// Creates a function
    /// @param dag owner of this
@@ -814,22 +812,22 @@ public:
    /// Interval evaluation of this
    /// @param reg the variable domains
    /// @return the evaluation of this at reg
-   Interval eval(const IntervalRegion& reg);
+   Interval intervalEval(const IntervalRegion& reg);
 
   /// Interval evaluation
    /// @param pt variable values
    /// @return the evaluation of this at pt
-   Interval eval(const RealPoint& pt);
+   Interval intervalEval(const RealPoint& pt);
 
    /// @return the result of an interval evaluation
-   Interval val() const;
+   Interval intervalValue() const;
 
    /// Restricted interval evaluation
    /// @param v a variable
    /// @param x domain of v
    /// @return the interval evaluation such that only the nodes depending
    ///         on v are evaluated.
-   Interval evalOnly(const Variable& v, const Interval& x);
+   Interval intervalEvalOnly(const Variable& v, const Interval& x);
 
    /// HC4Revise contractor
    /// @param reg the variable domains
@@ -858,22 +856,22 @@ public:
    Proof sharedHc4Revise(IntervalRegion& reg);
 
    /// Interval differentiation in reverse mode
-   /// @param reg the variable domains
-   ///
-   /// It evaluates first this function and then calculates the derivatives.
-   void diff(const IntervalRegion& reg);
-
-   /// Interval differentiation in reverse mode
    ///
    /// It assumes that this function has been evaluated.
-   void diff();
+   void intervalDiff();
+
+   /// Interval differentiation in reverse mode
+   /// @param grad output gradient
+   ///
+   /// It assumes that this function has been evaluated.
+   void intervalDiff(IntervalVector& grad);
 
    /// Restricted interval differentiation in forward mode
    /// @param v a variable
    ///
    /// It assumes that this function has been evaluated.
    /// Only the nodes depending on the considered variable are differentiated.
-   bool diffOnly(const Variable& v);
+   bool intervalDiffOnly(const Variable& v);
 
    /// Restricted interval differentiation in forward mode
    /// @param v a variable
@@ -881,50 +879,7 @@ public:
    ///
    /// This function is first evaluated.
    /// Only the nodes depending on the considered variable are differentiated.   
-   bool diffOnly(const Variable& v, const Interval& x);
-
-   /// Real (point) evaluation
-   /// @param pt variable values
-   /// @return the evaluation of this at pt
-   double reval(const RealPoint& pt);
-
-   /// @return the result of the point evaluation
-   double rval() const;
-
-   /// Real differentiation in reverse mode
-   /// @param pt variable values
-   /// @return false if this function is discontinuous, true otherwise
-   ///
-   /// It evaluates first this function and then calculates the derivatives.
-   bool rdiff(const RealPoint& pt);
-
-   /// Point differentiation in reverse mode
-   /// @return false if this function is discontinuous, true otherwise
-   ///
-   /// It assumes that this function has been evaluated.
-   bool rdiff();
-
-   ///@{
-   Scope    funScope          () const override;
-   size_t   funArity          () const override;
-   Interval intervalEval      (const IntervalRegion& reg) override;
-   Interval intervalPointEval (const RealPoint& pt) override;
-   void     intervalDiff      (const IntervalRegion& reg,
-                               IntervalVector& grad) override;
-   void     intervalEvalDiff  (const IntervalRegion& reg, Interval& val,
-                               IntervalVector& grad) override;
-   double   realEval          (const RealPoint& pt) override;
-   void     realDiff          (const RealPoint& pt, RealVector& grad) override;
-   void     realEvalDiff      (const RealPoint& pt, double& val,
-                               RealVector& grad) override;
-   ///@}
-
-   /// @return the interval gradient after a differentiation
-   IntervalVector intervalGradient() const;
-
-   /// Assigns the interval gradient after a differentiation
-   /// @param G the gradient assigned
-   void toIntervalGradient(IntervalVector& G) const;
+   bool intervalDiffOnly(const Variable& v, const Interval& x);
 
    /// Gets an interval derivative after a differentiation
    /// @param i index of a variable in this with 0 <= i < nbVars()
@@ -936,12 +891,24 @@ public:
    /// @return the partial derivative of this with respect to v
    Interval intervalDeriv(const Variable& v) const;
 
-   /// @return the real gradient after a differentiation
-   RealVector realGradient() const;
+   /// Real (point) evaluation
+   /// @param pt variable values
+   /// @return the evaluation of this at pt
+   double realEval(const RealPoint& pt);
 
-   /// Assigns the real gradient after a differentiation
-   /// @param G the gradient assigned
-   void toRealGradient(RealVector& G) const;
+   /// @return the result of the point evaluation
+   double realValue() const;
+
+   /// Point differentiation in reverse mode
+   ///
+   /// It assumes that this function has been evaluated.
+   void realDiff();
+
+   /// Point differentiation in reverse mode
+   /// @param grad_ output gradient vector
+   ///
+   /// It assumes that this function has been evaluated.
+   void realDiff(RealVector& grad);
 
    /// Gets a real derivative after a differentiation
    /// @param i index of a variable in this with 0 <= i < nbVars()

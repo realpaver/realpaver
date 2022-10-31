@@ -1881,12 +1881,12 @@ double DagFun::realDeriv(size_t i) const
    return varNode(i)->rdv();
 }
 
-double DagFun::rval() const
+double DagFun::realValue() const
 {
    return rootNode()->rval();
 }
 
-Interval DagFun::val() const
+Interval DagFun::intervalValue() const
 {
    return rootNode()->val();
 }
@@ -1934,7 +1934,7 @@ void DagFun::insertOpNode(DagOp* node)
    }
 }
 
-Interval DagFun::eval(const IntervalRegion& reg)
+Interval DagFun::intervalEval(const IntervalRegion& reg)
 {
    for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(reg);
@@ -1942,7 +1942,7 @@ Interval DagFun::eval(const IntervalRegion& reg)
    return rootNode()->val();
 }
 
-Interval DagFun::eval(const RealPoint& pt)
+Interval DagFun::intervalEval(const RealPoint& pt)
 {
    for (size_t i=0; i<nbNodes(); ++i)
       node_[i]->eval(pt);
@@ -1950,7 +1950,7 @@ Interval DagFun::eval(const RealPoint& pt)
    return rootNode()->val();
 }
 
-Interval DagFun::evalOnly(const Variable& v, const Interval& x)
+Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
 {
    ASSERT(dependsOn(v),
           "Node " << rootNode()->index()
@@ -1971,7 +1971,7 @@ Proof DagFun::hc4Revise(IntervalRegion& reg)
 
 Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
 {
-   Interval e = eval(reg);
+   Interval e = intervalEval(reg);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -2066,7 +2066,7 @@ Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
 
 Proof DagFun::sharedHc4Revise(IntervalRegion& reg)
 {
-   Interval e = eval(reg);
+   Interval e = intervalEval(reg);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -2103,13 +2103,7 @@ Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
    return Proof::Maybe;
 }
 
-void DagFun::diff(const IntervalRegion& reg)
-{
-   eval(reg);
-   diff();
-}
-
-void DagFun::diff()
+void DagFun::intervalDiff()
 {
    // initializes the derivatives
    rootNode()->setDv(Interval::one());
@@ -2125,17 +2119,11 @@ void DagFun::diff()
    }
 }
 
-IntervalVector DagFun::intervalGradient() const
+void DagFun::intervalDiff(IntervalVector& grad)
 {
-   IntervalVector G(nbVars());
-   toIntervalGradient(G);
-   return G;
-}
-
-void DagFun::toIntervalGradient(IntervalVector& G) const
-{
+   intervalDiff();
    for (size_t i=0; i<nbVars(); ++i)
-      G.set(i, intervalDeriv(i));
+      grad.set(i, intervalDeriv(i));
 }
 
 Interval DagFun::intervalDeriv(const Variable& v) const
@@ -2143,7 +2131,7 @@ Interval DagFun::intervalDeriv(const Variable& v) const
    return dag_->findVarNode(v.id())->dv();
 }
 
-bool DagFun::diffOnly(const Variable& v)
+bool DagFun::intervalDiffOnly(const Variable& v)
 {
    ASSERT(dependsOn(v), "Node " << rootNode()->index()
                            << " does not depend on variable " << v.getName());
@@ -2162,13 +2150,13 @@ bool DagFun::diffOnly(const Variable& v)
    return rootNode()->diffOnly(v);
 }
 
-bool DagFun::diffOnly(const Variable& v, const Interval& x)
+bool DagFun::intervalDiffOnly(const Variable& v, const Interval& x)
 {
-   evalOnly(v, x);
-   return diffOnly(v);
+   intervalEvalOnly(v, x);
+   return intervalDiffOnly(v);
 }
 
-double DagFun::reval(const RealPoint& pt)
+double DagFun::realEval(const RealPoint& pt)
 {
    Double::rndNear();
 
@@ -2178,19 +2166,8 @@ double DagFun::reval(const RealPoint& pt)
    return rootNode()->rval();
 }
 
-bool DagFun::rdiff(const RealPoint& pt)
+void DagFun::realDiff()
 {
-   reval(pt);
-   return rdiff();
-}
-
-bool DagFun::rdiff()
-{
-   double e = rootNode()->rval();
-
-   if (Double::isNan(e) || Double::isInf(e))
-      return false;
-
    // initializes the derivatives
    rootNode()->setRdv(1.0);
 
@@ -2198,84 +2175,23 @@ bool DagFun::rdiff()
       node_[i]->setRdv(0.0);
 
    // differentiation
-   bool res = true;
    for (int i=nbNodes()-1; i>=0; --i)
    {
       size_t j = (size_t)i;
-      res = res & node_[j]->rdiff();
+      node_[j]->rdiff();
    }
-
-   return res;
 }
 
-RealVector DagFun::realGradient() const
+void DagFun::realDiff(RealVector& grad)
 {
-   RealVector G(nbVars());
-   toRealGradient(G);
-   return G;
-}
-
-void DagFun::toRealGradient(RealVector& G) const
-{
+   realDiff();
    for (size_t i=0; i<nbVars(); ++i)
-      G.set(i, realDeriv(i));
+      grad.set(i, realDeriv(i));
 }
 
 double DagFun::realDeriv(const Variable& v) const
 {
    return dag_->findVarNode(v.id())->rdv();
-}
-
-Scope DagFun::funScope() const
-{
-   return scope();
-}
-
-size_t DagFun::funArity() const
-{
-   return scope().size();   
-}
-
-double DagFun::realEval(const RealPoint& pt)
-{
-   return reval(pt);
-}
-
-void DagFun::realDiff(const RealPoint& pt, RealVector& grad)
-{
-   rdiff(pt);
-   toRealGradient(grad);
-}
-
-void DagFun::realEvalDiff(const RealPoint& pt, double& val, RealVector& grad)
-{
-   rdiff(pt);
-   val = rootNode()->rval();
-   toRealGradient(grad);
-}
-
-Interval DagFun::intervalEval(const IntervalRegion& reg)
-{
-   return eval(reg);
-}
-
-Interval DagFun::intervalPointEval(const RealPoint& pt)
-{
-   return eval(pt);
-}
-
-void DagFun::intervalDiff(const IntervalRegion& reg, IntervalVector& grad)
-{
-   diff(reg);
-   toIntervalGradient(grad);
-}
-
-void DagFun::intervalEvalDiff(const IntervalRegion& reg, Interval& val,
-                              IntervalVector& grad)
-{
-   diff(reg);
-   val = rootNode()->val();
-   toIntervalGradient(grad);
 }
 
 void DagFun::linearize(LPModel& lm)
@@ -2564,8 +2480,8 @@ bool Dag::intervalPointEval(const RealPoint& pt, IntervalVector& val)
    for (size_t i=0; i<nbFuns(); ++i)
    {
       DagFun* f = fun_[i];
-      val.set(i, f->val());
-      if (f->val().isEmpty()) res = false;
+      val.set(i, f->intervalValue());
+      if (f->intervalValue().isEmpty()) res = false;
    }
    return res;
 }
@@ -2578,7 +2494,7 @@ bool Dag::intervalEval(const IntervalRegion& reg)
       node_[i]->eval(reg);
 
    for (size_t i=0; i<nbFuns(); ++i)
-      if (fun_[i]->val().isEmpty()) res = false;
+      if (fun_[i]->intervalValue().isEmpty()) res = false;
 
    return res;
 }
@@ -2596,8 +2512,8 @@ bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& val)
    for (size_t i=0; i<nbFuns(); ++i)
    {
       DagFun* f = fun_[i];
-      val.set(i, f->val());
-      if (f->val().isEmpty()) res = false;
+      val.set(i, f->intervalValue());
+      if (f->intervalValue().isEmpty()) res = false;
    }
    return res;
 }
@@ -2611,7 +2527,7 @@ void Dag::intervalDiff(IntervalMatrix& jac)
    {
       // differentiates the i-th function
       DagFun* f = fun_[i];
-      f->diff();
+      f->intervalDiff();
 
       // fills the i-th row of the matrix
       size_t j = 0;
@@ -2635,7 +2551,7 @@ bool Dag::realEval(const RealPoint& pt)
       node_[i]->reval(pt);
 
    for (size_t i=0; i<nbFuns(); ++i)
-      if (Double::isNan(fun_[i]->rval()))
+      if (Double::isNan(fun_[i]->realValue()))
          return false;
 
    return true;
@@ -2655,7 +2571,7 @@ bool Dag::realEval(const RealPoint& pt, RealVector& v)
    for (size_t i=0; i<nbFuns(); ++i)
    {
       DagFun* f = fun_[i];
-      double x = f->rval();
+      double x = f->realValue();
 
       if (Double::isNan(x)) res = false;
       v.set(i, x);
@@ -2673,7 +2589,7 @@ void Dag::realDiff(RealMatrix& jac)
    {
       // differentiates the i-th function
       DagFun* f = fun_[i];
-      f->rdiff();
+      f->realDiff();
 
       // fills the i-th row of the matrix
       size_t j = 0;

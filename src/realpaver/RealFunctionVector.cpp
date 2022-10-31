@@ -40,6 +40,13 @@ size_t RealFunctionVector::nbFuns() const
    return dag_->nbFuns();
 }
 
+RealFunction RealFunctionVector::fun(size_t i) const
+{
+   ASSERT(i < nbFuns(), "Bad access to a real function in a vector");
+
+   return RealFunction(dag_, i);
+}
+
 const RealVector& RealFunctionVector::values() const
 {
    return val_;

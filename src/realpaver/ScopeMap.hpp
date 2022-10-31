@@ -29,7 +29,7 @@ public:
    virtual ~AbstractScopeMap();
 
    /// Application of the mapping M
-   /// @param id an integer
+   /// @param id an integer (a variable identifier)
    /// @return M(id)
    virtual size_t index(size_t id) const = 0;
 

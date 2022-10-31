@@ -10,48 +10,63 @@
 #ifndef REALPAVER_REAL_FUNCTION_HPP
 #define REALPAVER_REAL_FUNCTION_HPP
 
-#include "realpaver/Function.hpp"
-#include "realpaver/RealPoint.hpp"
+#include "realpaver/Dag.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for real-valued functions.
+/// This is a real-valued function.
 ///
-/// This class is a pure abstract class.
+/// This class is an adapter of the DagFun class.
 ///////////////////////////////////////////////////////////////////////////////
-class RealFunction : public virtual Function {
+class RealFunction {
 public:
+   /// Constructor
+   /// @param dag expression graph
+   /// @param i index of function in the DAG
+   RealFunction(SharedDag dag, size_t i);
+
    /// Virtual destructor
    virtual ~RealFunction();
+
+   /// Copy constructor
+   RealFunction(const RealFunction&) = default;
+
+   /// No asssignment
+   RealFunction& operator=(const RealFunction&) = delete;
+
+   /// @return the dag
+   SharedDag dag() const;
+
+   /// @return the scope of this, i.e. the set of variables
+   Scope scope() const;
+
+   /// @return the number of arguments of this
+   size_t nbVars() const;
+
+   /// @return the value obtained from the last evaluation
+   double value() const;
+
+   /// @return the gradient after a differentiation
+   const RealVector& gradient() const;
 
    /// Evaluates this
    /// @param pt values of variables
    /// @return value of this at pt
-   virtual double realEval(const RealPoint& pt) = 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for differentiable real-valued functions.
-///
-/// This class is a pure abstract class.
-///////////////////////////////////////////////////////////////////////////////
-class DiffRealFunction : public RealFunction {
-public:
-   /// Virtual destructor
-   virtual ~DiffRealFunction();
-
-   /// Differentiates this, i.e. evaluates its gradient
-   /// @param pt values of variables
-   /// @param grad gradient of this at pt
-   virtual void realDiff(const RealPoint& pt, RealVector& grad) = 0;
+   double eval(const RealPoint& pt);
 
    /// Evaluates and differentiates this
    /// @param pt values of variables
-   /// @param val result of evaluation of this at pt
-   /// @param grad gradient of this at pt
-   virtual void realEvalDiff(const RealPoint& pt, double& val,
-                             RealVector& grad) = 0;
+   ///
+   /// value() returns the value of this
+   /// gradient() returns the gradient of this
+   void diff(const RealPoint& pt);
+
+private:
+   SharedDag dag_;      // DAG
+   size_t index_;       // index of function
+   double val_;         // value
+   RealVector grad_;    // gradient
 };
 
 } // namespace

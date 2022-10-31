@@ -11,6 +11,7 @@
 #define REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 
 #include "realpaver/Dag.hpp"
+#include "realpaver/IntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -44,6 +45,9 @@ public:
    /// @return the number of functions in this
    size_t nbFuns() const;
 
+   /// @return the i-th function of thos
+   IntervalFunction fun(size_t i) const;
+
    /// @return the vector of values after an evaluation or a differentiation
    ///         of this
    const IntervalVector& values() const;
@@ -67,7 +71,7 @@ public:
    /// @param reg domains of variables
    ///
    /// values() returns the vector of values
-   /// jacobian() return the jacobian matrix
+   /// jacobian() returns the jacobian matrix
    void diff(const IntervalRegion& reg);
 
 private:

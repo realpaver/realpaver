@@ -11,6 +11,7 @@
 #define REALPAVER_REAL_FUNCTION_VECTOR_HPP
 
 #include "realpaver/Dag.hpp"
+#include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
 
@@ -43,6 +44,9 @@ public:
 
    /// @return the number of functions in this
    size_t nbFuns() const;
+
+   /// @return the i-th function of thos
+   RealFunction fun(size_t i) const;
 
    /// @return the vector of values after an evaluation or a differentiation
    ///         of this

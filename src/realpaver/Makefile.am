@@ -40,7 +40,6 @@ librealpaver_la_include_HEADERS = \
 		Double.hpp \
 		Env.hpp \
 		Exception.hpp \
-		Function.hpp \
 		HC4Contractor.hpp \
 		Inflator.hpp \
 		IntContractor.hpp \
@@ -140,7 +139,6 @@ librealpaver_la_SOURCES = \
 		Dag.cpp \
 		Env.cpp \
 		Exception.cpp \
-		Function.cpp \
 		HC4Contractor.cpp \
 		Inflator.cpp \
 		IntContractor.cpp \

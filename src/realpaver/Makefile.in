@@ -165,7 +165,7 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	BC3Contractor.cpp BC4Contractor.cpp CIDContractor.cpp \
 	Common.cpp Constraint.cpp ConstraintContractor.cpp \
 	ConstraintFixer.cpp ConstraintRelaxor.cpp Contractor.cpp \
-	ContractorPool.cpp Dag.cpp Env.cpp Exception.cpp Function.cpp \
+	ContractorPool.cpp Dag.cpp Env.cpp Exception.cpp \
 	HC4Contractor.cpp Inflator.cpp IntContractor.cpp Interval.cpp \
 	IntervalFunction.cpp IntervalFunctionVector.cpp \
 	IntervalMatrix.cpp IntervalNewton.cpp IntervalRegion.cpp \
@@ -188,7 +188,7 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	BC4Contractor.lo CIDContractor.lo Common.lo Constraint.lo \
 	ConstraintContractor.lo ConstraintFixer.lo \
 	ConstraintRelaxor.lo Contractor.lo ContractorPool.lo Dag.lo \
-	Env.lo Exception.lo Function.lo HC4Contractor.lo Inflator.lo \
+	Env.lo Exception.lo HC4Contractor.lo Inflator.lo \
 	IntContractor.lo Interval.lo IntervalFunction.lo \
 	IntervalFunctionVector.lo IntervalMatrix.lo IntervalNewton.lo \
 	IntervalRegion.lo IntervalSlicer.lo IntervalVector.lo \
@@ -233,9 +233,9 @@ am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
 	./$(DEPDIR)/ConstraintRelaxor.Plo ./$(DEPDIR)/Contractor.Plo \
 	./$(DEPDIR)/ContractorPool.Plo ./$(DEPDIR)/Dag.Plo \
 	./$(DEPDIR)/Env.Plo ./$(DEPDIR)/Exception.Plo \
-	./$(DEPDIR)/Function.Plo ./$(DEPDIR)/HC4Contractor.Plo \
-	./$(DEPDIR)/Inflator.Plo ./$(DEPDIR)/IntContractor.Plo \
-	./$(DEPDIR)/Interval.Plo ./$(DEPDIR)/IntervalFunction.Plo \
+	./$(DEPDIR)/HC4Contractor.Plo ./$(DEPDIR)/Inflator.Plo \
+	./$(DEPDIR)/IntContractor.Plo ./$(DEPDIR)/Interval.Plo \
+	./$(DEPDIR)/IntervalFunction.Plo \
 	./$(DEPDIR)/IntervalFunctionVector.Plo \
 	./$(DEPDIR)/IntervalMatrix.Plo ./$(DEPDIR)/IntervalNewton.Plo \
 	./$(DEPDIR)/IntervalRegion.Plo ./$(DEPDIR)/IntervalSlicer.Plo \
@@ -327,8 +327,8 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	Common.hpp config.hpp Constraint.hpp ConstraintContractor.hpp \
 	ConstraintFixer.hpp ConstraintRelaxor.hpp Contractor.hpp \
 	ContractorPool.hpp Dag.hpp Double.hpp Env.hpp Exception.hpp \
-	Function.hpp HC4Contractor.hpp Inflator.hpp IntContractor.hpp \
-	Interval.hpp IntervalFunction.hpp IntervalFunctionVector.hpp \
+	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Interval.hpp \
+	IntervalFunction.hpp IntervalFunctionVector.hpp \
 	IntervalImpl.hpp IntervalMatrix.hpp IntervalNewton.hpp \
 	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
 	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
@@ -518,8 +518,8 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	BC4Contractor.hpp CIDContractor.hpp Common.hpp config.hpp \
 	Constraint.hpp ConstraintContractor.hpp ConstraintFixer.hpp \
 	ConstraintRelaxor.hpp Contractor.hpp ContractorPool.hpp \
-	Dag.hpp Double.hpp Env.hpp Exception.hpp Function.hpp \
-	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Interval.hpp \
+	Dag.hpp Double.hpp Env.hpp Exception.hpp HC4Contractor.hpp \
+	Inflator.hpp IntContractor.hpp Interval.hpp \
 	IntervalFunction.hpp IntervalFunctionVector.hpp \
 	IntervalImpl.hpp IntervalMatrix.hpp IntervalNewton.hpp \
 	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
@@ -542,22 +542,21 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	BC4Contractor.cpp CIDContractor.cpp Common.cpp Constraint.cpp \
 	ConstraintContractor.cpp ConstraintFixer.cpp \
 	ConstraintRelaxor.cpp Contractor.cpp ContractorPool.cpp \
-	Dag.cpp Env.cpp Exception.cpp Function.cpp HC4Contractor.cpp \
-	Inflator.cpp IntContractor.cpp Interval.cpp \
-	IntervalFunction.cpp IntervalFunctionVector.cpp \
-	IntervalMatrix.cpp IntervalNewton.cpp IntervalRegion.cpp \
-	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
-	ListContractor.cpp Logger.cpp LPModel.cpp MaxCIDContractor.cpp \
-	NcspEnv.cpp NcspNode.cpp NcspSpace.cpp NcspSpaceDFS.cpp \
-	NcspSpaceBFS.cpp NcspSpaceDMDFS.cpp NcspSolver.cpp \
-	NcspSplit.cpp Objective.cpp Param.cpp parser_bison.ypp \
-	parser_flex.lpp Parser.cpp PolytopeHullContractor.cpp \
-	Preprocessor.cpp Problem.cpp Propagator.cpp RealFunction.cpp \
-	RealFunctionVector.cpp RealMatrix.cpp RealPoint.cpp \
-	RealVector.cpp Reformulation.cpp Scope.cpp ScopeMap.cpp \
-	SearchNode.cpp SymbolTable.cpp Term.cpp TermDeriver.cpp \
-	TermFixer.cpp ThickIntervalFunction.cpp Timer.cpp \
-	Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
+	Dag.cpp Env.cpp Exception.cpp HC4Contractor.cpp Inflator.cpp \
+	IntContractor.cpp Interval.cpp IntervalFunction.cpp \
+	IntervalFunctionVector.cpp IntervalMatrix.cpp \
+	IntervalNewton.cpp IntervalRegion.cpp IntervalSlicer.cpp \
+	IntervalVector.cpp IntervalUnion.cpp ListContractor.cpp \
+	Logger.cpp LPModel.cpp MaxCIDContractor.cpp NcspEnv.cpp \
+	NcspNode.cpp NcspSpace.cpp NcspSpaceDFS.cpp NcspSpaceBFS.cpp \
+	NcspSpaceDMDFS.cpp NcspSolver.cpp NcspSplit.cpp Objective.cpp \
+	Param.cpp parser_bison.ypp parser_flex.lpp Parser.cpp \
+	PolytopeHullContractor.cpp Preprocessor.cpp Problem.cpp \
+	Propagator.cpp RealFunction.cpp RealFunctionVector.cpp \
+	RealMatrix.cpp RealPoint.cpp RealVector.cpp Reformulation.cpp \
+	Scope.cpp ScopeMap.cpp SearchNode.cpp SymbolTable.cpp Term.cpp \
+	TermDeriver.cpp TermFixer.cpp ThickIntervalFunction.cpp \
+	Timer.cpp Tolerance.cpp UniIntervalFunction.cpp Variable.cpp \
 	VariableSelector.cpp $(am__append_4) $(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
@@ -680,7 +679,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dag.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Env.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Exception.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Function.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HC4Contractor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Inflator.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntContractor.Plo@am__quote@ # am--include-marker
@@ -947,7 +945,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/Dag.Plo
 	-rm -f ./$(DEPDIR)/Env.Plo
 	-rm -f ./$(DEPDIR)/Exception.Plo
-	-rm -f ./$(DEPDIR)/Function.Plo
 	-rm -f ./$(DEPDIR)/HC4Contractor.Plo
 	-rm -f ./$(DEPDIR)/Inflator.Plo
 	-rm -f ./$(DEPDIR)/IntContractor.Plo
@@ -1061,7 +1058,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/Dag.Plo
 	-rm -f ./$(DEPDIR)/Env.Plo
 	-rm -f ./$(DEPDIR)/Exception.Plo
-	-rm -f ./$(DEPDIR)/Function.Plo
 	-rm -f ./$(DEPDIR)/HC4Contractor.Plo
 	-rm -f ./$(DEPDIR)/Inflator.Plo
 	-rm -f ./$(DEPDIR)/IntContractor.Plo
