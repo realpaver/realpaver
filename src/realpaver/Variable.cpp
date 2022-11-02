@@ -181,15 +181,16 @@ bool Variable::operator==(const Variable& other) const
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
-   os << v.getName()
-      << " #"
+   os << "#"
       << v.id()
       << " "
-      << (v.isContinuous() ? "(C)" : "(D)")
+      << v.getName()
       << " in "
       << v.getDomain()
-      << " @ "
-      << v.getTolerance();
+      << " at "
+      << v.getTolerance()
+      << " "
+      << (v.isContinuous() ? "(continuous)" : "(discrete)");
 
    return os;
 }

@@ -33,6 +33,13 @@ public:
    ///                 false for a relative tolerance
    Tolerance(double val = 0.0, bool absolute = true);
 
+   /// Creates a tolerance
+   /// @param str string representation of the tolerance, e.g.
+   ///        1.0e-6A for an absolute tolerance, 1.0-6R for a relative tolerance
+   ///
+   /// Throws an exception if the format is not respected.
+   Tolerance(const std::string& str);
+
    /// Default copy constructor
    Tolerance(const Tolerance&) = default;
 

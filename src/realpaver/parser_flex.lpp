@@ -17,10 +17,12 @@ DIG         [0-9]
 INT         {DIG}+
 E           [eE][+-]?{DIG}+
 REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
+TOL         {REAL}[AR]
 
 %%
 {INT}           return TK_INT;
 {REAL}          return TK_REAL;
+{TOL}           return TK_TOL;
 
 "Variables"     return TK_STR_VAR;
 "Constants"     return TK_STR_CONST;
@@ -49,6 +51,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "pow"		return TK_POW;
 
 "in"     return TK_IN;
+"at"     return TK_AT;
 
 "+"      return TK_PLUS;
 "-"      return TK_MINUS;

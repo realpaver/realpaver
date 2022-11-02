@@ -325,8 +325,6 @@ void NcspSolver::branchAndPrune()
    makeContractor();
    makeSplit();
 
-std::cout << "apres les makers" << std::endl;
-
    // parameters
    double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");
    env_->setTimeLimit(false);

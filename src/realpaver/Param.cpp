@@ -278,36 +278,17 @@ void Param::processParam(const std::string& name, const std::string& val)
    // String
    auto its = strmap_.find(name);
    if (its != strmap_.end())
-   {      
+   {
       strmap_[name] = val;      
       return;
    }
 
-   // Tolerance: name has a prefix ABS_ or REL_
-   if (name.size() >= 5)
+   // Tolerance   
+   auto itt = tolmap_.find(name);
+   if (itt != tolmap_.end())
    {
-      std::string prefix = name.substr(0, 4);
-      std::string s = name.substr(4, name.size() - 4);
-
-      auto it = tolmap_.find(s);
-      Interval x(val);
-
-      if ((it != tolmap_.end()) && (!x.isEmpty()) && x.isPositive())
-      {
-         if (prefix == "ABS_")
-         {
-            Tolerance tol = Tolerance::makeAbs(x.right());
-            tolmap_[s] = tol;
-            return;
-         }
-
-         if (prefix == "REL_")
-         {
-            Tolerance tol = Tolerance::makeRel(x.right());
-            tolmap_[s] = tol;
-            return;
-         }
-      }
+      tolmap_[name] = Tolerance(val);
+      return;
    }
 
    // no parameter found

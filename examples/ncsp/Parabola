@@ -1,7 +1,9 @@
 Variables
-   x in [-5, 5],
-   y in [-5, 5]
+   x in [-5, 5] at 1.0e-6A,
+   y in [-5, 5] at 1.0e-8R
 ;
+
+Integer x;
 
 Constraints
    y - x^2 == 0,

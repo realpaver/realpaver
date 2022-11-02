@@ -65,6 +65,10 @@ int main(int argc, char** argv)
       if (!ok) THROW("Parse error: " << parser.getParseError());
       if (!problem.isCSP()) THROW("Not a NCSP");
 
+
+Scope sco = problem.scope();
+for (auto v : sco) cout << v << endl;
+
       // solving
       NcspSolver solver(problem);
       solver.getEnv()->setParam(prm);

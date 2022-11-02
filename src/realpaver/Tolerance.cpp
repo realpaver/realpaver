@@ -19,6 +19,22 @@ Tolerance::Tolerance(double val, bool absolute) :
    ASSERT(val >= 0.0 && (val <= 1.0 || absolute), "bad tolerance: " << val);
 }
 
+Tolerance::Tolerance(const std::string& str)
+{
+   if (str.size() < 2) THROW("Bad tolerance format");
+
+   size_t k = str.size()-1;
+   char c = str[k];
+
+   if (c != 'A' && c != 'R') THROW("Bad tolerance format");
+
+   Interval x(str.substr(0, k));
+   if (x.isEmpty() || x.right() < 0.0) THROW("Bad tolerance format");
+
+   abs_ = (c == 'A');
+   val_ = x.right();
+}
+
 double Tolerance::getVal() const
 {
    return val_;
@@ -162,8 +178,7 @@ Interval Tolerance::maxIntervalUp(double lb) const
 std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
 {
    os << tol.getVal()
-      << " "
-      << (tol.isAbsolute() ? "(abs)" : "(rel)");
+      << (tol.isAbsolute() ? "A" : "R");
    return os;
 }
 

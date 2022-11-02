@@ -37,6 +37,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 {
   char u_str[256];
   realpaver::TermRep* u_term;
+  realpaver::Tolerance* u_tol;
 }
 
 %type <u_str>     ident
@@ -49,11 +50,12 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    itv
 %type <u_term>    domain
 %type <u_term>    table_list_val_def
+%type <u_tol>     var_tol
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT
-%token TK_TABLE
+%token TK_TABLE TK_TOL TK_AT
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
@@ -139,7 +141,7 @@ var_tail
   ;
 
 var_def
-  : ident domain
+  : ident domain var_tol
     {
       realpaver::Term::SharedRep e($2);
       realpaver::Interval x = e->evalConst();
@@ -153,10 +155,32 @@ var_def
       }
 
       realpaver::Variable v = realpaver_bison_problem->addRealVar(x, $1);
-      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
-      v.setTolerance(tol);
-      
+
+      realpaver::Tolerance* tol = $3;
+      v.setTolerance(*tol);
+      delete tol;
+
       realpaver_bison_symtab->insertVariable($1, v);
+    }
+  ;
+
+var_tol
+  :
+    {
+      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
+      $$ = new realpaver::Tolerance(tol);
+    }
+  | TK_AT TK_TOL
+    {
+      try
+      {
+        $$ = new realpaver::Tolerance(realpaver_bison_text);
+      }
+      catch(realpaver::Exception e)
+      {
+        realpaver_bison_error("Bad tolerance");
+        YYABORT;
+      }
     }
   ;
 
