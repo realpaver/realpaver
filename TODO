@@ -1,9 +1,8 @@
 -------------------------------------------------------------------------------
-- Interfaces IntervalFunctionVector, RealFunctionVector,
-  DiffIntervalFunctionVector, DiffRealFunctionVector implemented by Dag
+- Constraint violation
 
 -------------------------------------------------------------------------------
-- Manage tolerances in parser
+- Linearization Taylor forms
 
 -------------------------------------------------------------------------------
 - Create a DAG from a .nl file

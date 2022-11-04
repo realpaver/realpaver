@@ -130,9 +130,14 @@ void Constraint::acceptVisitor(ConstraintVisitor& vis) const
    rep_->acceptVisitor(vis);
 }
 
-Proof Constraint::isSatisfied(const IntervalRegion& reg) const
+Proof Constraint::isSatisfied(const IntervalRegion& reg)
 {
    return rep_->isSatisfied(reg);
+}
+
+double Constraint::violation(const IntervalRegion& reg)
+{
+   return rep_->violation(reg);
 }
 
 Proof Constraint::contract(IntervalRegion& reg)
@@ -247,7 +252,7 @@ void ConstraintEq::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintEq::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintEq::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -263,6 +268,18 @@ Proof ConstraintEq::isSatisfied(const IntervalRegion& reg) const
 
    else
       return Proof::Empty;
+}
+
+double ConstraintEq::violation(const IntervalRegion& reg)
+{
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
+
+   if (l.isEmpty() || r.isEmpty()) return Double::inf();
+   if (l.isPossiblyEq(r)) return 0.0;
+ 
+   Double::rndNear();
+   return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
 }
 
 Proof ConstraintEq::contract(IntervalRegion& reg)
@@ -306,7 +323,7 @@ void ConstraintLe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLe::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintLe::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -322,6 +339,18 @@ Proof ConstraintLe::isSatisfied(const IntervalRegion& reg) const
 
    else
       return Proof::Empty;
+}
+
+double ConstraintLe::violation(const IntervalRegion& reg)
+{
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
+
+   if (l.isEmpty() || r.isEmpty()) return Double::inf();
+   if (l.isPossiblyLe(r)) return 0.0;
+ 
+   Double::rndNear();
+   return l.left() - r.right();
 }
 
 Proof ConstraintLe::contract(IntervalRegion& reg)
@@ -366,7 +395,7 @@ void ConstraintLt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintLt::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintLt::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -382,6 +411,18 @@ Proof ConstraintLt::isSatisfied(const IntervalRegion& reg) const
 
    else
       return Proof::Empty;
+}
+
+double ConstraintLt::violation(const IntervalRegion& reg)
+{
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
+
+   if (l.isEmpty() || r.isEmpty()) return Double::inf();
+   if (l.isPossiblyLt(r)) return 0.0;
+ 
+   Double::rndNear();
+   return l.left() - r.right();
 }
 
 Proof ConstraintLt::contract(IntervalRegion& reg)
@@ -426,7 +467,7 @@ void ConstraintGe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGe::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintGe::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -442,6 +483,18 @@ Proof ConstraintGe::isSatisfied(const IntervalRegion& reg) const
 
    else
       return Proof::Empty;
+}
+
+double ConstraintGe::violation(const IntervalRegion& reg)
+{
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
+
+   if (l.isEmpty() || r.isEmpty()) return Double::inf();
+   if (l.isPossiblyGe(r)) return 0.0;
+ 
+   Double::rndNear();
+   return r.left() - l.right();
 }
 
 Proof ConstraintGe::contract(IntervalRegion& reg)
@@ -486,7 +539,7 @@ void ConstraintGt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintGt::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintGt::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -502,6 +555,18 @@ Proof ConstraintGt::isSatisfied(const IntervalRegion& reg) const
 
    else
       return Proof::Empty;
+}
+
+double ConstraintGt::violation(const IntervalRegion& reg)
+{
+   Interval l = left().eval(reg),
+            r = right().eval(reg);
+
+   if (l.isEmpty() || r.isEmpty()) return Double::inf();
+   if (l.isPossiblyGt(r)) return 0.0;
+ 
+   Double::rndNear();
+   return r.left() - l.right();
 }
 
 Proof ConstraintGt::contract(IntervalRegion& reg)
@@ -559,7 +624,7 @@ void ConstraintIn::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ConstraintIn::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintIn::isSatisfied(const IntervalRegion& reg)
 {
    Interval e = term().eval(reg);
 
@@ -574,6 +639,17 @@ Proof ConstraintIn::isSatisfied(const IntervalRegion& reg) const
 
    else
       return Proof::Empty;
+}
+
+double ConstraintIn::violation(const IntervalRegion& reg)
+{
+   Interval e = term().eval(reg);
+
+   if (e.isEmpty()) return Double::inf();
+   if (x_.overlaps(e)) return 0.0;
+ 
+   Double::rndNear();
+   return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
 }
 
 Proof ConstraintIn::contract(IntervalRegion& reg)
@@ -784,7 +860,7 @@ bool ConstraintTable::isRowConsistent(size_t i, const IntervalRegion& reg) const
    return true;
 }
 
-Proof ConstraintTable::isSatisfied(const IntervalRegion& reg) const
+Proof ConstraintTable::isSatisfied(const IntervalRegion& reg)
 {
    size_t nbc = 0;
 
@@ -796,6 +872,41 @@ Proof ConstraintTable::isSatisfied(const IntervalRegion& reg) const
       }
 
    return (nbc == 1) ? Proof::Inner : Proof::Empty;
+}
+
+double ConstraintTable::violation(const IntervalRegion& reg)
+{
+   double res = Double::inf();
+
+   for (size_t i=0; i<nbRows(); ++i)
+      res = Double::min(res, rowViolation(reg, i));
+
+   return res;
+}
+
+double ConstraintTable::rowViolation(const IntervalRegion& reg, size_t i)
+{
+   double res = 0.0;
+   Double::rndNear();
+
+   for (size_t j=0; j<nbCols(); ++j)
+   {
+      Variable v = vcol_[j].getVar();
+      Interval val = vcol_[j].getVal(i);
+      Interval dom = reg.get(v);
+
+      double viol = 0.0;
+
+      if (dom.isCertainlyLt(val))
+         viol = val.left() - dom.right();
+
+      else if (dom.isCertainlyGt(val))
+         viol = dom.left() - val.right();
+
+      if (viol > res) res = viol;
+   }
+
+   return res;
 }
 
 Proof ConstraintTable::contract(IntervalRegion& reg)

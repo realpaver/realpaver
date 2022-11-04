@@ -67,7 +67,6 @@ public:
    /// @return true if a constraint is violated at preprocessing
    bool hasConstraintViolated() const;
 
-
 private:
    Param* param_;    // management of parameters
    bool tlim_;       // time limit reached

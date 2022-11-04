@@ -68,7 +68,13 @@ public:
    /// Satisfaction test
    /// @param reg domains of variables
    /// @return a certificate of proof
-   virtual Proof isSatisfied(const IntervalRegion& reg) const = 0;
+   virtual Proof isSatisfied(const IntervalRegion& reg) = 0;
+
+   /// Calculates the magnitude of violation
+   /// @param reg domains of variables
+   /// @return 0 if the constraint is satisfied, otherwise a positive real
+   ///         number that indicates how much the constraint is violated
+   virtual double violation(const IntervalRegion& reg) = 0;
 
    /// Contraction of domains
    /// @param reg domains of variables
@@ -131,7 +137,13 @@ public:
    /// Satisfaction test
    /// @param reg domains of variables
    /// @return a certificate of proof
-   Proof isSatisfied(const IntervalRegion& reg) const;
+   Proof isSatisfied(const IntervalRegion& reg);
+
+   /// Calculates the magnitude of violation
+   /// @param reg domains of variables
+   /// @return 0 if the constraint is satisfied, otherwise a positive real
+   ///         number that indicates how much the constraint is violated
+   double violation(const IntervalRegion& reg);
 
    /// Contraction of domains
    /// @param reg domains of variables
@@ -231,7 +243,8 @@ public:
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    ///@}
 };
@@ -254,7 +267,8 @@ public:
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    ///@}
 };
@@ -277,7 +291,8 @@ public:
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    ///@}
 };
@@ -300,7 +315,8 @@ public:
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    ///@}
 };
@@ -323,7 +339,8 @@ public:
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    ///@}
 };
@@ -354,7 +371,8 @@ public:
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    ///@}
 
@@ -459,7 +477,8 @@ public:
 
    ///@{
    bool isConstant() const override;
-   Proof isSatisfied(const IntervalRegion& reg) const override;
+   Proof isSatisfied(const IntervalRegion& reg) override;
+   double violation(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -470,6 +489,7 @@ private:
 
    void makeScopeAndHashCode();
    bool isRowConsistent(size_t i, const IntervalRegion& reg) const;
+   double rowViolation(const IntervalRegion& reg, size_t i);
 };
 
 /// Creates a table constraint

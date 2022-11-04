@@ -14,10 +14,13 @@ int main(void)
 
    try {
       Problem prob;
+      //~ Variable x = prob.addRealVar(0,  3, "x");
+      //~ Variable y = prob.addIntVar (4,  7, "y");
+      //~ Variable z = prob.addIntVar (-2, 10, "z");
+
       Variable x = prob.addRealVar(0,  3, "x");
       Variable y = prob.addIntVar (4,  7, "y");
-      Variable z = prob.addIntVar (-2, 10, "z");
-
+      Variable z = prob.addIntVar (-2, -1, "z");
 
       Scope sco = {z, x};
       cout << sco.var(1).getName() << endl;
@@ -56,8 +59,9 @@ int main(void)
       else
          cout << "not satisfied" << endl;
 
+      cout << "violation : " << c.violation(reg) << endl;
 
-      cout << c.contract(reg) << endl << reg << endl;
+//      cout << c.contract(reg) << endl << reg << endl;
    }
    catch (Exception ex) {
       cout << ex.what() << endl;
