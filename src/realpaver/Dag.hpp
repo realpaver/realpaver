@@ -855,6 +855,20 @@ public:
    /// It assumes that a DagContext has been initialized.
    Proof sharedHc4Revise(IntervalRegion& reg);
 
+   /// Calculates the violation of the underlying constraint
+   /// @param reg the variable domains
+   /// @return 0.0 if the constraint is satisfied, a positive real number
+   ///         otherwise equal to the width of the gap between the image of the
+   ///         function and the result of its evaluation at reg
+   double intervalViolation(const IntervalRegion& reg);
+
+   /// Calculates the violation of the underlying constraint
+   /// @param pt the values of the variables
+   /// @return 0.0 if the constraint is satisfied, a positive real number
+   ///         otherwise equal to the width of the gap between the image of the
+   ///         function and the result of its evaluation at pt
+   double realViolation(const RealPoint& pt);
+
    /// Interval differentiation in reverse mode
    ///
    /// It assumes that this function has been evaluated.

@@ -2103,6 +2103,29 @@ Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
    return Proof::Maybe;
 }
 
+double DagFun::intervalViolation(const IntervalRegion& reg)
+{
+   Interval e = intervalEval(reg);
+
+   if (e.isEmpty()) return Double::inf();
+   if (e.overlaps(image_)) return 0.0;
+   
+   Double::rndNear();
+   return e.isCertainlyLt(image_) ? image_.left() - e.right() :
+                                    e.left() - image_.right();
+}
+
+double DagFun::realViolation(const RealPoint& pt)
+{
+   double e = realEval(pt);
+
+   if (Double::isNan(e)) return Double::inf();
+   if (image_.contains(e)) return 0.0;
+
+   Double::rndNear();
+   return (e < image_.left()) ? image_.left() - e : e - image_.right();
+}
+
 void DagFun::intervalDiff()
 {
    // initializes the derivatives
