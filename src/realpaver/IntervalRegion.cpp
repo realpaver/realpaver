@@ -26,6 +26,20 @@ IntervalRegion::IntervalRegion(Scope sco, const IntervalVector& X)
    ASSERT(sco.size() == X.size(), "Bad initialization of an interval region");      
 }
 
+IntervalRegion::IntervalRegion(const RealPoint& pt)
+      : IntervalVector(pt),
+        scope_(pt.scope())
+{}
+
+
+IntervalRegion::IntervalRegion(Scope sco, const RealVector& X)
+      : IntervalVector(X),
+        scope_(sco)
+{
+   ASSERT(!sco.isEmpty(), "Empty scope used to create an interval region");      
+   ASSERT(sco.size() == X.size(), "Bad initialization of an interval region");      
+}
+
 Scope IntervalRegion::scope() const
 {
    return scope_;

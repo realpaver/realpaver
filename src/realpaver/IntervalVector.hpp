@@ -34,6 +34,10 @@ public:
    /// @param l list of elements inserted in this
    IntervalVector(const std::initializer_list<Interval>& l);
 
+   /// Creates a vector
+   /// @param pt real vector assigned to this
+   IntervalVector(const RealVector& pt);
+
    /// Default copy constructor
    IntervalVector(const IntervalVector&) = default;
 

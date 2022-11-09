@@ -61,6 +61,24 @@ int main(void)
 
       cout << "violation : " << c.violation(reg) << endl;
 
+      cout << "--------\nreg : " << reg << endl;
+      
+      RealPoint pt = reg.midpoint();
+      cout << "pt : " << pt << endl;
+
+      IntervalRegion ir(pt);
+      cout << "ir : " << ir << endl;
+
+      RealVector ptv(pt);
+      cout << "ptv : " << ptv << endl;
+
+      IntervalVector vi(ptv);
+      cout << "vi : " << vi << endl;
+
+      IntervalRegion rsr(reg.scope(), ptv);
+      cout << "rsr : " << rsr << endl;
+
+
 //      cout << c.contract(reg) << endl << reg << endl;
    }
    catch (Exception ex) {

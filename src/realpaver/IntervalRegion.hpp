@@ -34,6 +34,17 @@ public:
    /// The i-th variable in sco is assigned to X[i] for each i.
    IntervalRegion(Scope sco, const IntervalVector& X);
 
+   /// Creates an interval region
+   /// sco scope of this
+   /// X real vector having the same size than sco
+   ///
+   /// The i-th variable in sco is assigned to X[i] for each i.
+   IntervalRegion(Scope sco, const RealVector& X);
+
+   /// Creates an interval region
+   /// @param pt a real point assigned to this
+   IntervalRegion(const RealPoint& pt);
+
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
 

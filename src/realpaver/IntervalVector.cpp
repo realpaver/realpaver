@@ -23,6 +23,13 @@ IntervalVector::IntervalVector(const std::initializer_list<Interval>& l)
    for (auto x : l) push(x);
 }
 
+IntervalVector::IntervalVector(const RealVector& pt)
+      : NumericVector<Interval>(pt.size())
+{
+   for (size_t i=0; i<pt.size(); ++i)
+      set(i, pt[i]);
+}
+
 IntervalVector::~IntervalVector()
 {}
 

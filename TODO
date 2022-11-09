@@ -1,15 +1,19 @@
 -------------------------------------------------------------------------------
-- Constraint violation
+- Parsing variables with a finite set of real values
+  Transformation in table constraints
 
 -------------------------------------------------------------------------------
-- Linearization Taylor forms
+- Violation in DagFun (realViolation, intervalViolation)
+  Interfacing in RealFunction, IntervalFunction
+
+-------------------------------------------------------------------------------
+- Linearization
+  * Taylor forms
+  * Affine forms
 
 -------------------------------------------------------------------------------
 - Create a DAG from a .nl file
 
 -------------------------------------------------------------------------------
-- Comparaison des relaxations
-
--------------------------------------------------------------------------------
-- Relaxations quadratiques et résolution par Gurobi : arithmétique affine vers
-  quadratique ou formes de Taylor ordre 2 ? Ou appliquer RLT sur formes quadratiques ?
+- Quadratic relaxations to be solved by Gurobi
+  RLT or second-order Taylor forms
