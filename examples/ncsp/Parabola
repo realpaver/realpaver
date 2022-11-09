@@ -1,11 +1,14 @@
 Variables
-   x in [-5, 5] at 1.0e-6A,
-   y in [-5, 5] at 1.0e-8R
-;
-
-Integer x;
+   x in [-inf, +inf] tol 1.0e-12A,
+   y in [-5, 5] integer,
+   z binary,
+   w in [-1, pi];
 
 Constraints
    y - x^2 == 0,
    x^2 + y^2 - 2 == 0
 ;
+
+# changer la def des OBJECTIVES
+
+# def de variable reelle discrete transformee en TableConstraint

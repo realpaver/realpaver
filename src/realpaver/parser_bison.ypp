@@ -37,7 +37,6 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 {
   char u_str[256];
   realpaver::TermRep* u_term;
-  realpaver::Tolerance* u_tol;
 }
 
 %type <u_str>     ident
@@ -48,14 +47,14 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    real
 %type <u_term>    exponent
 %type <u_term>    itv
-%type <u_term>    domain
+%type <u_term>    itv_left
+%type <u_term>    itv_right
 %type <u_term>    table_list_val_def
-%type <u_tol>     var_tol
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
-%token TK_STR_INT
-%token TK_TABLE TK_TOL TK_AT
+%token TK_STR_INT TK_STR_TOL TK_STR_BIN
+%token TK_TABLE TK_TOL
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
@@ -63,6 +62,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_LCBR TK_RCBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
+%token TK_MINUS_INF TK_PLUS_INF
 
 %left TK_PLUS TK_MINUS
 %left TK_MUL TK_DIV
@@ -85,7 +85,6 @@ statement
   | ctr_statement
   | obj_statement
   | fun_statement
-  | int_statement
   ;
 
 const_statement
@@ -141,11 +140,8 @@ var_tail
   ;
 
 var_def
-  : ident domain var_tol
+  : ident
     {
-      realpaver::Term::SharedRep e($2);
-      realpaver::Interval x = e->evalConst();
-
       if (realpaver_bison_symtab->hasSymbol($1))
       {
         std::ostringstream os;
@@ -154,29 +150,66 @@ var_def
         YYABORT;         
       }
 
-      realpaver::Variable v = realpaver_bison_problem->addRealVar(x, $1);
+      realpaver::Variable v =
+         realpaver_bison_problem->addRealVar(realpaver::Interval::universe(),
+                                             $1);
 
-      realpaver::Tolerance* tol = $3;
-      v.setTolerance(*tol);
-      delete tol;
+      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
+      v.setTolerance(tol);
 
       realpaver_bison_symtab->insertVariable($1, v);
     }
+    var_dom
+    ;
+
+var_dom
+  : TK_STR_BIN
+    {
+      realpaver::Variable v = realpaver_bison_problem->lastVar();
+      v.setDomain(0, 1);
+      v.setDiscrete();
+      v.setTolerance(realpaver::Tolerance::makeAbs(0.0));
+
+      // the domain must also be assigned in the problem's initial region
+      realpaver_bison_problem->setDomain(v, 0, 1);
+    }
+  | TK_IN itv
+    {
+      realpaver::Term::SharedRep e($2);
+      realpaver::Interval x = e->evalConst();
+
+      if (x.isEmpty())
+      {
+         realpaver_bison_error("Empty domain");
+         YYABORT;
+      }
+
+      realpaver::Variable v = realpaver_bison_problem->lastVar();
+      v.setDomain(x);
+
+      // the domain must also be assigned in the problem's initial region
+      realpaver_bison_problem->setDomain(v, x);
+    }
+    var_info
   ;
 
-var_tol
+var_info
   :
+  | TK_STR_INT
     {
-      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
-      $$ = new realpaver::Tolerance(tol);
+      realpaver::Variable v = realpaver_bison_problem->lastVar();
+      v.setDiscrete();
+      v.setTolerance(realpaver::Tolerance::makeAbs(0.0));    
     }
-  | TK_AT TK_TOL
+  | TK_STR_TOL TK_TOL
     {
       try
       {
-        $$ = new realpaver::Tolerance(realpaver_bison_text);
+        realpaver::Tolerance tol(realpaver_bison_text);
+        realpaver::Variable v = realpaver_bison_problem->lastVar();
+        v.setTolerance(tol);
       }
-      catch(realpaver::Exception e)
+      catch(realpaver::Exception& e)
       {
         realpaver_bison_error("Bad tolerance");
         YYABORT;
@@ -383,38 +416,6 @@ arg_def
       }
 
       realpaver_fun_symbol->addArgument($1);
-    }
-  ;
-
-int_statement
-  : TK_STR_INT int_list
-  ;
-
-int_list
-  : int_def int_tail
-  ;
-
-int_tail
-  :
-  | TK_COMMA int_list
-  ;
-
-int_def
-  : ident
-    {
-      realpaver::VariableSymbol* vs = realpaver_bison_symtab->findVariable($1);
-
-      if (vs != nullptr)
-      {
-         vs->getVar().setDiscrete();
-      }
-      else
-      {
-        std::ostringstream os;
-        os << "Variable [" << $1 << "] not found";
-        realpaver_bison_error(os.str().c_str());
-        YYABORT;
-      }
     }
   ;
 
@@ -778,7 +779,7 @@ integer
         realpaver::Interval x(str);
         $$ = new realpaver::TermConst(x);
       }
-      catch(realpaver::Exception e)
+      catch(realpaver::Exception& e)
       {
         realpaver_bison_error("Bad integer value");
         YYABORT;
@@ -795,7 +796,7 @@ real
         realpaver::Interval x(str);
         $$ = new realpaver::TermConst(x);
       }
-      catch(realpaver::Exception e)
+      catch(realpaver::Exception& e)
       {
         realpaver_bison_error("Bad real number");
         YYABORT;
@@ -804,7 +805,7 @@ real
   ;
 
 itv
-  : TK_LSBR const_expr TK_COMMA const_expr TK_RSBR
+  : TK_LSBR itv_left TK_COMMA itv_right TK_RSBR
     {
       realpaver::Term::SharedRep lo($2);
       realpaver::Term::SharedRep up($4);
@@ -823,39 +824,27 @@ itv
     }
   ;
 
-domain
-  :
+itv_left
+  : const_expr
     {
+      $$ = $1;
+    }
+  | TK_MINUS_INF
+    {
+      // it is necessary to return a non-empty interval with -inf as left bound
       $$ = new realpaver::TermConst(realpaver::Interval::universe());
     }
-  | TK_LE const_expr
-    {
-      realpaver::Term::SharedRep e($2);
-      realpaver::Interval up = e->evalConst();
-      realpaver::Interval domain = realpaver::Interval::lessThan(up.right());
+  ;
 
-      $$ = new realpaver::TermConst(domain);
+itv_right
+  : const_expr
+    {
+      $$ = $1;
     }
-  | TK_GE const_expr
+  | TK_PLUS_INF
     {
-      realpaver::Term::SharedRep e($2);
-      realpaver::Interval lo = e->evalConst();
-      realpaver::Interval domain = realpaver::Interval::moreThan(lo.left());
-
-      $$ = new realpaver::TermConst(domain);
-    }
-  | TK_IN itv
-    {
-      realpaver::Term::SharedRep e($2);
-      realpaver::Interval domain = e->evalConst();
-
-      if (domain.isEmpty())
-      {
-         realpaver_bison_error("Empty domain");
-         YYABORT;
-      }
-
-      $$ = new realpaver::TermConst(domain);
+      // it is necessary to return a non-empty interval with +inf as right bound
+      $$ = new realpaver::TermConst(realpaver::Interval::universe());
     }
   ;
 

@@ -130,6 +130,11 @@ public:
    /// @param x new domain of this
    Variable& setDomain(const Interval& x);
 
+   /// Sets the domain of this
+   /// @param lo lower bound
+   /// @param up upper bound
+   Variable& setDomain(double lo, double up);
+
    /// @return true if this is discrete, false otherwise
    bool isDiscrete() const;
 

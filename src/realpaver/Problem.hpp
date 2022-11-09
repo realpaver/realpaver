@@ -25,12 +25,11 @@ namespace realpaver {
 /// A problem in general has a set of variables, a set of constraints and an
 /// objective function. The variables are indexed by the natural numbers
 /// 0, 1, 2, ... The variable domains define the initial region, which is
-/// an interval vector or Cartesian product of intervals.
+/// an interval vector or Cartesian product of intervals with a scope.
 ///
-/// There are three classes of problems:
+/// There are several classes of problems:
 /// - Constraint Satisfaction Problems (CSPs);
-/// - Bound (Constrained) Optimization Problems (BOPs);
-/// - Constrained Optimization Problems (COPs).
+/// - ...
 ///////////////////////////////////////////////////////////////////////////////
 class Problem {
 public:
@@ -87,6 +86,9 @@ public:
    /// @return the i-th variable of this
    Variable varAt(size_t i) const;
 
+   /// @return the last variable created in this
+   Variable lastVar() const;
+
    /// Checks if a variable is involved in this
    /// @param v a variable
    /// @return true if v a variable of this but it does not occur anywhere
@@ -134,6 +136,12 @@ public:
    /// @param v variable
    /// @param x new initial domain of v
    void setDomain(Variable v, const Interval& x);
+
+   /// Sets a domain in the initial region
+   /// @param v variable
+   /// @param lo lower bound
+   /// @param up upper bound
+   void setDomain(Variable v, double lo, double up);
 
    /// @return true if this is a CSP
    bool isCSP() const;

@@ -406,14 +406,9 @@ void Param::print(std::ostream& os) const
    {
       Tolerance tol = it->second;
       std::ostringstream ostr;
-      ostr << tol.getVal();
+      ostr << tol;
 
-      std::string name = "";
-      if (tol.isAbsolute()) name += "ABS_";
-      else name += "REL_";
-      name += it->first;
-
-      smap.insert(std::make_pair(name, ostr.str()));
+      smap.insert(std::make_pair(it->first, ostr.str()));
       size_t l = it->first.length();
       if (l > lmax) lmax = l;
    }

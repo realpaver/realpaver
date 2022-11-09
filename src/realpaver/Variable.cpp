@@ -126,6 +126,11 @@ Variable& Variable::setDomain(const Interval& x)
    return *this;
 }
 
+Variable& Variable::setDomain(double lo, double up)
+{
+   return setDomain(Interval(lo, up));
+}
+
 bool Variable::isDiscrete() const
 {
    return rep_->isDiscrete();
@@ -181,16 +186,23 @@ bool Variable::operator==(const Variable& other) const
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
-   os << "#"
-      << v.id()
-      << " "
-      << v.getName()
-      << " in "
-      << v.getDomain()
-      << " at "
-      << v.getTolerance()
-      << " "
-      << (v.isContinuous() ? "(continuous)" : "(discrete)");
+   os << " " << v.getName();
+
+   Interval x = v.getDomain();
+
+   if (v.isDiscrete())
+   {
+      if (x.isSetEq(Interval::zeroPlusOne()))
+         os << " binary";
+      else
+         os << " in "  << v.getDomain()
+            << " integer";
+   }
+   else
+   {
+      os << " in "  << x
+         << " tol " << v.getTolerance();
+   }
 
    return os;
 }

@@ -153,6 +153,11 @@ void Problem::setDomain(Variable v, const Interval& x)
    it->second = x;
 }
 
+void Problem::setDomain(Variable v, double lo, double up)
+{
+   setDomain(v, Interval(lo, up));
+}
+
 std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
    if (p.isEmpty()) return os << "Nothing in this problem";
@@ -172,48 +177,9 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
       if (!first) os << "," << std::endl;
       else first = false;
 
-      Variable v = p.varAt(i);
-      Interval I = v.getDomain();
-
-      if (v.isDiscrete()) intvar = true;
-   
-      os << indent << v.getName();
-      
-      if (!I.isUniverse())
-      {
-         if (I.isInfLeft())
-         {
-            os << " <= " << I.right();
-         }
-         else if (I.isInfRight())
-         {
-            os << " >= " << I.left();
-         }
-         else
-         {
-            os << " in " << I;
-         }
-      }
+      os << p.varAt(i);
    }
    os << std::endl << ";";
-
-   // integer variables
-   if (intvar)
-   {
-      os << std::endl << s_int << std::endl << indent;
-      first = true;
-      for (size_t i=0; i<p.nbVars(); ++i)
-      {
-         Variable v = p.varAt(i);
-         if (v.isDiscrete())
-         {
-            if (!first) os << ", ";
-            else first = false;
-            os << v.getName();
-         }
-      }
-      os << std::endl << ";";
-   }
 
    // constraints
    if (p.nbCtrs() > 0)
@@ -346,9 +312,15 @@ size_t Problem::nbVars() const
 
 Variable Problem::varAt(size_t i) const
 {
+   ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
    ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
 
    return vars_[i];
+}
+
+Variable Problem::lastVar() const
+{
+   return varAt(nbVars()-1);
 }
 
 size_t Problem::nbCtrs() const
@@ -358,6 +330,7 @@ size_t Problem::nbCtrs() const
 
 Constraint Problem::ctrAt(size_t i) const
 {
+   ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
    ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
 
    return ctrs_[i];

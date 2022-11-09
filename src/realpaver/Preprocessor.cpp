@@ -62,7 +62,8 @@ void Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
    timer_.stop();
 }
 
-void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg, Problem& dest)
+void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
+                             Problem& dest)
 {
    ASSERT(src.nbVars() == reg.size(), "Preprocessing error");
    ASSERT(!src.isEmpty(), "Preprocessing error");
@@ -78,6 +79,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg, Problem& d
    unfeasible_ = false;
 
    LOG_MAIN("Preprocessing");
+   LOG_INTER("Region: " << reg);
 
    // test empty domains
    for (size_t i=0; i<src.nbVars(); ++i)

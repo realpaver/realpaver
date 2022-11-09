@@ -30,10 +30,11 @@ TOL         {REAL}[AR]
 "Constraints"   return TK_STR_CTR;
 "Objectives"    return TK_STR_OBJ;
 "Functions"     return TK_STR_FUN;
-"Integer"       return TK_STR_INT;
 
-
-"table"  return TK_TABLE;
+"integer"       return TK_STR_INT;
+"binary"        return TK_STR_BIN;
+"tol"           return TK_STR_TOL;
+"table"         return TK_TABLE;
 
 "min"    return TK_MIN;
 "max"    return TK_MAX;
@@ -51,7 +52,8 @@ TOL         {REAL}[AR]
 "pow"		return TK_POW;
 
 "in"     return TK_IN;
-"at"     return TK_AT;
+"-inf"   return TK_MINUS_INF;
+"+inf"   return TK_PLUS_INF;
 
 "+"      return TK_PLUS;
 "-"      return TK_MINUS;
