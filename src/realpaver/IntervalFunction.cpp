@@ -42,6 +42,11 @@ size_t IntervalFunction::nbVars() const
    return dag_->fun(index_)->nbVars();   
 }
 
+Interval IntervalFunction::getImage() const
+{
+   return dag_->fun(index_)->getImage();
+}
+
 const IntervalVector& IntervalFunction::gradient() const
 {
    return grad_;
@@ -62,6 +67,25 @@ Interval IntervalFunction::pointEval(const RealPoint& pt)
 {
    val_ = dag_->fun(index_)->intervalEval(pt);
    return val_;
+}
+
+double IntervalFunction::violation(const IntervalRegion& reg)
+{
+   return dag_->fun(index_)->intervalViolation(reg);
+}
+
+double IntervalFunction::violation(const IntervalRegion& reg, double lo,
+                                   double up)
+{
+   Interval img(lo, up);
+   ASSERT(!img.isEmpty(), "Empty image for an interval function");
+
+   DagFun* f = dag_->fun(index_);
+   Interval tmp = f->getImage();
+   f->setImage(img);
+   double v = dag_->fun(index_)->intervalViolation(reg);
+   f->setImage(tmp);
+   return v;
 }
 
 void IntervalFunction::diff(const IntervalRegion& reg)

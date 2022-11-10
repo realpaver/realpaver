@@ -14,16 +14,21 @@ int main(void)
 
    try {
       Problem prob;
-      //~ Variable x = prob.addRealVar(0,  3, "x");
-      //~ Variable y = prob.addIntVar (4,  7, "y");
-      //~ Variable z = prob.addIntVar (-2, 10, "z");
+      Variable x = prob.addRealVar(0, 10, "x");
+      Variable y = prob.addRealVar(0, 10, "y");
 
-      Variable x = prob.addRealVar(0,  3, "x");
-      Variable y = prob.addIntVar (4,  7, "y");
-      Variable z = prob.addIntVar (-2, -1, "z");
+      Term t = sqr(x) - 4*x*y + sqr(y);
+;
+      cout << "t : " << t << endl;
 
-      Scope sco = {z, x};
-      cout << sco.var(1).getName() << endl;
+      IntervalRegion reg = prob.getDomains();
+      cout << "reg : " << reg << endl;
+
+      cout << "t(reg) : " << t.eval(reg) << endl;
+
+      Constraint c( t >= 0.0);
+      cout << c.contract(reg) << " " << reg << endl;
+
 
 /*
       IntervalRegion reg = prob.getDomains();
@@ -44,42 +49,6 @@ int main(void)
       cout << R << endl;
 */
 
-      Constraint c = table( {x, y, z},
-                            {1, 2, 3,
-                             1, 5, 0,
-                             2, 8, 3,
-                             3, 6, 11} );
-      cout << c << c.scope() << endl;
-
-      IntervalRegion reg = prob.getDomains();
-      cout << "reg : " << reg << endl;
-      
-      if (c.isSatisfied(reg) != Proof::Empty)
-         cout << "satisfied" << endl;
-      else
-         cout << "not satisfied" << endl;
-
-      cout << "violation : " << c.violation(reg) << endl;
-
-      cout << "--------\nreg : " << reg << endl;
-      
-      RealPoint pt = reg.midpoint();
-      cout << "pt : " << pt << endl;
-
-      IntervalRegion ir(pt);
-      cout << "ir : " << ir << endl;
-
-      RealVector ptv(pt);
-      cout << "ptv : " << ptv << endl;
-
-      IntervalVector vi(ptv);
-      cout << "vi : " << vi << endl;
-
-      IntervalRegion rsr(reg.scope(), ptv);
-      cout << "rsr : " << rsr << endl;
-
-
-//      cout << c.contract(reg) << endl << reg << endl;
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

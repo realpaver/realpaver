@@ -3,10 +3,6 @@
   Transformation in table constraints
 
 -------------------------------------------------------------------------------
-- Violation in DagFun (realViolation, intervalViolation)
-  Interfacing in RealFunction, IntervalFunction
-
--------------------------------------------------------------------------------
 - Linearization
   * Taylor forms
   * Affine forms
