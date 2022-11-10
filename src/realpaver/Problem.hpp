@@ -46,10 +46,10 @@ public:
    /// Default destructor
    ~Problem() = default;
 
-   /// Creates a new boolean variable
+   /// Creates a new variable with domain {0, 1}
    /// @param name name of the variable
    /// @return the new variable
-   Variable addBoolVar(const std::string& name = "");
+   Variable addBinaryVar(const std::string& name = "");
 
    /// Creates a new integer variable
    /// @param lo lower bound

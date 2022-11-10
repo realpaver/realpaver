@@ -139,10 +139,10 @@ public:
    bool isDiscrete() const;
 
    /// @return true if this is a discrete variable in [0, 1]
-   bool isDiscreteBool() const;
+   bool isBinary() const;
 
    /// @return true if this is a discrete variable not in [0, 1]
-   bool isDiscreteInt() const;
+   bool isInteger() const;
 
    /// Sets this as a discrete variable
    /// @return a reference to this

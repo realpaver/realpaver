@@ -26,7 +26,7 @@ Problem::Problem(const std::string& name)
         dom_()
 {}
 
-Variable Problem::addBoolVar(const std::string& name)
+Variable Problem::addBinaryVar(const std::string& name)
 {
    size_t id = vars_.size();
 
@@ -39,13 +39,13 @@ Variable Problem::addBoolVar(const std::string& name)
 
    Variable v(os.str());
    v.setId(id)
-    .setDomain(Interval(0,1))
+    .setDomain(Interval::zeroPlusOne())
     .setDiscrete()
     .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
-   dom_.insert(std::make_pair(v, Interval(0,1)));
+   dom_.insert(std::make_pair(v, Interval::zeroPlusOne()));
 
    return v;
 }

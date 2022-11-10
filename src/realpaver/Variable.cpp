@@ -136,12 +136,12 @@ bool Variable::isDiscrete() const
    return rep_->isDiscrete();
 }
 
-bool Variable::isDiscreteBool() const
+bool Variable::isBinary() const
 {
    return isDiscrete() && getDomain().isSetEq(Interval::zeroPlusOne());
 }
 
-bool Variable::isDiscreteInt() const
+bool Variable::isInteger() const
 {
    return isDiscrete() && getDomain().isSetNeq(Interval::zeroPlusOne());
 }
