@@ -101,6 +101,10 @@ public:
    /// @param c constraint inserted
    void addCtr(Constraint c);
 
+   /// Inserts a list of constraints
+   /// @param l constraints inserted
+   void addCtr(const std::initializer_list<Constraint>& l);
+
    /// Adds an objective function
    /// @param obj objective function
    void addObjective(Objective obj);

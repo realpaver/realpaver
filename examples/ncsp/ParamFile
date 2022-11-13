@@ -32,7 +32,7 @@ DTOL = 1.0e-6R
 OBJ_TOL = 1.0e-6R
 
 # Number of digits used to print floating-point numbers and intervals
-FLOAT_PRECISION = 12
+FLOAT_PRECISION = 8
 
 # Log level
 # NONE:  no log

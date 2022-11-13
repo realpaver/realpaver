@@ -173,9 +173,13 @@ var_dom
       // the domain must also be assigned in the problem's initial region
       realpaver_bison_problem->setDomain(v, 0, 1);
     }
-  | TK_IN itv
+  | TK_IN var_dom_def
+  ;
+ 
+var_dom_def
+  : itv
     {
-      realpaver::Term::SharedRep e($2);
+		realpaver::Term::SharedRep e($1);
       realpaver::Interval x = e->evalConst();
 
       if (x.isEmpty())
@@ -189,8 +193,49 @@ var_dom
 
       // the domain must also be assigned in the problem's initial region
       realpaver_bison_problem->setDomain(v, x);
-    }
-    var_info
+	 }
+	 var_info
+  | TK_LCBR
+    {
+      if (realpaver_var_vector != nullptr)
+         realpaver_var_vector->clear();
+      else
+        realpaver_var_vector = new std::vector<realpaver::Variable>();
+
+      if (realpaver_itv_vector != nullptr)
+         realpaver_itv_vector->clear();
+      else
+        realpaver_itv_vector = new std::vector<realpaver::Interval>();
+	 }
+    table_list_val TK_RCBR
+    {
+      realpaver::Variable v = realpaver_bison_problem->lastVar();
+		realpaver_var_vector->push_back(v);
+
+
+		if (realpaver_itv_vector->size() == 0)
+      {
+         realpaver_bison_error("Bad initialization of a real variable");
+         YYABORT;
+      }
+
+      realpaver::Constraint c( table(realpaver_var_vector->data(),
+                                     realpaver_var_vector->size(),
+                                     realpaver_itv_vector->data(),
+                                     realpaver_itv_vector->size()) );
+
+      realpaver_bison_problem->addCtr(c);
+ 
+		// assigns the variable domain
+		realpaver::Interval x = realpaver_itv_vector->at(0);
+		for (size_t i=1; i<realpaver_itv_vector->size(); ++i)
+			x |= realpaver_itv_vector->at(i);
+
+      v.setDomain(x);
+
+      // the domain must also be assigned in the problem's initial region
+      realpaver_bison_problem->setDomain(v, x);
+	 }
   ;
 
 var_info
@@ -285,6 +330,20 @@ ctr_def
       realpaver::Constraint c(lhs >= rhs);
       realpaver_bison_problem->addCtr(c);
     }
+  | expr TK_IN itv
+    {
+      realpaver::Term lhs(realpaver::Term::SharedRep($1));
+      realpaver::Term::SharedRep rhs($3);
+      realpaver::Interval x = rhs->evalConst();
+
+      if (x.isEmpty())
+      {
+         realpaver_bison_error("Empty function image");
+         YYABORT;
+      }
+      realpaver::Constraint c(in(lhs, x));
+      realpaver_bison_problem->addCtr(c);
+    }
   | TK_TABLE
     {
       if (realpaver_var_vector != nullptr)
@@ -300,7 +359,6 @@ ctr_def
     TK_LPAR TK_LCBR table_list_var TK_RCBR TK_COMMA    
                      TK_LCBR table_list_val TK_RCBR TK_RPAR
     {
-
       if (realpaver_var_vector->size() == 0 ||
           realpaver_itv_vector->size() % realpaver_var_vector->size() != 0)
       {
@@ -478,11 +536,7 @@ table_list_val_def
     {
        $$ = $1;
     }
-  | real
-    {
-       $$ = $1;
-    }  
-  | integer
+  | const_expr
     {
        $$ = $1;
     }

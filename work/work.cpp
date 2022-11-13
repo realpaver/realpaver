@@ -1,11 +1,19 @@
 #include <iostream>
 #include "realpaver/Dag.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/NcspSolver.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
 
 using namespace std;
 using namespace realpaver;
+
+
+
+Term dist(Term x1, Term y1, Term x2, Term y2)
+{
+   return sqrt(sqr(x1-x2) + sqr(y1-y2));
+}
 
 int main(void)
 {
@@ -13,22 +21,28 @@ int main(void)
    Interval::precision( 4 );
 
    try {
+
+      double x1 = 2,   y1 = 1.5, d1 = 2.55,
+             x2 = 6,   y2 = 5.5, d2 = 3.81,
+             x3 = 8.5, y3 = 1,   d3 = 4.12,
+             E = 1.0e-2;
+
+
       Problem prob;
-      Variable x = prob.addRealVar(0, 10, "x");
-      Variable y = prob.addRealVar(0, 10, "y");
+      Variable xM = prob.addRealVar(-1.0e8, 1.0e8, "xM");
+      Variable yM = prob.addRealVar(-1.0e8, 1.0e8, "yM");
 
-      Term t = sqr(x) - 4*x*y + sqr(y);
-;
-      cout << "t : " << t << endl;
+      prob.addCtr({ in(dist(xM, yM, x1, y1), Interval(d1-E, d1+E)),
+                    in(dist(xM, yM, x2, y2), Interval(d2-E, d2+E)),
+                    in(dist(xM, yM, x3, y3), Interval(d3-E, d3+E)) });
 
-      IntervalRegion reg = prob.getDomains();
-      cout << "reg : " << reg << endl;
+      NcspSolver solver(prob);
 
-      cout << "t(reg) : " << t.eval(reg) << endl;
+      Param prm;
+      prm.loadParam("ParamFile");
+      solver.getEnv()->setParam(prm);
 
-      Constraint c( t >= 0.0);
-      cout << c.contract(reg) << " " << reg << endl;
-
+      solver.solve();
 
 /*
       IntervalRegion reg = prob.getDomains();

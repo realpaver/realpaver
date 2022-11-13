@@ -118,6 +118,11 @@ void Problem::addCtr(Constraint c)
    ctrs_.push_back(c);
 }
 
+void Problem::addCtr(const std::initializer_list<Constraint>& l)
+{
+   for (const auto& c : l) addCtr(c);
+}
+
 void Problem::addObjective(Objective obj)
 {
    obj_ = obj;
