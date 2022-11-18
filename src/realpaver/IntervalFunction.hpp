@@ -48,10 +48,7 @@ public:
    Interval getImage() const;
 
    /// @return the value obtained from the last evaluation
-   Interval value() const;
-
-   /// @return the gradient after a differentiation
-   const IntervalVector& gradient() const;
+   Interval getValue() const;
 
    /// Evaluates this
    /// @param reg domains of variables
@@ -65,12 +62,13 @@ public:
 
    /// Evaluates and differentiates this
    /// @param reg domains of variables
+   /// @param grad output vector such that grad[i] if the derivative of this
+   /// at pt with respect to the i-th variable of its scope
    ///
-   /// value() returns the value of this
-   /// gradient() returns the gradient of this
-   void diff(const IntervalRegion& reg);
+   /// getValue() returns the value of this if needed
+   void diff(const IntervalRegion& reg, IntervalVector& grad);
 
-   /// Calculates the violation of the underlying constraint
+   /// Evaluates this and calculates the violation of the underlying constraint
    /// @param reg domains of variables
    /// @return 0.0 if the constraint is satisfied, a positive real number
    ///         otherwise equal to the width of the gap between the image of the
@@ -78,9 +76,11 @@ public:
    ///
    /// Given [lo, up] the image of this in the DagFun object, the underlying
    /// constraint is defined by lo <= f(x) <= up.
+   ///
+   /// getValue() returns the value of this if needed
    double violation(const IntervalRegion& reg);
 
-   /// Calculates the violation of the underlying constraint
+   /// Evaluates this and calculates the violation of the underlying constraint
    /// @param reg domains of variables
    /// @param lo left bound for this
    /// @param up right bound for this
@@ -89,13 +89,14 @@ public:
    ///         function and the result of its evaluation at reg
    ///
    /// The underlying constraint is defined by lo <= f(x) <= up.
+   ///
+   /// getValue() returns the value of this if needed
    double violation(const IntervalRegion& reg, double lo, double up);
 
 private:
    SharedDag dag_;         // DAG
    size_t index_;          // index of function
    Interval val_;          // value
-   IntervalVector grad_;   // gradient
 };
 
 } // namespace

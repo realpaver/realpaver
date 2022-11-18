@@ -15,13 +15,10 @@ namespace realpaver {
 IntervalFunction::IntervalFunction(SharedDag dag, size_t i)
       : dag_(dag),
         index_(i),
-        val_(),
-        grad_()
+        val_()
 {
    ASSERT(dag_ != nullptr, "Null pointer used to create an interval function");
    ASSERT(i < dag_->nbFuns(), "Bad index used to create an interval function");
-
-   grad_ = IntervalVector(dag_->fun(i)->nbVars());
 }
 
 IntervalFunction::~IntervalFunction()
@@ -47,12 +44,7 @@ Interval IntervalFunction::getImage() const
    return dag_->fun(index_)->getImage();
 }
 
-const IntervalVector& IntervalFunction::gradient() const
-{
-   return grad_;
-}
-
-Interval IntervalFunction::value() const
+Interval IntervalFunction::getValue() const
 {
    return val_;
 }
@@ -71,7 +63,9 @@ Interval IntervalFunction::pointEval(const RealPoint& pt)
 
 double IntervalFunction::violation(const IntervalRegion& reg)
 {
-   return dag_->fun(index_)->intervalViolation(reg);
+   DagFun* f = dag_->fun(index_);
+   val_ = f->intervalEval(reg);
+   return f->intervalViolation();
 }
 
 double IntervalFunction::violation(const IntervalRegion& reg, double lo,
@@ -83,16 +77,21 @@ double IntervalFunction::violation(const IntervalRegion& reg, double lo,
    DagFun* f = dag_->fun(index_);
    Interval tmp = f->getImage();
    f->setImage(img);
-   double v = dag_->fun(index_)->intervalViolation(reg);
+
+   val_ = f->intervalEval(reg);
+   double v = f->intervalViolation();
+
    f->setImage(tmp);
    return v;
 }
 
-void IntervalFunction::diff(const IntervalRegion& reg)
+void IntervalFunction::diff(const IntervalRegion& reg, IntervalVector& grad)
 {
+   ASSERT(nbVars() == grad.size(), "Bad size of gradient");
+
    DagFun* f = dag_->fun(index_);
    val_ = f->intervalEval(reg);
-   f->intervalDiff(grad_);
+   f->intervalDiff(grad);
 }
 
 } // namespace

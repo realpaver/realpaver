@@ -15,13 +15,10 @@ namespace realpaver {
 RealFunction::RealFunction(SharedDag dag, size_t i)
       : dag_(dag),
         index_(i),
-        val_(),
-        grad_()
+        val_()
 {
    ASSERT(dag_ != nullptr, "Null pointer used to create a real function");
    ASSERT(i < dag_->nbFuns(), "Bad index used to create a real function");
-
-   grad_ = RealVector(dag_->fun(i)->nbVars());
 }
 
 RealFunction::~RealFunction()
@@ -47,12 +44,7 @@ Interval RealFunction::getImage() const
    return dag_->fun(index_)->getImage();   
 }
 
-const RealVector& RealFunction::gradient() const
-{
-   return grad_;
-}
-
-double RealFunction::value() const
+double RealFunction::getValue() const
 {
    return val_;
 }
@@ -65,7 +57,9 @@ double RealFunction::eval(const RealPoint& pt)
 
 double RealFunction::violation(const RealPoint& pt)
 {
-   return dag_->fun(index_)->realViolation(pt);
+   DagFun* f = dag_->fun(index_);
+   val_ = f->realEval(pt);
+   return f->realViolation();
 }
 
 double RealFunction::violation(const RealPoint& pt, double lo, double up)
@@ -76,16 +70,21 @@ double RealFunction::violation(const RealPoint& pt, double lo, double up)
    DagFun* f = dag_->fun(index_);
    Interval tmp = f->getImage();
    f->setImage(img);
-   double v = dag_->fun(index_)->realViolation(pt);
+
+   val_ = f->realEval(pt);
+   double v = f->realViolation();
+
    f->setImage(tmp);
    return v;
 }
 
-void RealFunction::diff(const RealPoint& pt)
+void RealFunction::diff(const RealPoint& pt, RealVector& grad)
 {
+   ASSERT(nbVars() == grad.size(), "Bad size of gradient");
+
    DagFun* f = dag_->fun(index_);
    val_ = f->realEval(pt);
-   f->realDiff(grad_);
+   f->realDiff(grad);
 }
 
 } // namespace

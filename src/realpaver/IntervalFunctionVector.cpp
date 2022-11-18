@@ -13,8 +13,7 @@ namespace realpaver {
 
 IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
       : dag_(dag),
-        val_(dag->nbFuns()),
-        jac_(dag->nbFuns(), dag->nbVars())
+        val_(dag->nbFuns())
 {}
 
 IntervalFunctionVector::~IntervalFunctionVector()
@@ -47,14 +46,9 @@ IntervalFunction IntervalFunctionVector::fun(size_t i) const
    return IntervalFunction(dag_, i);
 }
 
-const IntervalVector& IntervalFunctionVector::values() const
+const IntervalVector& IntervalFunctionVector::getValues() const
 {
    return val_;
-}
-
-const IntervalMatrix& IntervalFunctionVector::jacobian() const
-{
-   return jac_;
 }
 
 void IntervalFunctionVector::eval(const IntervalRegion& reg)
@@ -67,10 +61,17 @@ void IntervalFunctionVector::pointEval(const RealPoint& pt)
    dag_->intervalPointEval(pt, val_);
 }
 
-void IntervalFunctionVector::diff(const IntervalRegion& reg)
+void IntervalFunctionVector::diff(const IntervalRegion& reg, IntervalMatrix& J)
 {
    dag_->intervalEval(reg, val_);
-   dag_->intervalDiff(jac_);
+   dag_->intervalDiff(J);
+}
+
+void IntervalFunctionVector::violation(const IntervalRegion& reg,
+                                       IntervalVector& viol)
+{
+   dag_->intervalEval(reg, val_);
+   dag_->intervalViolation(viol);
 }
 
 } // namespace

@@ -48,36 +48,44 @@ public:
    /// @return the i-th function of thos
    IntervalFunction fun(size_t i) const;
 
-   /// @return the vector of values after an evaluation or a differentiation
-   ///         of this
-   const IntervalVector& values() const;
-
-   /// @return the interval jacobian matrix after a differentiation of this
-   const IntervalMatrix& jacobian() const;
+   /// @return the vector of values after an evaluation of this
+   const IntervalVector& getValues() const;
 
    /// Evaluates this
    /// @param reg domains of variables
    ///
-   /// values() returns the vector of values
+   /// getValues() returns the vector of values
    void eval(const IntervalRegion& reg);
 
    /// Evaluates this
    /// @param pt values of variables
    ///
-   /// values() returns the vector of values
+   /// getValues() returns the vector of values
    void pointEval(const RealPoint& pt);
 
-   /// Differentiates this
+   /// Differentiates this (calculates an interval Jacobian matrix)
    /// @param reg domains of variables
+   /// @param J Jacobian matrix of this at reg such that we have the partial
+   ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
-   /// values() returns the vector of values
-   /// jacobian() returns the jacobian matrix
-   void diff(const IntervalRegion& reg);
+   /// J mush have nbFuns() rows and nbVars() columns.
+   ///
+   /// This is first evaluated, hence f you need both values and derivatives,
+   /// calling first eval() is useless and getValues() returns the vector of
+   /// values if needed.
+   void diff(const IntervalRegion& reg, IntervalMatrix& J);
+
+   /// Evaluates this and calculates the violation of the constraints
+   /// @param reg domains of variables
+   /// @param viol output vector such that viol[i] is the violation of the
+   ///        i-th function / constraint at reg
+   ///
+   /// getValues() returns the vector of values if needed
+   void violation(const IntervalRegion& reg, IntervalVector& viol);
 
 private:
    SharedDag dag_;
    IntervalVector val_;
-   IntervalMatrix jac_;
 };
 
 } // namespace

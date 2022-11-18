@@ -856,18 +856,20 @@ public:
    Proof sharedHc4Revise(IntervalRegion& reg);
 
    /// Calculates the violation of the underlying constraint
-   /// @param reg the variable domains
    /// @return 0.0 if the constraint is satisfied, a positive real number
    ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation at reg
-   double intervalViolation(const IntervalRegion& reg);
+   ///         function and the result of its evaluation
+   ///
+   /// It assumes that this function has been evaluated using intervalEval(.).
+   double intervalViolation();
 
    /// Calculates the violation of the underlying constraint
-   /// @param pt the values of the variables
    /// @return 0.0 if the constraint is satisfied, a positive real number
    ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation at pt
-   double realViolation(const RealPoint& pt);
+   ///         function and the result of its evaluation
+   ///
+   /// It assumes that this function has been evaluated using realEval(.).
+   double realViolation();
 
    /// Interval differentiation in reverse mode
    ///
@@ -1134,6 +1136,14 @@ public:
    /// @param jac resulting matrix of partial derivatives of this
    void intervalDiff(IntervalMatrix& jac);
 
+   /// Calculates the violation of the constraints
+   /// @param viol output vector such that viol[i] is the violation of the i-th
+   ///        constraint
+   ///
+   /// It asumes that this dag has been evaluated using intervalEval or
+   /// intervalPointEval.
+   void intervalViolation(IntervalVector& viol);
+
    /// Real (point) evaluation
    /// @param pt values of variables
    /// @return false if a NaN occurs in the computation, true othewise
@@ -1148,6 +1158,13 @@ public:
    /// Point differentiation in reverse mode to be called after an evaluation
    /// @param jac resulting matrix of partial derivatives of this
    void realDiff(RealMatrix& jac);
+
+   /// Calculates the violation of the constraints
+   /// @param viol output vector such that viol[i] is the violation of the i-th
+   ///        constraint
+   ///
+   /// It asumes that this dag has been evaluated using realEval.
+   void realViolation(RealVector& viol);
 
    /// Linearizes the DAG
    /// @param lm output LP model

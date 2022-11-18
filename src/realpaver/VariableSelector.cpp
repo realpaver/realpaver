@@ -88,9 +88,9 @@ std::pair<bool, Variable>
 MaxSmearSelector::selectVar(const IntervalRegion& reg)
 {
    Scope fscope = f_->scope();
+   IntervalVector grad(f_->nbVars());
 
-   f_->diff(reg);
-   const IntervalVector& grad(f_->gradient());
+   f_->diff(reg, grad);
 
    bool found = false;
    double smax, s, w;

@@ -1,6 +1,5 @@
 -------------------------------------------------------------------------------
-- Parsing variables with a finite set of real values
-  Transformation in table constraints
+- Violation in RealFunctionVector and IntervalFunctionVector
 
 -------------------------------------------------------------------------------
 - Linearization

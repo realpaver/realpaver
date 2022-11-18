@@ -2103,9 +2103,9 @@ Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
    return Proof::Maybe;
 }
 
-double DagFun::intervalViolation(const IntervalRegion& reg)
+double DagFun::intervalViolation()
 {
-   Interval e = intervalEval(reg);
+   Interval e = rootNode()->val();
 
    if (e.isEmpty()) return Double::inf();
    if (e.overlaps(image_)) return 0.0;
@@ -2115,9 +2115,9 @@ double DagFun::intervalViolation(const IntervalRegion& reg)
                                     e.left() - image_.right();
 }
 
-double DagFun::realViolation(const RealPoint& pt)
+double DagFun::realViolation()
 {
-   double e = realEval(pt);
+   double e = rootNode()->rval();
 
    if (Double::isNan(e)) return Double::inf();
    if (image_.contains(e)) return 0.0;
@@ -2541,6 +2541,14 @@ bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& val)
    return res;
 }
 
+void Dag::intervalViolation(IntervalVector& viol)
+{
+   ASSERT(nbFuns() == viol.size(), "Bad vector size used in a DAG");
+
+   for (size_t i=0; i<nbFuns(); ++i)
+      viol.set(i, fun_[i]->intervalViolation());
+}
+
 void Dag::intervalDiff(IntervalMatrix& jac)
 {
    ASSERT(nbVars() == jac.ncols() && nbFuns() == jac.nrows(),
@@ -2582,8 +2590,7 @@ bool Dag::realEval(const RealPoint& pt)
 
 bool Dag::realEval(const RealPoint& pt, RealVector& v)
 {
-   ASSERT(v.size() == nbFuns(),
-          "Bad dimensionEvaluation of dag, bad vector size");
+   ASSERT(v.size() == nbFuns(), "Bad vector size");
 
    Double::rndNear();
    bool res = true;
@@ -2601,6 +2608,14 @@ bool Dag::realEval(const RealPoint& pt, RealVector& v)
    }
 
    return res;
+}
+
+void Dag::realViolation(RealVector& viol)
+{
+   ASSERT(viol.size() == nbFuns(), "Bad vector size");
+
+   for (size_t i=0; i<nbFuns(); ++i)
+      viol.set(i, fun_[i]->realViolation());
 }
 
 void Dag::realDiff(RealMatrix& jac)

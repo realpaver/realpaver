@@ -13,8 +13,7 @@ namespace realpaver {
 
 RealFunctionVector::RealFunctionVector(SharedDag dag)
       : dag_(dag),
-        val_(dag->nbFuns()),
-        jac_(dag->nbFuns(), dag->nbVars())
+        val_(dag->nbFuns())
 {}
 
 RealFunctionVector::~RealFunctionVector()
@@ -47,14 +46,9 @@ RealFunction RealFunctionVector::fun(size_t i) const
    return RealFunction(dag_, i);
 }
 
-const RealVector& RealFunctionVector::values() const
+const RealVector& RealFunctionVector::getValues() const
 {
    return val_;
-}
-
-const RealMatrix& RealFunctionVector::jacobian() const
-{
-   return jac_;
 }
 
 void RealFunctionVector::eval(const RealPoint& pt)
@@ -62,10 +56,16 @@ void RealFunctionVector::eval(const RealPoint& pt)
    dag_->realEval(pt, val_);
 }
 
-void RealFunctionVector::diff(const RealPoint& pt)
+void RealFunctionVector::diff(const RealPoint& pt, RealMatrix& J)
 {
    dag_->realEval(pt, val_);
-   dag_->realDiff(jac_);
+   dag_->realDiff(J);
+}
+
+void RealFunctionVector::violation(const RealPoint& pt, RealVector& viol)
+{
+   dag_->realEval(pt, val_);
+   dag_->realViolation(viol);
 }
 
 } // namespace
