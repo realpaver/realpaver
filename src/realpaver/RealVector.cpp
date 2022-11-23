@@ -104,7 +104,7 @@ RealVector& RealVector::operator+=(const RealVector& V)
 RealVector& RealVector::operator-=(const RealVector& V)
 {
    RealVector::BaseType::sub(*this, V, *this);
-   return *this;   
+   return *this;
 }
 
 RealVector& RealVector::operator*=(double a)
@@ -146,6 +146,12 @@ RealVector operator*(double a, const RealVector& V)
    RealVector::BaseType::mulScalar(a, V, res);
    return res;
 }
+
+RealVector operator*(const RealVector& V,double a)
+{
+   return a*V;
+}
+
 
 RealVector operator/(const RealVector& V, double a)
 {
