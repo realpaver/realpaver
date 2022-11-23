@@ -6,6 +6,7 @@
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/LPSolver.hpp"
+#include "realpaver/RltRelaxer.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -16,15 +17,23 @@ int main(void)
    Interval::precision( 6 );
 
    try {
+      Problem prob;
+      Variable x = prob.addRealVar(1, 2, "x");
+      Variable y = prob.addRealVar(-1, 3, "y");
+      Variable z = prob.addRealVar(0, 4, "z");
 
-      Variable x("x");
-      Variable y("y");
-      x.setId(0); y.setId(1);
+      IntervalRegion reg = prob.getDomains();
 
-      Constraint c1(x+y*2<=0);
-      cout<<c1.scope()<<endl;
-      for (auto v:c1.scope()) cout<<v.getName()<<" ";
-      cout << endl;
+      SharedDag dag = std::make_shared<Dag>();
+      size_t i1 = dag->insert( x + y - z == 0);
+
+      cout << (*dag) << endl;
+
+      LPSolver solver;
+      RltRelaxer relaxer(dag);
+      relaxer.make(solver, reg);
+
+      cout << solver << endl;
 
 /*
    LPSolver solver;

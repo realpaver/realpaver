@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <sstream>
 #include "realpaver/Double.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/Param.hpp"
@@ -90,7 +91,15 @@ double LinVarRep::getUB() const
 
 std::string LinVarRep::getName() const
 {
-   return name_;
+   if (name_ != "")
+      return name_;
+
+   else
+   {
+      std::ostringstream os;
+      os << "_v" << index_;
+      return os.str();
+   }
 }
 
 double LinVarRep::getObjVal() const

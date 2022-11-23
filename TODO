@@ -1,14 +1,8 @@
 -------------------------------------------------------------------------------
-- Violation in RealFunctionVector and IntervalFunctionVector
-
--------------------------------------------------------------------------------
-- Linearization
+- Linearizations implemented as DAG visitors
   * Taylor forms
   * Affine forms
+  * RLT
 
 -------------------------------------------------------------------------------
 - Create a DAG from a .nl file
-
--------------------------------------------------------------------------------
-- Quadratic relaxations to be solved by Gurobi
-  RLT or second-order Taylor forms
