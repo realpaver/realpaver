@@ -17,10 +17,28 @@
 
 namespace realpaver {
 
+///////////////////////////////////////////////////////////////////////////////
+/// This generates a RLT relaxation of DAG.
+///////////////////////////////////////////////////////////////////////////////
 class RltRelaxer {
 public:
+   /// Creates a relaxer
+   /// @param dag DAG to be relaxed
    RltRelaxer(SharedDag dag);
 
+   /// No copy
+   RltRelaxer(const RltRelaxer&) = delete;
+
+   /// No assignment
+   RltRelaxer& operator=(const RltRelaxer&) = delete;
+
+   /// Default constructor
+   ~RltRelaxer() = default;
+
+   /// Makes the relaxation of the DAG enclosed in this in a given region
+   /// @param lpm model in which the relaxation is stored
+   /// @param reg the input region
+   /// @return true in case of success, false otherwise
    bool make(LPModel& lpm, const IntervalRegion& reg);
 
 private:
@@ -29,9 +47,14 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-
+/// This visits any dag node and generates linear under-estimation and
+/// over-estimation constraints.
+///////////////////////////////////////////////////////////////////////////////
 class RltVisitor : public DagVisitor {
 public:
+   /// Creates a visitor
+   /// @param lpm linear program
+   /// @param mpi map node index -> index of linear variable in lpm
    RltVisitor(LPModel* lpm, std::unordered_map<size_t, size_t>* mpi);
 
    ///@{
@@ -56,7 +79,8 @@ public:
    void apply(const DagTan* node) override;
    ///@}
 
-
+   /// @param node a node
+   /// @return the index of the linear variable associated with this node
    size_t indexLinVar(const DagNode* node) const;
 
 private:
