@@ -147,11 +147,10 @@ RealVector operator*(double a, const RealVector& V)
    return res;
 }
 
-RealVector operator*(const RealVector& V,double a)
+RealVector operator*(const RealVector& V, double a)
 {
    return a*V;
 }
-
 
 RealVector operator/(const RealVector& V, double a)
 {
@@ -164,6 +163,5 @@ RealVector* RealVector::clone() const
 {
    return new RealVector(*this);
 }
-
 
 } // namespace
