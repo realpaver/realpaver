@@ -7,14 +7,59 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_REFORMULATION_HPP
-#define REALPAVER_REFORMULATION_HPP
+#ifndef REALPAVER_RLT_RELAXATION_HPP
+#define REALPAVER_RLT_RELAXATION_HPP
 
 #include <functional>
-#include "realpaver/Interval.hpp"
+#include <unordered_map>
+#include "realpaver/Dag.hpp"
 #include "realpaver/LPModel.hpp"
 
 namespace realpaver {
+
+///////////////////////////////////////////////////////////////////////////////
+/// This visits any dag node and generates linear under-estimation and
+/// over-estimation constraints.
+///////////////////////////////////////////////////////////////////////////////
+class RltVisitor : public DagVisitor {
+public:
+   /// Creates a visitor
+   /// @param lpm linear program
+   /// @param mpi map node index -> index of linear variable in lpm
+   RltVisitor(LPModel* lpm, std::unordered_map<size_t, size_t>* mpi);
+
+   ///@{
+   void apply(const DagConst* node) override;
+   void apply(const DagVar* node) override;
+   void apply(const DagAdd* node) override;
+   void apply(const DagSub* node) override;
+   void apply(const DagMul* node) override;
+   void apply(const DagDiv* node) override;
+   void apply(const DagMin* node) override;
+   void apply(const DagMax* node) override;
+   void apply(const DagUsb* node) override;
+   void apply(const DagAbs* node) override;
+   void apply(const DagSgn* node) override;
+   void apply(const DagSqr* node) override;
+   void apply(const DagSqrt* node) override;
+   void apply(const DagPow* node) override;
+   void apply(const DagExp* node) override;
+   void apply(const DagLog* node) override;
+   void apply(const DagCos* node) override;
+   void apply(const DagSin* node) override;
+   void apply(const DagTan* node) override;
+   ///@}
+
+private:
+   LPModel* lpm_;
+   std::unordered_map<size_t, size_t>* mpi_;
+
+   /// @param node a node
+   /// @return the index of the linear variable associated with this node
+   size_t indexLinVar(const DagNode* node) const;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 
 /// Generates a linear under-estimator constraint of a convex function y = f(x)
 /// @param lm linear program in which the new consraint is inserted

@@ -89,6 +89,11 @@ double LinVarRep::getUB() const
    return ub_;
 }
 
+Interval LinVarRep::getDomain() const
+{
+   return Interval(lb_, ub_);
+}
+
 std::string LinVarRep::getName() const
 {
    if (name_ != "")
@@ -177,6 +182,11 @@ double LinVar::getLB() const
 double LinVar::getUB() const
 {
    return rep_->getUB();
+}
+
+Interval LinVar::getDomain() const
+{
+   return rep_->getDomain();
 }
 
 std::string LinVar::getName() const

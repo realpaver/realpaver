@@ -85,8 +85,7 @@ librealpaver_la_include_HEADERS = \
 		RealMatrix.hpp \
 		RealPoint.hpp \
 		RealVector.hpp \
-		Reformulation.hpp \
-		RltRelaxer.hpp \
+		RLTRelaxation.hpp \
 		Scope.hpp \
 		ScopeMap.hpp \
 		SearchNode.hpp \
@@ -178,8 +177,7 @@ librealpaver_la_SOURCES = \
 		RealMatrix.cpp \
 		RealPoint.cpp \
 		RealVector.cpp \
-		Reformulation.cpp \
-		RltRelaxer.cpp \
+		RLTRelaxation.cpp \
 		Scope.cpp \
 		ScopeMap.cpp \
 		SearchNode.cpp \

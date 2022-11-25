@@ -6,7 +6,7 @@
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/LPSolver.hpp"
-#include "realpaver/RltRelaxer.hpp"
+#include "realpaver/PolytopeHullContractor.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -20,20 +20,21 @@ int main(void)
       Problem prob;
       Variable x = prob.addRealVar(1, 2, "x");
       Variable y = prob.addRealVar(-1, 3, "y");
-      Variable z = prob.addRealVar(0, 4, "z");
 
       IntervalRegion reg = prob.getDomains();
 
       SharedDag dag = std::make_shared<Dag>();
-      size_t i1 = dag->insert( x + y - z == 0);
+      size_t i1 = dag->insert( y - sqr(x) == 0);
+      size_t i2 = dag->insert( sqr(x) + sqr(y) == 2);
 
-      cout << (*dag) << endl;
+      cout << (*dag);
+      cout << dag->scope() << endl;
+      cout << "input reg " << reg << endl;
 
-      LPSolver solver;
-      RltRelaxer relaxer(dag);
-      relaxer.make(solver, reg);
+      PolytopeHullContractor phc(dag, PolytopeCreatorStyle::RLT);
+      Proof proof = phc.contract(reg);
 
-      cout << solver << endl;
+      cout << proof << " " << reg << endl;
 
 /*
    LPSolver solver;

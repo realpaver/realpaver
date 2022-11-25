@@ -17,7 +17,6 @@
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalMatrix.hpp"
-#include "realpaver/LPModel.hpp"
 #include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {
@@ -157,17 +156,6 @@ public:
    /// @param x real value added in the real derivative
    void addRdv(double x);
 
-   /// @return the index of a linear variable representing this in a LP model
-   int indexLinVar() const;
-
-   /// Assigns the index of a linear variable representing this in a LP model
-   /// @param i index of a linear variable
-   void setIndexLinVar(int i);
-
-   /// Linearizes this node
-   /// @param lm output LP model
-   void linearize(LPModel& lm);
-
    /// Visitor pattern
    /// @param vis a visitor
    virtual void acceptVisitor(DagVisitor& vis) const = 0;
@@ -229,9 +217,6 @@ public:
 protected:
    Bitset bitset_;   // set of variables occurring in this
 
-   // inserts constraints for this node in a LP model
-   virtual void linearizeImpl(LPModel& lm) = 0;
-
 private:
    Dag* dag_;        // the DAG
    size_t index_;    // index of this node in the DAG
@@ -241,7 +226,6 @@ private:
    Interval dv_;     // interval derivative
    double rval_;     // result of a point evaluation
    double rdv_;      // point derivative
-   int ilv_;         // index of a linear variable in a LP model
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -266,7 +250,6 @@ public:
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 
    /// @return the constant interval value
@@ -301,7 +284,6 @@ public:
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 
 private:
@@ -379,7 +361,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
  
@@ -400,7 +381,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -421,7 +401,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -442,7 +421,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -463,7 +441,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -484,7 +461,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -505,7 +481,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -526,7 +501,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -547,7 +521,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -568,7 +541,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -589,7 +561,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -616,7 +587,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 
 private:
@@ -640,7 +610,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -661,7 +630,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -682,7 +650,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -703,7 +670,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -724,7 +690,6 @@ public:
    bool diff() override;
    void reval() override;
    bool rdiff() override;
-   void linearizeImpl(LPModel& lm) override;
    ///@}
 };
 
@@ -935,13 +900,6 @@ public:
    /// @param v a variable occurring in this
    /// @return the partial derivative of this with respect to v
    double realDeriv(const Variable& v) const;
-
-   /// Linearizes this function
-   /// @param lm output LP model
-   ///
-   /// Each node of this such that the index of the corresponding linear
-   /// variable is less than 0 is linearized
-   void linearize(LPModel& lm);
 
 private:
    Dag* dag_;                    // the DAG
@@ -1165,19 +1123,6 @@ public:
    ///
    /// It asumes that this dag has been evaluated using realEval.
    void realViolation(RealVector& viol);
-
-   /// Linearizes the DAG
-   /// @param lm output LP model
-   ///
-   /// Assumes that the DAG has been evaluated.
-   void linearize(LPModel& lm);
-
-   /// Linearizes a part of the DAG
-   /// @param lm output LP model
-   /// @param bs bitset such that bs[i] = 1 if the i-th function is linearized
-   ///
-   /// Assumes that the functions in the DAG have been evaluated.
-   void linearize(LPModel& lm, const Bitset& bs);
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

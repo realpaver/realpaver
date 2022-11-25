@@ -10,6 +10,8 @@
 #ifndef REALPAVER_POLYTOPE_HULL_CONTRACTOR_HPP
 #define REALPAVER_POLYTOPE_HULL_CONTRACTOR_HPP
 
+#include <vector>
+#include <unordered_map>
 #include "realpaver/Contractor.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/LPSolver.hpp"
@@ -28,10 +30,16 @@ std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style);
 ///////////////////////////////////////////////////////////////////////////////
 class PolytopeCreator {
 public:
-   /// Constructor
+   typedef std::vector<size_t> IndexList;
+
+   /// Creates a creator for a whole DAG
    /// @param dag dag-representation of a nonlinear system
-   /// @param scope set of variables of the system
-   PolytopeCreator(SharedDag dag, Scope scope);
+   PolytopeCreator(SharedDag dag);
+
+   /// Creates a creator for a subset of the  DAG
+   /// @param dag dag-representation of a nonlinear system
+   /// @param lfun list of indexes of the DAG functions to be relaxed
+   PolytopeCreator(SharedDag dag, const IndexList& lfun);
 
    /// Destructor
    virtual ~PolytopeCreator();
@@ -53,10 +61,16 @@ public:
    /// @return true in case of sucess, false otherwise
    virtual bool make(LPModel& lpm, const IntervalRegion& reg) = 0;
 
+   /// @param node a node of the DAG
+   /// @return the index of the linear variable with this node
+   size_t nodeToLinVar(DagNode* node) const;
+
 protected:
-   SharedDag dag_;
-   Scope scope_;
-   Bitset bs_;     // bitset view of the scope
+   SharedDag dag_;                           // DAG
+   Scope scope_;                             // scope
+   Bitset bs_;                               // bitset view of the scope
+   std::unordered_map<size_t, size_t > mnv_; // node index -> lin var index
+   IndexList lfun_;                          // list of indexes of functions
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,10 +79,14 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 class PolytopeRLTCreator : public PolytopeCreator {
 public:
-   /// Constructor
+   /// Creates a creator for a whole DAG
    /// @param dag dag-representation of a nonlinear system
-   /// @param scope set of variables of the system
-   PolytopeRLTCreator(SharedDag dag, Scope scope);
+   PolytopeRLTCreator(SharedDag dag);
+
+   /// Creates a creator for a part of a DAG
+   /// @param dag dag-representation of a nonlinear system
+   /// @param lfun list of indexes of the DAG functions to be relaxed
+   PolytopeRLTCreator(SharedDag dag, const IndexList& lfun);
 
    bool make(LPModel& lpm, const IntervalRegion& reg) override;
 };
@@ -79,7 +97,7 @@ public:
 /// Given a constraint system S, and a region R, it generates an outer
 /// approximation A of the set of solutions to S in R defined by a polytope.
 /// For each variable x, two LPs are solved: min or max x s.t. A in
-/// order to contract of the domain of x in R.
+/// order to contract the domain of x in R.
 ///
 /// This contractor is parameterized by the relaxation method.
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,9 +105,15 @@ class PolytopeHullContractor : public Contractor {
 public:
    /// Constructor
    /// @param dag a DAG representing a set of constraints
-   /// @param sco set of variables to be contracted by this
    /// @param style kind of relaxation method
-   PolytopeHullContractor(SharedDag dag, Scope sco, PolytopeCreatorStyle style);
+   PolytopeHullContractor(SharedDag dag, PolytopeCreatorStyle style);
+
+   /// Constructor
+   /// @param dag a DAG representing a set of constraints
+   /// @param lfun list of indexes of the DAG functions to be relaxed
+   /// @param style kind of relaxation method
+   PolytopeHullContractor(SharedDag dag, const IndexList& lfun,
+                          PolytopeCreatorStyle style);
 
    /// Destructor
    ~PolytopeHullContractor();

@@ -85,6 +85,9 @@ public:
 
    /// @return the upper bound of this
    double getUB() const;
+
+   /// @return the domain of this
+   Interval getDomain() const;
    
    /// @return the name of this
    std::string getName() const;
@@ -159,6 +162,9 @@ public:
 
    /// @return the upper bound of this
    double getUB() const;
+
+   /// @return the domain of this
+   Interval getDomain() const;
    
    /// @return the name of this
    std::string getName() const;  

@@ -14,7 +14,6 @@
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/Reformulation.hpp"
 
 namespace realpaver {
 
@@ -27,8 +26,7 @@ DagNode::DagNode(Dag* dag, size_t index)
         val_(),
         dv_(),
         rval_(0.0),
-        rdv_(0.0),
-        ilv_(-1)
+        rdv_(0.0)
 {}
 
 DagNode::~DagNode()
@@ -129,16 +127,6 @@ bool DagNode::dependsOn(const Variable& v) const
    return bitset_.get(v.id());
 }
 
-int DagNode::indexLinVar() const
-{
-   return ilv_;
-}
-
-void DagNode::setIndexLinVar(int i)
-{
-   ilv_ = i;
-}
-
 Interval DagNode::val() const
 {
    return val_;
@@ -187,26 +175,6 @@ void DagNode::setRdv(double x)
 void DagNode::addRdv(double x)
 {
    rdv_ = Double::add(rdv_, x);
-}
-
-void DagNode::linearize(LPModel& lm)
-{
-   ASSERT(!val_.isEmpty(), "Linearization of a DAG node with an empty domain");
-
-   // creation of a linear variable for this node
-   LinVar v = lm.makeVar(val_.left(), val_.right());
-   setIndexLinVar(v.getIndex());
-
-   if (LOG_ON)
-   {
-      std::ostringstream os;
-      os << "x" << v.getIndex();
-      v.setName(os.str());
-   }
-
-   // insertion of constraints
-   if (val_.isFinite() && (!val_.isSingleton()))
-      linearizeImpl(lm);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,11 +242,6 @@ Interval DagConst::getConst() const
    return x_;
 }
 
-void DagConst::linearizeImpl(LPModel& lm)
-{
-   // nothing to do
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagVar::DagVar(Dag* dag, size_t index, Variable v)
@@ -343,15 +306,6 @@ bool DagVar::rdiff()
 Variable DagVar::getVar() const
 {
    return v_;
-}
-
-void DagVar::linearizeImpl(LPModel& lm)
-{
-   if (v_.isDiscrete())
-   {
-      LinVar lv = lm.getLinVar(indexLinVar());
-      lv.setInteger();
-   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -494,17 +448,6 @@ bool DagAdd::rdiff()
    return true;
 }
 
-void DagAdd::linearizeImpl(LPModel& lm)
-{
-   LinVar z = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(left()->indexLinVar()),
-          y = lm.getLinVar(right()->indexLinVar());
-
-   // z = x + y => z - x - y = 0
-   LinExpr e( {1.0, -1.0, -1.0}, {z, x, y} );
-   lm.addCtr(0.0, e, 0.0);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSub::DagSub(Dag* dag, const IndexList& lsub)
@@ -548,17 +491,6 @@ bool DagSub::rdiff()
    right()->addRdv(-rdv());
 
    return true;
-}
-
-void DagSub::linearizeImpl(LPModel& lm)
-{
-   LinVar z = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(left()->indexLinVar()),
-          y = lm.getLinVar(right()->indexLinVar());
-
-   // z = x - y => z - x + y = 0
-   LinExpr e( {1.0, -1.0, 1.0}, {z, x, y} );
-   lm.addCtr(0.0, e, 0.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -606,60 +538,6 @@ bool DagMul::rdiff()
    return true;
 }
 
-void DagMul::linearizeImpl(LPModel& lm)
-{
-   LinVar z = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(left()->indexLinVar()),
-          y = lm.getLinVar(right()->indexLinVar());
-
-   // z = x*y, a <= x <= b, c <= y <= d
-   double a = left()->val().left(),
-          b = left()->val().right(),
-          c = right()->val().left(),
-          d = right()->val().right();
-
-   bool xvar = (a != b),   // left subterm not fixed?
-        yvar = (c != d);   // right subterm not fixed?
-
-   if (xvar && yvar)
-   {
-      // Mc Cormick relaxation
-      Interval A(a), B(b), C(c), D(d);
-
-      // first constraint: (x-a)*(y-c) >= 0, z - c*x - a*y >= -a*c
-      Interval I1 = -A*C;
-      LinExpr e1( {1.0, -c, -a}, {z, x, y} );
-      lm.addCtr(I1.left(), e1);
-
-      // second constraint: (x-a)*(y-d) <= 0, z - d*x - a*y <= -a*d
-      Interval I2 = -A*D;
-      LinExpr e2( {1.0, -d, -a}, {z, x, y} );
-      lm.addCtr(e2, I2.right());
-
-      // third constraint: (x-b)*(y-c) <= 0, z - c*x - b*y <= -b*c
-      Interval I3 = -B*C;
-      LinExpr e3( {1.0, -c, -b}, {z, x, y} );
-      lm.addCtr(e3, I3.right());
-
-      // fourth constraint: (x-b)*(y-d) >= 0, z - d*x - b*y >= -b*d
-      Interval I4 = -B*D;
-      LinExpr e4( {1.0, -d, -b}, {z, x, y} );
-      lm.addCtr(I4.left(), e4);
-   }
-   else if (!xvar)
-   {
-      // z = x*y with x fixed => z - a*y = 0
-      LinExpr e( {1.0, -a}, {z, y} );
-      lm.addCtr(0.0, e, 0.0);
-   }
-   else if (!yvar)
-   {
-      // z = x*y with y fixed => z - c*x = 0
-      LinExpr e( {1.0, -c}, {z, x} );
-      lm.addCtr(0.0, e, 0.0);      
-   }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagDiv::DagDiv(Dag* dag, const IndexList& lsub)
@@ -704,56 +582,6 @@ bool DagDiv::rdiff()
                    Double::sqr(right()->rval())));
 
    return right()->rval() != 0.0;
-}
-
-void DagDiv::linearizeImpl(LPModel& lm)
-{
-   LinVar z = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(left()->indexLinVar()),
-          y = lm.getLinVar(right()->indexLinVar());
-
-   // z = x/y <=> a <= x <= b, c <= y <= d
-   double a = left()->val().left(),
-          b = left()->val().right(),
-          c = right()->val().left(),
-          d = right()->val().right(),
-          u = val().left(),
-          v = val().right();
-
-   bool xvar = (a != b),   // left subterm not fixed?
-        yvar = (c != d);   // right subterm not fixed?
-
-   if (yvar)
-   {
-      // Mc Cormick relaxation on x = y*z, c <= y <= d, u <= z <= v
-      Interval C(c), D(d), U(u), V(v);
-
-      // first constraint: (y-c)*(z-u) >= 0, x -cz -uy >= -cu
-      Interval I1 = -C*U;
-      LinExpr e1( {1.0, -c, -u}, {x, z, y} );
-      lm.addCtr(I1.left(), e1);
-
-      // second constraint: (y-c)*(z-v) <= 0, x -cz -vy <= -cv
-      Interval I2 = -C*V;
-      LinExpr e2( {1.0, -c, -v}, {x, z, y} );
-      lm.addCtr(e2, I2.right());
-
-      // third constraint: (y-d)*(z-u) <= 0, x -dz -uy <= -du
-      Interval I3 = -D*U;
-      LinExpr e3( {1.0, -d, -u}, {x, z, y} );
-      lm.addCtr(e3, I3.right());
-
-      // fourth constraint: (y-d)*(z-v) >= 0, x -dz -vy >= -dv
-      Interval I4 = -D*V;
-      LinExpr e4( {1.0, -d, -v}, {x, z, y} );
-      lm.addCtr(I4.left(), e4);
-   }
-   else if (xvar)
-   {
-      // y fixed => x = y*z with y = c => x -cz = 0
-      LinExpr e( {1.0, -c}, {x, z} );
-      lm.addCtr(0.0, e, 0.0);      
-   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -823,42 +651,6 @@ bool DagMin::rdiff()
    {
       // d(min(l,r))/dl = d(min(l,r))/dr = [0,1] otherwise
       return false;
-   }
-}
-
-void DagMin::linearizeImpl(LPModel& lm)
-{
-   LinVar z = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(left()->indexLinVar()),
-          y = lm.getLinVar(right()->indexLinVar());
-
-   // z = min(x, y), a <= x <= b, c <= y <= d
-   double a = left()->val().left(),
-          b = left()->val().right(),
-          c = right()->val().left(),
-          d = right()->val().right();
-
-   if (b < c)
-   {
-      // z = x => z - x = 0
-      LinExpr e( {1.0, -1.0}, {z, x} );
-      lm.addCtr(0.0, e, 0.0);
-   }
-   else if (d < a)
-   {
-      // z = y => z - y = 0
-      LinExpr f( {1.0, -1.0}, {z, y} );
-      lm.addCtr(0.0, f, 0.0);
-   }
-   else
-   {
-      // z <= x => z - x <= 0
-      LinExpr e( {1.0, -1.0}, {z, x} );
-      lm.addCtr(e, 0.0);
-
-      // z <= y => z - y <= 0
-      LinExpr f( {1.0, -1.0}, {z, y} );
-      lm.addCtr(f, 0.0);
    }
 }
 
@@ -932,42 +724,6 @@ bool DagMax::rdiff()
    }
 }
 
-void DagMax::linearizeImpl(LPModel& lm)
-{
-   LinVar z = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(left()->indexLinVar()),
-          y = lm.getLinVar(right()->indexLinVar());
-
-   // z = max(x, y), a <= x <= b, c <= y <= d
-   double a = left()->val().left(),
-          b = left()->val().right(),
-          c = right()->val().left(),
-          d = right()->val().right();
-
-   if (d < a)
-   {
-      // z = x => z - x = 0
-      LinExpr e( {1.0, -1.0}, {z, x} );
-      lm.addCtr(0.0, e, 0.0);
-   }
-   else if (b < c)
-   {
-      // z = y => z - y = 0
-      LinExpr f( {1.0, -1.0}, {z, y} );
-      lm.addCtr(0.0, f, 0.0);
-   }
-   else
-   {
-      // z >= x => z - x >= 0
-      LinExpr e( {1.0, -1.0}, {z, x} );
-      lm.addCtr(0.0, e);
-      
-      // z >= y => z - y >= 0
-      LinExpr f( {1.0, -1.0}, {z, y} );
-      lm.addCtr(0.0, f);
-   }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagUsb::DagUsb(Dag* dag, const IndexList& lsub)
@@ -1008,16 +764,6 @@ bool DagUsb::rdiff()
    child()->addRdv(Double::usb(rdv()));
 
    return true;
-}
-
-void DagUsb::linearizeImpl(LPModel& lm)
-{
-   LinVar y = lm.getLinVar(indexLinVar()),
-          x = lm.getLinVar(child()->indexLinVar());
-
-   // y = -x => y + x = 0
-   LinExpr e( {1.0, 1.0}, {y, x} );
-   lm.addCtr(0.0, e, 0.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1080,45 +826,6 @@ bool DagAbs::rdiff()
    }
 }
 
-void DagAbs::linearizeImpl(LPModel& lm)
-{
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-
-   LinVar y = lm.getLinVar(iy),
-          x = lm.getLinVar(ix);
-
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   if (a >= 0.0)
-   {
-      // y = x => y - x = 0
-      LinExpr e( {1.0, -1.0}, {y, x} );
-      lm.addCtr(0.0, e, 0.0);
-   }
-   else if (b <= 0.0)
-   {
-      // y = -x => y + x = 0
-      LinExpr e( {1.0, 1.0}, {y, x} );
-      lm.addCtr(0.0, e, 0.0);
-   }
-   else
-   {
-      // underestimation: y >= x <=> y - x >= 0
-      LinExpr e1( {1.0, -1.0}, {y, x} );
-      lm.addCtr(0.0, e1);
-
-      // underestimation: y >= -x <=> y + x >= 0
-      LinExpr e2( {1.0, 1.0}, {y, x} );
-      lm.addCtr(0.0, e2);
-
-      // overestimation
-      auto f  = [](const Interval& x) { return abs(x); };
-      overConvex(lm, iy, ix, a, b, f);
-   }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSgn::DagSgn(Dag* dag, const IndexList& lsub)
@@ -1155,11 +862,6 @@ bool DagSgn::rdiff()
 {
    // d(sgn(u))/du = 0 except at 0
    return true;
-}
-
-void DagSgn::linearizeImpl(LPModel& lm)
-{
-   // nothing to do
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1204,24 +906,6 @@ bool DagSqr::rdiff()
    return true;
 }
 
-void DagSqr::linearizeImpl(LPModel& lm)
-{
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-   
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   auto f  = [](const Interval& x) { return sqr(x); };
-   auto df = [](const Interval& x) { return 2.0*x; };
-
-   underConvex(lm, iy, ix, a, b, a, f, df);
-   underConvex(lm, iy, ix, a, b, b, f, df);
-   underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-   overConvex(lm, iy, ix, a, b, f);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub)
@@ -1262,28 +946,6 @@ bool DagSqrt::rdiff()
    child()->addRdv(Double::div(Double::mul(0.5, rdv()), rval()));
 
    return true;
-}
-
-void DagSqrt::linearizeImpl(LPModel& lm)
-{
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   if (a < 0.0) return;
-
-   auto f  = [](const Interval& x) { return sqrt(x); };
-   auto df = [](const Interval& x) { return 1.0/(2.0*sqrt(x)); };
-
-   if (a > 0.0)
-      overConcave(lm, iy, ix, a, b, a, f, df);
-
-   overConcave(lm, iy, ix, a, b, b, f, df);
-   overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-   underConcave(lm, iy, ix, a, b, f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1352,60 +1014,6 @@ bool DagPow::rdiff()
    return true;
 }
 
-void DagPow::linearizeImpl(LPModel& lm)
-{
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-   
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   int n = exponent();
-
-   auto f  = [&n](const Interval& x) { return pow(x, n); };
-   auto df = [&n](const Interval& x) { return n*pow(x, n-1); };
-
-   if (n % 2 == 0 || a >= 0.0)
-   {
-      // convex function
-      underConvex(lm, iy, ix, a, b, a, f, df);
-      underConvex(lm, iy, ix, a, b, b, f, df);
-      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      overConvex(lm, iy, ix, a, b, f);
-   }
-   else
-   {
-      if (b <= 0.0)
-      {
-         // odd power, concave function
-         overConcave(lm, iy, ix, a, b, a, f, df);
-         overConcave(lm, iy, ix, a, b, b, f, df);
-         overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-         underConcave(lm, iy, ix, a, b, f);         
-      }
-      else
-      {
-         // odd power, concave over [a, 0] and convex in [0, b]
-         LinVar y = lm.getLinVar(iy),
-                x = lm.getLinVar(ix);
-
-         // best way, not implemented: find a tangent at point c in [0, b]
-         // (c unknown) passing through (a, f(a)); find another tangent
-         // at point c' in [a, 0] (c unknown) passing through (b, f(b))
-
-         // underestimation
-         Interval fa(f(a));
-         underLine(lm, iy, ix, a, fa.left(), b, 0.0);
-
-         // overestimation
-         Interval fb(f(b));
-         overLine(lm, iy, ix, a, 0.0, b, fb.right());
-      }
-   }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagExp::DagExp(Dag* dag, const IndexList& lsub)
@@ -1448,24 +1056,6 @@ bool DagExp::rdiff()
    return true;
 }
 
-void DagExp::linearizeImpl(LPModel& lm)
-{
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-   
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   auto f  = [](const Interval& x) { return exp(x); };
-   auto df = [](const Interval& x) { return exp(x); };
-
-   underConvex(lm, iy, ix, a, b, a, f, df);
-   underConvex(lm, iy, ix, a, b, b, f, df);
-   underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-   overConvex(lm, iy, ix, a, b, f);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagLog::DagLog(Dag* dag, const IndexList& lsub)
@@ -1506,26 +1096,6 @@ bool DagLog::rdiff()
    child()->addRdv(Double::div(rdv(), child()->rval()));
 
    return child()->val().isCertainlyGtZero();
-}
-
-void DagLog::linearizeImpl(LPModel& lm)
-{
-   if (val().isInf()) return;
-
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   auto f  = [](const Interval& x) { return log(x); };
-   auto df = [](const Interval& x) { return 1.0/x; };
-
-   overConcave(lm, iy, ix, a, b, a, f, df);
-   overConcave(lm, iy, ix, a, b, b, f, df);
-   overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-   underConcave(lm, iy, ix, a, b, f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1571,43 +1141,6 @@ bool DagCos::rdiff()
    return true;
 }
 
-void DagCos::linearizeImpl(LPModel& lm)
-{   
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   auto f  = [](const Interval& x) { return cos(x); };
-   auto df = [](const Interval& x) { return -sin(x); };
-
-   if (val().isPositive())
-   {
-      // concave function
-      overConcave(lm, iy, ix, a, b, a, f, df);
-      overConcave(lm, iy, ix, a, b, b, f, df);
-      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      underConcave(lm, iy, ix, a, b, f);      
-   }
-   else if (val().isNegative())
-   {
-      // convex function
-      underConvex(lm, iy, ix, a, b, a, f, df);
-      underConvex(lm, iy, ix, a, b, b, f, df);
-      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      overConvex(lm, iy, ix, a, b, f);
-   }
-   else if (Interval::minusOnePlusOne().strictlyContains(val()))
-   {
-      // concavo-convex function
-      relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
-   }
-   // else there is a stationaty point => no relaxation
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagSin::DagSin(Dag* dag, const IndexList& lsub)
@@ -1650,43 +1183,6 @@ bool DagSin::rdiff()
    return true;
 }
 
-void DagSin::linearizeImpl(LPModel& lm)
-{
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   auto f  = [](const Interval& x) { return sin(x); };
-   auto df = [](const Interval& x) { return cos(x); };
-
-   if (val().isPositive())
-   {
-   // concave function
-      overConcave(lm, iy, ix, a, b, a, f, df);
-      overConcave(lm, iy, ix, a, b, b, f, df);
-      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      underConcave(lm, iy, ix, a, b, f);      
-   }
-   else if (val().isNegative())
-   {
-      // convex function
-      underConvex(lm, iy, ix, a, b, a, f, df);
-      underConvex(lm, iy, ix, a, b, b, f, df);
-      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      overConvex(lm, iy, ix, a, b, f);
-   }
-   else if (Interval::minusOnePlusOne().strictlyContains(val()))
-   {
-      // concavo-convex function
-      relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
-   }
-   // else there is a stationary point => no relaxation
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagTan::DagTan(Dag* dag, const IndexList& lsub)
@@ -1727,57 +1223,6 @@ bool DagTan::rdiff()
    child()->addRdv(Double::mul(rdv(), Double::add(1.0, Double::sqr(rval()))));
 
    return val().isFinite();
-}
-
-void DagTan::linearizeImpl(LPModel& lm)
-{
-   if (val().isInf()) return;
-
-   size_t iy = indexLinVar(),
-          ix = child()->indexLinVar();
-
-   double a = child()->val().left(),
-          b = child()->val().right();
-
-   auto f  = [](const Interval& x) { return tan(x); };
-   auto df = [](const Interval& x) { return 1.0/sqr(cos(x)); };
-
-   if (val().isNegative())
-   {
-      // convex function
-      underConvex(lm, iy, ix, a, b, a, f, df);
-      underConvex(lm, iy, ix, a, b, b, f, df);
-      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      overConvex(lm, iy, ix, a, b, f);
-   }
-   else if (val().isPositive())
-   {
-      // concave function
-      overConcave(lm, iy, ix, a, b, a, f, df);
-      overConcave(lm, iy, ix, a, b, b, f, df);
-      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      underConcave(lm, iy, ix, a, b, f);         
-   }
-   else
-   {
-      // concavo-convex function
-      LinVar x = lm.getLinVar(ix),
-             y = lm.getLinVar(iy);
-
-      // underestimation: under the line passing through
-      // (b, tan(b)) with slope 1, i.e. y <= x + p
-      Interval p1(val().right() - Interval(b));
-      LinExpr e1( {1.0, -1.0}, {y, x} );
-      lm.addCtr(e1, p1.right());
-
-      // overestimation: over the line passing through
-      // (a, tan(a)) with slope 1, i.e. y >= x + p
-      Interval p2(val().left() - Interval(a));
-      LinExpr e2( {1.0, -1.0}, {y, x} );
-      lm.addCtr(p2.left(), e2);
-   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2217,15 +1662,6 @@ double DagFun::realDeriv(const Variable& v) const
    return dag_->findVarNode(v.id())->rdv();
 }
 
-void DagFun::linearize(LPModel& lm)
-{
-   for (size_t i=0; i<nbNodes(); ++i)
-   {
-      DagNode* node = node_[i];
-      if (node->indexLinVar() < 0) node->linearize(lm);
-   }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 DagContext::DagContext() : dom()
@@ -2639,51 +2075,6 @@ void Dag::realDiff(RealMatrix& jac)
             jac.set(i, j, 0.0);
 
          ++j;
-      }
-   }
-}
-
-void Dag::linearize(LPModel& lm)
-{
-   // linearizes all the nodes
-   for (size_t i=0; i<nbNodes(); ++i) node_[i]->linearize(lm);
-
-   for (size_t j=0; j<nbFuns(); ++j)
-   {
-      // assigns the domain of the linear variable associated with the root
-      // node of a function of this Dag
-      DagFun* f = fun(j);
-      LinVar lv = lm.getLinVar(f->rootNode()->indexLinVar());
-      lv.setDomain(f->getImage());
-   }
-}
-
-void Dag::linearize(LPModel& lm, const Bitset& bs)
-{
-   ASSERT(nbFuns() == bs.size(), "Bad bitset used to linearize a DAG");
-
-   if (bs.areAllOnes())
-   {
-      linearize(lm);
-   }
-   else
-   {
-      // resets the indexes of all the linear variables
-      for (size_t i=0; i<nbNodes(); ++i) node_[i]->setIndexLinVar(-1);
-
-      for (size_t j=0; j<bs.size(); ++j)
-      {
-         if (bs.get(j))
-         {
-            // linearizes the function
-            DagFun* f = fun(j);
-            f->linearize(lm);
-
-            // assigns the domain of the linear variable associated with
-            // its root node
-            LinVar lv = lm.getLinVar(f->rootNode()->indexLinVar());
-            lv.setDomain(f->getImage());
-         }
       }
    }
 }

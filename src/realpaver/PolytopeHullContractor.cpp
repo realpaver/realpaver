@@ -10,6 +10,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
+#include "realpaver/RltRelaxation.hpp"
 
 namespace realpaver {
 
@@ -27,16 +28,40 @@ std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PolytopeCreator::PolytopeCreator(SharedDag dag, Scope scope)
+PolytopeCreator::PolytopeCreator(SharedDag dag)
       : dag_(dag),
-        scope_(scope),
-        bs_()
+        scope_(dag->scope()),
+        bs_(),
+        mnv_(),
+        lfun_()
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");
-   ASSERT(!scope.isEmpty(), "Empty scope in a polytope maker");
-   ASSERT(dag->scope().contains(scope), "Bad scope in a polytope maker");
 
-   bs_ = scope.toBitset();
+   for (size_t i=0; i<dag->nbFuns(); ++i)
+      lfun_.push_back(i);
+
+   bs_ = scope_.toBitset();
+}
+
+PolytopeCreator::PolytopeCreator(SharedDag dag, const IndexList& lfun)
+      : dag_(dag),
+        scope_(),
+        bs_(),
+        mnv_(),
+        lfun_()
+{
+   ASSERT(dag_ != nullptr, "No dag in a polytope maker");
+   ASSERT(!lfun.empty(), "No list of functions in a polytope maker");
+
+   for (size_t i : lfun)
+   {
+      ASSERT(i<dag_->nbFuns(), "Bad function index in a polytope maker");
+
+      lfun_.push_back(i);
+      scope_.insert(dag->fun(i)->scope());
+   }
+
+   bs_ = scope_.toBitset();
 }
 
 PolytopeCreator::~PolytopeCreator()
@@ -57,28 +82,108 @@ bool PolytopeCreator::dependsOn(const Bitset& bs) const
    return bs_.overlaps(bs);
 }
 
+size_t PolytopeCreator::nodeToLinVar(DagNode* node) const
+{
+   auto it = mnv_.find(node->index());
+   return it->second;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-PolytopeRLTCreator::PolytopeRLTCreator(SharedDag dag, Scope scope)
-      : PolytopeCreator(dag, scope)
+PolytopeRLTCreator::PolytopeRLTCreator(SharedDag dag)
+      : PolytopeCreator(dag)
+{}
+
+PolytopeRLTCreator::PolytopeRLTCreator(SharedDag dag, const IndexList& lfun)
+      : PolytopeCreator(dag, lfun)
 {}
 
 bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
 {
    if (!dag_->intervalEval(reg)) return false;
 
-   dag_->linearize(lpm);
+   if (lfun_.size() == dag_->nbFuns())
+   {
+      for (size_t i=0; i<dag_->nbNodes(); ++i)
+      {
+         DagNode* node = dag_->node(i);
+         Interval val = node->val();
+
+         // creates a linear variable for this node
+         LinVar v = lpm.makeVar(val.left(), val.right());
+    
+         // inserts the couple of indexes in the map
+         mnv_.insert(std::make_pair(node->index(), v.getIndex()));
+
+         // constrains this variable
+         RltVisitor vis(&lpm, &mnv_);
+         node->acceptVisitor(vis);
+      }
+   }
+   else
+   {
+      for (size_t i : lfun_)
+      {
+         DagFun* f = dag_->fun(i);
+         for (size_t j=0; j<f->nbNodes(); ++j)
+         {
+            DagNode* node = f->node(j);
+            auto it = mnv_.find(node->index());
+            if (it == mnv_.end())
+            {
+               Interval val = node->val();
+
+               // creates a linear variable for this node
+               LinVar v = lpm.makeVar(val.left(), val.right());
+    
+               // inserts the couple of indexes in the map
+               mnv_.insert(std::make_pair(node->index(), v.getIndex()));
+            }
+
+            // constrains this variable
+            RltVisitor vis(&lpm, &mnv_);
+            node->acceptVisitor(vis);            
+         }
+      }
+   }
+
+   // takes into account the root nodes
+   for (size_t i : lfun_)
+   {
+      DagFun* f = dag_->fun(i);
+      DagNode* node = f->rootNode();
+
+      auto it = mnv_.find(node->index());
+      LinVar v = lpm.getLinVar(it->second);
+
+      Interval x = v.getDomain() & f->getImage();
+      if (x.isEmpty()) return false;
+      v.setDomain(x);
+   }
+
    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PolytopeHullContractor::PolytopeHullContractor(SharedDag dag, Scope sco,
+PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
                                                PolytopeCreatorStyle style)
       : creator_(nullptr)
 {
    if (style == PolytopeCreatorStyle::RLT)
-      creator_ = new PolytopeRLTCreator(dag, sco);
+      creator_ = new PolytopeRLTCreator(dag);
+
+   else
+      THROW("Polytope maker not yet implemented: " << style);
+}
+
+PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
+                                               const IndexList& lfun,
+                                               PolytopeCreatorStyle style)
+      : creator_(nullptr)
+{
+   if (style == PolytopeCreatorStyle::RLT)
+      creator_ = new PolytopeRLTCreator(dag, lfun);
 
    else
       THROW("Polytope maker not yet implemented: " << style);
@@ -101,8 +206,6 @@ Scope PolytopeHullContractor::scope() const
 
 Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 {
-   LOG_LOW("Polytope hull contractor on: " << reg);
-
    LPSolver solver;
 
    // linearizes the constraints
@@ -116,9 +219,11 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       Interval x = reg.get(v);
       DagNode* node = creator_->dag()->findVarNode(v.id());
 
-      LinVar lv = solver.getLinVar(node->indexLinVar());
+      LinVar lv = solver.getLinVar(creator_->nodeToLinVar(node));
       LinExpr e({1.0}, {lv});
       solver.setObj(e);
+
+DEBUG(solver << "\n\n");
 
       // reduction of the left bound
       solver.setMinimization();
@@ -126,6 +231,12 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       else solver.reoptimize();
 
       status = solver.getStatus();
+
+
+DEBUG("status " << status);
+DEBUG("obj " << solver.getObjVal());
+
+
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
@@ -136,9 +247,17 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 
       // reduction of the right bound
       solver.setMaximization();
+
+DEBUG(solver << "\n\n");
+
+
       solver.reoptimize();
 
       status = solver.getStatus();
+
+DEBUG("status " << status);
+DEBUG("obj " << solver.getObjVal());
+
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
@@ -148,7 +267,6 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       reg.set(v, x);
    }
 
-   LOG_LOW("Reduced region: " << reg);
    return Proof::Maybe;
 }
 
