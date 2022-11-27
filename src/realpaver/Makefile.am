@@ -43,6 +43,7 @@ librealpaver_la_include_HEADERS = \
 		HC4Contractor.hpp \
 		Inflator.hpp \
 		IntContractor.hpp \
+		Integer.hpp \
 		Interval.hpp \
 		IntervalFunction.hpp \
 		IntervalFunctionVector.hpp \
@@ -80,6 +81,7 @@ librealpaver_la_include_HEADERS = \
 		Preprocessor.hpp \
 		Problem.hpp \
 		Propagator.hpp \
+		Range.hpp \
 		RealFunction.hpp \
 		RealFunctionVector.hpp \
 		RealMatrix.hpp \
@@ -142,6 +144,7 @@ librealpaver_la_SOURCES = \
 		HC4Contractor.cpp \
 		Inflator.cpp \
 		IntContractor.cpp \
+		Integer.cpp \
 		Interval.cpp \
 		IntervalFunction.cpp \
 		IntervalFunctionVector.cpp \
@@ -172,6 +175,7 @@ librealpaver_la_SOURCES = \
 		Preprocessor.cpp \
 		Problem.cpp \
 		Propagator.cpp \
+		Range.cpp \
 		RealFunction.cpp \
 		RealFunctionVector.cpp \
 		RealMatrix.cpp \

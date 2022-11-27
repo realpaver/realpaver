@@ -40,7 +40,7 @@ Variable Problem::addBinaryVar(const std::string& name)
    Variable v(os.str());
    v.setId(id)
     .setDomain(Interval::zeroPlusOne())
-    .setDiscrete()
+    .setInteger()
     .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
@@ -72,7 +72,7 @@ Variable Problem::addIntVar(const Interval& x, const std::string& name)
    Variable v(os.str());
    v.setId(id)
     .setDomain(y)
-    .setDiscrete()
+    .setInteger()
     .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
@@ -234,12 +234,12 @@ bool Problem::isContinuous() const
    return true;
 }
 
-bool Problem::isDiscrete() const
+bool Problem::isInteger() const
 {
    if (nbVars() == 0) return false;
 
    for (size_t i=0; i<nbVars(); ++i)
-      if (!varAt(i).isDiscrete())
+      if (!varAt(i).isInteger())
          return false;
 
    return true;
@@ -253,7 +253,7 @@ bool Problem::isMixed() const
 
    for (size_t i=0; i<nbVars(); ++i)
    {
-      if (varAt(i).isDiscrete()) dis = true;
+      if (varAt(i).isInteger()) dis = true;
       if (varAt(i).isContinuous()) cont = true;
 
       if (dis && cont) return true;

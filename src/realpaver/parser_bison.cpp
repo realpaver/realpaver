@@ -1617,7 +1617,7 @@ yyreduce:
     {
       realpaver::Variable v = realpaver_bison_problem->lastVar();
       v.setDomain(0, 1);
-      v.setDiscrete();
+      v.setInteger();
       v.setTolerance(realpaver::Tolerance::makeAbs(0.0));
 
       // the domain must also be assigned in the problem's initial region
@@ -1700,7 +1700,7 @@ yyreduce:
 #line 244 "parser_bison.ypp"
     {
       realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setDiscrete();
+      v.setInteger();
       v.setTolerance(realpaver::Tolerance::makeAbs(0.0));    
     }
 #line 1707 "parser_bison.cpp"

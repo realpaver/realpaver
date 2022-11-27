@@ -30,7 +30,7 @@ void RltVisitor::apply(const DagConst* node)
 
 void RltVisitor::apply(const DagVar* node)
 {
-   if (node->getVar().isDiscrete())
+   if (node->getVar().isInteger())
    {
       LinVar lv = lpm_->getLinVar(indexLinVar(node));
       lv.setInteger();

@@ -181,7 +181,7 @@ void NcspSolver::makeContractor()
    // integer variables
    std::shared_ptr<IntContractor> iop = std::make_shared<IntContractor>();
    for (Variable v : preprob_.scope())
-      if (v.isDiscrete()) iop->insertVar(v);
+      if (v.isInteger()) iop->insertVar(v);
 
    if (iop->nbVars() > 0)
       mainpool->push(iop);

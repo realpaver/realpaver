@@ -214,7 +214,7 @@ void BOSolver::makeHC4()
          vpool->push(op);
       }
 
-      if (v.isDiscrete()) ic->insertVar(v);
+      if (v.isInteger()) ic->insertVar(v);
 
       i = i+1;
    }

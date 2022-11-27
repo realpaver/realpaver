@@ -39,7 +39,7 @@ size_t IntContractor::nbVars() const
 
 void IntContractor::insertVar(Variable v)
 {
-   ASSERT(v.isDiscrete(),
+   ASSERT(v.isInteger(),
           "IntContractor applied to a continuous variable " << v.getName());
 
    s_.insert(v);

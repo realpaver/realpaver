@@ -159,8 +159,8 @@ public:
    /// @return true if this has only continuous variables
    bool isContinuous() const;
 
-   /// @return true if this has only discrete variables
-   bool isDiscrete() const;
+   /// @return true if this has only integer (or binary) variables
+   bool isInteger() const;
 
    /// @return true if this has continuous and discrete variables
    bool isMixed() const;

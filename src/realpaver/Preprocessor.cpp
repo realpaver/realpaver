@@ -241,7 +241,7 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
    Scope sco = reg.scope();
    for (auto v : sco)
    {
-      if (v.isDiscrete())
+      if (v.isInteger())
       {
          Interval rnd = round(reg.get(v));
          reg.set(v, rnd);

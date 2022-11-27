@@ -55,11 +55,11 @@ public:
    /// @param x new domain of this
    void setDomain(const Interval& x);
 
-   /// @return true if this is discrete, false otherwise
-   bool isDiscrete() const;
+   /// @return true if this is an integer variable, false otherwise
+   bool isInteger() const;
 
-   /// Sets this as a discrete variable
-   void setDiscrete();
+   /// Sets this as an integer variable
+   void setInteger();
 
    /// @return true if this is continuous, false otherwise
    bool isContinuous() const;
@@ -135,18 +135,19 @@ public:
    /// @param up upper bound
    Variable& setDomain(double lo, double up);
 
-   /// @return true if this is discrete, false otherwise
-   bool isDiscrete() const;
-
-   /// @return true if this is a discrete variable in [0, 1]
-   bool isBinary() const;
-
-   /// @return true if this is a discrete variable not in [0, 1]
+   /// @return true if this is an integer variable, false otherwise
    bool isInteger() const;
 
-   /// Sets this as a discrete variable
+   /// Sets this as an integer variable
    /// @return a reference to this
-   Variable& setDiscrete();
+   Variable& setInteger();
+
+   /// @return true if this is an integer variable in [0, 1]
+   bool isBinary() const;
+
+   /// Sets this as an integer variable  in [0, 1]
+   /// @return a reference to this
+   Variable& setBinary();
 
    /// @return true if this is continuous, false otherwise
    bool isContinuous() const;

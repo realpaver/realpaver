@@ -36,24 +36,6 @@ size_t hash3(size_t h1, size_t h2, size_t h3);
 /// Combines four hash codes
 size_t hash4(size_t h1, size_t h2, size_t h3, size_t h4);
 
-
-///////////////////////////////////////////////////////////////////////////////
-/// This contains int values and operations.
-///////////////////////////////////////////////////////////////////////////////
-struct Integer {
-   /// @return the minimum representable value
-   static inline int min()
-   {
-      return std::numeric_limits<int>::min();
-   }
-
-   /// @return the maximum representable value
-   static inline int max()
-   {
-      return std::numeric_limits<int>::max();
-   }
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a certificate returned by solvers of optimization problems.
 ///////////////////////////////////////////////////////////////////////////////

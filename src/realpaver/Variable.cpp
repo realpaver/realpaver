@@ -49,12 +49,12 @@ void VariableRep::setDomain(const Interval& x)
    domain_ = x;
 }
 
-bool VariableRep::isDiscrete() const
+bool VariableRep::isInteger() const
 {
    return !continuous_;
 }
 
-void VariableRep::setDiscrete()
+void VariableRep::setInteger()
 {
    continuous_ = false;
 }
@@ -131,24 +131,26 @@ Variable& Variable::setDomain(double lo, double up)
    return setDomain(Interval(lo, up));
 }
 
-bool Variable::isDiscrete() const
+bool Variable::isInteger() const
 {
-   return rep_->isDiscrete();
+   return rep_->isInteger();
 }
 
 bool Variable::isBinary() const
 {
-   return isDiscrete() && getDomain().isSetEq(Interval::zeroPlusOne());
+   return isInteger() && getDomain().isSetEq(Interval::zeroPlusOne());
 }
 
-bool Variable::isInteger() const
+Variable& Variable::setInteger()
 {
-   return isDiscrete() && getDomain().isSetNeq(Interval::zeroPlusOne());
+   rep_->setInteger();
+   return *this;
 }
 
-Variable& Variable::setDiscrete()
+Variable& Variable::setBinary()
 {
-   rep_->setDiscrete();
+   rep_->setInteger();
+   rep_->setDomain(Interval::zeroPlusOne());
    return *this;
 }
 
@@ -190,7 +192,7 @@ std::ostream& operator<<(std::ostream& os, const Variable& v)
 
    Interval x = v.getDomain();
 
-   if (v.isDiscrete())
+   if (v.isInteger())
    {
       if (x.isSetEq(Interval::zeroPlusOne()))
          os << " binary";
@@ -215,8 +217,8 @@ Variable Variable::clone() const
     .setDomain(getDomain())
     .setTolerance(getTolerance());
 
-   if (isDiscrete())
-      v.setDiscrete();
+   if (isInteger())
+      v.setInteger();
    else
       v.setContinuous();
 

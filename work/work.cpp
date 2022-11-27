@@ -7,6 +7,7 @@
 #include "realpaver/Problem.hpp"
 #include "realpaver/LPSolver.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
+#include "realpaver/Range.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -17,6 +18,13 @@ int main(void)
    Interval::precision( 6 );
 
    try {
+      
+      Range r(0, 10);
+      cout << r << endl;
+      cout << r * Range::universe() << endl;
+      
+      return 1;
+      
       Problem prob;
       Variable x = prob.addRealVar(1, 2, "x");
       Variable y = prob.addRealVar(-1, 3, "y");
