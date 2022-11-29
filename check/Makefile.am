@@ -20,6 +20,7 @@ check_PROGRAMS = \
 	bitset_test \
 	dag_test \
 	hc4revise_test \
+	integer_test \
 	interval_test \
 	range_test \
 	scope_test
@@ -27,6 +28,7 @@ check_PROGRAMS = \
 bitset_test_SOURCES = bitset_test.cpp
 dag_test_SOURCES = dag_test.cpp
 hc4revise_test_SOURCES = hc4revise_test.cpp
+integer_test_SOURCES = integer_test.cpp
 interval_test_SOURCES = interval_test.cpp
 range_test_SOURCES = range_test.cpp
 scope_test_SOURCES = scope_test.cpp

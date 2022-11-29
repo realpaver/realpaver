@@ -3,6 +3,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <iostream>
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 
 using namespace std;
@@ -27,6 +28,6 @@ using namespace realpaver;
    {                                                  \
       bool thrown = false;                            \
       try { inst; }                                   \
-      catch(Menhir m) { thrown = true; }              \
+      catch(Exception& e) { thrown = true; }          \
       TEST_TRUE( thrown );                            \
    } while(0)

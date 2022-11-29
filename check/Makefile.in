@@ -92,6 +92,7 @@ build_triplet = @build@
 host_triplet = @host@
 @COND_CPPUNIT_TRUE@check_PROGRAMS = bitset_test$(EXEEXT) \
 @COND_CPPUNIT_TRUE@	dag_test$(EXEEXT) hc4revise_test$(EXEEXT) \
+@COND_CPPUNIT_TRUE@	integer_test$(EXEEXT) \
 @COND_CPPUNIT_TRUE@	interval_test$(EXEEXT) range_test$(EXEEXT) \
 @COND_CPPUNIT_TRUE@	scope_test$(EXEEXT)
 subdir = check
@@ -127,6 +128,11 @@ am__hc4revise_test_SOURCES_DIST = hc4revise_test.cpp
 hc4revise_test_OBJECTS = $(am_hc4revise_test_OBJECTS)
 hc4revise_test_LDADD = $(LDADD)
 hc4revise_test_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
+am__integer_test_SOURCES_DIST = integer_test.cpp
+@COND_CPPUNIT_TRUE@am_integer_test_OBJECTS = integer_test.$(OBJEXT)
+integer_test_OBJECTS = $(am_integer_test_OBJECTS)
+integer_test_LDADD = $(LDADD)
+integer_test_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
 am__interval_test_SOURCES_DIST = interval_test.cpp
 @COND_CPPUNIT_TRUE@am_interval_test_OBJECTS = interval_test.$(OBJEXT)
 interval_test_OBJECTS = $(am_interval_test_OBJECTS)
@@ -159,8 +165,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/bitset_test.Po \
 	./$(DEPDIR)/dag_test.Po ./$(DEPDIR)/hc4revise_test.Po \
-	./$(DEPDIR)/interval_test.Po ./$(DEPDIR)/range_test.Po \
-	./$(DEPDIR)/scope_test.Po
+	./$(DEPDIR)/integer_test.Po ./$(DEPDIR)/interval_test.Po \
+	./$(DEPDIR)/range_test.Po ./$(DEPDIR)/scope_test.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -181,11 +187,13 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(bitset_test_SOURCES) $(dag_test_SOURCES) \
-	$(hc4revise_test_SOURCES) $(interval_test_SOURCES) \
-	$(range_test_SOURCES) $(scope_test_SOURCES)
+	$(hc4revise_test_SOURCES) $(integer_test_SOURCES) \
+	$(interval_test_SOURCES) $(range_test_SOURCES) \
+	$(scope_test_SOURCES)
 DIST_SOURCES = $(am__bitset_test_SOURCES_DIST) \
 	$(am__dag_test_SOURCES_DIST) \
 	$(am__hc4revise_test_SOURCES_DIST) \
+	$(am__integer_test_SOURCES_DIST) \
 	$(am__interval_test_SOURCES_DIST) \
 	$(am__range_test_SOURCES_DIST) $(am__scope_test_SOURCES_DIST)
 am__can_run_installinfo = \
@@ -560,6 +568,7 @@ CLEANFILES = *~
 @COND_CPPUNIT_TRUE@bitset_test_SOURCES = bitset_test.cpp
 @COND_CPPUNIT_TRUE@dag_test_SOURCES = dag_test.cpp
 @COND_CPPUNIT_TRUE@hc4revise_test_SOURCES = hc4revise_test.cpp
+@COND_CPPUNIT_TRUE@integer_test_SOURCES = integer_test.cpp
 @COND_CPPUNIT_TRUE@interval_test_SOURCES = interval_test.cpp
 @COND_CPPUNIT_TRUE@range_test_SOURCES = range_test.cpp
 @COND_CPPUNIT_TRUE@scope_test_SOURCES = scope_test.cpp
@@ -620,6 +629,10 @@ hc4revise_test$(EXEEXT): $(hc4revise_test_OBJECTS) $(hc4revise_test_DEPENDENCIES
 	@rm -f hc4revise_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(hc4revise_test_OBJECTS) $(hc4revise_test_LDADD) $(LIBS)
 
+integer_test$(EXEEXT): $(integer_test_OBJECTS) $(integer_test_DEPENDENCIES) $(EXTRA_integer_test_DEPENDENCIES) 
+	@rm -f integer_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(integer_test_OBJECTS) $(integer_test_LDADD) $(LIBS)
+
 interval_test$(EXEEXT): $(interval_test_OBJECTS) $(interval_test_DEPENDENCIES) $(EXTRA_interval_test_DEPENDENCIES) 
 	@rm -f interval_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(interval_test_OBJECTS) $(interval_test_LDADD) $(LIBS)
@@ -641,6 +654,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitset_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dag_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hc4revise_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/integer_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/range_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scope_test.Po@am__quote@ # am--include-marker
@@ -892,6 +906,13 @@ hc4revise_test.log: hc4revise_test$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+integer_test.log: integer_test$(EXEEXT)
+	@p='integer_test$(EXEEXT)'; \
+	b='integer_test'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 interval_test.log: interval_test$(EXEEXT)
 	@p='interval_test$(EXEEXT)'; \
 	b='interval_test'; \
@@ -1009,6 +1030,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/bitset_test.Po
 	-rm -f ./$(DEPDIR)/dag_test.Po
 	-rm -f ./$(DEPDIR)/hc4revise_test.Po
+	-rm -f ./$(DEPDIR)/integer_test.Po
 	-rm -f ./$(DEPDIR)/interval_test.Po
 	-rm -f ./$(DEPDIR)/range_test.Po
 	-rm -f ./$(DEPDIR)/scope_test.Po
@@ -1060,6 +1082,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/bitset_test.Po
 	-rm -f ./$(DEPDIR)/dag_test.Po
 	-rm -f ./$(DEPDIR)/hc4revise_test.Po
+	-rm -f ./$(DEPDIR)/integer_test.Po
 	-rm -f ./$(DEPDIR)/interval_test.Po
 	-rm -f ./$(DEPDIR)/range_test.Po
 	-rm -f ./$(DEPDIR)/scope_test.Po
