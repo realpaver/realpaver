@@ -20,12 +20,16 @@ check_PROGRAMS = \
 	bitset_test \
 	dag_test \
 	hc4revise_test \
-	interval_test
+	interval_test \
+	range_test \
+	scope_test
 
 bitset_test_SOURCES = bitset_test.cpp
 dag_test_SOURCES = dag_test.cpp
 hc4revise_test_SOURCES = hc4revise_test.cpp
 interval_test_SOURCES = interval_test.cpp
+range_test_SOURCES = range_test.cpp
+scope_test_SOURCES = scope_test.cpp
 endif
 
 EXTRA_DIST = realpaver_test.hpp
