@@ -154,6 +154,26 @@ IntervalRegion IntervalRegion::subRegion(const Scope& sco) const
    return reg;
 }
 
+double IntervalRegion::distance(const IntervalRegion& reg) const
+{
+   return distanceOnScope(reg, scope_);
+}
+
+double IntervalRegion::distanceOnScope(const IntervalRegion& reg,
+                                       const Scope& sco) const
+{
+   ASSERT(scope_.contains(sco) && reg.scope_.contains(sco),
+          "Bad scopes used to calculate the distance between interval regions");
+
+   double d = 0.0;
+   for (auto v : sco)
+   {
+      double e = get(v).distance(reg.get(v));
+      if (e > d) d = e;
+   }
+   return d;
+}
+
 IntervalRegion* IntervalRegion::clone() const
 {
    return new IntervalRegion(*this);

@@ -242,7 +242,7 @@ IntervalVector* IntervalVector::clone() const
 double IntervalVector::distance(const IntervalVector& X) const
 {
    ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
-   
+
    double d = 0.0;
    for (size_t i=0; i<size(); ++i)
    {
