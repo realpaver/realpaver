@@ -4,9 +4,6 @@
 - Voir conséquences sur les vecteurs de fonctions
 
 -------------------------------------------------------------------------------
-- De toutatis importer RangeSlicer
-
--------------------------------------------------------------------------------
 - class Constraint : ConstraintOr, ConstraintNot, ConstraintAnd
 - à voir comment intégrer cela dans un DAG ou bien ce n'est pas inséré comme
   les ConstraintTable
