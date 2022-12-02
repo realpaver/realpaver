@@ -39,7 +39,7 @@ public:
    SharedContractorPool getPool() const;
 
    /// Sets the pool
-   /// @param pool new pool of contractors   
+   /// @param pool new pool of contractors
    void setPool(SharedContractorPool pool);
 
    ///@{

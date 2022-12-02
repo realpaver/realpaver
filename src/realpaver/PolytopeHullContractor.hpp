@@ -61,15 +61,15 @@ public:
    /// @return true in case of sucess, false otherwise
    virtual bool make(LPModel& lpm, const IntervalRegion& reg) = 0;
 
-   /// @param node a node of the DAG
-   /// @return the index of the linear variable with this node
-   size_t nodeToLinVar(DagNode* node) const;
+   /// @param v a variable
+   /// @return the index of the linear variable associated with v
+   size_t linVarIndex(Variable v) const;
 
 protected:
    SharedDag dag_;                           // DAG
    Scope scope_;                             // scope
    Bitset bs_;                               // bitset view of the scope
-   std::unordered_map<size_t, size_t > mnv_; // node index -> lin var index
+   std::unordered_map<size_t, size_t> mvv_;  // map var index ->lin var index
    IndexList lfun_;                          // list of indexes of functions
 };
 
@@ -89,6 +89,33 @@ public:
    PolytopeRLTCreator(SharedDag dag, const IndexList& lfun);
 
    bool make(LPModel& lpm, const IntervalRegion& reg) override;
+
+private:
+   size_t nodeToLinVar(DagNode* node) const;
+   void createLinVar(LPModel& lpm, DagNode* node);
+
+   std::unordered_map<size_t, size_t > mnv_; // node index -> lin var index
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a polytope maker that generates Taylor forms.
+///////////////////////////////////////////////////////////////////////////////
+class PolytopeTaylorCreator : public PolytopeCreator {
+public:
+   /// Creates a creator for a whole DAG
+   /// @param dag dag-representation of a nonlinear system
+   PolytopeTaylorCreator(SharedDag dag);
+
+   /// Creates a creator for a part of a DAG
+   /// @param dag dag-representation of a nonlinear system
+   /// @param lfun list of indexes of the DAG functions to be relaxed
+   /// @param corner 
+   PolytopeTaylorCreator(SharedDag dag, const IndexList& lfun);
+
+   bool make(LPModel& lpm, const IntervalRegion& reg) override;
+
+private:
+   Bitset corner_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

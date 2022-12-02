@@ -18,28 +18,22 @@ int main(void)
    Interval::precision( 6 );
 
    try {
-      
-      Range r(0, 10);
-      cout << r << endl;
-      cout << r * Range::universe() << endl;
-      
-      return 1;
-      
       Problem prob;
-      Variable x = prob.addRealVar(1, 2, "x");
-      Variable y = prob.addRealVar(-1, 3, "y");
+      Variable x = prob.addRealVar(-2, 1, "x");
+      Variable y = prob.addRealVar(-1, 2, "y");
 
       IntervalRegion reg = prob.getDomains();
 
       SharedDag dag = std::make_shared<Dag>();
-      size_t i1 = dag->insert( y - sqr(x) == 0);
-      size_t i2 = dag->insert( sqr(x) + sqr(y) == 2);
+      //size_t i1 = dag->insert( y - sqr(x) + x - 1 == 0);
+      //size_t i2 = dag->insert( sqr(y) - x*y + 2 <= 0);
 
-      cout << (*dag);
-      cout << dag->scope() << endl;
       cout << "input reg " << reg << endl;
 
-      PolytopeHullContractor phc(dag, PolytopeCreatorStyle::RLT);
+      size_t i1 = dag->insert( sqr(x) - x*y + sqr(y) <= 0);
+
+
+      PolytopeHullContractor phc(dag, PolytopeCreatorStyle::Taylor);
       Proof proof = phc.contract(reg);
 
       cout << proof << " " << reg << endl;
