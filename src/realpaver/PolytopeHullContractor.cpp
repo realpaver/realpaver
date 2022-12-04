@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/RltRelaxation.hpp"
@@ -196,7 +197,7 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
 
 bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
 {
-   if (!dag_->intervalEval(reg)) return false;
+
    Scope sco = scope();
 
    // creates the linear variables
@@ -204,12 +205,14 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
    {
       Interval val = reg.get(v);
       LinVar lv = lpm.makeVar(val.left(), val.right());
+      lv.setName(v.getName());
       mvv_.insert(std::make_pair(v.id(), lv.getIndex()));
    }
 
    // makes the opposite corners
    // current strategy: coner of left bounds and corner of right bounds
    RealPoint c1(sco), c2(sco);
+
    for (auto v : sco)
    {
       Interval dom = reg.get(v);
@@ -226,24 +229,55 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
       }
    }
 
+DEBUG("c1 : " << c1);
+
+   // evaluates the functions at both corners
+   IntervalVector fc1(lfun_.size()),
+                  fc2(lfun_.size());
+
+   for (size_t i : lfun_)
+   {
+      DagFun* f = dag_->fun(i);
+      Interval x1 = f->intervalEval(c1),
+               x2 = f->intervalEval(c2);
+               
+      if (x1.isEmpty() || x2.isEmpty()) return false;
+
+      fc1.set(i, x1);
+      fc2.set(i, x2);
+   }
+
+   DEBUG("fc1 : " << fc1);
+   DEBUG("fc2 : " << fc2);
+
+   // interval evaluation on the given region, used to calculate
+   // the derivatives thereafter
+   if (!dag_->intervalEval(reg)) return false;
+
    // generates the constraints
    for (size_t i : lfun_)
    {
       DagFun* f = dag_->fun(i);
       Interval img = f->getImage();
 
+
+DEBUG("\n\n fun no " << i);
+
       // differentiates the function
       f->intervalDiff();
 
-      // evaluation at corners
-      Interval fc1 = f->intervalEval(c1),
-               fc2 = f->intervalEval(c2);
-
-      // lower bounding functions
+      // lower bounding constraints
+      // if f has an upper bound, i.e. f(x) <= U then  we generate l1(x) <= U
+      // and l2(x) <= U such that we have l1(x) <= f(x) and l2(x) <= f(x)
+      // on the considered region
       if (!Double::isInf(img.right()))
       {
-         Interval u1 = img.right() - fc1,
-                  u2 = img.right() - fc2;
+         Interval u1 = img.right() - fc1.get(i),
+                  u2 = img.right() - fc2.get(i);
+
+
+DEBUG("lower BC with f(x) <= " << img.right());
+DEBUG("u1 : " << u1);
 
          LinExpr lo1, lo2;
 
@@ -251,8 +285,9 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
          {
             LinVar lv = lpm.getLinVar(linVarIndex(v));
             Interval z = f->intervalDeriv(v);
+            if (z.isEmpty() || z.isInf()) return false;
 
-DEBUG("df / " << v.getName() << " : " << z);
+DEBUG("df / d " << v.getName() << " : " << z);
 
             if (corner_.get(v.id()))
             {
@@ -270,18 +305,52 @@ DEBUG("df / " << v.getName() << " : " << z);
                lo2.addTerm(z.right(), lv);
                u2 += z.right() * Interval(c2.get(v));
             }
+
+DEBUG("u1 : " << u1);
+DEBUG("lo1 : " << lo1);
          }
 
          lpm.addCtr(lo1, u1.right());
          lpm.addCtr(lo2, u2.right());
       }
 
-      // upper bounding functions
+      // upper bounding constraints
+      // if f has a lower bound, i.e. f(x) >= L then  we generate u1(x) >= L
+      // and u2(x) >= L such that we have u1(x) >= f(x) and u2(x) >= f(x)
+      // on the considered region
       if (!Double::isInf(img.left()))
       {
-         Interval u1 = -fc1;
-      }
+         Interval l1 = img.left() - fc1.get(i),
+                  l2 = img.left() - fc2.get(i);
 
+         LinExpr up1, up2;
+
+         for (auto v : f->scope())
+         {
+            LinVar lv = lpm.getLinVar(linVarIndex(v));
+            Interval z = f->intervalDeriv(v);
+
+            if (corner_.get(v.id()))
+            {
+               up1.addTerm(z.left(), lv);
+               l1 += z.left() * Interval(c1.get(v));
+
+               up2.addTerm(z.right(), lv);
+               l2 += z.right() * Interval(c2.get(v));
+            }
+            else
+            {
+               up1.addTerm(z.right(), lv);
+               l1 += z.right() * Interval(c1.get(v));
+
+               up2.addTerm(z.left(), lv);
+               l2 += z.left() * Interval(c2.get(v));               
+            }
+         }
+
+         lpm.addCtr(l1.left(), up1);
+         lpm.addCtr(l2.left(), up2);
+      }
    }
    return true;
 }

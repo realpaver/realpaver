@@ -227,6 +227,9 @@ public:
    /// @return a pointer to the array of variable indexes of the terms of this
    int* getIndexVars() const;
 
+   /// output on a stream
+   void print(std::ostream& os) const;
+
 private:
    std::vector<double> coefs_;
    std::vector<int> vars_;
@@ -285,9 +288,15 @@ public:
    /// @return a pointer to the array of variable indexes of the terms of this
    int* getIndexVars() const;
 
+   /// output on a stream
+   friend std::ostream& operator<<(std::ostream& os, const LinExpr& e);
+
 private:
    std::shared_ptr<LinExprRep> rep_;
 };
+
+/// output on a stream
+std::ostream& operator<<(std::ostream& os, const LinExpr& e);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief This is the representation of a linear constraint in a LP model.

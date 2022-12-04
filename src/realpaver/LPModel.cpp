@@ -232,6 +232,18 @@ int* LinExprRep::getIndexVars() const
    return const_cast<int*>(vars_.data());
 }
 
+void LinExprRep::print(std::ostream& os) const
+{
+   for (size_t i=0; i<coefs_.size(); ++i)
+   {
+      double c = coefs_[i];
+      int iv = vars_[i];
+
+      if (c > 0) os << "+" << c << "*v" << iv;
+      if (c < 0) os << "-" << -c << "*v" << iv;
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 LinExpr::LinExpr() :
@@ -281,6 +293,12 @@ double* LinExpr::getCoefs() const
 int* LinExpr::getIndexVars() const
 {
    return rep_->getIndexVars();
+}
+
+std::ostream& operator<<(std::ostream& os, const LinExpr& e)
+{
+   e.rep_->print(os);
+   return os;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

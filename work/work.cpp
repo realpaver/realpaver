@@ -19,18 +19,18 @@ int main(void)
 
    try {
       Problem prob;
-      Variable x = prob.addRealVar(-2, 1, "x");
-      Variable y = prob.addRealVar(-1, 2, "y");
+      Variable x = prob.addRealVar(-2, 2, "x");
+      Variable y = prob.addRealVar(-2, 2, "y");
 
       IntervalRegion reg = prob.getDomains();
 
       SharedDag dag = std::make_shared<Dag>();
-      //size_t i1 = dag->insert( y - sqr(x) + x - 1 == 0);
-      //size_t i2 = dag->insert( sqr(y) - x*y + 2 <= 0);
+      size_t i1 = dag->insert( y - sqr(x) == 0);
+      size_t i2 = dag->insert( sqr(x) + sqr(y) - 2 == 0);
 
       cout << "input reg " << reg << endl;
 
-      size_t i1 = dag->insert( sqr(x) - x*y + sqr(y) <= 0);
+      //size_t i1 = dag->insert( sqr(x) - x*y + sqr(y) <= 0);
 
 
       PolytopeHullContractor phc(dag, PolytopeCreatorStyle::Taylor);
