@@ -170,11 +170,14 @@ void NcspSolver::makeContractor()
    // polytope hull contractor and non empty dag ?
    std::string with_polytope =
       env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
-   if (with_polytope == "YES" && !dag_->isEmpty())
+   if (with_polytope != "NO" && !dag_->isEmpty())
    {
+      PolytopeCreatorStyle style = PolytopeCreatorStyle::RLT;
+      if (with_polytope == "TAYLOR")
+         style = PolytopeCreatorStyle::Taylor;
+
       SharedContractor op =
-         std::make_shared<PolytopeHullContractor>(dag_,
-                                                  PolytopeCreatorStyle::RLT);
+         std::make_shared<PolytopeHullContractor>(dag_, style);
       mainpool->push(op);
    }
 

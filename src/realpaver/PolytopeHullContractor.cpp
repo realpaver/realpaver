@@ -19,9 +19,9 @@ std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style)
 {
    switch(style)
    {
-      case PolytopeCreatorStyle::Affine: return os << "affine maker";
-      case PolytopeCreatorStyle::RLT:    return os << "rlt maker";
-      case PolytopeCreatorStyle::Taylor: return os << "taylor maker";
+      case PolytopeCreatorStyle::Affine: return os << "Affine maker";
+      case PolytopeCreatorStyle::RLT:    return os << "RLT maker";
+      case PolytopeCreatorStyle::Taylor: return os << "Taylor maker";
       default:                           os.setstate(std::ios::failbit);
    }
    return os;
@@ -184,6 +184,7 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag)
       : PolytopeCreator(dag),
         corner_()
 {
+   // current strategy: corner of left bounds (each bit = 0)
    corner_ = Bitset(1 + scope().maxIndex(), 0);
 }
 
@@ -192,12 +193,12 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
       : PolytopeCreator(dag, lfun),
         corner_()
 {
+   // current strategy: corner of left bounds (each bit = 0)
    corner_ = Bitset(1 + scope().maxIndex(), 0);
 }
 
 bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
 {
-
    Scope sco = scope();
 
    // creates the linear variables
@@ -210,9 +211,7 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
    }
 
    // makes the opposite corners
-   // current strategy: coner of left bounds and corner of right bounds
    RealPoint c1(sco), c2(sco);
-
    for (auto v : sco)
    {
       Interval dom = reg.get(v);
@@ -221,7 +220,6 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
          c1.set(v, dom.right());
          c2.set(v, dom.left());
       }
-
       else
       {
          c1.set(v, dom.left());
@@ -229,26 +227,25 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
       }
    }
 
-DEBUG("c1 : " << c1);
+//~ DEBUG("c1 : " << c1);
 
    // evaluates the functions at both corners
    IntervalVector fc1(lfun_.size()),
                   fc2(lfun_.size());
-
    for (size_t i : lfun_)
    {
       DagFun* f = dag_->fun(i);
       Interval x1 = f->intervalEval(c1),
                x2 = f->intervalEval(c2);
-               
+
       if (x1.isEmpty() || x2.isEmpty()) return false;
 
       fc1.set(i, x1);
       fc2.set(i, x2);
    }
 
-   DEBUG("fc1 : " << fc1);
-   DEBUG("fc2 : " << fc2);
+   //~ DEBUG("fc1 : " << fc1);
+   //~ DEBUG("fc2 : " << fc2);
 
    // interval evaluation on the given region, used to calculate
    // the derivatives thereafter
@@ -261,23 +258,25 @@ DEBUG("c1 : " << c1);
       Interval img = f->getImage();
 
 
-DEBUG("\n\n fun no " << i);
+//~ DEBUG("\n\n fun no " << i);
 
       // differentiates the function
       f->intervalDiff();
 
       // lower bounding constraints
-      // if f has an upper bound, i.e. f(x) <= U then  we generate l1(x) <= U
-      // and l2(x) <= U such that we have l1(x) <= f(x) and l2(x) <= f(x)
-      // on the considered region
+      // assume that the right bound of the image of the function is finite
+      // we generate two linear constraints, one per corner
+      // the first one has the form lo1 <= u1 where lo1 is the non constant
+      // part of the constraint and u1 is the constant part
+      // the second one lo2 <= u2 is built similarly
       if (!Double::isInf(img.right()))
       {
-         Interval u1 = img.right() - fc1.get(i),
-                  u2 = img.right() - fc2.get(i);
+         Interval u1 = img.right() - fc1.get(i),  // U - f(c1)
+                  u2 = img.right() - fc2.get(i);  // U - f(c2)
 
 
-DEBUG("lower BC with f(x) <= " << img.right());
-DEBUG("u1 : " << u1);
+//~ DEBUG("lower BC with f(x) <= " << img.right());
+//~ DEBUG("u1 : " << u1);
 
          LinExpr lo1, lo2;
 
@@ -287,27 +286,33 @@ DEBUG("u1 : " << u1);
             Interval z = f->intervalDeriv(v);
             if (z.isEmpty() || z.isInf()) return false;
 
-DEBUG("df / d " << v.getName() << " : " << z);
+//~ DEBUG("df / d " << v.getName() << " : " << z);
 
             if (corner_.get(v.id()))
-            {
+            {  // right bound used for this variable (bit = 1)
+
+               // first corner => right bound of the derivative
                lo1.addTerm(z.right(), lv);
                u1 += z.right() * Interval(c1.get(v));
 
+               // second (opposite) corner => left bound of the derivative
                lo2.addTerm(z.left(), lv);
                u2 += z.left() * Interval(c2.get(v));
             }
             else
-            {
+            {  // left bound used for this variable (bit = 0)
+
+               // first corner => left bound of the derivative
                lo1.addTerm(z.left(), lv);
                u1 += z.left() * Interval(c1.get(v));
 
+               // second (opposite) corner => right bound of the derivative
                lo2.addTerm(z.right(), lv);
                u2 += z.right() * Interval(c2.get(v));
             }
 
-DEBUG("u1 : " << u1);
-DEBUG("lo1 : " << lo1);
+//~ DEBUG("u1 : " << u1);
+//~ DEBUG("lo1 : " << lo1);
          }
 
          lpm.addCtr(lo1, u1.right());
@@ -315,9 +320,11 @@ DEBUG("lo1 : " << lo1);
       }
 
       // upper bounding constraints
-      // if f has a lower bound, i.e. f(x) >= L then  we generate u1(x) >= L
-      // and u2(x) >= L such that we have u1(x) >= f(x) and u2(x) >= f(x)
-      // on the considered region
+      // assume that the left bound of the image of the function is finite
+      // we generate two linear constraints, one per corner
+      // the first one has the form up1 >= l1 where up1 is the non constant
+      // part of the constraint and l1 is the constant part
+      // the second one up2 >= l2 is built similarly
       if (!Double::isInf(img.left()))
       {
          Interval l1 = img.left() - fc1.get(i),
@@ -331,18 +338,24 @@ DEBUG("lo1 : " << lo1);
             Interval z = f->intervalDeriv(v);
 
             if (corner_.get(v.id()))
-            {
+            {  // right bound used for this variable (bit = 1)
+
+               // first corner => left bound of the derivative
                up1.addTerm(z.left(), lv);
                l1 += z.left() * Interval(c1.get(v));
 
+               // second (opposite) corner => right bound of the derivative
                up2.addTerm(z.right(), lv);
                l2 += z.right() * Interval(c2.get(v));
             }
             else
-            {
+            {  // left bound used for this variable (bit = 1)
+
+               // first corner => right bound of the derivative
                up1.addTerm(z.right(), lv);
                l1 += z.right() * Interval(c1.get(v));
 
+               // second (opposite) corner => left bound of the derivative
                up2.addTerm(z.left(), lv);
                l2 += z.left() * Interval(c2.get(v));               
             }
@@ -376,6 +389,8 @@ PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
                                                PolytopeCreatorStyle style)
       : creator_(nullptr)
 {
+   DEBUG("style : " << style);
+
    if (style == PolytopeCreatorStyle::RLT)
       creator_ = new PolytopeRLTCreator(dag, lfun);
 
@@ -405,7 +420,7 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 {
    LPSolver solver;
 
-DEBUG("PolytopeHullContractor");
+//~ DEBUG("PolytopeHullContractor");
 
    // linearizes the constraints
    if (!creator_->make(solver, reg)) return Proof::Maybe;
@@ -420,7 +435,7 @@ DEBUG("PolytopeHullContractor");
       LinExpr e({1.0}, {lv});
       solver.setObj(e);
 
-DEBUG(solver << "\n\n");
+//~ DEBUG(solver << "\n\n");
 
       // reduction of the left bound
       solver.setMinimization();
@@ -430,8 +445,8 @@ DEBUG(solver << "\n\n");
       status = solver.getStatus();
 
 
-DEBUG("status " << status);
-DEBUG("obj " << solver.getObjVal());
+//~ DEBUG("status " << status);
+//~ DEBUG("obj " << solver.getObjVal());
 
 
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
@@ -445,15 +460,15 @@ DEBUG("obj " << solver.getObjVal());
       // reduction of the right bound
       solver.setMaximization();
 
-DEBUG(solver << "\n\n");
+//~ DEBUG(solver << "\n\n");
 
 
       solver.reoptimize();
 
       status = solver.getStatus();
 
-DEBUG("status " << status);
-DEBUG("obj " << solver.getObjVal());
+//~ DEBUG("status " << status);
+//~ DEBUG("obj " << solver.getObjVal());
 
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
