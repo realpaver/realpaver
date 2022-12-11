@@ -60,6 +60,7 @@ Param::Param()
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
    dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT",   10.0));
    dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",      1.0e-3));
+   dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));

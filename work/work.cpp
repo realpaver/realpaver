@@ -15,7 +15,7 @@ using namespace realpaver;
 int main(void)
 {
    Logger::init(LogLevel::full, "work.log");
-   Interval::precision( 6 );
+   Interval::precision( 12 );
 
    try {
       Problem prob;

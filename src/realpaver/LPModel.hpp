@@ -95,6 +95,12 @@ public:
    /// @return the value of this in an optimal solution
    double getObjVal() const;
 
+   /// @return true if the solution of the primal problem is feasible after an
+   ///         an optimization, false otherwise
+   ///
+   /// Interval arithmetic is used to provide a proof certificate.
+   bool isPrimalSolutionFeasible() const;
+
 private:
    int index_;
    double lb_, ub_, objval_;
@@ -171,6 +177,12 @@ public:
 
    /// @return the value of this in an optimal solution
    double getObjVal() const;
+
+   /// @return true if the solution of the primal problem is feasible after an
+   ///         an optimization, false otherwise
+   ///
+   /// Interval arithmetic is used to provide a proof certificate.
+   bool isPrimalSolutionFeasible() const;
 
    friend class LPModel;
 
@@ -364,7 +376,7 @@ public:
 
    /// @return true is this has the form lb <= e <= ub with lb != ub
    bool isRange() const;
-  
+
 private:
    LinExpr expr_;
    double lb_, ub_;
@@ -544,7 +556,17 @@ public:
 
    /// @return the optimal value of the objective function in the last
    ///         computed optimal solution
+   ///
+   /// It returns the value given by the linear solver.
    double getObjVal() const;
+
+   /// @return the optimal value of the objective function in the last
+   ///         computed optimal solution
+   ///
+   /// It returns a safe value obtained from an interval evaluation of the
+   /// objective function. It should be called only if the primal solution is
+   /// feasible, i.e. isPrimalSolutionFeasible() is true.
+   double getSafeObjVal() const;
 
    /// Output on a stream
    friend std::ostream& operator<<(std::ostream& os, const LPModel& model);
@@ -588,6 +610,12 @@ public:
 
    /// @return the status of the last optimization stage
    OptimizationStatus getStatus() const;
+
+   /// @return true if the solution of the primal problem is feasible after an
+   ///         an optimization, false otherwise
+   ///
+   /// Interval arithmetic is used to provide a proof certificate.
+   bool isPrimalSolutionFeasible() const;
 
 protected:
    /// Sets the value of the objective function in an optimal solution

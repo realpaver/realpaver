@@ -1,0 +1,9 @@
+Variables
+   x in [-1.0e8, 1.0e8],
+   y in [-1.0e8, 1.0e8],
+   z in [-1.0e8, 1.0e8];
+
+Constraints
+   x^2 + y^2 + z^2 == 36,
+   x+y == z,
+   x*y + z^2 == 1;

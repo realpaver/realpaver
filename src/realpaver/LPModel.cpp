@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <sstream>
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/Param.hpp"
@@ -112,6 +113,11 @@ double LinVarRep::getObjVal() const
    return objval_;
 }
 
+bool LinVarRep::isPrimalSolutionFeasible() const
+{
+   return lb_ <= objval_ && objval_ <= ub_;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 LinVar::LinVar() : rep_(nullptr)
@@ -197,6 +203,11 @@ std::string LinVar::getName() const
 double LinVar::getObjVal() const
 {
    return rep_->getObjVal();
+}
+
+bool LinVar::isPrimalSolutionFeasible() const
+{
+   return rep_->isPrimalSolutionFeasible();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -658,6 +669,45 @@ OptimizationStatus LPModel::getStatus() const
 void LPModel::setStatus(OptimizationStatus status)
 {
    status_ = status;
+}
+
+double LPModel::getSafeObjVal() const
+{
+   Interval val = Interval::zero();
+
+   for (int i=0; i<obj_.getNbTerms(); ++i)
+   {
+      LinVar v = getLinVar(obj_.getIndexVar(i));
+      val += Interval(obj_.getCoef(i)) * v.getObjVal();
+   }
+
+   return isMinimization() ? val.left() : val.right();
+}
+
+bool LPModel::isPrimalSolutionFeasible() const
+{
+   // tests the variables
+   for (auto& v : vars_)
+      if (!v.isPrimalSolutionFeasible())
+         return false;
+
+   // tests the constraints
+   for (auto& ctr : ctrs_)
+   {
+      Interval val = Interval::zero();
+      LinExpr expr = ctr.getExpr();
+
+      for (int i=0; i<expr.getNbTerms(); ++i)
+      {
+         LinVar v = getLinVar(expr.getIndexVar(i));
+         val += Interval(expr.getCoef(i)) * v.getObjVal();
+      }
+
+      Interval img(ctr.getLB(), ctr.getUB());
+      if (!img.contains(val)) return false;
+   }
+
+   return true;
 }
 
 } // namespace

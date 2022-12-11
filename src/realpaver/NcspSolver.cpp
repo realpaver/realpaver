@@ -176,8 +176,10 @@ void NcspSolver::makeContractor()
       if (with_polytope == "TAYLOR")
          style = PolytopeCreatorStyle::Taylor;
 
-      SharedContractor op =
+      std::shared_ptr<PolytopeHullContractor> op =
          std::make_shared<PolytopeHullContractor>(dag_, style);
+      op->setRelaxEqTol(env_->getParam()->getDblParam("RELAXATION_EQ_TOL"));
+
       mainpool->push(op);
    }
 

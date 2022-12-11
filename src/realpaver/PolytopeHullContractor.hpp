@@ -65,12 +65,20 @@ public:
    /// @return the index of the linear variable associated with v
    size_t linVarIndex(Variable v) const;
 
+   /// @return the relaxation tolerance for the equations
+   double getRelaxEqTol() const;
+
+   /// Assigns the relaxation tolerance for the equations
+   /// @param tol a positive real number
+   void setRelaxEqTol(double tol);
+
 protected:
    SharedDag dag_;                           // DAG
    Scope scope_;                             // scope
    Bitset bs_;                               // bitset view of the scope
    std::unordered_map<size_t, size_t> mvv_;  // map var index ->lin var index
    IndexList lfun_;                          // list of indexes of functions
+   double eqtol_;                            // relaxation tol for the equations
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,13 +159,20 @@ public:
    /// No assignment
    PolytopeHullContractor& operator=(const PolytopeHullContractor&) = delete;
 
+   /// @return the relaxation tolerance for the equations
+   double getRelaxEqTol() const;
+
+   /// Assigns the relaxation tolerance for the equations
+   /// @param tol a positive real number
+   void setRelaxEqTol(double tol);
+
    bool dependsOn(const Bitset& bs) const override;
    Scope scope() const override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;
 
 private:
-   PolytopeCreator* creator_;
+   PolytopeCreator* creator_;    // creator of the relaxation
 };
 
 } // namespace

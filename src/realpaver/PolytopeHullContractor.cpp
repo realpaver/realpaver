@@ -10,6 +10,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/RltRelaxation.hpp"
 
@@ -34,7 +35,8 @@ PolytopeCreator::PolytopeCreator(SharedDag dag)
         scope_(dag->scope()),
         bs_(),
         mvv_(),
-        lfun_()
+        lfun_(),
+        eqtol_(Param::GetDblParam("RELAXATION_EQ_TOL"))
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");
 
@@ -48,7 +50,8 @@ PolytopeCreator::PolytopeCreator(SharedDag dag, const IndexList& lfun)
       : dag_(dag),
         scope_(),
         bs_(),
-        lfun_()
+        lfun_(),
+        eqtol_(Param::GetDblParam("RELAXATION_TOL"))
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");
    ASSERT(!lfun.empty(), "No list of functions in a polytope maker");
@@ -86,6 +89,19 @@ size_t PolytopeCreator::linVarIndex(Variable v) const
 {
    auto it = mvv_.find(v.id());
    return it->second;
+}
+
+double PolytopeCreator::getRelaxEqTol() const
+{
+   return eqtol_;
+}
+
+void PolytopeCreator::setRelaxEqTol(double tol)
+{
+   ASSERT(tol >= 0.0,
+          "The relaxation tolerance must be positive: " << tol << ".");
+
+   eqtol_ = tol;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,7 +186,11 @@ bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
       auto it = mnv_.find(node->index());
       LinVar v = lpm.getLinVar(it->second);
 
-      Interval x = v.getDomain() & f->getImage();
+      Interval img = f->getImage();
+      if (img.isSingleton())
+         img += Interval(-eqtol_, eqtol_);
+
+      Interval x = v.getDomain() & img;
       if (x.isEmpty()) return false;
       v.setDomain(x);
    }
@@ -227,8 +247,6 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
       }
    }
 
-//~ DEBUG("c1 : " << c1);
-
    // evaluates the functions at both corners
    IntervalVector fc1(lfun_.size()),
                   fc2(lfun_.size());
@@ -244,9 +262,6 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
       fc2.set(i, x2);
    }
 
-   //~ DEBUG("fc1 : " << fc1);
-   //~ DEBUG("fc2 : " << fc2);
-
    // interval evaluation on the given region, used to calculate
    // the derivatives thereafter
    if (!dag_->intervalEval(reg)) return false;
@@ -256,9 +271,8 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
    {
       DagFun* f = dag_->fun(i);
       Interval img = f->getImage();
-
-
-//~ DEBUG("\n\n fun no " << i);
+      if (img.isSingleton())
+         img += Interval(-eqtol_, eqtol_);
 
       // differentiates the function
       f->intervalDiff();
@@ -274,10 +288,6 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
          Interval u1 = img.right() - fc1.get(i),  // U - f(c1)
                   u2 = img.right() - fc2.get(i);  // U - f(c2)
 
-
-//~ DEBUG("lower BC with f(x) <= " << img.right());
-//~ DEBUG("u1 : " << u1);
-
          LinExpr lo1, lo2;
 
          for (auto v : f->scope())
@@ -285,8 +295,6 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
             LinVar lv = lpm.getLinVar(linVarIndex(v));
             Interval z = f->intervalDeriv(v);
             if (z.isEmpty() || z.isInf()) return false;
-
-//~ DEBUG("df / d " << v.getName() << " : " << z);
 
             if (corner_.get(v.id()))
             {  // right bound used for this variable (bit = 1)
@@ -310,9 +318,6 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
                lo2.addTerm(z.right(), lv);
                u2 += z.right() * Interval(c2.get(v));
             }
-
-//~ DEBUG("u1 : " << u1);
-//~ DEBUG("lo1 : " << lo1);
          }
 
          lpm.addCtr(lo1, u1.right());
@@ -420,8 +425,6 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 {
    LPSolver solver;
 
-//~ DEBUG("PolytopeHullContractor");
-
    // linearizes the constraints
    if (!creator_->make(solver, reg)) return Proof::Maybe;
 
@@ -435,8 +438,6 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       LinExpr e({1.0}, {lv});
       solver.setObj(e);
 
-//~ DEBUG(solver << "\n\n");
-
       // reduction of the left bound
       solver.setMinimization();
       if (first) solver.optimize();
@@ -444,15 +445,15 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 
       status = solver.getStatus();
 
-
-//~ DEBUG("status " << status);
-//~ DEBUG("obj " << solver.getObjVal());
+      if (!solver.isPrimalSolutionFeasible())
+         status = OptimizationStatus::Other;
 
 
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
-         x &= Interval::moreThan(solver.getObjVal());
+         x &= Interval::moreThan(solver.getSafeObjVal());
+         if (x.isEmpty()) return Proof::Empty;
       }
 
       first = false;
@@ -460,20 +461,18 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
       // reduction of the right bound
       solver.setMaximization();
 
-//~ DEBUG(solver << "\n\n");
-
-
       solver.reoptimize();
 
       status = solver.getStatus();
 
-//~ DEBUG("status " << status);
-//~ DEBUG("obj " << solver.getObjVal());
+      if (!solver.isPrimalSolutionFeasible())
+         status = OptimizationStatus::Other;
 
       if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
          x &= Interval::lessThan(solver.getObjVal());
+         if (x.isEmpty()) return Proof::Empty;
       }
 
       reg.set(v, x);
@@ -485,6 +484,16 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 void PolytopeHullContractor::print(std::ostream& os) const
 {
    os << "Polytope Hull contractor";
+}
+
+double PolytopeHullContractor::getRelaxEqTol() const
+{
+   return creator_->getRelaxEqTol();
+}
+
+void PolytopeHullContractor::setRelaxEqTol(double tol)
+{
+   creator_->setRelaxEqTol(tol);
 }
 
 } // namespace

@@ -1,4 +1,7 @@
 -------------------------------------------------------------------------------
+- Clustering of solutions
+
+-------------------------------------------------------------------------------
 - Changer IntervalFunction et RealFunction en classes virtuelles pures
 - Les dériver en IntervalDagFunction et RealDagFunction
 - Voir conséquences sur les vecteurs de fonctions
@@ -13,7 +16,6 @@
 
 -------------------------------------------------------------------------------
 - Linearizations implemented as DAG visitors
-  * Taylor forms
   * Affine forms
 
 -------------------------------------------------------------------------------
