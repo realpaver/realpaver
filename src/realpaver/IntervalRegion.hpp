@@ -146,20 +146,37 @@ public:
    /// @return this restricted to sco
    IntervalRegion subRegion(const Scope& sco) const;
 
-   /// Hausdorff distance
+   /// Hausdorff distance between regions
    /// @param reg an interval region
-   /// @return the distance between this and reg
+   /// @return the maximum distance componentwise between this and reg
    ///
    /// Assumption: this and reg have the same scope
    double distance(const IntervalRegion& reg) const;
 
-   /// Hausdorff distance on a scope
+   /// Hausdorff distance between regions on a scope
    /// @param reg an interval region
    /// @param sco a scope
-   /// @return the distance between this and reg restricted to sco
+   /// @return the maximum distance componentwise between this and reg
+   ///         restricted to sco
    ///
    /// Assumption: sco is included in the scopes of this and reg
    double distanceOnScope(const IntervalRegion& reg, const Scope& sco) const;
+
+   /// Gap between regions
+   /// @param reg an interval region
+   /// @return the maximum gap componentwise between this and reg
+   ///
+   /// Assumption: this and reg have the same scope
+   double gap(const IntervalRegion& reg) const;
+
+   /// Gap between regions on a scope
+   /// @param reg an interval region
+   /// @param sco a scope
+   /// @return the maximum gap componentwise between this and reg
+   ///         restricted to sco
+   ///
+   /// Assumption: sco is included in the scopes of this and reg
+   double gapOnScope(const IntervalRegion& reg, const Scope& sco) const;
 
    ///@{
    IntervalRegion* clone() const override;

@@ -252,5 +252,17 @@ double IntervalVector::distance(const IntervalVector& X) const
    return d;
 }
 
+double IntervalVector::gap(const IntervalVector& X) const
+{
+   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+
+   double gap = 0.0;
+   for (size_t i=0; i<size(); ++i)
+   {
+      double e = get(i).gap(X.get(i));
+      if (e > gap) gap = e;
+   }
+   return gap;
+}
 
 } // namespace

@@ -24,6 +24,7 @@ int main(void)
 
       IntervalRegion reg = prob.getDomains();
 
+
       SharedDag dag = std::make_shared<Dag>();
       size_t i1 = dag->insert( y - sqr(x) == 0);
       size_t i2 = dag->insert( sqr(x) + sqr(y) - 2 == 0);

@@ -192,10 +192,24 @@ public:
    /// @return true if this and other overlap
    bool overlaps(const Interval& other) const;
 
-   /// Hausdorff distance
+   /// Hausdorff distance between intervals
    /// @param other an interval
    /// @return the distance between this and other
+   ///
+   /// Given this = [a, b] and other = [c, d], the distance is defined by
+   ///         max(|a-c|, |b-d|)
    double distance(const Interval& other) const;
+
+   /// Gap between intervals
+   /// @param other an interval
+   /// @return the gap between this and other
+   ///
+   /// Given this = [a, b] and other = [c, d], the gap is equal to
+   ///    - +oo if an interval is empty
+   ///    - 0.0 if both intervals overlap
+   ///    - c-b if c>b
+   ///    - a-d if a>d
+   double gap(const Interval& other) const;
 
    ///@{
    /// Intersection

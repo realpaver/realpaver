@@ -174,6 +174,26 @@ double IntervalRegion::distanceOnScope(const IntervalRegion& reg,
    return d;
 }
 
+double IntervalRegion::gap(const IntervalRegion& reg) const
+{
+   return gapOnScope(reg, scope_);
+}
+
+double IntervalRegion::gapOnScope(const IntervalRegion& reg,
+                                       const Scope& sco) const
+{
+   ASSERT(scope_.contains(sco) && reg.scope_.contains(sco),
+          "Bad scopes used to calculate the gap between interval regions");
+
+   double gap = 0.0;
+   for (auto v : sco)
+   {
+      double e = get(v).gap(reg.get(v));
+      if (e > gap) gap = e;
+   }
+   return gap;
+}
+
 IntervalRegion* IntervalRegion::clone() const
 {
    return new IntervalRegion(*this);

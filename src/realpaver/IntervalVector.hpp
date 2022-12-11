@@ -138,10 +138,15 @@ public:
    /// @return a clone of this
    virtual IntervalVector* clone() const;
 
-   /// Hausdorff distance
+   /// Hausdorff distance between vectors
    /// @param X an interval vector
-   /// @return the distance between this and X
+   /// @return the maximum distance componentwise between this and X
    double distance(const IntervalVector& X) const;
+
+   /// Gap between vectors
+   /// @param X an interval vector
+   /// @return the maximum gap componentwise between this and X
+   double gap(const IntervalVector& X) const;
 };
 
 } // namespace

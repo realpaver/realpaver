@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Double.hpp"
 #include "realpaver/Interval.hpp"
 
 namespace realpaver {
@@ -563,6 +564,26 @@ bool Interval::overlaps(const Interval& other) const
 double Interval::distance(const Interval& other) const
 {
    return Interval::Traits::distance(impl_, other.impl_);
+}
+
+double Interval::gap(const Interval& other) const
+{
+   if (isEmpty() || other.isEmpty())
+      return Double::inf();
+
+   if (isCertainlyLt(other))
+   {
+      Double::rndUp();
+      return other.left() - right();
+   }
+
+   if (isCertainlyGt(other))
+   {
+      Double::rndUp();
+      return left() - other.right();
+   }
+
+   return 0.0;
 }
 
 Interval& Interval::operator&=(const Interval& other)
