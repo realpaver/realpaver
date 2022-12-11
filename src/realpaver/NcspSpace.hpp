@@ -58,6 +58,15 @@ public:
    /// @return true if there is a soltion node whose region is an inner region
    ///         or a feasible region
    virtual bool hasFeasibleSolNode() const = 0;
+
+   /// Aggregates the solutions that are close enough
+   /// @param gap two solutions are aggregated if their inter-gap is less than
+   ///        the value of gap
+   ///
+   /// If gap < 0.0 then there is no clustering; if gap = 0.0 then two solutions
+   /// are replaced by their hull if they overlap; otherwise two solutions
+   /// are replaced by their hull if their inter-gap is small enough.
+   virtual void makeSolClusters(double gap) = 0;
    ///@}
 
    /// Management of pending nodes

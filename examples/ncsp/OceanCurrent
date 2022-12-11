@@ -1,0 +1,19 @@
+Functions
+   dist(x1, y1, x2, y2) = sqrt((x1-x2)^2 + (y1-y2)^2);
+
+Constants
+   x1 = 2,   y1 = 1.5, d1 = 2.55,
+   x2 = 6,   y2 = 5.5, d2 = 3.81,
+   x3 = 8.5, y3 = 1,   d3 = 4.12,
+   E = 1.0e-2;
+
+Variables
+   xM in [-1.0e8, 1.0e8] tol 1.0e-2A,
+   yM in [-1.0e8, 1.0e8] tol 1.0e-2A;
+
+Constraints
+   dist(xM, yM, x1, y1) in [d1-E, d1+E],
+   dist(xM, yM, x2, y2) in [d2-E, d2+E],
+   dist(xM, yM, x3, y3) in [d3-E, d3+E];
+
+# solution with E=0: (4.5, 2)

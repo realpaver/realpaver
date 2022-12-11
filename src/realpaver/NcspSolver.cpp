@@ -377,6 +377,9 @@ void NcspSolver::branchAndPrune()
    }
    while (iter);
 
+   double gap = env_->getParam()->getDblParam("SOLUTION_CLUSTER_GAP");
+   space_->makeSolClusters(gap);
+
    stimer_.stop();
 }
 

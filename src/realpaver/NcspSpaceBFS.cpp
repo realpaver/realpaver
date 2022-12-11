@@ -47,6 +47,45 @@ bool NcspSpaceBFS::hasFeasibleSolNode() const
    return false;
 }
 
+void NcspSpaceBFS::makeSolClusters(double gap)
+{
+   // no clustering if the gap is negative
+   if (gap < 0.0) return;
+
+   // moves the solution nodes in a list
+   std::list<SharedNcspNode> lnode;
+   for (auto node : vsol_) lnode.push_back(node);
+   vsol_.clear();
+
+   while (!lnode.empty())
+   {
+      // extracts the first node
+      SharedNcspNode node = lnode.front();
+      IntervalRegion* regnode = node->region();
+      lnode.pop_front();
+
+      // finds another node that is close enough
+      bool found = false;
+      auto it = lnode.begin();
+      while (!found && it != lnode.end())
+      {
+         SharedNcspNode bis = *it;
+         IntervalRegion* regbis = bis->region();
+
+         if (regnode->gap(*regbis) <= gap)
+         {
+            // merges node in bisnode and iterates
+            regbis->hullAssignOnScope(*regnode, node->scope());
+            found = true;
+         }
+         else ++it;
+      }
+
+      // this is a solution node and no other solution is close enough
+      if (!found) vsol_.push_back(node);
+   }
+}
+
 size_t NcspSpaceBFS::nbPendingNodes() const
 {
    return lnode_.size();

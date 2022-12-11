@@ -39,6 +39,7 @@ public:
    SharedNcspNode popSolNode() override;
    SharedNcspNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
+   void makeSolClusters(double gap) override;
    size_t nbPendingNodes() const override;
    SharedNcspNode nextPendingNode() override;
    void insertPendingNode(const SharedNcspNode& node) override;

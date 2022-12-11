@@ -31,93 +31,10 @@ int main(void)
 
       cout << "input reg " << reg << endl;
 
-      //size_t i1 = dag->insert( sqr(x) - x*y + sqr(y) <= 0);
-
-
       PolytopeHullContractor phc(dag, PolytopeCreatorStyle::Taylor);
       Proof proof = phc.contract(reg);
 
       cout << proof << " " << reg << endl;
-
-/*
-   LPSolver solver;
-   double largeur = 311.5, L = 109.2, S = largeur - 2*L, lo = 0;
-
-   // variables
-   vector<LinVar> A, B;
-   int nc = 4;
-
-   for (size_t i=0; i<nc; ++i)
-   {
-      ostringstream aos;
-      aos << "a" << i;
-      A.push_back(solver.makeVar(lo, L, aos.str()));
-
-      ostringstream bos;
-      bos << "b" << i;
-      B.push_back(solver.makeVar(lo, L, bos.str()));
-   }
-
-   // Ai + Bi = S
-   for (size_t i=0; i<nc; ++i)
-   {
-      LinExpr e = { {1.0, 1.0}, {A[i], B[i]} };
-      solver.addCtr(S, e, S);
-   }
-
-   // Bi + Ai+1 = L
-   for (size_t i=0; i<nc-1; ++i)
-   {
-      LinExpr e = { {1.0, 1.0}, {B[i], A[i+1]} };
-      solver.addCtr(L, e, L);
-   }
-
-   // perte
-   LinVar p = solver.makeVar(0, 2*L, "p");
-
-   // perte : p = L - A0 + L - Bnc-1 <=> p + A0 + Bnc-1 = 2L
-   LinExpr ep = { {1.0, 1.0, 1.0}, {p, A[0], B[nc-1]} };
-   solver.addCtr(2*L, ep, 2*L);
-
-   // maximize A0
-   LinExpr ob = { {1.0}, {A[0]} };
-   solver.setObj(ob);
-   solver.setMaximization();
-
-   cout << solver << endl;
-
-   // solving
-   bool optimal = solver.optimize();
-
-   if (optimal)
-   {
-      cout << "OPTIMAL" << endl;
-      cout << "Objective value: " << solver.getObjVal() << endl;
-
-      for (int i=0; i<solver.getNbLinVars(); ++i)
-      {
-         LinVar v = solver.getLinVar(i);
-         cout << v.getName() << "*: " << v.getObjVal() << endl;
-      }
-   }
-   else
-   {
-      cout << "NOT OPTIMAL" << endl;
-   }
-
-   cout << endl;
-*/
-/*
-      Problem prob;
-      Variable x = prob.addRealVar(1, 2, "x");
-      Variable y = prob.addRealVar(0, 0, "y");
-      
-      Term t( sqr(x) - 4*x*y + sqr(y) );
-      IntervalRegion reg = prob.getDomains();
-      
-      cout << t.eval(reg) << endl;
-*/
-
 
 /*
       double x1 = 2,   y1 = 1.5, d1 = 2.55,
@@ -142,25 +59,6 @@ int main(void)
 
       solver.solve();
 */
-/*
-      IntervalRegion reg = prob.getDomains();
-
-      Dag dag;
-      dag.insert(sqr(x) - sqr(y));
-      dag.insert(3.0*x + sqr(z));
-      dag.insert(sqr(z) + z);
-      
-      cout << dag << endl;
-      IntervalMatrix J(3, 3);
-      dag.intervalDiff(reg, J);
-      cout << J << endl;
-
-      RealPoint pt = reg.midpoint();
-      RealMatrix R(3, 3);
-      dag.realDiff(pt, R);
-      cout << R << endl;
-*/
-
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

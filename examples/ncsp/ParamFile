@@ -72,6 +72,15 @@ BB_SPACE_FREQUENCY = 1
 # - DMDFS: Distant-Most Depth-First-Search
 BP_NODE_SELECTION = DMDFS
 
+# Limit on the gap between two solutions such that they are aggregated
+# if they are close enough.
+# The value is:
+# - negative if no clustering is required;
+# - 0.0 if two solutions are aggregated if they overlap;
+# - positive otherwise; in particular, a huge value may permit to calculate
+#   the hull of all the solutions.
+SOLUTION_CLUSTER_GAP = 1.0e-4
+
 ###############################################################################
 ## SPLITTING STRATEGIES                                                      ##
 ###############################################################################

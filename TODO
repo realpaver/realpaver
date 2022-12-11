@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-- Clustering of solutions
+- formars d'affichage pour les solutions
 
 -------------------------------------------------------------------------------
 - Changer IntervalFunction et RealFunction en classes virtuelles pures

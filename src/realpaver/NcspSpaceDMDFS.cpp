@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
 
@@ -58,6 +59,63 @@ bool NcspSpaceDMDFS::hasFeasibleSolNode() const
          return true;
    }
    return false;
+}
+
+void NcspSpaceDMDFS::makeSolClusters(double gap)
+{
+   // no clustering if the gap is negative
+   if (gap < 0.0) return;
+
+   // moves the solution nodes in a list
+   std::list<SharedNcspNode> lnode;
+   for (auto node : vsol_) lnode.push_back(node);
+   vsol_.clear();
+
+   while (!lnode.empty())
+   {
+      // extracts the first node
+      SharedNcspNode node = lnode.front();
+      IntervalRegion* regnode = node->region();
+      lnode.pop_front();
+
+      // finds another node that is close enough
+      bool found = false;
+      auto it = lnode.begin();
+      while (!found && it != lnode.end())
+      {
+         SharedNcspNode bis = *it;
+         IntervalRegion* regbis = bis->region();
+
+         if (regnode->gap(*regbis) <= gap)
+         {
+            // merges node in bisnode and iterates
+            regbis->hullAssignOnScope(*regnode, node->scope());
+            found = true;
+         }
+         else ++it;
+      }
+
+      // this is a solution node and no other solution is close enough
+      if (!found) vsol_.push_back(node);
+   }
+
+   // after the clustering phase, it is necessary to update the distance between
+   // each pending node and its closest solution.
+   for (auto& elem : vnode_)
+   {
+      IntervalRegion* reg = elem.node->region();
+      elem.mindist = Double::inf();
+
+      for (auto& sol : vsol_)
+      {
+         IntervalRegion* regsol = sol->region();
+         double d = reg->distance(*regsol);
+         if (d < elem.mindist) elem.mindist = d;
+      }
+   }
+   
+   // ascending ordering of the node distances
+   std::sort(vnode_.begin(), vnode_.end(), comparator);
 }
 
 size_t NcspSpaceDMDFS::nbPendingNodes() const
