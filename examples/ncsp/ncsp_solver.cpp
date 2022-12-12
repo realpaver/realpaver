@@ -135,9 +135,9 @@ int main(int argc, char** argv)
       {
          IntervalRegion reg(preproc->fixedRegion());
          Scope sco = preproc->fixedScope();
-         fsol << "PREPROCESSING" << endl;
-         fsol << sco << endl;
-         fsol << reg << endl << endl;
+         fsol << "--- PREPROCESSING ---" << endl << endl;
+         reg.stdPrint(fsol);
+         fsol << endl;
       }
 
       // solving
@@ -187,26 +187,48 @@ int main(int argc, char** argv)
                     << ORANGE(space->nbPendingNodes()) << endl;
 
             // writes the solutions
-            fsol << "SOLVING" << endl;
+            fsol << "--- SOLVING ---" << endl;
             Scope sco = preproc->unfixedScope();
-            fsol << sco << endl;
 
-            for (size_t i=0; i<space->nbSolNodes(); ++i)
+            string sdis =
+               solver.getEnv()->getParam()->getStrParam("DISPLAY_REGION");
+            if (sdis == "STD")
             {
-               SharedNcspNode node = space->getSolNode(i);
-               IntervalRegion* reg = node->region();
-               Proof proof = node->getProof();
-
-               fsol << "#" << (i+1);
-               switch (proof)
+               for (size_t i=0; i<space->nbSolNodes(); ++i)
                {
-                  case Proof::Inner:    fsol << " (I) "; break;
-                  case Proof::Feasible: fsol << " (F) "; break;
-                  case Proof::Maybe:    fsol << " (U) "; break;
-                  default:              fsol << " (error) "; break;
-               }
+                  SharedNcspNode node = space->getSolNode(i);
+                  IntervalRegion* reg = node->region();
+                  Proof proof = node->getProof();
 
-               fsol << (*reg) << endl;
+                  fsol << std::endl << "SOLUTION " << (i+1)
+                       << " [" << reg->width() << "]";
+
+                  switch (proof)
+                  {
+                     case Proof::Inner:    fsol << " [inner]"; break;
+                     case Proof::Feasible: fsol << " [safe]"; break;
+                     case Proof::Maybe:    fsol << " [unsafe]"; break;
+                     default:              fsol << " (bug!!!)"; break;
+                  }
+
+                  fsol << endl;
+                  reg->stdPrint(fsol);
+               }
+            }
+            else if (sdis == "VEC")
+            {
+               fsol << endl << "SCOPE = " << sco << endl;
+               for (size_t i=0; i<space->nbSolNodes(); ++i)
+               {
+                  SharedNcspNode node = space->getSolNode(i);
+                  IntervalRegion* reg = node->region();
+                  fsol << endl;
+                  reg->vecPrint(fsol);
+               }
+            }
+            else
+            {
+               THROW("Bad parameter value: DISPLAY_REGION = " << sdis);
             }
          }
 

@@ -201,6 +201,24 @@ IntervalRegion* IntervalRegion::clone() const
 
 void IntervalRegion::print(std::ostream& os) const
 {
+   stdPrint(os);
+}
+
+void IntervalRegion::stdPrint(std::ostream& os) const
+{
+   size_t lmax = scope_.maxVarLength();
+
+   for (auto v : scope_)
+   {
+      os << v.getName();
+      size_t n = v.getName().length();
+      for (size_t i=0; i<lmax-n; ++i) os << ' ';
+      os << " = " << get(v) << std::endl;
+   }
+}
+
+void IntervalRegion::vecPrint(std::ostream& os) const
+{
    IntervalVector::print(os);
 }
 

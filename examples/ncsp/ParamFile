@@ -45,6 +45,11 @@ LOG_LEVEL = FULL
 # Trace displayed in a terminal (YES or NO)
 TRACE = YES
 
+# Display of regions
+# STD: standard display with one variable and its domain per line
+# VEC: display of the vector of domains
+DISPLAY_REGION = STD
+
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##
 ###############################################################################
@@ -56,7 +61,7 @@ NODE_LIMIT = 500000
 DEPTH_LIMIT = 1000
 
 # Limit on the number of solutions
-SOLUTION_LIMIT = 1000
+SOLUTION_LIMIT = 10
 
 # In a branch-and-bound algorithm, the next node can be either the node with
 # the lowest lower bound or the node with the lowest upper bound (diving).

@@ -74,7 +74,8 @@ Param::Param()
    strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",    "GRADIENT"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
-   strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));   
+   strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
+   strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
 }
 
 int Param::getIntParam(const string& name) const

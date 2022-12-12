@@ -293,6 +293,9 @@ public:
    /// @return true if this scope is shared, false otherwise
    bool isShared() const;
 
+   /// @return the length of the longest variable name of this
+   size_t maxVarLength() const;
+
 private:
    std::shared_ptr<ScopeRep> rep_;
 

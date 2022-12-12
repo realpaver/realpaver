@@ -393,4 +393,15 @@ Scope operator|(Scope s, Scope t)
    return res;
 }
 
+size_t Scope::maxVarLength() const
+{
+   size_t l = 0;
+   for (auto v : *this)
+   {
+      size_t n = v.getName().length();
+      if (n > l) l = n;
+   }
+   return l;
+}
+
 } // namespace

@@ -183,6 +183,14 @@ public:
    void print(std::ostream& os) const override;
    ///@}
 
+   /// Display on a stream using the format x = [a, b] y = [c, d], etc.
+   /// @param os an output stream
+   void stdPrint(std::ostream& os) const;
+
+   /// Display on a stream of the vector of domains
+   /// @param os an output stream
+   void vecPrint(std::ostream& os) const;
+
 private:
    Scope scope_;
 };

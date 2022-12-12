@@ -45,6 +45,11 @@ LOG_LEVEL = NONE
 # Trace displayed in a terminal (YES or NO)
 TRACE = YES
 
+# Display of regions
+# STD: standard display with one variable and its domain per line
+# VEC: display of the vector of domains
+DISPLAY_REGION = STD
+
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##
 ###############################################################################
