@@ -1,3 +1,5 @@
+# System of Rose from the PoSSo test suite
+
 Variables
    x in [-1.0e3, 1.0e3],
    y in [-1.0e3, 1.0e3],

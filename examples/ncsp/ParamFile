@@ -61,7 +61,7 @@ NODE_LIMIT = 500000
 DEPTH_LIMIT = 1000
 
 # Limit on the number of solutions
-SOLUTION_LIMIT = 10
+SOLUTION_LIMIT = 1000
 
 # In a branch-and-bound algorithm, the next node can be either the node with
 # the lowest lower bound or the node with the lowest upper bound (diving).
@@ -75,7 +75,7 @@ BB_SPACE_FREQUENCY = 1
 # - DFS: Depth-First-Search
 # - BFS: Breadth-First-Search
 # - DMDFS: Distant-Most Depth-First-Search
-BP_NODE_SELECTION = DMDFS
+BP_NODE_SELECTION = DFS
 
 # Limit on the gap between two solutions such that they are aggregated
 # if they are close enough.
@@ -151,7 +151,7 @@ BC3_ITER_LIMIT = 30
 # that uses one contractor per constraint
 # HC4: HC4 contractor
 # BC4: BC4 contractor
-PROPAGATION_BASE = HC4
+PROPAGATION_BASE = BcC4
 
 # Now it is possible to increase the contraction power of the algorithm by
 # activating strong contractors, as follows:

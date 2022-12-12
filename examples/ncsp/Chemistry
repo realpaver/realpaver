@@ -1,0 +1,29 @@
+# Chemical equilibrium of hydrocarbon combustion
+# In: Keith Meintjes and Alexander P. Morgan.
+#     Chemical equilibrium systems as numerical test problems.
+#     ACM TOMS, Vol 16, No 2, 143-151, 1990.
+#
+# 1 solution
+
+Constants
+   R = 10,
+   R5 = 0.193,
+   R6 = 0.002597/sqrt(40),
+   R7 = 0.003448/sqrt(40),
+   R8 = 0.00001799/40,
+   R9 = 0.0002155/sqrt(40),
+   R10 = 0.00003846/40;
+
+Variables
+   x1 in [0, 1.0e3],
+   x2 in [0, 1.0e3],
+   x3 in [0, 1.0e3],
+   x4 in [0, 1.0e3],
+   x5 in [0, 1.0e3];
+
+Constraints
+   3*x5 == x1*(x2 + 1),
+   x3*(x2*(2*x3+R7) + 2*R5*x3 + R6) ==  8*x5,
+   x4*(R9*x2 + 2*x4) == 4*R*x5,
+   x2*(2*x1 + x3*(x3+R7) + R8 + 2*R10*x2 + R9*x4) + x1 == R*x5,
+   x2*(x1 + R10*x2 + x3*(x3+R7) + R8 + R9*x4) +x1 + x3*(R5*x3 + R6) + x4^2 == 1;

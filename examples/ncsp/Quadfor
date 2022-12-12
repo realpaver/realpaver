@@ -1,3 +1,8 @@
+# Gaussian quadrature formula with 2 knots and 2 weights over [-1, +1]
+# In: Jan Verschelde and Karin Gatermann.
+#     Symmetric Newton Polytopes for Solving Sparse Polynomial Systems.
+#     Adv. Appl. Math., 16(1): 95-127, 1995.
+
 Variables
    x1 in [-1.0e2, 1.0e2],
    x2 in [-1.0e2, 1.0e2],
@@ -10,11 +15,3 @@ Constraints
    w1*x1   + w2*x2   == 0,
    w1*x1^2 + w2*x2^2 == 2/3,
    w1*x1^3 + w2*x2^3 == 0;
-
-#   Time................................ 97.66s
-#   Number of nodes..................... 82393
-#   Search status....................... complete
-#   Solution status..................... no proof certificate
-#   Number of solutions................. 2
-#1 (U) ([0.816496577917, 0.816496585823], [-0.816496584396, -0.816496570161], [0.499999992106, 0.500000003968], [0.499999996032, 0.500000007894])
-#2 (U) ([-0.816496585823, -0.816496577917], [0.816496570161, 0.816496584396], [0.499999992106, 0.500000003968], [0.499999996032, 0.500000007894])

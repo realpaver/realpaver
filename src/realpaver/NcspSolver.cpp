@@ -268,12 +268,13 @@ void NcspSolver::bpStep(int depthlimit)
    if (isAnInnerRegion(*reg))
    {
       node->setProof(Proof::Inner);
-      
+
       string str = env_->getParam()->getStrParam("SPLIT_INNER");
       if (str == "NO")
       {
          LOG_INTER("Solution node (inner region)");
          space_->pushSolNode(node);
+
          return;
       }
       else
@@ -341,11 +342,29 @@ void NcspSolver::branchAndPrune()
 
    int depthlimit = env_->getParam()->getIntParam("DEPTH_LIMIT");
 
+   bool trace = env_->getParam()->getStrParam("TRACE") == "YES";
+
    bool iter = true;
-   
+
+   size_t nsol = 0;
+
    do
    {
       bpStep(depthlimit);
+      size_t soln = space_->nbSolNodes();
+
+      if (soln > nsol)
+      {
+         nsol = soln;
+         if (trace)
+         {
+            std::cout << "\tnb sol: " << "\033[34m" << nsol << "\033[39m"
+                      << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime()
+                      << "s" << "\033[39m"
+                      << "\t\tnb nod: " << "\033[31m" << space_->nbPendingNodes()
+                      << "\033[39m" << std::endl;
+         }
+      }
 
       if (space_->nbPendingNodes() == 0)
       {

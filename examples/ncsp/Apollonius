@@ -1,0 +1,30 @@
+# The Circle Theorem of Apollonius, page 284
+# In: D. Cox and J. Little and D. O'Shea,
+#     Ideals, Varieties and Algorithms,
+#     Springer-Verlag, NY, 1992.
+#
+# 1 solution
+
+Constants
+   u1 = 2,
+   u2 = 1;
+
+Variables
+   x1 in [-1.0e2, 1.0e2],
+   x2 in [-1.0e2, 1.0e2],
+   x3 in [-1.0e2, 1.0e2],
+   x4 in [-1.0e2, 1.0e2],
+   x5 in [-1.0e2, 1.0e2],
+   x6 in [-1.0e2, 1.0e2],
+   x7 in [-1.0e2, 1.0e2],
+   x8 in [-1.0e2, 1.0e2];
+
+Constraints
+   2*x1 == u1,
+   2*x2 == u2,
+   2*x3 == u1,
+   2*x4 == u2,
+   u1*x5 == u2*x6,
+   u2*x5 + u1*x6 == u1*u2,
+   (x1-x7)^2 + x8^2 - x7^2 == (x8-x2)^2,
+   (x1-x7)^2 + x8^2 == (x3-x7)^2 + (x4-x8)^2;

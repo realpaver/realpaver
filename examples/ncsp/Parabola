@@ -1,6 +1,11 @@
+# Intersection of a circle and a parabola
+#
+# 2 solutions
+
 Variables
-   x in {0},
-   y in [-inf, +inf];
+   x in [-10, 10],
+   y in [-10, 10];
 
 Constraints
-  y == x + 1;
+  y - x^2 == 0,
+  y2 + x^2 - 2 == 0;

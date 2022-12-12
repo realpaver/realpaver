@@ -1,3 +1,5 @@
+# System of Trinks from the PoSSo test suite
+
 Variables
    t in [-1.0e2, 1.0e2],
    u in [-1.0e2, 1.0e2],

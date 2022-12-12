@@ -1,3 +1,9 @@
+# In: P. Van Hentenryck and L. Michel and Y. Deville.
+#     Numerica: a Modeling Language for Global Optimization}.
+#     MIT Press, 1997.
+#
+# 1 solution
+
 Constants
    G_1_1 = 0.485,
    G_2_1 = 0.369,
