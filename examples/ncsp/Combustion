@@ -1,0 +1,29 @@
+# Combustion problem for a temperature of 3000 degrees
+# 
+# In: P. Van Hentenryck and L. Michel and F. Benhamou.
+#     Newton - Constraint Programming over non-linear Constraints.
+#     Scientific Programming, 1997.
+
+Variables
+   x1 in [0, 1.0e8],
+   x2 in [0, 1.0e8],
+   x3 in [0, 1.0e8],
+   x4 in [0, 1.0e8],
+   x5 in [0, 1.0e8],
+   x6 in [0, 1.0e8],
+   x7 in [0, 1.0e8],
+   x8 in [0, 1.0e8],
+   x9 in [0, 1.0e8],
+   x10 in [0, 1.0e8];
+
+Constraints
+   x2 + 2*x6 + x9 + 2*x10 == 1.0e-5,
+   x3 + x8 == 3.0e-5,
+   x1 + x3 + 2*x5 + 2*x8 + x9 + x10 == 5.0e-5,
+   x4 + 2*x7  == 1.0e-5,
+   0.5140437e-7 *x5  == x1^2,
+   0.1006932e-6 *x6  == 2*x2^2,
+   0.7816278e-15*x7  == x4^2,
+   0.1496236e-6 *x8  == x1*x3,
+   0.6194411e-7 *x9  == x1*x2,
+   0.2089296e-14*x10 == x1*x2^2;

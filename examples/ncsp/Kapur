@@ -1,0 +1,13 @@
+Variables
+   x in [0, 1000],
+   y in [0, 1000],
+   z in [0, 1000],
+   w in [0, 1000],
+   t in [0, 1000];
+
+Constraints
+   y*z + z*w + w*y == 9,
+   z*x + x*w + w*z == 4,
+   w*x + x*y + y*w == 5,
+   x*y + y*z + z*x == 16,
+   2*x*y*z + 2*y*z*w + 2*z*w*x + 2*w*x*y == 9*t;

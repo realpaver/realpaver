@@ -1,0 +1,32 @@
+# Heart-dipole problem
+# 
+# In: Morgan, A.P. and Sommese, A. and Watson, L.T..
+#     Mathematical reduction of a heart dipole model.
+#     J. Comput. Appl. Math. Vol. 27, pages 407-410, 1989.
+
+Variables
+   a in [-10, 10],
+   b in [-10, 10],
+   c in [-10, 10],
+   d in [-10, 10],
+   t in [-10, 10],
+   u in [-10, 10],
+   v in [-10, 10],
+   w in [-10, 10];
+
+Constraints
+   a + b == 0.63254,
+   c + d == -1.34534,
+   
+   t*a + u*b - v*c - w*d == -0.8365348,
+   v*a + w*b + t*c + u*d == 1.7345334,
+   
+   a*t^2 - a*v^2 - 2*c*t*v + b*u^2 - b*w^2 - 2*d*u*w == 1.352352,
+   c*t^2 - c*v^2 + 2*a*t*v + d*u^2 - d*w^2 + 2*b*u*w == -0.843453,
+   
+   a*t^3 - 3*a*t*v^2 + c*v^3 - 3*c*v*t^2 
+     + b*u^3 - 3*b*u*w^2 + d*w^3 - 3*d*w*u^2 == -0.9563453,
+   
+   c*t^3 - 3*c*t*v^2 - a*v^3 + 3*a*v*t^2 
+     + d*u^3 - 3*d*u*w^2 - b*w^3 + 3*b*w*u^2 == 1.2342523;
+   

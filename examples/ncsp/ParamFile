@@ -151,7 +151,7 @@ BC3_ITER_LIMIT = 30
 # that uses one contractor per constraint
 # HC4: HC4 contractor
 # BC4: BC4 contractor
-PROPAGATION_BASE = BcC4
+PROPAGATION_BASE = BC4
 
 # Now it is possible to increase the contraction power of the algorithm by
 # activating strong contractors, as follows:

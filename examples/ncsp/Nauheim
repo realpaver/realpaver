@@ -1,0 +1,27 @@
+# Small system from constructive Galois theory, called s9_1
+# In: Raphael Nauheim.
+#     Systems of Algebraic Equations with Bad Reduction.
+#     Universitaet Heidelberg, Interdisziplinaeres Zentrum fuer
+#     wissenschaftliches Rechnen, Preprint 95-46, Dezember 1995.
+# 
+# 4 solutions
+
+Variables
+   a in [-1.0e3, 1.0e3],
+   b in [-1.0e3, 1.0e3],
+   c in [-1.0e3, 1.0e3],
+   d in [-1.0e3, 1.0e3],
+   ee in [-1.0e3, 1.0e3],
+   f in [-1.0e3, 1.0e3],
+   g in [-1.0e3, 1.0e3],
+   h in [-1.0e3, 1.0e3];
+
+Constraints
+   ee*g + 2*d*h == 0,
+   9*ee + 4*b == 0,
+   4*c*h + 2*ee*f + 3*d*g == 0,
+   7*c - 9*a + 8*f == 0,
+   4*d*f + 5*c*g + 6*h + 3*ee == 0,
+   5*d + 6*c*f + 7*g - 9*b == 0,
+   9*d + 6*a == 5*b,
+   9*c == 7*a - 8;

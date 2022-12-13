@@ -1,0 +1,19 @@
+# A problem of magnetism in physics
+# In: S. Katsura, W. Fukuda, S. Inawashiro, N.M. Fujiki and R. Gebauer.
+# Cell Biophysics, Vol 11, pages 309--319, 1987.
+
+Variables
+   t in [-1.0e2, 1.0e2],
+   u in [-1.0e2, 1.0e2],
+   v in [-1.0e2, 1.0e2],
+   x in [-1.0e2, 1.0e2],
+   y in [-1.0e2, 1.0e2],
+   z in [-1.0e2, 1.0e2];
+
+Constraints
+   2*x^2+2*y^2+2*z^2+2*t^2+2*u^2+v^2-v == 0,
+   x*y+y*z+2*z*t+2*t*u+2*u*v-u == 0,
+   2*x*z+2*y*t+2*z*u+u^2+2*t*v-t == 0,
+   2*x*t+2*y*u+2*t*u+2*z*v-z == 0,
+   t^2+2*x*v+2*y*v+2*z*v-y == 0,
+   2*x+2*y+2*z+2*t+2*u+v-1 == 0;

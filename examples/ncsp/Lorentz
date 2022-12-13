@@ -1,0 +1,16 @@
+# Equilibrium points of a 4-dimensional Lorentz attractor
+# In: Tien-Yien Li.
+#     Solving polynomial systems.
+#     The Mathematical Intelligencer 9(3):33-39, 1987.
+
+Variables
+   x1 in [-1.0e3, 1.0e3],
+   x2 in [-1.0e3, 1.0e3],
+   x3 in [-1.0e3, 1.0e3],
+   x4 in [-1.0e3, 1.0e3];
+
+Constraints
+   x1*x2  - x1*x3 - x4 + 1 == 0,
+   x2*x3  - x2*x4 - x1 + 1 == 0,
+   -x1*x3 + x3*x4 - x2 + 1 == 0,
+   x1*x4  - x2*x4 - x3 + 1 == 0;

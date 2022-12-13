@@ -1,0 +1,33 @@
+# A sparse system, known as benchmark D1
+#
+# In: H. Hong and V. Stahl:
+# Safe Starting Regions by Fixed Points and Tightening.
+# Computing 53(3-4): 322-335, 1995.
+
+Variables
+   x1 in [-1.0e3, 1.0e3],
+   x2 in [-1.0e3, 1.0e3],
+   x3 in [-1.0e3, 1.0e3],
+   x4 in [-1.0e3, 1.0e3],
+   x5 in [-1.0e3, 1.0e3],
+   x6 in [-1.0e3, 1.0e3],
+   x7 in [-1.0e3, 1.0e3],
+   x8 in [-1.0e3, 1.0e3],
+   x9 in [-1.0e3, 1.0e3],
+   x10 in [-1.0e3, 1.0e3],
+   x11 in [-1.0e3, 1.0e3],
+   x12 in [-1.0e3, 1.0e3];
+
+Constraints
+  x1^2  + x2^2 - 1 == 0,
+  x3^2  + x4^2 - 1 == 0,
+  x5^2  + x6^2 - 1 == 0,
+  x7^2  + x8^2 - 1 == 0,
+  x9^2  + x10^2 - 1 == 0,
+  x11^2 + x12^2 - 1 == 0,
+  3*x3 + 2*x5 + x7 - 3.9701 == 0,
+  3*x1*x4 + 2*x1*x6 + x1*x8 - 1.7172 == 0,
+  3*x2*x4 + 2*x2*x6 + x2*x8 - 4.0616 == 0,
+  x3*x9 + x5*x9 + x7*x9 - 1.9791 == 0,
+  x2*x4*x9 + x2*x6*x9 + x2*x8*x9 + x1*x10 - 1.9115 == 0,
+  - x3*x10*x11 - x5*x10*x11 - x7*x10*x11 + x4*x12 + x6*x12 + x8*x12 - 0.4077 == 0;
