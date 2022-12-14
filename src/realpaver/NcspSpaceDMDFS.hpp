@@ -20,8 +20,8 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class NcspSpaceDMDFS : public NcspSpace {
 public:
-   /// Default constructor
-   NcspSpaceDMDFS() = default;
+   /// Constructor
+   NcspSpaceDMDFS();
 
    /// Default destructor
    ~NcspSpaceDMDFS() = default;
@@ -39,6 +39,7 @@ public:
    SharedNcspNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    void makeSolClusters(double gap) override;
+   size_t nbTotalSolNodes() const override;
    size_t nbPendingNodes() const override;
    SharedNcspNode nextPendingNode() override;
    void insertPendingNode(const SharedNcspNode& node) override;
@@ -60,6 +61,8 @@ private:
 
    std::vector<Elem> vnode_;           // vector of pending nodes
    std::vector<SharedNcspNode> vsol_;  // vector of solution nodes
+   size_t stotal_;                     // number of solution nodes that have
+                                       // been inserted in this
 };
 
 } // namespace

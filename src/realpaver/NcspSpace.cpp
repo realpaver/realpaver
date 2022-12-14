@@ -14,4 +14,23 @@ namespace realpaver {
 
 NcspSpace::~NcspSpace() {}
 
+IntervalRegion NcspSpace::hullOfPendingNodes() const
+{
+   size_t n = nbPendingNodes();
+   if (n == 0) THROW("No pending node in the space");
+
+   SharedNcspNode node = getPendingNode(0);
+   IntervalRegion* regnode = node->region();
+
+   IntervalRegion h(*regnode);
+
+   for (size_t i=1; i<n; ++i)
+   {
+      node = getPendingNode(i);
+      regnode = node->region();
+      h.hullAssignOnScope(*regnode, h.scope());
+   }
+   return h;
+}
+
 } // namespace

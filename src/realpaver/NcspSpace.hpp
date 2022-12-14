@@ -67,6 +67,9 @@ public:
    /// are replaced by their hull if they overlap; otherwise two solutions
    /// are replaced by their hull if their inter-gap is small enough.
    virtual void makeSolClusters(double gap) = 0;
+
+   /// @return the total number of solution nodes that have been inserted in this
+   virtual size_t nbTotalSolNodes() const = 0;
    ///@}
 
    /// Management of pending nodes
@@ -84,6 +87,11 @@ public:
    /// @param i a pending node index with 0 <= i < nbPendingNodes()
    /// @return the i-th pending node
    virtual SharedNcspNode getPendingNode(size_t i) const = 0;
+
+   /// @return the hull of the all the pending nodes
+   ///
+   /// throws an exception if there is no pending node
+   IntervalRegion hullOfPendingNodes() const;
    ///@}
 };
 

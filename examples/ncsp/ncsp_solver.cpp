@@ -81,7 +81,7 @@ int main(int argc, char** argv)
       fsol.open(solfilename, std::ofstream::out);
       if (fsol.bad()) THROW("Open error of solution file");
 
-      std::string sep = "##############################";
+      std::string sep = "###################################";
       sep += sep;
       std::string indent = "   ";
       int wpl = 36;
@@ -179,8 +179,11 @@ int main(int argc, char** argv)
             else
                cout << ORANGE("no proof certificate") << endl;
 
-            cout << indent << WP("Number of solutions", wpl)
+            cout << indent << WP("Number of clustered solutions", wpl)
                  << ORANGE(space->nbSolNodes()) << endl;
+
+            cout << indent << WP("Number of individual solutions", wpl)
+                 << ORANGE(space->nbTotalSolNodes()) << endl;
 
             if (!complete)
                cout << indent << WP("Number of pending nodes", wpl)
@@ -229,6 +232,16 @@ int main(int argc, char** argv)
             else
             {
                THROW("Bad parameter value: DISPLAY_REGION = " << sdis);
+            }
+
+            // writes the hull of the pending nodes
+            if (space->nbPendingNodes() > 0)
+            {
+               fsol << endl << "HULL OF PENDING NODES" << endl;
+               if (sdis == "STD")
+                  space->hullOfPendingNodes().stdPrint(fsol);
+               else if (sdis == "VEC")
+                  space->hullOfPendingNodes().vecPrint(fsol);
             }
          }
 

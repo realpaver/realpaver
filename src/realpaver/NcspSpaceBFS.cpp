@@ -12,6 +12,10 @@
 
 namespace realpaver {
 
+NcspSpaceBFS::NcspSpaceBFS()
+      : vsol_(), lnode_(), stotal_(0)
+{}
+
 size_t NcspSpaceBFS::nbSolNodes() const
 {
    return vsol_.size();
@@ -19,6 +23,7 @@ size_t NcspSpaceBFS::nbSolNodes() const
 
 void NcspSpaceBFS::pushSolNode(const SharedNcspNode& node)
 {
+   stotal_++;
    vsol_.push_back(node);
 }
 
@@ -84,6 +89,11 @@ void NcspSpaceBFS::makeSolClusters(double gap)
       // this is a solution node and no other solution is close enough
       if (!found) vsol_.push_back(node);
    }
+}
+
+size_t NcspSpaceBFS::nbTotalSolNodes() const
+{
+   return stotal_;
 }
 
 size_t NcspSpaceBFS::nbPendingNodes() const

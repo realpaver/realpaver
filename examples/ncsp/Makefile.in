@@ -376,6 +376,7 @@ EXTRA_DIST = \
 	Quadgrid.rpv \
 	Rabinowitz.rpv \
 	Rbpl.rpv \
+	Realkin.rpv \
 	Reimer5.rpv \
 	Rose.rpv \
 	Rueher.rpv \
@@ -383,6 +384,7 @@ EXTRA_DIST = \
 	SeyfertFilter.rpv \
 	Solotarev.rpv \
 	StackedGymnasticHalls.rpv \
+	SteelFramedComputerBuilding.rpv \
 	Transistor.rpv \
 	Trinks.rpv \
 	Virasoro.rpv \

@@ -14,6 +14,9 @@
 
 namespace realpaver {
 
+NcspSpaceDMDFS::NcspSpaceDMDFS()
+      : vnode_(), vsol_(), stotal_(0)
+{}
 
 size_t NcspSpaceDMDFS::nbSolNodes() const
 {
@@ -22,6 +25,7 @@ size_t NcspSpaceDMDFS::nbSolNodes() const
 
 void NcspSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
 {
+   stotal_++;
    vsol_.push_back(node);
 
    // update the distances
@@ -116,6 +120,11 @@ void NcspSpaceDMDFS::makeSolClusters(double gap)
    
    // ascending ordering of the node distances
    std::sort(vnode_.begin(), vnode_.end(), comparator);
+}
+
+size_t NcspSpaceDMDFS::nbTotalSolNodes() const
+{
+   return stotal_;
 }
 
 size_t NcspSpaceDMDFS::nbPendingNodes() const
