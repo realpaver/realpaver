@@ -1,0 +1,29 @@
+# Benchmark I2 from the Interval Arithmetic Benchmarks
+#
+# In: P. Van Hentenryck and L. Michel and F. Benhamou.
+#     Newton - Constraint Programming over non-linear Constraints.
+#     Scientific Programming, 1997.
+
+Variables
+   x1 in [-1, 2],
+   x2 in [-1, 2],
+   x3 in [-1, 2],
+   x4 in [-1, 2],
+   x5 in [-1, 2],
+   x6 in [-1, 2],
+   x7 in [-1, 2],
+   x8 in [-1, 2],
+   x9 in [-1, 2],
+   x10 in [-1, 2];
+
+Constraints
+   x1 - 0.25428722 - 0.18324757*x4*x3*x9  == 0,
+   x2 - 0.37842197 - 0.16275449*x1*x10*x6 == 0,
+   x3 - 0.27162577 - 0.16955071*x1*x2*x10 == 0,
+   x4 - 0.19807914 - 0.15585316*x7*x1*x6  == 0,
+   x5 - 0.44166728 - 0.19950920*x7*x6*x3  == 0,
+   x6 - 0.14654113 - 0.18922793*x8*x5*x10 == 0,
+   x7 - 0.42937161 - 0.21180486*x2*x5*x8  == 0,
+   x8 - 0.07056438 - 0.17081208*x1*x7*x6  == 0,
+   x9 - 0.34504906 - 0.19612740*x10*x6*x8 == 0,
+   x10 - 0.42651102 - 0.21466544*x4*x8*x1 == 0;

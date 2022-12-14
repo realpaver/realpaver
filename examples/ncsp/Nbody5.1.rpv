@@ -1,0 +1,17 @@
+# System from the PoSSo test suite
+
+Variables
+   B in [-1.0e2, 1.0e2],
+   D in [-1.0e2, 1.0e2],
+   F in [-1.0e2, 1.0e2],
+   b in [-1.0e2, 1.0e2],
+   d in [-1.0e2, 1.0e2],
+   f in [-1.0e2, 1.0e2];
+
+Constraints
+   3*(b-d)*(B-D) + (B+D)-6*F+4 == 0,
+   3*(b-d)*(B+D-2*F) + 5*(B-D) == 0,
+   3*(b-d)^2 - 6*(b+d) + 4*f + 3 == 0,
+   B^2*b^3 == 1,
+   D^2*d^3 == 1,
+   F^2*f^3 == 1;

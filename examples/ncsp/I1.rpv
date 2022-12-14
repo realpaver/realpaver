@@ -1,0 +1,37 @@
+# Benchmark I1 from the Interval Arithmetic Benchmarks
+#
+# In: P. Van Hentenryck, D. McAllester and D. Kapur:
+#     Solving Polynomial Systems Using a Branch and Prune Approach.
+#     SIAM J. Numerical Analysis, Vol. 34, No. 2, pp 797-827, 1997.
+#
+#     H. Hong and V. Stahl:
+#     Safe Starting Regions by Fixed Points and Tightening.
+#     Computing 53(3-4): 322-335, 1995.
+#
+#     R.E. Moore and S.T. Jones:
+#     Safe Starting Regions for Iterative Methods.
+#     SIAM J. Numer. Anal. 14(6): 1051-1065, 1977.
+
+Variables
+   x1 in [-2, 2],
+   x2 in [-2, 2],
+   x3 in [-2, 2],
+   x4 in [-2, 2],
+   x5 in [-2, 2],
+   x6 in [-2, 2],
+   x7 in [-2, 2],
+   x8 in [-2, 2],
+   x9 in [-2, 2],
+   x10 in [-2, 2];
+
+Constraints
+   x1 - 0.25428722 - 0.18324757*x4*x3*x9 == 0,
+   x2 - 0.37842197 - 0.16275449*x1*x10*x6 == 0,
+   x3 - 0.27162577 - 0.16955071*x1*x2*x10 == 0,
+   x4 - 0.19807914 - 0.15585316*x7*x1*x6 == 0,
+   x5 - 0.44166728 - 0.19950920*x7*x6*x3 == 0,
+   x6 - 0.14654113 - 0.18922793*x8*x5*x10 == 0,
+   x7 - 0.42937161 - 0.21180484*x2*x5*x8 == 0,
+   x8 - 0.07056438 - 0.17081208*x1*x7*x6 == 0,
+   x9 - 0.34504906 - 0.19612740*x10*x6*x8 == 0,
+   x10 - 0.42651102 - 0.21466544*x4*x8*x1 == 0;

@@ -1,0 +1,43 @@
+# Interpolating quadrature formula for function defined on a grid
+#
+# In: Wim Sweldens.
+#     The construction and application of wavelets in numerical analysis.
+#     PhD thesis, K.U.Leuven, 1994.
+#
+# Ill-conditionned system with one solution.
+
+Variables
+   b in [-1.0e1, 1.0e1],
+   w0 in [-1.0e1, 1.0e1],
+   w1 in [-1.0e1, 1.0e1],
+   w2 in [-1.0e1, 1.0e1],
+   w3 in [-1.0e1, 1.0e1];
+
+Constraints
+    w0 + w1 + w2 + w3 - 1 == 0,
+
+    b*(w0 + w1 + w2 + w3) + 1/2*w1 + w2 + 3/2*w3 - 0.63397459621556 == 0,
+
+    b^2*(w0 + w1 + w2 + w3) + b*(w1 + 2*w2 + 3*w3) + 1/4*w1 + w2 +
+    9/2*w3 - 0.40192378864668 == 0,
+
+    b^3*(w0 + w1 + w2 + w3) + b^2*(3/2*w1 + 3*w2 + 9/2*w3) +
+    b*(3/4*w1 + 3*w2 + 27/4*w3) + 1/8*w1 + w2 + 27/8*w3 - 0.13109155679036 == 0,
+
+    b^4*(w0 + w1 + w2 + w3) + b^3*(2*w1 + 4*w2 + 6*w3) +
+    b^2*(3/2*w1 + 6*w2 + 27/2*w3) + b*(1/2*w1 + 4*w2 + 27/2*w3) +
+    1/16*w1 + w2 + 81/16*w3 + 0.30219332850656 == 0;
+
+#    w0 + w1 + w2 + w3 - 1 == 0,
+
+#    w0*b + w1*b + w2*b + w3*b + 1/2*w1 + w2 + 3/2*w3 - 0.63397459621556 == 0,
+
+#    w0*b^2 + w1*b^2 + w2*b^2 + w3*b^2 + w1*b + 2*w2*b + 3*w3*b + 1/4*w1 + w2 +
+#    9/2*w3 - 0.40192378864668 == 0,
+
+#    w0*b^3 + w1*b^3 + w2*b^3 + w3*b^3 + 3/2*w1*b^2 + 3*w2*b^2 + 9/2*w3*b^2 +
+#    3/4*w1*b + 3*w2*b + 27/4*w3*b + 1/8*w1 + w2 + 27/8*w3 - 0.13109155679036 == 0,
+
+#    w0*b^4 + w1*b^4 + w2*b^4 + w3*b^4 + 2*w1*b^3 + 4*w2*b^3 + 6*w3*b^3 +
+#    3/2* w1*b^2 + 6*w2*b^2 + 27/2*w3*b^2 + 1/2*w1*b + 4*w2*b + 27/2* w3*b +
+#    1/16*w1 + w2 + 81/16*w3 + 0.30219332850656 == 0;

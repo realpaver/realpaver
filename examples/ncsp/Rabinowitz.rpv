@@ -1,0 +1,61 @@
+# Derivation of optimal multi-dimensional integration formulae
+#
+# In: D. Bini and B. Mourrain.
+#     Handbook of Polynomial Systems, 1996.
+#
+#     Ramon E. Moore.
+#     Methods and applications of interval analysis.
+#     chapter 6, page 64, SIAM Philadelphia, 1979.
+#
+#     Sandie T. Jones.
+#     Locating safe starting regions for iterative methods a heuristic algorithm.
+#     Interval Mathematics 1980, pages 377-386,
+#     Academic Press 1980, Editor Karl L.E. Nickel.
+
+Variables
+   x1 in [-1.0e2, 1.0e2],
+   x2 in [-1.0e2, 1.0e2],
+   x3 in [-1.0e2, 1.0e2],
+   x4 in [-1.0e2, 1.0e2],
+   x5 in [-1.0e2, 1.0e2],
+   x6 in [-1.0e2, 1.0e2],
+   x7 in [-1.0e2, 1.0e2],
+   x8 in [-1.0e2, 1.0e2],
+   x9 in [-1.0e2, 1.0e2],
+   w  in [-1.0e2, 1.0e2],
+   v  in [-1.0e2, 1.0e2],
+   u  in [-1.0e2, 1.0e2],
+   t  in [-1.0e2, 1.0e2],
+   r  in [-1.0e2, 1.0e2],
+   s  in [-1.0e2, 1.0e2],
+   q in [-1.0e2, 1.0e2];
+
+Constraints
+   x1 + x3 + x5 + 2*x7 == 1,
+   u      + t      + 2*v      + 2*x7*s           == 2/3,
+   u*x2   + t*x4   + 2*v*x6   + 2*x7*r           == 2/5,
+   u*x2^2 + t*x4^2 + 2*v*x6^2 + 2*x7*(x8^3+x9^3) == 2/7,
+   u*x2^3 + t*x4^3 + 2*q + 2*x7*(x8^4+x9^4) == 2/9,
+   v*x6   + 2*w  == 1/9,
+   q + 2*w*x8*x9 == 1/25,
+   v*x6^2 + w*s  == 1/15,
+   q + w*r       == 1/21,
+   w == x7*x8*x9,
+   v == x5*x6,
+   u == x1*x2,
+   t == x3*x4,
+   r == x8^2+x9^2,
+   s == x8+x9,
+   q == v*x6^3;
+
+
+# ORIGINAL SYSTEM:
+# x1+x3+x5+2*x7 = 1,
+# x1*x2+x3*x4+2*x5*x6+2*x7*(x8+x9) = 2/3,
+# x1*x2^2+x3*x4^2+2*x5*x6^2+2*x7*(x8^2+x9^2) = 2/5,
+# x1*x2^3+x3*x4^3+2*x5*x6^3+2*x7*(x8^3+x9^3) = 2/7,
+# x1*x2^4+x3*x4^4+2*x5*x6^4+2*x7*(x8^4+x9^4) = 2/9,
+# x5*x6^2+2*x7*x8*x9 = 1/9,
+# x5*x6^4+2*x7*x8^2*x9^2 = 1/25,
+# x5*x6^3+x7*x8*x9^2+x7*x8^2*x9 = 1/15,
+# x5*x6^4+x7*x8*x9^3+x7*x8^3*x9 = 1/21

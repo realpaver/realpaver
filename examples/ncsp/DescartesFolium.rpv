@@ -1,0 +1,11 @@
+# In: W. Older and A. Vellino.
+#     Constraint Arithmetic on Real Intervals.
+#     Constraint Logic Programming: Selected Research, 1993, MIT Press.
+
+Variables
+   X in [-100, 100],
+   Y in [-100, 100];
+
+Constraints
+   (X^2)/Y + (Y^2)/X == 2,
+   Y == exp(-X);

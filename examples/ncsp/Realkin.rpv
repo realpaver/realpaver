@@ -1,0 +1,23 @@
+Variables
+   x1 in [0, 2*PI],
+   x2 in [0, 2*PI],
+   x3 in [0, 2*PI],
+   x4 in [0, 2*PI],
+   x5 in [0, 2*PI],
+   x6 in [0, 2*PI];
+
+Constraints
+   sin(x2)*cos(x5)*sin(x6) - sin(x3)*cos(x5)*sin(x6) -
+   sin(x4)*cos(x5)*sin(x6) + cos(x2)*cos(x6) + cos(x3)*cos(x6) +
+   cos(x4)*cos(x6) == 0.4077,
+
+   cos(x1)*cos(x2)*sin(x5) + cos(x1)*cos(x3)*sin(x5) +
+   cos(x1)*cos(x4)*sin(x5) + sin(x1)*cos(x5) == 1.9115,
+
+   sin(x2)*sin(x5) + sin(x3)*sin(x5) + sin(x4)*sin(x5) == 1.9791,
+
+   3*cos(x1)*cos(x2) + 2*cos(x1)*cos(x3) + cos(x1)*cos(x4) == 4.0616,
+
+   3*sin(x1)*cos(x2) + 2*sin(x1)*cos(x3) + sin(x1)*cos(x4) == 1.7172,
+
+   3*sin(x2) + 2*sin(x3) + sin(x4) == 3.9701;

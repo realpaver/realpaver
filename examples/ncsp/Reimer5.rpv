@@ -1,0 +1,15 @@
+# The 5-dimensional system of Reimer from the PoSSo test suite
+
+Variables
+   t in [-1.0e0, 1.0e0],
+   u in [-1.0e0, 1.0e0],
+   x in [-1.0e0, 1.0e0],
+   y in [-1.0e0, 1.0e0],
+   z in [-1.0e0, 1.0e0];
+
+Constraints
+   -1 + 2*x^2 - 2*y^2 + 2*z^2 - 2*t^2 + 2*u^2 == 0,
+   -1 + 2*x^3 - 2*y^3 + 2*z^3 - 2*t^3 + 2*u^3 == 0,
+   -1 + 2*x^4 - 2*y^4 + 2*z^4 - 2*t^4 + 2*u^4 == 0,
+   -1 + 2*x^5 - 2*y^5 + 2*z^5 - 2*t^5 + 2*u^5 == 0,
+   -1 + 2*x^6 - 2*y^6 + 2*z^6 - 2*t^6 + 2*u^6 == 0;

@@ -1,0 +1,22 @@
+# School Building - Full dimensional
+#
+# In: Taken from SpaceSolver, LIA/EPFL.
+
+Constants
+   ZeroPlus = 1e-12;
+
+Variables
+   H_b  in [150, 400],    # 300 Beam depth
+   H_s  in [50, 200],     # 100 Slab depth
+   S    in [1500, 2200],  # 2000 Beam spacing
+   W    in [3000, 13500], # 10000 Beam span 
+   p    in [15, 50],      # 30 -
+   u    in [10, 60];      # 40 -
+
+Constraints
+   u <= (3.18e-5*H_s + 0.0054)*S - ZeroPlus,
+   H_s >= 137.7 - 0.08633*S + 5.511e-5*S^2 - 8.358e-9*S^3 + ZeroPlus,
+   p == u + 9.62e-5*(0.0417*W)^1.5161,
+   H_b >= 0.077*(p*W^2)^0.3976 + ZeroPlus,
+   H_b >= 0.0168*(S*W^3)^0.2839 + ZeroPlus;
+

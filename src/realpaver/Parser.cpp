@@ -42,8 +42,7 @@ void Parser::initSymbolTable()
    for (auto k : keywords) symtab_.insertKeyword(k);
 
    // constants
-   symtab_.insertConstant("pi", Interval::pi());
-   symtab_.insertConstant("e",  exp(Interval(1.0)));
+   symtab_.insertConstant("PI", Interval::pi());
 }
 
 std::string Parser::getParseError() const
