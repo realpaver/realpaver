@@ -10,6 +10,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/Interval.hpp"
+#include "realpaver/Stat.hpp"
 
 namespace realpaver {
 
@@ -615,12 +616,20 @@ Interval round(const Interval& x)
 
 Interval& Interval::operator+=(const Interval& other)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_ADD");
+#endif
+
    Interval::Traits::addAssign(impl_, other.impl_);     
    return *this;
 }
 
 Interval operator+(const Interval& x, const Interval& y)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_ADD");
+#endif
+
    return Interval(Interval::Traits::add(x.impl_, y.impl_));      
 }
 

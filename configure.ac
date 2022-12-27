@@ -362,6 +362,25 @@ else
 fi
 
 
+# --enable-stat
+AC_MSG_CHECKING([whether to collect statistics])
+AC_ARG_ENABLE(stat,
+   [AS_HELP_STRING([--enable-stat],
+                   [collect statistics (default=no)])],
+   [enable_stat=yes],
+   [enable_stat=no])
+
+if test ${enable_stat} = "yes"; then
+   AC_DEFINE(STAT_ON, 1,
+             [Define to 1 to collect statistics.])
+   AC_MSG_RESULT([yes])
+else
+   AC_DEFINE(STAT_ON, 0,
+             [Define this to 1 to collect statistics.])
+   AC_MSG_RESULT([no])
+fi
+
+
 # file generation
 AC_CONFIG_FILES([Makefile
                  check/Makefile
@@ -384,6 +403,7 @@ printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
 printf "\tLog files          : ${enable_log}\n"
+printf "\tStatistics         : ${enable_stat}\n"
 printf "\tUnit testing       : ${have_cppunit}\n"
 printf "\tDoxygen            : ${DOXYGEN}\n"
 printf "\nRun make to compile Realpaver\n"

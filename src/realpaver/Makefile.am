@@ -93,6 +93,7 @@ librealpaver_la_include_HEADERS = \
 		ScopeMap.hpp \
 		SearchNode.hpp \
 		SplitStrategy.hpp \
+		Stat.hpp \
 		SymbolTable.hpp \
 		Term.hpp \
 		TermDeriver.hpp \
@@ -187,6 +188,7 @@ librealpaver_la_SOURCES = \
 		Scope.cpp \
 		ScopeMap.cpp \
 		SearchNode.cpp \
+		Stat.cpp \
 		SymbolTable.cpp \
 		Term.cpp \
 		TermDeriver.cpp \

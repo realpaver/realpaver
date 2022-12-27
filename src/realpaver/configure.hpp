@@ -82,6 +82,9 @@
 /* Define to 1 if compiling for Mac OS X */
 #define PLATFORM_OSX 1
 
+/* Define this to 1 to collect statistics. */
+#define STAT_ON 0
+
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */

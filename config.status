@@ -1097,6 +1097,7 @@ D["LP_LIB_CLP"]=" 1"
 D["DEBUG_ON"]=" 1"
 D["ASSERT_ON"]=" 1"
 D["LOG_ON"]=" 1"
+D["STAT_ON"]=" 0"
   for (key in D) D_is_set[key] = 1
   FS = ""
 }
