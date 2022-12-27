@@ -51,11 +51,6 @@ GRBLinExpr LPSolver::makeGrbLinExpr(LinExpr e)
    {
       int j = e.getIndexVar(i);
       double coef = e.getCoef(i);
-
-if (Double::isNan(coef)) DEBUG("IS NAN ....................." << i << " " << j);
-if (Double::isInf(coef)) DEBUG("IS INF .....................");
-
-
       GRBVar gv = vars_[j];
       ge += coef*gv;
    }

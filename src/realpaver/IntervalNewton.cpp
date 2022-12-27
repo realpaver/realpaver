@@ -79,7 +79,7 @@ void IntervalNewton::setInflator(const Inflator& inflator)
 
 Proof IntervalNewton::contract(UniIntervalFunction& f, Interval& x)
 {
-   LOG_LOW("\nInterval Newton: contract " << x);
+   LOG_LOW("Interval Newton: contract " << x);
    LOG_LOW("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
 
    Proof proof = Proof::Maybe;

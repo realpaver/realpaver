@@ -27,7 +27,8 @@ static std::vector<std::string> keywords = {
    "Aliases", "Functions", "Objectives",
    "integer", "in", "binary", "tol", "inf",
    "MIN", "MAX", "min", "max", "abs", "sgn", "sqr", "sqrt", "pow",
-   "log", "exp", "cos", "sin", "tan"
+   "log", "exp", "cos", "sin", "tan",
+   "if", "then", "else", "or", "and", "not"
 };
 
 Parser::Parser() : symtab_(), param_()

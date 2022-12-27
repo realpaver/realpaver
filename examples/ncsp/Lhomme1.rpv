@@ -1,3 +1,25 @@
+#Variables
+#   k1 in [0.2, 5],
+#   k2 in [0, 0.1],
+#   k3 in [0.9, 1.11111112],
+#   DT1 in [1, 1000],
+#   DT2 in [0.1, 1000],
+#   DTc in [0.001, 1000],
+#   DTh in [0.001, 1000],
+#   Fc  in [1.0e-20, 1.0e1],
+#   Fh  in [1.0e-20, 1.0e1],
+#   Kc  in [1.0e-20, 1.0e1];
+
+#Aliases
+#   Kh        = k3*Kc;
+
+#Constraints
+#   DTh + DT2 == DT1 + DTc,
+#   DTh*Kh*Fh == DTc*Kc*Fc,
+#   DT2       == k1*DT1,
+#   DT1       == k2*DTh;
+
+
 Variables
    k1 in [0.2, 5],
    k2 in [0, 0.1],

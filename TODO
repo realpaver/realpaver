@@ -1,15 +1,24 @@
 -------------------------------------------------------------------------------
-- formars d'affichage pour les solutions
-
--------------------------------------------------------------------------------
 - Changer IntervalFunction et RealFunction en classes virtuelles pures
 - Les dériver en IntervalDagFunction et RealDagFunction
 - Voir conséquences sur les vecteurs de fonctions
 
 -------------------------------------------------------------------------------
+- Développer la partie Statistiques
+- config STAT_ON
+- exemple : compter la proportion de réussite du solveur lineaire
+
+-------------------------------------------------------------------------------
+- Hansen's derivative
+
+-------------------------------------------------------------------------------
+- LP solver: correction de Scherbina
+
+-------------------------------------------------------------------------------
 - class Constraint : ConstraintOr, ConstraintNot, ConstraintAnd
-- à voir comment intégrer cela dans un DAG ou bien ce n'est pas inséré comme
-  les ConstraintTable
+
+- ou Formula
+- If Formula then Formula else Formula
 
 -------------------------------------------------------------------------------
 - De toutatis récupérer l'interface GLPK

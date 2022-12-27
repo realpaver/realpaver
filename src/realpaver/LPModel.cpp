@@ -11,6 +11,7 @@
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/Param.hpp"
 
@@ -686,6 +687,9 @@ double LPModel::getSafeObjVal() const
 
 bool LPModel::isPrimalSolutionFeasible() const
 {
+   // TODO
+   return true;
+
    // tests the variables
    for (auto& v : vars_)
       if (!v.isPrimalSolutionFeasible())

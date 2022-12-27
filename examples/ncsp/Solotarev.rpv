@@ -2,10 +2,10 @@
 
 
 Variables
-   a in [-1.0e3, 1.0e3],
-   b in [-1.0e3, 1.0e3],
-   x in [-1.0e3, 1.0e3],
-   y in [-1.0e3, 1.0e3];
+   a in [-10, 10] integer,
+   b in [-10, 10],
+   x in [-10, 10],
+   y in [-10, 10];
 
 Constraints
    3*x^2-2*x-a == 0,

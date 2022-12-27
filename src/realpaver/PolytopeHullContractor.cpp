@@ -394,8 +394,6 @@ PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
                                                PolytopeCreatorStyle style)
       : creator_(nullptr)
 {
-   DEBUG("style : " << style);
-
    if (style == PolytopeCreatorStyle::RLT)
       creator_ = new PolytopeRLTCreator(dag, lfun);
 
@@ -431,6 +429,9 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
    bool first = true;
    OptimizationStatus status;
 
+
+static int ntotal = 0, nfeas= 0, nopt = 0;
+
    for (auto v : creator_->scope())
    {
       Interval x = reg.get(v);
@@ -445,38 +446,51 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 
       status = solver.getStatus();
 
-      if (!solver.isPrimalSolutionFeasible())
-         status = OptimizationStatus::Other;
+++ntotal;
 
-
-      if (status == OptimizationStatus::Infeasible) return Proof::Empty;
+      if (status == OptimizationStatus::Infeasible)
+         return Proof::Empty;
+      
       if (status == OptimizationStatus::Optimal)
       {
-         x &= Interval::moreThan(solver.getSafeObjVal());
-         if (x.isEmpty()) return Proof::Empty;
+++nopt;
+         if (solver.isPrimalSolutionFeasible())
+         {
+++nfeas;
+            x &= Interval::moreThan(solver.getSafeObjVal());
+            if (x.isEmpty()) return Proof::Empty;
+         }
       }
 
       first = false;
 
       // reduction of the right bound
       solver.setMaximization();
-
       solver.reoptimize();
+
+++ntotal;
 
       status = solver.getStatus();
 
-      if (!solver.isPrimalSolutionFeasible())
-         status = OptimizationStatus::Other;
+      if (status == OptimizationStatus::Infeasible)
+         return Proof::Empty;
 
-      if (status == OptimizationStatus::Infeasible) return Proof::Empty;
       if (status == OptimizationStatus::Optimal)
       {
-         x &= Interval::lessThan(solver.getObjVal());
-         if (x.isEmpty()) return Proof::Empty;
+++nopt;
+         if (solver.isPrimalSolutionFeasible())
+         {
+++nfeas;
+            x &= Interval::lessThan(solver.getObjVal());
+            if (x.isEmpty()) return Proof::Empty;
+         }
       }
 
       reg.set(v, x);
    }
+
+   // TODO
+   LOG_INTER("Success of LP solver: " << nopt << ", " << nfeas << " / " << ntotal);
 
    return Proof::Maybe;
 }

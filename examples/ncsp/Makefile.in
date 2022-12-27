@@ -322,6 +322,7 @@ EXTRA_DIST = \
 	Bronstein.rpv \
 	Brown5.rpv \
 	Broyden10.rpv \
+	BurdenFaires.rpv \
 	Butcher.rpv \
 	Caprasse.rpv \
 	Cassou.rpv \

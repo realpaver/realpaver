@@ -12,18 +12,18 @@ Constants
    L_z = 11.5;
 
 Variables
-   E          in [2, 10],      #2     # beam spacing [m]
-   H_s1       in [5, 8],       #7     # height of lower gym [m]
-   H_s2       in [5, 8],       #7     # height of upper gym [m]
-   L          in [10, 50],     #27.4  # span [m]
-   c          in [200, 500],   #200   # half cover plate width [mm]
-   d          in [20, 40],     #20    # web thickness [mm]
-   h_a        in [800, 4000],  #4000  # beam height [mm]
-   k          in [1, 1e8],     #1e7   # modal stiffness [N/m]
-   m          in [1, 1e6],     #1000  # modal weight [kg]
-   P          in [0, 10],      #5     # depth of foundation [m]
-   q_concrete in [200, 2000 ], #200   # self weight [kg/m]
-   t          in [20, 100];    #20    # half cover plate thickness [mm]
+   E          in [2, 10]     tol 1.0e-3A,  #2     # beam spacing [m]
+   H_s1       in [5, 8]      tol 1.0e-3A,  #7     # height of lower gym [m]
+   H_s2       in [5, 8]      tol 1.0e-3A,  #7     # height of upper gym [m]
+   L          in [10, 50]    tol 1.0e-3A,  #27.4  # span [m]
+   c          in [200, 500]  tol 1.0e-3A,  #200   # half cover plate width [mm]
+   d          in [20, 40]    tol 1.0e-3A,  #20    # web thickness [mm]
+   h_a        in [800, 4000] tol 1.0e-3A,  #4000  # beam height [mm]
+   k          in [1, 1e8]    tol 1.0e-3A,  #1e7   # modal stiffness [N/m]
+   m          in [1, 1e6]    tol 1.0e-3A,  #1000  # modal weight [kg]
+   P          in [0, 10]     tol 1.0e-3A,  #5     # depth of foundation [m]
+   q_concrete in [200, 2000] tol 1.0e-3A,  #200   # self weight [kg/m]
+   t          in [20, 100]   tol 1.0e-3A;  #20    # half cover plate thickness [mm]
 
 Constraints
 
@@ -41,12 +41,12 @@ Constraints
 # by dynamics expert
    q_concrete == 200 * E^0.6,
    m == q_concrete * E * L / 2,
-   k == E_steel/L^3/1E6*(3.37*h_a^3*d+42.84*h_a^2*t*c),
+   k == E_steel / L^3 / 1E6 * (3.37 * h_a^3 * d + 42.84 * h_a^2 * t * c),
    sqrt(k/m) >= 8 * 2 * PI,
 
 # by civil engineer
-   1/2 * h_a * d * 235 / sqrt(3) >= 1000 * L * E^1.6*R_f*S,
-   235*t*c*h_a/500 >= 250 * L * E^1.6*R_f*S,
+   1/2 * h_a * d * 235 / sqrt(3) >= 1000 * L * E^1.6 * R_f * S,
+   235 * t * c * h_a/500 >= 250 * L * E^1.6 * R_f * S,
 
 # by geologist
    P <= 5 - ZeroPlus,

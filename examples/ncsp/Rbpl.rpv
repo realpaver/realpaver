@@ -2,7 +2,7 @@
 #
 # In: B. Mourrain.
 #     The 40 generic positions of a parallel robot.
-#      M. Bronstein, editor, ISSAC'93, ACM Press, pages 173-182, Kiev, 1993.
+#     M. Bronstein, editor, ISSAC'93, ACM Press, pages 173-182, Kiev, 1993.
 
 Variables
    a in [-1.0e2, 1.0e2],
