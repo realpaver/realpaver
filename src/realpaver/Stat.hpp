@@ -30,13 +30,28 @@ public:
    /// Throws an exception if the given name is not registered
    static int& getIntStat(const std::string& name);
 
+   /// Gets a timer
+   /// @param name string representation
+   /// @return a reference to the timer
+   ///
+   /// Throws an exception if the given name is not registered
+   static Timer& getTimeStat(const std::string& name);
+
    /// Resets all the statistics
    static void reset();
 
-private:
-   static Stat instance_;  // singleton
+   /// Prints the statistics on a stream
+   /// @param os the output stream
+   static void print(std::ostream& os);
 
+private:
+   static Stat instance_;     // singleton
+   static int space_;
+   
    std::unordered_map<std::string, int> intmap_;
+   std::unordered_map<std::string, Timer> timmap_;
+
+   static void printSpace(const std::string& str, std::ostream& os);
 
    Stat();
    ~Stat() = default;

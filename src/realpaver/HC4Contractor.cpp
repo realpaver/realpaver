@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/HC4Contractor.hpp"
+#include "realpaver/Stat.hpp"
 
 namespace realpaver {
 
@@ -28,7 +29,18 @@ bool HC4Contractor::dependsOn(const Bitset& bs) const
 
 Proof HC4Contractor::contract(IntervalRegion& reg)
 {
-   return dag_->fun(if_)->hc4Revise(reg);
+#if STAT_ON
+   Timer& tim = Stat::getTimeStat("TIMER_HC4");
+   tim.start();
+#endif
+
+   Proof proof = dag_->fun(if_)->hc4Revise(reg);
+
+#if STAT_ON
+   tim.stop();
+#endif
+
+   return proof;
 }
 
 void HC4Contractor::print(std::ostream& os) const

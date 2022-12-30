@@ -636,91 +636,156 @@ Interval operator+(const Interval& x, const Interval& y)
 Interval addPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_ADD_PX");
+#endif
+
    return Interval(Interval::Traits::addPX(x.impl_, y.impl_, z.impl_));
 }
 
 Interval addPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_ADD_PY");
+#endif
+
    return Interval(Interval::Traits::addPY(x.impl_, y.impl_, z.impl_));   
 }
 
 Interval addPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_ADD_PZ");
+#endif
+
    return Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));   
 }
 
 Interval& Interval::operator-=(const Interval& other)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_SUB");
+#endif
+
    Interval::Traits::subAssign(impl_, other.impl_);     
    return *this;   
 }
 
 Interval operator-(const Interval& x, const Interval& y)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_SUB");
+#endif
+
    return Interval(Interval::Traits::sub(x.impl_, y.impl_));      
 }
 
 Interval subPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_SUB_PX");
+#endif
+
    return Interval(Interval::Traits::subPX(x.impl_, y.impl_, z.impl_));
 }
 
 Interval subPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_SUB_PY");
+#endif
+
    return Interval(Interval::Traits::subPY(x.impl_, y.impl_, z.impl_));   
 }
 
 Interval subPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_SUB_PZ");
+#endif
+
    return Interval(Interval::Traits::subPZ(x.impl_, y.impl_, z.impl_));   
 }
 
 Interval operator-(const Interval& x)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_USUB");
+#endif
+
    return Interval(Interval::Traits::usub(x.impl_));
 }
 
 Interval usubPX(const Interval& x, const Interval& y)
 {
+
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_USUB_PX");
+#endif
+
    return Interval(Interval::Traits::usubPX(x.impl_, y.impl_));   
 }
 
 Interval usubPY(const Interval& x, const Interval& y)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_USUB_PY");
+#endif
+
    return Interval(Interval::Traits::usubPY(x.impl_, y.impl_));      
 }
 
 Interval& Interval::operator*=(const Interval& other)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_MUL");
+#endif
+
    Interval::Traits::mulAssign(impl_, other.impl_);  
    return *this;   
 }
 
 Interval operator*(const Interval& x, const Interval& y)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_MUL");
+#endif
+
    return Interval(Interval::Traits::mul(x.impl_, y.impl_));      
 }
 
 Interval mulPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_MUL_PX");
+#endif
+
    return Interval(Interval::Traits::mulPX(x.impl_, y.impl_, z.impl_));
 }
 
 Interval mulPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_MUL_PY");
+#endif
+
    return Interval(Interval::Traits::mulPY(x.impl_, y.impl_, z.impl_));   
 }
 
 Interval mulPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
+#if STAT_ON
+   ++Stat::getIntStat("ITV_OP_MUL_PZ");
+#endif
+
    return Interval(Interval::Traits::mulPZ(x.impl_, y.impl_, z.impl_));   
 }
 

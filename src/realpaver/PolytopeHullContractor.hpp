@@ -173,6 +173,8 @@ public:
 
 private:
    PolytopeCreator* creator_;    // creator of the relaxation
+
+   Proof contractImpl(IntervalRegion& reg);
 };
 
 } // namespace

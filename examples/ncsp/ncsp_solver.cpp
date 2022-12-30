@@ -5,6 +5,7 @@
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
+#include "realpaver/Stat.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -46,6 +47,7 @@ int main(int argc, char** argv)
       if (pfilename != "") prm.loadParam(pfilename);
 
       // logger
+#if LOG_ON
       LogLevel loglevel = StringToLogLevel(prm.getStrParam("LOG_LEVEL"));
       string flog = "";
       if (loglevel != LogLevel::none)
@@ -53,6 +55,15 @@ int main(int argc, char** argv)
          flog = basefname + ".log";
          Logger::init(loglevel, flog);
       }
+#endif
+
+      // statistics
+#if STAT_ON
+      string statfilename = basefname + ".sta";
+      ofstream fstat;
+      fstat.open(statfilename, std::ofstream::out);
+      if (fstat.bad()) THROW("Open error of statistics file");
+#endif
 
       LOG_MAIN("NCSP solving");
       LOG_MAIN("Input file: " << filename);
@@ -73,7 +84,7 @@ int main(int argc, char** argv)
       Interval::precision(prec);
 
       ////////////////////
-      solver.solve();      
+      solver.solve();
       ////////////////////
 
       string solfilename = basefname + ".sol";
@@ -92,9 +103,17 @@ int main(int argc, char** argv)
 
       cout << indent << WP("Input file", wpl) << ORANGE(filename) << endl;
 
+#if LOG_ON
       cout << indent << WP("Log file", wpl);
       string meslog = (loglevel != LogLevel::none) ? flog : "no log";
       cout << ORANGE(meslog) << endl;
+#endif
+
+      // statistics
+#if STAT_ON
+      cout << indent << WP("Statistics file", wpl);
+      cout << ORANGE(statfilename) << endl;
+#endif
 
       cout << indent << WP("Output file", wpl) << ORANGE(solfilename) << endl;
       cout << GRAY(sep) << endl;
@@ -244,6 +263,11 @@ int main(int argc, char** argv)
                   space->hullOfPendingNodes().vecPrint(fsol);
             }
          }
+
+         // writes the statistics
+#if STAT_ON
+         Stat::print(fstat);
+#endif
 
          // limits
          if (env->usedTimeLimit())
