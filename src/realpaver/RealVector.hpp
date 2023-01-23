@@ -105,6 +105,9 @@ public:
    virtual RealVector* clone() const;
 };
 
+/// output on a stream
+std::ostream& operator<<(std::ostream& os, const RealVector& V);
+
 ///@{
 /// Operators on real vectors
 RealVector operator+(const RealVector& V, const RealVector& W);

@@ -265,4 +265,11 @@ double IntervalVector::gap(const IntervalVector& X) const
    return gap;
 }
 
+std::ostream&
+operator<<(std::ostream& os, const IntervalVector& X)
+{
+   X.print(os);
+   return os;
+}
+
 } // namespace

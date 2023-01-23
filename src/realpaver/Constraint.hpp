@@ -98,6 +98,11 @@ public:
    /// @return true if this is linear
    virtual bool isLinear() const;
 
+   /// @return true if this is a bound-constraint of the form f R g where
+   ///         f is a variable and g is a constant (or f is a constant and
+   ///         g is a variable, and R in {=, >, <, >=, <=}.
+   virtual bool isBoundConstraint() const;
+
 protected:
    typedef std::shared_ptr<ConstraintRep> SharedRep;
    friend class Constraint;
@@ -177,6 +182,11 @@ public:
    /// @return true if this is linear
    bool isLinear() const;
 
+   /// @return true if this is a bound-constraint of the form f R g where
+   ///         f is a variable and g is a constant (or f is a constant and
+   ///         g is a variable, and R in {=, >, <, >=, <=}.
+   bool isBoundConstraint() const;
+
 public:
    /// type of the shared representation
    typedef ConstraintRep::SharedRep SharedRep;
@@ -224,6 +234,7 @@ public:
    bool isEquation() const override;
    bool isInequality() const override;
    bool isLinear() const override;
+   bool isBoundConstraint() const override;
    ///@}
 
 private:

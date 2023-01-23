@@ -1121,7 +1121,7 @@ public:
    /// @param viol output vector such that viol[i] is the violation of the i-th
    ///        constraint
    ///
-   /// It asumes that this dag has been evaluated using realEval.
+   /// It assumes that this dag has been evaluated using realEval.
    void realViolation(RealVector& viol);
 
 private:

@@ -118,7 +118,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
          return;
       }
 
-      else if (proof == Proof::Inner)
+      else if (proof == Proof::Inner || c.isBoundConstraint())
       {
          LOG_INTER("Inactive constraint: " << c);
          nbc_ = nbc_ + 1;

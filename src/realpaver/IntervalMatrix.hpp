@@ -74,6 +74,9 @@ public:
    /// @return the infinite-norm of this
    double linfNorm() const;
 
+   /// @return the midpoint of this
+   RealMatrix midpoint() const;
+
    /// Addition with assignment
    /// @param A a matrix
    /// @return a reference to this

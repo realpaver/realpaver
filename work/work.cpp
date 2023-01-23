@@ -19,22 +19,54 @@ int main(void)
 
    try {
       Problem prob;
-      Variable x = prob.addRealVar(-2, 2, "x");
-      Variable y = prob.addRealVar(-2, 2, "y");
+      Variable x = prob.addRealVar(-3, 2, "x");
+      Variable y = prob.addRealVar(-2, 4, "y");
+      Variable p = prob.addBinaryVar("b");
+      Variable q = prob.addIntVar(0, 10, "q");
 
+      cout << y.getDomain() << ' ' << y.getTolerance() << ' ' << y.hashCode() << endl;
+
+      
+      Scope S = prob.scope();
+      cout << S << endl;
+   
+      for (const auto& v : S)
+         cout << v.getName() << ' ';
+      cout << endl;
+      
       IntervalRegion reg = prob.getDomains();
+      cout << reg << endl
+           << "x in " << reg.get(x) << endl;
 
+      Term t( y - sqr(x) );
+      cout << "t = " << t << endl
+           << t.eval(reg) << endl
+           << t.contract(reg, Interval(0, 1)) << endl
+           << reg.subRegion(t.scope()) << endl;
+
+      Constraint c( t == 100 );
+
+      cout << "c: " << c         << endl;
+      
+      if (c.isSatisfied(reg) != Proof::Empty) {
+         Proof certificate = c.contract(reg);
+         cout << certificate << ' ' << reg << endl;
+      }
+      else
+         cout << c.violation(reg)   << endl;
 
       SharedDag dag = std::make_shared<Dag>();
       size_t i1 = dag->insert( y - sqr(x) == 0);
       size_t i2 = dag->insert( sqr(x) + sqr(y) - 2 == 0);
+
+      cout << (*dag) << endl;
 
       cout << "input reg " << reg << endl;
 
       PolytopeHullContractor phc(dag, PolytopeCreatorStyle::Taylor);
       Proof proof = phc.contract(reg);
 
-      cout << proof << " " << reg << endl;
+cout << proof << ' ' << reg.subRegion(phc.scope()) << endl;
 
 /*
       double x1 = 2,   y1 = 1.5, d1 = 2.55,

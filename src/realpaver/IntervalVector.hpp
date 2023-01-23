@@ -149,6 +149,9 @@ public:
    double gap(const IntervalVector& X) const;
 };
 
+/// output on a stream
+std::ostream& operator<<(std::ostream& os, const IntervalVector& X);
+
 } // namespace
 
 #endif

@@ -90,6 +90,11 @@ bool ConstraintRep::isLinear() const
    return false;
 }
 
+bool ConstraintRep::isBoundConstraint() const
+{
+   return false;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Constraint::Constraint(const SharedRep& rep) : rep_(rep)
@@ -170,6 +175,11 @@ bool Constraint::isLinear() const
    return rep_->isLinear();
 }
 
+bool Constraint::isBoundConstraint() const
+{
+   return rep_->isBoundConstraint();
+}
+
 std::ostream& operator<<(std::ostream& os, Constraint c)
 {
    c.print(os);
@@ -239,6 +249,11 @@ bool ConstraintBin::isInequality() const
 bool ConstraintBin::isLinear() const
 {
    return l_.isLinear() && r_.isLinear();
+}
+
+bool ConstraintBin::isBoundConstraint() const
+{
+   return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -697,7 +712,7 @@ Constraint in(Term t, double a, double b)
 
 ConstraintTableCol::ConstraintTableCol(Variable v)
       : v_(v),
-      vval_()
+        vval_()
 {}
 
 ConstraintTableCol::ConstraintTableCol(Variable v,

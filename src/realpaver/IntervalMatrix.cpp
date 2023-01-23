@@ -96,6 +96,19 @@ double IntervalMatrix::linfNorm() const
    return norm;
 }
 
+RealMatrix IntervalMatrix::midpoint() const
+{
+   size_t n = nrows(),
+          m = ncols();
+   RealMatrix res(n, m);
+
+   for (size_t i=0; i<n; ++i)
+      for (size_t j=0; j<m; ++j)
+         res.set(i, j, get(i, j).midpoint());
+
+   return res;
+}
+
 std::ostream& operator<<(std::ostream& os, const IntervalMatrix& A)
 {
    A.print(os);

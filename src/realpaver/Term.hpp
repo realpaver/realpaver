@@ -218,9 +218,12 @@ public:
    /// @return true if v occurs in this
    bool dependsOn(const Variable& v) const;
 
-   /// Makes the scope of this
-   /// @param s the set of variables occurring in this
+   /// Inserts the variables of this in a scope
+   /// @param s scope modified
    void makeScope(Scope& s) const;
+
+   /// @return creates and returns thz scope of this
+   Scope scope() const;
 
    ///@{
    /// Arithmetic operations with assignment
@@ -314,6 +317,7 @@ public:
    void eval(const IntervalRegion& reg) override;
    Proof contract(IntervalRegion& reg) override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isNumber() const override;
    bool isZero() const override;
    bool isOne() const override;
    bool isMinusOne() const override;

@@ -300,6 +300,13 @@ Term Term::clone() const
    return Term(srep);
 }
 
+Scope Term::scope() const
+{
+   Scope s;
+   makeScope(s);
+   return s;
+}
+
 Proof Term::contract(IntervalRegion& reg, const Interval& img)
 {
    hc4ReviseForward(reg);
@@ -1449,6 +1456,11 @@ void TermConst::print(std::ostream& os) const
 void TermConst::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+bool TermConst::isNumber() const
+{
+   return true;
 }
 
 bool TermConst::isZero() const

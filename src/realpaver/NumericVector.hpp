@@ -213,14 +213,6 @@ void NumericVector<T>::print(std::ostream& os) const
 }
 
 template <typename T>
-std::ostream&
-operator<<(std::ostream& os, const NumericVector<T>& V)
-{
-   V.print(os);
-   return os;
-}
-
-template <typename T>
 size_t NumericVector<T>::hashCode() const
 {
    size_t h = 0;

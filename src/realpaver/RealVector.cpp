@@ -164,4 +164,11 @@ RealVector* RealVector::clone() const
    return new RealVector(*this);
 }
 
+std::ostream&
+operator<<(std::ostream& os, const RealVector& V)
+{
+   V.print(os);
+   return os;
+}
+
 } // namespace
