@@ -194,6 +194,50 @@ double IntervalRegion::gapOnScope(const IntervalRegion& reg,
    return gap;
 }
 
+double IntervalRegion::perimeter() const
+{
+   return perimeterOnScope(scope_);
+}
+
+double IntervalRegion::perimeterOnScope(const Scope& sco) const
+{
+   double p = 0.0;
+
+   for (const auto& v : scope_)
+      p += get(v).width();
+
+   return p;
+}
+
+double IntervalRegion::gridPerimeter() const
+{
+   return gridPerimeterOnScope(scope_);
+}
+
+double IntervalRegion::gridPerimeterOnScope(const Scope& sco) const
+{
+   double p = 0.0;
+
+   for (const auto& v : scope_)
+   {
+      Interval x = get(v);
+      Tolerance tol = v.getTolerance();
+
+DEBUG("Var " << v.getName() << " in " << x << " : " << tol);
+
+      if (!tol.hasTolerance(x))
+      {
+         if (tol.isAbsolute())
+            p += x.width() / tol.getVal();
+
+         else
+            p += x.relWidth() / tol.getVal();
+      }
+   }
+
+   return p;
+}
+
 IntervalRegion* IntervalRegion::clone() const
 {
    return new IntervalRegion(*this);
@@ -208,7 +252,7 @@ void IntervalRegion::stdPrint(std::ostream& os) const
 {
    size_t lmax = scope_.maxVarLength();
 
-   for (auto v : scope_)
+   for (const auto& v : scope_)
    {
       os << v.getName();
       size_t n = v.getName().length();

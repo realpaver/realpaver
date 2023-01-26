@@ -37,11 +37,13 @@ Variable Problem::addBinaryVar(const std::string& name)
 
    checkSymbol(os.str());
 
+   double prevOne = Double::prevDouble(1.0);
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(Interval::zeroPlusOne())
     .setInteger()
-    .setTolerance(Tolerance::makeAbs(0.0));
+    .setTolerance(Tolerance::makeAbs(prevOne));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -69,11 +71,13 @@ Variable Problem::addIntVar(const Interval& x, const std::string& name)
 
    checkSymbol(os.str());
 
+   double prevOne = Double::prevDouble(1.0);
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(y)
     .setInteger()
-    .setTolerance(Tolerance::makeAbs(0.0));
+    .setTolerance(Tolerance::makeAbs(prevOne));
 
    vars_.push_back(v);
    scope_.insert(v);

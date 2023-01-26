@@ -21,7 +21,7 @@ int main(void)
       Problem prob;
       Variable x = prob.addRealVar(-3, 2, "x");
       Variable y = prob.addRealVar(-2, 4, "y");
-      Variable p = prob.addBinaryVar("b");
+      Variable b = prob.addBinaryVar("b");
       Variable q = prob.addIntVar(0, 10, "q");
 
       cout << y.getDomain() << ' ' << y.getTolerance() << ' ' << y.hashCode() << endl;
@@ -36,7 +36,19 @@ int main(void)
       
       IntervalRegion reg = prob.getDomains();
       cout << reg << endl
-           << "x in " << reg.get(x) << endl;
+           << "b in " << reg.get(b) << endl << b << endl << b.getTolerance() << endl;
+           
+           
+           reg.set(x, Interval(0, 0.51));
+
+   x.setTolerance(Tolerance::makeAbs(0.5));
+   y.setTolerance(Tolerance::makeRel(0.25));
+
+      cout << "GRID PERI : " << reg.gridPerimeter() << endl;
+           
+           
+           
+return 0;
 
       Term t( y - sqr(x) );
       cout << "t = " << t << endl

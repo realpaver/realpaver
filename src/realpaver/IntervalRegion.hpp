@@ -178,6 +178,26 @@ public:
    /// Assumption: sco is included in the scopes of this and reg
    double gapOnScope(const IntervalRegion& reg, const Scope& sco) const;
 
+   /// @return the sum of the widths of the components of this
+   double perimeter() const;
+
+   /// @return the sum of the widths of some components of this
+   /// @param sco the components considered
+   double perimeterOnScope(const Scope& sco) const;
+
+   /// @return the grid perimeter of this
+   ///
+   /// Given xi in Di with tolerance Ei (Absolute or Relative) for each i,
+   /// the grid perimeter is the sum for each i of the following quantity:
+   /// - 0.0 if Di has tolerance Ei
+   /// - width(Di) / Ei if Ei is absolute
+   /// - relative width(Di) / Ei if Ei is relative
+   double gridPerimeter() const;
+
+   /// @return the grid perimeter for some components of this
+   /// @param sco the components considered   
+   double gridPerimeterOnScope(const Scope& sco) const;
+
    ///@{
    IntervalRegion* clone() const override;
    void print(std::ostream& os) const override;
