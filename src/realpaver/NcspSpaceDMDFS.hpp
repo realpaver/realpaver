@@ -55,7 +55,8 @@ private:
    struct Comp {
       bool operator()(const Elem& x, const Elem& y)
       {
-         return x.mindist < y.mindist;
+         return (x.mindist < y.mindist) ||
+                 (x.mindist == y.mindist && x.node->index() < y.node->index());
       }
    } comparator;
 

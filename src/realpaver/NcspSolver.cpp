@@ -18,6 +18,7 @@
 #include "realpaver/NcspSpaceBFS.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
+#include "realpaver/NcspSpaceHybridDFS.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/Propagator.hpp"
 #include "realpaver/VariableSelector.hpp"
@@ -81,9 +82,23 @@ void NcspSolver::makeSpace()
 {
    // gets the strategy from the parameters
    std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
-   if (s == "DFS") space_ = new NcspSpaceDFS();
-   if (s == "BFS") space_ = new NcspSpaceBFS();
-   if (s == "DMDFS") space_ = new NcspSpaceDMDFS();
+   if (s == "DFS")
+      space_ = new NcspSpaceDFS();
+
+   else if (s == "BFS")
+      space_ = new NcspSpaceBFS();
+
+   else if (s == "DMDFS")
+      space_ = new NcspSpaceDMDFS();
+
+   else if (s == "IDFS")
+      space_ = new NcspSpaceHybridDFS(HybridDFSStyle::Depth);
+
+   else if (s == "PDFS")
+      space_ = new NcspSpaceHybridDFS(HybridDFSStyle::Perimeter);
+
+   else if (s == "GPDFS")
+      space_ = new NcspSpaceHybridDFS(HybridDFSStyle::GridPerimeter);
 
    THROW_IF(space_ == nullptr,
             "Unable to make the space object in a Ncsp solver");
@@ -305,6 +320,11 @@ void NcspSolver::bpStep(int depthlimit)
       LOG_INTER("Splits node " << node->index() << " > "
                                << split_->getNbNodes() << " sub-nodes");
 
+
+// TODO
+auto itt = split_->begin();
+
+
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
          ++nbnodes_;
@@ -314,8 +334,9 @@ void NcspSolver::bpStep(int depthlimit)
          subnode->setDepth(depth);
 
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
-         space_->insertPendingNode(subnode);
       }
+
+      space_->insertPendingNodes(split_->begin(), split_->end());
    }
 }
 

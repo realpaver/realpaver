@@ -77,7 +77,7 @@ void NcspSpaceBFS::makeSolClusters(double gap)
          SharedNcspNode bis = *it;
          IntervalRegion* regbis = bis->region();
 
-         if (regnode->gap(*regbis) <= gap)
+         if (regnode->gap(*regbis) < gap)
          {
             // merges node in bisnode and iterates
             regbis->hullAssignOnScope(*regnode, node->scope());

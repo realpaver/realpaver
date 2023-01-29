@@ -33,4 +33,11 @@ IntervalRegion NcspSpace::hullOfPendingNodes() const
    return h;
 }
 
+void NcspSpace::insertPendingNodes(NcspSplit::iterator first,
+                                   NcspSplit::iterator last)
+{
+   for (auto it = first; it != last; ++it)
+      insertPendingNode(*it);
+}
+
 } // namespace

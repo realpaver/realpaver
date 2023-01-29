@@ -12,6 +12,7 @@
 
 #include <vector>
 #include "realpaver/NcspNode.hpp"
+#include "realpaver/NcspSplit.hpp"
 
 namespace realpaver {
 
@@ -82,7 +83,17 @@ public:
    virtual SharedNcspNode nextPendingNode() = 0;
 
    /// Inserts a pending node in this
+   /// @param node node inserted in this
    virtual void insertPendingNode(const SharedNcspNode& node) = 0;
+
+   /// Inserts a collection of pending nodes in this
+   /// @param first iterator on the first node
+   /// @param last iterator after the last node
+   ///
+   /// The default behavior calls insertPendingNode for each node in
+   /// the range of iterators.
+   virtual void insertPendingNodes(NcspSplit::iterator first,
+                                   NcspSplit::iterator last);
 
    /// @param i a pending node index with 0 <= i < nbPendingNodes()
    /// @return the i-th pending node

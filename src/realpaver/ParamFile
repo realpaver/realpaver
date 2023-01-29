@@ -17,7 +17,7 @@
 TIME_LIMIT = 100.0
 
 # Tolerance on the width of an interval domain of a constrained variable
-# The value is a posiive real number followed by a character: A for an absolute
+# The value is a positive real number followed by a character: A for an absolute
 # or R for a relative tolerance.
 XTOL = 1.0e-8A
 
@@ -75,6 +75,12 @@ BB_SPACE_FREQUENCY = 1
 # - DFS: Depth-First-Search
 # - BFS: Breadth-First-Search
 # - DMDFS: Distant-Most Depth-First-Search
+# - IDFS: Hybrid Best-First Depth-First strategy such that the next node
+#         after a DFS stage is a node whose depth in the search tree is minimal
+# - PDFS: Hybrid Best-First Depth-First strategy such that the next node
+#         after a DFS stage is a node whose perimeter is maximal
+# - GPDFS: Hybrid Best-First Depth-First strategy such that the next node
+#          after a DFS stage is a node whose grid perimeter is maximal
 BP_NODE_SELECTION = DFS
 
 # Limit on the gap between two solutions such that they are aggregated
