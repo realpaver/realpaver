@@ -3,9 +3,10 @@
 #     Constraint Logic Programming: Selected Research, 1993, MIT Press.
 
 Variables
-   X in [-100, 100],
-   Y in [-100, 100];
+   x in [0, 2],
+   y in [0, 2];
 
 Constraints
-   (X^2)/Y + (Y^2)/X == 2,
-   Y == exp(-X);
+#   (x^2)/y + (y^2)/x == 2,
+   x^3 + y^3 == 2*x*y,
+   y == exp(-x);

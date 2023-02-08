@@ -223,8 +223,6 @@ double IntervalRegion::gridPerimeterOnScope(const Scope& sco) const
       Interval x = get(v);
       Tolerance tol = v.getTolerance();
 
-DEBUG("Var " << v.getName() << " in " << x << " : " << tol);
-
       if (!tol.hasTolerance(x))
       {
          if (tol.isAbsolute())

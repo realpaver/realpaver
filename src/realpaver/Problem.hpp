@@ -23,9 +23,15 @@ namespace realpaver {
 /// This is a problem involving constraints.
 ///
 /// A problem in general has a set of variables, a set of constraints and an
-/// objective function. The variables are indexed by the natural numbers
-/// 0, 1, 2, ... The variable domains define the initial region, which is
-/// an interval vector or Cartesian product of intervals with a scope.
+/// objective function.
+///
+/// The variables are indexed by consecutive natural numbers that are
+/// automatically generated. Given NP the number of problem instances already
+/// created and the static variable MAX_NB_VAR initialized to a huge value
+/// (one million), the first variable identifier is NP*MAX_NB_VAR.
+///
+/// The variable domains define the initial region, which is an interval vector
+/// or Cartesian product of intervals with a scope.
 ///
 /// There are several classes of problems:
 /// - Constraint Satisfaction Problems (CSPs);
@@ -193,6 +199,10 @@ public:
    /// @return true if this has no variable, no constraint, no objective
    bool isEmpty() const;
 
+   /// Maximum number of variables in a problem
+   /// The default value is huge
+   static int MAX_NB_VAR;
+
 private:
    std::string name_;               // name
    std::vector<Variable> vars_;     // vector of variables
@@ -206,6 +216,9 @@ private:
 
    // throws an exception if a name is already used as the name of a symbol
    void checkSymbol(const std::string& name);
+
+   static int NP;    // problem counter
+   int id_;          // problem id
 };
 
 /// Output on a stream

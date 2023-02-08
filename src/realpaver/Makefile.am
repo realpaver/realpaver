@@ -104,7 +104,8 @@ librealpaver_la_include_HEADERS = \
 		Tolerance.hpp \
 		UniIntervalFunction.hpp \
 		Variable.hpp \
-		VariableSelector.hpp
+		VariableSelector.hpp \
+		VariableVector.hpp
 
 #		BOContractor.hpp \
 #		BOLocalGradient.hpp \
@@ -200,7 +201,8 @@ librealpaver_la_SOURCES = \
 		Tolerance.cpp \
 		UniIntervalFunction.cpp \
 		Variable.cpp \
-		VariableSelector.cpp
+		VariableSelector.cpp \
+		VariableVector.cpp
 
 #		BOContractor.cpp \
 #		BOLocalGradient.cpp \

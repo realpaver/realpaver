@@ -8,4 +8,4 @@ Variables
 
 Constraints
   y - x^2 == 0,
-  y2 + x^2 - 2 == 0;
+  y^2 + x^2 - 2 == 0;

@@ -44,6 +44,7 @@ EXTRA_DIST = \
 	Emiris.rpv \
 	Enfant1.rpv \
 	Enfant2.rpv \
+	Flower.rpv \
 	Fourbar.rpv \
 	Geneig.rpv \
 	H106.rpv \

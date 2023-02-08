@@ -3,7 +3,7 @@
 # Cell Biophysics, Vol 11, pages 309--319, 1987.
 
 Variables
-t in [-1.0e2, 1.0e2],
+   t in [-1.0e2, 1.0e2],
    u in [-1.0e2, 1.0e2],
    v in [-1.0e2, 1.0e2],
    x in [-1.0e2, 1.0e2],

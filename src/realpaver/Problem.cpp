@@ -16,6 +16,9 @@
 
 namespace realpaver {
 
+int Problem::MAX_NB_VAR = 1000000;
+int Problem::NP = 0;
+
 Problem::Problem(const std::string& name)
       : name_(),
         vars_(),
@@ -23,12 +26,13 @@ Problem::Problem(const std::string& name)
         obj_(MIN(Term(0))),
         scope_(),
         vname_(),
-        dom_()
+        dom_(),
+        id_(++NP)
 {}
 
 Variable Problem::addBinaryVar(const std::string& name)
 {
-   size_t id = vars_.size();
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
 
    std::ostringstream os;
 
@@ -62,7 +66,7 @@ Variable Problem::addIntVar(const Interval& x, const std::string& name)
    Interval y = round(x);
    THROW_IF(y.isEmpty(), "Integer variable with an empty domain");
    
-   size_t id = vars_.size();
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
 
    std::ostringstream os;
 
@@ -95,7 +99,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
 {
    THROW_IF(x.isEmpty(), "Real variable with an empty domain");
 
-   size_t id = vars_.size();
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
 
    std::ostringstream os;
 

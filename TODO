@@ -1,4 +1,11 @@
 -------------------------------------------------------------------------------
+- VariableVector
+- Générateur de Katsura avec factorisation... utile ? les derivées sont linéaires..., etc.
+
+-------------------------------------------------------------------------------
+- contraintes par morceaux
+
+-------------------------------------------------------------------------------
 - Changer IntervalFunction et RealFunction en classes virtuelles pures
 - Les dériver en IntervalDagFunction et RealDagFunction
 - Voir conséquences sur les vecteurs de fonctions

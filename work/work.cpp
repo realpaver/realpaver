@@ -8,6 +8,7 @@
 #include "realpaver/LPSolver.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/Range.hpp"
+#include "realpaver/VariableVector.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -23,8 +24,17 @@ int main(void)
       Variable y = prob.addRealVar(-2, 4, "y");
       Variable b = prob.addBinaryVar("b");
       Variable q = prob.addIntVar(0, 10, "q");
+      
+      cout << x.id() << " " << y.id() << endl;
 
       cout << y.getDomain() << ' ' << y.getTolerance() << ' ' << y.hashCode() << endl;
+
+
+
+VariableVector vv("vv", -2, 6);
+cout << vv << endl;
+cout << vv.get(-1) << endl;
+
 
       
       Scope S = prob.scope();

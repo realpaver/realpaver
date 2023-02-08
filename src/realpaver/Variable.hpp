@@ -83,6 +83,8 @@ private:
    Interval domain_;
    bool continuous_;
    Tolerance tol_;
+
+   static int NEXT_ID;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,6 +166,7 @@ public:
 
    /// Sets the tolerance of this
    /// @param tol new tolerance of this
+   /// @return a reference to this
    Variable& setTolerance(const Tolerance& tol);
 
    /// @return a clone of this with a new representation

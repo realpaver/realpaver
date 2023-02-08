@@ -11,9 +11,11 @@
 
 namespace realpaver {
 
+int VariableRep::NEXT_ID = 0;
+
 VariableRep::VariableRep(const std::string& name) :
       name_(name),
-      id_(0),
+      id_(++NEXT_ID),
       domain_(),
       continuous_(true),
       tol_(Tolerance::makeAbs(0.0))

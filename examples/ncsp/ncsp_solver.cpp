@@ -234,7 +234,7 @@ int main(int argc, char** argv)
                   }
 
                   fsol << endl;
-                  reg->stdPrint(fsol);
+                  reg->stdPrint(fsol);                  
                }
             }
             else if (sdis == "VEC")

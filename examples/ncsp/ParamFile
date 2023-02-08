@@ -32,7 +32,7 @@ DTOL = 1.0e-6R
 OBJ_TOL = 1.0e-6R
 
 # Number of digits used to print floating-point numbers and intervals
-FLOAT_PRECISION = 12
+FLOAT_PRECISION = 10
 
 # Log level
 # NONE:  no log
@@ -61,7 +61,7 @@ NODE_LIMIT = 500000
 DEPTH_LIMIT = 1000
 
 # Limit on the number of solutions
-SOLUTION_LIMIT = 1000
+SOLUTION_LIMIT = 5000
 
 # In a branch-and-bound algorithm, the next node can be either the node with
 # the lowest lower bound or the node with the lowest upper bound (diving).
@@ -81,7 +81,7 @@ BB_SPACE_FREQUENCY = 1
 #         after a DFS stage is a node whose perimeter is maximal
 # - GPDFS: Hybrid Best-First Depth-First strategy such that the next node
 #          after a DFS stage is a node whose grid perimeter is maximal
-BP_NODE_SELECTION = GPDFS
+BP_NODE_SELECTION = DFS
 
 # Limit on the gap between two solutions such that they are aggregated
 # if they are close enough.
@@ -90,7 +90,7 @@ BP_NODE_SELECTION = GPDFS
 # - 0.0 if two solutions are aggregated if they overlap;
 # - positive otherwise; in particular, a huge value may permit to calculate
 #   the hull of all the solutions.
-SOLUTION_CLUSTER_GAP = 0.0
+SOLUTION_CLUSTER_GAP = 1.0e-9
 
 ###############################################################################
 ## SPLITTING STRATEGIES                                                      ##
