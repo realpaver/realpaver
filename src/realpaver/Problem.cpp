@@ -56,6 +56,32 @@ Variable Problem::addBinaryVar(const std::string& name)
    return v;
 }
 
+VariableVector Problem::addBinaryVars(const std::string& name, int first,
+                                      int last)
+{
+   VariableVector vec(name, first, last);
+
+   double prevOne = Double::prevDouble(1.0);
+
+   for (int i=first; i<=last; ++i)
+   {
+      Variable v = vec[i];
+
+      size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+      v.setId(id)
+       .setDomain(Interval::zeroPlusOne())
+       .setInteger()
+       .setTolerance(Tolerance::makeAbs(prevOne));
+
+      vars_.push_back(v);
+      scope_.insert(v);
+      dom_.insert(std::make_pair(v, Interval::zeroPlusOne()));
+   }
+
+   return vec;
+}
+
 Variable Problem::addIntVar(int lo, int up, const std::string& name)
 {
    return addIntVar(Interval(lo, up), name);
@@ -90,6 +116,31 @@ Variable Problem::addIntVar(const Interval& x, const std::string& name)
    return v;
 }
 
+VariableVector Problem::addIntVars(const std::string& name, int first, int last,
+                                   const Interval& x)
+{
+   VariableVector vec(name, first, last);
+
+   double prevOne = Double::prevDouble(1.0);
+
+   for (int i=first; i<=last; ++i)
+   {
+      Variable v = vec[i];
+      size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+      v.setId(id)
+       .setDomain(x)
+       .setInteger()
+       .setTolerance(Tolerance::makeAbs(prevOne));
+
+      vars_.push_back(v);
+      scope_.insert(v);
+      dom_.insert(std::make_pair(v, x));
+   }
+
+   return vec;
+}
+
 Variable Problem::addRealVar(double lo, double up, const std::string& name)
 {
    return addRealVar(Interval(lo, up), name);
@@ -119,6 +170,29 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    dom_.insert(std::make_pair(v, x));
 
    return v;
+}
+
+VariableVector Problem::addRealVars(const std::string& name, int first,
+                                    int last, const Interval& x)
+{
+   VariableVector vec(name, first, last);
+
+   for (int i=first; i<=last; ++i)
+   {
+      Variable v = vec[i];
+      size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+      v.setId(id)
+       .setDomain(x)
+       .setContinuous()
+       .setTolerance(Param::GetTolParam("XTOL"));
+
+      vars_.push_back(v);
+      scope_.insert(v);
+      dom_.insert(std::make_pair(v, x));
+   }
+
+   return vec;
 }
 
 void Problem::addCtr(Constraint c)
@@ -183,7 +257,6 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
 
    // variables
    bool first = true;
-   bool intvar = false;
    os << s_var << std::endl;
    for (size_t i=0; i<p.nbVars(); ++i)
    {

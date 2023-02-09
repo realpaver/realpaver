@@ -31,10 +31,10 @@ int main(void)
 
 
 
-VariableVector vv("vv", -2, 6);
-cout << vv << endl;
-cout << vv.get(-1) << endl;
-
+VariableVector W = prob.addRealVars("W", -2, 6, Interval(0, 4.5));
+cout << W << endl;
+cout << W[1].id() << " " << W[1].getDomain() << endl;
+cout << prob.scope() << endl;
 
       
       Scope S = prob.scope();

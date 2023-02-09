@@ -16,6 +16,7 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
+#include "realpaver/VariableVector.hpp"
 
 namespace realpaver {
 
@@ -57,6 +58,13 @@ public:
    /// @return the new variable
    Variable addBinaryVar(const std::string& name = "");
 
+   /// Creates a vector of binary variables
+   /// @param name base name
+   /// @param first index of the first variable
+   /// @param last index of the last variable
+   /// @return the vector created
+   VariableVector addBinaryVars(const std::string& name, int first, int last);
+
    /// Creates a new integer variable
    /// @param lo lower bound
    /// @param up  bound
@@ -71,6 +79,14 @@ public:
    /// @return the new variable
    Variable addIntVar(const Interval& x, const std::string& name = "");
 
+   /// Creates a vector of integer variables
+   /// @param name base name
+   /// @param first index of the first variable
+   /// @param last index of the last variable
+   /// @return the vector created
+   VariableVector addIntVars(const std::string& name, int first, int last,
+                             const Interval& x = Interval::universe());
+
    /// Creates a new real variable
    /// @param lo lower bound
    /// @param up  bound
@@ -83,6 +99,14 @@ public:
    /// @param name name of the variable
    /// @return the new variable
    Variable addRealVar(const Interval& x, const std::string& name = "");
+
+   /// Creates a vector of integer variables
+   /// @param name base name
+   /// @param first index of the first variable
+   /// @param last index of the last variable
+   /// @return the vector created
+   VariableVector addRealVars(const std::string& name, int first, int last,
+                              const Interval& x = Interval::universe());
 
    /// @return the number of variables
    size_t nbVars() const;

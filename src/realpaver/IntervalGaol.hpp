@@ -912,6 +912,13 @@ struct IntervalTraits<RawInterval> {
    {
       return y & sgn(x);
    }
+
+   // TODO: the role of this function is just to remove a warning due to
+   // the constant NaN_val that is defined but not used.
+   static inline gaol::uintdouble useless_remove_warnings()
+   {
+      return gaol::NaN_val;
+   }
 };
 
 } // namespace
