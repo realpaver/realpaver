@@ -320,11 +320,6 @@ void NcspSolver::bpStep(int depthlimit)
       LOG_INTER("Splits node " << node->index() << " > "
                                << split_->getNbNodes() << " sub-nodes");
 
-
-// TODO
-auto itt = split_->begin();
-
-
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
          ++nbnodes_;

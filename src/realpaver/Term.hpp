@@ -278,7 +278,7 @@ private:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, Term t);
+std::ostream& operator<<(std::ostream& os, const Term& t);
 
 ///@{
 /// Creation of terms
@@ -568,6 +568,7 @@ public:
    TermUsb(const SharedRep& t);
 
    ///@{
+   void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;

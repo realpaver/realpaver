@@ -313,7 +313,7 @@ Proof Term::contract(IntervalRegion& reg, const Interval& img)
    return hc4ReviseBackward(reg, img);
 }
 
-std::ostream& operator<<(std::ostream& os, Term t)
+std::ostream& operator<<(std::ostream& os, const Term& t)
 {
    t.print(os);
    return os;
@@ -762,7 +762,9 @@ Term operator-(Term l, Term r)
    }
 
    else
+   {
       return Term(std::make_shared<TermSub>(l.rep(), r.rep()));
+   }
 }
 
 Term operator*(Term l, Term r)
@@ -1726,7 +1728,7 @@ void TermAdd::contractRoot()
 void TermAdd::print(std::ostream& os) const
 {
    left()->print(os);
-   os << opSymbol();
+   os << " " << opSymbol() << " ";
    right()->print(os);
 }
 
@@ -1784,10 +1786,8 @@ void TermSub::print(std::ostream& os) const
    OpPriority p = priority(),
               rp = right()->priority();
 
-   os << "(";
    left()->print(os);
-   os << ")";
-   os << opSymbol();
+   os << " " << opSymbol() << " ";
    
    if (rp <= p && (!right()->isVar()))
    {
@@ -2085,6 +2085,23 @@ bool TermUsb::isUsb() const
    return true;
 }
 
+void TermUsb::print(std::ostream& os) const
+{
+   OpPriority p = priority(),
+              rp = child()->priority();
+
+   os << opSymbol();
+   
+   if (rp <= p && (!child()->isVar()))
+   {
+      os << "(";
+      child()->print(os);
+      os << ")";
+   }
+   else
+      child()->print(os);
+}
+
 TermRep* TermUsb::cloneRoot() const
 {
    return new TermUsb(child());
@@ -2188,9 +2205,20 @@ void TermSqr::evalRoot()
 
 void TermSqr::print(std::ostream& os) const
 {
-   os << "(";
-   child()->print(os);
-   os << ")^2";
+   OpPriority p = priority(),
+              rp = child()->priority();
+
+   if (p <= rp || child()->isVar())
+   {
+      child()->print(os);
+      os << "^2";
+   }
+   else
+   {
+      os << "(";
+      child()->print(os);
+      os << ")^2";
+   }
 }
 
 void TermSqr::contractRoot()

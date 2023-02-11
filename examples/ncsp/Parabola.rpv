@@ -2,10 +2,26 @@
 #
 # 2 solutions
 
+# Variables
+#    x in [-10, 10],
+#    y in [-10, 10];
+
+# Constraints
+#   y - x^2 == 0,
+#   y^2 + x^2 - 2 == 0;
+
+
 Variables
    x in [-10, 10],
-   y in [-10, 10];
+   y in [-10, 10],
+   rho in [0, 10*sqrt(2)],
+   theta in [-PI, PI]
+   ;
 
 Constraints
   y - x^2 == 0,
-  y^2 + x^2 - 2 == 0;
+  y^2 + x^2 - 2 == 0,
+  x == rho * cos(theta),
+  y == rho * sin(theta),
+  cos(theta)^2 + sin(theta)^2 == 1,
+  rho == sqrt(x^2 + y^2);

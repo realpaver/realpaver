@@ -9,6 +9,7 @@
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/Range.hpp"
 #include "realpaver/VariableVector.hpp"
+#include "realpaver/QuadraticTerm.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -29,12 +30,21 @@ int main(void)
 
       cout << y.getDomain() << ' ' << y.getTolerance() << ' ' << y.hashCode() << endl;
 
+      cout << endl << endl;
 
+      Term tt ( x - (2*sqr(y) - (3 - x*y)) );
+      
+      cout << "tt : " << tt << endl;
+      cout << endl << endl;
+      
+      
+//      Term tt = 2*sqr(x) + 1.0 - y + 2*x*y + 3*y*x - sqr(y);
+      QuadraticTerm qt(tt);
 
-VariableVector W = prob.addRealVars("W", -2, 6, Interval(0, 4.5));
-cout << W << endl;
-cout << W[1].id() << " " << W[1].getDomain() << endl;
-cout << prob.scope() << endl;
+      cout << "qt : " << qt << endl;
+      cout << "to term : " << qt.toTerm() << endl;
+      cout << endl << "---------------------------------" << endl;
+
 
       
       Scope S = prob.scope();

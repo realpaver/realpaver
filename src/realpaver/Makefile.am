@@ -82,6 +82,7 @@ librealpaver_la_include_HEADERS = \
 		Preprocessor.hpp \
 		Problem.hpp \
 		Propagator.hpp \
+		QuadraticTerm.hpp \
 		Range.hpp \
 		RangeSlicer.hpp \
 		RealFunction.hpp \
@@ -180,6 +181,7 @@ librealpaver_la_SOURCES = \
 		Preprocessor.cpp \
 		Problem.cpp \
 		Propagator.cpp \
+		QuadraticTerm.cpp \
 		Range.cpp \
 		RangeSlicer.cpp \
 		RealFunction.cpp \
