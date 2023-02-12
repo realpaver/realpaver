@@ -23,6 +23,7 @@ int main(void)
       Problem prob;
       Variable x = prob.addRealVar(-3, 2, "x");
       Variable y = prob.addRealVar(-2, 4, "y");
+      Variable z = prob.addRealVar(-1, 6, "z");
       Variable b = prob.addBinaryVar("b");
       Variable q = prob.addIntVar(0, 10, "q");
       
@@ -30,9 +31,16 @@ int main(void)
 
       cout << y.getDomain() << ' ' << y.getTolerance() << ' ' << y.hashCode() << endl;
 
+
+
+      cout << endl << endl << "#########################" << endl;
+      Term tata = (-2*z) * z;
+      cout << "tata := " << tata << endl;
+
+
       cout << endl << endl;
 
-      Term tt ( x - (2*sqr(y) - (3 - x*y)) );
+      Term tt (  (2*sqr(y) - (3 + x*y)) + y*z - y - 5*sqr(z));
       
       cout << "tt : " << tt << endl;
       cout << endl << endl;
@@ -43,8 +51,17 @@ int main(void)
 
       cout << "qt : " << qt << endl;
       cout << "to term : " << qt.toTerm() << endl;
+
+      Term qtf = qt.factorize();
+      cout << "factorized : " << qtf << endl;
+      
       cout << endl << "---------------------------------" << endl;
 
+      IntervalRegion XX = prob.getDomains();
+      cout << "tt in " << tt.eval(XX) << endl;
+      cout << "qtf in " << qtf.eval(XX) << endl;
+
+      cout << endl << "---------------------------------" << endl;
 
       
       Scope S = prob.scope();

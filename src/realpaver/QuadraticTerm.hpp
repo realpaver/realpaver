@@ -10,6 +10,7 @@
 #ifndef REALPAVER_QUADRATIC_TERM_HPP
 #define REALPAVER_QUADRATIC_TERM_HPP
 
+#include <list>
 #include <set>
 #include "realpaver/Term.hpp"
 
@@ -59,6 +60,12 @@ public:
    /// @return term represented by this
    Term toTerm() const;
 
+   // TODO
+   Scope makeScope() const;
+
+   // TODO
+   Term factorize() const;
+
 private:
    struct Square {
       Interval coef;
@@ -66,7 +73,7 @@ private:
    };
 
    struct CompSquare {
-      bool operator()(const Square& s1, const Square& s2)
+      bool operator()(const Square& s1, const Square& s2) const
       {
          return s1.v.id() < s2.v.id();
       }
@@ -78,7 +85,7 @@ private:
    };
 
    struct CompLin {
-      bool operator()(const Lin& l1, const Lin& l2)
+      bool operator()(const Lin& l1, const Lin& l2) const
       {
          return l1.v.id() < l2.v.id();
       }
@@ -91,7 +98,7 @@ private:
    };
 
    struct CompBilin {
-      bool operator()(const Bilin& b1, const Bilin& b2)
+      bool operator()(const Bilin& b1, const Bilin& b2) const
       {
          return (b1.v1.id() < b2.v1.id()) ||
                 ( (b1.v1.id() == b2.v1.id()) && (b1.v2.id() < b2.v2.id()) );
@@ -104,6 +111,8 @@ private:
    std::set<Lin, CompLin> sl_;         // linear terms
 
    friend std::ostream& operator<<(std::ostream& os, const QuadraticTerm& t);
+
+   void sortByOcc(std::list<Variable>& lv) const;
 };
 
 /// Output on a stream

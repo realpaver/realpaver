@@ -544,9 +544,37 @@ Term operator+(Term l, Term r)
       }
 
       else
-      {
          return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
+   }
+
+   else if (r.isMul())
+   {
+      TermMul* rt = static_cast<TermMul*>(r.rep().get());
+
+      if (rt->left()->isConstant())
+      {
+         // f + (-a * g) -> f - a*g
+         Interval x = rt->left()->evalConst();
+         if (x.isCertainlyLeZero())
+            return l - ((-x)*rt->right());
+
+         else
+            return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
       }
+
+      else if (rt->right()->isConstant())
+      {
+         // f + (g * -a) -> f - a*g
+         Interval x = rt->right()->evalConst();
+         if (x.isCertainlyLeZero())
+            return l - ((-x)*rt->left());
+
+         else
+            return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
+      }
+
+      else
+         return Term(std::make_shared<TermAdd>(l.rep(), r.rep()));
    }
 
    else
@@ -755,6 +783,36 @@ Term operator-(Term l, Term r)
          return x + aux;
       }
 
+      else if (r.isMul())
+      {
+         TermMul* rt = static_cast<TermMul*>(r.rep().get());
+
+         if (rt->left()->isConstant())
+         {
+            // f - (-a * g) -> f + a*g
+            Interval x = rt->left()->evalConst();
+            if (x.isCertainlyLeZero())
+               return l + ((-x)*rt->right());
+
+            else
+               return Term(std::make_shared<TermSub>(l.rep(),r.rep()));
+         }
+
+         else if (rt->right()->isConstant())
+         {
+            // f - (g * -a) -> f + a*g
+            Interval x = rt->right()->evalConst();
+            if (x.isCertainlyLeZero())
+               return l + ((-x)*rt->left());
+
+            else
+               return Term(std::make_shared<TermSub>(l.rep(),r.rep()));
+         }
+
+         else
+            return Term(std::make_shared<TermSub>(l.rep(),r.rep()));
+      }
+
       else
       {
          return Term(std::make_shared<TermSub>(l.rep(),r.rep()));
@@ -799,6 +857,18 @@ Term operator*(Term l, Term r)
    else if (r.isConstant())
       return Term(std::make_shared<TermMul>(r.rep(),l.rep()));
 
+   else if (l.isVar() && r.isVar())
+   {
+      TermVar* lt = static_cast<TermVar*>(l.rep().get());
+      TermVar* rt = static_cast<TermVar*>(r.rep().get());
+
+      if (lt->var().id() == rt->var().id())
+         return sqr(l);
+
+      else
+         return Term(std::make_shared<TermMul>(l.rep(),r.rep()));
+   }
+
    else if (l.isMul() && r.isMul())
    {
       TermMul* lt = static_cast<TermMul*>(l.rep().get());
@@ -808,28 +878,28 @@ Term operator*(Term l, Term r)
       {
          // (a * f) * (b * g) -> (a * b) * f * g
          Interval x( lt->left()->evalConst() * rt->left()->evalConst() );
-         return x * lt->right() * rt->right();
+         return x * (lt->right() * rt->right());
       }
 
       else if (lt->left()->isConstant() && rt->right()->isConstant())
       {
          // (a * f) * (g * b) -> (a * b) * f * g
          Interval x( lt->left()->evalConst() * rt->right()->evalConst() );
-         return x * lt->right() * rt->left();
+         return x * (lt->right() * rt->left());
       }
 
       else if (lt->right()->isConstant() && rt->left()->isConstant())
       {
          // (f * a) * (b * g) -> (a * b) * f * g
          Interval x( lt->right()->evalConst() * rt->left()->evalConst() );
-         return x * lt->left() * rt->right();
+         return x * (lt->left() * rt->right());
       }
 
       else if (lt->right()->isConstant() && rt->right()->isConstant())
       {
          // (f * a) * (g * b) -> (a * b) * f * g
          Interval x( lt->right()->evalConst() * rt->right()->evalConst() );
-         return x * lt->left() * rt->left();
+         return x * (lt->left() * rt->left());
       }
 
       else
@@ -856,7 +926,7 @@ Term operator*(Term l, Term r)
       {
          // (a * f) * (g / b) -> (a / b) * f * g
          Interval x( lt->left()->evalConst() / rt->right()->evalConst() );
-         return x * lt->right() * rt->left();
+         return x * (lt->right() * rt->left());
       }
 
       else if (lt->right()->isConstant() && rt->left()->isConstant())
@@ -871,7 +941,7 @@ Term operator*(Term l, Term r)
       {
          // (f * a) * (g / b) -> (a / b) * f * g
          Interval x( lt->right()->evalConst() / rt->right()->evalConst() );
-         return x * lt->left() * rt->left();
+         return x * (lt->left() * rt->left());
       }
 
       else
@@ -906,14 +976,14 @@ Term operator*(Term l, Term r)
       {
          // (f / a) * (b * g) -> (b / a) * f * g
          Interval x( rt->left()->evalConst() / lt->right()->evalConst() );
-         return x * lt->left() * rt->right();
+         return x * (lt->left() * rt->right());
       }
 
       else if (lt->right()->isConstant() && rt->right()->isConstant())
       {
          // (f / a) * (g * b) -> (b / a) * f  * g
          Interval x( rt->right()->evalConst() / lt->right()->evalConst() );
-         return x * lt->left() * rt->left();
+         return x * (lt->left() * rt->left());
       }
 
       else
@@ -955,7 +1025,7 @@ Term operator*(Term l, Term r)
       {
          // (f / a) * (g / b) -> 1/(a * b) * f * g
          Interval x( lt->right()->evalConst() * rt->right()->evalConst() );
-         return (1/x) * lt->left() * rt->left();
+         return (1/x) * (lt->left() * rt->left());
       }
 
       else
@@ -964,8 +1034,54 @@ Term operator*(Term l, Term r)
       }
    }
 
+   else if (l.isMul())
+   {
+      TermMul* lt = static_cast<TermMul*>(l.rep().get());
+
+      if (lt->left()->isConstant())
+      {
+         // (a * f) * g -> a * (f * g)
+         Interval x( lt->left()->evalConst() );
+         return x * (lt->right() * r);
+      }
+
+      else if (lt->right()->isConstant())
+      {
+         // (f * a) * g -> a * (f * g)
+         Interval x( lt->right()->evalConst() );
+         return x * (lt->left() * r);
+      }
+
+      else
+         return Term(std::make_shared<TermMul>(l.rep(),r.rep()));
+   }
+
+   else if (r.isMul())
+   {
+      TermMul* rt = static_cast<TermMul*>(r.rep().get());
+
+      if (rt->left()->isConstant())
+      {
+         // f * (a * g) -> a * (f * g)
+         Interval x( rt->left()->evalConst() );
+         return x * (l * rt->right());
+      }
+
+      else if (rt->right()->isConstant())
+      {
+         // f * (g * a) -> a * (f * g)
+         Interval x( rt->right()->evalConst() );
+         return x * (l * rt->left());
+      }
+
+      else
+         return Term(std::make_shared<TermMul>(l.rep(),r.rep()));
+   }
+
    else
+   {
       return Term(std::make_shared<TermMul>(l.rep(),r.rep()));
+   }
 }
 
 Term operator/(Term l, Term r)
@@ -1206,6 +1322,28 @@ Term operator-(Term t)
    {
       TermUsb* ut = static_cast<TermUsb*>(t.rep().get());
       return Term(ut->child());
+   }
+
+   else if (t.isMul())
+   {
+      TermMul* tm = static_cast<TermMul*>(t.rep().get());
+
+      if (tm->left()->isConstant())
+      {
+         // -(a * f) -> (-a) * f
+         Interval x( tm->left()->evalConst() );
+         return (-x) * tm->right();
+      }
+
+      else if (tm->right()->isConstant())
+      {
+         // -(f * a) -> (-a) * f
+         Interval x( tm->right()->evalConst() );
+         return (-x) * tm->left();         
+      }
+
+      else
+         return Term(std::make_shared<TermUsb>(t.rep()));
    }
 
    else
@@ -1789,7 +1927,7 @@ void TermSub::print(std::ostream& os) const
    left()->print(os);
    os << " " << opSymbol() << " ";
    
-   if (rp <= p && (!right()->isVar()))
+   if (rp <= p && (!right()->isVar()) && (!right()->isNumber()))
    {
       os << "(";
       right()->print(os);

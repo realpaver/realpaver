@@ -170,6 +170,125 @@ std::ostream& operator<<(std::ostream& os, const QuadraticTerm& t)
    return os;
 }
 
+Scope QuadraticTerm::makeScope() const
+{
+   Scope sco;
+
+   for (const auto& s : sq_)
+      sco.insert(s.v);
+
+   for (const auto& s : sb_)
+   {
+      sco.insert(s.v1);
+      sco.insert(s.v2);
+   }
+
+   for (const auto& s : sl_)
+      sco.insert(s.v);
+
+   return sco;
+}
+
+Term QuadraticTerm::factorize() const
+{
+   std::list<Variable> lv;
+   sortByOcc(lv);
+
+   Term t(cst_);
+
+   // copy of the set of bilinear terms
+   std::set<Bilin, CompBilin> bi(sb_);
+
+   for (const Variable& v : lv)
+   {
+      Term vfactor(0.0);
+
+      // quadratic term
+      Square s = {1.0, v};
+      auto it = sq_.find(s);
+      if (it != sq_.end())
+      {
+         if ((*it).coef.isCertainlyLeZero())
+            vfactor -= (-(*it).coef) * v;
+
+         else
+            vfactor += (*it).coef * v;
+      }
+
+      // bilinear terms
+      auto kt = bi.begin();
+      while (kt != bi.end())
+      {
+         if ((*kt).v1.id() == v.id())
+         {
+            if ((*kt).coef.isCertainlyLeZero())
+               vfactor -= (-(*kt).coef) * (*kt).v2;
+
+            else
+               vfactor += (*kt).coef * (*kt).v2;
+
+            kt = bi.erase(kt);
+         }
+         else if ((*kt).v2.id() == v.id())
+         {
+            if ((*kt).coef.isCertainlyLeZero())
+               vfactor -= (-(*kt).coef) * (*kt).v1;
+
+            else
+               vfactor += (*kt).coef * (*kt).v1;
+
+            kt = bi.erase(kt);            
+         }
+         else ++kt;
+      }
+
+      // linear term
+      Lin l = {1.0, v};
+      auto jt = sl_.find(l);
+      if (jt != sl_.end())
+      {
+         if ((*jt).coef.isCertainlyLeZero())
+            vfactor -= -(*jt).coef;
+
+         else
+            vfactor += (*jt).coef;
+      }
+
+      // inserts the factorized sub-term in the result
+      t += (v * vfactor);
+   }
+
+   return t;
+}
+
+void QuadraticTerm::sortByOcc(std::list<Variable>& lv) const
+{
+   Scope sco = makeScope();
+
+   for (const Variable& v : sco)
+   {
+      int n = sco.count(v);
+      auto it = lv.begin();
+      bool iter = true;
+      while (iter)
+      {
+         if (it == lv.end())
+            iter = false;
+
+         else
+         {
+            int m = sco.count(*it);
+            if (n >= m)
+               iter = false;
+
+            else ++it;
+         }
+      }
+
+      lv.insert(it, v);
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 QuadraticTermCreator::QuadraticTermCreator(QuadraticTerm* qt)
