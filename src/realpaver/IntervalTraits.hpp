@@ -66,6 +66,8 @@ struct IntervalTraits
 
    static interval minusPiPlusPi();
 
+   static interval zeroPi();
+
    static interval zeroTwoPi();
 
    static double infinity();

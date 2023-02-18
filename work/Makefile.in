@@ -90,7 +90,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = work$(EXEEXT)
+noinst_PROGRAMS = complex$(EXEEXT) work$(EXEEXT)
 subdir = work
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -105,14 +105,18 @@ CONFIG_HEADER = $(top_builddir)/src/realpaver/configure.hpp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_work_OBJECTS = work.$(OBJEXT)
-work_OBJECTS = $(am_work_OBJECTS)
-work_LDADD = $(LDADD)
-work_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
+am_complex_OBJECTS = complex.$(OBJEXT)
+complex_OBJECTS = $(am_complex_OBJECTS)
+complex_LDADD = $(LDADD)
+complex_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_work_OBJECTS = work.$(OBJEXT)
+work_OBJECTS = $(am_work_OBJECTS)
+work_LDADD = $(LDADD)
+work_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -128,7 +132,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/realpaver
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/work.Po
+am__depfiles_remade = ./$(DEPDIR)/complex.Po ./$(DEPDIR)/work.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -148,8 +152,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(work_SOURCES)
-DIST_SOURCES = $(work_SOURCES)
+SOURCES = $(complex_SOURCES) $(work_SOURCES)
+DIST_SOURCES = $(complex_SOURCES) $(work_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -313,6 +317,7 @@ LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 AM_CPPFLAGS = -I.. -I../src
 CLEANFILES = *~
 work_SOURCES = work.cpp
+complex_SOURCES = complex.cpp
 all: all-am
 
 .SUFFIXES:
@@ -356,6 +361,10 @@ clean-noinstPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+complex$(EXEEXT): $(complex_OBJECTS) $(complex_DEPENDENCIES) $(EXTRA_complex_DEPENDENCIES) 
+	@rm -f complex$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(complex_OBJECTS) $(complex_LDADD) $(LIBS)
+
 work$(EXEEXT): $(work_OBJECTS) $(work_DEPENDENCIES) $(EXTRA_work_DEPENDENCIES) 
 	@rm -f work$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(work_OBJECTS) $(work_LDADD) $(LIBS)
@@ -366,6 +375,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/complex.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/work.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -526,7 +536,8 @@ clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/work.Po
+		-rm -f ./$(DEPDIR)/complex.Po
+	-rm -f ./$(DEPDIR)/work.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -572,7 +583,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/work.Po
+		-rm -f ./$(DEPDIR)/complex.Po
+	-rm -f ./$(DEPDIR)/work.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

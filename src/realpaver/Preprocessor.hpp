@@ -89,7 +89,7 @@ public:
    /// @return the fixed variables of the source problem
    Scope fixedScope() const;
 
-   /// @return the fixed variables of the source problem
+   /// @return the unfixed variables of the source problem
    Scope unfixedScope() const;
 
    /// @return the number of inactive constraints detected by this
@@ -97,6 +97,19 @@ public:
 
    /// @return the number of fixed variables detected by this
    size_t nbFixedVars() const;
+
+   /// @return the number of unfixed variables after preprocessing
+   size_t nbUnfixedVars() const;
+
+   /// Gets a fixed variable
+   /// @param i an integer between 0 and nbFixedVars() - 1
+   /// @return the i-th fixed variable in this
+   Variable getFixedVar(size_t i) const;
+
+   /// Gets an unfixed variable
+   /// @param i an integer between 0 and nbUnfixedVars() - 1
+   /// @return the i-th unfixed variable in this
+   Variable getUnfixedVar(size_t i) const;
 
    /// @return the domains of the fixed variables if nbFixedVars() > 0
    IntervalRegion fixedRegion() const;

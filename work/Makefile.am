@@ -8,6 +8,7 @@ AM_CPPFLAGS = -I.. -I../src
 
 CLEANFILES = *~
 
-noinst_PROGRAMS = work
+noinst_PROGRAMS = complex work
 
 work_SOURCES = work.cpp
+complex_SOURCES = complex.cpp

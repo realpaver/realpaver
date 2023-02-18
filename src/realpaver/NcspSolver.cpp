@@ -224,7 +224,9 @@ void NcspSolver::makeSplit()
    // TODO: max smear strategy not handled
 
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
+   
    if (sli == "BISECTION") slicer = new IntervalBisecter();
+   if (sli == "BISECTION_INF") slicer = new IntervalBisecterInf();
    if (sli == "PEELING")
    {
       double f = env_->getParam()->getDblParam("SPLIT_PEEL_FACTOR");
@@ -237,7 +239,7 @@ void NcspSolver::makeSplit()
    }
 
    THROW_IF(selector == nullptr || slicer == nullptr,
-            "Unable to make the split object in a BO solver");
+            "Unable to make the split object in a Ncsp solver");
 
    std::unique_ptr<VariableSelector> pselector(selector);
    std::unique_ptr<IntervalSlicer> pslicer(slicer);
@@ -433,5 +435,46 @@ Preprocessor* NcspSolver::getPreprocessor() const
    return preproc_;
 }
 
+size_t NcspSolver::getNbSolutions() const
+{
+   if (preproc_->isSolved())
+      return preproc_->isUnfeasible() ? 0 : 1;
+
+   else
+      return space_->nbSolNodes();
+}
+
+std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
+{
+   ASSERT(i < getNbSolutions(), "Bad access to a solution in a Ncsp solver");
+
+   IntervalRegion reg(problem_.getDomains());
+   Proof proof = Proof::Inner;
+
+   // assigns the values of the fixed variables
+   for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
+   {
+      Variable v = preproc_->getFixedVar(i);
+      reg.set(v, preproc_->getFixedDomain(v));
+   }
+
+   // assigns the values of the unfixed variables
+   if (!preproc_->allVarsFixed())
+   {
+      SharedNcspNode node = space_->getSolNode(i);
+      proof = node->getProof();
+
+      IntervalRegion* regnode = node->region();
+
+      for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
+      {
+         Variable v = preproc_->getUnfixedVar(i);
+         Variable w = preproc_->srcToDestVar(v);
+         reg.set(v, regnode->get(w));
+      }
+   }
+
+   return std::make_pair(reg, proof);
+}
 
 } // namespace

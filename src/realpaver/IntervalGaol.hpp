@@ -195,6 +195,12 @@ struct IntervalTraits<RawInterval> {
       return x;
    }
 
+   static inline interval zeroPi()
+   {
+      static interval x = interval::zero() | interval::pi();
+      return x;
+   }
+
    static inline interval zeroTwoPi()
    {
       static interval x = interval::zero() | interval::two_pi();

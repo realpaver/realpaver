@@ -60,10 +60,17 @@ public:
    /// @return term represented by this
    Term toTerm() const;
 
-   // TODO
+   /// Creates and return the scope of this
+   /// @return the scope of this
    Scope makeScope() const;
 
-   // TODO
+   /// Factorizes this such that the variables are ordered by a decreasing
+   /// number of occurrences
+   /// @return a term resulting from the factorization of this
+   ///
+   /// Given x the variable occurring the more in this the first step
+   /// generates the equivalent expression x*f + g such that x does not occur
+   /// in g, then g is factorized following the same process, and so on
    Term factorize() const;
 
 private:

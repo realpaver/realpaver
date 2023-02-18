@@ -86,6 +86,7 @@ public:
    static Interval halfPi();
    static Interval twoPi();
    static Interval minusPiPlusPi();
+   static Interval zeroPi();
    static Interval zeroTwoPi();
    ///@}
 

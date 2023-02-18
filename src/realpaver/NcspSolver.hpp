@@ -25,8 +25,22 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a solver for Numerical CSPs.
 ///
-/// A solver implements a branch-and-prune algorithm prameterized by several
-/// components
+/// A solver is a two-phase constraint solving algorithm. The first phase is
+/// a preprocessing step that tries to reduce the variable domains, to
+/// fix and then eliminate some variables, to detect inactive constraints
+/// or unfeasible constraints. The second phase is an interval-based
+/// branch-and-prune algorithm prameterized by several components.
+///
+/// The solver takes as input a problem that must be a NCSP. Its components
+/// are generated according to a Param object prm that can be assigned as
+/// follows:
+/// solver.getEnv()->setParam(prm);
+///
+/// After the solving phase, it is possible to read the solutions as follows:
+/// for (size_t i=0; i<solver.getNbSolutions(); ++i) {
+///    std::pair<IntervalRegion, Proof> sol = solver.getSolution(i);
+/// }
+/// The scope of each solution is the one of the input problem.
 ///////////////////////////////////////////////////////////////////////////////
 class NcspSolver {
 public:
@@ -65,11 +79,19 @@ public:
    /// @return the preprocessor used by this
    Preprocessor* getPreprocessor() const;
 
+   /// @return the number of solutions after the preprocessing / solving phase
+   size_t getNbSolutions() const;
+
+   /// Gets a solution after the preprocessing / solving phase
+   /// @param i an index between 0 and getNbSolutions()-1
+   /// @return the i-th solution in this
+   std::pair<IntervalRegion, Proof> getSolution(size_t i) const;
+
 private:
    Problem problem_;             // initial problem
    Problem preprob_;             // problem resulting from preprocessing
    Preprocessor* preproc_;       // preprocessor
-   
+
    NcspEnv* env_;                // environment
    NcspSpace* space_;            // search tree
    SharedDag dag_;               // dag

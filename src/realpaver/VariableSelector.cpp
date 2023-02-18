@@ -93,7 +93,7 @@ MaxSmearSelector::selectVar(const IntervalRegion& reg)
    f_->diff(reg, grad);
 
    bool found = false;
-   double smax, s, w;
+   double smax = 0.0, s, w;
    Variable vmax;
 
    for (auto v : scope_)

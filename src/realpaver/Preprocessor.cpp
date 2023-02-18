@@ -285,6 +285,31 @@ size_t Preprocessor::nbFixedVars() const
    return vim_.size();
 }
 
+size_t Preprocessor::nbUnfixedVars() const
+{
+   return vvm_.size();
+}
+
+Variable Preprocessor::getFixedVar(size_t i) const
+{
+   ASSERT(i < nbFixedVars(),
+          "Bad access to a fixed variable in a preprocessor");
+
+   auto it = vim_.begin();
+   std::advance(it, i);
+   return (*it).first;
+}
+
+Variable Preprocessor::getUnfixedVar(size_t i) const
+{
+   ASSERT(i < nbUnfixedVars(),
+          "Bad access to a-n unfixed variable in a preprocessor");
+   
+   auto it = vvm_.begin();
+   std::advance(it, i);
+   return (*it).first;
+}
+
 IntervalRegion Preprocessor::fixedRegion() const
 {
    ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");

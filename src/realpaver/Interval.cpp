@@ -130,6 +130,12 @@ Interval Interval::minusPiPlusPi()
    return x;
 }
 
+Interval Interval::zeroPi()
+{
+   static Interval x(Interval::Traits::zeroPi());
+   return x;
+}
+
 Interval Interval::zeroTwoPi()
 {
    static Interval x(Interval::Traits::zeroTwoPi());
