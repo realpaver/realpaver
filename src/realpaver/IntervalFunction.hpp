@@ -21,10 +21,15 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalFunction {
 public:
-   /// Constructor
+   /// Constructor given an existing dag
    /// @param dag expression graph
    /// @param i index of function in the DAG
    IntervalFunction(SharedDag dag, size_t i);
+
+   /// Constructor that creates a DAG from a term
+   /// @param t a trerm
+   /// @param img the image of t
+   IntervalFunction(Term t, const Interval& img = Interval::universe());
 
    /// Virtual destructor
    virtual ~IntervalFunction();

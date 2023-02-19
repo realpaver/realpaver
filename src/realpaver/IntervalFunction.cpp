@@ -21,6 +21,15 @@ IntervalFunction::IntervalFunction(SharedDag dag, size_t i)
    ASSERT(i < dag_->nbFuns(), "Bad index used to create an interval function");
 }
 
+IntervalFunction::IntervalFunction(Term t, const Interval& img)
+      : dag_(nullptr),
+        index_(0),
+        val_()
+{
+   dag_ = std::make_shared<Dag>();
+   index_ = dag_->insert(t, img);
+}
+
 IntervalFunction::~IntervalFunction()
 {}
 

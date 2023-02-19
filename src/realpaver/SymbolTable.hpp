@@ -183,6 +183,7 @@ private:
 /// There are several types of symbols:
 /// - constants;
 /// - variables;
+/// - aliases;
 /// - functions.
 ///
 /// This has a stack of function calls which supports the composition of

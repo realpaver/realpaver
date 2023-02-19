@@ -10,6 +10,7 @@
 #ifndef REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 #define REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 
+#include <vector>
 #include "realpaver/Dag.hpp"
 #include "realpaver/IntervalFunction.hpp"
 
@@ -23,6 +24,11 @@ public:
    /// Constructor
    /// @param dag expression DAG representing a vector of functions
    IntervalFunctionVector(SharedDag dag);
+
+   IntervalFunctionVector(const std::initializer_list<Term>& lt);
+
+   IntervalFunctionVector(const std::initializer_list<Term>& lt,
+                          const std::initializer_list<Interval>& limg);
 
    /// Virtual destructor
    virtual ~IntervalFunctionVector();

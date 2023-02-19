@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalFunctionVector.hpp"
 
 namespace realpaver {
@@ -14,7 +15,41 @@ namespace realpaver {
 IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
       : dag_(dag),
         val_(dag->nbFuns())
-{}
+{
+   ASSERT(dag->nbFuns() > 0,
+          "Creation of an interval function vector from an empty Dag");
+}
+
+IntervalFunctionVector::IntervalFunctionVector(
+      const std::initializer_list<Term>& lt)
+      : dag_(nullptr),
+        val_(lt.size())
+{
+   ASSERT(lt.size() > 0,
+          "Creation of an interval function vector from an empty list");
+
+   dag_ = std::make_shared<Dag>();
+   for (const auto& t : lt)
+      dag_->insert(t);
+}
+
+IntervalFunctionVector::IntervalFunctionVector(
+      const std::initializer_list<Term>& lt,
+      const std::initializer_list<Interval>& limg)
+      : dag_(nullptr),
+        val_(lt.size())
+{
+   ASSERT(lt.size() > 0,
+          "Creation of an interval function vector from an empty list");
+
+   ASSERT(lt.size() == limg.size(),
+          "Bad initialiaztion of an interval function vector ");
+
+   auto it = lt.begin();
+   auto jt = limg.begin();
+   for (; it != lt.end(); ++it, ++jt)
+      dag_->insert(*it, *jt);
+}
 
 IntervalFunctionVector::~IntervalFunctionVector()
 {}

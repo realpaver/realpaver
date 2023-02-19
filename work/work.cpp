@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include "realpaver/Dag.hpp"
+#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/Parser.hpp"
@@ -22,7 +23,21 @@ int main(void)
    Interval::precision( 12 );
 
    try {
-      // TODO
+      Variable x("x");
+      Variable y("y");
+
+      IntervalRegion R({x, y});
+      R.set(x, Interval(-4, 3));
+      R.set(y, Interval(0, 7));
+
+      IntervalFunctionVector F({sqr(x) + y + 1.0, y - 3*x});
+
+      F.eval(R);
+      cout << F.getValues() << endl;
+
+      IntervalMatrix J(2, 2);
+      F.diff(R, J);
+      cout << J << endl;
    }
    catch (Exception ex) {
       cout << ex.what() << endl;
