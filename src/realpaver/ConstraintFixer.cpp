@@ -24,7 +24,7 @@ Constraint ConstraintFixer::getConstraint() const
    return c_;
 }
 
-void ConstraintFixer::apply(const ConstraintEq* c)
+void ConstraintFixer::apply(const ArithCtrEq* c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -35,7 +35,7 @@ void ConstraintFixer::apply(const ConstraintEq* c)
    c_ = (vl.getTerm() == vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ConstraintLe* c)
+void ConstraintFixer::apply(const ArithCtrLe* c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -46,7 +46,7 @@ void ConstraintFixer::apply(const ConstraintLe* c)
    c_ = (vl.getTerm() <= vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ConstraintLt* c)
+void ConstraintFixer::apply(const ArithCtrLt* c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -57,7 +57,7 @@ void ConstraintFixer::apply(const ConstraintLt* c)
    c_ = (vl.getTerm() < vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ConstraintGe* c)
+void ConstraintFixer::apply(const ArithCtrGe* c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -68,7 +68,7 @@ void ConstraintFixer::apply(const ConstraintGe* c)
    c_ = (vl.getTerm() >= vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ConstraintGt* c)
+void ConstraintFixer::apply(const ArithCtrGt* c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -79,7 +79,7 @@ void ConstraintFixer::apply(const ConstraintGt* c)
    c_ = (vl.getTerm() > vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ConstraintIn* c)
+void ConstraintFixer::apply(const ArithCtrIn* c)
 {
    TermFixer vis(vvm_, vim_);
    c->term().acceptVisitor(vis);
@@ -87,7 +87,7 @@ void ConstraintFixer::apply(const ConstraintIn* c)
    c_ = in(vis.getTerm(), c->image());
 }
 
-void ConstraintFixer::apply(const ConstraintTable* c)
+void ConstraintFixer::apply(const TableCtr* c)
 {
    // checks the consistent assignments with respect to the variable domains
    Bitset consistent(c->nbRows(), 0);
@@ -111,15 +111,15 @@ void ConstraintFixer::apply(const ConstraintTable* c)
    }
 
    // rewrites the constraint
-   Constraint::SharedRep srep = std::make_shared<ConstraintTable>();
-   ConstraintTable* rep = static_cast<ConstraintTable*>(srep.get());
+   Constraint::SharedRep srep = std::make_shared<TableCtr>();
+   TableCtr* rep = static_cast<TableCtr*>(srep.get());
 
    for (size_t j=0; j<c->nbCols(); ++j)
    {
       auto it = vvm_->find(c->getVar(j));
       if (it != vvm_->end())
       {
-         ConstraintTableCol col(it->second);
+         TableCtrCol col(it->second);
 
          for (size_t i=0; i<c->nbRows(); ++i)
             if (consistent.get(i))

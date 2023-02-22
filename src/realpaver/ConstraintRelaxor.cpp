@@ -24,7 +24,7 @@ Constraint ConstraintRelaxor::getRelaxedCtr() const
    return relaxed_;
 }
 
-void ConstraintRelaxor::apply(const ConstraintEq* c)
+void ConstraintRelaxor::apply(const ArithCtrEq* c)
 {
    relaxed_ = in(c->left() - c->right(), Interval(-nu_, nu_));
 }

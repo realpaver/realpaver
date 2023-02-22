@@ -208,16 +208,16 @@ std::ostream& operator<<(std::ostream& os, Constraint c);
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a base class of constraints between two terms.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintBin : public ConstraintRep {
+class ArithCtrBinary : public ConstraintRep {
 public:
    /// Creates a binary constraint
    /// @param l left-hand side
    /// @param r right-hand side
    /// @param rel relation symbol
-   ConstraintBin(Term l, Term r, RelSymbol rel);
+   ArithCtrBinary(Term l, Term r, RelSymbol rel);
 
    /// Virtual destructor
-   virtual ~ConstraintBin();
+   virtual ~ArithCtrBinary();
 
    /// @return the left-hand term
    Term left() const;
@@ -245,12 +245,12 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an equation of the form l = r.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintEq : public ConstraintBin {
+class ArithCtrEq : public ArithCtrBinary {
 public:
    /// Creates an equation
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintEq(Term l, Term r);
+   ArithCtrEq(Term l, Term r);
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -269,12 +269,12 @@ Constraint operator==(Term l, Term r);
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l <= r.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintLe : public ConstraintBin {
+class ArithCtrLe : public ArithCtrBinary {
 public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintLe(Term l, Term r);
+   ArithCtrLe(Term l, Term r);
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -293,12 +293,12 @@ Constraint operator<=(Term l, Term r);
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l < r.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintLt : public ConstraintBin {
+class ArithCtrLt : public ArithCtrBinary {
 public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintLt(Term l, Term r);
+   ArithCtrLt(Term l, Term r);
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -312,17 +312,17 @@ public:
 /// @param l left-hand side
 /// @param r right-hand side
 /// @return l < r
-Constraint operator< (Term l, Term r);
+Constraint operator<(Term l, Term r);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l >= r.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintGe : public ConstraintBin {
+class ArithCtrGe : public ArithCtrBinary {
 public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintGe(Term l, Term r);
+   ArithCtrGe(Term l, Term r);
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -341,12 +341,12 @@ Constraint operator>=(Term l, Term r);
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an inequality constraint of the form l > r.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintGt : public ConstraintBin {
+class ArithCtrGt : public ArithCtrBinary {
 public:
    /// Creates an inequality constraint
    /// @param l left-hand side
    /// @param r right-hand side
-   ConstraintGt(Term l, Term r);
+   ArithCtrGt(Term l, Term r);
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -367,12 +367,12 @@ Constraint operator>(Term l, Term r);
 ///
 /// The constraint f in I is equivalent to min(I) <= f <= max(I).
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintIn : public ConstraintBin {
+class ArithCtrIn : public ArithCtrBinary {
 public:
    /// Creates a double inequality constraint
    /// @param t term representing a function
    /// @param x the bounds
-   ConstraintIn(Term t, const Interval& x);
+   ArithCtrIn(Term t, const Interval& x);
 
    /// @return the bounds of the function
    Interval image() const;
@@ -407,16 +407,16 @@ Constraint in(Term t, double a, double b);
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a column of a table constraint.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintTableCol {
+class TableCtrCol {
 public:
    /// Constructor
    /// @param v a variable
-   ConstraintTableCol(Variable v);
+   TableCtrCol(Variable v);
 
    /// Constructor
    /// @param v a variable
    /// @param l list of values of the variable
-   ConstraintTableCol(Variable v, const std::initializer_list<Interval>& l);
+   TableCtrCol(Variable v, const std::initializer_list<Interval>& l);
 
    /// @return the number of assignments of the variable
    size_t size() const;
@@ -445,22 +445,22 @@ private:
 ///          3  4  5
 ///
 /// In this example, we have 3 variables and 2 assignments.
-/// Each column is represented by an instance of ConstraintTableCol.
+/// Each column is represented by an instance of TableCtrCol.
 ///////////////////////////////////////////////////////////////////////////////
-class ConstraintTable : public ConstraintRep {
+class TableCtr : public ConstraintRep {
 public:
    /// Constructor that creates an empty constraint
-   ConstraintTable();
+   TableCtr();
 
    /// Constructor
    /// @param l list of columns of this
-   ConstraintTable(const std::initializer_list<ConstraintTableCol>& l);
+   TableCtr(const std::initializer_list<TableCtrCol>& l);
 
    /// Constructor
    /// @param vars a list of variables
    /// @param values list of values representing a row oriented matrix
-   ConstraintTable(const std::initializer_list<Variable>& vars,
-                   const std::initializer_list<Interval>& values);
+   TableCtr(const std::initializer_list<Variable>& vars,
+                   const std::initializer_list<Interval>& values);   
 
    /// @return the number of columns (variables)
    size_t nbCols() const;
@@ -480,11 +480,11 @@ public:
    /// Column access
    /// @param j a column index between 0 and nbCols()
    /// @return the j-th column of this
-   ConstraintTableCol getCol(size_t j) const;
+   TableCtrCol getCol(size_t j) const;
 
    /// Inserts a column in the last place
    /// @param col column added to this
-   void addCol(const ConstraintTableCol& col);
+   void addCol(const TableCtrCol& col);
 
    ///@{
    bool isConstant() const override;
@@ -496,7 +496,7 @@ public:
    ///@}
 
 private:
-   std::vector<ConstraintTableCol> vcol_; // vector of columns
+   std::vector<TableCtrCol> vcol_; // vector of columns
 
    void makeScopeAndHashCode();
    bool isRowConsistent(size_t i, const IntervalRegion& reg) const;
@@ -532,13 +532,13 @@ public:
    virtual ~ConstraintVisitor();
 
    ///@{
-   virtual void apply(const ConstraintEq* c);
-   virtual void apply(const ConstraintLe* c);
-   virtual void apply(const ConstraintLt* c);
-   virtual void apply(const ConstraintGe* c);
-   virtual void apply(const ConstraintGt* c);
-   virtual void apply(const ConstraintIn* c);
-   virtual void apply(const ConstraintTable* c);
+   virtual void apply(const ArithCtrEq* c);
+   virtual void apply(const ArithCtrLe* c);
+   virtual void apply(const ArithCtrLt* c);
+   virtual void apply(const ArithCtrGe* c);
+   virtual void apply(const ArithCtrGt* c);
+   virtual void apply(const ArithCtrIn* c);
+   virtual void apply(const TableCtr* c);
    ///@}
 };
 

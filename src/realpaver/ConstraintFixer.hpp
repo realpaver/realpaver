@@ -53,13 +53,13 @@ public:
    Constraint getConstraint() const;
 
    ///@{
-   void apply(const ConstraintEq* c) override;
-   void apply(const ConstraintLe* c) override;
-   void apply(const ConstraintLt* c) override;
-   void apply(const ConstraintGe* c) override;
-   void apply(const ConstraintGt* c) override;
-   void apply(const ConstraintIn* c) override;
-   void apply(const ConstraintTable* c) override;
+   void apply(const ArithCtrEq* c) override;
+   void apply(const ArithCtrLe* c) override;
+   void apply(const ArithCtrLt* c) override;
+   void apply(const ArithCtrGe* c) override;
+   void apply(const ArithCtrGt* c) override;
+   void apply(const ArithCtrIn* c) override;
+   void apply(const TableCtr* c) override;
    ///@}
 
 private:

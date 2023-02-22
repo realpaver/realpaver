@@ -2401,7 +2401,7 @@ size_t DagCreator::index()
    return index_;
 }
 
-void DagCreator::apply(const ConstraintEq* c)
+void DagCreator::apply(const ArithCtrEq* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);
@@ -2414,7 +2414,7 @@ void DagCreator::apply(const ConstraintEq* c)
    index_ = dag_->insertFun(f);
 }
    
-void DagCreator::apply(const ConstraintLe* c)
+void DagCreator::apply(const ArithCtrLe* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);
@@ -2427,7 +2427,7 @@ void DagCreator::apply(const ConstraintLe* c)
    index_ = dag_->insertFun(f);
 }
 
-void DagCreator::apply(const ConstraintLt* c)
+void DagCreator::apply(const ArithCtrLt* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);
@@ -2440,7 +2440,7 @@ void DagCreator::apply(const ConstraintLt* c)
    index_ = dag_->insertFun(f);
 }
 
-void DagCreator::apply(const ConstraintGe* c)
+void DagCreator::apply(const ArithCtrGe* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);
@@ -2453,7 +2453,7 @@ void DagCreator::apply(const ConstraintGe* c)
    index_ = dag_->insertFun(f);
 }
 
-void DagCreator::apply(const ConstraintGt* c)
+void DagCreator::apply(const ArithCtrGt* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);
@@ -2466,7 +2466,7 @@ void DagCreator::apply(const ConstraintGt* c)
    index_ = dag_->insertFun(f);
 }
 
-void DagCreator::apply(const ConstraintIn* c)
+void DagCreator::apply(const ArithCtrIn* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);

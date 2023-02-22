@@ -188,7 +188,7 @@ std::ostream& operator<<(std::ostream& os, Constraint c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintBin::ConstraintBin(Term l, Term r, RelSymbol rel)
+ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
       : ConstraintRep(),
         l_(l),
         r_(r),
@@ -204,70 +204,70 @@ ConstraintBin::ConstraintBin(Term l, Term r, RelSymbol rel)
    setScope(s);
 }
 
-ConstraintBin::~ConstraintBin()
+ArithCtrBinary::~ArithCtrBinary()
 {}
 
-Term ConstraintBin::left() const
+Term ArithCtrBinary::left() const
 {
    return l_;
 }
 
-Term ConstraintBin::right() const
+Term ArithCtrBinary::right() const
 {
    return r_;
 }
 
-RelSymbol ConstraintBin::relSymbol() const
+RelSymbol ArithCtrBinary::relSymbol() const
 {
    return rel_;
 }
 
-bool ConstraintBin::isConstant() const
+bool ArithCtrBinary::isConstant() const
 {
    return l_.isConstant() && r_.isConstant();
 }
 
-void ConstraintBin::print(std::ostream& os) const
+void ArithCtrBinary::print(std::ostream& os) const
 {
    l_.print(os);
    os << " " << rel_ << " ";
    r_.print(os);
 }
 
-bool ConstraintBin::isEquation() const
+bool ArithCtrBinary::isEquation() const
 {
    return rel_ == RelSymbol::Eq;
 }
 
-bool ConstraintBin::isInequality() const
+bool ArithCtrBinary::isInequality() const
 {
    return rel_ == RelSymbol::Ge || rel_ == RelSymbol::Gt ||
           rel_ == RelSymbol::Le || rel_ == RelSymbol::Lt ||
           rel_ == RelSymbol::In;
 }
 
-bool ConstraintBin::isLinear() const
+bool ArithCtrBinary::isLinear() const
 {
    return l_.isLinear() && r_.isLinear();
 }
 
-bool ConstraintBin::isBoundConstraint() const
+bool ArithCtrBinary::isBoundConstraint() const
 {
    return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintEq::ConstraintEq(Term l, Term r)
-      : ConstraintBin(l, r, RelSymbol::Eq)
+ArithCtrEq::ArithCtrEq(Term l, Term r)
+      : ArithCtrBinary(l, r, RelSymbol::Eq)
 {}
 
-void ConstraintEq::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrEq::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
 
-Proof ConstraintEq::isSatisfied(const IntervalRegion& reg)
+Proof ArithCtrEq::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -285,7 +285,7 @@ Proof ConstraintEq::isSatisfied(const IntervalRegion& reg)
       return Proof::Empty;
 }
 
-double ConstraintEq::violation(const IntervalRegion& reg)
+double ArithCtrEq::violation(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -297,7 +297,7 @@ double ConstraintEq::violation(const IntervalRegion& reg)
    return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
 }
 
-Proof ConstraintEq::contract(IntervalRegion& reg)
+Proof ArithCtrEq::contract(IntervalRegion& reg)
 {
    Interval l = left().hc4ReviseForward(reg),
             r = right().hc4ReviseForward(reg);
@@ -324,21 +324,21 @@ Proof ConstraintEq::contract(IntervalRegion& reg)
 
 Constraint operator==(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintEq>(l.rep(), r.rep()));
+   return Constraint(std::make_shared<ArithCtrEq>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintLe::ConstraintLe(Term l, Term r)
-      : ConstraintBin(l, r, RelSymbol::Le)
+ArithCtrLe::ArithCtrLe(Term l, Term r)
+      : ArithCtrBinary(l, r, RelSymbol::Le)
 {}
 
-void ConstraintLe::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrLe::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
 
-Proof ConstraintLe::isSatisfied(const IntervalRegion& reg)
+Proof ArithCtrLe::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -356,7 +356,7 @@ Proof ConstraintLe::isSatisfied(const IntervalRegion& reg)
       return Proof::Empty;
 }
 
-double ConstraintLe::violation(const IntervalRegion& reg)
+double ArithCtrLe::violation(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -368,7 +368,7 @@ double ConstraintLe::violation(const IntervalRegion& reg)
    return l.left() - r.right();
 }
 
-Proof ConstraintLe::contract(IntervalRegion& reg)
+Proof ArithCtrLe::contract(IntervalRegion& reg)
 {
    Interval l = left().hc4ReviseForward(reg),
             r = right().hc4ReviseForward(reg);
@@ -396,21 +396,21 @@ Proof ConstraintLe::contract(IntervalRegion& reg)
 
 Constraint operator<=(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintLe>(l.rep(), r.rep()));
+   return Constraint(std::make_shared<ArithCtrLe>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintLt::ConstraintLt(Term l, Term r)
-      : ConstraintBin(l, r, RelSymbol::Lt)
+ArithCtrLt::ArithCtrLt(Term l, Term r)
+      : ArithCtrBinary(l, r, RelSymbol::Lt)
 {}
 
-void ConstraintLt::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrLt::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
 
-Proof ConstraintLt::isSatisfied(const IntervalRegion& reg)
+Proof ArithCtrLt::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -428,7 +428,7 @@ Proof ConstraintLt::isSatisfied(const IntervalRegion& reg)
       return Proof::Empty;
 }
 
-double ConstraintLt::violation(const IntervalRegion& reg)
+double ArithCtrLt::violation(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -440,7 +440,7 @@ double ConstraintLt::violation(const IntervalRegion& reg)
    return l.left() - r.right();
 }
 
-Proof ConstraintLt::contract(IntervalRegion& reg)
+Proof ArithCtrLt::contract(IntervalRegion& reg)
 {
    Interval l = left().hc4ReviseForward(reg),
             r = right().hc4ReviseForward(reg);
@@ -468,21 +468,21 @@ Proof ConstraintLt::contract(IntervalRegion& reg)
 
 Constraint operator<(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintLt>(l.rep(), r.rep()));
+   return Constraint(std::make_shared<ArithCtrLt>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintGe::ConstraintGe(Term l, Term r)
-      : ConstraintBin(l, r, RelSymbol::Ge)
+ArithCtrGe::ArithCtrGe(Term l, Term r)
+      : ArithCtrBinary(l, r, RelSymbol::Ge)
 {}
 
-void ConstraintGe::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrGe::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
 
-Proof ConstraintGe::isSatisfied(const IntervalRegion& reg)
+Proof ArithCtrGe::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -500,7 +500,7 @@ Proof ConstraintGe::isSatisfied(const IntervalRegion& reg)
       return Proof::Empty;
 }
 
-double ConstraintGe::violation(const IntervalRegion& reg)
+double ArithCtrGe::violation(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -512,7 +512,7 @@ double ConstraintGe::violation(const IntervalRegion& reg)
    return r.left() - l.right();
 }
 
-Proof ConstraintGe::contract(IntervalRegion& reg)
+Proof ArithCtrGe::contract(IntervalRegion& reg)
 {
    Interval l = left().hc4ReviseForward(reg),
             r = right().hc4ReviseForward(reg);
@@ -540,21 +540,21 @@ Proof ConstraintGe::contract(IntervalRegion& reg)
 
 Constraint operator>=(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintGe>(l.rep(), r.rep()));
+   return Constraint(std::make_shared<ArithCtrGe>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintGt::ConstraintGt(Term l, Term r)
-      : ConstraintBin(l, r, RelSymbol::Gt)
+ArithCtrGt::ArithCtrGt(Term l, Term r)
+      : ArithCtrBinary(l, r, RelSymbol::Gt)
 {}
 
-void ConstraintGt::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrGt::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
 
-Proof ConstraintGt::isSatisfied(const IntervalRegion& reg)
+Proof ArithCtrGt::isSatisfied(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -572,7 +572,7 @@ Proof ConstraintGt::isSatisfied(const IntervalRegion& reg)
       return Proof::Empty;
 }
 
-double ConstraintGt::violation(const IntervalRegion& reg)
+double ArithCtrGt::violation(const IntervalRegion& reg)
 {
    Interval l = left().eval(reg),
             r = right().eval(reg);
@@ -584,7 +584,7 @@ double ConstraintGt::violation(const IntervalRegion& reg)
    return r.left() - l.right();
 }
 
-Proof ConstraintGt::contract(IntervalRegion& reg)
+Proof ArithCtrGt::contract(IntervalRegion& reg)
 {
    Interval l = left().hc4ReviseForward(reg),
             r = right().hc4ReviseForward(reg);
@@ -612,34 +612,34 @@ Proof ConstraintGt::contract(IntervalRegion& reg)
 
 Constraint operator>(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintGt>(l.rep(), r.rep()));
+   return Constraint(std::make_shared<ArithCtrGt>(l.rep(), r.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintIn::ConstraintIn(Term t, const Interval& x)
-      : ConstraintBin(t, x, RelSymbol::In), x_(x)
+ArithCtrIn::ArithCtrIn(Term t, const Interval& x)
+      : ArithCtrBinary(t, x, RelSymbol::In), x_(x)
 {
    ASSERT(!(x.isEmpty() || x.isUniverse()),
           "Bad interval target in a IN constraint");
 }
 
-Interval ConstraintIn::image() const
+Interval ArithCtrIn::image() const
 {
    return x_;
 }
 
-Term ConstraintIn::term() const
+Term ArithCtrIn::term() const
 {
    return left();
 }
 
-void ConstraintIn::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrIn::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
 
-Proof ConstraintIn::isSatisfied(const IntervalRegion& reg)
+Proof ArithCtrIn::isSatisfied(const IntervalRegion& reg)
 {
    Interval e = term().eval(reg);
 
@@ -656,7 +656,7 @@ Proof ConstraintIn::isSatisfied(const IntervalRegion& reg)
       return Proof::Empty;
 }
 
-double ConstraintIn::violation(const IntervalRegion& reg)
+double ArithCtrIn::violation(const IntervalRegion& reg)
 {
    Interval e = term().eval(reg);
 
@@ -667,7 +667,7 @@ double ConstraintIn::violation(const IntervalRegion& reg)
    return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
 }
 
-Proof ConstraintIn::contract(IntervalRegion& reg)
+Proof ArithCtrIn::contract(IntervalRegion& reg)
 {
    Interval e = term().hc4ReviseForward(reg);
 
@@ -700,7 +700,7 @@ Constraint in(Term t, const Interval& x)
       return t >= x.left();
 
    else
-      return Constraint(std::make_shared<ConstraintIn>(t.rep(), x));
+      return Constraint(std::make_shared<ArithCtrIn>(t.rep(), x));
 }
 
 Constraint in(Term t, double a, double b)
@@ -710,33 +710,33 @@ Constraint in(Term t, double a, double b)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintTableCol::ConstraintTableCol(Variable v)
+TableCtrCol::TableCtrCol(Variable v)
       : v_(v),
         vval_()
 {}
 
-ConstraintTableCol::ConstraintTableCol(Variable v,
+TableCtrCol::TableCtrCol(Variable v,
                                        const std::initializer_list<Interval>& l)
       : v_(v),
         vval_(l)
 {}
 
-size_t ConstraintTableCol::size() const
+size_t TableCtrCol::size() const
 {
    return vval_.size();
 }
 
-Variable ConstraintTableCol::getVar() const
+Variable TableCtrCol::getVar() const
 {
    return v_;
 }
 
-void ConstraintTableCol::addValue(const Interval& x)
+void TableCtrCol::addValue(const Interval& x)
 {
    vval_.push_back(x);
 }
 
-Interval ConstraintTableCol::getVal(size_t i) const
+Interval TableCtrCol::getVal(size_t i) const
 {
    ASSERT(i < size(), "Bad access in a column of a table constraint @ " << i);
    return vval_[i];
@@ -744,13 +744,13 @@ Interval ConstraintTableCol::getVal(size_t i) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintTable::ConstraintTable()
+TableCtr::TableCtr()
       : ConstraintRep(),
         vcol_()
 {}
 
-ConstraintTable::ConstraintTable(
-   const std::initializer_list<ConstraintTableCol>& l)
+TableCtr::TableCtr(
+   const std::initializer_list<TableCtrCol>& l)
       : ConstraintRep(),
         vcol_(l)
 {
@@ -761,7 +761,7 @@ ConstraintTable::ConstraintTable(
    makeScopeAndHashCode();
 }
 
-ConstraintTable::ConstraintTable(
+TableCtr::TableCtr(
    const std::initializer_list<Variable>& vars,
    const std::initializer_list<Interval>& values)
       : ConstraintRep(),
@@ -776,7 +776,7 @@ ConstraintTable::ConstraintTable(
    // creates the columns
    for (auto itv=vars.begin(); itv != vars.end(); ++itv)
    {
-      ConstraintTableCol col(*itv);
+      TableCtrCol col(*itv);
       vcol_.push_back(col);
    }
 
@@ -799,7 +799,7 @@ ConstraintTable::ConstraintTable(
    makeScopeAndHashCode();
 }
 
-void ConstraintTable::makeScopeAndHashCode()
+void TableCtr::makeScopeAndHashCode()
 {
    Scope s;
    hcode_ = static_cast<size_t>(RelSymbol::Table);
@@ -814,23 +814,23 @@ void ConstraintTable::makeScopeAndHashCode()
    setScope(s);   
 }
 
-size_t ConstraintTable::nbCols() const
+size_t TableCtr::nbCols() const
 {
    return vcol_.size();
 }
 
-size_t ConstraintTable::nbRows() const
+size_t TableCtr::nbRows() const
 {
    return vcol_.empty() ? 0 : vcol_[0].size();
 }
 
-Variable ConstraintTable::getVar(size_t j) const
+Variable TableCtr::getVar(size_t j) const
 {
    ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j].getVar();
 }
 
-Interval ConstraintTable::getVal(size_t i, size_t j) const
+Interval TableCtr::getVal(size_t i, size_t j) const
 {
    ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
    ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
@@ -838,13 +838,13 @@ Interval ConstraintTable::getVal(size_t i, size_t j) const
 }
 
 
-ConstraintTableCol ConstraintTable::getCol(size_t j) const
+TableCtrCol TableCtr::getCol(size_t j) const
 {
    ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j];
 }
 
-void ConstraintTable::addCol(const ConstraintTableCol& col)
+void TableCtr::addCol(const TableCtrCol& col)
 {
    ASSERT(vcol_.empty() || col.size() == nbRows(),
           "Bad insertion of a new column in a table constraint");
@@ -859,12 +859,12 @@ void ConstraintTable::addCol(const ConstraintTableCol& col)
    makeScopeAndHashCode();
 }
 
-bool ConstraintTable::isConstant() const
+bool TableCtr::isConstant() const
 {
    return vcol_.empty();
 }
 
-bool ConstraintTable::isRowConsistent(size_t i, const IntervalRegion& reg) const
+bool TableCtr::isRowConsistent(size_t i, const IntervalRegion& reg) const
 {
    for (size_t j=0; j<nbCols(); ++j)
    {      
@@ -875,7 +875,7 @@ bool ConstraintTable::isRowConsistent(size_t i, const IntervalRegion& reg) const
    return true;
 }
 
-Proof ConstraintTable::isSatisfied(const IntervalRegion& reg)
+Proof TableCtr::isSatisfied(const IntervalRegion& reg)
 {
    size_t nbc = 0;
 
@@ -889,7 +889,7 @@ Proof ConstraintTable::isSatisfied(const IntervalRegion& reg)
    return (nbc == 1) ? Proof::Inner : Proof::Empty;
 }
 
-double ConstraintTable::violation(const IntervalRegion& reg)
+double TableCtr::violation(const IntervalRegion& reg)
 {
    double res = Double::inf();
 
@@ -899,7 +899,7 @@ double ConstraintTable::violation(const IntervalRegion& reg)
    return res;
 }
 
-double ConstraintTable::rowViolation(const IntervalRegion& reg, size_t i)
+double TableCtr::rowViolation(const IntervalRegion& reg, size_t i)
 {
    double res = 0.0;
    Double::rndNear();
@@ -924,7 +924,7 @@ double ConstraintTable::rowViolation(const IntervalRegion& reg, size_t i)
    return res;
 }
 
-Proof ConstraintTable::contract(IntervalRegion& reg)
+Proof TableCtr::contract(IntervalRegion& reg)
 {
    Bitset consistent(nbRows(), 1);
    size_t nbc = nbRows();     // number of consistent rows
@@ -958,7 +958,7 @@ Proof ConstraintTable::contract(IntervalRegion& reg)
    return (nbc == 1) ? Proof::Inner : Proof::Maybe;
 }
 
-void ConstraintTable::print(std::ostream& os) const
+void TableCtr::print(std::ostream& os) const
 {
    os << "table(";
    // prints the variables
@@ -984,7 +984,7 @@ void ConstraintTable::print(std::ostream& os) const
    os << "})";
 }
 
-void ConstraintTable::acceptVisitor(ConstraintVisitor& vis) const
+void TableCtr::acceptVisitor(ConstraintVisitor& vis) const
 {
    vis.apply(this);
 }
@@ -992,7 +992,7 @@ void ConstraintTable::acceptVisitor(ConstraintVisitor& vis) const
 Constraint table(const std::initializer_list<Variable>& vars,
                  const std::initializer_list<Interval>& values)
 {
-   return Constraint(std::make_shared<ConstraintTable>(vars, values));
+   return Constraint(std::make_shared<TableCtr>(vars, values));
 }
 
 Constraint table(const Variable* vars, size_t nvars,
@@ -1003,12 +1003,12 @@ Constraint table(const Variable* vars, size_t nvars,
 
    size_t nrows = nvalues / nvars;
    
-   Constraint::SharedRep srep = std::make_shared<ConstraintTable>();
-   ConstraintTable* rep = static_cast<ConstraintTable*>(srep.get());
+   Constraint::SharedRep srep = std::make_shared<TableCtr>();
+   TableCtr* rep = static_cast<TableCtr*>(srep.get());
 
    for (size_t j=0; j<nvars; ++j)
    {
-      ConstraintTableCol col(vars[j]);
+      TableCtrCol col(vars[j]);
       for (size_t i=0; i<nrows; ++i)
       {
          Interval x = values[i*nvars + j];
@@ -1025,37 +1025,37 @@ Constraint table(const Variable* vars, size_t nvars,
 ConstraintVisitor::~ConstraintVisitor()
 {}
 
-void ConstraintVisitor::apply(const ConstraintEq* c)
+void ConstraintVisitor::apply(const ArithCtrEq* c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ConstraintLe* c)
+void ConstraintVisitor::apply(const ArithCtrLe* c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ConstraintLt* c)
+void ConstraintVisitor::apply(const ArithCtrLt* c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ConstraintGe* c)
+void ConstraintVisitor::apply(const ArithCtrGe* c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ConstraintGt* c)
+void ConstraintVisitor::apply(const ArithCtrGt* c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ConstraintIn* c)
+void ConstraintVisitor::apply(const ArithCtrIn* c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ConstraintTable* c)
+void ConstraintVisitor::apply(const TableCtr* c)
 {
    THROW("Visit method not implemented");
 }

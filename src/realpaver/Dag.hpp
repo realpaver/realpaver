@@ -1245,7 +1245,7 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to insert a constraint in a DAG.
+/// This is a visitor used to insert an arithmetic constraint in a DAG.
 ///////////////////////////////////////////////////////////////////////////////
 class DagCreator : public ConstraintVisitor {
 public:
@@ -1258,12 +1258,12 @@ public:
    size_t index();
 
    ///@{
-   void apply(const ConstraintEq* c) override;
-   void apply(const ConstraintLe* c) override;
-   void apply(const ConstraintLt* c) override;
-   void apply(const ConstraintGe* c) override;
-   void apply(const ConstraintGt* c) override;
-   void apply(const ConstraintIn* c) override;
+   void apply(const ArithCtrEq* c) override;
+   void apply(const ArithCtrLe* c) override;
+   void apply(const ArithCtrLt* c) override;
+   void apply(const ArithCtrGe* c) override;
+   void apply(const ArithCtrGt* c) override;
+   void apply(const ArithCtrIn* c) override;
    ///@}
 
 private:
