@@ -54,6 +54,11 @@ void IntervalVector::set(size_t i, const Interval& x)
    operator[](i) = x;
 }
 
+void IntervalVector::setEmpty()
+{
+   set(0, Interval::emptyset());
+}
+
 bool IntervalVector::isEmpty() const
 {
    for (size_t i=0; i<size(); ++i)

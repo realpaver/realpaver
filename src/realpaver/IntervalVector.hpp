@@ -62,6 +62,9 @@ public:
    /// @param x an interval
    void set(size_t i, const Interval& x);
 
+   /// Assignds this to the empty vector (assigns the first component to empty)
+   void setEmpty();
+
    /// @return true if one element of this is empty
    bool isEmpty() const;
 

@@ -30,6 +30,14 @@ int main(void)
       R.set(x, Interval(-4, 3));
       R.set(y, Interval(0, 7));
 
+      IntervalFunction f(sqr(x) + y + 1.0);
+      IntervalVector G(2);
+      f.diff(R, G);
+      cout << G << endl;
+      cout << f.scope() << endl;
+      cout << f.nbVars() << endl;
+
+/*
       IntervalFunctionVector F({sqr(x) + y + 1.0, y - 3*x});
 
       F.eval(R);
@@ -38,6 +46,7 @@ int main(void)
       IntervalMatrix J(2, 2);
       F.diff(R, J);
       cout << J << endl;
+*/
    }
    catch (Exception ex) {
       cout << ex.what() << endl;

@@ -76,21 +76,20 @@ std::pair<bool, Variable> MaxDomSelector::selectVar(const IntervalRegion& reg)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MaxSmearSelector::MaxSmearSelector(IntervalFunction* f, Scope s)
+MaxSmearSelector::MaxSmearSelector(IntervalFunction f, Scope s)
       : VariableSelector(s),
         f_(f)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a MaxSmear selector");
-   ASSERT(f != nullptr, "Null function n a MaxSmear selector");
 }
 
 std::pair<bool, Variable>
 MaxSmearSelector::selectVar(const IntervalRegion& reg)
 {
-   Scope fscope = f_->scope();
-   IntervalVector grad(f_->nbVars());
+   Scope fscope = f_.scope();
+   IntervalVector grad(f_.nbVars());
 
-   f_->diff(reg, grad);
+   f_.diff(reg, grad);
 
    bool found = false;
    double smax = 0.0, s, w;
