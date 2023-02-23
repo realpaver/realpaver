@@ -103,7 +103,6 @@ librealpaver_la_include_HEADERS = \
 		ThickIntervalFunction.hpp \
 		Timer.hpp \
 		Tolerance.hpp \
-		UniIntervalFunction.hpp \
 		Variable.hpp \
 		VariableSelector.hpp \
 		VariableVector.hpp
@@ -201,7 +200,6 @@ librealpaver_la_SOURCES = \
 		ThickIntervalFunction.cpp \
 		Timer.cpp \
 		Tolerance.cpp \
-		UniIntervalFunction.cpp \
 		Variable.cpp \
 		VariableSelector.cpp \
 		VariableVector.cpp

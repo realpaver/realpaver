@@ -74,12 +74,14 @@ size_t IntervalFunctionVector::nbFuns() const
    return dag_->nbFuns();
 }
 
+/*
 IntervalFunction IntervalFunctionVector::fun(size_t i) const
 {
    ASSERT(i < nbFuns(), "Bad access to an interval function in a vector");
 
    return IntervalFunction(dag_, i);
 }
+*/
 
 const IntervalVector& IntervalFunctionVector::getValues() const
 {

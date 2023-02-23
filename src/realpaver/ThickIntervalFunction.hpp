@@ -12,7 +12,6 @@
 
 #include "realpaver/Dag.hpp"
 #include "realpaver/IntervalRegion.hpp"
-#include "realpaver/UniIntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -26,7 +25,7 @@ namespace realpaver {
 /// The update method must be called first. Then the evaluation and
 /// differentiation methods can be called.
 ///////////////////////////////////////////////////////////////////////////////
-class ThickIntervalFunction : public UniIntervalFunction {
+class ThickIntervalFunction {
 public:
    /// Creates a thick function
    /// @param dag a DAG
@@ -48,11 +47,15 @@ public:
    /// @return true if this depends on bs
    bool dependsOn(const Bitset& bs) const;
 
-   ///@{
-   Interval eval(const Interval& x) override;
-   Interval diff(const Interval& x) override;
-   std::pair<Interval, Interval> evalDiff(const Interval& x) override;
-   ///@}
+   /// Evaluates this
+   /// @param x
+   /// @return interval evaluation of this at x
+   Interval eval(const Interval& x);
+
+   /// Differentiates this
+   /// @param x
+   /// @return interval derivative of this at x
+   Interval diff(const Interval& x);
 
    /// Updates the associated function in the DAG
    /// @param reg domains of variables

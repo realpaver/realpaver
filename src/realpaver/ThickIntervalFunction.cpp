@@ -37,16 +37,6 @@ Interval ThickIntervalFunction::diff(const Interval& x)
                                         Interval::universe();
 }
 
-std::pair<Interval, Interval>
-ThickIntervalFunction::evalDiff(const Interval& x)
-{
-   Interval e = f_->intervalEvalOnly(v_, x),
-            dv = f_->intervalDiffOnly(v_) ? f_->intervalDeriv(v_) :
-                                            Interval::universe();
-
-   return std::make_pair(e, dv);
-}
-
 Interval ThickIntervalFunction::update(const IntervalRegion& reg)
 {
    return f_->intervalEval(reg);
@@ -61,6 +51,5 @@ DagFun* ThickIntervalFunction::getFun() const
 {
    return f_;
 }
-
 
 } // namespace

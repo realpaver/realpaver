@@ -12,7 +12,7 @@
 
 #include <vector>
 #include "realpaver/Dag.hpp"
-#include "realpaver/IntervalFunction.hpp"
+//#include "realpaver/IntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -51,8 +51,9 @@ public:
    /// @return the number of functions in this
    size_t nbFuns() const;
 
-   /// @return the i-th function of thos
-   IntervalFunction fun(size_t i) const;
+   /// @return the i-th function of this
+//   IntervalFunction fun(size_t i) const;
+// TODO
 
    /// @return the vector of values after an evaluation of this
    const IntervalVector& getValues() const;

@@ -8,23 +8,18 @@
 using namespace realpaver;
 using namespace std;
 
+Interval f(const Interval& x)  { return sqr(x) - 2.0; }
+Interval df(const Interval& x) { return 2.0*x; }
+
 int main(void)
 {
-   Logger::init(LogLevel::full, "interval_newton.log");
+   Logger::init(LogLevel::full, "newton.log");
    Interval::precision( 16 );
-   
-   Problem problem;
-   Variable x = problem.addRealVar(1.0, 10.0, "x");
-   Constraint c( sqr(x) - 2.0 == 0.0 );
-
-   SharedDag dag = std::make_shared<Dag>();
-   size_t idx = dag->insert(c);
-   ThickIntervalFunction f(dag, idx, x);
 
    IntervalNewton newton;
-   Interval I( x.getDomain() );
+   Interval I(1, 10);
 
-   Proof p = newton.contract(f, I);
+   Proof p = newton.contract(f, df, I);
    cout << "Proof: " << p << endl;
 
    if (p != Proof::Empty)

@@ -10,9 +10,9 @@
 #ifndef REALPAVER_INTERVAL_NEWTON_HPP
 #define REALPAVER_INTERVAL_NEWTON_HPP
 
+#include <functional>
 #include "realpaver/Inflator.hpp"
 #include "realpaver/Tolerance.hpp"
-#include "realpaver/UniIntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -57,36 +57,46 @@ public:
 
    /// Contraction method
    /// @param f a univariate function
+   /// @param df the derivative of f
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof contract(UniIntervalFunction& f, Interval& x);
+   Proof contract(std::function<Interval(const Interval&)> f,
+                  std::function<Interval(const Interval&)> df, Interval& x);
 
    /// Combines the contraction method with search
    /// @param f a univariate function
+   /// @param df the derivative of f
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof search(UniIntervalFunction& f, Interval& x);
+   Proof search(std::function<Interval(const Interval&)> f,
+                std::function<Interval(const Interval&)> df, Interval& x);
 
    /// Step of the contraction method
    /// @param f a univariate function
+   /// @param df the derivative of f
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
    ///
    /// The interval x is contracted as the intersection of x and
    /// the set hull( c - f(c) / f'(x) ) where c is the midpoint of x.
-   Proof step(UniIntervalFunction& f, Interval& x);
+   Proof step(std::function<Interval(const Interval&)> f,
+              std::function<Interval(const Interval&)> df, Interval& x);
 
    /// Local search method
    /// @param f a univariate function
+   /// @param df the derivative of f
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localSearch(UniIntervalFunction& f, Interval& x);
+   Proof localSearch(std::function<Interval(const Interval&)> f,
+                     std::function<Interval(const Interval&)> df, Interval& x);
 
    /// Step of the local search method
    /// @param f a univariate function
+   /// @param df the derivative of f
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localStep(UniIntervalFunction& f, Interval& x);
+   Proof localStep(std::function<Interval(const Interval&)> f,
+                   std::function<Interval(const Interval&)> df, Interval& x);
 
    /// Sets a limit of iterations of the iterative methods
    /// @param n new value of the limit
@@ -135,8 +145,11 @@ private:
    Tolerance ldtol_;
    Inflator inflator_;
 
-   Proof shrinkLeft(UniIntervalFunction& f, Interval& x);
-   Proof shrinkRight(UniIntervalFunction& f, Interval& x);
+   Proof shrinkLeft(std::function<Interval(const Interval&)> f,
+                    std::function<Interval(const Interval&)> df, Interval& x);
+
+   Proof shrinkRight(std::function<Interval(const Interval&)> f,
+                     std::function<Interval(const Interval&)> df, Interval& x);
 };
 
 } // namespace
