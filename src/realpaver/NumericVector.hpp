@@ -56,6 +56,10 @@ public:
    /// @return the size of this
    size_t size() const;
 
+   /// Resizes the vector
+   /// @param n new size of this
+   void resize(size_t n);
+
    /// Constant access in this
    /// @param i an index between 0 and size()-1
    /// @return the i-th element of this
@@ -152,6 +156,12 @@ template <typename T>
 size_t NumericVector<T>::size() const
 {
    return elems_.size();
+}
+
+template <typename T>
+void NumericVector<T>::resize(size_t n)
+{
+   elems_.resize(n);
 }
 
 template <typename T>

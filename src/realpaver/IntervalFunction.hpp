@@ -54,13 +54,19 @@ public:
    /// @return value of this at pt
    virtual Interval pointEval(const RealPoint& pt) = 0;
 
-   /// Evaluates and differentiates this
+   /// Differentiates this
    /// @param reg domains of variables
    /// @param grad output vector such that grad[i] if the derivative of this
-   /// at pt with respect to the i-th variable of its scope
-   ///
-   /// getValue() returns the value of this if needed
+   /// at reg with respect to the i-th variable of its scope
    virtual void diff(const IntervalRegion& reg, IntervalVector& grad) = 0;
+
+   /// Evaluates and differentiates this
+   /// @param reg domains of variables
+   /// @param val result of evaluation of this at reg
+   /// @param grad output vector such that grad[i] if the derivative of this
+   /// at reg with respect to the i-th variable of its scope
+   virtual void evalDiff(const IntervalRegion& reg, Interval& val,
+                         IntervalVector& grad) = 0;
 
    /// Evaluates this and calculates the violation of the underlying constraint
    /// @param reg domains of variables
@@ -70,8 +76,6 @@ public:
    ///
    /// Given [lo, up] the image of this in the DagFun object, the underlying
    /// constraint is defined by lo <= f(x) <= up.
-   ///
-   /// getValue() returns the value of this if needed
    virtual double violation(const IntervalRegion& reg) = 0;
 
    /// Evaluates this and calculates the violation of the underlying constraint
@@ -83,8 +87,6 @@ public:
    ///         function and the result of its evaluation at reg
    ///
    /// The underlying constraint is defined by lo <= f(x) <= up.
-   ///
-   /// getValue() returns the value of this if needed
    virtual double violation(const IntervalRegion& reg, double lo,
                             double up) = 0;
 
@@ -144,8 +146,16 @@ public:
    /// Differentiates this
    /// @param reg domains of variables
    /// @param grad output vector such that grad[i] if the derivative of this
-   /// at pt with respect to the i-th variable of its scope
+   /// at reg with respect to the i-th variable of its scope
    void diff(const IntervalRegion& reg, IntervalVector& grad);
+
+   /// Evaluates and differentiates this
+   /// @param reg domains of variables
+   /// @param val result of evaluation of this at reg
+   /// @param grad output vector such that grad[i] if the derivative of this
+   /// at pt with respect to the i-th variable of its scope
+   void evalDiff(const IntervalRegion& reg, Interval& val,
+                 IntervalVector& grad);
 
    /// Calculates the violation of the underlying constraint
    /// @param reg domains of variables
@@ -220,6 +230,8 @@ public:
    Interval eval(const IntervalRegion& reg) override;
    Interval pointEval(const RealPoint& pt) override;
    void diff(const IntervalRegion& reg, IntervalVector& grad) override;
+   void evalDiff(const IntervalRegion& reg, Interval& val,
+                 IntervalVector& grad) override;
    double violation(const IntervalRegion& reg) override;
    double violation(const IntervalRegion& reg, double lo, double up) override;
    ///@}

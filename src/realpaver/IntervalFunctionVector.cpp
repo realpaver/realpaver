@@ -12,7 +12,13 @@
 
 namespace realpaver {
 
-IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
+IntervalFunctionVectorRep::~IntervalFunctionVectorRep()
+{}
+
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+IntervalFunctionVectorDag::IntervalFunctionVectorDag(SharedDag dag)
       : dag_(dag),
         val_(dag->nbFuns())
 {
@@ -20,7 +26,7 @@ IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
           "Creation of an interval function vector from an empty Dag");
 }
 
-IntervalFunctionVector::IntervalFunctionVector(
+IntervalFunctionVectorDag::IntervalFunctionVectorDag(
       const std::initializer_list<Term>& lt)
       : dag_(nullptr),
         val_(lt.size())
@@ -33,7 +39,7 @@ IntervalFunctionVector::IntervalFunctionVector(
       dag_->insert(t);
 }
 
-IntervalFunctionVector::IntervalFunctionVector(
+IntervalFunctionVectorDag::IntervalFunctionVectorDag(
       const std::initializer_list<Term>& lt,
       const std::initializer_list<Interval>& limg)
       : dag_(nullptr),
@@ -51,64 +57,63 @@ IntervalFunctionVector::IntervalFunctionVector(
       dag_->insert(*it, *jt);
 }
 
-IntervalFunctionVector::~IntervalFunctionVector()
+IntervalFunctionVectorDag::~IntervalFunctionVectorDag()
 {}
 
-SharedDag IntervalFunctionVector::dag() const
+SharedDag IntervalFunctionVectorDag::dag() const
 {
    return dag_;
 }
 
-Scope IntervalFunctionVector::scope() const
+Scope IntervalFunctionVectorDag::scope() const
 {
    return dag_->scope();
 }
 
-size_t IntervalFunctionVector::nbVars() const
+size_t IntervalFunctionVectorDag::nbVars() const
 {
    return dag_->nbVars();
 }
 
-size_t IntervalFunctionVector::nbFuns() const
+size_t IntervalFunctionVectorDag::nbFuns() const
 {
    return dag_->nbFuns();
 }
 
-/*
-IntervalFunction IntervalFunctionVector::fun(size_t i) const
+IntervalFunction IntervalFunctionVectorDag::fun(size_t i) const
 {
    ASSERT(i < nbFuns(), "Bad access to an interval function in a vector");
 
    return IntervalFunction(dag_, i);
 }
-*/
 
-const IntervalVector& IntervalFunctionVector::getValues() const
+const IntervalVector& IntervalFunctionVectorDag::getValues() const
 {
    return val_;
 }
 
-void IntervalFunctionVector::eval(const IntervalRegion& reg)
+void IntervalFunctionVectorDag::eval(const IntervalRegion& reg)
 {
    dag_->intervalEval(reg, val_);
 }
 
-void IntervalFunctionVector::pointEval(const RealPoint& pt)
+void IntervalFunctionVectorDag::pointEval(const RealPoint& pt)
 {
    dag_->intervalPointEval(pt, val_);
 }
 
-void IntervalFunctionVector::diff(const IntervalRegion& reg, IntervalMatrix& J)
+void IntervalFunctionVectorDag::diff(const IntervalRegion& reg, IntervalMatrix& J)
 {
    dag_->intervalEval(reg, val_);
    dag_->intervalDiff(J);
 }
 
-void IntervalFunctionVector::violation(const IntervalRegion& reg,
+void IntervalFunctionVectorDag::violation(const IntervalRegion& reg,
                                        IntervalVector& viol)
 {
    dag_->intervalEval(reg, val_);
    dag_->intervalViolation(viol);
 }
+*/
 
 } // namespace

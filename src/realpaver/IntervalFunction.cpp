@@ -82,6 +82,12 @@ void IntervalFunction::diff(const IntervalRegion& reg, IntervalVector& grad)
    return rep_->diff(reg, grad);
 }
 
+void IntervalFunction::evalDiff(const IntervalRegion& reg, Interval& val,
+                                IntervalVector& grad)
+{
+   return rep_->evalDiff(reg, val, grad);   
+}
+
 double IntervalFunction::violation(const IntervalRegion& reg)
 {
    return rep_->violation(reg);
@@ -168,10 +174,17 @@ double IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
 
 void IntervalFunctionDag::diff(const IntervalRegion& reg, IntervalVector& grad)
 {
+   Interval val;
+   evalDiff(reg, val, grad);
+}
+
+void IntervalFunctionDag::evalDiff(const IntervalRegion& reg, Interval& val,
+                                   IntervalVector& grad)
+{
    ASSERT(nbVars() == grad.size(), "Bad size of gradient");
 
    DagFun* f = dag_->fun(index_);
-   Interval val = f->intervalEval(reg);
+   val = f->intervalEval(reg);
    if (val.isEmpty())
       grad.setEmpty();
 
