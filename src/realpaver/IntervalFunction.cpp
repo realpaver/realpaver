@@ -88,15 +88,16 @@ void IntervalFunction::evalDiff(const IntervalRegion& reg, Interval& val,
    return rep_->evalDiff(reg, val, grad);   
 }
 
-double IntervalFunction::violation(const IntervalRegion& reg)
+void IntervalFunction::violation(const IntervalRegion& reg, Interval& val,
+                                 double& viol)
 {
-   return rep_->violation(reg);
+   rep_->violation(reg, val, viol);
 }
 
-double IntervalFunction::violation(const IntervalRegion& reg, double lo,
-                                   double up)
+void IntervalFunction::violation(const IntervalRegion& reg, double lo,
+                                 double up, Interval& val, double& viol)
 {
-   return rep_->violation(reg, lo, up);
+   rep_->violation(reg, lo, up, val, viol);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,15 +149,16 @@ Interval IntervalFunctionDag::pointEval(const RealPoint& pt)
    return dag_->fun(index_)->intervalEval(pt);
 }
 
-double IntervalFunctionDag::violation(const IntervalRegion& reg)
+void IntervalFunctionDag::violation(const IntervalRegion& reg, Interval& val,
+                                    double& viol)
 {
    DagFun* f = dag_->fun(index_);
-   f->intervalEval(reg);
-   return f->intervalViolation();
+   val = f->intervalEval(reg);
+   viol = f->intervalViolation();
 }
 
-double IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
-                                      double up)
+void IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
+                                    double up, Interval& val, double& viol)
 {
    Interval img(lo, up);
    ASSERT(!img.isEmpty(), "Empty image for an interval function");
@@ -165,11 +167,10 @@ double IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
    Interval tmp = f->getImage();
    f->setImage(img);
 
-   f->intervalEval(reg);
-   double v = f->intervalViolation();
+   val = f->intervalEval(reg);
+   viol = f->intervalViolation();
 
    f->setImage(tmp);
-   return v;
 }
 
 void IntervalFunctionDag::diff(const IntervalRegion& reg, IntervalVector& grad)

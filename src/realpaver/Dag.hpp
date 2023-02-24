@@ -1100,7 +1100,7 @@ public:
    ///
    /// It asumes that this dag has been evaluated using intervalEval or
    /// intervalPointEval.
-   void intervalViolation(IntervalVector& viol);
+   void intervalViolation(RealVector& viol);
 
    /// Real (point) evaluation
    /// @param pt values of variables

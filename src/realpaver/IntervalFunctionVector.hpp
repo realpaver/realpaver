@@ -85,18 +85,124 @@ public:
 
    /// Evaluates this and calculates the violation of the constraints
    /// @param reg domains of variables
+   /// @param val output vector such that val[i] is the evaluation of
+   ///        the i-th function at reg
    /// @param viol output vector such that viol[i] is the violation of the
    ///        i-th function / constraint at reg
-   virtual void violation(const IntervalRegion& reg, IntervalVector& viol) = 0;
+   virtual void violation(const IntervalRegion& reg, IntervalVector& val,
+                          RealVector& viol) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalFunctionVector {
 public:
+   /// Creates an empty vector
+   IntervalFunctionVector();
+
+   /// Constructor
+   /// @param dag a dag whose functions are added in this in the same order
+   IntervalFunctionVector(SharedDag dag);
+
+   /// Constructor that creates a dag
+   /// @param lt list of terms inserted in the dag
+   IntervalFunctionVector(const std::initializer_list<Term>& lt);
+
+   /// Constructor that creates a dag
+   /// @param lt list of terms inserted in the dag
+   /// @param li list of images (bounds) of those terms
+   IntervalFunctionVector(const std::initializer_list<Term>& lt,
+                          const std::initializer_list<Interval>& li);
+
+   /// Constructor
+   /// @param lf list of functions
+   IntervalFunctionVector(const std::initializer_list<IntervalFunction>& lf);
+
+   /// Default copy constructor
+   IntervalFunctionVector(const IntervalFunctionVector&) = default;
+
+   /// No assignment
+   IntervalFunctionVector& operator=(const IntervalFunctionVector&) = delete;
+
+   /// Default destructor
+   ~IntervalFunctionVector() = default;
+
+   /// @return the scope of this, i.e. the set of variables
+   Scope scope() const;
+
+   /// @return the number of variables in this
+   size_t nbVars() const;
+
+   /// @return the number of functions in this
+   size_t nbFuns() const;
+
+   /// @return the i-th function of this
+   IntervalFunction fun(size_t i) const;
+
+   /// Inserts a function at the end
+   /// @param f function inserted
+   ///
+   /// It may be necessary to switch to another representation if the current
+   /// one is not a list.
+   void addFun(IntervalFunction f);
+
+   /// Evaluates this
+   /// @param reg domains of variables
+   /// @param val output vector such that val[i] is the result of the evaluation
+   ///        of the i-th function of this at reg
+   ///
+   /// val must have nbFuns() components.
+   void eval(const IntervalRegion& reg, IntervalVector& val);
+
+   /// Evaluates this
+   /// @param pt values of variables
+   /// @param val output vector such that val[i] is the result of the evaluation
+   ///        of the i-th function of this at pt
+   ///
+   /// val must have nbFuns() components.
+   void pointEval(const RealPoint& pt, IntervalVector& val);
+
+   /// Differentiates this (calculates an interval Jacobian matrix)
+   /// @param reg domains of variables
+   /// @param J Jacobian matrix of this at reg such that we have the partial
+   ///        derivative dfi / dxj in the i-th row and j-th column of J
+   ///
+   /// J must have nbFuns() rows and nbVars() columns.
+   void diff(const IntervalRegion& reg, IntervalMatrix& J);
+
+   /// Evaluates and differentiates this
+   /// @param reg domains of variables
+   /// @param val output vector such that val[i] is the result of the evaluation
+   ///        of the i-th function of this at pt
+   /// @param J Jacobian matrix of this at reg such that we have the partial
+   ///        derivative dfi / dxj in the i-th row and j-th column of J
+   ///
+   /// J must have nbFuns() rows and nbVars() columns; val must have
+   /// nbFuns() components.
+   void evalDiff(const IntervalRegion& reg, IntervalVector& val,
+                         IntervalMatrix& J);
+
+   /// Evaluates this and calculates the violation of the constraints
+   /// @param reg domains of variables
+   /// @param val output vector such that val[i] is the evaluation of
+   ///        the i-th function at reg
+   /// @param viol output vector such that viol[i] is the violation of the
+   ///        i-th function / constraint at reg
+   void violation(const IntervalRegion& reg, IntervalVector& val,
+                  RealVector& viol);
+
+   /// type of the representation of interval functions vectors
+   typedef std::shared_ptr<IntervalFunctionVectorRep> SharedRep;
+
+   /// @return the representation of this
+   SharedRep rep() const;
+
+   /// Constructor
+   /// @param rep representation of this
+   IntervalFunctionVector(SharedRep rep);
 
 private:
-   
+   SharedRep rep_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,9 +211,94 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalFunctionVectorDag : public IntervalFunctionVectorRep {
 public:
+   /// Constructor
+   /// @param dag a dag whose functions are added in this in the same order
+   IntervalFunctionVectorDag(SharedDag dag);
+
+   /// Constructor that creates a dag
+   /// @param lt list of terms inserted in the dag
+   IntervalFunctionVectorDag(const std::initializer_list<Term>& lt);
+
+   /// Constructor that creates a dag
+   /// @param lt list of terms inserted in the dag
+   /// @param li list of images (bounds) of those terms
+   IntervalFunctionVectorDag(const std::initializer_list<Term>& lt,
+                             const std::initializer_list<Interval>& li);
+
+   /// Default copy constructor
+   IntervalFunctionVectorDag(const IntervalFunctionVectorDag&) = default;
+
+   /// No assignment
+   IntervalFunctionVectorDag&
+   operator=(const IntervalFunctionVectorDag&) = delete;
+
+   /// Default destructor
+   ~IntervalFunctionVectorDag() = default;
+
+   /// @return the dag enclosed in this
+   SharedDag dag() const;
+
+   ///@{
+   Scope scope() const override;
+   size_t nbVars() const override;
+   size_t nbFuns() const override;
+   IntervalFunction fun(size_t i) const override;
+   void eval(const IntervalRegion& reg, IntervalVector& val) override;
+   void pointEval(const RealPoint& pt, IntervalVector& val) override;
+   void diff(const IntervalRegion& reg, IntervalMatrix& J) override;
+   void evalDiff(const IntervalRegion& reg, IntervalVector& val,
+                 IntervalMatrix& J) override;
+   void violation(const IntervalRegion& reg, IntervalVector& val,
+                  RealVector& viol) override;
+   ///@}
 
 private:
    SharedDag dag_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a vector of interval-valued functions based on a a list.
+///////////////////////////////////////////////////////////////////////////////
+class IntervalFunctionVectorList : public IntervalFunctionVectorRep {
+public:
+   /// Constructor of an empty function vector
+   IntervalFunctionVectorList();
+
+   /// Constructor
+   /// @param lf list of functions
+   IntervalFunctionVectorList(const std::initializer_list<IntervalFunction>& lf);
+
+   /// Default copy constructor
+   IntervalFunctionVectorList(const IntervalFunctionVectorList&) = default;
+
+   /// No assignment
+   IntervalFunctionVectorList&
+   operator=(const IntervalFunctionVectorList&) = delete;
+
+   /// Default destructor
+   ~IntervalFunctionVectorList() = default;
+
+   /// Inserts a function at the end
+   /// @param f function inserted
+   void addFun(IntervalFunction f);
+
+   ///@{
+   Scope scope() const override;
+   size_t nbVars() const override;
+   size_t nbFuns() const override;
+   IntervalFunction fun(size_t i) const override;
+   void eval(const IntervalRegion& reg, IntervalVector& val) override;
+   void pointEval(const RealPoint& pt, IntervalVector& val) override;
+   void diff(const IntervalRegion& reg, IntervalMatrix& J) override;
+   void evalDiff(const IntervalRegion& reg, IntervalVector& val,
+                 IntervalMatrix& J) override;
+   void violation(const IntervalRegion& reg, IntervalVector& val,
+                  RealVector& viol) override;
+   ///@}
+
+private:
+   std::vector<IntervalFunction> vf_;
+   Scope scope_;
 };
 
 } // namespace

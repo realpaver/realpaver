@@ -70,25 +70,28 @@ public:
 
    /// Evaluates this and calculates the violation of the underlying constraint
    /// @param reg domains of variables
-   /// @return 0.0 if the constraint is satisfied, a positive real number
-   ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation at reg
+   /// @param val evaluation of this at reg
+   /// @param viol 0.0 if the constraint is satisfied, a positive real number
+   ///        otherwise equal to the width of the gap between the image of the
+   ///        function and the result of its evaluation at reg
    ///
    /// Given [lo, up] the image of this in the DagFun object, the underlying
    /// constraint is defined by lo <= f(x) <= up.
-   virtual double violation(const IntervalRegion& reg) = 0;
+   virtual void violation(const IntervalRegion& reg, Interval& val,
+                          double& viol) = 0;
 
    /// Evaluates this and calculates the violation of the underlying constraint
    /// @param reg domains of variables
    /// @param lo left bound for this
    /// @param up right bound for this
-   /// @return 0.0 if the constraint is satisfied, a positive real number
-   ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation at reg
+   /// @param val evaluation of this at reg
+   /// @param viol 0.0 if the constraint is satisfied, a positive real number
+   ///        otherwise equal to the width of the gap between the image of the
+   ///        function and the result of its evaluation at reg
    ///
    /// The underlying constraint is defined by lo <= f(x) <= up.
-   virtual double violation(const IntervalRegion& reg, double lo,
-                            double up) = 0;
+   virtual void violation(const IntervalRegion& reg, double lo,
+                          double up, Interval& val, double& viol) = 0;
 
 private:
    Interval img_;
@@ -159,13 +162,14 @@ public:
 
    /// Calculates the violation of the underlying constraint
    /// @param reg domains of variables
-   /// @return 0.0 if the constraint is satisfied, a positive real number
-   ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation at reg
+   /// @param val evaluation of this at reg
+   /// @param viol 0.0 if the constraint is satisfied, a positive real number
+   ///        otherwise equal to the width of the gap between the image of the
+   ///        function and the result of its evaluation at reg
    ///
    /// Given [lo, up] the image of this in the DagFun object, the underlying
    /// constraint is defined by lo <= f(x) <= up.
-   double violation(const IntervalRegion& reg);
+   void violation(const IntervalRegion& reg, Interval& val, double& viol);
 
    /// Calculates the violation of the underlying constraint
    /// @param reg domains of variables
@@ -176,7 +180,8 @@ public:
    ///         function and the result of its evaluation at reg
    ///
    /// The underlying constraint is defined by lo <= f(x) <= up.
-   double violation(const IntervalRegion& reg, double lo, double up);
+   void violation(const IntervalRegion& reg, double lo, double up,
+                  Interval& val, double& viol);
 
    /// type of shared pointer to a representation
    typedef std::shared_ptr<IntervalFunctionRep> SharedRep;
@@ -232,8 +237,10 @@ public:
    void diff(const IntervalRegion& reg, IntervalVector& grad) override;
    void evalDiff(const IntervalRegion& reg, Interval& val,
                  IntervalVector& grad) override;
-   double violation(const IntervalRegion& reg) override;
-   double violation(const IntervalRegion& reg, double lo, double up) override;
+   void violation(const IntervalRegion& reg, Interval& val,
+                  double& viol) override;
+   void violation(const IntervalRegion& reg, double lo, double up,
+                    Interval& val, double& viol) override;
    ///@}
 
 private:

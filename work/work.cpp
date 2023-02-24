@@ -29,13 +29,30 @@ int main(void)
       IntervalRegion R({x, y});
       R.set(x, Interval(-4, 3));
       R.set(y, Interval(0, 7));
+      cout << R << endl;
 
-      IntervalFunction f(sqr(x) + y + 1.0);
-      IntervalVector G(2);
-      f.diff(R, G);
-      cout << G << endl;
-      cout << f.scope() << endl;
-      cout << f.nbVars() << endl;
+      Term ta(sqr(x) - y);
+      Term tb(x + 2*y);
+      Term tc(abs(x) - y + 1.0);
+
+      IntervalFunctionVector F({ta, tb});
+      cout << "scope : " << F.scope() << endl;
+      cout << "nb V  : " << F.nbVars() << endl;
+      cout << "nb F : " << F.nbFuns() << endl;
+
+      F.addFun(IntervalFunction(tc));
+      cout << "scope : " << F.scope() << endl;
+      cout << "nb V  : " << F.nbVars() << endl;
+      cout << "nb F : " << F.nbFuns() << endl;
+   
+      IntervalVector V(F.nbFuns());
+      F.eval(R, V);
+      cout << "eval : " << V << endl;
+
+      IntervalMatrix J(F.nbFuns(), F.nbVars());
+      F.diff(R, J);
+      cout << "diff : " << endl << J << endl;
+
 
 /*
       IntervalFunctionVector F({sqr(x) + y + 1.0, y - 3*x});

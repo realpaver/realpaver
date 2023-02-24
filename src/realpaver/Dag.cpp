@@ -1977,7 +1977,7 @@ bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& val)
    return res;
 }
 
-void Dag::intervalViolation(IntervalVector& viol)
+void Dag::intervalViolation(RealVector& viol)
 {
    ASSERT(nbFuns() == viol.size(), "Bad vector size used in a DAG");
 

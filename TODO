@@ -11,11 +11,6 @@
 - Voir conséquences sur les vecteurs de fonctions
 
 -------------------------------------------------------------------------------
-- Développer la partie Statistiques
-- config STAT_ON
-- exemple : compter la proportion de réussite du solveur lineaire
-
--------------------------------------------------------------------------------
 - Hansen's derivative
 
 -------------------------------------------------------------------------------
