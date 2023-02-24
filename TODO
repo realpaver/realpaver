@@ -1,33 +1,22 @@
 -------------------------------------------------------------------------------
-- VariableVector
-- Générateur de Katsura avec factorisation... utile ? les derivées sont linéaires..., etc.
+- Constraints
+  * piecewise constraints
+  * conditional constraints
 
 -------------------------------------------------------------------------------
-- contraintes par morceaux
+- DAG
+  * new nodes (linear, ...)
+  * create a DAG from a .nl file
+  * Hansen's derivative
+  * affine forms
 
 -------------------------------------------------------------------------------
-- Changer IntervalFunction et RealFunction en classes virtuelles pures
-- Les dériver en IntervalDagFunction et RealDagFunction
-- Voir conséquences sur les vecteurs de fonctions
+- LP solver
+  * Scherbina's correction
+  * interface GLPK (toutatis)
 
 -------------------------------------------------------------------------------
-- Hansen's derivative
-
--------------------------------------------------------------------------------
-- LP solver: correction de Scherbina
-
--------------------------------------------------------------------------------
-- class Constraint : ConstraintOr, ConstraintNot, ConstraintAnd
-
-- ou Formula
-- If Formula then Formula else Formula
-
--------------------------------------------------------------------------------
-- De toutatis récupérer l'interface GLPK
-
--------------------------------------------------------------------------------
-- Linearizations implemented as DAG visitors
-  * Affine forms
-
--------------------------------------------------------------------------------
-- Create a DAG from a .nl file
+- Newton
+  * matrix inversion, lapack ?
+  * Gauss-Seidel
+  * Hansen-Sengupta
