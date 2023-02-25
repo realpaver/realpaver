@@ -17,6 +17,5 @@
 
 -------------------------------------------------------------------------------
 - Newton
-  * matrix inversion, lapack ?
   * Gauss-Seidel
   * Hansen-Sengupta
