@@ -62,6 +62,7 @@ Param::Param()
    dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",      1.0e-3));
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
+   dblmap_.insert(std::make_pair("GAUSSIAN_MIN_PIVOT",        1.0e-8));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));

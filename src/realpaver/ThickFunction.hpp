@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_THICK_INTERVAL_FUNCTION_HPP
-#define REALPAVER_THICK_INTERVAL_FUNCTION_HPP
+#ifndef REALPAVER_THICK_FUNCTION_HPP
+#define REALPAVER_THICK_FUNCTION_HPP
 
 #include "realpaver/Dag.hpp"
 #include "realpaver/IntervalRegion.hpp"
@@ -25,22 +25,22 @@ namespace realpaver {
 /// The update method must be called first. Then the evaluation and
 /// differentiation methods can be called.
 ///////////////////////////////////////////////////////////////////////////////
-class ThickIntervalFunction {
+class ThickFunction {
 public:
    /// Creates a thick function
    /// @param dag a DAG
    /// @param i index of a function in the DAG
    /// @param v a variable occurring in the function
-   ThickIntervalFunction(SharedDag dag, size_t i, Variable v);
+   ThickFunction(SharedDag dag, size_t i, Variable v);
 
    /// Default copy constructor
-   ThickIntervalFunction(const ThickIntervalFunction&) = default;
+   ThickFunction(const ThickFunction&) = default;
 
    /// No assignment
-   ThickIntervalFunction& operator=(const ThickIntervalFunction&) = delete;
+   ThickFunction& operator=(const ThickFunction&) = delete;
 
    /// Default destructor
-   ~ThickIntervalFunction() = default;
+   ~ThickFunction() = default;
 
    /// Dependency test
    /// @param bs a bitset

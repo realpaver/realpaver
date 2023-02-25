@@ -13,7 +13,7 @@
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/ThickIntervalFunction.hpp"
+#include "realpaver/ThickFunction.hpp"
 
 namespace realpaver {
 
@@ -75,7 +75,7 @@ public:
    ///@}
 
 private:
-   ThickIntervalFunction f_;  // univariate thick interval function
+   ThickFunction f_;  // univariate thick interval function
    IntervalPeeler peeler_;    // peeling at interval bounds
    size_t maxiter_;           // maximum number of steps in shrink
    IntervalNewton* newton_;   // interval Newton method
@@ -103,9 +103,9 @@ private:
    Proof isConsistent(const Interval& x);
 
    // used to call the interval Newton method
-   struct ThickIntervalFunctionCaller {
-      ThickIntervalFunction* tf_;
-      ThickIntervalFunctionCaller(ThickIntervalFunction* tf) { tf_ = tf; }
+   struct ThickFunctionCaller {
+      ThickFunction* tf_;
+      ThickFunctionCaller(ThickFunction* tf) { tf_ = tf; }
 
       Interval eval(const Interval& x) { return tf_->eval(x); }
       Interval diff(const Interval& x) { return tf_->diff(x); }

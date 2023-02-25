@@ -128,7 +128,7 @@ Proof BC3Contractor::shrink(const Interval& x, Interval& res,
    Proof proof;
    size_t nbiter = 0;
 
-   ThickIntervalFunctionCaller cal(&f_);
+   ThickFunctionCaller cal(&f_);
 
    std::function<Interval(const Interval&)> calf =
       [&cal](const Interval& x) { return cal.eval(x); };

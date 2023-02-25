@@ -180,8 +180,8 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	RealFunction.cpp RealFunctionVector.cpp RealMatrix.cpp \
 	RealPoint.cpp RealVector.cpp RLTRelaxation.cpp Scope.cpp \
 	ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp Term.cpp \
-	TermDeriver.cpp TermFixer.cpp ThickIntervalFunction.cpp \
-	Timer.cpp Tolerance.cpp Variable.cpp VariableSelector.cpp \
+	TermDeriver.cpp TermFixer.cpp ThickFunction.cpp Timer.cpp \
+	Tolerance.cpp Variable.cpp VariableSelector.cpp \
 	VariableVector.cpp LPSolverClp.cpp LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
 @COND_LP_GUROBI_TRUE@am__objects_2 = LPSolverGurobi.lo
@@ -203,7 +203,7 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	RealFunction.lo RealFunctionVector.lo RealMatrix.lo \
 	RealPoint.lo RealVector.lo RLTRelaxation.lo Scope.lo \
 	ScopeMap.lo SearchNode.lo Stat.lo SymbolTable.lo Term.lo \
-	TermDeriver.lo TermFixer.lo ThickIntervalFunction.lo Timer.lo \
+	TermDeriver.lo TermFixer.lo ThickFunction.lo Timer.lo \
 	Tolerance.lo Variable.lo VariableSelector.lo VariableVector.lo \
 	$(am__objects_1) $(am__objects_2)
 librealpaver_la_OBJECTS = $(am_librealpaver_la_OBJECTS)
@@ -262,7 +262,7 @@ am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
 	./$(DEPDIR)/SearchNode.Plo ./$(DEPDIR)/Stat.Plo \
 	./$(DEPDIR)/SymbolTable.Plo ./$(DEPDIR)/Term.Plo \
 	./$(DEPDIR)/TermDeriver.Plo ./$(DEPDIR)/TermFixer.Plo \
-	./$(DEPDIR)/ThickIntervalFunction.Plo ./$(DEPDIR)/Timer.Plo \
+	./$(DEPDIR)/ThickFunction.Plo ./$(DEPDIR)/Timer.Plo \
 	./$(DEPDIR)/Tolerance.Plo ./$(DEPDIR)/Variable.Plo \
 	./$(DEPDIR)/VariableSelector.Plo \
 	./$(DEPDIR)/VariableVector.Plo ./$(DEPDIR)/parser_bison.Plo \
@@ -350,10 +350,9 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	RealMatrix.hpp RealPoint.hpp RealVector.hpp RLTRelaxation.hpp \
 	Scope.hpp ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp \
 	Stat.hpp SymbolTable.hpp Term.hpp TermDeriver.hpp \
-	TermFixer.hpp ThickIntervalFunction.hpp Timer.hpp \
-	Tolerance.hpp Variable.hpp VariableSelector.hpp \
-	VariableVector.hpp IntervalGaol.hpp LPSolverClp.hpp \
-	LPSolverGurobi.hpp
+	TermFixer.hpp ThickFunction.hpp Timer.hpp Tolerance.hpp \
+	Variable.hpp VariableSelector.hpp VariableVector.hpp \
+	IntervalGaol.hpp LPSolverClp.hpp LPSolverGurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP) \
 	configure.hpp.in
@@ -544,10 +543,9 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	RealMatrix.hpp RealPoint.hpp RealVector.hpp RLTRelaxation.hpp \
 	Scope.hpp ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp \
 	Stat.hpp SymbolTable.hpp Term.hpp TermDeriver.hpp \
-	TermFixer.hpp ThickIntervalFunction.hpp Timer.hpp \
-	Tolerance.hpp Variable.hpp VariableSelector.hpp \
-	VariableVector.hpp $(am__append_1) $(am__append_2) \
-	$(am__append_3)
+	TermFixer.hpp ThickFunction.hpp Timer.hpp Tolerance.hpp \
+	Variable.hpp VariableSelector.hpp VariableVector.hpp \
+	$(am__append_1) $(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	BC4Contractor.cpp CIDContractor.cpp Common.cpp Constraint.cpp \
 	ConstraintContractor.cpp ConstraintFixer.cpp \
@@ -567,8 +565,8 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	RealFunction.cpp RealFunctionVector.cpp RealMatrix.cpp \
 	RealPoint.cpp RealVector.cpp RLTRelaxation.cpp Scope.cpp \
 	ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp Term.cpp \
-	TermDeriver.cpp TermFixer.cpp ThickIntervalFunction.cpp \
-	Timer.cpp Tolerance.cpp Variable.cpp VariableSelector.cpp \
+	TermDeriver.cpp TermFixer.cpp ThickFunction.cpp Timer.cpp \
+	Tolerance.cpp Variable.cpp VariableSelector.cpp \
 	VariableVector.cpp $(am__append_4) $(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
 librealpaver_la_LIBADD = -lm
@@ -743,7 +741,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Term.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermDeriver.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TermFixer.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ThickIntervalFunction.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ThickFunction.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tolerance.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@ # am--include-marker
@@ -1015,7 +1013,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/Term.Plo
 	-rm -f ./$(DEPDIR)/TermDeriver.Plo
 	-rm -f ./$(DEPDIR)/TermFixer.Plo
-	-rm -f ./$(DEPDIR)/ThickIntervalFunction.Plo
+	-rm -f ./$(DEPDIR)/ThickFunction.Plo
 	-rm -f ./$(DEPDIR)/Timer.Plo
 	-rm -f ./$(DEPDIR)/Tolerance.Plo
 	-rm -f ./$(DEPDIR)/Variable.Plo
@@ -1134,7 +1132,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/Term.Plo
 	-rm -f ./$(DEPDIR)/TermDeriver.Plo
 	-rm -f ./$(DEPDIR)/TermFixer.Plo
-	-rm -f ./$(DEPDIR)/ThickIntervalFunction.Plo
+	-rm -f ./$(DEPDIR)/ThickFunction.Plo
 	-rm -f ./$(DEPDIR)/Timer.Plo
 	-rm -f ./$(DEPDIR)/Tolerance.Plo
 	-rm -f ./$(DEPDIR)/Variable.Plo

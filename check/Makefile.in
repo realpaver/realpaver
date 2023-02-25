@@ -94,6 +94,7 @@ host_triplet = @host@
 @COND_CPPUNIT_TRUE@	dag_test$(EXEEXT) hc4revise_test$(EXEEXT) \
 @COND_CPPUNIT_TRUE@	integer_test$(EXEEXT) \
 @COND_CPPUNIT_TRUE@	interval_test$(EXEEXT) range_test$(EXEEXT) \
+@COND_CPPUNIT_TRUE@	real_matrix_test$(EXEEXT) \
 @COND_CPPUNIT_TRUE@	scope_test$(EXEEXT)
 subdir = check
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -143,6 +144,13 @@ am__range_test_SOURCES_DIST = range_test.cpp
 range_test_OBJECTS = $(am_range_test_OBJECTS)
 range_test_LDADD = $(LDADD)
 range_test_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
+am__real_matrix_test_SOURCES_DIST = real_matrix_test.cpp
+@COND_CPPUNIT_TRUE@am_real_matrix_test_OBJECTS =  \
+@COND_CPPUNIT_TRUE@	real_matrix_test.$(OBJEXT)
+real_matrix_test_OBJECTS = $(am_real_matrix_test_OBJECTS)
+real_matrix_test_LDADD = $(LDADD)
+real_matrix_test_DEPENDENCIES =  \
+	../src/realpaver/.libs/librealpaver.la
 am__scope_test_SOURCES_DIST = scope_test.cpp
 @COND_CPPUNIT_TRUE@am_scope_test_OBJECTS = scope_test.$(OBJEXT)
 scope_test_OBJECTS = $(am_scope_test_OBJECTS)
@@ -166,7 +174,8 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/bitset_test.Po \
 	./$(DEPDIR)/dag_test.Po ./$(DEPDIR)/hc4revise_test.Po \
 	./$(DEPDIR)/integer_test.Po ./$(DEPDIR)/interval_test.Po \
-	./$(DEPDIR)/range_test.Po ./$(DEPDIR)/scope_test.Po
+	./$(DEPDIR)/range_test.Po ./$(DEPDIR)/real_matrix_test.Po \
+	./$(DEPDIR)/scope_test.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -189,13 +198,15 @@ am__v_CXXLD_1 =
 SOURCES = $(bitset_test_SOURCES) $(dag_test_SOURCES) \
 	$(hc4revise_test_SOURCES) $(integer_test_SOURCES) \
 	$(interval_test_SOURCES) $(range_test_SOURCES) \
-	$(scope_test_SOURCES)
+	$(real_matrix_test_SOURCES) $(scope_test_SOURCES)
 DIST_SOURCES = $(am__bitset_test_SOURCES_DIST) \
 	$(am__dag_test_SOURCES_DIST) \
 	$(am__hc4revise_test_SOURCES_DIST) \
 	$(am__integer_test_SOURCES_DIST) \
 	$(am__interval_test_SOURCES_DIST) \
-	$(am__range_test_SOURCES_DIST) $(am__scope_test_SOURCES_DIST)
+	$(am__range_test_SOURCES_DIST) \
+	$(am__real_matrix_test_SOURCES_DIST) \
+	$(am__scope_test_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -571,6 +582,7 @@ CLEANFILES = *~
 @COND_CPPUNIT_TRUE@integer_test_SOURCES = integer_test.cpp
 @COND_CPPUNIT_TRUE@interval_test_SOURCES = interval_test.cpp
 @COND_CPPUNIT_TRUE@range_test_SOURCES = range_test.cpp
+@COND_CPPUNIT_TRUE@real_matrix_test_SOURCES = real_matrix_test.cpp
 @COND_CPPUNIT_TRUE@scope_test_SOURCES = scope_test.cpp
 EXTRA_DIST = realpaver_test.hpp
 TESTS = $(check_PROGRAMS)
@@ -641,6 +653,10 @@ range_test$(EXEEXT): $(range_test_OBJECTS) $(range_test_DEPENDENCIES) $(EXTRA_ra
 	@rm -f range_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(range_test_OBJECTS) $(range_test_LDADD) $(LIBS)
 
+real_matrix_test$(EXEEXT): $(real_matrix_test_OBJECTS) $(real_matrix_test_DEPENDENCIES) $(EXTRA_real_matrix_test_DEPENDENCIES) 
+	@rm -f real_matrix_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(real_matrix_test_OBJECTS) $(real_matrix_test_LDADD) $(LIBS)
+
 scope_test$(EXEEXT): $(scope_test_OBJECTS) $(scope_test_DEPENDENCIES) $(EXTRA_scope_test_DEPENDENCIES) 
 	@rm -f scope_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(scope_test_OBJECTS) $(scope_test_LDADD) $(LIBS)
@@ -657,6 +673,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/integer_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/range_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/real_matrix_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scope_test.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -927,6 +944,13 @@ range_test.log: range_test$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+real_matrix_test.log: real_matrix_test$(EXEEXT)
+	@p='real_matrix_test$(EXEEXT)'; \
+	b='real_matrix_test'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 scope_test.log: scope_test$(EXEEXT)
 	@p='scope_test$(EXEEXT)'; \
 	b='scope_test'; \
@@ -1033,6 +1057,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/integer_test.Po
 	-rm -f ./$(DEPDIR)/interval_test.Po
 	-rm -f ./$(DEPDIR)/range_test.Po
+	-rm -f ./$(DEPDIR)/real_matrix_test.Po
 	-rm -f ./$(DEPDIR)/scope_test.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -1085,6 +1110,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/integer_test.Po
 	-rm -f ./$(DEPDIR)/interval_test.Po
 	-rm -f ./$(DEPDIR)/range_test.Po
+	-rm -f ./$(DEPDIR)/real_matrix_test.Po
 	-rm -f ./$(DEPDIR)/scope_test.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic

@@ -205,7 +205,7 @@ LOCAL_SOLVER_TIME_LIMIT = 10.0
 LOCAL_SOLVER_ALGORITHM = GRADIENT
 
 ###############################################################################
-## LINEAR PROGRAMMING                                                        ##
+## LINEAR SOLVERS                                                            ##
 ###############################################################################
 
 # Time limit in seconds
@@ -213,6 +213,10 @@ LP_TIME_LIMIT = 10.0
 
 # Iteration limit
 LP_ITER_LIMIT = 50
+
+# Threshold on the values of pivots in Gaussian elimination
+# A pivot must strictly greater than this (positive) value.
+GAUSSIAN_MIN_PIVOT = 1.0e-8
 
 ###############################################################################
 ## INTERVAL NEWTON                                                           ##

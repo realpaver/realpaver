@@ -100,7 +100,7 @@ librealpaver_la_include_HEADERS = \
 		Term.hpp \
 		TermDeriver.hpp \
 		TermFixer.hpp \
-		ThickIntervalFunction.hpp \
+		ThickFunction.hpp \
 		Timer.hpp \
 		Tolerance.hpp \
 		Variable.hpp \
@@ -197,7 +197,7 @@ librealpaver_la_SOURCES = \
 		Term.cpp \
 		TermDeriver.cpp \
 		TermFixer.cpp \
-		ThickIntervalFunction.cpp \
+		ThickFunction.cpp \
 		Timer.cpp \
 		Tolerance.cpp \
 		Variable.cpp \

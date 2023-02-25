@@ -69,6 +69,19 @@ public:
    /// @return the infinite-norm of this
    double linfNorm() const;
 
+   /// Assigns this to the identity matrix
+   void setIdentity();
+
+   /// Equality test
+   /// @param A a matrix
+   /// return true if this is equal to A
+   bool operator==(const RealMatrix& A) const;
+
+   /// Disequality test
+   /// @param A a matrix
+   /// return true if this is not equal to A
+   bool operator!=(const RealMatrix& A) const;
+
    /// Addition with assignment
    /// @param A a matrix
    /// @return a reference to this
@@ -96,6 +109,37 @@ public:
    ///
    /// this is assigned to this / a
    RealMatrix& operator/=(double a);
+
+   /// Calculates the inverse of a square matrix
+   /// @param P the result in case of success
+   /// @return true if this is invertible
+   ///
+   /// This is modified.
+   bool inverse(RealMatrix& P);
+
+   /// @return the threshold on the values of pivots
+   bool getMinPivot() const;
+
+   /// Assigns the threshold on the values of pivots
+   /// @param val any pivot must be strictly greater than this value
+   void setMinPivot(double val);
+
+private:
+   double minpiv_;   // threshold on the values of pivots
+
+   // first phase of inversion: calculates an upper triangular matrix
+   // using Gauss-Jordan elimination
+   bool elimination(RealMatrix& P);
+
+   // second phase of inversion: back substitution
+   void substitution(RealMatrix& P);
+
+   // finds a pivot in the submatrix of this such that the coefficient
+   // (i, i) is the upper left corner
+   bool findPivot(size_t i, size_t& row, size_t& col);
+
+   // divides the i-th rows in this and P by this(i, i)
+   void dividePivot(size_t i, RealMatrix& P);
 };
 
 /// Output on s stream

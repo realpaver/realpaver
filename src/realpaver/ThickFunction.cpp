@@ -7,12 +7,11 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/ThickIntervalFunction.hpp"
+#include "realpaver/ThickFunction.hpp"
 
 namespace realpaver {
 
-ThickIntervalFunction::ThickIntervalFunction(SharedDag dag, size_t i,
-                                             Variable v)
+ThickFunction::ThickFunction(SharedDag dag, size_t i, Variable v)
       : dag_(dag),
         f_(nullptr),
         if_(i),
@@ -21,33 +20,33 @@ ThickIntervalFunction::ThickIntervalFunction(SharedDag dag, size_t i,
    f_ = dag->fun(i);
 }
 
-bool ThickIntervalFunction::dependsOn(const Bitset& bs) const
+bool ThickFunction::dependsOn(const Bitset& bs) const
 {
    return f_->dependsOn(bs);
 }
 
-Interval ThickIntervalFunction::eval(const Interval& x)
+Interval ThickFunction::eval(const Interval& x)
 {
    return f_->intervalEvalOnly(v_, x);
 }
 
-Interval ThickIntervalFunction::diff(const Interval& x)
+Interval ThickFunction::diff(const Interval& x)
 {
    return f_->intervalDiffOnly(v_, x) ? f_->intervalDeriv(v_) :
                                         Interval::universe();
 }
 
-Interval ThickIntervalFunction::update(const IntervalRegion& reg)
+Interval ThickFunction::update(const IntervalRegion& reg)
 {
    return f_->intervalEval(reg);
 }
 
-Variable ThickIntervalFunction::getVar() const
+Variable ThickFunction::getVar() const
 {
    return v_;
 }
 
-DagFun* ThickIntervalFunction::getFun() const
+DagFun* ThickFunction::getFun() const
 {
    return f_;
 }

@@ -63,6 +63,9 @@ public:
    /// @return the number of columns of this
    size_t ncols() const;
 
+   /// @return true if this is a square matrix
+   bool isSquare() const;
+
    /// Constant access in this
    /// @param i a row index between 0 and nrows()-1
    /// @param j a column index between 0 and ncols()-1
@@ -80,6 +83,16 @@ public:
    ///
    /// Assigns x to all the element of this
    void setAll(ConstRefType x);
+
+   /// Swaps two rows
+   /// @param i a row index
+   /// @param j a row index
+   void swapRows(size_t i, size_t j);
+
+   /// Swaps two columns
+   /// @param i a column index
+   /// @param j a column index
+   void swapCols(size_t i, size_t j);
 
    /// Output on a stream
    /// @param os an output stream
@@ -178,6 +191,12 @@ size_t NumericMatrix<T>::ncols() const
 }
 
 template <typename T>
+bool NumericMatrix<T>::isSquare() const
+{
+   return nrows_ == ncols_;
+}
+
+template <typename T>
 typename NumericMatrix<T>::ValueType
 NumericMatrix<T>::operator()(size_t i, size_t j) const
 {
@@ -205,6 +224,28 @@ void NumericMatrix<T>::setAll(ConstRefType x)
 }
 
 template <typename T>
+void NumericMatrix<T>::swapRows(size_t i, size_t j)
+{
+   for (size_t k=0; k<ncols(); ++k)
+   {
+      T tmp = operator()(i, k);
+      operator()(i, k) = operator()(j, k);
+      operator()(j, k) = tmp;
+   }
+}
+
+template <typename T>
+void NumericMatrix<T>::swapCols(size_t i, size_t j)
+{
+   for (size_t k=0; k<nrows(); ++k)
+   {
+      T tmp = operator()(k, i);
+      operator()(k, i) = operator()(k, j);
+      operator()(k, j) = tmp;
+   }
+}
+
+template <typename T>
 void NumericMatrix<T>::print(std::ostream& os) const
 {
    for (size_t i=0; i<nrows_; ++i)
@@ -213,7 +254,7 @@ void NumericMatrix<T>::print(std::ostream& os) const
       os << '(';
       for (size_t j=0; j<ncols_; ++j)
       {
-         if (j>0) os << " ";
+         if (j>0) os << "\t";
          os << operator()(i, j);
       }
       os << ')';

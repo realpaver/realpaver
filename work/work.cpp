@@ -13,6 +13,7 @@
 #include "realpaver/VariableVector.hpp"
 #include "realpaver/QuadraticTerm.hpp"
 #include "realpaver/HC4Contractor.hpp"
+#include "realpaver/RealMatrix.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -23,6 +24,33 @@ int main(void)
    Interval::precision( 12 );
 
    try {
+
+      //~ RealMatrix M({{-1.0, 2.0, 3.5},
+                    //~ {1.25, 0.0, -2.5},
+                    //~ {-0.5, 0.0, 6.0}});
+
+      RealMatrix M({{1, -1},
+                    {-2, 1}});
+
+      RealMatrix MM(M);
+
+      RealMatrix P(M);
+      P.setIdentity();
+
+      cout << "--- M ---" << endl << M << endl << endl;
+      cout << "--- P ---" << endl << P << endl << endl;
+
+      bool b = M.inverse(P);
+      if (b)
+      {
+         cout << "--- M ---" << endl << M << endl << endl;
+         cout << "--- P ---" << endl << P << endl << endl;
+         cout << "--- P*M ---" << endl << P*MM << endl << endl;
+      }
+      else
+         cout << "SINGULAR" << endl;
+
+/*
       Variable x("x");
       Variable y("y");
 
@@ -52,17 +80,6 @@ int main(void)
       IntervalMatrix J(F.nbFuns(), F.nbVars());
       F.diff(R, J);
       cout << "diff : " << endl << J << endl;
-
-
-/*
-      IntervalFunctionVector F({sqr(x) + y + 1.0, y - 3*x});
-
-      F.eval(R);
-      cout << F.getValues() << endl;
-
-      IntervalMatrix J(2, 2);
-      F.diff(R, J);
-      cout << J << endl;
 */
    }
    catch (Exception ex) {
