@@ -14,6 +14,7 @@
 #include "realpaver/Interval.hpp"
 #include "realpaver/LinumIntervalTraits.hpp"
 #include "realpaver/NumericVector.hpp"
+#include "realpaver/RealMatrix.hpp"
 #include "realpaver/RealVector.hpp"
 
 namespace realpaver {
@@ -151,6 +152,12 @@ public:
    /// @return the maximum gap componentwise between this and X
    double gap(const IntervalVector& X) const;
 };
+
+/// Multiplication
+/// @param A a real matrix
+/// @param X an interval vector
+/// @return A*X
+IntervalVector operator*(const RealMatrix& A, const IntervalVector& X);
 
 /// output on a stream
 std::ostream& operator<<(std::ostream& os, const IntervalVector& X);

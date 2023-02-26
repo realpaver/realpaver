@@ -37,6 +37,8 @@ Param::Param()
    tolmap_.insert(std::make_pair("DTOL",                      tol6));
    tolmap_.insert(std::make_pair("OBJ_TOL",                   tol6));
    tolmap_.insert(std::make_pair("PROPAGATION_DTOL",          tol3));
+   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_XTOL",         tol8));
+   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_DTOL",         tol6));
 
    // integer
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
@@ -50,6 +52,7 @@ Param::Param()
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
    intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
+   intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   20));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));

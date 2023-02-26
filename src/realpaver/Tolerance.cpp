@@ -97,6 +97,15 @@ bool Tolerance::hasTolerance(const Interval& x) const
    }
 }
 
+bool Tolerance::hasTolerance(const IntervalVector& X) const
+{
+   for (size_t i=0; i<X.size(); ++i)
+      if (!hasTolerance(X.get(i)))
+         return false;
+
+   return true;
+}
+
 bool Tolerance::hasTolerance(double x, double y) const
 {
    if (x == y) return true;

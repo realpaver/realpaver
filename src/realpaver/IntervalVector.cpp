@@ -270,6 +270,25 @@ double IntervalVector::gap(const IntervalVector& X) const
    return gap;
 }
 
+IntervalVector operator*(const RealMatrix& A, const IntervalVector& X)
+{
+   ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
+
+   IntervalVector Y(A.nrows());
+
+   for (size_t i=0; i<Y.size(); ++i)
+   {
+      Interval z(0.0);
+
+      for (size_t j=0; j<A.ncols(); ++j)
+         z += A.get(i, j) * X.get(j);
+
+      Y.set(i, z);
+   }
+
+   return Y;
+}
+
 std::ostream&
 operator<<(std::ostream& os, const IntervalVector& X)
 {

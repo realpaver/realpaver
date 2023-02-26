@@ -11,6 +11,7 @@
 #define REALPAVER_TOLERANCE_HPP
 
 #include "realpaver/Interval.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 
@@ -85,6 +86,12 @@ public:
    /// @param x an interval
    /// @return true if the tolerance of 'x' is less than this
    bool hasTolerance(const Interval& x) const;
+
+   /// Tests if the tolerance of every component of an interval vector is less
+   /// than this
+   /// @param X an interval vector
+   /// @return true if the tolerance of 'X' is less than this
+   bool hasTolerance(const IntervalVector& X) const;
 
    /// Tests if the distance between two real numbers is less than this
    /// @param x a number

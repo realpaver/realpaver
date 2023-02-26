@@ -16,25 +16,38 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-// Hash codes
+// Types
+///////////////////////////////////////////////////////////////////////////////
+
+/// The type of indexes for arrays, vectors, and matrices.
+typedef int Index;
+
+/// The type of exponents in expressions.
+typedef int Exponent;
+
+/// The type of hash codes.
+typedef std::size_t HashCode;
+
+///////////////////////////////////////////////////////////////////////////////
+// Hash coding functions
 ///////////////////////////////////////////////////////////////////////////////
 
 /// Calculates the hash code of a value using std::hash
 template <typename T>
-size_t hash1(const T& x)
+HashCode hash1(const T& x)
 {
    std::hash<T> fun;
    return fun(x);
 }
 
 /// Combines two hash codes
-size_t hash2(size_t h1, size_t h2);
+HashCode hash2(HashCode h1, HashCode h2);
 
 /// Combines three hash codes
-size_t hash3(size_t h1, size_t h2, size_t h3);
+HashCode hash3(HashCode h1, HashCode h2, HashCode h3);
 
 /// Combines four hash codes
-size_t hash4(size_t h1, size_t h2, size_t h3, size_t h4);
+HashCode hash4(HashCode h1, HashCode h2, HashCode h3, HashCode h4);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a certificate returned by solvers of optimization problems.
