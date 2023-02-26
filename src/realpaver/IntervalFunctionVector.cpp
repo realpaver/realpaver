@@ -211,7 +211,6 @@ IntervalFunction IntervalFunctionVectorDag::fun(size_t i) const
    return IntervalFunction(dag_, i);
 }
 
-
 void IntervalFunctionVectorDag::eval(const IntervalRegion& reg,
                                      IntervalVector& val)
 {

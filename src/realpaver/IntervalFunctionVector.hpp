@@ -17,7 +17,7 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of the hirarchy of representations of interval
+/// This is the base class of the hierarchy of representations of interval
 /// function vectors.
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalFunctionVectorRep {
@@ -74,7 +74,7 @@ public:
    /// Evaluates and differentiates this
    /// @param reg domains of variables
    /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
+   ///        of the i-th function of this at reg
    /// @param J Jacobian matrix of this at reg such that we have the partial
    ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
@@ -94,6 +94,10 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is the main of interval function vectors.
+///
+/// This encloses a shared pointer to its representation. It is a lightweight
+/// object that can be copied and assigned.
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalFunctionVector {
 public:
@@ -173,7 +177,7 @@ public:
    /// Evaluates and differentiates this
    /// @param reg domains of variables
    /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
+   ///        of the i-th function of this at reg
    /// @param J Jacobian matrix of this at reg such that we have the partial
    ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
