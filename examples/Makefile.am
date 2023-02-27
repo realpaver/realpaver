@@ -1,7 +1,7 @@
 ###############################################################################
 ## This file is part of Realpaver, an interval constraint and NLP solver.    ##
 ##                                                                           ##
-## Copyright (c) 2017-2022 LS2N, Nantes                                      ##
+## Copyright (c) 2017-2023 LS2N, Nantes                                      ##
 ##                                                                           ##
 ## Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   ##
 ## COPYING for information.                                                  ##
@@ -16,10 +16,10 @@ LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 
 AM_CPPFLAGS = -I.. -I../src
 
-CLEANFILES = *~ *.log
-
-noinst_PROGRAMS = lp newton propag
+noinst_PROGRAMS = lp uni_newton propag
 
 lp_SOURCES = lp.cpp
-newton_SOURCES = newton.cpp
+uni_newton_SOURCES = uni_newton.cpp
 propag_SOURCES = propag.cpp
+
+CLEANFILES = *~ *.log $(noinst_PROGRAMS)

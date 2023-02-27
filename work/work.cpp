@@ -14,6 +14,7 @@
 #include "realpaver/QuadraticTerm.hpp"
 #include "realpaver/HC4Contractor.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include "realpaver/IntervalGaussSeidel.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -29,26 +30,28 @@ int main(void)
                     //~ {1.25, 0.0, -2.5},
                     //~ {-0.5, 0.0, 6.0}});
 
-      RealMatrix M({{1, -1},
-                    {-2, 1}});
+      Interval m11(2, 3),
+               m12(-0.5, 0.7),
+               m21(-1, 2),
+               m22(-2, -1),
+               x1(-10, 10),
+               x2(-10, 10),
+               b1(3, 5),
+               b2(1, 2);
 
-      RealMatrix MM(M);
+      IntervalMatrix A({{m11, m12},
+                        {m21, m22}});
+      IntervalVector x({x1, x2});
+      IntervalVector b({b1, b2});
+      cout << "--- A ---" << endl << A << endl << endl;
+      cout << "--- x ---" << endl << x << endl << endl;
+      cout << "--- b ---" << endl << b << endl << endl;
 
-      RealMatrix P(M);
-      P.setIdentity();
-
-      cout << "--- M ---" << endl << M << endl << endl;
-      cout << "--- P ---" << endl << P << endl << endl;
-
-      bool b = M.inverse(P);
-      if (b)
-      {
-         cout << "--- M ---" << endl << M << endl << endl;
-         cout << "--- P ---" << endl << P << endl << endl;
-         cout << "--- P*M ---" << endl << P*MM << endl << endl;
-      }
-      else
-         cout << "SINGULAR" << endl;
+   IntervalGaussSeidel gs;
+   Proof p = gs.contract(A, x, b);
+   cout << "--- proof ---" << endl << p << endl << endl;
+   cout << "--- x ---" << endl << x << endl << endl;
+   
 
 /*
       Variable x("x");

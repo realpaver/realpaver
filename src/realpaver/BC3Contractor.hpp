@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
@@ -11,9 +11,9 @@
 #define REALPAVER_BC3_CONTRACTOR_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/ThickFunction.hpp"
+#include "realpaver/UniIntervalNewton.hpp"
 
 namespace realpaver {
 
@@ -65,7 +65,7 @@ public:
    /// @return the Newton operator enclosed
    ///
    /// Useful to change its parameters
-   IntervalNewton* getNewton() const;
+   UniIntervalNewton* getNewton() const;
 
    ///@{
    bool dependsOn(const Bitset& bs) const override;
@@ -75,10 +75,10 @@ public:
    ///@}
 
 private:
-   ThickFunction f_;  // univariate thick interval function
-   IntervalPeeler peeler_;    // peeling at interval bounds
-   size_t maxiter_;           // maximum number of steps in shrink
-   IntervalNewton* newton_;   // interval Newton method
+   ThickFunction f_;             // univariate thick interval function
+   IntervalPeeler peeler_;       // peeling at interval bounds
+   size_t maxiter_;              // maximum number of steps in shrink
+   UniIntervalNewton* newton_;   // interval Newton method
 
    // split functions
    typedef bool (*SplitFun)(const Interval& x, Interval& x1, Interval& x2);

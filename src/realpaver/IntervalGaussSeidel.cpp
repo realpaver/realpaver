@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalGaussSeidel.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
@@ -77,10 +78,15 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix& A, IntervalVector& x,
    ASSERT(A.nrows() == A.ncols(),
           "Bad interval linear system as input of the Gauss Seidel method");
 
+   LOG_LOW("Interval Gauss-Seidel on A:\n" <<
+           A << "\nx: " << x << "\nb: " << b);
+
+   LOG_LOW("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
+
    Proof proof = Proof::Maybe;
 
    bool iter = true;
-   int nb_steps = 0;
+   size_t nb_steps = 0;
 
    do
    {
@@ -89,12 +95,14 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix& A, IntervalVector& x,
       // inner step
       int res = innerStep(A, x, b);
 
+      LOG_LOW("  step > " << ((res == 0) ? "empty " : "maybe ") << x);
+
       if (res == 0)
       {
          proof = Proof::Empty;
          iter = false;
       }
-      
+   
       else if (res == 1)
          iter = false;
 
@@ -106,9 +114,10 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix& A, IntervalVector& x,
    }
    while (iter);
 
+   LOG_LOW("> " << proof << " " << x);
+
    return proof;
 }
-
 
 int IntervalGaussSeidel::innerStep(const IntervalMatrix& A, IntervalVector& x,
                                    const IntervalVector& b)

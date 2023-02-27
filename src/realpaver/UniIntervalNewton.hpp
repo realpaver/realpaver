@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_INTERVAL_NEWTON_HPP
-#define REALPAVER_INTERVAL_NEWTON_HPP
+#ifndef REALPAVER_UNI_INTERVAL_NEWTON_HPP
+#define REALPAVER_UNI_INTERVAL_NEWTON_HPP
 
 #include <functional>
 #include "realpaver/Inflator.hpp"
@@ -49,11 +49,11 @@ namespace realpaver {
 /// - the distance between Xk and Xk-1 is smaller than a given tolerance
 /// - the method diverges
 ///////////////////////////////////////////////////////////////////////////////
-class IntervalNewton {
+class UniIntervalNewton {
 public:
    /// Creates an interval Newton operator
    /// The parameters are assigned to the default values.
-   IntervalNewton();
+   UniIntervalNewton();
 
    /// Contraction method
    /// @param f a univariate function

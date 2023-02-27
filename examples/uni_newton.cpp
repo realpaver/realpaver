@@ -1,6 +1,6 @@
 #include <iostream>
 #include "realpaver/Dag.hpp"
-#include "realpaver/IntervalNewton.hpp"
+#include "realpaver/UniIntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/ThickIntervalFunction.hpp"
@@ -16,7 +16,7 @@ int main(void)
    Logger::init(LogLevel::full, "newton.log");
    Interval::precision( 16 );
 
-   IntervalNewton newton;
+   UniIntervalNewton newton;
    Interval I(1, 10);
 
    Proof p = newton.contract(f, df, I);

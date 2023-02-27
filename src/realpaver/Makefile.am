@@ -1,7 +1,7 @@
 ###############################################################################
 ## This file is part of Realpaver, an interval constraint and NLP solver.    ##
 ##                                                                           ##
-## Copyright (c) 2017-2022 LS2N, Nantes                                      ##
+## Copyright (c) 2017-2023 LS2N, Nantes                                      ##
 ##                                                                           ##
 ## Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   ##
 ## COPYING for information.                                                  ##
@@ -50,7 +50,6 @@ librealpaver_la_include_HEADERS = \
 		IntervalGaussSeidel.hpp \
 		IntervalImpl.hpp \
 		IntervalMatrix.hpp \
-		IntervalNewton.hpp \
 		IntervalRegion.hpp \
 		IntervalSlicer.hpp \
 		IntervalTraits.hpp \
@@ -104,6 +103,7 @@ librealpaver_la_include_HEADERS = \
 		ThickFunction.hpp \
 		Timer.hpp \
 		Tolerance.hpp \
+		UniIntervalNewton.hpp \
 		Variable.hpp \
 		VariableSelector.hpp \
 		VariableVector.hpp
@@ -155,7 +155,6 @@ librealpaver_la_SOURCES = \
 		IntervalFunctionVector.cpp \
 		IntervalGaussSeidel.cpp \
 		IntervalMatrix.cpp \
-		IntervalNewton.cpp \
 		IntervalRegion.cpp \
 		IntervalSlicer.cpp \
 		IntervalVector.cpp \
@@ -202,6 +201,7 @@ librealpaver_la_SOURCES = \
 		ThickFunction.cpp \
 		Timer.cpp \
 		Tolerance.cpp \
+		UniIntervalNewton.cpp \
 		Variable.cpp \
 		VariableSelector.cpp \
 		VariableVector.cpp

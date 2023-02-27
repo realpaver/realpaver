@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
@@ -19,7 +19,7 @@ BC3Contractor::BC3Contractor(SharedDag dag, size_t i, Variable v)
         peeler_(Param::GetDblParam("BC3_PEEL_FACTOR")),
         maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))
 {
-   newton_ = new IntervalNewton();
+   newton_ = new UniIntervalNewton();
 }
 
 BC3Contractor::~BC3Contractor()
@@ -47,7 +47,7 @@ void BC3Contractor::setMaxIter(size_t val)
    maxiter_ = val;
 }
 
-IntervalNewton* BC3Contractor::getNewton() const
+UniIntervalNewton* BC3Contractor::getNewton() const
 {
    return newton_;
 }

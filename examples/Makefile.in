@@ -91,7 +91,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = lp$(EXEEXT) newton$(EXEEXT) propag$(EXEEXT)
+noinst_PROGRAMS = lp$(EXEEXT) uni_newton$(EXEEXT) propag$(EXEEXT)
 subdir = examples
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -114,14 +114,14 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_newton_OBJECTS = newton.$(OBJEXT)
-newton_OBJECTS = $(am_newton_OBJECTS)
-newton_LDADD = $(LDADD)
-newton_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
 am_propag_OBJECTS = propag.$(OBJEXT)
 propag_OBJECTS = $(am_propag_OBJECTS)
 propag_LDADD = $(LDADD)
 propag_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
+am_uni_newton_OBJECTS = uni_newton.$(OBJEXT)
+uni_newton_OBJECTS = $(am_uni_newton_OBJECTS)
+uni_newton_LDADD = $(LDADD)
+uni_newton_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -137,8 +137,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/realpaver
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/lp.Po ./$(DEPDIR)/newton.Po \
-	./$(DEPDIR)/propag.Po
+am__depfiles_remade = ./$(DEPDIR)/lp.Po ./$(DEPDIR)/propag.Po \
+	./$(DEPDIR)/uni_newton.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -158,8 +158,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(lp_SOURCES) $(newton_SOURCES) $(propag_SOURCES)
-DIST_SOURCES = $(lp_SOURCES) $(newton_SOURCES) $(propag_SOURCES)
+SOURCES = $(lp_SOURCES) $(propag_SOURCES) $(uni_newton_SOURCES)
+DIST_SOURCES = $(lp_SOURCES) $(propag_SOURCES) $(uni_newton_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -364,10 +364,10 @@ SUBDIRS = bop ncsp
 DIST_SUBDIRS = bop ncsp
 LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 AM_CPPFLAGS = -I.. -I../src
-CLEANFILES = *~ *.log
 lp_SOURCES = lp.cpp
-newton_SOURCES = newton.cpp
+uni_newton_SOURCES = uni_newton.cpp
 propag_SOURCES = propag.cpp
+CLEANFILES = *~ *.log $(noinst_PROGRAMS)
 all: all-recursive
 
 .SUFFIXES:
@@ -415,13 +415,13 @@ lp$(EXEEXT): $(lp_OBJECTS) $(lp_DEPENDENCIES) $(EXTRA_lp_DEPENDENCIES)
 	@rm -f lp$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(lp_OBJECTS) $(lp_LDADD) $(LIBS)
 
-newton$(EXEEXT): $(newton_OBJECTS) $(newton_DEPENDENCIES) $(EXTRA_newton_DEPENDENCIES) 
-	@rm -f newton$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(newton_OBJECTS) $(newton_LDADD) $(LIBS)
-
 propag$(EXEEXT): $(propag_OBJECTS) $(propag_DEPENDENCIES) $(EXTRA_propag_DEPENDENCIES) 
 	@rm -f propag$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(propag_OBJECTS) $(propag_LDADD) $(LIBS)
+
+uni_newton$(EXEEXT): $(uni_newton_OBJECTS) $(uni_newton_DEPENDENCIES) $(EXTRA_uni_newton_DEPENDENCIES) 
+	@rm -f uni_newton$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(uni_newton_OBJECTS) $(uni_newton_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -430,8 +430,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lp.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newton.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/propag.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uni_newton.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -665,8 +665,8 @@ clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
 
 distclean: distclean-recursive
 		-rm -f ./$(DEPDIR)/lp.Po
-	-rm -f ./$(DEPDIR)/newton.Po
 	-rm -f ./$(DEPDIR)/propag.Po
+	-rm -f ./$(DEPDIR)/uni_newton.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -713,8 +713,8 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
 		-rm -f ./$(DEPDIR)/lp.Po
-	-rm -f ./$(DEPDIR)/newton.Po
 	-rm -f ./$(DEPDIR)/propag.Po
+	-rm -f ./$(DEPDIR)/uni_newton.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

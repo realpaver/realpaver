@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
@@ -11,75 +11,75 @@
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
-#include "realpaver/IntervalNewton.hpp"
+#include "realpaver/UniIntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
 
-IntervalNewton::IntervalNewton() :
-   maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
+UniIntervalNewton::UniIntervalNewton() :
+   maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
    xtol_(Param::GetTolParam("XTOL")),
    dtol_(Param::GetTolParam("DTOL")),
    ldtol_(Param::GetTolParam("DTOL")),
    inflator_()
 {}
 
-size_t IntervalNewton::getMaxIter() const
+size_t UniIntervalNewton::getMaxIter() const
 {
    return maxiter_;
 }
 
-void IntervalNewton::setMaxIter(size_t n)
+void UniIntervalNewton::setMaxIter(size_t n)
 {
    ASSERT(n > 0, "bad parameter in the interval Interval Newton method");
 
    maxiter_ = n;
 }
 
-Tolerance IntervalNewton::getXTol() const
+Tolerance UniIntervalNewton::getXTol() const
 {
    return xtol_;
 }
 
-void IntervalNewton::setXTol(const Tolerance& tol)
+void UniIntervalNewton::setXTol(const Tolerance& tol)
 {
    xtol_ = tol;
 }
 
-Tolerance IntervalNewton::getDTol() const
+Tolerance UniIntervalNewton::getDTol() const
 {
    return dtol_;
 }
 
-void IntervalNewton::setDTol(const Tolerance& tol)
+void UniIntervalNewton::setDTol(const Tolerance& tol)
 {
    dtol_ = tol;
 }
 
-Tolerance IntervalNewton::getLocalDTol() const
+Tolerance UniIntervalNewton::getLocalDTol() const
 {
    return ldtol_;
 }
 
-void IntervalNewton::setLocalDTol(const Tolerance& tol)
+void UniIntervalNewton::setLocalDTol(const Tolerance& tol)
 {
    ldtol_ = tol;
 }
 
-Inflator IntervalNewton::getInflator() const
+Inflator UniIntervalNewton::getInflator() const
 {
    return inflator_;
 }
 
-void IntervalNewton::setInflator(const Inflator& inflator)
+void UniIntervalNewton::setInflator(const Inflator& inflator)
 {
    inflator_ = inflator;
 }
 
-Proof IntervalNewton::contract(std::function<Interval(const Interval&)> f,
-                               std::function<Interval(const Interval&)> df,
-                               Interval& x)
+Proof UniIntervalNewton::contract(std::function<Interval(const Interval&)> f,
+                                  std::function<Interval(const Interval&)> df,
+                                  Interval& x)
 {
    LOG_LOW("Interval Newton: contract " << x);
    LOG_LOW("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
@@ -125,9 +125,9 @@ Proof IntervalNewton::contract(std::function<Interval(const Interval&)> f,
    return proof;
 }
 
-Proof IntervalNewton::step(std::function<Interval(const Interval&)> f,
-                           std::function<Interval(const Interval&)> df,
-                           Interval& x)
+Proof UniIntervalNewton::step(std::function<Interval(const Interval&)> f,
+                              std::function<Interval(const Interval&)> df,
+                              Interval& x)
 {
    Interval fx = f(x);
    Interval dx = df(x);
@@ -182,9 +182,9 @@ Proof IntervalNewton::step(std::function<Interval(const Interval&)> f,
    return proof;
 }
 
-Proof IntervalNewton::search(std::function<Interval(const Interval&)> f,
-                             std::function<Interval(const Interval&)> df,
-                             Interval& x)
+Proof UniIntervalNewton::search(std::function<Interval(const Interval&)> f,
+                                std::function<Interval(const Interval&)> df,
+                                Interval& x)
 {
    Proof proof = contract(f, df, x);
    if (proof != Proof::Maybe) return proof;
@@ -200,9 +200,9 @@ Proof IntervalNewton::search(std::function<Interval(const Interval&)> f,
    return proof;
 }
 
-Proof IntervalNewton::shrinkLeft(std::function<Interval(const Interval&)> f,
-                                 std::function<Interval(const Interval&)> df,
-                                 Interval& x)
+Proof UniIntervalNewton::shrinkLeft(std::function<Interval(const Interval&)> f,
+                                    std::function<Interval(const Interval&)> df,
+                                    Interval& x)
 {
    std::stack<Interval> stak;
    stak.push(x);
@@ -236,9 +236,9 @@ Proof IntervalNewton::shrinkLeft(std::function<Interval(const Interval&)> f,
    return Proof::Empty;
 }
 
-Proof IntervalNewton::shrinkRight(std::function<Interval(const Interval&)> f,
-                                  std::function<Interval(const Interval&)> df,
-                                  Interval& x)
+Proof UniIntervalNewton::shrinkRight(std::function<Interval(const Interval&)> f,
+                                     std::function<Interval(const Interval&)> df,
+                                     Interval& x)
 {
    std::stack<Interval> stak;
    stak.push(x);
@@ -272,9 +272,9 @@ Proof IntervalNewton::shrinkRight(std::function<Interval(const Interval&)> f,
    return Proof::Empty;   
 }
 
-Proof IntervalNewton::localSearch(std::function<Interval(const Interval&)> f,
-                                  std::function<Interval(const Interval&)> df,
-                                  Interval& x)
+Proof UniIntervalNewton::localSearch(std::function<Interval(const Interval&)> f,
+                                     std::function<Interval(const Interval&)> df,
+                                     Interval& x)
 {
    Proof proof = Proof::Maybe;
    Interval y = x.midpoint();
@@ -327,9 +327,9 @@ Proof IntervalNewton::localSearch(std::function<Interval(const Interval&)> f,
    return proof;
 }
 
-Proof IntervalNewton::localStep(std::function<Interval(const Interval&)> f,
-                                std::function<Interval(const Interval&)> df,
-                                Interval& x)
+Proof UniIntervalNewton::localStep(std::function<Interval(const Interval&)> f,
+                                   std::function<Interval(const Interval&)> df,
+                                   Interval& x)
 {
    Interval ix = inflator_.inflate(x);
    Interval fix = f(ix);

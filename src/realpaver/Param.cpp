@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This file is part of Realpaver, an interval constraint and NLP solver.    //
 //                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
 //                                                                           //
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
@@ -47,12 +47,12 @@ Param::Param()
    intmap_.insert(std::make_pair("LINE_SEARCH_ITER_LIMIT",    20));
    intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
-   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         20));
+   intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT",     20));
    intmap_.insert(std::make_pair("SPLIT_NB_SLICES",           5));
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
    intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
-   intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   20));
+   intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   50));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
