@@ -12,7 +12,6 @@
 
 #include <map>
 #include <memory>
-#include "realpaver/Bitset.hpp"
 #include "realpaver/ScopeMap.hpp"
 #include "realpaver/Variable.hpp"
 
@@ -215,9 +214,6 @@ public:
 
    /// @return the greatest variable identifier in this
    size_t maxIndex() const;
-
-   /// @return a bitset corresponding to this
-   Bitset toBitset() const;
 
    /// Inserts a variable in this
    /// @param v a variable

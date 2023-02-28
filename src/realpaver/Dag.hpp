@@ -156,6 +156,11 @@ public:
    /// @param x real value added in the real derivative
    void addRdv(double x);
 
+   /// Counts the number of occurrences of a variable
+   /// @param v a variable
+   /// @return the number of occurrences of v in the tree rooted by this
+   virtual size_t nbOccurrences(const Variable& v) const;
+
    /// Visitor pattern
    /// @param vis a visitor
    virtual void acceptVisitor(DagVisitor& vis) const = 0;
@@ -274,6 +279,7 @@ public:
    Variable getVar() const;
 
    ///@{
+   size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
    void eval(const IntervalRegion& reg) override;
@@ -332,6 +338,7 @@ public:
    virtual void reval() = 0;
 
    ///@{
+   virtual size_t nbOccurrences(const Variable& v) const override;
    virtual void print(std::ostream& os) const override;
    void eval(const IntervalRegion& reg) override;
    void eval(const RealPoint& pt) override;
@@ -748,17 +755,14 @@ public:
    DagVar* varNode(size_t i) const;
 
    /// Dependency test
-   /// @param bs a bitset representing a set of variables
-   /// @return true if this depends on bs
-   bool dependsOn(const Bitset& bs) const;
-
-   /// Dependency test
    /// @param v a variable
    /// @return true if v occurs in this
    bool dependsOn(const Variable& v) const;
 
-   /// Gets the bitset representing the set of variables this depends on
-   const Bitset& bitset() const;
+   /// Counts the number of occurrences of a variable
+   /// @param v a variable
+   /// @return the number of occurrences of v in this
+   size_t nbOccurrences(const Variable& v) const;
 
    /// Assigns the index of this in the dag
    /// @param i new value

@@ -49,18 +49,10 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
-   /// @return a bitset this depends on
-   Bitset bitset() const;
-
    /// Dependency test
    /// @param v a variable
    /// @return true if this depends on v
    bool dependsOn(Variable v) const;
-
-   /// Tests if this constraint depends on a variable referenced in a bitset
-   /// @param bs a bitset
-   /// @return the result of the test
-   bool dependsOn(const Bitset& bs) const;
 
    /// @return true if this constraint is variable free
    virtual bool isConstant() const = 0;
@@ -113,7 +105,6 @@ protected:
 
 private:
    Scope scope_;
-   Bitset bs_;
 
 protected:
    size_t hcode_;
@@ -132,9 +123,6 @@ public:
 
    /// @return the scope of this
    Scope scope() const;
-
-   /// @return a bitset this depends on
-   Bitset bitset() const;
 
    /// @return true if this is variable free
    bool isConstant() const;
@@ -167,11 +155,6 @@ public:
    /// @param v a variable
    /// @return true if this depends on v
    bool dependsOn(Variable v) const;
-
-   /// Tests if this constraint depends on a variable referenced in a bitset
-   /// @param bs a bitset
-   /// @return the result of the test
-   bool dependsOn(const Bitset& bs) const;
 
    /// @return true if this is an equation
    bool isEquation() const;

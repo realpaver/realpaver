@@ -80,20 +80,22 @@ public:
    /// @return the corner of this made from all the right bounds
    RealPoint rCorner() const;
 
-  /// Gets a corner of this
-   /// @param bs a bitset having the same size than this
+   /// Gets a corner of this
+   /// @param bs a bitset having the same size than the scope of this
    /// @return a corner of this defined by 'bs'
    ///
    /// Let res be the result. For each i, res[i] is equal to the left bound of
-   /// the i-th component of this if bs[i] is true, the right bound otherwise.
+   /// the i-th component of this (the i-th variable in the scope) if bs[i] is
+   /// true, the right bound otherwise.
    RealPoint corner(const Bitset& bs) const;
 
    /// Gets a corner of this
-   /// @param bs a bitset having the same size than this
+   /// @param bs a bitset having the same size than the scope of this
    /// @return a corner of this defined by 'bs'
    ///
    /// Let res be the result. For each i, res[i] is equal to the right bound of
-   /// the i-th component of this if bs[i] is true, the left bound otherwise.
+   /// the i-th component of this (the i-th variable in the scope) if bs[i] is
+   /// true, the left bound otherwise.
    RealPoint oppositeCorner(const Bitset& bs) const;
 
    /// Set containment test

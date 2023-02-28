@@ -19,10 +19,11 @@ BC4Contractor::BC4Contractor(SharedDag dag, size_t i)
 {
    hc4_ = new HC4Contractor(dag, i);
 
-   Scope s = dag->fun(i)->scope();
+   DagFun* f = dag->fun(i);
+   Scope s = f->scope();
    for (auto v : s)
    {
-      if (s.count(v) > 1)
+      if (f->nbOccurrences(v) > 1)
          bc3_.push_back(new BC3Contractor(dag_, if_, v));
    }
 }

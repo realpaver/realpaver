@@ -33,6 +33,8 @@ int main(void)
       size_t i = dag->insert( y - sqr(x) == 0 );
       size_t j = dag->insert( sqr(x) + sqr(y) - 2.0 == 0 );
 
+      cout << (*dag) << endl;
+
       SharedContractorVector pool = std::make_shared<ContractorVector>();
       pool->push(std::make_shared<HC4Contractor>(dag, i));
       pool->push(std::make_shared<HC4Contractor>(dag, j));

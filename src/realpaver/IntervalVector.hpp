@@ -85,7 +85,7 @@ public:
    RealVector rCorner() const;
 
    /// Gets a corner of this
-   /// @param bs a bitset having the same size than this
+   /// @param bs a bitset indexed from 0 to size()-1
    /// @return a corner of this defined by 'bs'
    ///
    /// Let res be the result. For each i, res[i] is equal to the left bound of
@@ -93,7 +93,7 @@ public:
    RealVector corner(const Bitset& bs) const;
 
    /// Gets a corner of this
-   /// @param bs a bitset having the same size than this
+   /// @param bs a bitset indexed from 0 to size()-1
    /// @return a corner of this defined by 'bs'
    ///
    /// Let res be the result. For each i, res[i] is equal to the right bound of

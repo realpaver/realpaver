@@ -18,18 +18,28 @@ namespace realpaver {
 /// This is a sequence of bits.
 ///
 /// The number of bits is fixed when an object is created.
+/// * Given the size n, the bits are indexed from 0 to n-1.
+/// * Given a couple (first, last) with last >= first, the bits are indexed
+///   from first to last.
 ///////////////////////////////////////////////////////////////////////////////
 class Bitset {
 public:
    /// Creates an empty bitset
    Bitset();
 
-   /// Creates a bitset
+   /// Creates a bitset (b{0}, b{1}, ..., b{n-1}) initialized to (0, 0, ... 0)
    /// @param n number of bits
    /// @param val each bit is initialized to 0 is val = 0, 1 otherwise
-   Bitset(size_t n, size_t val = 0);
+   Bitset(size_t n);
 
-   /// Creates a bitset
+   /// Creates a bitset (b{first}, b{first+1}, ..., b{last}) initialized
+   /// to (0, 0, ... 0)
+   /// @param first index of first bit
+   /// @param last index of last bit
+   /// @param val each bit is initialized to 0 is val = 0, 1 otherwise
+   Bitset(int first, int last);
+
+   /// Creates a bitset in extension given a list of bits, e.g. {0, 1, 1, 0, 0}
    /// @param l list of bits
    Bitset(const std::initializer_list<int>& l);
 
@@ -51,29 +61,35 @@ public:
    /// @return the number of bits
    size_t size() const;
 
+   /// &@return the index of the first bit of this
+   int first() const;
+
+   /// &@return the index of the last bit of this
+   int last() const;
+
    /// @return the number of words used to store the bits
    size_t wordCount() const;
 
    /// @return 0 if the i-th bit is equal to 0, another value otherwise
-   size_t get(size_t i) const;
+   size_t get(int i) const;
 
    /// Sets a bit to 0
    /// @param i index of the bit assigned
-   void setZero(size_t i);
+   Bitset& setZero(int i);
 
    /// Sets all bits to 0
-   void setAllZero();
+   Bitset& setAllZero();
 
    /// Sets a bit to 1
    /// @param i index of the bit assigned
-   void setOne(size_t i);
+   Bitset& setOne(int i);
 
    /// Sets all bits to 1
-   void setAllOne();
+   Bitset& setAllOne();
 
    /// Flips the value of one bit
    /// @param i index of the bit modified
-   void flip(size_t i);
+   void flip(int i);
 
    /// Flips all bits
    void flipAll();
@@ -121,6 +137,8 @@ private:
    static const size_t BITS_PER_WORD = 8 * sizeof(word_t);
 
    size_t size_;     // number of bits
+   int first_;       // index of first bit
+   int last_;        // index of last bit
    size_t wcount_;   // number of words
    word_t* word_;    // array of words
 
@@ -146,7 +164,7 @@ private:
    word_t shadow_word_;
 
    // used for debugging
-   static void printWord(word_t w);
+//   static void printWord(word_t w);
 };
 
 /// Output on a stream

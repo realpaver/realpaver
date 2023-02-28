@@ -120,8 +120,11 @@ RealVector IntervalVector::rCorner() const
 
 RealVector IntervalVector::corner(const Bitset& bs) const
 {
-   ASSERT(size() <= bs.size(), "Bad access to the corner of " << (*this) <<
+   ASSERT(size() == bs.size(), "Bad access to the corner of " << (*this) <<
                                " given a bitset " << bs);
+
+   ASSERT(bs.first() == 0, "Bad access to the corner of " << (*this) <<
+                           " given a bitset whose first index is not 0");
 
    RealVector co(size());
 
@@ -136,8 +139,11 @@ RealVector IntervalVector::corner(const Bitset& bs) const
 
 RealVector IntervalVector::oppositeCorner(const Bitset& bs) const
 {
-   ASSERT(size() <= bs.size(), "Bad access to the corner of " << (*this) <<
+   ASSERT(size() == bs.size(), "Bad access to the corner of " << (*this) <<
                                " given a bitset " << bs);
+
+   ASSERT(bs.first() == 0, "Bad access to the corner of " << (*this) <<
+                           " given a bitset whose first index is not 0");
 
    RealVector co(size());
 

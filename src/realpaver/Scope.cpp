@@ -311,16 +311,6 @@ size_t Scope::count(const Variable& v) const
    return (it == end()) ? 0 : it.count();
 }
 
-Bitset Scope::toBitset() const
-{
-   Bitset b(1+maxIndex(), 0);
-
-   for (auto it = begin(); it != end(); ++it)
-      b.setOne(it.var().id());
-
-   return b;
-}
-
 Scope Scope::clone() const
 {
    Scope s;

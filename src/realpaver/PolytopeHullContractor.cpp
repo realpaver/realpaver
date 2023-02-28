@@ -195,7 +195,8 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag)
         corner_()
 {
    // current strategy: corner of left bounds (each bit = 0)
-   corner_ = Bitset(1 + scope().maxIndex(), 0);
+   corner_ = Bitset(scope().size());
+   corner_.setAllZero();
 }
 
 PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
@@ -204,7 +205,8 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
         corner_()
 {
    // current strategy: corner of left bounds (each bit = 0)
-   corner_ = Bitset(1 + scope().maxIndex(), 0);
+   corner_ = Bitset(scope().size());
+   corner_.setAllZero();
 }
 
 bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
@@ -225,7 +227,7 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
    for (auto v : sco)
    {
       Interval dom = reg.get(v);
-      if (corner_.get(v.id()))
+      if (corner_.get(sco.index(v)))
       {
          c1.set(v, dom.right());
          c2.set(v, dom.left());
@@ -286,7 +288,7 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
             Interval z = f->intervalDeriv(v);
             if (z.isEmpty() || z.isInf()) return false;
 
-            if (corner_.get(v.id()))
+            if (corner_.get(sco.index(v)))
             {  // right bound used for this variable (bit = 1)
 
                // first corner => right bound of the derivative
@@ -332,7 +334,7 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
             LinVar lv = lpm.getLinVar(linVarIndex(v));
             Interval z = f->intervalDeriv(v);
 
-            if (corner_.get(v.id()))
+            if (corner_.get(sco.index(v)))
             {  // right bound used for this variable (bit = 1)
 
                // first corner => left bound of the derivative

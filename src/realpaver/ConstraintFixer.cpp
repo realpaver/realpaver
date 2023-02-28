@@ -90,7 +90,8 @@ void ConstraintFixer::apply(const ArithCtrIn* c)
 void ConstraintFixer::apply(const TableCtr* c)
 {
    // checks the consistent assignments with respect to the variable domains
-   Bitset consistent(c->nbRows(), 0);
+   Bitset consistent(c->nbRows());
+   consistent.setAllZero();
 
    for (size_t i=0; i<c->nbRows(); ++i)
    {

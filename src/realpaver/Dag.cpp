@@ -177,6 +177,11 @@ void DagNode::addRdv(double x)
    rdv_ = Double::add(rdv_, x);
 }
 
+size_t DagNode::nbOccurrences(const Variable& v) const
+{
+   return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
@@ -248,8 +253,13 @@ DagVar::DagVar(Dag* dag, size_t index, Variable v)
       : DagNode(dag, index),
         v_(v)
 {
-   bitset_ = Bitset(1 + v.id(), 0);
+   bitset_ = Bitset(v.id(), v.id());
    bitset_.setOne(v.id());
+}
+
+size_t DagVar::nbOccurrences(const Variable& v) const
+{
+   return (v_.id() == v.id()) ? 1 : 0;
 }
 
 void DagVar::print(std::ostream& os) const
@@ -350,6 +360,16 @@ bool DagOp::eq(const DagOp* other) const
          return false;
 
    return true;
+}
+
+size_t DagOp::nbOccurrences(const Variable& v) const
+{
+   size_t n = 0;
+
+   for (size_t i=0; i<subArity(); ++i)
+      n += subNode(i)->nbOccurrences(v);
+
+   return n;
 }
 
 void DagOp::print(std::ostream& os) const
@@ -1281,19 +1301,14 @@ DagVar* DagFun::varNode(size_t i) const
    return vnode_[i];
 }
 
-const Bitset& DagFun::bitset() const
-{
-   return rootNode()->bitset();
-}
-
-bool DagFun::dependsOn(const Bitset& bs) const
-{
-   return rootNode()->dependsOn(bs);
-}
-
 bool DagFun::dependsOn(const Variable& v) const
 {
    return rootNode()->dependsOn(v);
+}
+
+size_t DagFun::nbOccurrences(const Variable& v) const
+{
+   return rootNode()->nbOccurrences(v);
 }
 
 Interval DagFun::intervalDeriv(size_t i) const
@@ -2094,7 +2109,7 @@ void Dag::print(std::ostream& os) const
          os << node->index();
       }
       os << "] in " << f->getImage();
-      os << " bitset: " << f->bitset() << std::endl;
+      os << " bitset: " << f->rootNode()->bitset() << std::endl;
    }
 
    for (DagNode* node : node_)

@@ -25,7 +25,7 @@ public:
    void testInitA()
    {
       size_t n = 5;
-      Bitset b(n, 0);
+      Bitset b(n);
       TEST_TRUE( b.size() == n );
       TEST_TRUE( b.nbZeros() == n );
    }
@@ -33,7 +33,8 @@ public:
    void testInitB()
    {
       size_t n = 5;
-      Bitset b(n, 1);
+      Bitset b(n);
+      b.setAllOne();
       TEST_TRUE( b.size() == n );
       TEST_TRUE( b.nbOnes() == n );
    }
@@ -41,7 +42,7 @@ public:
    void testSet()
    {
       size_t n = 125, i = 97;
-      Bitset b(n, 0);
+      Bitset b(n);
       b.setOne(i);
       TEST_TRUE( b.get(i) != 0 );
       TEST_TRUE( b.nbOnes() == 1 );
@@ -50,7 +51,7 @@ public:
    void testFlip()
    {
       size_t n = 302, i = 146;
-      Bitset b(n, 0);
+      Bitset b(n);
       b.setOne(i);
       TEST_TRUE( b.get(i) != 0 );
       b.flip(i);
@@ -60,7 +61,7 @@ public:
    void testFlipAll()
    {
       size_t n = 128, i = 64;
-      Bitset b(n, 0);
+      Bitset b(n);
       b.setOne(i);
       b.flipAll();
       TEST_TRUE( b.get(i) == 0 );
@@ -70,7 +71,7 @@ public:
    void testAnd()
    {
       size_t n = 45, i = 7, j = 12, k = 22, l = 36;
-      Bitset b1(n, 0), b2(n, 0);
+      Bitset b1(n), b2(n);
       b1.setOne(i); b1.setOne(j);
       b2.setOne(i); b2.setOne(k); b2.setOne(l);
 
@@ -86,7 +87,7 @@ public:
    void testOr()
    {
       size_t n = 500, i = 0, j = 229, k = 341, l = 499;
-      Bitset b1(n, 0), b2(n, 0);
+      Bitset b1(n), b2(n);
       b1.setOne(i); b1.setOne(j);
       b2.setOne(i); b2.setOne(l);
 
@@ -102,7 +103,7 @@ public:
    void testOverlaps()
    {
       size_t n = 220, i = 70, j = 102, k = 103, l = 199;
-      Bitset b1(n, 0), b2(n, 0), b3(n, 0);
+      Bitset b1(n), b2(n), b3(n);
       b1.setOne(i); b1.setOne(j);
       b2.setOne(j); b2.setOne(k);
       b3.setOne(k); b3.setOne(l);
@@ -114,7 +115,7 @@ public:
    void testNot()
    {
       size_t n = 28, i = 3, j = 20;
-      Bitset b1(n, 0);
+      Bitset b1(n);
       b1.setOne(i); b1.setOne(j);
 
       Bitset b2( ~b1 );

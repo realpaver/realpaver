@@ -32,7 +32,6 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel)
 
 ConstraintRep::ConstraintRep()
       : scope_(),
-        bs_(),
         hcode_(0)
 {}
 
@@ -44,11 +43,6 @@ size_t ConstraintRep::hashCode() const
    return hcode_;
 }
 
-Bitset ConstraintRep::bitset() const
-{
-   return bs_;
-}
-
 Scope ConstraintRep::scope() const
 {
    return scope_;
@@ -57,22 +51,11 @@ Scope ConstraintRep::scope() const
 void ConstraintRep::setScope(Scope s)
 {
    scope_ = s;
-   
-   if (s.isEmpty())
-      bs_ = Bitset(1,0);
-
-   else
-      bs_ = scope_.toBitset();
 }
 
 bool ConstraintRep::dependsOn(Variable v) const
 {
    return scope_.contains(v);
-}
-
-bool ConstraintRep::dependsOn(const Bitset& bs) const
-{
-   return bs_.overlaps(bs);
 }
 
 bool ConstraintRep::isEquation() const
@@ -115,11 +98,6 @@ Scope Constraint::scope() const
    return rep_->scope();
 }
 
-Bitset Constraint::bitset() const
-{
-   return rep_->bitset();
-}
-
 bool Constraint::isConstant() const
 {
    return rep_->isConstant();
@@ -153,11 +131,6 @@ Proof Constraint::contract(IntervalRegion& reg)
 bool Constraint::dependsOn(Variable v) const
 {
    return rep_->dependsOn(v);
-}
-
-bool Constraint::dependsOn(const Bitset& bs) const
-{
-   return rep_->dependsOn(bs);
 }
 
 bool Constraint::isEquation() const
@@ -926,7 +899,8 @@ double TableCtr::rowViolation(const IntervalRegion& reg, size_t i)
 
 Proof TableCtr::contract(IntervalRegion& reg)
 {
-   Bitset consistent(nbRows(), 1);
+   Bitset consistent(nbRows());
+   consistent.setAllOne();
    size_t nbc = nbRows();     // number of consistent rows
 
    // checks consistency

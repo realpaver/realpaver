@@ -6,6 +6,7 @@
 // Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
+
 #include <algorithm>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
@@ -15,32 +16,71 @@ namespace realpaver {
 
 Bitset::Bitset()
       : size_(0),
+        first_(0),
+        last_(-1),
         wcount_(0),
         word_(nullptr),
         shadow_word_(0)
 {}
 
-Bitset::Bitset(size_t n, size_t val)
-      : size_(n),
-        wcount_(1 + (n - 1) / BITS_PER_WORD),
-        word_(nullptr),
-        shadow_word_(0)
+Bitset::Bitset(size_t n) : Bitset(0, n-1)
 {
-   ASSERT(n > 0, "creation of bitset with null size... " <<
+   ASSERT(n > 0, "Creation of bitset with null size... " <<
                  "the default constructor must be used");
+}
 
+Bitset::Bitset(int first, int last)
+{
+   ASSERT(first <= last, "Creation of bitset with bad indexes");
+
+   size_ = 1 + (size_t)(last - first);
+   first_ = first;
+   last_ = last;
+   wcount_ = 1 + (size_ - 1) / BITS_PER_WORD;
    word_ = new word_t[wcount_];
 
    // shadow word : 00...011...1 with k zeros
    static word_t nz = ~0;
-   size_t k = wcount_ * BITS_PER_WORD - n;
+   size_t k = wcount_ * BITS_PER_WORD - size_;
    shadow_word_ = (k == 0) ? nz : (nz >> k);
 
-   if (val) setAllOne();
-   else setAllZero();
+   setAllZero();
 }
 
-Bitset::Bitset(const std::initializer_list<int>& l) : Bitset(l.size(), 0)
+Bitset::~Bitset()
+{
+   if (word_ != nullptr)
+      delete[] word_;
+}
+
+Bitset::Bitset(const Bitset& other):
+   size_(other.size_),
+   first_(other.first_),
+   last_(other.last_),
+   wcount_(other.wcount_),
+   word_(nullptr),
+   shadow_word_(other.shadow_word_)
+{
+   if (other.size() > 0)
+   {
+      word_ = new word_t[wcount_];
+      std::copy_n(other.word_, wcount_, word_);
+   }
+}
+
+Bitset::Bitset(Bitset&& other) :
+   size_(other.size_),
+   first_(other.first_),
+   last_(other.last_),
+   wcount_(other.wcount_),
+   word_(other.word_),
+   shadow_word_(other.shadow_word_)
+{
+   other.size_ = other.wcount_ = 0;
+   other.word_ = nullptr;
+}
+
+Bitset::Bitset(const std::initializer_list<int>& l) : Bitset(l.size())
 {
    size_t j = 0;
 
@@ -55,6 +95,8 @@ Bitset& Bitset::operator=(const Bitset& other)
       delete[] word_;
 
    size_ = other.size_;
+   first_ = other.first_;
+   last_ = other.last_;
    wcount_ = other.wcount_;
    shadow_word_ = other.shadow_word_;
 
@@ -73,6 +115,8 @@ Bitset& Bitset::operator=(Bitset&& other)
       delete[] word_;
 
    size_ = other.size_;
+   first_ = other.first_;
+   last_ = other.last_;
    wcount_ = other.wcount_;
    word_ = other.word_;
    shadow_word_ = other.shadow_word_;
@@ -83,44 +127,24 @@ Bitset& Bitset::operator=(Bitset&& other)
    return *this;
 }
 
-Bitset::~Bitset()
-{
-   if (word_ != nullptr)
-      delete[] word_;
-}
-
-Bitset::Bitset(const Bitset& other):
-   size_(other.size_),
-   wcount_(other.wcount_),
-   word_(nullptr),
-   shadow_word_(other.shadow_word_)
-{
-   if (other.size() > 0)
-   {
-      word_ = new word_t[wcount_];
-      std::copy_n(other.word_, wcount_, word_);
-   }
-}
-
-Bitset::Bitset(Bitset&& other) :
-   size_(other.size_),
-   wcount_(other.wcount_),
-   word_(other.word_),
-   shadow_word_(other.shadow_word_)
-{
-   other.size_ = other.wcount_ = 0;
-   other.word_ = nullptr;
-}
-
 size_t Bitset::size() const 
 {
    return size_;
 }
 
-size_t Bitset::get(size_t i) const
+int Bitset::first() const
 {
-   return i >= size() ?
-             0 : word_[bitIndex(i)] & (word_t(1) << bitOffset(i));
+   return first_;
+}
+
+int Bitset::last() const
+{
+   return last_;
+}
+
+size_t Bitset::wordCount() const
+{
+   return wcount_;
 }
 
 void Bitset::keepShadowBits()
@@ -129,34 +153,43 @@ void Bitset::keepShadowBits()
       word_[wcount_-1] &= shadow_word_;
 }
 
-void Bitset::setZero(size_t i)
+size_t Bitset::get(int i) const
 {
-   word_[bitIndex(i)] &= ~(word_t(1) << bitOffset(i));
+   if (i < first_ || i > last_)
+      return 0;
+
+   else
+   {
+      int j = i - first_;
+      return word_[bitIndex(j)] & (word_t(1) << bitOffset(j));
+   }
 }
 
-void Bitset::setOne(size_t i)
+Bitset& Bitset::setZero(int i)
 {
-   word_[bitIndex(i)] |= (word_t(1) << bitOffset(i));
+   int j = i - first_;
+   word_[bitIndex(j)] &= ~(word_t(1) << bitOffset(j));
+
+   return *this;
 }
 
-void Bitset::flip(size_t i)
+Bitset& Bitset::setOne(int i)
 {
-   if (get(i)) setZero(i);
-   else setOne(i);
+   int j = i - first_;
+   word_[bitIndex(j)] |= (word_t(1) << bitOffset(j));
+
+   return *this;
 }
 
-size_t Bitset::wordCount() const
-{
-   return wcount_;
-}
-
-void Bitset::setAllZero()
+Bitset& Bitset::setAllZero()
 {
    for (size_t i=0; i<wcount_; ++i)
       word_[i] = 0;
+
+   return *this;
 }
 
-void Bitset::setAllOne()
+Bitset& Bitset::setAllOne()
 {
    static word_t nz = ~0;
 
@@ -164,6 +197,14 @@ void Bitset::setAllOne()
       word_[i] = nz;
 
    keepShadowBits();
+
+   return *this;
+}
+
+void Bitset::flip(int i)
+{
+   if (get(i)) setZero(i);
+   else setOne(i);
 }
 
 void Bitset::flipAll()
@@ -196,16 +237,16 @@ size_t Bitset::nbOnes() const
 
 bool Bitset::areAllOnes() const
 {
-   size_t last = wcount_ - 1, w;
+   size_t wlast = wcount_ - 1, w;
 
-   for (size_t i=0; i<last; ++i)
+   for (size_t i=0; i<wlast; ++i)
    {
       w = ~word_[i];
       if (w != 0) return false;
    }
 
    // last word
-   w = (~word_[last]) & shadow_word_;
+   w = (~word_[wlast]) & shadow_word_;
    if (w != 0) return false;
 
    return true;
@@ -225,8 +266,12 @@ void Bitset::print(std::ostream& os) const
       os << "empty bitset";
 
    else
-      for (size_t i=0; i<size_; ++i)
+   {
+      for (int i=first_; i<=last_; ++i)
          os << (get(i) ? 1 : 0);
+
+      os << "{" << first_ << "}";
+   }
 }
 
 size_t Bitset::hashCode() const
@@ -246,57 +291,94 @@ size_t Bitset::hashCode() const
 
 bool Bitset::overlaps(const Bitset& other) const
 {
-   size_t wc = std::min(wordCount(),other.wordCount());
+   if (size_ == 0 || other.size_ == 0)
+      return false;
 
-   for (size_t i=0; i<wc; ++i)      
-      if (word_[i] & other.word_[i])
-         return true;
+   if (first_ == other.first_ && last_ == other.last_)
+   {
+      for (size_t i=0; i<wcount_; ++i)      
+         if (word_[i] & other.word_[i])
+            return true;
 
-   return false;
+      return false;
+   }
+   else
+   {
+      // interval of indexes of common bits
+      int p = std::max(first_, other.first_),
+          q = std::min(last_, other.last_);
+
+      for (int i=p; i<=q; ++i)
+         if (get(i) && other.get(i))
+            return true;
+
+      return false;
+   }
 }
 
 Bitset& Bitset::operator&=(const Bitset& other)
 {
-   size_t nb = std::max(size(), other.size());
+   if (size_ == 0 || other.size_ == 0)
+   {
+      Bitset aux;
+      return *this = aux;
+   }
 
-   if (nb == 0) return *this;
+   if (first_ == other.first_ && last_ == other.last_)
+   {
+      for (size_t i=0; i<wcount_; ++i)      
+         word_[i] &= other.word_[i];
 
-   Bitset aux(nb);
+      return *this;
+   }
 
-   size_t wc = std::min(wordCount(), other.wordCount());
-   for (size_t i=0; i<wc; ++i)
-      aux.word_[i] = word_[i] & other.word_[i];
+   // interval of indexes of common bits
+   int p = std::max(first_, other.first_),
+       q = std::min(last_, other.last_);
 
-   if (wordCount() < other.wordCount())
-      for (size_t i=wc; i<other.wordCount(); ++i)
-         aux.word_[i] = other.word_[i];
+   if (p > q)
+   {
+      Bitset aux;
+      return *this = aux;
+   }
 
-   if (wordCount() > other.wordCount())
-      for (size_t i=wc; i<wordCount(); ++i)
-         aux.word_[i] = word_[i];
+   Bitset aux(p, q);
+   aux.setAllZero();
+
+   for (int i=p; i<=q; ++i)
+      if (get(i) && other.get(i))
+         aux.setOne(i);
 
    return *this = aux;
 }
 
 Bitset& Bitset::operator|=(const Bitset& other)
 {
-   size_t nb = std::max(size(), other.size());
+   if (other.size_ == 0) return *this;
+   if (size_ == 0) return *this = other;
 
-   if (nb == 0) return *this;
+   if (first_ == other.first_ && last_ == other.last_)
+   {
+      for (size_t i=0; i<wcount_; ++i)      
+         word_[i] |= other.word_[i];
 
-   Bitset aux(nb);
+      return *this;
+   }
 
-   size_t wc = std::min(wordCount(), other.wordCount());
-   for (size_t i=0; i<wc; ++i)
-      aux.word_[i] = word_[i] | other.word_[i];
+   int p = std::min(first_, other.first_),
+       q = std::max(last_, other.last_);
 
-   if (wordCount() < other.wordCount())
-      for (size_t i=wc; i<other.wordCount(); ++i)
-         aux.word_[i] = other.word_[i];
+   Bitset aux(p, q);
+   aux.setAllZero();
 
-   if (wordCount() > other.wordCount())
-      for (size_t i=wc; i<wordCount(); ++i)
-         aux.word_[i] = word_[i];
+   for (int i=p; i<=q; ++i)
+   {
+      bool b = false;
+      if (i>=first_ && i<=last_ && get(i)) b = true;
+      if (i>=other.first_ && i<=other.last_ && other.get(i)) b = true;
+      if (b)
+         aux.setOne(i);
+   }
 
    return *this = aux;
 }
@@ -334,17 +416,6 @@ std::ostream& operator<<(std::ostream& os, const Bitset& b)
 {
    b.print(os);
    return os;
-}
-
-void Bitset::printWord(word_t w)
-{
-   word_t x = w;
-   for (size_t i=0; i<BITS_PER_WORD; ++i)
-   {
-      std::cout << (x >> (BITS_PER_WORD - 1));
-      x = (x << 1);
-   }
-   std::cout << std::endl;
 }
 
 } // namespace

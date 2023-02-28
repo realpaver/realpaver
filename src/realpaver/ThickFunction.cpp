@@ -20,11 +20,6 @@ ThickFunction::ThickFunction(SharedDag dag, size_t i, Variable v)
    f_ = dag->fun(i);
 }
 
-bool ThickFunction::dependsOn(const Bitset& bs) const
-{
-   return f_->dependsOn(bs);
-}
-
 Interval ThickFunction::eval(const Interval& x)
 {
    return f_->intervalEvalOnly(v_, x);

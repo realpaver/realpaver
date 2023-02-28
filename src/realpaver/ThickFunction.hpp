@@ -42,11 +42,6 @@ public:
    /// Default destructor
    ~ThickFunction() = default;
 
-   /// Dependency test
-   /// @param bs a bitset
-   /// @return true if this depends on bs
-   bool dependsOn(const Bitset& bs) const;
-
    /// Evaluates this
    /// @param x
    /// @return interval evaluation of this at x
