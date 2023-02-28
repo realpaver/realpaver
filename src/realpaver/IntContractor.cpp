@@ -13,20 +13,17 @@
 namespace realpaver {
 
 IntContractor::IntContractor()
-      : s_(),
-        b_()
+      : s_()
 {}
 
 IntContractor::IntContractor(Variable v)
-      : s_(),
-        b_()
+      : s_()
 {
    insertVar(v);
 }
 
 IntContractor::IntContractor(const std::initializer_list<Variable>& l)
-      : s_(),
-        b_()
+      : s_()
 {
    for (auto v : l)
       insertVar(v);
@@ -43,12 +40,6 @@ void IntContractor::insertVar(Variable v)
           "IntContractor applied to a continuous variable " << v.getName());
 
    s_.insert(v);
-   b_ = s_.toBitset();
-}
-
-bool IntContractor::dependsOn(const Bitset& bs) const
-{
-   return b_.overlaps(bs);
 }
 
 Proof IntContractor::contract(IntervalRegion& reg)

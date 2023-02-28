@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <unordered_set>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
@@ -62,11 +63,6 @@ void Propagator::setPool(SharedContractorPool pool)
    pool_ = pool;
 }
 
-bool Propagator::dependsOn(const Bitset& bs) const
-{
-   return pool_->dependsOn(bs);
-}
-
 Scope Propagator::scope() const
 {
    return pool_->scope();
@@ -91,8 +87,8 @@ Proof Propagator::contract(IntervalRegion& reg)
    // vector of proof certificates
    certif_.resize(N);
 
-   // bitset used to check the domain modifications
-   Bitset modified(1 + scope.maxIndex());
+   // Set of variables  used to check the domain modifications
+   ModifSetType modif;
 
    // copy used to check the domain modifications
    IntervalRegion* copy = reg.clone();
@@ -132,8 +128,7 @@ Proof Propagator::contract(IntervalRegion& reg)
             else
             {
                // detects the variables whose domains have been modified
-               bool isModified = false;
-               modified.setAllZero();
+               modif.clear();
 
                for (auto v : scope)
                {
@@ -143,9 +138,8 @@ Proof Propagator::contract(IntervalRegion& reg)
                   if (!dtol_.haveDistTolerance(prev, curr))
                   {
                      LOG_LOW("Propagation on variable: " << v.getName());
-                     
-                     isModified = true;
-                     modified.setOne(v.id());
+                  
+                     modif.insert(v);
                   }
                }
 
@@ -153,11 +147,11 @@ Proof Propagator::contract(IntervalRegion& reg)
                // variable
                next = count = 0;
 
-               if (isModified)
+               if (modif.size() > 0)
                {
                   for (size_t i=0; i<N; ++i)
                      if (certif_[i] != Proof::Inner &&
-                         pool_->contractorAt(i)->dependsOn(modified))
+                         contractorDependsOn(i, modif))
                      {
                         queue[count] = i;
                         ++count;
@@ -190,6 +184,16 @@ Proof Propagator::contract(IntervalRegion& reg)
 void Propagator::print(std::ostream& os) const
 {
    os << "Propagator on " << pool_->poolSize() << " contractors";
+}
+
+bool Propagator::contractorDependsOn(size_t i, const ModifSetType& ms)
+{
+   SharedContractor op = pool_->contractorAt(i);
+
+   for (const auto& v : ms)
+      if (op->dependsOn(v)) return true;
+
+   return false;
 }
 
 } // namespace

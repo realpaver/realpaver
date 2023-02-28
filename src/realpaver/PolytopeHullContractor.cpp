@@ -34,7 +34,6 @@ std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style)
 PolytopeCreator::PolytopeCreator(SharedDag dag)
       : dag_(dag),
         scope_(dag->scope()),
-        bs_(),
         mvv_(),
         lfun_(),
         eqtol_(Param::GetDblParam("RELAXATION_EQ_TOL"))
@@ -43,14 +42,11 @@ PolytopeCreator::PolytopeCreator(SharedDag dag)
 
    for (size_t i=0; i<dag->nbFuns(); ++i)
       lfun_.push_back(i);
-
-   bs_ = scope_.toBitset();
 }
 
 PolytopeCreator::PolytopeCreator(SharedDag dag, const IndexList& lfun)
       : dag_(dag),
         scope_(),
-        bs_(),
         lfun_(),
         eqtol_(Param::GetDblParam("RELAXATION_TOL"))
 {
@@ -64,8 +60,6 @@ PolytopeCreator::PolytopeCreator(SharedDag dag, const IndexList& lfun)
       lfun_.push_back(i);
       scope_.insert(dag->fun(i)->scope());
    }
-
-   bs_ = scope_.toBitset();
 }
 
 PolytopeCreator::~PolytopeCreator()
@@ -79,11 +73,6 @@ SharedDag PolytopeCreator::dag() const
 Scope PolytopeCreator::scope() const
 {
    return scope_;
-}
-
-bool PolytopeCreator::dependsOn(const Bitset& bs) const
-{
-   return bs_.overlaps(bs);
 }
 
 size_t PolytopeCreator::linVarIndex(Variable v) const
@@ -408,11 +397,6 @@ PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
 PolytopeHullContractor::~PolytopeHullContractor()
 {
    if (creator_ != nullptr) delete creator_;
-}
-
-bool PolytopeHullContractor::dependsOn(const Bitset& bs) const
-{
-   return creator_->dependsOn(bs);
 }
 
 Scope PolytopeHullContractor::scope() const

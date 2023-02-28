@@ -54,7 +54,6 @@ public:
    void setPool(SharedContractorPool pool);
 
    ///@{
-   bool dependsOn(const Bitset& bs) const override;
    Scope scope() const override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;
@@ -84,6 +83,14 @@ private:
    Tolerance dtol_;              // tolerance used for propagation
    size_t maxiter_;              // maximum number of propagation steps
    std::vector<Proof> certif_;   // proof certificates of contractors
+
+   // hash set of variables
+   typedef std::unordered_set<Variable, VariableHasher, VariableEqual>
+         ModifSetType;
+
+   // returns true if the i-th contractor of this depends on a variable that
+   // belongs to the set ms
+   bool contractorDependsOn(size_t i, const ModifSetType& ms);
 };
 
 /// Type of shared pointers on propagators

@@ -22,11 +22,6 @@ HC4Contractor::HC4Contractor(SharedDag dag, size_t i)
                              " function index " << i);
 }
 
-bool HC4Contractor::dependsOn(const Bitset& bs) const
-{
-   return dag_->fun(if_)->dependsOn(bs);
-}
-
 Proof HC4Contractor::contract(IntervalRegion& reg)
 {
 #if STAT_ON

@@ -16,37 +16,26 @@ CIDContractor::CIDContractor(SharedContractor op, Variable v,
                              std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(v),
-           slicer_(std::move(slicer)),
-           bs_()
+           slicer_(std::move(slicer))
 {
    ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
    ASSERT(op->scope().contains(v), "Bad variable " << v <<
                                    " in a CID contractor");
    ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
-
-   bs_ = op->scope().toBitset();
 }
 
 CIDContractor::CIDContractor(SharedContractor op,
                              std::unique_ptr<IntervalSlicer> slicer)
       : op_(op),
         v_(),
-        slicer_(std::move(slicer)),
-        bs_()
+        slicer_(std::move(slicer))
 {
    ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
    ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
-
-   bs_ = op->scope().toBitset();   
 }
 
 CIDContractor::~CIDContractor()
 {}
-
-bool CIDContractor::dependsOn(const Bitset& bs) const
-{
-   return bs_.overlaps(bs);
-}
 
 Scope CIDContractor::scope() const
 {

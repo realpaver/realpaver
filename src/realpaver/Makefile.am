@@ -50,6 +50,7 @@ librealpaver_la_include_HEADERS = \
 		IntervalGaussSeidel.hpp \
 		IntervalImpl.hpp \
 		IntervalMatrix.hpp \
+		IntervalNewton.hpp \
 		IntervalRegion.hpp \
 		IntervalSlicer.hpp \
 		IntervalTraits.hpp \
@@ -155,6 +156,7 @@ librealpaver_la_SOURCES = \
 		IntervalFunctionVector.cpp \
 		IntervalGaussSeidel.cpp \
 		IntervalMatrix.cpp \
+		IntervalNewton.cpp \
 		IntervalRegion.cpp \
 		IntervalSlicer.cpp \
 		IntervalVector.cpp \

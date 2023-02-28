@@ -353,6 +353,9 @@ bool Scope::contains(const Scope& other) const
 
 bool Scope::disjoint(const Scope& other) const
 {
+   if (minIndex() > other.maxIndex()) return true;
+   if (maxIndex() < other.minIndex()) return true;
+   
    for (auto v : *this)
    {
       if (other.contains(v))

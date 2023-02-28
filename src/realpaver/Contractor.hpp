@@ -11,7 +11,6 @@
 #define REALPAVER_CONTRACTOR_HPP
 
 #include <memory>
-#include "realpaver/Bitset.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Scope.hpp"
 
@@ -44,10 +43,10 @@ public:
    /// Virtual destructor
    virtual ~Contractor();
 
-   /// Tests if this contractor depends on a variable referenced in a bitset
-   /// @param bs a bitset
-   /// @return the result of the test
-   virtual bool dependsOn(const Bitset& bs) const = 0;
+   /// Tests if this contractor depends on a variable
+   /// @param v a variable
+   /// @return true if the scope of this contains v
+   bool dependsOn(const Variable& v) const;
 
    /// @return the set of variable on which this depends on
    virtual Scope scope() const = 0;

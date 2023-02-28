@@ -30,6 +30,13 @@ int main(void)
                     //~ {1.25, 0.0, -2.5},
                     //~ {-0.5, 0.0, 6.0}});
 
+      Problem p;
+      Variable x = p.addRealVar(1, 2, "x");
+      Variable y = p.addRealVar(-2, 3, "y");
+      Scope s = p.scope();
+      cout << s << endl << s.toBitset() << endl;
+   
+/*
       Interval m11(2, 3),
                m12(-0.5, 0.7),
                m21(-1, 2),
@@ -47,11 +54,11 @@ int main(void)
       cout << "--- x ---" << endl << x << endl << endl;
       cout << "--- b ---" << endl << b << endl << endl;
 
-   IntervalGaussSeidel gs;
-   Proof p = gs.contract(A, x, b);
-   cout << "--- proof ---" << endl << p << endl << endl;
-   cout << "--- x ---" << endl << x << endl << endl;
-   
+      IntervalGaussSeidel gs;
+      Proof p = gs.contract(A, x, b);
+      cout << "--- proof ---" << endl << p << endl << endl;
+      cout << "--- x ---" << endl << x << endl << endl;
+*/
 
 /*
       Variable x("x");

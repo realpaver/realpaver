@@ -68,7 +68,6 @@ public:
    UniIntervalNewton* getNewton() const;
 
    ///@{
-   bool dependsOn(const Bitset& bs) const override;
    Scope scope() const override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;

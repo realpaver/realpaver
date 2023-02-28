@@ -50,11 +50,6 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
-   /// Tests if this depends on a variable referenced in a bitset
-   /// @param bs a bitset
-   /// @return the result of the test
-   bool dependsOn(const Bitset& bs) const;
-
    /// Makes the linear relaxation
    /// @param lpm resulting linear model
    /// @param reg input region
@@ -75,7 +70,6 @@ public:
 protected:
    SharedDag dag_;                           // DAG
    Scope scope_;                             // scope
-   Bitset bs_;                               // bitset view of the scope
    std::unordered_map<size_t, size_t> mvv_;  // map var index ->lin var index
    IndexList lfun_;                          // list of indexes of functions
    double eqtol_;                            // relaxation tol for the equations
@@ -166,10 +160,11 @@ public:
    /// @param tol a positive real number
    void setRelaxEqTol(double tol);
 
-   bool dependsOn(const Bitset& bs) const override;
+   ///@{
    Scope scope() const override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;
+   ///@}
 
 private:
    PolytopeCreator* creator_;    // creator of the relaxation

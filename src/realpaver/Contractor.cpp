@@ -17,6 +17,11 @@ Contractor::~Contractor()
 void Contractor::print(std::ostream& os) const
 {}
 
+bool Contractor::dependsOn(const Variable& v) const
+{
+   return scope().contains(v);
+}
+
 std::ostream& operator<<(std::ostream& os, const Contractor& op)
 {
    op.print(os);

@@ -49,7 +49,6 @@ Bitset::Bitset(const std::initializer_list<int>& l) : Bitset(l.size(), 0)
          setOne(j);
 }
 
-
 Bitset& Bitset::operator=(const Bitset& other)
 {
    if (word_ != nullptr)

@@ -85,11 +85,6 @@ Scope BC3Contractor::scope() const
    return f_.getFun()->scope();
 }
 
-bool BC3Contractor::dependsOn(const Bitset& bs) const
-{
-   return f_.dependsOn(bs);
-}
-
 bool BC3Contractor::splitLeft(const Interval& x, Interval& x1, Interval& x2)
 {
    double c = x.midpoint();

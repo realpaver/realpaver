@@ -207,6 +207,22 @@ struct VariableHasher {
    }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// This is an equality comparator of variables.
+///
+/// This implements a function call operator that returns true if two
+/// variables have the same id.
+///////////////////////////////////////////////////////////////////////////////
+struct VariableEqual {
+   /// @param v a variable
+   /// @param w a variable
+   /// @return true if v and w represent the same variable
+   bool operator()(const Variable& v, const Variable& w) const
+   {
+      return v.id() == w.id();
+   }
+};
+
 } // namespace
 
 #endif

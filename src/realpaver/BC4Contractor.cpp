@@ -39,11 +39,6 @@ Scope BC4Contractor::scope() const
    return dag_->fun(if_)->scope();
 }
 
-bool BC4Contractor::dependsOn(const Bitset& bs) const
-{
-  return dag_->fun(if_)->dependsOn(bs); 
-}
-
 Proof BC4Contractor::contract(IntervalRegion& reg)
 {
    // HC4

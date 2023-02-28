@@ -27,11 +27,6 @@ MaxCIDContractor::~MaxCIDContractor()
    if (op_ != nullptr) delete op_;
 }
 
-bool MaxCIDContractor::dependsOn(const Bitset& bs) const
-{
-   return op_->dependsOn(bs);
-}
-
 Scope MaxCIDContractor::scope() const
 {
    return op_->scope();

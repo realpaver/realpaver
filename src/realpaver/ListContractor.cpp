@@ -30,11 +30,6 @@ void ListContractor::setPool(SharedContractorPool pool)
    pool_ = pool;
 }
 
-bool ListContractor::dependsOn(const Bitset& bs) const
-{
-   return pool_->dependsOn(bs);
-}
-
 Scope ListContractor::scope() const
 {
    return pool_->scope();

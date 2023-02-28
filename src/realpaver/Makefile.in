@@ -168,20 +168,20 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	ContractorPool.cpp Dag.cpp Env.cpp Exception.cpp \
 	HC4Contractor.cpp Inflator.cpp IntContractor.cpp Integer.cpp \
 	Interval.cpp IntervalFunction.cpp IntervalFunctionVector.cpp \
-	IntervalGaussSeidel.cpp IntervalMatrix.cpp IntervalRegion.cpp \
-	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
-	ListContractor.cpp Logger.cpp LPModel.cpp MaxCIDContractor.cpp \
-	NcspEnv.cpp NcspNode.cpp NcspSpace.cpp NcspSpaceDFS.cpp \
-	NcspSpaceBFS.cpp NcspSpaceDMDFS.cpp NcspSpaceHybridDFS.cpp \
-	NcspSolver.cpp NcspSplit.cpp Objective.cpp Param.cpp \
-	parser_bison.ypp parser_flex.lpp Parser.cpp \
-	PolytopeHullContractor.cpp Preprocessor.cpp Problem.cpp \
-	Propagator.cpp QuadraticTerm.cpp Range.cpp RangeSlicer.cpp \
-	RealFunction.cpp RealFunctionVector.cpp RealMatrix.cpp \
-	RealPoint.cpp RealVector.cpp RLTRelaxation.cpp Scope.cpp \
-	ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp Term.cpp \
-	TermDeriver.cpp TermFixer.cpp ThickFunction.cpp Timer.cpp \
-	Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
+	IntervalGaussSeidel.cpp IntervalMatrix.cpp IntervalNewton.cpp \
+	IntervalRegion.cpp IntervalSlicer.cpp IntervalVector.cpp \
+	IntervalUnion.cpp ListContractor.cpp Logger.cpp LPModel.cpp \
+	MaxCIDContractor.cpp NcspEnv.cpp NcspNode.cpp NcspSpace.cpp \
+	NcspSpaceDFS.cpp NcspSpaceBFS.cpp NcspSpaceDMDFS.cpp \
+	NcspSpaceHybridDFS.cpp NcspSolver.cpp NcspSplit.cpp \
+	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
+	Parser.cpp PolytopeHullContractor.cpp Preprocessor.cpp \
+	Problem.cpp Propagator.cpp QuadraticTerm.cpp Range.cpp \
+	RangeSlicer.cpp RealFunction.cpp RealFunctionVector.cpp \
+	RealMatrix.cpp RealPoint.cpp RealVector.cpp RLTRelaxation.cpp \
+	Scope.cpp ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp \
+	Term.cpp TermDeriver.cpp TermFixer.cpp ThickFunction.cpp \
+	Timer.cpp Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
 	VariableSelector.cpp VariableVector.cpp LPSolverClp.cpp \
 	LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
@@ -193,12 +193,13 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	Env.lo Exception.lo HC4Contractor.lo Inflator.lo \
 	IntContractor.lo Integer.lo Interval.lo IntervalFunction.lo \
 	IntervalFunctionVector.lo IntervalGaussSeidel.lo \
-	IntervalMatrix.lo IntervalRegion.lo IntervalSlicer.lo \
-	IntervalVector.lo IntervalUnion.lo ListContractor.lo Logger.lo \
-	LPModel.lo MaxCIDContractor.lo NcspEnv.lo NcspNode.lo \
-	NcspSpace.lo NcspSpaceDFS.lo NcspSpaceBFS.lo NcspSpaceDMDFS.lo \
-	NcspSpaceHybridDFS.lo NcspSolver.lo NcspSplit.lo Objective.lo \
-	Param.lo parser_bison.lo parser_flex.lo Parser.lo \
+	IntervalMatrix.lo IntervalNewton.lo IntervalRegion.lo \
+	IntervalSlicer.lo IntervalVector.lo IntervalUnion.lo \
+	ListContractor.lo Logger.lo LPModel.lo MaxCIDContractor.lo \
+	NcspEnv.lo NcspNode.lo NcspSpace.lo NcspSpaceDFS.lo \
+	NcspSpaceBFS.lo NcspSpaceDMDFS.lo NcspSpaceHybridDFS.lo \
+	NcspSolver.lo NcspSplit.lo Objective.lo Param.lo \
+	parser_bison.lo parser_flex.lo Parser.lo \
 	PolytopeHullContractor.lo Preprocessor.lo Problem.lo \
 	Propagator.lo QuadraticTerm.lo Range.lo RangeSlicer.lo \
 	RealFunction.lo RealFunctionVector.lo RealMatrix.lo \
@@ -242,15 +243,16 @@ am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
 	./$(DEPDIR)/Interval.Plo ./$(DEPDIR)/IntervalFunction.Plo \
 	./$(DEPDIR)/IntervalFunctionVector.Plo \
 	./$(DEPDIR)/IntervalGaussSeidel.Plo \
-	./$(DEPDIR)/IntervalMatrix.Plo ./$(DEPDIR)/IntervalRegion.Plo \
-	./$(DEPDIR)/IntervalSlicer.Plo ./$(DEPDIR)/IntervalUnion.Plo \
-	./$(DEPDIR)/IntervalVector.Plo ./$(DEPDIR)/LPModel.Plo \
-	./$(DEPDIR)/LPSolverClp.Plo ./$(DEPDIR)/LPSolverGurobi.Plo \
-	./$(DEPDIR)/ListContractor.Plo ./$(DEPDIR)/Logger.Plo \
-	./$(DEPDIR)/MaxCIDContractor.Plo ./$(DEPDIR)/NcspEnv.Plo \
-	./$(DEPDIR)/NcspNode.Plo ./$(DEPDIR)/NcspSolver.Plo \
-	./$(DEPDIR)/NcspSpace.Plo ./$(DEPDIR)/NcspSpaceBFS.Plo \
-	./$(DEPDIR)/NcspSpaceDFS.Plo ./$(DEPDIR)/NcspSpaceDMDFS.Plo \
+	./$(DEPDIR)/IntervalMatrix.Plo ./$(DEPDIR)/IntervalNewton.Plo \
+	./$(DEPDIR)/IntervalRegion.Plo ./$(DEPDIR)/IntervalSlicer.Plo \
+	./$(DEPDIR)/IntervalUnion.Plo ./$(DEPDIR)/IntervalVector.Plo \
+	./$(DEPDIR)/LPModel.Plo ./$(DEPDIR)/LPSolverClp.Plo \
+	./$(DEPDIR)/LPSolverGurobi.Plo ./$(DEPDIR)/ListContractor.Plo \
+	./$(DEPDIR)/Logger.Plo ./$(DEPDIR)/MaxCIDContractor.Plo \
+	./$(DEPDIR)/NcspEnv.Plo ./$(DEPDIR)/NcspNode.Plo \
+	./$(DEPDIR)/NcspSolver.Plo ./$(DEPDIR)/NcspSpace.Plo \
+	./$(DEPDIR)/NcspSpaceBFS.Plo ./$(DEPDIR)/NcspSpaceDFS.Plo \
+	./$(DEPDIR)/NcspSpaceDMDFS.Plo \
 	./$(DEPDIR)/NcspSpaceHybridDFS.Plo ./$(DEPDIR)/NcspSplit.Plo \
 	./$(DEPDIR)/Objective.Plo ./$(DEPDIR)/Param.Plo \
 	./$(DEPDIR)/Parser.Plo ./$(DEPDIR)/PolytopeHullContractor.Plo \
@@ -338,24 +340,24 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Integer.hpp \
 	Interval.hpp IntervalFunction.hpp IntervalFunctionVector.hpp \
 	IntervalGaussSeidel.hpp IntervalImpl.hpp IntervalMatrix.hpp \
-	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
-	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
-	LinumIntervalTraits.hpp LinumTraits.hpp ListContractor.hpp \
-	Logger.hpp LPModel.hpp LPSolver.hpp MaxCIDContractor.hpp \
-	NcspEnv.hpp NcspNode.hpp NcspSpace.hpp NcspSpaceBFS.hpp \
-	NcspSpaceDFS.hpp NcspSpaceDMDFS.hpp NcspSpaceHybridDFS.hpp \
-	NcspSolver.hpp NcspSplit.hpp NumericMatrix.hpp \
-	NumericVector.hpp Objective.hpp Param.hpp Parser.hpp \
-	parser_bison.hpp PolytopeHullContractor.hpp Preprocessor.hpp \
-	Problem.hpp Propagator.hpp QuadraticTerm.hpp Range.hpp \
-	RangeSlicer.hpp RealFunction.hpp RealFunctionVector.hpp \
-	RealMatrix.hpp RealPoint.hpp RealVector.hpp RLTRelaxation.hpp \
-	Scope.hpp ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp \
-	Stat.hpp SymbolTable.hpp Term.hpp TermDeriver.hpp \
-	TermFixer.hpp ThickFunction.hpp Timer.hpp Tolerance.hpp \
-	UniIntervalNewton.hpp Variable.hpp VariableSelector.hpp \
-	VariableVector.hpp IntervalGaol.hpp LPSolverClp.hpp \
-	LPSolverGurobi.hpp
+	IntervalNewton.hpp IntervalRegion.hpp IntervalSlicer.hpp \
+	IntervalTraits.hpp IntervalVector.hpp IntervalUnion.hpp \
+	LinumDoubleTraits.hpp LinumIntervalTraits.hpp LinumTraits.hpp \
+	ListContractor.hpp Logger.hpp LPModel.hpp LPSolver.hpp \
+	MaxCIDContractor.hpp NcspEnv.hpp NcspNode.hpp NcspSpace.hpp \
+	NcspSpaceBFS.hpp NcspSpaceDFS.hpp NcspSpaceDMDFS.hpp \
+	NcspSpaceHybridDFS.hpp NcspSolver.hpp NcspSplit.hpp \
+	NumericMatrix.hpp NumericVector.hpp Objective.hpp Param.hpp \
+	Parser.hpp parser_bison.hpp PolytopeHullContractor.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp QuadraticTerm.hpp \
+	Range.hpp RangeSlicer.hpp RealFunction.hpp \
+	RealFunctionVector.hpp RealMatrix.hpp RealPoint.hpp \
+	RealVector.hpp RLTRelaxation.hpp Scope.hpp ScopeMap.hpp \
+	SearchNode.hpp SplitStrategy.hpp Stat.hpp SymbolTable.hpp \
+	Term.hpp TermDeriver.hpp TermFixer.hpp ThickFunction.hpp \
+	Timer.hpp Tolerance.hpp UniIntervalNewton.hpp Variable.hpp \
+	VariableSelector.hpp VariableVector.hpp IntervalGaol.hpp \
+	LPSolverClp.hpp LPSolverGurobi.hpp
 HEADERS = $(librealpaver_la_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP) \
 	configure.hpp.in
@@ -532,24 +534,24 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	Inflator.hpp IntContractor.hpp Integer.hpp Interval.hpp \
 	IntervalFunction.hpp IntervalFunctionVector.hpp \
 	IntervalGaussSeidel.hpp IntervalImpl.hpp IntervalMatrix.hpp \
-	IntervalRegion.hpp IntervalSlicer.hpp IntervalTraits.hpp \
-	IntervalVector.hpp IntervalUnion.hpp LinumDoubleTraits.hpp \
-	LinumIntervalTraits.hpp LinumTraits.hpp ListContractor.hpp \
-	Logger.hpp LPModel.hpp LPSolver.hpp MaxCIDContractor.hpp \
-	NcspEnv.hpp NcspNode.hpp NcspSpace.hpp NcspSpaceBFS.hpp \
-	NcspSpaceDFS.hpp NcspSpaceDMDFS.hpp NcspSpaceHybridDFS.hpp \
-	NcspSolver.hpp NcspSplit.hpp NumericMatrix.hpp \
-	NumericVector.hpp Objective.hpp Param.hpp Parser.hpp \
-	parser_bison.hpp PolytopeHullContractor.hpp Preprocessor.hpp \
-	Problem.hpp Propagator.hpp QuadraticTerm.hpp Range.hpp \
-	RangeSlicer.hpp RealFunction.hpp RealFunctionVector.hpp \
-	RealMatrix.hpp RealPoint.hpp RealVector.hpp RLTRelaxation.hpp \
-	Scope.hpp ScopeMap.hpp SearchNode.hpp SplitStrategy.hpp \
-	Stat.hpp SymbolTable.hpp Term.hpp TermDeriver.hpp \
-	TermFixer.hpp ThickFunction.hpp Timer.hpp Tolerance.hpp \
-	UniIntervalNewton.hpp Variable.hpp VariableSelector.hpp \
-	VariableVector.hpp $(am__append_1) $(am__append_2) \
-	$(am__append_3)
+	IntervalNewton.hpp IntervalRegion.hpp IntervalSlicer.hpp \
+	IntervalTraits.hpp IntervalVector.hpp IntervalUnion.hpp \
+	LinumDoubleTraits.hpp LinumIntervalTraits.hpp LinumTraits.hpp \
+	ListContractor.hpp Logger.hpp LPModel.hpp LPSolver.hpp \
+	MaxCIDContractor.hpp NcspEnv.hpp NcspNode.hpp NcspSpace.hpp \
+	NcspSpaceBFS.hpp NcspSpaceDFS.hpp NcspSpaceDMDFS.hpp \
+	NcspSpaceHybridDFS.hpp NcspSolver.hpp NcspSplit.hpp \
+	NumericMatrix.hpp NumericVector.hpp Objective.hpp Param.hpp \
+	Parser.hpp parser_bison.hpp PolytopeHullContractor.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp QuadraticTerm.hpp \
+	Range.hpp RangeSlicer.hpp RealFunction.hpp \
+	RealFunctionVector.hpp RealMatrix.hpp RealPoint.hpp \
+	RealVector.hpp RLTRelaxation.hpp Scope.hpp ScopeMap.hpp \
+	SearchNode.hpp SplitStrategy.hpp Stat.hpp SymbolTable.hpp \
+	Term.hpp TermDeriver.hpp TermFixer.hpp ThickFunction.hpp \
+	Timer.hpp Tolerance.hpp UniIntervalNewton.hpp Variable.hpp \
+	VariableSelector.hpp VariableVector.hpp $(am__append_1) \
+	$(am__append_2) $(am__append_3)
 librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	BC4Contractor.cpp CIDContractor.cpp Common.cpp Constraint.cpp \
 	ConstraintContractor.cpp ConstraintFixer.cpp \
@@ -557,20 +559,20 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	Dag.cpp Env.cpp Exception.cpp HC4Contractor.cpp Inflator.cpp \
 	IntContractor.cpp Integer.cpp Interval.cpp \
 	IntervalFunction.cpp IntervalFunctionVector.cpp \
-	IntervalGaussSeidel.cpp IntervalMatrix.cpp IntervalRegion.cpp \
-	IntervalSlicer.cpp IntervalVector.cpp IntervalUnion.cpp \
-	ListContractor.cpp Logger.cpp LPModel.cpp MaxCIDContractor.cpp \
-	NcspEnv.cpp NcspNode.cpp NcspSpace.cpp NcspSpaceDFS.cpp \
-	NcspSpaceBFS.cpp NcspSpaceDMDFS.cpp NcspSpaceHybridDFS.cpp \
-	NcspSolver.cpp NcspSplit.cpp Objective.cpp Param.cpp \
-	parser_bison.ypp parser_flex.lpp Parser.cpp \
-	PolytopeHullContractor.cpp Preprocessor.cpp Problem.cpp \
-	Propagator.cpp QuadraticTerm.cpp Range.cpp RangeSlicer.cpp \
-	RealFunction.cpp RealFunctionVector.cpp RealMatrix.cpp \
-	RealPoint.cpp RealVector.cpp RLTRelaxation.cpp Scope.cpp \
-	ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp Term.cpp \
-	TermDeriver.cpp TermFixer.cpp ThickFunction.cpp Timer.cpp \
-	Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
+	IntervalGaussSeidel.cpp IntervalMatrix.cpp IntervalNewton.cpp \
+	IntervalRegion.cpp IntervalSlicer.cpp IntervalVector.cpp \
+	IntervalUnion.cpp ListContractor.cpp Logger.cpp LPModel.cpp \
+	MaxCIDContractor.cpp NcspEnv.cpp NcspNode.cpp NcspSpace.cpp \
+	NcspSpaceDFS.cpp NcspSpaceBFS.cpp NcspSpaceDMDFS.cpp \
+	NcspSpaceHybridDFS.cpp NcspSolver.cpp NcspSplit.cpp \
+	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
+	Parser.cpp PolytopeHullContractor.cpp Preprocessor.cpp \
+	Problem.cpp Propagator.cpp QuadraticTerm.cpp Range.cpp \
+	RangeSlicer.cpp RealFunction.cpp RealFunctionVector.cpp \
+	RealMatrix.cpp RealPoint.cpp RealVector.cpp RLTRelaxation.cpp \
+	Scope.cpp ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp \
+	Term.cpp TermDeriver.cpp TermFixer.cpp ThickFunction.cpp \
+	Timer.cpp Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
 	VariableSelector.cpp VariableVector.cpp $(am__append_4) \
 	$(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
@@ -703,6 +705,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalFunctionVector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalGaussSeidel.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalMatrix.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalNewton.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalRegion.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalSlicer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IntervalUnion.Plo@am__quote@ # am--include-marker
@@ -976,6 +979,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/IntervalFunctionVector.Plo
 	-rm -f ./$(DEPDIR)/IntervalGaussSeidel.Plo
 	-rm -f ./$(DEPDIR)/IntervalMatrix.Plo
+	-rm -f ./$(DEPDIR)/IntervalNewton.Plo
 	-rm -f ./$(DEPDIR)/IntervalRegion.Plo
 	-rm -f ./$(DEPDIR)/IntervalSlicer.Plo
 	-rm -f ./$(DEPDIR)/IntervalUnion.Plo
@@ -1096,6 +1100,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/IntervalFunctionVector.Plo
 	-rm -f ./$(DEPDIR)/IntervalGaussSeidel.Plo
 	-rm -f ./$(DEPDIR)/IntervalMatrix.Plo
+	-rm -f ./$(DEPDIR)/IntervalNewton.Plo
 	-rm -f ./$(DEPDIR)/IntervalRegion.Plo
 	-rm -f ./$(DEPDIR)/IntervalSlicer.Plo
 	-rm -f ./$(DEPDIR)/IntervalUnion.Plo

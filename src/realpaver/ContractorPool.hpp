@@ -43,11 +43,6 @@ public:
    /// @return the set of variables it depends on
    virtual Scope scope() const = 0;
 
-   /// Dependence test with respect to a set of variables
-   /// @param bs a bitset for a set of variables
-   /// @return true if a contractor from this depends on bs
-   virtual bool dependsOn(const Bitset& bs) const = 0;
-
    /// Gets a contractor
    /// @param i an index between 0 and poolSize()-1
    /// @return the i-th contractor
@@ -85,7 +80,6 @@ public:
    ///@{
    size_t poolSize() const override;
    Scope scope() const override;
-   bool dependsOn(const Bitset& bs) const override;
    SharedContractor contractorAt(size_t i) const override;
    void removeContractorAt(size_t i) override;
    ///@}
@@ -93,7 +87,6 @@ public:
 private:
    std::vector<SharedContractor> v_;
    Scope s_;
-   Bitset bs_;
 };
 
 /// Type of shared contractor vectors.

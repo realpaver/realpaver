@@ -45,7 +45,6 @@ public:
    size_t nbVars() const;
 
    ///@{
-   bool dependsOn(const Bitset& bs) const override;
    Scope scope() const override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;
@@ -53,7 +52,6 @@ public:
 
 private:
    Scope s_;
-   Bitset b_;
 };
 
 /// Type of shared pointers on contractors

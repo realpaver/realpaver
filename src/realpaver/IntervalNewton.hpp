@@ -7,31 +7,30 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/ConstraintContractor.hpp"
+#ifndef REALPAVER_INTERVAL_NEWTON_HPP
+#define REALPAVER_INTERVAL_NEWTON_HPP
+
+#include "realpaver/Contractor.hpp"
+#include "realpaver/IntervalFunctionVector.hpp"
 
 namespace realpaver {
 
-ConstraintContractor::ConstraintContractor(Constraint c) : c_(c)
-{}
+class IntervalNewton : public Contractor {
+public:
+   IntervalNewton(IntervalFunctionVector F);
 
-Scope ConstraintContractor::scope() const
-{
-   return c_.scope();
-}
+   ///@{
+   Scope scope() const override;
+   Proof contract(IntervalRegion& reg) override;
+   void print(std::ostream& os) const override;
+   ///@}
 
-Proof ConstraintContractor::contract(IntervalRegion& reg)
-{
-   return c_.contract(reg);
-}
-
-void ConstraintContractor::print(std::ostream& os) const
-{
-   os << "contractor of " << c_;
-}
-
-Constraint ConstraintContractor::getConstraint() const
-{
-   return c_;
-}
+private:
+   IntervalFunctionVector F_;
+   IntervalMatrix jac_;
+   IntervalVector y_, b_;
+};
 
 } // namespace
+
+#endif

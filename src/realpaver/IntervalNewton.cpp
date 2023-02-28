@@ -7,31 +7,34 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/ConstraintContractor.hpp"
+#include "realpaver/IntervalNewton.hpp"
 
 namespace realpaver {
 
-ConstraintContractor::ConstraintContractor(Constraint c) : c_(c)
-{}
-
-Scope ConstraintContractor::scope() const
+IntervalNewton::IntervalNewton(IntervalFunctionVector F)
+      : Contractor(),
+        F_(F),
+        jac_(F.nbFuns(), F.nbVars()),
+        y_(F.nbVars()),
+        b_(F.nbFuns())
 {
-   return c_.scope();
+   ASSERT(F.nbVars() == F.nbFuns(),
+          "Interval Newton defined with a non-square system");
 }
 
-Proof ConstraintContractor::contract(IntervalRegion& reg)
+Scope IntervalNewton::scope() const
 {
-   return c_.contract(reg);
+   return F_.scope();
 }
 
-void ConstraintContractor::print(std::ostream& os) const
+Proof IntervalNewton::contract(IntervalRegion& reg)
 {
-   os << "contractor of " << c_;
+   // TODO
 }
 
-Constraint ConstraintContractor::getConstraint() const
+void IntervalNewton::print(std::ostream& os) const
 {
-   return c_;
+   os << "Interval Newton";
 }
 
 } // namespace

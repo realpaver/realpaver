@@ -33,7 +33,7 @@ public:
    /// @param l list of bits
    Bitset(const std::initializer_list<int>& l);
 
-   /// Cpy constructor
+   /// Copy constructor
    Bitset(const Bitset& other);
 
    /// Move constructor
@@ -120,9 +120,9 @@ private:
    typedef size_t word_t;
    static const size_t BITS_PER_WORD = 8 * sizeof(word_t);
 
-   size_t size_;    // number of bits
-   size_t wcount_;  // number of words
-   word_t* word_;  // array of words
+   size_t size_;     // number of bits
+   size_t wcount_;   // number of words
+   word_t* word_;    // array of words
 
    // let (b0, b1, ..., b_{n-1}) be a bitset (i.e. n == size_)
    // let w be the number of words (i.e. w == wcount_)

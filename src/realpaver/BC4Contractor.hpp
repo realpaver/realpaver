@@ -40,7 +40,6 @@ public:
    BC4Contractor& operator=(const BC4Contractor&) = delete;
 
    ///@{
-   bool dependsOn(const Bitset& bs) const override;
    Scope scope() const override;
    Proof contract(IntervalRegion& reg) override;
    void print(std::ostream& os) const override;
