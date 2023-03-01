@@ -143,6 +143,11 @@ public:
    /// @return midpoint of this restricted to sco
    RealPoint midpointOnScope(const Scope& sco) const;
 
+   /// Midpoint of this on a scope
+   /// @param sco a scope included in the scope of this
+   /// @param pt midpoint of this restricted to sco
+   void midpointOnScope(const Scope& sco, RealPoint& pt) const;
+
    /// Gets a sub-region
    /// @param sco a scope included in the scope of this
    /// @return this restricted to sco

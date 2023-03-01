@@ -295,6 +295,13 @@ IntervalVector operator*(const RealMatrix& A, const IntervalVector& X)
    return Y;
 }
 
+IntervalVector operator-(const IntervalVector& X)
+{
+   IntervalVector res(X.size());
+   IntervalVector::BaseType::usb(X, res);
+   return res;
+}
+
 std::ostream&
 operator<<(std::ostream& os, const IntervalVector& X)
 {

@@ -26,6 +26,9 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalVector : public NumericVector<Interval> {
 public:
+   /// Base class
+   typedef NumericVector<Interval> BaseType;
+
    /// Creates a vector
    /// @param n number of elements
    /// @param x initialization value
@@ -158,6 +161,11 @@ public:
 /// @param X an interval vector
 /// @return A*X
 IntervalVector operator*(const RealMatrix& A, const IntervalVector& X);
+
+/// Unary subtraction
+/// @param X an interval vector
+/// @return -X
+IntervalVector operator-(const IntervalVector& X);
 
 /// output on a stream
 std::ostream& operator<<(std::ostream& os, const IntervalVector& X);

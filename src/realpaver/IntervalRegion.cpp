@@ -140,9 +140,22 @@ void IntervalRegion::setOnScope(const IntervalRegion& reg, const Scope& sco)
 RealPoint IntervalRegion::midpointOnScope(const Scope& sco) const
 {
    RealPoint pt(sco);
-   for (auto v : sco) pt.set(v, get(v).midpoint());
+   midpointOnScope(sco, pt);
    return pt;
 }
+
+void IntervalRegion::midpointOnScope(const Scope& sco, RealPoint& pt) const
+{
+   ASSERT(scope_.contains(sco),
+          "Bad scope used t create the midpoint of a region" << sco);
+
+   ASSERT(pt.scope().contains(sco),
+          "Bad scope used t create the midpoint of a region" << sco);
+
+   for (auto v : sco)
+      pt.set(v, get(v).midpoint());
+}
+
 
 IntervalRegion IntervalRegion::subRegion(const Scope& sco) const
 {
