@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 
 namespace realpaver {

@@ -784,7 +784,7 @@ void TableCtr::makeScopeAndHashCode()
       hcode_ = hash2(v.hashCode(), hcode_);
    }
 
-   setScope(s);   
+   setScope(s);
 }
 
 size_t TableCtr::nbCols() const

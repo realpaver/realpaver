@@ -7,10 +7,12 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/BC4Contractor.hpp"
 #include "realpaver/ConstraintContractor.hpp"
 #include "realpaver/HC4Contractor.hpp"
 #include "realpaver/IntContractor.hpp"
+#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ListContractor.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/MaxCIDContractor.hpp"
@@ -33,6 +35,7 @@ NcspSolver::NcspSolver(const Problem& problem)
         space_(nullptr),
         contractor_(nullptr),
         split_(nullptr),
+        prover_(nullptr),
         stimer_(),
         nbnodes_(0)
 {
@@ -49,6 +52,7 @@ NcspSolver::~NcspSolver()
    if (preproc_ != nullptr) delete preproc_;
    if (space_ != nullptr) delete space_;
    if (split_ != nullptr) delete split_;
+   if (prover_ != nullptr) delete prover_;
 }
 
 double NcspSolver::getSolvingTime() const
@@ -111,7 +115,7 @@ void NcspSolver::makeSpace()
    space_->insertPendingNode(node);
    ++nbnodes_;
 }
-   
+
 void NcspSolver::makeContractor()
 {
    // creates an empty dag
@@ -142,7 +146,7 @@ void NcspSolver::makeContractor()
          else
          {
             LOG_INTER("Bad assignment of PROPAGATION_BASE");
-            THROW("-");  // exception just catched below
+            THROW("-");  // exception catched below
          }
       }
       catch(Exception& e)
@@ -163,6 +167,7 @@ void NcspSolver::makeContractor()
    // propagator or propagator + max CID ?
    std::string with_max_cid =
       env_->getParam()->getStrParam("PROPAGATION_WITH_MAX_CID");
+
    if (with_max_cid == "YES")
    {
       std::unique_ptr<VariableSelector> selector =
@@ -185,6 +190,7 @@ void NcspSolver::makeContractor()
    // polytope hull contractor and non empty dag ?
    std::string with_polytope =
       env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
+
    if (with_polytope != "NO" && !dag_->isEmpty())
    {
       PolytopeCreatorStyle style = PolytopeCreatorStyle::RLT;
@@ -196,6 +202,77 @@ void NcspSolver::makeContractor()
       op->setRelaxEqTol(env_->getParam()->getDblParam("RELAXATION_EQ_TOL"));
 
       mainpool->push(op);
+   }
+
+   // interval Newton method for a square system of equations
+   std::string with_newton =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_NEWTON");
+
+   if (with_newton != "NO")
+   {
+      std::vector<size_t> eq; // indexes of equations in the DAG
+
+      for (size_t i=0; i<dag_->nbFuns(); ++i)
+      {
+         if (dag_->fun(i)->getImage().isZero())
+            eq.push_back(i);
+      }
+
+      if (eq.size() > 1)
+      {
+         std::shared_ptr<IntervalNewton> newton = nullptr;
+
+         if (eq.size() == dag_->nbFuns())
+         {
+            IntervalFunctionVector F(dag_);
+            if (F.nbVars() == F.nbFuns())
+            {
+               newton = std::make_shared<IntervalNewton>(F);
+            }
+         }
+         else
+         {
+            IntervalFunctionVector F;
+            for (size_t i : eq)
+            {
+               IntervalFunction g(dag_, i);
+               F.addFun(g);
+            }
+            if (F.nbVars() == F.nbFuns())
+            {
+               newton = std::make_shared<IntervalNewton>(F);
+            }
+         }
+
+         if (newton != nullptr)
+         {
+            Tolerance tol = env_->getParam()->getTolParam("NEWTON_XTOL");
+            newton->setXTol(tol);
+            
+            tol = env_->getParam()->getTolParam("NEWTON_DTOL");
+            newton->setDTol(tol);
+
+            int niter = env_->getParam()->getIntParam("NEWTON_ITER_LIMIT");
+            newton->setMaxIter(niter);
+
+            double delta = env_->getParam()->getDblParam("INFLATION_DELTA");
+            newton->setInflationDelta(delta);
+
+            double chi = env_->getParam()->getDblParam("INFLATION_CHI");
+            newton->setInflationChi(chi);
+
+            tol = env_->getParam()->getTolParam("GAUSS_SEIDEL_XTOL");
+            newton->getGaussSeidel()->setXTol(tol);
+
+            tol = env_->getParam()->getTolParam("GAUSS_SEIDEL_DTOL");
+            newton->getGaussSeidel()->setDTol(tol);
+
+            niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
+            newton->getGaussSeidel()->setMaxIter(niter);
+
+            mainpool->push(newton);
+         }
+      }
    }
 
    // integer variables
@@ -348,6 +425,21 @@ void NcspSolver::branchAndPrune()
    makeContractor();
    makeSplit();
 
+   // prover that derives proof certificates of the solutions
+   prover_ = new Prover(preprob_);
+
+   int niter = env_->getParam()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
+   prover_->setMaxIter(niter);
+
+   double delta = env_->getParam()->getDblParam("INFLATION_DELTA");
+   prover_->setInflationDelta(delta);
+
+   double chi = env_->getParam()->getDblParam("INFLATION_CHI");
+   prover_->setInflationChi(chi);
+
+   Tolerance tol = env_->getParam()->getTolParam("NEWTON_CERTIFY_DTOL");
+   prover_->setDTol(tol);
+
    // parameters
    double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");
    env_->setTimeLimit(false);
@@ -417,7 +509,18 @@ void NcspSolver::branchAndPrune()
    double gap = env_->getParam()->getDblParam("SOLUTION_CLUSTER_GAP");
    space_->makeSolClusters(gap);
 
+   certifySolutions();
+
    stimer_.stop();
+}
+
+void NcspSolver::certifySolutions()
+{
+   for (size_t i=0; i<space_->nbSolNodes(); ++i)
+   {
+      SharedNcspNode node = space_->getSolNode(i);
+      node->setProof(prover_->certify(*node->region()));
+   }
 }
 
 NcspEnv* NcspSolver::getEnv() const

@@ -176,12 +176,13 @@ am__librealpaver_la_SOURCES_DIST = AssertDebug.hpp Bitset.cpp \
 	NcspSpaceHybridDFS.cpp NcspSolver.cpp NcspSplit.cpp \
 	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
 	Parser.cpp PolytopeHullContractor.cpp Preprocessor.cpp \
-	Problem.cpp Propagator.cpp QuadraticTerm.cpp Range.cpp \
-	RangeSlicer.cpp RealFunction.cpp RealFunctionVector.cpp \
-	RealMatrix.cpp RealPoint.cpp RealVector.cpp RLTRelaxation.cpp \
-	Scope.cpp ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp \
-	Term.cpp TermDeriver.cpp TermFixer.cpp ThickFunction.cpp \
-	Timer.cpp Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
+	Problem.cpp Propagator.cpp Prover.cpp QuadraticTerm.cpp \
+	Range.cpp RangeSlicer.cpp RealFunction.cpp \
+	RealFunctionVector.cpp RealMatrix.cpp RealPoint.cpp \
+	RealVector.cpp RLTRelaxation.cpp Scope.cpp ScopeMap.cpp \
+	SearchNode.cpp Stat.cpp SymbolTable.cpp Term.cpp \
+	TermDeriver.cpp TermFixer.cpp ThickFunction.cpp Timer.cpp \
+	Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
 	VariableSelector.cpp VariableVector.cpp LPSolverClp.cpp \
 	LPSolverGurobi.cpp
 @COND_LP_CLP_TRUE@am__objects_1 = LPSolverClp.lo
@@ -201,11 +202,11 @@ am_librealpaver_la_OBJECTS = Bitset.lo BC3Contractor.lo \
 	NcspSolver.lo NcspSplit.lo Objective.lo Param.lo \
 	parser_bison.lo parser_flex.lo Parser.lo \
 	PolytopeHullContractor.lo Preprocessor.lo Problem.lo \
-	Propagator.lo QuadraticTerm.lo Range.lo RangeSlicer.lo \
-	RealFunction.lo RealFunctionVector.lo RealMatrix.lo \
-	RealPoint.lo RealVector.lo RLTRelaxation.lo Scope.lo \
-	ScopeMap.lo SearchNode.lo Stat.lo SymbolTable.lo Term.lo \
-	TermDeriver.lo TermFixer.lo ThickFunction.lo Timer.lo \
+	Propagator.lo Prover.lo QuadraticTerm.lo Range.lo \
+	RangeSlicer.lo RealFunction.lo RealFunctionVector.lo \
+	RealMatrix.lo RealPoint.lo RealVector.lo RLTRelaxation.lo \
+	Scope.lo ScopeMap.lo SearchNode.lo Stat.lo SymbolTable.lo \
+	Term.lo TermDeriver.lo TermFixer.lo ThickFunction.lo Timer.lo \
 	Tolerance.lo UniIntervalNewton.lo Variable.lo \
 	VariableSelector.lo VariableVector.lo $(am__objects_1) \
 	$(am__objects_2)
@@ -257,9 +258,10 @@ am__depfiles_remade = ./$(DEPDIR)/BC3Contractor.Plo \
 	./$(DEPDIR)/Objective.Plo ./$(DEPDIR)/Param.Plo \
 	./$(DEPDIR)/Parser.Plo ./$(DEPDIR)/PolytopeHullContractor.Plo \
 	./$(DEPDIR)/Preprocessor.Plo ./$(DEPDIR)/Problem.Plo \
-	./$(DEPDIR)/Propagator.Plo ./$(DEPDIR)/QuadraticTerm.Plo \
-	./$(DEPDIR)/RLTRelaxation.Plo ./$(DEPDIR)/Range.Plo \
-	./$(DEPDIR)/RangeSlicer.Plo ./$(DEPDIR)/RealFunction.Plo \
+	./$(DEPDIR)/Propagator.Plo ./$(DEPDIR)/Prover.Plo \
+	./$(DEPDIR)/QuadraticTerm.Plo ./$(DEPDIR)/RLTRelaxation.Plo \
+	./$(DEPDIR)/Range.Plo ./$(DEPDIR)/RangeSlicer.Plo \
+	./$(DEPDIR)/RealFunction.Plo \
 	./$(DEPDIR)/RealFunctionVector.Plo ./$(DEPDIR)/RealMatrix.Plo \
 	./$(DEPDIR)/RealPoint.Plo ./$(DEPDIR)/RealVector.Plo \
 	./$(DEPDIR)/Scope.Plo ./$(DEPDIR)/ScopeMap.Plo \
@@ -349,8 +351,8 @@ am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
 	NcspSpaceHybridDFS.hpp NcspSolver.hpp NcspSplit.hpp \
 	NumericMatrix.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	Parser.hpp parser_bison.hpp PolytopeHullContractor.hpp \
-	Preprocessor.hpp Problem.hpp Propagator.hpp QuadraticTerm.hpp \
-	Range.hpp RangeSlicer.hpp RealFunction.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp Prover.hpp \
+	QuadraticTerm.hpp Range.hpp RangeSlicer.hpp RealFunction.hpp \
 	RealFunctionVector.hpp RealMatrix.hpp RealPoint.hpp \
 	RealVector.hpp RLTRelaxation.hpp Scope.hpp ScopeMap.hpp \
 	SearchNode.hpp SplitStrategy.hpp Stat.hpp SymbolTable.hpp \
@@ -543,8 +545,8 @@ librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
 	NcspSpaceHybridDFS.hpp NcspSolver.hpp NcspSplit.hpp \
 	NumericMatrix.hpp NumericVector.hpp Objective.hpp Param.hpp \
 	Parser.hpp parser_bison.hpp PolytopeHullContractor.hpp \
-	Preprocessor.hpp Problem.hpp Propagator.hpp QuadraticTerm.hpp \
-	Range.hpp RangeSlicer.hpp RealFunction.hpp \
+	Preprocessor.hpp Problem.hpp Propagator.hpp Prover.hpp \
+	QuadraticTerm.hpp Range.hpp RangeSlicer.hpp RealFunction.hpp \
 	RealFunctionVector.hpp RealMatrix.hpp RealPoint.hpp \
 	RealVector.hpp RLTRelaxation.hpp Scope.hpp ScopeMap.hpp \
 	SearchNode.hpp SplitStrategy.hpp Stat.hpp SymbolTable.hpp \
@@ -567,12 +569,13 @@ librealpaver_la_SOURCES = AssertDebug.hpp Bitset.cpp BC3Contractor.cpp \
 	NcspSpaceHybridDFS.cpp NcspSolver.cpp NcspSplit.cpp \
 	Objective.cpp Param.cpp parser_bison.ypp parser_flex.lpp \
 	Parser.cpp PolytopeHullContractor.cpp Preprocessor.cpp \
-	Problem.cpp Propagator.cpp QuadraticTerm.cpp Range.cpp \
-	RangeSlicer.cpp RealFunction.cpp RealFunctionVector.cpp \
-	RealMatrix.cpp RealPoint.cpp RealVector.cpp RLTRelaxation.cpp \
-	Scope.cpp ScopeMap.cpp SearchNode.cpp Stat.cpp SymbolTable.cpp \
-	Term.cpp TermDeriver.cpp TermFixer.cpp ThickFunction.cpp \
-	Timer.cpp Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
+	Problem.cpp Propagator.cpp Prover.cpp QuadraticTerm.cpp \
+	Range.cpp RangeSlicer.cpp RealFunction.cpp \
+	RealFunctionVector.cpp RealMatrix.cpp RealPoint.cpp \
+	RealVector.cpp RLTRelaxation.cpp Scope.cpp ScopeMap.cpp \
+	SearchNode.cpp Stat.cpp SymbolTable.cpp Term.cpp \
+	TermDeriver.cpp TermFixer.cpp ThickFunction.cpp Timer.cpp \
+	Tolerance.cpp UniIntervalNewton.cpp Variable.cpp \
 	VariableSelector.cpp VariableVector.cpp $(am__append_4) \
 	$(am__append_5)
 librealpaver_la_DEPENDENCIES = parser_flex.lpp parser_bison.ypp
@@ -732,6 +735,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preprocessor.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Problem.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Propagator.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Prover.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QuadraticTerm.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RLTRelaxation.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Range.Plo@am__quote@ # am--include-marker
@@ -1006,6 +1010,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/Preprocessor.Plo
 	-rm -f ./$(DEPDIR)/Problem.Plo
 	-rm -f ./$(DEPDIR)/Propagator.Plo
+	-rm -f ./$(DEPDIR)/Prover.Plo
 	-rm -f ./$(DEPDIR)/QuadraticTerm.Plo
 	-rm -f ./$(DEPDIR)/RLTRelaxation.Plo
 	-rm -f ./$(DEPDIR)/Range.Plo
@@ -1127,6 +1132,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/Preprocessor.Plo
 	-rm -f ./$(DEPDIR)/Problem.Plo
 	-rm -f ./$(DEPDIR)/Propagator.Plo
+	-rm -f ./$(DEPDIR)/Prover.Plo
 	-rm -f ./$(DEPDIR)/QuadraticTerm.Plo
 	-rm -f ./$(DEPDIR)/RLTRelaxation.Plo
 	-rm -f ./$(DEPDIR)/Range.Plo

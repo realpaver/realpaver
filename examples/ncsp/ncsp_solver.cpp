@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/Param.hpp"

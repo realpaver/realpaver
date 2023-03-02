@@ -276,6 +276,15 @@ double IntervalVector::gap(const IntervalVector& X) const
    return gap;
 }
 
+void IntervalVector::inflate(double delta, double chi)
+{
+   ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
+   ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
+
+   for (size_t i=0; i<size(); ++i)
+      set(i, get(i).inflate(delta, chi));
+}
+
 IntervalVector operator*(const RealMatrix& A, const IntervalVector& X)
 {
    ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);

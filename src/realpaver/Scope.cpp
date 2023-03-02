@@ -52,7 +52,7 @@ void ScopeRep::makeMap()
    }
    else if (maxid_ - minid_ == size() - 1)
    {
-      scopeMap_ = new ScopeSeqMap(minid_,maxid_);
+      scopeMap_ = new ScopeSeqMap(minid_, maxid_);
    }
    else
    {
@@ -79,12 +79,12 @@ Variable ScopeRep::var(size_t i) const
    return it->first;
 }
 
-size_t ScopeRep::minIndex() const
+size_t ScopeRep::minVarId() const
 {
    return minid_;
 }
 
-size_t ScopeRep::maxIndex() const
+size_t ScopeRep::maxVarId() const
 {
    return maxid_;
 }
@@ -246,14 +246,14 @@ bool Scope::contains(const Variable& v) const
    return find(v) != end();
 }
 
-size_t Scope::minIndex() const
+size_t Scope::minVarId() const
 {
-   return rep_->minIndex();
+   return rep_->minVarId();
 }
 
-size_t Scope::maxIndex() const
+size_t Scope::maxVarId() const
 {
-   return rep_->maxIndex();
+   return rep_->maxVarId();
 }
 
 void Scope::print(std::ostream& os) const
@@ -343,8 +343,8 @@ bool Scope::contains(const Scope& other) const
 
 bool Scope::disjoint(const Scope& other) const
 {
-   if (minIndex() > other.maxIndex()) return true;
-   if (maxIndex() < other.minIndex()) return true;
+   if (minVarId() > other.maxVarId()) return true;
+   if (maxVarId() < other.minVarId()) return true;
    
    for (auto v : *this)
    {
@@ -386,7 +386,7 @@ Scope operator|(Scope s, Scope t)
    return res;
 }
 
-size_t Scope::maxVarLength() const
+size_t Scope::nameMaxLength() const
 {
    size_t l = 0;
    for (auto v : *this)

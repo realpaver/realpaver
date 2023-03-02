@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ThickFunction.hpp"
 
 namespace realpaver {

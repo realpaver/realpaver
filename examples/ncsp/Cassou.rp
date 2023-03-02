@@ -1,10 +1,16 @@
 # The system of Pierrette Cassou-Nogu`es
 
 Variables
-   b in [-1.0e0, 1.0e0],
-   c in [-1.0e0, 1.0e0],
-   d in [-1.0e0, 1.0e0],
+   b in [-1.0e1, 1.0e1],
+   c in [-1.0e1, 1.0e1],
+   d in [-1.0e1, 1.0e1],
    e in [-1.0e1, 1.0e1];
+
+#   b in [-1.0e0, 1.0e0],
+#   c in [-1.0e0, 1.0e0],
+#   d in [-1.0e0, 1.0e0],
+#   e in [-1.0e1, 1.0e1];
+
 
 Constraints
    15.0*b^4*c*d^2 + 6.0*b^4*c^3 + 21.0*b^4*c^2*d - 144.0*b^2*c - 8.0*b^2*c^2*e
@@ -20,4 +26,5 @@ Constraints
  - 1008.0*d*e
  + 15.0*c^2*b^2*d*e - 15.0*c^3*b^2*e - 80.0*d*e^2*c + 40.0*d^2*e^2 
  + 40.0*e^2*c^2 == 0,
+
    261.0 + 4.0*d*b^2*c - 3.0*d^2*b^2 - 4.0*c^2*b^2 + 22.0*e*c - 22.0*d*e == 0;

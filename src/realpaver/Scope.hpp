@@ -69,20 +69,20 @@ public:
    void print(std::ostream& os) const;
 
    /// @return the smallest variable identifier in this
-   size_t minIndex() const;
+   size_t minVarId() const;
 
    /// @return the greatest variable identifier in this
-   size_t maxIndex() const;
+   size_t maxVarId() const;
 
 private:
-   struct comp {
+   struct Comp {
       bool operator()(Variable x, Variable y) const
       {
          return x.id() < y.id();
       }
    };
 
-   typedef typename std::map< Variable, size_t, comp > MapType;
+   typedef typename std::map<Variable, size_t, Comp> MapType;
    typedef typename MapType::const_iterator MapIteratorType;
    MapType m_;
 
@@ -210,10 +210,10 @@ public:
    bool contains(const Variable& v) const;
 
    /// @return the smallest variable identifier in this
-   size_t minIndex() const;
+   size_t minVarId() const;
 
    /// @return the greatest variable identifier in this
-   size_t maxIndex() const;
+   size_t maxVarId() const;
 
    /// Inserts a variable in this
    /// @param v a variable
@@ -290,7 +290,7 @@ public:
    bool isShared() const;
 
    /// @return the length of the longest variable name of this
-   size_t maxVarLength() const;
+   size_t nameMaxLength() const;
 
 private:
    std::shared_ptr<ScopeRep> rep_;

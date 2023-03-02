@@ -24,8 +24,14 @@ class IntervalRegion : public IntervalVector {
 public:
    /// Creates an interval region
    /// sco scope of this
+   ///
+   /// The domains in this are assigned to the domains enclosed in the variables
+   IntervalRegion(Scope sco);
+
+   /// Creates an interval region
+   /// sco scope of this
    /// x interval assigned to each element of this
-   IntervalRegion(Scope sco, const Interval& x = Interval::universe());
+   IntervalRegion(Scope sco, const Interval& x);
 
    /// Creates an interval region
    /// sco scope of this
@@ -184,6 +190,15 @@ public:
    ///
    /// Assumption: sco is included in the scopes of this and reg
    double gapOnScope(const IntervalRegion& reg, const Scope& sco) const;
+
+   /// Inflation method
+   /// @param sco a scope
+   /// @param delta a real > 1.0
+   /// @param chi a real > 0.0
+   ///
+   /// Let x be an interval of sco and let m(x) be its midpoint.
+   /// Then x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
+   void inflateOnScope(const Scope& sco, double delta, double chi);
 
    /// @return the sum of the widths of the components of this
    double perimeter() const;

@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
 
 namespace realpaver {
@@ -104,7 +105,7 @@ void ConstraintFixer::apply(const TableCtr* c)
          {
             Variable v = it->first;
             if (c->getVal(i, j).isDisjoint(reg_.get(v)))
-               cons= false;
+               cons = false;
          }
          ++j;
       }

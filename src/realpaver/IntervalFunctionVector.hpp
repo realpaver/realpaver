@@ -140,6 +140,9 @@ public:
    /// @return the number of functions in this
    size_t nbFuns() const;
 
+   /// @return true if nbVars() == nbFuns() and this is non empty
+   bool isSquare() const;
+
    /// @return the i-th function of this
    IntervalFunction fun(size_t i) const;
 

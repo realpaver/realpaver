@@ -154,6 +154,14 @@ public:
    /// @param X an interval vector
    /// @return the maximum gap componentwise between this and X
    double gap(const IntervalVector& X) const;
+
+   /// Inflation method
+   /// @param delta a real > 1.0
+   /// @param chi a real > 0.0
+   ///
+   /// Let x be an interval of this and let m(x) be its midpoint.
+   /// Then x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
+   void inflate(double delta, double chi);
 };
 
 /// Multiplication

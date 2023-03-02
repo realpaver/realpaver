@@ -41,6 +41,7 @@ Param::Param()
    tolmap_.insert(std::make_pair("GAUSS_SEIDEL_DTOL",         tol6));
    tolmap_.insert(std::make_pair("NEWTON_XTOL",               tol8));
    tolmap_.insert(std::make_pair("NEWTON_DTOL",               tol6));
+   tolmap_.insert(std::make_pair("NEWTON_CERTIFY_DTOL",       tol3));
 
    // integer
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
@@ -56,6 +57,7 @@ Param::Param()
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
    intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   50));
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
+   intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
@@ -69,6 +71,8 @@ Param::Param()
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
    dblmap_.insert(std::make_pair("GAUSSIAN_MIN_PIVOT",        1.0e-8));
+   dblmap_.insert(std::make_pair("INFLATION_DELTA",           1.125));
+   dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
@@ -83,6 +87,7 @@ Param::Param()
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
    strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
 }
 
 int Param::getIntParam(const string& name) const

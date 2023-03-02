@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Parser.hpp"
 
 extern int realpaver_flex_init_file(realpaver::Problem* prob,

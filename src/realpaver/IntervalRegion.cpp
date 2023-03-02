@@ -7,9 +7,20 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalRegion.hpp"
 
 namespace realpaver {
+
+IntervalRegion::IntervalRegion(Scope sco)
+      : IntervalVector(sco.size()),
+        scope_(sco)
+{
+   ASSERT(!sco.isEmpty(), "Empty scope used to create an interval region");   
+
+   for (const auto& v : sco)
+      set(v, v.getDomain());
+}
 
 IntervalRegion::IntervalRegion(Scope sco, const Interval& x)
       : IntervalVector(sco.size(), x),
@@ -30,7 +41,6 @@ IntervalRegion::IntervalRegion(const RealPoint& pt)
       : IntervalVector(pt),
         scope_(pt.scope())
 {}
-
 
 IntervalRegion::IntervalRegion(Scope sco, const RealVector& X)
       : IntervalVector(X),
@@ -193,7 +203,7 @@ double IntervalRegion::gap(const IntervalRegion& reg) const
 }
 
 double IntervalRegion::gapOnScope(const IntervalRegion& reg,
-                                       const Scope& sco) const
+                                  const Scope& sco) const
 {
    ASSERT(scope_.contains(sco) && reg.scope_.contains(sco),
           "Bad scopes used to calculate the gap between interval regions");
@@ -205,6 +215,15 @@ double IntervalRegion::gapOnScope(const IntervalRegion& reg,
       if (e > gap) gap = e;
    }
    return gap;
+}
+
+void IntervalRegion::inflateOnScope(const Scope& sco, double delta, double chi)
+{
+   ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
+   ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
+
+   for (auto v : sco)
+      set(v, get(v).inflate(delta, chi));
 }
 
 double IntervalRegion::perimeter() const
@@ -261,7 +280,7 @@ void IntervalRegion::print(std::ostream& os) const
 
 void IntervalRegion::stdPrint(std::ostream& os) const
 {
-   size_t lmax = scope_.maxVarLength();
+   size_t lmax = scope_.nameMaxLength();
 
    for (const auto& v : scope_)
    {

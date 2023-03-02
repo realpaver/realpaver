@@ -14,7 +14,7 @@
 #include "realpaver/QuadraticTerm.hpp"
 #include "realpaver/HC4Contractor.hpp"
 #include "realpaver/RealMatrix.hpp"
-#include "realpaver/IntervalGaussSeidel.hpp"
+#include "realpaver/IntervalNewton.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -25,6 +25,26 @@ int main(void)
    Interval::precision( 12 );
 
    try {
+      Problem pbm;
+      Variable x = pbm.addRealVar(0, 10, "x");
+      Variable y = pbm.addRealVar(0, 10, "y");
+
+      //~ SharedDag dag = make_shared<Dag>();
+      //~ dag->insert(sqr(x) + sqr(y) == 4);
+      //~ dag->insert(y - sqr(x) == 0);
+
+      IntervalFunctionVector F({sqr(x) + sqr(y) - 4, y - sqr(x)});
+      IntervalNewton N(F);
+
+      IntervalRegion R({x, y});
+      R.set(x, Interval(1, 10));
+      R.set(y, Interval(1, 10));
+      cout << R << endl;
+
+      Proof p = N.contract(R);
+      cout << p << endl << R << endl;
+
+/*
       Interval m11(2, 3),
                m12(-0.5, 0.7),
                m21(-1, 2),
@@ -46,7 +66,7 @@ int main(void)
       Proof p = gs.contract(A, x, b);
       cout << "--- proof ---" << endl << p << endl << endl;
       cout << "--- x ---" << endl << x << endl << endl;
-
+*/
 
 /*
       Variable x("x");

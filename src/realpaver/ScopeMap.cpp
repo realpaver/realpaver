@@ -83,7 +83,7 @@ size_t ScopeHashMap::index(size_t id) const
 
 void ScopeHashMap::insert(size_t id)
 {
-   m_.insert(std::make_pair(id,next_));
+   m_.insert(std::make_pair(id, next_));
    next_++;
 }
 

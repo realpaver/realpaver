@@ -62,16 +62,25 @@ Scope IntervalFunctionVector::scope() const
 
 size_t IntervalFunctionVector::nbVars() const
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   if (rep_ == nullptr)
+      return 0;
 
-   return rep_->nbVars();
+   else
+      return rep_->nbVars();
 }
 
 size_t IntervalFunctionVector::nbFuns() const
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   if (rep_ == nullptr)
+      return 0;
 
-   return rep_->nbFuns();
+   else
+      return rep_->nbFuns();
+}
+
+bool IntervalFunctionVector::isSquare() const
+{
+   return nbVars() == nbFuns() && nbVars() > 0;
 }
 
 IntervalFunction IntervalFunctionVector::fun(size_t i) const

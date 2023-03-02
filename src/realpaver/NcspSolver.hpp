@@ -18,6 +18,7 @@
 #include "realpaver/NcspSplit.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/Prover.hpp"
 #include "realpaver/Timer.hpp"
 
 namespace realpaver {
@@ -98,6 +99,8 @@ private:
    SharedContractor contractor_; // contraction operator
    NcspSplit* split_;            // splitting strategy
 
+   Prover* prover_;              // solution prover
+
    Timer stimer_;                // timer for the solving phase
    int nbnodes_;                 // number of nodes processed
 
@@ -107,6 +110,7 @@ private:
    void makeSplit();
    void bpStep(int depthlimit);
    bool isAnInnerRegion(const IntervalRegion& reg) const;
+   void certifySolutions();
 };
 
 } // namespace
