@@ -206,8 +206,95 @@ Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
 
 Proof IntervalNewton::certify(IntervalRegion& reg)
 {
-   // TODO: inflation
-   return contract(reg);
+   bool iter = true;
+   Proof proof = Proof::Maybe;
+   size_t nb_steps = 0;
+
+   IntervalRegion X(scope());
+   X.setOnScope(reg, scope());
+
+   do
+   {
+      ++ nb_steps;
+
+      // inflation
+      X.inflate(delta_, chi_);
+
+      F_.evalDiff(X, val_, jac_);
+
+      if (!val_.containsZero())
+      {
+         proof = Proof::Empty;
+         iter = false;
+         continue;
+      }
+
+      X.midpointOnScope(scope(), c_);
+      F_.pointEval(c_, val_);
+
+      if (val_.isEmpty())
+      {
+         iter = false;
+         continue;
+      }
+
+      makeY(X);      // y := X - c
+      b_ = -val_;    // b := -F(c)
+
+      Proof certif = gs_->contractPrecond(jac_, y_, b_);
+            
+      if (certif == Proof::Empty)
+      {
+         proof = Proof::Empty;
+         iter = false;
+         continue;
+      }
+
+      // X := y + c
+      bool hasdtol;
+      certif = certifyX(X, hasdtol);
+
+      if (certif == Proof::Feasible)
+      {
+         proof = Proof::Feasible;
+         iter = false;
+      }
+
+      // checks the stopping criteria
+      if (nb_steps > cmaxiter_ || (!hasdtol))
+         iter = false;
+
+   }
+   while (iter);
+
+   if (proof == Proof::Feasible)
+      reg.setOnScope(X, scope());
+
+   return proof;
+}
+
+Proof IntervalNewton::certifyX(IntervalRegion& X, bool& hasdtol)
+{
+   // X := y + c
+   int i = 0;
+   Proof proof = Proof::Feasible;
+   hasdtol = true;
+
+   for (const auto& v : scope())
+   {
+      Interval dom = X.get(v),
+               z = y_.get(i) + c_.get(v);
+
+      if (!dom.strictlyContains(z))
+         proof = Proof::Maybe;
+
+      if (!dtol_.haveDistTolerance(z, dom))
+         hasdtol = false;
+
+      X.set(v, z);
+      i = i+1;
+   }
+   return proof;
 }
 
 double IntervalNewton::getInflationDelta() const

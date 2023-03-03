@@ -8,10 +8,10 @@
 /* #undef ARCH_X86_64 */
 
 /* Define this to 1 to check assertions. */
-#define ASSERT_ON 1
+#define ASSERT_ON 0
 
 /* Define this to 1 to turn on debugging. */
-#define DEBUG_ON 1
+#define DEBUG_ON 0
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -47,7 +47,7 @@
 #define INTERVAL_LIB_GAOL 1
 
 /* Define this to 1 to generate log files. */
-#define LOG_ON 1
+#define LOG_ON 0
 
 /* Define to 1 to use the Clp solver. */
 #define LP_LIB_CLP 1

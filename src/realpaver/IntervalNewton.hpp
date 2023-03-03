@@ -115,16 +115,21 @@ private:
    IntervalVector val_, y_, b_;     // working vectors
    RealPoint c_;                    // point of expansion
    IntervalGaussSeidel* gs_;        // Gauss-Seidel operator
+
+   // parameters of the contraction method
    size_t maxiter_;           // maximum number of iterations (contraction)
    Tolerance xtol_;           // tolerance on the width of an interval
    Tolerance dtol_;           // tolerance on the distance between two intervals
+
+   // parameters of the certification method
    double delta_;             // parameter delta of inflation
    double chi_;               // parameter chi of inflation
-   size_t cmaxiter_;          // maximum number of iterations (certification)
+   size_t cmaxiter_;          // maximum number of iterations
    Tolerance cdtol_;          // tolerance on the distance between two intervals
 
    void makeY(IntervalRegion& X);
    Proof reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol);
+   Proof certifyX(IntervalRegion& X, bool& hasdtol);
 };
 
 } // namespace

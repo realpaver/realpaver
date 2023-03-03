@@ -217,17 +217,17 @@ bool RealMatrix::elimination(RealMatrix& P)
       double pivot = get(i, i);
 
       // puts zeros in the column under the pivot
-      for (int j=i+1; j<nrows(); ++j)
+      for (size_t j=i+1; j<nrows(); ++j)
       {
          double c = get(j, i) / pivot;
 
-         for (int k=0; k<ncols(); ++k)
+         for (size_t k=0; k<ncols(); ++k)
          {
             double val = P.get(j, k) - c*P.get(i, k);
             P.set(j, k, val);
          }
 
-         for (int k=i+1; k<ncols(); ++k)
+         for (size_t k=i+1; k<ncols(); ++k)
          {
             double val = get(j, k) - c*get(i, k);
             set(j, k, val);
@@ -259,13 +259,13 @@ void RealMatrix::dividePivot(size_t i, RealMatrix& P)
 
 void RealMatrix::substitution(RealMatrix& P)
 {
-   for (int k=ncols()-1; k>0; --k)
+   for (int k=(int)ncols()-1; k>0; --k)
    {
       for (int i=k-1; i>=0; --i)
       {
          double c = get(i, k);
 
-         for (int j=i+1; j<ncols(); ++j)
+         for (int j=i+1; j<(int)ncols(); ++j)
          {
             double val = get(i, j) - c*get(k, j);
             set(i, j, val);
@@ -273,7 +273,7 @@ void RealMatrix::substitution(RealMatrix& P)
 
          set(i, k, 0.0);
 
-         for (int j=0; j<ncols(); ++j)
+         for (int j=0; j<(int)ncols(); ++j)
          {
             double val = P.get(i, j) - c*P.get(k, j);
             P.set(i, j, val);
@@ -329,13 +329,10 @@ bool RealMatrix::operator==(const RealMatrix& A) const
    if (nrows() != A.nrows()) return false;
    if (ncols() != A.ncols()) return false;
 
-   for (int i=0; i<nrows(); ++i)
-      for (int j=0; j<ncols(); ++j)
+   for (size_t i=0; i<nrows(); ++i)
+      for (size_t j=0; j<ncols(); ++j)
          if (get(i, j) != A.get(i, j))
-         {
-   DEBUG(get(i, j) << " diff " << A.get(i, j));
             return false;
-}
 
    return true;
 }
