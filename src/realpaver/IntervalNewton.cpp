@@ -258,6 +258,7 @@ Proof IntervalNewton::certify(IntervalRegion& reg)
       {
          proof = Proof::Feasible;
          iter = false;
+         continue;
       }
 
       // checks the stopping criteria
