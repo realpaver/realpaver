@@ -32,36 +32,15 @@ int main(void)
       IntervalRegion R({x, y});
       cout << R << endl;
 
-      RealPoint P({x, y});
-      cout << P << endl;
-      P.set(x, 4.0);
-      P.set(y, -2.0);
+      Param prm;
+      Parser parser(prm);
+      Problem problem;
 
-      Interval II("1.1", "1.1");
+      bool ok = parser.parseFile("examples/ncsp/TestProblem.rp", problem);
+      if (!ok) THROW("Parse error: " << parser.getParseError());
 
-      Term t(1 + II*x - 2*y);
-      cout << "t : " << t << endl;
+      cout << problem << endl;
 
-      SharedDag dag = std::make_shared<Dag>();
-      size_t idx = dag->insert(t == 0);
-      cout << (*dag) << endl;
-
-      DagFun* fun = dag->fun(idx);
-      cout << fun->intervalEval(R) << endl;
-
-      IntervalVector G(fun->scope().size());
-      fun->intervalDiff(G);
-      cout << "df / dx : " << G << endl;
-
-      //~ Proof proof = fun->hc4Revise(R);
-      //~ cout << proof << endl;
-      //~ cout << R << endl;
-      
-      PolytopeHullContractor phc(dag, PolytopeCreatorStyle::RLT);
-
-      Proof proof = phc.contract(R);
-      cout << proof << endl;
-      cout << R << endl;
       
       //cout << fun->realEval(P) << endl;
 /*

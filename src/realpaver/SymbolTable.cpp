@@ -490,8 +490,15 @@ void FunctionCallProcessor::apply(const TermTan* t)
 
 void FunctionCallProcessor::apply(const TermLin* t)
 {
-   // TODO
-   THROW("Function call processor not yet implemented for linear terms");
+   t_ = t->getConstantValue();
+
+   for (auto it=t->begin(); it!=t->end(); ++it)
+   {
+      Interval coef = t->getCoefSub(it);
+      Variable v = t->getVarSub(it);
+      size_t i = fc_->getFunctionSymbol()->getIndexVar(v);
+      t_ += coef*fc_->getTerm(i);
+   }
 }
 
 Term FunctionCallProcessor::getTerm() const

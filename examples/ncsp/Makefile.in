@@ -322,6 +322,7 @@ EXTRA_DIST = \
 	Bronstein.rp \
 	Brown5.rp \
 	Brown6.rp \
+	Brown10.rp \
 	Broyden10.rp \
 	BurdenFaires.rp \
 	Butcher.rp \
