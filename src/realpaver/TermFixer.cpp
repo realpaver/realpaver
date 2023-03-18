@@ -198,4 +198,45 @@ void TermFixer::apply(const TermTan* t)
    t_ = tan(vis.t_);
 }
 
+void TermFixer::apply(const TermLin* t)
+{
+   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
+
+   // keeps the constant value
+   tlin->addConstant(t->getConstantValue());
+
+   // examines each sub-term
+   for (auto it=t->begin(); it!=t->end(); ++it)
+   {
+      Variable v = t->getVarSub(it);
+      Interval x = t->getCoefSub(it);
+
+      auto it1 = vvm_->find(v);
+      auto it2 = vim_->find(v);
+
+      if (it1 != vvm_->end())
+      {
+         Variable w = it1->second;
+         tlin->addTerm(x, w);
+      }
+      else if (it2 != vim_->end())
+      {
+         Interval y = it2->second;
+         tlin->addConstant(x * y);
+      }
+      else
+         THROW("Term fixer error");
+   }
+
+   // assigns the result
+   if (tlin->isConstant())
+      t_ = Term(tlin->evalConst());
+
+   else if (tlin->isVariable())
+      t_ = Term(tlin->getVarSub(0));
+
+   else
+      t_ = Term(tlin);
+}
+
 } // namespace

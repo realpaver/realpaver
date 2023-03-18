@@ -522,4 +522,14 @@ void QuadraticTermCreator::apply(const TermSin* t)
 void QuadraticTermCreator::apply(const TermTan* t)
 {}
    
+void QuadraticTermCreator::apply(const TermLin* t)
+{
+   qt_->addConstant(t->getConstantValue());
+
+   for (auto it=t->begin(); it!=t->end(); ++it)
+      qt_->addLin(t->getCoefSub(it), t->getVarSub(it));
+
+   success_ = true;
+}
+
 } // namespace

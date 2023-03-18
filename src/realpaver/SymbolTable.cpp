@@ -488,6 +488,12 @@ void FunctionCallProcessor::apply(const TermTan* t)
    t_ = tan(vis.getTerm());
 }
 
+void FunctionCallProcessor::apply(const TermLin* t)
+{
+   // TODO
+   THROW("Function call processor not yet implemented for linear terms");
+}
+
 Term FunctionCallProcessor::getTerm() const
 {
    return t_;

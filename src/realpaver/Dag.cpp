@@ -1247,6 +1247,159 @@ bool DagTan::rdiff()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DagLin::DagLin(Dag* dag, const TermLin* t, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Lin, lsub),
+        cst_(t->getConstantValue()),
+        terms_()
+{   
+   for (auto it=t->begin(); it!=t->end(); ++it)
+   {
+      Interval x = t->getCoefSub(it);
+      Variable v = t->getVarSub(it);
+      DagVar* node = dag->findVarNode(v.id());
+      Item itm = {x, node, Interval::zero()};
+      terms_.insert(itm);
+   }
+}
+
+bool DagLin::eqSymbol(const DagOp* other) const
+{
+   if (getSymbol() != other->getSymbol())
+      return false;
+
+   if (subArity() != other->subArity())
+      return false;
+
+   // compares here the constants
+   // the variables are compared in the eq() method
+   const DagLin* dl = static_cast<const DagLin*>(other);
+   auto it = terms_.begin();
+   auto jt = dl->terms_.begin();
+
+   while (it != terms_.end())
+   {
+      if (!(*it).coef.isSetEq((*jt).coef))
+         return false;
+
+      ++it;
+      ++jt;
+   }
+   return true;
+}
+
+size_t DagLin::nbOccurrences(const Variable& v) const
+{
+   return dependsOn(v) ? 1 : 0;
+}
+
+void DagLin::print(std::ostream& os) const
+{
+   os << getSymbol();
+}
+
+void DagLin::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagLin::eval()
+{
+   setVal(cst_);
+
+   for (const Item& citm : terms_)
+   {
+      Item& itm = const_cast<Item&>(citm);
+      itm.ival = itm.coef * itm.node->val();
+      setVal(val() + itm.ival);
+   }
+}
+
+void DagLin::proj(IntervalRegion& reg)
+{
+   for (auto it=terms_.begin(); it!=terms_.end(); ++it)
+   {
+      // contracts the domain of the variable node
+      Interval x = dom() - cst_;
+      DagVar* node = (*it).node;
+
+      auto jt = terms_.begin();
+      while (jt != it)
+      {
+         x -= jt->ival;
+         ++jt;
+      }
+      ++jt;
+      while (jt != terms_.end())
+      {
+         x -= jt->ival;
+         ++jt;
+      }
+
+      node->reduceDom(mulPY(it->coef, node->dom(), x));
+   }
+}
+
+bool DagLin::diff()
+{
+   for (const Item& itm : terms_)
+   {
+      // d(a * v) / dv = a
+      DagVar* node = itm.node;
+      node->addDv(dv() * itm.coef);
+   }
+   return true;
+}
+
+void DagLin::reval()
+{
+   setRval(cst_.midpoint());
+
+   for (const Item& citm : terms_)
+   {
+      Item& itm = const_cast<Item&>(citm);
+      itm.ival = itm.coef * itm.node->rval();
+      setRval(rval() + itm.ival.midpoint());
+   }
+}
+
+bool DagLin::rdiff()
+{
+   for (const Item& itm : terms_)
+   {
+      // d(a * v) / dv = a
+      DagVar* node = itm.node;
+      node->addRdv(rdv() * itm.coef.midpoint());
+   }   
+   return true;
+}
+
+DagLin::const_iterator DagLin::begin() const
+{
+   return terms_.begin();
+}
+   
+DagLin::const_iterator DagLin::end() const
+{
+   return terms_.end();
+}
+
+Interval DagLin::getCoefSub(const_iterator it) const
+{
+   return (*it).coef;
+}
+
+DagVar* DagLin::getNodeSub(const_iterator it) const
+{
+   return (*it).node;
+}
+
+Interval DagLin::getConstantValue() const
+{
+   return cst_;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
       : dag_(dag),
         node_(),
@@ -2108,6 +2261,7 @@ void Dag::print(std::ostream& os) const
          if (j != 0) os << " ";
          os << node->index();
       }
+
       os << "] in " << f->getImage();
       os << " bitset: " << f->rootNode()->bitset() << std::endl;
    }
@@ -2258,6 +2412,11 @@ void DagVisitor::apply(const DagTan* d)
    THROW("visit method not implemented");
 }
 
+void DagVisitor::apply(const DagLin* d)
+{
+   THROW("visit method not implemented");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagFunCreator::DagFunCreator(DagFun* f): f_(f)
@@ -2400,6 +2559,13 @@ void DagFunCreator::apply(const DagTan* d)
 {
    visitSubNodes(d);
    DagTan* aux = const_cast<DagTan*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagLin* d)
+{
+   visitSubNodes(d);
+   DagLin* aux = const_cast<DagLin*>(d);
    f_->insertOpNode(aux);
 }
 
@@ -2642,6 +2808,20 @@ void DagTermCreator::apply(const TermTan* t)
 {
    visitSubnodes(t);
    DagTan* node = new DagTan(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermLin* t)
+{
+   // creates the variable nodes
+   for (auto it=t->begin(); it !=t->end(); ++it)
+   {
+      Variable v = t->getVarSub(it);
+      size_t idx = dag_->insertVarNode(v);
+      lsub_.push_back(idx);
+   }
+
+   DagLin* node = new DagLin(dag_, t, lsub_);
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 

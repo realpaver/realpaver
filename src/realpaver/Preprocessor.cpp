@@ -177,7 +177,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
       ConstraintFixer fixer(&vvm_, &vim_, reg);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
-      
+
       if (c.isConstant())
       {
          LOG_INTER("Constraint with no variable: " << c);

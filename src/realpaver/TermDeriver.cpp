@@ -13,12 +13,7 @@
 namespace realpaver {
 
 TermDeriver::TermDeriver(Variable v)
-      : id_(v.id()),
-        dt_()
-{}
-
-TermDeriver::TermDeriver(size_t id)
-      : id_(id),
+      : v_(v),
         dt_()
 {}
 
@@ -34,7 +29,7 @@ void TermDeriver::apply(const TermConst* t)
 
 void TermDeriver::apply(const TermVar* t)
 {
-   if (t->var().id() == id_)
+   if (t->var().id() == v_.id())
       dt_ = Term(1);
 
    else
@@ -43,10 +38,10 @@ void TermDeriver::apply(const TermVar* t)
 
 void TermDeriver::apply(const TermAdd* t)
 {
-   TermDeriver vl(id_);
+   TermDeriver vl(v_);
    t->left()->acceptVisitor(vl);
 
-   TermDeriver vr(id_);
+   TermDeriver vr(v_);
    t->right()->acceptVisitor(vr);
 
    dt_ = vl.dt_ + vr.dt_;
@@ -54,10 +49,10 @@ void TermDeriver::apply(const TermAdd* t)
 
 void TermDeriver::apply(const TermSub* t)
 {
-   TermDeriver vl(id_);
+   TermDeriver vl(v_);
    t->left()->acceptVisitor(vl);
 
-   TermDeriver vr(id_);
+   TermDeriver vr(v_);
    t->right()->acceptVisitor(vr);
 
    dt_ = vl.dt_ - vr.dt_;
@@ -65,10 +60,10 @@ void TermDeriver::apply(const TermSub* t)
 
 void TermDeriver::apply(const TermMul* t)
 {
-   TermDeriver vl(id_);
+   TermDeriver vl(v_);
    t->left()->acceptVisitor(vl);
 
-   TermDeriver vr(id_);
+   TermDeriver vr(v_);
    t->right()->acceptVisitor(vr);
 
    dt_ = vl.dt_*t->right() + vr.dt_*t->left();
@@ -76,10 +71,10 @@ void TermDeriver::apply(const TermMul* t)
 
 void TermDeriver::apply(const TermDiv* t)
 {
-   TermDeriver vl(id_);
+   TermDeriver vl(v_);
    t->left()->acceptVisitor(vl);
 
-   TermDeriver vr(id_);
+   TermDeriver vr(v_);
    t->right()->acceptVisitor(vr);
 
    dt_ = (vl.dt_*t->right() - vr.dt_*t->left()) / sqr(t->right());
@@ -97,14 +92,14 @@ void TermDeriver::apply(const TermMax* t)
    
 void TermDeriver::apply(const TermUsb* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = -vis.dt_;
 }
 
 void TermDeriver::apply(const TermAbs* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = sgn(t->child())*vis.dt_;
 }
@@ -116,21 +111,21 @@ void TermDeriver::apply(const TermSgn* t)
 
 void TermDeriver::apply(const TermSqr* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = (2*vis.dt_)*t->child();
 }
 
 void TermDeriver::apply(const TermSqrt* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = (0.5*vis.dt_)/sqrt(t->child());
 }
 
 void TermDeriver::apply(const TermPow* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
 
    int n = t->exponent();
@@ -139,37 +134,47 @@ void TermDeriver::apply(const TermPow* t)
 
 void TermDeriver::apply(const TermExp* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = vis.dt_*exp(t->child());
 }
 
 void TermDeriver::apply(const TermLog* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = vis.dt_ / t->child();
 }
 
 void TermDeriver::apply(const TermCos* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = (-vis.dt_)*sin(t->child());
 }
 
 void TermDeriver::apply(const TermSin* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = vis.dt_*cos(t->child());
 }
 
 void TermDeriver::apply(const TermTan* t)
 {
-   TermDeriver vis(id_);
+   TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = (1 + sqr(tan(t->child())))*vis.dt_;
+}
+
+void TermDeriver::apply(const TermLin* t)
+{
+   auto it = t->find(v_);
+   if (it == t->end())
+      dt_ = Term(0);
+
+   else
+      dt_ = Term(t->getCoefSub(it));
 }
 
 } // namespace

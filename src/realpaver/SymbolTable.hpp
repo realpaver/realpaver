@@ -303,25 +303,26 @@ public:
    FunctionCallProcessor(FunctionCall* fc);
 
    ///@{
-   virtual void apply(const TermConst* t) override;
-   virtual void apply(const TermVar* t) override;
-   virtual void apply(const TermAdd* t) override;
-   virtual void apply(const TermSub* t) override;
-   virtual void apply(const TermMul* t) override;
-   virtual void apply(const TermDiv* t) override;
-   virtual void apply(const TermMin* t) override;
-   virtual void apply(const TermMax* t) override;
-   virtual void apply(const TermUsb* t) override;
-   virtual void apply(const TermAbs* t) override;
-   virtual void apply(const TermSgn* t) override;
-   virtual void apply(const TermSqr* t) override;
-   virtual void apply(const TermSqrt* t) override;
-   virtual void apply(const TermPow* t) override;
-   virtual void apply(const TermExp* t) override;
-   virtual void apply(const TermLog* t) override;
-   virtual void apply(const TermCos* t) override;
-   virtual void apply(const TermSin* t) override;
-   virtual void apply(const TermTan* t) override;
+   void apply(const TermConst* t) override;
+   void apply(const TermVar* t) override;
+   void apply(const TermAdd* t) override;
+   void apply(const TermSub* t) override;
+   void apply(const TermMul* t) override;
+   void apply(const TermDiv* t) override;
+   void apply(const TermMin* t) override;
+   void apply(const TermMax* t) override;
+   void apply(const TermUsb* t) override;
+   void apply(const TermAbs* t) override;
+   void apply(const TermSgn* t) override;
+   void apply(const TermSqr* t) override;
+   void apply(const TermSqrt* t) override;
+   void apply(const TermPow* t) override;
+   void apply(const TermExp* t) override;
+   void apply(const TermLog* t) override;
+   void apply(const TermCos* t) override;
+   void apply(const TermSin* t) override;
+   void apply(const TermTan* t) override;
+   void apply(const TermLin* t) override;
    ///@}
 
    Term getTerm() const;

@@ -127,7 +127,7 @@ SPLIT_NB_SLICES = 7
 # An inner region can be considered as a solution or it can be split.
 # - YES: it is split;
 # - NO:  it is considered as a solution.
-SPLIT_INNER = YES
+SPLIT_INNER = NO
 
 ###############################################################################
 ## CONTRACTORS AND PROPAGATION                                               ##
@@ -172,7 +172,7 @@ PROPAGATION_WITH_MAX_CID = YES
 # - RLT: contractor based on a RLT-based relaxation
 # - AFFINE: contractor based an an affine relaxation
 # - TAYLOR: contractor based on a Taylor relaxation
-PROPAGATION_WITH_POLYTOPE = NO
+PROPAGATION_WITH_POLYTOPE = RLT
 
 # Propagation with the interval Newton method applied to a square system
 # of equations (YES or NO)

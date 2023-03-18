@@ -48,6 +48,7 @@ public:
    void apply(const DagCos* node) override;
    void apply(const DagSin* node) override;
    void apply(const DagTan* node) override;
+   void apply(const DagLin* node) override;
    ///@}
 
 private:

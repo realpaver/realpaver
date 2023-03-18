@@ -6,12 +6,18 @@
 #
 # Ill-conditionned system with one solution.
 
+Constants
+   lo = -2.0,
+   up =  2.0;
+
+# up = 10.0;
+
 Variables
-   b in [-1.0e1, 1.0e1],
-   w0 in [-1.0e1, 1.0e1],
-   w1 in [-1.0e1, 1.0e1],
-   w2 in [-1.0e1, 1.0e1],
-   w3 in [-1.0e1, 1.0e1];
+   b  in [lo, up],
+   w0 in [lo, up],
+   w1 in [lo, up],
+   w2 in [lo, up],
+   w3 in [lo, up];
 
 Constraints
     w0 + w1 + w2 + w3 - 1 == 0,

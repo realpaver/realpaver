@@ -23,10 +23,6 @@ public:
    /// @param v a variable
    TermDeriver(Variable v);
 
-   /// Creates a deriver
-   /// @param id an identifier of variable
-   TermDeriver(size_t id);
-
    /// @return the partial derivative after a visit
    Term getDerivative() const;
 
@@ -50,11 +46,12 @@ public:
    void apply(const TermCos* t) override;
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
+   void apply(const TermLin* t) override;
    ///@}
 
 private:
-   size_t id_;    // variable id
-   Term dt_;      // partial derivative
+   Variable v_;   // variable
+   Term dt_;      // partial derivative wrt. this variable
 };
 
 } // namespace

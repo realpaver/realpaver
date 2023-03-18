@@ -14,12 +14,12 @@ namespace realpaver {
 
 int VariableRep::NEXT_ID = 0;
 
-VariableRep::VariableRep(const std::string& name) :
-      name_(name),
-      id_(NEXT_ID++),
-      domain_(),
-      continuous_(true),
-      tol_(Tolerance::makeAbs(0.0))
+VariableRep::VariableRep(const std::string& name)
+      : name_(name),
+        id_(NEXT_ID++),
+        domain_(),
+        continuous_(true),
+        tol_(Tolerance::makeAbs(0.0))
 {}
 
 size_t VariableRep::id() const
@@ -89,9 +89,21 @@ void VariableRep::setTolerance(const Tolerance& tol)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Variable::Variable(const std::string& name) :
-   rep_(std::make_shared<VariableRep>(name))
+Variable::Variable(const std::string& name)
+      : rep_(std::make_shared<VariableRep>(name))
 {}
+
+Variable::Variable(const Interval& x, const std::string& name)
+      : Variable(name)
+{
+   setDomain(x);
+}
+
+Variable::Variable(double lo, double up, const std::string& name)
+      : Variable(name)
+{
+   setDomain(Interval(lo, up));
+}
 
 Variable::Variable() : rep_(nullptr)
 {}

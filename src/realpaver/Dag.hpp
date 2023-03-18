@@ -701,6 +701,55 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a DAG node representing a (non-constant) linear expression.
+///////////////////////////////////////////////////////////////////////////////
+class DagLin : public DagOp {
+public:
+   /// Creates an empty linear expression
+   DagLin(Dag* dag, const TermLin* t, const IndexList& lsub);
+
+   ///@{
+   bool eqSymbol(const DagOp* other) const override;
+   size_t nbOccurrences(const Variable& v) const override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalRegion& reg) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   ///@}
+
+   /// @return the constant value of this linear expression
+   Interval getConstantValue() const;
+
+private:
+   struct Item {
+      Interval coef;    // coefficient
+      DagVar* node;     // variable node
+      Interval ival;    // used for the evaluation
+   };
+
+   struct CompItem {
+      bool operator()(const Item& i1, const Item& i2) const
+      {
+         return i1.node->getVar().id() < i2.node->getVar().id();
+      }
+   };
+
+   Interval cst_;                      // constant value
+   std::set<Item, CompItem> terms_;    // set of linear terms
+
+public:
+   typedef std::set<Item, CompItem>::const_iterator const_iterator;
+   const_iterator begin() const;
+   const_iterator end() const;
+
+   Interval getCoefSub(const_iterator it) const;
+   DagVar* getNodeSub(const_iterator it) const;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is a function in a DAG.
 ///
 /// To every function is associated an image, i.e. we have L <= f(x) <= U.
@@ -1208,6 +1257,7 @@ public:
    virtual void apply(const DagCos* d);
    virtual void apply(const DagSin* d);
    virtual void apply(const DagTan* d);
+   virtual void apply(const DagLin* d);
    ///@}
 };
 
@@ -1240,6 +1290,7 @@ public:
    virtual void apply(const DagCos* d) override;
    virtual void apply(const DagSin* d) override;
    virtual void apply(const DagTan* d) override;
+   virtual void apply(const DagLin* d) override;
    ///@}
 
 private:
@@ -1308,6 +1359,7 @@ public:
    void apply(const TermCos* t) override;
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
+   void apply(const TermLin* t) override;
    ///@}
 
 private:

@@ -583,6 +583,88 @@ void RltVisitor::apply(const DagTan* node)
    }
 }
 
+void RltVisitor::apply(const DagLin* node)
+{
+   //`y = a_0 + sum_i a_i*x_i
+   // where a_0, a_i are intervals, hence it comes
+   //`y >= a_0 + sum_i MIN(a_i*x_i)
+   //`y <= a_0 + sum_i MAX(a_i*x_i)
+
+   LPModel& lm = *lpm_;
+   Interval a0 = node->getConstantValue();
+
+   size_t iy = indexLinVar(node);
+   LinVar y = lm.getLinVar(iy);
+
+   LinExpr e;
+   int status = 2;
+
+   for (auto it=node->begin(); it!=node->end(); ++it)
+   {
+      DagVar* vnode = node->getNodeSub(it);
+      size_t ix = indexLinVar(vnode);
+      LinVar x = lm.getLinVar(ix);
+      Interval coef = node->getCoefSub(it);
+
+      if (coef.containsZero())
+      {
+         status = 0;
+         break;
+      }
+
+      else if (coef.isSingleton())
+         e.addTerm(coef.left(), x);
+
+      else
+      {
+         // MIN(a_i*x_i)
+         if (coef.isPositive())
+            e.addTerm(coef.left(), x);
+
+         else
+            e.addTerm(coef.right(), x);
+
+         status = 1;
+      }
+   }
+
+   if (status == 2)
+   {
+      // all the a_i are degenerated
+      // y = a_0 + e <=> e - y = -a_0
+      e.addTerm(-1.0, y);
+      lm.addCtr(-a0.right(), e, -a0.left());
+   }
+   else if (status == 1)
+   {
+      // y >= MIN(a_0) + e <=> e - y <= -MIN(a_0)
+      e.addTerm(-1.0, y);
+      lm.addCtr(e, -a0.left());
+
+      LinExpr f;
+      for (auto it=node->begin(); it!=node->end(); ++it)
+      {
+         DagVar* vnode = node->getNodeSub(it);
+         size_t ix = indexLinVar(vnode);
+         LinVar x = lm.getLinVar(ix);
+         Interval coef = node->getCoefSub(it);
+
+         // MAX(a_i*x_i)
+         if (coef.isPositive())
+            f.addTerm(coef.right(), x);
+
+         else
+            f.addTerm(coef.left(), x);
+      }
+
+      // y <= MAX(a_0) + f <=> f - y >= -MAX(a_0)
+      f.addTerm(-1.0, y);
+      lm.addCtr(-a0.right(), f);
+   }
+
+   // else nothing (status == 0)
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void underConvex(LPModel& lm, size_t iy, size_t ix,

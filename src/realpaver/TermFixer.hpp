@@ -73,6 +73,7 @@ public:
    void apply(const TermCos* t) override;
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
+   void apply(const TermLin* t) override;
    ///@}
 
 private:

@@ -99,6 +99,19 @@ public:
    /// @param name of the variable
    Variable(const std::string& name);
 
+   /// Creates a variable
+   /// @param x variable domain
+   /// @param name of the variable
+   /// @param x variable domain
+   Variable(const Interval& x, const std::string& name);
+
+   /// Creates a variable
+   /// @param x variable domain
+   /// @param name of the variable
+   /// @param lo lower bound of the variable domain
+   /// @param up upper bound of the variable domain
+   Variable(double lo, double up, const std::string& name);
+
    /// Creates a variable having no representation
    Variable();
 

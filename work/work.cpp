@@ -15,6 +15,7 @@
 #include "realpaver/HC4Contractor.hpp"
 #include "realpaver/RealMatrix.hpp"
 #include "realpaver/IntervalNewton.hpp"
+#include "realpaver/TermDeriver.hpp"
 
 using namespace std;
 using namespace realpaver;
@@ -25,24 +26,57 @@ int main(void)
    Interval::precision( 12 );
 
    try {
-      Problem pbm;
-      Variable x = pbm.addRealVar(0, 10, "x");
-      Variable y = pbm.addRealVar(0, 10, "y");
+      Variable x(1, 10, "x");
+      Variable y(3, 10, "y");
 
-      //~ SharedDag dag = make_shared<Dag>();
-      //~ dag->insert(sqr(x) + sqr(y) == 4);
-      //~ dag->insert(y - sqr(x) == 0);
+      IntervalRegion R({x, y});
+      cout << R << endl;
+
+      RealPoint P({x, y});
+      cout << P << endl;
+      P.set(x, 4.0);
+      P.set(y, -2.0);
+
+      Interval II("1.1", "1.1");
+
+      Term t(1 + II*x - 2*y);
+      cout << "t : " << t << endl;
+
+      SharedDag dag = std::make_shared<Dag>();
+      size_t idx = dag->insert(t == 0);
+      cout << (*dag) << endl;
+
+      DagFun* fun = dag->fun(idx);
+      cout << fun->intervalEval(R) << endl;
+
+      IntervalVector G(fun->scope().size());
+      fun->intervalDiff(G);
+      cout << "df / dx : " << G << endl;
+
+      //~ Proof proof = fun->hc4Revise(R);
+      //~ cout << proof << endl;
+      //~ cout << R << endl;
+      
+      PolytopeHullContractor phc(dag, PolytopeCreatorStyle::RLT);
+
+      Proof proof = phc.contract(R);
+      cout << proof << endl;
+      cout << R << endl;
+      
+      //cout << fun->realEval(P) << endl;
+/*
+      Variable x(1, 10, "x");
+      Variable y(1, 10, "y");
 
       IntervalFunctionVector F({sqr(x) + sqr(y) - 4, y - sqr(x)});
       IntervalNewton N(F);
 
       IntervalRegion R({x, y});
-      R.set(x, Interval(1, 10));
-      R.set(y, Interval(1, 10));
       cout << R << endl;
 
       Proof p = N.contract(R);
       cout << p << endl << R << endl;
+*/
 
 /*
       Interval m11(2, 3),

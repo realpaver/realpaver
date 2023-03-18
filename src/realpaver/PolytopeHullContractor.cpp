@@ -117,7 +117,7 @@ void PolytopeRLTCreator::createLinVar(LPModel& lpm, DagNode* node)
 
    // creates a linear variable for this node
    LinVar v = lpm.makeVar(val.left(), val.right());
-    
+
    // inserts the couple (node index, lin var index)
    mnv_.insert(std::make_pair(node->index(), v.getIndex()));
 
@@ -176,7 +176,7 @@ bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
       auto it = mnv_.find(node->index());
       LinVar v = lpm.getLinVar(it->second);
 
-      Interval img = f->getImage();
+      Interval img = f->getImage();      
       if (img.isSingleton())
          img += Interval(-eqtol_, eqtol_);
 
@@ -424,7 +424,6 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 
 Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
 {
-
    LPSolver solver;
 
    // linearizes the constraints

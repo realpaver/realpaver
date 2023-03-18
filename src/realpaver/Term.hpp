@@ -10,6 +10,7 @@
 #ifndef REALPAVER_TERM_HPP
 #define REALPAVER_TERM_HPP
 
+#include <set>
 #include <unordered_map>
 #include <vector>
 #include "realpaver/IntervalRegion.hpp"
@@ -24,7 +25,7 @@ class TermVisitor;   // forward declaration
 ///////////////////////////////////////////////////////////////////////////////
 enum class OpSymbol {
    Add, Sub, Mul, Div, Min, Max, Usb, Abs, Sgn, Sqr, Sqrt, Pow,
-   Exp, Log, Cos, Sin, Tan
+   Exp, Log, Cos, Sin, Tan, Lin
 };
 
 /// Output on a stream
@@ -98,6 +99,7 @@ public:
    virtual bool isMul() const;
    virtual bool isDiv() const;
    virtual bool isUsb() const;
+   virtual bool isLin() const;
    ///@}
 
    /// Dependency test
@@ -193,12 +195,11 @@ public:
    void acceptVisitor(TermVisitor& vis) const;   
 
    ///@{
-   /// Tests and operations for numbers used for the simplication of terms
+   /// Tests
    bool isNumber() const;
    bool isZero() const;
    bool isOne() const;
    bool isMinusOne() const;
-   bool isUsb() const;
    ///@}
 
    ///@{
@@ -211,6 +212,8 @@ public:
    bool isSub() const;
    bool isMul() const;
    bool isDiv() const;
+   bool isUsb() const;
+   bool isLin() const;
    ///@}
 
    /// Dependency test
@@ -780,11 +783,112 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a (non constant) linear expression.
+///////////////////////////////////////////////////////////////////////////////
+class TermLin : public TermRep {
+public:
+   /// Creates a linear term equal to zero
+   /// @param t sub-term
+   TermLin();
+
+   /// Adds a constant to this
+   /// @param val constant
+   void addConstant(const Interval& val);
+
+   /// Adds the opposite of a constant to this
+   /// @param val constant
+   void subConstant(const Interval& val);
+
+   /// Adds a product of a constant and a variable to this
+   /// @param x constant
+   /// @param v variable
+   void addTerm(const Interval& x, Variable v);
+
+   /// Adds the opposite of a product of a constant and a variable to this
+   /// @param x constant
+   /// @param v variable
+   void subTerm(const Interval& x, Variable v);
+
+   /// Adds a linear term to this
+   /// @param t linear term
+   void addTermLin(const TermLin& t);
+
+   /// Adds the opposite of a linear term to this
+   /// @param t linear term
+   void subTermLin(const TermLin& t);
+
+   ///@{
+   void print(std::ostream& os) const override;
+   Interval evalConst() const override;
+   void eval(const IntervalRegion& reg) override;
+   Proof contract(IntervalRegion& reg) override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   bool isLinear() const override;
+   bool isLin() const override;
+   bool dependsOn(const Variable& v) const override;
+   void makeScope(Scope& s) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+
+   /// @return the constant value of this
+   Interval getConstantValue() const;
+
+   /// @return the number of sub-terms (variables) in this
+   size_t getNbSub() const;
+
+   /// Access to a sub-term
+   /// @param i an index between 0 and getNbVars()-1
+   /// @return the coefficient of the i-th linear sub-term in this
+   Interval getCoefSub(size_t i) const;
+
+   /// Access to a sub-term
+   /// @param i an index between 0 and getNbVars()-1
+   /// @return the variable of the i-th linear sub-term in this
+   Variable getVarSub(size_t i) const;
+
+   /// @return true if this is reduced to a variable
+   bool isVariable() const;
+
+   /// Changes the sign of the constant and each coefficient in this
+   void toOpposite();
+
+private:
+   struct Item {
+      Interval coef;    // coefficient
+      Variable var;     // variable term
+      Interval ival;    // used for the evaluation
+   };
+
+   struct CompItem {
+      bool operator()(const Item& i1, const Item& i2) const
+      {
+         return i1.var.id() < i2.var.id();
+      }
+   };
+
+   void makeHashCode();
+
+public:
+   typedef std::set<Item, CompItem>::const_iterator const_iterator;
+   const_iterator begin() const;
+   const_iterator end() const;
+   const_iterator find(const Variable& v) const;
+
+   Interval getCoefSub(const_iterator it) const;
+   Variable getVarSub(const_iterator it) const;
+
+private:
+   Interval cst_;                      // constant value
+   std::set<Item, CompItem> terms_;    // set of linear terms
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is the base class of visitors of terms.
 ///////////////////////////////////////////////////////////////////////////////
 class TermVisitor {
 public:
-   /// Virtul destructor
+   /// Virtual destructor
    virtual ~TermVisitor();
 
    ///@{
@@ -807,6 +911,7 @@ public:
    virtual void apply(const TermCos* t);
    virtual void apply(const TermSin* t);
    virtual void apply(const TermTan* t);
+   virtual void apply(const TermLin* t);
    ///@}
 };
 
@@ -833,25 +938,26 @@ public:
    Term getSquare(size_t i) const;
 
    ///@{
-   virtual void apply(const TermConst* t) override;
-   virtual void apply(const TermVar* t) override;
-   virtual void apply(const TermAdd* t) override;
-   virtual void apply(const TermSub* t) override;
-   virtual void apply(const TermMul* t) override;
-   virtual void apply(const TermDiv* t) override;
-   virtual void apply(const TermMin* t) override;
-   virtual void apply(const TermMax* t) override;
-   virtual void apply(const TermUsb* t) override;
-   virtual void apply(const TermAbs* t) override;
-   virtual void apply(const TermSgn* t) override;
-   virtual void apply(const TermSqr* t) override;
-   virtual void apply(const TermSqrt* t) override;
-   virtual void apply(const TermPow* t) override;
-   virtual void apply(const TermExp* t) override;
-   virtual void apply(const TermLog* t) override;
-   virtual void apply(const TermCos* t) override;
-   virtual void apply(const TermSin* t) override;
-   virtual void apply(const TermTan* t) override;
+   void apply(const TermConst* t) override;
+   void apply(const TermVar* t) override;
+   void apply(const TermAdd* t) override;
+   void apply(const TermSub* t) override;
+   void apply(const TermMul* t) override;
+   void apply(const TermDiv* t) override;
+   void apply(const TermMin* t) override;
+   void apply(const TermMax* t) override;
+   void apply(const TermUsb* t) override;
+   void apply(const TermAbs* t) override;
+   void apply(const TermSgn* t) override;
+   void apply(const TermSqr* t) override;
+   void apply(const TermSqrt* t) override;
+   void apply(const TermPow* t) override;
+   void apply(const TermExp* t) override;
+   void apply(const TermLog* t) override;
+   void apply(const TermCos* t) override;
+   void apply(const TermSin* t) override;
+   void apply(const TermTan* t) override;
+   void apply(const TermLin* t) override;
    ///@}
 
 private:

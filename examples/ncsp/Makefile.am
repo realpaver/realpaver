@@ -26,6 +26,7 @@ EXTRA_DIST = \
 	Bifurcation.rp \
 	Bronstein.rp \
 	Brown5.rp \
+	Brown6.rp \
 	Broyden10.rp \
 	BurdenFaires.rp \
 	Butcher.rp \

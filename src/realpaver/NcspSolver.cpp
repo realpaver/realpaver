@@ -72,7 +72,6 @@ void NcspSolver::solve()
    // first phase: preprocessing
    preproc_->apply(problem_, preprob_);
    if (preproc_->isSolved()) return;
-
    return branchAndPrune();
 }
 
