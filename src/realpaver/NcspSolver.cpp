@@ -28,8 +28,8 @@
 namespace realpaver {
 
 NcspSolver::NcspSolver(const Problem& problem)
-      : problem_(problem),
-        preprob_(),
+      : problem_(nullptr),
+        preprob_(nullptr),
         preproc_(nullptr),
         env_(nullptr),
         space_(nullptr),
@@ -37,13 +37,15 @@ NcspSolver::NcspSolver(const Problem& problem)
         split_(nullptr),
         prover_(nullptr),
         stimer_(),
-        nbnodes_(0)
+        nbnodes_(0),
+        withPreprocessing_(true)
 {
    THROW_IF(!problem.isCSP(), "Ncsp solver applied to a problem that is " <<
                               "not a constraint satisfaction problem");
 
    env_ = new NcspEnv();
    preproc_ = new Preprocessor();
+   problem_ = new Problem(problem);
 }
 
 NcspSolver::~NcspSolver()
@@ -53,6 +55,8 @@ NcspSolver::~NcspSolver()
    if (space_ != nullptr) delete space_;
    if (split_ != nullptr) delete split_;
    if (prover_ != nullptr) delete prover_;
+   if (preprob_ != nullptr) delete preprob_;
+   if (problem_ != nullptr) delete problem_;
 }
 
 double NcspSolver::getSolvingTime() const
@@ -67,12 +71,26 @@ int NcspSolver::getTotalNodes() const
 
 void NcspSolver::solve()
 {
-   LOG_MAIN("Input problem\n" << problem_);
+   LOG_MAIN("Input problem\n" << (*problem_));
 
-   // first phase: preprocessing
-   preproc_->apply(problem_, preprob_);
-   if (preproc_->isSolved()) return;
-   return branchAndPrune();
+   std::string pre = env_->getParam()->getStrParam("PREPROCESSING");
+   if (pre == "YES")
+   {
+      // preprocessing + branch-and-prune
+      withPreprocessing_ = true;
+      preprob_ = new Problem();
+      preproc_->apply(*problem_, *preprob_);
+      if (!preproc_->isSolved())
+         branchAndPrune();
+   }
+   else
+   {
+      // only branch-and-prune
+      withPreprocessing_ = false;
+      preprob_ = problem_;
+      problem_ = nullptr;
+      branchAndPrune();
+   }
 }
 
 void NcspSolver::setContractor(SharedContractor contractor)
@@ -108,7 +126,7 @@ void NcspSolver::makeSpace()
 
    // creates and inserts the root node
    SharedNcspNode node =
-      std::make_shared<NcspNode>(preprob_.scope(), preprob_.getDomains());
+      std::make_shared<NcspNode>(preprob_->scope(), preprob_->getDomains());
 
    node->setIndex(1);
    space_->insertPendingNode(node);
@@ -127,9 +145,9 @@ void NcspSolver::makeContractor()
 
    // creates a propagator with one default contractor per constraint
    SharedContractorVector pool = std::make_shared<ContractorVector>();
-   for (size_t i=0; i<preprob_.nbCtrs(); ++i)
+   for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
-      Constraint c = preprob_.ctrAt(i);
+      Constraint c = preprob_->ctrAt(i);
       std::shared_ptr<Contractor> op = nullptr;
 
       try
@@ -170,7 +188,7 @@ void NcspSolver::makeContractor()
    if (with_max_cid == "YES")
    {
       std::unique_ptr<VariableSelector> selector =
-         std::make_unique<MaxDomSelector>(preprob_.scope());
+         std::make_unique<MaxDomSelector>(preprob_->scope());
 
       int nb = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
       std::unique_ptr<IntervalSlicer> slicer =
@@ -276,7 +294,7 @@ void NcspSolver::makeContractor()
 
    // integer variables
    std::shared_ptr<IntContractor> iop = std::make_shared<IntContractor>();
-   for (Variable v : preprob_.scope())
+   for (Variable v : preprob_->scope())
       if (v.isInteger()) iop->insertVar(v);
 
    if (iop->nbVars() > 0)
@@ -292,7 +310,7 @@ void NcspSolver::makeSplit()
    VariableSelector* selector = nullptr;
    IntervalSlicer* slicer = nullptr;
 
-   Scope sco = preprob_.scope();
+   Scope sco = preprob_->scope();
 
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
    if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
@@ -325,9 +343,9 @@ void NcspSolver::makeSplit()
 
 bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
 {
-   for (size_t i=0; i<preprob_.nbCtrs(); ++i)
+   for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
-      Constraint c = preprob_.ctrAt(i);
+      Constraint c = preprob_->ctrAt(i);
       if (c.isSatisfied(reg) != Proof::Inner)
          return false;
    }
@@ -425,7 +443,7 @@ void NcspSolver::branchAndPrune()
    makeSplit();
 
    // prover that derives proof certificates of the solutions
-   prover_ = new Prover(preprob_);
+   prover_ = new Prover(*preprob_);
 
    int niter = env_->getParam()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
    prover_->setMaxIter(niter);
@@ -550,33 +568,43 @@ std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
 {
    ASSERT(i < getNbSolutions(), "Bad access to a solution in a Ncsp solver");
 
-   IntervalRegion reg(problem_.getDomains());
-   Proof proof = Proof::Inner;
-
-   // assigns the values of the fixed variables
-   for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
+   if (withPreprocessing_)
    {
-      Variable v = preproc_->getFixedVar(i);
-      reg.set(v, preproc_->getFixedDomain(v));
-   }
+      IntervalRegion reg(problem_->getDomains());
+      Proof proof = Proof::Inner;
 
-   // assigns the values of the unfixed variables
-   if (!preproc_->allVarsFixed())
+      // assigns the values of the fixed variables
+      for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
+      {
+         Variable v = preproc_->getFixedVar(i);
+         reg.set(v, preproc_->getFixedDomain(v));
+      }
+
+      // assigns the values of the unfixed variables
+      if (!preproc_->allVarsFixed())
+      {
+         SharedNcspNode node = space_->getSolNode(i);
+         proof = node->getProof();
+
+         IntervalRegion* regnode = node->region();
+
+         for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
+         {
+            Variable v = preproc_->getUnfixedVar(i);
+            Variable w = preproc_->srcToDestVar(v);
+            reg.set(v, regnode->get(w));
+         }
+      }
+
+      return std::make_pair(reg, proof);
+   }
+   else
    {
       SharedNcspNode node = space_->getSolNode(i);
-      proof = node->getProof();
-
+      Proof proof = node->getProof();
       IntervalRegion* regnode = node->region();
-
-      for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
-      {
-         Variable v = preproc_->getUnfixedVar(i);
-         Variable w = preproc_->srcToDestVar(v);
-         reg.set(v, regnode->get(w));
-      }
+      return std::make_pair(*regnode, proof);
    }
-
-   return std::make_pair(reg, proof);
 }
 
 } // namespace

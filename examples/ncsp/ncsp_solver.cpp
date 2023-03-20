@@ -120,48 +120,53 @@ int main(int argc, char** argv)
       cout << GRAY(sep) << endl;
 
       // preprocessing
+      string prepro = solver.getEnv()->getParam()->getStrParam("PREPROCESSING");
+
       Preprocessor* preproc = solver.getPreprocessor();
 
-      cout << BLUE("Preprocessing") << endl;
-      cout << std::fixed << std::setprecision(2)
-           << indent << WP("Time", wpl)
-           << ORANGE(preproc->elapsedTime() << "s")
-           << endl;
-
-      cout << std::fixed << std::setprecision(2)
-           << indent << WP("Status", wpl);
-
-      if (preproc->isSolved())
+      if (prepro == "YES")
       {
-         if (preproc->isUnfeasible())
-            cout << ORANGE("solved unfeasible") << endl;
+         cout << BLUE("Preprocessing") << endl;
+         cout << std::fixed << std::setprecision(2)
+              << indent << WP("Time", wpl)
+              << ORANGE(preproc->elapsedTime() << "s")
+              << endl;
+
+         cout << std::fixed << std::setprecision(2)
+              << indent << WP("Status", wpl);
+
+         if (preproc->isSolved())
+         {
+            if (preproc->isUnfeasible())
+               cout << ORANGE("solved unfeasible") << endl;
+            else
+               cout << ORANGE("solved feasible") << endl;
+         }
          else
-            cout << ORANGE("solved feasible") << endl;
-      }
-      else
-         cout << ORANGE("not solved") << endl;
+            cout << ORANGE("not solved") << endl;
 
-      if (!preproc->isSolved())
-      {
-         cout << indent << WP("Number of variables fixed", wpl)
-              << ORANGE(preproc->nbFixedVars()) << endl
-              << indent << WP("Number of inactive constraints", wpl)
-              << ORANGE(preproc->nbInactiveCtrs()) << endl;
-      }
+         if (!preproc->isSolved())
+         {
+            cout << indent << WP("Number of variables fixed", wpl)
+                 << ORANGE(preproc->nbFixedVars()) << endl
+                 << indent << WP("Number of inactive constraints", wpl)
+                 << ORANGE(preproc->nbInactiveCtrs()) << endl;
+         }
 
-      cout << GRAY(sep) << endl;
+         cout << GRAY(sep) << endl;
 
-      if (preproc->nbFixedVars() > 0)
-      {
-         IntervalRegion reg(preproc->fixedRegion());
-         Scope sco = preproc->fixedScope();
-         fsol << "--- PREPROCESSING ---" << endl << endl;
-         reg.stdPrint(fsol);
-         fsol << endl;
+         if (preproc->nbFixedVars() > 0)
+         {
+            IntervalRegion reg(preproc->fixedRegion());
+            Scope sco = preproc->fixedScope();
+            fsol << "--- PREPROCESSING ---" << endl << endl;
+            reg.stdPrint(fsol);
+            fsol << endl;
+         }
       }
 
       // solving
-      if (!preproc->isSolved())
+      if (!(prepro == "YES" && preproc->isSolved()))
       {
          NcspEnv* env = solver.getEnv();
          NcspSpace* space = solver.getSpace();

@@ -88,6 +88,7 @@ Param::Param()
    strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
+   strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
 }
 
 int Param::getIntParam(const string& name) const

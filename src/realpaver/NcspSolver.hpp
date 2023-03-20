@@ -89,8 +89,8 @@ public:
    std::pair<IntervalRegion, Proof> getSolution(size_t i) const;
 
 private:
-   Problem problem_;             // initial problem
-   Problem preprob_;             // problem resulting from preprocessing
+   Problem* problem_;            // initial problem
+   Problem* preprob_;            // problem resulting from preprocessing
    Preprocessor* preproc_;       // preprocessor
 
    NcspEnv* env_;                // environment
@@ -103,6 +103,7 @@ private:
 
    Timer stimer_;                // timer for the solving phase
    int nbnodes_;                 // number of nodes processed
+   bool withPreprocessing_;      // true if preprocessing enabled
 
    void branchAndPrune();
    void makeSpace();

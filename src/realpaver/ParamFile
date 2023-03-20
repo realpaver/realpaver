@@ -50,6 +50,9 @@ TRACE = YES
 # VEC: display of the vector of domains
 DISPLAY_REGION = STD
 
+# Preprocessing phase of the solving process enabled or disabled (YES or NO)
+PREPROCESSING = YES
+
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##
 ###############################################################################
