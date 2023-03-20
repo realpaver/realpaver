@@ -1,6 +1,8 @@
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include "realpaver/config.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
@@ -69,8 +71,6 @@ int main(int argc, char** argv)
       if (!ok) THROW("Parse error: " << parser.getParseError());
       if (!problem.isCSP()) THROW("Not a NCSP");
 
-DEBUG("PROBLEM : " << problem);
-
       // solving
       NcspSolver solver(problem);
       solver.getEnv()->setParam(prm);
@@ -111,6 +111,14 @@ DEBUG("PROBLEM : " << problem);
       string prepro = solver.getEnv()->getParam()->getStrParam("PREPROCESSING");
 
       Preprocessor* preproc = solver.getPreprocessor();
+
+      fsol << WP("NCSP solver", wpl) << REALPAVER_STRING << endl;
+
+      auto now = chrono::system_clock::now();
+      std::time_t end_time = chrono::system_clock::to_time_t(now);
+
+      fsol << WP("Input file", wpl) << filename << endl;
+      fsol << WP("Current date and time: ", wpl) << ctime(&end_time) << endl;
 
       if (prepro == "YES")
       {
