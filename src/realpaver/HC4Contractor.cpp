@@ -9,7 +9,6 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/HC4Contractor.hpp"
-#include "realpaver/Stat.hpp"
 
 namespace realpaver {
 
@@ -24,17 +23,7 @@ HC4Contractor::HC4Contractor(SharedDag dag, size_t i)
 
 Proof HC4Contractor::contract(IntervalRegion& reg)
 {
-#if STAT_ON
-   Timer& tim = Stat::getTimeStat("TIMER_HC4");
-   tim.start();
-#endif
-
    Proof proof = dag_->fun(if_)->hc4Revise(reg);
-
-#if STAT_ON
-   tim.stop();
-#endif
-
    return proof;
 }
 

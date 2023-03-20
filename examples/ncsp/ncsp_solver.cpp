@@ -58,14 +58,6 @@ int main(int argc, char** argv)
       }
 #endif
 
-      // statistics
-#if STAT_ON
-      string statfilename = basefname + ".sta";
-      ofstream fstat;
-      fstat.open(statfilename, std::ofstream::out);
-      if (fstat.bad()) THROW("Open error of statistics file");
-#endif
-
       LOG_MAIN("NCSP solving");
       LOG_MAIN("Input file: " << filename);
 
@@ -108,12 +100,6 @@ int main(int argc, char** argv)
       cout << indent << WP("Log file", wpl);
       string meslog = (loglevel != LogLevel::none) ? flog : "no log";
       cout << ORANGE(meslog) << endl;
-#endif
-
-      // statistics
-#if STAT_ON
-      cout << indent << WP("Statistics file", wpl);
-      cout << ORANGE(statfilename) << endl;
 #endif
 
       cout << indent << WP("Output file", wpl) << ORANGE(solfilename) << endl;
@@ -269,11 +255,6 @@ int main(int argc, char** argv)
                   space->hullOfPendingNodes().vecPrint(fsol);
             }
          }
-
-         // writes the statistics
-#if STAT_ON
-         Stat::print(fstat);
-#endif
 
          // limits
          if (env->usedTimeLimit())

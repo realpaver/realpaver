@@ -831,7 +831,6 @@ with_lplib
 enable_debug
 enable_assert
 enable_log
-enable_stat
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1489,7 +1488,6 @@ Optional Features:
   --enable-debug          turn on debugging (default=no)
   --enable-assert         check assertions (default=no)
   --enable-log            generate log files (default=no)
-  --enable-stat           collect statistics (default=no)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -17791,33 +17789,6 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-# --enable-stat
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to collect statistics" >&5
-printf %s "checking whether to collect statistics... " >&6; }
-@%:@ Check whether --enable-stat was given.
-if test ${enable_stat+y}
-then :
-  enableval=$enable_stat; enable_stat=yes
-else $as_nop
-  enable_stat=no
-fi
-
-
-if test ${enable_stat} = "yes"; then
-   
-printf "%s\n" "@%:@define STAT_ON 1" >>confdefs.h
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-else
-   
-printf "%s\n" "@%:@define STAT_ON 0" >>confdefs.h
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
 # file generation
 ac_config_files="$ac_config_files Makefile check/Makefile doc/Doxyfile doc/Makefile examples/Makefile examples/bop/Makefile examples/ncsp/Makefile src/Makefile src/realpaver/Makefile work/Makefile"
 
@@ -20454,7 +20425,6 @@ printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
 printf "\tLog files          : ${enable_log}\n"
-printf "\tStatistics         : ${enable_stat}\n"
 printf "\tUnit testing       : ${have_cppunit}\n"
 printf "\tDoxygen            : ${DOXYGEN}\n"
 printf "\nRun make to compile Realpaver\n"
@@ -20465,4 +20435,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/usr/local/ --with-include-path=/usr/local/include --with-lib-path=/usr/local/lib --with-itvlib=GaolCrlibm --with-lplib=Clp --enable-debug --enable-assert --enable-log --enable-stat
+# ./configure --prefix=/usr/local/ --with-include-path=/usr/local/include --with-lib-path=/usr/local/lib --with-itvlib=GaolCrlibm --with-lplib=Clp --enable-debug --enable-assert --enable-log

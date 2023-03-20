@@ -362,25 +362,6 @@ else
 fi
 
 
-# --enable-stat
-AC_MSG_CHECKING([whether to collect statistics])
-AC_ARG_ENABLE(stat,
-   [AS_HELP_STRING([--enable-stat],
-                   [collect statistics (default=no)])],
-   [enable_stat=yes],
-   [enable_stat=no])
-
-if test ${enable_stat} = "yes"; then
-   AC_DEFINE(STAT_ON, 1,
-             [Define to 1 to collect statistics.])
-   AC_MSG_RESULT([yes])
-else
-   AC_DEFINE(STAT_ON, 0,
-             [Define this to 1 to collect statistics.])
-   AC_MSG_RESULT([no])
-fi
-
-
 # file generation
 AC_CONFIG_FILES([Makefile
                  check/Makefile
@@ -403,7 +384,6 @@ printf "\tLP solver          : ${use_lplib}\n"
 printf "\tDebugging          : ${enable_debug}\n"
 printf "\tAssertion checking : ${enable_assert}\n"
 printf "\tLog files          : ${enable_log}\n"
-printf "\tStatistics         : ${enable_stat}\n"
 printf "\tUnit testing       : ${have_cppunit}\n"
 printf "\tDoxygen            : ${DOXYGEN}\n"
 printf "\nRun make to compile Realpaver\n"
@@ -414,4 +394,4 @@ echo ""
 # ./configure --prefix=/home/granvilliers-l/local/ --with-mathlib-include=/home/granvilliers-l/local/include --with-mathlib-lib=/home/granvilliers-l/local/lib --with-mathlib=apmathlib --enable-preserve-rounding=yes --enable-verbose-mode=no
 
 # Realpaver configuration
-# ./configure --prefix=/usr/local/ --with-include-path=/usr/local/include --with-lib-path=/usr/local/lib --with-itvlib=GaolCrlibm --with-lplib=Clp --enable-debug --enable-assert --enable-log --enable-stat
+# ./configure --prefix=/usr/local/ --with-include-path=/usr/local/include --with-lib-path=/usr/local/lib --with-itvlib=GaolCrlibm --with-lplib=Clp --enable-debug --enable-assert --enable-log

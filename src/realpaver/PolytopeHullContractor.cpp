@@ -13,7 +13,6 @@
 #include "realpaver/Param.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
 #include "realpaver/RltRelaxation.hpp"
-#include "realpaver/Stat.hpp"
 
 namespace realpaver {
 
@@ -408,17 +407,7 @@ Scope PolytopeHullContractor::scope() const
 
 Proof PolytopeHullContractor::contract(IntervalRegion& reg)
 {
-#if STAT_ON
-   Timer& tim = Stat::getTimeStat("TIMER_POLYTOPE_HULL");
-   tim.start();
-#endif
-
    Proof proof = contractImpl(reg);
-
-#if STAT_ON
-   tim.stop();
-#endif
-
    return proof;
 }
 
