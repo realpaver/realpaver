@@ -114,27 +114,48 @@ DEBUG("PROBLEM : " << problem);
 
       if (prepro == "YES")
       {
+         fsol << "--- PREPROCESSING ---" << endl << endl
+              << std::fixed << std::setprecision(2)
+              << WP("Elapsed time", wpl)
+              << preproc->elapsedTime() << " (seconds)"
+              << endl
+              << std::fixed << std::setprecision(2)
+              << WP("Status", wpl);
+
          cout << BLUE("Preprocessing") << endl;
          cout << std::fixed << std::setprecision(2)
               << indent << WP("Time", wpl)
               << ORANGE(preproc->elapsedTime() << "s")
-              << endl;
-
-         cout << std::fixed << std::setprecision(2)
+              << endl
+              << std::fixed << std::setprecision(2)
               << indent << WP("Status", wpl);
 
          if (preproc->isSolved())
          {
             if (preproc->isUnfeasible())
+            {
+               fsol << "solved unfeasible" << endl;
                cout << ORANGE("solved unfeasible") << endl;
+            }
             else
+            {
+               fsol << "solved feasible" << endl;
                cout << ORANGE("solved feasible") << endl;
+            }
          }
          else
+         {
+            fsol << "not solved" << endl;
             cout << ORANGE("not solved") << endl;
+         }
 
          if (!preproc->isSolved())
          {
+            fsol << WP("Number of inactive constraints", wpl)
+                 << preproc->nbInactiveCtrs() << endl
+                 << WP("Number of variables fixed", wpl)
+                 << preproc->nbFixedVars() << endl;
+            
             cout << indent << WP("Number of variables fixed", wpl)
                  << ORANGE(preproc->nbFixedVars()) << endl
                  << indent << WP("Number of inactive constraints", wpl)
@@ -145,9 +166,9 @@ DEBUG("PROBLEM : " << problem);
 
          if (preproc->nbFixedVars() > 0)
          {
+            fsol << endl;
             IntervalRegion reg(preproc->fixedRegion());
             Scope sco = preproc->fixedScope();
-            fsol << "--- PREPROCESSING ---" << endl << endl;
             reg.stdPrint(fsol);
             fsol << endl;
          }
@@ -158,8 +179,16 @@ DEBUG("PROBLEM : " << problem);
       {
          NcspEnv* env = solver.getEnv();
          NcspSpace* space = solver.getSpace();
-         
+
+         fsol << "--- SOLVING ---" << endl << endl;
          cout << BLUE("Solving") << endl;
+
+         fsol << WP("Elapsed time", wpl)
+              << std::fixed << std::setprecision(2)
+              << solver.getSolvingTime() << " (seconds)"
+              << endl
+              << WP("Number of nodes", wpl)
+              << solver.getTotalNodes() << endl;
 
          cout << indent << WP("Time", wpl)
               << std::fixed << std::setprecision(2)
@@ -171,39 +200,66 @@ DEBUG("PROBLEM : " << problem);
          bool complete = env->usedNoLimit() &&
                          space->nbPendingNodes() == 0;
 
+         fsol << WP("Search status", wpl);
          cout << indent << WP("Search status", wpl);
          if (complete)
+         {
+            fsol << "complete" << endl;
             cout << ORANGE("complete") << endl;
+         }
          else
+         {
+            fsol << "partial" << endl;
             cout << ORANGE("partial") << endl;
+         }
 
+         fsol << WP("Solution status", wpl);
          cout << indent << WP("Solution status", wpl);
          if (space->nbSolNodes() == 0)
          {
             if (complete)
+            {
+               fsol << "proved unfeasible" << endl;
                cout << ORANGE("unfeasible") << endl;
+            }
             else
+            {
+               fsol << "no solution found" << endl;
                cout << ORANGE("no solution found") << endl;
+            }
          }
          else
          {
             if (space->hasFeasibleSolNode())
+            {
+               fsol << "proved feasible" << endl;
                cout << ORANGE("feasible") << endl;
+            }
             else
+            {
+               fsol << "no proof certificate" << endl;
                cout << ORANGE("no proof certificate") << endl;
+            }
 
+            fsol << WP("Number of clustered solutions", wpl)
+                 << space->nbSolNodes() << endl;
             cout << indent << WP("Number of clustered solutions", wpl)
                  << ORANGE(space->nbSolNodes()) << endl;
 
+            fsol << WP("Number of individual solutions", wpl)
+                 << space->nbTotalSolNodes() << endl;
             cout << indent << WP("Number of individual solutions", wpl)
                  << ORANGE(space->nbTotalSolNodes()) << endl;
 
             if (!complete)
+            {
+               fsol << WP("Number of pending nodes", wpl)
+                    << space->nbPendingNodes() << endl;
                cout << indent << WP("Number of pending nodes", wpl)
                     << ORANGE(space->nbPendingNodes()) << endl;
+            }
 
             // writes the solutions
-            fsol << "--- SOLVING ---" << endl;
             Scope sco = preproc->unfixedScope();
 
             string sdis =
@@ -257,6 +313,10 @@ DEBUG("PROBLEM : " << problem);
                   space->hullOfPendingNodes().vecPrint(fsol);
             }
          }
+
+         // writes the parameters in the solution file
+         fsol << endl << "--- PARAMETERS ---" << endl << endl;
+         env->getParam()->print(fsol);
 
          // limits
          if (env->usedTimeLimit())
