@@ -95,6 +95,11 @@ public:
    /// @return the number of inactive constraints detected by this
    size_t nbInactiveCtrs() const;
 
+   /// Gets an inactive constraint
+   /// @param i an index between 0 and nbInactiveCtrs()-1
+   /// @return the i-th inactive constraint in this
+   Constraint getInactiveCtr(size_t i) const;
+
    /// @return the number of fixed variables detected by this
    size_t nbFixedVars() const;
 
@@ -127,6 +132,7 @@ private:
    VarVarMapType vvm_;                 // map for non fixed variables
    VarIntervalMapType vim_;            // map for fixed variables
 
+   std::vector<Constraint> inactive_;  // constraints inactive
    std::vector<Constraint> active_;    // constraints not inactive
    size_t nbc_;                        // number of inactive constraints
    bool unfeasible_;                   // true if problem unfeasible

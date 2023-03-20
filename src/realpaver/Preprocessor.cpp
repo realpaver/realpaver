@@ -16,8 +16,8 @@ namespace realpaver {
 Preprocessor::Preprocessor()
       : vvm_(),
         vim_(),
+        inactive_(),
         active_(),
-        nbc_(0),
         unfeasible_(false),
         timer_()
 {}
@@ -75,8 +75,8 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    // resets this
    vvm_.clear();
    vim_.clear();
+   inactive_.clear();
    active_.clear();
-   nbc_ = 0;
    unfeasible_ = false;
 
    LOG_MAIN("Preprocessing");
@@ -122,7 +122,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
       else if (proof == Proof::Inner || c.isBoundConstraint())
       {
          LOG_INTER("Inactive constraint: " << c);
-         nbc_ = nbc_ + 1;
+         inactive_.push_back(c);
       }
       
       else
@@ -131,7 +131,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
       }
    }
 
-   LOG_MAIN("Number of inactive constraints: " << nbc_);
+   LOG_MAIN("Number of inactive constraints: " << inactive_.size());
 
    // rewrites the variables
    for (size_t i=0; i<src.nbVars(); ++i)
@@ -181,7 +181,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
       if (c.isConstant())
       {
          LOG_INTER("Constraint with no variable: " << c);
-         nbc_ = nbc_ + 1;
+         inactive_.push_back(input);
       }
 
       else dest.addCtr(c);
@@ -278,7 +278,13 @@ Scope Preprocessor::unfixedScope() const
 
 size_t Preprocessor::nbInactiveCtrs() const
 {
-   return nbc_;
+   return inactive_.size();
+}
+
+Constraint Preprocessor::getInactiveCtr(size_t i) const
+{
+   ASSERT(i < inactive_.size(), "Bad access to an inactive constraint");
+   return inactive_[i];
 }
 
 size_t Preprocessor::nbFixedVars() const

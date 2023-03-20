@@ -78,6 +78,14 @@ int main(int argc, char** argv)
       int prec = prm.getIntParam("FLOAT_PRECISION");
       Interval::precision(prec);
 
+      std::string sep = "###################################";
+      sep += sep;
+      std::string indent = "   ";
+      int wpl = 36;
+
+      cout << GRAY(sep) << endl;
+      cout << BLUE(REALPAVER_STRING) << BLUE(" NCSP solver") << endl;
+
       ////////////////////
       solver.solve();
       ////////////////////
@@ -87,14 +95,9 @@ int main(int argc, char** argv)
       fsol.open(solfilename, std::ofstream::out);
       if (fsol.bad()) THROW("Open error of solution file");
 
-      std::string sep = "###################################";
-      sep += sep;
-      std::string indent = "   ";
-      int wpl = 36;
-
       // preliminaries
       cout << GRAY(sep) << endl;
-      cout << BLUE("Realpaver NCSP solving") << endl;
+      cout << BLUE("Files") << endl;
 
       cout << indent << WP("Input file", wpl) << ORANGE(filename) << endl;
 
@@ -118,7 +121,7 @@ int main(int argc, char** argv)
       std::time_t end_time = chrono::system_clock::to_time_t(now);
 
       fsol << WP("Input file", wpl) << filename << endl;
-      fsol << WP("Current date and time: ", wpl) << ctime(&end_time) << endl;
+      fsol << WP("Current date and time", wpl) << ctime(&end_time) << endl;
 
       if (prepro == "YES")
       {
@@ -157,27 +160,32 @@ int main(int argc, char** argv)
             cout << ORANGE("not solved") << endl;
          }
 
-         if (!preproc->isSolved())
-         {
-            fsol << WP("Number of inactive constraints", wpl)
-                 << preproc->nbInactiveCtrs() << endl
-                 << WP("Number of variables fixed", wpl)
-                 << preproc->nbFixedVars() << endl;
-            
-            cout << indent << WP("Number of variables fixed", wpl)
-                 << ORANGE(preproc->nbFixedVars()) << endl
-                 << indent << WP("Number of inactive constraints", wpl)
-                 << ORANGE(preproc->nbInactiveCtrs()) << endl;
-         }
+         fsol << WP("Number of variables fixed", wpl)
+              << preproc->nbFixedVars() << endl;
+
+         cout << indent << WP("Number of variables fixed", wpl)
+              << ORANGE(preproc->nbFixedVars()) << endl
+              << indent << WP("Number of inactive constraints", wpl)
+              << ORANGE(preproc->nbInactiveCtrs()) << endl;
 
          cout << GRAY(sep) << endl;
 
          if (preproc->nbFixedVars() > 0)
          {
-            fsol << endl;
             IntervalRegion reg(preproc->fixedRegion());
             Scope sco = preproc->fixedScope();
             reg.stdPrint(fsol);
+         }
+
+         fsol << WP("Number of inactive constraints", wpl)
+              << preproc->nbInactiveCtrs() << endl;
+
+         if (preproc->nbInactiveCtrs() > 0)
+         {
+            for (size_t i=0; i<preproc->nbInactiveCtrs(); ++i)
+            {
+               fsol << preproc->getInactiveCtr(i) << endl;
+            }
             fsol << endl;
          }
       }
