@@ -80,8 +80,8 @@ void NcspSolver::solve()
       withPreprocessing_ = true;
       preprob_ = new Problem();
       preproc_->apply(*problem_, *preprob_);
-      if (!preproc_->isSolved())
-         branchAndPrune();
+      
+      if (!preproc_->isSolved()) branchAndPrune();
    }
    else
    {

@@ -69,6 +69,8 @@ int main(int argc, char** argv)
       if (!ok) THROW("Parse error: " << parser.getParseError());
       if (!problem.isCSP()) THROW("Not a NCSP");
 
+DEBUG("PROBLEM : " << problem);
+
       // solving
       NcspSolver solver(problem);
       solver.getEnv()->setParam(prm);

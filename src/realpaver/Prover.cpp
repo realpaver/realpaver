@@ -27,11 +27,13 @@ Prover::Prover(const Problem& p)
    for (size_t i=0; i<p.nbCtrs(); ++i)
    {
       Constraint c = p.ctrAt(i);
+
       if (c.isEquation())
       {
          Constraint::SharedRep rep = c.rep();
          ArithCtrEq* eq = static_cast<ArithCtrEq*>(rep.get());
          Term t = eq->left() - eq->right();
+
          F.addFun(IntervalFunction(t));
       }
       else

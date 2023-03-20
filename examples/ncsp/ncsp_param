@@ -51,7 +51,7 @@ TRACE = YES
 DISPLAY_REGION = STD
 
 # Preprocessing phase of the solving process enabled or disabled (YES or NO)
-PREPROCESSING = NO
+PREPROCESSING = YES
 
 ###############################################################################
 ## BRANCH-AND-CONTRACT ALGORITHMS                                            ##
@@ -175,7 +175,7 @@ PROPAGATION_WITH_MAX_CID = YES
 # - RLT: contractor based on a RLT-based relaxation
 # - AFFINE: contractor based an an affine relaxation
 # - TAYLOR: contractor based on a Taylor relaxation
-PROPAGATION_WITH_POLYTOPE = RLT
+PROPAGATION_WITH_POLYTOPE = NO
 
 # Propagation with the interval Newton method applied to a square system
 # of equations (YES or NO)

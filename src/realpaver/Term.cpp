@@ -377,11 +377,10 @@ Term addConstVar(Term tc, Term tv)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    Interval x = tc.evalConst();
 
-   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
-   tlin->addConstant(x);
-   tlin->addTerm(1.0, tvar->var());
-
-   return Term(tlin);
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>();
+   res->addConstant(x);
+   res->addTerm(1.0, tvar->var());
+   return Term(res);
 }
 
 Term addConstLin(Term tc, Term tl)
@@ -389,8 +388,9 @@ Term addConstLin(Term tc, Term tl)
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
    Interval x = tc.evalConst();
 
-   tlin->addConstant(x);
-   return tl;
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->addConstant(x);
+   return Term(res);
 }
 
 Term addVarVar(Term tv, Term tw)
@@ -398,11 +398,10 @@ Term addVarVar(Term tv, Term tw)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    TermVar* twar = static_cast<TermVar*>(tw.rep().get());
 
-   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
-   tlin->addTerm(1.0, tvar->var());
-   tlin->addTerm(1.0, twar->var());
-
-   return simplifyLin(Term(tlin));
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>();
+   res->addTerm(1.0, tvar->var());
+   res->addTerm(1.0, twar->var());
+   return simplifyLin(Term(res));
 }
 
 Term addVarLin(Term tv, Term tl)
@@ -410,9 +409,9 @@ Term addVarLin(Term tv, Term tl)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
 
-   tlin->addTerm(1.0, tvar->var());
-
-   return simplifyLin(tl);
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->addTerm(1.0, tvar->var());
+   return simplifyLin(Term(res));
 }
 
 Term addLinLin(Term tl, Term tm)
@@ -420,9 +419,9 @@ Term addLinLin(Term tl, Term tm)
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
    TermLin* tmin = static_cast<TermLin*>(tm.rep().get());
 
-   tlin->addTermLin(*tmin);
-
-   return simplifyLin(tl);
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->addTermLin(*tmin);
+   return simplifyLin(Term(res));
 }
 
 Term operator+(Term l, Term r)
@@ -475,11 +474,11 @@ Term subConstVar(Term tc, Term tv)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    Interval x = tc.evalConst();
 
-   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
-   tlin->addConstant(x);
-   tlin->addTerm(-1.0, tvar->var());
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>();
+   res->addConstant(x);
+   res->addTerm(-1.0, tvar->var());
 
-   return Term(tlin);
+   return Term(res);
 }
 
 Term subVarConst(Term tv, Term tc)
@@ -487,11 +486,11 @@ Term subVarConst(Term tv, Term tc)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    Interval x = tc.evalConst();
 
-   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
-   tlin->addConstant(-x);
-   tlin->addTerm(1.0, tvar->var());
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>();
+   res->addConstant(-x);
+   res->addTerm(1.0, tvar->var());
 
-   return Term(tlin);
+   return Term(res);
 }
 
 Term subConstLin(Term tc, Term tl)
@@ -499,10 +498,10 @@ Term subConstLin(Term tc, Term tl)
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
    Interval x = tc.evalConst();
 
-   tlin->toOpposite();
-   tlin->addConstant(x);
-
-   return tl;
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->toOpposite();
+   res->addConstant(x);
+   return Term(res);
 }
 
 Term subLinConst(Term tl, Term tc)
@@ -510,8 +509,9 @@ Term subLinConst(Term tl, Term tc)
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
    Interval x = tc.evalConst();
 
-   tlin->subConstant(x);
-   return tl;
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->subConstant(x);
+   return Term(res);
 }
 
 Term subVarVar(Term tv, Term tw)
@@ -519,11 +519,10 @@ Term subVarVar(Term tv, Term tw)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    TermVar* twar = static_cast<TermVar*>(tw.rep().get());
 
-   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
-   tlin->addTerm(1.0, tvar->var());
-   tlin->addTerm(-1.0, twar->var());
-
-   return simplifyLin(Term(tlin));
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>();
+   res->addTerm(1.0, tvar->var());
+   res->addTerm(-1.0, twar->var());
+   return simplifyLin(Term(res));
 }
 
 Term subVarLin(Term tv, Term tl)
@@ -531,10 +530,11 @@ Term subVarLin(Term tv, Term tl)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
 
-   tlin->toOpposite();
-   tlin->addTerm(1.0, tvar->var());
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->toOpposite();
+   res->addTerm(1.0, tvar->var());
 
-   return simplifyLin(tl);
+   return simplifyLin(Term(res));
 }
 
 Term subLinVar(Term tl, Term tv)
@@ -542,9 +542,10 @@ Term subLinVar(Term tl, Term tv)
    TermVar* tvar = static_cast<TermVar*>(tv.rep().get());
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
 
-   tlin->addTerm(-1.0, tvar->var());
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->addTerm(-1.0, tvar->var());
 
-   return simplifyLin(tl);
+   return simplifyLin(Term(res));
 }
 
 Term subLinLin(Term tl, Term tm)
@@ -552,9 +553,9 @@ Term subLinLin(Term tl, Term tm)
    TermLin* tlin = static_cast<TermLin*>(tl.rep().get());
    TermLin* tmin = static_cast<TermLin*>(tm.rep().get());
 
-   tlin->subTermLin(*tmin);
-
-   return simplifyLin(tl);
+   std::shared_ptr<TermLin> res = std::make_shared<TermLin>(*tlin);
+   res->subTermLin(*tmin);
+   return simplifyLin(Term(res));
 }
 
 Term operator-(Term l, Term r)

@@ -2586,7 +2586,7 @@ void DagCreator::apply(const ArithCtrEq* c)
 {
    // visits the constraint
    DagTermCreator vis(dag_);
-   Term t( c->left() - c->right());
+   Term t(c->left() - c->right());  
    t.acceptVisitor(vis);
 
    // creates the function
@@ -2594,7 +2594,7 @@ void DagCreator::apply(const ArithCtrEq* c)
    f->setScope(c->scope());
    index_ = dag_->insertFun(f);
 }
-   
+
 void DagCreator::apply(const ArithCtrLe* c)
 {
    // visits the constraint
