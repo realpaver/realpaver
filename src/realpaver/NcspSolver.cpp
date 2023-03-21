@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BC4Contractor.hpp"
 #include "realpaver/ConstraintContractor.hpp"
@@ -533,10 +534,23 @@ void NcspSolver::branchAndPrune()
 
 void NcspSolver::certifySolutions()
 {
-   for (size_t i=0; i<space_->nbSolNodes(); ++i)
+   std::list<SharedNcspNode> lsol;
+   while (space_->nbSolNodes() > 0)
    {
-      SharedNcspNode node = space_->getSolNode(i);
-      node->setProof(prover_->certify(*node->region()));
+      SharedNcspNode node = space_->popSolNode();
+      Proof proof = prover_->certify(*node->region());
+      
+      if (proof != Proof::Empty)
+      {
+         node->setProof(proof);
+         lsol.push_back(node);
+      }
+   }
+
+   while (!lsol.empty())
+   {
+      space_->pushSolNode(lsol.front());
+      lsol.pop_front();
    }
 }
 

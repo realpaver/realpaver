@@ -99,7 +99,7 @@ public:
    /// @return the i-th pending node
    virtual SharedNcspNode getPendingNode(size_t i) const = 0;
 
-   /// @return the hull of the all the pending nodes
+   /// @return the hull of all the pending nodes
    ///
    /// throws an exception if there is no pending node
    IntervalRegion hullOfPendingNodes() const;
