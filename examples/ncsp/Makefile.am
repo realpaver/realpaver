@@ -29,6 +29,8 @@ EXTRA_DIST = \
 	Brown6.rp \
 	Brown10.rp \
 	Broyden10.rp \
+	BroydenTridiagonal10.rp \
+	BroydenTridiagonal100.rp \
 	BurdenFaires.rp \
 	Butcher.rp \
 	Caprasse.rp \
@@ -98,6 +100,7 @@ EXTRA_DIST = \
 	StackedGymnasticHalls.rp \
 	SteelFramedComputerBuilding.rp \
 	Transistor.rp \
+	Trigo10.rp \
 	Trinks.rp \
 	Virasoro.rp \
 	Vrahatis.rp \
