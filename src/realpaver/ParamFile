@@ -113,8 +113,6 @@ SPLIT_SELECTOR = MAX_DOM
 
 # Domain splitting strategy
 # - BISECTION: divides a domain in two equal parts
-# - BISECTION_INF: divides a bounded domain in two equal parts and handles
-#                  specifically an unbounded interval
 # - PEELING:   divides a domain in three parts
 #              the width of peels is fixed using SPLIT_PEEL_FACTOR
 # - PARTITION: divides a domain in N slices of equal size

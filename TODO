@@ -5,7 +5,7 @@
 
 -------------------------------------------------------------------------------
 - DAG
-  * new nodes (linear, ...)
+  * new nodes
   * create a DAG from a .nl file
   * Hansen's derivative
   * affine forms

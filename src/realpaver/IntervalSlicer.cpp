@@ -59,33 +59,6 @@ void IntervalBisecter::applyImpl(const Interval& x)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void IntervalBisecterInf::applyImpl(const Interval& x)
-{
-   Interval y(10.0);
-   Interval l = x.left() + y,
-            r = x.right() - y;
-
-   double m;
-
-   if (x.strictlyContains(l.left()))
-   {
-      m = l.left();
-   }
-   else if (x.strictlyContains(r.right()))
-   {
-      m = r.right();
-   }
-   else
-   {
-      m = x.midpoint();
-   }
-
-   push(Interval(x.left(), m));
-   push(Interval(m, x.right()));
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 IntervalPeeler::IntervalPeeler(double f) : IntervalSlicer()
 {
    setFactor(f);

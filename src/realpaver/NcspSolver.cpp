@@ -321,7 +321,6 @@ void NcspSolver::makeSplit()
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
    
    if (sli == "BISECTION") slicer = new IntervalBisecter();
-   if (sli == "BISECTION_INF") slicer = new IntervalBisecterInf();
    if (sli == "PEELING")
    {
       double f = env_->getParam()->getDblParam("SPLIT_PEEL_FACTOR");

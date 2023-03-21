@@ -14,7 +14,7 @@
 ###############################################################################
 
 # Time limit in seconds
-TIME_LIMIT = 1.0
+TIME_LIMIT = 3600.0
 
 # Tolerance on the width of an interval domain of a constrained variable
 # The value is a positive real number followed by a character: A for an absolute
@@ -40,7 +40,7 @@ FLOAT_PRECISION = 10
 # INTER: intermediary level e.g. display nodes in a search algorithm
 # LOW:   low level e.g. display quantities in iterative methods
 # FULL:  verbose mode
-LOG_LEVEL = FULL
+LOG_LEVEL = NONE
 
 # Trace displayed in a terminal (YES or NO)
 TRACE = YES
@@ -113,8 +113,6 @@ SPLIT_SELECTOR = MAX_DOM
 
 # Domain splitting strategy
 # - BISECTION: divides a domain in two equal parts
-# - BISECTION_INF: divides a bounded domain in two equal parts and handles
-#                  specifically an unbounded interval
 # - PEELING:   divides a domain in three parts
 #              the width of peels is fixed using SPLIT_PEEL_FACTOR
 # - PARTITION: divides a domain in N slices of equal size

@@ -81,20 +81,6 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This bisects every bounded interval and processes every unbounded interval
-/// as follows:
-/// - [-inf, +inf] -> [-inf, 0], [0, +inf] (bisection)
-/// - [a, +inf]    -> TODO
-/// - [-inf, b]    -> splits [-b, +inf] and returns the opposite
-///////////////////////////////////////////////////////////////////////////////
-class IntervalBisecterInf : public IntervalSlicer {
-public:
-   ///@{
-   void applyImpl(const Interval& x) override;
-   ///@}
-};
-
-///////////////////////////////////////////////////////////////////////////////
 /// This divides an interval in three parts.
 ///
 /// Given an interval [a,b] and a factor 0 < f < 100, it calculates the
