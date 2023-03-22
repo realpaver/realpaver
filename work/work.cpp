@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -20,10 +21,18 @@
 using namespace std;
 using namespace realpaver;
 
+//~ void signal_callback_handler(int signum) {
+   //~ cout << "Caught signal " << signum << endl;
+   //~ exit(signum);
+//~ }
+
 int main(void)
 {
    Logger::init(LogLevel::full, "work.log");
    Interval::precision( 12 );
+
+   //~ signal(SIGINT, signal_callback_handler);
+   //~ while(1);
 
    try {
       Variable x(1, 10, "x");

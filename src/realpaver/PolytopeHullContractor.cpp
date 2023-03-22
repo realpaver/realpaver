@@ -421,9 +421,6 @@ Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
    bool first = true;
    OptimizationStatus status;
 
-
-static int ntotal = 0, nfeas= 0, nopt = 0;
-
    for (auto v : creator_->scope())
    {
       Interval x = reg.get(v);
@@ -438,17 +435,13 @@ static int ntotal = 0, nfeas= 0, nopt = 0;
 
       status = solver.getStatus();
 
-++ntotal;
-
       if (status == OptimizationStatus::Infeasible)
          return Proof::Empty;
       
       if (status == OptimizationStatus::Optimal)
       {
-++nopt;
          if (solver.isPrimalSolutionFeasible())
          {
-++nfeas;
             x &= Interval::moreThan(solver.getSafeObjVal());
             if (x.isEmpty()) return Proof::Empty;
          }
@@ -459,9 +452,6 @@ static int ntotal = 0, nfeas= 0, nopt = 0;
       // reduction of the right bound
       solver.setMaximization();
       solver.reoptimize();
-
-++ntotal;
-
       status = solver.getStatus();
 
       if (status == OptimizationStatus::Infeasible)
@@ -469,10 +459,8 @@ static int ntotal = 0, nfeas= 0, nopt = 0;
 
       if (status == OptimizationStatus::Optimal)
       {
-++nopt;
          if (solver.isPrimalSolutionFeasible())
          {
-++nfeas;
             x &= Interval::lessThan(solver.getObjVal());
             if (x.isEmpty()) return Proof::Empty;
          }
@@ -480,9 +468,6 @@ static int ntotal = 0, nfeas= 0, nopt = 0;
 
       reg.set(v, x);
    }
-
-   // TODO
-   LOG_INTER("Success of LP solver: " << nopt << ", " << nfeas << " / " << ntotal);
 
    return Proof::Maybe;
 }
