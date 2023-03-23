@@ -106,10 +106,16 @@ SOLUTION_CLUSTER_GAP = 0.0
 SPLIT_OBJECTIVE = NO
 
 # Variable selection strategy that chooses the next variable to split
-# - MAX_DOM:     largest domain
-# - MAX_SMEAR:   maximum smear
-# - ROUND_ROBIN: round-robin strategy
-SPLIT_SELECTOR = MAX_DOM
+# - MAX_DOM:          largest domain
+# - MAX_SMEAR:        maximum smear
+# - ROUND_ROBIN:      round-robin strategy
+# - HYBRID_DOM_ROBIN: hybrid strategy using MAX_DOM and ROUND_ROBIN
+SPLIT_SELECTOR = ROUND_ROBIN
+
+# Parameter of the HYBRID_DOM_ROBIN splitting strategy (>= 1)
+# Inverse of the frequency of use of ROUND_ROBIN, e.g. 3 means that
+# ROUND_ROBIN is used one time every three splitting steps
+SPLIT_DOM_ROBIN = 2
 
 # Domain splitting strategy
 # - BISECTION: divides a domain in two equal parts

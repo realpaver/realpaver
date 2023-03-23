@@ -58,6 +58,7 @@ Param::Param()
    intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   50));
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
    intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
+   intmap_.insert(std::make_pair("SPLIT_DOM_ROBIN",           2));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));

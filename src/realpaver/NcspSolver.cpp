@@ -316,6 +316,11 @@ void NcspSolver::makeSplit()
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
    if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
    if (sel == "ROUND_ROBIN") selector = new RoundRobinSelector(sco);
+   if (sel == "HYBRID_DOM_ROBIN")
+   {
+      int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
+      selector = new HybridDomRobinSelector(sco, n);
+   }
    // TODO: max smear strategy not handled
 
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");

@@ -29,6 +29,7 @@ void NcspSpaceBFS::pushSolNode(const SharedNcspNode& node)
 
 SharedNcspNode NcspSpaceBFS::popSolNode()
 {
+   stotal_--;
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;

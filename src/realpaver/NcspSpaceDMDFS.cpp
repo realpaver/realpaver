@@ -42,6 +42,7 @@ void NcspSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
 
 SharedNcspNode NcspSpaceDMDFS::popSolNode()
 {
+   stotal_--;
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;

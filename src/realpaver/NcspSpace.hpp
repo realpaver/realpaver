@@ -69,7 +69,9 @@ public:
    /// are replaced by their hull if their inter-gap is small enough.
    virtual void makeSolClusters(double gap) = 0;
 
-   /// @return the total number of solution nodes that have been inserted in this
+   /// @return the total number of solution nodes that have been pushed in
+   ///         this minus the number of solution nodes that have been popped
+   ///         from this
    virtual size_t nbTotalSolNodes() const = 0;
    ///@}
 

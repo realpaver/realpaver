@@ -23,7 +23,7 @@ namespace realpaver {
 class VariableSelector {
 public:
    /// Creates a selector on a set of variables
-   ///@param s a scope
+   /// @param s a scope
    VariableSelector(Scope s);
 
    /// Virtual destructor
@@ -42,17 +42,13 @@ public:
    /// @param node a search node
    /// @return a pair <b, v> such that no variable is selected if b = false,
    ///         otherwise v is the selected variable
-   ///
-   /// The default implementation calls selecVar on the region of the node.
-   virtual std::pair<bool, Variable> selectVar(const SearchNode& node);
+   virtual std::pair<bool, Variable> selectVar(SearchNode& node) = 0;
 
    /// Selection method
-   /// @param reg variable domains
+   /// @param reg an interval region
    /// @return a pair <b, v> such that no variable is selected if b = false,
    ///         otherwise v is the selected variable
-   ///
-   /// The default implementation returns <false, >
-   virtual std::pair<bool, Variable> selectVar(const IntervalRegion& reg);
+   virtual std::pair<bool, Variable> selectVar(const IntervalRegion& reg) = 0;
 
 protected:
    Scope scope_;
@@ -64,7 +60,7 @@ protected:
 class MaxDomSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
-   ///@param s a scope
+   /// @param s a scope
    MaxDomSelector(Scope s);
 
    /// Destructor
@@ -76,7 +72,10 @@ public:
    /// No assignment
    MaxDomSelector& operator=(const MaxDomSelector&) = delete;
 
+   ///@{
+   std::pair<bool, Variable> selectVar(SearchNode& node) override;
    std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   ///@}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,8 +84,8 @@ public:
 class MaxSmearSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
-   ///@param f a function
-   ///@param s a scope
+   /// @param f a function
+   /// @param s a scope
    MaxSmearSelector(IntervalFunction f, Scope s);
 
    /// Destructor
@@ -98,7 +97,10 @@ public:
    /// No assignment
    MaxSmearSelector& operator=(const MaxSmearSelector&) = delete;
 
+   ///@{
+   std::pair<bool, Variable> selectVar(SearchNode& node) override;
    std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   ///@}
 
 private:
    IntervalFunction f_;
@@ -110,7 +112,7 @@ private:
 class RoundRobinSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
-   ///@param s a scope
+   /// @param s a scope
    RoundRobinSelector(Scope s);
 
    /// Destructor
@@ -122,7 +124,45 @@ public:
    /// No assignment
    RoundRobinSelector& operator=(const RoundRobinSelector&) = delete;
 
-   std::pair<bool, Variable> selectVar(const SearchNode& node) override;
+   ///@{
+   std::pair<bool, Variable> selectVar(SearchNode& node) override;
+   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a selector of the variable following an hybrid strategy.
+///
+/// It alternates the max-dom selector and the round-robin selector according
+/// to a factor f >= 1.
+/// - f = 1: round-robin always used
+/// - f = 2: alternates round-robin and max-dom
+/// - f = 3: applies round-robin, two times max-dom, ...
+/// and so on
+///////////////////////////////////////////////////////////////////////////////
+class HybridDomRobinSelector : public VariableSelector {
+public:
+   /// Creates a selector on a set of variables
+   /// @param s a scope
+   /// @param f inverse of the frequency of use of the round-robin strategy
+   HybridDomRobinSelector(Scope s, int f);
+
+   /// Destructor
+   ~HybridDomRobinSelector() = default;
+
+   /// Default copy constructor
+   HybridDomRobinSelector(const HybridDomRobinSelector&) = default;
+
+   /// No assignment
+   HybridDomRobinSelector& operator=(const HybridDomRobinSelector&) = delete;
+
+   ///@{
+   std::pair<bool, Variable> selectVar(SearchNode& node) override;
+   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   ///@}
+
+private:
+   int f_;
 };
 
 } // namespace

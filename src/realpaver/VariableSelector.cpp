@@ -25,16 +25,6 @@ Scope VariableSelector::scope() const
    return scope_;
 }
 
-std::pair<bool, Variable> VariableSelector::selectVar(const SearchNode& node)
-{
-   return selectVar(*node.region());
-}
-
-std::pair<bool, Variable> VariableSelector::selectVar(const IntervalRegion& reg)
-{
-   return std::make_pair(false, Variable());
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 MaxDomSelector::MaxDomSelector(Scope s) : VariableSelector(s)
@@ -42,7 +32,8 @@ MaxDomSelector::MaxDomSelector(Scope s) : VariableSelector(s)
    ASSERT(!s.isEmpty(), "Empty scope in a selector");
 }
 
-std::pair<bool, Variable> MaxDomSelector::selectVar(const IntervalRegion& reg)
+std::pair<bool, Variable>
+MaxDomSelector::selectVar(const IntervalRegion& reg)
 {
    bool found = false;
    double wmax, w;
@@ -73,6 +64,11 @@ std::pair<bool, Variable> MaxDomSelector::selectVar(const IntervalRegion& reg)
    }
 
    return std::make_pair(found, vmax);   
+}
+
+std::pair<bool, Variable> MaxDomSelector::selectVar(SearchNode& node)
+{
+   return selectVar(*node.region());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,12 +131,25 @@ MaxSmearSelector::selectVar(const IntervalRegion& reg)
    return std::make_pair(found, vmax);
 }
 
+std::pair<bool, Variable>
+MaxSmearSelector::selectVar(SearchNode& node)
+{
+   return selectVar(*node.region());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 RoundRobinSelector::RoundRobinSelector(Scope s) : VariableSelector(s)
 {}
 
-std::pair<bool, Variable> RoundRobinSelector::selectVar(const SearchNode& node)
+std::pair<bool, Variable>
+RoundRobinSelector::selectVar(const IntervalRegion& reg)
+{
+   MaxDomSelector selector(scope_);
+   return selector.selectVar(reg);
+}
+
+std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
 {
    IntervalRegion* reg = node.region();
    Variable v = node.splitVariable();
@@ -163,6 +172,7 @@ std::pair<bool, Variable> RoundRobinSelector::selectVar(const SearchNode& node)
       if (!v.getTolerance().hasTolerance(reg->get(v)))
       {
          found = true;
+         node.setSplitVariable(v);
       }
       else
       {
@@ -173,6 +183,36 @@ std::pair<bool, Variable> RoundRobinSelector::selectVar(const SearchNode& node)
    }
 
    return std::make_pair(found, v);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+HybridDomRobinSelector::HybridDomRobinSelector(Scope s, int f)
+      : VariableSelector(s),
+        f_(f)
+{
+   ASSERT(f>=1, "Bad factor of an hybrid max/robin selector");
+}
+
+std::pair<bool, Variable>
+HybridDomRobinSelector::selectVar(const IntervalRegion& reg)
+{
+   MaxDomSelector selector(scope_);
+   return selector.selectVar(reg);
+}
+
+std::pair<bool, Variable> HybridDomRobinSelector::selectVar(SearchNode& node)
+{
+   if (node.depth() % f_ == 0)
+   {
+      RoundRobinSelector selector(scope_);
+      return selector.selectVar(node);
+   }
+   else
+   {
+      MaxDomSelector selector(scope_);
+      return selector.selectVar(node);
+   }
 }
 
 } // namespace

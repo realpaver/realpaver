@@ -37,7 +37,6 @@ bool NcspSplit::applyImpl(SharedNcspNode node)
    // reuses the input node
    auto it = slicer_->begin();
    reg->set(v, *it);
-   node->setSplitVariable(v);
    push(node);
 
    // generates the other nodes
@@ -45,7 +44,6 @@ bool NcspSplit::applyImpl(SharedNcspNode node)
    {
       SharedNcspNode aux = std::make_shared<NcspNode>(*node);
       aux->region()->set(v, *it);
-      aux->setSplitVariable(v);
       push(aux);
    }
 

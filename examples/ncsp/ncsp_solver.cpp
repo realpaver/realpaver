@@ -163,8 +163,8 @@ int main(int argc, char** argv)
          }
          else
          {
-            fsol << "not solved" << endl;
-            cout << RED("not solved") << endl;
+            fsol << "checked" << endl;
+            cout << GREEN("checked") << endl;
 
             fsol << WP("Number of variables fixed", wpl)
                  << preproc->nbFixedVars() << endl;
@@ -266,26 +266,18 @@ int main(int argc, char** argv)
             }
          }
 
-         fsol << WP("Number of clustered solutions", wpl)
+         fsol << WP("Number of solutions", wpl)
               << space->nbSolNodes() << endl;
-         fsol << WP("Number of individual solutions", wpl)
-              << space->nbTotalSolNodes() << endl;
 
          if (space->nbSolNodes() > 0)
          {
-            cout << indent << WP("Number of clustered solutions", wpl)
+            cout << indent << WP("Number of solutions", wpl)
                  << GREEN(space->nbSolNodes()) << endl;
-
-            cout << indent << WP("Number of individual solutions", wpl)
-                 << GREEN(space->nbTotalSolNodes()) << endl;
          }
          else
          {
-            cout << indent << WP("Number of clustered solutions", wpl)
+            cout << indent << WP("Number of solutions", wpl)
                  << RED(space->nbSolNodes()) << endl;
-
-            cout << indent << WP("Number of individual solutions", wpl)
-                 << RED(space->nbTotalSolNodes()) << endl;
          }
 
          // limits
