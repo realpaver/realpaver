@@ -11,7 +11,7 @@
 #define REALPAVER_VARIABLE_SELECTOR_HPP
 
 #include <vector>
-#include "realpaver/IntervalFunction.hpp"
+#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/SearchNode.hpp"
 #include "realpaver/Tolerance.hpp"
 
@@ -86,7 +86,7 @@ public:
    /// Creates a selector on a set of variables
    /// @param f a function
    /// @param s a scope
-   MaxSmearSelector(IntervalFunction f, Scope s);
+   MaxSmearSelector(IntervalFunctionVector F, Scope s);
 
    /// Destructor
    ~MaxSmearSelector() = default;
@@ -103,7 +103,7 @@ public:
    ///@}
 
 private:
-   IntervalFunction f_;
+   IntervalFunctionVector F_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -306,6 +306,36 @@ void NcspSolver::makeContractor()
    contractor_ = std::make_shared<ListContractor>(mainpool);
 }
 
+VariableSelector* NcspSolver::makeMaxSmearStrategy()
+{
+   IntervalFunctionVector F;
+
+   for (size_t i=0; i<preprob_->nbCtrs(); ++i)
+   {
+      Constraint c = preprob_->ctrAt(i);
+
+      if (c.isEquation() || c.isInequality())
+      {
+         Constraint::SharedRep rep = c.rep();
+         ArithCtrBinary* eq = static_cast<ArithCtrBinary*>(rep.get());
+         Term t = eq->left() - eq->right();
+
+         F.addFun(IntervalFunction(t));
+      }
+   }
+
+   if (preprob_->nbVars() == F.nbVars())
+   {
+      return new MaxSmearSelector(F, preprob_->scope());
+   }
+   else
+   {
+      LOG_INTER("Unable to create a max-smear variable selection strategy");
+      int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
+      return new HybridDomRobinSelector(preprob_->scope(), n);
+   }
+}
+
 void NcspSolver::makeSplit()
 {
    VariableSelector* selector = nullptr;
@@ -321,7 +351,10 @@ void NcspSolver::makeSplit()
       int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
       selector = new HybridDomRobinSelector(sco, n);
    }
-   // TODO: max smear strategy not handled
+   if (sel == "MAX_SMEAR")
+   {
+      selector = makeMaxSmearStrategy();   
+   }
 
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
    
@@ -371,7 +404,7 @@ void NcspSolver::bpStep(int depthlimit)
 
    // contracts the region
    Proof proof = contractor_->contract(*reg);
-   
+
    LOG_INTER("Contraction -> " << proof);
    LOG_INTER("Contracted region: " << *reg);
 
@@ -428,7 +461,7 @@ void NcspSolver::bpStep(int depthlimit)
          SharedNcspNode subnode = *it;
          subnode->setIndex(nbnodes_);
          subnode->setDepth(depth);
-
+   
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
       }
 
@@ -479,9 +512,12 @@ void NcspSolver::branchAndPrune()
    bool iter = true;
 
    size_t nsol = 0;
+   size_t nnodes = 0, tnodes = 0;
 
    do
    {
+      ++nnodes;
+      ++tnodes;
       bpStep(depthlimit);
       size_t soln = space_->nbSolNodes();
 
@@ -493,7 +529,21 @@ void NcspSolver::branchAndPrune()
             std::cout << "\tnb sol: " << "\033[34m" << nsol << "\033[39m"
                       << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime()
                       << "s" << "\033[39m"
-                      << "\t\tnb nod: " << "\033[31m" << space_->nbPendingNodes()
+                      << "\t\tspace size: " << "\033[31m" << space_->nbPendingNodes()
+                      << "\033[39m" << std::endl;
+         }
+         
+         nnodes = 0;
+      }
+      else
+      {
+
+         if (trace && nnodes % 1000 == 0)
+         {
+            std::cout << "\tnb nod: " << "\033[34m" << tnodes << "\033[39m"
+                      << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime()
+                      << "s" << "\033[39m"
+                      << "\t\tspace size: " << "\033[31m" << space_->nbPendingNodes()
                       << "\033[39m" << std::endl;
          }
       }

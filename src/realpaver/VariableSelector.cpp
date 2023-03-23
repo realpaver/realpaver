@@ -73,9 +73,9 @@ std::pair<bool, Variable> MaxDomSelector::selectVar(SearchNode& node)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MaxSmearSelector::MaxSmearSelector(IntervalFunction f, Scope s)
+MaxSmearSelector::MaxSmearSelector(IntervalFunctionVector F, Scope s)
       : VariableSelector(s),
-        f_(f)
+        F_(F)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a MaxSmear selector");
 }
@@ -83,6 +83,52 @@ MaxSmearSelector::MaxSmearSelector(IntervalFunction f, Scope s)
 std::pair<bool, Variable>
 MaxSmearSelector::selectVar(const IntervalRegion& reg)
 {
+   Scope fscope = F_.scope();
+   IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
+
+   // calculates the partial derivatives
+   F_.diff(reg, jac);
+
+   bool found = false;
+   double maxsmear = 0.0;
+   Variable maxvar;
+
+   for (auto v : scope_)
+   {
+      Interval I = reg.get(v);
+      if (v.getTolerance().hasTolerance(I)) continue;
+
+      size_t j = F_.scope().index(v);
+
+      // finds the maximum magnitude of the dFi / dxj
+      double mag = 0.0;
+      for (size_t i=0; i<F_.nbFuns(); ++i)
+      {
+         double m = jac.get(i, j).mag();
+         if (m > mag) mag = m;
+      }
+
+      double smear = mag*I.width();
+      if (found)
+      {
+         if (smear > maxsmear)
+         {
+            maxsmear = smear;
+            maxvar = v;
+         }
+      }
+      else
+      {
+         maxsmear = smear;
+         maxvar = v;
+         found = true;
+      }
+   }
+
+   return std::make_pair(found, maxvar);
+}
+
+/*
    Scope fscope = f_.scope();
    IntervalVector grad(f_.nbVars());
 
@@ -129,7 +175,7 @@ MaxSmearSelector::selectVar(const IntervalRegion& reg)
    }
 
    return std::make_pair(found, vmax);
-}
+   */
 
 std::pair<bool, Variable>
 MaxSmearSelector::selectVar(SearchNode& node)

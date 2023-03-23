@@ -80,7 +80,7 @@ int main(int argc, char** argv)
       int prec = prm.getIntParam("FLOAT_PRECISION");
       Interval::precision(prec);
 
-      std::string sep = "###################################";
+      std::string sep = "########################################";
       sep += sep;
       std::string indent = "   ";
       int wpl = 36;
