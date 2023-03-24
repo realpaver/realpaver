@@ -1,0 +1,194 @@
+NCSP solver......................... Realpaver 1.0
+Input file.......................... unsolved/Caprasse.rp
+Current date and time............... Fri Mar 24 15:21:09 2023
+
+--- PREPROCESSING ---
+
+Elapsed time........................ 0.000 (seconds)
+Status.............................. checked
+Number of variables fixed........... 0
+Number of inactive constraints...... 0
+
+--- SOLVING ---
+
+Elapsed time........................ 5.082 (seconds)
+Number of nodes..................... 6055
+Search status....................... complete
+Solution status..................... proved feasible
+Number of solutions................. 18
+
+SOLUTION 1 [4.441e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [-3.863703306, -3.863703305]
+y = [-1.000000001, -0.9999999999]
+z = [-3.863703306, -3.863703305]
+
+SOLUTION 2 [2.665e-15] [safe]
+t = [-3.14626437, -3.146264369]
+x = [-3.581656808e-24, 3.581656808e-24]
+y = [-3.14626437, -3.146264369]
+z = [-7.809639329e-27, 7.809639329e-27]
+
+SOLUTION 3 [1.998e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [-1.035276181, -1.03527618]
+y = [-1.000000001, -0.9999999999]
+z = [-1.035276181, -1.03527618]
+
+SOLUTION 4 [2.776e-16] [safe]
+t = [-0.3178372452, -0.3178372451]
+x = [-6.694616347e-21, 6.694616347e-21]
+y = [-0.3178372452, -0.3178372451]
+z = [-3.307487937e-23, 3.307487937e-23]
+
+SOLUTION 5 [3.109e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [-2.000000001, -1.999999999]
+y = [-1.000000001, -0.9999999999]
+z = [1.999999999, 2.000000001]
+
+SOLUTION 6 [1.221e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [-2.118166754e-24, 2.118166754e-24]
+y = [0.9999999999, 1.000000001]
+z = [-4.107825223e-27, 4.107825223e-27]
+
+SOLUTION 7 [3.109e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [1.999999999, 2.000000001]
+y = [-1.000000001, -0.9999999999]
+z = [-2.000000001, -1.999999999]
+
+SOLUTION 8 [1.776e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [1.03527618, 1.035276181]
+y = [-1.000000001, -0.9999999999]
+z = [1.03527618, 1.035276181]
+
+SOLUTION 9 [4.441e-15] [safe]
+t = [-1.000000001, -0.9999999999]
+x = [3.863703305, 3.863703306]
+y = [-1.000000001, -0.9999999999]
+z = [3.863703305, 3.863703306]
+
+SOLUTION 10 [1.443e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [-2.117889198e-24, 2.117889198e-24]
+y = [-1.000000001, -0.9999999999]
+z = [-4.218847525e-27, 4.218847525e-27]
+
+SOLUTION 11 [4.441e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [-3.863703306, -3.863703305]
+y = [0.9999999999, 1.000000001]
+z = [-3.863703306, -3.863703305]
+
+SOLUTION 12 [1.776e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [-1.035276181, -1.03527618]
+y = [0.9999999999, 1.000000001]
+z = [-1.035276181, -1.03527618]
+
+SOLUTION 13 [2.776e-16] [safe]
+t = [0.3178372451, 0.3178372452]
+x = [-6.694616347e-21, 6.694616347e-21]
+y = [0.3178372451, 0.3178372452]
+z = [-3.307487937e-23, 3.307487937e-23]
+
+SOLUTION 14 [2.665e-15] [safe]
+t = [3.146264369, 3.14626437]
+x = [-3.581656808e-24, 3.581656808e-24]
+y = [3.146264369, 3.14626437]
+z = [-7.809639329e-27, 7.809639329e-27]
+
+SOLUTION 15 [3.109e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [-2.000000001, -1.999999999]
+y = [0.9999999999, 1.000000001]
+z = [1.999999999, 2.000000001]
+
+SOLUTION 16 [3.109e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [1.999999999, 2.000000001]
+y = [0.9999999999, 1.000000001]
+z = [-2.000000001, -1.999999999]
+
+SOLUTION 17 [1.998e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [1.03527618, 1.035276181]
+y = [0.9999999999, 1.000000001]
+z = [1.03527618, 1.035276181]
+
+SOLUTION 18 [4.441e-15] [safe]
+t = [0.9999999999, 1.000000001]
+x = [3.863703305, 3.863703306]
+y = [0.9999999999, 1.000000001]
+z = [3.863703305, 3.863703306]
+
+--- INPUT PROBLEM ---
+
+REGION
+t = [-1000, 1000]
+x = [-1000, 1000]
+y = [-1000, 1000]
+z = [-1000, 1000]
+
+CONSTRAINTS
+y^2*z + (2*x)*y*t - (2*x) - z == 0
+(-pow(x,3))*z + (4*x)*y^2*z + 4*x^2*y*t + 2*pow(y,3)*t + 4*x^2 - 10*y^2 + (4*x)*z - (10*y)*t + 2 == 0
+(2*y)*z*t + x*t^2 - x - (2*z) == 0
+(-x)*pow(z,3) + (4*y)*z^2*t + (4*x)*z*t^2 + (2*y)*pow(t,3) + (4*x)*z + 4*z^2 - (10*y)*t - 10*t^2 + 2 == 0
+
+--- PARAMETERS ---
+
+BB_SPACE_FREQUENCY        = 1
+BC3_ITER_LIMIT            = 30
+BC3_PEEL_FACTOR           = 2
+BP_NODE_SELECTION         = DFS
+DEPTH_LIMIT               = 10000
+DISPLAY_REGION            = STD
+DTOL                      = 1e-06R
+FLOAT_PRECISION           = 10
+GAUSSIAN_MIN_PIVOT        = 1e-08
+GAUSS_SEIDEL_DTOL         = 1e-06R
+GAUSS_SEIDEL_ITER_LIMIT   = 50
+GAUSS_SEIDEL_XTOL         = 1e-08A
+GRADIENT_DESCENT_TOL      = 0.001
+INFLATION_CHI             = 1e-12
+INFLATION_DELTA           = 1.125
+LINE_SEARCH_ARMIJO        = 0.09375
+LINE_SEARCH_ITER_LIMIT    = 20
+LINE_SEARCH_STEP_TOL      = 1e-08
+LOCAL_SOLVER_ALGORITHM    = GRADIENT
+LOCAL_SOLVER_TIME_LIMIT   = 10
+LOG_LEVEL                 = INTER
+LP_ITER_LIMIT             = 50
+LP_TIME_LIMIT             = 10
+NEWTON_CERTIFY_DTOL       = 0.001R
+NEWTON_CERTIFY_ITER_LIMIT = 20
+NEWTON_DTOL               = 1e-06R
+NEWTON_ITER_LIMIT         = 30
+NEWTON_XTOL               = 1e-08A
+NODE_LIMIT                = 500000
+OBJ_TOL                   = 1e-06R
+PREPROCESSING             = YES
+PROPAGATION_BASE          = HC4
+PROPAGATION_DTOL          = 1e-10R
+PROPAGATION_ITER_LIMIT    = 200
+PROPAGATION_WITH_MAX_CID  = YES
+PROPAGATION_WITH_NEWTON   = YES
+PROPAGATION_WITH_POLYTOPE = NO
+RELAXATION_EQ_TOL         = 1e-08
+SOLUTION_CLUSTER_GAP      = 1e-06
+SOLUTION_LIMIT            = 5000
+SPLIT_DOM_ROBIN           = 2
+SPLIT_INNER               = NO
+SPLIT_NB_SLICES           = 7
+SPLIT_OBJECTIVE           = NO
+SPLIT_PEEL_FACTOR         = 10
+SPLIT_SELECTOR            = HYBRID_DOM_ROBIN
+SPLIT_SLICER              = BISECTION
+TIME_LIMIT                = 3600
+TRACE                     = YES
+UNI_NEWTON_ITER_LIMIT     = 20
+XTOL                      = 1e-08A

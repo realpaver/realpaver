@@ -40,7 +40,7 @@ FLOAT_PRECISION = 10
 # INTER: intermediary level e.g. display nodes in a search algorithm
 # LOW:   low level e.g. display quantities in iterative methods
 # FULL:  verbose mode
-LOG_LEVEL = NONE
+LOG_LEVEL = INTER
 
 # Trace displayed in a terminal (YES or NO)
 TRACE = YES
@@ -166,7 +166,7 @@ BC3_ITER_LIMIT = 30
 # that uses one contractor per constraint
 # HC4: HC4 contractor
 # BC4: BC4 contractor
-PROPAGATION_BASE = HC4
+PROPAGATION_BASE = BC4
 
 # Now it is possible to increase the contraction power of the algorithm by
 # activating strong contractors, as follows:

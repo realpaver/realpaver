@@ -34,7 +34,7 @@ Prover::Prover(const Problem& p)
          ArithCtrEq* eq = static_cast<ArithCtrEq*>(rep.get());
          Term t = eq->left() - eq->right();
 
-         F.addFun(IntervalFunction(t));
+         F.addFun(IntervalFunction(t));   
       }
       else
          ctr_.push_back(c);
@@ -50,6 +50,9 @@ Prover::Prover(const Problem& p)
          newton_->setCertifyMaxIter(maxiter_);
          newton_->setCertifyDTol(dtol_);
       }
+
+      else
+         canprove_ = false;
    }
 
    else

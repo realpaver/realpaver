@@ -110,9 +110,9 @@ int main(int argc, char** argv)
 #endif
 
       cout << indent << WP("Output file", wpl) << BLACK(solfilename) << endl;
-      cout << GRAY(sep) << endl;
 
       // preprocessing
+      cout << GRAY(sep) << endl;
       string prepro = solver.getEnv()->getParam()->getStrParam("PREPROCESSING");
 
       Preprocessor* preproc = solver.getPreprocessor();
@@ -195,8 +195,6 @@ int main(int argc, char** argv)
          }
       }
 
-      cout << GRAY(sep) << endl;
-
       NcspEnv* env = solver.getEnv();
 
       // solving
@@ -205,6 +203,7 @@ int main(int argc, char** argv)
          NcspSpace* space = solver.getSpace();
 
          fsol << "--- SOLVING ---" << endl << endl;
+         cout << GRAY(sep) << endl;
          cout << BLUE("Solving") << endl;
 
          fsol << WP("Elapsed time", wpl)
@@ -384,6 +383,17 @@ int main(int argc, char** argv)
             else if (sd == "VEC")
                hpn.vecPrint(fsol);
          }
+      }
+
+      // writes the problem
+      fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
+      fsol << "REGION" << endl << problem.getDomains() << endl;
+
+      // writes the constraints
+      fsol << "CONSTRAINTS" << endl;
+      for (size_t i=0; i<problem.nbCtrs(); ++i)
+      {
+         fsol << problem.ctrAt(i) << endl;
       }
 
       // writes the parameters in the solution file

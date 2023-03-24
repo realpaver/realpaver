@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
 
 namespace realpaver {
@@ -218,9 +219,12 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
 {
    // AC1 propagation algorithm
    bool modified;
+   int nbsteps = Param::GetIntParam("PROPAGATION_ITER_LIMIT");
+
    do
    {
       modified = false;
+      --nbsteps;
       IntervalRegion save(reg);
 
       for (size_t i=0; i<problem.nbCtrs(); ++i)
@@ -236,7 +240,7 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
 
       if (!save.equals(reg)) modified = true;
    }
-   while (modified);
+   while (modified && nbsteps>0);
    
    // integer variables
    Scope sco = reg.scope();
