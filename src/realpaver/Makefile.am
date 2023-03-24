@@ -24,12 +24,14 @@ lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir=$(includedir)/realpaver
 
 librealpaver_la_include_HEADERS = \
+		AssertDebug.hpp \
 		Bitset.hpp \
 		BC3Contractor.hpp \
 		BC4Contractor.hpp \
 		CIDContractor.hpp \
 		Common.hpp \
 		config.hpp \
+		configure.hpp \
 		Constraint.hpp \
 		ConstraintContractor.hpp \
 		ConstraintFixer.hpp \

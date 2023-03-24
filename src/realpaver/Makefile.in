@@ -334,13 +334,14 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__librealpaver_la_include_HEADERS_DIST = Bitset.hpp \
+am__librealpaver_la_include_HEADERS_DIST = AssertDebug.hpp Bitset.hpp \
 	BC3Contractor.hpp BC4Contractor.hpp CIDContractor.hpp \
-	Common.hpp config.hpp Constraint.hpp ConstraintContractor.hpp \
-	ConstraintFixer.hpp ConstraintRelaxor.hpp Contractor.hpp \
-	ContractorPool.hpp Dag.hpp Double.hpp Env.hpp Exception.hpp \
-	HC4Contractor.hpp Inflator.hpp IntContractor.hpp Integer.hpp \
-	Interval.hpp IntervalFunction.hpp IntervalFunctionVector.hpp \
+	Common.hpp config.hpp configure.hpp Constraint.hpp \
+	ConstraintContractor.hpp ConstraintFixer.hpp \
+	ConstraintRelaxor.hpp Contractor.hpp ContractorPool.hpp \
+	Dag.hpp Double.hpp Env.hpp Exception.hpp HC4Contractor.hpp \
+	Inflator.hpp IntContractor.hpp Integer.hpp Interval.hpp \
+	IntervalFunction.hpp IntervalFunctionVector.hpp \
 	IntervalGaussSeidel.hpp IntervalImpl.hpp IntervalMatrix.hpp \
 	IntervalNewton.hpp IntervalRegion.hpp IntervalSlicer.hpp \
 	IntervalTraits.hpp IntervalVector.hpp IntervalUnion.hpp \
@@ -528,9 +529,10 @@ EXTRA_DIST = \
 
 lib_LTLIBRARIES = librealpaver.la
 librealpaver_la_includedir = $(includedir)/realpaver
-librealpaver_la_include_HEADERS = Bitset.hpp BC3Contractor.hpp \
-	BC4Contractor.hpp CIDContractor.hpp Common.hpp config.hpp \
-	Constraint.hpp ConstraintContractor.hpp ConstraintFixer.hpp \
+librealpaver_la_include_HEADERS = AssertDebug.hpp Bitset.hpp \
+	BC3Contractor.hpp BC4Contractor.hpp CIDContractor.hpp \
+	Common.hpp config.hpp configure.hpp Constraint.hpp \
+	ConstraintContractor.hpp ConstraintFixer.hpp \
 	ConstraintRelaxor.hpp Contractor.hpp ContractorPool.hpp \
 	Dag.hpp Double.hpp Env.hpp Exception.hpp HC4Contractor.hpp \
 	Inflator.hpp IntContractor.hpp Integer.hpp Interval.hpp \

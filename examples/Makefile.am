@@ -9,8 +9,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = bop ncsp
-DIST_SUBDIRS = bop ncsp
+SUBDIRS = bop
+DIST_SUBDIRS = bop
 
 LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
 

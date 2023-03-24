@@ -9,21 +9,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = generators solved unsolved
-DIST_SUBDIRS = generators solved unsolved
-
-LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
-
-AM_CPPFLAGS = -I.. -I../src
-
-CLEANFILES = *~ *.log
-
-noinst_PROGRAMS = ncsp_solver
-
-ncsp_solver_SOURCES = ncsp_solver.cpp
+CLEANFILES = *~
 
 EXTRA_DIST = \
-	ncsp_param \
 	Apollonius.rp \
 	Bellido.rp \
 	Bifurcation.rp \

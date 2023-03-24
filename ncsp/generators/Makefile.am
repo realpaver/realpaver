@@ -13,4 +13,5 @@ CLEANFILES = *~
 
 EXTRA_DIST = \
 	broydentri.cpp \
+	katsura.cpp \
 	trigo.cpp

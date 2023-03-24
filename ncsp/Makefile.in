@@ -92,7 +92,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = ncsp_solver$(EXEEXT)
-subdir = examples/ncsp
+subdir = ncsp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -109,7 +109,7 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_ncsp_solver_OBJECTS = ncsp_solver.$(OBJEXT)
 ncsp_solver_OBJECTS = $(am_ncsp_solver_OBJECTS)
 ncsp_solver_LDADD = $(LDADD)
-ncsp_solver_DEPENDENCIES = ../../src/realpaver/.libs/librealpaver.la
+ncsp_solver_DEPENDENCIES = ../src/realpaver/.libs/librealpaver.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -351,10 +351,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = generators solutions
-DIST_SUBDIRS = generators solutions
-LDADD = ../../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
-AM_CPPFLAGS = -I.. -I../../src
+SUBDIRS = generators solved unsolved
+DIST_SUBDIRS = generators solved unsolved
+LDADD = ../src/realpaver/.libs/librealpaver.la @INTERVAL_LIB@ @LP_LIB@
+AM_CPPFLAGS = -I.. -I../src
 CLEANFILES = *~ *.log
 ncsp_solver_SOURCES = ncsp_solver.cpp
 EXTRA_DIST = \
@@ -457,9 +457,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/ncsp/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign ncsp/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign examples/ncsp/Makefile
+	  $(AUTOMAKE) --foreign ncsp/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

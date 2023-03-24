@@ -11,6 +11,4 @@ AUTOMAKE_OPTIONS = foreign
 
 CLEANFILES = *~
 
-EXTRA_DIST = \
-	Quadgrid.sol \
-	Vrahatis.sol
+EXTRA_DIST =
