@@ -110,7 +110,7 @@ SPLIT_OBJECTIVE = NO
 # - MAX_SMEAR:        maximum smear
 # - ROUND_ROBIN:      round-robin strategy
 # - HYBRID_DOM_ROBIN: hybrid strategy using MAX_DOM and ROUND_ROBIN
-SPLIT_SELECTOR = MAX_SMEAR
+SPLIT_SELECTOR = HYBRID_DOM_ROBIN
 
 # Parameter of the HYBRID_DOM_ROBIN splitting strategy (>= 1)
 # Inverse of the frequency of use of ROUND_ROBIN, e.g. 3 means that

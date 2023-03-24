@@ -370,6 +370,8 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  examples/bop/Makefile
                  examples/ncsp/Makefile
+                 examples/ncsp/generators/Makefile
+                 examples/ncsp/solutions/Makefile
                  src/Makefile
                  src/realpaver/Makefile
                  work/Makefile])
