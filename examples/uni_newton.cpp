@@ -3,7 +3,7 @@
 #include "realpaver/UniIntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/ThickIntervalFunction.hpp"
+#include "realpaver/ThickFunction.hpp"
 
 using namespace realpaver;
 using namespace std;
