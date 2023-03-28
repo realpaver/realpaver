@@ -18,21 +18,21 @@ gurobi_dir = get_option('GUROBI_DIR')
 
 lp_lib_name = get_option('LP_LIB')
 lp_dep = dependency('', required : false)
-if lp_lib_name == 'Clp'
+if lp_lib_name.to_upper() == 'CLP'
   lp_dep = dependency('clp', required : true)
-elif lp_lib_name == 'Gurobi'
+elif lp_lib_name.to_upper() == 'GUROBI'
   #lp_dep = dependency('gurobi100', required: true, method: 'auto')
   lp_dep = cpp_comp.find_library('gurobi100', required: true, dirs: [gurobi_dir+'/lib'])
   #include_dirs += [gurobi_dir+'/include']
-elif lp_lib_name == 'Soplex'
+elif lp_lib_name.to_upper() == 'SOPLEX'
   lp_dep = cpp_comp.find_library('soplex', required : true)
-elif lp_lib_name == 'Highs'
+elif lp_lib_name.to_upper() == 'HIGHS'
   lp_dep = dependency('highs', required : true)
 endif
 
 interval_lib_name = get_option('INTERVAL_LIB')
 interval_dep = dependency('', required : false)
-if interval_lib_name == 'Gaol'
+if interval_lib_name.to_upper() == 'GAOL'
   # Search first for apmathlib if present
   mathlib_dep = cpp_comp.find_library('ultim', required : false)
   # Else consider to use crlibm
@@ -150,7 +150,6 @@ if not bison.found()
   warning('MESON_SKIP_TEST bison not found.')
 endif
 
-
 subdir('src')
 
 subdir('check')
@@ -160,3 +159,14 @@ subdir('doc')
 subdir('examples')
 
 subdir('work')
+
+subdir('ncsp')
+
+
+## Generation of pkg-config file to ease dependency detection when using realpaver as a library
+## In your meson project, just add: rp_lib = dependency('realpaver')
+pkgconfig = find_program('pkg-config', required: false)
+if pkgconfig.found()
+  pkg = import('pkgconfig')
+  pkg.generate(realpaver_lib)
+endif

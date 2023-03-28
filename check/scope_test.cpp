@@ -1,4 +1,4 @@
-#include "Scope.hpp"
+#include "realpaver/Scope.hpp"
 #include "realpaver_test.hpp"
 
 class ScopeTest : public CppUnit::TestFixture
