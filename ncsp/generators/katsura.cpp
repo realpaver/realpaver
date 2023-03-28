@@ -19,7 +19,7 @@ int main(int argc, char ** argv)
 
    cout << "Generator of problem " << name << endl;
 
-   vector<var> vars(n);
+   vector<realpaver::Variable> vars(n);
 
 
    return 0;
