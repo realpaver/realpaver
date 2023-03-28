@@ -45,7 +45,7 @@ int main(void)
       Parser parser(prm);
       Problem problem;
 
-      bool ok = parser.parseFile("examples/ncsp/TestProblem.rp", problem);
+      bool ok = parser.parseFile("../ncsp/benchmarks/TestProblem.rp", problem);
       if (!ok) THROW("Parse error: " << parser.getParseError());
 
       cout << problem << endl;
