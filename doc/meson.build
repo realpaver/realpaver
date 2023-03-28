@@ -5,8 +5,8 @@ if not doxygen.found()
 else
   cdata = configuration_data()
   cdata.set('REALPAVER_VERSION', meson.project_version())
-  cdata.set('TOP_SRCDIR', meson.source_root())
-  cdata.set('TOP_BUILDDIR', meson.build_root())
+  cdata.set('TOP_SRCDIR', meson.project_source_root())
+  cdata.set('TOP_BUILDDIR', meson.project_build_root())
   if find_program('dot', required : false).found()
     cdata.set('HAVE_DOT', 'YES')
   else
