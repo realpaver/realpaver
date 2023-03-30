@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/RltRelaxation.hpp"
+#include "realpaver/RLTRelaxation.hpp"
 
 namespace realpaver {
 

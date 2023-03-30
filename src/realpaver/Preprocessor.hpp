@@ -134,7 +134,6 @@ private:
 
    std::vector<Constraint> inactive_;  // constraints inactive
    std::vector<Constraint> active_;    // constraints not inactive
-   size_t nbc_;                        // number of inactive constraints
    bool unfeasible_;                   // true if problem unfeasible
 
    Timer timer_;

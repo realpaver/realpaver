@@ -867,7 +867,6 @@ Range sgnPY(const Range& x, const Range& y)
 
 Range& Range::operator/=(const Range& other)
 {
-   Range res((*this) / other);
    return *this = (*this) / other;
 }
 

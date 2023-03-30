@@ -38,7 +38,7 @@ public:
    HC4Contractor(const HC4Contractor&) = default;
 
    /// Default assignment operator
-   HC4Contractor& operator=(const HC4Contractor&) = default;
+   HC4Contractor& operator=(const HC4Contractor&) = delete;
 
    /// Default destructor
    ~HC4Contractor() = default;

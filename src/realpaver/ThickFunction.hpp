@@ -66,7 +66,6 @@ public:
 private:
    SharedDag dag_;   // dag
    DagFun* f_;       // function in the dag
-   size_t if_;       // function index in the dag
    Variable v_;      // variable index
 };
 

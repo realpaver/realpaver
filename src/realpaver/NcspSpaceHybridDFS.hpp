@@ -90,12 +90,12 @@ private:
    };
 
    struct Comp {
-      bool operator()(const Elem& e1, const Elem& e2)
+      bool operator()(const Elem& e1, const Elem& e2) const
       {
          return (e1.depth < e2.depth) ||
                 (e1.depth == e2.depth && e1.node->index() < e2.node->index());
       }
-   } comparator;
+   };
 
    std::set<Elem, Comp> set_;
 };
@@ -132,12 +132,12 @@ private:
    };
 
    struct Comp {
-      bool operator()(const Elem& e1, const Elem& e2)
+      bool operator()(const Elem& e1, const Elem& e2) const
       {
          return (e1.peri > e2.peri) ||
                 (e1.peri == e2.peri && e1.node->index() < e2.node->index());
       }
-   } comparator;
+   };
 
    std::set<Elem, Comp> set_;
 };
@@ -174,12 +174,12 @@ private:
    };
 
    struct Comp {
-      bool operator()(const Elem& e1, const Elem& e2)
+      bool operator()(const Elem& e1, const Elem& e2) const
       {
          return (e1.peri > e2.peri) ||
                 (e1.peri == e2.peri && e1.node->index() < e2.node->index());
       }
-   } comparator;
+   };
 
    std::set<Elem, Comp> set_;
 };

@@ -12,7 +12,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/PolytopeHullContractor.hpp"
-#include "realpaver/RltRelaxation.hpp"
+#include "realpaver/RLTRelaxation.hpp"
 
 namespace realpaver {
 

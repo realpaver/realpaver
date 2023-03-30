@@ -15,7 +15,6 @@ namespace realpaver {
 ThickFunction::ThickFunction(SharedDag dag, size_t i, Variable v)
       : dag_(dag),
         f_(nullptr),
-        if_(i),
         v_(v)
 {
    f_ = dag->fun(i);
