@@ -418,7 +418,7 @@ void NcspSolver::bpStep(int depthlimit)
    {
       node->setProof(Proof::Inner);
 
-      string str = env_->getParam()->getStrParam("SPLIT_INNER");
+      std::string str = env_->getParam()->getStrParam("SPLIT_INNER");
       if (str == "NO")
       {
          LOG_INTER("Solution node (inner region)");

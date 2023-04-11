@@ -44,42 +44,42 @@ public:
    /// Gets the value of an integral parameter
    /// @param name name of parameter
    /// @return value of parameter
-   int getIntParam(const string& name) const;
+   int getIntParam(const std::string& name) const;
 
    /// Sets the value of an integral parameter
    /// @param name name of parameter
    /// @param val value assigned
-   void setIntParam(const string& name, int val);
+   void setIntParam(const std::string& name, int val);
 
    /// Gets the value of a real parameter
    /// @param name name of parameter
    /// @return value of parameter
-   double getDblParam(const string& name) const;
+   double getDblParam(const std::string& name) const;
 
    /// Sets the value of a real parameter
    /// @param name name of parameter
    /// @param val value assigned
-   void setDblParam(const string& name, double val);
+   void setDblParam(const std::string& name, double val);
 
    /// Gets the value of a tolerance parameter
    /// @param name name of parameter
    /// @return value of parameter
-   Tolerance getTolParam(const string& name) const;
+   Tolerance getTolParam(const std::string& name) const;
 
    /// Sets the value of a tolerance parameter
    /// @param name name of parameter
    /// @param val value assigned
-   void setTolParam(const string& name, const Tolerance& val);
+   void setTolParam(const std::string& name, const Tolerance& val);
 
    /// Gets the value of a string parameter
    /// @param name name of parameter
    /// @return value of parameter
-   std::string getStrParam(const string& name) const;
+   std::string getStrParam(const std::string& name) const;
 
    /// Sets the value of a string parameter
    /// @param name name of parameter
    /// @param val value assigned
-   void setStrParam(const string& name, const std::string& val);
+   void setStrParam(const std::string& name, const std::string& val);
 
    /// Writes the parameters on a stream
    /// @param os output stream
@@ -92,42 +92,42 @@ public:
    /// Gets the value of an integral parameter in the static instance
    /// @param name name of parameter
    /// @return value of parameter
-   static int GetIntParam(const string& name);
+   static int GetIntParam(const std::string& name);
 
    /// Sets the value of an integral parameter in the static instance
    /// @param name name of parameter
    /// @param val value assigned
-   static void SetIntParam(const string& name, int val);
+   static void SetIntParam(const std::string& name, int val);
 
    /// Gets the value of a real parameter in the static instance
    /// @param name name of parameter
    /// @return value of parameter
-   static double GetDblParam(const string& name);
+   static double GetDblParam(const std::string& name);
 
    /// Sets the value of a real parameter in the static instance
    /// @param name name of parameter
    /// @param val value assigned
-   static void SetDblParam(const string& name, double val);
+   static void SetDblParam(const std::string& name, double val);
 
    /// Gets the value of a tolerance parameter in the static instance
    /// @param name name of parameter
    /// @return value of parameter
-   static Tolerance GetTolParam(const string& name);
+   static Tolerance GetTolParam(const std::string& name);
 
    /// Sets the value of a tolerance parameter in the static instance
    /// @param name name of parameter
    /// @param val value assigned
-   static void SetTolParam(const string& name, const Tolerance& val);
+   static void SetTolParam(const std::string& name, const Tolerance& val);
 
    /// Gets the value of a string parameter in the static instance
    /// @param name name of parameter
    /// @return value of parameter
-   static std::string GetStrParam(const string& name);
+   static std::string GetStrParam(const std::string& name);
 
    /// Sets the value of a string parameter in the static instance
    /// @param name name of parameter
    /// @param val value assigned
-   static void SetStrParam(const string& name, const std::string& val);
+   static void SetStrParam(const std::string& name, const std::string& val);
 
    /// Writes the parameters of the static instance on a stream
    /// @param os output stream

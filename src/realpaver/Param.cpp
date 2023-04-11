@@ -92,7 +92,7 @@ Param::Param()
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
 }
 
-int Param::getIntParam(const string& name) const
+int Param::getIntParam(const std::string& name) const
 {
    auto it = intmap_.find(name);
 
@@ -102,12 +102,12 @@ int Param::getIntParam(const string& name) const
    return it->second;
 }
 
-int Param::GetIntParam(const string& name)
+int Param::GetIntParam(const std::string& name)
 {
    return instance_.getIntParam(name);
 }
 
-void Param::setIntParam(const string& name, int val)
+void Param::setIntParam(const std::string& name, int val)
 {
    auto it = intmap_.find(name);
 
@@ -117,12 +117,12 @@ void Param::setIntParam(const string& name, int val)
    intmap_[name] = val;
 }
 
-void Param::SetIntParam(const string& name, int val)
+void Param::SetIntParam(const std::string& name, int val)
 {
    instance_.setIntParam(name, val);
 }
 
-double Param::getDblParam(const string& name) const
+double Param::getDblParam(const std::string& name) const
 {
    auto it = dblmap_.find(name);
 
@@ -132,12 +132,12 @@ double Param::getDblParam(const string& name) const
    return it->second;   
 }
 
-double Param::GetDblParam(const string& name)
+double Param::GetDblParam(const std::string& name)
 {
    return instance_.getDblParam(name);
 }
 
-void Param::setDblParam(const string& name, double val)
+void Param::setDblParam(const std::string& name, double val)
 {
    auto it = dblmap_.find(name);
 
@@ -147,12 +147,12 @@ void Param::setDblParam(const string& name, double val)
    dblmap_[name] = val;
 }
 
-void Param::SetDblParam(const string& name, double val)
+void Param::SetDblParam(const std::string& name, double val)
 {
    instance_.setDblParam(name, val);
 }
 
-std::string Param::getStrParam(const string& name) const
+std::string Param::getStrParam(const std::string& name) const
 {
    auto it = strmap_.find(name);
 
@@ -162,12 +162,12 @@ std::string Param::getStrParam(const string& name) const
    return it->second;      
 }
 
-std::string Param::GetStrParam(const string& name)
+std::string Param::GetStrParam(const std::string& name)
 {
    return instance_.getStrParam(name);
 }
 
-void Param::setStrParam(const string& name, const std::string& val)
+void Param::setStrParam(const std::string& name, const std::string& val)
 {
    auto it = strmap_.find(name);
 
@@ -177,12 +177,12 @@ void Param::setStrParam(const string& name, const std::string& val)
    strmap_[name] = val;   
 }
 
-void Param::SetStrParam(const string& name, const std::string& val)
+void Param::SetStrParam(const std::string& name, const std::string& val)
 {
    instance_.setStrParam(name, val);
 }
 
-Tolerance Param::getTolParam(const string& name) const
+Tolerance Param::getTolParam(const std::string& name) const
 {
    auto it = tolmap_.find(name);
 
@@ -192,12 +192,12 @@ Tolerance Param::getTolParam(const string& name) const
    return it->second;
 }
 
-Tolerance Param::GetTolParam(const string& name)
+Tolerance Param::GetTolParam(const std::string& name)
 {
    return instance_.getTolParam(name);
 }
 
-void Param::setTolParam(const string& name, const Tolerance& val)
+void Param::setTolParam(const std::string& name, const Tolerance& val)
 {
    auto it = tolmap_.find(name);
 
@@ -207,7 +207,7 @@ void Param::setTolParam(const string& name, const Tolerance& val)
    tolmap_[name] = val;
 }
 
-void Param::SetTolParam(const string& name, const Tolerance& val)
+void Param::SetTolParam(const std::string& name, const Tolerance& val)
 {
    instance_.setTolParam(name, val);
 }
