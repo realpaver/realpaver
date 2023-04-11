@@ -18,6 +18,14 @@ if interval_lib_name.to_upper() == 'GAOL'
     install: true,
     install_dir : 'include/realpaver')
   rp_sources += [gaol_header]
+elif interval_lib_name.to_upper() == 'INUM64'
+  inum64_header = custom_target('gen-interval-header',
+    input: 'IntervalInum64.hpp',
+    output: 'IntervalImpl.hpp',
+    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    install: true,
+    install_dir : 'include/realpaver')
+  rp_sources += [inum64_header]
 endif
 
 lp_header_hpp = ''

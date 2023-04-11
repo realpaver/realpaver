@@ -32,6 +32,7 @@ endif
 
 interval_lib_name = get_option('INTERVAL_LIB')
 interval_dep = dependency('', required : false)
+mathlib_dep = dependency('', required : false)
 if interval_lib_name.to_upper() == 'GAOL'
   # Search first for apmathlib if present
   mathlib_dep = cpp_comp.find_library('ultim', required : false)
@@ -39,7 +40,12 @@ if interval_lib_name.to_upper() == 'GAOL'
   if not mathlib_dep.found()
     mathlib_dep = cpp_comp.find_library('crlibm', required : true)
   endif
-  gaol_dep = cpp_comp.find_library('gaol', required : true)
+  interval_dep = cpp_comp.find_library('gaol', required : true)
+elif interval_lib_name.to_upper() == 'INUM64'
+  mathlib_dep = cpp_comp.find_library('mpfr', required: true)
+  interval_dep = cpp_comp.find_library('inum64', required: true)
+else
+  error('No suitable interval library found!')
 endif
 m_dep = cpp_comp.find_library('m', required : true)
 
@@ -47,7 +53,7 @@ if not lp_dep.found()
   error('Missing linear programming library (Clp or Gurobi)!')
 endif
 
-deps_lib = [lp_dep,mathlib_dep,gaol_dep,m_dep]
+deps_lib = [lp_dep,mathlib_dep,interval_dep,m_dep]
 
 flex = find_program('flex', required: false)
 bison = find_program('bison', required: false)
