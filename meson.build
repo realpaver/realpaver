@@ -50,7 +50,7 @@ endif
 m_dep = cpp_comp.find_library('m', required : true)
 
 if not lp_dep.found()
-  error('Missing linear programming library (Clp or Gurobi)!')
+  error('Missing linear programming library!')
 endif
 
 deps_lib = [lp_dep,mathlib_dep,interval_dep,m_dep]
@@ -158,7 +158,7 @@ endif
 
 subdir('src')
 
-subdir('check')
+subdir('test')
 
 subdir('doc')
 
