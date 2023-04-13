@@ -416,18 +416,6 @@ struct IntervalTraits<RawInterval> {
       os << x;
    } 
 
-   static inline std::streamsize precision(std::streamsize n)
-   {
-      // TODO
-      return 16;
-   }
-
-   static inline std::streamsize precision()
-   {
-      // TODO
-      return 16;
-   }
-
    static inline void addAssign(interval& x, const interval& y)
    {
       x += y;

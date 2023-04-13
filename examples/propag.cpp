@@ -11,7 +11,6 @@ using namespace std;
 int main(void)
 {
    Logger::init(LogLevel::full, "propag.log");
-   Interval::precision( 8 );
 
    try {
       Problem problem;

@@ -166,10 +166,6 @@ struct IntervalTraits
 
    static void print(std::ostream& os, const interval& x);
 
-   static std::streamsize precision(std::streamsize n);
-
-   static std::streamsize precision();
-
    static void addAssign(interval& x, const interval& y);
 
    static interval add(const interval& x, const interval& y);

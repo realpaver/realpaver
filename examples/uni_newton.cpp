@@ -14,7 +14,6 @@ Interval df(const Interval& x) { return 2.0*x; }
 int main(void)
 {
    Logger::init(LogLevel::full, "newton.log");
-   Interval::precision( 16 );
 
    UniIntervalNewton newton;
    Interval I(1, 10);

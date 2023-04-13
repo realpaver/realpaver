@@ -11,6 +11,7 @@
 #define REALPAVER_INTERVAL_GAOL_HPP
 
 #include <iostream>
+#include <iomanip>
 #include <gaol/gaol>
 #include "realpaver/IntervalTraits.hpp"
 
@@ -467,26 +468,21 @@ struct IntervalTraits<RawInterval> {
    static inline void print(std::ostream& os, const interval& x)
    {
       if (x.is_empty())
+      {
          os << "empty";
-
+      }
       else if (x.is_an_int())
       {
          int n = (int)x.left();
          os << n;
       }
-
-      else os << x;
+      else
+      {
+         std::streamsize size = interval::precision(os.precision());
+         os << x;
+         interval::precision(size);
+      }
    } 
-
-   static inline std::streamsize precision(std::streamsize n)
-   {
-      return interval::precision(n);
-   }
-
-   static inline std::streamsize precision()
-   {
-      return interval::precision();
-   }
 
    static inline void addAssign(interval& x, const interval& y)
    {

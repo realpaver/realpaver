@@ -267,16 +267,6 @@ std::ostream& operator<<(std::ostream& os, const Interval& x)
    return os;
 }
 
-std::streamsize Interval::precision(std::streamsize n)
-{
-   return Interval::Traits::precision(n);
-}
-
-std::streamsize Interval::precision()
-{
-   return Interval::Traits::precision();
-}
-
 double Interval::left() const
 {
    return Interval::Traits::left(impl_);

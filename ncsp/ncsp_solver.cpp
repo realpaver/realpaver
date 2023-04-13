@@ -77,9 +77,6 @@ int main(int argc, char** argv)
       NcspSolver solver(problem);
       solver.getEnv()->setParam(prm);
 
-      int prec = prm.getIntParam("FLOAT_PRECISION");
-      Interval::precision(prec);
-
       std::string sep = "########################################";
       sep += sep;
       std::string indent = "   ";
@@ -325,17 +322,19 @@ int main(int argc, char** argv)
          // writes the solutions
          Scope sco = preproc->unfixedScope();
 
+         int prec = prm.getIntParam("FLOAT_PRECISION");
+         fsol << std::defaultfloat;
+
          string sd =solver.getEnv()->getParam()->getStrParam("DISPLAY_REGION");
          if (sd == "STD")
          {
             for (size_t i=0; i<space->nbSolNodes(); ++i)
             {
-               fsol << std::defaultfloat << std::setprecision(4);
-
                SharedNcspNode node = space->getSolNode(i);
                IntervalRegion* reg = node->region();
                Proof proof = node->getProof();
 
+               fsol << std::setprecision(4);
                fsol << std::endl << "SOLUTION " << (i+1)
                     << " [" << reg->width() << "]";
 
@@ -347,7 +346,7 @@ int main(int argc, char** argv)
                   default:              fsol << " (bug!!!)"; break;
                }
 
-               fsol << endl;
+               fsol << std::setprecision(prec) << endl;
                reg->stdPrint(fsol);                  
             }
          }
@@ -356,11 +355,11 @@ int main(int argc, char** argv)
             fsol << endl << "SCOPE = " << sco << endl;
             for (size_t i=0; i<space->nbSolNodes(); ++i)
             {
-               fsol << std::defaultfloat << std::setprecision(4);
+               fsol << std::setprecision(4);
 
                SharedNcspNode node = space->getSolNode(i);
                IntervalRegion* reg = node->region();
-               fsol << endl;
+               fsol << std::setprecision(prec) << endl;
                reg->vecPrint(fsol);
             }
          }

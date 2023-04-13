@@ -245,12 +245,8 @@ public:
    /// Returns m(x) + delta*(x - m(x)) + chi*[-1,1]
    Interval inflate(double delta, double chi) const;
 
-   ///@{
    /// Output on a stream
    friend std::ostream& operator<<(std::ostream& os, const Interval& x);
-   static std::streamsize precision(std::streamsize n);
-   static std::streamsize precision();
-   ///@}
 
    ///@{
    /// Addition
