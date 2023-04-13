@@ -1,0 +1,10 @@
+prefix=/Library/gurobi1000/macos_universal2
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: gurobi
+Description: C++ API for Gurobi Optimization
+Url: https://www.gurobi.com/
+Version: 10.0.0
+Cflags: -I${includedir} -I${includedir}/include
+Libs: -L${libdir} -lgurobi100 -lgurobi_c++

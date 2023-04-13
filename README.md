@@ -43,6 +43,18 @@ Example of meson setup command:
 meson setup build --prefix /opt/homebrew/Cellar/realpaver/1.0.0 -DLP_LIB=Highs -DLOG=true
 ```
 
+### How to compile with Gurobi?
+
+**Requirements:** pkg-config
+
+1. Modify the gurobi100.pc file in the realpaver folder with your own configuration for gurobi
+2. Copy this file to a folder where meson will look at when searching for dependencies (i.e. /opt/homebrew/Cellar/yaml-cpp/0.7.0/share/pkgconfig/ in macOS with homebrew)
+3. Configure your build folder with gurobi as LP solver:
+
+```bash
+meson setup build -DLP_LIB=Gurobi
+```
+
 ## How to run tests
 
 In the build folder run:

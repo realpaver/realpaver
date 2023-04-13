@@ -8,22 +8,15 @@ cpp_comp = meson.get_compiler('cpp')
 
 ## dependencies
 
-#includedir = get_option('includedir')
-#libdir = get_option('libdir')
-
 gurobi_dir = get_option('GUROBI_DIR')
-
-
-#include_dirs = [includedir]
 
 lp_lib_name = get_option('LP_LIB')
 lp_dep = dependency('', required : false)
 if lp_lib_name.to_upper() == 'CLP'
   lp_dep = dependency('clp', required : true)
 elif lp_lib_name.to_upper() == 'GUROBI'
-  #lp_dep = dependency('gurobi100', required: true, method: 'auto')
-  lp_dep = cpp_comp.find_library('gurobi100', required: true, dirs: [gurobi_dir+'/lib'])
-  #include_dirs += [gurobi_dir+'/include']
+  lp_dep = dependency('gurobi100', required: true, method: 'auto')
+  #lp_dep = cpp_comp.find_library('gurobi100', required: true, dirs: gurobi_dir+'/lib')
 elif lp_lib_name.to_upper() == 'SOPLEX'
   lp_dep = cpp_comp.find_library('soplex', required : true)
 elif lp_lib_name.to_upper() == 'HIGHS'
