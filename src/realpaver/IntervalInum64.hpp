@@ -14,34 +14,14 @@
 #include "inum64/inum64.hpp"
 #include "realpaver/IntervalTraits.hpp"
 
-#if defined(PACKAGE_BUGREPORT)
-#   undef PACKAGE_BUGREPORT
-#endif
-
-#if defined(PACKAGE_NAME)
-#   undef PACKAGE_NAME
-#endif
-
-#if defined(PACKAGE_STRING)
-#   undef PACKAGE_STRING
-#endif
-
-#if defined(PACKAGE_TARNAME)
-#   undef PACKAGE_TARNAME
-#endif
-
-#if defined(PACKAGE_VERSION)
-#   undef PACKAGE_VERSION
-#endif
-
 #if defined(VERSION)
-#   undef VERSION
+#undef VERSION
 #endif
 
 namespace realpaver {
 
 /// Raw interval type
-typedef inum64 RawInterval;
+using RawInterval = inum64::interval;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a specialization of the interval traits for inum64.
@@ -65,34 +45,22 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval create(double l, double r)
    {
-      return interval(l,r);
+      return interval(l, r);
    }
 
    static inline interval create(const char* s)
    {
-      try {
-         interval res(s,s);
-         return res;
-      }
-      catch(std::exception& e)
-      {}
-      return interval::emptyset();
+      return interval(s, s);
    }
 
    static inline interval create(const char* sl, char const* sr)
    {
-      try {
-         interval res(sl, sr);
-         return res;
-      }
-      catch(std::exception& e)
-      {}
-      return interval::emptyset();
+      return interval(sl, sr);
    }
 
    static inline void setEmpty(interval& x)
    {
-      x = interval::emptyset();
+      x.set_empty();
    }
 
    static inline double left(const interval& x)
@@ -107,8 +75,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline size_t hashCode(const interval& x)
    {
-      std::hash<double> f;      
-      return f(x.left()) ^ (f(x.right()) << 1);
+      return x.hash_code();
    }
 
    static inline interval universe()
@@ -203,7 +170,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval zeroTwoPi()
    {
-      static interval x = zero() | inum64::two_pi();
+      static interval x = zero() | interval::two_pi();
       return x;
    }
 
@@ -260,12 +227,12 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isInfLeft(const interval& x)
    {
-      return x.left() == interval::universe().left();
+      return x.is_left_unbounded();
    }
 
    static inline bool isInfRight(const interval& x)
    {
-      return x.right() == interval::universe().right();
+      return x.is_right_unbounded();
    }
 
    static inline bool isSingleton(const interval& x)
@@ -280,7 +247,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isAnInt(const interval& x)
    {
-      return round(x) == x;
+      return x.is_an_int();
    }
 
    static inline bool contains(const interval& x, double a)
@@ -300,7 +267,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool strictlyContainsZero(const interval& x)
    {
-      return x.strictly_contains(0.0);
+      return x.strictly_contains_zero();
    }
 
    static inline bool contains(const interval& x, const interval& y)
@@ -326,22 +293,22 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isNegative(const interval& x)
    {
-      return x.right() <= 0.0;
+      return x.is_negative();
    }
 
    static inline bool isStrictlyNegative(const interval& x)
    {
-      return x.right() < 0.0;
+      return x.is_strictly_negative();
    }
 
    static inline bool isPositive(const interval& x)
    {
-      return x.left() >= 0.0;
+      return x.is_positive();
    }
 
    static inline bool isStrictlyPositive(const interval& x)
    {
-      return x.left() > 0.0;
+      return x.is_strictly_positive();
    }
 
    static inline bool isPossiblyEq(const interval& x, const interval& y)
@@ -416,7 +383,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline double distance(const interval& x, const interval& y)
    {
-      return  ::distance(x,y);
+      return  inum64::distance(x, y);
    }
 
    static inline void inter_assign(interval& x, const interval& y)
@@ -441,31 +408,24 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval round(const interval& x)
    {
-      return ::round(x);
+      return inum64::round(x);
    }
 
    static inline void print(std::ostream& os, const interval& x)
    {
-      if (x.is_empty())
-         os << "empty";
-
-      else if (isAnInt(x))
-      {
-         int n = (int)x.left();
-         os << n;
-      }
-
-      else os << x;
+      os << x;
    } 
 
    static inline std::streamsize precision(std::streamsize n)
    {
-      return INUM64_REAL_PREC;
+      // TODO
+      return 16;
    }
 
    static inline std::streamsize precision()
    {
-      return INUM64_REAL_PREC;
+      // TODO
+      return 16;
    }
 
    static inline void addAssign(interval& x, const interval& y)
@@ -481,19 +441,19 @@ struct IntervalTraits<RawInterval> {
    static inline interval addPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return x & (z - y);
+      return inum64::add_px(x, y, z);
    }
 
    static inline interval addPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return y & (z - x);
+      return inum64::add_py(x, y, z);
    }
 
    static inline interval addPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return z & (x + y);
+      return inum64::add_pz(x, y, z);
    }
 
    static inline void subAssign(interval& x, const interval& y)
@@ -509,19 +469,19 @@ struct IntervalTraits<RawInterval> {
    static inline interval subPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return x & (y + z);
+      return inum64::sub_px(x, y, z);
    }
 
    static inline interval subPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return y & (x - z);
+      return inum64::sub_py(x, y, z);
    }
 
    static inline interval subPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return z & (x - y);
+      return inum64::sub_pz(x, y, z);
    }
 
    static inline interval usub(const interval& x)
@@ -531,12 +491,12 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval usubPX(const interval& x, const interval& y)
    {
-      return x & (-y);
+      return inum64::usub_px(x, y);
    }
 
    static inline interval usubPY(const interval& x, const interval& y)
    {
-      return y & (-x);
+      return inum64::usub_py(x, y);
    }
 
    static inline void mulAssign(interval& x, const interval& y)
@@ -552,19 +512,19 @@ struct IntervalTraits<RawInterval> {
    static inline interval mulPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mul_px(x, y, z);
+      return inum64::mul_px(x, y, z);
    }
 
    static inline interval mulPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mul_py(x, y, z);;
+      return inum64::mul_py(x, y, z);;
    }
 
    static inline interval mulPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mul_pz(x, y, z);;
+      return inum64::mul_pz(x, y, z);;
    }
 
    static inline void divAssign(interval& x, const interval& y)
@@ -580,220 +540,218 @@ struct IntervalTraits<RawInterval> {
    static inline interval divPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPZ(y,z,x);
+      return inum64::div_px(x, y, z);
    }
 
    static inline interval divPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPX(y,z,x);
+      return inum64::div_py(x, y, z);
    }
 
    static inline interval divPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPY(y,z,x);     
+      return inum64::div_pz(x, y, z);     
    }
 
    static inline interval sqr(const interval& x)
    {
-      return ::sqr(x);
+      return inum64::sqr(x);
    }
 
    static inline interval sqrPX(const interval& x, const interval& y)
    {
-      return ::sqr_px(x,y);
+      return inum64::sqr_px(x, y);
    }
 
    static inline interval sqrPY(const interval& x, const interval& y)
    {
-      return ::sqr_py(x,y);
+      return inum64::sqr_py(x, y);
    }
 
    static inline interval sqrt(const interval& x)
    {
-      return ::sqrt(x);
+      return inum64::sqrt(x);
    }
 
    static inline interval sqrtPX(const interval& x, const interval& y)
    {
-      return ::sqrt_px(x,y);
+      return inum64::sqrt_px(x, y);
    }
 
    static inline interval sqrtPY(const interval& x, const interval& y)
    {
-      return ::sqrt_py(x,y);
+      return inum64::sqrt_py(x, y);
    }
 
    static inline interval pow(const interval& x, int n)
    {
-      return ::pow(x,n);
+      return inum64::pow(x, n);
    }
 
    static inline interval powPX(const interval& x, int n,
                                 const interval& y)
    {
-      return ::pow_px(x,y,n);
+      return inum64::pow_px(x, y, n);
    }
 
    static inline interval powPY(const interval& x, int n,
                                 const interval& y)
    {
-      return ::pow_py(x,y,n);
+      return inum64::pow_py(x, y, n);
    }
 
    static inline interval exp(const interval& x)
    {
-      return ::exp(x);
+      return inum64::exp(x);
    }
 
    static inline interval expPX(const interval& x, const interval& y)
    {
-      return ::exp_px(x,y);
+      return inum64::exp_px(x, y);
    }
 
    static inline interval expPY(const interval& x, const interval& y)
    {
-      return ::exp_py(x,y);
+      return inum64::exp_py(x, y);
    }
 
    static inline interval log(const interval& x)
    {
-      return ::log(x);
+      return inum64::log(x);
    }
 
    static inline interval logPX(const interval& x, const interval& y)
    {
-      return ::log_px(x,y);
+      return inum64::log_px(x, y);
    }
 
    static inline interval logPY(const interval& x, const interval& y)
    {
-      return ::log_py(x,y);
+      return inum64::log_py(x, y);
    }
 
    static inline interval cos(const interval& x)
    {
-      return ::cos(x) & minusOnePlusOne();
+      return inum64::cos(x);
    }
 
    static inline interval cosPX(const interval& x, const interval& y)
    {
-      return ::cos_px(x,y);
+      return inum64::cos_px(x, y);
    }
 
    static inline interval cosPY(const interval& x, const interval& y)
    {
-      return ::cos_py(x,y);
+      return inum64::cos_py(x, y);
    }
 
    static inline interval sin(const interval& x)
    {
-      return ::sin(x) & minusOnePlusOne();
+      return inum64::sin(x);
    }
 
    static inline interval sinPX(const interval& x, const interval& y)
    {
-      return ::sin_px(x,y);
+      return inum64::sin_px(x, y);
    }
 
    static inline interval sinPY(const interval& x, const interval& y)
    {
-      return ::sin_py(x,y);
+      return inum64::sin_py(x, y);
    }
 
    static inline interval tan(const interval& x)
    {
-      return ::tan(x);
+      return inum64::tan(x);
    }
 
    static inline interval tanPX(const interval& x, const interval& y)
    {
-      return ::tan_px(x,y);
+      return inum64::tan_px(x, y);
    }
 
    static inline interval tanPY(const interval& x, const interval& y)
    {
-      return ::tan_py(x,y);
+      return inum64::tan_py(x, y);
    }
 
    static inline interval abs(const interval& x)
    {
-      return ::abs(x);
+      return inum64::abs(x);
    }
 
    static inline interval absPX(const interval& x, const interval& y)
    {      
-      return ::abs_px(x,y);
+      return inum64::abs_px(x, y);
    }
 
    static inline interval absPY(const interval& x, const interval& y)
    {
-      return ::abs_py(x,y);
+      return inum64::abs_py(x, y);
    }
 
    static inline interval min(const interval& x, const interval& y)
    {
-      return ::min(x,y);
+      return inum64::min(x, y);
    }
 
    static interval minPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return ::min_px(x,y,z);
+      return inum64::min_px(x, y, z);
    }
 
    static inline interval minPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return ::min_py(x,y,z);
+      return inum64::min_py(x, y, z);
    }
 
    static inline interval minPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return ::min_pz(x,y,z);
+      return inum64::min_pz(x, y, z);
    }
 
    static inline interval max(const interval& x, const interval& y)
    {
-      return ::max(x,y);
+      return inum64::max(x, y);
    }
 
    static interval maxPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return ::max_px(x,y,z);
+      return inum64::max_px(x, y, z);
    }
 
    static inline interval maxPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return ::max_py(x,y,z);
+      return inum64::max_py(x, y, z);
    }
 
    static inline interval maxPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return ::max_pz(x,y,z);
+      return inum64::max_pz(x, y, z);
    }
 
    static interval sgn(const interval& x)
    {
-      
-      return ::sgn(x);
+      return inum64::sgn(x);
    }
 
    static interval sgnPX(const interval& x, const interval& y)
    {
-      return ::sgn_px(x,y);
+      return inum64::sgn_px(x, y);
    }
 
    static inline interval sgnPY(const interval& x, const interval& y)
    {
-      return ::sgn_py(x,y);
+      return inum64::sgn_py(x, y);
    }
-
 };
 
 } // namespace
