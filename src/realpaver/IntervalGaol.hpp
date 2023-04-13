@@ -347,22 +347,22 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isNegative(const interval& x)
    {
-      return x.right() <= 0.0;
+      return !x.is_empty() && x.right() <= 0.0;
    }
 
    static inline bool isStrictlyNegative(const interval& x)
    {
-      return x.right() < 0.0;
+      return !x.is_empty() && x.right() < 0.0;
    }
 
    static inline bool isPositive(const interval& x)
    {
-      return x.left() >= 0.0;
+      return !x.is_empty() && x.left() >= 0.0;
    }
 
    static inline bool isStrictlyPositive(const interval& x)
    {
-      return x.left() > 0.0;
+      return !x.is_empty() && x.left() > 0.0;
    }
 
    static inline bool isPossiblyEq(const interval& x, const interval& y)
@@ -568,13 +568,13 @@ struct IntervalTraits<RawInterval> {
    static inline interval mulPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return gaol::div_rel(z,y,x);
+      return gaol::div_rel(z, y, x);
    }
 
    static inline interval mulPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return gaol::div_rel(z,x,y);
+      return gaol::div_rel(z, x, y);
    }
 
    static inline interval mulPZ(const interval& x, const interval& y,
@@ -596,19 +596,19 @@ struct IntervalTraits<RawInterval> {
    static inline interval divPX(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPZ(y,z,x);
+      return mulPZ(y, z, x);
    }
 
    static inline interval divPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPX(y,z,x);
+      return mulPX(y, z, x);
    }
 
    static inline interval divPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPY(y,z,x);     
+      return mulPY(y, z, x);     
    }
 
    static inline interval sqr(const interval& x)
@@ -690,7 +690,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval cos(const interval& x)
    {
-      return gaol::cos(x) & minusOnePlusOne();
+      return gaol::cos(x);
    }
 
    static inline interval cosPX(const interval& x, const interval& y)
@@ -705,7 +705,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval sin(const interval& x)
    {
-      return gaol::sin(x) & minusOnePlusOne();
+      return gaol::sin(x);
    }
 
    static inline interval sinPX(const interval& x, const interval& y)
@@ -740,7 +740,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval absPX(const interval& x, const interval& y)
    {      
-      return x & gaol::invabs_rel(y,x);
+      return x & gaol::invabs_rel(y, x);
    }
 
    static inline interval absPY(const interval& x, const interval& y)
@@ -750,72 +750,96 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval min(const interval& x, const interval& y)
    {
-      return gaol::min(x,y);
+      return gaol::min(x, y);
    }
 
    static interval minPX(const interval& x, const interval& y,
-                                const interval& z)
+                        const interval& z)
    {
       if (x.is_empty() || y.is_empty() || z.is_empty())
+      {
          return interval::emptyset();
+      }
+   
+      interval pz = minPZ(x, y, z);
+      if (pz.is_empty())
+      {
+         return interval::emptyset();
+      }
+      else if (x.right() < y.left())
+      {
+         /* z = min(x, y) <=> z = x */
+         return x & pz;
+      }
+      else if (x.left() > y.right())
+      {
+         /* z = min(x, y) <=> z = y, hence no contraction for x */
+         return x;
+      }
       else
       {
-         if (z.left() > y.right())         /* z:            |-----| */
-            return interval::emptyset();   /* y: |-----|            */
-
-         else if (y.left() > z.right())    /* z: |-----|            */
-            return x & z;                  /* y:            |-----| */
-
-         else
-            return x & interval(z.left(),GAOL_INFINITY);
+         /* the left bound of x cannot be smaller than the minimum */
+         return interval(std::max(x.left(), pz.left()), x.right());
       }
    }
 
    static inline interval minPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return minPX(y,x,z);
+      return minPX(y, x, z);
    }
 
    static inline interval minPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return z & gaol::min(x,y);
+      return z & gaol::min(x, y);
    }
 
    static inline interval max(const interval& x, const interval& y)
    {
-      return gaol::max(x,y);
+      return gaol::max(x, y);
    }
 
    static interval maxPX(const interval& x, const interval& y,
-                                const interval& z)
+                         const interval& z)
    {
       if (x.is_empty() || y.is_empty() || z.is_empty())
+      {
          return interval::emptyset();
+      }
+   
+      interval pz = maxPZ(x, y, z);
+      if (pz.is_empty())
+      {
+         return interval::emptyset();
+      }
+      else if (x.left() > y.right())
+      {
+         /* z = max(x, y) <=> z = x */
+         return x & pz;
+      }
+      else if (x.right() < y.left())
+      {
+         /* z = min(x, y) <=> z = y, hence no contraction for x */
+         return x;
+      }
       else
       {
-         if (z.left() > y.right())        /* z :            |-----| */
-            return x & z;                 /* y : |-----|            */
-
-         else if (y.left() > z.right())   /* y :            |-----| */
-            return interval::emptyset();  /* z : |-----|            */
-
-         else
-            return x & interval(-GAOL_INFINITY,z.right());
+         /* the right bound of x cannot be greater than the maximum */
+         return interval(x.left(), std::min(x.right(), pz.right()));
       }
    }
 
    static inline interval maxPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return maxPX(y,x,z);      
+      return maxPX(y, x, z);      
    }
 
    static inline interval maxPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return z & gaol::max(x,y);
+      return z & gaol::max(x, y);
    }
 
    static interval sgn(const interval& x)
