@@ -118,5 +118,5 @@ int main()
    TEST(test_overlap)
    TEST(test_not)
 
-   exit(0);
+   END_TEST
 }

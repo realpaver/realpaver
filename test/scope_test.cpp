@@ -44,7 +44,6 @@ void test_remove()
    Scope s;
    s.insert(v);
    TEST_TRUE(s.contains(v))
-
    s.remove(v);
    TEST_FALSE(s.contains(v))
 }
@@ -69,5 +68,5 @@ int main()
    TEST(test_remove)
    TEST(test_overlap)
 
-   exit(0);
+   END_TEST
 }

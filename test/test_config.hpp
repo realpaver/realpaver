@@ -3,16 +3,17 @@
 
 using namespace realpaver;
 
-std::string test_fun_name = "";
+std::string realpaver_test_name = "";
+int realpaver_test_result = 0;
 
 #define TEST(f)                        \
-   test_fun_name = #f;                 \
+   realpaver_test_name = #f;           \
    f();
 
 #define TEST_TRUE(cond)                \
    if (!(cond)) {                      \
       std::cerr << "Fail in '"         \
-                << test_fun_name       \
+                << realpaver_test_name \
                 << "' line "           \
                 << __LINE__            \
                 << ": "                \
@@ -20,13 +21,13 @@ std::string test_fun_name = "";
                 << #cond               \
                 << " )"                \
                 << std::endl;          \
-      exit(1);                         \
-}
+      realpaver_test_result = 1;       \
+   }
 
 #define TEST_FALSE(cond)               \
    if (cond) {                         \
       std::cerr << "Fail in '"         \
-                << test_fun_name       \
+                << realpaver_test_name \
                 << "' line "           \
                 << __LINE__            \
                 << ": "                \
@@ -34,5 +35,7 @@ std::string test_fun_name = "";
                 << #cond               \
                 << " )"                \
                 << std::endl;          \
-      exit(1);                         \
-}
+      realpaver_test_result = 1;       \
+   }
+
+#define END_TEST exit(realpaver_test_result);
