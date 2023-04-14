@@ -618,7 +618,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval sqrPX(const interval& x, const interval& y)
    {
-      return gaol::sqrt_rel(y,x);
+      return gaol::sqrt_rel(y, x);
    }
 
    static inline interval sqrPY(const interval& x, const interval& y)
@@ -643,19 +643,19 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval pow(const interval& x, int n)
    {
-      return gaol::pow(x,n);
+      return gaol::pow(x, n);
    }
 
    static inline interval powPX(const interval& x, int n,
                                 const interval& y)
    {
-      return gaol::nth_root_rel(y,n,x);
+      return gaol::nth_root_rel(y, n, x);
    }
 
    static inline interval powPY(const interval& x, int n,
                                 const interval& y)
    {
-      return y & gaol::pow(x,n);
+      return y & gaol::pow(x, n);
    }
 
    static inline interval exp(const interval& x)
@@ -695,7 +695,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval cosPX(const interval& x, const interval& y)
    {
-      return x & gaol::acos_rel(y,x);
+      return x & gaol::acos_rel(y, x);
    }
 
    static inline interval cosPY(const interval& x, const interval& y)
@@ -710,7 +710,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval sinPX(const interval& x, const interval& y)
    {
-      return x & gaol::asin_rel(y,x);
+      return x & gaol::asin_rel(y, x);
    }
 
    static inline interval sinPY(const interval& x, const interval& y)
@@ -725,7 +725,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline interval tanPX(const interval& x, const interval& y)
    {
-      return x & gaol::atan_rel(y,x);
+      return x & gaol::atan_rel(y, x);
    }
 
    static inline interval tanPY(const interval& x, const interval& y)
