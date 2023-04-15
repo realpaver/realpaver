@@ -10,6 +10,12 @@ integer_test = executable( 'integer_test',
                          include_directories: ['../src'] )
 test('Test of integer', integer_test)
 
+range_test = executable( 'range_test',
+                         sources: 'range_test.cpp',
+                         link_with:realpaver_lib,
+                         include_directories: ['../src'] )
+test('Test of range', range_test)
+
 scope_test = executable( 'scope_test',
                          sources: 'scope_test.cpp',
                          link_with:realpaver_lib,
