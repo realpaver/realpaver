@@ -80,13 +80,13 @@ void test_4()
 
 int main()
 {
-   INIT(init)
+   INIT_TEST
 
    TEST(test_1)
    TEST(test_2)
    TEST(test_3)
    TEST(test_4)
 
-   CLEAN(clean)
+   CLEAN_TEST
    END_TEST
 }
