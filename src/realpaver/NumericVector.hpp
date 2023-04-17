@@ -14,7 +14,7 @@
 #include <vector>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
-#include "realpaver/LinumTraits.hpp"
+#include "realpaver/NumericTraits.hpp"
 
 namespace realpaver {
 
@@ -25,7 +25,7 @@ template <typename T>
 class NumericVector {
 protected:
    /// Traits class
-  typedef LinumTraits<T> TraitsType;
+  typedef NumericTraits<T> TraitsType;
       
 public:
    /// Value type

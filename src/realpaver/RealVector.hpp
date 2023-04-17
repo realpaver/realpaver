@@ -11,7 +11,7 @@
 #define REALPAVER_REAL_VECTOR_HPP
 
 #include "realpaver/Double.hpp"
-#include "realpaver/LinumDoubleTraits.hpp"
+#include "realpaver/NumericDoubleTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 
 namespace realpaver {

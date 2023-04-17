@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LINUM_TRAITS_HPP
-#define REALPAVER_LINUM_TRAITS_HPP
+#ifndef REALPAVER_NUMERIC_TRAITS_HPP
+#define REALPAVER_NUMERIC_TRAITS_HPP
 
 namespace realpaver {
 
@@ -16,7 +16,7 @@ namespace realpaver {
 /// This is a traits class for numbers used in linear algebra.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-struct LinumTraits
+struct NumericTraits
 {
    /// Value type
    typedef T ValueType;

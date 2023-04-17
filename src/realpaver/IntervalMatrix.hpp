@@ -10,7 +10,7 @@
 #ifndef REALPAVER_INTERVAL_MATRIX_HPP
 #define REALPAVER_INTERVAL_MATRIX_HPP
 
-#include "realpaver/LinumIntervalTraits.hpp"
+#include "realpaver/NumericIntervalTraits.hpp"
 #include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {

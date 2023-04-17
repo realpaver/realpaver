@@ -12,7 +12,7 @@
 
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Interval.hpp"
-#include "realpaver/LinumIntervalTraits.hpp"
+#include "realpaver/NumericIntervalTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealMatrix.hpp"
 #include "realpaver/RealVector.hpp"

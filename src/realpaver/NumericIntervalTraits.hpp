@@ -7,39 +7,49 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LINUM_DOUBLE_TRAITS_HPP
-#define REALPAVER_LINUM_DOUBLE_TRAITS_HPP
+#ifndef REALPAVER_NUMERIC_INTERVAL_TRAITS_HPP
+#define REALPAVER_NUMERIC_INTERVAL_TRAITS_HPP
 
-#include "Double.hpp"
-#include "LinumTraits.hpp"
+#include "Interval.hpp"
+#include "NumericTraits.hpp"
 
 namespace realpaver {
+   
+static inline Interval itv_sqr(const Interval& x)
+{
+   return sqr(x);
+}
+
+static inline Interval itv_sqrt(const Interval& x)
+{
+   return sqrt(x);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a specialization of a traits class for real numbers.
+/// This is a specialization of a traits class for intervals.
 ///////////////////////////////////////////////////////////////////////////////
 template <>
-struct LinumTraits<double>
+struct NumericTraits<Interval>
 {
    /// Value type
-   typedef double ValueType;
+   typedef Interval ValueType;
 
    /// Reference type
-   typedef double& RefType;
+   typedef Interval& RefType;
 
    /// Const reference type
-   typedef const double& ConstRefType;
+   typedef const Interval& ConstRefType;
 
    /// @return the number zero
    static inline ValueType zero()
    {
-      return 0.0;
+      return Interval::zero();
    }
 
    /// @return the number one
    static inline ValueType one()
    {
-      return 1.0;
+      return Interval::one();
    }
 
    /// Addition
@@ -48,7 +58,7 @@ struct LinumTraits<double>
    /// @return x + y
    static inline ValueType add(ConstRefType x, ConstRefType y)
    {
-      return Double::add(x, y);
+      return x + y;
    }
 
    /// Subtraction
@@ -57,7 +67,7 @@ struct LinumTraits<double>
    /// @return x - y
    static inline ValueType sub(ConstRefType x, ConstRefType y)
    {
-      return Double::sub(x, y);
+      return x - y;
    }
 
    /// Unary subtraction
@@ -74,7 +84,7 @@ struct LinumTraits<double>
    /// @return x * y
    static inline ValueType mul(ConstRefType x, ConstRefType y)
    {
-      return Double::mul(x, y);
+      return x * y;
    }
 
    /// Division
@@ -83,7 +93,7 @@ struct LinumTraits<double>
    /// @return x / y
    static inline ValueType div(ConstRefType x, ConstRefType y)
    {
-      return Double::div(x, y);
+      return x / y;
    }
 
    /// Square
@@ -91,7 +101,7 @@ struct LinumTraits<double>
    /// @return square of x
    static inline ValueType sqr(ConstRefType x)
    {
-      return Double::sqr(x);
+      return itv_sqr(x);
    }
 
    /// Square root
@@ -99,7 +109,7 @@ struct LinumTraits<double>
    /// @return square root of x
    static inline ValueType sqrt(ConstRefType x)
    {
-      return Double::sqrt(x);
+      return itv_sqrt(x);
    }
 
    /// Addition with assignment
@@ -109,7 +119,7 @@ struct LinumTraits<double>
    /// x += y
    static inline void addAssign(RefType x, ConstRefType y)
    {
-      Double::addAssign(x, y);
+      x += y;
    }
 
    /// Subtraction with assignment
@@ -119,7 +129,7 @@ struct LinumTraits<double>
    /// x -= y
    static inline void subAssign(ValueType& x, ConstRefType y)
    {
-      Double::subAssign(x, y);
+      x -= y;
    }
 
    /// Multiplication with assignment
@@ -129,7 +139,7 @@ struct LinumTraits<double>
    /// x *= y
    static inline void mulAssign(RefType x, ConstRefType y)
    {
-      Double::mulAssign(x, y);
+      x *= y;
    }
 
   /// Division with assignment
@@ -139,7 +149,7 @@ struct LinumTraits<double>
    /// x /= y
    static inline void divAssign(ValueType& x, ConstRefType y)
    {
-      Double::divAssign(x, y);
+      x /= y;
    }
 
    /// Test of infinity
@@ -147,7 +157,7 @@ struct LinumTraits<double>
    /// @return true if 'x' is infinite
    static inline bool isInf(ConstRefType x)
    {
-      return Double::isInf(x);
+      return x.isInf();
    }
 
    /// Test of equality
@@ -156,7 +166,7 @@ struct LinumTraits<double>
    /// @return true if 'x' is equal to 'y'
    static inline bool isEqual(ConstRefType x, ConstRefType y)
    {
-      return Double::isEqual(x, y);
+      return x.isSetEq(y);
    }
 
    /// Hash code
@@ -164,7 +174,7 @@ struct LinumTraits<double>
    /// @return the hash code of x
    static inline size_t hashCode(ConstRefType  x)
    {
-      return Double::hashCode(x);
+      return x.hashCode();
    }
 };
 

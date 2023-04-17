@@ -11,7 +11,7 @@
 #define REALPAVER_REAL_MATRIX_HPP
 
 #include "realpaver/Double.hpp"
-#include "realpaver/LinumDoubleTraits.hpp"
+#include "realpaver/NumericDoubleTraits.hpp"
 #include "realpaver/NumericMatrix.hpp"
 
 namespace realpaver {

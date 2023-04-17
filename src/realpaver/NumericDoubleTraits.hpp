@@ -7,49 +7,39 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LINUM_INTERVAL_TRAITS_HPP
-#define REALPAVER_LINUM_INTERVAL_TRAITS_HPP
+#ifndef REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP
+#define REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP
 
-#include "Interval.hpp"
-#include "LinumTraits.hpp"
+#include "Double.hpp"
+#include "NumericTraits.hpp"
 
 namespace realpaver {
-   
-static inline Interval itv_sqr(const Interval& x)
-{
-   return sqr(x);
-}
-
-static inline Interval itv_sqrt(const Interval& x)
-{
-   return sqrt(x);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a specialization of a traits class for intervals.
+/// This is a specialization of a traits class for real numbers.
 ///////////////////////////////////////////////////////////////////////////////
 template <>
-struct LinumTraits<Interval>
+struct NumericTraits<double>
 {
    /// Value type
-   typedef Interval ValueType;
+   typedef double ValueType;
 
    /// Reference type
-   typedef Interval& RefType;
+   typedef double& RefType;
 
    /// Const reference type
-   typedef const Interval& ConstRefType;
+   typedef const double& ConstRefType;
 
    /// @return the number zero
    static inline ValueType zero()
    {
-      return Interval::zero();
+      return 0.0;
    }
 
    /// @return the number one
    static inline ValueType one()
    {
-      return Interval::one();
+      return 1.0;
    }
 
    /// Addition
@@ -58,7 +48,7 @@ struct LinumTraits<Interval>
    /// @return x + y
    static inline ValueType add(ConstRefType x, ConstRefType y)
    {
-      return x + y;
+      return Double::add(x, y);
    }
 
    /// Subtraction
@@ -67,7 +57,7 @@ struct LinumTraits<Interval>
    /// @return x - y
    static inline ValueType sub(ConstRefType x, ConstRefType y)
    {
-      return x - y;
+      return Double::sub(x, y);
    }
 
    /// Unary subtraction
@@ -84,7 +74,7 @@ struct LinumTraits<Interval>
    /// @return x * y
    static inline ValueType mul(ConstRefType x, ConstRefType y)
    {
-      return x * y;
+      return Double::mul(x, y);
    }
 
    /// Division
@@ -93,7 +83,7 @@ struct LinumTraits<Interval>
    /// @return x / y
    static inline ValueType div(ConstRefType x, ConstRefType y)
    {
-      return x / y;
+      return Double::div(x, y);
    }
 
    /// Square
@@ -101,7 +91,7 @@ struct LinumTraits<Interval>
    /// @return square of x
    static inline ValueType sqr(ConstRefType x)
    {
-      return itv_sqr(x);
+      return Double::sqr(x);
    }
 
    /// Square root
@@ -109,7 +99,7 @@ struct LinumTraits<Interval>
    /// @return square root of x
    static inline ValueType sqrt(ConstRefType x)
    {
-      return itv_sqrt(x);
+      return Double::sqrt(x);
    }
 
    /// Addition with assignment
@@ -119,7 +109,7 @@ struct LinumTraits<Interval>
    /// x += y
    static inline void addAssign(RefType x, ConstRefType y)
    {
-      x += y;
+      Double::addAssign(x, y);
    }
 
    /// Subtraction with assignment
@@ -129,7 +119,7 @@ struct LinumTraits<Interval>
    /// x -= y
    static inline void subAssign(ValueType& x, ConstRefType y)
    {
-      x -= y;
+      Double::subAssign(x, y);
    }
 
    /// Multiplication with assignment
@@ -139,7 +129,7 @@ struct LinumTraits<Interval>
    /// x *= y
    static inline void mulAssign(RefType x, ConstRefType y)
    {
-      x *= y;
+      Double::mulAssign(x, y);
    }
 
   /// Division with assignment
@@ -149,7 +139,7 @@ struct LinumTraits<Interval>
    /// x /= y
    static inline void divAssign(ValueType& x, ConstRefType y)
    {
-      x /= y;
+      Double::divAssign(x, y);
    }
 
    /// Test of infinity
@@ -157,7 +147,7 @@ struct LinumTraits<Interval>
    /// @return true if 'x' is infinite
    static inline bool isInf(ConstRefType x)
    {
-      return x.isInf();
+      return Double::isInf(x);
    }
 
    /// Test of equality
@@ -166,7 +156,7 @@ struct LinumTraits<Interval>
    /// @return true if 'x' is equal to 'y'
    static inline bool isEqual(ConstRefType x, ConstRefType y)
    {
-      return x.isSetEq(y);
+      return Double::isEqual(x, y);
    }
 
    /// Hash code
@@ -174,7 +164,7 @@ struct LinumTraits<Interval>
    /// @return the hash code of x
    static inline size_t hashCode(ConstRefType  x)
    {
-      return x.hashCode();
+      return Double::hashCode(x);
    }
 };
 
