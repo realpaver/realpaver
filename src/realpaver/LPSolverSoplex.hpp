@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LPSOLVER_CLP_HPP
-#define REALPAVER_LPSOLVER_CLP_HPP
+#ifndef REALPAVER_LPSOLVER_SOPLEX_HPP
+#define REALPAVER_LPSOLVER_SOPLEX_HPP
 
 #include <soplex.h>
 #include "realpaver/LPModel.hpp"
@@ -18,7 +18,7 @@ using namespace soplex;
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a wrapper class for the LP solver Clp.
+/// @brief This is a wrapper class for the LP solver Soplex.
 ///
 /// It inherits the methods for creating a model from its base class.
 /// It implements the optimization method.

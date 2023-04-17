@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LPSOLVER_CLP_HPP
-#define REALPAVER_LPSOLVER_CLP_HPP
+#ifndef REALPAVER_LPSOLVER_HIGHS_HPP
+#define REALPAVER_LPSOLVER_HIGHS_HPP
 
 #include <Highs.h>
 #include "realpaver/LPModel.hpp"
@@ -16,7 +16,7 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a wrapper class for the LP solver Clp.
+/// @brief This is a wrapper class for the LP solver Highs.
 ///
 /// It inherits the methods for creating a model from its base class.
 /// It implements the optimization method.
