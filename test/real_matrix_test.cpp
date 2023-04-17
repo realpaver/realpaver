@@ -9,8 +9,8 @@ void test_inv_1()
    RealMatrix P(2, 2);
    bool b = M.inverse(P);
 
-   TEST_TRUE( b );
-   TEST_TRUE( P == Q );
+   TEST_TRUE(b);
+   TEST_TRUE(P == Q);
 }
 
 void test_inv_2()
@@ -21,8 +21,8 @@ void test_inv_2()
    RealMatrix P(3, 3);
    bool b = M.inverse(P);
 
-   TEST_TRUE( b );
-   TEST_TRUE( P == Q );
+   TEST_TRUE(b);
+   TEST_TRUE(P == Q);
 }
 
 void test_inv_3()
@@ -32,7 +32,7 @@ void test_inv_3()
    RealMatrix P(2, 2);
    bool b = M.inverse(P);
 
-   TEST_FALSE( b );
+   TEST_FALSE(b);
 }
 
 void test_inv_4()
@@ -42,7 +42,7 @@ void test_inv_4()
    RealMatrix P(3, 3);
    bool b = M.inverse(P);
 
-   TEST_FALSE( b );
+   TEST_FALSE(b);
 }
 
 
