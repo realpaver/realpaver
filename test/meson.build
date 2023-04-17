@@ -4,6 +4,12 @@ bitset_test = executable( 'bitset_test',
                           include_directories: ['../src'] )
 test('Test of bitset', bitset_test)
 
+hc4_test = executable( 'hc4_test',
+                       sources: 'hc4_test.cpp',
+                       link_with:realpaver_lib,
+                       include_directories: ['../src'] )
+test('Test of HC4', hc4_test)
+
 integer_test = executable( 'integer_test',
                            sources: 'integer_test.cpp',
                            link_with:realpaver_lib,

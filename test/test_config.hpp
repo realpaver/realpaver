@@ -60,3 +60,6 @@ int realpaver_test_result = 0;
    } while(0)
 
 #define END_TEST exit(realpaver_test_result);
+
+#define INIT(f) f();
+#define CLEAN(f) f();
