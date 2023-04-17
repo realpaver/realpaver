@@ -5,9 +5,9 @@ bitset_test = executable( 'bitset_test',
 test('Test of bitset', bitset_test)
 
 integer_test = executable( 'integer_test',
-                         sources: 'integer_test.cpp',
-                         link_with:realpaver_lib,
-                         include_directories: ['../src'] )
+                           sources: 'integer_test.cpp',
+                           link_with:realpaver_lib,
+                           include_directories: ['../src'] )
 test('Test of integer', integer_test)
 
 range_test = executable( 'range_test',
@@ -15,6 +15,12 @@ range_test = executable( 'range_test',
                          link_with:realpaver_lib,
                          include_directories: ['../src'] )
 test('Test of range', range_test)
+
+real_matrix_test = executable( 'real_matrix_test',
+                               sources: 'real_matrix_test.cpp',
+                               link_with:realpaver_lib,
+                               include_directories: ['../src'] )
+test('Test of real matrix', real_matrix_test)
 
 scope_test = executable( 'scope_test',
                          sources: 'scope_test.cpp',
