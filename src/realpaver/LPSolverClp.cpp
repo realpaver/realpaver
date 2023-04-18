@@ -84,17 +84,29 @@ bool LPSolver::run()
 
    if (simplex_->isProvenOptimal())
    {
+      // assigns the optimum
       setObjVal(simplex_->getObjValue());
 
+      // assigns the values of the primal variables
       int n = getNbLinVars();
-      double* sol = simplex_->primalColumnSolution();
-
+      double* colPrimal = simplex_->primalColumnSolution();
       for (int i=0; i<n; ++i)
       {
          LinVar v = getLinVar(i);
-         v.setObjVal(sol[i]);
+         v.setObjVal(colPrimal[i]);
       }
 
+      // assigns the values of the dual variables
+      // i.e. the multipliers of the primal constraints
+      int m = getNbLinCtrs();
+      double* rowDual = simplex_->dualRowSolution();
+      for (int i=0; i<m; ++i)
+      {
+         LinCtr c = getLinCtr(i);
+         c.setMultVal(rowDual[i]);
+      }
+
+      // assigns the status
       setStatus(OptimizationStatus::Optimal);
       return true;
    }

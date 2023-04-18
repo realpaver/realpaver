@@ -318,7 +318,8 @@ std::ostream& operator<<(std::ostream& os, const LinExpr& e)
 LinCtrRep::LinCtrRep(double lb, LinExpr e, double ub) :
    expr_(e),
    lb_(lb),
-   ub_(ub)
+   ub_(ub),
+   multval_(0.0)
 {}
 
 LinCtrRep::LinCtrRep(double lb, LinExpr e) :
@@ -343,6 +344,11 @@ void LinCtrRep::setUB(double ub)
    ub_ = ub;
 }
 
+void LinCtrRep::setMultVal(double val)
+{
+   multval_ = val;
+}
+
 LinExpr LinCtrRep::getExpr() const
 {
    return expr_;
@@ -356,6 +362,11 @@ double LinCtrRep::getLB() const
 double LinCtrRep::getUB() const
 {
    return ub_;
+}
+
+double LinCtrRep::getMultVal() const
+{
+   return multval_;
 }
 
 bool LinCtrRep::isLessEqual() const
@@ -408,6 +419,11 @@ void LinCtr::setUB(double ub)
    rep_->setUB(ub);
 }
 
+void LinCtr::setMultVal(double val)
+{
+   rep_->setMultVal(val);
+}
+
 LinExpr LinCtr::getExpr() const
 {
    return rep_->getExpr();
@@ -421,6 +437,11 @@ double LinCtr::getLB() const
 double LinCtr::getUB() const
 {
    return rep_->getUB();
+}
+
+double LinCtr::getMultVal() const
+{
+   return rep_->getMultVal();
 }
 
 bool LinCtr::isLessEqual() const

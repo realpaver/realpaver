@@ -356,6 +356,11 @@ public:
    /// @param ub the new upper bound of this
    void setUB(double ub);
 
+   /// Sets the multiplier, i.e. the value of the corresponding dual
+   /// variable, of this in an optimal solution
+   /// @param val the new multiplier in an optimal solution
+   void setMultVal(double val);
+
    /// @return the expression of this
    LinExpr getExpr() const;
 
@@ -364,6 +369,9 @@ public:
 
    /// @return the upper bound of this
    double getUB() const;
+
+   /// @return the multiplier of this in an optimal solution
+   double getMultVal() const;
 
    /// @return true is this has the form e <= ub
    bool isLessEqual() const;
@@ -379,7 +387,7 @@ public:
 
 private:
    LinExpr expr_;
-   double lb_, ub_;
+   double lb_, ub_, multval_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -427,6 +435,11 @@ public:
    /// @param ub the new upper bound of this
    void setUB(double ub);
 
+  /// Sets the multiplier, i.e. the value of the corresponding dual
+   /// variable, of this in an optimal solution
+   /// @param val the new multiplier in an optimal solution
+   void setMultVal(double val);
+
    /// @return the expression of this
    LinExpr getExpr() const;
 
@@ -435,7 +448,10 @@ public:
 
    /// @return the upper bound of this
    double getUB() const;
-  
+
+   /// @return the multiplier of this in an optimal solution
+   double getMultVal() const;
+
    /// @return true is this has the form e <= ub
    bool isLessEqual() const;
 
