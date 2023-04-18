@@ -1,13 +1,12 @@
-
+## Configuration of Realpaver using meson build
 project('Realpaver','cpp',version: '1.0.0',
-    default_options: ['cpp_std=c++14'])
+    default_options: ['cpp_std=c++17'])
+
 
 ## Main compiler and linker configs
-
 cpp_comp = meson.get_compiler('cpp')
 
 ## dependencies
-
 gurobi_dir = get_option('GUROBI_DIR')
 
 lp_lib_name = get_option('LP_LIB')
@@ -50,7 +49,6 @@ deps_lib = [lp_dep,mathlib_dep,interval_dep,m_dep]
 
 flex = find_program('flex', required: false)
 bison = find_program('bison', required: false)
-
 
 
 ## Config
@@ -137,7 +135,8 @@ foreach h : check_headers
   endif
 endforeach
 
-# Checking flex and bison to generate parser files
+
+## Checking flex and bison to generate parser files
 flex = find_program('flex', required: false)
 bison = find_program('bison', required: false)
 
@@ -149,16 +148,13 @@ if not bison.found()
   warning('MESON_SKIP_TEST bison not found.')
 endif
 
+
+## Sub-directories
 subdir('src')
-
 subdir('test')
-
 subdir('doc')
-
 subdir('examples')
-
 subdir('work')
-
 subdir('ncsp')
 
 
@@ -167,5 +163,5 @@ subdir('ncsp')
 pkgconfig = find_program('pkg-config', required: false)
 if pkgconfig.found()
   pkg = import('pkgconfig')
-  pkg.generate(realpaver_lib)
+  pkg.generate(realpaver_lib, extra_cflags: '-std=c++17')
 endif
