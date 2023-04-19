@@ -28,7 +28,8 @@ void LPSolver::makeVars()
    {
       LinVar v = getLinVar(i);
       int j = v.getIndex();
-      simplex_->addVar(v.getLB(),v.getUB());
+      // simplex_->addVar(v.getLB(),v.getUB());
+      simplex_->addVar(-simplex_->getInfinity(),simplex_->getInfinity());
 
       if (!v.isContinuous())
         simplex_->changeColIntegrality(j, HighsVarType::kInteger);
@@ -43,6 +44,16 @@ void LPSolver::makeCtrs()
       LinCtr c = getLinCtr(i);
       LinExpr e = c.getExpr();
       simplex_->addRow(c.getLB(),c.getUB(),e.getNbTerms(),e.getIndexVars(),e.getCoefs());
+   }
+   
+   // RAPHAEL
+   // bound constraints
+   int n = getNbLinVars();
+   for (int i=0; i<n; ++i)
+   {
+      LinVar v = getLinVar(i);
+      LinExpr e = {{1.0}, {v}};
+      simplex_->addRow(v.getLB(), v.getUB(),e.getNbTerms(), e.getIndexVars(), e.getCoefs());
    }
 }
 
@@ -97,11 +108,28 @@ bool LPSolver::run()
       setObjVal(simplex_->getInfo().objective_function_value);
 
       int n = getNbLinVars();
+      int m = getNbLinCtrs();
+
       const HighsSolution& solution = simplex_->getSolution();
       for (int i=0; i<n; ++i)
       {
          LinVar v = getLinVar(i);
          v.setObjVal(solution.col_value[i]);
+      }
+
+      // RAPHAEL
+      // assigns the values of the dual variables (multipliers)
+      // first for the primal constraints
+      for (int i=0; i<m; ++i)
+      {
+         LinCtr c = getLinCtr(i);
+         c.setMultiplier(solution.row_dual[i]);
+      }
+      // second for the primal bound constraints
+      for (int i=0; i<n; ++i)
+      {
+         LinVar v = getLinVar(i);
+         v.setMultiplier(solution.row_dual[m+i]);
       }
 
       setStatus(OptimizationStatus::Optimal);

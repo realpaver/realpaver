@@ -13,7 +13,7 @@
 #include <soplex.h>
 #include "realpaver/LPModel.hpp"
 
-using namespace soplex;
+// using namespace soplex;
 
 namespace realpaver {
 
@@ -53,7 +53,7 @@ public:
    bool reoptimize();
 
 private:
-   SoPlex* simplex_;
+   soplex::SoPlex* simplex_;
   
    void makeVars();
    void makeCtrs();

@@ -35,9 +35,9 @@ void LPSolver::makeVars()
      LinVar v = getLinVar(i);
      int j = v.getIndex();
      dsrow.add(j, 1);
-    //  simplex_->addRowReal(soplex::LPRowReal(v.getLB(), dsrow, v.getUB()));
-     simplex_->changeBoundsReal(j, v.getLB(), v.getUB());
-     simplex_->changeRangeReal(j, v.getLB(), v.getUB());
+     simplex_->addRowReal(soplex::LPRowReal(-soplex::infinity, dsrow, soplex::infinity));
+   //   simplex_->changeBoundsReal(j, v.getLB(), v.getUB());
+   //   simplex_->changeRangeReal(j, v.getLB(), v.getUB());
      if (!v.isContinuous()){
        nb_int++;
        vint.push_back(j);
@@ -56,11 +56,24 @@ void LPSolver::makeCtrs()
    {
       LinCtr c = getLinCtr(i);
       LinExpr e = c.getExpr();
-      DSVectorReal dsrow(n);
+      soplex::DSVectorReal dsrow(n);
       for (int j=0;j<e.getNbTerms();j++){
         dsrow.add(e.getIndexVar(j), e.getCoef(j));
       }
-      simplex_->addRowReal(LPRowReal(c.getLB(), dsrow, c.getUB()));
+      simplex_->addRowReal(soplex::LPRowReal(c.getLB(), dsrow, c.getUB()));
+   }
+
+   // RAPHAEL
+   // bound constraints
+   for (int i=0; i<n; ++i)
+   {
+      LinVar v = getLinVar(i);
+      LinExpr e = {{1.0}, {v}};
+      soplex::DSVectorReal dsrow(n);
+      for (int j=0;j<e.getNbTerms();j++){
+        dsrow.add(e.getIndexVar(j), e.getCoef(j));
+      }
+      simplex_->addRowReal(soplex::LPRowReal(v.getLB(), dsrow, v.getUB()));
    }
 }
 
@@ -96,12 +109,12 @@ void LPSolver::makeSoplexSimplex()
 
 bool LPSolver::run()
 {
-   simplex_->setIntParam(SoPlex::SOLVEMODE, SoPlex::SOLVEMODE_REAL);
-   simplex_->setBoolParam(SoPlex::ENSURERAY, true);
-   simplex_->setRealParam(SoPlex::TIMELIMIT, getMaxSeconds());
+   simplex_->setIntParam(soplex::SoPlex::SOLVEMODE, soplex::SoPlex::SOLVEMODE_REAL);
+   simplex_->setBoolParam(soplex::SoPlex::ENSURERAY, true);
+   simplex_->setRealParam(soplex::SoPlex::TIMELIMIT, getMaxSeconds());
    const int max_iter = getMaxIter();
-   simplex_->setIntParam(SoPlex::ITERLIMIT,max_iter);
-   simplex_->setIntParam(SoPlex::VERBOSITY, SoPlex::VERBOSITY_ERROR);
+   simplex_->setIntParam(soplex::SoPlex::ITERLIMIT,max_iter);
+   simplex_->setIntParam(soplex::SoPlex::VERBOSITY, soplex::SoPlex::VERBOSITY_ERROR);
 //    simplex_->setRealParam(SoPlex::FEASTOL, tolerance);
 //    simplex_->setRealParam(SoPlex::OPTTOL, tolerance);
 
@@ -114,13 +127,32 @@ bool LPSolver::run()
    {
       setObjVal(simplex_->objValueReal());
 
+      int m = getNbLinCtrs();
       int n = getNbLinVars();
-      DVectorReal solution(n);
+
+      soplex::DVectorReal solution(n);
       simplex_->getPrimalReal(solution);
       for (int i=0; i<n; ++i)
       {
          LinVar v = getLinVar(i);
          v.setObjVal(solution[i]);
+      }
+
+      // RAPHAEL
+      // assigns the values of the dual variables (multipliers)
+      soplex::DVectorReal dual(m+n);
+      simplex_->getDualReal(dual);
+      // first for the primal constraints
+      for (int i=0; i<m; ++i)
+      {
+         LinCtr c = getLinCtr(i);
+         c.setMultiplier(dual[i]);
+      }
+      // second for the primal bound constraints
+      for (int i=0; i<n; ++i)
+      {
+         LinVar v = getLinVar(i);
+         v.setMultiplier(dual[m+i]);
       }
 
       setStatus(OptimizationStatus::Optimal);
