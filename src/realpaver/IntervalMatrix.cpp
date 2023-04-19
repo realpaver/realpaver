@@ -49,6 +49,17 @@ IntervalMatrix::IntervalMatrix(const RealMatrix& A)
          set(i, j, A.get(i, j));
 }
 
+IntervalMatrix IntervalMatrix::transpose() const
+{
+   IntervalMatrix A(ncols(), nrows());
+
+   for (size_t i=0; i<nrows(); ++i)
+      for (size_t j=0; j<ncols(); ++j)
+         A.set(j, i, get(i, j));
+
+   return A;
+}
+
 bool IntervalMatrix::isEmpty() const
 {
    for (size_t i=0; i<nrows(); ++i)
@@ -193,6 +204,29 @@ IntervalMatrix operator*(const RealMatrix& A, const IntervalMatrix& B)
 {
    IntervalMatrix tmp(A);
    return tmp*B; 
+}
+
+IntervalVector operator*(const IntervalMatrix& A, const IntervalVector& X)
+{
+   ASSERT(A.ncols() == X.size(),
+          "Bad dimensions in a product of a matric and a vector");
+
+   IntervalVector Y(A.nrows());
+   for (size_t i=0; i<A.nrows(); ++i)
+   {
+      Interval z(0.0);
+      for (size_t j=0; j<A.ncols(); ++j)
+         z += A.get(i, j)*X[j];
+
+      Y.set(i, z);
+   }
+   return Y;
+}
+
+IntervalVector operator*(const IntervalMatrix& A, const RealVector& X)
+{
+   IntervalVector tmp(X);
+   return A*tmp;
 }
 
 } // namespace

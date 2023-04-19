@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <iostream>
 #include "realpaver/LPSolver.hpp"
 
@@ -37,25 +38,29 @@ int main(void)
    // solving
    bool optimal = solver.optimize();
 
+   cout << std::setprecision(16);
+
    if (optimal)
    {
       cout << "OPTIMAL" << endl;
 
       // optimum
-      cout << "f*:  " << solver.getObjVal() << endl;
+      cout << "f*:  " << solver.getSafeObjVal() << endl;
 
       // primal variables
       for (int i=0; i<solver.getNbLinVars(); ++i)
       {
          LinVar v = solver.getLinVar(i);
-         cout << v.getName() << "*: " << v.getObjVal() << endl;
+         cout << v.getName() << "*: " << v.getObjVal()
+              << ", multiplier : " << v.getMultiplier()
+              << endl;
       }
 
       // multipliers / dual variables
       for (int i=0; i<solver.getNbLinCtrs(); ++i)
       {
          LinCtr c = solver.getLinCtr(i);
-         cout << "y" << i+1 << "*: " << c.getMultVal() << endl;
+         cout << "y" << i+1 << "*: " << c.getMultiplier() << endl;
       }
    }
    else
@@ -66,37 +71,38 @@ int main(void)
    cout << endl;
 
    /////////////////////////////////////////////////////////////////////////////
-   // maximize 0.25*x1 + x2
-   LinExpr neo = { {0.25, 1.0}, {x1, x2} };
+   // minimize 0.25*x1 - x2
+   LinExpr neo = { {0.25, -1.0}, {x1, x2} };
    solver.setObj(neo);
-   solver.setMaximization();
+   solver.setMinimization();
 
-   // SOLUTION: f* = 6.5 at x* = (2, 6)
-   //      with y* = (0.464, -0.071, 0)
+   // SOLUTION: f* = -5.5 at x* = (2, 6)
+   //      with y* = (-0.393, 0.214, 0)
 
    // solving
    optimal = solver.reoptimize();
-
 
    if (optimal)
    {
       cout << "OPTIMAL" << endl;
 
       // optimum
-      cout << "f*:  " << solver.getObjVal() << endl;
+      cout << "f*:  " << solver.getSafeObjVal() << endl;
 
       // primal variables
       for (int i=0; i<solver.getNbLinVars(); ++i)
       {
          LinVar v = solver.getLinVar(i);
-         cout << v.getName() << "*: " << v.getObjVal() << endl;
+         cout << v.getName() << "*: " << v.getObjVal()
+              << ", multiplier : " << v.getMultiplier()
+              << endl;
       }
 
       // multipliers / dual variables
       for (int i=0; i<solver.getNbLinCtrs(); ++i)
       {
          LinCtr c = solver.getLinCtr(i);
-         cout << "y" << i+1 << "*: " << c.getMultVal() << endl;
+         cout << "y" << i+1 << "*: " << c.getMultiplier() << endl;
       }
    }
    else

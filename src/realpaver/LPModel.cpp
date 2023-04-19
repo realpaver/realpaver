@@ -23,6 +23,7 @@ LinVarRep::LinVarRep(int index, double lb, double ub,
    lb_(lb),
    ub_(ub),
    objval_(0.0),
+   mult_(0.0),
    name_(name),
    continuous_(continuous)
 {}
@@ -64,6 +65,11 @@ void LinVarRep::setName(const std::string& name)
 void LinVarRep::setObjVal(double val)
 {
    objval_ = val;
+}
+
+void LinVarRep::setMultiplier(double val)
+{
+   mult_ = val;
 }
 
 bool LinVarRep::isContinuous() const
@@ -112,6 +118,11 @@ std::string LinVarRep::getName() const
 double LinVarRep::getObjVal() const
 {
    return objval_;
+}
+
+double LinVarRep::getMultiplier() const
+{
+   return mult_;
 }
 
 bool LinVarRep::isPrimalSolutionFeasible() const
@@ -166,6 +177,11 @@ void LinVar::setObjVal(double val) const
    rep_->setObjVal(val);
 }
 
+void LinVar::setMultiplier(double val)
+{
+   rep_->setMultiplier(val);
+}
+
 bool LinVar::isContinuous() const
 {
    return rep_->isContinuous();
@@ -204,6 +220,11 @@ std::string LinVar::getName() const
 double LinVar::getObjVal() const
 {
    return rep_->getObjVal();
+}
+
+double LinVar::getMultiplier() const
+{
+   return rep_->getMultiplier();
 }
 
 bool LinVar::isPrimalSolutionFeasible() const
@@ -319,7 +340,7 @@ LinCtrRep::LinCtrRep(double lb, LinExpr e, double ub) :
    expr_(e),
    lb_(lb),
    ub_(ub),
-   multval_(0.0)
+   mult_(0.0)
 {}
 
 LinCtrRep::LinCtrRep(double lb, LinExpr e) :
@@ -344,9 +365,9 @@ void LinCtrRep::setUB(double ub)
    ub_ = ub;
 }
 
-void LinCtrRep::setMultVal(double val)
+void LinCtrRep::setMultiplier(double val)
 {
-   multval_ = val;
+   mult_ = val;
 }
 
 LinExpr LinCtrRep::getExpr() const
@@ -364,9 +385,9 @@ double LinCtrRep::getUB() const
    return ub_;
 }
 
-double LinCtrRep::getMultVal() const
+double LinCtrRep::getMultiplier() const
 {
-   return multval_;
+   return mult_;
 }
 
 bool LinCtrRep::isLessEqual() const
@@ -419,9 +440,9 @@ void LinCtr::setUB(double ub)
    rep_->setUB(ub);
 }
 
-void LinCtr::setMultVal(double val)
+void LinCtr::setMultiplier(double val)
 {
-   rep_->setMultVal(val);
+   rep_->setMultiplier(val);
 }
 
 LinExpr LinCtr::getExpr() const
@@ -439,9 +460,9 @@ double LinCtr::getUB() const
    return rep_->getUB();
 }
 
-double LinCtr::getMultVal() const
+double LinCtr::getMultiplier() const
 {
-   return rep_->getMultVal();
+   return rep_->getMultiplier();
 }
 
 bool LinCtr::isLessEqual() const
@@ -695,22 +716,11 @@ void LPModel::setStatus(OptimizationStatus status)
 
 double LPModel::getSafeObjVal() const
 {
-   Interval val = Interval::zero();
-
-   for (int i=0; i<obj_.getNbTerms(); ++i)
-   {
-      LinVar v = getLinVar(obj_.getIndexVar(i));
-      val += Interval(obj_.getCoef(i)) * v.getObjVal();
-   }
-
-   return isMinimization() ? val.left() : val.right();
+   return safeBound();
 }
 
 bool LPModel::isPrimalSolutionFeasible() const
 {
-   // TODO
-   return true;
-
    // tests the variables
    for (auto& v : vars_)
       if (!v.isPrimalSolutionFeasible())
@@ -733,6 +743,105 @@ bool LPModel::isPrimalSolutionFeasible() const
    }
 
    return true;
+}
+
+IntervalVector LPModel::safeX() const
+{
+   int n = getNbLinVars();
+   IntervalVector X(n);
+   for (int i=0; i<n; ++i)
+   {
+      X.set(i, getLinVar(i).getDomain());
+   }
+   return X;
+}
+
+IntervalVector LPModel::safeB() const
+{
+   int n = getNbLinVars();
+   int m = getNbLinCtrs();
+   IntervalVector B(m+n);
+   for (int i=0; i<m; ++i)
+   {
+      LinCtr c = getLinCtr(i);
+      B.set(i, Interval(c.getLB(), c.getUB()));
+   }
+   for (int i=0; i<n; ++i)
+   {
+      LinVar v = getLinVar(i);
+      B.set(m+i, v.getDomain());
+   }
+   return B;
+}
+
+IntervalVector LPModel::safeC() const
+{
+   int n = getNbLinVars();
+   LinExpr obj = getObjExpr();
+   IntervalVector C(n);
+   for (int i=0; i<n; ++i)
+   {
+      C.set(i, obj.getCoef(i));
+   }
+   return C;
+}
+
+IntervalVector LPModel::safeR() const
+{
+   return safeAT()*safeL() - safeC();
+}
+
+IntervalVector LPModel::safeL() const
+{
+   int n = getNbLinVars();
+   int m = getNbLinCtrs();
+   IntervalVector L(m+n);
+   for (int i=0; i<m; ++i)
+   {
+      LinCtr c = getLinCtr(i);
+      L.set(i, Interval(c.getMultiplier()));
+   }
+   for (int i=0; i<n; ++i)
+   {
+      LinVar v = getLinVar(i);
+      L.set(m+i, Interval(v.getMultiplier()));
+   }
+   return L;
+}
+
+IntervalMatrix LPModel::safeAT() const
+{
+   int n = getNbLinVars();
+   int m = getNbLinCtrs();
+   IntervalMatrix AT(n, m+n, Interval::zero());
+
+   // primal constraints
+   for (int j=0; j<m; ++j)
+   {
+      LinExpr e = getLinCtr(j).getExpr();
+      int p = e.getNbTerms();
+      for (int k=0; k<p; ++k)
+      {
+         double a = e.getCoef(k);
+         int ind = e.getIndexVar(k);
+         AT.set(ind, j, Interval(a));
+      }
+   }
+
+   // bound constraints
+   for (int i=0; i<n; ++i)
+   {
+      AT.set(i, m+i, Interval::one());
+   }
+
+   return AT;
+}
+
+double LPModel::safeBound() const
+{
+   Interval z = safeL().scalarProduct(safeB()) -
+                safeR().scalarProduct(safeX());
+   return isMinimization() ? z.left() : z.right();
 }
 
 } // namespace

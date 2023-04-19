@@ -10,6 +10,7 @@
 #ifndef REALPAVER_INTERVAL_MATRIX_HPP
 #define REALPAVER_INTERVAL_MATRIX_HPP
 
+#include "realpaver/IntervalVector.hpp"
 #include "realpaver/NumericIntervalTraits.hpp"
 #include "realpaver/RealMatrix.hpp"
 
@@ -77,6 +78,9 @@ public:
    /// @return the midpoint of this
    RealMatrix midpoint() const;
 
+   /// @return the transpose of this
+   IntervalMatrix transpose() const;
+
    /// Addition with assignment
    /// @param A a matrix
    /// @return a reference to this
@@ -118,6 +122,9 @@ IntervalMatrix operator-(const IntervalMatrix& A);
 IntervalMatrix operator*(double a, const IntervalMatrix& B);
 IntervalMatrix operator*(const IntervalMatrix& B, double a);
 IntervalMatrix operator*(const IntervalMatrix& A, const IntervalMatrix& B);
+
+IntervalVector operator*(const IntervalMatrix& A, const IntervalVector& X);
+IntervalVector operator*(const IntervalMatrix& A, const RealVector& X);
 
 IntervalMatrix operator*(const RealMatrix& A, const IntervalMatrix& B);
 

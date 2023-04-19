@@ -180,6 +180,17 @@ RealMatrix operator*(const RealMatrix& A, const RealMatrix& B)
    return res;   
 }
 
+RealMatrix RealMatrix::transpose() const
+{
+   RealMatrix A(ncols(), nrows());
+
+   for (size_t i=0; i<nrows(); ++i)
+      for (size_t j=0; j<ncols(); ++j)
+         A.set(j, i, get(i, j));
+
+   return A;
+}
+
 bool RealMatrix::inverse(RealMatrix& P)
 {
    ASSERT(isSquare(), "Inversion of a non-square matrix");

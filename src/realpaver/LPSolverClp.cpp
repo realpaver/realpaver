@@ -29,8 +29,10 @@ void LPSolver::makeVars()
    {
       LinVar v = getLinVar(i);
       int j = v.getIndex();
-      simplex_->setColumnLower(j, v.getLB());
-      simplex_->setColumnUpper(j, v.getUB());
+
+      // RAPHAEL
+      //simplex_->setColumnLower(j, v.getLB());
+      //simplex_->setColumnUpper(j, v.getUB());
 
       if (v.isContinuous())
          simplex_->setContinuous(j);
@@ -41,6 +43,7 @@ void LPSolver::makeVars()
 
 void LPSolver::makeCtrs()
 {
+   // linear constraints
    int m = getNbLinCtrs();
    for (int i=0; i<m; ++i)
    {
@@ -49,6 +52,17 @@ void LPSolver::makeCtrs()
 
       simplex_->addRow(e.getNbTerms(), e.getIndexVars(), e.getCoefs(),
                        c.getLB(), c.getUB());
+   }
+
+   // RAPHAEL
+   // bound constraints
+   int n = getNbLinVars();
+   for (int i=0; i<n; ++i)
+   {
+      LinVar v = getLinVar(i);
+      LinExpr e = {{1.0}, {v}};
+      simplex_->addRow(e.getNbTerms(), e.getIndexVars(), e.getCoefs(),
+                       v.getLB(), v.getUB());
    }
 }
 
@@ -84,11 +98,10 @@ bool LPSolver::run()
 
    if (simplex_->isProvenOptimal())
    {
-      // assigns the optimum
-      setObjVal(simplex_->getObjValue());
+      int n = getNbLinVars();
+      int m = getNbLinCtrs();
 
       // assigns the values of the primal variables
-      int n = getNbLinVars();
       double* colPrimal = simplex_->primalColumnSolution();
       for (int i=0; i<n; ++i)
       {
@@ -96,16 +109,25 @@ bool LPSolver::run()
          v.setObjVal(colPrimal[i]);
       }
 
-      // assigns the values of the dual variables
-      // i.e. the multipliers of the primal constraints
-      int m = getNbLinCtrs();
+      // assigns the optimum
+      setObjVal(simplex_->getObjValue());
+
+      // RAPHAEL
+      // assigns the values of the dual variables (multipliers)
       double* rowDual = simplex_->dualRowSolution();
+      // first for the primal constraints
       for (int i=0; i<m; ++i)
       {
          LinCtr c = getLinCtr(i);
-         c.setMultVal(rowDual[i]);
+         c.setMultiplier(rowDual[i]);
       }
-
+      // second for the primal bound constraints
+      for (int i=0; i<n; ++i)
+      {
+         LinVar v = getLinVar(i);
+         v.setMultiplier(rowDual[m+i]);
+      }
+   
       // assigns the status
       setStatus(OptimizationStatus::Optimal);
       return true;

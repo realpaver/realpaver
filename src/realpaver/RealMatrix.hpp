@@ -110,6 +110,9 @@ public:
    /// this is assigned to this / a
    RealMatrix& operator/=(double a);
 
+   /// @return the transpose of this
+   RealMatrix transpose() const;
+
    /// Calculates the inverse of a square matrix
    /// @param P the result in case of success
    /// @return true if this is invertible

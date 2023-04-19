@@ -285,6 +285,18 @@ void IntervalVector::inflate(double delta, double chi)
       set(i, get(i).inflate(delta, chi));
 }
 
+Interval IntervalVector::scalarProduct(const IntervalVector& X) const
+{
+   ASSERT(size() == X.size(),
+          "Scalar product of vectors having different sizes");
+
+   Interval prod = get(0)*X.get(0);
+   for (size_t i=1; i<size(); ++i)
+      prod += get(i)*X.get(i);
+
+   return prod;
+}
+
 IntervalVector operator*(const RealMatrix& A, const IntervalVector& X)
 {
    ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
@@ -308,6 +320,13 @@ IntervalVector operator-(const IntervalVector& X)
 {
    IntervalVector res(X.size());
    IntervalVector::BaseType::usb(X, res);
+   return res;
+}
+
+IntervalVector operator-(const IntervalVector& X, const IntervalVector& Y)
+{
+   IntervalVector res(X.size());
+   IntervalVector::BaseType::sub(X, Y, res);
    return res;
 }
 

@@ -14,7 +14,8 @@
 #include <memory>
 #include <vector>
 #include "realpaver/Common.hpp"
-#include "realpaver/Interval.hpp"
+#include "realpaver/IntervalMatrix.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 
@@ -68,8 +69,13 @@ public:
    void setName(const std::string& name);
 
    /// Sets the value of this in an optimal solution
-   /// @param value the new value in an optimal solution
+   /// @param val the new value in an optimal solution
    void setObjVal(double val);
+
+   /// Sets the multiplier of the bound constraint corresponding
+   /// to this in an optimal solution
+   /// @param val the new value of the multiplier
+   void setMultiplier(double val);
 
    /// @return true if this is a continuous variable
    bool isContinuous() const;
@@ -95,6 +101,10 @@ public:
    /// @return the value of this in an optimal solution
    double getObjVal() const;
 
+   /// @return the multiplier of the bound constraint corresponding
+   ///         to this in an optimal solution
+   double getMultiplier() const;
+
    /// @return true if the solution of the primal problem is feasible after an
    ///         an optimization, false otherwise
    ///
@@ -103,7 +113,7 @@ public:
 
 private:
    int index_;
-   double lb_, ub_, objval_;
+   double lb_, ub_, objval_, mult_;
    std::string name_;
    bool continuous_;
 };
@@ -151,8 +161,13 @@ public:
    void setName(const std::string& name);
 
    /// Sets the value of this in an optimal solution
-   /// @param value the new value in an optimal solution
+   /// @param val the new value in an optimal solution
    void setObjVal(double val) const;
+
+   /// Sets the multiplier of the bound constraint corresponding
+   /// to this in an optimal solution
+   /// @param val the new value of the multiplier
+   void setMultiplier(double val);
 
    /// @return true if this is a continuous variable
    bool isContinuous() const;
@@ -177,6 +192,10 @@ public:
 
    /// @return the value of this in an optimal solution
    double getObjVal() const;
+
+   /// @return the multiplier of the bound constraint corresponding
+   ///         to this in an optimal solution
+   double getMultiplier() const;
 
    /// @return true if the solution of the primal problem is feasible after an
    ///         an optimization, false otherwise
@@ -359,7 +378,7 @@ public:
    /// Sets the multiplier, i.e. the value of the corresponding dual
    /// variable, of this in an optimal solution
    /// @param val the new multiplier in an optimal solution
-   void setMultVal(double val);
+   void setMultiplier(double val);
 
    /// @return the expression of this
    LinExpr getExpr() const;
@@ -371,7 +390,7 @@ public:
    double getUB() const;
 
    /// @return the multiplier of this in an optimal solution
-   double getMultVal() const;
+   double getMultiplier() const;
 
    /// @return true is this has the form e <= ub
    bool isLessEqual() const;
@@ -387,7 +406,7 @@ public:
 
 private:
    LinExpr expr_;
-   double lb_, ub_, multval_;
+   double lb_, ub_, mult_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -438,7 +457,7 @@ public:
   /// Sets the multiplier, i.e. the value of the corresponding dual
    /// variable, of this in an optimal solution
    /// @param val the new multiplier in an optimal solution
-   void setMultVal(double val);
+   void setMultiplier(double val);
 
    /// @return the expression of this
    LinExpr getExpr() const;
@@ -450,7 +469,7 @@ public:
    double getUB() const;
 
    /// @return the multiplier of this in an optimal solution
-   double getMultVal() const;
+   double getMultiplier() const;
 
    /// @return true is this has the form e <= ub
    bool isLessEqual() const;
@@ -565,23 +584,18 @@ public:
    /// The default implementation does nothing.
    virtual bool reoptimize();
 
-   /// Gets the value of a variable in an optimal solution
+   /// Gets the value of a variable in an optimal solution after an optimization
    /// @param v a variable of this
    /// @return the value of v in the last computed optimal solution
    double getObjVal(LinVar v) const;
 
-   /// @return the optimal value of the objective function in the last
-   ///         computed optimal solution
-   ///
-   /// It returns the value given by the linear solver.
+   /// Gets the optimum after an optimization
+   /// @return the value returned by the linear solver
    double getObjVal() const;
 
-   /// @return the optimal value of the objective function in the last
-   ///         computed optimal solution
-   ///
-   /// It returns a safe value obtained from an interval evaluation of the
-   /// objective function. It should be called only if the primal solution is
-   /// feasible, i.e. isPrimalSolutionFeasible() is true.
+   /// Gets a safe bound of the optimum after an optimization
+   /// @return a lower bound of the optimum for a minimization problem
+   ///         or an upper bound for a maximization problem
    double getSafeObjVal() const;
 
    /// Output on a stream
@@ -652,10 +666,20 @@ private:
    size_t maxiter_;
    OptimizationStatus status_;
 
+   // display
    void printLinExpr(std::ostream& os, LinExpr e) const;
    void printVars(std::ostream& os) const;
    void printCtrs(std::ostream& os) const;
    void printObj(std::ostream& os) const;
+
+   // safe bounds
+   IntervalVector safeX() const;
+   IntervalVector safeB() const;
+   IntervalVector safeC() const;
+   IntervalVector safeL() const;
+   IntervalMatrix safeAT() const;
+   IntervalVector safeR() const;
+   double safeBound() const;
 };
 
 } // namespace

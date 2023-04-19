@@ -162,6 +162,11 @@ public:
    /// Let x be an interval of this and let m(x) be its midpoint.
    /// Then x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
    void inflate(double delta, double chi);
+
+   /// Scalar product
+   /// @param X a vector
+   /// @return the product of this and X
+   Interval scalarProduct(const IntervalVector& X) const;
 };
 
 /// Multiplication
@@ -174,6 +179,12 @@ IntervalVector operator*(const RealMatrix& A, const IntervalVector& X);
 /// @param X an interval vector
 /// @return -X
 IntervalVector operator-(const IntervalVector& X);
+
+/// Subtraction
+/// @param X an interval vector
+/// @param Y an interval vector
+/// @return X-Y
+IntervalVector operator-(const IntervalVector& X, const IntervalVector& Y);
 
 /// output on a stream
 std::ostream& operator<<(std::ostream& os, const IntervalVector& X);
