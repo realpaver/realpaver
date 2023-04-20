@@ -15,10 +15,5 @@
   * affine forms
 
 -------------------------------------------------------------------------------
-- LP solver
-  * Scherbina's correction
-  * interface GLPK (toutatis)
-
--------------------------------------------------------------------------------
 - Newton
   * Parametric operator

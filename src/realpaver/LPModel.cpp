@@ -716,6 +716,19 @@ void LPModel::setStatus(OptimizationStatus status)
 
 double LPModel::getSafeObjVal() const
 {
+/*
+std::cout << "safeL : " << safeL() << std::endl << std::endl;
+std::cout << "safeB : " << safeB() << std::endl << std::endl;
+std::cout << "safeC : " << safeC() << std::endl << std::endl;
+std::cout << "safeX : " << safeX() << std::endl << std::endl;
+std::cout << "L.B   : " << safeL().scalarProduct(safeB()) << std::endl << std::endl;
+std::cout << "R     : " << safeR() << std::endl << std::endl;
+std::cout << "R.X   : " << safeR().scalarProduct(safeX()) << std::endl << std::endl;
+std::cout << "AT*L  : " << safeAT()*safeL() << std::endl << std::endl;
+
+std::cout << "Bound : " << getObjVal() << std::endl;
+std::cout << "safeBound : " << safeBound() << std::endl;
+*/
    return safeBound();
 }
 
@@ -748,6 +761,7 @@ bool LPModel::isPrimalSolutionFeasible() const
 IntervalVector LPModel::safeX() const
 {
    int n = getNbLinVars();
+
    IntervalVector X(n);
    for (int i=0; i<n; ++i)
    {
@@ -760,6 +774,7 @@ IntervalVector LPModel::safeB() const
 {
    int n = getNbLinVars();
    int m = getNbLinCtrs();
+
    IntervalVector B(m+n);
    for (int i=0; i<m; ++i)
    {
@@ -778,11 +793,15 @@ IntervalVector LPModel::safeC() const
 {
    int n = getNbLinVars();
    LinExpr obj = getObjExpr();
-   IntervalVector C(n);
-   for (int i=0; i<n; ++i)
+
+   IntervalVector C(n, Interval::zero());
+   for (int i=0; i<obj.getNbTerms(); ++i)
    {
-      C.set(i, obj.getCoef(i));
+      int j = obj.getIndexVar(i);
+      double a = obj.getCoef(i);
+      C.set(j, Interval(a));
    }
+
    return C;
 }
 
@@ -839,9 +858,18 @@ IntervalMatrix LPModel::safeAT() const
 
 double LPModel::safeBound() const
 {
-   Interval z = safeL().scalarProduct(safeB()) -
-                safeR().scalarProduct(safeX());
+   IntervalVector L = safeL();
+   IntervalVector R = safeAT()*L - safeC();
+   Interval z = L.scalarProduct(safeB()) - R.scalarProduct(safeX());
    return isMinimization() ? z.left() : z.right();
+}
+
+bool LPModel::isSafeInfeasible() const
+{
+   IntervalVector L = safeL();
+   IntervalVector R = safeAT()*L;
+   Interval d = R.scalarProduct(safeX()) - L.scalarProduct(safeB());
+   return !d.containsZero();
 }
 
 } // namespace

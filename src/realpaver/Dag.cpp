@@ -1294,7 +1294,11 @@ size_t DagLin::nbOccurrences(const Variable& v) const
 
 void DagLin::print(std::ostream& os) const
 {
-   os << getSymbol();
+   os << getSymbol() << "(" << cst_ << ")";
+   for (const auto& t : terms_)
+   {
+      os << "(" << t.coef << ", " << t.node->index() << ")";
+   }
 }
 
 void DagLin::acceptVisitor(DagVisitor& vis) const

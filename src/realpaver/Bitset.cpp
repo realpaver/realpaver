@@ -270,7 +270,7 @@ void Bitset::print(std::ostream& os) const
       for (int i=first_; i<=last_; ++i)
          os << (get(i) ? 1 : 0);
 
-      os << "{" << first_ << "}";
+      os << " (first: " << first_ << ")";
    }
 }
 

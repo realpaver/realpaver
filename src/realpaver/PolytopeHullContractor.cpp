@@ -411,6 +411,9 @@ Proof PolytopeHullContractor::contract(IntervalRegion& reg)
    return proof;
 }
 
+// TODO
+#include <iomanip>
+
 Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
 {
    LPSolver solver;
@@ -418,6 +421,9 @@ Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
    // linearizes the constraints
    if (!creator_->make(solver, reg)) return Proof::Maybe;
 
+   // first is true if a call to solver.optimize() is required, false false after
+   // a successfull optimization, then the next call to the solver can use
+   // reoptimize() after just changing the objective function
    bool first = true;
    OptimizationStatus status;
 
@@ -430,40 +436,44 @@ Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
 
       // reduction of the left bound
       solver.setMinimization();
+
+      status = solver.getStatus();
+      if (status == OptimizationStatus::Optimal)
+      {
+         x &= Interval::moreThan(solver.getSafeObjVal());
+         if (x.isEmpty()) return Proof::Empty;   
+         first = false;
+      }
+      else if (status == OptimizationStatus::Infeasible)
+      {
+         if (solver.isSafeInfeasible()) return Proof::Empty;
+         first = true;
+      }
+      else
+      {
+         first = true;
+      }
+
+      // reduction of the right bound
+      solver.setMaximization();
       if (first) solver.optimize();
       else solver.reoptimize();
 
       status = solver.getStatus();
-
-      if (status == OptimizationStatus::Infeasible)
-         return Proof::Empty;
-      
       if (status == OptimizationStatus::Optimal)
       {
-         if (solver.isPrimalSolutionFeasible())
-         {
-            x &= Interval::moreThan(solver.getSafeObjVal());
-            if (x.isEmpty()) return Proof::Empty;
-         }
+         x &= Interval::lessThan(solver.getSafeObjVal());
+         if (x.isEmpty()) return Proof::Empty;
+         first = false;
       }
-
-      first = false;
-
-      // reduction of the right bound
-      solver.setMaximization();
-      solver.reoptimize();
-      status = solver.getStatus();
-
-      if (status == OptimizationStatus::Infeasible)
-         return Proof::Empty;
-
-      if (status == OptimizationStatus::Optimal)
+      else if (status == OptimizationStatus::Infeasible)
       {
-         if (solver.isPrimalSolutionFeasible())
-         {
-            x &= Interval::lessThan(solver.getObjVal());
-            if (x.isEmpty()) return Proof::Empty;
-         }
+         if (solver.isSafeInfeasible()) return Proof::Empty;
+         first = true;
+      }
+      else
+      {
+         first = true;
       }
 
       reg.set(v, x);

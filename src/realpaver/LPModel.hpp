@@ -593,10 +593,14 @@ public:
    /// @return the value returned by the linear solver
    double getObjVal() const;
 
-   /// Gets a safe bound of the optimum after an optimization
+   /// Gets a safe bound of the optimum after a successfull optimization
    /// @return a lower bound of the optimum for a minimization problem
    ///         or an upper bound for a maximization problem
    double getSafeObjVal() const;
+
+   /// Gets a certificate of infeasibility after a non successfull optimization
+   /// @return true if the linear problem is cerainly infeasible
+   bool isSafeInfeasible() const;
 
    /// Output on a stream
    friend std::ostream& operator<<(std::ostream& os, const LPModel& model);

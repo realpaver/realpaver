@@ -145,7 +145,7 @@ void overLine(LPModel& lm, size_t iy, size_t ix,
 /// @param x2 abcissa of the second point
 /// @param y2 ordinate of the second point
 void underLine(LPModel& lm, size_t iy, size_t ix,
-              double x1, double y1, double x2, double y2);
+               double x1, double y1, double x2, double y2);
 
 } // namespace
 
