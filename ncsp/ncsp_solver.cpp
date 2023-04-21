@@ -22,8 +22,9 @@ using namespace std;
 #define CYAN(s)    "\033[36m" << s << "\033[39m"
 #define GRAY(s)    "\033[37m" << s << "\033[39m"
 
-// returns the filename without its extension
-string baseFilename(const std::string& filename);
+// parses the filename
+void parseFilename(const std::string& filename, std::string& path,
+                   std::string& base, std::string& ext);
 
 // processes the argulments on the command line
 bool processArgs(int argc, char** argv, string& filename, string& pfilename);
@@ -40,8 +41,11 @@ int main(int argc, char** argv)
       // processes the arguments
       bool ok = processArgs(argc, argv, filename, pfilename);
       if (!ok) THROW("Bad arguments on the command line");
-      string basefname = baseFilename(filename);
-
+   
+      // parses the problem file name
+      string baseFilename, pathFilename, extFilename;
+      parseFilename(filename, pathFilename, baseFilename, extFilename);
+   
       // tries to open the problem file
       ifstream infile(filename);
       if (!infile.is_open()) THROW("Bad problem filename: " << filename);
@@ -57,7 +61,7 @@ int main(int argc, char** argv)
       string flog = "";
       if (loglevel != LogLevel::none)
       {
-         flog = basefname + ".log";
+         flog = baseFilename + ".log";
          Logger::init(loglevel, flog);
       }
 #endif
@@ -89,7 +93,7 @@ int main(int argc, char** argv)
       solver.solve();
       ////////////////////
 
-      string solfilename = basefname + ".sol";
+      string solfilename = baseFilename + ".sol";
       ofstream fsol;
       fsol.open(solfilename, std::ofstream::out);
       if (fsol.bad()) THROW("Open error of solution file");
@@ -441,28 +445,50 @@ bool processArgs(int argc, char** argv, string& filename, string& pfilename)
    return hasfile;
 }
 
-string baseFilename(const std::string& filename)
+void parseFilename(const std::string& filename, std::string& path,
+                   std::string& base, std::string& ext)
 {
-   string str = "";
-   if (filename[0] == '.') return str;
-
-   bool hasPoint = false;
-
-   // finds an extension if any
-   int i = filename.length() - 1;
-   while (i>=0 and !hasPoint)
+   bool iter = true, found = false;
+   size_t pos = 0;
+   do
    {
-      if (filename[i] == '.')
+      size_t k = filename.find('/', pos);
+      if (k == std::string::npos)
       {
-         hasPoint = true;
-         str = filename.substr(0, i);
+         k = filename.find('\\', pos);
       }
-      i = i-1;
+      if (k == std::string::npos)
+      {
+         iter = false;
+      }
+      else
+      {
+         pos = k+1;
+         found = true;
+      }
    }
+   while (iter);
 
-   if (!hasPoint) str = filename;
-
-   return str;
+   if (found)
+   {
+      path = filename.substr(0, pos);
+   }
+   else
+   {
+      path = "";
+   }
+   
+   size_t k = filename.find('.', pos);
+   if (k == std::string::npos)
+   {
+      base = filename.substr(pos, filename.length() - pos);
+      ext = "";
+   }
+   else
+   {
+      base = filename.substr(pos, k - pos);
+      ext = filename.substr(k, filename.length() - k);
+   }
 }
 
 string WP(const string& s, int n)
