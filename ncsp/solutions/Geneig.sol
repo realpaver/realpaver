@@ -1,0 +1,170 @@
+NCSP solver......................... Realpaver 1.0.0
+Input file.......................... ../ncsp/benchmarks/Geneig.rp
+Current date and time............... Wed May 10 15:59:14 2023
+
+--- PREPROCESSING ---
+
+Elapsed time........................ 0.000 (seconds)
+Status.............................. checked
+Number of variables fixed........... 0
+Number of inactive constraints...... 0
+
+--- SOLVING ---
+
+Elapsed time........................ 2220.188 (seconds)
+Number of nodes..................... 209841
+Search status....................... complete
+Solution status..................... proved feasible
+Number of solutions................. 10
+
+SOLUTION 1 [1.932e-14] [safe]
+x1 = [-0.4270923636, -0.4270923635]
+x2 = [-1.151673754, -1.151673753]
+x3 = [0.4932136796, 0.4932136797]
+x4 = [1.443982202, 1.443982203]
+x5 = [0.6415702352, 0.6415702353]
+x6 = [-1.203809982, -1.203809981]
+
+SOLUTION 2 [2.598e-14] [safe]
+x1 = [-1.090125203, -1.090125202]
+x2 = [-0.468830941, -0.4688309409]
+x3 = [1.779181527, 1.779181528]
+x4 = [1.921906658, 1.921906659]
+x5 = [-1.142132043, -1.142132042]
+x6 = [0.8910882254, 0.8910882255]
+
+SOLUTION 3 [4.33e-15] [safe]
+x1 = [-0.4031049211, -0.403104921]
+x2 = [1.02852436, 1.028524361]
+x3 = [-0.7658027833, -0.7658027832]
+x4 = [0.5844388647, 0.5844388648]
+x5 = [0.5559444793, 0.5559444794]
+x6 = [-0.5268843381, -0.526884338]
+
+SOLUTION 4 [1.164e-13] [safe]
+x1 = [-2.747009244, -2.747009243]
+x2 = [1.756050897, 1.756050898]
+x3 = [3.041347259, 3.04134726]
+x4 = [-0.8336867406, -0.8336867405]
+x5 = [-0.2167021724, -0.2167021723]
+x6 = [-1.069991881, -1.06999188]
+
+SOLUTION 5 [2.487e-14] [safe]
+x1 = [-1.436477439, -1.436477438]
+x2 = [0.3536216081, 0.3536216082]
+x3 = [0.693350523, 0.6933505231]
+x4 = [-0.3069214463, -0.3069214462]
+x5 = [1.696426753, 1.696426754]
+x6 = [0.951877558, 0.9518775581]
+
+SOLUTION 6 [9.77e-15] [safe]
+x1 = [1.546405788, 1.546405789]
+x2 = [-2.080056019, -2.080056018]
+x3 = [1.781823439, 1.78182344]
+x4 = [-1.01638637, -1.016386369]
+x5 = [0.7682131606, 0.7682131607]
+x6 = [0.4943561406, 0.4943561407]
+
+SOLUTION 7 [2.665e-15] [safe]
+x1 = [0.299075932, 0.2990759321]
+x2 = [0.1296325601, 0.1296325602]
+x3 = [-0.02502294258, -0.02502294257]
+x4 = [0.2828582567, 0.2828582568]
+x5 = [0.3134561936, 0.3134561937]
+x6 = [2.023239619, 2.02323962]
+
+SOLUTION 8 [1.332e-15] [safe]
+x1 = [0.3614344119, 0.361434412]
+x2 = [0.08627395401, 0.08627395402]
+x3 = [0.2305730684, 0.2305730685]
+x4 = [-0.1783448107, -0.1783448106]
+x5 = [0.5000633762, 0.5000633763]
+x6 = [-0.7932998193, -0.7932998192]
+
+SOLUTION 9 [2.054e-15] [safe]
+x1 = [0.2492294548, 0.2492294549]
+x2 = [0.6724385474, 0.6724385475]
+x3 = [0.4933296687, 0.4933296688]
+x4 = [-0.3937834585, -0.3937834584]
+x5 = [-0.02121421256, -0.02121421255]
+x6 = [1.458570463, 1.458570464]
+
+SOLUTION 10 [4.274e-15] [safe]
+x1 = [0.3749148466, 0.3749148467]
+x2 = [0.2694677091, 0.2694677092]
+x3 = [0.2013580398, 0.2013580399]
+x4 = [0.3433656524, 0.3433656525]
+x5 = [-0.1891062482, -0.1891062481]
+x6 = [-0.9890675711, -0.989067571]
+
+--- INPUT PROBLEM ---
+
+REGION
+x1 = [-1000, 1000]
+x2 = [-1000, 1000]
+x3 = [-1000, 1000]
+x4 = [-1000, 1000]
+x5 = [-1000, 1000]
+x6 = [-1000, 1000]
+
+CONSTRAINTS
+x6^2*(-10*x1+2*x2-x3+x4+3*x5) + x6*(x1+2*x2+x3+2*x4+x5) + 10*x1 + 2*x2 - x3 + 2*x4 - (2*x5) == 0
+x6^2*(2*x1-11*x2+2*x3-2*x4+x5) + x6*(2*x1+x2+2*x3+x4+3*x5) + 2*x1 + 9*x2 + 3*x3 - x4 - (2*x5) == 0
+x6^2*(-x1 + 2*x2 - (12*x3) - x4 + x5) + x6*(x1+2*x2-2*x4-2*x5) - x1 + 3*x2 + 10*x3 + 2*x4 - x5 == 0
+x6^2*(x1-2*x2-x3-10*x4+2*x5) + x6*(2*x1+x2-2*x3+2*x4+3*x5) + 2*x1 - x2 + 2*x3 + 12*x4 + x5 == 0
+x6^2*(3*x1+x2+x3+2*x4-11*x5) + x6*(x1+3*x2-2*x3+3*x4+3*x5) - (2*x1) - (2*x2) - x3 + x4 + 10*x5 == 0
+x1+x2+x3+x4+x5-1 == 0
+
+--- PARAMETERS ---
+
+BB_SPACE_FREQUENCY        = 1
+BC3_ITER_LIMIT            = 30
+BC3_PEEL_FACTOR           = 2
+BP_NODE_SELECTION         = DFS
+DEPTH_LIMIT               = 10000
+DISPLAY_REGION            = STD
+DTOL                      = 1e-06R
+FLOAT_PRECISION           = 10
+GAUSSIAN_MIN_PIVOT        = 1e-08
+GAUSS_SEIDEL_DTOL         = 1e-06R
+GAUSS_SEIDEL_ITER_LIMIT   = 50
+GAUSS_SEIDEL_XTOL         = 1e-08A
+GRADIENT_DESCENT_TOL      = 0.001
+INFLATION_CHI             = 1e-12
+INFLATION_DELTA           = 1.125
+LINE_SEARCH_ARMIJO        = 0.09375
+LINE_SEARCH_ITER_LIMIT    = 20
+LINE_SEARCH_STEP_TOL      = 1e-08
+LOCAL_SOLVER_ALGORITHM    = GRADIENT
+LOCAL_SOLVER_TIME_LIMIT   = 10
+LOG_LEVEL                 = INTER
+LP_ITER_LIMIT             = 50
+LP_TIME_LIMIT             = 10
+NEWTON_CERTIFY_DTOL       = 0.001R
+NEWTON_CERTIFY_ITER_LIMIT = 20
+NEWTON_DTOL               = 1e-06R
+NEWTON_ITER_LIMIT         = 30
+NEWTON_XTOL               = 1e-08A
+NODE_LIMIT                = 500000
+OBJ_TOL                   = 1e-06R
+PREPROCESSING             = YES
+PROPAGATION_BASE          = HC4
+PROPAGATION_DTOL          = 1e-10R
+PROPAGATION_ITER_LIMIT    = 200
+PROPAGATION_WITH_MAX_CID  = YES
+PROPAGATION_WITH_NEWTON   = YES
+PROPAGATION_WITH_POLYTOPE = TAYLOR
+RELAXATION_EQ_TOL         = 1e-08
+SOLUTION_CLUSTER_GAP      = 1e-06
+SOLUTION_LIMIT            = 5000
+SPLIT_DOM_ROBIN           = 2
+SPLIT_INNER               = NO
+SPLIT_NB_SLICES           = 7
+SPLIT_OBJECTIVE           = NO
+SPLIT_PEEL_FACTOR         = 10
+SPLIT_SELECTOR            = HYBRID_DOM_ROBIN
+SPLIT_SLICER              = BISECTION
+TIME_LIMIT                = 3600
+TRACE                     = YES
+UNI_NEWTON_ITER_LIMIT     = 20
+XTOL                      = 1e-08A
