@@ -2182,6 +2182,45 @@ void Dag::intervalDiff(IntervalMatrix& jac)
    }
 }
 
+void Dag::hansenDiff(const IntervalRegion& reg, IntervalMatrix& jac)
+{
+   ASSERT(nbVars() == jac.ncols() && nbFuns() == jac.nrows(),
+          "Bad dimensions of a Jacobian matrix used in a DAG");
+
+   ASSERT(nbVars() == nbFuns(),
+          "Hansen's derivatives can be computed only for square systems");
+
+   IntervalRegion X = reg.midpoint();
+
+   size_t j = 0;
+   for (auto v : scope())
+   {
+      // assigns the domain of v
+      X.set(v, reg.get(v));
+
+      // evaluates the DAG
+      intervalEval(X);
+
+      // calculates every dfi/dv and assigns it in the Jacobian matrix
+      for (size_t i=0; i<nbFuns(); ++i)
+      {
+         DagFun* f = fun_[i];
+
+         if (f->dependsOn(v))
+         {
+            f->intervalDiff();
+            jac.set(i, j, f->intervalDeriv(v));
+         }
+         else
+         {
+            jac.set(i, j, Interval::zero());
+         }
+      }
+
+      ++j;
+   }
+}
+
 bool Dag::realEval(const RealPoint& pt)
 {
    Double::rndNear();

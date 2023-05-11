@@ -237,16 +237,31 @@ void IntervalFunctionVectorDag::diff(const IntervalRegion& reg,
 {
    IntervalVector val(nbFuns());
 
-   dag_->intervalEval(reg, val);
-   dag_->intervalDiff(J);
+   if (nbVars() == nbFuns())
+   {
+      dag_->hansenDiff(reg, J);
+   }
+   else
+   {
+      dag_->intervalEval(reg, val);
+      dag_->intervalDiff(J);
+   }
 }
 
 void IntervalFunctionVectorDag::evalDiff(const IntervalRegion& reg,
                                          IntervalVector& val,
                                          IntervalMatrix& J) 
 {
-   dag_->intervalEval(reg, val);
-   dag_->intervalDiff(J);
+   if (nbVars() == nbFuns())
+   {
+      dag_->intervalEval(reg, val);
+      dag_->hansenDiff(reg, J);
+   }
+   else
+   {
+      dag_->intervalEval(reg, val);
+      dag_->intervalDiff(J);
+   }
 }
 
 void IntervalFunctionVectorDag::violation(const IntervalRegion& reg,

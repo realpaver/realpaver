@@ -1147,6 +1147,11 @@ public:
    /// @param jac resulting matrix of partial derivatives of this
    void intervalDiff(IntervalMatrix& jac);
 
+   /// Interval differentiation for square systems using Hansen's method
+   /// @param reg domains of variables
+   /// @param jac resulting matrix of partial derivatives of this
+   void hansenDiff(const IntervalRegion& reg, IntervalMatrix& jac);
+
    /// Calculates the violation of the constraints
    /// @param viol output vector such that viol[i] is the violation of the i-th
    ///        constraint
