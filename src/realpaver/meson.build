@@ -52,6 +52,12 @@ lp_header = custom_target('gen-lp-header',
     install_dir : 'include/realpaver')
 rp_sources += [lp_header]
 
+
+if local_solver_name.to_upper() == 'IPOPT'
+  rp_headers += ['LocalSolverIpopt.hpp']
+  rp_sources += ['LocalSolverIpopt.cpp']
+endif
+
 rp_headers += [
   'AssertDebug.hpp',
   'Bitset.hpp',
@@ -86,6 +92,7 @@ rp_headers += [
   'IntervalVector.hpp',
   'IntervalUnion.hpp',
   'ListContractor.hpp',
+  'LocalSolver.hpp',
   'Logger.hpp',
   'LPModel.hpp',
   'MaxCIDContractor.hpp',
@@ -173,6 +180,7 @@ rp_sources += [
   'IntervalVector.cpp',
   'IntervalUnion.cpp',
   'ListContractor.cpp',
+  'LocalSolver.cpp',
   'Logger.cpp',
   'LPModel.cpp',
   'MaxCIDContractor.cpp',

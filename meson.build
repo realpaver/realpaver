@@ -45,7 +45,13 @@ if not lp_dep.found()
   error('Missing linear programming library!')
 endif
 
-deps_lib = [lp_dep,mathlib_dep,interval_dep,m_dep]
+local_solver_name = get_option('LOCAL_SOLVER')
+local_solver_dep = dependency('', required : false)
+if local_solver_name.to_upper() == 'IPOPT'
+  local_solver_dep = dependency('ipopt', required : true)
+endif
+
+deps_lib = [lp_dep,mathlib_dep,interval_dep,m_dep,local_solver_dep]
 
 flex = find_program('flex', required: false)
 bison = find_program('bison', required: false)
