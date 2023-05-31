@@ -45,3 +45,12 @@ scope_test = executable( 'scope_test',
                          link_with:realpaver_lib,
                          include_directories: ['../src'] )
 test('Test of scope', scope_test)
+
+if local_solver_name.to_lower() =='nlopt'
+    nlopt_test = executable( 'nlopt_test',
+                            sources: 'nlopt_test.cpp',
+                            link_with:realpaver_lib,
+                            dependencies: local_solver_dep,
+                            include_directories: ['../src'] )
+    test('Test of Nlopt API', nlopt_test)
+endif

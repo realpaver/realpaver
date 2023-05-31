@@ -7,64 +7,43 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LOCAL_SOLVER_HPP
-#define REALPAVER_LOCAL_SOLVER_HPP
+#ifndef REALPAVER_LOCAL_SOLVER_NLOPT_HPP
+#define REALPAVER_LOCAL_SOLVER_NLOPT_HPP
 
-#include "realpaver/Common.hpp"
-#include "realpaver/IntervalRegion.hpp"
-#include "realpaver/RealFunction.hpp"
-#include "realpaver/RealFunctionVector.hpp"
+#include "realpaver/LocalSolver.hpp"
+
+#include <nlopt.hpp>
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interface for local optimization solvers.
 ///////////////////////////////////////////////////////////////////////////////
-class LocalSolver {
+class LocalSolverNlopt : public LocalSolver {
 public:
    /// Default constructor
-   /// @param problem a numerical problem
-   LocalSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
-
-   /// Default copy constructor
-   LocalSolver(const LocalSolver&) = default;
-
-   /// No assignment
-   LocalSolver& operator=(const LocalSolver&) = delete;
+   LocalSolverNlopt(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Virtual destructor
-   virtual ~LocalSolver();
+   virtual ~LocalSolverNlopt();
 
-   /// Minimization of a function
-   /// @param f a real function
+   /// Minimization of a problem
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
    /// @param dest final point found by the optimization procedure
    /// @return an optimization status
    virtual OptimizationStatus minimize(const IntervalRegion& reg,
                                        const RealPoint& src,
-                                       RealPoint& dest) = 0;
+                                       RealPoint& dest);
 
-   /// @return the time limit for a run of minimize
-   double getTimeLimit() const;
 
-   /// Assigns the time limit for a run of minimize
-   /// @param val time limit in seconds
-   void setTimeLimit(double val);
+   void set_algorithm_name(nlopt::algorithm alg);
 
 protected:
-   std::shared_ptr<RealFunction> obj_;            // Objective function on real numbers
-   std::shared_ptr<RealFunctionVector> ctrs_;     // Vector of functions for the constraints
+   std::shared_ptr<nlopt::opt> optimizer_;
+   nlopt::algorithm algorithm_ = nlopt::algorithm::LD_SLSQP;
 
-   std::shared_ptr<RealPoint> best_;
-   double best_val_;
-
-   int n_;
-   int m_;
-   Scope s_;
-
-private:
-   double time_limit_;
+   double f_(const std::vector<double> &x, std::vector<double> &grad, void* f_data);
 };
 
 } // namespace

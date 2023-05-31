@@ -56,6 +56,9 @@ rp_sources += [lp_header]
 if local_solver_name.to_upper() == 'IPOPT'
   rp_headers += ['LocalSolverIpopt.hpp']
   rp_sources += ['LocalSolverIpopt.cpp']
+elif local_solver_name.to_upper() == 'NLOPT'
+  rp_headers += ['LocalSolverNlopt.hpp']
+  rp_sources += ['LocalSolverNlopt.cpp']
 endif
 
 rp_headers += [

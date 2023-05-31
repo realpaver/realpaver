@@ -19,6 +19,7 @@ LocalSolver::LocalSolver(const RealFunction& obj, const RealFunctionVector& ctrs
     obj_ = std::make_shared<RealFunction>(obj);
     ctrs_ = std::make_shared<RealFunctionVector>(ctrs);
     best_ = nullptr;
+    best_val_ = Interval::universe().right();
     n_ = s_.size();
 }
 
