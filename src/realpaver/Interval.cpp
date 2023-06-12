@@ -10,6 +10,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/Interval.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -623,19 +624,37 @@ Interval operator+(const Interval& x, const Interval& y)
 Interval addPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::addPX(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::addPX(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("addPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval addPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::addPY(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::addPY(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("addPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval addPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));   
+
+#if LOG_ON
+   LOG_FULL("addPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval& Interval::operator-=(const Interval& other)
@@ -652,19 +671,37 @@ Interval operator-(const Interval& x, const Interval& y)
 Interval subPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::subPX(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::subPX(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("subPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval subPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::subPY(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::subPY(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("subPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval subPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::subPZ(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::subPZ(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("subPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval operator-(const Interval& x)
@@ -674,12 +711,24 @@ Interval operator-(const Interval& x)
 
 Interval usubPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::usubPX(x.impl_, y.impl_));   
+   Interval res = Interval(Interval::Traits::usubPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("usubPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval usubPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::usubPY(x.impl_, y.impl_));      
+   Interval res = Interval(Interval::Traits::usubPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("usubPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res; 
 }
 
 Interval& Interval::operator*=(const Interval& other)
@@ -696,19 +745,37 @@ Interval operator*(const Interval& x, const Interval& y)
 Interval mulPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::mulPX(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::mulPX(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("mulPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval mulPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::mulPY(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::mulPY(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("mulPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval mulPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::mulPZ(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::mulPZ(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("mulPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval& Interval::operator/=(const Interval& other)
@@ -722,22 +789,39 @@ Interval operator/(const Interval& x, const Interval& y)
    return Interval(Interval::Traits::div(x.impl_, y.impl_));      
 }
 
-Interval divPX(const Interval& x, const Interval& y,
-                      const Interval& z)
+Interval divPX(const Interval& x, const Interval& y, const Interval& z)
 {
-   return Interval(Interval::Traits::divPX(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::divPX(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("divPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval divPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::divPY(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::divPY(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("divPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval divPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::divPZ(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::divPZ(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("divPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sqr(const Interval& x)
@@ -747,12 +831,24 @@ Interval sqr(const Interval& x)
 
 Interval sqrPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sqrPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sqrPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sqrPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sqrPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sqrPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sqrPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sqrPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sqrt(const Interval& x)
@@ -762,12 +858,24 @@ Interval sqrt(const Interval& x)
 
 Interval sqrtPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sqrtPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sqrtPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sqrtPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sqrtPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sqrtPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sqrtPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sqrtPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval pow(const Interval& x, int n)
@@ -777,12 +885,24 @@ Interval pow(const Interval& x, int n)
 
 Interval powPX(const Interval& x, int n, const Interval& y)
 {
-   return Interval(Interval::Traits::powPX(x.impl_, n, y.impl_));
+   Interval res = Interval(Interval::Traits::powPX(x.impl_, n, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("powPX(x,n,y) on " << x << "," << n << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval powPY(const Interval& x, int n, const Interval& y)
 {
-   return Interval(Interval::Traits::powPY(x.impl_, n, y.impl_));   
+   Interval res = Interval(Interval::Traits::powPY(x.impl_, n, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("powPY(x,n,y) on " << x << "," << n << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval exp(const Interval& x)
@@ -792,12 +912,24 @@ Interval exp(const Interval& x)
 
 Interval expPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::expPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::expPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("expPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval expPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::expPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::expPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("expPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval log(const Interval& x)
@@ -807,12 +939,24 @@ Interval log(const Interval& x)
 
 Interval logPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::logPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::logPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("logPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval logPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::logPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::logPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("logPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sin(const Interval& x)
@@ -822,12 +966,24 @@ Interval sin(const Interval& x)
 
 Interval sinPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sinPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sinPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sinPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sinPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sinPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sinPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sinPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval cos(const Interval& x)
@@ -837,12 +993,24 @@ Interval cos(const Interval& x)
 
 Interval cosPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::cosPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::cosPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("cosPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval cosPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::cosPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::cosPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("cosPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval tan(const Interval& x)
@@ -852,12 +1020,24 @@ Interval tan(const Interval& x)
 
 Interval tanPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::tanPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::tanPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("tanPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval tanPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::tanPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::tanPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("tanPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval abs(const Interval& x)
@@ -867,12 +1047,24 @@ Interval abs(const Interval& x)
 
 Interval absPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::absPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::absPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("absPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval absPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::absPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::absPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("absPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval min(const Interval& x, const Interval& y)
@@ -883,19 +1075,37 @@ Interval min(const Interval& x, const Interval& y)
 Interval minPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::minPX(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::minPX(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("minPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval minPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::minPY(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::minPY(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("minPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval minPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::minPZ(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::minPZ(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("minPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval max(const Interval& x, const Interval& y)
@@ -906,19 +1116,37 @@ Interval max(const Interval& x, const Interval& y)
 Interval maxPX(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::maxPX(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::maxPX(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("maxPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval maxPY(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::maxPY(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::maxPY(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("maxPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval maxPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   return Interval(Interval::Traits::maxPZ(x.impl_, y.impl_, z.impl_));
+   Interval res = Interval(Interval::Traits::maxPZ(x.impl_, y.impl_, z.impl_));
+
+#if LOG_ON
+   LOG_FULL("maxPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sgn(const Interval& x)
@@ -928,12 +1156,24 @@ Interval sgn(const Interval& x)
 
 Interval sgnPX(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sgnPX(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sgnPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sgnPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sgnPY(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sgnPY(x.impl_, y.impl_));
+   Interval res = Interval(Interval::Traits::sgnPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sgnPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 } // namespace

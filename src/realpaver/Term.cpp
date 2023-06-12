@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
@@ -1058,6 +1059,12 @@ void TermVar::eval(const IntervalRegion& reg)
 
 Proof TermVar::contract(IntervalRegion& reg)
 {
+   ival_ &= reg.get(v_);
+
+#if LOG_ON
+   LOG_FULL("term contract variable " << v_.getName() << " -> " << ival_);
+#endif
+
    reg.set(v_, ival_);
    return ival_.isEmpty() ? Proof::Empty : Proof::Maybe;
 }
