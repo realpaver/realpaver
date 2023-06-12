@@ -22,6 +22,7 @@ namespace realpaver {
 class LocalSolverIpopt : public LocalSolver, Ipopt::TNLP {
 public:
    /// Default constructor
+   LocalSolverIpopt(const Problem& pb);
    LocalSolverIpopt(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Virtual destructor
@@ -71,13 +72,6 @@ public:
                                   Ipopt::Number obj_value,
 				  const Ipopt::IpoptData* ip_data,
 				  Ipopt::IpoptCalculatedQuantities* ip_cq);
-
-protected:
-   SharedIntervalRegion reg_;
-   void updateRegion(const IntervalRegion& reg);
-
-   std::shared_ptr<RealPoint> start_;
-   void updateStart(const RealPoint& start);
 
 };
 

@@ -12,11 +12,18 @@
 
 namespace realpaver {
 
-double LocalSolverNlopt::f_(const std::vector<double> &x, std::vector<double> &grad, void* f_data){
+double LocalSolverNlopt::f_(const std::vector<double> &x, std::vector<double> &grad, void* f_data)
+{
     return 0.0;
 }
 
-LocalSolverNlopt::LocalSolverNlopt(const RealFunction& obj, const RealFunctionVector& ctrs) : LocalSolver(obj, ctrs){
+LocalSolverNlopt::LocalSolverNlopt(const Problem& pb) : LocalSolver(pb)
+{
+
+}
+
+LocalSolverNlopt::LocalSolverNlopt(const RealFunction& obj, const RealFunctionVector& ctrs) : LocalSolver(obj, ctrs)
+{
 
 }
 

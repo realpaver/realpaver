@@ -22,6 +22,7 @@ namespace realpaver {
 class LocalSolverNlopt : public LocalSolver {
 public:
    /// Default constructor
+   LocalSolverNlopt(const Problem& pb);
    LocalSolverNlopt(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Virtual destructor

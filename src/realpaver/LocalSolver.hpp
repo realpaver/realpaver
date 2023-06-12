@@ -11,6 +11,7 @@
 #define REALPAVER_LOCAL_SOLVER_HPP
 
 #include "realpaver/Common.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/RealFunctionVector.hpp"
@@ -24,6 +25,7 @@ class LocalSolver {
 public:
    /// Default constructor
    /// @param problem a numerical problem
+   LocalSolver(const Problem& pb, bool withobj = false);
    LocalSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Default copy constructor
@@ -52,19 +54,40 @@ public:
    /// @param val time limit in seconds
    void setTimeLimit(double val);
 
+   double get_best_val() const;
+   RealPoint get_best_point() const;
+   OptimizationStatus get_status() const;
+
 protected:
+   std::shared_ptr<Problem> pb_;
    std::shared_ptr<RealFunction> obj_;            // Objective function on real numbers
+   std::shared_ptr<RealFunctionVector> diff_obj_; // Objective function on real numbers
    std::shared_ptr<RealFunctionVector> ctrs_;     // Vector of functions for the constraints
 
-   std::shared_ptr<RealPoint> best_;
-   double best_val_;
+   std::shared_ptr<Dag> dag_;                     // DAG to represent and store the problem to solve with a local solver
+   std::shared_ptr<Dag> odag_;                    // DAG to represent and store theobjective function
 
-   int n_;
-   int m_;
-   Scope s_;
+   std::shared_ptr<RealPoint> best_;              // Optimal point
+   double best_val_;                              // objective function value for optimal point
+   OptimizationStatus status_;
+
+
+   int n_;     // number of variables
+   int m_;     // number of constraints
+   Scope s_;   // Scope of problem
+   Scope os_;  // Scope of objective function
+   
+   Variable z_;         // Variable to represent the objective function and formulate a constraint on the objective
+   size_t ic_;          // index of the objective constraint in the DAG
+
+   SharedIntervalRegion reg_;                      // Interval region in which search for an optimal value
+   void updateRegion(const IntervalRegion& reg);   // Update of search region
+
+   std::shared_ptr<RealPoint> start_;              // Starting point
+   void updateStart(const RealPoint& start);       // Update of starting point
 
 private:
-   double time_limit_;
+   double time_limit_;                             // Stop criterion based on time spend to optimize
 };
 
 } // namespace

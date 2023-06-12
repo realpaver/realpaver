@@ -2,6 +2,8 @@
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Parser.hpp"
+#include "realpaver/LocalSolver.hpp"
+#include "realpaver/LocalSolverNlopt.hpp"
 
 #include <nlopt.hpp>
 
@@ -122,6 +124,21 @@ void configure_optimizer(nlopt::opt& optimizer, std::vector<double>& x)
     optimizer.set_upper_bounds(x_u);
 }
 
+
+void test_solver_creation(std::string filepath)
+{
+    std::cerr<<"\n*** Creating "<<filepath<<std::endl;
+    
+    if (!init_pointers(filepath))
+    {
+        TEST_TRUE(false);
+    }
+
+    size_t n = pb->nbVars();
+    LocalSolverNlopt nlopt(*pb);
+    
+}
+
 void test_neldermead(std::string filepath)
 {
     std::cerr<<"\n*** Solving "<<filepath<<" with NELDERMEAD:"<<std::endl;
@@ -219,6 +236,8 @@ int main()
 {
     pb = nullptr;
     obj = nullptr;
+
+    test_solver_creation("../examples/bop/Beale.bop");
     
     test_neldermead("../examples/bop/Beale.bop");
 

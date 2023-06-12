@@ -13,20 +13,28 @@
 
 namespace realpaver {
 
-LocalSolverIpopt::LocalSolverIpopt(const RealFunction& obj, const RealFunctionVector& ctrs) : LocalSolver(obj, ctrs){
-    reg_ = nullptr;
-    start_ = nullptr;
+LocalSolverIpopt::LocalSolverIpopt(const Problem& pb) : LocalSolver(pb)
+{
+    
+}
+
+LocalSolverIpopt::LocalSolverIpopt(const RealFunction& obj, const RealFunctionVector& ctrs) : LocalSolver(obj, ctrs)
+{
+    /// TODO
 }
 
 LocalSolverIpopt::~LocalSolverIpopt()
 {
+   std::cout<<"Freeing IPOPT solver object"<<std::endl;
 }
 
 
 OptimizationStatus LocalSolverIpopt::minimize(const IntervalRegion& reg,
                                     const RealPoint& src,
-                                    RealPoint& dest) {
-    
+                                    RealPoint& dest)
+{
+    status_ = OptimizationStatus::Other;
+
     updateRegion(reg);
     updateStart(src);
 
@@ -35,12 +43,13 @@ OptimizationStatus LocalSolverIpopt::minimize(const IntervalRegion& reg,
     // Change some options
     app->Options()->SetNumericValue("tol", 1e-9);
     app->Options()->SetStringValue("mu_strategy", "adaptive");
+    app->Options()->SetStringValue("hessian_approximation", "limited-memory");
 
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status;
     status = app->Initialize();
     if (status != Ipopt::Solve_Succeeded) {
-        printf("\n\n*** Error during initialization!\n");
+        std::cerr << std::endl << std::endl << "*** Error during initialization!" << std::endl;
     }
     else
     {
@@ -48,39 +57,57 @@ OptimizationStatus LocalSolverIpopt::minimize(const IntervalRegion& reg,
         status = app->OptimizeTNLP(this);
 
         if (status == Ipopt::Solve_Succeeded) {
-            printf("\n\n*** The problem solved!\n");
+            std::cout << std::endl << std::endl << "*** The problem solved!" << std::endl;
+            dest = *best_;
+            std::cout<<"LocalSolverIpopt::minimize ended with success!"<<std::endl;
+            status_ = OptimizationStatus::Optimal;
         }
         else {
-            printf("\n\n*** The problem FAILED!\n");
+            std::cerr << std::endl << std::endl << "*** The problem FAILED!" << std::endl;
         }
-
-        dest = *best_;
     }
-    return OptimizationStatus::Other;
+    std::cout<<"LocalSolverIpopt::minimize ended!"<<std::endl;
+    return status_;
 }
 
 
 bool LocalSolverIpopt::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
-                        Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style) {
-
+                        Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style)
+{
+    // std::cout<<"get_nlp_info"<<std::endl;
     n = n_;
     m = m_;
     
+    // std::cout<<"get_nlp_info"<<std::endl;
     // nnz_jac_g: number of nonzeros in jacobian
     // TODO
+    nnz_jac_g = 0;
+    // std::cout<<"Number of constraints: "<<dag_->nbFuns()<<std::endl;
+    for(size_t j=0; j<m_;j++)
+    {
+        for(size_t i=0; i<s_.size();i++)
+        {
+            if (ctrs_->fun(j).scope().contains(s_.var(i)))
+                nnz_jac_g++;
+        }
+    }
+    // std::cout<<"Number of nonzeros in jacobian: "<<nnz_jac_g<<std::endl;
 
-    // nnz_h_jag: number of nonzeros in hessian
+    // nnz_h_lag: number of nonzeros in hessian
     // TODO
-    
+    nnz_h_lag = 0;
+
     // use the C style indexing (0-based).the numbering style used for row/col entries in the sparse matrix format 
     index_style = TNLP::C_STYLE;
 
-    return false;
+    // std::cout<<"get_nlp_info"<<std::endl;
+    return true;
 }
 
 bool LocalSolverIpopt::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
-                            Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u){
-
+                            Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u)
+{
+    // std::cout<<"get_bounds_info"<<std::endl;
     for (size_t i=0; i<n; i++)
     {
         x_l[i] = (*reg_)[i].left();
@@ -89,15 +116,22 @@ bool LocalSolverIpopt::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt
 
     // g_l and g_u are bounds for the constraints : g_l <= c <= g_u
     // TODO
+    for(size_t i=0; i<m_; i++)
+    {
+        g_l[i] = dag_->fun(i)->getImage().left();
+        g_u[i] = dag_->fun(i)->getImage().right();
+    }
 
-    return false;
+    // std::cout<<"get_bounds_info"<<std::endl;
+    return true;
 }
 
 bool LocalSolverIpopt::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
                                 bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
                                 Ipopt::Index m, bool init_lambda,
-                                Ipopt::Number* lambda) {
-
+                                Ipopt::Number* lambda)
+{
+    // std::cout<<"get_starting_point"<<std::endl;
     for (size_t i=0; i<n; i++)
         x[i] = (*start_)[i];
 
@@ -105,37 +139,67 @@ bool LocalSolverIpopt::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Nu
     // lambda are the dual multipliers, not mandatory
     // TODO?
 
-    return false;
+    // std::cout<<"get_starting_point"<<std::endl;
+    return true;
 }
 
-bool LocalSolverIpopt::eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number& obj_value) {
-
+bool LocalSolverIpopt::eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number& obj_value)
+{
+    // std::cout<<"eval_f"<<std::endl;
     // compute obj_value, i.e. the value of the objective function, from x vector
-    // TODO
+    // if (x==nullptr || x == 0)
+    //     return false;
+    RealPoint pt(s_);
+    for(size_t i=0; i<s_.size();i++)
+        pt[i] = x[i];
+    obj_value = obj_->eval(pt);
 
-    return false;
+    // std::cout<<"eval_f"<<std::endl;
+    return true;
 }
 
-bool LocalSolverIpopt::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number* grad_f) {
-
+bool LocalSolverIpopt::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number* grad_f)
+{
+    // std::cout<<"eval_grad_f"<<std::endl;
     // compute grad_f, i.e. the gradient of the objective function, from x vector
-    // TODO
-
-    return false;
+    // if (x==nullptr || x == 0)
+    //     return false;
+    RealPoint pt(s_);
+    for(size_t i=0; i<s_.size();i++)
+        pt[i] = x[i];
+    RealPoint gf(s_);
+    obj_->diff(pt,gf);
+    for(size_t i=0; i<s_.size();i++)
+        grad_f[i] = gf[i];
+    
+    // std::cout<<"eval_grad_f: "<<gf<<std::endl;
+    return true;
 }
 
-bool LocalSolverIpopt::eval_g (Ipopt::Index n, const Ipopt::Number *x, bool new_x, Ipopt::Index m, Ipopt::Number *g){
-
+bool LocalSolverIpopt::eval_g (Ipopt::Index n, const Ipopt::Number *x, bool new_x, Ipopt::Index m, Ipopt::Number *g)
+{
+    // std::cout<<"eval_g"<<std::endl;
+    // if (x==nullptr || x == 0)
+    //     return false;
     // compute g, i.e. the value of the constraints, from x vector
     // TODO
+    RealPoint pt(s_);
+    for(size_t i=0; i<s_.size();i++)
+        pt[i] = x[i];
+    for(size_t j=0; j<ctrs_->nbFuns();j++)
+    {
+        g[j] = ctrs_->fun(j).eval(pt);
+    }
 
-    return false;
+    // std::cout<<"eval_g"<<std::endl;
+    return true;
 }
 
 bool LocalSolverIpopt::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x, bool new_x,
                                 Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index *iRow,
-                                Ipopt::Index *jCol, Ipopt::Number *values) {
-
+                                Ipopt::Index *jCol, Ipopt::Number *values)
+{
+    // std::cout<<"eval_jac_g"<<std::endl;
     // compute values, i.e. the Jacobian of the constraints, from x vector where:
     // - nele_jac is the number of nonzeros in the Jacobian
     // - iRow are the row indices of the Jacobian entries
@@ -144,14 +208,51 @@ bool LocalSolverIpopt::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x, bool 
     // - iRow[i] and iCol[i] defines its coordinates in J
     // - values[i] defines its value
     // TODO
-
-    return false;
+    if (values == nullptr || values == NULL || values == 0)
+    {
+        // Return the structure of the Jacobian:
+        for (size_t j=0; j<m_; j++)
+        {
+            for (size_t i=0; i<n_; i++)
+            {
+                iRow[j*m_+i] = j;
+                jCol[j*m_+i] = i;
+            }
+        }
+        return true;
+    }
+    else
+    {
+        RealPoint pt(s_);
+        for(size_t i=0; i<n;i++)
+        {
+            pt[i] = x[i];
+        }
+        size_t nb_val = 0;
+        for(size_t j=0; j<m_;j++)
+        {
+            RealMatrix jac(m_,n_);
+            ctrs_->diff(pt,jac);
+            for(size_t i=0;i<s_.size();i++)
+            {
+                // if (nele_jac==nb_val)
+                //     return true;
+                if (ctrs_->fun(j).scope().contains(s_.var(i)))
+                {
+                    values[nb_val] = jac.get(j,i);
+                }
+            }
+        }
+    }
+    // std::cout<<"eval_jac_g"<<std::endl;
+    return true;
 }
 
 bool LocalSolverIpopt::eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_x,Ipopt::Number obj_factor,
                         Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda, Ipopt::Index nele_hess,
-                        Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values) {
-
+                        Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values)
+{
+    // std::cout<<"eval_h"<<std::endl;
     // compute values for the Hessian matrix, where:
     // - obj_factor is the factor in front of the objective term in the Hessian, $ \sigma_f$. (input)
     // - lambda is the values for the constraint multipliers, $ \lambda$, at which the Hessian is to be evaluated. (input)
@@ -159,18 +260,33 @@ bool LocalSolverIpopt::eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_
     // - iRow is the row indices of entries in the Hessian. (output)
     // - jCol is the column indices of entries in the Hessian. (output)
     // - values is the values of the entries in the Hessian. (output)
-    
+    // if (values == nullptr || values == 0)
+    //     return false;
+    // RealPoint pt(s_);
+    // for(size_t i=0; i<s_.size();i++)
+    //     pt[i] = x[i];
+    // for(size_t j=0; j<diff_obj_->nbFuns();j++)
+    // {
+    //     RealPoint df_j(diff_obj_->fun(j).scope());
+    //     ctrs_->fun(j).diff(pt,df_j);
+    //     // TODO: save values in values using nele_hess, iRow and jCol
+    // }
+    // std::cout<<"eval_h"<<std::endl;
     return false;
 }
 
-Ipopt::Index LocalSolverIpopt::get_number_of_nonlinear_variables() {
-
-    return -1;
+Ipopt::Index LocalSolverIpopt::get_number_of_nonlinear_variables()
+{
+    return s_.size();
 }
 
-bool LocalSolverIpopt::get_list_of_nonlinear_variables (Ipopt::Index num_nonlin_vars, Ipopt::Index *pos_nonlin_vars) {
-
-    return false;
+bool LocalSolverIpopt::get_list_of_nonlinear_variables (Ipopt::Index num_nonlin_vars, Ipopt::Index *pos_nonlin_vars)
+{
+    for (size_t i=0; i<s_.size();i++)
+    {
+        pos_nonlin_vars[i] = i;
+    }
+    return true;
 }
 
 void LocalSolverIpopt::finalize_solution(Ipopt::SolverReturn status,
@@ -178,8 +294,9 @@ void LocalSolverIpopt::finalize_solution(Ipopt::SolverReturn status,
                                 Ipopt::Index m, const Ipopt::Number* g, const Ipopt::Number* lambda,
                                 Ipopt::Number obj_value,
                 const Ipopt::IpoptData* ip_data,
-                Ipopt::IpoptCalculatedQuantities* ip_cq) {
-
+                Ipopt::IpoptCalculatedQuantities* ip_cq)
+{
+    // std::cout<<"finalize_solution"<<std::endl;
     /*
     status: (in), gives the status of the algorithm as specified in IpAlgTypes.hpp,
         SUCCESS: Algorithm terminated successfully at a locally optimal point, satisfying the convergence tolerances (can be specified by options).
@@ -204,23 +321,15 @@ void LocalSolverIpopt::finalize_solution(Ipopt::SolverReturn status,
     obj_value: (in), the final value of the objective, $ f(x_*)$.
     ip_data and ip_cq are provided for expert users.
 */
-
     if (best_ == nullptr)
         best_ = std::make_shared<RealPoint>(RealPoint(start_->scope()));
     for (size_t i=0; i<n; i++)
         (*best_)[i] = x[i];
+        
+    // std::cout<<"finalize_solution"<<std::endl;
 }
 
 
-void LocalSolverIpopt::updateRegion(const IntervalRegion& reg)
-{
-    reg_ = std::make_shared<IntervalRegion>(reg);
-}
-
-void LocalSolverIpopt::updateStart(const RealPoint& start)
-{
-    start_ = std::make_shared<RealPoint>(start);
-}
 
 
 }

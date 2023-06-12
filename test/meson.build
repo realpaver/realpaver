@@ -53,4 +53,11 @@ if local_solver_name.to_lower() =='nlopt'
                             dependencies: local_solver_dep,
                             include_directories: ['../src'] )
     test('Test of Nlopt API', nlopt_test)
+elif local_solver_name.to_lower() =='ipopt'
+    ipopt_test = executable( 'ipopt_test',
+                            sources: 'ipopt_test.cpp',
+                            link_with:realpaver_lib,
+                            dependencies: local_solver_dep,
+                            include_directories: ['../src'] )
+    test('Test of Ipopt API', ipopt_test)
 endif
