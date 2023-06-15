@@ -57,8 +57,8 @@ if local_solver_name.to_upper() == 'IPOPT'
   rp_headers += ['LocalOptimizerIpopt.hpp']
   rp_sources += ['LocalOptimizerIpopt.cpp']
 elif local_solver_name.to_upper() == 'NLOPT'
-  rp_headers += ['LocalSolverNlopt.hpp']
-  rp_sources += ['LocalSolverNlopt.cpp']
+  rp_headers += ['LocalOptimizerNlopt.hpp']
+  rp_sources += ['LocalOptimizerNlopt.cpp']
 endif
 
 rp_headers += [
@@ -96,7 +96,6 @@ rp_headers += [
   'IntervalUnion.hpp',
   'ListContractor.hpp',
   'LocalOptimizer.hpp',
-  'LocalSolver.hpp',
   'Logger.hpp',
   'LPModel.hpp',
   'MaxCIDContractor.hpp',
@@ -185,7 +184,6 @@ rp_sources += [
   'IntervalUnion.cpp',
   'ListContractor.cpp',
   'LocalOptimizer.cpp',
-  'LocalSolver.cpp',
   'Logger.cpp',
   'LPModel.cpp',
   'MaxCIDContractor.cpp',

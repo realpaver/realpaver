@@ -2,8 +2,8 @@
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Parser.hpp"
-#include "realpaver/LocalSolver.hpp"
-#include "realpaver/LocalSolverNlopt.hpp"
+#include "realpaver/LocalOptimizer.hpp"
+#include "realpaver/LocalOptimizerNlopt.hpp"
 
 #include <nlopt.hpp>
 
@@ -134,8 +134,7 @@ void test_solver_creation(std::string filepath)
         TEST_TRUE(false);
     }
 
-    size_t n = pb->nbVars();
-    LocalSolverNlopt nlopt(*pb);
+    LocalOptimizerNlopt nlopt(*pb);
     
 }
 
@@ -232,6 +231,33 @@ void test_mma(std::string filepath)
     TEST_TRUE(status > 0);
 }
 
+
+void test_rp_neldermead(std::string filepath)
+{
+    std::cerr<<"\n*** Solving "<<filepath<<" with RP_NM:"<<std::endl;
+    
+    if (!init_pointers(filepath))
+    {
+        TEST_TRUE(false);
+    }
+
+    LocalOptimizerNlopt ls(*pb);
+
+    OptimizationStatus status = ls.minimize(pb->getDomains(),pb->getDomains().midpoint());
+
+
+    if (status == OptimizationStatus::Optimal)
+        std::cerr<<"Success!"<<std::endl;
+    else // if (status == OptimizationStatus::Other)
+        std::cerr<<"Failed to minimze!"<<std::endl;
+
+    std::cerr<<"Final point: ";
+    std::cerr<<*(ls.bestPoint())<<" ";
+    std::cerr<<" with f="<<ls.bestVal()<<std::endl;
+
+    TEST_TRUE(status == OptimizationStatus::Optimal);
+}
+
 int main()
 {
     pb = nullptr;
@@ -247,6 +273,8 @@ int main()
 
     test_mma("../examples/bop/Beale.bop");
 
+    test_rp_neldermead("../examples/bop/Beale.bop");
+
     pb = nullptr;
     obj = nullptr;
 
@@ -257,4 +285,7 @@ int main()
     test_bobyqa("../examples/bop/Rapha.bop");
 
     test_mma("../examples/bop/Rapha.bop");
+
+    test_rp_neldermead("../examples/bop/Rapha.bop");
+    
 }

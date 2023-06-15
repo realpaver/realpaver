@@ -10,7 +10,7 @@
 #ifndef REALPAVER_LOCAL_SOLVER_NLOPT_HPP
 #define REALPAVER_LOCAL_SOLVER_NLOPT_HPP
 
-#include "realpaver/LocalSolver.hpp"
+#include "realpaver/LocalOptimizer.hpp"
 
 #include <nlopt.hpp>
 
@@ -19,32 +19,30 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interface for local optimization solvers.
 ///////////////////////////////////////////////////////////////////////////////
-class LocalSolverNlopt : public LocalSolver {
+class LocalOptimizerNlopt : public LocalOptimizer {
 public:
    /// Default constructor
-   LocalSolverNlopt(const Problem& pb);
-   LocalSolverNlopt(const RealFunction& obj, const RealFunctionVector& ctrs);
+   LocalOptimizerNlopt(const Problem& pb);
+   LocalOptimizerNlopt(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Virtual destructor
-   virtual ~LocalSolverNlopt();
+   virtual ~LocalOptimizerNlopt();
 
    /// Minimization of a problem
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
-   /// @param dest final point found by the optimization procedure
    /// @return an optimization status
    virtual OptimizationStatus minimize(const IntervalRegion& reg,
-                                       const RealPoint& src,
-                                       RealPoint& dest);
+                                       const RealPoint& src);
 
 
-   void set_algorithm_name(nlopt::algorithm alg);
+   void algorithm_name(nlopt::algorithm alg);
+   nlopt::algorithm algorithm_name() const;
 
 protected:
-   std::shared_ptr<nlopt::opt> optimizer_;
-   nlopt::algorithm algorithm_ = nlopt::algorithm::LD_SLSQP;
+   std::shared_ptr<nlopt::opt> optimizer_;                              // Point to the nlp optimizer object
+   nlopt::algorithm algorithm_ = nlopt::algorithm::LN_NELDERMEAD;       // solving algorithm for nlopt
 
-   double f_(const std::vector<double> &x, std::vector<double> &grad, void* f_data);
 };
 
 } // namespace

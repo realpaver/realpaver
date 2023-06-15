@@ -55,15 +55,23 @@ OptimizationStatus LocalOptimizerIpopt::minimize(const IntervalRegion& reg,
         Ipopt::SmartPtr<Ipopt::TNLP> tnlp = new LocalTNLP(this);
         status = app->OptimizeTNLP(tnlp);
 
-        if (status == Ipopt::Solve_Succeeded) {
-            // std::cout << std::endl << std::endl << "*** The problem solved!" << std::endl;
+        if (status == Ipopt::Solve_Succeeded || status == Ipopt::Solved_To_Acceptable_Level)
+        {
             status_ = OptimizationStatus::Optimal;
         }
-        else {
+        else if (status == Ipopt::Maximum_Iterations_Exceeded)
+        {
+            status_ = OptimizationStatus::StopOnIterLimit;
+        }
+        else if (status == Ipopt::Maximum_CpuTime_Exceeded)
+        {
+            status_ = OptimizationStatus::StopOnTimeLimit;
+        }
+        else
+        {
             std::cerr << std::endl << std::endl << "*** IPOPT FAILED!" << std::endl;
         }
     }
-    // std::cout<<"LocalOptimizerIpopt::minimize ended!"<<std::endl;
     return status_;
 }
 
