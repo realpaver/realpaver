@@ -54,8 +54,8 @@ rp_sources += [lp_header]
 
 
 if local_solver_name.to_upper() == 'IPOPT'
-  rp_headers += ['LocalSolverIpopt.hpp']
-  rp_sources += ['LocalSolverIpopt.cpp']
+  rp_headers += ['LocalOptimizerIpopt.hpp']
+  rp_sources += ['LocalOptimizerIpopt.cpp']
 elif local_solver_name.to_upper() == 'NLOPT'
   rp_headers += ['LocalSolverNlopt.hpp']
   rp_sources += ['LocalSolverNlopt.cpp']
@@ -95,6 +95,7 @@ rp_headers += [
   'IntervalVector.hpp',
   'IntervalUnion.hpp',
   'ListContractor.hpp',
+  'LocalOptimizer.hpp',
   'LocalSolver.hpp',
   'Logger.hpp',
   'LPModel.hpp',
@@ -183,6 +184,7 @@ rp_sources += [
   'IntervalVector.cpp',
   'IntervalUnion.cpp',
   'ListContractor.cpp',
+  'LocalOptimizer.cpp',
   'LocalSolver.cpp',
   'Logger.cpp',
   'LPModel.cpp',

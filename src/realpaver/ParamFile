@@ -210,6 +210,9 @@ GRADIENT_DESCENT_TOL = 1.0e-3
 # Time limit in seconds
 LOCAL_SOLVER_TIME_LIMIT = 10.0
 
+# Iteration limit in seconds
+LOCAL_SOLVER_ITER_LIMIT = 100
+
 # Local optimization technique
 # - GRADIENT:   gradient descent method
 # - EVALUATION: simple test at the midpoint of a region

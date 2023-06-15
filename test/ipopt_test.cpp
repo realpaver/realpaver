@@ -2,8 +2,8 @@
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Parser.hpp"
-#include "realpaver/LocalSolver.hpp"
-#include "realpaver/LocalSolverIpopt.hpp"
+#include "realpaver/LocalOptimizer.hpp"
+#include "realpaver/LocalOptimizerIpopt.hpp"
 
 #include "IpIpoptApplication.hpp"
 
@@ -421,6 +421,7 @@ bool init_pointers(std::string filepath)
 }
 
 
+
 void test_ipopt(std::string filepath)
 {
     std::cerr<<"\n*** Solving "<<filepath<<" with IPOPT:"<<std::endl;
@@ -430,22 +431,16 @@ void test_ipopt(std::string filepath)
         TEST_TRUE(false);
     }
 
-    LocalSolverIpopt rp_ipopt(*pb);
+    LocalOptimizerIpopt rp_ipopt(*pb);
     
     RealPoint sol(pb->scope());
     OptimizationStatus status = OptimizationStatus::Other;
     IntervalRegion box(pb->getDomains());
     RealPoint start(pb->scope(),box.midpoint());
-    // try
-    // {    
-    status = rp_ipopt.minimize(box,start,sol);
+    
+    status = rp_ipopt.minimize(box,start);
     std::cerr<<"\n*** Solving status with IPOPT:"<<status<<std::endl;
-    std::cerr<<"Best point: "<<rp_ipopt.get_best_point()<<" with obj: "<<rp_ipopt.get_best_val()<<std::endl;
-    // }
-    // catch (...)
-    // {
-    //     std::cerr<<"Unexpected error!"<<std::endl;
-    // }
+    std::cerr<<"Best point: "<<rp_ipopt.bestPoint()<<" with obj: "<<rp_ipopt.bestVal()<<std::endl;
 
     TEST_TRUE(status == OptimizationStatus::Optimal);
     std::cerr<<"\nDone!"<<std::endl;
