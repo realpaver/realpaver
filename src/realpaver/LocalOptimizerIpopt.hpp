@@ -30,8 +30,8 @@ public:
     public:
         /// Constructor
         /// @param ls a pointer to a local optimizer object
-        LocalTNLP(LocalOptimizerIpopt* ls);
-
+        LocalTNLP(LocalOptimizerIpopt* ls, SharedIntervalRegion reg, std::shared_ptr<RealPoint> start);
+        
         bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
                             Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style);
         bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
@@ -66,6 +66,10 @@ public:
                             const Ipopt::IpoptData* ip_data,
                             Ipopt::IpoptCalculatedQuantities* ip_cq);
         LocalOptimizerIpopt* ls_;
+
+        SharedIntervalRegion reg_;                      // Interval region in which search for an optimal value
+        std::shared_ptr<RealPoint> start_;              // Starting point
+        double best_val_;                              // objective function value for optimal point
     };
 
 

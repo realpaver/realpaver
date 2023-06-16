@@ -20,7 +20,9 @@ LocalOptimizer::LocalOptimizer(const Problem& pb)
     n_(pb.nbVars()), m_(pb.nbCtrs()), s_(pb.scope() | pb.getObjective().getTerm().scope()),
     os_(pb.getObjective().getTerm().scope()),
     time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
-    iter_limit_(Param::GetIntParam("LOCAL_SOLVER_ITER_LIMIT"))
+    iter_limit_(Param::GetIntParam("LOCAL_SOLVER_ITER_LIMIT")),
+    atol_(Param::GetDblParam("LOCAL_SOLVER_ATOL")),
+    rtol_(Param::GetDblParam("LOCAL_SOLVER_RTOL"))
 {
     bool ismin = pb_->getObjective().isMinimization();
 
@@ -49,13 +51,6 @@ LocalOptimizer::LocalOptimizer(const Problem& pb)
     else
         ctrs_ = std::make_shared<RealFunctionVector>(dag);
 
-    // initial region
-    reg_ = std::shared_ptr<IntervalRegion>(new IntervalRegion(s_));
-
-    for (Variable v : s_)
-        reg_->set(v, pb_->getDomain(v));
-
-    start_ = std::shared_ptr<RealPoint>(new RealPoint(reg_->midpoint()));
     best_ = nullptr;
     best_val_ = Interval::universe().right();
 }
@@ -69,7 +64,6 @@ LocalOptimizer::LocalOptimizer(const RealFunction& obj, const RealFunctionVector
     ctrs_ = std::make_shared<RealFunctionVector>(ctrs);
     n_ = os_.size();
     m_ = ctrs.nbFuns();
-    start_ = nullptr;
     best_ = nullptr;
     best_val_ = Interval::universe().right();
 }
@@ -126,35 +120,6 @@ std::shared_ptr<RealFunction> LocalOptimizer::obj()
 std::shared_ptr<RealFunctionVector> LocalOptimizer::ctrs()
 {
     return ctrs_;
-}
-
-// std::shared_ptr<Dag> LocalOptimizer::ctr_dag()
-// {
-//     return dag_;
-// }
-// std::shared_ptr<Dag> LocalOptimizer::obj_dag()
-// {
-//     return odag_;
-// }
-
-SharedIntervalRegion LocalOptimizer::region()
-{
-    return reg_;
-}
-
-void LocalOptimizer::region(const IntervalRegion& reg)
-{
-    reg_ = std::make_shared<IntervalRegion>(reg);
-}
-
-std::shared_ptr<RealPoint> LocalOptimizer::start()
-{
-    return start_;
-}
-
-void LocalOptimizer::start(const RealPoint& start)
-{
-    start_ = std::make_shared<RealPoint>(start);
 }
 
 double LocalOptimizer::bestVal() const

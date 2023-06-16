@@ -69,6 +69,8 @@ Param::Param()
    dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",         10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
    dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT",   10.0));
+   dblmap_.insert(std::make_pair("LOCAL_SOLVER_ATOL",         1.0e-9));
+   dblmap_.insert(std::make_pair("LOCAL_SOLVER_RTOL",         1.0e-4));
    dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",      1.0e-3));
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));

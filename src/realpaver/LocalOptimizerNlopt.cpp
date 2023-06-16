@@ -89,8 +89,8 @@ OptimizationStatus LocalOptimizerNlopt::minimize(const IntervalRegion& reg,
         optimizer_ = std::make_shared<nlopt::opt>(nlopt::opt(algorithm_,n)); 
     }
 
-    optimizer_->set_ftol_rel(1e-4);
-    optimizer_->set_ftol_abs(1e-9);
+    optimizer_->set_ftol_rel(rtol_);
+    optimizer_->set_ftol_abs(atol_);
     optimizer_->set_maxeval(this->iterLimit());
     optimizer_->set_maxtime(this->timeLimit());
 

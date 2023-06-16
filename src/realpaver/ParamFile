@@ -210,8 +210,14 @@ GRADIENT_DESCENT_TOL = 1.0e-3
 # Time limit in seconds
 LOCAL_SOLVER_TIME_LIMIT = 10.0
 
-# Iteration limit in seconds
+# Iteration limit
 LOCAL_SOLVER_ITER_LIMIT = 100
+
+# Absolute tolerance on the objective function
+LOCAL_SOLVER_ATOL = 1.0-9
+
+# Relative tolerance on the objective function
+LOCAL_SOLVER_RTOL = 1.0-4
 
 # Local optimization technique
 # - GRADIENT:   gradient descent method

@@ -87,19 +87,19 @@ public:
 //    std::shared_ptr<Dag> obj_dag();
 
 
-   /// @return the pointer to the region in which the optimization is launched
-   SharedIntervalRegion region();
+   // /// @return the pointer to the region in which the optimization is launched
+   // SharedIntervalRegion region();
 
-   /// Assigns the region for a run of the minimize
-   /// @param the interval region
-   void region(const IntervalRegion& reg);
+   // /// Assigns the region for a run of the minimize
+   // /// @param the interval region
+   // void region(const IntervalRegion& reg);
 
-   /// @return the pointer to the starting point
-   std::shared_ptr<RealPoint> start();
+   // /// @return the pointer to the starting point
+   // std::shared_ptr<RealPoint> start();
 
-   /// Assigns the starting point to run minimize
-   /// @param start the starting point
-   void start(const RealPoint& start);
+   // /// Assigns the starting point to run minimize
+   // /// @param start the starting point
+   // void start(const RealPoint& start);
 
    /// @return the best value for the objective function
    double bestVal() const;
@@ -130,16 +130,15 @@ protected:
    size_t m_;     // number of constraints
    Scope s_;   // Scope of problem
    Scope os_;  // Scope of objective function
-   
-   SharedIntervalRegion reg_;                      // Interval region in which search for an optimal value
-   std::shared_ptr<RealPoint> start_;              // Starting point
 
    std::shared_ptr<RealPoint> best_;              // Optimal point
    double best_val_;                              // objective function value for optimal point
    OptimizationStatus status_;
 
    double time_limit_;                             // Stop criterion based on time spend to optimize
-   size_t iter_limit_;
+   size_t iter_limit_;                             // Stop criterion based on the number of iterations
+   double atol_;                                   // Stop criterion based on absolute tolerance on the objective
+   size_t rtol_;                                   // Stop criterion based on relative tolerance on the objective
 };
 
 } // namespace

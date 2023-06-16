@@ -31,13 +31,10 @@ OptimizationStatus LocalOptimizerIpopt::minimize(const IntervalRegion& reg,
 {
     status_ = OptimizationStatus::Other;
 
-    region(reg);
-    start(src);
-
     Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
     // Change some options
-    app->Options()->SetNumericValue("tol", 1e-9);
+    app->Options()->SetNumericValue("tol", atol_);
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetStringValue("hessian_approximation", "limited-memory");
     app->Options()->SetNumericValue("max_cpu_time", time_limit_);
@@ -52,8 +49,10 @@ OptimizationStatus LocalOptimizerIpopt::minimize(const IntervalRegion& reg,
     else
     {
         // Ask Ipopt to solve the problem
-        Ipopt::SmartPtr<Ipopt::TNLP> tnlp = new LocalTNLP(this);
+        Ipopt::SmartPtr<LocalTNLP> tnlp = new LocalTNLP(this, std::make_shared<IntervalRegion>(reg),
+                                                                std::make_shared<RealPoint>(src));
         status = app->OptimizeTNLP(tnlp);
+        best_val_ = tnlp->best_val_;
 
         if (status == Ipopt::Solve_Succeeded || status == Ipopt::Solved_To_Acceptable_Level)
         {
@@ -76,8 +75,8 @@ OptimizationStatus LocalOptimizerIpopt::minimize(const IntervalRegion& reg,
 }
 
 
-
-LocalOptimizerIpopt::LocalTNLP::LocalTNLP(LocalOptimizerIpopt* ls) : ls_(ls)
+LocalOptimizerIpopt::LocalTNLP::LocalTNLP(LocalOptimizerIpopt* ls, SharedIntervalRegion reg, std::shared_ptr<RealPoint> start)
+    : ls_(ls), reg_(reg), start_(start)
 {
 }
 
@@ -116,13 +115,13 @@ bool LocalOptimizerIpopt::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index&
 bool LocalOptimizerIpopt::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
                             Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u)
 {
-    SharedIntervalRegion reg = ls_->region();
+    // SharedIntervalRegion reg = ls_->region();
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     
     for (size_t i=0; i<n; i++)
     {
-        x_l[i] = (*reg)[i].left();
-        x_u[i] = (*reg)[i].right();
+        x_l[i] = (*reg_)[i].left();
+        x_u[i] = (*reg_)[i].right();
     }
 
     // g_l and g_u are bounds for the constraints : g_l <= c <= g_u
@@ -141,9 +140,9 @@ bool LocalOptimizerIpopt::LocalTNLP::get_starting_point(Ipopt::Index n, bool ini
                                 Ipopt::Index m, bool init_lambda,
                                 Ipopt::Number* lambda)
 {
-    std::shared_ptr<RealPoint> start = ls_->start();
+    // std::shared_ptr<RealPoint> start = ls_->start();
     for (size_t i=0; i<n; i++)
-        x[i] = (*start)[i];
+        x[i] = (*start_)[i];
 
     // z are dual variables, not mandatory
     // lambda are the dual multipliers, not mandatory
@@ -317,12 +316,13 @@ void LocalOptimizerIpopt::LocalTNLP::finalize_solution(Ipopt::SolverReturn statu
 
     if (best == nullptr)
     {
-        std::shared_ptr<RealPoint> start = ls_->start();
-        best = std::make_shared<RealPoint>(RealPoint(start->scope()));
+        // std::shared_ptr<RealPoint> start = ls_->start();
+        best = std::make_shared<RealPoint>(RealPoint(start_->scope()));
     }
     for (size_t i=0; i<n; i++)
         (*best)[i] = x[i];
     ls_->bestPoint(best);
+    best_val_ = obj_value;
 }
 
 

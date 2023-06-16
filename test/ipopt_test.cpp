@@ -440,7 +440,7 @@ void test_ipopt(std::string filepath)
     
     status = rp_ipopt.minimize(box,start);
     std::cerr<<"\n*** Solving status with IPOPT:"<<status<<std::endl;
-    std::cerr<<"Best point: "<<rp_ipopt.bestPoint()<<" with obj: "<<rp_ipopt.bestVal()<<std::endl;
+    std::cerr<<"Best point: "<<*(rp_ipopt.bestPoint())<<" with obj: "<<rp_ipopt.bestVal()<<std::endl;
 
     TEST_TRUE(status == OptimizationStatus::Optimal);
     std::cerr<<"\nDone!"<<std::endl;
