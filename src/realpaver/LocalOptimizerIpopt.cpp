@@ -38,7 +38,7 @@ OptimizationStatus LocalOptimizerIpopt::minimize(const IntervalRegion& reg,
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetStringValue("hessian_approximation", "limited-memory");
     app->Options()->SetNumericValue("max_cpu_time", time_limit_);
-    app->Options()->SetNumericValue("max_iter", iter_limit_);
+    app->Options()->SetIntegerValue("max_iter", iter_limit_);
 
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status;
@@ -86,9 +86,9 @@ bool LocalOptimizerIpopt::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index&
 {
     n = ls_->nbVars();
     m = ls_->nbCtrs();
-    const Scope s = ls_->scope();
-    const std::shared_ptr<RealFunction> obj = ls_->obj();
-    const std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
+    Scope s = ls_->scope();
+    std::shared_ptr<RealFunction> obj = ls_->obj();
+    std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     
     // nnz_jac_g: number of nonzeros in jacobian
     // TODO
@@ -101,7 +101,7 @@ bool LocalOptimizerIpopt::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index&
                 nnz_jac_g++;
         }
     }
-    
+    // std::cerr<<"nnz_jac_g: "<<nnz_jac_g<<std::endl;
     // nnz_h_lag: number of nonzeros in hessian
     // TODO
     nnz_h_lag = 0;
@@ -115,7 +115,6 @@ bool LocalOptimizerIpopt::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index&
 bool LocalOptimizerIpopt::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
                             Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u)
 {
-    // SharedIntervalRegion reg = ls_->region();
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     
     for (size_t i=0; i<n; i++)
@@ -128,6 +127,7 @@ bool LocalOptimizerIpopt::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Numb
     // TODO
     for(size_t i=0; i<m; i++)
     {
+        // std::cerr<<"ctr_"<<i<<" in "<<ctrs->fun(i).getImage()<<std::endl;
         g_l[i] = ctrs->fun(i).getImage().left();
         g_u[i] = ctrs->fun(i).getImage().right();
     }
@@ -147,6 +147,7 @@ bool LocalOptimizerIpopt::LocalTNLP::get_starting_point(Ipopt::Index n, bool ini
     // z are dual variables, not mandatory
     // lambda are the dual multipliers, not mandatory
     // TODO?
+    // std::cerr<<*start_<<std::endl;
 
     return true;
 }
@@ -168,15 +169,19 @@ bool LocalOptimizerIpopt::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number*
 bool LocalOptimizerIpopt::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number* grad_f)
 {
     const Scope s = ls_->scope();
+    const Scope os = ls_->obj()->scope();
     std::shared_ptr<RealFunction> obj = ls_->obj();
     // compute grad_f, i.e. the gradient of the objective function, from x vector
     RealPoint pt(s);
-    for(size_t i=0; i<s.size();i++)
-        pt[i] = x[i];
-    RealPoint gf(s);
-    obj->diff(pt,gf);
-    for(size_t i=0; i<s.size();i++)
-        grad_f[i] = gf[i];
+    for(size_t i=0; i<os.size();i++)
+    {
+        pt[i] = x[i]; //x[s.index(os.var(i))];
+    }
+    RealPoint gf(obj->scope());
+    obj->diff(pt.subPoint(os),gf);
+    // std::cerr<<"gf: "<<gf<<" with x: "<<pt<<std::endl;
+    for(size_t i=0; i<os.size();i++)
+        grad_f[s.index(os.var(i))] = gf[i];
     
     return true;
 }
@@ -209,39 +214,57 @@ bool LocalOptimizerIpopt::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Nu
     // Then, each nonzero of J is referenced by an index i, where:
     // - iRow[i] and iCol[i] defines its coordinates in J
     // - values[i] defines its value
+    Scope s = ls_->scope();
+    std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     if (values == nullptr || values == NULL || values == 0)
     {
+        size_t nb_val = 0;
         // Return the structure of the Jacobian:
         for (size_t j=0; j<m; j++)
         {
+            // std::cerr<<"ctr"<<j<<": "<<ctrs->fun(j).scope()<<std::endl;
             for (size_t i=0; i<n; i++)
             {
-                iRow[j*m+i] = j;
-                jCol[j*m+i] = i;
+                if (ctrs->fun(j).scope().contains(s.var(i)))
+                {
+                    // std::cerr<<"var"<<i<<":"<<s.var(i)<<std::endl;
+                    // iRow[j*m+i] = j;
+                    // jCol[j*m+i] = i;
+                    iRow[nb_val] = j;
+                    jCol[nb_val] = i;
+                    nb_val++;
+                }
             }
         }
-        return true;
+        // std::cerr<<"nb_val: "<<nb_val<<std::endl;
     }
     else
     {
-        const Scope s = ls_->scope();
-        std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
-
-        RealPoint pt(s);
+        // std::cerr<<"Computing jacobian"<<std::endl;
+        Scope cs = ls_->ctrs()->scope();
+        RealPoint pt(cs);
+        // std::cerr<<"x_:";
         for(size_t i=0; i<n;i++)
         {
-            pt[i] = x[i];
+            // std::cerr<<x[i]<<",";
+            if(cs.contains(s.var(i)))
+                pt[cs.index(s.var(i))] = x[i];
+            // pt[i] = x[i];
         }
+        // std::cerr<<std::endl<<"x: "<<pt<<std::endl;
         size_t nb_val = 0;
+        RealMatrix jac(m,cs.size());
+        // ctrs->diff(pt.subPoint(cs),jac);
+        ctrs->diff(pt,jac);
+        // std::cerr<<"J: "<<std::endl<<jac<<std::endl;
         for(size_t j=0; j<m;j++)
         {
-            RealMatrix jac(m,n);
-            ctrs->diff(pt,jac);
             for(size_t i=0;i<n;i++)
             {
                 if (ctrs->fun(j).scope().contains(s.var(i)))
                 {
-                    values[nb_val] = jac.get(j,i);
+                    // std::cerr<<"J["<<j<<","<<i<<"]:"<<jac.get(j,cs.index(s.var(i)))<<std::endl;
+                    values[nb_val] = jac.get(j,cs.index(s.var(i)));
                 }
             }
         }
@@ -250,19 +273,19 @@ bool LocalOptimizerIpopt::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Nu
     return true;
 }
 
-bool LocalOptimizerIpopt::LocalTNLP::eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_x,Ipopt::Number obj_factor,
-                        Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda, Ipopt::Index nele_hess,
-                        Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values)
-{
-    // compute values for the Hessian matrix, where:
-    // - obj_factor is the factor in front of the objective term in the Hessian, $ \sigma_f$. (input)
-    // - lambda is the values for the constraint multipliers, $ \lambda$, at which the Hessian is to be evaluated. (input)
-    // - nele_hess is the number of nonzeros in the Hessian (dimension of iRow, jCol, and values). (input)
-    // - iRow is the row indices of entries in the Hessian. (output)
-    // - jCol is the column indices of entries in the Hessian. (output)
-    // - values is the values of the entries in the Hessian. (output)
-    return false;
-}
+// bool LocalOptimizerIpopt::LocalTNLP::eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_x,Ipopt::Number obj_factor,
+//                         Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda, Ipopt::Index nele_hess,
+//                         Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values)
+// {
+//     // compute values for the Hessian matrix, where:
+//     // - obj_factor is the factor in front of the objective term in the Hessian, $ \sigma_f$. (input)
+//     // - lambda is the values for the constraint multipliers, $ \lambda$, at which the Hessian is to be evaluated. (input)
+//     // - nele_hess is the number of nonzeros in the Hessian (dimension of iRow, jCol, and values). (input)
+//     // - iRow is the row indices of entries in the Hessian. (output)
+//     // - jCol is the column indices of entries in the Hessian. (output)
+//     // - values is the values of the entries in the Hessian. (output)
+//     return false;
+// }
 
 Ipopt::Index LocalOptimizerIpopt::LocalTNLP::get_number_of_nonlinear_variables()
 {

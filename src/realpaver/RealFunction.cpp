@@ -102,6 +102,8 @@ RealFunctionDag::RealFunctionDag(SharedDag dag, size_t i)
 {
    ASSERT(dag_ != nullptr, "Null pointer used to create a real function");
    ASSERT(i < dag_->nbFuns(), "Bad index used to create a real function");
+
+   img_ = dag->fun(i)->getImage();
 }
 
 RealFunctionDag::RealFunctionDag(Term t, const Interval& img)
@@ -110,6 +112,7 @@ RealFunctionDag::RealFunctionDag(Term t, const Interval& img)
 {
    dag_ = std::make_shared<Dag>();
    index_ = dag_->insert(t, img);
+   img_ = img;
 }
 
 SharedDag RealFunctionDag::dag() const

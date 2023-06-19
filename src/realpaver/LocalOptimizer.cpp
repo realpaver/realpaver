@@ -45,6 +45,8 @@ LocalOptimizer::LocalOptimizer(const Problem& pb)
     for (size_t j=0; j<m_; j++)
     {
         dag->insert(pb.ctrAt(j));
+        // std::cerr<<pb.ctrAt(j)<<std::endl;
+        // std::cerr<<dag->fun(j)->getImage()<<std::endl;
     }
     if (dag->nbFuns()==0)
         ctrs_ = std::make_shared<RealFunctionVector>();

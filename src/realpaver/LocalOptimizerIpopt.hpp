@@ -51,9 +51,9 @@ public:
                             Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index *iRow,
                             Ipopt::Index *jCol, Ipopt::Number *values);
 
-        bool eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_x,Ipopt::Number obj_factor,
-                            Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda, Ipopt::Index nele_hess,
-                            Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values);
+        // bool eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_x,Ipopt::Number obj_factor,
+        //                     Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda, Ipopt::Index nele_hess,
+        //                     Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values);
 
         Ipopt::Index get_number_of_nonlinear_variables();
 

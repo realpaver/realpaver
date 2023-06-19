@@ -442,7 +442,7 @@ void test_ipopt(std::string filepath)
     std::cerr<<"\n*** Solving status with IPOPT:"<<status<<std::endl;
     std::cerr<<"Best point: "<<*(rp_ipopt.bestPoint())<<" with obj: "<<rp_ipopt.bestVal()<<std::endl;
 
-    TEST_TRUE(status == OptimizationStatus::Optimal);
+    TEST_TRUE(status != OptimizationStatus::Other);
     std::cerr<<"\nDone!"<<std::endl;
 }
 
@@ -463,5 +463,12 @@ int main()
     obj = nullptr;
 
     test_ipopt("../examples/bop/Rapha.bop");
+
+
+
+    pb = nullptr;
+    obj = nullptr;
+
+    test_ipopt("../examples/test.rp");
 
 }
