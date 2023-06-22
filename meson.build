@@ -171,5 +171,6 @@ subdir('ncsp')
 pkgconfig = find_program('pkg-config', required: false)
 if pkgconfig.found()
   pkg = import('pkgconfig')
-  pkg.generate(realpaver_lib, extra_cflags: '-std=c++17')
+  pkg.generate(realpaver_lib, extra_cflags: '-std=c++17',
+        requires: [lp_dep.name(), local_solver_dep.name()])
 endif
