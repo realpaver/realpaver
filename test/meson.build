@@ -45,3 +45,26 @@ scope_test = executable( 'scope_test',
                          link_with:realpaver_lib,
                          include_directories: ['../src'] )
 test('Test of scope', scope_test)
+
+
+realfunctionvector_test = executable( 'realfunctionvector_test',
+                         sources: 'realfunctionvector_test.cpp',
+                         link_with:realpaver_lib,
+                         include_directories: ['../src'] )
+test('Test of realfunctionvector', realfunctionvector_test)
+
+if local_solver_name.to_lower() =='nlopt'
+    nlopt_test = executable( 'nlopt_test',
+                            sources: 'nlopt_test.cpp',
+                            link_with:realpaver_lib,
+                            dependencies: local_solver_dep,
+                            include_directories: ['../src'] )
+    test('Test of Nlopt API', nlopt_test)
+elif local_solver_name.to_lower() =='ipopt'
+    ipopt_test = executable( 'ipopt_test',
+                            sources: 'ipopt_test.cpp',
+                            link_with:realpaver_lib,
+                            dependencies: local_solver_dep,
+                            include_directories: ['../src'] )
+    test('Test of Ipopt API', ipopt_test)
+endif

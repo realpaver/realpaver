@@ -1,0 +1,11 @@
+Variables
+    x in [-2.5,5],
+    y in [-2.5,5],
+    z in [-2.5,5];
+
+
+Objectives
+   MIN 2*x+3*y-2;
+
+Constraints
+   x^2 + z <= 2;

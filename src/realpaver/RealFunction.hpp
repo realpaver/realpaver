@@ -87,7 +87,7 @@ public:
    virtual void violation(const RealPoint& pt, double lo, double up,
                           double& val, double& viol) = 0;
 
-private:
+protected:
    Interval img_;
 };
 
