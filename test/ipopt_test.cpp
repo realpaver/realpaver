@@ -5,6 +5,8 @@
 #include "realpaver/LocalOptimizer.hpp"
 #include "realpaver/LocalOptimizerIpopt.hpp"
 
+#include "realpaver/Prover.hpp"
+
 #include "IpIpoptApplication.hpp"
 
 using namespace realpaver;
@@ -411,6 +413,7 @@ bool init_pointers(std::string filepath)
         if (!parser.parseFile(filepath,*pb))
         {
             std::cerr<<"Unable to parse file "<<std::filesystem::current_path()<<filepath<<std::endl;
+            std::cerr<<parser.getParseError()<<std::endl;
             return false;
         }
     }
@@ -446,6 +449,74 @@ void test_ipopt(std::string filepath)
     std::cerr<<"\nDone!"<<std::endl;
 }
 
+void test_prover(std::string csp_file, std::string bop_file)
+{
+    std::cerr<<"\n*** Solving "<<bop_file<<" with IPOPT:"<<std::endl;
+    
+    if (!init_pointers(bop_file))
+    {
+        TEST_TRUE(false);
+    }
+
+    LocalOptimizerIpopt rp_ipopt(*pb);
+    
+    RealPoint sol(pb->scope());
+    OptimizationStatus status = OptimizationStatus::Other;
+    IntervalRegion box(pb->getDomains());
+    RealPoint start(pb->scope(),box.midpoint());
+    
+    status = rp_ipopt.minimize(box,start);
+    std::cerr<<"\n*** Solving status with IPOPT:"<<status<<std::endl;
+    std::cerr<<"Best point: "<<*(rp_ipopt.bestPoint())<<" with obj: "<<rp_ipopt.bestVal()<<std::endl;
+
+    if (status == OptimizationStatus::Optimal || rp_ipopt.bestVal()<=1e-9)
+    {
+        std::shared_ptr<Problem> csp = std::make_shared<Problem>(Problem(csp_file));
+        Parser parser;
+        if (!parser.parseFile(csp_file,*csp))
+        {
+            std::cerr<<"Unable to parse file "<<std::filesystem::current_path()<<csp_file<<std::endl;
+            std::cerr<<parser.getParseError()<<std::endl;
+            TEST_TRUE(false);
+        }
+        Prover prover(*csp);
+        IntervalRegion r(csp->scope(),*(rp_ipopt.bestPoint()));
+        std::cerr<<"Before inflation: "<<r<<std::endl;
+        std::cerr<<"Width of region:"<<r.width()<<std::endl;
+        // x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
+        double eps=1e-8;
+        r.inflate(1.0+eps,eps);
+        std::cerr<<"After inflation: "<<r<<std::endl;
+        std::cerr<<"Width of region:"<<r.width()<<std::endl;
+        
+        Proof p = prover.certify(*r.clone());
+        std::cerr<<"Proof: "<<p<<std::endl;
+        IntervalRegion exclusion(r);
+        if(p==Proof::Feasible)
+            {
+                std::cerr<<"Update exclusion region!"<<std::endl;
+                exclusion.setOnScope(r,r.scope());
+            }
+
+        while(p==Proof::Feasible)
+        {
+            eps *= 10;
+            r.inflate(1.0+eps,eps);
+            std::cerr<<"Width of region:"<<r.width()<<std::endl;
+            p = prover.certify(*r.clone());
+            std::cerr<<"Proof: "<<p<<" : "<<r<<std::endl;
+            if(p==Proof::Feasible)
+            {
+                std::cerr<<"Update exclusion region!"<<std::endl;
+                exclusion.setOnScope(r,r.scope());
+            }
+        }
+        std::cerr<<"Computed exclusion region:"<<exclusion<<std::endl;
+        std::cerr<<"Width of exclusion region:"<<exclusion.width()<<std::endl;
+    }
+    std::cerr<<"\nDone!"<<std::endl;
+}
+
 
 int main()
 {
@@ -470,5 +541,11 @@ int main()
     obj = nullptr;
 
     test_ipopt("../examples/test.rp");
+
+
+    pb = nullptr;
+    obj = nullptr;
+
+    test_prover("../ncsp/benchmarks/Brown5.rp","../ncsp/benchmarks/Brown5_opt.rp");
 
 }
