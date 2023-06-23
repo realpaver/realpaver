@@ -85,6 +85,8 @@ public:
 
 };
 
+using DefaultLocalOptimizer=LocalOptimizerIpopt;
+
 } // namespace
 
 #endif

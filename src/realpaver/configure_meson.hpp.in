@@ -61,6 +61,12 @@
 #mesondefine INTERVAL_LIB_GAOL
 
 
+
+/* Define to 1 to use GAOL. */
+#mesondefine LOCAL_OPTIMIZER_IPOPT
+#mesondefine LOCAL_OPTIMIZER_NLOPT
+
+
 /* Name of package */
 #define PACKAGE "@project_name@"
 

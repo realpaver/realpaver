@@ -45,6 +45,8 @@ protected:
 
 };
 
+using DefaultLocalOptimizer=LocalOptimizerIpopt;
+
 } // namespace
 
 #endif

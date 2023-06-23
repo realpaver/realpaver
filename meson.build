@@ -111,10 +111,16 @@ elif lp_lib_name == 'Clp'
   conf_data.set('LP_LIB_GUROBI',1)
 endif
 # Configuring interval lib
-if interval_lib_name == 'Gaol'
+if interval_lib_name.to_lower() == 'gaol'
   conf_data.set('INTERVAL_LIB_GAOL',1)
-elif interval_lib_name == 'Crlibm'
-  conf_data.set('INTERVAL_LIB_CRLIBM',1)
+# elif interval_lib_name == 'Crlibm'
+#   conf_data.set('INTERVAL_LIB_CRLIBM',1)
+endif
+
+if local_solver_name.to_lower() == 'ipopt'
+  conf_data.set('LOCAL_OPTIMIZER_IPOPT',1)
+elif local_solver_name.to_lower() == 'nlopt'
+  conf_data.set('LOCAL_OPTIMIZER_NLOPT',1)
 endif
 
 assert_opt = get_option('ASSERT')

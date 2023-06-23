@@ -290,14 +290,15 @@ bool LocalOptimizerIpopt::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Nu
 Ipopt::Index LocalOptimizerIpopt::LocalTNLP::get_number_of_nonlinear_variables()
 {
     // TODO
-    const Scope s = ls_->scope();
-    return s.size();
+    // const Scope s = ls_->scope();
+    return ls_->nbVars();
 }
 
 bool LocalOptimizerIpopt::LocalTNLP::get_list_of_nonlinear_variables (Ipopt::Index num_nonlin_vars, Ipopt::Index *pos_nonlin_vars)
 {
-    const Scope s = ls_->scope();
-    for (size_t i=0; i<s.size();i++)
+    // const Scope s = ls_->scope();
+    // for (size_t i=0; i<s.size();i++)
+    for (size_t i=0; i<ls_->nbVars();i++)
     {
         pos_nonlin_vars[i] = i;
     }

@@ -53,6 +53,13 @@ realfunctionvector_test = executable( 'realfunctionvector_test',
                          include_directories: ['../src'] )
 test('Test of realfunctionvector', realfunctionvector_test)
 
+
+exclusion_contractor_test = executable( 'exclusion_contractor_test',
+                         sources: 'exclusion_contractor_test.cpp',
+                         link_with:realpaver_lib,
+                         include_directories: ['../src'] )
+test('Test of ExclusionContractor', exclusion_contractor_test)
+
 if local_solver_name.to_lower() =='nlopt'
     nlopt_test = executable( 'nlopt_test',
                             sources: 'nlopt_test.cpp',

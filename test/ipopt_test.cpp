@@ -521,7 +521,7 @@ void test_prover(std::string csp_file, std::string bop_file)
 int main()
 {
 
-    test_ipopt_ex();
+    // test_ipopt_ex();
 
     pb = nullptr;
     obj = nullptr;
@@ -543,9 +543,9 @@ int main()
     test_ipopt("../examples/test.rp");
 
 
-    pb = nullptr;
-    obj = nullptr;
+    // pb = nullptr;
+    // obj = nullptr;
 
-    test_prover("../ncsp/benchmarks/Brown5.rp","../ncsp/benchmarks/Brown5_opt.rp");
+    // test_prover("../ncsp/benchmarks/Brown5.rp","../ncsp/benchmarks/Brown5_opt.rp");
 
 }
