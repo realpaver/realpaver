@@ -16,7 +16,10 @@ double f_rp(const std::vector<double> &x, std::vector<double> &grad, void* f_dat
 {
     NLPSolver* ls = reinterpret_cast<NLPSolver*>(f_data);
 
-    RealPoint rp(ls->obj()->scope(),0.0);
+    Scope s = ls->obj()->scope();
+    if (ls->nbCtrs()>0) s.insert(ls->ctrs()->scope());
+
+    RealPoint rp(s,0.0);
     for (size_t i=0; i<x.size(); i++)
     {
         rp[i] = x[i];
@@ -29,7 +32,10 @@ double f_rp_diff(const std::vector<double> &x, std::vector<double> &grad, void* 
 {
     NLPSolver* ls = reinterpret_cast<NLPSolver*>(f_data);
 
-    RealPoint rp(ls->obj()->scope(),0.0);
+    Scope s = ls->obj()->scope();
+    if (ls->nbCtrs()>0) s.insert(ls->ctrs()->scope());
+
+    RealPoint rp(s,0.0);
     for (size_t i=0; i<x.size(); i++)
     {
         rp[i] = x[i];

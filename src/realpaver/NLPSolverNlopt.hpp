@@ -41,7 +41,7 @@ public:
 
 protected:
    std::shared_ptr<nlopt::opt> optimizer_;                              // Point to the nlp optimizer object
-   nlopt::algorithm nlopt_algorithm_ = nlopt::algorithm::LN_NELDERMEAD;       // solving algorithm for nlopt
+   nlopt::algorithm nlopt_algorithm_ = nlopt::algorithm::LD_SLSQP;       // solving algorithm for nlopt
 
 };
 

@@ -73,6 +73,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
         }
         else
         {
+
             std::cerr << std::endl << std::endl << "*** IPOPT FAILED!" << std::endl;
         }
     }
@@ -93,8 +94,9 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt:
     m = ls_->nbCtrs();
     std::shared_ptr<RealFunction> obj = ls_->obj();
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
-    const Scope s = ls_->obj()->scope() | ls_->ctrs()->scope();
     
+    Scope s = ls_->obj()->scope();
+    if (m>0) s.insert(ls_->ctrs()->scope());
     // nnz_jac_g: number of nonzeros in jacobian
     // TODO
     nnz_jac_g = 0;
@@ -113,7 +115,6 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt:
 
     // use the C style indexing (0-based).the numbering style used for row/col entries in the sparse matrix format 
     index_style = TNLP::C_STYLE;
-    
     return true;
 }
 
@@ -161,7 +162,8 @@ bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x, bool n
 {
     // compute obj_value, i.e. the value of the objective function, from x vector
     const std::shared_ptr<RealFunction> obj = ls_->obj();
-    const Scope s = ls_->obj()->scope() | ls_->ctrs()->scope();
+    Scope s = ls_->obj()->scope();
+    if (ls_->nbCtrs()>0) s.insert(ls_->ctrs()->scope());
     
     RealPoint pt(s);
     for(size_t i=0; i<s.size();i++)
@@ -174,7 +176,8 @@ bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x, bool n
 bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number* grad_f)
 {
     std::shared_ptr<RealFunction> obj = ls_->obj();
-    const Scope s = ls_->obj()->scope() | ls_->ctrs()->scope();
+    Scope s = ls_->obj()->scope();
+    if (ls_->nbCtrs()>0) s.insert(ls_->ctrs()->scope());
     const Scope os = obj->scope();
     // compute grad_f, i.e. the gradient of the objective function, from x vector
     RealPoint pt(s);
@@ -193,7 +196,8 @@ bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, b
 
 bool NLPSolver::LocalTNLP::eval_g (Ipopt::Index n, const Ipopt::Number *x, bool new_x, Ipopt::Index m, Ipopt::Number *g)
 {
-    const Scope s = ls_->obj()->scope() | ls_->ctrs()->scope();
+    Scope s = ls_->obj()->scope();
+    if (m>0) s.insert(ls_->ctrs()->scope());
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     // compute g, i.e. the value of the constraints, from x vector
     // TODO
@@ -219,7 +223,8 @@ bool NLPSolver::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x, b
     // Then, each nonzero of J is referenced by an index i, where:
     // - iRow[i] and iCol[i] defines its coordinates in J
     // - values[i] defines its value
-    const Scope s = ls_->obj()->scope() | ls_->ctrs()->scope();
+    Scope s = ls_->obj()->scope();
+    if (m>0) s.insert(ls_->ctrs()->scope());
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     if (values == nullptr || values == NULL || values == 0)
     {
