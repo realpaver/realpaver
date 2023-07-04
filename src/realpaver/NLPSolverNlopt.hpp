@@ -7,10 +7,10 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LOCAL_SOLVER_NLOPT_HPP
-#define REALPAVER_LOCAL_SOLVER_NLOPT_HPP
+#ifndef REALPAVER_NLP_SOLVER_NLOPT_HPP
+#define REALPAVER_NLP_SOLVER_NLOPT_HPP
 
-#include "realpaver/LocalOptimizer.hpp"
+#include "realpaver/NLPModel.hpp"
 
 #include <nlopt.hpp>
 
@@ -19,14 +19,15 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interface for local optimization solvers.
 ///////////////////////////////////////////////////////////////////////////////
-class LocalOptimizerNlopt : public LocalOptimizer {
+class NLPSolver : public NLPModel {
 public:
    /// Default constructor
-   LocalOptimizerNlopt(const Problem& pb);
-   LocalOptimizerNlopt(const RealFunction& obj, const RealFunctionVector& ctrs);
+   NLPSolver(const Problem& pb);
+   NLPSolver(const RealFunction& obj);
+   NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Virtual destructor
-   virtual ~LocalOptimizerNlopt();
+   virtual ~NLPSolver();
 
    /// Minimization of a problem
    /// @param reg interval region in the search space
@@ -36,16 +37,13 @@ public:
                                        const RealPoint& src);
 
 
-   void algorithm_name(nlopt::algorithm alg);
-   nlopt::algorithm algorithm_name() const;
+   void set_algorithm(std::string alg);
 
 protected:
    std::shared_ptr<nlopt::opt> optimizer_;                              // Point to the nlp optimizer object
-   nlopt::algorithm algorithm_ = nlopt::algorithm::LN_NELDERMEAD;       // solving algorithm for nlopt
+   nlopt::algorithm nlopt_algorithm_ = nlopt::algorithm::LN_NELDERMEAD;       // solving algorithm for nlopt
 
 };
-
-using DefaultLocalOptimizer=LocalOptimizerIpopt;
 
 } // namespace
 

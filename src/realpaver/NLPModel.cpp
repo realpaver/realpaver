@@ -7,7 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/LocalOptimizer.hpp"
+#include "realpaver/NLPModel.hpp"
 #include "realpaver/Param.hpp"
 
 #include "realpaver/Term.hpp"
@@ -15,25 +15,24 @@
 
 namespace realpaver {
 
-LocalOptimizer::LocalOptimizer(const Problem& pb)
-    : pb_(std::make_shared<Problem>(pb)),
-    n_(pb.nbVars()), m_(pb.nbCtrs()), s_(pb.scope() | pb.getObjective().getTerm().scope()),
-    os_(pb.getObjective().getTerm().scope()),
+NLPModel::NLPModel(const Problem& pb)
+    : n_(pb.nbVars()), m_(pb.nbCtrs()),
     time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
     iter_limit_(Param::GetIntParam("LOCAL_SOLVER_ITER_LIMIT")),
     atol_(Param::GetDblParam("LOCAL_SOLVER_ATOL")),
-    rtol_(Param::GetDblParam("LOCAL_SOLVER_RTOL"))
+    rtol_(Param::GetDblParam("LOCAL_SOLVER_RTOL")),
+    alg_("DEFAULT")
 {
-    bool ismin = pb_->getObjective().isMinimization();
+    bool ismin = pb.getObjective().isMinimization();
 
     // objective function
-    Term to = pb_->getObjective().getTerm();
+    Term to = pb.getObjective().getTerm();
 
     // objective function to be minimized
     Term tomin = ismin ? to : -to;
 
     // scope of the objective function
-    to.makeScope(os_);
+    // to.makeScope(pb.getObjective().getTerm().scope());
 
     // DAG
     std::shared_ptr<Dag> dag =  std::make_shared<Dag>();
@@ -45,8 +44,6 @@ LocalOptimizer::LocalOptimizer(const Problem& pb)
     for (size_t j=0; j<m_; j++)
     {
         dag->insert(pb.ctrAt(j));
-        // std::cerr<<pb.ctrAt(j)<<std::endl;
-        // std::cerr<<dag->fun(j)->getImage()<<std::endl;
     }
     if (dag->nbFuns()==0)
         ctrs_ = std::make_shared<RealFunctionVector>();
@@ -57,96 +54,107 @@ LocalOptimizer::LocalOptimizer(const Problem& pb)
     best_val_ = Interval::universe().right();
 }
 
-LocalOptimizer::LocalOptimizer(const RealFunction& obj, const RealFunctionVector& ctrs)
-    : m_(ctrs.nbFuns()), s_(ctrs.scope()), os_(obj.scope()), 
+NLPModel::NLPModel(const RealFunction& obj)
+    : n_(obj.nbVars()),m_(0), 
     time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
-    iter_limit_(Param::GetDblParam("LOCAL_SOLVER_ITER_LIMIT"))
+    iter_limit_(Param::GetDblParam("LOCAL_SOLVER_ITER_LIMIT")),
+    alg_("DEFAULT")
 {
     obj_ = std::make_shared<RealFunction>(obj);
-    ctrs_ = std::make_shared<RealFunctionVector>(ctrs);
-    n_ = os_.size();
-    m_ = ctrs.nbFuns();
+    ctrs_ = std::make_shared<RealFunctionVector>();
     best_ = nullptr;
     best_val_ = Interval::universe().right();
 }
 
-LocalOptimizer::~LocalOptimizer()
+NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
+    : n_(obj.nbVars()),m_(ctrs.nbFuns()),
+    time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
+    iter_limit_(Param::GetDblParam("LOCAL_SOLVER_ITER_LIMIT")),
+    alg_("DEFAULT")
+{
+    obj_ = std::make_shared<RealFunction>(obj);
+    ctrs_ = std::make_shared<RealFunctionVector>(ctrs);
+    best_ = nullptr;
+    best_val_ = Interval::universe().right();
+}
+
+NLPModel::~NLPModel()
 {
 }
 
-double LocalOptimizer::timeLimit() const
+double NLPModel::timeLimit() const
 {
    return time_limit_;
 }
 
-void LocalOptimizer::timeLimit(double val)
+void NLPModel::set_timeLimit(double val)
 {
    time_limit_ = val;
 }
 
-size_t LocalOptimizer::iterLimit() const
+size_t NLPModel::iterLimit() const
 {
    return iter_limit_;
 }
 
-void LocalOptimizer::iterLimit(size_t val)
+void NLPModel::set_iterLimit(size_t val)
 {
    iter_limit_ = val;
 }
 
-size_t LocalOptimizer::nbVars() const
+size_t NLPModel::nbVars() const
 {
     return n_;
 }
 
-size_t LocalOptimizer::nbCtrs() const
+size_t NLPModel::nbCtrs() const
 {
     return m_;
 }
 
-Scope LocalOptimizer::scope() const
-{
-    return s_;
-}
-
-Scope LocalOptimizer::obj_scope() const
-{
-    return os_;
-}
-
-std::shared_ptr<RealFunction> LocalOptimizer::obj()
+std::shared_ptr<RealFunction> NLPModel::obj()
 {
     return obj_;
 }
 
-std::shared_ptr<RealFunctionVector> LocalOptimizer::ctrs()
+std::shared_ptr<RealFunctionVector> NLPModel::ctrs()
 {
     return ctrs_;
 }
 
-double LocalOptimizer::bestVal() const
+double NLPModel::bestVal() const
 {
    return best_val_;
 }
 
-RealPoint LocalOptimizer::bestPoint() const
+RealPoint NLPModel::bestPoint() const
 {
    return *best_;
 }
 
-std::shared_ptr<RealPoint> LocalOptimizer::bestPoint()
+std::shared_ptr<RealPoint> NLPModel::bestPoint()
 {
     return best_;
 }
 
-void LocalOptimizer::bestPoint(std::shared_ptr<RealPoint> best )
+void NLPModel::set_bestPoint(std::shared_ptr<RealPoint> best)
 {
     best_ = best;
 }
 
-OptimizationStatus LocalOptimizer::status() const
+OptimizationStatus NLPModel::status() const
 {
    return status_;
+}
+
+std::string  NLPModel::algorithm() const
+{
+    return std::string(alg_);
+}
+
+void  NLPModel::set_algorithm(std::string alg_name)
+{
+    alg_ = alg_name;
 }
 
 

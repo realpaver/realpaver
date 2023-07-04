@@ -21,25 +21,29 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interface for local optimization solvers.
 ///////////////////////////////////////////////////////////////////////////////
-class LocalOptimizer {
+class NLPModel {
 public:
    /// Constructor
    /// @param problem a numerical problem
-   LocalOptimizer(const Problem& pb);
+   NLPModel(const Problem& pb);
+
+   /// Constructor
+   /// @param obj a function over reals to be minimized
+   NLPModel(const RealFunction& obj);
 
    /// Constructor
    /// @param obj a function over reals to be minimized
    /// @param ctrs a vector of functions over reals for the constraints
-   LocalOptimizer(const RealFunction& obj, const RealFunctionVector& ctrs);
+   NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Default copy constructor
-   LocalOptimizer(const LocalOptimizer&) = default;
+   NLPModel(const NLPModel&) = default;
 
    /// No assignment
-   LocalOptimizer& operator=(const LocalOptimizer&) = delete;
+   NLPModel& operator=(const NLPModel&) = delete;
 
    /// Virtual destructor
-   virtual ~LocalOptimizer();
+   virtual ~NLPModel();
 
    /// Minimization of a function
    /// @param reg interval region in the search space
@@ -53,14 +57,21 @@ public:
 
    /// Assigns the time limit for a run of minimize
    /// @param val time limit in seconds
-   void timeLimit(double val);
+   void set_timeLimit(double val);
 
    /// @return the iteration limit for a run of minimize
    size_t iterLimit() const;
 
    /// Assigns the iteration limit for a run of minimize
    /// @param iter iteration limit
-   void iterLimit(size_t iter);
+   void set_iterLimit(size_t iter);
+
+
+   /// @return the name of the solving algorithm to use
+   std::string algorithm() const;
+
+   /// Assigns the name of the solving algorithm to use
+   virtual void set_algorithm(std::string name);
 
    /// @return the number of variables in the optimization problem
    size_t nbVars() const;
@@ -68,38 +79,11 @@ public:
    /// @return the number of constraints in the optimization problem
    size_t nbCtrs() const;
 
-   /// @return the scope of the optimization problem
-   Scope scope() const;
-
-   /// @return the scope of the objective function
-   Scope obj_scope() const;
-
    /// @return the a pointer to the objective function
    std::shared_ptr<RealFunction> obj();
 
-//    std::shared_ptr<RealFunctionVector> diff_obj();
-
    /// @return the pointer to the vector of constraints functions
    std::shared_ptr<RealFunctionVector> ctrs();
-
-
-//    std::shared_ptr<Dag> ctr_dag();
-//    std::shared_ptr<Dag> obj_dag();
-
-
-   // /// @return the pointer to the region in which the optimization is launched
-   // SharedIntervalRegion region();
-
-   // /// Assigns the region for a run of the minimize
-   // /// @param the interval region
-   // void region(const IntervalRegion& reg);
-
-   // /// @return the pointer to the starting point
-   // std::shared_ptr<RealPoint> start();
-
-   // /// Assigns the starting point to run minimize
-   // /// @param start the starting point
-   // void start(const RealPoint& start);
 
    /// @return the best value for the objective function
    double bestVal() const;
@@ -111,25 +95,17 @@ public:
    std::shared_ptr<RealPoint> bestPoint();
 
    /// Assigns the optimal point
-   /// @param best the new optimal point
-   void bestPoint(std::shared_ptr<RealPoint> best);
+   void set_bestPoint(std::shared_ptr<RealPoint>);
 
    /// @return the optimization status
    OptimizationStatus status() const;
 
 protected:
-   std::shared_ptr<Problem> pb_;
    std::shared_ptr<RealFunction> obj_;            // Objective function on real numbers
-//    std::shared_ptr<RealFunctionVector> diff_obj_; // Objective function on real numbers
    std::shared_ptr<RealFunctionVector> ctrs_;     // Vector of functions for the constraints
-
-//    std::shared_ptr<Dag> dag_;                     // DAG to represent and store the problem to solve with a local solver
-//    std::shared_ptr<Dag> odag_;                    // DAG to represent and store theobjective function
 
    size_t n_;     // number of variables
    size_t m_;     // number of constraints
-   Scope s_;   // Scope of problem
-   Scope os_;  // Scope of objective function
 
    std::shared_ptr<RealPoint> best_;              // Optimal point
    double best_val_;                              // objective function value for optimal point
@@ -139,6 +115,8 @@ protected:
    size_t iter_limit_;                             // Stop criterion based on the number of iterations
    double atol_;                                   // Stop criterion based on absolute tolerance on the objective
    size_t rtol_;                                   // Stop criterion based on relative tolerance on the objective
+
+   std::string alg_;
 };
 
 } // namespace

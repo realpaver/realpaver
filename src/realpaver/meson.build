@@ -53,13 +53,21 @@ lp_header = custom_target('gen-lp-header',
 rp_sources += [lp_header]
 
 
+local_solver_header_hpp = ''
 if local_solver_name.to_upper() == 'IPOPT'
-  rp_headers += ['LocalOptimizerIpopt.hpp']
-  rp_sources += ['LocalOptimizerIpopt.cpp']
+  local_solver_header_hpp = ['NLPSolverIpopt.hpp']
+  rp_sources += ['NLPSolverIpopt.cpp']
 elif local_solver_name.to_upper() == 'NLOPT'
-  rp_headers += ['LocalOptimizerNlopt.hpp']
-  rp_sources += ['LocalOptimizerNlopt.cpp']
+  local_solver_header_hpp = ['NLPSolverNlopt.hpp']
+  rp_sources += ['NLPSolverNlopt.cpp']
 endif
+nlp_header = custom_target('gen-local-solver-header',
+    input: local_solver_header_hpp,
+    output: 'NLPSolver.hpp',
+    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    install: true,
+    install_dir : 'include/realpaver')
+rp_sources += [nlp_header]
 
 rp_headers += [
   'AssertDebug.hpp',
@@ -79,7 +87,6 @@ rp_headers += [
   'Double.hpp',
   'Env.hpp',
   'Exception.hpp',
-  'ExclusionRegionContractor.hpp',
   'HC4Contractor.hpp',
   'Inflator.hpp',
   'IntContractor.hpp',
@@ -96,7 +103,6 @@ rp_headers += [
   'IntervalVector.hpp',
   'IntervalUnion.hpp',
   'ListContractor.hpp',
-  'LocalOptimizer.hpp',
   'Logger.hpp',
   'LPModel.hpp',
   'MaxCIDContractor.hpp',
@@ -109,6 +115,7 @@ rp_headers += [
   'NcspSpaceHybridDFS.hpp',
   'NcspSolver.hpp',
   'NcspSplit.hpp',
+  'NLPModel.hpp',
   'NumericDoubleTraits.hpp',
   'NumericIntervalTraits.hpp',
   'NumericTraits.hpp',
@@ -169,7 +176,6 @@ rp_sources += [
   'Dag.cpp',
   'Env.cpp',
   'Exception.cpp',
-  'ExclusionRegionContractor.cpp',
   'HC4Contractor.cpp',
   'Inflator.cpp',
   'IntContractor.cpp',
@@ -185,7 +191,6 @@ rp_sources += [
   'IntervalVector.cpp',
   'IntervalUnion.cpp',
   'ListContractor.cpp',
-  'LocalOptimizer.cpp',
   'Logger.cpp',
   'LPModel.cpp',
   'MaxCIDContractor.cpp',
@@ -198,6 +203,7 @@ rp_sources += [
   'NcspSpaceHybridDFS.cpp',
   'NcspSolver.cpp',
   'NcspSplit.cpp',
+  'NLPModel.cpp',
   'Objective.cpp',
   'Param.cpp',
   'Parser.cpp',
@@ -238,7 +244,9 @@ extra_dist = ['parser_flex.lpp','parser_bison.ypp',
   'LPSolverClp.cpp','LPSolverClp.hpp',
   'LPSolverGurobi.cpp','LPSolverGurobi.hpp',
   'LPSolverHighs.cpp','LPSolverHighs.hpp',
-  'LPSolverSoplex.cpp','LPSolverSoplex.hpp']
+  'LPSolverSoplex.cpp','LPSolverSoplex.hpp',
+  'NLPSolverIpopt.cpp','NLPSolverIpopt.hpp',
+  'NLPSolverNlopt.cpp','NLPSolverNlopt.hpp']
 
 realpaver_lib = both_libraries('realpaver',
     sources: rp_sources,

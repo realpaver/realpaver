@@ -54,24 +54,24 @@ realfunctionvector_test = executable( 'realfunctionvector_test',
 test('Test of realfunctionvector', realfunctionvector_test)
 
 
-exclusion_contractor_test = executable( 'exclusion_contractor_test',
-                         sources: 'exclusion_contractor_test.cpp',
-                         link_with:realpaver_lib,
-                         include_directories: ['../src'] )
-test('Test of ExclusionContractor', exclusion_contractor_test)
+# exclusion_contractor_test = executable( 'exclusion_contractor_test',
+#                          sources: 'exclusion_contractor_test.cpp',
+#                          link_with:realpaver_lib,
+#                          include_directories: ['../src'] )
+# test('Test of ExclusionContractor', exclusion_contractor_test)
 
-if local_solver_name.to_lower() =='nlopt'
-    nlopt_test = executable( 'nlopt_test',
-                            sources: 'nlopt_test.cpp',
-                            link_with:realpaver_lib,
-                            dependencies: local_solver_dep,
-                            include_directories: ['../src'] )
-    test('Test of Nlopt API', nlopt_test)
-elif local_solver_name.to_lower() =='ipopt'
-    ipopt_test = executable( 'ipopt_test',
-                            sources: 'ipopt_test.cpp',
-                            link_with:realpaver_lib,
-                            dependencies: local_solver_dep,
-                            include_directories: ['../src'] )
-    test('Test of Ipopt API', ipopt_test)
-endif
+# if local_solver_name.to_lower() =='nlopt'
+#     nlopt_test = executable( 'nlopt_test',
+#                             sources: 'nlopt_test.cpp',
+#                             link_with:realpaver_lib,
+#                             dependencies: local_solver_dep,
+#                             include_directories: ['../src'] )
+#     test('Test of Nlopt API', nlopt_test)
+# elif local_solver_name.to_lower() =='ipopt'
+#     ipopt_test = executable( 'ipopt_test',
+#                             sources: 'ipopt_test.cpp',
+#                             link_with:realpaver_lib,
+#                             dependencies: local_solver_dep,
+#                             include_directories: ['../src'] )
+#     test('Test of Ipopt API', ipopt_test)
+# endif

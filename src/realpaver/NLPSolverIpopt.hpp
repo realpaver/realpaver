@@ -10,7 +10,7 @@
 #ifndef REALPAVER_LOCAL_OPTIMIZER_IPOPT_HPP
 #define REALPAVER_LOCAL_OPTIMIZER_IPOPT_HPP
 
-#include "realpaver/LocalOptimizer.hpp"
+#include "realpaver/NLPModel.hpp"
 
 #include <IpTNLP.hpp>
 
@@ -19,18 +19,19 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interface for local optimization solvers.
 ///////////////////////////////////////////////////////////////////////////////
-class LocalOptimizerIpopt : public LocalOptimizer {
+class NLPSolver : public NLPModel {
 public:
     /// Default constructor
-    LocalOptimizerIpopt(const Problem& pb);
-    LocalOptimizerIpopt(const RealFunction& obj, const RealFunctionVector& ctrs);
+    NLPSolver(const Problem& pb);
+    NLPSolver(const RealFunction& obj);
+    NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
 
     /// Inner class to state the problem for Ipopt
     class LocalTNLP : public Ipopt::TNLP {
     public:
         /// Constructor
         /// @param ls a pointer to a local optimizer object
-        LocalTNLP(LocalOptimizerIpopt* ls, SharedIntervalRegion reg, std::shared_ptr<RealPoint> start);
+        LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, std::shared_ptr<RealPoint> start);
         
         bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
                             Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style);
@@ -65,7 +66,7 @@ public:
                             Ipopt::Number obj_value,
                             const Ipopt::IpoptData* ip_data,
                             Ipopt::IpoptCalculatedQuantities* ip_cq);
-        LocalOptimizerIpopt* ls_;
+        NLPSolver* ls_;
 
         SharedIntervalRegion reg_;                      // Interval region in which search for an optimal value
         std::shared_ptr<RealPoint> start_;              // Starting point
@@ -74,7 +75,7 @@ public:
 
 
    /// Virtual destructor
-   virtual ~LocalOptimizerIpopt();
+   virtual ~NLPSolver();
 
    /// Minimization of a problem
    /// @param reg interval region in the search space
@@ -85,7 +86,6 @@ public:
 
 };
 
-using DefaultLocalOptimizer=LocalOptimizerIpopt;
 
 } // namespace
 

@@ -8,15 +8,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include "realpaver/LocalOptimizerNlopt.hpp"
+#include "realpaver/NLPSolver.hpp"
 
 namespace realpaver {
 
 double f_rp(const std::vector<double> &x, std::vector<double> &grad, void* f_data)
 {
-    LocalOptimizerNlopt* ls = reinterpret_cast<LocalOptimizerNlopt*>(f_data);
+    NLPSolver* ls = reinterpret_cast<NLPSolver*>(f_data);
 
-    RealPoint rp(ls->scope(),0.0);
+    RealPoint rp(ls->obj()->scope(),0.0);
     for (size_t i=0; i<x.size(); i++)
     {
         rp[i] = x[i];
@@ -27,9 +27,9 @@ double f_rp(const std::vector<double> &x, std::vector<double> &grad, void* f_dat
 
 double f_rp_diff(const std::vector<double> &x, std::vector<double> &grad, void* f_data)
 {
-    LocalOptimizerNlopt* ls = reinterpret_cast<LocalOptimizerNlopt*>(f_data);
+    NLPSolver* ls = reinterpret_cast<NLPSolver*>(f_data);
 
-    RealPoint rp(ls->scope(),0.0);
+    RealPoint rp(ls->obj()->scope(),0.0);
     for (size_t i=0; i<x.size(); i++)
     {
         rp[i] = x[i];
@@ -55,38 +55,47 @@ double f_rp_diff(const std::vector<double> &x, std::vector<double> &grad, void* 
     return val;
 }
 
-LocalOptimizerNlopt::LocalOptimizerNlopt(const Problem& pb) : LocalOptimizer(pb)
+NLPSolver::NLPSolver(const Problem& pb) : NLPModel(pb)
 {
 }
 
-LocalOptimizerNlopt::LocalOptimizerNlopt(const RealFunction& obj, const RealFunctionVector& ctrs)
-    : LocalOptimizer(obj, ctrs)
+NLPSolver::NLPSolver(const RealFunction& obj)
+    : NLPModel(obj)
 {
 }
 
-LocalOptimizerNlopt::~LocalOptimizerNlopt()
+NLPSolver::NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs)
+    : NLPModel(obj, ctrs)
+{
+}
+
+NLPSolver::~NLPSolver()
 {
 }
 
 
-void LocalOptimizerNlopt::algorithm_name(nlopt::algorithm alg)
+void NLPSolver::set_algorithm(std::string alg)
 {
-    algorithm_ = alg;
+    NLPModel::set_algorithm(alg);
+
+    if(alg=="NELDERMEAD")
+        nlopt_algorithm_ = nlopt::algorithm::LN_NELDERMEAD;
+    else if (alg == "SLSQP")
+        nlopt_algorithm_ = nlopt::algorithm::LD_SLSQP;
+    else if (alg == "BOBYQA")
+        nlopt_algorithm_ = nlopt::algorithm::LN_BOBYQA;
+    else if (alg == "MMA")
+        nlopt_algorithm_ = nlopt::algorithm::LD_MMA;
 }
 
 
-nlopt::algorithm LocalOptimizerNlopt::algorithm_name() const
-{
-    return algorithm_;
-}
-
-OptimizationStatus LocalOptimizerNlopt::minimize(const IntervalRegion& reg,
+OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
                                     const RealPoint& src) {
     size_t n = src.size();
 
-    if (optimizer_==nullptr || !(optimizer_->get_algorithm() == algorithm_ && n == optimizer_->get_dimension()))
+    if (optimizer_==nullptr || !(optimizer_->get_algorithm() == nlopt_algorithm_ && n == optimizer_->get_dimension()))
     {
-        optimizer_ = std::make_shared<nlopt::opt>(nlopt::opt(algorithm_,n)); 
+        optimizer_ = std::make_shared<nlopt::opt>(nlopt::opt(nlopt_algorithm_,n)); 
     }
 
     optimizer_->set_ftol_rel(rtol_);
@@ -94,7 +103,10 @@ OptimizationStatus LocalOptimizerNlopt::minimize(const IntervalRegion& reg,
     optimizer_->set_maxeval(this->iterLimit());
     optimizer_->set_maxtime(this->timeLimit());
 
-    optimizer_->set_min_objective(f_rp,this);
+    if (nlopt_algorithm_ == nlopt::algorithm::LN_NELDERMEAD || nlopt_algorithm_ == nlopt::algorithm::LN_BOBYQA)
+        optimizer_->set_min_objective(f_rp,this);
+    else
+        optimizer_->set_min_objective(f_rp_diff,this);
     
     std::vector<double> x_l(n);
     std::vector<double> x_u(n);
