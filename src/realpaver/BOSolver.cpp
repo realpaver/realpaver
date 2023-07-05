@@ -135,7 +135,7 @@ int BOSolver::getNbPendingNodes() const
 
 void BOSolver::makeLocalSolver()
 {
-   std::string stra = param_.getStrParam("LOCAL_SOLVER_ALGORITHM");
+   std::string stra = param_.getStrParam("BO_LOCAL_SOLVER_ALGORITHM");
 
    if (stra == "GRADIENT")
    {
@@ -149,7 +149,7 @@ void BOSolver::makeLocalSolver()
    THROW_IF(localSolver_ == nullptr,
             "Unable to make the local solver in a BO solver");
 
-   localSolver_->setTimeLimit(param_.getDblParam("LOCAL_SOLVER_TIME_LIMIT"));
+   localSolver_->setTimeLimit(param_.getDblParam("BO_LOCAL_SOLVER_TIME_LIMIT"));
 }
 
 void BOSolver::makeSplit()

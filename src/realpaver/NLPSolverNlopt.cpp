@@ -7,7 +7,6 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "realpaver/NLPSolver.hpp"
 
 namespace realpaver {
@@ -41,8 +40,8 @@ double f_rp_diff(const std::vector<double> &x, std::vector<double> &grad, void* 
         rp[i] = x[i];
     }
     double val = ls->obj()->eval(rp);
-    RealVector g(x.size(),0.0);
-    ls->obj()->diff(rp,g);
+    RealVector g(x.size(), 0.0);
+    ls->obj()->diff(rp, g);
     if (grad.empty())
     {
         for (size_t i=0; i<g.size(); i++)
@@ -52,7 +51,6 @@ double f_rp_diff(const std::vector<double> &x, std::vector<double> &grad, void* 
     }
     else
     {
-
         for (size_t i=0; i<g.size(); i++)
         {
             grad[i] = g[i];
@@ -63,28 +61,31 @@ double f_rp_diff(const std::vector<double> &x, std::vector<double> &grad, void* 
 
 NLPSolver::NLPSolver(const Problem& pb) : NLPModel(pb)
 {
+    optimizer_ = nullptr;
 }
 
 NLPSolver::NLPSolver(const RealFunction& obj)
     : NLPModel(obj)
 {
+    optimizer_ = nullptr;
 }
 
 NLPSolver::NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs)
     : NLPModel(obj, ctrs)
 {
+    optimizer_ = nullptr;
 }
 
 NLPSolver::~NLPSolver()
 {
+    if (optimizer_ != nullptr) delete optimizer_;
 }
 
-
-void NLPSolver::set_algorithm(std::string alg)
+void NLPSolver::setAlgorithm(std::string alg)
 {
-    NLPModel::set_algorithm(alg);
+    NLPModel::setAlgorithm(alg);
 
-    if(alg=="NELDERMEAD")
+    if (alg == "NELDERMEAD")
         nlopt_algorithm_ = nlopt::algorithm::LN_NELDERMEAD;
     else if (alg == "SLSQP")
         nlopt_algorithm_ = nlopt::algorithm::LD_SLSQP;
@@ -94,25 +95,25 @@ void NLPSolver::set_algorithm(std::string alg)
         nlopt_algorithm_ = nlopt::algorithm::LD_MMA;
 }
 
-
 OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
-                                    const RealPoint& src) {
+                                       const RealPoint& src) {
     size_t n = src.size();
 
-    if (optimizer_==nullptr || !(optimizer_->get_algorithm() == nlopt_algorithm_ && n == optimizer_->get_dimension()))
+    if (optimizer_==nullptr || !(optimizer_->get_algorithm() == nlopt_algorithm_ &&
+                                 n == optimizer_->get_dimension()))
     {
-        optimizer_ = std::make_shared<nlopt::opt>(nlopt::opt(nlopt_algorithm_,n)); 
+        optimizer_ = new nlopt::opt(nlopt_algorithm_, n); 
     }
 
-    optimizer_->set_ftol_rel(rtol_);
-    optimizer_->set_ftol_abs(atol_);
+    optimizer_->set_ftol_rel(rtol_.getVal());
+    optimizer_->set_ftol_abs(atol_.getVal());
     optimizer_->set_maxeval(this->iterLimit());
     optimizer_->set_maxtime(this->timeLimit());
 
     if (nlopt_algorithm_ == nlopt::algorithm::LN_NELDERMEAD || nlopt_algorithm_ == nlopt::algorithm::LN_BOBYQA)
-        optimizer_->set_min_objective(f_rp,this);
+        optimizer_->set_min_objective(f_rp, this);
     else
-        optimizer_->set_min_objective(f_rp_diff,this);
+        optimizer_->set_min_objective(f_rp_diff, this);
     
     std::vector<double> x_l(n);
     std::vector<double> x_u(n);
@@ -126,15 +127,17 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
     optimizer_->set_lower_bounds(x_l);
     optimizer_->set_upper_bounds(x_u);
 
-    nlopt::result status = optimizer_->optimize(x,best_val_);
+    nlopt::result status = optimizer_->optimize(x, best_val_);
 
-    if (best_ == nullptr)
-        best_ = std::make_shared<RealPoint>(RealPoint(src.scope()));
-    for (size_t i=0; i<n; i++)
-        (*best_)[i] = x[i];
+    // creates and assigns the best point
+    if (best_ != nullptr) delete best_;
+    best_ = new RealPoint(src.scope());
 
-    if (status == nlopt::SUCCESS || status == nlopt::FTOL_REACHED || status == nlopt::XTOL_REACHED) {
-        // std::cerr<<"\n\n*** The problem solved!\n"<<std::endl;
+//    for (size_t i=0; i<n; i++)
+    best_->setArray(x.data());
+
+    if (status == nlopt::SUCCESS || status == nlopt::FTOL_REACHED ||
+        status == nlopt::XTOL_REACHED) {
         status_ = OptimizationStatus::Optimal;
     }
     else if (status == nlopt::MAXEVAL_REACHED)
@@ -153,7 +156,4 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
     return status_;
 }
 
-
-
-
-}
+} // namespace

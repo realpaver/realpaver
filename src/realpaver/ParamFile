@@ -207,22 +207,30 @@ LINE_SEARCH_ITER_LIMIT = 20
 # Tolerance on the norm of the gradient in the steepest descent method
 GRADIENT_DESCENT_TOL = 1.0e-3
 
-# Time limit in seconds
-LOCAL_SOLVER_TIME_LIMIT = 10.0
-
-# Iteration limit
-LOCAL_SOLVER_ITER_LIMIT = 100
-
-# Absolute tolerance on the objective function
-LOCAL_SOLVER_ATOL = 1.0-9
-
-# Relative tolerance on the objective function
-LOCAL_SOLVER_RTOL = 1.0-4
-
 # Local optimization technique
 # - GRADIENT:   gradient descent method
 # - EVALUATION: simple test at the midpoint of a region
-LOCAL_SOLVER_ALGORITHM = GRADIENT
+BO_LOCAL_SOLVER_ALGORITHM = GRADIENT
+
+# Time limit in seconds
+BO_LOCAL_SOLVER_TIME_LIMIT = 10.0
+
+# Algorithm implemented by the NLP solver
+# - DEFAULT: default algorithm
+# TODO
+NLP_SOLVER_ALGORITHM = DEFAULT
+
+# Time limit in seconds
+NLP_SOLVER_TIME_LIMIT = 10.0
+
+# Iteration limit
+NLP_SOLVER_ITER_LIMIT = 100
+
+# Absolute tolerance on the objective function
+NLP_SOLVER_ATOL = 1.0-9A
+
+# Relative tolerance on the objective function
+NLP_SOLVER_RTOL = 1.0-4R
 
 ###############################################################################
 ## LINEAR SOLVERS                                                            ##

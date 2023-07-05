@@ -169,6 +169,8 @@ RealFunctionVectorDag::RealFunctionVectorDag(
    ASSERT(lt.size() == li.size(),
           "Bad initialization of a real function vector ");
 
+   dag_ = std::make_shared<Dag>();
+
    auto it = lt.begin();
    auto jt = li.begin();
    for (; it != lt.end(); ++it, ++jt)

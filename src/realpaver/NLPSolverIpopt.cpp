@@ -7,38 +7,33 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include "realpaver/NLPSolver.hpp"
 #include <IpIpoptApplication.hpp>
 
 namespace realpaver {
 
 NLPSolver::NLPSolver(const Problem& pb) : NLPModel(pb)
-{
-}
+{}
 
 NLPSolver::NLPSolver(const RealFunction& obj) : NLPModel(obj)
-{
-}
+{}
 
-NLPSolver::NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs) : NLPModel(obj, ctrs)
-{
-}
+NLPSolver::NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs)
+    : NLPModel(obj, ctrs)
+{}
 
 NLPSolver::~NLPSolver()
-{
-}
+{}
 
 
 OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
-                                    const RealPoint& src)
+                                       const RealPoint& src)
 {
     status_ = OptimizationStatus::Other;
-
     Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
     // Change some options
-    app->Options()->SetNumericValue("tol", atol_);
+    app->Options()->SetNumericValue("tol", atol_.getVal());
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetStringValue("hessian_approximation", "limited-memory");
     app->Options()->SetNumericValue("max_cpu_time", time_limit_);
@@ -48,14 +43,15 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status;
     status = app->Initialize();
+
     if (status != Ipopt::Solve_Succeeded) {
         std::cerr << std::endl << std::endl << "*** Error during IPOPT initialization!" << std::endl;
     }
     else
     {
         // Ask Ipopt to solve the problem
-        Ipopt::SmartPtr<LocalTNLP> tnlp = new LocalTNLP(this, std::make_shared<IntervalRegion>(reg),
-                                                                std::make_shared<RealPoint>(src));
+        Ipopt::SmartPtr<LocalTNLP> tnlp = new LocalTNLP(this, std::make_shared<IntervalRegion>(reg), src);
+
         status = app->OptimizeTNLP(tnlp);
         best_val_ = tnlp->best_val_;
 
@@ -77,15 +73,13 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
             std::cerr << std::endl << std::endl << "*** IPOPT FAILED!" << std::endl;
         }
     }
+
     return status_;
 }
 
-
-NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, std::shared_ptr<RealPoint> start)
+NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, const RealPoint& start)
     : ls_(ls), reg_(reg), start_(start)
-{
-}
-
+{}
 
 bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
                         Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style)
@@ -115,6 +109,7 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt:
 
     // use the C style indexing (0-based).the numbering style used for row/col entries in the sparse matrix format 
     index_style = TNLP::C_STYLE;
+
     return true;
 }
 
@@ -148,7 +143,7 @@ bool NLPSolver::LocalTNLP::get_starting_point(Ipopt::Index n, bool init_x, Ipopt
 {
     // std::shared_ptr<RealPoint> start = ls_->start();
     for (size_t i=0; i<n; i++)
-        x[i] = (*start_)[i];
+        x[i] = start_[i];
 
     // z are dual variables, not mandatory
     // lambda are the dual multipliers, not mandatory
@@ -190,7 +185,7 @@ bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, b
     // std::cerr<<"gf: "<<gf<<" with x: "<<pt<<std::endl;
     for(size_t i=0; i<os.size();i++)
         grad_f[s.index(os.var(i))] = gf[i];
-    
+
     return true;
 }
 
@@ -208,7 +203,7 @@ bool NLPSolver::LocalTNLP::eval_g (Ipopt::Index n, const Ipopt::Number *x, bool 
     {
         g[j] = ctrs->fun(j).eval(pt);
     }
-    
+
     return true;
 }
 
@@ -312,6 +307,7 @@ bool NLPSolver::LocalTNLP::get_list_of_nonlinear_variables (Ipopt::Index num_non
     {
         pos_nonlin_vars[i] = i;
     }
+
     return true;
 }
 
@@ -346,20 +342,11 @@ void NLPSolver::LocalTNLP::finalize_solution(Ipopt::SolverReturn status,
     obj_value: (in), the final value of the objective, $ f(x_*)$.
     ip_data and ip_cq are provided for expert users.
 */
-    std::shared_ptr<RealPoint> best = ls_->bestPoint();
+    RealPoint best(start_.scope());
+    best.setArray(x);
+    ls_->setBestPoint(best);
 
-    if (best == nullptr)
-    {
-        // std::shared_ptr<RealPoint> start = ls_->start();
-        best = std::make_shared<RealPoint>(RealPoint(start_->scope()));
-    }
-    for (size_t i=0; i<n; i++)
-        (*best)[i] = x[i];
-    ls_->set_bestPoint(best);
     best_val_ = obj_value;
 }
 
-
-
-
-}
+} // namespace

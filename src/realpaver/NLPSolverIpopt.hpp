@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LOCAL_OPTIMIZER_IPOPT_HPP
-#define REALPAVER_LOCAL_OPTIMIZER_IPOPT_HPP
+#ifndef REALPAVER_NLP_SOLVER_IPOPT_HPP
+#define REALPAVER_NLP_SOLVER_IPOPT_HPP
 
 #include "realpaver/NLPModel.hpp"
 
@@ -31,7 +31,7 @@ public:
     public:
         /// Constructor
         /// @param ls a pointer to a local optimizer object
-        LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, std::shared_ptr<RealPoint> start);
+        LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, const RealPoint& start);
         
         bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
                             Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style);
@@ -68,24 +68,21 @@ public:
                             Ipopt::IpoptCalculatedQuantities* ip_cq);
         NLPSolver* ls_;
 
-        SharedIntervalRegion reg_;                      // Interval region in which search for an optimal value
-        std::shared_ptr<RealPoint> start_;              // Starting point
-        double best_val_;                              // objective function value for optimal point
+        SharedIntervalRegion reg_;      // Interval region in which search for an optimal value
+        RealPoint start_;               // Starting point
+        double best_val_;               // objective function value for optimal point
     };
 
-
-   /// Virtual destructor
-   virtual ~NLPSolver();
+   /// Destructor
+   ~NLPSolver();
 
    /// Minimization of a problem
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
    /// @return an optimization status
-   virtual OptimizationStatus minimize(const IntervalRegion& reg,
-                                       const RealPoint& src);
-
+   OptimizationStatus minimize(const IntervalRegion& reg,
+                               const RealPoint& src);
 };
-
 
 } // namespace
 

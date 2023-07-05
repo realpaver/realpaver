@@ -28,20 +28,24 @@ Param::Param()
         dblmap_(),
         strmap_()
 {
-   Tolerance tol3 = Tolerance::makeRel(1.0e-3),
-             tol6 = Tolerance::makeRel(1.0e-6),
-             tol8 = Tolerance::makeRel(1.0e-8);
+   Tolerance rtol3 = Tolerance::makeRel(1.0e-3),
+             rtol4 = Tolerance::makeRel(1.0e-4),
+             rtol6 = Tolerance::makeRel(1.0e-6),
+             rtol8 = Tolerance::makeRel(1.0e-8),
+             atol9 = Tolerance::makeAbs(1.0e-9);
 
    // tolerance
-   tolmap_.insert(std::make_pair("XTOL",                      tol8));
-   tolmap_.insert(std::make_pair("DTOL",                      tol6));
-   tolmap_.insert(std::make_pair("OBJ_TOL",                   tol6));
-   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",          tol3));
-   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_XTOL",         tol8));
-   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_DTOL",         tol6));
-   tolmap_.insert(std::make_pair("NEWTON_XTOL",               tol8));
-   tolmap_.insert(std::make_pair("NEWTON_DTOL",               tol6));
-   tolmap_.insert(std::make_pair("NEWTON_CERTIFY_DTOL",       tol3));
+   tolmap_.insert(std::make_pair("XTOL",                      rtol8));
+   tolmap_.insert(std::make_pair("DTOL",                      rtol6));
+   tolmap_.insert(std::make_pair("OBJ_TOL",                   rtol6));
+   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",          rtol3));
+   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_XTOL",         rtol8));
+   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_DTOL",         rtol6));
+   tolmap_.insert(std::make_pair("NEWTON_XTOL",               rtol8));
+   tolmap_.insert(std::make_pair("NEWTON_DTOL",               rtol6));
+   tolmap_.insert(std::make_pair("NEWTON_CERTIFY_DTOL",       rtol3));
+   tolmap_.insert(std::make_pair("NLP_SOLVER_ATOL",           atol9));
+   tolmap_.insert(std::make_pair("NLP_SOLVER_RTOL",           rtol4));
 
    // integer
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
@@ -59,7 +63,7 @@ Param::Param()
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
    intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
    intmap_.insert(std::make_pair("SPLIT_DOM_ROBIN",           2));
-   intmap_.insert(std::make_pair("LOCAL_SOLVER_ITER_LIMIT",   100));
+   intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT",     100));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
@@ -68,15 +72,14 @@ Param::Param()
    dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",           2.0));
    dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",         10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
-   dblmap_.insert(std::make_pair("LOCAL_SOLVER_TIME_LIMIT",   10.0));
-   dblmap_.insert(std::make_pair("LOCAL_SOLVER_ATOL",         1.0e-9));
-   dblmap_.insert(std::make_pair("LOCAL_SOLVER_RTOL",         1.0e-4));
+   dblmap_.insert(std::make_pair("BO_LOCAL_SOLVER_TIME_LIMIT",10.0));
    dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",      1.0e-3));
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
    dblmap_.insert(std::make_pair("GAUSSIAN_MIN_PIVOT",        1.0e-8));
    dblmap_.insert(std::make_pair("INFLATION_DELTA",           1.125));
    dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT",     10.0));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
@@ -86,13 +89,15 @@ Param::Param()
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_MAX_CID",  "YES"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
-   strmap_.insert(std::make_pair("LOCAL_SOLVER_ALGORITHM",    "GRADIENT"));
+   strmap_.insert(std::make_pair("BO_LOCAL_SOLVER_ALGORITHM", "GRADIENT"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
    strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
+   strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
+
 }
 
 int Param::getIntParam(const std::string& name) const

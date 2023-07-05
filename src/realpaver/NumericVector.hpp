@@ -31,6 +31,12 @@ public:
    /// Value type
    typedef T ValueType;
 
+   /// Pointer type
+   typedef T* PointerType;
+
+   /// Constant pointer type
+   typedef const T* ConstPointerType;
+
    /// Reference type
    typedef T& RefType;
 
@@ -79,6 +85,10 @@ public:
    /// Assigns another vector to this
    /// @param V a vector having the same size than this
    void setAll(const NumericVector& V);
+
+   /// Asigns this from an array
+   /// @param array array of values to be assigned to this
+   void setArray(ConstPointerType array);
 
    /// Insertion of one element at the end of this
    /// @param x a number inserted at the end
@@ -198,6 +208,14 @@ NumericVector<T>::setAll(const NumericVector& V)
 
    for (size_t i=0; i<elems_.size(); ++i)
       elems_[i] = V.elems_[i];
+}
+
+template <typename T>
+void
+NumericVector<T>::setArray(ConstPointerType array)
+{
+   for (size_t i=0; i<elems_.size(); ++i)
+      elems_[i] = array[i];
 }
 
 template <typename T>

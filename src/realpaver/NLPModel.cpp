@@ -16,12 +16,13 @@
 namespace realpaver {
 
 NLPModel::NLPModel(const Problem& pb)
-    : n_(pb.nbVars()), m_(pb.nbCtrs()),
-    time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
-    iter_limit_(Param::GetIntParam("LOCAL_SOLVER_ITER_LIMIT")),
-    atol_(Param::GetDblParam("LOCAL_SOLVER_ATOL")),
-    rtol_(Param::GetDblParam("LOCAL_SOLVER_RTOL")),
-    alg_("DEFAULT")
+    : n_(pb.nbVars()),
+      m_(pb.nbCtrs()),
+      time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
+      iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
+      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
+      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     bool ismin = pb.getObjective().isMinimization();
 
@@ -55,10 +56,13 @@ NLPModel::NLPModel(const Problem& pb)
 }
 
 NLPModel::NLPModel(const RealFunction& obj)
-    : n_(obj.nbVars()),m_(0), 
-    time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
-    iter_limit_(Param::GetDblParam("LOCAL_SOLVER_ITER_LIMIT")),
-    alg_("DEFAULT")
+    : n_(obj.nbVars()),
+      m_(0), 
+      time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
+      iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
+      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
+      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     obj_ = std::make_shared<RealFunction>(obj);
     ctrs_ = std::make_shared<RealFunctionVector>();
@@ -67,10 +71,13 @@ NLPModel::NLPModel(const RealFunction& obj)
 }
 
 NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
-    : n_(obj.nbVars()),m_(ctrs.nbFuns()),
-    time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT")),
-    iter_limit_(Param::GetDblParam("LOCAL_SOLVER_ITER_LIMIT")),
-    alg_("DEFAULT")
+    : n_(obj.nbVars()),
+      m_(ctrs.nbFuns()),
+      time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
+      iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
+      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
+      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     obj_ = std::make_shared<RealFunction>(obj);
     ctrs_ = std::make_shared<RealFunctionVector>(ctrs);
@@ -80,6 +87,7 @@ NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
 
 NLPModel::~NLPModel()
 {
+    if (best_ != nullptr) delete best_;
 }
 
 double NLPModel::timeLimit() const
@@ -87,7 +95,7 @@ double NLPModel::timeLimit() const
    return time_limit_;
 }
 
-void NLPModel::set_timeLimit(double val)
+void NLPModel::setTimeLimit(double val)
 {
    time_limit_ = val;
 }
@@ -97,7 +105,7 @@ size_t NLPModel::iterLimit() const
    return iter_limit_;
 }
 
-void NLPModel::set_iterLimit(size_t val)
+void NLPModel::setIterLimit(size_t val)
 {
    iter_limit_ = val;
 }
@@ -132,14 +140,10 @@ RealPoint NLPModel::bestPoint() const
    return *best_;
 }
 
-std::shared_ptr<RealPoint> NLPModel::bestPoint()
+void NLPModel::setBestPoint(const RealPoint& best)
 {
-    return best_;
-}
-
-void NLPModel::set_bestPoint(std::shared_ptr<RealPoint> best)
-{
-    best_ = best;
+    if (best_ != nullptr) delete best_;
+    best_ = new RealPoint(best);
 }
 
 OptimizationStatus NLPModel::status() const
@@ -152,10 +156,31 @@ std::string  NLPModel::algorithm() const
     return std::string(alg_);
 }
 
-void  NLPModel::set_algorithm(std::string alg_name)
+void  NLPModel::setAlgorithm(std::string alg_name)
 {
-    alg_ = alg_name;
+   alg_ = alg_name;
 }
 
+Tolerance NLPModel::atol() const
+{
+   return atol_;
+}
+
+void NLPModel::setAtol(Tolerance tol)
+{
+   ASSERT(tol.isAbsolute(), "This tolerance must be absolute");
+   atol_ = tol;
+}
+
+Tolerance NLPModel::rtol() const
+{
+   return rtol_;
+}
+
+void NLPModel::setRtol(Tolerance tol)
+{
+   ASSERT(tol.isRelative(), "This tolerance must be relative");
+   rtol_ = tol;
+}
 
 } // namespace

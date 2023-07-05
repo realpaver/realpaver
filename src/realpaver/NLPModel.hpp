@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LOCAL_OPTIMIZER_HPP
-#define REALPAVER_LOCAL_OPTIMIZER_HPP
+#ifndef REALPAVER_NLP_MODEL_HPP
+#define REALPAVER_NLP_MODEL_HPP
 
 #include "realpaver/Common.hpp"
 #include "realpaver/Problem.hpp"
@@ -57,21 +57,20 @@ public:
 
    /// Assigns the time limit for a run of minimize
    /// @param val time limit in seconds
-   void set_timeLimit(double val);
+   void setTimeLimit(double val);
 
    /// @return the iteration limit for a run of minimize
    size_t iterLimit() const;
 
    /// Assigns the iteration limit for a run of minimize
    /// @param iter iteration limit
-   void set_iterLimit(size_t iter);
-
+   void setIterLimit(size_t iter);
 
    /// @return the name of the solving algorithm to use
    std::string algorithm() const;
 
    /// Assigns the name of the solving algorithm to use
-   virtual void set_algorithm(std::string name);
+   virtual void setAlgorithm(std::string name);
 
    /// @return the number of variables in the optimization problem
    size_t nbVars() const;
@@ -91,14 +90,25 @@ public:
    /// @return the optimal point
    RealPoint bestPoint() const;
 
-   /// @return the pointer to the optimal point
-   std::shared_ptr<RealPoint> bestPoint();
-
    /// Assigns the optimal point
-   void set_bestPoint(std::shared_ptr<RealPoint>);
+   void setBestPoint(const RealPoint& best);
 
    /// @return the optimization status
    OptimizationStatus status() const;
+
+   /// @return the absolute tolerance on the objective function
+   Tolerance atol() const;
+
+   /// Assigns the absolute tolerance on the objective function
+   /// @param tol new value
+   void setAtol(Tolerance tol);
+
+   /// @return the relative tolerance on the objective function
+   Tolerance rtol() const;
+
+   /// Assigns the relative tolerance on the objective function
+   /// @param tol new value
+   void setRtol(Tolerance tol);
 
 protected:
    std::shared_ptr<RealFunction> obj_;            // Objective function on real numbers
@@ -107,16 +117,16 @@ protected:
    size_t n_;     // number of variables
    size_t m_;     // number of constraints
 
-   std::shared_ptr<RealPoint> best_;              // Optimal point
-   double best_val_;                              // objective function value for optimal point
+   RealPoint* best_;                    // Optimal point
+   double best_val_;                    // objective function value for optimal point
    OptimizationStatus status_;
 
    double time_limit_;                             // Stop criterion based on time spend to optimize
    size_t iter_limit_;                             // Stop criterion based on the number of iterations
-   double atol_;                                   // Stop criterion based on absolute tolerance on the objective
-   size_t rtol_;                                   // Stop criterion based on relative tolerance on the objective
+   Tolerance atol_;                                // Stop criterion based on absolute tolerance on the objective
+   Tolerance rtol_;                                // Stop criterion based on relative tolerance on the objective
 
-   std::string alg_;
+   std::string alg_;                               // Local optimization algorithm
 };
 
 } // namespace

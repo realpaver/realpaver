@@ -13,7 +13,7 @@
 namespace realpaver {
 
 BOLocalSolver::BOLocalSolver()
-      : time_limit_(Param::GetDblParam("LOCAL_SOLVER_TIME_LIMIT"))
+      : time_limit_(Param::GetDblParam("BO_LOCAL_SOLVER_TIME_LIMIT"))
 {}
 
 BOLocalSolver::~BOLocalSolver()

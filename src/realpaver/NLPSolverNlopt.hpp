@@ -11,7 +11,6 @@
 #define REALPAVER_NLP_SOLVER_NLOPT_HPP
 
 #include "realpaver/NLPModel.hpp"
-
 #include <nlopt.hpp>
 
 namespace realpaver {
@@ -26,23 +25,22 @@ public:
    NLPSolver(const RealFunction& obj);
    NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
 
-   /// Virtual destructor
-   virtual ~NLPSolver();
+   /// Destructor
+   ~NLPSolver();
 
    /// Minimization of a problem
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
    /// @return an optimization status
-   virtual OptimizationStatus minimize(const IntervalRegion& reg,
-                                       const RealPoint& src);
+   OptimizationStatus minimize(const IntervalRegion& reg,
+                               const RealPoint& src);
 
-
-   void set_algorithm(std::string alg);
+   // @Override
+   void setAlgorithm(std::string alg);
 
 protected:
-   std::shared_ptr<nlopt::opt> optimizer_;                              // Point to the nlp optimizer object
-   nlopt::algorithm nlopt_algorithm_ = nlopt::algorithm::LD_SLSQP;       // solving algorithm for nlopt
-
+   nlopt::opt* optimizer_;                                           // Pointer to the nlp optimizer object
+   nlopt::algorithm nlopt_algorithm_ = nlopt::algorithm::LD_SLSQP;   // Solving algorithm for nlopt
 };
 
 } // namespace

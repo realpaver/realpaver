@@ -12,21 +12,25 @@ int main(void)
       Problem problem;
       Variable x = problem.addRealVar(0, 10, "x"),
                y = problem.addRealVar(0, 10, "y");
-      
-      std::cout<<"Variables created"<<std::endl;
 
       RealFunction f(sqr(x) + sqr(y));
-
-      std::cout<<"Objective function created"<<std::endl;
 
       RealFunctionVector G( {y - x + 1, y - x - 2},
                             {Interval::negative(), Interval::positive()} );
 
-      std::cout<<"Constraints functions created"<<std::endl;
-
       NLPSolver optimizer(f, G);
 
-      std::cout<<"Solver created!"<<std::endl;
+      IntervalRegion reg = problem.getDomains();
+      RealPoint src = reg.midpoint();
+
+      OptimizationStatus status = optimizer.minimize(reg, src);
+      cout << "Status.......... " << status << endl;
+   
+      if (status == OptimizationStatus::Optimal)
+      {
+         cout << "Optimum value... " << optimizer.bestVal() << endl
+              << "at point........ " << optimizer.bestPoint() << endl;
+      }
    }
    catch(Exception e) {
       cout << e.what() << endl;
