@@ -32,7 +32,8 @@ In realpaver root folder, run `meson configure` command, while specifying one of
 ### Realpaver specific options:
 
 - `-DLP_LIB=LIBNAME`: specify the linear programing library/solver to use (default: Clp, can be replaced by Highs, Soplex)
-- `-DINTERVAL_lib=LIBNAME`: specify the interval library to use (default: Gaol)
+- `-DINTERVAL_LIB=LIBNAME`: specify the interval library to use (default: Gaol)
+- `-DLOCAL_SOLVER=LIBNAME`: specify the local optimization solver to use (default: none, can be replaced by NLOPT, IPOPT)
 - `-DASSERT=BOOLVAL`: activate assertions (default: true)
 - `-DDEBUG=BOOLVAL`: activate debug messages (default: false)
 - `-DLOG=BOOLVAL`: activate logging (default: false)
