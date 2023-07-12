@@ -35,6 +35,13 @@ public:
    /// Default copy constructor
    RealPoint(const RealPoint&) = default;
 
+   /// Creates a point from another point projected on a scope
+   /// @param pt a point
+   /// @param sco a scope that is included in the scope of pt
+   ///
+   /// this is equal to pt restricted to s
+   RealPoint(const RealPoint& pt, Scope s);
+
    /// Default assignment operator
    RealPoint& operator=(const RealPoint&) = default;
 

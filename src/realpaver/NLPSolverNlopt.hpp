@@ -16,31 +16,56 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for local optimization solvers.
+/// This is an implementation of NLP solver for Nlopt.
 ///////////////////////////////////////////////////////////////////////////////
 class NLPSolver : public NLPModel {
 public:
-   /// Default constructor
+   /// Creates a solver for an optimization problem
+   /// @param pb an optimization problem
    NLPSolver(const Problem& pb);
+
+   /// Creates a solver for an unconstrained optimization problem
+   /// @param obj an objective function to be minimized
    NLPSolver(const RealFunction& obj);
+
+   /// Creates a solver for a onstrained optimization problem
+   /// @param obj an objective function to be minimized
+   /// @param ctrs a vector of constraint functions
    NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
 
    /// Destructor
    ~NLPSolver();
 
+   /// No copy
+   NLPSolver(const NLPSolver&) = delete;
+
+   /// No assignment
+   NLPSolver& operator=(const NLPSolver&) = delete;
+
    /// Minimization of a problem
    /// @param reg interval region in the search space
    /// @param src starting point that belongs to the region
    /// @return an optimization status
+   ///
+   /// Both scopes of reg and src must contain the scope of this.
+   /// They do not necessarily correspond.
    OptimizationStatus minimize(const IntervalRegion& reg,
                                const RealPoint& src);
 
-   // @Override
-   void setAlgorithm(std::string alg);
+   // Structure used to process a constraint
+   struct Ctr {
+      NLPSolver* ls;    // the solver vector
+      size_t idx;       // constraint index
+      bool isleft;      // true if the left bound is considered
+   };
 
-protected:
-   nlopt::opt* optimizer_;                                           // Pointer to the nlp optimizer object
-   nlopt::algorithm nlopt_algorithm_ = nlopt::algorithm::LD_SLSQP;   // Solving algorithm for nlopt
+private:
+   nlopt::opt* optimizer_;       // nlopt optimizer
+   nlopt::algorithm nlopt_alg_;  // optimization technique
+   std::vector<Ctr> nl_ctrs_;    // management of constraints
+
+   void makeAlgorithm();
+   void makeCtrs();
 };
 
 } // namespace

@@ -50,6 +50,16 @@ IntervalRegion::IntervalRegion(Scope sco, const RealVector& X)
    ASSERT(sco.size() == X.size(), "Bad initialization of an interval region");      
 }
 
+IntervalRegion::IntervalRegion(const IntervalRegion& reg, Scope sco)
+      : IntervalVector(sco.size()),
+        scope_(sco)
+{
+   ASSERT(reg.scope().contains(sco), "Bad scope used to create a sub-region");
+
+   for (Variable v : sco)
+      set(v, reg.get(v));
+}
+
 Scope IntervalRegion::scope() const
 {
    return scope_;

@@ -70,7 +70,10 @@ public:
    std::string algorithm() const;
 
    /// Assigns the name of the solving algorithm to use
-   virtual void setAlgorithm(std::string name);
+   void setAlgorithm(const std::string& name);
+
+   /// @return the name of the optimization algorithm
+   std::string getAlgorithm() const;
 
    /// @return the number of variables in the optimization problem
    size_t nbVars() const;
@@ -79,10 +82,10 @@ public:
    size_t nbCtrs() const;
 
    /// @return the a pointer to the objective function
-   std::shared_ptr<RealFunction> obj();
+   RealFunction* obj() const;
 
    /// @return the pointer to the vector of constraints functions
-   std::shared_ptr<RealFunctionVector> ctrs();
+   RealFunctionVector* ctrs() const;
 
    /// @return the best value for the objective function
    double bestVal() const;
@@ -110,9 +113,14 @@ public:
    /// @param tol new value
    void setRtol(Tolerance tol);
 
+   /// @return the scope of this
+   Scope scope() const;
+
 protected:
-   std::shared_ptr<RealFunction> obj_;            // Objective function on real numbers
-   std::shared_ptr<RealFunctionVector> ctrs_;     // Vector of functions for the constraints
+   RealFunction* obj_;            // Objective function on real numbers
+   RealFunctionVector* ctrs_;     // Vector of functions for the constraints
+
+   Scope scope_;     // union of scopes of the objective function and the constraints
 
    size_t n_;     // number of variables
    size_t m_;     // number of constraints

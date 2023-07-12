@@ -8,21 +8,26 @@ using namespace std;
 
 int main(void)
 {
+   Logger::init(LogLevel::full, "nlp.log");
+
    try {
       Problem problem;
-      Variable x = problem.addRealVar(0, 10, "x"),
-               y = problem.addRealVar(0, 10, "y");
+      Variable x = problem.addRealVar(1, 10, "x"),
+               y = problem.addRealVar(-1, 9, "y"),
+               w = problem.addRealVar(0, 9, "w"),
+               z = problem.addRealVar(2, 7, "z");
 
-      RealFunction f(sqr(x) + sqr(y));
+      RealFunction f(sqr(x) + sqr(z));
 
-      RealFunctionVector G( {y - x + 1, y - x - 2},
+      RealFunctionVector G( {y - z + 1, z - x - 2},
                             {Interval::negative(), Interval::positive()} );
 
       NLPSolver optimizer(f, G);
+      optimizer.setAlgorithm("NLOPT_SLSQP");
 
       IntervalRegion reg = problem.getDomains();
       RealPoint src = reg.midpoint();
-
+   
       OptimizationStatus status = optimizer.minimize(reg, src);
       cout << "Status.......... " << status << endl;
    

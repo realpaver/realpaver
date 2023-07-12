@@ -16,7 +16,10 @@
 namespace realpaver {
 
 NLPModel::NLPModel(const Problem& pb)
-    : n_(pb.nbVars()),
+    : obj_(nullptr),
+      ctrs_(nullptr),
+      scope_(pb.scope()),
+      n_(pb.nbVars()),
       m_(pb.nbCtrs()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
@@ -31,32 +34,29 @@ NLPModel::NLPModel(const Problem& pb)
 
     // objective function to be minimized
     Term tomin = ismin ? to : -to;
-
-    // scope of the objective function
-    // to.makeScope(pb.getObjective().getTerm().scope());
-
-    // DAG
-    std::shared_ptr<Dag> dag =  std::make_shared<Dag>();
     std::shared_ptr<Dag> odag = std::make_shared<Dag>();
     odag->insert(tomin);   // Add the objective expression to the objective dag
-    obj_ = std::make_shared<RealFunction>(odag,0);
+    obj_ = new RealFunction(odag, 0);
 
-    // Add all constraints to the constraint dag
+    // constraints
+    std::shared_ptr<Dag> dag =  std::make_shared<Dag>();
     for (size_t j=0; j<m_; j++)
-    {
         dag->insert(pb.ctrAt(j));
-    }
-    if (dag->nbFuns()==0)
-        ctrs_ = std::make_shared<RealFunctionVector>();
-    else
-        ctrs_ = std::make_shared<RealFunctionVector>(dag);
+
+    // TODO : GERER EXCEPTION si la contrainte n'est pas acceptée
+
+    if (dag->nbFuns()>0)
+        ctrs_ = new RealFunctionVector(dag);
 
     best_ = nullptr;
     best_val_ = Interval::universe().right();
 }
 
 NLPModel::NLPModel(const RealFunction& obj)
-    : n_(obj.nbVars()),
+    : obj_(nullptr),
+      ctrs_(nullptr),
+      scope_(),
+      n_(obj.nbVars()),
       m_(0), 
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
@@ -64,14 +64,17 @@ NLPModel::NLPModel(const RealFunction& obj)
       rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
-    obj_ = std::make_shared<RealFunction>(obj);
-    ctrs_ = std::make_shared<RealFunctionVector>();
+    scope_.insert(obj.scope());
+    obj_ = new RealFunction(obj);
     best_ = nullptr;
     best_val_ = Interval::universe().right();
 }
 
 NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
-    : n_(obj.nbVars()),
+    : obj_(nullptr),
+      ctrs_(nullptr),
+      scope_(),
+      n_(obj.nbVars()),
       m_(ctrs.nbFuns()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
@@ -79,15 +82,19 @@ NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
       rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
-    obj_ = std::make_shared<RealFunction>(obj);
-    ctrs_ = std::make_shared<RealFunctionVector>(ctrs);
+    scope_.insert(obj.scope());
+    scope_.insert(ctrs.scope());
+    obj_ = new RealFunction(obj);
+    ctrs_ = new RealFunctionVector(ctrs);
     best_ = nullptr;
     best_val_ = Interval::universe().right();
 }
 
 NLPModel::~NLPModel()
 {
-    if (best_ != nullptr) delete best_;
+   if (best_ != nullptr) delete best_;
+   if (obj_ != nullptr) delete obj_;
+   if (ctrs_ != nullptr) delete ctrs_;
 }
 
 double NLPModel::timeLimit() const
@@ -120,12 +127,12 @@ size_t NLPModel::nbCtrs() const
     return m_;
 }
 
-std::shared_ptr<RealFunction> NLPModel::obj()
+RealFunction* NLPModel::obj() const
 {
     return obj_;
 }
 
-std::shared_ptr<RealFunctionVector> NLPModel::ctrs()
+RealFunctionVector* NLPModel::ctrs() const
 {
     return ctrs_;
 }
@@ -156,9 +163,14 @@ std::string  NLPModel::algorithm() const
     return std::string(alg_);
 }
 
-void  NLPModel::setAlgorithm(std::string alg_name)
+void  NLPModel::setAlgorithm(const std::string& name)
 {
-   alg_ = alg_name;
+   alg_ = name;
+}
+
+std::string NLPModel::getAlgorithm() const
+{
+   return alg_;
 }
 
 Tolerance NLPModel::atol() const
@@ -181,6 +193,11 @@ void NLPModel::setRtol(Tolerance tol)
 {
    ASSERT(tol.isRelative(), "This tolerance must be relative");
    rtol_ = tol;
+}
+
+Scope NLPModel::scope() const
+{
+   return scope_;
 }
 
 } // namespace

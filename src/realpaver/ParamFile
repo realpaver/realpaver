@@ -217,7 +217,10 @@ BO_LOCAL_SOLVER_TIME_LIMIT = 10.0
 
 # Algorithm implemented by the NLP solver
 # - DEFAULT: default algorithm
-# TODO
+# - NLOPT_NELDERMEAD: derivative-free unconstrained local optimization using NlOpt
+# - NLOPT_BOBYQA: derivative-free unconstrained local optimization using NlOpt
+# - NLOPT_MMA: gradient-based constrained local optimization using NlOpt
+# - NLOPT_SLSQP: gradient-based constrained local optimization using NlOpt
 NLP_SOLVER_ALGORITHM = DEFAULT
 
 # Time limit in seconds

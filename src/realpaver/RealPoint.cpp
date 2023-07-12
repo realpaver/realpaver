@@ -27,6 +27,16 @@ RealPoint::RealPoint(Scope s, const RealVector& X)
    ASSERT(s.size() == X.size(), "Bad initialization of a real point");  
 }
 
+RealPoint::RealPoint(const RealPoint& pt, Scope s)
+      : RealVector(s.size()),
+        scope_(s)
+{
+   ASSERT(pt.scope().contains(s), "Bad scope used to project a point in a sub-space");
+
+   for (Variable v : s)
+      set(v, pt.get(v));
+}
+
 Scope RealPoint::scope() const
 {
    return scope_;

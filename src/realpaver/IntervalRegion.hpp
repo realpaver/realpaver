@@ -54,6 +54,13 @@ public:
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
 
+   /// Creates a region from another region projected on a scope
+   /// @param reg an interval region
+   /// @param sco a scope that is included in the scope of reg
+   ///
+   /// this is equal to reg restricted to sco
+   IntervalRegion(const IntervalRegion& reg, Scope sco);
+
    /// Default assignment operator
    IntervalRegion& operator=(const IntervalRegion&) = default;
 
