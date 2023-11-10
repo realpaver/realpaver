@@ -27,3 +27,6 @@ uni_newton = executable('uni_newton',
   include_directories: ['../src']+incdir,
   dependencies: deps_lib
 )
+
+# Sub-directories
+subdir('ncsp')

@@ -164,7 +164,6 @@ subdir('src')
 subdir('test')
 subdir('doc')
 subdir('examples')
-subdir('ncsp')
 
 
 ## Generation of pkg-config file to ease dependency detection when using realpaver as a library
