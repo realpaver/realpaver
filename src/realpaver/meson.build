@@ -69,6 +69,25 @@ nlp_header = custom_target('gen-local-solver-header',
     install_dir : 'include/realpaver')
 rp_sources += [nlp_header]
 
+
+if flex.found() and bison.found()
+   flex_analyzer = custom_target('flex-parser-gen',
+      input: 'parser_flex.lpp',
+      output: 'parser_flex.cpp',
+      command: [flex, '-o', '@OUTPUT@', '@INPUT@'])
+   rp_sources += [flex_analyzer]
+
+   bison_analyzer = custom_target('bison-parser-gen',
+      input: 'parser_bison.ypp',
+      output: ['parser_bison.hpp', 'parser_bison.cpp'],
+      command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'])
+   rp_sources += [bison_analyzer]
+else
+   rp_sources += ['parser_flex.cpp',
+                  'parser_bison.cpp']
+endif
+
+
 rp_headers += [
   'AssertDebug.hpp',
   'Bitset.hpp',
@@ -124,7 +143,6 @@ rp_headers += [
   'Objective.hpp',
   'Param.hpp',
   'Parser.hpp',
-  'parser_bison.hpp',
   'PolytopeHullContractor.hpp',
   'Preprocessor.hpp',
   'Problem.hpp',
@@ -207,8 +225,6 @@ rp_sources += [
   'Objective.cpp',
   'Param.cpp',
   'Parser.cpp',
-  'parser_flex.cpp',
-  'parser_bison.cpp',
   'PolytopeHullContractor.cpp',
   'Preprocessor.cpp',
   'Problem.cpp',

@@ -867,6 +867,17 @@ Term pow(Term t, const Interval& x)
       return exp(x*log(t));
 }
 
+Term pow(Term t, Term e)
+{
+   if (e.isConstant())
+   {
+      Interval d = e.evalConst();
+      return pow(t, d);
+   }
+   else
+      return exp(e*log(t));
+}
+
 Term exp(Term t)
 {
    if (!Term::simplification())

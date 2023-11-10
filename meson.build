@@ -55,10 +55,6 @@ endif
 
 deps_lib = [lp_dep,mathlib_dep,interval_dep,m_dep,local_solver_dep]
 
-flex = find_program('flex', required: false)
-bison = find_program('bison', required: false)
-
-
 ## Config
 os_unix   = false
 os_linux  = false

@@ -1,6 +1,6 @@
-#line 1 "parser_flex.cpp"
+#line 1 "src/realpaver/parser_flex.cpp"
 
-#line 3 "parser_flex.cpp"
+#line 3 "src/realpaver/parser_flex.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -306,6 +306,7 @@ typedef int16_t flex_int16_t;
 typedef uint16_t flex_uint16_t;
 typedef int32_t flex_int32_t;
 typedef uint32_t flex_uint32_t;
+typedef uint64_t flex_uint64_t;
 #else
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
@@ -414,7 +415,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 typedef size_t yy_size_t;
 #endif
 
-extern int yyleng;
+extern yy_size_t yyleng;
 
 extern FILE *yyin, *yyout;
 
@@ -457,7 +458,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -526,8 +527,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = NULL; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int yyleng;
+static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
+yy_size_t yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = NULL;
@@ -554,7 +555,7 @@ static void yy_init_buffer ( YY_BUFFER_STATE b, FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer ( char *base, yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string ( const char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes ( const char *bytes, int len  );
+YY_BUFFER_STATE yy_scan_bytes ( const char *bytes, yy_size_t len  );
 
 void *yyalloc ( yy_size_t  );
 void *yyrealloc ( void *, yy_size_t  );
@@ -607,7 +608,7 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	yyleng = (int) (yy_cp - yy_bp); \
+	yyleng = (yy_size_t) (yy_cp - yy_bp); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
@@ -810,8 +811,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "parser_flex.lpp"
-#line 2 "parser_flex.lpp"
+#line 1 "../src/realpaver/parser_flex.lpp"
+#line 2 "../src/realpaver/parser_flex.lpp"
 #include <stdio.h>
 #include "realpaver/parser_bison.hpp"
 #include "realpaver/Param.hpp"
@@ -819,8 +820,8 @@ char *yytext;
 #include "realpaver/SymbolTable.hpp"
 
 extern int realpaver_bison_lineno;
-#line 822 "parser_flex.cpp"
-#line 823 "parser_flex.cpp"
+#line 823 "src/realpaver/parser_flex.cpp"
+#line 824 "src/realpaver/parser_flex.cpp"
 
 #define INITIAL 0
 
@@ -859,7 +860,7 @@ FILE *yyget_out ( void );
 
 void yyset_out  ( FILE * _out_str  );
 
-			int yyget_leng ( void );
+			yy_size_t yyget_leng ( void );
 
 char *yyget_text ( void );
 
@@ -926,7 +927,7 @@ static int input ( void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		int n; \
+		yy_size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -1035,9 +1036,9 @@ YY_DECL
 		}
 
 	{
-#line 22 "parser_flex.lpp"
+#line 22 "../src/realpaver/parser_flex.lpp"
 
-#line 1040 "parser_flex.cpp"
+#line 1041 "src/realpaver/parser_flex.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1096,286 +1097,286 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 23 "parser_flex.lpp"
+#line 23 "../src/realpaver/parser_flex.lpp"
 return TK_INT;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "parser_flex.lpp"
+#line 24 "../src/realpaver/parser_flex.lpp"
 return TK_REAL;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 "parser_flex.lpp"
+#line 25 "../src/realpaver/parser_flex.lpp"
 return TK_TOL;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 27 "parser_flex.lpp"
+#line 27 "../src/realpaver/parser_flex.lpp"
 return TK_STR_VAR;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 28 "parser_flex.lpp"
+#line 28 "../src/realpaver/parser_flex.lpp"
 return TK_STR_CONST;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 29 "parser_flex.lpp"
+#line 29 "../src/realpaver/parser_flex.lpp"
 return TK_STR_ALIAS;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 30 "parser_flex.lpp"
+#line 30 "../src/realpaver/parser_flex.lpp"
 return TK_STR_CTR;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 31 "parser_flex.lpp"
+#line 31 "../src/realpaver/parser_flex.lpp"
 return TK_STR_OBJ;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 32 "parser_flex.lpp"
+#line 32 "../src/realpaver/parser_flex.lpp"
 return TK_STR_FUN;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 34 "parser_flex.lpp"
+#line 34 "../src/realpaver/parser_flex.lpp"
 return TK_STR_INT;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 35 "parser_flex.lpp"
+#line 35 "../src/realpaver/parser_flex.lpp"
 return TK_STR_BIN;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 36 "parser_flex.lpp"
+#line 36 "../src/realpaver/parser_flex.lpp"
 return TK_STR_TOL;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 37 "parser_flex.lpp"
+#line 37 "../src/realpaver/parser_flex.lpp"
 return TK_TABLE;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 39 "parser_flex.lpp"
+#line 39 "../src/realpaver/parser_flex.lpp"
 return TK_MIN;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 40 "parser_flex.lpp"
+#line 40 "../src/realpaver/parser_flex.lpp"
 return TK_MAX;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 41 "parser_flex.lpp"
+#line 41 "../src/realpaver/parser_flex.lpp"
 return TK_MIN;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 42 "parser_flex.lpp"
+#line 42 "../src/realpaver/parser_flex.lpp"
 return TK_MAX;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 43 "parser_flex.lpp"
+#line 43 "../src/realpaver/parser_flex.lpp"
 return TK_SQR;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 44 "parser_flex.lpp"
+#line 44 "../src/realpaver/parser_flex.lpp"
 return TK_SQRT;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 45 "parser_flex.lpp"
+#line 45 "../src/realpaver/parser_flex.lpp"
 return TK_LOG;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 46 "parser_flex.lpp"
+#line 46 "../src/realpaver/parser_flex.lpp"
 return TK_EXP;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 47 "parser_flex.lpp"
+#line 47 "../src/realpaver/parser_flex.lpp"
 return TK_TAN;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 48 "parser_flex.lpp"
+#line 48 "../src/realpaver/parser_flex.lpp"
 return TK_COS;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 49 "parser_flex.lpp"
+#line 49 "../src/realpaver/parser_flex.lpp"
 return TK_SIN;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 50 "parser_flex.lpp"
+#line 50 "../src/realpaver/parser_flex.lpp"
 return TK_SGN;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 51 "parser_flex.lpp"
+#line 51 "../src/realpaver/parser_flex.lpp"
 return TK_ABS;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 52 "parser_flex.lpp"
+#line 52 "../src/realpaver/parser_flex.lpp"
 return TK_POW;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 54 "parser_flex.lpp"
+#line 54 "../src/realpaver/parser_flex.lpp"
 return TK_IN;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 55 "parser_flex.lpp"
+#line 55 "../src/realpaver/parser_flex.lpp"
 return TK_MINUS_INF;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 56 "parser_flex.lpp"
+#line 56 "../src/realpaver/parser_flex.lpp"
 return TK_PLUS_INF;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 58 "parser_flex.lpp"
+#line 58 "../src/realpaver/parser_flex.lpp"
 return TK_PLUS;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 59 "parser_flex.lpp"
+#line 59 "../src/realpaver/parser_flex.lpp"
 return TK_MINUS;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 60 "parser_flex.lpp"
+#line 60 "../src/realpaver/parser_flex.lpp"
 return TK_MUL;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 61 "parser_flex.lpp"
+#line 61 "../src/realpaver/parser_flex.lpp"
 return TK_DIV;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 62 "parser_flex.lpp"
+#line 62 "../src/realpaver/parser_flex.lpp"
 return TK_CARET;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 63 "parser_flex.lpp"
+#line 63 "../src/realpaver/parser_flex.lpp"
 return TK_LPAR;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 64 "parser_flex.lpp"
+#line 64 "../src/realpaver/parser_flex.lpp"
 return TK_RPAR;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 65 "parser_flex.lpp"
+#line 65 "../src/realpaver/parser_flex.lpp"
 return TK_LSBR;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 66 "parser_flex.lpp"
+#line 66 "../src/realpaver/parser_flex.lpp"
 return TK_RSBR;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 67 "parser_flex.lpp"
+#line 67 "../src/realpaver/parser_flex.lpp"
 return TK_LCBR;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 68 "parser_flex.lpp"
+#line 68 "../src/realpaver/parser_flex.lpp"
 return TK_RCBR;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 69 "parser_flex.lpp"
+#line 69 "../src/realpaver/parser_flex.lpp"
 return TK_COMMA;
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 70 "parser_flex.lpp"
+#line 70 "../src/realpaver/parser_flex.lpp"
 return TK_SCOLON;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 71 "parser_flex.lpp"
+#line 71 "../src/realpaver/parser_flex.lpp"
 return TK_COLON;
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 72 "parser_flex.lpp"
+#line 72 "../src/realpaver/parser_flex.lpp"
 return TK_GT;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 73 "parser_flex.lpp"
+#line 73 "../src/realpaver/parser_flex.lpp"
 return TK_LT;
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 74 "parser_flex.lpp"
+#line 74 "../src/realpaver/parser_flex.lpp"
 return TK_EQ_EQ;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 75 "parser_flex.lpp"
+#line 75 "../src/realpaver/parser_flex.lpp"
 return TK_EQ;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 76 "parser_flex.lpp"
+#line 76 "../src/realpaver/parser_flex.lpp"
 return TK_GE;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 77 "parser_flex.lpp"
+#line 77 "../src/realpaver/parser_flex.lpp"
 return TK_LE;
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 78 "parser_flex.lpp"
+#line 78 "../src/realpaver/parser_flex.lpp"
 return TK_PIPE;
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 80 "parser_flex.lpp"
+#line 80 "../src/realpaver/parser_flex.lpp"
 return TK_IDENT;
 	YY_BREAK
 case 53:
 /* rule 53 can match eol */
 YY_RULE_SETUP
-#line 82 "parser_flex.lpp"
+#line 82 "../src/realpaver/parser_flex.lpp"
 { ++realpaver_bison_lineno; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 84 "parser_flex.lpp"
+#line 84 "../src/realpaver/parser_flex.lpp"
 {}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 86 "parser_flex.lpp"
+#line 86 "../src/realpaver/parser_flex.lpp"
 {}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 87 "parser_flex.lpp"
+#line 87 "../src/realpaver/parser_flex.lpp"
 ECHO;
 	YY_BREAK
-#line 1378 "parser_flex.cpp"
+#line 1379 "src/realpaver/parser_flex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1562,7 +1563,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -1576,7 +1577,7 @@ static int yy_get_next_buffer (void)
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1634,7 +1635,7 @@ static int yy_get_next_buffer (void)
 
 	if (((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc(
 			(void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, (yy_size_t) new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
@@ -1737,7 +1738,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (int) ((yy_c_buf_p) - (yytext_ptr));
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -2106,12 +2107,12 @@ YY_BUFFER_STATE yy_scan_string (const char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = (yy_size_t) (_yybytes_len + 2);
@@ -2153,7 +2154,7 @@ static void yynoreturn yy_fatal_error (const char* msg )
 	do \
 		{ \
 		/* Undo effects of setting up yytext. */ \
-        int yyless_macro_arg = (n); \
+        yy_size_t yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
 		yytext[yyleng] = (yy_hold_char); \
 		(yy_c_buf_p) = yytext + yyless_macro_arg; \
@@ -2193,7 +2194,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-int yyget_leng  (void)
+yy_size_t yyget_leng  (void)
 {
         return yyleng;
 }
@@ -2343,7 +2344,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 87 "parser_flex.lpp"
+#line 87 "../src/realpaver/parser_flex.lpp"
 
 
 realpaver::Problem* realpaver_bison_problem;

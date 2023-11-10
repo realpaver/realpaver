@@ -299,6 +299,7 @@ Term sqrt(Term t);
 Term pow(Term t, int n);
 Term pow(Term t, double d);
 Term pow(Term t, const Interval& x);
+Term pow(Term t, Term e);
 Term exp(Term t);
 Term log(Term t);
 Term cos(Term t);

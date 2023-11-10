@@ -68,7 +68,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %left TK_MUL TK_DIV
 %right TK_UMINUS
 %right TK_UPLUS
-%right TK_POW
+%right TK_CARET
 
 %start model
 
@@ -532,11 +532,7 @@ table_list_val_tail
   ;
 
 table_list_val_def
-  : itv
-    {
-       $$ = $1;
-    }
-  | const_expr
+  : const_expr
     {
        $$ = $1;
     }
@@ -586,11 +582,11 @@ expr
                       res(lhs / rhs);
       $$ = res.cloneRoot();
     }
-  | expr TK_CARET exponent
+  | expr TK_CARET expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($1)),
-                      d(realpaver::Term::SharedRep($3)),
-                      res(pow(t, d.evalConst()));
+                      e(realpaver::Term::SharedRep($3)),
+                      res(pow(t, e));
       $$ = res.cloneRoot();
     }
   | TK_POW TK_LPAR expr TK_COMMA exponent TK_RPAR
