@@ -9,7 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/NLPSolver.hpp"
+#include "realpaver/NLPSolverNlopt.hpp"
 
 namespace realpaver {
 

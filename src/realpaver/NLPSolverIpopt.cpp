@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/NLPSolver.hpp"
 #include <IpIpoptApplication.hpp>
+#include "realpaver/NLPSolverIpopt.hpp"
 
 namespace realpaver {
 
