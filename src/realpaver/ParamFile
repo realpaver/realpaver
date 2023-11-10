@@ -194,27 +194,6 @@ RELAXATION_EQ_TOL = 1.0e-10
 ## LOCAL OPTIMIZATION                                                        ##
 ###############################################################################
 
-# Coefficient of the Armijo rule used to stop a line search optimization
-# > 0.0 and < 1.0
-LINE_SEARCH_ARMIJO = 0.09375
-
-# Smallest value of the step length of line search algorithm (absolute value)
-LINE_SEARCH_STEP_TOL = 1.0e-8
-
-# Iteration limit of line search algorithm
-LINE_SEARCH_ITER_LIMIT = 20
-
-# Tolerance on the norm of the gradient in the steepest descent method
-GRADIENT_DESCENT_TOL = 1.0e-3
-
-# Local optimization technique
-# - GRADIENT:   gradient descent method
-# - EVALUATION: simple test at the midpoint of a region
-BO_LOCAL_SOLVER_ALGORITHM = GRADIENT
-
-# Time limit in seconds
-BO_LOCAL_SOLVER_TIME_LIMIT = 10.0
-
 # Algorithm implemented by the NLP solver
 # - DEFAULT: default algorithm
 # - NLOPT_NELDERMEAD: derivative-free unconstrained local optimization using NlOpt

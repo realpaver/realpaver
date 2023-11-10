@@ -1,8 +1,0 @@
-Variables
-   x in [-15, -5],
-   y in [-3, 3]
-;
-
-Objectives
-   MIN 100*sqrt(abs(y-0.01*x^2)) + 0.01*abs(x+10)
-;

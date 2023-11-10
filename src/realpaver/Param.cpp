@@ -51,7 +51,6 @@ Param::Param()
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
    intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
    intmap_.insert(std::make_pair("SOLUTION_LIMIT",            100));
-   intmap_.insert(std::make_pair("LINE_SEARCH_ITER_LIMIT",    20));
    intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
    intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT",     20));
@@ -67,13 +66,9 @@ Param::Param()
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
-   dblmap_.insert(std::make_pair("LINE_SEARCH_ARMIJO",        0.09375));
-   dblmap_.insert(std::make_pair("LINE_SEARCH_STEP_TOL",      1.0e-8));
    dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",           2.0));
    dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",         10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
-   dblmap_.insert(std::make_pair("BO_LOCAL_SOLVER_TIME_LIMIT",10.0));
-   dblmap_.insert(std::make_pair("GRADIENT_DESCENT_TOL",      1.0e-3));
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
    dblmap_.insert(std::make_pair("GAUSSIAN_MIN_PIVOT",        1.0e-8));
@@ -89,7 +84,6 @@ Param::Param()
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_MAX_CID",  "YES"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
-   strmap_.insert(std::make_pair("BO_LOCAL_SOLVER_ALGORITHM", "GRADIENT"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
    strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));

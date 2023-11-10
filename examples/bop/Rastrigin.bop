@@ -1,8 +1,0 @@
-Variables
-   x1 in [-5.12, 5.12],
-   x2 in [-5.12, 5.12]
-;
-
-Objectives
-   MIN 20 + x1^2 - 10*cos(2*pi*x1) + x2^2 - 10*cos(2*pi*x2)
-;
