@@ -22,6 +22,10 @@ elif lp_lib_name.to_upper() == 'HIGHS'
   lp_dep = dependency('highs', required : true)
 endif
 
+if not lp_dep.found()
+  error('Missing linear programming library!')
+endif
+
 interval_lib_name = get_option('INTERVAL_LIB')
 interval_dep = dependency('', required : false)
 mathlib_dep = dependency('', required : false)
@@ -40,10 +44,6 @@ else
   error('No suitable interval library found!')
 endif
 m_dep = cpp_comp.find_library('m', required : true)
-
-if not lp_dep.found()
-  error('Missing linear programming library!')
-endif
 
 local_solver_name = get_option('LOCAL_SOLVER')
 local_solver_dep = dependency('', required : false)
@@ -164,7 +164,6 @@ subdir('src')
 subdir('test')
 subdir('doc')
 subdir('examples')
-subdir('work')
 subdir('ncsp')
 
 
