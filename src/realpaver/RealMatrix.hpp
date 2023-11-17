@@ -127,6 +127,13 @@ public:
    /// @param val any pivot must be strictly greater than this value
    void setMinPivot(double val);
 
+   /// Computes the LU decomposition of *this
+   /// @param L and U initialized matrices filled by the algorithm
+   void LU(RealMatrix* L, RealMatrix* U) const;
+
+   /// Checks if *this is positive definite
+   bool isPositiveDefinite() const;
+
 private:
    double minpiv_;   // threshold on the values of pivots
 

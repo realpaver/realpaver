@@ -335,6 +335,75 @@ void RealMatrix::setMinPivot(double val)
    minpiv_ = val;
 }
 
+// Doolittle algorithm
+void RealMatrix::LU(RealMatrix* L, RealMatrix* U) const
+{
+   if (L != nullptr)
+   {
+      ASSERT(this->nrows()==L->nrows(),"");
+      ASSERT(this->ncols()==L->ncols(),"");
+   }
+   else
+      L = new RealMatrix(this->nrows(),this->ncols());
+   if (U != nullptr)
+   {
+      ASSERT(this->nrows()==U->nrows(),"");
+      ASSERT(this->ncols()==U->ncols(),"");
+   }
+   else
+      U = new RealMatrix(this->nrows(),this->ncols());
+   
+   // Adaptation from: https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
+   // Decomposing matrix into Upper and Lower
+   // triangular matrix
+   for (size_t i = 0; i < this->nrows(); i++) 
+   {
+      // Upper Triangular
+      for (size_t k = i; k < this->nrows(); k++)
+      {
+         // Summation of L(i, j) * U(j, k)
+         int sum = 0;
+         for (size_t j = 0; j < i; j++)
+            sum += ((*L)(i,j) * (*L)(j,k));
+
+         // Evaluating U(i, k)
+         (*U)(i,k) = (*this)(i,k) - sum;
+      }
+ 
+        // Lower Triangular
+        for (size_t k = i; k < this->nrows(); k++) 
+        {
+            if (i == k)
+                (*L)(i,i) = 1; // Diagonal as 1
+            else
+            {
+               // Summation of L(k, j) * U(j, i)
+               int sum = 0;
+               for (size_t j = 0; j < i; j++)
+                  sum += ((*L)(k,j) * (*U)(j,i));
+
+               // Evaluating L(k, i)
+               (*L)(k,i) = ((*this)(k,i) - sum) / (*U)(i,i);
+            }
+        }
+    }
+}
+
+bool RealMatrix::isPositiveDefinite() const
+{
+   RealMatrix L(this->nrows(),this->ncols());
+   RealMatrix U(this->nrows(),this->ncols());
+   this->LU(&L,&U);
+   for (size_t i = 0; i < U.nrows(); i++)
+   {
+      if (U(i,i)<0)
+         return false;
+   }
+   return true;
+}
+
+
+
 bool RealMatrix::operator==(const RealMatrix& A) const
 {
    if (nrows() != A.nrows()) return false;
