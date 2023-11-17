@@ -338,54 +338,53 @@ void RealMatrix::setMinPivot(double val)
 // Doolittle algorithm
 void RealMatrix::LU(RealMatrix* L, RealMatrix* U) const
 {
+   ASSERT(this->nrows()==this->ncols(), "LU decomposition only apply to square matrices");
    if (L != nullptr)
    {
-      ASSERT(this->nrows()==L->nrows(),"");
-      ASSERT(this->ncols()==L->ncols(),"");
+      ASSERT(this->nrows()==L->nrows(),"L has a wrong number of rows");
+      ASSERT(this->ncols()==L->ncols(),"L has a wrong number of columns");
    }
    else
       L = new RealMatrix(this->nrows(),this->ncols());
    if (U != nullptr)
    {
-      ASSERT(this->nrows()==U->nrows(),"");
-      ASSERT(this->ncols()==U->ncols(),"");
+      ASSERT(this->nrows()==U->nrows(),"U has a wrong number of rows");
+      ASSERT(this->ncols()==U->ncols(),"U has a wrong number of columns");
    }
    else
       U = new RealMatrix(this->nrows(),this->ncols());
-   
    // Adaptation from: https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
    // Decomposing matrix into Upper and Lower
    // triangular matrix
    for (size_t i = 0; i < this->nrows(); i++) 
-   {
-      // Upper Triangular
-      for (size_t k = i; k < this->nrows(); k++)
+   { // i is the row number
+      for (size_t j = 0; j < this->ncols(); j++)
       {
-         // Summation of L(i, j) * U(j, k)
-         int sum = 0;
-         for (size_t j = 0; j < i; j++)
-            sum += ((*L)(i,j) * (*L)(j,k));
-
-         // Evaluating U(i, k)
-         (*U)(i,k) = (*this)(i,k) - sum;
-      }
- 
-        // Lower Triangular
-        for (size_t k = i; k < this->nrows(); k++) 
-        {
-            if (i == k)
-                (*L)(i,i) = 1; // Diagonal as 1
-            else
-            {
-               // Summation of L(k, j) * U(j, i)
-               int sum = 0;
-               for (size_t j = 0; j < i; j++)
-                  sum += ((*L)(k,j) * (*U)(j,i));
-
-               // Evaluating L(k, i)
-               (*L)(k,i) = ((*this)(k,i) - sum) / (*U)(i,i);
+         if (i<=j)
+         {
+            // Summation of L(i, k) * U(k, j)
+            double sum_U = 0;
+            for (size_t k = 0; k < i; k++)
+            {  
+               sum_U += ((*L)(i,k) * (*U)(k,j));
             }
-        }
+            // Evaluating U(i, k)
+            (*U)(i,j) = (*this)(i,j) - sum_U; // sum_U = 0 when i=0
+            
+            if (i == j)
+               (*L)(i,i) = 1; // Diagonal as 1
+         }
+         else
+         {
+            // Summation of L(i, k) * U(k, i)
+            double sum_L = 0;
+            for (size_t k = 0; k < j; k++)
+               sum_L += ((*L)(i,k) * (*U)(k,j));
+            // Evaluating L(k, i)
+            (*L)(i,j) = ((*this)(i,j) - sum_L) / (*U)(j,j); // sum_L = 0 when i=0
+         }
+         
+      }
     }
 }
 
