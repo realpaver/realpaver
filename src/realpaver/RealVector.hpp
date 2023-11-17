@@ -13,6 +13,7 @@
 #include "realpaver/Double.hpp"
 #include "realpaver/NumericDoubleTraits.hpp"
 #include "realpaver/NumericVector.hpp"
+#include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {
 
@@ -111,11 +112,13 @@ std::ostream& operator<<(std::ostream& os, const RealVector& V);
 ///@{
 /// Operators on real vectors
 RealVector operator+(const RealVector& V, const RealVector& W);
+RealVector operator+(const RealVector& V, double w);
 RealVector operator-(const RealVector& V, const RealVector& W);
 RealVector operator-(const RealVector& V);
 
 RealVector operator*(double a, const RealVector& V);
 RealVector operator*(const RealVector& V, double a);
+RealVector operator*(const RealMatrix& A, const RealVector& X);
 
 RealVector operator/(const RealVector& V, double a);
 ///@}
