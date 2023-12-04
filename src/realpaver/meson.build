@@ -103,6 +103,7 @@ rp_headers += [
   'Contractor.hpp',
   'ContractorPool.hpp',
   'Dag.hpp',
+  'Domain.hpp',
   'Double.hpp',
   'Env.hpp',
   'Exception.hpp',
@@ -173,6 +174,7 @@ rp_headers += [
   'Variable.hpp',
   'VariableSelector.hpp',
   'VariableVector.hpp',
+  'ZeroOne.hpp',
   'IntervalGaol.hpp',
   'LPSolverClp.hpp',
   'LPSolverGurobi.hpp'
@@ -192,6 +194,7 @@ rp_sources += [
   'Contractor.cpp',
   'ContractorPool.cpp',
   'Dag.cpp',
+  'Domain.cpp',
   'Env.cpp',
   'Exception.cpp',
   'HC4Contractor.cpp',
@@ -251,6 +254,7 @@ rp_sources += [
   'Timer.cpp',
   'Tolerance.cpp',
   'UniIntervalNewton.cpp',
+  'ZeroOne.cpp',
   'Variable.cpp',
   'VariableSelector.cpp',
   'VariableVector.cpp'
