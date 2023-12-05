@@ -166,12 +166,12 @@ var_dom
   : TK_STR_BIN
     {
       realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setDomain(0, 1);
-      v.setInteger();
+      //v.setDomain(0, 1); TODOK
+      //v.setInteger(); TODOK
       v.setTolerance(realpaver::Tolerance::makeAbs(0.0));
 
       // the domain must also be assigned in the problem's initial region
-      realpaver_bison_problem->setDomain(v, 0, 1);
+      //realpaver_bison_problem->setDomain(v, 0, 1); TODOK
     }
   | TK_IN var_dom_def
   ;
@@ -189,10 +189,10 @@ var_dom_def
       }
 
       realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setDomain(x);
+      //v.setDomain(x); TODOK
 
       // the domain must also be assigned in the problem's initial region
-      realpaver_bison_problem->setDomain(v, x);
+      // realpaver_bison_problem->setDomain(v, x);  TODOK
 	 }
 	 var_info
   | TK_LCBR
@@ -231,10 +231,10 @@ var_dom_def
 		for (size_t i=1; i<realpaver_itv_vector->size(); ++i)
 			x |= realpaver_itv_vector->at(i);
 
-      v.setDomain(x);
+      //v.setDomain(x); TODOK
 
       // the domain must also be assigned in the problem's initial region
-      realpaver_bison_problem->setDomain(v, x);
+      //realpaver_bison_problem->setDomain(v, x);  TODOK
 	 }
   ;
 
@@ -243,7 +243,7 @@ var_info
   | TK_STR_INT
     {
       realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setInteger();
+      //v.setInteger(); TODOK
       v.setTolerance(realpaver::Tolerance::makeAbs(0.0));    
     }
   | TK_STR_TOL TK_TOL

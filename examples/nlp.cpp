@@ -25,7 +25,7 @@ int main(void)
       NLPSolver optimizer(f, G);
       optimizer.setAlgorithm("NLOPT_SLSQP");
 
-      IntervalRegion reg = problem.getDomains();
+      IntervalRegion reg = problem.makeIntervalRegion();
       RealPoint src = reg.midpoint();
    
       OptimizationStatus status = optimizer.minimize(reg, src);

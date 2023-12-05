@@ -52,7 +52,7 @@ Variable Preprocessor::srcToDestVar(Variable v) const
    
 void Preprocessor::apply(const Problem& src, Problem& dest)
 {
-   IntervalRegion reg = src.getDomains();
+   IntervalRegion reg = src.makeIntervalRegion();
    apply(src, reg, dest);
 }
 
@@ -139,11 +139,9 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    {
       Variable v        = src.varAt(i);
       Interval domain   = reg.get(v);
-      bool isContinuous = v.isContinuous();
-      Tolerance tol     = v.getTolerance();
+      bool isReal       = v.isReal();
 
-      bool isFixed = isContinuous ? domain.isCanonical() :
-                                    domain.isSingleton();
+      bool isFixed = isReal ? domain.isCanonical() : domain.isSingleton();
 
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
    
@@ -160,10 +158,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
       else
       {
          // creates a clone of the variable in the other problem
-         Variable w = isContinuous ?
-                           dest.addRealVar(domain, v.getName()) :
-                           dest.addIntVar(domain, v.getName());
-         w.setTolerance(tol);
+         Variable w = dest.addClonedVar(v);
 
          // new map entry
          vvm_.insert(std::make_pair(v, w));
@@ -189,7 +184,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(src.getDomains());
+   Interval dobj = obj.getTerm().eval(src.makeIntervalRegion());
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");

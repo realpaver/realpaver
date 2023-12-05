@@ -56,6 +56,15 @@ public:
    /// @param sr string representation of the right bound 
    Interval(const std::string& sl, const std::string& sr);
 
+   /// Creates an interval fron a string
+   /// @param s string representation of a floating-point number
+   Interval(const char* s);
+
+   /// Creates an interval given its bounds
+   /// @param sl string representation of the left bound 
+   /// @param sr string representation of the right bound 
+   Interval(const char* sl, const char* sr);
+
    /// Default copy constructor
    Interval(const Interval&) = default;
 

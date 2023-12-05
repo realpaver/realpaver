@@ -15,6 +15,32 @@ namespace realpaver {
 Domain::~Domain()
 {}
 
+bool Domain::isConnected() const
+{
+   return false;
+}
+
+bool Domain::isBinary() const
+{
+   return false;
+}
+
+bool Domain::isInteger() const
+{
+   return false;
+}
+
+bool Domain::isReal() const
+{
+   return false;
+}
+
+std::ostream& operator<<(std::ostream& os, const Domain& dom)
+{
+   dom.print(os);
+   return os;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 IntervalDomain::IntervalDomain(const Interval& x)
@@ -25,6 +51,11 @@ IntervalDomain::IntervalDomain(const Interval& x)
 bool IntervalDomain::isEmpty() const
 {
    return val_.isEmpty();
+}
+
+bool IntervalDomain::isReal() const
+{
+   return true;
 }
 
 const Interval& IntervalDomain::getVal() const
@@ -47,9 +78,19 @@ void IntervalDomain::contract(Interval& x)
    x &= val_;
 }
 
+bool IntervalDomain::isConnected() const
+{
+   return true;
+}
+
 IntervalDomain* IntervalDomain::clone() const
 {
    return new IntervalDomain(*this);
+}
+
+void IntervalDomain::print(std::ostream& os) const
+{
+   os << val_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,7 +120,12 @@ bool IntervalUnionDomain::isEmpty() const
 {
    return val_.isEmpty();
 }
- 
+
+bool IntervalUnionDomain::isReal() const
+{
+   return true;
+}
+
 Interval IntervalUnionDomain::intervalHull() const
 {
    return val_.hull();
@@ -93,6 +139,11 @@ void IntervalUnionDomain::contract(Interval& x)
 IntervalUnionDomain* IntervalUnionDomain::clone() const
 {
    return new IntervalUnionDomain(*this);
+}
+
+void IntervalUnionDomain::print(std::ostream& os) const
+{
+   os << val_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,6 +168,11 @@ bool RangeDomain::isEmpty() const
    return val_.isEmpty();
 }
 
+bool RangeDomain::isInteger() const
+{
+   return true;
+}
+
 Interval RangeDomain::intervalHull() const
 {
    return val_.toInterval();
@@ -130,6 +186,63 @@ void RangeDomain::contract(Interval& x)
 RangeDomain* RangeDomain::clone() const
 {
    return new RangeDomain(*this);
+}
+
+void RangeDomain::print(std::ostream& os) const
+{
+   os << val_;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+RangeUnionDomain::RangeUnionDomain(const RangeUnion& u)
+   : Domain(),
+     val_(u)
+{}
+
+RangeUnionDomain::RangeUnionDomain(const std::initializer_list<Range>& l)
+   : Domain(),
+     val_(l)
+{}
+
+const RangeUnion& RangeUnionDomain::getVal() const
+{
+   return val_;
+}
+
+void RangeUnionDomain::setVal(const RangeUnion& u)
+{
+   val_ = u;
+}
+
+bool RangeUnionDomain::isEmpty() const
+{
+   return val_.isEmpty();
+}
+ 
+bool RangeUnionDomain::isInteger() const
+{
+   return true;
+}
+
+Interval RangeUnionDomain::intervalHull() const
+{
+   return val_.hull().toInterval();
+}
+
+void RangeUnionDomain::contract(Interval& x)
+{
+   val_.contract(x);
+}
+
+RangeUnionDomain* RangeUnionDomain::clone() const
+{
+   return new RangeUnionDomain(*this);
+}
+
+void RangeUnionDomain::print(std::ostream& os) const
+{
+   os << val_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,6 +267,11 @@ bool BinaryDomain::isEmpty() const
    return val_.isEmpty();
 }
 
+bool BinaryDomain::isBinary() const
+{
+   return true;
+}
+
 Interval BinaryDomain::intervalHull() const
 {
    return val_.toRange().toInterval();
@@ -168,5 +286,10 @@ BinaryDomain* BinaryDomain::clone() const
 {
    return new BinaryDomain(*this);
 }
-   
+
+void BinaryDomain::print(std::ostream& os) const
+{
+   os << val_;
+}
+
 } // namespace

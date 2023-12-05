@@ -68,19 +68,19 @@ public:
    static Range strictlyGreaterThan(const Integer& a);
    ///@}
 
-   /// @return the smallest inite bound
+   /// @return the smallest finite bound
    static Integer MIN();
 
-   /// @return the greatest inite bound
+   /// @return the greatest finite bound
    static Integer MAX();
 
-   /// @return the interval [-inf, +inf]
+   /// @return the interval [MIN(), MAX()]
    static Range universe();
 
-   /// @return the interval [0, +inf]
+   /// @return the interval [0, MAX()]
    static Range positive();
 
-   /// @return the interval [-inf, 0]
+   /// @return the interval [MIN(), 0]
    static Range negative();
 
    /// @reeturn the empty set
@@ -169,6 +169,10 @@ public:
 
    bool isDisjoint(const Range& other) const;
    bool overlaps(const Range& other) const;
+
+   /// @return true if (this union other) = hull(this union other)
+   ///         and this and other are non empty
+   bool isJoinable(const Range& other) const;
 
    bool isCertainlyLeZero() const;
    bool isCertainlyLtZero() const;

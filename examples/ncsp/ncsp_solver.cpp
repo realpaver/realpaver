@@ -390,7 +390,7 @@ int main(int argc, char** argv)
 
       // writes the problem
       fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
-      fsol << "REGION" << endl << problem.getDomains() << endl;
+      fsol << "REGION" << endl << problem.makeIntervalRegion() << endl;
 
       // writes the constraints
       fsol << "CONSTRAINTS" << endl;

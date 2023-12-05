@@ -209,6 +209,20 @@ bool Range::isCertainlyGtZero() const
    return r_ > 0;
 }
 
+bool Range::isJoinable(const Range& other) const
+{
+   if (isEmpty() || other.isEmpty())
+      return false;
+
+   if (overlaps(other))
+      return true;
+
+   if (isCertainlyLt(other))
+      return r_ + 1 == other.l_;
+
+   return other.r_ + 1 == l_;
+}
+
 Range Range::roundOutward(const Interval& x)
 {
    if (x.isEmpty())

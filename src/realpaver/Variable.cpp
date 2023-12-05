@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <memory>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Variable.hpp"
 
@@ -17,10 +18,16 @@ int VariableRep::NEXT_ID = 0;
 VariableRep::VariableRep(const std::string& name)
       : name_(name),
         id_(NEXT_ID++),
-        domain_(),
-        continuous_(true),
+        dom_(nullptr),
         tol_(Tolerance::makeAbs(0.0))
-{}
+{
+   dom_ = new IntervalDomain(Interval::universe());
+}
+
+VariableRep::~VariableRep()
+{
+   if (dom_ != nullptr) delete dom_;
+}
 
 size_t VariableRep::id() const
 {
@@ -42,34 +49,32 @@ void VariableRep::setName(const std::string& name)
    name_ = name;
 }
 
-Interval VariableRep::getDomain() const
+Domain* VariableRep::getDomain() const
 {
-   return domain_;
+   return dom_;
 }
 
-void VariableRep::setDomain(const Interval& x)
+void VariableRep::setDomain(Domain* dom)
 {
-   domain_ = x;
+   THROW_IF(dom == nullptr, "The domain of " + getName() + " is null");
+
+   if (dom_ != nullptr) delete dom_;
+   dom_ = dom;
+}
+
+bool VariableRep::isBinary() const
+{
+   return dom_->isBinary();
 }
 
 bool VariableRep::isInteger() const
 {
-   return !continuous_;
+   return dom_->isInteger();
 }
 
-void VariableRep::setInteger()
+bool VariableRep::isReal() const
 {
-   continuous_ = false;
-}
-
-bool VariableRep::isContinuous() const
-{
-   return continuous_;
-}
-
-void VariableRep::setContinuous()
-{
-   continuous_ = true;
+   return dom_->isReal();
 }
 
 size_t VariableRep::hashCode() const
@@ -92,18 +97,6 @@ void VariableRep::setTolerance(const Tolerance& tol)
 Variable::Variable(const std::string& name)
       : rep_(std::make_shared<VariableRep>(name))
 {}
-
-Variable::Variable(const Interval& x, const std::string& name)
-      : Variable(name)
-{
-   setDomain(x);
-}
-
-Variable::Variable(double lo, double up, const std::string& name)
-      : Variable(name)
-{
-   setDomain(Interval(lo, up));
-}
 
 Variable::Variable() : rep_(nullptr)
 {}
@@ -130,20 +123,20 @@ Variable& Variable::setName(const std::string& name)
    return *this;
 }
 
-Interval Variable::getDomain() const
+Domain* Variable::getDomain() const
 {
    return rep_->getDomain();
 }
 
-Variable& Variable::setDomain(const Interval& x)
+Variable& Variable::setDomain(std::unique_ptr<Domain> dom)
 {
-   rep_->setDomain(x);
+   rep_->setDomain(dom.release());
    return *this;
 }
 
-Variable& Variable::setDomain(double lo, double up)
+bool Variable::isBinary() const
 {
-   return setDomain(Interval(lo, up));
+   return rep_->isBinary();
 }
 
 bool Variable::isInteger() const
@@ -151,33 +144,9 @@ bool Variable::isInteger() const
    return rep_->isInteger();
 }
 
-bool Variable::isBinary() const
+bool Variable::isReal() const
 {
-   return isInteger() && getDomain().isSetEq(Interval::zeroPlusOne());
-}
-
-Variable& Variable::setInteger()
-{
-   rep_->setInteger();
-   return *this;
-}
-
-Variable& Variable::setBinary()
-{
-   rep_->setInteger();
-   rep_->setDomain(Interval::zeroPlusOne());
-   return *this;
-}
-
-bool Variable::isContinuous() const
-{
-   return rep_->isContinuous();
-}
-
-Variable& Variable::setContinuous()
-{
-   rep_->setContinuous();
-   return *this;
+   return rep_->isReal();
 }
 
 size_t Variable::hashCode() const
@@ -203,23 +172,9 @@ bool Variable::operator==(const Variable& other) const
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
-   os << " " << v.getName();
-
-   Interval x = v.getDomain();
-
-   if (v.isInteger())
-   {
-      if (x.isSetEq(Interval::zeroPlusOne()))
-         os << " binary";
-      else
-         os << " in "  << v.getDomain()
-            << " integer";
-   }
-   else
-   {
-      os << " in "  << x
-         << " tol " << v.getTolerance();
-   }
+   os << " " << v.getName()
+      << " in " << (*v.getDomain())
+      << " tol: " << v.getTolerance();
 
    return os;
 }
@@ -228,14 +183,11 @@ Variable Variable::clone() const
 {
    Variable v(getName());
 
-   v.setId(id())
-    .setDomain(getDomain())
-    .setTolerance(getTolerance());
+   std::unique_ptr<Domain> dom(getDomain()->clone());
 
-   if (isInteger())
-      v.setInteger();
-   else
-      v.setContinuous();
+   v.setId(id())
+    .setDomain(std::move(dom))
+    .setTolerance(getTolerance());
 
    return v;
 }

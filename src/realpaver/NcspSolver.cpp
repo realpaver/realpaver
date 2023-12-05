@@ -127,7 +127,8 @@ void NcspSolver::makeSpace()
 
    // creates and inserts the root node
    SharedNcspNode node =
-      std::make_shared<NcspNode>(preprob_->scope(), preprob_->getDomains());
+      std::make_shared<NcspNode>(preprob_->scope(),
+                                 preprob_->makeIntervalRegion());
 
    node->setIndex(1);
    space_->insertPendingNode(node);
@@ -638,7 +639,7 @@ std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
 
    if (withPreprocessing_)
    {
-      IntervalRegion reg(problem_->getDomains());
+      IntervalRegion reg(problem_->makeIntervalRegion());
       Proof proof = Proof::Inner;
 
       // assigns the values of the fixed variables

@@ -10,6 +10,8 @@
 #ifndef REALPAVER_ZERO_ONE_HPP
 #define REALPAVER_ZERO_ONE_HPP
 
+#include <iostream>
+
 namespace realpaver {
 
 class Range;
@@ -56,7 +58,10 @@ public:
 private:
    bool zro_, one_;
 };
-   
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, const ZeroOne& zo);
+
 } // namespace
 
 #endif

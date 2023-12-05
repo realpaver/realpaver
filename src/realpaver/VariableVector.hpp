@@ -54,16 +54,6 @@ public:
    /// @return the variable at index i in this
    Variable get(int i) const;
 
-   /// Assigns the domain of all the variables of this
-   /// @param x an interval
-   void setDomain(const Interval& x);
-
-   /// Defines all the variables as integer variables
-   void setInteger();
-
-   /// Defines all the variables as binary variables
-   void setBinary();
-
    /// Sets the tolerance of all the variables of this
    /// @param tol new tolerance
    void setTolerance(const Tolerance& tol);
@@ -122,19 +112,6 @@ public:
    /// @param i an index of this
    /// @return the variable at index i in this
    Variable operator[](int i) const;
-
-   /// Assigns the domain of all the variables of this
-   /// @param x an interval
-   /// @return a reference to this
-   VariableVector& setDomain(const Interval& x);
-
-   /// Defines all the variables as integer variables
-   /// @return a reference to this
-   VariableVector& setInteger();
-
-   /// Defines all the variables as binary variables
-   /// @return a reference to this
-   VariableVector& setBinary();
 
    /// Sets the tolerance of all the variables of this
    /// @param tol new tolerance

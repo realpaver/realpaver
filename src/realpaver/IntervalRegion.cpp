@@ -19,7 +19,7 @@ IntervalRegion::IntervalRegion(Scope sco)
    ASSERT(!sco.isEmpty(), "Empty scope used to create an interval region");   
 
    for (const auto& v : sco)
-      set(v, v.getDomain());
+      set(v, v.getDomain()->intervalHull());
 }
 
 IntervalRegion::IntervalRegion(Scope sco, const Interval& x)

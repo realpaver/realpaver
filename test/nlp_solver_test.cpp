@@ -13,7 +13,6 @@ using namespace realpaver;
 std::shared_ptr<Problem> pb;
 std::shared_ptr<RealFunction> obj;
 
-
 bool init_pointers(std::string filepath)
 {
     if (pb == nullptr)
@@ -33,8 +32,6 @@ bool init_pointers(std::string filepath)
     return true;
 }
 
-
-
 void test_ipopt(std::string filepath)
 {
     std::cerr<<"\n*** Solving "<<filepath<<std::endl;
@@ -48,7 +45,7 @@ void test_ipopt(std::string filepath)
     
     RealPoint sol(pb->scope());
     OptimizationStatus status = OptimizationStatus::Other;
-    IntervalRegion box(pb->getDomains());
+    IntervalRegion box(pb->makeIntervalRegion());
     RealPoint start(pb->scope(),box.midpoint());
 
     std::cerr<<"Search space: "<<box<<std::endl;
@@ -62,10 +59,8 @@ void test_ipopt(std::string filepath)
     std::cerr<<"\nDone!"<<std::endl;
 }
 
-
 int main()
 {
-
     // test_ipopt_ex();
 
     pb = nullptr;
@@ -79,7 +74,6 @@ int main()
     obj = nullptr;
 
     test_ipopt("../examples/bop/Rapha.bop");
-
 
     END_TEST
 }

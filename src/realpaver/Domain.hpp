@@ -10,9 +10,11 @@
 #ifndef REALPAVER_DOMAIN_HPP
 #define REALPAVER_DOMAIN_HPP
 
+#include <iostream>
 #include "realpaver/Interval.hpp"
 #include "realpaver/IntervalUnion.hpp"
 #include "realpaver/Range.hpp"
+#include "realpaver/RangeUnion.hpp"
 #include "realpaver/ZeroOne.hpp"
 
 namespace realpaver {
@@ -37,9 +39,36 @@ public:
    /// @param x an interval assigned to hull(x inter this)
    virtual void contract(Interval& x) = 0;
 
+   /// @return true if this is connected, typically if it is a real interval
+   ///
+   /// The default implementation returns false
+   virtual bool isConnected() const;
+
+   /// @return true if this is a binary domain
+   ///
+   /// The default implementation returns false
+   virtual bool isBinary() const;
+
+   /// @return true if this is an integer domain
+   ///
+   /// The default implementation returns false
+   virtual bool isInteger() const;
+
+   /// @return true if this is a real domain
+   ///
+   /// The default implementation returns false
+   virtual bool isReal() const;
+
    /// @return a clone of this
    virtual Domain* clone() const = 0;
+
+   /// prints this on a stream
+   /// @param os an output stream
+   virtual void print(std::ostream& os) const = 0;
 };
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, const Domain& dom);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interval domain.
@@ -67,9 +96,12 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isReal() const override;
    Interval intervalHull() const override;
    void contract(Interval& x) override;
+   bool isConnected() const override;
    IntervalDomain* clone() const override;
+   void print(std::ostream& os) const override;
    ///@}
 
 private:
@@ -98,7 +130,7 @@ public:
    /// Default destructor
    ~IntervalUnionDomain() = default;
 
-   /// @return the interval enclosed
+   /// @return the interval union enclosed
    const IntervalUnion& getVal() const;
 
    /// Setter
@@ -107,9 +139,11 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isReal() const override;
    Interval intervalHull() const override;
    void contract(Interval& x) override;
    IntervalUnionDomain* clone() const override;
+   void print(std::ostream& os) const override;
    ///@}
 
 private:
@@ -143,13 +177,57 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isInteger() const override;
    Interval intervalHull() const override;
    void contract(Interval& x) override;
    RangeDomain* clone() const override;
+   void print(std::ostream& os) const override;
    ///@}
 
 private:
    Range val_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a range union domain.
+///////////////////////////////////////////////////////////////////////////////
+class RangeUnionDomain : public Domain {
+public:
+   /// Creates a domain
+   /// @param u value assigned to this
+   RangeUnionDomain(const RangeUnion& u);
+
+   /// Creates a domain
+   /// @param l value assigned to this
+   RangeUnionDomain(const std::initializer_list<Range>& l);
+
+   /// Default copy constructor
+   RangeUnionDomain(const RangeUnionDomain&) = default;
+
+   /// No assignment
+   RangeUnionDomain& operator=(const RangeUnionDomain&) = delete;
+
+   /// Default destructor
+   ~RangeUnionDomain() = default;
+
+   /// @return the range union enclosed
+   const RangeUnion& getVal() const;
+
+   /// Setter
+   /// @param u a range union assigned to this
+   void setVal(const RangeUnion& u);
+
+   ///@{
+   bool isEmpty() const override;
+   bool isInteger() const override;
+   Interval intervalHull() const override;
+   void contract(Interval& x) override;
+   RangeUnionDomain* clone() const override;
+   void print(std::ostream& os) const override;
+   ///@}
+
+private:
+   RangeUnion val_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,9 +256,11 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isBinary() const override;
    Interval intervalHull() const override;
    void contract(Interval& x) override;
    BinaryDomain* clone() const override;
+   void print(std::ostream& os) const override;
    ///@}
 
 private:

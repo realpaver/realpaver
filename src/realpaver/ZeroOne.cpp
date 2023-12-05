@@ -58,5 +58,23 @@ Range ZeroOne::toRange() const
    else
       return Range::emptyset();
 }
+ 
+std::ostream& operator<<(std::ostream& os, const ZeroOne& zo)
+{
+   if (zo.hasZero())
+
+      if (zo.hasOne())
+         os << "{0, 1}";
+      else
+         os << "0";
+
+   else if (zo.hasOne())
+      os << "1";
+
+   else
+      os << "empty";
    
+   return os;
+}
+ 
 } // namespace

@@ -15,13 +15,20 @@ int main(void)
    try {
       Problem problem;
 
-      //~ Variable x = problem.addRealVar(-10,  4, "x"),
-               //~ y = problem.addRealVar( -3,  7, "y");
+      Variable x = problem.addBinaryVar("x"),
+               y = problem.addRealVar(IntervalUnion{"1.2", "6.7", Interval(4,5)}, "y"),
+               z = problem.addIntVar(RangeUnion{0, 1, 3, 7, -1, -3, 5, 6}, "z");
 
+      cout << problem << endl;
+   
+   
+return 0;
+
+/*
       Variable x = problem.addRealVar(-7,  3, "x"),
                y = problem.addRealVar( -3, 6, "y");
 
-      IntervalRegion reg = problem.getDomains();
+      IntervalRegion reg = problem.makeIntervalRegion();
 
       cout << "Region:     " << reg << endl;
 
@@ -47,7 +54,7 @@ int main(void)
 
       if (proof != Proof::Empty)
          cout << "New region: " << reg << endl;      
-
+*/
    }
    catch(Exception e) {
       cout << e.what() << endl;
