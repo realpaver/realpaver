@@ -72,6 +72,9 @@ public:
    /// @param os output stream
    void print(std::ostream& os) const;
 
+   /// Clears this, which becomes empty
+   void clear();
+
 private:
    typedef std::vector<Interval> VectorType;
    VectorType v_;

@@ -11,8 +11,8 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BC4Contractor.hpp"
 #include "realpaver/ConstraintContractor.hpp"
+#include "realpaver/DomainContractor.hpp"
 #include "realpaver/HC4Contractor.hpp"
-#include "realpaver/IntContractor.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ListContractor.hpp"
 #include "realpaver/Logger.hpp"
@@ -294,13 +294,13 @@ void NcspSolver::makeContractor()
       }
    }
 
-   // integer variables
-   std::shared_ptr<IntContractor> iop = std::make_shared<IntContractor>();
+   // variables with disconnected domains
+   std::shared_ptr<DomainContractor> dop = std::make_shared<DomainContractor>();
    for (Variable v : preprob_->scope())
-      if (v.isInteger()) iop->insertVar(v);
+      if (!v.getDomain()->isConnected()) dop->insertVar(v);
 
-   if (iop->nbVars() > 0)
-      mainpool->push(iop);
+   if (dop->nbVars() > 0)
+      mainpool->push(dop);
 
    // creates the contractor of this solver applying the contractors of
    // the main pool in sequence

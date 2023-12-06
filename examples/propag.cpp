@@ -15,16 +15,6 @@ int main(void)
    try {
       Problem problem;
 
-      Variable x = problem.addBinaryVar("x"),
-               y = problem.addRealVar(IntervalUnion{"1.2", "6.7", Interval(4,5)}, "y"),
-               z = problem.addIntVar(RangeUnion{0, 1, 3, 7, -1, -3, 5, 6}, "z");
-
-      cout << problem << endl;
-   
-   
-return 0;
-
-/*
       Variable x = problem.addRealVar(-7,  3, "x"),
                y = problem.addRealVar( -3, 6, "y");
 
@@ -33,8 +23,8 @@ return 0;
       cout << "Region:     " << reg << endl;
 
       SharedDag dag = std::make_shared<Dag>();
-      //~ size_t i = dag.insert( y == 0.5*x );
-      //~ size_t j = dag.insert( y == 2*x );
+      //~ size_t i = dag->insert( y == 0.5*x );
+      //~ size_t j = dag->insert( y == 2*x );
 
       size_t i = dag->insert( y - sqr(x) == 0 );
       size_t j = dag->insert( sqr(x) + sqr(y) - 2.0 == 0 );
@@ -54,7 +44,6 @@ return 0;
 
       if (proof != Proof::Empty)
          cout << "New region: " << reg << endl;      
-*/
    }
    catch(Exception e) {
       cout << e.what() << endl;

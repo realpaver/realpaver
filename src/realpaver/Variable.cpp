@@ -172,9 +172,11 @@ bool Variable::operator==(const Variable& other) const
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
-   os << " " << v.getName()
-      << " in " << (*v.getDomain())
-      << " tol: " << v.getTolerance();
+   os << v.getName()
+      << " in " << (*v.getDomain());
+
+   if (v.isReal())
+      os << " tol " << v.getTolerance();
 
    return os;
 }

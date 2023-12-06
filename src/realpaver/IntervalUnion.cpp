@@ -223,6 +223,11 @@ bool IntervalUnion::findInter(const Interval& x, int& first, int& last) const
       return false;
 }
 
+void IntervalUnion::clear()
+{
+   v_.clear();
+}
+
 std::ostream& operator<<(std::ostream& os, const IntervalUnion& u)
 {
    u.print(os);

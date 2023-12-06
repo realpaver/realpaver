@@ -14,6 +14,13 @@ if local_solver_dep.found()
   )
 endif
 
+parsing = executable('parsing',
+  sources: 'parsing.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src']+incdir,
+  dependencies: deps_lib
+)
+
 propag = executable('propag',
   sources: 'propag.cpp',
   link_with: realpaver_lib,

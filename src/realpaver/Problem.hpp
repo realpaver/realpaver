@@ -53,6 +53,11 @@ public:
    /// Default destructor
    ~Problem() = default;
 
+   /// Creates a new variable with no domain yet
+   /// @param name name of the variable
+   /// @return the new variable
+   Variable addVar(const std::string& name = "");
+
    /// Creates a new variable with domain {0, 1}
    /// @param name name of the variable
    /// @return the new variable

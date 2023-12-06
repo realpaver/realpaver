@@ -33,6 +33,7 @@ TOL         {REAL}[AR]
 
 "integer"       return TK_STR_INT;
 "binary"        return TK_STR_BIN;
+"real"          return TK_STR_REAL;
 "tol"           return TK_STR_TOL;
 "table"         return TK_TABLE;
 
@@ -95,6 +96,10 @@ realpaver::FunctionSymbol* realpaver_fun_symbol;
 std::vector<realpaver::Variable>* realpaver_var_vector;
 std::vector<realpaver::Interval>* realpaver_itv_vector;
 
+// unions used to parse the variable domains
+realpaver::IntervalUnion* realpaver_itv_union;
+realpaver::RangeUnion* realpaver_range_union;
+
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;
 
@@ -110,6 +115,8 @@ void realpaver_flex_init(realpaver::Problem* prob,
   realpaver_fun_symbol = nullptr;
   realpaver_var_vector = nullptr;
   realpaver_itv_vector = nullptr;
+  realpaver_itv_union = nullptr;
+  realpaver_range_union = nullptr;
 }
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
@@ -151,6 +158,8 @@ void realpaver_flex_cleanup_str()
 
   if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
   if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
+  if (realpaver_itv_union != nullptr) delete realpaver_itv_union;
+  if (realpaver_range_union != nullptr) delete realpaver_range_union;
 
   realpaver_bison__delete_buffer(realpaver_bison_buffer);
 }
@@ -163,6 +172,8 @@ void realpaver_flex_cleanup_file()
 
   if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
   if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
+  if (realpaver_itv_union != nullptr) delete realpaver_itv_union;
+  if (realpaver_range_union != nullptr) delete realpaver_range_union;
 
   if (realpaver_bison_in)
   {

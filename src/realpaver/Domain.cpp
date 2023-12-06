@@ -44,8 +44,8 @@ std::ostream& operator<<(std::ostream& os, const Domain& dom)
 ///////////////////////////////////////////////////////////////////////////////
 
 IntervalDomain::IntervalDomain(const Interval& x)
-   : Domain(),
-     val_(x)
+      : Domain(),
+        val_(x)
 {}
 
 bool IntervalDomain::isEmpty() const
@@ -96,14 +96,14 @@ void IntervalDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 IntervalUnionDomain::IntervalUnionDomain(const IntervalUnion& u)
-   : Domain(),
-     val_(u)
+      : Domain(),
+        val_(u)
 {}
 
 IntervalUnionDomain::IntervalUnionDomain(
-      const std::initializer_list<Interval>& l)
-   : Domain(),
-     val_(l)
+   const std::initializer_list<Interval>& l)
+      : Domain(),
+        val_(l)
 {}
 
 const IntervalUnion& IntervalUnionDomain::getVal() const
@@ -149,8 +149,8 @@ void IntervalUnionDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 RangeDomain::RangeDomain(const Range& r)
-   : Domain(),
-   val_(r)
+      : Domain(),
+        val_(r)
 {}
 
 const Range& RangeDomain::getVal() const
@@ -196,13 +196,13 @@ void RangeDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 RangeUnionDomain::RangeUnionDomain(const RangeUnion& u)
-   : Domain(),
-     val_(u)
+      : Domain(),
+        val_(u)
 {}
 
 RangeUnionDomain::RangeUnionDomain(const std::initializer_list<Range>& l)
-   : Domain(),
-     val_(l)
+      : Domain(),
+        val_(l)
 {}
 
 const RangeUnion& RangeUnionDomain::getVal() const
@@ -248,8 +248,8 @@ void RangeUnionDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 BinaryDomain::BinaryDomain()
-   : Domain(),
-     val_()
+      : Domain(),
+        val_()
 {}
 
 const ZeroOne& BinaryDomain::getVal() const

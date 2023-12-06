@@ -29,6 +29,27 @@ Problem::Problem(const std::string& name)
         id_(++NP)
 {}
 
+Variable Problem::addVar(const std::string& name)
+{
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+   std::ostringstream os;
+
+   if (name == "") os << "_v" << id;
+   else            os << name;
+
+   checkSymbol(os.str());
+
+   Variable v(os.str());
+   v.setId(id)
+    .setTolerance(Tolerance::makeAbs(0.0));
+
+   vars_.push_back(v);
+   scope_.insert(v);
+
+   return v;
+}
+
 Variable Problem::addBinaryVar(const std::string& name)
 {
    size_t id = MAX_NB_VAR*id_ + vars_.size();

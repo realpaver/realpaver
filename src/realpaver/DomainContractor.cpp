@@ -8,59 +8,60 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/IntContractor.hpp"
+#include "realpaver/DomainContractor.hpp"
 
 namespace realpaver {
 
-IntContractor::IntContractor()
+DomainContractor::DomainContractor()
       : s_()
 {}
 
-IntContractor::IntContractor(Variable v)
+DomainContractor::DomainContractor(Variable v)
       : s_()
 {
    insertVar(v);
 }
 
-IntContractor::IntContractor(const std::initializer_list<Variable>& l)
+DomainContractor::DomainContractor(const std::initializer_list<Variable>& l)
       : s_()
 {
    for (auto v : l)
       insertVar(v);
 }
 
-size_t IntContractor::nbVars() const
+size_t DomainContractor::nbVars() const
 {
    return s_.size();
 }
 
-void IntContractor::insertVar(Variable v)
+void DomainContractor::insertVar(Variable v)
 {
-   ASSERT(v.isInteger(),
-          "IntContractor applied to a continuous variable " << v.getName());
+   ASSERT(!v.getDomain()->isConnected(),
+          "DomainContractor applied to a continuous variable " << v.getName());
 
    s_.insert(v);
 }
 
-Proof IntContractor::contract(IntervalRegion& reg)
+Proof DomainContractor::contract(IntervalRegion& reg)
 {
    for (auto v : s_)
    {
-      Interval rnd = round(reg.get(v));
-      reg.set(v, rnd);
+      Interval x = reg.get(v);
+      v.getDomain()->contract(x);
+      reg.set(v, x);
 
-      if (rnd.isEmpty()) return Proof::Empty;
+      if (x.isEmpty()) return Proof::Empty;
    }
    return Proof::Maybe;
 }
 
-void IntContractor::print(std::ostream& os) const
+void DomainContractor::print(std::ostream& os) const
 {
    os << "integral: ";
    for (auto v : s_) os << v.getName() << " ";
 }
 
-Scope IntContractor::scope() const
+Scope DomainContractor::scope() const
 {
    return s_;
 }

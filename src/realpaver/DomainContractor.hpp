@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_INT_CONTRACTOR_HPP
-#define REALPAVER_INT_CONTRACTOR_HPP
+#ifndef REALPAVER_DOMAIN_CONTRACTOR_HPP
+#define REALPAVER_DOMAIN_CONTRACTOR_HPP
 
 #include <vector>
 #include "realpaver/Contractor.hpp"
@@ -17,28 +17,29 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor for integer variables.
+/// This is a contractor for variables having non interval domains.
 ///
-/// Given an interval vector X and integer variable v, let X[v] be the domain
-/// of v. This operator contracts X[v] as the hull of all the integers in X[v].
+/// Given a variable v and an interval region X, let dom be the initial domain
+/// of v and let X[v] be the domain of v in X. This operator contracts X[v] as
+/// the hull of X[v] inter dom.
 ///
 /// Such a contractor is able to manage one variable or a list of variables.
 ///////////////////////////////////////////////////////////////////////////////
-class IntContractor : public Contractor {
+class DomainContractor : public Contractor {
 public:
    /// Creates a contractor with no variable
-   IntContractor();
+   DomainContractor();
 
    /// Creates a contractor for one variable
-   /// @param v an integer variable
-   IntContractor(Variable v);
+   /// @param v a variable
+   DomainContractor(Variable v);
 
    /// Creates a contractor for a list of variables
-   /// @param l list of integer variables
-   IntContractor(const std::initializer_list<Variable>& l);
+   /// @param l list of variables
+   DomainContractor(const std::initializer_list<Variable>& l);
 
    /// Inserts a variable in the list of variables
-   /// @param v an integer variable
+   /// @param v a variable
    void insertVar(Variable v);
 
    /// @return the number of variables
@@ -55,7 +56,7 @@ private:
 };
 
 /// Type of shared pointers on contractors
-typedef std::shared_ptr<IntContractor> SharedIntContractor;
+typedef std::shared_ptr<DomainContractor> SharedDomainContractor;
 
 } // namespace
 

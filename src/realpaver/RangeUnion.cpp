@@ -282,6 +282,11 @@ bool RangeUnion::findJoin(const Range& r, int& first, int& last) const
       return false;
 }
 
+void RangeUnion::clear()
+{
+   v_.clear();
+}
+
 std::ostream& operator<<(std::ostream& os, const RangeUnion& u)
 {
    u.print(os);
