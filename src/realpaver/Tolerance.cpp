@@ -21,15 +21,15 @@ Tolerance::Tolerance(double val, bool absolute) :
 
 Tolerance::Tolerance(const std::string& str)
 {
-   if (str.size() < 2) THROW("Bad tolerance format");
+   if (str.size() < 2) THROW("Bad tolerance format: " + str);
 
    size_t k = str.size()-1;
    char c = str[k];
 
-   if (c != 'A' && c != 'R') THROW("Bad tolerance format");
+   if (c != 'A' && c != 'R') THROW("Bad tolerance format: " + str);
 
    Interval x(str.substr(0, k));
-   if (x.isEmpty() || x.right() < 0.0) THROW("Bad tolerance format");
+   if (x.isEmpty() || x.right() < 0.0) THROW("Bad tolerance format: " + str);
 
    abs_ = (c == 'A');
    val_ = x.right();

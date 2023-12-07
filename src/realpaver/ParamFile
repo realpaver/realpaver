@@ -209,10 +209,10 @@ NLP_SOLVER_TIME_LIMIT = 10.0
 NLP_SOLVER_ITER_LIMIT = 100
 
 # Absolute tolerance on the objective function
-NLP_SOLVER_ATOL = 1.0-9A
+NLP_SOLVER_ATOL = 1.0e-9A
 
 # Relative tolerance on the objective function
-NLP_SOLVER_RTOL = 1.0-4R
+NLP_SOLVER_RTOL = 1.0e-4R
 
 ###############################################################################
 ## LINEAR SOLVERS                                                            ##

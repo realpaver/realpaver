@@ -81,7 +81,7 @@ void NcspSolver::solve()
       withPreprocessing_ = true;
       preprob_ = new Problem();
       preproc_->apply(*problem_, *preprob_);
-      
+   
       if (!preproc_->isSolved()) branchAndPrune();
    }
    else
@@ -126,9 +126,19 @@ void NcspSolver::makeSpace()
             "Unable to make the space object in a Ncsp solver");
 
    // creates and inserts the root node
-   SharedNcspNode node =
-      std::make_shared<NcspNode>(preprob_->scope(),
-                                 preprob_->makeIntervalRegion());
+   SharedNcspNode node;
+
+   if (withPreprocessing_)
+   {
+      node = std::make_shared<NcspNode>(preprob_->scope(),
+                                        preproc_->destRegion());
+   }
+   else
+   {
+      node =
+         std::make_shared<NcspNode>(preprob_->scope(),
+                                    preprob_->makeIntervalRegion());
+   }
 
    node->setIndex(1);
    space_->insertPendingNode(node);
@@ -155,7 +165,7 @@ void NcspSolver::makeContractor()
       try
       {
          size_t j = dag_->insert(c);
-         
+
          if (base == "HC4")
             op = std::make_shared<HC4Contractor>(dag_, j);
 
@@ -297,12 +307,13 @@ void NcspSolver::makeContractor()
    // variables with disconnected domains
    std::shared_ptr<DomainContractor> dop = std::make_shared<DomainContractor>();
    for (Variable v : preprob_->scope())
-      if (!v.getDomain()->isConnected()) dop->insertVar(v);
+      if (!v.getDomain()->isConnected())
+         dop->insertVar(v);
 
    if (dop->nbVars() > 0)
       mainpool->push(dop);
 
-   // creates the contractor of this solver applying the contractors of
+   // creates the contractor of this solver, which applies the contractors of
    // the main pool in sequence
    contractor_ = std::make_shared<ListContractor>(mainpool);
 }
@@ -472,7 +483,8 @@ void NcspSolver::bpStep(int depthlimit)
 
 void NcspSolver::branchAndPrune()
 {
-   LOG_MAIN("Branch-and-prune algorithm on problem\n" << preprob_);
+   LOG_MAIN("**************************************************");
+   LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
    LOG_INTER("Parameters\n" << *env_->getParam());
 
    stimer_.start();

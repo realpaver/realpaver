@@ -66,6 +66,7 @@ int main(int argc, char** argv)
       }
 #endif
 
+      LOG_MAIN("**************************************************");
       LOG_MAIN("NCSP solving");
       LOG_MAIN("Input file: " << filename);
 

@@ -17,11 +17,17 @@ namespace realpaver {
 Preprocessor::Preprocessor()
       : vvm_(),
         vim_(),
+        reg_(nullptr),
         inactive_(),
         active_(),
         unfeasible_(false),
         timer_()
 {}
+
+Preprocessor::~Preprocessor()
+{
+   if (reg_!=nullptr) delete reg_;
+}
 
 bool Preprocessor::allVarsFixed() const
 {
@@ -49,29 +55,29 @@ Variable Preprocessor::srcToDestVar(Variable v) const
    auto it = vvm_.find(v);
    return it->second;
 }
-   
+
+Scope Preprocessor::destScope() const
+{
+   Scope sco;
+   for (auto p : vvm_)
+      sco.insert(p.second);
+
+   return sco;
+}
+
+IntervalRegion Preprocessor::destRegion() const
+{
+   IntervalRegion reg(destScope());
+   for (auto p : vvm_)
+      reg.set(p.second, reg_->get(p.first));
+
+   return reg;
+}
+
 void Preprocessor::apply(const Problem& src, Problem& dest)
-{
-   IntervalRegion reg = src.makeIntervalRegion();
-   apply(src, reg, dest);
-}
-
-void Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
-{
-   timer_.reset();
-   timer_.start();
-   applyImpl(src, reg, dest);
-   timer_.stop();
-}
-
-void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
-                             Problem& dest)
-{
-   ASSERT(src.nbVars() == reg.size(), "Preprocessing error");
+{   
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
-
-   Objective obj = src.getObjective();
 
    // resets this
    vvm_.clear();
@@ -80,14 +86,28 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    active_.clear();
    unfeasible_ = false;
 
+   // makes the interval region used for propagation
+   if (reg_!=nullptr) delete reg_;
+   reg_ = new IntervalRegion(src.makeIntervalRegion());
+
    LOG_MAIN("Preprocessing");
-   LOG_INTER("Region: " << reg);
+   LOG_INTER("Region: " << (*reg_));
+
+   timer_.reset();
+   timer_.start();
+   applyImpl(src, dest);
+   timer_.stop();
+}
+
+void Preprocessor::applyImpl(const Problem& src, Problem& dest)
+{
+   Objective obj = src.getObjective();
 
    // test empty domains
    for (size_t i=0; i<src.nbVars(); ++i)
    {
       Variable v        = src.varAt(i);
-      Interval domain   = reg.get(v);
+      Interval domain   = reg_->get(v);
 
       if (domain.isEmpty())
       {
@@ -98,20 +118,20 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    }
 
    // propagation
-   bool ok = propagate(src, reg);
+   bool ok = propagate(src, *reg_);
    if (!ok)
    {
       unfeasible_ = true;
       return;
    }
 
-   LOG_INTER("Contracted region: " << reg);
+   LOG_INTER("Contracted region: " << (*reg_));
 
    // satisfaction tests
    for (size_t i=0; i<src.nbCtrs(); ++i)
    {
       Constraint c = src.ctrAt(i);
-      Proof proof = c.isSatisfied(reg);
+      Proof proof = c.isSatisfied(*reg_);
 
       if (proof == Proof::Empty)
       {
@@ -138,11 +158,10 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    for (size_t i=0; i<src.nbVars(); ++i)
    {
       Variable v        = src.varAt(i);
-      Interval domain   = reg.get(v);
+      Interval domain   = reg_->get(v);
       bool isReal       = v.isReal();
 
       bool isFixed = isReal ? domain.isCanonical() : domain.isSingleton();
-
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
    
       if (isFake)
@@ -170,7 +189,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    // rewrites the constraints
    for (Constraint input : active_)
    {
-      ConstraintFixer fixer(&vvm_, &vim_, reg);
+      ConstraintFixer fixer(&vvm_, &vim_, *reg_);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
 
@@ -184,7 +203,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(src.makeIntervalRegion());
+   Interval dobj = obj.getTerm().eval(*reg_);
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");
@@ -236,20 +255,21 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
       if (!save.equals(reg)) modified = true;
    }
    while (modified && nbsteps>0);
-   
-   // integer variables
+
+   // variables with disconnected domains
    Scope sco = reg.scope();
    for (auto v : sco)
    {
-      if (v.isInteger())
+      if (!v.getDomain()->isConnected())
       {
-         Interval rnd = round(reg.get(v));
-         reg.set(v, rnd);
+         Interval y = reg.get(v);
+         v.getDomain()->contract(y);
+         reg.set(v, y);
 
-         if (rnd.isEmpty()) return false;
+         if (y.isEmpty()) return false;
       }
    }
-   
+
    return true;
 }
 
