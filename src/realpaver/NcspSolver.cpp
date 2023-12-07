@@ -126,21 +126,11 @@ void NcspSolver::makeSpace()
             "Unable to make the space object in a Ncsp solver");
 
    // creates and inserts the root node
-   SharedNcspNode node;
-
-   if (withPreprocessing_)
-   {
-      node = std::make_shared<NcspNode>(preprob_->scope(),
-                                        preproc_->destRegion());
-   }
-   else
-   {
-      node =
-         std::make_shared<NcspNode>(preprob_->scope(),
-                                    preprob_->makeIntervalRegion());
-   }
-
+   SharedNcspNode node =
+      std::make_shared<NcspNode>(preprob_->scope(),
+                                 preprob_->makeIntervalRegion());
    node->setIndex(1);
+
    space_->insertPendingNode(node);
    ++nbnodes_;
 }

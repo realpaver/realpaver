@@ -144,7 +144,7 @@ Range RangeUnion::hull() const
       return Range(v_[0].left(), v_[size()-1].right());
 }
 
-void RangeUnion::contract(Interval& x) const
+void RangeUnion::contractInterval(Interval& x) const
 {
    Range r = Range::roundInward(x);
 
@@ -164,6 +164,46 @@ void RangeUnion::contract(Interval& x) const
 
       else
          x.setEmpty();
+   }
+}
+
+
+void RangeUnion::contract(const Interval& x)
+{
+   if (x.isEmpty())
+   {
+      clear();
+      return;
+   }
+
+   int first, last;
+   Range r = Range::roundInward(x);
+   bool b = findInter(r, first, last);
+
+   if (!b)
+   {
+      clear();
+      return;
+   }
+
+   // intersects the outermost intervals (and not the other ones)
+   v_[first] &= r;
+   v_[last] &= r;
+
+   // removes the intervals after last
+   if (last < v_.size()-1)
+   {
+      auto it = v_.begin();
+      std::advance(it, last+1);
+      v_.erase(it, v_.end());
+   }
+
+   // (and then) removes the intervals before first
+   if (first > 0)
+   {
+      auto it = v_.begin();
+      std::advance(it, first);
+      v_.erase(v_.begin(), it);
    }
 }
 

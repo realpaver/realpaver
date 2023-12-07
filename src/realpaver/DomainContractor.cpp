@@ -47,7 +47,7 @@ Proof DomainContractor::contract(IntervalRegion& reg)
    for (auto v : s_)
    {
       Interval x = reg.get(v);
-      v.getDomain()->contract(x);
+      v.getDomain()->contractInterval(x);
       reg.set(v, x);
 
       if (x.isEmpty()) return Proof::Empty;

@@ -73,9 +73,14 @@ Interval IntervalDomain::intervalHull() const
    return val_;
 }
 
-void IntervalDomain::contract(Interval& x)
+void IntervalDomain::contractInterval(Interval& x) const
 {
    x &= val_;
+}
+
+void IntervalDomain::contract(const Interval& x)
+{
+   val_ &= x;
 }
 
 bool IntervalDomain::isConnected() const
@@ -131,7 +136,12 @@ Interval IntervalUnionDomain::intervalHull() const
    return val_.hull();
 }
 
-void IntervalUnionDomain::contract(Interval& x)
+void IntervalUnionDomain::contractInterval(Interval& x) const
+{
+   val_.contractInterval(x);
+}
+
+void IntervalUnionDomain::contract(const Interval& x)
 {
    val_.contract(x);
 }
@@ -178,9 +188,14 @@ Interval RangeDomain::intervalHull() const
    return val_.toInterval();
 }
 
-void RangeDomain::contract(Interval& x)
+void RangeDomain::contractInterval(Interval& x) const
 {
    x = round(x) & intervalHull();
+}
+
+void RangeDomain::contract(const Interval& x)
+{
+   val_ &= Range::roundInward(x);
 }
 
 RangeDomain* RangeDomain::clone() const
@@ -230,7 +245,12 @@ Interval RangeUnionDomain::intervalHull() const
    return val_.hull().toInterval();
 }
 
-void RangeUnionDomain::contract(Interval& x)
+void RangeUnionDomain::contractInterval(Interval& x) const
+{
+   val_.contractInterval(x);
+}
+
+void RangeUnionDomain::contract(const Interval& x)
 {
    val_.contract(x);
 }
@@ -277,9 +297,18 @@ Interval BinaryDomain::intervalHull() const
    return val_.toRange().toInterval();
 }
 
-void BinaryDomain::contract(Interval& x)
+void BinaryDomain::contractInterval(Interval& x) const
 {
    x = round(x) & intervalHull();
+}
+
+void BinaryDomain::contract(const Interval& x)
+{
+   if (!x.contains(0.0))
+      val_.setZero(false);
+
+   if (!x.contains(1.0))
+      val_.setOne(false);
 }
 
 BinaryDomain* BinaryDomain::clone() const

@@ -37,7 +37,11 @@ public:
 
    /// Contraction method
    /// @param x an interval assigned to hull(x inter this)
-   virtual void contract(Interval& x) = 0;
+   virtual void contractInterval(Interval& x) const = 0;
+
+   /// Contraction method
+   /// @param x an interval such that this is assigned to (x inter this)
+   virtual void contract(const Interval& x) = 0;
 
    /// @return true if this is connected, typically if it is a real interval
    ///
@@ -98,7 +102,8 @@ public:
    bool isEmpty() const override;
    bool isReal() const override;
    Interval intervalHull() const override;
-   void contract(Interval& x) override;
+   void contractInterval(Interval& x) const override;
+   void contract(const Interval& x) override;
    bool isConnected() const override;
    IntervalDomain* clone() const override;
    void print(std::ostream& os) const override;
@@ -141,7 +146,8 @@ public:
    bool isEmpty() const override;
    bool isReal() const override;
    Interval intervalHull() const override;
-   void contract(Interval& x) override;
+   void contractInterval(Interval& x) const override;
+   void contract(const Interval& x) override;
    IntervalUnionDomain* clone() const override;
    void print(std::ostream& os) const override;
    ///@}
@@ -179,7 +185,8 @@ public:
    bool isEmpty() const override;
    bool isInteger() const override;
    Interval intervalHull() const override;
-   void contract(Interval& x) override;
+   void contractInterval(Interval& x) const override;
+   void contract(const Interval& x) override;
    RangeDomain* clone() const override;
    void print(std::ostream& os) const override;
    ///@}
@@ -221,7 +228,8 @@ public:
    bool isEmpty() const override;
    bool isInteger() const override;
    Interval intervalHull() const override;
-   void contract(Interval& x) override;
+   void contractInterval(Interval& x) const override;
+   void contract(const Interval& x) override;
    RangeUnionDomain* clone() const override;
    void print(std::ostream& os) const override;
    ///@}
@@ -258,7 +266,8 @@ public:
    bool isEmpty() const override;
    bool isBinary() const override;
    Interval intervalHull() const override;
-   void contract(Interval& x) override;
+   void contractInterval(Interval& x) const override;
+   void contract(const Interval& x) override;
    BinaryDomain* clone() const override;
    void print(std::ostream& os) const override;
    ///@}

@@ -179,6 +179,11 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
          // creates a clone of the variable in the other problem
          Variable w = dest.addClonedVar(v);
 
+         // assigns the reduced domain to it
+         std::unique_ptr<Domain> wdom(v.getDomain()->clone());
+         wdom->contract(domain);
+         w.setDomain(std::move(wdom));
+
          // new map entry
          vvm_.insert(std::make_pair(v, w));
       }
@@ -263,7 +268,7 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
       if (!v.getDomain()->isConnected())
       {
          Interval y = reg.get(v);
-         v.getDomain()->contract(y);
+         v.getDomain()->contractInterval(y);
          reg.set(v, y);
 
          if (y.isEmpty()) return false;

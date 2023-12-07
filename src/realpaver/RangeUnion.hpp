@@ -72,7 +72,13 @@ public:
    /// @param x an interval
    ///
    /// x is assigned tohull(x inter this)
-   void contract(Interval& x) const;
+   void contractInterval(Interval& x) const;
+
+   /// Contracts this
+   /// @param x an interval
+   ///
+   /// this is assigned to (this inter x)
+   void contract(const Interval& x);
 
    /// Output on a stream
    /// @param os output stream

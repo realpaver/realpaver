@@ -137,7 +137,7 @@ Interval IntervalUnion::hull() const
       return Interval(v_[0].left(), v_[size()-1].right());
 }
 
-void IntervalUnion::contract(Interval& x) const
+void IntervalUnion::contractInterval(Interval& x) const
 {
    if (!x.isEmpty())
    {
@@ -154,6 +154,44 @@ void IntervalUnion::contract(Interval& x) const
          else
             x.setEmpty();
       }
+   }
+}
+
+void IntervalUnion::contract(const Interval& x)
+{
+   if (x.isEmpty())
+   {
+      clear();
+      return;
+   }
+
+   int first, last;
+   bool b = findInter(x, first, last);
+
+   if (!b)
+   {
+      clear();
+      return;
+   }
+
+   // intersects the outermost intervals (and not the other ones)
+   v_[first] &= x;
+   v_[last] &= x;
+
+   // removes the intervals after last
+   if (last < v_.size()-1)
+   {
+      auto it = v_.begin();
+      std::advance(it, last+1);
+      v_.erase(it, v_.end());
+   }
+
+   // (and then) removes the intervals before first
+   if (first > 0)
+   {
+      auto it = v_.begin();
+      std::advance(it, first);
+      v_.erase(v_.begin(), it);
    }
 }
 
