@@ -18,7 +18,7 @@ void init()
    dag->insert(sqr(x + y) - 2*z + 2 == 0);
    dag->insert(sqr(x + y) - 2*z + 2 >= 0);
 
-   reg = new IntervalRegion(prob->makeIntervalRegion());
+   reg = new IntervalRegion(prob->scope());
 }
 
 void clean()

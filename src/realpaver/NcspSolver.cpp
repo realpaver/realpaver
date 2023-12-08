@@ -126,9 +126,10 @@ void NcspSolver::makeSpace()
             "Unable to make the space object in a Ncsp solver");
 
    // creates and inserts the root node
+   IntervalRegion reg(preprob_->scope());
+
    SharedNcspNode node =
-      std::make_shared<NcspNode>(preprob_->scope(),
-                                 preprob_->makeIntervalRegion());
+      std::make_shared<NcspNode>(preprob_->scope(), reg);
    node->setIndex(1);
 
    space_->insertPendingNode(node);
@@ -641,7 +642,7 @@ std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
 
    if (withPreprocessing_)
    {
-      IntervalRegion reg(problem_->makeIntervalRegion());
+      IntervalRegion reg(problem_->scope());
       Proof proof = Proof::Inner;
 
       // assigns the values of the fixed variables

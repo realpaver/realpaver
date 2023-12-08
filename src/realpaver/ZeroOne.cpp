@@ -21,6 +21,16 @@ bool ZeroOne::isEmpty() const
    return !(zro_ || one_);
 }
 
+bool ZeroOne::isZero() const
+{
+   return zro_ && (!one_);
+}
+
+bool ZeroOne::isOne() const
+{
+   return (!zro_) && one_;
+}
+
 bool ZeroOne::hasZero() const
 {
    return zro_;

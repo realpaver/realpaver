@@ -88,7 +88,7 @@ void Preprocessor::apply(const Problem& src, Problem& dest)
 
    // makes the interval region used for propagation
    if (reg_!=nullptr) delete reg_;
-   reg_ = new IntervalRegion(src.makeIntervalRegion());
+   reg_ = new IntervalRegion(src.scope());
 
    LOG_MAIN("Preprocessing");
    LOG_INTER("Region: " << (*reg_));

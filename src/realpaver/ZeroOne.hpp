@@ -36,6 +36,12 @@ public:
    /// @return true if this is empty
    bool isEmpty() const;
 
+   /// @return true if this is reduced to 0
+   bool isZero() const;
+
+   /// @return true if this is reduced to 1
+   bool isOne() const;
+
    /// @return true if 0 is in this
    bool hasZero() const;
 

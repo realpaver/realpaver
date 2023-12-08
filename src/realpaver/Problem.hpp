@@ -10,12 +10,14 @@
 #ifndef REALPAVER_PROBLEM_HPP
 #define REALPAVER_PROBLEM_HPP
 
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
+#include "realpaver/SearchRegion.hpp"
 #include "realpaver/VariableVector.hpp"
 
 namespace realpaver {
@@ -31,8 +33,8 @@ namespace realpaver {
 /// created and the static variable MAX_NB_VAR initialized to a huge value
 /// (one million), the first variable identifier is NP*MAX_NB_VAR.
 ///
-/// The variable domains define the initial region, which is an interval vector
-/// or Cartesian product of intervals with a scope.
+/// The Cartesian product of variable domains can be simply obtained by
+/// creating a SearchRegion from the scope of this.
 ///
 /// There are several classes of problems:
 /// - Constraint Satisfaction Problems (CSPs);
@@ -68,7 +70,7 @@ public:
    /// @param first index of the first variable
    /// @param last index of the last variable
    /// @return the vector created
-   VariableVector addBinaryVars(const std::string& name, int first, int last);
+   VariableVector addBinaryVarVector(const std::string& name, int first, int last);
 
    /// Creates a new integer variable
    /// @param lo lower bound
@@ -97,8 +99,8 @@ public:
    /// @param last index of the last variable
    /// @param r domain of every variable in this
    /// @return the vector created
-   VariableVector addIntVars(const std::string& name, int first, int last,
-                             const Range& r = Range::universe());
+   VariableVector addIntVarVector(const std::string& name, int first, int last,
+                                  const Range& r = Range::universe());
 
    /// Creates a new real variable
    /// @param lo lower bound
@@ -125,8 +127,8 @@ public:
    /// @param last index of the last variable
    /// @param x domain of every variable
    /// @return the vector created
-   VariableVector addRealVars(const std::string& name, int first, int last,
-                              const Interval& x = Interval::universe());
+   VariableVector addRealVarVector(const std::string& name, int first, int last,
+                                   const Interval& x = Interval::universe());
 
    /// Creates a new real variable by cloning
    /// @param v a variable (from this or another problem)
@@ -174,13 +176,6 @@ public:
    /// @param i an index in 0 .. nbCtrs()-1
    /// @return the i-th constraint of this
    Constraint ctrAt(size_t i) const;
-
-   /// Gets the initial region
-   /// @return the vector of domains
-   ///
-   /// The i-th component of the vector is th domain of the i-th variable
-   /// for each i;.
-   IntervalRegion makeIntervalRegion() const;
 
    /// @return true if this is a CSP
    bool isCSP() const;

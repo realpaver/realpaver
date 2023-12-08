@@ -4,6 +4,7 @@
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Propagator.hpp"
+#include "realpaver/SearchRegion.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -18,9 +19,15 @@ int main(void)
       Variable x = problem.addRealVar(-7,  3, "x"),
                y = problem.addRealVar( -3, 6, "y");
 
-      IntervalRegion reg = problem.makeIntervalRegion();
+      SearchRegion R(problem.scope());
+      cout << "R:     " << R << endl;
 
+      IntervalRegion reg(R);
       cout << "Region:     " << reg << endl;
+
+
+
+
 
       SharedDag dag = std::make_shared<Dag>();
       //~ size_t i = dag->insert( y == 0.5*x );

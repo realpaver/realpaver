@@ -53,6 +53,11 @@ bool IntervalDomain::isEmpty() const
    return val_.isEmpty();
 }
 
+bool IntervalDomain::isCanonical() const
+{
+   return val_.isCanonical();
+}
+
 bool IntervalDomain::isReal() const
 {
    return true;
@@ -126,6 +131,11 @@ bool IntervalUnionDomain::isEmpty() const
    return val_.isEmpty();
 }
 
+bool IntervalUnionDomain::isCanonical() const
+{
+   return (val_.size() == 1) && val_[0].isCanonical();
+}
+
 bool IntervalUnionDomain::isReal() const
 {
    return true;
@@ -176,6 +186,11 @@ void RangeDomain::setVal(const Range& r)
 bool RangeDomain::isEmpty() const
 {
    return val_.isEmpty();
+}
+
+bool RangeDomain::isCanonical() const
+{
+   return val_.isSingleton();
 }
 
 bool RangeDomain::isInteger() const
@@ -234,7 +249,12 @@ bool RangeUnionDomain::isEmpty() const
 {
    return val_.isEmpty();
 }
- 
+
+bool RangeUnionDomain::isCanonical() const
+{
+   return (val_.size() == 1) && val_[0].isSingleton();
+}
+
 bool RangeUnionDomain::isInteger() const
 {
    return true;
@@ -285,6 +305,11 @@ void BinaryDomain::setVal(const ZeroOne& zo)
 bool BinaryDomain::isEmpty() const
 {
    return val_.isEmpty();
+}
+
+bool BinaryDomain::isCanonical() const
+{
+   return val_.isZero() || val_.isOne();
 }
 
 bool BinaryDomain::isBinary() const

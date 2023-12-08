@@ -32,6 +32,9 @@ public:
    /// @return true if this is empty
    virtual bool isEmpty() const = 0;
 
+   /// @return true if this is canonical (non empty and not splitable)
+   virtual bool isCanonical() const = 0;
+
    /// Returns the interval hull of this
    virtual Interval intervalHull() const = 0;
 
@@ -74,6 +77,25 @@ public:
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Domain& dom);
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+//class RealDomain : public Domain {
+  
+  // width, used to select ?
+  // widthHull, used to test the tolerance
+   
+//};
+
+// TODO : enumeration of domains
+
+//class IntegerDomain : public Domain {
+   
+//}
+
+// ou dans Domain une methode isEnum()
+// une classe Enumerable, méthodes nbElems, nbElems(Interval)
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interval domain.
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,6 +122,7 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isCanonical() const override;
    bool isReal() const override;
    Interval intervalHull() const override;
    void contractInterval(Interval& x) const override;
@@ -144,6 +167,7 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isCanonical() const override;
    bool isReal() const override;
    Interval intervalHull() const override;
    void contractInterval(Interval& x) const override;
@@ -183,6 +207,7 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isCanonical() const override;
    bool isInteger() const override;
    Interval intervalHull() const override;
    void contractInterval(Interval& x) const override;
@@ -226,6 +251,7 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isCanonical() const override;
    bool isInteger() const override;
    Interval intervalHull() const override;
    void contractInterval(Interval& x) const override;
@@ -264,6 +290,7 @@ public:
 
    ///@{
    bool isEmpty() const override;
+   bool isCanonical() const override;
    bool isBinary() const override;
    Interval intervalHull() const override;
    void contractInterval(Interval& x) const override;

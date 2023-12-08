@@ -59,9 +59,9 @@ Integer Range::right() const
    return r_;
 }
 
-Integer Range::nbElems() const
+unsigned long  Range::nbElems() const
 {
-   return r_ - l_ + 1;
+   return (unsigned long)r_.toInt() - l_.toInt() + 1;
 }
 
 bool Range::isEmpty() const

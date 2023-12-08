@@ -17,20 +17,22 @@
 
 namespace realpaver {
 
+class SearchRegion;
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a scoped interval vector.
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalRegion : public IntervalVector {
 public:
    /// Creates an interval region
-   /// sco scope of this
+   /// @param sco scope of this
    ///
    /// The domains in this are assigned to the domains enclosed in the variables
    IntervalRegion(Scope sco);
 
    /// Creates an interval region
-   /// sco scope of this
-   /// x interval assigned to each element of this
+   /// @param sco scope of this
+   /// @param x interval assigned to each element of this
    IntervalRegion(Scope sco, const Interval& x);
 
    /// Creates an interval region
@@ -41,8 +43,8 @@ public:
    IntervalRegion(Scope sco, const IntervalVector& X);
 
    /// Creates an interval region
-   /// sco scope of this
-   /// X real vector having the same size than sco
+   /// @param sco scope of this
+   /// @param X real vector having the same size than sco
    ///
    /// The i-th variable in sco is assigned to X[i] for each i.
    IntervalRegion(Scope sco, const RealVector& X);
@@ -50,6 +52,12 @@ public:
    /// Creates an interval region
    /// @param pt a real point assigned to this
    IntervalRegion(const RealPoint& pt);
+
+   /// Creates an interval region
+   /// @param reg a search region
+   ///
+   /// this is the interval hull of reg
+   IntervalRegion(const SearchRegion& reg);
 
    /// Default copy constructor
    IntervalRegion(const IntervalRegion&) = default;
@@ -79,7 +87,7 @@ public:
 
    /// Sets an element of this
    /// @param v a variable that belongs to the scope of this
-   /// @param x interval assigned to v ion this
+   /// @param x interval assigned to v in this
    ///
    /// This masks the access by index.
    void set(const Variable& v, const Interval& x);

@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalRegion.hpp"
+#include "realpaver/SearchRegion.hpp"
 
 namespace realpaver {
 
@@ -58,6 +59,14 @@ IntervalRegion::IntervalRegion(const IntervalRegion& reg, Scope sco)
 
    for (Variable v : sco)
       set(v, reg.get(v));
+}
+
+IntervalRegion::IntervalRegion(const SearchRegion& reg)
+      : IntervalVector(reg.scope().size()),
+        scope_(reg.scope())
+{
+   for (Variable v : scope_)
+      set(v, reg.getDomain(v)->intervalHull());
 }
 
 Scope IntervalRegion::scope() const

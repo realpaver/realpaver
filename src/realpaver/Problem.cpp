@@ -74,8 +74,8 @@ Variable Problem::addBinaryVar(const std::string& name)
    return v;
 }
 
-VariableVector Problem::addBinaryVars(const std::string& name, int first,
-                                      int last)
+VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
+                                           int last)
 {
    VariableVector vec(name, first, last);
 
@@ -154,8 +154,8 @@ Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
    return v;
 }
 
-VariableVector Problem::addIntVars(const std::string& name, int first, int last,
-                                   const Range& r)
+VariableVector Problem::addIntVarVector(const std::string& name, int first, int last,
+                                        const Range& r)
 {
    VariableVector vec(name, first, last);
 
@@ -234,8 +234,8 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
    return v;
 }
 
-VariableVector Problem::addRealVars(const std::string& name, int first,
-                                    int last, const Interval& x)
+VariableVector Problem::addRealVarVector(const std::string& name, int first,
+                                         int last, const Interval& x)
 {
    VariableVector vec(name, first, last);
 
@@ -283,13 +283,6 @@ void Problem::addCtr(const std::initializer_list<Constraint>& l)
 void Problem::addObjective(Objective obj)
 {
    obj_ = obj;
-}
-
-IntervalRegion Problem::makeIntervalRegion() const
-{
-   IntervalRegion r(scope_);
-   for (auto v : scope_) r.set(v, v.getDomain()->intervalHull());
-   return r;
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)

@@ -122,7 +122,7 @@ public:
    Integer right() const;
 
    /// @return the number of elements in this
-   Integer nbElems() const;
+   unsigned long nbElems() const;
 
    /// @return the midpoint of this
    Integer midpoint() const;

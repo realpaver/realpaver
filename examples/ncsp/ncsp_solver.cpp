@@ -9,6 +9,7 @@
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Stat.hpp"
+#include "realpaver/SearchRegion.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -391,7 +392,8 @@ int main(int argc, char** argv)
 
       // writes the problem
       fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
-      fsol << "REGION" << endl << problem.makeIntervalRegion() << endl;
+      SearchRegion reg(problem.scope());
+      fsol << "REGION" << endl << reg << endl;
 
       // writes the constraints
       fsol << "CONSTRAINTS" << endl;
