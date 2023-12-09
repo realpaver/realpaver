@@ -45,7 +45,7 @@ void test_ipopt(std::string filepath)
     
     RealPoint sol(pb->scope());
     OptimizationStatus status = OptimizationStatus::Other;
-    IntervalRegion box(pb->scope());
+    IntervalBox box(pb->scope());
     RealPoint start(pb->scope(),box.midpoint());
 
     std::cerr<<"Search space: "<<box<<std::endl;

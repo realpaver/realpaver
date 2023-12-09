@@ -24,19 +24,19 @@ NcspSplit::NcspSplit(std::unique_ptr<VariableSelector> selector,
 
 bool NcspSplit::applyImpl(SharedNcspNode node)
 {
-   IntervalRegion* reg = node->region();
+   IntervalBox* B = node->region();
 
    std::pair<bool, Variable> p = selector_->selectVar(*node);
    if (!p.first) return false;
 
    Variable v = p.second;
 
-   size_t n = slicer_->apply(reg->get(v));
+   size_t n = slicer_->apply(B->get(v));
    if (n < 2) return false;
 
    // reuses the input node
    auto it = slicer_->begin();
-   reg->set(v, *it);
+   B->set(v, *it);
    push(node);
 
    // generates the other nodes

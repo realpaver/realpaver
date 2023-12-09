@@ -54,18 +54,18 @@ void CIDContractor::setVar(Variable v)
    v_ = v;
 }
 
-Proof CIDContractor::contract(IntervalRegion& reg)
+Proof CIDContractor::contract(IntervalBox& B)
 {
-   slicer_->apply(reg.get(v_));
+   slicer_->apply(B.get(v_));
 
-   if (slicer_->nbSlices() == 1) return op_->contract(reg);
+   if (slicer_->nbSlices() == 1) return op_->contract(B);
 
-   IntervalRegion* init = reg.clone();
+   IntervalBox* init = B.clone();
    Proof proof = Proof::Empty, certif;
 
    for (auto it = slicer_->begin(); it != slicer_->end(); ++it)
    {
-      IntervalRegion* slice = init->clone();
+      IntervalBox* slice = init->clone();
       slice->set(v_, *it);
       certif = op_->contract(*slice);
    
@@ -73,12 +73,12 @@ Proof CIDContractor::contract(IntervalRegion& reg)
       {
          if (proof == Proof::Empty)
          {
-            reg.setOnScope(*slice, scope());
+            B.setOnScope(*slice, scope());
             proof = certif;
          }
          else
          {
-            reg.hullAssignOnScope(*slice, scope());
+            B.hullAssignOnScope(*slice, scope());
             proof = std::min(proof, certif);
          }
       }

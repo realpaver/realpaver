@@ -126,9 +126,9 @@ void PolytopeRLTCreator::createLinVar(LPModel& lpm, DagNode* node)
       mvv_.insert(std::make_pair(vnode->getVar().id(), v.getIndex()));
 }
 
-bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalRegion& reg)
+bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalBox& B)
 {
-   if (!dag_->intervalEval(reg)) return false;
+   if (!dag_->intervalEval(B)) return false;
 
    if (lfun_.size() == dag_->nbFuns())
    {
@@ -208,14 +208,14 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
    corner_.setAllZero();
 }
 
-bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
+bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
 {
    Scope sco = scope();
 
    // creates the linear variables
    for (auto v : sco)
    {
-      Interval val = reg.get(v);
+      Interval val = B.get(v);
       LinVar lv = lpm.makeVar(val.left(), val.right());
       lv.setName(v.getName());
       mvv_.insert(std::make_pair(v.id(), lv.getIndex()));
@@ -225,7 +225,7 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
    RealPoint c1(sco), c2(sco);
    for (auto v : sco)
    {
-      Interval dom = reg.get(v);
+      Interval dom = B.get(v);
       if (corner_.get(sco.index(v)))
       {
          c1.set(v, dom.right());
@@ -253,9 +253,9 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalRegion& reg)
       fc2.set(i, x2);
    }
 
-   // interval evaluation on the given region, used to calculate
+   // interval evaluation on the given box, used to calculate
    // the derivatives thereafter
-   if (!dag_->intervalEval(reg)) return false;
+   if (!dag_->intervalEval(B)) return false;
 
    // generates the constraints
    for (size_t i : lfun_)
@@ -405,21 +405,21 @@ Scope PolytopeHullContractor::scope() const
    return creator_->scope();
 }
 
-Proof PolytopeHullContractor::contract(IntervalRegion& reg)
+Proof PolytopeHullContractor::contract(IntervalBox& B)
 {
-   Proof proof = contractImpl(reg);
+   Proof proof = contractImpl(B);
    return proof;
 }
 
 // TODO
 #include <iomanip>
 
-Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
+Proof PolytopeHullContractor::contractImpl(IntervalBox& B)
 {
    LPSolver solver;
 
    // linearizes the constraints
-   if (!creator_->make(solver, reg)) return Proof::Maybe;
+   if (!creator_->make(solver, B)) return Proof::Maybe;
 
    // first is true if a call to solver.optimize() is required, false false after
    // a successfull optimization, then the next call to the solver can use
@@ -429,7 +429,7 @@ Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
 
    for (auto v : creator_->scope())
    {
-      Interval x = reg.get(v);
+      Interval x = B.get(v);
       LinVar lv = solver.getLinVar(creator_->linVarIndex(v));
       LinExpr e({1.0}, {lv});
       solver.setObj(e);
@@ -476,7 +476,7 @@ Proof PolytopeHullContractor::contractImpl(IntervalRegion& reg)
          first = true;
       }
 
-      reg.set(v, x);
+      B.set(v, x);
    }
 
    return Proof::Maybe;

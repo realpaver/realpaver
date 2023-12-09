@@ -31,7 +31,7 @@ void NcspSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
    // update the distances
    for (auto& elem : vnode_)
    {
-      IntervalRegion* reg = node->region();
+      IntervalBox* reg = node->region();
       double d = elem.node->region()->distance(*reg);
       if (d < elem.mindist) elem.mindist = d;
    }
@@ -80,7 +80,7 @@ void NcspSpaceDMDFS::makeSolClusters(double gap)
    {
       // extracts the first node
       SharedNcspNode node = lnode.front();
-      IntervalRegion* regnode = node->region();
+      IntervalBox* regnode = node->region();
       lnode.pop_front();
 
       // finds another node that is close enough
@@ -89,7 +89,7 @@ void NcspSpaceDMDFS::makeSolClusters(double gap)
       while (!found && it != lnode.end())
       {
          SharedNcspNode bis = *it;
-         IntervalRegion* regbis = bis->region();
+         IntervalBox* regbis = bis->region();
 
          if (regnode->gap(*regbis) < gap)
          {
@@ -108,12 +108,12 @@ void NcspSpaceDMDFS::makeSolClusters(double gap)
    // each pending node and its closest solution.
    for (auto& elem : vnode_)
    {
-      IntervalRegion* reg = elem.node->region();
+      IntervalBox* reg = elem.node->region();
       elem.mindist = Double::inf();
 
       for (auto& sol : vsol_)
       {
-         IntervalRegion* regsol = sol->region();
+         IntervalBox* regsol = sol->region();
          double d = reg->distance(*regsol);
          if (d < elem.mindist) elem.mindist = d;
       }
@@ -146,7 +146,7 @@ void NcspSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
    double d = Double::inf();
    for (auto& sol : vsol_)
    {
-      IntervalRegion* reg = sol->region();
+      IntervalBox* reg = sol->region();
       double e = node->region()->distance(*reg);
       if (e < d) d = e;
    }

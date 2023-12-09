@@ -19,7 +19,7 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a contractor for variables having non interval domains.
 ///
-/// Given a variable v and an interval region X, let dom be the initial domain
+/// Given a variable v and an interval box X, let dom be the initial domain
 /// of v and let X[v] be the domain of v in X. This operator contracts X[v] as
 /// the hull of X[v] inter dom.
 ///
@@ -47,7 +47,7 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalRegion& reg) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 

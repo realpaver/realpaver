@@ -13,7 +13,8 @@
 
 namespace realpaver {
 
-double ctr_nlopt(const std::vector<double>& x, std::vector<double>& grad, void* f_data)
+double ctr_nlopt(const std::vector<double>& x, std::vector<double>& grad,
+                 void* f_data)
 {
    NLPSolver::Ctr* c = reinterpret_cast<NLPSolver::Ctr*>(f_data);
    NLPSolver* ls = c->ls;
@@ -54,7 +55,8 @@ double ctr_nlopt(const std::vector<double>& x, std::vector<double>& grad, void* 
     return val;
 }
 
-double f_nlopt(const std::vector<double>& x, std::vector<double>& grad, void* f_data)
+double f_nlopt(const std::vector<double>& x, std::vector<double>& grad,
+               void* f_data)
 {
     NLPSolver* ls = reinterpret_cast<NLPSolver*>(f_data);
     RealFunction* obj = ls->obj();
@@ -113,11 +115,11 @@ NLPSolver::~NLPSolver()
    if (optimizer_ != nullptr) delete optimizer_;
 }
 
-OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
+OptimizationStatus NLPSolver::minimize(const IntervalBox& B,
                                        const RealPoint& src)
 {
-    ASSERT(reg.scope().contains(scope()),
-           "Bad scope of an interval region given as input of NlpOpt");
+    ASSERT(B.scope().contains(scope()),
+           "Bad scope of an interval box given as input of NlpOpt");
 
     ASSERT(src.scope().contains(scope()),
            "Bad scope of astarting point given as input of NlpOpt");
@@ -125,8 +127,8 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
     // gets the dimension
     size_t n = this->scope().size();
 
-    // projects reg and src on the scope of this
-    IntervalRegion R(reg, this->scope());
+    // projects B and src on the scope of this
+    IntervalBox X(B, this->scope());
     RealPoint P(src, this->scope());
 
     LOG_LOW("Nlopt optimize at point: " << P);
@@ -149,8 +151,8 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
     std::vector<double> x_l(n), x_u(n), x(n);
     for (size_t i=0; i<n; i++)
     {
-        x_l[i] = R[i].left();
-        x_u[i] = R[i].right();
+        x_l[i] = X[i].left();
+        x_u[i] = X[i].right();
         x[i] = P[i];
     }
     optimizer_->set_lower_bounds(x_l);

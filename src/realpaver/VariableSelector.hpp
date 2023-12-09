@@ -45,10 +45,10 @@ public:
    virtual std::pair<bool, Variable> selectVar(SearchNode& node) = 0;
 
    /// Selection method
-   /// @param reg an interval region
-   /// @return a pair <b, v> such that no variable is selected if b = false,
+   /// @param B an interval box
+   /// @return a pair <ok, v> such that no variable is selected if ok = false,
    ///         otherwise v is the selected variable
-   virtual std::pair<bool, Variable> selectVar(const IntervalRegion& reg) = 0;
+   virtual std::pair<bool, Variable> selectVar(const IntervalBox& B) = 0;
 
 protected:
    Scope scope_;
@@ -74,7 +74,7 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   std::pair<bool, Variable> selectVar(const IntervalBox& B) override;
    ///@}
 };
 
@@ -99,7 +99,7 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   std::pair<bool, Variable> selectVar(const IntervalBox& B) override;
    ///@}
 
 private:
@@ -126,7 +126,7 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   std::pair<bool, Variable> selectVar(const IntervalBox& B) override;
    ///@}
 };
 
@@ -158,7 +158,7 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalRegion& reg) override;
+   std::pair<bool, Variable> selectVar(const IntervalBox& B) override;
    ///@}
 
 private:

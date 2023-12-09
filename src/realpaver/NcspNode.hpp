@@ -24,9 +24,9 @@ class NcspNode : public SearchNode {
 public:
    /// Creates a node
    /// @param scope set of variables
-   /// @param reg domains of variables
+   /// @param B domains of variables
    /// @param depth depth of this
-   NcspNode(const Scope& scope, const IntervalRegion& reg,  int depth = 0);
+   NcspNode(const Scope& scope, const IntervalBox& B,  int depth = 0);
 
    /// Default copy constructor
    NcspNode(const NcspNode& node) = default;

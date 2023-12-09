@@ -15,7 +15,6 @@
 #include <unordered_set>
 #include <vector>
 #include "realpaver/Constraint.hpp"
-#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
 #include "realpaver/SearchRegion.hpp"
 #include "realpaver/VariableVector.hpp"

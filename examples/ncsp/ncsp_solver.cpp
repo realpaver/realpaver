@@ -158,10 +158,10 @@ int main(int argc, char** argv)
                fsol << "solved feasible" << endl;
                cout << GREEN("solved feasible") << endl;
 
-               IntervalRegion reg(preproc->fixedRegion());
+               IntervalBox B(preproc->fixedRegion());
                fsol << endl << "SOLUTION " << std::scientific
-                    << "[" << reg.width() << "]"
-                    << endl << reg;
+                    << "[" << B.width() << "]"
+                    << endl << B;
             }
          }
          else
@@ -179,9 +179,9 @@ int main(int argc, char** argv)
 
             if (preproc->nbFixedVars() > 0)
             {
-               IntervalRegion reg(preproc->fixedRegion());
+               IntervalBox B(preproc->fixedRegion());
                Scope sco = preproc->fixedScope();
-               reg.stdPrint(fsol);
+               B.stdPrint(fsol);
             }
 
             fsol << WP("Number of inactive constraints", wpl)
@@ -337,7 +337,7 @@ int main(int argc, char** argv)
             for (size_t i=0; i<space->nbSolNodes(); ++i)
             {
                SharedNcspNode node = space->getSolNode(i);
-               IntervalRegion* reg = node->region();
+               IntervalBox* reg = node->region();
                Proof proof = node->getProof();
 
                fsol << std::setprecision(4);
@@ -364,7 +364,7 @@ int main(int argc, char** argv)
                fsol << std::setprecision(4);
 
                SharedNcspNode node = space->getSolNode(i);
-               IntervalRegion* reg = node->region();
+               IntervalBox* reg = node->region();
                fsol << std::setprecision(prec) << endl;
                reg->vecPrint(fsol);
             }
@@ -377,7 +377,7 @@ int main(int argc, char** argv)
          // writes the hull of the pending nodes
          if (space->nbPendingNodes() > 0)
          {
-            IntervalRegion hpn = space->hullOfPendingNodes();
+            IntervalBox hpn = space->hullOfPendingNodes();
 
             fsol << std::defaultfloat << std::setprecision(4);
             fsol << endl << "HULL OF PENDING NODES" << " ["

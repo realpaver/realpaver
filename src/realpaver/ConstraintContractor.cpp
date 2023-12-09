@@ -20,9 +20,9 @@ Scope ConstraintContractor::scope() const
    return c_.scope();
 }
 
-Proof ConstraintContractor::contract(IntervalRegion& reg)
+Proof ConstraintContractor::contract(IntervalBox& B)
 {
-   return c_.contract(reg);
+   return c_.contract(B);
 }
 
 void ConstraintContractor::print(std::ostream& os) const

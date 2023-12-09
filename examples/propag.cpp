@@ -19,15 +19,11 @@ int main(void)
       Variable x = problem.addRealVar(-7,  3, "x"),
                y = problem.addRealVar( -3, 6, "y");
 
-      SearchRegion R(problem.scope());
-      cout << "R:     " << R << endl;
+      SearchRegion reg(problem.scope());
+      cout << "Region:    " << reg << endl;
 
-      IntervalRegion reg(R);
-      cout << "Region:     " << reg << endl;
-
-
-
-
+      IntervalBox B(reg);
+      cout << "Box:     " << B << endl;
 
       SharedDag dag = std::make_shared<Dag>();
       //~ size_t i = dag->insert( y == 0.5*x );
@@ -45,12 +41,12 @@ int main(void)
       Propagator tor(pool);
       tor.setDistTol(Tolerance::makeRel(1.0e-2));
 
-      Proof proof = tor.contract(reg);
+      Proof proof = tor.contract(B);
 
       cout << "Proof:      " << proof << endl;
 
       if (proof != Proof::Empty)
-         cout << "New region: " << reg << endl;      
+         cout << "New box: " << B << endl;      
    }
    catch(Exception e) {
       cout << e.what() << endl;

@@ -43,14 +43,13 @@ public:
    NLPSolver& operator=(const NLPSolver&) = delete;
 
    /// Minimization of a problem
-   /// @param reg interval region in the search space
-   /// @param src starting point that belongs to the region
+   /// @param B interval box in the search space
+   /// @param src starting point that belongs to the box
    /// @return an optimization status
    ///
    /// Both scopes of reg and src must contain the scope of this.
    /// They do not necessarily correspond.
-   OptimizationStatus minimize(const IntervalRegion& reg,
-                               const RealPoint& src);
+   OptimizationStatus minimize(const IntervalBox& B, const RealPoint& src);
 
    // Structure used to process a constraint
    struct Ctr {

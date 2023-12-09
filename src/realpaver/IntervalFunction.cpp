@@ -67,9 +67,9 @@ size_t IntervalFunction::nbVars() const
    return rep_->nbVars();
 }
 
-Interval IntervalFunction::eval(const IntervalRegion& reg)
+Interval IntervalFunction::eval(const IntervalBox& B)
 {
-   return rep_->eval(reg);
+   return rep_->eval(B);
 }
 
 Interval IntervalFunction::pointEval(const RealPoint& pt)
@@ -77,27 +77,27 @@ Interval IntervalFunction::pointEval(const RealPoint& pt)
    return rep_->pointEval(pt);
 }
 
-void IntervalFunction::diff(const IntervalRegion& reg, IntervalVector& grad)
+void IntervalFunction::diff(const IntervalBox& B, IntervalVector& grad)
 {
-   return rep_->diff(reg, grad);
+   return rep_->diff(B, grad);
 }
 
-void IntervalFunction::evalDiff(const IntervalRegion& reg, Interval& val,
+void IntervalFunction::evalDiff(const IntervalBox& B, Interval& val,
                                 IntervalVector& grad)
 {
-   return rep_->evalDiff(reg, val, grad);   
+   return rep_->evalDiff(B, val, grad);   
 }
 
-void IntervalFunction::violation(const IntervalRegion& reg, Interval& val,
+void IntervalFunction::violation(const IntervalBox& B, Interval& val,
                                  double& viol)
 {
-   rep_->violation(reg, val, viol);
+   rep_->violation(B, val, viol);
 }
 
-void IntervalFunction::violation(const IntervalRegion& reg, double lo,
+void IntervalFunction::violation(const IntervalBox& B, double lo,
                                  double up, Interval& val, double& viol)
 {
-   rep_->violation(reg, lo, up, val, viol);
+   rep_->violation(B, lo, up, val, viol);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,9 +139,9 @@ size_t IntervalFunctionDag::nbVars() const
    return dag_->fun(index_)->nbVars();   
 }
 
-Interval IntervalFunctionDag::eval(const IntervalRegion& reg)
+Interval IntervalFunctionDag::eval(const IntervalBox& B)
 {
-   return dag_->fun(index_)->intervalEval(reg);
+   return dag_->fun(index_)->intervalEval(B);
 }
 
 Interval IntervalFunctionDag::pointEval(const RealPoint& pt)
@@ -149,15 +149,15 @@ Interval IntervalFunctionDag::pointEval(const RealPoint& pt)
    return dag_->fun(index_)->intervalEval(pt);
 }
 
-void IntervalFunctionDag::violation(const IntervalRegion& reg, Interval& val,
+void IntervalFunctionDag::violation(const IntervalBox& B, Interval& val,
                                     double& viol)
 {
    DagFun* f = dag_->fun(index_);
-   val = f->intervalEval(reg);
+   val = f->intervalEval(B);
    viol = f->intervalViolation();
 }
 
-void IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
+void IntervalFunctionDag::violation(const IntervalBox& B, double lo,
                                     double up, Interval& val, double& viol)
 {
    Interval img(lo, up);
@@ -167,25 +167,25 @@ void IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
    Interval tmp = f->getImage();
    f->setImage(img);
 
-   val = f->intervalEval(reg);
+   val = f->intervalEval(B);
    viol = f->intervalViolation();
 
    f->setImage(tmp);
 }
 
-void IntervalFunctionDag::diff(const IntervalRegion& reg, IntervalVector& grad)
+void IntervalFunctionDag::diff(const IntervalBox& B, IntervalVector& grad)
 {
    Interval val;
-   evalDiff(reg, val, grad);
+   evalDiff(B, val, grad);
 }
 
-void IntervalFunctionDag::evalDiff(const IntervalRegion& reg, Interval& val,
+void IntervalFunctionDag::evalDiff(const IntervalBox& B, Interval& val,
                                    IntervalVector& grad)
 {
    ASSERT(nbVars() == grad.size(), "Bad size of gradient");
 
    DagFun* f = dag_->fun(index_);
-   val = f->intervalEval(reg);
+   val = f->intervalEval(B);
    if (val.isEmpty())
       grad.setEmpty();
 

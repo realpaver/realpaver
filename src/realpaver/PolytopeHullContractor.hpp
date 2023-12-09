@@ -52,9 +52,9 @@ public:
 
    /// Makes the linear relaxation
    /// @param lpm resulting linear model
-   /// @param reg input region
+   /// @param B input box
    /// @return true in case of sucess, false otherwise
-   virtual bool make(LPModel& lpm, const IntervalRegion& reg) = 0;
+   virtual bool make(LPModel& lpm, const IntervalBox& B) = 0;
 
    /// @param v a variable
    /// @return the index of the linear variable associated with v
@@ -90,7 +90,7 @@ public:
    /// @param lfun list of indexes of the DAG functions to be relaxed
    PolytopeRLTCreator(SharedDag dag, const IndexList& lfun);
 
-   bool make(LPModel& lpm, const IntervalRegion& reg) override;
+   bool make(LPModel& lpm, const IntervalBox& B) override;
 
 private:
    size_t nodeToLinVar(DagNode* node) const;
@@ -114,7 +114,7 @@ public:
    /// @param corner 
    PolytopeTaylorCreator(SharedDag dag, const IndexList& lfun);
 
-   bool make(LPModel& lpm, const IntervalRegion& reg) override;
+   bool make(LPModel& lpm, const IntervalBox& B) override;
 
 private:
    Bitset corner_;
@@ -162,14 +162,14 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalRegion& reg) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 
 private:
    PolytopeCreator* creator_;    // creator of the relaxation
 
-   Proof contractImpl(IntervalRegion& reg);
+   Proof contractImpl(IntervalBox& B);
 };
 
 } // namespace

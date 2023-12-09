@@ -21,9 +21,9 @@ HC4Contractor::HC4Contractor(SharedDag dag, size_t i)
                              " function index " << i);
 }
 
-Proof HC4Contractor::contract(IntervalRegion& reg)
+Proof HC4Contractor::contract(IntervalBox& B)
 {
-   Proof proof = dag_->fun(if_)->hc4Revise(reg);
+   Proof proof = dag_->fun(if_)->hc4Revise(B);
    return proof;
 }
 

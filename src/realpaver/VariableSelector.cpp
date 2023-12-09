@@ -33,7 +33,7 @@ MaxDomSelector::MaxDomSelector(Scope s) : VariableSelector(s)
 }
 
 std::pair<bool, Variable>
-MaxDomSelector::selectVar(const IntervalRegion& reg)
+MaxDomSelector::selectVar(const IntervalBox& B)
 {
    bool found = false;
    double wmax, w;
@@ -41,7 +41,7 @@ MaxDomSelector::selectVar(const IntervalRegion& reg)
 
    for (auto v : scope_)
    {
-      const Interval& I = reg.get(v);
+      const Interval& I = B.get(v);
 
       if (!v.getTolerance().hasTolerance(I))
       {
@@ -80,14 +80,13 @@ MaxSmearSelector::MaxSmearSelector(IntervalFunctionVector F, Scope s)
    ASSERT(!s.isEmpty(), "Empty scope in a MaxSmear selector");
 }
 
-std::pair<bool, Variable>
-MaxSmearSelector::selectVar(const IntervalRegion& reg)
+std::pair<bool, Variable> MaxSmearSelector::selectVar(const IntervalBox& B)
 {
    Scope fscope = F_.scope();
    IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
 
    // calculates the partial derivatives
-   F_.diff(reg, jac);
+   F_.diff(B, jac);
 
    bool found = false;
    double maxsmear = 0.0;
@@ -95,7 +94,7 @@ MaxSmearSelector::selectVar(const IntervalRegion& reg)
 
    for (auto v : scope_)
    {
-      Interval I = reg.get(v);
+      Interval I = B.get(v);
       if (v.getTolerance().hasTolerance(I)) continue;
 
       size_t j = F_.scope().index(v);
@@ -128,57 +127,7 @@ MaxSmearSelector::selectVar(const IntervalRegion& reg)
    return std::make_pair(found, maxvar);
 }
 
-/*
-   Scope fscope = f_.scope();
-   IntervalVector grad(f_.nbVars());
-
-   f_.diff(reg, grad);
-
-   bool found = false;
-   double smax = 0.0, s, w;
-   Variable vmax;
-
-   for (auto v : scope_)
-   {
-      Interval I = reg.get(v);;
-
-      if (!v.getTolerance().hasTolerance(I))
-      {
-         w = I.width();
-
-         if (fscope.contains(v))
-         {
-            size_t pos = fscope.index(v);
-            Interval dv = grad[pos];
-            s = dv.isZero() ? w : w * dv.mag();
-         }
-         else
-         {
-            s = w;
-         }
-         
-         if (found)
-         {
-            if (s > smax)
-            {
-               smax = s;
-               vmax = v;
-            }
-         }
-         else
-         {
-            found = true;
-            smax = s;
-            vmax = v;
-         }
-      }
-   }
-
-   return std::make_pair(found, vmax);
-   */
-
-std::pair<bool, Variable>
-MaxSmearSelector::selectVar(SearchNode& node)
+std::pair<bool, Variable> MaxSmearSelector::selectVar(SearchNode& node)
 {
    return selectVar(*node.region());
 }
@@ -189,15 +138,15 @@ RoundRobinSelector::RoundRobinSelector(Scope s) : VariableSelector(s)
 {}
 
 std::pair<bool, Variable>
-RoundRobinSelector::selectVar(const IntervalRegion& reg)
+RoundRobinSelector::selectVar(const IntervalBox& B)
 {
    MaxDomSelector selector(scope_);
-   return selector.selectVar(reg);
+   return selector.selectVar(B);
 }
 
 std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
 {
-   IntervalRegion* reg = node.region();
+   IntervalBox* B = node.region();
    Variable v = node.splitVariable();
    auto it = scope_.begin();
 
@@ -215,7 +164,7 @@ std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
    {
       v = *it;
 
-      if (!v.getTolerance().hasTolerance(reg->get(v)))
+      if (!v.getTolerance().hasTolerance(B->get(v)))
       {
          found = true;
          node.setSplitVariable(v);
@@ -241,10 +190,10 @@ HybridDomRobinSelector::HybridDomRobinSelector(Scope s, int f)
 }
 
 std::pair<bool, Variable>
-HybridDomRobinSelector::selectVar(const IntervalRegion& reg)
+HybridDomRobinSelector::selectVar(const IntervalBox& B)
 {
    MaxDomSelector selector(scope_);
-   return selector.selectVar(reg);
+   return selector.selectVar(B);
 }
 
 std::pair<bool, Variable> HybridDomRobinSelector::selectVar(SearchNode& node)

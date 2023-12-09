@@ -56,7 +56,7 @@ public:
    /// @return the i-th solution node
    virtual SharedNcspNode getSolNode(size_t i) const = 0;
 
-   /// @return true if there is a soltion node whose region is an inner region
+   /// @return true if there is a solution node whose region is an inner region
    ///         or a feasible region
    virtual bool hasFeasibleSolNode() const = 0;
 
@@ -104,7 +104,7 @@ public:
    /// @return the hull of all the pending nodes
    ///
    /// throws an exception if there is no pending node
-   IntervalRegion hullOfPendingNodes() const;
+   IntervalBox hullOfPendingNodes() const;
    ///@}
 };
 

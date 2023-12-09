@@ -12,7 +12,7 @@
 
 #include "realpaver/Common.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/IntervalRegion.hpp"
+#include "realpaver/IntervalBox.hpp"
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/RealFunctionVector.hpp"
 
@@ -46,10 +46,10 @@ public:
    virtual ~NLPModel();
 
    /// Minimization of a function
-   /// @param reg interval region in the search space
-   /// @param src starting point that belongs to the region
+   /// @param B interval box in the search space
+   /// @param src starting point that belongs to the box
    /// @return an optimization status
-   virtual OptimizationStatus minimize(const IntervalRegion& reg,
+   virtual OptimizationStatus minimize(const IntervalBox& B,
                                        const RealPoint& src) = 0;
 
    /// @return the time limit for a run of minimize

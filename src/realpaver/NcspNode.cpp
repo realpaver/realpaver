@@ -12,8 +12,8 @@
 
 namespace realpaver {
 
-NcspNode::NcspNode(const Scope& scope, const IntervalRegion& reg,  int depth)
-      : SearchNode(scope, reg, 0),
+NcspNode::NcspNode(const Scope& scope, const IntervalBox& B,  int depth)
+      : SearchNode(scope, B, 0),
         proof_(Proof::Maybe)
 {}
 

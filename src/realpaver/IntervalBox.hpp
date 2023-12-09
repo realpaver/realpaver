@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_INTERVAL_REGION_HPP
-#define REALPAVER_INTERVAL_REGION_HPP
+#ifndef REALPAVER_INTERVAL_BOX_HPP
+#define REALPAVER_INTERVAL_BOX_HPP
 
 #include <memory>
 #include "realpaver/IntervalVector.hpp"
@@ -22,58 +22,59 @@ class SearchRegion;
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a scoped interval vector.
 ///////////////////////////////////////////////////////////////////////////////
-class IntervalRegion : public IntervalVector {
+class IntervalBox : public IntervalVector {
 public:
-   /// Creates an interval region
+   /// Creates an interval box
    /// @param sco scope of this
    ///
-   /// The domains in this are assigned to the domains enclosed in the variables
-   IntervalRegion(Scope sco);
+   /// The domains in this are assigned to the hull of domains enclosed in the
+   /// variables
+   IntervalBox(Scope sco);
 
-   /// Creates an interval region
+   /// Creates an interval box
    /// @param sco scope of this
    /// @param x interval assigned to each element of this
-   IntervalRegion(Scope sco, const Interval& x);
+   IntervalBox(Scope sco, const Interval& x);
 
-   /// Creates an interval region
+   /// Creates an interval box
    /// sco scope of this
    /// X interval vector having the same size than sco
    ///
    /// The i-th variable in sco is assigned to X[i] for each i.
-   IntervalRegion(Scope sco, const IntervalVector& X);
+   IntervalBox(Scope sco, const IntervalVector& X);
 
-   /// Creates an interval region
+   /// Creates an interval box
    /// @param sco scope of this
    /// @param X real vector having the same size than sco
    ///
    /// The i-th variable in sco is assigned to X[i] for each i.
-   IntervalRegion(Scope sco, const RealVector& X);
+   IntervalBox(Scope sco, const RealVector& X);
 
-   /// Creates an interval region
+   /// Creates an interval box
    /// @param pt a real point assigned to this
-   IntervalRegion(const RealPoint& pt);
+   IntervalBox(const RealPoint& pt);
 
-   /// Creates an interval region
+   /// Creates an interval box
    /// @param reg a search region
    ///
    /// this is the interval hull of reg
-   IntervalRegion(const SearchRegion& reg);
+   IntervalBox(const SearchRegion& reg);
 
    /// Default copy constructor
-   IntervalRegion(const IntervalRegion&) = default;
+   IntervalBox(const IntervalBox&) = default;
 
-   /// Creates a region from another region projected on a scope
-   /// @param reg an interval region
-   /// @param sco a scope that is included in the scope of reg
+   /// Creates a box from another box projected on a scope
+   /// @param B an interval box
+   /// @param sco a scope that is included in the scope of B
    ///
-   /// this is equal to reg restricted to sco
-   IntervalRegion(const IntervalRegion& reg, Scope sco);
+   /// this is equal to B restricted to sco
+   IntervalBox(const IntervalBox& B, Scope sco);
 
    /// Default assignment operator
-   IntervalRegion& operator=(const IntervalRegion&) = default;
+   IntervalBox& operator=(const IntervalBox&) = default;
 
    /// Default destructor
-   ~IntervalRegion() = default;
+   ~IntervalBox() = default;
 
    /// @return the scope of this (sorted set of variables)
    Scope scope() const;
@@ -120,15 +121,15 @@ public:
    RealPoint oppositeCorner(const Bitset& bs) const;
 
    /// Set containment test
-   /// @param reg a region whose scope is contained in the scope of this
-   /// @return true if reg[v] is included in this[v] for each variable v
-   bool contains(const IntervalRegion& reg) const;
+   /// @param B a box whose scope is contained in the scope of this
+   /// @return true if B[v] is included in this[v] for each variable v
+   bool contains(const IntervalBox& B) const;
 
    /// Set containment test
-   /// @param reg a region whose scope is contained in the scope of this
-   /// @return true if reg[v] is strictly included in this[v] for each
+   /// @param B a box whose scope is contained in the scope of this
+   /// @return true if B[v] is strictly included in this[v] for each
    ///         variable v
-   bool strictlyContains(const IntervalRegion& reg) const;
+   bool strictlyContains(const IntervalBox& B) const;
 
    /// Set containment test
    /// @param pt a point whose scope is contained in the scope of this
@@ -140,24 +141,24 @@ public:
    /// @return true if pt[v] strictly belongs to this[v] for each variable v
    bool strictlyContains(const RealPoint& pt) const;
 
-   /// Tests if two regions overlap
-   /// @param reg a region having the same scope than this
-   /// @return true if this and reg overlap
-   bool overlaps(const IntervalRegion& reg) const;
+   /// Tests if two boxes overlap
+   /// @param B a box having the same scope than this
+   /// @return true if this and B overlap
+   bool overlaps(const IntervalBox& B) const;
 
    /// Hull with assignment on a scope
-   /// @param reg an interval region
-   /// @param sco a scope included in the scope of this and reg
+   /// @param B an interval box
+   /// @param sco a scope included in the scope of this and B
    ///
-   /// this[sco] is assigned to the hull of this[sco] and reg[sco]
-   void hullAssignOnScope(const IntervalRegion& reg, const Scope& sco);
+   /// this[sco] is assigned to the hull of this[sco] and B[sco]
+   void hullAssignOnScope(const IntervalBox& B, const Scope& sco);
 
    /// Assignment on a scope
-   /// @param reg an interval region
-   /// @param sco a scope included in the scope of this and reg
+   /// @param B an interval box
+   /// @param sco a scope included in the scope of this and B
    ///
-   /// this[sco] is assigned to reg[sco]
-   void setOnScope(const IntervalRegion& reg, const Scope& sco);
+   /// this[sco] is assigned to B[sco]
+   void setOnScope(const IntervalBox& B, const Scope& sco);
 
    /// Midpoint of this on a scope
    /// @param sco a scope included in the scope of this
@@ -169,42 +170,42 @@ public:
    /// @param pt midpoint of this restricted to sco
    void midpointOnScope(const Scope& sco, RealPoint& pt) const;
 
-   /// Gets a sub-region
+   /// Gets a sub-box
    /// @param sco a scope included in the scope of this
    /// @return this restricted to sco
-   IntervalRegion subRegion(const Scope& sco) const;
+   IntervalBox subRegion(const Scope& sco) const;
 
-   /// Hausdorff distance between regions
-   /// @param reg an interval region
-   /// @return the maximum distance componentwise between this and reg
+   /// Hausdorff distance between boxes
+   /// @param B an interval box
+   /// @return the maximum distance componentwise between this and B
    ///
-   /// Assumption: this and reg have the same scope
-   double distance(const IntervalRegion& reg) const;
+   /// Assumption: this and B have the same scope
+   double distance(const IntervalBox& B) const;
 
-   /// Hausdorff distance between regions on a scope
-   /// @param reg an interval region
+   /// Hausdorff distance between boxes on a scope
+   /// @param B an interval box
    /// @param sco a scope
-   /// @return the maximum distance componentwise between this and reg
+   /// @return the maximum distance componentwise between this and B
    ///         restricted to sco
    ///
-   /// Assumption: sco is included in the scopes of this and reg
-   double distanceOnScope(const IntervalRegion& reg, const Scope& sco) const;
+   /// Assumption: sco is included in the scopes of this and B
+   double distanceOnScope(const IntervalBox& B, const Scope& sco) const;
 
-   /// Gap between regions
-   /// @param reg an interval region
-   /// @return the maximum gap componentwise between this and reg
+   /// Gap between boxes
+   /// @param B an interval box
+   /// @return the maximum gap componentwise between this and B
    ///
-   /// Assumption: this and reg have the same scope
-   double gap(const IntervalRegion& reg) const;
+   /// Assumption: this and B have the same scope
+   double gap(const IntervalBox& B) const;
 
-   /// Gap between regions on a scope
-   /// @param reg an interval region
+   /// Gap between boxes on a scope
+   /// @param B an interval box
    /// @param sco a scope
-   /// @return the maximum gap componentwise between this and reg
+   /// @return the maximum gap componentwise between this and B
    ///         restricted to sco
    ///
-   /// Assumption: sco is included in the scopes of this and reg
-   double gapOnScope(const IntervalRegion& reg, const Scope& sco) const;
+   /// Assumption: sco is included in the scopes of this and B
+   double gapOnScope(const IntervalBox& B, const Scope& sco) const;
 
    /// Inflation method
    /// @param sco a scope
@@ -236,7 +237,7 @@ public:
    double gridPerimeterOnScope(const Scope& sco) const;
 
    ///@{
-   IntervalRegion* clone() const override;
+   IntervalBox* clone() const override;
    void print(std::ostream& os) const override;
    ///@}
 
@@ -252,8 +253,8 @@ private:
    Scope scope_;
 };
 
-/// This is a shared interval region.
-typedef std::shared_ptr<IntervalRegion> SharedIntervalRegion;
+/// This is a shared interval box.
+typedef std::shared_ptr<IntervalBox> SharedIntervalBox;
 
 } // namespace
 

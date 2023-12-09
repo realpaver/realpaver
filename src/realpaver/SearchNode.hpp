@@ -10,30 +10,30 @@
 #ifndef REALPAVER_SEARCH_NODE_HPP
 #define REALPAVER_SEARCH_NODE_HPP
 
-#include "realpaver/IntervalRegion.hpp"
+#include "realpaver/IntervalBox.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a base class for search nodes.
 ///
-/// A node has a scope, an interval region, an index, a tree depth, and it is
+/// A node has a scope, an interval box, an index, a tree depth, and it is
 /// possible to register a variable, e.g. the selected variable in the parent
 /// node whose domain has been split.
 ///
 /// The scope is shared. It may be the set of variables considered by some
 /// splitting component.
 ///
-/// The interval region is owned by this. Its scope is assumed to contain
+/// The interval box is owned by this. Its scope is assumed to contain
 /// the scope of this.
 ///////////////////////////////////////////////////////////////////////////////
 class SearchNode {
 public:
    /// Creates a node
    /// @param scope set of variables
-   /// @param reg domains of variables
+   /// @param B domains of variables
    /// @param depth depth of this
-   SearchNode(Scope scope, const IntervalRegion& reg,  int depth = 0);
+   SearchNode(Scope scope, const IntervalBox& B,  int depth = 0);
 
    /// Virtual destructor
    virtual ~SearchNode();
@@ -62,7 +62,7 @@ public:
    void incrementDepth();
 
    /// @return the vector of domains of this
-   IntervalRegion* region() const;
+   IntervalBox* region() const;
 
    /// @return the scope of this
    Scope scope() const;
@@ -76,7 +76,7 @@ public:
 
 private:
    Scope scope_;
-   IntervalRegion* reg_;
+   IntervalBox* B_;
    int depth_, index_;
    Variable v_;
 };

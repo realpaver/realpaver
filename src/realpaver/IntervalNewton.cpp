@@ -97,7 +97,7 @@ IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
    return gs_;
 }
 
-Proof IntervalNewton::contract(IntervalRegion& X)
+Proof IntervalNewton::contract(IntervalBox& X)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
@@ -160,7 +160,7 @@ Proof IntervalNewton::contract(IntervalRegion& X)
    return proof;
 }
 
-void IntervalNewton::makeY(IntervalRegion& X)
+void IntervalNewton::makeY(IntervalBox& X)
 {
    // y := X - c
    int i = 0;
@@ -171,7 +171,7 @@ void IntervalNewton::makeY(IntervalRegion& X)
    }
 }
 
-Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
+Proof IntervalNewton::reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol)
 {
    int i = 0;
    Proof proof = Proof::Feasible;
@@ -204,14 +204,14 @@ Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
    return proof;
 }
 
-Proof IntervalNewton::certify(IntervalRegion& reg)
+Proof IntervalNewton::certify(IntervalBox& B)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
 
-   IntervalRegion X(scope());
-   X.setOnScope(reg, scope());
+   IntervalBox X(scope());
+   X.setOnScope(B, scope());
 
    do
    {
@@ -269,12 +269,12 @@ Proof IntervalNewton::certify(IntervalRegion& reg)
    while (iter);
 
    if (proof == Proof::Feasible)
-      reg.setOnScope(X, scope());
+      B.setOnScope(X, scope());
 
    return proof;
 }
 
-Proof IntervalNewton::certifyX(IntervalRegion& X, bool& hasdtol)
+Proof IntervalNewton::certifyX(IntervalBox& X, bool& hasdtol)
 {
    // X := y + c
    int i = 0;

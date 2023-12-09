@@ -126,10 +126,9 @@ void NcspSolver::makeSpace()
             "Unable to make the space object in a Ncsp solver");
 
    // creates and inserts the root node
-   IntervalRegion reg(preprob_->scope());
+   IntervalBox B(preprob_->scope());
 
-   SharedNcspNode node =
-      std::make_shared<NcspNode>(preprob_->scope(), reg);
+   SharedNcspNode node = std::make_shared<NcspNode>(preprob_->scope(), B);
    node->setIndex(1);
 
    space_->insertPendingNode(node);
@@ -382,12 +381,12 @@ void NcspSolver::makeSplit()
    split_ = new NcspSplit(std::move(pselector), std::move(pslicer));
 }
 
-bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
+bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
 {
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
       Constraint c = preprob_->ctrAt(i);
-      if (c.isSatisfied(reg) != Proof::Inner)
+      if (c.isSatisfied(B) != Proof::Inner)
          return false;
    }
 
@@ -397,19 +396,19 @@ bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
 void NcspSolver::bpStep(int depthlimit)
 {
    SharedNcspNode node = space_->nextPendingNode();
-   IntervalRegion* reg = node->region();
+   IntervalBox* B = node->region();
 
    LOG_INTER("Extracts node " << node->index() << " (depth "
                               << node->depth() << ")");
-   LOG_LOW("Region: " << *reg);
+   LOG_LOW("Box: " << *B);
 
    node->setProof(Proof::Maybe);
 
-   // contracts the region
-   Proof proof = contractor_->contract(*reg);
+   // contracts the box
+   Proof proof = contractor_->contract(*B);
 
    LOG_INTER("Contraction -> " << proof);
-   LOG_INTER("Contracted region: " << *reg);
+   LOG_INTER("Contracted box: " << *B);
 
    if (proof == Proof::Empty)
    {
@@ -417,21 +416,21 @@ void NcspSolver::bpStep(int depthlimit)
       return;
    }
 
-   if (isAnInnerRegion(*reg))
+   if (isAnInnerRegion(*B))
    {
       node->setProof(Proof::Inner);
 
       std::string str = env_->getParam()->getStrParam("SPLIT_INNER");
       if (str == "NO")
       {
-         LOG_INTER("Solution node (inner region)");
+         LOG_INTER("Solution node (inner box)");
          space_->pushSolNode(node);
 
          return;
       }
       else
       {
-         LOG_INTER("Inner region detected but split required");        
+         LOG_INTER("Inner box detected but split required");        
       }
    }
 
@@ -636,20 +635,20 @@ size_t NcspSolver::getNbSolutions() const
       return space_->nbSolNodes();
 }
 
-std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
+std::pair<IntervalBox, Proof> NcspSolver::getSolution(size_t i) const
 {
    ASSERT(i < getNbSolutions(), "Bad access to a solution in a Ncsp solver");
 
    if (withPreprocessing_)
    {
-      IntervalRegion reg(problem_->scope());
+      IntervalBox B(problem_->scope());
       Proof proof = Proof::Inner;
 
       // assigns the values of the fixed variables
       for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
       {
          Variable v = preproc_->getFixedVar(i);
-         reg.set(v, preproc_->getFixedDomain(v));
+         B.set(v, preproc_->getFixedDomain(v));
       }
 
       // assigns the values of the unfixed variables
@@ -658,24 +657,24 @@ std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
          SharedNcspNode node = space_->getSolNode(i);
          proof = node->getProof();
 
-         IntervalRegion* regnode = node->region();
+         IntervalBox* Bnode = node->region();
 
          for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
          {
             Variable v = preproc_->getUnfixedVar(i);
             Variable w = preproc_->srcToDestVar(v);
-            reg.set(v, regnode->get(w));
+            B.set(v, Bnode->get(w));
          }
       }
 
-      return std::make_pair(reg, proof);
+      return std::make_pair(B, proof);
    }
    else
    {
       SharedNcspNode node = space_->getSolNode(i);
       Proof proof = node->getProof();
-      IntervalRegion* regnode = node->region();
-      return std::make_pair(*regnode, proof);
+      IntervalBox* Bnode = node->region();
+      return std::make_pair(*Bnode, proof);
    }
 }
 

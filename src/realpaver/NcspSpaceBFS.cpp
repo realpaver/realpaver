@@ -67,7 +67,7 @@ void NcspSpaceBFS::makeSolClusters(double gap)
    {
       // extracts the first node
       SharedNcspNode node = lnode.front();
-      IntervalRegion* regnode = node->region();
+      IntervalBox* regnode = node->region();
       lnode.pop_front();
 
       // finds another node that is close enough
@@ -76,7 +76,7 @@ void NcspSpaceBFS::makeSolClusters(double gap)
       while (!found && it != lnode.end())
       {
          SharedNcspNode bis = *it;
-         IntervalRegion* regbis = bis->region();
+         IntervalBox* regbis = bis->region();
 
          if (regnode->gap(*regbis) < gap)
          {

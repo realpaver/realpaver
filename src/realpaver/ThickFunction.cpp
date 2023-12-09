@@ -31,9 +31,9 @@ Interval ThickFunction::diff(const Interval& x)
                                         Interval::universe();
 }
 
-Interval ThickFunction::update(const IntervalRegion& reg)
+Interval ThickFunction::update(const IntervalBox& B)
 {
-   return f_->intervalEval(reg);
+   return f_->intervalEval(B);
 }
 
 Variable ThickFunction::getVar() const

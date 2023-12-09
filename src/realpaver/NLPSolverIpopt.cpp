@@ -26,7 +26,7 @@ NLPSolver::~NLPSolver()
 {}
 
 
-OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
+OptimizationStatus NLPSolver::minimize(const IntervalBox& B,
                                        const RealPoint& src)
 {
     status_ = OptimizationStatus::Other;
@@ -50,39 +50,43 @@ OptimizationStatus NLPSolver::minimize(const IntervalRegion& reg,
     else
     {
         // Ask Ipopt to solve the problem
-        Ipopt::SmartPtr<LocalTNLP> tnlp = new LocalTNLP(this, std::make_shared<IntervalRegion>(reg), src);
+        Ipopt::SmartPtr<LocalTNLP> tnlp =
+         new LocalTNLP(this, std::make_shared<IntervalBox>(B), src);
 
         status = app->OptimizeTNLP(tnlp);
         best_val_ = tnlp->best_val_;
 
-        if (status == Ipopt::Solve_Succeeded || status == Ipopt::Solved_To_Acceptable_Level)
+        if (status == Ipopt::Solve_Succeeded ||
+            status == Ipopt::Solved_To_Acceptable_Level)
         {
-            status_ = OptimizationStatus::Optimal;
+           status_ = OptimizationStatus::Optimal;
         }
         else if (status == Ipopt::Maximum_Iterations_Exceeded)
         {
-            status_ = OptimizationStatus::StopOnIterLimit;
+           status_ = OptimizationStatus::StopOnIterLimit;
         }
         else if (status == Ipopt::Maximum_CpuTime_Exceeded)
         {
-            status_ = OptimizationStatus::StopOnTimeLimit;
+           status_ = OptimizationStatus::StopOnTimeLimit;
         }
         else
         {
-
-            std::cerr << std::endl << std::endl << "*** IPOPT FAILED!" << std::endl;
+           std::cerr << std::endl << std::endl << "*** IPOPT FAILED!" << std::endl;
         }
     }
 
     return status_;
 }
 
-NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, const RealPoint& start)
-    : ls_(ls), reg_(reg), start_(start)
+NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalBox B,
+                                const RealPoint& start)
+    : ls_(ls), B_(B), start_(start)
 {}
 
-bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
-                        Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style)
+bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m,
+                                        Ipopt::Index& nnz_jac_g,
+                                        Ipopt::Index& nnz_h_lag,
+                                        IndexStyleEnum& index_style)
 {
     n = ls_->nbVars();
     m = ls_->nbCtrs();
@@ -113,8 +117,9 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt:
     return true;
 }
 
-bool NLPSolver::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
-                            Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u)
+bool NLPSolver::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l,
+                                           Ipopt::Number* x_u, Ipopt::Index m,
+                                           Ipopt::Number* g_l, Ipopt::Number* g_u)
 {
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     
@@ -136,10 +141,11 @@ bool NLPSolver::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, I
     return true;
 }
 
-bool NLPSolver::LocalTNLP::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
-                                bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
-                                Ipopt::Index m, bool init_lambda,
-                                Ipopt::Number* lambda)
+bool NLPSolver::LocalTNLP::get_starting_point(Ipopt::Index n, bool init_x,
+                                              Ipopt::Number* x, bool init_z,
+                                              Ipopt::Number* z_L, Ipopt::Number* z_U,
+                                              Ipopt::Index m, bool init_lambda,
+                                              Ipopt::Number* lambda)
 {
     // std::shared_ptr<RealPoint> start = ls_->start();
     for (size_t i=0; i<n; i++)
@@ -153,7 +159,8 @@ bool NLPSolver::LocalTNLP::get_starting_point(Ipopt::Index n, bool init_x, Ipopt
     return true;
 }
 
-bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number& obj_value)
+bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x,
+                                  bool new_x, Ipopt::Number& obj_value)
 {
     // compute obj_value, i.e. the value of the objective function, from x vector
     const std::shared_ptr<RealFunction> obj = ls_->obj();
@@ -168,7 +175,8 @@ bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x, bool n
     return true;
 }
 
-bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number* grad_f)
+bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x,
+                                       bool new_x, Ipopt::Number* grad_f)
 {
     std::shared_ptr<RealFunction> obj = ls_->obj();
     Scope s = ls_->obj()->scope();
@@ -189,7 +197,8 @@ bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, b
     return true;
 }
 
-bool NLPSolver::LocalTNLP::eval_g (Ipopt::Index n, const Ipopt::Number *x, bool new_x, Ipopt::Index m, Ipopt::Number *g)
+bool NLPSolver::LocalTNLP::eval_g (Ipopt::Index n, const Ipopt::Number *x,
+                                   bool new_x, Ipopt::Index m, Ipopt::Number *g)
 {
     Scope s = ls_->obj()->scope();
     if (m>0) s.insert(ls_->ctrs()->scope());
@@ -207,9 +216,10 @@ bool NLPSolver::LocalTNLP::eval_g (Ipopt::Index n, const Ipopt::Number *x, bool 
     return true;
 }
 
-bool NLPSolver::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x, bool new_x,
-                                Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index *iRow,
-                                Ipopt::Index *jCol, Ipopt::Number *values)
+bool NLPSolver::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x,
+                                       bool new_x, Ipopt::Index m,
+                                       Ipopt::Index nele_jac, Ipopt::Index *iRow,
+                                       Ipopt::Index *jCol, Ipopt::Number *values)
 {
     // compute values, i.e. the Jacobian of the constraints, from x vector where:
     // - nele_jac is the number of nonzeros in the Jacobian
@@ -299,7 +309,8 @@ Ipopt::Index NLPSolver::LocalTNLP::get_number_of_nonlinear_variables()
     return ls_->nbVars();
 }
 
-bool NLPSolver::LocalTNLP::get_list_of_nonlinear_variables (Ipopt::Index num_nonlin_vars, Ipopt::Index *pos_nonlin_vars)
+bool NLPSolver::LocalTNLP::get_list_of_nonlinear_variables
+   (Ipopt::Index num_nonlin_vars, Ipopt::Index *pos_nonlin_vars)
 {
     // const Scope s = ls_->scope();
     // for (size_t i=0; i<s.size();i++)
@@ -312,11 +323,13 @@ bool NLPSolver::LocalTNLP::get_list_of_nonlinear_variables (Ipopt::Index num_non
 }
 
 void NLPSolver::LocalTNLP::finalize_solution(Ipopt::SolverReturn status,
-                                Ipopt::Index n, const Ipopt::Number* x, const Ipopt::Number* z_L, const Ipopt::Number* z_U,
-                                Ipopt::Index m, const Ipopt::Number* g, const Ipopt::Number* lambda,
+                                Ipopt::Index n, const Ipopt::Number* x,
+                                const Ipopt::Number* z_L, const Ipopt::Number* z_U,
+                                Ipopt::Index m, const Ipopt::Number* g,
+                                const Ipopt::Number* lambda,
                                 Ipopt::Number obj_value,
-                const Ipopt::IpoptData* ip_data,
-                Ipopt::IpoptCalculatedQuantities* ip_cq)
+                                const Ipopt::IpoptData* ip_data,
+                                Ipopt::IpoptCalculatedQuantities* ip_cq)
 {
    /*
     status: (in), gives the status of the algorithm as specified in IpAlgTypes.hpp,

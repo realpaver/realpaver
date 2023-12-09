@@ -34,10 +34,10 @@ public:
    Prover& operator=(const Prover&) = delete;
 
    /// Certification method
-   /// @param reg a region
-   /// @return a certificate of proof of reg with respect to the constraints
+   /// @param B a box
+   /// @return a certificate of proof of B with respect to the constraints
    ///         of the given problem
-   Proof certify(IntervalRegion& reg);
+   Proof certify(IntervalBox& B);
 
    /// Sets a limit of iterations of the Newton operator
    /// @param n new value of the limit
@@ -64,7 +64,7 @@ public:
    /// @param val new value
    void setInflationChi(const double& val);
 
-   /// @return the tolerance on the distance between two consecutive regions
+   /// @return the tolerance on the distance between two consecutive boxes
    ///         in the certification technique of the Newton operator
    Tolerance getDTol() const;
 

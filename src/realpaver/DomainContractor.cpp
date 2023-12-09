@@ -42,13 +42,13 @@ void DomainContractor::insertVar(Variable v)
    s_.insert(v);
 }
 
-Proof DomainContractor::contract(IntervalRegion& reg)
+Proof DomainContractor::contract(IntervalBox& B)
 {
    for (auto v : s_)
    {
-      Interval x = reg.get(v);
+      Interval x = B.get(v);
       v.getDomain()->contractInterval(x);
-      reg.set(v, x);
+      B.set(v, x);
 
       if (x.isEmpty()) return Proof::Empty;
    }

@@ -14,15 +14,15 @@ namespace realpaver {
 
 NcspSpace::~NcspSpace() {}
 
-IntervalRegion NcspSpace::hullOfPendingNodes() const
+IntervalBox NcspSpace::hullOfPendingNodes() const
 {
    size_t n = nbPendingNodes();
    if (n == 0) THROW("No pending node in the space");
 
    SharedNcspNode node = getPendingNode(0);
-   IntervalRegion* regnode = node->region();
+   IntervalBox* regnode = node->region();
 
-   IntervalRegion h(*regnode);
+   IntervalBox h(*regnode);
 
    for (size_t i=1; i<n; ++i)
    {

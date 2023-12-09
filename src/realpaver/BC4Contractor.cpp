@@ -41,17 +41,17 @@ Scope BC4Contractor::scope() const
    return dag_->fun(if_)->scope();
 }
 
-Proof BC4Contractor::contract(IntervalRegion& reg)
+Proof BC4Contractor::contract(IntervalBox& box)
 {
    // HC4
-   Proof proof = hc4_->contract(reg);
+   Proof proof = hc4_->contract(box);
 
    if (proof != Proof::Maybe) return proof;
 
    // BC3
    for (size_t i=0; i<bc3_.size(); ++i)
    {
-      Proof certif = bc3_[i]->contract(reg);
+      Proof certif = bc3_[i]->contract(box);
 
       if (certif == Proof::Empty)
          return certif;      

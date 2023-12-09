@@ -33,16 +33,16 @@ Scope MaxCIDContractor::scope() const
    return op_->scope();
 }
 
-Proof MaxCIDContractor::contract(IntervalRegion& reg)
+Proof MaxCIDContractor::contract(IntervalBox& B)
 {
-   std::pair<bool, Variable> sel = selector_->selectVar(reg);
+   std::pair<bool, Variable> sel = selector_->selectVar(B);
 
    Proof proof = Proof::Maybe;
 
    if (sel.first)
    {
       op_->setVar(sel.second);
-      proof = op_->contract(reg);
+      proof = op_->contract(B);
    }
 
    return proof;

@@ -39,7 +39,7 @@ namespace realpaver {
 ///
 /// After the solving phase, it is possible to read the solutions as follows:
 /// for (size_t i=0; i<solver.getNbSolutions(); ++i) {
-///    std::pair<IntervalRegion, Proof> sol = solver.getSolution(i);
+///    std::pair<IntervalBox, Proof> sol = solver.getSolution(i);
 /// }
 /// The scope of each solution is the one of the input problem.
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ public:
    /// Gets a solution after the preprocessing / solving phase
    /// @param i an index between 0 and getNbSolutions()-1
    /// @return the i-th solution in this
-   std::pair<IntervalRegion, Proof> getSolution(size_t i) const;
+   std::pair<IntervalBox, Proof> getSolution(size_t i) const;
 
 private:
    Problem* problem_;            // initial problem
@@ -110,10 +110,9 @@ private:
    void makeContractor();
    void makeSplit();
    void bpStep(int depthlimit);
-   bool isAnInnerRegion(const IntervalRegion& reg) const;
+   bool isAnInnerRegion(const IntervalBox& B) const;
    void certifySolutions();
    VariableSelector* makeMaxSmearStrategy();
-
 };
 
 } // namespace

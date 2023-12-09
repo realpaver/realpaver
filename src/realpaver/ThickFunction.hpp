@@ -11,16 +11,16 @@
 #define REALPAVER_THICK_FUNCTION_HPP
 
 #include "realpaver/Dag.hpp"
-#include "realpaver/IntervalRegion.hpp"
+#include "realpaver/IntervalBox.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a thick interval function.
 ///
-/// Given a function f(x1, ..., xn) in a DAG, a variable xi and a region R,
+/// Given a function f(x1, ..., xn) in a DAG, a variable xi and a box B,
 /// the thick function is obtained from f by replacing each variable xj but xi
-/// by its domain in R.
+/// by its domain in B.
 ///
 /// The update method must be called first. Then the evaluation and
 /// differentiation methods can be called.
@@ -53,9 +53,9 @@ public:
    Interval diff(const Interval& x);
 
    /// Updates the associated function in the DAG
-   /// @param reg domains of variables
-   /// @return interval evaluation of this at reg
-   Interval update(const IntervalRegion& reg);
+   /// @param B domains of variables
+   /// @return interval evaluation of this at B
+   Interval update(const IntervalBox& B);
 
    /// @return the index of the variable of this
    Variable getVar() const;

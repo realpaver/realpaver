@@ -18,8 +18,8 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a contractor implementing Constructive Interval Disjunction.
 ///
-/// Given a region R, a variable v, a slicer and a contractor, the domain of
-/// v in R is divided by the slicer, each slice is reduced by the contractor,
+/// Given a box B, a variable v, a slicer and a contractor, the domain of
+/// v in B is divided by the slicer, each slice is reduced by the contractor,
 /// and the hull of the contracted slices is returned.
 ///
 /// The scope of this corresponds to the scope of the given contractor.
@@ -57,7 +57,7 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalRegion& reg) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 

@@ -4,7 +4,7 @@
 
 Problem* prob;
 Dag* dag;
-IntervalRegion* reg;
+IntervalBox* B;
 Variable x, y, z;
 
 void init()
@@ -18,62 +18,62 @@ void init()
    dag->insert(sqr(x + y) - 2*z + 2 == 0);
    dag->insert(sqr(x + y) - 2*z + 2 >= 0);
 
-   reg = new IntervalRegion(prob->scope());
+   B = new IntervalBox(prob->scope());
 }
 
 void clean()
 {
-   delete reg;
+   delete B;
    delete dag;
    delete prob;
 }
 
 void test_1()
 {
-   reg->set(x, Interval(-10, 15));
-   reg->set(y, Interval(-20, 5));
-   reg->set(z, Interval(-10, 5.5));
+   B->set(x, Interval(-10, 15));
+   B->set(y, Interval(-20, 5));
+   B->set(z, Interval(-10, 5.5));
 
-   Proof p = dag->fun(0)->hc4Revise(*reg);
+   Proof p = dag->fun(0)->hc4Revise(*B);
 
    TEST_TRUE(p == Proof::Maybe);
-   TEST_TRUE(reg->get(x).isSetEq(Interval(-8, 15)));
-   TEST_TRUE(reg->get(y).isSetEq(Interval(-18, 5)));
-   TEST_TRUE(reg->get(z).isSetEq(Interval(1, 5.5)));
+   TEST_TRUE(B->get(x).isSetEq(Interval(-8, 15)));
+   TEST_TRUE(B->get(y).isSetEq(Interval(-18, 5)));
+   TEST_TRUE(B->get(z).isSetEq(Interval(1, 5.5)));
 }
 
 void test_2()
 {
-   reg->set(x, Interval::universe());
-   reg->set(y, Interval(-20, 5));
-   reg->set(z, Interval(-10, 5.5));
+   B->set(x, Interval::universe());
+   B->set(y, Interval(-20, 5));
+   B->set(z, Interval(-10, 5.5));
 
-   Proof p = dag->fun(0)->hc4Revise(*reg);
+   Proof p = dag->fun(0)->hc4Revise(*B);
 
    TEST_TRUE(p == Proof::Maybe);
-   TEST_TRUE(reg->get(x).isSetEq(Interval(-8, 23)));
-   TEST_TRUE(reg->get(y).isSetEq(Interval(-20, 5)));
-   TEST_TRUE(reg->get(z).isSetEq(Interval(1, 5.5)));
+   TEST_TRUE(B->get(x).isSetEq(Interval(-8, 23)));
+   TEST_TRUE(B->get(y).isSetEq(Interval(-20, 5)));
+   TEST_TRUE(B->get(z).isSetEq(Interval(1, 5.5)));
 }
 
 void test_3()
 {
-   reg->set(x, Interval(-10, 15));
-   reg->set(y, Interval(-20, 5));
-   reg->set(z, Interval(-10, 0));
+   B->set(x, Interval(-10, 15));
+   B->set(y, Interval(-20, 5));
+   B->set(z, Interval(-10, 0));
 
-   Proof p = dag->fun(0)->hc4Revise(*reg);
+   Proof p = dag->fun(0)->hc4Revise(*B);
 
    TEST_TRUE(p == Proof::Empty);
 }
 
 void test_4()
 {
-   reg->set(x, Interval(2, 4));
-   reg->set(y, Interval(3, 10));
-   reg->set(z, Interval(0, 6));
+   B->set(x, Interval(2, 4));
+   B->set(y, Interval(3, 10));
+   B->set(z, Interval(0, 6));
 
-   Proof p = dag->fun(1)->hc4Revise(*reg);
+   Proof p = dag->fun(1)->hc4Revise(*B);
 
    TEST_TRUE(p == Proof::Inner);
 }
