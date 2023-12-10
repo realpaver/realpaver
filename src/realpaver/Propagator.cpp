@@ -68,7 +68,7 @@ Scope Propagator::scope() const
    return pool_->scope();
 }
 
-Proof Propagator::contract(IntervalBox& B)
+Proof Propagator::contract(IntervalBox& box)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
@@ -91,7 +91,7 @@ Proof Propagator::contract(IntervalBox& B)
    ModifSetType modif;
 
    // copy used to check the domain modifications
-   IntervalBox* copy = B.clone();
+   IntervalBox* copy = box.clone();
 
    // result of the algorithm
    Proof proof;
@@ -102,14 +102,14 @@ Proof Propagator::contract(IntervalBox& B)
    // number of propagation steps
    size_t num_steps = 0;
 
-   LOG_LOW("Propagator on box: " << B);
+   LOG_LOW("Propagator on box: " << box);
    LOG_LOW("Tolerance on the distance between regions: " << dtol_);
 
    do
    {
       // apply the next contractor from the queue
       size_t j = queue[next];
-      proof = pool_->contractorAt(j)->contract(B);
+      proof = pool_->contractorAt(j)->contract(box);
       certif_[j] = proof;
 
       if (proof != Proof::Empty)
@@ -119,7 +119,7 @@ Proof Propagator::contract(IntervalBox& B)
          // propagation when the queue is empty
          if (next == count)
          {            
-            LOG_LOW("Box after inner step: " << B);
+            LOG_LOW("Box after inner step: " << box);
             
             if (++num_steps > maxiter_)
             {
@@ -133,7 +133,7 @@ Proof Propagator::contract(IntervalBox& B)
                for (auto v : scope)
                {
                   const Interval& prev = copy->get(v);
-                  const Interval& curr = B.get(v);
+                  const Interval& curr = box.get(v);
 
                   if (!dtol_.haveDistTolerance(prev, curr))
                   {
@@ -160,7 +160,7 @@ Proof Propagator::contract(IntervalBox& B)
                   // save the current box for the next propagation step
                   if (count != 0)
                   {
-                     copy->setOnScope(B, scope);
+                     copy->setOnScope(box, scope);
                   }
                }
             }

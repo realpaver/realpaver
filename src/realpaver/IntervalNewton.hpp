@@ -72,9 +72,9 @@ public:
 
    /// Tries to derive a proof certificate for the existence of a solution
    /// in an interval box using an inflation-based algorithm
-   /// @param B a box
+   /// @param box a box
    /// @return proof certificate
-   Proof certify(IntervalBox& B);
+   Proof certify(IntervalBox& box);
 
    /// @return parameter delta of inflation
    double getInflationDelta() const;

@@ -113,19 +113,19 @@ void Constraint::acceptVisitor(ConstraintVisitor& vis) const
    rep_->acceptVisitor(vis);
 }
 
-Proof Constraint::isSatisfied(const IntervalBox& B)
+Proof Constraint::isSatisfied(const IntervalBox& box)
 {
-   return rep_->isSatisfied(B);
+   return rep_->isSatisfied(box);
 }
 
-double Constraint::violation(const IntervalBox& B)
+double Constraint::violation(const IntervalBox& box)
 {
-   return rep_->violation(B);
+   return rep_->violation(box);
 }
 
-Proof Constraint::contract(IntervalBox& B)
+Proof Constraint::contract(IntervalBox& box)
 {
-   return rep_->contract(B);
+   return rep_->contract(box);
 }
 
 bool Constraint::dependsOn(Variable v) const
@@ -240,10 +240,10 @@ void ArithCtrEq::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ArithCtrEq::isSatisfied(const IntervalBox& B)
+Proof ArithCtrEq::isSatisfied(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -258,10 +258,10 @@ Proof ArithCtrEq::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrEq::violation(const IntervalBox& B)
+double ArithCtrEq::violation(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyEq(r)) return 0.0;
@@ -270,10 +270,10 @@ double ArithCtrEq::violation(const IntervalBox& B)
    return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
 }
 
-Proof ArithCtrEq::contract(IntervalBox& B)
+Proof ArithCtrEq::contract(IntervalBox& box)
 {
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
+   Interval l = left().hc4ReviseForward(box),
+            r = right().hc4ReviseForward(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -285,8 +285,8 @@ Proof ArithCtrEq::contract(IntervalBox& B)
    {
       Interval img = l & r;
 
-      Proof pl = left().hc4ReviseBackward(B, img),
-            pr = right().hc4ReviseBackward(B, img);
+      Proof pl = left().hc4ReviseBackward(box, img),
+            pr = right().hc4ReviseBackward(box, img);
 
       return std::min(pl, pr);
    }
@@ -311,10 +311,10 @@ void ArithCtrLe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ArithCtrLe::isSatisfied(const IntervalBox& B)
+Proof ArithCtrLe::isSatisfied(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -329,10 +329,10 @@ Proof ArithCtrLe::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrLe::violation(const IntervalBox& B)
+double ArithCtrLe::violation(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLe(r)) return 0.0;
@@ -341,10 +341,10 @@ double ArithCtrLe::violation(const IntervalBox& B)
    return l.left() - r.right();
 }
 
-Proof ArithCtrLe::contract(IntervalBox& B)
+Proof ArithCtrLe::contract(IntervalBox& box)
 {
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
+   Interval l = left().hc4ReviseForward(box),
+            r = right().hc4ReviseForward(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -357,8 +357,8 @@ Proof ArithCtrLe::contract(IntervalBox& B)
       Interval imgl = Interval::lessThan(r.right()),
                imgr = Interval::moreThan(l.left());
 
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
+      Proof pl = left().hc4ReviseBackward(box, imgl),
+            pr = right().hc4ReviseBackward(box, imgr);
 
       return std::min(pl, pr);
    }
@@ -383,10 +383,10 @@ void ArithCtrLt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ArithCtrLt::isSatisfied(const IntervalBox& B)
+Proof ArithCtrLt::isSatisfied(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -401,10 +401,10 @@ Proof ArithCtrLt::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrLt::violation(const IntervalBox& B)
+double ArithCtrLt::violation(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLt(r)) return 0.0;
@@ -413,10 +413,10 @@ double ArithCtrLt::violation(const IntervalBox& B)
    return l.left() - r.right();
 }
 
-Proof ArithCtrLt::contract(IntervalBox& B)
+Proof ArithCtrLt::contract(IntervalBox& box)
 {
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
+   Interval l = left().hc4ReviseForward(box),
+            r = right().hc4ReviseForward(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -429,8 +429,8 @@ Proof ArithCtrLt::contract(IntervalBox& B)
       Interval imgl = Interval::lessThan(r.right()),
                imgr = Interval::moreThan(l.left());
 
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
+      Proof pl = left().hc4ReviseBackward(box, imgl),
+            pr = right().hc4ReviseBackward(box, imgr);
 
       return std::min(pl, pr);
    }
@@ -455,10 +455,10 @@ void ArithCtrGe::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ArithCtrGe::isSatisfied(const IntervalBox& B)
+Proof ArithCtrGe::isSatisfied(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -473,10 +473,10 @@ Proof ArithCtrGe::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrGe::violation(const IntervalBox& B)
+double ArithCtrGe::violation(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGe(r)) return 0.0;
@@ -485,10 +485,10 @@ double ArithCtrGe::violation(const IntervalBox& B)
    return r.left() - l.right();
 }
 
-Proof ArithCtrGe::contract(IntervalBox& B)
+Proof ArithCtrGe::contract(IntervalBox& box)
 {
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
+   Interval l = left().hc4ReviseForward(box),
+            r = right().hc4ReviseForward(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -501,8 +501,8 @@ Proof ArithCtrGe::contract(IntervalBox& B)
       Interval imgl = Interval::moreThan(r.left()),
                imgr = Interval::lessThan(l.right());
 
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
+      Proof pl = left().hc4ReviseBackward(box, imgl),
+            pr = right().hc4ReviseBackward(box, imgr);
 
       return std::min(pl, pr);
    }
@@ -527,10 +527,10 @@ void ArithCtrGt::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ArithCtrGt::isSatisfied(const IntervalBox& B)
+Proof ArithCtrGt::isSatisfied(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -545,10 +545,10 @@ Proof ArithCtrGt::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrGt::violation(const IntervalBox& B)
+double ArithCtrGt::violation(const IntervalBox& box)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(box),
+            r = right().eval(box);
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGt(r)) return 0.0;
@@ -557,10 +557,10 @@ double ArithCtrGt::violation(const IntervalBox& B)
    return r.left() - l.right();
 }
 
-Proof ArithCtrGt::contract(IntervalBox& B)
+Proof ArithCtrGt::contract(IntervalBox& box)
 {
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
+   Interval l = left().hc4ReviseForward(box),
+            r = right().hc4ReviseForward(box);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -573,8 +573,8 @@ Proof ArithCtrGt::contract(IntervalBox& B)
       Interval imgl = Interval::moreThan(r.left()),
                imgr = Interval::lessThan(l.right());
 
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
+      Proof pl = left().hc4ReviseBackward(box, imgl),
+            pr = right().hc4ReviseBackward(box, imgr);
 
       return std::min(pl, pr);
    }
@@ -612,9 +612,9 @@ void ArithCtrIn::acceptVisitor(ConstraintVisitor& vis) const
    vis.apply(this);
 }
 
-Proof ArithCtrIn::isSatisfied(const IntervalBox& B)
+Proof ArithCtrIn::isSatisfied(const IntervalBox& box)
 {
-   Interval e = term().eval(B);
+   Interval e = term().eval(box);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -629,9 +629,9 @@ Proof ArithCtrIn::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrIn::violation(const IntervalBox& B)
+double ArithCtrIn::violation(const IntervalBox& box)
 {
-   Interval e = term().eval(B);
+   Interval e = term().eval(box);
 
    if (e.isEmpty()) return Double::inf();
    if (x_.overlaps(e)) return 0.0;
@@ -640,9 +640,9 @@ double ArithCtrIn::violation(const IntervalBox& B)
    return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
 }
 
-Proof ArithCtrIn::contract(IntervalBox& B)
+Proof ArithCtrIn::contract(IntervalBox& box)
 {
-   Interval e = term().hc4ReviseForward(B);
+   Interval e = term().hc4ReviseForward(box);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -654,7 +654,7 @@ Proof ArithCtrIn::contract(IntervalBox& B)
    {
       Interval img = e & x_;
 
-      return term().hc4ReviseBackward(B, img);
+      return term().hc4ReviseBackward(box, img);
    }
 
    else
@@ -837,23 +837,23 @@ bool TableCtr::isConstant() const
    return vcol_.empty();
 }
 
-bool TableCtr::isRowConsistent(size_t i, const IntervalBox& B) const
+bool TableCtr::isRowConsistent(size_t i, const IntervalBox& box) const
 {
    for (size_t j=0; j<nbCols(); ++j)
    {      
       Variable v = vcol_[j].getVar();
-      if (B.get(v).isDisjoint(vcol_[j].getVal(i)))
+      if (box.get(v).isDisjoint(vcol_[j].getVal(i)))
          return false;
    }
    return true;
 }
 
-Proof TableCtr::isSatisfied(const IntervalBox& B)
+Proof TableCtr::isSatisfied(const IntervalBox& box)
 {
    size_t nbc = 0;
 
    for (size_t i=0; i<nbRows(); ++i)
-      if (isRowConsistent(i, B))
+      if (isRowConsistent(i, box))
       {
          ++nbc;
          if (nbc > 1) return Proof::Maybe;
@@ -862,17 +862,17 @@ Proof TableCtr::isSatisfied(const IntervalBox& B)
    return (nbc == 1) ? Proof::Inner : Proof::Empty;
 }
 
-double TableCtr::violation(const IntervalBox& B)
+double TableCtr::violation(const IntervalBox& box)
 {
    double res = Double::inf();
 
    for (size_t i=0; i<nbRows(); ++i)
-      res = Double::min(res, rowViolation(B, i));
+      res = Double::min(res, rowViolation(box, i));
 
    return res;
 }
 
-double TableCtr::rowViolation(const IntervalBox& B, size_t i)
+double TableCtr::rowViolation(const IntervalBox& box, size_t i)
 {
    double res = 0.0;
    Double::rndNear();
@@ -881,7 +881,7 @@ double TableCtr::rowViolation(const IntervalBox& B, size_t i)
    {
       Variable v = vcol_[j].getVar();
       Interval val = vcol_[j].getVal(i);
-      Interval dom = B.get(v);
+      Interval dom = box.get(v);
 
       double viol = 0.0;
 
@@ -897,7 +897,7 @@ double TableCtr::rowViolation(const IntervalBox& B, size_t i)
    return res;
 }
 
-Proof TableCtr::contract(IntervalBox& B)
+Proof TableCtr::contract(IntervalBox& box)
 {
    Bitset consistent(nbRows());
    consistent.setAllOne();
@@ -905,7 +905,7 @@ Proof TableCtr::contract(IntervalBox& B)
 
    // checks consistency
    for (size_t i=0; i<nbRows(); ++i)
-      if (!isRowConsistent(i, B))
+      if (!isRowConsistent(i, box))
       {
          consistent.setZero(i);
          --nbc;
@@ -924,9 +924,9 @@ Proof TableCtr::contract(IntervalBox& B)
          if (consistent.get(i))
             h |= vcol_[j].getVal(i);
 
-      Interval x = h & B.get(v);
+      Interval x = h & box.get(v);
       if (x.isEmpty()) return Proof::Empty;
-      B.set(v, x);
+      box.set(v, x);
    }
 
    return (nbc == 1) ? Proof::Inner : Proof::Maybe;

@@ -12,31 +12,31 @@
 
 namespace realpaver {
 
-SearchNode::SearchNode(Scope scope, const IntervalBox& B, int depth)
+SearchNode::SearchNode(Scope scope, const IntervalBox& box, int depth)
       : scope_(scope),
-        B_(nullptr),
+        box_(nullptr),
         depth_(depth),
         index_(0),
         v_()
 {
    ASSERT(depth >= 0, "Bad depth of a search node " << depth);
-   ASSERT(B.scope().contains(scope), "Bad scopes in a search node");
+   ASSERT(box.scope().contains(scope), "Bad scopes in a search node");
 
-   B_ = new IntervalBox(B);
+   box_ = new IntervalBox(box);
 }
 
 SearchNode::SearchNode(const SearchNode& node)
       : scope_(node.scope_),
-        B_(nullptr),
+        box_(nullptr),
         depth_(node.depth_),
         v_(node.v_)
 {
-   B_ = node.B_->clone();
+   box_ = node.box_->clone();
 }
 
 SearchNode::~SearchNode()
 {
-   delete B_;
+   delete box_;
 }
 
 int SearchNode::depth() const
@@ -68,7 +68,7 @@ void SearchNode::incrementDepth()
 
 IntervalBox* SearchNode::region() const
 {
-   return B_;
+   return box_;
 }
 
 Scope SearchNode::scope() const

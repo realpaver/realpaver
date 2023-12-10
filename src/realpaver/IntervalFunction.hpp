@@ -45,9 +45,9 @@ public:
    virtual size_t nbVars() const = 0;
 
    /// Evaluates this
-   /// @param B domains of variables
-   /// @return value of this at B
-   virtual Interval eval(const IntervalBox& B) = 0;
+   /// @param box domains of variables
+   /// @return value of this in the box
+   virtual Interval eval(const IntervalBox& box) = 0;
 
    /// Evaluates this
    /// @param  pt values of variables
@@ -55,42 +55,42 @@ public:
    virtual Interval pointEval(const RealPoint& pt) = 0;
 
    /// Differentiates this
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param grad output vector such that grad[i] if the derivative of this
-   /// at B with respect to the i-th variable of its scope
-   virtual void diff(const IntervalBox& B, IntervalVector& grad) = 0;
+   /// in the box with respect to the i-th variable of its scope
+   virtual void diff(const IntervalBox& box, IntervalVector& grad) = 0;
 
    /// Evaluates and differentiates this
-   /// @param B domains of variables
-   /// @param val result of evaluation of this at B
+   /// @param box domains of variables
+   /// @param val result of evaluation of this in the box
    /// @param grad output vector such that grad[i] if the derivative of this
-   /// at B with respect to the i-th variable of its scope
-   virtual void evalDiff(const IntervalBox& B, Interval& val,
+   /// in the box with respect to the i-th variable of its scope
+   virtual void evalDiff(const IntervalBox& box, Interval& val,
                          IntervalVector& grad) = 0;
 
    /// Evaluates this and calculates the violation of the underlying constraint
-   /// @param B domains of variables
-   /// @param val evaluation of this at B
+   /// @param box domains of variables
+   /// @param val evaluation of this in the box
    /// @param viol 0.0 if the constraint is satisfied, a positive real number
    ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at B
+   ///        function and the result of its evaluation in the box
    ///
    /// Given [lo, up] the image of this in the DagFun object, the underlying
    /// constraint is defined by lo <= f(x) <= up.
-   virtual void violation(const IntervalBox& B, Interval& val,
+   virtual void violation(const IntervalBox& box, Interval& val,
                           double& viol) = 0;
 
    /// Evaluates this and calculates the violation of the underlying constraint
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param lo left bound for this
    /// @param up right bound for this
-   /// @param val evaluation of this at B
+   /// @param val evaluation of this in the box
    /// @param viol 0.0 if the constraint is satisfied, a positive real number
    ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at B
+   ///        function and the result of its evaluation in the box
    ///
    /// The underlying constraint is defined by lo <= f(x) <= up.
-   virtual void violation(const IntervalBox& B, double lo,
+   virtual void violation(const IntervalBox& box, double lo,
                           double up, Interval& val, double& viol) = 0;
 
 private:
@@ -137,49 +137,49 @@ public:
    size_t nbVars() const;
 
    /// Evaluates this
-   /// @param B domains of variables
-   /// @return value of this at B
-   Interval eval(const IntervalBox& B);
+   /// @param box domains of variables
+   /// @return value of this in the box
+   Interval eval(const IntervalBox& box);
 
    /// Evaluates this
-   /// @param  pt values of variables
+   /// @param pt values of variables
    /// @return value of this at pt
    Interval pointEval(const RealPoint& pt);
 
    /// Differentiates this
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param grad output vector such that grad[i] if the derivative of this
-   /// at B with respect to the i-th variable of its scope
-   void diff(const IntervalBox& B, IntervalVector& grad);
+   /// in the box with respect to the i-th variable of its scope
+   void diff(const IntervalBox& box, IntervalVector& grad);
 
    /// Evaluates and differentiates this
-   /// @param B domains of variables
-   /// @param val result of evaluation of this at B
+   /// @param box domains of variables
+   /// @param val result of evaluation of this in the box
    /// @param grad output vector such that grad[i] if the derivative of this
-   /// at B with respect to the i-th variable of its scope
-   void evalDiff(const IntervalBox& B, Interval& val, IntervalVector& grad);
+   /// in the box with respect to the i-th variable of its scope
+   void evalDiff(const IntervalBox& box, Interval& val, IntervalVector& grad);
 
    /// Calculates the violation of the underlying constraint
-   /// @param B domains of variables
-   /// @param val evaluation of this at B
+   /// @param box domains of variables
+   /// @param val evaluation of this in the box
    /// @param viol 0.0 if the constraint is satisfied, a positive real number
    ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at B
+   ///        function and the result of its evaluation in the box
    ///
    /// Given [lo, up] the image of this in the DagFun object, the underlying
    /// constraint is defined by lo <= f(x) <= up.
-   void violation(const IntervalBox& B, Interval& val, double& viol);
+   void violation(const IntervalBox& box, Interval& val, double& viol);
 
    /// Calculates the violation of the underlying constraint
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param lo left bound for this
    /// @param up right bound for this
    /// @return 0.0 if the constraint is satisfied, a positive real number
    ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation at B
+   ///         function and the result of its evaluation in the box
    ///
    /// The underlying constraint is defined by lo <= f(x) <= up.
-   void violation(const IntervalBox& B, double lo, double up,
+   void violation(const IntervalBox& box, double lo, double up,
                   Interval& val, double& viol);
 
    /// type of shared pointer to a representation
@@ -230,15 +230,22 @@ public:
 
    ///@{
    Scope scope() const override;
+
    size_t nbVars() const override;
-   Interval eval(const IntervalBox& B) override;
+
+   Interval eval(const IntervalBox& box) override;
+
    Interval pointEval(const RealPoint& pt) override;
-   void diff(const IntervalBox& B, IntervalVector& grad) override;
-   void evalDiff(const IntervalBox& B, Interval& val,
+
+   void diff(const IntervalBox& box, IntervalVector& grad) override;
+
+   void evalDiff(const IntervalBox& box, Interval& val,
                  IntervalVector& grad) override;
-   void violation(const IntervalBox& B, Interval& val,
+
+   void violation(const IntervalBox& box, Interval& val,
                   double& viol) override;
-   void violation(const IntervalBox& B, double lo, double up,
+
+   void violation(const IntervalBox& box, double lo, double up,
                   Interval& val, double& viol) override;
    ///@}
 

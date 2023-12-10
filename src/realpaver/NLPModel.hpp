@@ -46,10 +46,10 @@ public:
    virtual ~NLPModel();
 
    /// Minimization of a function
-   /// @param B interval box in the search space
+   /// @param box interval box in the search space
    /// @param src starting point that belongs to the box
    /// @return an optimization status
-   virtual OptimizationStatus minimize(const IntervalBox& B,
+   virtual OptimizationStatus minimize(const IntervalBox& box,
                                        const RealPoint& src) = 0;
 
    /// @return the time limit for a run of minimize

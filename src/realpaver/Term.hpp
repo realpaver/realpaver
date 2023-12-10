@@ -67,15 +67,15 @@ public:
    virtual Interval evalConst() const = 0;
 
    /// Interval evaluation
-   /// @param B domains of variables
+   /// @param box domains of variables
    ///
    /// The result is assigned in the interval value enclosed.
-   virtual void eval(const IntervalBox& B) = 0;
+   virtual void eval(const IntervalBox& box) = 0;
 
    /// Contraction of domains
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @return a certificate of proof
-   virtual Proof contract(IntervalBox& B) = 0;
+   virtual Proof contract(IntervalBox& box) = 0;
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -163,32 +163,32 @@ public:
    Interval evalConst() const;
 
    /// Interval evaluation
-   /// @param B domains of variables
-   /// @return the interval evaluation of this at B
-   Interval eval(const IntervalBox& B) const;
+   /// @param box domains of variables
+   /// @return the interval evaluation of this in the box
+   Interval eval(const IntervalBox& box) const;
 
    /// Reduction of domains using the HC4 Revise contractor
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param img image or bounds of this considered as a function
    /// @return a certificate of proof
    ///
    /// This algorithm first evaluates the nodes from the leaves to the root
    /// (forward phase) and then calculates the projections from the root to
    /// the leaves (backward phase).
-   Proof contract(IntervalBox& B, const Interval& img);
+   Proof contract(IntervalBox& box, const Interval& img);
 
    /// Forward phase of the HC4 Revise contractor
-   /// @param B domains of variables
-   /// @return the interval evaluation of this at B
-   Interval hc4ReviseForward(const IntervalBox& B) const;
+   /// @param box domains of variables
+   /// @return the interval evaluation of this in the box
+   Interval hc4ReviseForward(const IntervalBox& box) const;
 
    /// Backward phase of the HC4 Revise contractor
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param img image or bounds of this considered as a function
    /// @return a certificate of proof
    ///
    /// Assumes that the forward phase has been executed using hc4ReviseForward.
-   Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
+   Proof hc4ReviseBackward(IntervalBox& box, const Interval& img);
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -318,8 +318,8 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isNumber() const override;
    bool isZero() const override;
@@ -351,8 +351,8 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
@@ -414,8 +414,8 @@ public:
    void insert(const SharedRep& t);
 
    ///@{
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
    virtual bool isLinear() const override;
@@ -821,8 +821,8 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
    bool isLin() const override;

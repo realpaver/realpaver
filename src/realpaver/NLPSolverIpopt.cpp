@@ -26,7 +26,7 @@ NLPSolver::~NLPSolver()
 {}
 
 
-OptimizationStatus NLPSolver::minimize(const IntervalBox& B,
+OptimizationStatus NLPSolver::minimize(const IntervalBox& box,
                                        const RealPoint& src)
 {
     status_ = OptimizationStatus::Other;
@@ -51,7 +51,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox& B,
     {
         // Ask Ipopt to solve the problem
         Ipopt::SmartPtr<LocalTNLP> tnlp =
-         new LocalTNLP(this, std::make_shared<IntervalBox>(B), src);
+         new LocalTNLP(this, std::make_shared<IntervalBox>(box), src);
 
         status = app->OptimizeTNLP(tnlp);
         best_val_ = tnlp->best_val_;
@@ -78,9 +78,9 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox& B,
     return status_;
 }
 
-NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalBox B,
+NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalBox box,
                                 const RealPoint& start)
-    : ls_(ls), B_(B), start_(start)
+    : ls_(ls), box_(box), start_(start)
 {}
 
 bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m,

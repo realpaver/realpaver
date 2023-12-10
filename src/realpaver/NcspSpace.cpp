@@ -20,17 +20,17 @@ IntervalBox NcspSpace::hullOfPendingNodes() const
    if (n == 0) THROW("No pending node in the space");
 
    SharedNcspNode node = getPendingNode(0);
-   IntervalBox* regnode = node->region();
+   IntervalBox* box = node->region();
 
-   IntervalBox h(*regnode);
+   IntervalBox hull(*box);
 
    for (size_t i=1; i<n; ++i)
    {
       node = getPendingNode(i);
-      regnode = node->region();
-      h.hullAssignOnScope(*regnode, h.scope());
+      box = node->region();
+      hull.hullAssignOnScope(*box, hull.scope());
    }
-   return h;
+   return hull;
 }
 
 void NcspSpace::insertPendingNodes(NcspSplit::iterator first,

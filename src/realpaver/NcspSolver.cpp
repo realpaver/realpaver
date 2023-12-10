@@ -126,9 +126,9 @@ void NcspSolver::makeSpace()
             "Unable to make the space object in a Ncsp solver");
 
    // creates and inserts the root node
-   IntervalBox B(preprob_->scope());
+   IntervalBox box(preprob_->scope());
 
-   SharedNcspNode node = std::make_shared<NcspNode>(preprob_->scope(), B);
+   SharedNcspNode node = std::make_shared<NcspNode>(preprob_->scope(), box);
    node->setIndex(1);
 
    space_->insertPendingNode(node);
@@ -381,12 +381,12 @@ void NcspSolver::makeSplit()
    split_ = new NcspSplit(std::move(pselector), std::move(pslicer));
 }
 
-bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
+bool NcspSolver::isAnInnerRegion(const IntervalBox& box) const
 {
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
       Constraint c = preprob_->ctrAt(i);
-      if (c.isSatisfied(B) != Proof::Inner)
+      if (c.isSatisfied(box) != Proof::Inner)
          return false;
    }
 
@@ -396,19 +396,19 @@ bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
 void NcspSolver::bpStep(int depthlimit)
 {
    SharedNcspNode node = space_->nextPendingNode();
-   IntervalBox* B = node->region();
+   IntervalBox* box = node->region();
 
    LOG_INTER("Extracts node " << node->index() << " (depth "
                               << node->depth() << ")");
-   LOG_LOW("Box: " << *B);
+   LOG_LOW("Box: " << *box);
 
    node->setProof(Proof::Maybe);
 
    // contracts the box
-   Proof proof = contractor_->contract(*B);
+   Proof proof = contractor_->contract(*box);
 
    LOG_INTER("Contraction -> " << proof);
-   LOG_INTER("Contracted box: " << *B);
+   LOG_INTER("Contracted box: " << *box);
 
    if (proof == Proof::Empty)
    {
@@ -416,7 +416,7 @@ void NcspSolver::bpStep(int depthlimit)
       return;
    }
 
-   if (isAnInnerRegion(*B))
+   if (isAnInnerRegion(*box))
    {
       node->setProof(Proof::Inner);
 
@@ -641,14 +641,14 @@ std::pair<IntervalBox, Proof> NcspSolver::getSolution(size_t i) const
 
    if (withPreprocessing_)
    {
-      IntervalBox B(problem_->scope());
+      IntervalBox box(problem_->scope());
       Proof proof = Proof::Inner;
 
       // assigns the values of the fixed variables
       for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
       {
          Variable v = preproc_->getFixedVar(i);
-         B.set(v, preproc_->getFixedDomain(v));
+         box.set(v, preproc_->getFixedDomain(v));
       }
 
       // assigns the values of the unfixed variables
@@ -657,24 +657,24 @@ std::pair<IntervalBox, Proof> NcspSolver::getSolution(size_t i) const
          SharedNcspNode node = space_->getSolNode(i);
          proof = node->getProof();
 
-         IntervalBox* Bnode = node->region();
+         IntervalBox* aux = node->region();
 
          for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
          {
             Variable v = preproc_->getUnfixedVar(i);
             Variable w = preproc_->srcToDestVar(v);
-            B.set(v, Bnode->get(w));
+            box.set(v, aux->get(w));
          }
       }
 
-      return std::make_pair(B, proof);
+      return std::make_pair(box, proof);
    }
    else
    {
       SharedNcspNode node = space_->getSolNode(i);
       Proof proof = node->getProof();
-      IntervalBox* Bnode = node->region();
-      return std::make_pair(*Bnode, proof);
+      IntervalBox* aux = node->region();
+      return std::make_pair(*aux, proof);
    }
 }
 

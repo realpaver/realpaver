@@ -52,9 +52,9 @@ public:
    virtual Scope scope() const = 0;
 
    /// Contraction method
-   /// @param B interval box that is contracted
+   /// @param box interval box that is contracted
    /// @return a certificate of proof
-   virtual Proof contract(IntervalBox& B) = 0;
+   virtual Proof contract(IntervalBox& box) = 0;
 
    /// Output on a stream
    /// param os an output stream

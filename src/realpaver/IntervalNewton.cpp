@@ -204,14 +204,14 @@ Proof IntervalNewton::reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol)
    return proof;
 }
 
-Proof IntervalNewton::certify(IntervalBox& B)
+Proof IntervalNewton::certify(IntervalBox& box)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
 
    IntervalBox X(scope());
-   X.setOnScope(B, scope());
+   X.setOnScope(box, scope());
 
    do
    {
@@ -269,7 +269,7 @@ Proof IntervalNewton::certify(IntervalBox& B)
    while (iter);
 
    if (proof == Proof::Feasible)
-      B.setOnScope(X, scope());
+      box.setOnScope(X, scope());
 
    return proof;
 }

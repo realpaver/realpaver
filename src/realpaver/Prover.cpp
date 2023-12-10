@@ -65,7 +65,7 @@ Prover::~Prover()
       delete newton_;
 }
 
-Proof Prover::certify(IntervalBox& B)
+Proof Prover::certify(IntervalBox& box)
 {
    if (!canprove_) return Proof::Maybe;
 
@@ -73,13 +73,13 @@ Proof Prover::certify(IntervalBox& B)
 
    for (auto& c : ctr_)
    {
-      Proof certif = c.isSatisfied(B);
+      Proof certif = c.isSatisfied(box);
       proof = std::min(proof, certif);
    }
 
    if (newton_ != nullptr && proof != Proof::Empty)
    {
-      proof = newton_->certify(B);
+      proof = newton_->certify(box);
    }
 
    return proof;

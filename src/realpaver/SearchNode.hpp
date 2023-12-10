@@ -31,9 +31,9 @@ class SearchNode {
 public:
    /// Creates a node
    /// @param scope set of variables
-   /// @param B domains of variables
+   /// @param box domains of variables
    /// @param depth depth of this
-   SearchNode(Scope scope, const IntervalBox& B,  int depth = 0);
+   SearchNode(Scope scope, const IntervalBox& box,  int depth = 0);
 
    /// Virtual destructor
    virtual ~SearchNode();
@@ -61,7 +61,7 @@ public:
    /// Increments the depth of this
    void incrementDepth();
 
-   /// @return the vector of domains of this
+   /// @return the domains of this
    IntervalBox* region() const;
 
    /// @return the scope of this
@@ -76,7 +76,7 @@ public:
 
 private:
    Scope scope_;
-   IntervalBox* B_;
+   IntervalBox* box_;
    int depth_, index_;
    Variable v_;
 };
