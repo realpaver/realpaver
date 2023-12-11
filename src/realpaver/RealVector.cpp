@@ -125,6 +125,16 @@ RealVector operator+(const RealVector& V, const RealVector& W)
    return res;
 }
 
+RealVector operator+(const RealVector& V, double w)
+{
+   RealVector res(V.size());
+   for (size_t i=0; i<V.size(); ++i)
+   {
+      res.set(i, V.get(i)+w);
+   }
+   return res;
+}
+
 RealVector operator-(const RealVector& V, const RealVector& W)
 {
    RealVector res(V.size());
@@ -149,6 +159,25 @@ RealVector operator*(double a, const RealVector& V)
 RealVector operator*(const RealVector& V, double a)
 {
    return a*V;
+}
+
+RealVector operator*(const RealMatrix& A, const RealVector& X)
+{
+   ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
+
+   RealVector Y(A.nrows());
+
+   for (size_t i=0; i<Y.size(); ++i)
+   {
+      double z = 0.0;
+
+      for (size_t j=0; j<A.ncols(); ++j)
+         z += A.get(i, j) * X.get(j);
+
+      Y.set(i, z);
+   }
+
+   return Y;
 }
 
 RealVector operator/(const RealVector& V, double a)

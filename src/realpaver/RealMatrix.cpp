@@ -335,6 +335,74 @@ void RealMatrix::setMinPivot(double val)
    minpiv_ = val;
 }
 
+// Doolittle algorithm
+void RealMatrix::LU(RealMatrix* L, RealMatrix* U) const
+{
+   ASSERT(this->nrows()==this->ncols(), "LU decomposition only apply to square matrices");
+   if (L != nullptr)
+   {
+      ASSERT(this->nrows()==L->nrows(),"L has a wrong number of rows");
+      ASSERT(this->ncols()==L->ncols(),"L has a wrong number of columns");
+   }
+   else
+      L = new RealMatrix(this->nrows(),this->ncols());
+   if (U != nullptr)
+   {
+      ASSERT(this->nrows()==U->nrows(),"U has a wrong number of rows");
+      ASSERT(this->ncols()==U->ncols(),"U has a wrong number of columns");
+   }
+   else
+      U = new RealMatrix(this->nrows(),this->ncols());
+   // Adaptation from: https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
+   // Decomposing matrix into Upper and Lower
+   // triangular matrix
+   for (size_t i = 0; i < this->nrows(); i++) 
+   { // i is the row number
+      for (size_t j = 0; j < this->ncols(); j++)
+      {
+         if (i<=j)
+         {
+            // Summation of L(i, k) * U(k, j)
+            double sum_U = 0;
+            for (size_t k = 0; k < i; k++)
+            {  
+               sum_U += ((*L)(i,k) * (*U)(k,j));
+            }
+            // Evaluating U(i, k)
+            (*U)(i,j) = (*this)(i,j) - sum_U; // sum_U = 0 when i=0
+            
+            if (i == j)
+               (*L)(i,i) = 1; // Diagonal as 1
+         }
+         else
+         {
+            // Summation of L(i, k) * U(k, i)
+            double sum_L = 0;
+            for (size_t k = 0; k < j; k++)
+               sum_L += ((*L)(i,k) * (*U)(k,j));
+            // Evaluating L(k, i)
+            (*L)(i,j) = ((*this)(i,j) - sum_L) / (*U)(j,j); // sum_L = 0 when i=0
+         }
+         
+      }
+    }
+}
+
+bool RealMatrix::isPositiveDefinite() const
+{
+   RealMatrix L(this->nrows(),this->ncols());
+   RealMatrix U(this->nrows(),this->ncols());
+   this->LU(&L,&U);
+   for (size_t i = 0; i < U.nrows(); i++)
+   {
+      if (U(i,i)<0)
+         return false;
+   }
+   return true;
+}
+
+
+
 bool RealMatrix::operator==(const RealMatrix& A) const
 {
    if (nrows() != A.nrows()) return false;
