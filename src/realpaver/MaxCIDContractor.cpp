@@ -13,13 +13,9 @@
 namespace realpaver {
 
 MaxCIDContractor::MaxCIDContractor(SharedContractor op,
-                                   std::unique_ptr<VariableSelector> selector,
                                    std::unique_ptr<IntervalSlicer> slicer)
-      : op_(nullptr),
-        selector_(std::move(selector))
+      : op_(nullptr)
 {
-   ASSERT(selector_ != nullptr, "No selector in a MaxCID contractor");
-
    op_ = new CIDContractor(op, std::move(slicer));
 }
 
@@ -35,22 +31,38 @@ Scope MaxCIDContractor::scope() const
 
 Proof MaxCIDContractor::contract(IntervalBox& box)
 {
-   std::pair<bool, Variable> sel = selector_->selectVar(box);
-
-   Proof proof = Proof::Maybe;
-
-   if (sel.first)
-   {
-      op_->setVar(sel.second);
-      proof = op_->contract(box);
-   }
-
-   return proof;
+   Variable v = selectMaxDom(box);
+   op_->setVar(v);
+   return op_->contract(box);
 }
 
 void MaxCIDContractor::print(std::ostream& os) const
 {
    os << "Max CID contractor";
+}
+
+Variable MaxCIDContractor::selectMaxDom(const IntervalBox& box)
+{
+   Scope::const_iterator it = op_->scope().begin();
+   Variable vmax = *it;
+   double wmax = box.get(vmax).width();
+
+   ++it;
+   while (it != op_->scope().end())
+   {
+      Variable v = *it;
+      double w = box.get(v).width();
+
+      if (w > wmax)
+      {
+         vmax = v;
+         wmax = w;
+      }
+      
+      ++it;
+   }
+
+   return vmax;
 }
 
 } // namespace

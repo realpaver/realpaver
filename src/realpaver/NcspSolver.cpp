@@ -189,16 +189,12 @@ void NcspSolver::makeContractor()
 
    if (with_max_cid == "YES")
    {
-      std::unique_ptr<VariableSelector> selector =
-         std::make_unique<MaxDomSelector>(preprob_->scope());
-
       int nb = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
       std::unique_ptr<IntervalSlicer> slicer =
          std::make_unique<IntervalPartitionMaker>(nb);
 
       SharedContractor op =
-         std::make_shared<MaxCIDContractor>(propagator, std::move(selector),
-                                            std::move(slicer));
+         std::make_shared<MaxCIDContractor>(propagator, std::move(slicer));
 
       mainpool->push(op);
    }

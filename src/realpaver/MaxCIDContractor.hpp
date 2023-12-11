@@ -16,17 +16,14 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a CID contractor applied to the best variable identified by a
-/// selection strategy.
+/// This is a CID contractor applied to the variable having the largest domain.
 ///////////////////////////////////////////////////////////////////////////////
 class MaxCIDContractor : public Contractor {
 public:
    /// Creates a contractor
    /// @param op a contractor
-   /// @param selector object used to select a variable
    /// @param slicer object used to slice a variable domain
    MaxCIDContractor(SharedContractor op,
-                    std::unique_ptr<VariableSelector> selector,
                     std::unique_ptr<IntervalSlicer> slicer);
 
    /// Destructor
@@ -46,7 +43,8 @@ public:
 
 private:
    CIDContractor* op_;
-   std::unique_ptr<VariableSelector> selector_;
+
+   Variable selectMaxDom(const IntervalBox& box);
 };
 
 } // namespace
