@@ -18,6 +18,15 @@
 #include "realpaver/ZeroOne.hpp"
 
 namespace realpaver {
+   
+/// domain types
+enum class DomainType {
+   Binary,
+   Interval,
+   IntervalUnion,
+   Range,
+   RangeUnion
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a pure abstract class representing a variable domain.
@@ -26,8 +35,14 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class Domain {
 public:
+   /// Constructor
+   Domain(DomainType type);
+
    /// Virtual destructor
    virtual ~Domain();
+
+   /// @return the domain type
+   DomainType type() const;
 
    /// @return true if this is empty
    virtual bool isEmpty() const = 0;
@@ -72,6 +87,9 @@ public:
    /// prints this on a stream
    /// @param os an output stream
    virtual void print(std::ostream& os) const = 0;
+
+private:
+   DomainType type_;
 };
 
 /// Output on a stream

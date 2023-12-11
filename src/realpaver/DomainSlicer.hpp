@@ -135,7 +135,7 @@ public:
       operator=(const IntervalUnionDomainBisecter&) = delete;
 
    /// Default destructor
-   ~IntervalUnionDomainBisecter();
+   ~IntervalUnionDomainBisecter() = default;
 
    void applyImpl(Domain* dom) override;
 };

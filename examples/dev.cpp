@@ -1,6 +1,7 @@
 #include <iostream>
+#include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
-#include "realpaver/DomainSlicer.hpp"
+#include "realpaver/Problem.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -9,23 +10,36 @@ int main(void)
 {
    try
    {
-      RangeUnionDomain u({Range(0, 1)});
-      RangeUnionDomain* bdom = new RangeUnionDomain(u);
+      Problem P;
+      Variable x = P.addRealVar(-1, 2, "x"),
+               y = P.addRealVar(0, 6, "y"),
+               n = P.addIntVar(1, 7, "n"),
+               b = P.addBinaryVar("b");
 
-      RangeUnionDomainBisecter slicer;
+      std::unique_ptr<DomainSlicerMap>
+         map = DomainSlicerFactory::makeBisectionStrategy(P.scope());   
 
-      size_t n = slicer.apply(bdom);
-      cout << n << endl;
+      SearchRegion reg(P.scope());
+      cout << reg << endl;
 
-      DomainSlicer::iterator it = slicer.begin();
-      while (it != slicer.end())
+      Variable vsel = b;
+      cout << "split var: " << vsel.getName() << endl;
+
+      DomainSlicer* slicer = map->getSlicer(vsel);
+
+      Domain* dom = reg.getDomain(vsel);
+
+      size_t ns = slicer->apply(dom);
+      cout << "nb slices: " << ns << endl;
+
+      DomainSlicer::iterator it = slicer->begin();
+      while (it != slicer->end())
       {
-         Domain* dom = slicer.next(it);
-         cout << (*dom) << endl;
-         delete dom;
+         Domain* slice = slicer->next(it);
+         cout << "a slice: " << (*slice) << endl;
+         delete slice;
       }
 
-      delete bdom;
    }
    catch(Exception e)
    {

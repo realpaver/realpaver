@@ -15,6 +15,14 @@ namespace realpaver {
 Domain::~Domain()
 {}
 
+Domain::Domain(DomainType type) : type_(type)
+{}
+
+DomainType Domain::type() const
+{
+   return type_;
+}
+
 bool Domain::isConnected() const
 {
    return false;
@@ -44,7 +52,7 @@ std::ostream& operator<<(std::ostream& os, const Domain& dom)
 ///////////////////////////////////////////////////////////////////////////////
 
 IntervalDomain::IntervalDomain(const Interval& x)
-      : Domain(),
+      : Domain(DomainType::Interval),
         val_(x)
 {}
 
@@ -106,13 +114,13 @@ void IntervalDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 IntervalUnionDomain::IntervalUnionDomain(const IntervalUnion& u)
-      : Domain(),
+      : Domain(DomainType::IntervalUnion),
         val_(u)
 {}
 
 IntervalUnionDomain::IntervalUnionDomain(
    const std::initializer_list<Interval>& l)
-      : Domain(),
+      : Domain(DomainType::IntervalUnion),
         val_(l)
 {}
 
@@ -169,7 +177,7 @@ void IntervalUnionDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 RangeDomain::RangeDomain(const Range& r)
-      : Domain(),
+      : Domain(DomainType::Range),
         val_(r)
 {}
 
@@ -226,12 +234,12 @@ void RangeDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 RangeUnionDomain::RangeUnionDomain(const RangeUnion& u)
-      : Domain(),
+      : Domain(DomainType::RangeUnion),
         val_(u)
 {}
 
 RangeUnionDomain::RangeUnionDomain(const std::initializer_list<Range>& l)
-      : Domain(),
+      : Domain(DomainType::RangeUnion),
         val_(l)
 {}
 
@@ -288,12 +296,12 @@ void RangeUnionDomain::print(std::ostream& os) const
 ///////////////////////////////////////////////////////////////////////////////
 
 BinaryDomain::BinaryDomain()
-      : Domain(),
+      : Domain(DomainType::Binary),
         val_()
 {}
 
 BinaryDomain::BinaryDomain(const ZeroOne& zo)
-      : Domain(),
+      : Domain(DomainType::Binary),
         val_(zo)
 {
    ASSERT(!zo.isEmpty(),
