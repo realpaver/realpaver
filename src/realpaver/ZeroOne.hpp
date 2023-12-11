@@ -24,6 +24,11 @@ public:
    /// Creates the set {0, 1}
    ZeroOne();
 
+   /// Creates an element
+   /// @param zro true if 0 belongs to this
+   /// @param one true if 1 belongs to this
+   ZeroOne(bool zro, bool one);
+
    /// Default copy constructor
    ZeroOne(const ZeroOne&) = default;
 
@@ -33,6 +38,13 @@ public:
    /// Default destructor
    ~ZeroOne() = default;
 
+   ///@{
+   static ZeroOne universe();
+   static ZeroOne zero();
+   static ZeroOne one();
+   static ZeroOne emptyset();
+   ///@}
+
    /// @return true if this is empty
    bool isEmpty() const;
 
@@ -41,6 +53,9 @@ public:
 
    /// @return true if this is reduced to 1
    bool isOne() const;
+
+   /// @return true if this is {0, 1}
+   bool isUniverse() const;
 
    /// @return true if 0 is in this
    bool hasZero() const;

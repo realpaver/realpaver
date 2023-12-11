@@ -31,7 +31,7 @@ size_t IntervalUnion::size() const
    return v_.size();
 }
 
-Interval IntervalUnion::operator[](size_t i) const
+const Interval& IntervalUnion::operator[](size_t i) const
 {
    ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
 
@@ -56,6 +56,18 @@ IntervalUnion::iterator IntervalUnion::begin()
 IntervalUnion::iterator IntervalUnion::end()
 {
    return v_.end();
+}
+
+IntervalUnion IntervalUnion::subUnion(size_t i, size_t j) const
+{
+   ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
+   ASSERT(j>=0 && j<v_.size(), "Bad access in an interval union @ " << j);
+   ASSERT(i<=j, "Bad indexes used to create a sub interval union");
+
+   IntervalUnion u;
+   for (size_t k=i; k<=j; ++k)
+      u.v_.push_back(v_[k]);
+   return u;
 }
 
 IntervalUnion& IntervalUnion::insert(const Interval& x)

@@ -5,6 +5,7 @@
 #include "realpaver/Problem.hpp"
 #include "realpaver/Propagator.hpp"
 #include "realpaver/SearchRegion.hpp"
+#include "realpaver/Timer.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -14,6 +15,49 @@ int main(void)
    Logger::init(LogLevel::full, "propag.log");
 
    try {
+      
+      
+      Problem P;
+
+      Variable xx = P.addRealVar(-7,  3, "x"),
+               yy = P.addRealVar( -3, 6, "y"),
+               zz = P.addRealVar( -3, 6, "z"),
+               uu = P.addRealVar( -3, 6, "u"),
+               vv = P.addRealVar( -3, 6, "v"),
+               ww = P.addRealVar( -3, 6, "w");
+
+
+      Scope scop({xx, yy, zz});
+
+      SearchRegion pr(scop);
+      IntervalBox pb(scop);
+      
+      int NS = 1000000;
+
+      Timer tim;
+      tim.start();
+
+      for (int i=0; i<NS; ++i)
+         new SearchRegion(pr);
+
+      tim.stop();
+      cout << tim.elapsedTime() << endl;
+
+
+      tim.reset();
+
+      tim.start();
+
+      for (int i=0; i<NS; ++i)
+         new IntervalBox(pb);
+
+      tim.stop();
+      cout << tim.elapsedTime() << endl;
+
+      return 0;
+      
+      
+      
       Problem problem;
 
       Variable x = problem.addRealVar(-7,  3, "x"),

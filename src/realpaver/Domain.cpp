@@ -292,6 +292,14 @@ BinaryDomain::BinaryDomain()
         val_()
 {}
 
+BinaryDomain::BinaryDomain(const ZeroOne& zo)
+      : Domain(),
+        val_(zo)
+{
+   ASSERT(!zo.isEmpty(),
+          "Creation of an empty binary domain");
+}
+
 const ZeroOne& BinaryDomain::getVal() const
 {
    return val_;

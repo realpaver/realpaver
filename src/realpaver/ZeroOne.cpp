@@ -13,8 +13,36 @@
 namespace realpaver {
 
 ZeroOne::ZeroOne()
-   : zro_(true), one_(true)
+      : zro_(true), one_(true)
 {}
+
+ZeroOne::ZeroOne(bool zro, bool one)
+      : zro_(zro), one_(one)
+{}
+
+ZeroOne ZeroOne::universe()
+{
+   static ZeroOne zo(true, true);
+   return zo;
+}
+
+ZeroOne ZeroOne::zero()
+{
+   static ZeroOne zo(true, false);
+   return zo;   
+}
+
+ZeroOne ZeroOne::one()
+{
+   static ZeroOne zo(false, true);
+   return zo;
+}
+
+ZeroOne ZeroOne::emptyset()
+{
+   static ZeroOne zo(false, false);
+   return zo;
+}
 
 bool ZeroOne::isEmpty() const
 {
@@ -29,6 +57,11 @@ bool ZeroOne::isZero() const
 bool ZeroOne::isOne() const
 {
    return (!zro_) && one_;
+}
+
+bool ZeroOne::isUniverse() const
+{
+   return zro_ && one_;
 }
 
 bool ZeroOne::hasZero() const

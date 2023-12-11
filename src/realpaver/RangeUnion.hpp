@@ -60,6 +60,11 @@ public:
    /// Assigns this to the empty set
    void setEmpty();
 
+   /// Gets a part of this
+   /// @param i index between 0 and size()-1
+   /// @param j index between 0 and size()-1 such that j >= i
+   RangeUnion subUnion(size_t i, size_t j) const;
+
    /// Inserts an element in this
    /// @param r range inserted in this
    /// @return a reference to this

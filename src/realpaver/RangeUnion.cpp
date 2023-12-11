@@ -65,6 +65,18 @@ RangeUnion::iterator RangeUnion::end()
    return v_.end();
 }
 
+RangeUnion RangeUnion::subUnion(size_t i, size_t j) const
+{
+   ASSERT(i>=0 && i<v_.size(), "Bad access in a range union @ " << i);
+   ASSERT(j>=0 && j<v_.size(), "Bad access in a range union @ " << j);
+   ASSERT(i<=j, "Bad indexes used to create a sub range union");
+
+   RangeUnion u;
+   for (size_t k=i; k<=j; ++k)
+      u.v_.push_back(v_[k]);
+   return u;
+}
+
 RangeUnion& RangeUnion::insert(const Range& r)
 {
    if (r.isEmpty()) return *this;

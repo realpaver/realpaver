@@ -272,6 +272,10 @@ public:
    /// Creates a 0/1 domain
    BinaryDomain();
 
+   /// Creates a 0/1 domain
+   /// @param zo value of this
+   BinaryDomain(const ZeroOne& zo);
+
    /// Default copy constructor
    BinaryDomain(const BinaryDomain&) = default;
 
