@@ -44,12 +44,6 @@ public:
    ///         otherwise v is the selected variable
    virtual std::pair<bool, Variable> selectVar(SearchNode& node) = 0;
 
-   /// Selection method
-   /// @param box an interval box
-   /// @return a pair <ok, v> such that no variable is selected if ok = false,
-   ///         otherwise v is the selected variable
-   virtual std::pair<bool, Variable> selectVar(const IntervalBox& box) = 0;
-
 protected:
    Scope scope_;
 };
@@ -57,6 +51,7 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable with largest domain.
 ///////////////////////////////////////////////////////////////////////////////
+/*
 class MaxDomSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
@@ -74,13 +69,14 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalBox& box) override;
    ///@}
 };
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable with maximum smear.
 ///////////////////////////////////////////////////////////////////////////////
+/*
 class MaxSmearSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
@@ -99,12 +95,12 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalBox& box) override;
    ///@}
 
 private:
    IntervalFunctionVector F_;
 };
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable following a round-robin strategy.
@@ -126,7 +122,6 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalBox& box) override;
    ///@}
 };
 
@@ -140,6 +135,7 @@ public:
 /// - f = 3: applies round-robin, two times max-dom, ...
 /// and so on
 ///////////////////////////////////////////////////////////////////////////////
+/*
 class HybridDomRobinSelector : public VariableSelector {
 public:
    /// Creates a selector on a set of variables
@@ -158,12 +154,12 @@ public:
 
    ///@{
    std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   std::pair<bool, Variable> selectVar(const IntervalBox& box) override;
    ///@}
 
 private:
    int f_;
 };
+*/
 
 } // namespace
 

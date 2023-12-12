@@ -112,7 +112,8 @@ private:
    void bpStep(int depthlimit);
    bool isAnInnerRegion(const IntervalBox& box) const;
    void certifySolutions();
-   VariableSelector* makeMaxSmearStrategy();
+
+//   VariableSelector* makeMaxSmearStrategy();
 };
 
 } // namespace

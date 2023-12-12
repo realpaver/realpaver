@@ -47,7 +47,7 @@ public:
    /// @param src starting point that belongs to the box
    /// @return an optimization status
    ///
-   /// Both scopes of reg and src must contain the scope of this.
+   /// Both scopes of the box and src must contain the scope of this.
    /// They do not necessarily correspond.
    OptimizationStatus minimize(const IntervalBox& box, const RealPoint& src);
 

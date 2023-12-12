@@ -16,7 +16,6 @@
 #include <vector>
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Objective.hpp"
-#include "realpaver/SearchRegion.hpp"
 #include "realpaver/VariableVector.hpp"
 
 namespace realpaver {
@@ -33,7 +32,7 @@ namespace realpaver {
 /// (one million), the first variable identifier is NP*MAX_NB_VAR.
 ///
 /// The Cartesian product of variable domains can be simply obtained by
-/// creating a SearchRegion from the scope of this.
+/// creating a domain box from the scope of this.
 ///
 /// There are several classes of problems:
 /// - Constraint Satisfaction Problems (CSPs);

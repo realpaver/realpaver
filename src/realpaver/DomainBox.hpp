@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_SEARCH_REGION_HPP
-#define REALPAVER_SEARCH_REGION_HPP
+#ifndef REALPAVER_DOMAIN_BOX_HPP
+#define REALPAVER_DOMAIN_BOX_HPP
 
 #include "realpaver/Domain.hpp"
 #include "realpaver/Scope.hpp"
@@ -16,25 +16,25 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a region of a search space occurring in a search node.
+/// This is a list of couples variable / domain.
 ///
 /// It associates a scope and a vector of variable domains indexed by the
 /// local indexes of the variables from the scope.
 ///////////////////////////////////////////////////////////////////////////////
-class SearchRegion {
+class DomainBox {
 public:
-   /// Creates a region
+   /// Creates a box
    /// sco scope of this such that the domains are extracted from the variables
-   SearchRegion(Scope sco);
+   DomainBox(Scope sco);
 
    /// Copy constructor
-   SearchRegion(const SearchRegion& reg);
+   DomainBox(const DomainBox& box);
 
    /// No asignment
-   SearchRegion& operator=(const SearchRegion&) = delete;
+   DomainBox& operator=(const DomainBox&) = delete;
 
    /// Destructor
-   ~SearchRegion();
+   ~DomainBox();
 
    /// @return the scope of this (sorted set of variables)
    Scope scope() const;
@@ -61,7 +61,12 @@ public:
    Variable getVar(size_t i) const;
 
    /// @return a clone of this
-   SearchRegion* clone() const;
+   DomainBox* clone() const;
+
+   /// Tests if the domain of a variable is splitable
+   /// @param v a variable in this
+   /// @return true if the domain of v in this has the desired tolerance
+   bool isSplitable(const Variable& v) const;
 
    /// Display on a stream
    /// @param os an output stream
@@ -73,7 +78,7 @@ private:
 };
 
 /// Display in a stream
-std::ostream& operator<<(std::ostream& os, const SearchRegion& reg);
+std::ostream& operator<<(std::ostream& os, const DomainBox& box);
 
 } // namespace
 

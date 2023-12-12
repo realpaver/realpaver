@@ -8,8 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DomainBox.hpp"
 #include "realpaver/IntervalBox.hpp"
-#include "realpaver/SearchRegion.hpp"
 
 namespace realpaver {
 
@@ -61,12 +61,12 @@ IntervalBox::IntervalBox(const IntervalBox& B, Scope sco)
       set(v, B.get(v));
 }
 
-IntervalBox::IntervalBox(const SearchRegion& reg)
-      : IntervalVector(reg.scope().size()),
-        scope_(reg.scope())
+IntervalBox::IntervalBox(const DomainBox& box)
+      : IntervalVector(box.scope().size()),
+        scope_(box.scope())
 {
    for (Variable v : scope_)
-      set(v, reg.getDomain(v)->intervalHull());
+      set(v, box.getDomain(v)->intervalHull());
 }
 
 Scope IntervalBox::scope() const

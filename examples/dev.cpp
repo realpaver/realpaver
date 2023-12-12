@@ -1,4 +1,5 @@
 #include <iostream>
+#include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
 #include "realpaver/Problem.hpp"
@@ -19,7 +20,7 @@ int main(void)
       std::unique_ptr<DomainSlicerMap>
          map = DomainSlicerFactory::makeBisectionStrategy(P.scope());   
 
-      SearchRegion reg(P.scope());
+      DomainBox reg(P.scope());
       cout << reg << endl;
 
       Variable vsel = b;

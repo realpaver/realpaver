@@ -8,45 +8,45 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "AssertDebug.hpp"
-#include "SearchRegion.hpp"
+#include "DomainBox.hpp"
 
 namespace realpaver {
 
-SearchRegion::SearchRegion(Scope sco)
+DomainBox::DomainBox(Scope sco)
       : sco_(sco),
         doms_(sco.size())
 {
-   ASSERT(!sco_.isEmpty(), "Creation of a search region with an empty scope");
+   ASSERT(!sco_.isEmpty(), "Creation of a domain box with an empty scope");
 
    for (size_t i=0; i<size(); ++i)
       doms_[i] = sco_.var(i).getDomain()->clone();
 }
 
-SearchRegion::SearchRegion(const SearchRegion& reg)
-      : sco_(reg.sco_),
-        doms_(reg.sco_.size())
+DomainBox::DomainBox(const DomainBox& box)
+      : sco_(box.sco_),
+        doms_(box.sco_.size())
 {
    for (size_t i=0; i<size(); ++i)
-      doms_[i] = reg.doms_[i]->clone();
+      doms_[i] = box.doms_[i]->clone();
 }
 
-SearchRegion::~SearchRegion()
+DomainBox::~DomainBox()
 {
    for (size_t i=0; i<size(); ++i)
       delete doms_[i];
 }
 
-Scope SearchRegion::scope() const
+Scope DomainBox::scope() const
 {
    return sco_;
 }
 
-size_t SearchRegion::size() const
+size_t DomainBox::size() const
 {
    return sco_.size();
 }
 
-bool SearchRegion::isEmpty() const
+bool DomainBox::isEmpty() const
 {
    for (size_t i=0; i<size(); ++i)
       if (doms_[i]->isEmpty())
@@ -55,34 +55,45 @@ bool SearchRegion::isEmpty() const
    return false;
 }
 
-Domain* SearchRegion::getDomain(const Variable& v) const
+Domain* DomainBox::getDomain(const Variable& v) const
 {
    ASSERT(sco_.contains(v),
-          "Bad access in a region to variable " << v.getName());
+          "Bad access in a domain box to variable " << v.getName());
 
    return doms_[sco_.index(v)];
 }
 
-Domain* SearchRegion::getDomain(size_t i) const
+Domain* DomainBox::getDomain(size_t i) const
 {
-   ASSERT(i>=0 && i<size(), "Bad access in a region at index " << i);
+   ASSERT(i>=0 && i<size(), "Bad access in a domain box at index " << i);
 
    return doms_[i];
 }
 
-Variable SearchRegion::getVar(size_t i) const
+Variable DomainBox::getVar(size_t i) const
 {
-   ASSERT(i>=0 && i<size(), "Bad access in a region at index " << i);
+   ASSERT(i>=0 && i<size(), "Bad access in a domain box at index " << i);
 
    return sco_.var(i);
 }
 
-SearchRegion* SearchRegion::clone() const
+DomainBox* DomainBox::clone() const
 {
-   return new SearchRegion(*this);
+   return new DomainBox(*this);
 }
 
-void SearchRegion::print(std::ostream& os) const
+bool DomainBox::isSplitable(const Variable& v) const
+{
+   Domain* dom = getDomain(v);
+
+   if (dom->isReal())
+      return !v.getTolerance().hasTolerance(dom->intervalHull());
+
+   else
+      return !dom->isCanonical();
+}
+
+void DomainBox::print(std::ostream& os) const
 {
    for (size_t i=0; i<size(); ++i)
    {
@@ -91,9 +102,9 @@ void SearchRegion::print(std::ostream& os) const
    }
 }
 
-std::ostream& operator<<(std::ostream& os, const SearchRegion& reg)
+std::ostream& operator<<(std::ostream& os, const DomainBox& box)
 {
-   reg.print(os);
+   box.print(os);
    return os;
 }
 

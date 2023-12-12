@@ -304,6 +304,7 @@ void NcspSolver::makeContractor()
    contractor_ = std::make_shared<ListContractor>(mainpool);
 }
 
+/* TODO
 VariableSelector* NcspSolver::makeMaxSmearStrategy()
 {
    IntervalFunctionVector F;
@@ -333,6 +334,7 @@ VariableSelector* NcspSolver::makeMaxSmearStrategy()
       return new HybridDomRobinSelector(preprob_->scope(), n);
    }
 }
+*/
 
 void NcspSolver::makeSplit()
 {
@@ -342,9 +344,11 @@ void NcspSolver::makeSplit()
    Scope sco = preprob_->scope();
 
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
-   if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
+
+// TODO
+//   if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
    if (sel == "ROUND_ROBIN") selector = new RoundRobinSelector(sco);
-   if (sel == "HYBRID_DOM_ROBIN")
+/*   if (sel == "HYBRID_DOM_ROBIN")
    {
       int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
       selector = new HybridDomRobinSelector(sco, n);
@@ -353,7 +357,7 @@ void NcspSolver::makeSplit()
    {
       selector = makeMaxSmearStrategy();   
    }
-
+*/
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
    
    if (sli == "BISECTION") slicer = new IntervalBisecter();

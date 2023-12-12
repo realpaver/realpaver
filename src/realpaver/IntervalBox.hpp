@@ -17,7 +17,7 @@
 
 namespace realpaver {
 
-class SearchRegion;
+class DomainBox;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a scoped interval vector.
@@ -55,10 +55,10 @@ public:
    IntervalBox(const RealPoint& pt);
 
    /// Creates an interval box
-   /// @param reg a search region
+   /// @param box a domain box
    ///
-   /// this is the interval hull of reg
-   IntervalBox(const SearchRegion& reg);
+   /// this is the interval hull of the given box
+   IntervalBox(const DomainBox& box);
 
    /// Default copy constructor
    IntervalBox(const IntervalBox&) = default;

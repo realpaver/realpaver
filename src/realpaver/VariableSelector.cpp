@@ -27,6 +27,7 @@ Scope VariableSelector::scope() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/*
 MaxDomSelector::MaxDomSelector(Scope s) : VariableSelector(s)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a selector");
@@ -70,9 +71,11 @@ std::pair<bool, Variable> MaxDomSelector::selectVar(SearchNode& node)
 {
    return selectVar(*node.region());
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/*
 MaxSmearSelector::MaxSmearSelector(IntervalFunctionVector F, Scope s)
       : VariableSelector(s),
         F_(F)
@@ -131,18 +134,12 @@ std::pair<bool, Variable> MaxSmearSelector::selectVar(SearchNode& node)
 {
    return selectVar(*node.region());
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 
 RoundRobinSelector::RoundRobinSelector(Scope s) : VariableSelector(s)
 {}
-
-std::pair<bool, Variable>
-RoundRobinSelector::selectVar(const IntervalBox& box)
-{
-   MaxDomSelector selector(scope_);
-   return selector.selectVar(box);
-}
 
 std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
 {
@@ -181,7 +178,7 @@ std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
 HybridDomRobinSelector::HybridDomRobinSelector(Scope s, int f)
       : VariableSelector(s),
         f_(f)
@@ -209,5 +206,6 @@ std::pair<bool, Variable> HybridDomRobinSelector::selectVar(SearchNode& node)
       return selector.selectVar(node);
    }
 }
+*/
 
 } // namespace
