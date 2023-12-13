@@ -224,6 +224,10 @@ void RangeUnion::print(std::ostream& os) const
    if (isEmpty())
       os << "{empty}";
 
+   else if (size()==1)
+      os << v_[0];
+
+
    else
    {
       os << "{";

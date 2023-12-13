@@ -208,8 +208,6 @@ public:
    SharedNcspNode popSolNode() override;
    SharedNcspNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
-   void makeSolClusters(double gap) override;
-   size_t nbTotalSolNodes() const override;
    size_t nbPendingNodes() const override;
    SharedNcspNode nextPendingNode() override;
    void insertPendingNode(const SharedNcspNode& node) override;
@@ -221,11 +219,9 @@ public:
 
 private:
    std::vector<SharedNcspNode> sta_;   // stack of pending nodes (for DFS)
-   HybridNcspNodeSet * set_;           // set of pending nodes (for BestFS)
+   HybridNcspNodeSet* set_;            // set of pending nodes (for BestFS)
    std::vector<SharedNcspNode> vsol_;  // vector of solution nodes
-   size_t stotal_;                     // number of solution nodes that have
-                                       // been inserted in this
-   bool leftRight_;                    // true if the current DFS stage is
+  bool leftRight_;                     // true if the current DFS stage is
                                        // left-to-right, false for right-to-left
 };
 

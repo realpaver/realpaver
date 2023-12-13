@@ -67,12 +67,7 @@ public:
    /// If gap < 0.0 then there is no clustering; if gap = 0.0 then two solutions
    /// are replaced by their hull if they overlap; otherwise two solutions
    /// are replaced by their hull if their inter-gap is small enough.
-   virtual void makeSolClusters(double gap) = 0;
-
-   /// @return the total number of solution nodes that have been pushed in
-   ///         this minus the number of solution nodes that have been popped
-   ///         from this
-   virtual size_t nbTotalSolNodes() const = 0;
+   virtual void makeSolClusters(double gap);
    ///@}
 
    /// Management of pending nodes
@@ -100,11 +95,6 @@ public:
    /// @param i a pending node index with 0 <= i < nbPendingNodes()
    /// @return the i-th pending node
    virtual SharedNcspNode getPendingNode(size_t i) const = 0;
-
-   /// @return the hull of all the pending nodes
-   ///
-   /// throws an exception if there is no pending node
-   IntervalBox hullOfPendingNodes() const;
    ///@}
 };
 

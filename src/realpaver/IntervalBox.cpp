@@ -66,7 +66,7 @@ IntervalBox::IntervalBox(const DomainBox& box)
         scope_(box.scope())
 {
    for (Variable v : scope_)
-      set(v, box.getDomain(v)->intervalHull());
+      set(v, box.get(v)->intervalHull());
 }
 
 Scope IntervalBox::scope() const
@@ -155,7 +155,12 @@ bool IntervalBox::overlaps(const IntervalBox& B) const
    return true;
 }
 
-void IntervalBox::hullAssignOnScope(const IntervalBox& B, const Scope& sco)
+void IntervalBox::glue(const IntervalBox& B)
+{
+   glueOnScope(B, scope_);
+}
+
+void IntervalBox::glueOnScope(const IntervalBox& B, const Scope& sco)
 {
    for (auto v : sco) set(v, get(v) | B.get(v));
 }
@@ -252,7 +257,7 @@ double IntervalBox::perimeterOnScope(const Scope& sco) const
 {
    double p = 0.0;
 
-   for (const auto& v : scope_)
+   for (const auto& v : sco)
       p += get(v).width();
 
    return p;
@@ -267,7 +272,7 @@ double IntervalBox::gridPerimeterOnScope(const Scope& sco) const
 {
    double p = 0.0;
 
-   for (const auto& v : scope_)
+   for (const auto& v : sco)
    {
       Interval x = get(v);
       Tolerance tol = v.getTolerance();
@@ -292,10 +297,10 @@ IntervalBox* IntervalBox::clone() const
 
 void IntervalBox::print(std::ostream& os) const
 {
-   stdPrint(os);
+   vecPrint(os);
 }
 
-void IntervalBox::stdPrint(std::ostream& os) const
+void IntervalBox::listPrint(std::ostream& os) const
 {
    size_t lmax = scope_.nameMaxLength();
 
@@ -310,7 +315,15 @@ void IntervalBox::stdPrint(std::ostream& os) const
 
 void IntervalBox::vecPrint(std::ostream& os) const
 {
-   IntervalVector::print(os);
+   os << '(';
+   for (size_t i=0; i<size(); ++i)
+   {
+      if (i!=0) os << ", ";
+
+      Variable v = scope_.var(i);
+      os << v.getName() << " = " << get(v);
+   }
+   os << ')'; 
 }
 
 } // namespace

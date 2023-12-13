@@ -9,42 +9,56 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/NcspSplit.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-NcspSplit::NcspSplit(std::unique_ptr<VariableSelector> selector,
-                     std::unique_ptr<IntervalSlicer> slicer)
+
+NcspSplit::NcspSplit(std::unique_ptr<NcspSelector> selector,
+                     std::unique_ptr<DomainSlicerMap> smap)
       : SplitStrategy<SharedNcspNode>(),
-        selector_(std::move(selector)),
-        slicer_(std::move(slicer))
+        selector_(selector.release()),
+        smap_(smap.release())
 {
    ASSERT(selector_ != nullptr, "No selector in a split object");
-   ASSERT(slicer_ != nullptr, "No slicer in a split object");
+   ASSERT(smap_ != nullptr, "No slicer map in a split object");
+}
+
+NcspSplit::~NcspSplit()
+{
+   delete selector_;
+   delete smap_;
 }
 
 bool NcspSplit::applyImpl(SharedNcspNode node)
 {
-   IntervalBox* B = node->region();
+   DomainBox* B = node->box();
+
+   LOG_INTER("Split node " << node->index() << ": " << (*B));
 
    std::pair<bool, Variable> p = selector_->selectVar(*node);
+
    if (!p.first) return false;
 
    Variable v = p.second;
+   DomainSlicer* slicer = smap_->getSlicer(v);
 
-   size_t n = slicer_->apply(B->get(v));
+   size_t n = slicer->apply(B->get(v));
    if (n < 2) return false;
 
-   // reuses the input node
-   auto it = slicer_->begin();
-   B->set(v, *it);
+   // reuses the input node with the first slice
+   auto it = slicer->begin();
+   std::unique_ptr<Domain> slice = slicer->next(it);
+   B->set(v, std::move(slice));
    push(node);
 
-   // generates the other nodes
-   while (++it != slicer_->end())
+   // new nodes for the other slices
+   while (it != slicer->end())
    {
+      slice = slicer->next(it);
       SharedNcspNode aux = std::make_shared<NcspNode>(*node);
-      aux->region()->set(v, *it);
-      push(aux);
+      aux->box()->set(v, std::move(slice));
+      push(aux);      
    }
 
    return true;

@@ -28,7 +28,7 @@ int main(void)
 
       DomainSlicer* slicer = map->getSlicer(vsel);
 
-      Domain* dom = reg.getDomain(vsel);
+      Domain* dom = reg.get(vsel);
 
       size_t ns = slicer->apply(dom);
       cout << "nb slices: " << ns << endl;
@@ -36,9 +36,8 @@ int main(void)
       DomainSlicer::iterator it = slicer->begin();
       while (it != slicer->end())
       {
-         Domain* slice = slicer->next(it);
+         std::unique_ptr<Domain> slice = slicer->next(it);
          cout << "a slice: " << (*slice) << endl;
-         delete slice;
       }
 
    }

@@ -91,7 +91,7 @@ void Preprocessor::apply(const Problem& src, Problem& dest)
    box_ = new IntervalBox(src.scope());
 
    LOG_MAIN("Preprocessing");
-   LOG_INTER("Region: " << (*box_));
+   LOG_INTER("Box: " << (*box_));
 
    timer_.reset();
    timer_.start();

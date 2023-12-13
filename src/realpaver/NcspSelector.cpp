@@ -8,19 +8,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/VariableSelector.hpp"
+#include "realpaver/NcspSelector.hpp"
 
 namespace realpaver {
 
-VariableSelector::VariableSelector(Scope s) : scope_(s)
+NcspSelector::NcspSelector(Scope s) : scope_(s)
 {
    ASSERT(s.size() > 0, "Creation of a selector with an empty scope");
 }
 
-VariableSelector::~VariableSelector()
+NcspSelector::~NcspSelector()
 {}
 
-Scope VariableSelector::scope() const
+Scope NcspSelector::scope() const
 {
    return scope_;
 }
@@ -28,7 +28,7 @@ Scope VariableSelector::scope() const
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
-MaxDomSelector::MaxDomSelector(Scope s) : VariableSelector(s)
+MaxDomSelector::MaxDomSelector(Scope s) : NcspSelector(s)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a selector");
 }
@@ -77,7 +77,7 @@ std::pair<bool, Variable> MaxDomSelector::selectVar(SearchNode& node)
 
 /*
 MaxSmearSelector::MaxSmearSelector(IntervalFunctionVector F, Scope s)
-      : VariableSelector(s),
+      : NcspSelector(s),
         F_(F)
 {
    ASSERT(!s.isEmpty(), "Empty scope in a MaxSmear selector");
@@ -138,12 +138,12 @@ std::pair<bool, Variable> MaxSmearSelector::selectVar(SearchNode& node)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RoundRobinSelector::RoundRobinSelector(Scope s) : VariableSelector(s)
+NcspSelectorRR::NcspSelectorRR(Scope s) : NcspSelector(s)
 {}
 
-std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
+std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
 {
-   IntervalBox* box = node.region();
+   DomainBox* box = node.box();
    Variable v = node.splitVariable();
    auto it = scope_.begin();
 
@@ -161,7 +161,7 @@ std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
    {
       v = *it;
 
-      if (!v.getTolerance().hasTolerance(box->get(v)))
+      if (box->isSplitable(v))
       {
          found = true;
          node.setSplitVariable(v);
@@ -180,7 +180,7 @@ std::pair<bool, Variable> RoundRobinSelector::selectVar(SearchNode& node)
 ///////////////////////////////////////////////////////////////////////////////
 /*
 HybridDomRobinSelector::HybridDomRobinSelector(Scope s, int f)
-      : VariableSelector(s),
+      : NcspSelector(s),
         f_(f)
 {
    ASSERT(f>=1, "Bad factor of an hybrid max/robin selector");
@@ -197,7 +197,7 @@ std::pair<bool, Variable> HybridDomRobinSelector::selectVar(SearchNode& node)
 {
    if (node.depth() % f_ == 0)
    {
-      RoundRobinSelector selector(scope_);
+      NcspSelectorRR selector(scope_);
       return selector.selectVar(node);
    }
    else

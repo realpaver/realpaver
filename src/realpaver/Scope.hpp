@@ -266,6 +266,16 @@ public:
    /// @return true if this and the 'other' scope overlap
    bool overlaps(const Scope& other) const;
 
+   /// Equality test
+   /// @param other a scope
+   /// @return true if this and the 'other' scope are equal
+   bool operator==(const Scope& other) const;
+
+   /// Disequality test
+   /// @param other a scope
+   /// @return true if this and the 'other' scope are different
+   bool operator!=(const Scope& other) const;
+
    /// Type of constant iterators
    typedef typename ScopeRep::const_iterator const_iterator;
 

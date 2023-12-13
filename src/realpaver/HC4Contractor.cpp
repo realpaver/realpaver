@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/HC4Contractor.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -23,7 +24,12 @@ HC4Contractor::HC4Contractor(SharedDag dag, size_t i)
 
 Proof HC4Contractor::contract(IntervalBox& box)
 {
+   LOG_LOW("HC4 contractor @ " << if_ << " on " << box);
+
    Proof proof = dag_->fun(if_)->hc4Revise(box);
+
+   LOG_LOW(" -> " << proof << ", " << box);
+
    return proof;
 }
 

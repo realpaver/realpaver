@@ -78,7 +78,7 @@ Proof CIDContractor::contract(IntervalBox& box)
          }
          else
          {
-            box.hullAssignOnScope(*slice, scope());
+            box.glueOnScope(*slice, scope());
             proof = std::min(proof, certif);
          }
       }

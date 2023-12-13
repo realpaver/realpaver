@@ -87,7 +87,7 @@ Proof Propagator::contract(IntervalBox& box)
    // vector of proof certificates
    certif_.resize(N);
 
-   // Set of variables  used to check the domain modifications
+   // Set of variables used to check the domain modifications
    ModifSetType modif;
 
    // copy used to check the domain modifications
@@ -100,10 +100,9 @@ Proof Propagator::contract(IntervalBox& box)
    size_t next = 0;
 
    // number of propagation steps
-   size_t num_steps = 0;
+   size_t nb_steps = 0;
 
-   LOG_LOW("Propagator on box: " << box);
-   LOG_LOW("Tolerance on the distance between regions: " << dtol_);
+   LOG_INTER("Propagator[" << dtol_ << "] on " << box);
 
    do
    {
@@ -118,10 +117,8 @@ Proof Propagator::contract(IntervalBox& box)
 
          // propagation when the queue is empty
          if (next == count)
-         {            
-            LOG_LOW("Box after inner step: " << box);
-            
-            if (++num_steps > maxiter_)
+         {                 
+            if (++nb_steps > maxiter_)
             {
                count = 0;
             }
@@ -169,6 +166,8 @@ Proof Propagator::contract(IntervalBox& box)
    }
    while (proof != Proof::Empty && count > 0);
 
+   LOG_LOW("Propagation loops: " << nb_steps);
+
    if (proof != Proof::Empty)
    {
       proof = certif_[0];
@@ -177,6 +176,8 @@ Proof Propagator::contract(IntervalBox& box)
    }
 
    delete copy;
+
+   LOG_INTER(" -> " << proof << ", " << box);
 
    return proof;
 }

@@ -7,8 +7,10 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <sstream>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainContractor.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -47,8 +49,19 @@ Proof DomainContractor::contract(IntervalBox& box)
    for (auto v : s_)
    {
       Interval x = box.get(v);
+
+#if LOG_ON
+   std::ostringstream os;
+   os << "Domain contractor of " << v.getName() << " in " << x;
+#endif
+
       v.getDomain()->contractInterval(x);
       box.set(v, x);
+
+#if LOG_ON
+   os << " -> " << x;
+   LOG_LOW(os.str());
+#endif
 
       if (x.isEmpty()) return Proof::Empty;
    }

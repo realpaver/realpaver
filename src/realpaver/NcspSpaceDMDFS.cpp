@@ -14,9 +14,50 @@
 
 namespace realpaver {
 
-NcspSpaceDMDFS::NcspSpaceDMDFS()
-      : vnode_(), vsol_(), stotal_(0)
+DistCalculator::~DistCalculator()
 {}
+
+///////////////////////////////////////////////////////////////////////////////
+
+double HausdorffDistCalculator::distance(const DomainBox& db1,
+                                         const DomainBox& db2)
+{
+   ASSERT(db1.scope() == db2.scope(),
+          "The scopes of the two boxes must be equal");
+
+   double d = 0.0;
+   for (const auto& v : db1.scope())
+   {
+      Interval x = db1.get(v)->intervalHull(),
+               y = db2.get(v)->intervalHull();
+      double e = x.distance(y);
+
+      if (e > d)
+         d = e;
+   }
+   return d;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspSpaceDMDFS::NcspSpaceDMDFS()
+      : vnode_(), vsol_(), dcalc_(nullptr)
+{
+   dcalc_ = new HausdorffDistCalculator();
+}
+
+NcspSpaceDMDFS::~NcspSpaceDMDFS()
+{
+   if (dcalc_ != nullptr) delete dcalc_;
+}
+
+void
+NcspSpaceDMDFS::setDistCalculator(std::unique_ptr<DistCalculator> dcalc)
+{
+   if (dcalc_ != nullptr) delete dcalc_;
+
+   dcalc_ = dcalc.release();
+}
 
 size_t NcspSpaceDMDFS::nbSolNodes() const
 {
@@ -25,24 +66,23 @@ size_t NcspSpaceDMDFS::nbSolNodes() const
 
 void NcspSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
 {
-   stotal_++;
    vsol_.push_back(node);
 
    // update the distances
    for (auto& elem : vnode_)
    {
-      IntervalBox* reg = node->region();
-      double d = elem.node->region()->distance(*reg);
-      if (d < elem.mindist) elem.mindist = d;
+      double d = dcalc_->distance(*node->box(), *elem.node->box());
+
+      if (d < elem.mindist)
+         elem.mindist = d;
    }
-   
+
    // ascending ordering of the node distances
    std::sort(vnode_.begin(), vnode_.end(), comparator);
 }
 
 SharedNcspNode NcspSpaceDMDFS::popSolNode()
 {
-   stotal_--;
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;
@@ -71,61 +111,28 @@ void NcspSpaceDMDFS::makeSolClusters(double gap)
    // no clustering if the gap is negative
    if (gap < 0.0) return;
 
-   // moves the solution nodes in a list
-   std::list<SharedNcspNode> lnode;
-   for (auto node : vsol_) lnode.push_back(node);
-   vsol_.clear();
+   // clustering from the super class
+   NcspSpace::makeSolClusters(gap);
 
-   while (!lnode.empty())
-   {
-      // extracts the first node
-      SharedNcspNode node = lnode.front();
-      IntervalBox* regnode = node->region();
-      lnode.pop_front();
-
-      // finds another node that is close enough
-      bool found = false;
-      auto it = lnode.begin();
-      while (!found && it != lnode.end())
-      {
-         SharedNcspNode bis = *it;
-         IntervalBox* regbis = bis->region();
-
-         if (regnode->gap(*regbis) < gap)
-         {
-            // merges node in bisnode and iterates
-            regbis->hullAssignOnScope(*regnode, node->scope());
-            found = true;
-         }
-         else ++it;
-      }
-
-      // this is a solution node and no other solution is close enough
-      if (!found) vsol_.push_back(node);
-   }
-
-   // after the clustering phase, it is necessary to update the distance between
-   // each pending node and its closest solution.
+   // it is necessary to update the distance between each pending node and its
+   // closest solution.
    for (auto& elem : vnode_)
    {
-      IntervalBox* reg = elem.node->region();
+      DomainBox* reg = elem.node->box();
       elem.mindist = Double::inf();
 
       for (auto& sol : vsol_)
       {
-         IntervalBox* regsol = sol->region();
-         double d = reg->distance(*regsol);
-         if (d < elem.mindist) elem.mindist = d;
+         DomainBox* regsol = sol->box();
+         double d = dcalc_->distance(*reg, *regsol);
+
+         if (d < elem.mindist)
+            elem.mindist = d;
       }
    }
    
    // ascending ordering of the node distances
    std::sort(vnode_.begin(), vnode_.end(), comparator);
-}
-
-size_t NcspSpaceDMDFS::nbTotalSolNodes() const
-{
-   return stotal_;
 }
 
 size_t NcspSpaceDMDFS::nbPendingNodes() const
@@ -146,9 +153,11 @@ void NcspSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
    double d = Double::inf();
    for (auto& sol : vsol_)
    {
-      IntervalBox* reg = sol->region();
-      double e = node->region()->distance(*reg);
-      if (e < d) d = e;
+      DomainBox* reg = sol->box();
+      double e = dcalc_->distance(*reg, *node->box());
+
+      if (e < d)
+         d = e;
    }
 
    Elem elem = { node, d };

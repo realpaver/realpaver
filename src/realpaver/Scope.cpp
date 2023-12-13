@@ -359,6 +359,20 @@ bool Scope::overlaps(const Scope& other) const
    return !disjoint(other);
 }
 
+bool Scope::operator==(const Scope& other) const
+{
+   if (isEmpty() && other.isEmpty()) return true;
+
+   if (size() != other.size()) return false;
+
+   return contains(other);
+}
+
+bool Scope::operator!=(const Scope& other) const
+{
+   return !operator==(other);
+}
+
 Scope operator&(Scope s, Scope t)
 {
    Scope res;

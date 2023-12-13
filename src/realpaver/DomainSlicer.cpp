@@ -13,10 +13,7 @@
 namespace realpaver {
 
 DomainSlicer::~DomainSlicer()
-{
-   for (Domain* dom : cont_)
-      delete dom;
-}
+{}
 
 size_t DomainSlicer::apply(Domain* dom)
 {
@@ -38,7 +35,10 @@ void DomainSlicer::clear()
 void DomainSlicer::push(Domain* dom)
 {
    if (!dom->isEmpty())
-      cont_.push_back(dom);
+   {
+      std::unique_ptr<Domain> p(dom);
+      cont_.push_back(std::move(p));
+   }
 }
 
 DomainSlicer::iterator DomainSlicer::begin()
@@ -51,15 +51,15 @@ DomainSlicer::iterator DomainSlicer::end()
    return cont_.end();
 }
 
-Domain* DomainSlicer::next(iterator& it)
+std::unique_ptr<Domain> DomainSlicer::next(iterator& it)
 {
    ASSERT(it != end(), "Bad iterator in a domain slicer");
 
-   Domain* dom = *it;
+   std::unique_ptr<Domain>p = std::move(*it);
    iterator aux = it;
    ++it;
    cont_.erase(aux);
-   return dom;
+   return p;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

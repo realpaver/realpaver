@@ -56,7 +56,7 @@ protected:
    void push(Domain* dom);
 
 private:
-   typedef std::list<Domain*> ContainerType;
+   typedef std::list< std::unique_ptr<Domain> > ContainerType;
    ContainerType cont_;
 
 public:
@@ -74,7 +74,7 @@ public:
    /// @return the domain pointed by it
    ///
    /// Iterator it is moved to the next element.
-   Domain* next(iterator& it);
+   std::unique_ptr<Domain> next(iterator& it);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

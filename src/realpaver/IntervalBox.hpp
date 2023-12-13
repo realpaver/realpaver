@@ -146,12 +146,20 @@ public:
    /// @return true if this and B overlap
    bool overlaps(const IntervalBox& B) const;
 
-   /// Hull with assignment on a scope
+   /// Glue a box in this
+   /// @param B an interval box whose scope is included in the scope of this
+   ///
+   /// for each variable v in the scope of this, its domain in this is
+   /// assigned to the hull of its domain in this and its domain in B
+   void glue(const IntervalBox& B);
+
+   /// Glue a box in this, restricted to some scope
    /// @param B an interval box
    /// @param sco a scope included in the scope of this and B
    ///
-   /// this[sco] is assigned to the hull of this[sco] and B[sco]
-   void hullAssignOnScope(const IntervalBox& B, const Scope& sco);
+   /// for each variable v in the given scope, its domain in this is
+   /// assigned to the hull of its domain in this and its domain in B
+   void glueOnScope(const IntervalBox& B, const Scope& sco);
 
    /// Assignment on a scope
    /// @param B an interval box
@@ -241,12 +249,19 @@ public:
    void print(std::ostream& os) const override;
    ///@}
 
-   /// Display on a stream using the format x = [a, b] y = [c, d], etc.
+   /// Display on a stream with one variable per line
    /// @param os an output stream
-   void stdPrint(std::ostream& os) const;
+   ///
+   /// Example:
+   /// x = [1.35, 1.36]
+   /// y = [0, 0.01]
+   void listPrint(std::ostream& os) const;
 
-   /// Display on a stream of the vector of domains
+   /// Display on a stream using a vector notation
    /// @param os an output stream
+   ///
+   /// Example:
+   /// (x = [1.35, 1.36], y = [Ø, 0.01])
    void vecPrint(std::ostream& os) const;
 
 private:

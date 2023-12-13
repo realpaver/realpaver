@@ -7,33 +7,32 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_VARIABLE_SELECTOR_HPP
-#define REALPAVER_VARIABLE_SELECTOR_HPP
+#ifndef REALPAVER_NCSP_SELECTOR_HPP
+#define REALPAVER_NCSP_SELECTOR_HPP
 
 #include <vector>
-#include "realpaver/IntervalFunctionVector.hpp"
-#include "realpaver/SearchNode.hpp"
-#include "realpaver/Tolerance.hpp"
+//#include "realpaver/IntervalFunctionVector.hpp"
+#include "realpaver/NcspNode.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of variables used by splitting strategies.
 ///////////////////////////////////////////////////////////////////////////////
-class VariableSelector {
+class NcspSelector {
 public:
    /// Creates a selector on a set of variables
    /// @param s a scope
-   VariableSelector(Scope s);
+   NcspSelector(Scope s);
 
    /// Virtual destructor
-   virtual ~VariableSelector();
+   virtual ~NcspSelector();
 
    /// Default copy constructor
-   VariableSelector(const VariableSelector&) = default;
+   NcspSelector(const NcspSelector&) = default;
 
    /// No assignment
-   VariableSelector& operator=(const VariableSelector&) = delete;
+   NcspSelector& operator=(const NcspSelector&) = delete;
 
    /// @return the scope of this
    Scope scope() const;
@@ -42,7 +41,7 @@ public:
    /// @param node a search node
    /// @return a pair <b, v> such that no variable is selected if b = false,
    ///         otherwise v is the selected variable
-   virtual std::pair<bool, Variable> selectVar(SearchNode& node) = 0;
+   virtual std::pair<bool, Variable> selectVar(NcspNode& node) = 0;
 
 protected:
    Scope scope_;
@@ -52,7 +51,7 @@ protected:
 /// This is a selector of the variable with largest domain.
 ///////////////////////////////////////////////////////////////////////////////
 /*
-class MaxDomSelector : public VariableSelector {
+class MaxDomSelector : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
    /// @param s a scope
@@ -77,7 +76,7 @@ public:
 /// This is a selector of the variable with maximum smear.
 ///////////////////////////////////////////////////////////////////////////////
 /*
-class MaxSmearSelector : public VariableSelector {
+class MaxSmearSelector : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
    /// @param f a function
@@ -105,23 +104,23 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable following a round-robin strategy.
 ///////////////////////////////////////////////////////////////////////////////
-class RoundRobinSelector : public VariableSelector {
+class NcspSelectorRR : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
    /// @param s a scope
-   RoundRobinSelector(Scope s);
+   NcspSelectorRR(Scope s);
 
    /// Destructor
-   ~RoundRobinSelector() = default;
+   ~NcspSelectorRR() = default;
 
    /// Default copy constructor
-   RoundRobinSelector(const RoundRobinSelector&) = default;
+   NcspSelectorRR(const NcspSelectorRR&) = default;
 
    /// No assignment
-   RoundRobinSelector& operator=(const RoundRobinSelector&) = delete;
+   NcspSelectorRR& operator=(const NcspSelectorRR&) = delete;
 
    ///@{
-   std::pair<bool, Variable> selectVar(SearchNode& node) override;
+   std::pair<bool, Variable> selectVar(NcspNode& node) override;
    ///@}
 };
 
@@ -136,7 +135,7 @@ public:
 /// and so on
 ///////////////////////////////////////////////////////////////////////////////
 /*
-class HybridDomRobinSelector : public VariableSelector {
+class HybridDomRobinSelector : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
    /// @param s a scope
