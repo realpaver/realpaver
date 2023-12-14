@@ -249,16 +249,6 @@ bool Term::isNumber() const
    return rep_->isNumber();
 }
 
-bool Term::isConstant() const
-{
-   return rep_->isConstant();
-}
-
-bool Term::isLinear() const
-{
-   return rep_->isLinear();
-}
-
 bool Term::isVar() const
 {
    return rep_->isVar();
@@ -292,6 +282,16 @@ bool Term::isDiv() const
 bool Term::isLin() const
 {
    return rep_->isLin();
+}
+
+bool Term::isConstant() const
+{
+   return rep_->isConstant();
+}
+
+bool Term::isLinear() const
+{
+   return rep_->isLinear();
 }
 
 bool Term::isSumOfSquares() const
@@ -1145,6 +1145,36 @@ TermOp::TermOp(const SharedRep& l, const SharedRep& r, OpSymbol op,
 TermOp::~TermOp()
 {}
 
+bool TermOp::isAdd() const
+{
+   return op_ == OpSymbol::Add;
+}
+
+bool TermOp::isSub() const
+{
+   return op_ == OpSymbol::Sub;
+}
+
+bool TermOp::isMul() const
+{
+   return op_ == OpSymbol::Mul;
+}
+
+bool TermOp::isDiv() const
+{
+   return op_ == OpSymbol::Div;
+}
+
+bool TermOp::isUsb() const
+{
+   return op_ == OpSymbol::Usb;
+}
+
+bool TermOp::isLin() const
+{
+   return op_ == OpSymbol::Lin;
+}
+
 void TermOp::insert(const SharedRep& t)
 {
    v_.push_back(t);
@@ -1287,11 +1317,6 @@ bool TermAdd::isLinear() const
    return left()->isLinear() && right()->isLinear();
 }
 
-bool TermAdd::isAdd() const
-{
-   return true;
-}
-
 TermRep* TermAdd::cloneRoot() const
 {
    return new TermAdd(left(), right());
@@ -1352,11 +1377,6 @@ void TermSub::acceptVisitor(TermVisitor& vis) const
 bool TermSub::isLinear() const
 {
    return left()->isLinear() && right()->isLinear();
-}
-
-bool TermSub::isSub() const
-{
-   return true;
 }
 
 TermRep* TermSub::cloneRoot() const
@@ -1431,11 +1451,6 @@ bool TermMul::isLinear() const
           (left()->isLinear() && right()->isConstant());
 }
 
-bool TermMul::isMul() const
-{
-   return true;
-}
-
 TermRep* TermMul::cloneRoot() const
 {
    return new TermMul(left(), right());
@@ -1498,11 +1513,6 @@ void TermDiv::print(std::ostream& os) const
 void TermDiv::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
-}
-
-bool TermDiv::isDiv() const
-{
-   return true;
 }
 
 TermRep* TermDiv::cloneRoot() const
@@ -1624,11 +1634,6 @@ void TermUsb::acceptVisitor(TermVisitor& vis) const
 bool TermUsb::isLinear() const
 {
    return child()->isLinear();
-}
-
-bool TermUsb::isUsb() const
-{
-   return true;
 }
 
 void TermUsb::print(std::ostream& os) const
@@ -2274,11 +2279,6 @@ void TermLin::acceptVisitor(TermVisitor& vis) const
 }
 
 bool TermLin::isLinear() const
-{
-   return true;
-}
-
-bool TermLin::isLin() const
 {
    return true;
 }

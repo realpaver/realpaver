@@ -17,6 +17,10 @@ namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This provides proof certificates for solutions.
+///
+/// Given a set of constraints {C1, ..., Cm} and a box B, the certification
+/// process is as follows:
+/// - 
 ///////////////////////////////////////////////////////////////////////////////
 class Prover {
 public:
@@ -77,11 +81,15 @@ public:
    void setDTol(const Tolerance& tol);
 
 private:
-   IntervalNewton* newton_;         // Newton operator for the equations
-   std::vector<Constraint> ctr_;    // other constraints
-   bool canprove_;                  // true if this can prove
+   struct Item {
+      Constraint ctr;
+      bool iseq;
+      Proof proof;
+   };
 
-   // parameters of the certification technique of the Newton operator
+   std::vector<Item> v_;
+
+   IntervalNewton* mnewton_;        // multivariate Newton operator
    double delta_;                   // parameter delta of inflation
    double chi_;                     // parameter chi of inflation
    size_t maxiter_;                 // maximum number of iterations

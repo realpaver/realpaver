@@ -158,7 +158,10 @@ void NcspSolver::makeContractor()
             op = std::make_shared<HC4Contractor>(dag_, j);
 
          else if (base == "BC4")
+         {
+            LOG_LOW("make BC4");
             op = std::make_shared<BC4Contractor>(dag_, j);
+         }
 
          else
          {
@@ -197,7 +200,6 @@ void NcspSolver::makeContractor()
 /*
    if (with_max_cid == "YES")
    {
-
       int nb = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
       std::unique_ptr<IntervalSlicer> slicer =
          std::make_unique<IntervalPartitionMaker>(nb);
@@ -210,7 +212,8 @@ void NcspSolver::makeContractor()
    }
 
    else*/
-      mainpool->push(propagator);
+
+   mainpool->push(propagator);
 
    // polytope hull contractor and non empty dag ?
    std::string with_polytope =
@@ -594,23 +597,41 @@ void NcspSolver::branchAndPrune()
    double gap = env_->getParam()->getDblParam("SOLUTION_CLUSTER_GAP");
    space_->makeSolClusters(gap);
 
-// TODO
-//   certifySolutions();
+   certifySolutions();
 
    stimer_.stop();
 }
 
 void NcspSolver::certifySolutions()
 {
-   /*
    std::list<SharedNcspNode> lsol;
    while (space_->nbSolNodes() > 0)
    {
       SharedNcspNode node = space_->popSolNode();
-      Proof proof = prover_->certify(*node->region());
+      Proof proof = node->getProof();
+
+      DomainBox* dbox = node->box();
+      IntervalBox B(*dbox);
+
+      proof = prover_->certify(B);
       
       if (proof != Proof::Empty)
       {
+         // B may be different from the hull of dbox, typically when
+         // a Newton operator is applied by the prover; it is then necessary
+         // to modify dbox
+         for (const auto& v : B.scope())
+         {
+            Interval x = B.get(v),
+                     y = dbox->get(v)->intervalHull();
+
+            if (x.isSetNeq(y))
+            {
+               std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
+               dbox->set(v, std::move(dom));
+            }
+         }
+
          node->setProof(proof);
          lsol.push_back(node);
       }
@@ -621,7 +642,6 @@ void NcspSolver::certifySolutions()
       space_->pushSolNode(lsol.front());
       lsol.pop_front();
    }
-   */
 }
 
 NcspEnv* NcspSolver::getEnv() const
