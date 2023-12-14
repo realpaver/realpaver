@@ -626,7 +626,7 @@ void NcspSolver::certifySolutions()
                      y = dbox->get(v)->intervalHull();
 
             if (x.isSetNeq(y))
-            {
+            {               
                std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
                dbox->set(v, std::move(dom));
             }

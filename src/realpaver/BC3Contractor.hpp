@@ -100,15 +100,6 @@ private:
 
    // consistency checking
    Proof isConsistent(const Interval& x);
-
-   // used to call the interval Newton method
-   struct ThickFunctionCaller {
-      ThickFunction* tf_;
-      ThickFunctionCaller(ThickFunction* tf) { tf_ = tf; }
-
-      Interval eval(const Interval& x) { return tf_->eval(x); }
-      Interval diff(const Interval& x) { return tf_->diff(x); }
-   };
 };
 
 } // namespace

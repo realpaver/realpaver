@@ -13,6 +13,7 @@
 #include <functional>
 #include "realpaver/Inflator.hpp"
 #include "realpaver/Tolerance.hpp"
+#include "realpaver/UniIntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -46,7 +47,7 @@ namespace realpaver {
 /// - Xk is empty
 /// - the existence of a zero in Xk is proven
 /// - the limit on the number of iterations is reached
-/// - the distance between Xk and Xk-1 is smaller than a given tolerance
+/// - the distance between Xk and Xk-1 is greater than a given tolerance
 /// - the method diverges
 ///////////////////////////////////////////////////////////////////////////////
 class UniIntervalNewton {
@@ -57,46 +58,36 @@ public:
 
    /// Contraction method
    /// @param f a univariate function
-   /// @param df the derivative of f
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof contract(std::function<Interval(const Interval&)> f,
-                  std::function<Interval(const Interval&)> df, Interval& x);
+   Proof contract(UniIntervalFunction& f, Interval& x);
 
    /// Combines the contraction method with search
    /// @param f a univariate function
-   /// @param df the derivative of f
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof search(std::function<Interval(const Interval&)> f,
-                std::function<Interval(const Interval&)> df, Interval& x);
+   Proof search(UniIntervalFunction& f, Interval& x);
 
    /// Step of the contraction method
    /// @param f a univariate function
-   /// @param df the derivative of f
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
    ///
    /// The interval x is contracted as the intersection of x and
    /// the set hull( c - f(c) / f'(x) ) where c is the midpoint of x.
-   Proof step(std::function<Interval(const Interval&)> f,
-              std::function<Interval(const Interval&)> df, Interval& x);
+   Proof step(UniIntervalFunction& f, Interval& x);
 
-   /// Local search method
+   /// Local search and certification method
    /// @param f a univariate function
-   /// @param df the derivative of f
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localSearch(std::function<Interval(const Interval&)> f,
-                     std::function<Interval(const Interval&)> df, Interval& x);
+   Proof localSearch(UniIntervalFunction& f, Interval& x);
 
    /// Step of the local search method
    /// @param f a univariate function
-   /// @param df the derivative of f
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localStep(std::function<Interval(const Interval&)> f,
-                   std::function<Interval(const Interval&)> df, Interval& x);
+   Proof localStep(UniIntervalFunction& f, Interval& x);
 
    /// Sets a limit of iterations of the iterative methods
    /// @param n new value of the limit
@@ -128,11 +119,14 @@ public:
 
    /// Sets the tolerance on the distance between two consecutive intervals
    /// in the local search method
-   /// @param tol absolute or relative tolerance
+   /// @param tol absolute or relative tolerance`
+   ///
+   /// An iteration stops if the distance between two consecutive is greater
+   /// than the tolerance, i.e. the method diverges.
    void setLocalDTol(const Tolerance& tol);
 
    /// @returns the inflator used by the local search method
-   Inflator getInflator() const;
+   Inflator& getInflator();
 
    /// Sets the inflator used by the local search method
    /// @param inflator the new inflator
@@ -145,11 +139,8 @@ private:
    Tolerance ldtol_;
    Inflator inflator_;
 
-   Proof shrinkLeft(std::function<Interval(const Interval&)> f,
-                    std::function<Interval(const Interval&)> df, Interval& x);
-
-   Proof shrinkRight(std::function<Interval(const Interval&)> f,
-                     std::function<Interval(const Interval&)> df, Interval& x);
+   Proof shrinkLeft(UniIntervalFunction& f, Interval& x);
+   Proof shrinkRight(UniIntervalFunction& f, Interval& x);
 };
 
 } // namespace

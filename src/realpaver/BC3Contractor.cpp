@@ -123,14 +123,6 @@ Proof BC3Contractor::shrink(const Interval& x, Interval& res,
    Proof proof;
    size_t nbiter = 0;
 
-   ThickFunctionCaller cal(&f_);
-
-   std::function<Interval(const Interval&)> calf =
-      [&cal](const Interval& x) { return cal.eval(x); };
-
-   std::function<Interval(const Interval&)> caldf =
-      [&cal](const Interval& x) { return cal.diff(x); };
-
    stak.push(x);
    while (!stak.empty())
    {
@@ -154,7 +146,7 @@ Proof BC3Contractor::shrink(const Interval& x, Interval& res,
       }
       else
       {
-         proof = newton_->contract(calf, caldf, z);
+         proof = newton_->contract(f_, z);
 
          if (proof == Proof::Feasible)
          {

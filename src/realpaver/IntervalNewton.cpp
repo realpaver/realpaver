@@ -251,8 +251,8 @@ Proof IntervalNewton::certify(IntervalBox& box)
       }
 
       // X := y + c
-      bool hasdtol;
-      certif = certifyX(X, hasdtol);
+      bool hascdtol;
+      certif = certifyX(X, hascdtol);
 
       if (certif == Proof::Feasible)
       {
@@ -262,7 +262,7 @@ Proof IntervalNewton::certify(IntervalBox& box)
       }
 
       // checks the stopping criteria
-      if (nb_steps > cmaxiter_ || (!hasdtol))
+      if (nb_steps > cmaxiter_ || (!hascdtol))
          iter = false;
 
    }
@@ -274,12 +274,12 @@ Proof IntervalNewton::certify(IntervalBox& box)
    return proof;
 }
 
-Proof IntervalNewton::certifyX(IntervalBox& X, bool& hasdtol)
+Proof IntervalNewton::certifyX(IntervalBox& X, bool& hascdtol)
 {
    // X := y + c
    int i = 0;
    Proof proof = Proof::Feasible;
-   hasdtol = true;
+   hascdtol = true;
 
    for (const auto& v : scope())
    {
@@ -289,8 +289,8 @@ Proof IntervalNewton::certifyX(IntervalBox& X, bool& hasdtol)
       if (!dom.strictlyContains(z))
          proof = Proof::Maybe;
 
-      if (!dtol_.haveDistTolerance(z, dom))
-         hasdtol = false;
+      if (!cdtol_.haveDistTolerance(z, dom))
+         hascdtol = false;
 
       X.set(v, z);
       i = i+1;

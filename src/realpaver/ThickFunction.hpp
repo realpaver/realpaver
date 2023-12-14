@@ -11,7 +11,7 @@
 #define REALPAVER_THICK_FUNCTION_HPP
 
 #include "realpaver/Dag.hpp"
-#include "realpaver/IntervalBox.hpp"
+#include "realpaver/UniIntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -25,7 +25,7 @@ namespace realpaver {
 /// The update method must be called first. Then the evaluation and
 /// differentiation methods can be called.
 ///////////////////////////////////////////////////////////////////////////////
-class ThickFunction {
+class ThickFunction : public UniIntervalFunction {
 public:
    /// Creates a thick function
    /// @param dag a DAG
@@ -45,12 +45,12 @@ public:
    /// Evaluates this
    /// @param x
    /// @return interval evaluation of this at x
-   Interval eval(const Interval& x);
+   Interval eval(const Interval& x) override;
 
    /// Differentiates this
    /// @param x
    /// @return interval derivative of this at x
-   Interval diff(const Interval& x);
+   Interval diff(const Interval& x) override;
 
    /// Updates the associated function in the DAG
    /// @param box domains of variables

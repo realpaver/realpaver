@@ -345,9 +345,9 @@ int main(int argc, char** argv)
 
             switch (sol.second)
             {
-               case Proof::Inner:    fsol << " [inner]"; break;
-               case Proof::Feasible: fsol << " [safe]"; break;
-               case Proof::Maybe:    fsol << " [unsafe]"; break;
+               case Proof::Inner:    fsol << " [exact]"; break;
+               case Proof::Feasible: fsol << " [feasible]"; break;
+               case Proof::Maybe:    fsol << " [unvalidated]"; break;
                default:              fsol << " (bug!!!)"; break;
             }
 

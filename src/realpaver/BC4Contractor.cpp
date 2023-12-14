@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BC4Contractor.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -43,10 +44,16 @@ Scope BC4Contractor::scope() const
 
 Proof BC4Contractor::contract(IntervalBox& box)
 {
+   LOG_LOW("BC4 contractor @ " << if_ << " on " << box);
+   
    // HC4
    Proof proof = hc4_->contract(box);
 
-   if (proof != Proof::Maybe) return proof;
+   if (proof != Proof::Maybe)
+   {
+      LOG_LOW("BC4 -> " << proof);
+      return proof;
+   }
 
    // BC3
    for (size_t i=0; i<bc3_.size(); ++i)
@@ -54,11 +61,15 @@ Proof BC4Contractor::contract(IntervalBox& box)
       Proof certif = bc3_[i]->contract(box);
 
       if (certif == Proof::Empty)
-         return certif;      
+      {
+         LOG_LOW("BC4 -> " << certif);
+         return certif;
+      }
       else
          proof = std::max(proof, certif);
    }
 
+   LOG_LOW("BC4 -> " << proof);
    return proof;
 }
 
