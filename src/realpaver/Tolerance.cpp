@@ -184,6 +184,36 @@ Interval Tolerance::maxIntervalUp(double lb) const
    return -maxIntervalDn(-lb); 
 }
 
+double Tolerance::discreteSize(const Interval& x) const
+{
+   if (x.isEmpty())
+      return 0.0;
+   
+   else if (x.isCanonical())
+      return 1.0;
+  
+   else if (x.isInf())
+      return Double::floor(Double::greatest());
+
+   else if (Interval::minusOnePlusOne().contains(x))
+   {
+      // absolute tolerance
+      double a = x.width() / val_,
+             b = Double::floor(a);
+
+      return (a == b) ? b : b+1.0;
+   }
+
+   else
+   {
+      // relative tolerance
+      double a = x.relWidth() / val_,
+             b = Double::floor(a);
+
+      return (a == b) ? b : b+1.0;
+   }
+}
+
 std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
 {
    os << tol.getVal()

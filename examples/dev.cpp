@@ -3,6 +3,7 @@
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/Tolerance.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -11,6 +12,12 @@ int main(void)
 {
    try
    {
+      Tolerance tol = Tolerance::makeAbs(0.00125);
+      Interval zzz(100, 200);
+      cout << "" << tol.discreteSize(zzz) << endl;
+      return 0;
+      
+      
       Problem P;
       Variable x = P.addRealVar(-1, 2, "x"),
                y = P.addRealVar(0, 6, "y"),

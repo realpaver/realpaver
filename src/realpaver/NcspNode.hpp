@@ -102,7 +102,6 @@ std::ostream& operator<<(std::ostream& os, const NcspNode& node);
 /// Type of shared pointers on CSP nodes
 typedef std::shared_ptr<NcspNode> SharedNcspNode;
 
-
 } // namespace
 
 #endif

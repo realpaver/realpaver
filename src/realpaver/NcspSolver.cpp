@@ -193,27 +193,17 @@ void NcspSolver::makeContractor()
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
    propagator->setMaxIter(niter);
 
-   // propagator or propagator + max CID ?
-   std::string with_max_cid =
-      env_->getParam()->getStrParam("PROPAGATION_WITH_MAX_CID");
+   // propagator or stronger CID propagator ?
+   std::string with_cid =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_CID");
 
-/*
-   if (with_max_cid == "YES")
+   if (with_cid == "YES")
    {
-      int nb = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
-      std::unique_ptr<IntervalSlicer> slicer =
-         std::make_unique<IntervalPartitionMaker>(nb);
-
-      SharedContractor op =
-         std::make_shared<MaxCIDContractor>(propagator, std::move(slicer));
-
-      mainpool->push(op);
-
+      // TODO, replace the following
+      mainpool->push(propagator);
    }
-
-   else*/
-
-   mainpool->push(propagator);
+   else
+      mainpool->push(propagator);
 
    // polytope hull contractor and non empty dag ?
    std::string with_polytope =
@@ -342,44 +332,31 @@ VariableSelector* NcspSolver::makeMaxSmearStrategy()
 
 void NcspSolver::makeSplit()
 {
-   NcspSelector* selector = nullptr;
    Scope sco = preprob_->scope();
 
+   // makes the selector
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
+   NcspSelector* selector = nullptr;
+
+   if (sel == "RR")      selector = new NcspSelectorRR(sco);
+   else if (sel == "LF") selector = new NcspSelectorLF(sco);
+   else if (sel == "SF") selector = new NcspSelectorSF(sco);
+
 
 // TODO
-//   if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
-   if (sel == "ROUND_ROBIN") selector = new NcspSelectorRR(sco);
-/*   if (sel == "HYBRID_DOM_ROBIN")
-   {
-      int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
-      selector = new HybridDomRobinSelector(sco, n);
-   }
+/*
    if (sel == "MAX_SMEAR")
    {
       selector = makeMaxSmearStrategy();   
    }
 */
+
+   // makes the slicer
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
+   std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
-
-/*
-   if (sli == "BISECTION") slicer = new IntervalBisecter();
-   if (sli == "PEELING")
-   {
-      double f = env_->getParam()->getDblParam("SPLIT_PEEL_FACTOR");
-      slicer = new IntervalPeeler(f);
-   }
-   if (sli == "PARTITION")
-   {
-      size_t n = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
-      slicer = new IntervalPartitionMaker(n);
-   }
-*/
-
-   std::unique_ptr<DomainSlicerMap>
-      smap = DomainSlicerFactory::makeBisectionStrategy(sco);
-   
+   if (sli == "BISECTION") 
+      smap = DomainSlicerFactory::makeBisectionStrategy(sco);   
 
    THROW_IF(selector == nullptr || smap == nullptr,
             "Unable to make the split object in a Ncsp solver");

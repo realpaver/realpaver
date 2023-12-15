@@ -54,20 +54,17 @@ Param::Param()
    intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
    intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT",     20));
-   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",           5));
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
    intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
    intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   50));
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
    intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
-   intmap_.insert(std::make_pair("SPLIT_DOM_ROBIN",           2));
    intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT",     100));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
    dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",           2.0));
-   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",         10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
@@ -79,10 +76,10 @@ Param::Param()
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
    strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",           "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR",            "MAX_DOM"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTOR",            "RR"));
    strmap_.insert(std::make_pair("SPLIT_SLICER",              "BISECTION"));
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_MAX_CID",  "YES"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_CID",      "NO"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));

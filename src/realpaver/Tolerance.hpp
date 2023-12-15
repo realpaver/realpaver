@@ -115,6 +115,9 @@ public:
    /// @return the largest interval [lb, ub] having this tolerance
    Interval maxIntervalUp(double lb) const;
 
+   /// TODO
+   double discreteSize(const Interval& x) const;
+
 private:
    double val_;   // magnitude
    bool abs_;     // true for an absolute precision

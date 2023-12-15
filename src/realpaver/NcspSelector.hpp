@@ -48,29 +48,75 @@ protected:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a selector of the variable with largest domain.
+/// This is a selector of the variable following a round-robin strategy.
 ///////////////////////////////////////////////////////////////////////////////
-/*
-class MaxDomSelector : public NcspSelector {
+class NcspSelectorRR : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
    /// @param s a scope
-   MaxDomSelector(Scope s);
+   NcspSelectorRR(Scope s);
 
    /// Destructor
-   ~MaxDomSelector() = default;
+   ~NcspSelectorRR() = default;
 
    /// Default copy constructor
-   MaxDomSelector(const MaxDomSelector&) = default;
+   NcspSelectorRR(const NcspSelectorRR&) = default;
 
    /// No assignment
-   MaxDomSelector& operator=(const MaxDomSelector&) = delete;
+   NcspSelectorRR& operator=(const NcspSelectorRR&) = delete;
 
    ///@{
-   std::pair<bool, Variable> selectVar(SearchNode& node) override;
+   std::pair<bool, Variable> selectVar(NcspNode& node) override;
    ///@}
 };
-*/
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a selector of the variable having the largest domain.
+/// Largest-First
+///////////////////////////////////////////////////////////////////////////////
+class NcspSelectorLF : public NcspSelector {
+public:
+   /// Creates a selector on a set of variables
+   /// @param s a scope
+   NcspSelectorLF(Scope s);
+
+   /// Destructor
+   ~NcspSelectorLF() = default;
+
+   /// Default copy constructor
+   NcspSelectorLF(const NcspSelectorLF&) = default;
+
+   /// No assignment
+   NcspSelectorLF& operator=(const NcspSelectorLF&) = delete;
+
+   ///@{
+   std::pair<bool, Variable> selectVar(NcspNode& node) override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a selector of the variable having the smallest domain.
+/// Smallest-First
+///////////////////////////////////////////////////////////////////////////////
+class NcspSelectorSF : public NcspSelector {
+public:
+   /// Creates a selector on a set of variables
+   /// @param s a scope
+   NcspSelectorSF(Scope s);
+
+   /// Destructor
+   ~NcspSelectorSF() = default;
+
+   /// Default copy constructor
+   NcspSelectorSF(const NcspSelectorSF&) = default;
+
+   /// No assignment
+   NcspSelectorSF& operator=(const NcspSelectorSF&) = delete;
+
+   ///@{
+   std::pair<bool, Variable> selectVar(NcspNode& node) override;
+   ///@}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable with maximum smear.
@@ -98,65 +144,6 @@ public:
 
 private:
    IntervalFunctionVector F_;
-};
-*/
-
-///////////////////////////////////////////////////////////////////////////////
-/// This is a selector of the variable following a round-robin strategy.
-///////////////////////////////////////////////////////////////////////////////
-class NcspSelectorRR : public NcspSelector {
-public:
-   /// Creates a selector on a set of variables
-   /// @param s a scope
-   NcspSelectorRR(Scope s);
-
-   /// Destructor
-   ~NcspSelectorRR() = default;
-
-   /// Default copy constructor
-   NcspSelectorRR(const NcspSelectorRR&) = default;
-
-   /// No assignment
-   NcspSelectorRR& operator=(const NcspSelectorRR&) = delete;
-
-   ///@{
-   std::pair<bool, Variable> selectVar(NcspNode& node) override;
-   ///@}
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// This is a selector of the variable following an hybrid strategy.
-///
-/// It alternates the max-dom selector and the round-robin selector according
-/// to a factor f >= 1.
-/// - f = 1: round-robin always used
-/// - f = 2: alternates round-robin and max-dom
-/// - f = 3: applies round-robin, two times max-dom, ...
-/// and so on
-///////////////////////////////////////////////////////////////////////////////
-/*
-class HybridDomRobinSelector : public NcspSelector {
-public:
-   /// Creates a selector on a set of variables
-   /// @param s a scope
-   /// @param f inverse of the frequency of use of the round-robin strategy
-   HybridDomRobinSelector(Scope s, int f);
-
-   /// Destructor
-   ~HybridDomRobinSelector() = default;
-
-   /// Default copy constructor
-   HybridDomRobinSelector(const HybridDomRobinSelector&) = default;
-
-   /// No assignment
-   HybridDomRobinSelector& operator=(const HybridDomRobinSelector&) = delete;
-
-   ///@{
-   std::pair<bool, Variable> selectVar(SearchNode& node) override;
-   ///@}
-
-private:
-   int f_;
 };
 */
 
