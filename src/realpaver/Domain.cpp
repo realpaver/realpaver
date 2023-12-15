@@ -56,6 +56,11 @@ IntervalDomain::IntervalDomain(const Interval& x)
         val_(x)
 {}
 
+double IntervalDomain::size() const
+{
+   return val_.isEmpty() ? 0.0 : val_.width();
+}
+
 bool IntervalDomain::isEmpty() const
 {
    return val_.isEmpty();
@@ -134,6 +139,11 @@ void IntervalUnionDomain::setVal(const IntervalUnion& u)
    val_ = u;
 }
 
+double IntervalUnionDomain::size() const
+{
+   return val_.width();
+}
+
 bool IntervalUnionDomain::isEmpty() const
 {
    return val_.isEmpty();
@@ -189,6 +199,11 @@ const Range& RangeDomain::getVal() const
 void RangeDomain::setVal(const Range& r)
 {
    val_ = r;
+}
+
+double RangeDomain::size() const
+{
+   return (double)val_.nbElems();
 }
 
 bool RangeDomain::isEmpty() const
@@ -251,6 +266,11 @@ const RangeUnion& RangeUnionDomain::getVal() const
 void RangeUnionDomain::setVal(const RangeUnion& u)
 {
    val_ = u;
+}
+
+double RangeUnionDomain::size() const
+{
+   return (double)val_.nbElems();
 }
 
 bool RangeUnionDomain::isEmpty() const
@@ -316,6 +336,13 @@ const ZeroOne& BinaryDomain::getVal() const
 void BinaryDomain::setVal(const ZeroOne& zo)
 {
    val_ = zo;
+}
+
+double BinaryDomain::size() const
+{
+   if (val_.isEmpty()) return 0.0;
+   if (val_.isUniverse()) return 2.0;
+   return 1.0;
 }
 
 bool BinaryDomain::isEmpty() const

@@ -61,7 +61,7 @@ Integer Range::right() const
 
 unsigned long  Range::nbElems() const
 {
-   return (unsigned long)r_.toInt() - l_.toInt() + 1;
+   return isEmpty() ? 0 : (unsigned long)r_.toInt() - l_.toInt() + 1;
 }
 
 bool Range::isEmpty() const

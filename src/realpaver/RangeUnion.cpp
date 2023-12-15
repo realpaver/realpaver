@@ -343,6 +343,14 @@ void RangeUnion::clear()
    v_.clear();
 }
 
+unsigned long RangeUnion::nbElems() const
+{
+   unsigned long n = 0;
+   for (size_t i=0; i<size(); ++i)
+      n += v_[i].nbElems();
+   return n;
+}
+
 std::ostream& operator<<(std::ostream& os, const RangeUnion& u)
 {
    u.print(os);

@@ -92,6 +92,9 @@ public:
    /// Clears this, which becomes empty
    void clear();
 
+   /// @return the number of elements in this
+   unsigned long nbElems() const;
+
 private:
    typedef std::vector<Range> VectorType;
    VectorType v_;

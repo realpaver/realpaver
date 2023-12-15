@@ -86,6 +86,9 @@ public:
    /// Clears this, which becomes empty
    void clear();
 
+   /// @return the sum of the widths of the components of this
+   double width() const;
+
 private:
    typedef std::vector<Interval> VectorType;
    VectorType v_;

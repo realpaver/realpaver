@@ -44,6 +44,12 @@ public:
    /// @return the domain type
    DomainType type() const;
 
+   /// @return if this is a real domain then returns the width of this,
+   ///         returns the number of values in this otherwise
+   ///
+   /// If this is empty then the size must be equal to 0.
+   virtual double size() const = 0;
+
    /// @return true if this is empty
    virtual bool isEmpty() const = 0;
 
@@ -95,25 +101,6 @@ private:
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Domain& dom);
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-//class RealDomain : public Domain {
-  
-  // width, used to select ?
-  // widthHull, used to test the tolerance
-   
-//};
-
-// TODO : enumeration of domains
-
-//class IntegerDomain : public Domain {
-   
-//}
-
-// ou dans Domain une methode isEnum()
-// une classe Enumerable, méthodes nbElems, nbElems(Interval)
-
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an interval domain.
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,6 +126,7 @@ public:
    void setVal(const Interval& x);
 
    ///@{
+   double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
    bool isReal() const override;
@@ -184,6 +172,7 @@ public:
    void setVal(const IntervalUnion& u);
 
    ///@{
+   double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
    bool isReal() const override;
@@ -224,6 +213,7 @@ public:
    void setVal(const Range& r);
 
    ///@{
+   double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
    bool isInteger() const override;
@@ -268,6 +258,7 @@ public:
    void setVal(const RangeUnion& u);
 
    ///@{
+   double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
    bool isInteger() const override;
@@ -311,6 +302,7 @@ public:
    void setVal(const ZeroOne& zo);
 
    ///@{
+   double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
    bool isBinary() const override;

@@ -84,6 +84,10 @@ BB_SPACE_FREQUENCY = 1
 #         after a DFS stage is a node whose perimeter is maximal
 # - GPDFS: Hybrid Best-First Depth-First strategy such that the next node
 #          after a DFS stage is a node whose grid perimeter is maximal
+#
+# Assigns SPLIT_INNER = true for DMDFS and the hybrid DFS in order to calculate
+# solutions at the given tolerance, and not to consider larger inner boxes
+# as solutions
 BP_NODE_SELECTION = DFS
 
 # Limit on the gap between two solutions such that they are aggregated

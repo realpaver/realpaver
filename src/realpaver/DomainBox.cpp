@@ -180,8 +180,7 @@ void DomainBox::glueOnScope(const DomainBox& B, const Scope& sco)
    for (const auto& v : sco)
    {
       Interval x = get(v)->intervalHull() | B.get(v)->intervalHull();
-      std::unique_ptr<IntervalDomain>
-         dom(new IntervalDomain(x));
+      std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
       set(v, std::move(dom));
    }
 }

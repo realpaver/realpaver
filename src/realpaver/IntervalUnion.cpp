@@ -278,6 +278,14 @@ void IntervalUnion::clear()
    v_.clear();
 }
 
+double IntervalUnion::width() const
+{
+   double s = 0.0;
+   for (size_t i=0; i<size(); ++i)
+      s += v_[i].width();
+   return s;
+}
+
 std::ostream& operator<<(std::ostream& os, const IntervalUnion& u)
 {
    u.print(os);
