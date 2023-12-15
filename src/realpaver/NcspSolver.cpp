@@ -16,7 +16,6 @@
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ListContractor.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/MaxCIDContractor.hpp"
 #include "realpaver/NcspSelector.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/NcspSpaceBFS.hpp"
