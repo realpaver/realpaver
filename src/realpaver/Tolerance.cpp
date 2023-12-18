@@ -197,7 +197,7 @@ double Tolerance::discreteSize(const Interval& x) const
 
    else if (Interval::minusOnePlusOne().contains(x))
    {
-      // absolute tolerance
+      // absolute
       double a = x.width() / val_,
              b = Double::floor(a);
 
@@ -206,7 +206,7 @@ double Tolerance::discreteSize(const Interval& x) const
 
    else
    {
-      // relative tolerance
+      // relative
       double a = x.relWidth() / val_,
              b = Double::floor(a);
 

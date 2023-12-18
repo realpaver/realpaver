@@ -119,6 +119,32 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a selector that works as follows. If there is an integer variable
+/// whose domain is splitable, then it selects the integer variable having the
+/// smallest domain. Otherwise, it selects the real variable having the
+/// largest domain.
+///////////////////////////////////////////////////////////////////////////////
+class NcspSelectorMixedSLF : public NcspSelector {
+public:
+   /// Creates a selector on a set of variables
+   /// @param s a scope
+   NcspSelectorMixedSLF(Scope s);
+
+   /// Destructor
+   ~NcspSelectorMixedSLF() = default;
+
+   /// Default copy constructor
+   NcspSelectorMixedSLF(const NcspSelectorMixedSLF&) = default;
+
+   /// No assignment
+   NcspSelectorMixedSLF& operator=(const NcspSelectorMixedSLF&) = delete;
+
+   ///@{
+   std::pair<bool, Variable> selectVar(NcspNode& node) override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of the variable with maximum smear.
 ///////////////////////////////////////////////////////////////////////////////
 /*

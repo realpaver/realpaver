@@ -110,9 +110,11 @@ SOLUTION_CLUSTER_GAP = 0.0
 SPLIT_OBJECTIVE = NO
 
 # Variable selection strategy that chooses the next variable to split
-# - RR:      round-robin strategy
-# - LF:      largest domain
-# - SF:      smallest domain
+# - RR:       round-robin strategy
+# - LF:       largest domain
+# - SF:       smallest domain
+# - MIXED_SLF integer variable with smallest first and then real variable
+#             with largest domain
 SPLIT_SELECTOR = RR
 
 # Domain splitting strategy

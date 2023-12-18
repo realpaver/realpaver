@@ -27,6 +27,47 @@ Scope NcspSelector::scope() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+NcspSelectorRR::NcspSelectorRR(Scope s) : NcspSelector(s)
+{}
+
+std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
+{
+   DomainBox* box = node.box();
+   Variable v = node.splitVariable();
+   auto it = scope_.begin();
+
+   if (!v.hasNullPointer())
+   {
+      it = scope_.find(v);
+      ++it;
+      if (it == scope_.end()) it = scope_.begin();
+   }
+
+   bool found = false;
+   size_t nb = 0;
+
+   while (!found && nb<scope_.size())
+   {
+      v = *it;
+
+      if (box->isSplitable(v))
+      {
+         found = true;
+         node.setSplitVariable(v);
+      }
+      else
+      {
+         ++nb;
+         ++it;
+         if (it == scope_.end()) it = scope_.begin();
+      }
+   }
+
+   return std::make_pair(found, v);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 /*
 MaxSmearSelector::MaxSmearSelector(IntervalFunctionVector F, Scope s)
       : NcspSelector(s),
@@ -125,6 +166,7 @@ std::pair<bool, Variable> NcspSelectorLF::selectVar(NcspNode& node)
          {
             vres = v;
             dres = d;
+            found = true;
          }
       }
    }
@@ -154,6 +196,7 @@ std::pair<bool, Variable> NcspSelectorSF::selectVar(NcspNode& node)
          {
             vres = v;
             dres = d;
+            found = true;
          }
       }
    }
@@ -163,43 +206,48 @@ std::pair<bool, Variable> NcspSelectorSF::selectVar(NcspNode& node)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NcspSelectorRR::NcspSelectorRR(Scope s) : NcspSelector(s)
+NcspSelectorMixedSLF::NcspSelectorMixedSLF(Scope s) : NcspSelector(s)
 {}
 
-std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
+std::pair<bool, Variable> NcspSelectorMixedSLF::selectVar(NcspNode& node)
 {
    DomainBox* box = node.box();
-   Variable v = node.splitVariable();
-   auto it = scope_.begin();
+   Variable ivmin, rvmax;
+   double idmin, rdmax;
+   bool ifound, rfound;
 
-   if (!v.hasNullPointer())
+   ifound = rfound = false;
+
+   for (const auto& v : scope_)
    {
-      it = scope_.find(v);
-      ++it;
-      if (it == scope_.end()) it = scope_.begin();
-   }
-
-   bool found = false;
-   size_t nb = 0;
-
-   while (!found && nb<scope_.size())
-   {
-      v = *it;
-
       if (box->isSplitable(v))
       {
-         found = true;
-         node.setSplitVariable(v);
-      }
-      else
-      {
-         ++nb;
-         ++it;
-         if (it == scope_.end()) it = scope_.begin();
+         double d = domSize(v, box->get(v));
+
+         if (v.isReal())
+         {
+            if ((!rfound) || (d > rdmax))
+            {
+               rvmax = v;
+               rdmax = d;
+               rfound = true;
+               
+            }
+         }
+         else
+         {
+            if ((!ifound) || (d < idmin))
+            {
+               ivmin = v;
+               idmin = d;
+               ifound = true;
+            }
+         }
       }
    }
 
-   return std::make_pair(found, v);
+   return (ifound) ? std::make_pair(ifound, ivmin) :
+                     std::make_pair(rfound, rvmax);
 }
 
 } // namespace

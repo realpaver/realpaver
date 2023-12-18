@@ -337,9 +337,10 @@ void NcspSolver::makeSplit()
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
    NcspSelector* selector = nullptr;
 
-   if (sel == "RR")      selector = new NcspSelectorRR(sco);
-   else if (sel == "LF") selector = new NcspSelectorLF(sco);
-   else if (sel == "SF") selector = new NcspSelectorSF(sco);
+   if (sel == "RR")              selector = new NcspSelectorRR(sco);
+   else if (sel == "LF")         selector = new NcspSelectorLF(sco);
+   else if (sel == "SF")         selector = new NcspSelectorSF(sco);
+   else if (sel == "MIXED_°SLF") selector = new NcspSelectorMixedSLF(sco);
 
 
 // TODO
