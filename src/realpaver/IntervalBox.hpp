@@ -264,6 +264,11 @@ public:
    /// (x = [1.35, 1.36], y = [Ø, 0.01])
    void vecPrint(std::ostream& os) const;
 
+   /// Tests if the domain of a variable is splitable
+   /// @param v a variable in this
+   /// @return true if the domain of v in this has the desired tolerance
+   bool isSplitable(const Variable& v) const;
+
 private:
    Scope scope_;
 };

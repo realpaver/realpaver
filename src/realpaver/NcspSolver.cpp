@@ -297,10 +297,10 @@ void NcspSolver::makeContractor()
    contractor_ = std::make_shared<ListContractor>(mainpool);
 }
 
-/* TODO
-VariableSelector* NcspSolver::makeMaxSmearStrategy()
+NcspSelector* NcspSolver::makeSelectorSSR()
 {
    IntervalFunctionVector F;
+   bool ok = true;
 
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
@@ -310,24 +310,24 @@ VariableSelector* NcspSolver::makeMaxSmearStrategy()
       {
          Constraint::SharedRep rep = c.rep();
          ArithCtrBinary* eq = static_cast<ArithCtrBinary*>(rep.get());
-         Term t = eq->left() - eq->right();
 
+         Term t = eq->left() - eq->right();
          F.addFun(IntervalFunction(t));
       }
+      else
+         ok = false;
    }
 
-   if (preprob_->nbVars() == F.nbVars())
+   if (ok && (preprob_->nbVars() == F.nbVars()))
    {
-      return new MaxSmearSelector(F, preprob_->scope());
+      return new NcspSelectorSSR(F);
    }
    else
    {
-      LOG_INTER("Unable to create a max-smear variable selection strategy");
-      int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
-      return new HybridDomRobinSelector(preprob_->scope(), n);
+      LOG_INTER("Unable to create a SmearSumRel variable selection strategy");
+      return new NcspSelectorRR(preprob_->scope());
    }
 }
-*/
 
 void NcspSolver::makeSplit()
 {
@@ -340,16 +340,8 @@ void NcspSolver::makeSplit()
    if (sel == "RR")              selector = new NcspSelectorRR(sco);
    else if (sel == "LF")         selector = new NcspSelectorLF(sco);
    else if (sel == "SF")         selector = new NcspSelectorSF(sco);
-   else if (sel == "MIXED_°SLF") selector = new NcspSelectorMixedSLF(sco);
-
-
-// TODO
-/*
-   if (sel == "MAX_SMEAR")
-   {
-      selector = makeMaxSmearStrategy();   
-   }
-*/
+   else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(sco);
+   else if (sel == "SSR")        selector = makeSelectorSSR();
 
    // makes the slicer
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");

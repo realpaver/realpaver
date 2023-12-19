@@ -326,4 +326,9 @@ void IntervalBox::vecPrint(std::ostream& os) const
    os << ')'; 
 }
 
+bool IntervalBox::isSplitable(const Variable& v) const
+{
+      return !v.getTolerance().hasTolerance(get(v));
+}
+
 } // namespace

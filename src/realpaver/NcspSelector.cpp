@@ -68,69 +68,6 @@ std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/*
-MaxSmearSelector::MaxSmearSelector(IntervalFunctionVector F, Scope s)
-      : NcspSelector(s),
-        F_(F)
-{
-   ASSERT(!s.isEmpty(), "Empty scope in a MaxSmear selector");
-}
-
-std::pair<bool, Variable> MaxSmearSelector::selectVar(const IntervalBox& box)
-{
-   Scope fscope = F_.scope();
-   IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
-
-   // calculates the partial derivatives
-   F_.diff(box, jac);
-
-   bool found = false;
-   double maxsmear = 0.0;
-   Variable maxvar;
-
-   for (auto v : scope_)
-   {
-      Interval I = box.get(v);
-      if (v.getTolerance().hasTolerance(I)) continue;
-
-      size_t j = F_.scope().index(v);
-
-      // finds the maximum magnitude of the dFi / dxj
-      double mag = 0.0;
-      for (size_t i=0; i<F_.nbFuns(); ++i)
-      {
-         double m = jac.get(i, j).mag();
-         if (m > mag) mag = m;
-      }
-
-      double smear = mag*I.width();
-      if (found)
-      {
-         if (smear > maxsmear)
-         {
-            maxsmear = smear;
-            maxvar = v;
-         }
-      }
-      else
-      {
-         maxsmear = smear;
-         maxvar = v;
-         found = true;
-      }
-   }
-
-   return std::make_pair(found, maxvar);
-}
-
-std::pair<bool, Variable> MaxSmearSelector::selectVar(SearchNode& node)
-{
-   return selectVar(*node.region());
-}
-*/
-
-///////////////////////////////////////////////////////////////////////////////
-
 double domSize(const Variable& v, Domain* dom)
 {
    double d;
@@ -248,6 +185,90 @@ std::pair<bool, Variable> NcspSelectorMixedSLF::selectVar(NcspNode& node)
 
    return (ifound) ? std::make_pair(ifound, ivmin) :
                      std::make_pair(rfound, rvmax);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspSelectorSSR::NcspSelectorSSR(IntervalFunctionVector F)
+      : NcspSelector(F.scope()),
+        F_(F),
+        ssr_(F.nbVars())
+{}
+
+void NcspSelectorSSR::calculateSSR(const IntervalBox& B)
+{
+   IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
+   RealMatrix S(F_.nbFuns(), F_.nbVars(), 0.0);
+
+   // calculates the partial derivatives
+   F_.diff(B, jac);
+
+   // calculates the relative smear values
+   for (size_t i=0; i<F_.nbFuns(); ++i)
+   {
+      double sum = 0.0;
+      for (size_t j=0; j<F_.nbVars(); ++j)
+      {
+         const auto& v = scope_.var(j);
+         double smear = jac.get(i, j).mag() * B.get(v).width();
+         S.set(i, j, smear);
+         sum += smear;
+      }
+      for (size_t j=0; j<F_.nbVars(); ++j)
+      {
+         if (sum != 0.0)
+            S.set(i, j, S.get(i, j) / sum);
+      }
+   }
+
+   // calculates the smearRelSum values
+   for (size_t j=0; j<F_.nbVars(); ++j)
+   {
+      ssr_[j] = 0.0;
+      for (size_t i=0; i<F_.nbFuns(); ++i)
+      {
+         ssr_[j] += S.get(i, j);
+      }
+   }
+}
+
+std::pair<bool, Variable> NcspSelectorSSR::selectVar(const IntervalBox& B)
+{
+   // calculates the smearSumRel values
+   calculateSSR(B);
+
+   // selects a variable
+   bool found = false;
+   double smax;
+   Variable vmax;
+
+   for (const auto& v : scope_)
+   {
+      if (B.isSplitable(v))
+      {
+         double s = getSSR(v);
+
+         if ((!found) || (s > smax))
+         {
+            vmax = v;
+            smax = s;
+            found = true;
+         }
+      }
+   }
+
+   return std::make_pair(found, vmax);
+}
+
+std::pair<bool, Variable> NcspSelectorSSR::selectVar(NcspNode& node)
+{
+   IntervalBox B(*node.box());
+   return selectVar(B);
+}
+
+double NcspSelectorSSR::getSSR(const Variable& v) const
+{
+   return ssr_[scope_.index(v)];
 }
 
 } // namespace

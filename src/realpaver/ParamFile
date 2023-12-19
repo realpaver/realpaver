@@ -113,6 +113,7 @@ SPLIT_OBJECTIVE = NO
 # - RR:       round-robin strategy
 # - LF:       largest domain
 # - SF:       smallest domain
+# - SSR:      smear sum relative (using derivatives)
 # - MIXED_SLF integer variable with smallest first and then real variable
 #             with largest domain
 SPLIT_SELECTOR = RR

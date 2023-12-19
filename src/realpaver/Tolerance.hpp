@@ -115,7 +115,12 @@ public:
    /// @return the largest interval [lb, ub] having this tolerance
    Interval maxIntervalUp(double lb) const;
 
-   /// TODO
+   /// Calculates the size of a partition of an interval with respect to this
+   /// @param x an interval
+   /// @return 0 if x is empty, 1 if x is canonical, the width of x divided
+   ///         by the magnitude of this rounded upward if x is included in
+   ///         [-1, +1], the relative width of x divided by the magnitude of
+   ///         this rounded upward otherwise
    double discreteSize(const Interval& x) const;
 
 private:
