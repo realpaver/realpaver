@@ -2,6 +2,7 @@
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Tolerance.hpp"
 
@@ -12,10 +13,19 @@ int main(void)
 {
    try
    {
-      Tolerance tol = Tolerance::makeAbs(0.00125);
-      Interval zzz(100, 200);
-      cout << "" << tol.discreteSize(zzz) << endl;
-      return 0;
+      IntervalPartitionMaker slicer(10);
+      slicer.apply(Interval(0,99));
+      auto it = slicer.begin();
+      
+      std::advance(it, 3);
+      
+      while (it != slicer.end())
+      {
+         cout << (*it) << endl;
+         ++it;
+      }
+
+/*
       
       
       Problem P;
@@ -46,7 +56,7 @@ int main(void)
          std::unique_ptr<Domain> slice = slicer->next(it);
          cout << "a slice: " << (*slice) << endl;
       }
-
+*/
    }
    catch(Exception e)
    {

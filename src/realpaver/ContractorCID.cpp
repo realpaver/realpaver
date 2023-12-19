@@ -8,11 +8,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/CIDContractor.hpp"
+#include "realpaver/ContractorCID.hpp"
 
 namespace realpaver {
 
-CIDContractor::CIDContractor(SharedContractor op, Variable v,
+ContractorCID::ContractorCID(SharedContractor op, Variable v,
                              std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(v),
@@ -24,7 +24,7 @@ CIDContractor::CIDContractor(SharedContractor op, Variable v,
    ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
 }
 
-CIDContractor::CIDContractor(SharedContractor op,
+ContractorCID::ContractorCID(SharedContractor op,
                              std::unique_ptr<IntervalSlicer> slicer)
       : op_(op),
         v_(),
@@ -34,27 +34,24 @@ CIDContractor::CIDContractor(SharedContractor op,
    ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
 }
 
-CIDContractor::~CIDContractor()
-{}
-
-Scope CIDContractor::scope() const
+Scope ContractorCID::scope() const
 {
    return op_->scope();
 }
 
-Variable CIDContractor::getVar() const
+Variable ContractorCID::getVar() const
 {
    return v_;
 }
 
-void CIDContractor::setVar(Variable v)
+void ContractorCID::setVar(Variable v)
 {
    ASSERT(scope().contains(v), "Bad variable " << v << " in a CID contractor");
 
    v_ = v;
 }
 
-Proof CIDContractor::contract(IntervalBox& box)
+Proof ContractorCID::contract(IntervalBox& box)
 {
    slicer_->apply(box.get(v_));
 
@@ -89,7 +86,7 @@ Proof CIDContractor::contract(IntervalBox& box)
    return proof;
 }
 
-void CIDContractor::print(std::ostream& os) const
+void ContractorCID::print(std::ostream& os) const
 {
    os << "CID contractor on " << v_.getName();
 }

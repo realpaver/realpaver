@@ -198,7 +198,7 @@ void NcspSolver::makeContractor()
 
    if (with_cid == "YES")
    {
-      // TODO, replace the following
+      // TODO: create a CID propagator and replace the following
       mainpool->push(propagator);
    }
    else

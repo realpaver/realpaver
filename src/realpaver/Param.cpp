@@ -61,6 +61,8 @@ Param::Param()
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
    intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
    intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT",     100));
+   intmap_.insert(std::make_pair("NB_SLICE_3B",               7));
+   intmap_.insert(std::make_pair("NB_SLICE_CID",              3));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));

@@ -63,11 +63,20 @@ public:
    /// Iterators on the set of slices
    typedef typename ContainerType::iterator iterator;
 
-   /// @returns an iterator on the beginning of the container of slices
+   /// @returns an iterator on the first slice
    iterator begin();
 
    /// @returns an iterator on the end of the container of slices
    iterator end();
+
+   /// Reverse iterators on the set of slices
+   typedef typename ContainerType::reverse_iterator reverse_iterator;
+
+   /// @returns a reverse iterator on the last slice
+   reverse_iterator rbegin();
+
+   /// @returns a reverse iterator on the reverse end of the container of slices
+   reverse_iterator rend();
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CID_CONTRACTOR_HPP
-#define REALPAVER_CID_CONTRACTOR_HPP
+#ifndef REALPAVER_CONTRACTOR_3B_HPP
+#define REALPAVER_CONTRACTOR_3B_HPP
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
@@ -16,37 +16,36 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor implementing Constructive Interval Disjunction.
+/// This is a contractor implementing 3B consistency.
 ///
 /// Given a box B, a variable v, a slicer and a contractor, the domain of
-/// v in B is divided by the slicer, each slice is reduced by the contractor,
-/// and the hull of the contracted slices is returned.
+/// v in B is divided by the slicer, each slice is ... TODO
 ///
 /// The scope of this corresponds to the scope of the given contractor.
 ///////////////////////////////////////////////////////////////////////////////
-class CIDContractor : public Contractor {
+class Contractor3B : public Contractor {
 public:
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
    /// @param a slicer
-   CIDContractor(SharedContractor op, Variable v,
+   Contractor3B(SharedContractor op, Variable v,
                  std::unique_ptr<IntervalSlicer> slicer);
 
    /// Creates a contractor without any variable (to be fixed later)
    /// @param op a contractor
-   /// @param a slicer
-   CIDContractor(SharedContractor op,
+   /// @param slicer a slicer
+   Contractor3B(SharedContractor op,
                  std::unique_ptr<IntervalSlicer> slicer);
 
-   /// Destructor
-   ~CIDContractor();
+   /// Default destructor
+   ~Contractor3B() = default;
 
    /// No copy
-   CIDContractor(const CIDContractor&) = delete;
+   Contractor3B(const Contractor3B&) = delete;
 
    /// No assignment
-   CIDContractor& operator=(const CIDContractor&) = delete;
+   Contractor3B& operator=(const Contractor3B&) = delete;
 
    /// @return the variable whose domain is sliced
    Variable getVar() const;

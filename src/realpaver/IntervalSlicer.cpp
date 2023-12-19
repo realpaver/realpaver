@@ -48,6 +48,16 @@ IntervalSlicer::iterator IntervalSlicer::end()
    return cont_.end();
 }
 
+IntervalSlicer::reverse_iterator IntervalSlicer::rbegin()
+{
+   return cont_.rbegin();
+}
+
+IntervalSlicer::reverse_iterator IntervalSlicer::rend()
+{
+   return cont_.rend();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void IntervalBisecter::applyImpl(const Interval& x)
