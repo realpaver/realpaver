@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_LIST_CONTRACTOR_HPP
-#define REALPAVER_LIST_CONTRACTOR_HPP
+#ifndef REALPAVER_CONTRACTOR_LIST_HPP
+#define REALPAVER_CONTRACTOR_LIST_HPP
 
 #include "realpaver/ContractorPool.hpp"
 
@@ -17,20 +17,20 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a contractor applying a group of contractors in sequence.
 ///////////////////////////////////////////////////////////////////////////////
-class ListContractor : public Contractor {
+class ContractorList : public Contractor {
 public:
    /// Constructor
    /// @param pool a pool of contractors
-   ListContractor(SharedContractorPool pool = nullptr);
+   ContractorList(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
-   ListContractor(const ListContractor&) = default;
+   ContractorList(const ContractorList&) = default;
 
    /// No assignment
-   ListContractor& operator=(const ListContractor&) = delete;
+   ContractorList& operator=(const ContractorList&) = delete;
 
    /// Default destructor
-   ~ListContractor() = default;
+   ~ContractorList() = default;
 
    /// @return the number of contractors
    size_t poolSize() const;
@@ -53,7 +53,7 @@ private:
 };
 
 /// Type of shared pointers on list contractors
-typedef std::shared_ptr<ListContractor> SharedListContractor;
+typedef std::shared_ptr<ContractorList> SharedContractorList;
 
 } // namespace
 

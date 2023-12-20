@@ -14,7 +14,7 @@
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorDom.hpp"
 #include "realpaver/IntervalNewton.hpp"
-#include "realpaver/ListContractor.hpp"
+#include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSelector.hpp"
 #include "realpaver/NcspSolver.hpp"
@@ -298,7 +298,7 @@ void NcspSolver::makeContractor()
 
    // creates the contractor of this solver, which applies the contractors of
    // the main pool in sequence
-   contractor_ = std::make_shared<ListContractor>(mainpool);
+   contractor_ = std::make_shared<ContractorList>(mainpool);
 }
 
 NcspSelector* NcspSolver::makeSelectorSSR()

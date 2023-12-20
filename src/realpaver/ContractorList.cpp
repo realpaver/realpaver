@@ -8,35 +8,35 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ListContractor.hpp"
+#include "realpaver/ContractorList.hpp"
 
 namespace realpaver {
 
-ListContractor::ListContractor(SharedContractorPool pool)
+ContractorList::ContractorList(SharedContractorPool pool)
       : pool_(pool)
 {}
 
-size_t ListContractor::poolSize() const
+size_t ContractorList::poolSize() const
 {
    return pool_->poolSize();
 }
 
-SharedContractorPool ListContractor::getPool() const
+SharedContractorPool ContractorList::getPool() const
 {
    return pool_;
 }
 
-void ListContractor::setPool(SharedContractorPool pool)
+void ContractorList::setPool(SharedContractorPool pool)
 {
    pool_ = pool;
 }
 
-Scope ListContractor::scope() const
+Scope ContractorList::scope() const
 {
    return pool_->scope();
 }
 
-Proof ListContractor::contract(IntervalBox& box)
+Proof ContractorList::contract(IntervalBox& box)
 {
    Proof proof;
 
@@ -48,7 +48,7 @@ Proof ListContractor::contract(IntervalBox& box)
    return Proof::Maybe;
 }
 
-void ListContractor::print(std::ostream& os) const
+void ContractorList::print(std::ostream& os) const
 {
    os << "List of " << poolSize() << " contractors";
 }
