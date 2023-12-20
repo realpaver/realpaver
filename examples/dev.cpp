@@ -1,6 +1,6 @@
 #include <iostream>
 #include "realpaver/Contractor3B.hpp"
-#include "realpaver/ConstraintContractor.hpp"
+#include "realpaver/ContractorCtr.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
@@ -24,7 +24,7 @@ int main(void)
       IntervalBox B(scop);
       cout << B << endl;
 
-      shared_ptr<Contractor> ctc = make_shared<ConstraintContractor>(c);
+      shared_ptr<Contractor> ctc = make_shared<ContractorCtr>(c);
       unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(10);
 
       Contractor3B ctc3b(ctc, x, std::move(slicer));

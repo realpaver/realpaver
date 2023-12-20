@@ -10,7 +10,7 @@
 #include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BC4Contractor.hpp"
-#include "realpaver/ConstraintContractor.hpp"
+#include "realpaver/ContractorCtr.hpp"
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorDom.hpp"
 #include "realpaver/IntervalNewton.hpp"
@@ -170,7 +170,7 @@ void NcspSolver::makeContractor()
       }
       catch(Exception& e)
       {
-         op = std::make_shared<ConstraintContractor>(c);
+         op = std::make_shared<ContractorCtr>(c);
       }
 
       pool->push(op);
