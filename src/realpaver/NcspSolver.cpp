@@ -12,7 +12,7 @@
 #include "realpaver/BC4Contractor.hpp"
 #include "realpaver/ConstraintContractor.hpp"
 #include "realpaver/ContractorHC4.hpp"
-#include "realpaver/DomainContractor.hpp"
+#include "realpaver/ContractorDom.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ListContractor.hpp"
 #include "realpaver/Logger.hpp"
@@ -177,7 +177,7 @@ void NcspSolver::makeContractor()
    }
 
    // variables with disconnected domains
-   std::shared_ptr<DomainContractor> dop = std::make_shared<DomainContractor>();
+   std::shared_ptr<ContractorDom> dop = std::make_shared<ContractorDom>();
    for (Variable v : preprob_->scope())
       if (!v.getDomain()->isConnected())
          dop->insertVar(v);
@@ -291,6 +291,10 @@ void NcspSolver::makeContractor()
          }
       }
    }
+
+   // it is necessary to prune the domains of the integral variables at the end
+   if (dop->nbVars() > 0)
+      mainpool->push(dop);
 
    // creates the contractor of this solver, which applies the contractors of
    // the main pool in sequence
