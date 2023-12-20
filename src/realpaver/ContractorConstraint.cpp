@@ -8,29 +8,29 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorCtr.hpp"
+#include "realpaver/ContractorConstraint.hpp"
 
 namespace realpaver {
 
-ContractorCtr::ContractorCtr(Constraint c) : c_(c)
+ContractorConstraint::ContractorConstraint(Constraint c) : c_(c)
 {}
 
-Scope ContractorCtr::scope() const
+Scope ContractorConstraint::scope() const
 {
    return c_.scope();
 }
 
-Proof ContractorCtr::contract(IntervalBox& box)
+Proof ContractorConstraint::contract(IntervalBox& box)
 {
    return c_.contract(box);
 }
 
-void ContractorCtr::print(std::ostream& os) const
+void ContractorConstraint::print(std::ostream& os) const
 {
    os << "Contractor of " << c_;
 }
 
-Constraint ContractorCtr::getConstraint() const
+Constraint ContractorConstraint::getConstraint() const
 {
    return c_;
 }

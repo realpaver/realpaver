@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_POLYTOPE_HULL_CONTRACTOR_HPP
-#define REALPAVER_POLYTOPE_HULL_CONTRACTOR_HPP
+#ifndef REALPAVER_CONTRACTOR_POLYTOPE_HPP
+#define REALPAVER_CONTRACTOR_POLYTOPE_HPP
 
 #include <vector>
 #include <unordered_map>
@@ -130,28 +130,28 @@ private:
 ///
 /// This contractor is parameterized by the relaxation method.
 ///////////////////////////////////////////////////////////////////////////////
-class PolytopeHullContractor : public Contractor {
+class ContractorPolytope : public Contractor {
 public:
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param style kind of relaxation method
-   PolytopeHullContractor(SharedDag dag, PolytopeCreatorStyle style);
+   ContractorPolytope(SharedDag dag, PolytopeCreatorStyle style);
 
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param lfun list of indexes of the DAG functions to be relaxed
    /// @param style kind of relaxation method
-   PolytopeHullContractor(SharedDag dag, const IndexList& lfun,
-                          PolytopeCreatorStyle style);
+   ContractorPolytope(SharedDag dag, const IndexList& lfun,
+                      PolytopeCreatorStyle style);
 
    /// Destructor
-   ~PolytopeHullContractor();
+   ~ContractorPolytope();
 
    /// No copy
-   PolytopeHullContractor(const PolytopeHullContractor&) = delete;
+   ContractorPolytope(const ContractorPolytope&) = delete;
 
    /// No assignment
-   PolytopeHullContractor& operator=(const PolytopeHullContractor&) = delete;
+   ContractorPolytope& operator=(const ContractorPolytope&) = delete;
 
    /// @return the relaxation tolerance for the equations
    double getRelaxEqTol() const;

@@ -1,6 +1,6 @@
 #include "test_config.hpp"
 #include "realpaver/ContractorCID.hpp"
-#include "realpaver/ContractorCtr.hpp"
+#include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/Problem.hpp"
 
 #include <memory>
@@ -21,7 +21,7 @@ void init()
    B = new IntervalBox(P->scope());
    Constraint c( x - y == 0 );
 
-   shared_ptr<Contractor> ctc = make_shared<ContractorCtr>(c);
+   shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
    unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(3);
    cid = new ContractorCID(ctc, x, std::move(slicer));
 }

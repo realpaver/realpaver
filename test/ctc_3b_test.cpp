@@ -1,6 +1,6 @@
 #include "test_config.hpp"
 #include "realpaver/Contractor3B.hpp"
-#include "realpaver/ContractorCtr.hpp"
+#include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/Problem.hpp"
 
 #include <memory>
@@ -21,7 +21,7 @@ Result my_test(const Interval& I)
    Scope scop( {x} );
    IntervalBox B(scop);
 
-   shared_ptr<Contractor> ctc = make_shared<ContractorCtr>(c);
+   shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
    unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(10);
 
    Contractor3B ctc3b(ctc, x, std::move(slicer));

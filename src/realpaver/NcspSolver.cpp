@@ -10,9 +10,9 @@
 #include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorBC4.hpp"
-#include "realpaver/ContractorCtr.hpp"
+#include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorHC4.hpp"
-#include "realpaver/ContractorDom.hpp"
+#include "realpaver/ContractorDomain.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
@@ -22,7 +22,7 @@
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
-#include "realpaver/PolytopeHullContractor.hpp"
+#include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/Propagator.hpp"
 
 namespace realpaver {
@@ -170,14 +170,14 @@ void NcspSolver::makeContractor()
       }
       catch(Exception& e)
       {
-         op = std::make_shared<ContractorCtr>(c);
+         op = std::make_shared<ContractorConstraint>(c);
       }
 
       pool->push(op);
    }
 
    // variables with disconnected domains
-   std::shared_ptr<ContractorDom> dop = std::make_shared<ContractorDom>();
+   std::shared_ptr<ContractorDomain> dop = std::make_shared<ContractorDomain>();
    for (Variable v : preprob_->scope())
       if (!v.getDomain()->isConnected())
          dop->insertVar(v);
@@ -214,8 +214,8 @@ void NcspSolver::makeContractor()
       if (with_polytope == "TAYLOR")
          style = PolytopeCreatorStyle::Taylor;
 
-      std::shared_ptr<PolytopeHullContractor> op =
-         std::make_shared<PolytopeHullContractor>(dag_, style);
+      std::shared_ptr<ContractorPolytope> op =
+         std::make_shared<ContractorPolytope>(dag_, style);
       op->setRelaxEqTol(env_->getParam()->getDblParam("RELAXATION_EQ_TOL"));
 
       mainpool->push(op);

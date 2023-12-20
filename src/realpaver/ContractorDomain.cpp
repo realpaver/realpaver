@@ -9,34 +9,34 @@
 
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorDom.hpp"
+#include "realpaver/ContractorDomain.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorDom::ContractorDom()
+ContractorDomain::ContractorDomain()
       : s_()
 {}
 
-ContractorDom::ContractorDom(Variable v)
+ContractorDomain::ContractorDomain(Variable v)
       : s_()
 {
    insertVar(v);
 }
 
-ContractorDom::ContractorDom(const std::initializer_list<Variable>& l)
+ContractorDomain::ContractorDomain(const std::initializer_list<Variable>& l)
       : s_()
 {
    for (auto v : l)
       insertVar(v);
 }
 
-size_t ContractorDom::nbVars() const
+size_t ContractorDomain::nbVars() const
 {
    return s_.size();
 }
 
-void ContractorDom::insertVar(Variable v)
+void ContractorDomain::insertVar(Variable v)
 {
    ASSERT(!v.getDomain()->isConnected(),
           "Domain contractor applied to a continuous variable " << v.getName());
@@ -44,7 +44,7 @@ void ContractorDom::insertVar(Variable v)
    s_.insert(v);
 }
 
-Proof ContractorDom::contract(IntervalBox& box)
+Proof ContractorDomain::contract(IntervalBox& box)
 {
    for (auto v : s_)
    {
@@ -68,13 +68,13 @@ Proof ContractorDom::contract(IntervalBox& box)
    return Proof::Maybe;
 }
 
-void ContractorDom::print(std::ostream& os) const
+void ContractorDomain::print(std::ostream& os) const
 {
    os << "Domain contractor: ";
    for (auto v : s_) os << v.getName() << " ";
 }
 
-Scope ContractorDom::scope() const
+Scope ContractorDomain::scope() const
 {
    return s_;
 }

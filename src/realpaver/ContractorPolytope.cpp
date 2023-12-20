@@ -11,7 +11,7 @@
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/PolytopeHullContractor.hpp"
+#include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/RLTRelaxation.hpp"
 
 namespace realpaver {
@@ -366,8 +366,8 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& box)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
-                                               PolytopeCreatorStyle style)
+ContractorPolytope::ContractorPolytope(SharedDag dag,
+                                       PolytopeCreatorStyle style)
       : creator_(nullptr)
 {
    if (style == PolytopeCreatorStyle::RLT)
@@ -380,9 +380,8 @@ PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
       THROW("Polytope maker not yet implemented: " << style);
 }
 
-PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
-                                               const IndexList& lfun,
-                                               PolytopeCreatorStyle style)
+ContractorPolytope::ContractorPolytope(SharedDag dag, const IndexList& lfun,
+                                       PolytopeCreatorStyle style)
       : creator_(nullptr)
 {
    if (style == PolytopeCreatorStyle::RLT)
@@ -395,17 +394,17 @@ PolytopeHullContractor::PolytopeHullContractor(SharedDag dag,
       THROW("Polytope maker not yet implemented: " << style);
 }
 
-PolytopeHullContractor::~PolytopeHullContractor()
+ContractorPolytope::~ContractorPolytope()
 {
    if (creator_ != nullptr) delete creator_;
 }
 
-Scope PolytopeHullContractor::scope() const
+Scope ContractorPolytope::scope() const
 {
    return creator_->scope();
 }
 
-Proof PolytopeHullContractor::contract(IntervalBox& box)
+Proof ContractorPolytope::contract(IntervalBox& box)
 {
    Proof proof = contractImpl(box);
    return proof;
@@ -414,15 +413,15 @@ Proof PolytopeHullContractor::contract(IntervalBox& box)
 // TODO
 #include <iomanip>
 
-Proof PolytopeHullContractor::contractImpl(IntervalBox& box)
+Proof ContractorPolytope::contractImpl(IntervalBox& box)
 {
    LPSolver solver;
 
    // linearizes the constraints
    if (!creator_->make(solver, box)) return Proof::Maybe;
 
-   // first is true if a call to solver.optimize() is required, false false after
-   // a successfull optimization, then the next call to the solver can use
+   // first is true if a call to solver.optimize() is required, false false
+   // after a successfull optimization, then the next call to the solver can use
    // reoptimize() after just changing the objective function
    bool first = true;
    OptimizationStatus status;
@@ -482,17 +481,17 @@ Proof PolytopeHullContractor::contractImpl(IntervalBox& box)
    return Proof::Maybe;
 }
 
-void PolytopeHullContractor::print(std::ostream& os) const
+void ContractorPolytope::print(std::ostream& os) const
 {
    os << "Polytope Hull contractor";
 }
 
-double PolytopeHullContractor::getRelaxEqTol() const
+double ContractorPolytope::getRelaxEqTol() const
 {
    return creator_->getRelaxEqTol();
 }
 
-void PolytopeHullContractor::setRelaxEqTol(double tol)
+void ContractorPolytope::setRelaxEqTol(double tol)
 {
    creator_->setRelaxEqTol(tol);
 }

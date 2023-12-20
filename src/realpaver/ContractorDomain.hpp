@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_DOM_HPP
-#define REALPAVER_CONTRACTOR_DOM_HPP
+#ifndef REALPAVER_CONTRACTOR_DOMAIN_HPP
+#define REALPAVER_CONTRACTOR_DOMAIN_HPP
 
 #include <vector>
 #include "realpaver/Contractor.hpp"
@@ -25,18 +25,18 @@ namespace realpaver {
 ///
 /// Such a contractor is able to manage one variable or a list of variables.
 ///////////////////////////////////////////////////////////////////////////////
-class ContractorDom : public Contractor {
+class ContractorDomain : public Contractor {
 public:
    /// Creates a contractor with no variable
-   ContractorDom();
+   ContractorDomain();
 
    /// Creates a contractor for one variable
    /// @param v a variable
-   ContractorDom(Variable v);
+   ContractorDomain(Variable v);
 
    /// Creates a contractor for a list of variables
    /// @param l list of variables
-   ContractorDom(const std::initializer_list<Variable>& l);
+   ContractorDomain(const std::initializer_list<Variable>& l);
 
    /// Inserts a variable in the list of variables
    /// @param v a variable
@@ -56,7 +56,7 @@ private:
 };
 
 /// Type of shared pointers on contractors
-typedef std::shared_ptr<ContractorDom> SharedContractorDom;
+typedef std::shared_ptr<ContractorDomain> SharedContractorDomain;
 
 } // namespace
 

@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_CTR_HPP
-#define REALPAVER_CONTRACTOR_CTR_HPP
+#ifndef REALPAVER_CONTRACTOR_CONSTRAINT_HPP
+#define REALPAVER_CONTRACTOR_CONSTRAINT_HPP
 
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Contractor.hpp"
@@ -20,20 +20,20 @@ namespace realpaver {
 ///
 /// This contractor simply calls the default contraction of the constraint.
 ///////////////////////////////////////////////////////////////////////////////
-class ContractorCtr : public Contractor {
+class ContractorConstraint : public Contractor {
 public:
    /// Constructor
    /// @param c constraint of this
-   ContractorCtr(Constraint c);
+   ContractorConstraint(Constraint c);
 
    /// Default copy constructor
-   ContractorCtr(const ContractorCtr&) = default;
+   ContractorConstraint(const ContractorConstraint&) = default;
 
    /// No assignment
-   ContractorCtr& operator=(const ContractorCtr&) = delete;
+   ContractorConstraint& operator=(const ContractorConstraint&) = delete;
 
    /// Default destructor
-   ~ContractorCtr() = default;
+   ~ContractorConstraint() = default;
 
    ///@{
    Scope scope() const override;
