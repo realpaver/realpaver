@@ -32,7 +32,7 @@ Contractor3B::Contractor3B(SharedContractor op, Variable v, size_t n)
    ASSERT(op_.get() != nullptr, "No operator in a 3B contractor");
    ASSERT(op->scope().contains(v), "Bad variable " << v <<
                                    " in a 3B contractor");
-   ASSERT(n > 1, "Bad number of slices in a CID contractor");
+   ASSERT(n > 1, "Bad number of slices in a CID contractor: " << n);
 
    slicer_ = std::make_unique<IntervalPartitionMaker>(n);
 }

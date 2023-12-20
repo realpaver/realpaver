@@ -16,29 +16,28 @@ namespace realpaver {
 Contractor3BCID::Contractor3BCID(SharedContractor op, Variable v,
                                  std::unique_ptr<IntervalSlicer> slicer3B,
                                  std::unique_ptr<IntervalSlicer> slicerCID)
-      : op_(op),
-        v_(v),
-        slicer3B_(std::move(slicer3B)),
-        slicerCID_(std::move(slicerCID))
+      : v_(v),
+        ctc3B_(nullptr),
+        ctcCID_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a 3BCID contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v <<
-                                   " in a 3BCID contractor");
-   ASSERT(slicer3B_ != nullptr, "No slicer in a 3BCID contractor");
-   ASSERT(slicerCID_ != nullptr, "No slicer in a 3BCID contractor");
+   ctc3B_ = new Contractor3B(op, v, std::move(slicer3B));
+   ctcCID_ = new ContractorCID(op, v, std::move(slicerCID));
 }
 
-Contractor3BCID::Contractor3BCID(SharedContractor op,
-                                 std::unique_ptr<IntervalSlicer> slicer3B,
-                                 std::unique_ptr<IntervalSlicer> slicerCID)
-      : op_(op),
-        v_(),
-        slicer3B_(std::move(slicer3B)),
-        slicerCID_(std::move(slicerCID))
+Contractor3BCID::Contractor3BCID(SharedContractor op, Variable v,
+                                 size_t n3B, size_t nCID)
+      : v_(v),
+        ctc3B_(nullptr),
+        ctcCID_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a 3BCID contractor");
-   ASSERT(slicer3B_ != nullptr, "No slicer in a 3BCID contractor");
-   ASSERT(slicerCID_ != nullptr, "No slicer in a 3BCID contractor");
+   ctc3B_ = new Contractor3B(op, v, n3B);
+   ctcCID_ = new ContractorCID(op, v, nCID);
+}
+
+Contractor3BCID::~Contractor3BCID()
+{
+   delete ctc3B_;
+   delete ctcCID_;
 }
 
 Variable Contractor3BCID::getVar() const
@@ -56,12 +55,22 @@ void Contractor3BCID::setVar(Variable v)
 
 Scope Contractor3BCID::scope() const
 {
-   return op_->scope();
+   return ctc3B_->scope();
 }
 
-Proof Contractor3BCID::contract(IntervalBox& box)
+Proof Contractor3BCID::contract(IntervalBox& B)
 {
-   // TODO
+   Interval dom = B.get(v_);
+
+   Proof proof = ctc3B_->contract(B);
+
+   if (proof == Proof::Empty)
+      return Proof::Empty;
+
+   if (dom.isSetEq(B.get(v_)))
+      return Proof::Maybe;
+
+   return ctcCID_->contract(B);
 }
 
 void Contractor3BCID::print(std::ostream& os) const

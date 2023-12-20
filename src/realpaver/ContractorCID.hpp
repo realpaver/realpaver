@@ -36,7 +36,7 @@ public:
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
-   /// @param n number of slices
+   /// @param n number of slices (at least 2)
    ContractorCID(SharedContractor op, Variable v, size_t n);
 
    /// Default destructor

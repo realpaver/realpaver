@@ -10,40 +10,38 @@
 #ifndef REALPAVER_CONTRACTOR_3BCID_HPP
 #define REALPAVER_CONTRACTOR_3BCID_HPP
 
-#include "realpaver/Contractor.hpp"
-#include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/Contractor3B.hpp"
+#include "realpaver/ContractorCID.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor that combines Constructive Interval Disjunction with
-/// 3B consistency.
+/// This is a contractor that combines a 3B contractor and a CID contractor.
 ///
-/// Given a variable, a box B, and a contractor op, a shaving process tries
-/// to remove slices of the domain of v in B (3B). When no slice can be removed
-/// then the CID contractor is applied.
+/// Given a variable and a box B, the 3B contractor is applied. If the domain
+/// of v in B is not reduced then B is returned. Oherwise, the CID
+/// contractor is applied.
 ///////////////////////////////////////////////////////////////////////////////
 class Contractor3BCID : public Contractor {
 public:
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
-   /// @param slicer3B a slicer for 3B consistency
-   /// @param slicerCID 
+   /// @param slicer3B a slicer for the 3B contractor
+   /// @param slicerCID  a slicer for the CID contractor
    Contractor3BCID(SharedContractor op, Variable v,
                    std::unique_ptr<IntervalSlicer> slicer3B,
                    std::unique_ptr<IntervalSlicer> slicerCID);
 
-   /// Creates a contractor without any variable (to be fixed later)
+   /// Creates a contractor
    /// @param op a contractor
-   /// @param slicer3B a slicer for 3B consistency
-   /// @param slicerCID 
-   Contractor3BCID(SharedContractor op,
-                   std::unique_ptr<IntervalSlicer> slicer3B,
-                   std::unique_ptr<IntervalSlicer> slicerCID);
+   /// @param v a variable
+   /// @param n3B number of slices for the 3B contractor (at least 2)
+   /// @param nCID  number of slices for the CID contractor (at least 2)
+   Contractor3BCID(SharedContractor op, Variable v, size_t n3B, size_t nCID);
 
-   /// Default destructor
-   ~Contractor3BCID() = default;
+   /// Destructor
+   ~Contractor3BCID();
 
    /// No copy
    Contractor3BCID(const Contractor3BCID&) = delete;
@@ -60,15 +58,14 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalBox& box) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 
 private:
-   SharedContractor op_;
    Variable v_;
-   std::unique_ptr<IntervalSlicer> slicer3B_;
-   std::unique_ptr<IntervalSlicer> slicerCID_;
+   Contractor3B* ctc3B_;
+   ContractorCID* ctcCID_;
 };
 
 
