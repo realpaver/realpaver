@@ -4,17 +4,23 @@ bitset_test = executable( 'bitset_test',
                           include_directories: ['../src'] )
 test('Test of bitset', bitset_test)
 
-c3b_test = executable( 'c3b_test',
-                        sources: 'c3b_test.cpp',
+ctc_3b_test = executable( 'ctc_3b_test',
+                        sources: 'ctc_3b_test.cpp',
                         link_with: realpaver_lib,
                         include_directories: ['../src'] )
-test('Test of 3B contractor', c3b_test)
+test('Test of 3B contractor', ctc_3b_test)
 
-hc4_test = executable( 'hc4_test',
-                       sources: 'hc4_test.cpp',
+ctc_cid_test = executable( 'ctc_cid_test',
+                        sources: 'ctc_cid_test.cpp',
+                        link_with: realpaver_lib,
+                        include_directories: ['../src'] )
+test('Test of CID contractor', ctc_cid_test)
+
+ctc_hc4_test = executable( 'ctc_hc4_test',
+                       sources: 'ctc_hc4_test.cpp',
                        link_with: realpaver_lib,
                        include_directories: ['../src'] )
-test('Test of HC4 contractor', hc4_test)
+test('Test of HC4 contractor', ctc_hc4_test)
 
 dag_test = executable( 'dag_test',
                        sources: 'dag_test.cpp',
