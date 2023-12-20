@@ -8,21 +8,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/HC4Contractor.hpp"
+#include "realpaver/ContractorHC4.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-HC4Contractor::HC4Contractor(SharedDag dag, size_t i)
+ContractorHC4::ContractorHC4(SharedDag dag, size_t i)
       : dag_(dag),
         if_(i)
 {
-   ASSERT(dag != nullptr, "Creation of an HC4Contractor from a null pointer");
-   ASSERT(i < dag->nbFuns(), "Creation of an HC4Contractor given a bad " <<
+   ASSERT(dag != nullptr, "Creation of HC4 contractor from a null pointer");
+   ASSERT(i < dag->nbFuns(), "Creation of HC4 contractor given a bad " <<
                              " function index " << i);
 }
 
-Proof HC4Contractor::contract(IntervalBox& box)
+Proof ContractorHC4::contract(IntervalBox& box)
 {
    LOG_LOW("HC4 contractor @ " << if_ << " on " << box);
 
@@ -33,22 +33,22 @@ Proof HC4Contractor::contract(IntervalBox& box)
    return proof;
 }
 
-void HC4Contractor::print(std::ostream& os) const
+void ContractorHC4::print(std::ostream& os) const
 {
    os << "HC4 contractor / function " << " @ " << if_;
 }
 
-size_t HC4Contractor::getFunIndex() const
+size_t ContractorHC4::getFunIndex() const
 {
    return if_;
 }
 
-SharedDag HC4Contractor::getDag() const
+SharedDag ContractorHC4::getDag() const
 {
    return dag_;
 }
 
-Scope HC4Contractor::scope() const
+Scope ContractorHC4::scope() const
 {
    return dag_->fun(if_)->scope();
 }

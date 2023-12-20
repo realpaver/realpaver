@@ -1,6 +1,6 @@
 #include <iostream>
 #include "realpaver/DomainBox.hpp"
-#include "realpaver/HC4Contractor.hpp"
+#include "realpaver/ContractorHC4.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
@@ -36,8 +36,8 @@ int main(void)
       cout << (*dag) << endl;
 
       SharedContractorVector pool = std::make_shared<ContractorVector>();
-      pool->push(std::make_shared<HC4Contractor>(dag, i));
-      pool->push(std::make_shared<HC4Contractor>(dag, j));
+      pool->push(std::make_shared<ContractorHC4>(dag, i));
+      pool->push(std::make_shared<ContractorHC4>(dag, j));
 
       Propagator tor(pool);
       tor.setDistTol(Tolerance::makeRel(1.0e-2));

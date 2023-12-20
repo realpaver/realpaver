@@ -11,8 +11,8 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BC4Contractor.hpp"
 #include "realpaver/ConstraintContractor.hpp"
+#include "realpaver/ContractorHC4.hpp"
 #include "realpaver/DomainContractor.hpp"
-#include "realpaver/HC4Contractor.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ListContractor.hpp"
 #include "realpaver/Logger.hpp"
@@ -154,7 +154,7 @@ void NcspSolver::makeContractor()
          size_t j = dag_->insert(c);
 
          if (base == "HC4")
-            op = std::make_shared<HC4Contractor>(dag_, j);
+            op = std::make_shared<ContractorHC4>(dag_, j);
 
          else if (base == "BC4")
          {

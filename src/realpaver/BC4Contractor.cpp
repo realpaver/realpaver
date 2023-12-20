@@ -19,7 +19,7 @@ BC4Contractor::BC4Contractor(SharedDag dag, size_t i)
         hc4_(nullptr),
         bc3_()
 {
-   hc4_ = new HC4Contractor(dag, i);
+   hc4_ = new ContractorHC4(dag, i);
 
    DagFun* f = dag->fun(i);
    Scope s = f->scope();

@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_HC4_CONTRACTOR_HPP
-#define REALPAVER_HC4_CONTRACTOR_HPP
+#ifndef REALPAVER_CONTRACTOR_HC4_HPP
+#define REALPAVER_CONTRACTOR_HC4_HPP
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/Dag.hpp"
@@ -24,7 +24,7 @@ namespace realpaver {
 ///
 /// The expression of the constraint comes from a DAG.
 ///////////////////////////////////////////////////////////////////////////////
-class HC4Contractor : public Contractor {
+class ContractorHC4 : public Contractor {
 public:
    /// Creates a contractor
    /// @param dag a DAG
@@ -32,16 +32,16 @@ public:
    ///
    /// We have 0 <= i < dag->nbFuns().
    /// This does not own the dag.
-   HC4Contractor(SharedDag dag, size_t i);
+   ContractorHC4(SharedDag dag, size_t i);
 
    /// Default copy constructor
-   HC4Contractor(const HC4Contractor&) = default;
+   ContractorHC4(const ContractorHC4&) = default;
 
    /// Default assignment operator
-   HC4Contractor& operator=(const HC4Contractor&) = delete;
+   ContractorHC4& operator=(const ContractorHC4&) = delete;
 
    /// Default destructor
-   ~HC4Contractor() = default;
+   ~ContractorHC4() = default;
 
    ///@{
    Scope scope() const override;
