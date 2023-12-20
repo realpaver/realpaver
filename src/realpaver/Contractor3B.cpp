@@ -46,48 +46,79 @@ Variable Contractor3B::getVar() const
 
 void Contractor3B::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a 3b contractor");
+   ASSERT(scope().contains(v), "Bad variable " << v << " in a 3B contractor");
 
    v_ = v;
 }
 
 Proof Contractor3B::contract(IntervalBox& box)
 {
-   slicer_->apply(box.get(v_));
+   Interval dom = box.get(v_);
+   slicer_->apply(dom);
+   size_t nbs = slicer_->nbSlices();
 
-   if (slicer_->nbSlices() == 1) return op_->contract(box);
+   if (nbs == 1)
+      return op_->contract(box);
 
+   // left to right
+   size_t nbl = 0;               // number of left inconsistent facets
+   auto it = slicer_->begin();   // iterator on the first slice
+   bool iter = true;
+   Interval lslice;
 
-/* TODO
- 
-   IntervalBox* init = box.clone();
-   Proof proof = Proof::Empty, certif;
-
-   for (auto it = slicer_->begin(); it != slicer_->end(); ++it)
+   while (iter)
    {
-      IntervalBox* slice = init->clone();
-      slice->set(v_, *it);
-      certif = op_->contract(*slice);
-   
-      if (certif != Proof::Empty)
+      IntervalBox* facet = box.clone();
+      lslice = *it;
+      facet->set(v_, lslice);
+
+      Proof certif = op_->contract(*facet);
+      if (certif == Proof::Empty)
       {
-         if (proof == Proof::Empty)
-         {
-            box.setOnScope(*slice, scope());
-            proof = certif;
-         }
-         else
-         {
-            box.glueOnScope(*slice, scope());
-            proof = std::min(proof, certif);
-         }
+         ++nbl;
+         ++it;
+         if (nbl == nbs) iter = false;
       }
-      delete slice;
+      else
+         iter = false;
+
+      delete facet;
    }
 
-   delete init;
-   return proof;
-*/
+   if (nbl == nbs) return Proof::Empty;
+
+   // right to left
+   size_t nbr = 0;               // number of right inconsistent facets
+   auto jt = slicer_->rbegin();
+   iter = true;
+   Interval rslice;
+
+   while (iter)
+   {
+      IntervalBox* facet = box.clone();
+      rslice = *jt;
+      facet->set(v_, rslice);
+
+      Proof certif = op_->contract(*facet);
+      if (certif == Proof::Empty)
+      {
+         ++nbr;
+         ++jt;
+         if (nbr == nbs - nbl - 1)
+         {
+            iter = false;
+            rslice = *jt;
+         }
+      }
+      else
+         iter = false;
+
+      delete facet;
+   }
+
+   box.set(v_, Interval(lslice.left(), rslice.right()));
+
+   return Proof::Maybe;
 }
 
 void Contractor3B::print(std::ostream& os) const

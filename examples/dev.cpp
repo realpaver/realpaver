@@ -1,4 +1,6 @@
 #include <iostream>
+#include "realpaver/Contractor3B.hpp"
+#include "realpaver/ConstraintContractor.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
@@ -13,17 +15,23 @@ int main(void)
 {
    try
    {
-      IntervalPartitionMaker slicer(10);
-      slicer.apply(Interval(0,99));
-      auto it = slicer.begin();
-      
-      std::advance(it, 3);
-      
-      while (it != slicer.end())
-      {
-         cout << (*it) << endl;
-         ++it;
-      }
+
+      Problem P;
+      Variable x = P.addRealVar(0, 10, "x");
+      Constraint c( in(x, Interval(0.5, 1)) );
+
+      Scope scop( {x} );
+      IntervalBox B(scop);
+      cout << B << endl;
+
+      shared_ptr<Contractor> ctc = make_shared<ConstraintContractor>(c);
+      unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(10);
+
+      Contractor3B ctc3b(ctc, x, std::move(slicer));
+
+      Proof proof = ctc3b.contract(B);
+      cout << proof << endl;
+      cout << B << endl;
 
 /*
       

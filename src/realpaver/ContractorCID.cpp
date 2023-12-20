@@ -55,7 +55,8 @@ Proof ContractorCID::contract(IntervalBox& box)
 {
    slicer_->apply(box.get(v_));
 
-   if (slicer_->nbSlices() == 1) return op_->contract(box);
+   if (slicer_->nbSlices() == 1)
+      return op_->contract(box);
 
    IntervalBox* init = box.clone();
    Proof proof = Proof::Empty, certif;
