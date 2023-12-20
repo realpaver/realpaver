@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_BC3_CONTRACTOR_HPP
-#define REALPAVER_BC3_CONTRACTOR_HPP
+#ifndef REALPAVER_CONTRACTOR_BC3_HPP
+#define REALPAVER_CONTRACTOR_BC3_HPP
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
@@ -31,22 +31,22 @@ namespace realpaver {
 /// at the bounds of domains. The peel factor is a percentage of the width of
 /// an interval.
 //////////////////////////////////////////////////////////////////////////////////
-class BC3Contractor : public Contractor {
+class ContractorBC3 : public Contractor {
 public:
    /// Creates a contractor
    /// @param dag a DAG
    /// @param i index of a function in the DAG
    /// @param v a variable occurring in the function
-   BC3Contractor(SharedDag dag, size_t i, Variable v);
+   ContractorBC3(SharedDag dag, size_t i, Variable v);
 
    /// Destructor
-   ~BC3Contractor();
+   ~ContractorBC3();
 
    /// No copy
-   BC3Contractor(const BC3Contractor&) = delete;
+   ContractorBC3(const ContractorBC3&) = delete;
 
    /// No assignment
-   BC3Contractor& operator=(const BC3Contractor&) = delete;
+   ContractorBC3& operator=(const ContractorBC3&) = delete;
 
    /// @return the peel factor
    double getPeelFactor() const;

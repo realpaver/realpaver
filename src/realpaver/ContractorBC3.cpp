@@ -9,12 +9,12 @@
 
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/BC3Contractor.hpp"
+#include "realpaver/ContractorBC3.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
 
-BC3Contractor::BC3Contractor(SharedDag dag, size_t i, Variable v)
+ContractorBC3::ContractorBC3(SharedDag dag, size_t i, Variable v)
       : f_(dag, i, v),
         peeler_(Param::GetDblParam("BC3_PEEL_FACTOR")),
         maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))
@@ -22,47 +22,47 @@ BC3Contractor::BC3Contractor(SharedDag dag, size_t i, Variable v)
    newton_ = new UniIntervalNewton();
 }
 
-BC3Contractor::~BC3Contractor()
+ContractorBC3::~ContractorBC3()
 {
    delete newton_;
 }
 
-double BC3Contractor::getPeelFactor() const
+double ContractorBC3::getPeelFactor() const
 {
    return peeler_.getFactor();
 }
 
-void BC3Contractor::setPeelFactor(double f)
+void ContractorBC3::setPeelFactor(double f)
 {
    peeler_.setFactor(f);
 }
 
-size_t BC3Contractor::getMaxIter() const
+size_t ContractorBC3::getMaxIter() const
 {
    return maxiter_;
 }
 
-void BC3Contractor::setMaxIter(size_t val)
+void ContractorBC3::setMaxIter(size_t val)
 {
    maxiter_ = val;
 }
 
-UniIntervalNewton* BC3Contractor::getNewton() const
+UniIntervalNewton* ContractorBC3::getNewton() const
 {
    return newton_;
 }
 
-Proof BC3Contractor::shrinkLeft(const Interval& x, Interval& res)
+Proof ContractorBC3::shrinkLeft(const Interval& x, Interval& res)
 {
    return shrink(x, res, splitLeft, peelLeft);
 }
 
-Proof BC3Contractor::shrinkRight(const Interval& x, Interval& res)
+Proof ContractorBC3::shrinkRight(const Interval& x, Interval& res)
 {
    return shrink(x, res, splitRight, peelRight);   
 }
 
-Proof BC3Contractor::isConsistent(const Interval& x)
+Proof ContractorBC3::isConsistent(const Interval& x)
 {
    Interval e = f_.eval(x);
    const Interval& image = f_.getFun()->getImage();
@@ -80,12 +80,12 @@ Proof BC3Contractor::isConsistent(const Interval& x)
       return Proof::Maybe;
 }
 
-Scope BC3Contractor::scope() const
+Scope ContractorBC3::scope() const
 {
    return f_.getFun()->scope();
 }
 
-bool BC3Contractor::splitLeft(const Interval& x, Interval& x1, Interval& x2)
+bool ContractorBC3::splitLeft(const Interval& x, Interval& x1, Interval& x2)
 {
    double c = x.midpoint();
    x1 = Interval(c,x.right());
@@ -93,7 +93,7 @@ bool BC3Contractor::splitLeft(const Interval& x, Interval& x1, Interval& x2)
    return x.strictlyContains(c);
 }
 
-bool BC3Contractor::splitRight(const Interval& x, Interval& x1, Interval& x2)
+bool ContractorBC3::splitRight(const Interval& x, Interval& x1, Interval& x2)
 {
    double c = x.midpoint();
    x1 = Interval(x.left(), c);
@@ -101,21 +101,21 @@ bool BC3Contractor::splitRight(const Interval& x, Interval& x1, Interval& x2)
    return x.strictlyContains(c);
 }
 
-void BC3Contractor::peelLeft(const Interval& x, IntervalPeeler& peeler,
+void ContractorBC3::peelLeft(const Interval& x, IntervalPeeler& peeler,
                              Interval& b, Interval& r)
 {
    b = peeler.peelLeft(x);
    r = Interval(b.right(), x.right());
 }
 
-void BC3Contractor::peelRight(const Interval& x, IntervalPeeler& peeler,
+void ContractorBC3::peelRight(const Interval& x, IntervalPeeler& peeler,
                               Interval& b, Interval& r)
 {
    b = peeler.peelRight(x);
    r = Interval(x.left(), b.left());
 }
 
-Proof BC3Contractor::shrink(const Interval& x, Interval& res,
+Proof ContractorBC3::shrink(const Interval& x, Interval& res,
                             SplitFun split_fun, PeelFun peel_fun)
 {
    std::stack<Interval> stak;
@@ -173,7 +173,7 @@ Proof BC3Contractor::shrink(const Interval& x, Interval& res,
    return Proof::Empty;
 }
 
-Proof BC3Contractor::contract(IntervalBox& box)
+Proof ContractorBC3::contract(IntervalBox& box)
 {
    Interval lsol, rsol;
    Proof proof, certif;
@@ -210,7 +210,7 @@ Proof BC3Contractor::contract(IntervalBox& box)
    return std::max(proof,certif);
 }
 
-void BC3Contractor::print(std::ostream& os) const
+void ContractorBC3::print(std::ostream& os) const
 {
    os << "BC3 contractor #" << f_.getFun()->index();
 }
