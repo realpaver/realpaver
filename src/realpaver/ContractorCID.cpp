@@ -24,14 +24,17 @@ ContractorCID::ContractorCID(SharedContractor op, Variable v,
    ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
 }
 
-ContractorCID::ContractorCID(SharedContractor op,
-                             std::unique_ptr<IntervalSlicer> slicer)
-      : op_(op),
-        v_(),
-        slicer_(std::move(slicer))
+ContractorCID::ContractorCID(SharedContractor op, Variable v, size_t n)
+         : op_(op),
+           v_(v),
+           slicer_(nullptr)
 {
    ASSERT(op_.get() != nullptr, "No operator in a CID contractor");
-   ASSERT(slicer_ != nullptr, "No slicer in a CID contractor");
+   ASSERT(op->scope().contains(v), "Bad variable " << v <<
+                                   " in a CID contractor");
+   ASSERT(n > 1, "Bad number of slices in a CID contractor");
+
+   slicer_ = std::make_unique<IntervalPartitionMaker>(n);
 }
 
 Scope ContractorCID::scope() const

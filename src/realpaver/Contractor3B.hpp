@@ -28,15 +28,15 @@ public:
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
-   /// @param a slicer
-   Contractor3B(SharedContractor op, Variable v,
-                 std::unique_ptr<IntervalSlicer> slicer);
-
-   /// Creates a contractor without any variable (to be fixed later)
-   /// @param op a contractor
    /// @param slicer a slicer
-   Contractor3B(SharedContractor op,
-                 std::unique_ptr<IntervalSlicer> slicer);
+   Contractor3B(SharedContractor op, Variable v,
+                std::unique_ptr<IntervalSlicer> slicer);
+
+   /// Creates a contractor
+   /// @param op a contractor
+   /// @param v a variable
+   /// @param n number of slices
+   Contractor3B(SharedContractor op, Variable v, size_t n);
 
    /// Default destructor
    ~Contractor3B() = default;

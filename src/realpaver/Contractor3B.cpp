@@ -24,14 +24,17 @@ Contractor3B::Contractor3B(SharedContractor op, Variable v,
    ASSERT(slicer_ != nullptr, "No slicer in a 3B contractor");
 }
 
-Contractor3B::Contractor3B(SharedContractor op,
-                             std::unique_ptr<IntervalSlicer> slicer)
-      : op_(op),
-        v_(),
-        slicer_(std::move(slicer))
+Contractor3B::Contractor3B(SharedContractor op, Variable v, size_t n)
+         : op_(op),
+           v_(v),
+           slicer_(nullptr)
 {
    ASSERT(op_.get() != nullptr, "No operator in a 3B contractor");
-   ASSERT(slicer_ != nullptr, "No slicer in a 3B contractor");
+   ASSERT(op->scope().contains(v), "Bad variable " << v <<
+                                   " in a 3B contractor");
+   ASSERT(n > 1, "Bad number of slices in a CID contractor");
+
+   slicer_ = std::make_unique<IntervalPartitionMaker>(n);
 }
 
 Scope Contractor3B::scope() const
