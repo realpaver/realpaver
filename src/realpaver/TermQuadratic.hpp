@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_QUADRATIC_TERM_HPP
-#define REALPAVER_QUADRATIC_TERM_HPP
+#ifndef REALPAVER_TERM_QUADRATIC_HPP
+#define REALPAVER_TERM_QUADRATIC_HPP
 
 #include <list>
 #include <set>
@@ -19,23 +19,23 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This represents a quadratic expression.
 ///////////////////////////////////////////////////////////////////////////////
-class QuadraticTerm {
+class TermQuadratic {
 public:
    /// Constructor of a 0 term
-   QuadraticTerm();
+   TermQuadratic();
 
    /// Constructor
    /// @param t a term to be transformed into a quadratic term
-   QuadraticTerm(const Term& t);
+   TermQuadratic(const Term& t);
 
    /// Default copy constructor
-   QuadraticTerm(const QuadraticTerm&) = default;
+   TermQuadratic(const TermQuadratic&) = default;
 
    /// No copy
-   QuadraticTerm& operator=(const QuadraticTerm&) = default;
+   TermQuadratic& operator=(const TermQuadratic&) = default;
 
    /// Default destructor
-   ~QuadraticTerm() = default;
+   ~TermQuadratic() = default;
 
    /// Adds a constant in this
    /// @param a an interval
@@ -117,7 +117,7 @@ private:
    std::set<Bilin, CompBilin> sb_;     // bilinear terms
    std::set<Lin, CompLin> sl_;         // linear terms
 
-   friend std::ostream& operator<<(std::ostream& os, const QuadraticTerm& t);
+   friend std::ostream& operator<<(std::ostream& os, const TermQuadratic& t);
 
    void sortByOcc(std::list<Variable>& lv) const;
 };
@@ -126,22 +126,22 @@ private:
 /// @param os a stream
 /// @param t quadratic term written
 /// @return a reference to the given stream
-std::ostream& operator<<(std::ostream& os, const QuadraticTerm& t);
+std::ostream& operator<<(std::ostream& os, const TermQuadratic& t);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a visitor used to transform (or not) a term into a quadratic term.
 ///////////////////////////////////////////////////////////////////////////////
-class QuadraticTermCreator : public TermVisitor {
+class TermQuadraticCreator : public TermVisitor {
 public:
    /// Constructor
    /// @param qt a pointer to the quadratic term modified by a visit
-   QuadraticTermCreator(QuadraticTerm* qt);
+   TermQuadraticCreator(TermQuadratic* qt);
 
    /// @return true if this has visited a term representing a quadratic term
    bool visitSuccessfull() const;
 
    /// @return the quadratic term in this
-   QuadraticTerm* getQuadraticTerm() const;
+   TermQuadratic* getTermQuadratic() const;
 
    ///@{
    void apply(const TermConst* t) override;
@@ -167,7 +167,7 @@ public:
    ///@}
 
 private:
-   QuadraticTerm* qt_;
+   TermQuadratic* qt_;
    bool plus_;
    bool success_;
 

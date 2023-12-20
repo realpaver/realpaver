@@ -11,7 +11,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Prover.hpp"
-#include "realpaver/ThickFunction.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
 
 namespace realpaver {
 
@@ -47,7 +47,7 @@ Prover::Prover(const Problem& p)
       {
          if (F.nbVars() == 1)
          {
-            unewton_ = new UniIntervalNewton();
+            unewton_ = new IntervalNewtonUni();
             unewton_->setMaxIter(maxiter_);
             unewton_->setLocalDTol(dtol_);
             unewton_->getInflator().setDelta(delta_);
@@ -126,7 +126,7 @@ Proof Prover::certify(IntervalBox& box)
 
       Variable v = dag_->fun(0)->scope().var(0);
       Interval x = box.get(v);
-      ThickFunction f(dag_, 0, v);
+      IntervalThickFunction f(dag_, 0, v);
       proof = unewton_->localSearch(f, x);
       box.set(v, x);
 

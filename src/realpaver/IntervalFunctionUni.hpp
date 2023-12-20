@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_UNI_INTERVAL_FUNCTION_HPP
-#define REALPAVER_UNI_INTERVAL_FUNCTION_HPP
+#ifndef REALPAVER_INTERVAL_FUNCTION_UNI_HPP
+#define REALPAVER_INTERVAL_FUNCTION_UNI_HPP
 
 #include "realpaver/Interval.hpp"
 
@@ -17,19 +17,19 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the base class of univariate interval functions.
 ///////////////////////////////////////////////////////////////////////////////
-class UniIntervalFunction {
+class IntervalFunctionUni {
 public:
    /// Default constructor
-   UniIntervalFunction() = default;
+   IntervalFunctionUni() = default;
 
    /// Default copy constructor
-   UniIntervalFunction(const UniIntervalFunction&) = default;
+   IntervalFunctionUni(const IntervalFunctionUni&) = default;
 
    /// No assignment
-   UniIntervalFunction& operator=(const UniIntervalFunction&) = delete;
+   IntervalFunctionUni& operator=(const IntervalFunctionUni&) = delete;
 
    /// Virtual destructor
-   virtual ~UniIntervalFunction();
+   virtual ~IntervalFunctionUni();
 
    /// Evaluates this
    /// @param x

@@ -7,11 +7,11 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "realpaver/UniIntervalFunction.hpp"
+#include "realpaver/IntervalFunctionUni.hpp"
 
 namespace realpaver {
 
-UniIntervalFunction::~UniIntervalFunction()
+IntervalFunctionUni::~IntervalFunctionUni()
 {}
 
 } // namespace

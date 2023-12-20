@@ -7,13 +7,13 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_UNI_INTERVAL_NEWTON_HPP
-#define REALPAVER_UNI_INTERVAL_NEWTON_HPP
+#ifndef REALPAVER_INTERVAL_NEWTON_UNI_HPP
+#define REALPAVER_INTERVAL_NEWTON_UNI_HPP
 
 #include <functional>
 #include "realpaver/Inflator.hpp"
 #include "realpaver/Tolerance.hpp"
-#include "realpaver/UniIntervalFunction.hpp"
+#include "realpaver/IntervalFunctionUni.hpp"
 
 namespace realpaver {
 
@@ -50,23 +50,23 @@ namespace realpaver {
 /// - the distance between Xk and Xk-1 is greater than a given tolerance
 /// - the method diverges
 ///////////////////////////////////////////////////////////////////////////////
-class UniIntervalNewton {
+class IntervalNewtonUni {
 public:
    /// Creates an interval Newton operator
    /// The parameters are assigned to the default values.
-   UniIntervalNewton();
+   IntervalNewtonUni();
 
    /// Contraction method
    /// @param f a univariate function
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof contract(UniIntervalFunction& f, Interval& x);
+   Proof contract(IntervalFunctionUni& f, Interval& x);
 
    /// Combines the contraction method with search
    /// @param f a univariate function
    /// @param x an interval that is possibly contracted
    /// @return a certificate of proof
-   Proof search(UniIntervalFunction& f, Interval& x);
+   Proof search(IntervalFunctionUni& f, Interval& x);
 
    /// Step of the contraction method
    /// @param f a univariate function
@@ -75,19 +75,19 @@ public:
    ///
    /// The interval x is contracted as the intersection of x and
    /// the set hull( c - f(c) / f'(x) ) where c is the midpoint of x.
-   Proof step(UniIntervalFunction& f, Interval& x);
+   Proof step(IntervalFunctionUni& f, Interval& x);
 
    /// Local search and certification method
    /// @param f a univariate function
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localSearch(UniIntervalFunction& f, Interval& x);
+   Proof localSearch(IntervalFunctionUni& f, Interval& x);
 
    /// Step of the local search method
    /// @param f a univariate function
    /// @param x an interval
    /// @return a certificate of proof
-   Proof localStep(UniIntervalFunction& f, Interval& x);
+   Proof localStep(IntervalFunctionUni& f, Interval& x);
 
    /// Sets a limit of iterations of the iterative methods
    /// @param n new value of the limit
@@ -139,8 +139,8 @@ private:
    Tolerance ldtol_;
    Inflator inflator_;
 
-   Proof shrinkLeft(UniIntervalFunction& f, Interval& x);
-   Proof shrinkRight(UniIntervalFunction& f, Interval& x);
+   Proof shrinkLeft(IntervalFunctionUni& f, Interval& x);
+   Proof shrinkRight(IntervalFunctionUni& f, Interval& x);
 };
 
 } // namespace

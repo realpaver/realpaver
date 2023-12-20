@@ -12,7 +12,7 @@
 
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/UniIntervalNewton.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 
 namespace realpaver {
 
@@ -90,7 +90,7 @@ private:
    std::vector<Item> v_;            // vector of constraints
    SharedDag dag_;                  // dag of equations
    IntervalNewton* mnewton_;        // multivariate Newton operator on the dag
-   UniIntervalNewton* unewton_;     // univariate Newton operator
+   IntervalNewtonUni* unewton_;     // univariate Newton operator
    double delta_;                   // parameter delta of inflation
    double chi_;                     // parameter chi of inflation
    size_t maxiter_;                 // maximum number of iterations

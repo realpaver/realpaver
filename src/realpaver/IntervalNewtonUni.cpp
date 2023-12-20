@@ -11,13 +11,13 @@
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
-#include "realpaver/UniIntervalNewton.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
 
-UniIntervalNewton::UniIntervalNewton() :
+IntervalNewtonUni::IntervalNewtonUni() :
    maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
    xtol_(Param::GetTolParam("XTOL")),
    dtol_(Param::GetTolParam("NEWTON_DTOL")),
@@ -25,59 +25,59 @@ UniIntervalNewton::UniIntervalNewton() :
    inflator_()
 {}
 
-size_t UniIntervalNewton::getMaxIter() const
+size_t IntervalNewtonUni::getMaxIter() const
 {
    return maxiter_;
 }
 
-void UniIntervalNewton::setMaxIter(size_t n)
+void IntervalNewtonUni::setMaxIter(size_t n)
 {
    ASSERT(n > 0, "bad parameter in the interval Interval Newton method");
 
    maxiter_ = n;
 }
 
-Tolerance UniIntervalNewton::getXTol() const
+Tolerance IntervalNewtonUni::getXTol() const
 {
    return xtol_;
 }
 
-void UniIntervalNewton::setXTol(const Tolerance& tol)
+void IntervalNewtonUni::setXTol(const Tolerance& tol)
 {
    xtol_ = tol;
 }
 
-Tolerance UniIntervalNewton::getDTol() const
+Tolerance IntervalNewtonUni::getDTol() const
 {
    return dtol_;
 }
 
-void UniIntervalNewton::setDTol(const Tolerance& tol)
+void IntervalNewtonUni::setDTol(const Tolerance& tol)
 {
    dtol_ = tol;
 }
 
-Tolerance UniIntervalNewton::getLocalDTol() const
+Tolerance IntervalNewtonUni::getLocalDTol() const
 {
    return ldtol_;
 }
 
-void UniIntervalNewton::setLocalDTol(const Tolerance& tol)
+void IntervalNewtonUni::setLocalDTol(const Tolerance& tol)
 {
    ldtol_ = tol;
 }
 
-Inflator& UniIntervalNewton::getInflator()
+Inflator& IntervalNewtonUni::getInflator()
 {
    return inflator_;
 }
 
-void UniIntervalNewton::setInflator(const Inflator& inflator)
+void IntervalNewtonUni::setInflator(const Inflator& inflator)
 {
    inflator_ = inflator;
 }
 
-Proof UniIntervalNewton::contract(UniIntervalFunction& f,
+Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
                                   Interval& x)
 {
    LOG_LOW("Interval Newton: contract " << x);
@@ -124,7 +124,7 @@ Proof UniIntervalNewton::contract(UniIntervalFunction& f,
    return proof;
 }
 
-Proof UniIntervalNewton::step(UniIntervalFunction& f, Interval& x)
+Proof IntervalNewtonUni::step(IntervalFunctionUni& f, Interval& x)
 {
    Interval fx = f.eval(x);
    Interval dx = f.diff(x);
@@ -179,7 +179,7 @@ Proof UniIntervalNewton::step(UniIntervalFunction& f, Interval& x)
    return proof;
 }
 
-Proof UniIntervalNewton::search(UniIntervalFunction& f, Interval& x)
+Proof IntervalNewtonUni::search(IntervalFunctionUni& f, Interval& x)
 {
    Proof proof = contract(f, x);
    if (proof != Proof::Maybe) return proof;
@@ -195,7 +195,7 @@ Proof UniIntervalNewton::search(UniIntervalFunction& f, Interval& x)
    return proof;
 }
 
-Proof UniIntervalNewton::shrinkLeft(UniIntervalFunction& f, Interval& x)
+Proof IntervalNewtonUni::shrinkLeft(IntervalFunctionUni& f, Interval& x)
 {
    std::stack<Interval> stak;
    stak.push(x);
@@ -229,7 +229,7 @@ Proof UniIntervalNewton::shrinkLeft(UniIntervalFunction& f, Interval& x)
    return Proof::Empty;
 }
 
-Proof UniIntervalNewton::shrinkRight(UniIntervalFunction& f, Interval& x)
+Proof IntervalNewtonUni::shrinkRight(IntervalFunctionUni& f, Interval& x)
 {
    std::stack<Interval> stak;
    stak.push(x);
@@ -263,7 +263,7 @@ Proof UniIntervalNewton::shrinkRight(UniIntervalFunction& f, Interval& x)
    return Proof::Empty;   
 }
 
-Proof UniIntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)
+Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)
 {
    Proof proof = Proof::Maybe;
    Interval y = x.midpoint();
@@ -312,7 +312,7 @@ Proof UniIntervalNewton::localSearch(UniIntervalFunction& f, Interval& x)
    return proof;
 }
 
-Proof UniIntervalNewton::localStep(UniIntervalFunction& f, Interval& x)
+Proof IntervalNewtonUni::localStep(IntervalFunctionUni& f, Interval& x)
 {
    Interval ix = inflator_.inflate(x);
    Interval fix = f.eval(ix);

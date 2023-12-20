@@ -19,7 +19,7 @@ ContractorBC3::ContractorBC3(SharedDag dag, size_t i, Variable v)
         peeler_(Param::GetDblParam("BC3_PEEL_FACTOR")),
         maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))
 {
-   newton_ = new UniIntervalNewton();
+   newton_ = new IntervalNewtonUni();
 }
 
 ContractorBC3::~ContractorBC3()
@@ -47,7 +47,7 @@ void ContractorBC3::setMaxIter(size_t val)
    maxiter_ = val;
 }
 
-UniIntervalNewton* ContractorBC3::getNewton() const
+IntervalNewtonUni* ContractorBC3::getNewton() const
 {
    return newton_;
 }

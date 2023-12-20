@@ -1,14 +1,14 @@
 #include <iostream>
 #include "realpaver/Dag.hpp"
-#include "realpaver/UniIntervalNewton.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/UniIntervalFunction.hpp"
+#include "realpaver/IntervalFunctionUni.hpp"
 
 using namespace realpaver;
 using namespace std;
 
-class MyFun : public UniIntervalFunction {
+class MyFun : public IntervalFunctionUni {
    Interval eval(const Interval& x)  { return sqr(x) - 2.0; }
    Interval diff(const Interval& x) { return 2.0*x; }
 };
@@ -17,7 +17,7 @@ int main(void)
 {
    Logger::init(LogLevel::full, "newton.log");
 
-   UniIntervalNewton newton;
+   IntervalNewtonUni newton;
    MyFun f;
    Interval I(1, 10);
 

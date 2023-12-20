@@ -12,8 +12,8 @@
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/ThickFunction.hpp"
-#include "realpaver/UniIntervalNewton.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 
 namespace realpaver {
 
@@ -65,7 +65,7 @@ public:
    /// @return the Newton operator enclosed
    ///
    /// Useful to change its parameters
-   UniIntervalNewton* getNewton() const;
+   IntervalNewtonUni* getNewton() const;
 
    ///@{
    Scope scope() const override;
@@ -74,10 +74,10 @@ public:
    ///@}
 
 private:
-   ThickFunction f_;             // univariate thick interval function
+   IntervalThickFunction f_;     // univariate thick interval function
    IntervalPeeler peeler_;       // peeling at interval bounds
    size_t maxiter_;              // maximum number of steps in shrink
-   UniIntervalNewton* newton_;   // interval Newton method
+   IntervalNewtonUni* newton_;   // interval Newton method
 
    // split functions
    typedef bool (*SplitFun)(const Interval& x, Interval& x1, Interval& x2);

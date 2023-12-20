@@ -8,40 +8,42 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ThickFunction.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
 
 namespace realpaver {
 
-ThickFunction::ThickFunction(SharedDag dag, size_t i, Variable v)
-      : dag_(dag),
+IntervalThickFunction::IntervalThickFunction(SharedDag dag, size_t i,
+                                             Variable v)
+      : IntervalFunctionUni(),
+        dag_(dag),
         f_(nullptr),
         v_(v)
 {
    f_ = dag->fun(i);
 }
 
-Interval ThickFunction::eval(const Interval& x)
+Interval IntervalThickFunction::eval(const Interval& x)
 {
    return f_->intervalEvalOnly(v_, x);
 }
 
-Interval ThickFunction::diff(const Interval& x)
+Interval IntervalThickFunction::diff(const Interval& x)
 {
    return f_->intervalDiffOnly(v_, x) ? f_->intervalDeriv(v_) :
                                         Interval::universe();
 }
 
-Interval ThickFunction::update(const IntervalBox& box)
+Interval IntervalThickFunction::update(const IntervalBox& box)
 {
    return f_->intervalEval(box);
 }
 
-Variable ThickFunction::getVar() const
+Variable IntervalThickFunction::getVar() const
 {
    return v_;
 }
 
-DagFun* ThickFunction::getFun() const
+DagFun* IntervalThickFunction::getFun() const
 {
    return f_;
 }
