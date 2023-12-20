@@ -91,7 +91,6 @@ endif
 rp_headers += [
   'AssertDebug.hpp',
   'Bitset.hpp',
-  'BC4Contractor.hpp',
   'Common.hpp',
   'config.hpp',
   'Constraint.hpp',
@@ -101,6 +100,7 @@ rp_headers += [
   'Contractor3B.hpp',
   'Contractor3BCID.hpp',
   'ContractorBC3.hpp',
+  'ContractorBC4.hpp',
   'ContractorCID.hpp',
   'ContractorCtr.hpp',
   'ContractorDom.hpp',
@@ -189,7 +189,6 @@ rp_headers += [
 rp_sources += [
   'AssertDebug.hpp',
   'Bitset.cpp',
-  'BC4Contractor.cpp',
   'Common.cpp',
   'Constraint.cpp',
   'ConstraintFixer.cpp',
@@ -198,6 +197,7 @@ rp_sources += [
   'Contractor3B.cpp',
   'Contractor3BCID.cpp',
   'ContractorBC3.cpp',
+  'ContractorBC4.cpp',
   'ContractorCID.cpp',
   'ContractorCtr.cpp',
   'ContractorDom.cpp',

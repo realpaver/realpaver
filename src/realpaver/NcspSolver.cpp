@@ -9,7 +9,7 @@
 
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/BC4Contractor.hpp"
+#include "realpaver/ContractorBC4.hpp"
 #include "realpaver/ContractorCtr.hpp"
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorDom.hpp"
@@ -159,7 +159,7 @@ void NcspSolver::makeContractor()
          else if (base == "BC4")
          {
             LOG_LOW("make BC4");
-            op = std::make_shared<BC4Contractor>(dag_, j);
+            op = std::make_shared<ContractorBC4>(dag_, j);
          }
 
          else
