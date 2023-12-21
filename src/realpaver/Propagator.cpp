@@ -102,7 +102,9 @@ Proof Propagator::contract(IntervalBox& box)
    // number of propagation steps
    size_t nb_steps = 0;
 
-   LOG_INTER("Propagator[" << dtol_ << "] on " << box);
+   LOG_NL();
+   LOG_INTER("Propagator [" << dtol_ << "]");
+   LOG_INTER("Current box: " << box);
 
    do
    {
@@ -132,11 +134,20 @@ Proof Propagator::contract(IntervalBox& box)
                   const Interval& prev = copy->get(v);
                   const Interval& curr = box.get(v);
 
+                  LOG_LOW("Propagation test on " << v.getName() << " ["
+                                                 << dtol_ << "]");
+
                   if (!dtol_.haveDistTolerance(prev, curr))
                   {
-                     LOG_LOW("Propagation on variable: " << v.getName());
-                  
+                     LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
+                                  << " -> propagation");
+
                      modif.insert(v);
+                  }
+                  else
+                  {
+                     LOG_LOW("  " << prev << " -> " << curr
+                                  << " not reduced enough");
                   }
                }
 
@@ -166,8 +177,6 @@ Proof Propagator::contract(IntervalBox& box)
    }
    while (proof != Proof::Empty && count > 0);
 
-   LOG_LOW("Propagation loops: " << nb_steps);
-
    if (proof != Proof::Empty)
    {
       proof = certif_[0];
@@ -178,6 +187,7 @@ Proof Propagator::contract(IntervalBox& box)
    delete copy;
 
    LOG_INTER(" -> " << proof << ", " << box);
+   LOG_INTER("End of propagator, " << nb_steps << " loop(s)");
 
    return proof;
 }

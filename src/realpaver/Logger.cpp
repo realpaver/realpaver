@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <ctime>
-#include <iomanip>
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -20,7 +19,8 @@ Logger::Logger() :
       level_(LogLevel::none),
       ofs_(),
       path_(""),
-      maxsize_(1048576)
+      maxsize_(1048576),
+      fprec_(8)
 {}
 
 Logger::~Logger()
@@ -93,9 +93,26 @@ void Logger::log(LogLevel level, const std::string& msg)
    if (getSize() < getMaxSize())
    {
       std::string s = LogLevelToString(level) + ".";
-      instance_.ofs_ << std::setw(7) << std::left << s;
-      instance_.ofs_ << msg << std::endl;
+      instance_.ofs_ << std::setw(7) << std::left << s
+                     << msg << std::endl;
    }
+}
+
+std::streamsize Logger::floatPrecision() const
+{
+   return fprec_;
+}
+
+std::streamsize Logger::setFloatPrecision(std::streamsize n)
+{
+   std::streamsize old = fprec_;
+   fprec_ = n;   
+   return old;
+}
+
+void Logger::newline()
+{
+   ofs_ << std::endl;
 }
 
 std::string LogLevelToString(LogLevel level)

@@ -73,6 +73,9 @@ void NcspSolver::solve()
 {
    LOG_MAIN("Input problem\n" << (*problem_));
 
+   int fp = env_->getParam()->getIntParam("FLOAT_PRECISION");
+   Logger::getInstance()->setFloatPrecision(fp);
+
    std::string pre = env_->getParam()->getStrParam("PREPROCESSING");
    if (pre == "YES")
    {
@@ -460,7 +463,6 @@ void NcspSolver::bpStep(int depthlimit)
 
 void NcspSolver::branchAndPrune()
 {
-   LOG_MAIN("**************************************************");
    LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
    LOG_INTER("Parameters\n" << *env_->getParam());
 

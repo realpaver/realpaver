@@ -11,6 +11,7 @@
 #define REALPAVER_LOGGER_HPP
 
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -74,6 +75,17 @@ public:
    /// Writes a message
    void log(LogLevel level, const std::string& msg);
 
+   /// @return the number of digits of floats when printed on a stream
+   std::streamsize floatPrecision() const;
+
+   /// Assigns the number of digits of floats when printed on a stream
+   /// @param n a number of digits
+   /// @return the value before assignment
+   std::streamsize setFloatPrecision(std::streamsize n);
+
+   /// Inserts a new line in the log file
+   void newline();
+
 private:
    static Logger instance_;   // the instance
    bool connected_;           // true if it is connected
@@ -81,6 +93,7 @@ private:
    std::ofstream ofs_;        // log file
    std::string path_;         // path of the log file
    size_t maxsize_;           // maximum size of a log file in bytes
+   std::streamsize fprec_;    // float precision (number of digits)
 
    Logger();
    ~Logger();
@@ -89,16 +102,17 @@ private:
 };
 
 #if LOG_ON
-#  define LOG(level, msg)                                   \
-   if (level <= Logger::getInstance()->getLogLevel())       \
-   {                                                        \
-      do                                                    \
-      {                                                     \
-         std::ostringstream __os;                           \
-         __os << msg;                                       \
-         Logger::getInstance()->log(level, __os.str());     \
-      }                                                     \
-      while(0);                                             \
+#  define LOG(level, msg)                                         \
+   if (level <= Logger::getInstance()->getLogLevel())             \
+   {                                                              \
+      do                                                          \
+      {                                                           \
+         std::ostringstream __os;                                 \
+         __os.precision(Logger::getInstance()->floatPrecision()); \
+         __os << msg;                                             \
+         Logger::getInstance()->log(level, __os.str());           \
+      }                                                           \
+      while(0);                                                   \
    }
 #else
 #  define LOG(level, msg)
@@ -108,6 +122,20 @@ private:
 #define LOG_INTER(msg) LOG(LogLevel::inter, msg)
 #define LOG_LOW(msg)   LOG(LogLevel::low, msg)
 #define LOG_FULL(msg)  LOG(LogLevel::full, msg)
+
+#if LOG_ON
+#  define LOG_NL()                                                \
+   if (Logger::getInstance()->getLogLevel() > LogLevel::none)     \
+   {                                                              \
+      do                                                          \
+      {                                                           \
+         Logger::getInstance()->newline();                        \
+      }                                                           \
+      while(0);                                                   \
+   }
+#else
+#  define LOG_NL()
+#endif
 
 } // namespace
 
