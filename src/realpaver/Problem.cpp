@@ -26,9 +26,29 @@ Problem::Problem(const std::string& name)
         obj_(MIN(Term(0))),
         scope_(),
         vname_(),
-        dom_(),
         id_(++NP)
 {}
+
+Variable Problem::addVar(const std::string& name)
+{
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+   std::ostringstream os;
+
+   if (name == "") os << "_v" << id;
+   else            os << name;
+
+   checkSymbol(os.str());
+
+   Variable v(os.str());
+   v.setId(id)
+    .setTolerance(Tolerance::makeAbs(0.0));
+
+   vars_.push_back(v);
+   scope_.insert(v);
+
+   return v;
+}
 
 Variable Problem::addBinaryVar(const std::string& name)
 {
@@ -41,42 +61,37 @@ Variable Problem::addBinaryVar(const std::string& name)
 
    checkSymbol(os.str());
 
-   double prevOne = Double::prevDouble(1.0);
+   std::unique_ptr<Domain> dom(new BinaryDomain());
 
    Variable v(os.str());
    v.setId(id)
-    .setDomain(Interval::zeroPlusOne())
-    .setInteger()
-    .setTolerance(Tolerance::makeAbs(prevOne));
+    .setDomain(std::move(dom))
+    .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
-   dom_.insert(std::make_pair(v, Interval::zeroPlusOne()));
 
    return v;
 }
 
-VariableVector Problem::addBinaryVars(const std::string& name, int first,
-                                      int last)
+VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
+                                           int last)
 {
    VariableVector vec(name, first, last);
-
-   double prevOne = Double::prevDouble(1.0);
 
    for (int i=first; i<=last; ++i)
    {
       Variable v = vec[i];
 
       size_t id = MAX_NB_VAR*id_ + vars_.size();
+      std::unique_ptr<Domain> dom(new BinaryDomain());
 
       v.setId(id)
-       .setDomain(Interval::zeroPlusOne())
-       .setInteger()
-       .setTolerance(Tolerance::makeAbs(prevOne));
+       .setDomain(std::move(dom))
+       .setTolerance(Tolerance::makeAbs(0.0));
 
       vars_.push_back(v);
       scope_.insert(v);
-      dom_.insert(std::make_pair(v, Interval::zeroPlusOne()));
    }
 
    return vec;
@@ -84,13 +99,12 @@ VariableVector Problem::addBinaryVars(const std::string& name, int first,
 
 Variable Problem::addIntVar(int lo, int up, const std::string& name)
 {
-   return addIntVar(Interval(lo, up), name);
+   return addIntVar(Range(lo, up), name);
 }
 
-Variable Problem::addIntVar(const Interval& x, const std::string& name)
+Variable Problem::addIntVar(const Range& r, const std::string& name)
 {
-   Interval y = round(x);
-   THROW_IF(y.isEmpty(), "Integer variable with an empty domain");
+   THROW_IF(r.isEmpty(), "Integer variable with an empty domain");
    
    size_t id = MAX_NB_VAR*id_ + vars_.size();
 
@@ -101,41 +115,63 @@ Variable Problem::addIntVar(const Interval& x, const std::string& name)
 
    checkSymbol(os.str());
 
-   double prevOne = Double::prevDouble(1.0);
+   std::unique_ptr<Domain> dom(new RangeDomain(r));
 
    Variable v(os.str());
    v.setId(id)
-    .setDomain(y)
-    .setInteger()
-    .setTolerance(Tolerance::makeAbs(prevOne));
+    .setDomain(std::move(dom))
+    .setTolerance(Tolerance::makeAbs(0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
-   dom_.insert(std::make_pair(v, y));
 
    return v;
 }
 
-VariableVector Problem::addIntVars(const std::string& name, int first, int last,
-                                   const Interval& x)
+Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
+{
+   THROW_IF(u.isEmpty(), "Integer variable with an empty domain");
+   
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+   std::ostringstream os;
+
+   if (name == "") os << "_i" << id;
+   else            os << name;
+
+   checkSymbol(os.str());
+
+   std::unique_ptr<Domain> dom(new RangeUnionDomain(u));
+
+   Variable v(os.str());
+   v.setId(id)
+    .setDomain(std::move(dom))
+    .setTolerance(Tolerance::makeAbs(0.0));
+
+   vars_.push_back(v);
+   scope_.insert(v);
+
+   return v;
+}
+
+VariableVector Problem::addIntVarVector(const std::string& name, int first, int last,
+                                        const Range& r)
 {
    VariableVector vec(name, first, last);
-
-   double prevOne = Double::prevDouble(1.0);
 
    for (int i=first; i<=last; ++i)
    {
       Variable v = vec[i];
       size_t id = MAX_NB_VAR*id_ + vars_.size();
 
+      std::unique_ptr<Domain> dom(new RangeDomain(r));
+
       v.setId(id)
-       .setDomain(x)
-       .setInteger()
-       .setTolerance(Tolerance::makeAbs(prevOne));
+       .setDomain(std::move(dom))
+       .setTolerance(Tolerance::makeAbs(0.0));
 
       vars_.push_back(v);
       scope_.insert(v);
-      dom_.insert(std::make_pair(v, x));
    }
 
    return vec;
@@ -159,21 +195,47 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
    
    checkSymbol(os.str());
 
+   std::unique_ptr<Domain> dom(new IntervalDomain(x));
+
    Variable v(os.str());
    v.setId(id)
-    .setDomain(x)
-    .setContinuous()
+    .setDomain(std::move(dom))
     .setTolerance(Param::GetTolParam("XTOL"));
 
    vars_.push_back(v);
    scope_.insert(v);
-   dom_.insert(std::make_pair(v, x));
 
    return v;
 }
 
-VariableVector Problem::addRealVars(const std::string& name, int first,
-                                    int last, const Interval& x)
+Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
+{
+   THROW_IF(u.isEmpty(), "Real variable with an empty domain");
+
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
+
+   std::ostringstream os;
+
+   if (name == "") os << "_x" << id;
+   else            os << name;
+   
+   checkSymbol(os.str());
+
+   std::unique_ptr<Domain> dom(new IntervalUnionDomain(u));
+
+   Variable v(os.str());
+   v.setId(id)
+    .setDomain(std::move(dom))
+    .setTolerance(Param::GetTolParam("XTOL"));
+
+   vars_.push_back(v);
+   scope_.insert(v);
+
+   return v;
+}
+
+VariableVector Problem::addRealVarVector(const std::string& name, int first,
+                                         int last, const Interval& x)
 {
    VariableVector vec(name, first, last);
 
@@ -182,17 +244,30 @@ VariableVector Problem::addRealVars(const std::string& name, int first,
       Variable v = vec[i];
       size_t id = MAX_NB_VAR*id_ + vars_.size();
 
+      std::unique_ptr<Domain> dom(new IntervalDomain(x));
+
       v.setId(id)
-       .setDomain(x)
-       .setContinuous()
+       .setDomain(std::move(dom))
        .setTolerance(Param::GetTolParam("XTOL"));
 
       vars_.push_back(v);
       scope_.insert(v);
-      dom_.insert(std::make_pair(v, x));
    }
 
    return vec;
+}
+
+Variable Problem::addClonedVar(Variable v)
+{
+   Variable res = v.clone();
+
+   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   res.setId(id);
+
+   vars_.push_back(res);
+   scope_.insert(res);
+
+   return res;
 }
 
 void Problem::addCtr(Constraint c)
@@ -208,41 +283,6 @@ void Problem::addCtr(const std::initializer_list<Constraint>& l)
 void Problem::addObjective(Objective obj)
 {
    obj_ = obj;
-}
-
-IntervalRegion Problem::getDomains() const
-{
-   IntervalRegion r(scope_);
-   for (auto v : scope_) r.set(v, getDomain(v));
-   return r;
-}
-
-Interval Problem::getDomain(Variable v) const
-{
-   ASSERT(scope_.contains(v),
-          "Variable " << v.getName() << "does not belong to the problem");
-
-   auto it = dom_.find(v);
-   return it->second;
-}
-
-void Problem::setDomains(const IntervalRegion& reg)
-{
-   for (auto v : reg.scope()) setDomain(v, reg.get(v));
-}
-
-void Problem::setDomain(Variable v, const Interval& x)
-{
-   ASSERT(scope_.contains(v),
-          "Variable " << v.getName() << "does not belong to the problem");
-
-   auto it = dom_.find(v);
-   it->second = x;
-}
-
-void Problem::setDomain(Variable v, double lo, double up)
-{
-   setDomain(v, Interval(lo, up));
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem& p)
@@ -304,12 +344,12 @@ bool Problem::isFakeVar(Variable v) const
    return true;
 }
 
-bool Problem::isContinuous() const
+bool Problem::isReal() const
 {
    if (nbVars() == 0) return false;
 
    for (size_t i=0; i<nbVars(); ++i)
-      if (!varAt(i).isContinuous())
+      if (!varAt(i).isReal())
          return false;
 
    return true;
@@ -320,7 +360,7 @@ bool Problem::isInteger() const
    if (nbVars() == 0) return false;
 
    for (size_t i=0; i<nbVars(); ++i)
-      if (!varAt(i).isInteger())
+      if (varAt(i).isReal())
          return false;
 
    return true;
@@ -335,7 +375,7 @@ bool Problem::isMixed() const
    for (size_t i=0; i<nbVars(); ++i)
    {
       if (varAt(i).isInteger()) dis = true;
-      if (varAt(i).isContinuous()) cont = true;
+      if (varAt(i).isReal()) cont = true;
 
       if (dis && cont) return true;
    }

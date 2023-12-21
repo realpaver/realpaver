@@ -170,9 +170,9 @@ public:
    virtual void print(std::ostream& os) const = 0;
 
    /// Interval evaluation of this
-   /// @param reg the variable domains
+   /// @param box the variable domains
    /// The result is assigned in the interval value enclosed in this.
-   virtual void eval(const IntervalRegion& reg) = 0;
+   virtual void eval(const IntervalBox& box) = 0;
 
    /// Interval evaluation of this
    /// @param pt the variable values
@@ -188,11 +188,11 @@ public:
    virtual void evalOnly(const Variable& v, const Interval& x) = 0;
 
    /// Interval projection
-   /// @param reg the variable domains
+   /// @param box the variable domains
    ///
    /// It assumes that an interval evaluation has been done.
-   /// The new projections are assigned in reg.
-   virtual void proj(IntervalRegion& reg) = 0;
+   /// The new projections are assigned in the box.
+   virtual void proj(IntervalBox& box) = 0;
 
    /// Interval differentiation in reverse mode
    /// @return false if some operation at this node is not continuous
@@ -247,10 +247,10 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval(const IntervalRegion& reg) override;
+   void eval(const IntervalBox& box) override;
    void eval(const RealPoint& pt) override;
    void evalOnly(const Variable& v, const Interval& x) override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
@@ -282,10 +282,10 @@ public:
    size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval(const IntervalRegion& reg) override;
+   void eval(const IntervalBox& box) override;
    void eval(const RealPoint& pt) override;
    void evalOnly(const Variable& v, const Interval& x) override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
@@ -340,7 +340,7 @@ public:
    ///@{
    virtual size_t nbOccurrences(const Variable& v) const override;
    virtual void print(std::ostream& os) const override;
-   void eval(const IntervalRegion& reg) override;
+   void eval(const IntervalBox& box) override;
    void eval(const RealPoint& pt) override;
    void evalOnly(const Variable& v, const Interval& x) override;
    bool diffOnly(const Variable& v) override;
@@ -364,7 +364,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -384,7 +384,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -404,7 +404,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -424,7 +424,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -444,7 +444,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -464,7 +464,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -484,7 +484,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -504,7 +504,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -524,7 +524,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -544,7 +544,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -564,7 +564,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -590,7 +590,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -613,7 +613,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -633,7 +633,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -653,7 +653,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -673,7 +673,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -693,7 +693,7 @@ public:
    ///@{
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -714,7 +714,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalRegion& reg) override;
+   void proj(IntervalBox& box) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -828,9 +828,9 @@ public:
    void setScope(Scope s);
 
    /// Interval evaluation of this
-   /// @param reg the variable domains
-   /// @return the evaluation of this at reg
-   Interval intervalEval(const IntervalRegion& reg);
+   /// @param box the variable domains
+   /// @return the evaluation of this in the box
+   Interval intervalEval(const IntervalBox& box);
 
   /// Interval evaluation
    /// @param pt variable values
@@ -848,30 +848,27 @@ public:
    Interval intervalEvalOnly(const Variable& v, const Interval& x);
 
    /// HC4Revise contractor
-   /// @param reg the variable domains
+   /// @param box the variable domains
    /// @return a certificate of proof
    ///
-   /// The projections of this onto its variables are assigned in
-   /// the given region.
-   Proof hc4Revise(IntervalRegion& reg);
+   /// The projections of this onto its variables are assigned in the given box.
+   Proof hc4Revise(IntervalBox& box);
 
    /// HC4Revise contractor on the constraint negation
-   /// @param reg the variable domains
+   /// @param box the variable domains
    /// @return a certificate of proof
    ///
-   /// The projections of this onto its variables are assigned in
-   /// the given region.
-   Proof hc4ReviseNeg(IntervalRegion& reg);
+   /// The projections of this onto its variables are assigned in the given box.
+   Proof hc4ReviseNeg(IntervalBox& box);
 
    /// HC4Revise contractor with node sharing
-   /// @param reg the variable domains
+   /// @param box the variable domains
    /// @return a certificate of proof
    ///
-   /// The projections of this onto its variables are assigned in
-   /// the given region.
+   /// The projections of this onto its variables are assigned in the given box.
    ///
    /// It assumes that a DagContext has been initialized.
-   Proof sharedHc4Revise(IntervalRegion& reg);
+   Proof sharedHc4Revise(IntervalBox& box);
 
    /// Calculates the violation of the underlying constraint
    /// @return 0.0 if the constraint is satisfied, a positive real number
@@ -974,7 +971,7 @@ private:
 
    // backward phase of the Hc4Revise contractor
    // to be called after the assignment of the projection over the root node 
-   Proof hc4ReviseBack(IntervalRegion& reg);
+   Proof hc4ReviseBack(IntervalBox& box);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1127,18 +1124,18 @@ public:
    void reduceDom(size_t i, const Interval& x);
 
    /// Interval evaluation
-   /// @param reg domains of variables
+   /// @param box domains of variables
    /// @return false if an empty interval occurs in the computation
-   bool intervalEval(const IntervalRegion& reg);
+   bool intervalEval(const IntervalBox& box);
 
    /// Interval evaluation
-   /// @param reg domains of variables
+   /// @param box domains of variables
    /// @param val output vector such that v[i] is the value of the i-th function
    /// @return false if the output vector is empty
-   bool intervalEval(const IntervalRegion& reg, IntervalVector& val);
+   bool intervalEval(const IntervalBox& box, IntervalVector& val);
 
    /// Interval evaluation
-   /// @param reg domains of variables
+   /// @param pt values of variables
    /// @param val output vector such that v[i] is the value of the i-th function
    /// @return false if the output vector is empty
    bool intervalPointEval(const RealPoint& pt, IntervalVector& val);
@@ -1148,9 +1145,9 @@ public:
    void intervalDiff(IntervalMatrix& jac);
 
    /// Interval differentiation for square systems using Hansen's method
-   /// @param reg domains of variables
+   /// @param box domains of variables
    /// @param jac resulting matrix of partial derivatives of this
-   void hansenDiff(const IntervalRegion& reg, IntervalMatrix& jac);
+   void hansenDiff(const IntervalBox& box, IntervalMatrix& jac);
 
    /// Calculates the violation of the constraints
    /// @param viol output vector such that viol[i] is the violation of the i-th

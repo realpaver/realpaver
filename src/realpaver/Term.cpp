@@ -187,18 +187,18 @@ Interval Term::evalConst() const
    return rep_->evalConst();
 }
 
-Interval Term::eval(const IntervalRegion& reg) const
+Interval Term::eval(const IntervalBox& box) const
 {
-   rep_->eval(reg);
+   rep_->eval(box);
    return rep_->ival_;
 }
 
-Interval Term::hc4ReviseForward(const IntervalRegion& reg) const
+Interval Term::hc4ReviseForward(const IntervalBox& box) const
 {
-   return eval(reg);
+   return eval(box);
 }
 
-Proof Term::hc4ReviseBackward(IntervalRegion& reg, const Interval& img)
+Proof Term::hc4ReviseBackward(IntervalBox& box, const Interval& img)
 {
    if (rep_->ival_.isEmpty())       return Proof::Empty;
    if (img.isDisjoint(rep_->ival_)) return Proof::Empty;
@@ -206,7 +206,7 @@ Proof Term::hc4ReviseBackward(IntervalRegion& reg, const Interval& img)
 
    rep_->ival_ &= img;
 
-   return rep_->contract(reg);   
+   return rep_->contract(box);   
 }
 
 void Term::acceptVisitor(TermVisitor& vis) const
@@ -249,16 +249,6 @@ bool Term::isNumber() const
    return rep_->isNumber();
 }
 
-bool Term::isConstant() const
-{
-   return rep_->isConstant();
-}
-
-bool Term::isLinear() const
-{
-   return rep_->isLinear();
-}
-
 bool Term::isVar() const
 {
    return rep_->isVar();
@@ -294,6 +284,16 @@ bool Term::isLin() const
    return rep_->isLin();
 }
 
+bool Term::isConstant() const
+{
+   return rep_->isConstant();
+}
+
+bool Term::isLinear() const
+{
+   return rep_->isLinear();
+}
+
 bool Term::isSumOfSquares() const
 {
    SumOfSquaresCreator creator;
@@ -319,10 +319,10 @@ Scope Term::scope() const
    return s;
 }
 
-Proof Term::contract(IntervalRegion& reg, const Interval& img)
+Proof Term::contract(IntervalBox& box, const Interval& img)
 {
-   hc4ReviseForward(reg);
-   return hc4ReviseBackward(reg, img);
+   hc4ReviseForward(box);
+   return hc4ReviseBackward(box, img);
 }
 
 std::ostream& operator<<(std::ostream& os, const Term& t)
@@ -976,12 +976,12 @@ Interval TermConst::evalConst() const
    return x_;
 }
 
-void TermConst::eval(const IntervalRegion& reg)
+void TermConst::eval(const IntervalBox& box)
 {
    ival_ = x_;
 }
 
-Proof TermConst::contract(IntervalRegion& reg)
+Proof TermConst::contract(IntervalBox& box)
 {
    return Proof::Maybe;
 }
@@ -1063,20 +1063,20 @@ Interval TermVar::evalConst() const
    return Interval::universe();
 }
 
-void TermVar::eval(const IntervalRegion& reg)
+void TermVar::eval(const IntervalBox& box)
 {
-   ival_ = reg.get(v_);
+   ival_ = box.get(v_);
 }
 
-Proof TermVar::contract(IntervalRegion& reg)
+Proof TermVar::contract(IntervalBox& box)
 {
-   ival_ &= reg.get(v_);
+   ival_ &= box.get(v_);
 
 #if LOG_ON
    LOG_FULL("term contract variable " << v_.getName() << " -> " << ival_);
 #endif
 
-   reg.set(v_, ival_);
+   box.set(v_, ival_);
    return ival_.isEmpty() ? Proof::Empty : Proof::Maybe;
 }
 
@@ -1145,6 +1145,36 @@ TermOp::TermOp(const SharedRep& l, const SharedRep& r, OpSymbol op,
 TermOp::~TermOp()
 {}
 
+bool TermOp::isAdd() const
+{
+   return op_ == OpSymbol::Add;
+}
+
+bool TermOp::isSub() const
+{
+   return op_ == OpSymbol::Sub;
+}
+
+bool TermOp::isMul() const
+{
+   return op_ == OpSymbol::Mul;
+}
+
+bool TermOp::isDiv() const
+{
+   return op_ == OpSymbol::Div;
+}
+
+bool TermOp::isUsb() const
+{
+   return op_ == OpSymbol::Usb;
+}
+
+bool TermOp::isLin() const
+{
+   return op_ == OpSymbol::Lin;
+}
+
 void TermOp::insert(const SharedRep& t)
 {
    v_.push_back(t);
@@ -1171,21 +1201,21 @@ void TermOp::print(std::ostream& os) const
    os << ")";
 }
 
-void TermOp::eval(const IntervalRegion& reg)
+void TermOp::eval(const IntervalBox& box)
 {
-   for (auto sub : v_) sub->eval(reg);
+   for (auto sub : v_) sub->eval(box);
 
    evalRoot();
 }
 
-Proof TermOp::contract(IntervalRegion& reg)
+Proof TermOp::contract(IntervalBox& box)
 {
    if (ival_.isEmpty()) return Proof::Empty;
 
    contractRoot();
 
    for (auto sub : v_)
-      if (sub->contract(reg) == Proof::Empty) return Proof::Empty;
+      if (sub->contract(box) == Proof::Empty) return Proof::Empty;
 
    return Proof::Maybe;
 }
@@ -1287,11 +1317,6 @@ bool TermAdd::isLinear() const
    return left()->isLinear() && right()->isLinear();
 }
 
-bool TermAdd::isAdd() const
-{
-   return true;
-}
-
 TermRep* TermAdd::cloneRoot() const
 {
    return new TermAdd(left(), right());
@@ -1352,11 +1377,6 @@ void TermSub::acceptVisitor(TermVisitor& vis) const
 bool TermSub::isLinear() const
 {
    return left()->isLinear() && right()->isLinear();
-}
-
-bool TermSub::isSub() const
-{
-   return true;
 }
 
 TermRep* TermSub::cloneRoot() const
@@ -1431,11 +1451,6 @@ bool TermMul::isLinear() const
           (left()->isLinear() && right()->isConstant());
 }
 
-bool TermMul::isMul() const
-{
-   return true;
-}
-
 TermRep* TermMul::cloneRoot() const
 {
    return new TermMul(left(), right());
@@ -1498,11 +1513,6 @@ void TermDiv::print(std::ostream& os) const
 void TermDiv::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
-}
-
-bool TermDiv::isDiv() const
-{
-   return true;
 }
 
 TermRep* TermDiv::cloneRoot() const
@@ -1624,11 +1634,6 @@ void TermUsb::acceptVisitor(TermVisitor& vis) const
 bool TermUsb::isLinear() const
 {
    return child()->isLinear();
-}
-
-bool TermUsb::isUsb() const
-{
-   return true;
 }
 
 void TermUsb::print(std::ostream& os) const
@@ -2222,7 +2227,7 @@ Interval TermLin::evalConst() const
    return cst_;
 }
 
-void TermLin::eval(const IntervalRegion& reg)
+void TermLin::eval(const IntervalBox& box)
 {
    ival_ = cst_;
 
@@ -2232,12 +2237,12 @@ void TermLin::eval(const IntervalRegion& reg)
       // we do that since the modification of ival does not affect the ordering
       // of the elements (only the variable identifiers are used as keys)
       Item& itm = const_cast<Item&>(citm);
-      itm.ival = itm.coef * reg.get(itm.var);
+      itm.ival = itm.coef * box.get(itm.var);
       ival_ += itm.ival;
    }
 }
 
-Proof TermLin::contract(IntervalRegion& reg)
+Proof TermLin::contract(IntervalBox& box)
 {
    for (auto it=terms_.begin(); it!=terms_.end(); ++it)
    {
@@ -2257,9 +2262,9 @@ Proof TermLin::contract(IntervalRegion& reg)
          ++jt;
       }
 
-      Interval dom = reg.get(it->var);
+      Interval dom = box.get(it->var);
       dom = mulPY(it->coef, dom, x);
-      reg.set(it->var, dom);
+      box.set(it->var, dom);
 
       if (dom.isEmpty())
          return Proof::Empty;
@@ -2274,11 +2279,6 @@ void TermLin::acceptVisitor(TermVisitor& vis) const
 }
 
 bool TermLin::isLinear() const
-{
-   return true;
-}
-
-bool TermLin::isLin() const
 {
    return true;
 }

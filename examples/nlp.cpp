@@ -25,10 +25,10 @@ int main(void)
       NLPSolver optimizer(f, G);
       optimizer.setAlgorithm("NLOPT_SLSQP");
 
-      IntervalRegion reg = problem.getDomains();
-      RealPoint src = reg.midpoint();
+      IntervalBox box(problem.scope());
+      RealPoint src = box.midpoint();
    
-      OptimizationStatus status = optimizer.minimize(reg, src);
+      OptimizationStatus status = optimizer.minimize(box, src);
       cout << "Status.......... " << status << endl;
    
       if (status == OptimizationStatus::Optimal)

@@ -11,7 +11,7 @@
 #define REALPAVER_VARIABLE_HPP
 
 #include <memory>
-#include "realpaver/Interval.hpp"
+#include "realpaver/Domain.hpp"
 #include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
@@ -31,8 +31,8 @@ public:
    /// No assignment
    VariableRep& operator=(const VariableRep&) = delete;
 
-   /// Default destructor
-   ~VariableRep() = default;
+   /// Destructor
+   ~VariableRep();
 
    /// @return the unique identifier of this
    size_t id() const;
@@ -49,23 +49,20 @@ public:
    void setName(const std::string& name);
 
    /// @return the domain of this
-   Interval getDomain() const;
+   Domain* getDomain() const;
 
    /// Sets the domain of this
-   /// @param x new domain of this
-   void setDomain(const Interval& x);
+   /// @param dom new domain of this
+   void setDomain(Domain* dom);
+
+   /// @return true if this is a binary variable, false otherwise
+   bool isBinary() const;
 
    /// @return true if this is an integer variable, false otherwise
    bool isInteger() const;
 
-   /// Sets this as an integer variable
-   void setInteger();
-
-   /// @return true if this is continuous, false otherwise
-   bool isContinuous() const;
-
-   /// Sets this as a continuous variable
-   void setContinuous();
+   /// @return true if this is a real variable, false otherwise
+   bool isReal() const;
 
    /// @return the hash code of this
    size_t hashCode() const;
@@ -80,8 +77,7 @@ public:
 private:
    std::string name_;
    size_t id_;
-   Interval domain_;
-   bool continuous_;
+   Domain* dom_;
    Tolerance tol_;
 
    static int NEXT_ID;
@@ -97,20 +93,9 @@ class Variable {
 public:
    /// Creates a variable
    /// @param name of the variable
+   ///
+   /// The default domain is the interval universe.
    Variable(const std::string& name);
-
-   /// Creates a variable
-   /// @param x variable domain
-   /// @param name of the variable
-   /// @param x variable domain
-   Variable(const Interval& x, const std::string& name);
-
-   /// Creates a variable
-   /// @param x variable domain
-   /// @param name of the variable
-   /// @param lo lower bound of the variable domain
-   /// @param up upper bound of the variable domain
-   Variable(double lo, double up, const std::string& name);
 
    /// Creates a variable having no representation
    Variable();
@@ -139,37 +124,22 @@ public:
    Variable& setName(const std::string& name);
 
    /// @return the domain of this
-   Interval getDomain() const;
+   Domain* getDomain() const;
 
    /// Sets the domain of this
-   /// @param x new domain of this
-   Variable& setDomain(const Interval& x);
-
-   /// Sets the domain of this
-   /// @param lo lower bound
-   /// @param up upper bound
-   Variable& setDomain(double lo, double up);
-
-   /// @return true if this is an integer variable, false otherwise
-   bool isInteger() const;
-
-   /// Sets this as an integer variable
-   /// @return a reference to this
-   Variable& setInteger();
+   /// @param dom new domain of this
+   ///
+   /// throws an exception if dom is null
+   Variable& setDomain(std::unique_ptr<Domain> dom);
 
    /// @return true if this is an integer variable in [0, 1]
    bool isBinary() const;
 
-   /// Sets this as an integer variable  in [0, 1]
-   /// @return a reference to this
-   Variable& setBinary();
+   /// @return true if this is an integer variable, false otherwise
+   bool isInteger() const;
 
-   /// @return true if this is continuous, false otherwise
-   bool isContinuous() const;
-
-   /// Sets this as a continuous variable
-   /// @return a reference to this
-   Variable& setContinuous();
+   /// @return true if this is a real variable, false otherwise
+   bool isReal() const;
 
    /// @return the hash code of this
    size_t hashCode() const;

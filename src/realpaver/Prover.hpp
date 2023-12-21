@@ -12,11 +12,16 @@
 
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This provides proof certificates for solutions.
+///
+/// Given a set of constraints {C1, ..., Cm} and a box B, the certification
+/// process is as follows:
+/// - 
 ///////////////////////////////////////////////////////////////////////////////
 class Prover {
 public:
@@ -34,10 +39,10 @@ public:
    Prover& operator=(const Prover&) = delete;
 
    /// Certification method
-   /// @param reg a region
-   /// @return a certificate of proof of reg with respect to the constraints
+   /// @param box a box
+   /// @return a certificate of proof of the box with respect to the constraints
    ///         of the given problem
-   Proof certify(IntervalRegion& reg);
+   Proof certify(IntervalBox& box);
 
    /// Sets a limit of iterations of the Newton operator
    /// @param n new value of the limit
@@ -64,7 +69,7 @@ public:
    /// @param val new value
    void setInflationChi(const double& val);
 
-   /// @return the tolerance on the distance between two consecutive regions
+   /// @return the tolerance on the distance between two consecutive boxes
    ///         in the certification technique of the Newton operator
    Tolerance getDTol() const;
 
@@ -77,11 +82,15 @@ public:
    void setDTol(const Tolerance& tol);
 
 private:
-   IntervalNewton* newton_;         // Newton operator for the equations
-   std::vector<Constraint> ctr_;    // other constraints
-   bool canprove_;                  // true if this can prove
-
-   // parameters of the certification technique of the Newton operator
+   struct Item {
+      Constraint ctr;
+      bool iseq;
+      Proof proof;
+   };
+   std::vector<Item> v_;            // vector of constraints
+   SharedDag dag_;                  // dag of equations
+   IntervalNewton* mnewton_;        // multivariate Newton operator on the dag
+   IntervalNewtonUni* unewton_;     // univariate Newton operator
    double delta_;                   // parameter delta of inflation
    double chi_;                     // parameter chi of inflation
    size_t maxiter_;                 // maximum number of iterations

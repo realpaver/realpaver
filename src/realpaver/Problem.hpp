@@ -10,11 +10,11 @@
 #ifndef REALPAVER_PROBLEM_HPP
 #define REALPAVER_PROBLEM_HPP
 
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include "realpaver/Constraint.hpp"
-#include "realpaver/IntervalRegion.hpp"
 #include "realpaver/Objective.hpp"
 #include "realpaver/VariableVector.hpp"
 
@@ -31,8 +31,8 @@ namespace realpaver {
 /// created and the static variable MAX_NB_VAR initialized to a huge value
 /// (one million), the first variable identifier is NP*MAX_NB_VAR.
 ///
-/// The variable domains define the initial region, which is an interval vector
-/// or Cartesian product of intervals with a scope.
+/// The Cartesian product of variable domains can be simply obtained by
+/// creating a domain box from the scope of this.
 ///
 /// There are several classes of problems:
 /// - Constraint Satisfaction Problems (CSPs);
@@ -53,6 +53,11 @@ public:
    /// Default destructor
    ~Problem() = default;
 
+   /// Creates a new variable with no domain yet
+   /// @param name name of the variable
+   /// @return the new variable
+   Variable addVar(const std::string& name = "");
+
    /// Creates a new variable with domain {0, 1}
    /// @param name name of the variable
    /// @return the new variable
@@ -63,7 +68,7 @@ public:
    /// @param first index of the first variable
    /// @param last index of the last variable
    /// @return the vector created
-   VariableVector addBinaryVars(const std::string& name, int first, int last);
+   VariableVector addBinaryVarVector(const std::string& name, int first, int last);
 
    /// Creates a new integer variable
    /// @param lo lower bound
@@ -73,19 +78,27 @@ public:
    Variable addIntVar(int lo, int up, const std::string& name = "");
 
    /// Creates a new integer variable
-   /// @param x variable domain
+   /// @param r variable domain
    /// @param up  bound
    /// @param name name of the variable
    /// @return the new variable
-   Variable addIntVar(const Interval& x, const std::string& name = "");
+   Variable addIntVar(const Range& r, const std::string& name = "");
+
+   /// Creates a new integer variable
+   /// @param u variable domain
+   /// @param up  bound
+   /// @param name name of the variable
+   /// @return the new variable
+   Variable addIntVar(const RangeUnion& u, const std::string& name = "");
 
    /// Creates a vector of integer variables
    /// @param name base name
    /// @param first index of the first variable
    /// @param last index of the last variable
+   /// @param r domain of every variable in this
    /// @return the vector created
-   VariableVector addIntVars(const std::string& name, int first, int last,
-                             const Interval& x = Interval::universe());
+   VariableVector addIntVarVector(const std::string& name, int first, int last,
+                                  const Range& r = Range::universe());
 
    /// Creates a new real variable
    /// @param lo lower bound
@@ -100,13 +113,25 @@ public:
    /// @return the new variable
    Variable addRealVar(const Interval& x, const std::string& name = "");
 
+   /// Creates a new real variable
+   /// @param u variable domain
+   /// @param name name of the variable
+   /// @return the new variable
+   Variable addRealVar(const IntervalUnion& u, const std::string& name = "");
+
    /// Creates a vector of integer variables
    /// @param name base name
    /// @param first index of the first variable
    /// @param last index of the last variable
+   /// @param x domain of every variable
    /// @return the vector created
-   VariableVector addRealVars(const std::string& name, int first, int last,
-                              const Interval& x = Interval::universe());
+   VariableVector addRealVarVector(const std::string& name, int first, int last,
+                                   const Interval& x = Interval::universe());
+
+   /// Creates a new real variable by cloning
+   /// @param v a variable (from this or another problem)
+   /// @return the new variable (with a new identifier) that is a clone of v
+   Variable addClonedVar(Variable v);
 
    /// @return the number of variables
    size_t nbVars() const;
@@ -150,33 +175,6 @@ public:
    /// @return the i-th constraint of this
    Constraint ctrAt(size_t i) const;
 
-   /// Gets the initial region
-   /// @return the vector of domains
-   ///
-   /// The i-th component of the vector is th domain of the i-th variable
-   /// for each i;.
-   IntervalRegion getDomains() const;
-
-   /// Gets the domain of a variable
-   /// @param v a variable
-   /// @return the domain of v
-   Interval getDomain(Variable v) const;
-
-   /// Sets the initial region
-   /// @param reg domains of variables
-   void setDomains(const IntervalRegion& reg);
-
-   /// Sets a domain in the initial region
-   /// @param v variable
-   /// @param x new initial domain of v
-   void setDomain(Variable v, const Interval& x);
-
-   /// Sets a domain in the initial region
-   /// @param v variable
-   /// @param lo lower bound
-   /// @param up upper bound
-   void setDomain(Variable v, double lo, double up);
-
    /// @return true if this is a CSP
    bool isCSP() const;
 
@@ -186,8 +184,8 @@ public:
    /// @return true if this is a COP
    bool isCOP() const;
 
-   /// @return true if this has only continuous variables
-   bool isContinuous() const;
+   /// @return true if this has only real variables
+   bool isReal() const;
 
    /// @return true if this has only integer (or binary) variables
    bool isInteger() const;
@@ -234,9 +232,8 @@ private:
    Objective obj_;                  // objective function
    Scope scope_;                    // set of variables
 
+   // set of symbols used in this problem
    std::unordered_set<std::string> vname_;
-
-   std::unordered_map<Variable, Interval, VariableHasher> dom_;
 
    // throws an exception if a name is already used as the name of a symbol
    void checkSymbol(const std::string& name);

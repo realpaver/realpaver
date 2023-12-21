@@ -11,10 +11,9 @@
 #define REALPAVER_NCSP_SPLIT_HPP
 
 #include <list>
-#include "realpaver/NcspNode.hpp"
-#include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/DomainSlicerFactory.hpp"
+#include "realpaver/NcspSelector.hpp"
 #include "realpaver/SplitStrategy.hpp"
-#include "realpaver/VariableSelector.hpp"
 
 namespace realpaver {
 
@@ -27,11 +26,11 @@ public:
    typedef SharedNcspNode NodeType;
 
    /// Creates a splitting object
-   NcspSplit(std::unique_ptr<VariableSelector> selector,
-             std::unique_ptr<IntervalSlicer> slicer);
+   NcspSplit(std::unique_ptr<NcspSelector> selector,
+             std::unique_ptr<DomainSlicerMap> smap);
 
-   /// Default destructor
-   ~NcspSplit() = default;
+   /// Deestructor
+   ~NcspSplit();
 
    /// No copy
    NcspSplit(const NcspSplit&) = delete;
@@ -47,8 +46,8 @@ public:
    typedef typename SplitStrategy<SharedNcspNode>::iterator iterator;
 
 private:
-   std::unique_ptr<VariableSelector> selector_;
-   std::unique_ptr<IntervalSlicer> slicer_;
+   NcspSelector* selector_;
+   DomainSlicerMap* smap_;
 };
 
 } // namespace

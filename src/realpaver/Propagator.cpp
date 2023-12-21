@@ -68,7 +68,7 @@ Scope Propagator::scope() const
    return pool_->scope();
 }
 
-Proof Propagator::contract(IntervalRegion& reg)
+Proof Propagator::contract(IntervalBox& box)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
@@ -87,11 +87,11 @@ Proof Propagator::contract(IntervalRegion& reg)
    // vector of proof certificates
    certif_.resize(N);
 
-   // Set of variables  used to check the domain modifications
+   // Set of variables used to check the domain modifications
    ModifSetType modif;
 
    // copy used to check the domain modifications
-   IntervalRegion* copy = reg.clone();
+   IntervalBox* copy = box.clone();
 
    // result of the algorithm
    Proof proof;
@@ -100,16 +100,17 @@ Proof Propagator::contract(IntervalRegion& reg)
    size_t next = 0;
 
    // number of propagation steps
-   size_t num_steps = 0;
+   size_t nb_steps = 0;
 
-   LOG_LOW("Propagator on region: " << reg);
-   LOG_LOW("Tolerance on the distance between regions: " << dtol_);
+   LOG_NL();
+   LOG_INTER("Propagator [" << dtol_ << "]");
+   LOG_INTER("Current box: " << box);
 
    do
    {
       // apply the next contractor from the queue
       size_t j = queue[next];
-      proof = pool_->contractorAt(j)->contract(reg);
+      proof = pool_->contractorAt(j)->contract(box);
       certif_[j] = proof;
 
       if (proof != Proof::Empty)
@@ -118,10 +119,8 @@ Proof Propagator::contract(IntervalRegion& reg)
 
          // propagation when the queue is empty
          if (next == count)
-         {            
-            LOG_LOW("Region after inner step: " << reg);
-            
-            if (++num_steps > maxiter_)
+         {                 
+            if (++nb_steps > maxiter_)
             {
                count = 0;
             }
@@ -133,13 +132,22 @@ Proof Propagator::contract(IntervalRegion& reg)
                for (auto v : scope)
                {
                   const Interval& prev = copy->get(v);
-                  const Interval& curr = reg.get(v);
+                  const Interval& curr = box.get(v);
+
+                  LOG_LOW("Propagation test on " << v.getName() << " ["
+                                                 << dtol_ << "]");
 
                   if (!dtol_.haveDistTolerance(prev, curr))
                   {
-                     LOG_LOW("Propagation on variable: " << v.getName());
-                  
+                     LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
+                                  << " -> propagation");
+
                      modif.insert(v);
+                  }
+                  else
+                  {
+                     LOG_LOW("  " << prev << " -> " << curr
+                                  << " not reduced enough");
                   }
                }
 
@@ -160,7 +168,7 @@ Proof Propagator::contract(IntervalRegion& reg)
                   // save the current box for the next propagation step
                   if (count != 0)
                   {
-                     copy->setOnScope(reg, scope);
+                     copy->setOnScope(box, scope);
                   }
                }
             }
@@ -177,6 +185,9 @@ Proof Propagator::contract(IntervalRegion& reg)
    }
 
    delete copy;
+
+   LOG_INTER(" -> " << proof << ", " << box);
+   LOG_INTER("End of propagator, " << nb_steps << " loop(s)");
 
    return proof;
 }

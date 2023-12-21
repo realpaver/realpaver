@@ -1,24 +1,27 @@
 #include <iostream>
 #include "realpaver/Dag.hpp"
-#include "realpaver/UniIntervalNewton.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/ThickFunction.hpp"
+#include "realpaver/IntervalFunctionUni.hpp"
 
 using namespace realpaver;
 using namespace std;
 
-Interval f(const Interval& x)  { return sqr(x) - 2.0; }
-Interval df(const Interval& x) { return 2.0*x; }
+class MyFun : public IntervalFunctionUni {
+   Interval eval(const Interval& x)  { return sqr(x) - 2.0; }
+   Interval diff(const Interval& x) { return 2.0*x; }
+};
 
 int main(void)
 {
    Logger::init(LogLevel::full, "newton.log");
 
-   UniIntervalNewton newton;
+   IntervalNewtonUni newton;
+   MyFun f;
    Interval I(1, 10);
 
-   Proof p = newton.contract(f, df, I);
+   Proof p = newton.contract(f, I);
    cout << "Proof: " << p << endl;
 
    if (p != Proof::Empty)

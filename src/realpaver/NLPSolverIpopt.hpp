@@ -31,7 +31,7 @@ public:
     public:
         /// Constructor
         /// @param ls a pointer to a local optimizer object
-        LocalTNLP(NLPSolver* ls, SharedIntervalRegion reg, const RealPoint& start);
+        LocalTNLP(NLPSolver* ls, SharedIntervalBox box, const RealPoint& start);
         
         bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
                             Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style);
@@ -68,20 +68,19 @@ public:
                             Ipopt::IpoptCalculatedQuantities* ip_cq);
         NLPSolver* ls_;
 
-        SharedIntervalRegion reg_;      // Interval region in which search for an optimal value
-        RealPoint start_;               // Starting point
-        double best_val_;               // objective function value for optimal point
+        SharedIntervalBox box_;  // Interval box in which search for an optimal value
+        RealPoint start_;        // Starting point
+        double best_val_;        // objective function value for optimal point
     };
 
    /// Destructor
    ~NLPSolver();
 
    /// Minimization of a problem
-   /// @param reg interval region in the search space
-   /// @param src starting point that belongs to the region
+   /// @param box interval box in the search space
+   /// @param src starting point that belongs to the box
    /// @return an optimization status
-   OptimizationStatus minimize(const IntervalRegion& reg,
-                               const RealPoint& src);
+   OptimizationStatus minimize(const IntervalBox& box, const RealPoint& src);
 };
 
 } // namespace

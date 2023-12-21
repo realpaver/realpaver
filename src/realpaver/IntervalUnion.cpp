@@ -31,7 +31,7 @@ size_t IntervalUnion::size() const
    return v_.size();
 }
 
-Interval IntervalUnion::operator[](size_t i) const
+const Interval& IntervalUnion::operator[](size_t i) const
 {
    ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
 
@@ -56,6 +56,18 @@ IntervalUnion::iterator IntervalUnion::begin()
 IntervalUnion::iterator IntervalUnion::end()
 {
    return v_.end();
+}
+
+IntervalUnion IntervalUnion::subUnion(size_t i, size_t j) const
+{
+   ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
+   ASSERT(j>=0 && j<v_.size(), "Bad access in an interval union @ " << j);
+   ASSERT(i<=j, "Bad indexes used to create a sub interval union");
+
+   IntervalUnion u;
+   for (size_t k=i; k<=j; ++k)
+      u.v_.push_back(v_[k]);
+   return u;
 }
 
 IntervalUnion& IntervalUnion::insert(const Interval& x)
@@ -137,7 +149,7 @@ Interval IntervalUnion::hull() const
       return Interval(v_[0].left(), v_[size()-1].right());
 }
 
-void IntervalUnion::contract(Interval& x) const
+void IntervalUnion::contractInterval(Interval& x) const
 {
    if (!x.isEmpty())
    {
@@ -154,6 +166,44 @@ void IntervalUnion::contract(Interval& x) const
          else
             x.setEmpty();
       }
+   }
+}
+
+void IntervalUnion::contract(const Interval& x)
+{
+   if (x.isEmpty())
+   {
+      clear();
+      return;
+   }
+
+   int first, last;
+   bool b = findInter(x, first, last);
+
+   if (!b)
+   {
+      clear();
+      return;
+   }
+
+   // intersects the outermost intervals (and not the other ones)
+   v_[first] &= x;
+   v_[last] &= x;
+
+   // removes the intervals after last
+   if (last < v_.size()-1)
+   {
+      auto it = v_.begin();
+      std::advance(it, last+1);
+      v_.erase(it, v_.end());
+   }
+
+   // (and then) removes the intervals before first
+   if (first > 0)
+   {
+      auto it = v_.begin();
+      std::advance(it, first);
+      v_.erase(v_.begin(), it);
    }
 }
 
@@ -221,6 +271,19 @@ bool IntervalUnion::findInter(const Interval& x, int& first, int& last) const
    }
    else
       return false;
+}
+
+void IntervalUnion::clear()
+{
+   v_.clear();
+}
+
+double IntervalUnion::width() const
+{
+   double s = 0.0;
+   for (size_t i=0; i<size(); ++i)
+      s += v_[i].width();
+   return s;
 }
 
 std::ostream& operator<<(std::ostream& os, const IntervalUnion& u)

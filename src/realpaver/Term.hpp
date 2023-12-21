@@ -13,7 +13,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include "realpaver/IntervalRegion.hpp"
+#include "realpaver/IntervalBox.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -67,40 +67,60 @@ public:
    virtual Interval evalConst() const = 0;
 
    /// Interval evaluation
-   /// @param reg domains of variables
+   /// @param box domains of variables
    ///
    /// The result is assigned in the interval value enclosed.
-   virtual void eval(const IntervalRegion& reg) = 0;
+   virtual void eval(const IntervalBox& box) = 0;
 
    /// Contraction of domains
-   /// @param reg domains of variables
+   /// @param box domains of variables
    /// @return a certificate of proof
-   virtual Proof contract(IntervalRegion& reg) = 0;
+   virtual Proof contract(IntervalBox& box) = 0;
 
    /// Visitor pattern
    /// @param vis a visitor
    virtual void acceptVisitor(TermVisitor& vis) const = 0;
 
-   ///@{
-   /// Tests and operations for numbers used for the simplication of terms
+   /// @return true if the root node of this has type TermConst (a number)
    virtual bool isNumber() const;
-   virtual bool isZero() const;
-   virtual bool isOne() const;
-   virtual bool isMinusOne() const;
-   ///@}
 
-   ///@{
-   /// Tests
-   virtual bool isLinear() const = 0;
-   bool isConstant() const;
+   /// @return true if this has one node that is equal to 0
+   virtual bool isZero() const;
+
+   /// @return true if this has one node that is equal to 1
+   virtual bool isOne() const;
+
+   /// @return true if this has one node that is equal to -1
+   virtual bool isMinusOne() const;
+
+   /// @return true if the root node of this has type TermVar
    virtual bool isVar() const;
+
+   /// @return true if the root node of this has type TermAdd
    virtual bool isAdd() const;
+
+   /// @return true if the root node of this has type TermSub
    virtual bool isSub() const;
+
+   /// @return true if the root node of this has type TermMul
    virtual bool isMul() const;
+
+   /// @return true if the root node of this has type TermDiv
    virtual bool isDiv() const;
+
+   /// @return true if the root node of this has type TermUsb
    virtual bool isUsb() const;
+
+      /// @return true if the root node of this has type TermLin
    virtual bool isLin() const;
-   ///@}
+
+   /// @return true if this is a linear expression
+   virtual bool isLinear() const = 0;
+
+   /// @return true if this has no variable
+   ///
+   /// test done in O(1)
+   bool isConstant() const;
 
    /// Dependency test
    /// @param v a variable
@@ -163,58 +183,80 @@ public:
    Interval evalConst() const;
 
    /// Interval evaluation
-   /// @param reg domains of variables
-   /// @return the interval evaluation of this at reg
-   Interval eval(const IntervalRegion& reg) const;
+   /// @param box domains of variables
+   /// @return the interval evaluation of this in the box
+   Interval eval(const IntervalBox& box) const;
 
    /// Reduction of domains using the HC4 Revise contractor
-   /// @param reg domains of variables
+   /// @param box domains of variables
    /// @param img image or bounds of this considered as a function
    /// @return a certificate of proof
    ///
    /// This algorithm first evaluates the nodes from the leaves to the root
    /// (forward phase) and then calculates the projections from the root to
    /// the leaves (backward phase).
-   Proof contract(IntervalRegion& reg, const Interval& img);
+   Proof contract(IntervalBox& box, const Interval& img);
 
    /// Forward phase of the HC4 Revise contractor
-   /// @param reg domains of variables
-   /// @return the interval evaluation of this at reg
-   Interval hc4ReviseForward(const IntervalRegion& reg) const;
+   /// @param box domains of variables
+   /// @return the interval evaluation of this in the box
+   Interval hc4ReviseForward(const IntervalBox& box) const;
 
    /// Backward phase of the HC4 Revise contractor
-   /// @param reg domains of variables
+   /// @param box domains of variables
    /// @param img image or bounds of this considered as a function
    /// @return a certificate of proof
    ///
    /// Assumes that the forward phase has been executed using hc4ReviseForward.
-   Proof hc4ReviseBackward(IntervalRegion& reg, const Interval& img);
+   Proof hc4ReviseBackward(IntervalBox& box, const Interval& img);
 
    /// Visitor pattern
    /// @param vis a visitor
    void acceptVisitor(TermVisitor& vis) const;   
 
-   ///@{
-   /// Tests
+   /// @return true if the root node of this has type TermConst (a number)
    bool isNumber() const;
-   bool isZero() const;
-   bool isOne() const;
-   bool isMinusOne() const;
-   ///@}
 
-   ///@{
-   /// Tests
-   bool isSumOfSquares() const;
-   bool isLinear() const;
-   bool isConstant() const;
+   /// @return true if this has one node that is equal to 0
+   bool isZero() const;
+
+   /// @return true if this has one node that is equal to 1
+   bool isOne() const;
+
+   /// @return true if this has one node that is equal to -1
+   bool isMinusOne() const;
+
+   /// @return true if the root node of this has type TermVar
    bool isVar() const;
+
+   /// @return true if the root node of this has type TermAdd
    bool isAdd() const;
+
+   /// @return true if the root node of this has type TermSub
    bool isSub() const;
+
+   /// @return true if the root node of this has type TermMul
    bool isMul() const;
+
+   /// @return true if the root node of this has type TermDiv
    bool isDiv() const;
+
+   /// @return true if the root node of this has type TermUsb
    bool isUsb() const;
+
+      /// @return true if the root node of this has type TermLin
    bool isLin() const;
-   ///@}
+
+   /// @return true if this is a linear expression
+   bool isLinear() const;
+
+   /// @return true if this has no variable
+   ///
+   /// test done in O(1)
+   bool isConstant() const;
+
+   /// @return true if this is a sum of squares
+   bool isSumOfSquares() const;
 
    /// Dependency test
    /// @param v a variable
@@ -318,8 +360,8 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalRegion& reg) override;
-   Proof contract(IntervalRegion& reg) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isNumber() const override;
    bool isZero() const override;
@@ -351,8 +393,8 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalRegion& reg) override;
-   Proof contract(IntervalRegion& reg) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
@@ -414,8 +456,14 @@ public:
    void insert(const SharedRep& t);
 
    ///@{
-   void eval(const IntervalRegion& reg) override;
-   Proof contract(IntervalRegion& reg) override;
+   bool isAdd() const override;
+   bool isSub() const override;
+   bool isMul() const override;
+   bool isDiv() const override;
+   bool isUsb() const override;
+   bool isLin() const override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
    virtual bool isLinear() const override;
@@ -448,7 +496,6 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
-   bool isAdd() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -471,7 +518,6 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
-   bool isSub() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -494,7 +540,6 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
-   bool isMul() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -516,7 +561,6 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
-   bool isDiv() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -578,7 +622,6 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
-   bool isUsb() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -821,11 +864,10 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalRegion& reg) override;
-   Proof contract(IntervalRegion& reg) override;
+   void eval(const IntervalBox& box) override;
+   Proof contract(IntervalBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
-   bool isLin() const override;
    bool dependsOn(const Variable& v) const override;
    void makeScope(Scope& s) const override;
    TermRep* cloneRoot() const override;

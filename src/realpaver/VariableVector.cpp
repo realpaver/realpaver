@@ -52,24 +52,6 @@ Variable VariableVectorRep::get(int i) const
    return vars_[i-first_];
 }
 
-void VariableVectorRep::setDomain(const Interval& x)
-{
-   for (auto& v : vars_)
-      v.setDomain(x);
-}
-
-void VariableVectorRep::setInteger()
-{
-   for (auto& v : vars_)
-      v.setInteger();
-}
-
-void VariableVectorRep::setBinary()
-{
-   for (auto& v : vars_)
-      v.setBinary();
-}
-
 void VariableVectorRep::setTolerance(const Tolerance& tol)
 {
    for (auto& v : vars_)
@@ -118,24 +100,6 @@ Variable VariableVector::get(int i) const
 Variable VariableVector::operator[](int i) const
 {
    return rep_->get(i);
-}
-
-VariableVector& VariableVector::setDomain(const Interval& x)
-{
-   rep_->setDomain(x);
-   return *this;
-}
-
-VariableVector& VariableVector::setInteger()
-{
-   rep_->setInteger();
-   return *this;
-}
-
-VariableVector& VariableVector::setBinary()
-{
-   rep_->setBinary();
-   return *this;
 }
 
 VariableVector& VariableVector::setTolerance(const Tolerance& tol)

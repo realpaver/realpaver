@@ -36,7 +36,7 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalRegion& X) override;
+   Proof contract(IntervalBox& X) override;
    void print(std::ostream& os) const override;
    ///@}
 
@@ -66,15 +66,15 @@ public:
    /// in the contraction method
    /// @param tol absolute or relative tolerance
    ///
-   /// The iteration stops if two consecutive regions are close enough, i.e.
+   /// The iteration stops if two consecutive boxes are close enough, i.e.
    /// their distance is smaller than tol
    void setDTol(const Tolerance& tol);
 
    /// Tries to derive a proof certificate for the existence of a solution
-   /// in an interval region using an inflation-based algorithm
-   /// @param reg a region
+   /// in an interval box using an inflation-based algorithm
+   /// @param box a box
    /// @return proof certificate
-   Proof certify(IntervalRegion& reg);
+   Proof certify(IntervalBox& box);
 
    /// @return parameter delta of inflation
    double getInflationDelta() const;
@@ -105,7 +105,7 @@ public:
    /// in the certification method
    /// @param tol absolute or relative tolerance
    ///
-   /// The iteration stops if two consecutive regions are far enough, i.e.
+   /// The iteration stops if two consecutive boxes are far enough, i.e.
    /// their distance is greater than tol
    void setCertifyDTol(const Tolerance& tol);
 
@@ -127,9 +127,9 @@ private:
    size_t cmaxiter_;          // maximum number of iterations
    Tolerance cdtol_;          // tolerance on the distance between two intervals
 
-   void makeY(IntervalRegion& X);
-   Proof reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol);
-   Proof certifyX(IntervalRegion& X, bool& hasdtol);
+   void makeY(IntervalBox& X);
+   Proof reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol);
+   Proof certifyX(IntervalBox& X, bool& hasdtol);
 };
 
 } // namespace

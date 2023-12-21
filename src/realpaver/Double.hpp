@@ -106,6 +106,18 @@ struct Double {
       std::fesetround(FE_UPWARD);
    }
 
+   /// Returns the greatest integral number not greater than x
+   static inline ValueType floor(ValueType x)
+   {
+      return std::floor(x);
+   }
+
+   /// Returns the smallest integral number not smaller than x
+   static inline ValueType ceil(ValueType x)
+   {
+      return std::ceil(x);
+   }
+
    /// Addition
    static inline ValueType add(ValueType x, ValueType y)
    {

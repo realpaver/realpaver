@@ -1,3 +1,10 @@
+dev = executable('dev',
+  sources: 'dev.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src']+incdir,
+  dependencies: deps_lib
+)
+
 lp = executable('lp',
   sources: 'lp.cpp',
   link_with: realpaver_lib,
@@ -13,6 +20,13 @@ if local_solver_dep.found()
     dependencies: deps_lib
   )
 endif
+
+parsing = executable('parsing',
+  sources: 'parsing.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src']+incdir,
+  dependencies: deps_lib
+)
 
 propag = executable('propag',
   sources: 'propag.cpp',

@@ -39,7 +39,7 @@ namespace realpaver {
 ///
 /// After the solving phase, it is possible to read the solutions as follows:
 /// for (size_t i=0; i<solver.getNbSolutions(); ++i) {
-///    std::pair<IntervalRegion, Proof> sol = solver.getSolution(i);
+///    std::pair<IntervalBox, Proof> sol = solver.getSolution(i);
 /// }
 /// The scope of each solution is the one of the input problem.
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,12 +81,26 @@ public:
    Preprocessor* getPreprocessor() const;
 
    /// @return the number of solutions after the preprocessing / solving phase
-   size_t getNbSolutions() const;
+   size_t nbSolutions() const;
 
    /// Gets a solution after the preprocessing / solving phase
-   /// @param i an index between 0 and getNbSolutions()-1
+   /// @param i an index between 0 and nbSolutions()-1
    /// @return the i-th solution in this
-   std::pair<IntervalRegion, Proof> getSolution(size_t i) const;
+   ///
+   /// The scope of the box is the scope of the initial problem, i.e. it must
+   /// include the variables fixed at preprocessing time.
+   std::pair<DomainBox, Proof> getSolution(size_t i) const;
+
+   /// @return the number of unexplored boxes after the solving phase
+   size_t nbPendingBoxes() const;
+
+   /// Gets a pending box after the solving phase
+   /// @param i an index between 0 and nbPendingBoxes()-1
+   /// @return the i-th pending box in this
+   ///
+   /// The scope of the box is the scope of the initial problem, i.e. it must
+   /// include the variables fixed at preprocessing time.
+   DomainBox getPendingBox(size_t i) const;
 
 private:
    Problem* problem_;            // initial problem
@@ -110,10 +124,9 @@ private:
    void makeContractor();
    void makeSplit();
    void bpStep(int depthlimit);
-   bool isAnInnerRegion(const IntervalRegion& reg) const;
+   bool isAnInnerRegion(const IntervalBox& box) const;
    void certifySolutions();
-   VariableSelector* makeMaxSmearStrategy();
-
+   NcspSelector* makeSelectorSSR();
 };
 
 } // namespace

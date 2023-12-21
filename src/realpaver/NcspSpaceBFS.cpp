@@ -13,7 +13,7 @@
 namespace realpaver {
 
 NcspSpaceBFS::NcspSpaceBFS()
-      : vsol_(), lnode_(), stotal_(0)
+      : vsol_(), lnode_()
 {}
 
 size_t NcspSpaceBFS::nbSolNodes() const
@@ -23,13 +23,11 @@ size_t NcspSpaceBFS::nbSolNodes() const
 
 void NcspSpaceBFS::pushSolNode(const SharedNcspNode& node)
 {
-   stotal_++;
    vsol_.push_back(node);
 }
 
 SharedNcspNode NcspSpaceBFS::popSolNode()
 {
-   stotal_--;
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;
@@ -37,7 +35,7 @@ SharedNcspNode NcspSpaceBFS::popSolNode()
 
 SharedNcspNode NcspSpaceBFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
+   ASSERT(i < vsol_.size(), "Bad access to a solution node in a NCSP space");
 
    return vsol_[i];
 }
@@ -51,50 +49,6 @@ bool NcspSpaceBFS::hasFeasibleSolNode() const
          return true;
    }
    return false;
-}
-
-void NcspSpaceBFS::makeSolClusters(double gap)
-{
-   // no clustering if the gap is negative
-   if (gap < 0.0) return;
-
-   // moves the solution nodes in a list
-   std::list<SharedNcspNode> lnode;
-   for (auto node : vsol_) lnode.push_back(node);
-   vsol_.clear();
-
-   while (!lnode.empty())
-   {
-      // extracts the first node
-      SharedNcspNode node = lnode.front();
-      IntervalRegion* regnode = node->region();
-      lnode.pop_front();
-
-      // finds another node that is close enough
-      bool found = false;
-      auto it = lnode.begin();
-      while (!found && it != lnode.end())
-      {
-         SharedNcspNode bis = *it;
-         IntervalRegion* regbis = bis->region();
-
-         if (regnode->gap(*regbis) < gap)
-         {
-            // merges node in bisnode and iterates
-            regbis->hullAssignOnScope(*regnode, node->scope());
-            found = true;
-         }
-         else ++it;
-      }
-
-      // this is a solution node and no other solution is close enough
-      if (!found) vsol_.push_back(node);
-   }
-}
-
-size_t NcspSpaceBFS::nbTotalSolNodes() const
-{
-   return stotal_;
 }
 
 size_t NcspSpaceBFS::nbPendingNodes() const
@@ -116,7 +70,7 @@ void NcspSpaceBFS::insertPendingNode(const SharedNcspNode& node)
 
 SharedNcspNode NcspSpaceBFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < lnode_.size(), "Bad access to a pending node in a CSP space");
+   ASSERT(i < lnode_.size(), "Bad access to a pending node in a NCSP space");
 
    auto it = lnode_.begin();
    if (i != 0)

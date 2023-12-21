@@ -4,6 +4,7 @@
 #include <iostream>
 #include "realpaver/config.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/Param.hpp"
@@ -156,10 +157,11 @@ int main(int argc, char** argv)
                fsol << "solved feasible" << endl;
                cout << GREEN("solved feasible") << endl;
 
-               IntervalRegion reg(preproc->fixedRegion());
+               IntervalBox B(preproc->fixedRegion());
                fsol << endl << "SOLUTION " << std::scientific
-                    << "[" << reg.width() << "]"
-                    << endl << reg;
+                    << "[" << B.width() << "]"
+                    << endl;
+               B.listPrint(fsol);
             }
          }
          else
@@ -177,9 +179,9 @@ int main(int argc, char** argv)
 
             if (preproc->nbFixedVars() > 0)
             {
-               IntervalRegion reg(preproc->fixedRegion());
+               IntervalBox B(preproc->fixedRegion());
                Scope sco = preproc->fixedScope();
-               reg.stdPrint(fsol);
+               B.listPrint(fsol);
             }
 
             fsol << WP("Number of inactive constraints", wpl)
@@ -330,67 +332,59 @@ int main(int argc, char** argv)
          fsol << std::defaultfloat;
 
          string sd =solver.getEnv()->getParam()->getStrParam("DISPLAY_REGION");
-         if (sd == "STD")
+
+         for (size_t i=0; i<solver.nbSolutions(); ++i)
          {
-            for (size_t i=0; i<space->nbSolNodes(); ++i)
+            std::pair<DomainBox, Proof> sol = solver.getSolution(i);
+            IntervalBox hull(sol.first);
+
+            fsol << std::setprecision(4);
+            fsol << std::endl << "SOLUTION " << (i+1)
+                 << " [" << hull.width() << "]";
+
+            switch (sol.second)
             {
-               SharedNcspNode node = space->getSolNode(i);
-               IntervalRegion* reg = node->region();
-               Proof proof = node->getProof();
-
-               fsol << std::setprecision(4);
-               fsol << std::endl << "SOLUTION " << (i+1)
-                    << " [" << reg->width() << "]";
-
-               switch (proof)
-               {
-                  case Proof::Inner:    fsol << " [inner]"; break;
-                  case Proof::Feasible: fsol << " [safe]"; break;
-                  case Proof::Maybe:    fsol << " [unsafe]"; break;
-                  default:              fsol << " (bug!!!)"; break;
-               }
-
-               fsol << std::setprecision(prec) << endl;
-               reg->stdPrint(fsol);                  
+               case Proof::Inner:    fsol << " [exact]"; break;
+               case Proof::Feasible: fsol << " [feasible]"; break;
+               case Proof::Maybe:    fsol << " [unvalidated]"; break;
+               default:              fsol << " (bug!!!)"; break;
             }
-         }
-         else if (sd == "VEC")
-         {
-            fsol << endl << "SCOPE = " << sco << endl;
-            for (size_t i=0; i<space->nbSolNodes(); ++i)
-            {
-               fsol << std::setprecision(4);
 
-               SharedNcspNode node = space->getSolNode(i);
-               IntervalRegion* reg = node->region();
-               fsol << std::setprecision(prec) << endl;
-               reg->vecPrint(fsol);
-            }
-         }
-         else
-         {
-            THROW("Bad parameter value: DISPLAY_REGION = " << sd);
+            fsol << std::setprecision(prec) << endl;
+               
+            if (sd == "STD")
+               sol.first.listPrint(fsol);
+            else
+               sol.first.vecPrint(fsol);
          }
 
          // writes the hull of the pending nodes
-         if (space->nbPendingNodes() > 0)
+         if (solver.nbPendingBoxes() > 0)
          {
-            IntervalRegion hpn = space->hullOfPendingNodes();
+            IntervalBox hp(solver.getPendingBox(0));
+            for (size_t i=1; i<solver.nbPendingBoxes(); ++i)
+            {
+               IntervalBox aux(solver.getPendingBox(i));
+               hp.glue(aux);
+            }
 
             fsol << std::defaultfloat << std::setprecision(4);
             fsol << endl << "HULL OF PENDING NODES" << " ["
-                 << hpn.width() << "]" << endl;
+                 << hp.width() << "]" << endl;
             if (sd == "STD")
-               hpn.stdPrint(fsol);
+               hp.listPrint(fsol);
 
-            else if (sd == "VEC")
-               hpn.vecPrint(fsol);
+            else
+               hp.vecPrint(fsol);
          }
       }
 
       // writes the problem
       fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
-      fsol << "REGION" << endl << problem.getDomains() << endl;
+      DomainBox box(problem.scope());
+      fsol << "BOX" << endl;
+      box.listPrint(fsol);
+      fsol << endl;
 
       // writes the constraints
       fsol << "CONSTRAINTS" << endl;

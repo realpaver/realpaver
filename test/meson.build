@@ -4,11 +4,23 @@ bitset_test = executable( 'bitset_test',
                           include_directories: ['../src'] )
 test('Test of bitset', bitset_test)
 
-hc4_test = executable( 'hc4_test',
-                       sources: 'hc4_test.cpp',
+ctc_3b_test = executable( 'ctc_3b_test',
+                        sources: 'ctc_3b_test.cpp',
+                        link_with: realpaver_lib,
+                        include_directories: ['../src'] )
+test('Test of 3B contractor', ctc_3b_test)
+
+ctc_cid_test = executable( 'ctc_cid_test',
+                        sources: 'ctc_cid_test.cpp',
+                        link_with: realpaver_lib,
+                        include_directories: ['../src'] )
+test('Test of CID contractor', ctc_cid_test)
+
+ctc_hc4_test = executable( 'ctc_hc4_test',
+                       sources: 'ctc_hc4_test.cpp',
                        link_with: realpaver_lib,
                        include_directories: ['../src'] )
-test('Test of HC4', hc4_test)
+test('Test of HC4 contractor', ctc_hc4_test)
 
 dag_test = executable( 'dag_test',
                        sources: 'dag_test.cpp',
@@ -51,7 +63,7 @@ realfunctionvector_test = executable( 'realfunctionvector_test',
                          sources: 'realfunctionvector_test.cpp',
                          link_with: realpaver_lib,
                          include_directories: ['../src'] )
-test('Test of realfunctionvector', realfunctionvector_test)
+test('Test of real function vector', realfunctionvector_test)
 
 if local_solver_dep.found()
   nlpsolver_test = executable( 'nlpsolver_test',

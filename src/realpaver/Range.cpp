@@ -59,9 +59,9 @@ Integer Range::right() const
    return r_;
 }
 
-Integer Range::nbElems() const
+unsigned long  Range::nbElems() const
 {
-   return r_ - l_ + 1;
+   return isEmpty() ? 0 : (unsigned long)r_.toInt() - l_.toInt() + 1;
 }
 
 bool Range::isEmpty() const
@@ -207,6 +207,20 @@ bool Range::isCertainlyGeZero() const
 bool Range::isCertainlyGtZero() const
 {
    return r_ > 0;
+}
+
+bool Range::isJoinable(const Range& other) const
+{
+   if (isEmpty() || other.isEmpty())
+      return false;
+
+   if (overlaps(other))
+      return true;
+
+   if (isCertainlyLt(other))
+      return r_ + 1 == other.l_;
+
+   return other.r_ + 1 == l_;
 }
 
 Range Range::roundOutward(const Interval& x)

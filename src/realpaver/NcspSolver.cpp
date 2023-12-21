@@ -9,22 +9,21 @@
 
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/BC4Contractor.hpp"
-#include "realpaver/ConstraintContractor.hpp"
-#include "realpaver/HC4Contractor.hpp"
-#include "realpaver/IntContractor.hpp"
+#include "realpaver/ContractorBC4.hpp"
+#include "realpaver/ContractorConstraint.hpp"
+#include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorDomain.hpp"
 #include "realpaver/IntervalNewton.hpp"
-#include "realpaver/ListContractor.hpp"
+#include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/MaxCIDContractor.hpp"
+#include "realpaver/NcspSelector.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/NcspSpaceBFS.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
-#include "realpaver/PolytopeHullContractor.hpp"
+#include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/Propagator.hpp"
-#include "realpaver/VariableSelector.hpp"
 
 namespace realpaver {
 
@@ -74,6 +73,9 @@ void NcspSolver::solve()
 {
    LOG_MAIN("Input problem\n" << (*problem_));
 
+   int fp = env_->getParam()->getIntParam("FLOAT_PRECISION");
+   Logger::getInstance()->setFloatPrecision(fp);
+
    std::string pre = env_->getParam()->getStrParam("PREPROCESSING");
    if (pre == "YES")
    {
@@ -81,7 +83,7 @@ void NcspSolver::solve()
       withPreprocessing_ = true;
       preprob_ = new Problem();
       preproc_->apply(*problem_, *preprob_);
-      
+   
       if (!preproc_->isSolved()) branchAndPrune();
    }
    else
@@ -126,10 +128,9 @@ void NcspSolver::makeSpace()
             "Unable to make the space object in a Ncsp solver");
 
    // creates and inserts the root node
-   SharedNcspNode node =
-      std::make_shared<NcspNode>(preprob_->scope(), preprob_->getDomains());
-
+   SharedNcspNode node = std::make_shared<NcspNode>(preprob_->scope());
    node->setIndex(1);
+
    space_->insertPendingNode(node);
    ++nbnodes_;
 }
@@ -154,12 +155,15 @@ void NcspSolver::makeContractor()
       try
       {
          size_t j = dag_->insert(c);
-         
+
          if (base == "HC4")
-            op = std::make_shared<HC4Contractor>(dag_, j);
+            op = std::make_shared<ContractorHC4>(dag_, j);
 
          else if (base == "BC4")
-            op = std::make_shared<BC4Contractor>(dag_, j);
+         {
+            LOG_LOW("make BC4");
+            op = std::make_shared<ContractorBC4>(dag_, j);
+         }
 
          else
          {
@@ -169,11 +173,20 @@ void NcspSolver::makeContractor()
       }
       catch(Exception& e)
       {
-         op = std::make_shared<ConstraintContractor>(c);
+         op = std::make_shared<ContractorConstraint>(c);
       }
 
       pool->push(op);
    }
+
+   // variables with disconnected domains
+   std::shared_ptr<ContractorDomain> dop = std::make_shared<ContractorDomain>();
+   for (Variable v : preprob_->scope())
+      if (!v.getDomain()->isConnected())
+         dop->insertVar(v);
+
+   if (dop->nbVars() > 0)
+      pool->push(dop);
 
    SharedPropagator propagator = std::make_shared<Propagator>(pool);
    Tolerance dtol = env_->getParam()->getTolParam("PROPAGATION_DTOL");
@@ -182,26 +195,15 @@ void NcspSolver::makeContractor()
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
    propagator->setMaxIter(niter);
 
-   // propagator or propagator + max CID ?
-   std::string with_max_cid =
-      env_->getParam()->getStrParam("PROPAGATION_WITH_MAX_CID");
+   // propagator or stronger CID propagator ?
+   std::string with_cid =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_CID");
 
-   if (with_max_cid == "YES")
+   if (with_cid == "YES")
    {
-      std::unique_ptr<VariableSelector> selector =
-         std::make_unique<MaxDomSelector>(preprob_->scope());
-
-      int nb = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
-      std::unique_ptr<IntervalSlicer> slicer =
-         std::make_unique<IntervalPartitionMaker>(nb);
-
-      SharedContractor op =
-         std::make_shared<MaxCIDContractor>(propagator, std::move(selector),
-                                            std::move(slicer));
-
-      mainpool->push(op);
+      // TODO: create a CID propagator and replace the following
+      mainpool->push(propagator);
    }
-
    else
       mainpool->push(propagator);
 
@@ -215,8 +217,8 @@ void NcspSolver::makeContractor()
       if (with_polytope == "TAYLOR")
          style = PolytopeCreatorStyle::Taylor;
 
-      std::shared_ptr<PolytopeHullContractor> op =
-         std::make_shared<PolytopeHullContractor>(dag_, style);
+      std::shared_ptr<ContractorPolytope> op =
+         std::make_shared<ContractorPolytope>(dag_, style);
       op->setRelaxEqTol(env_->getParam()->getDblParam("RELAXATION_EQ_TOL"));
 
       mainpool->push(op);
@@ -293,22 +295,19 @@ void NcspSolver::makeContractor()
       }
    }
 
-   // integer variables
-   std::shared_ptr<IntContractor> iop = std::make_shared<IntContractor>();
-   for (Variable v : preprob_->scope())
-      if (v.isInteger()) iop->insertVar(v);
+   // it is necessary to prune the domains of the integral variables at the end
+   if (dop->nbVars() > 0)
+      mainpool->push(dop);
 
-   if (iop->nbVars() > 0)
-      mainpool->push(iop);
-
-   // creates the contractor of this solver applying the contractors of
+   // creates the contractor of this solver, which applies the contractors of
    // the main pool in sequence
-   contractor_ = std::make_shared<ListContractor>(mainpool);
+   contractor_ = std::make_shared<ContractorList>(mainpool);
 }
 
-VariableSelector* NcspSolver::makeMaxSmearStrategy()
+NcspSelector* NcspSolver::makeSelectorSSR()
 {
    IntervalFunctionVector F;
+   bool ok = true;
 
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
@@ -318,73 +317,60 @@ VariableSelector* NcspSolver::makeMaxSmearStrategy()
       {
          Constraint::SharedRep rep = c.rep();
          ArithCtrBinary* eq = static_cast<ArithCtrBinary*>(rep.get());
-         Term t = eq->left() - eq->right();
 
+         Term t = eq->left() - eq->right();
          F.addFun(IntervalFunction(t));
       }
+      else
+         ok = false;
    }
 
-   if (preprob_->nbVars() == F.nbVars())
+   if (ok && (preprob_->nbVars() == F.nbVars()))
    {
-      return new MaxSmearSelector(F, preprob_->scope());
+      return new NcspSelectorSSR(F);
    }
    else
    {
-      LOG_INTER("Unable to create a max-smear variable selection strategy");
-      int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
-      return new HybridDomRobinSelector(preprob_->scope(), n);
+      LOG_INTER("Unable to create a SmearSumRel variable selection strategy");
+      return new NcspSelectorRR(preprob_->scope());
    }
 }
 
 void NcspSolver::makeSplit()
 {
-   VariableSelector* selector = nullptr;
-   IntervalSlicer* slicer = nullptr;
-
    Scope sco = preprob_->scope();
 
+   // makes the selector
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
-   if (sel == "MAX_DOM") selector = new MaxDomSelector(sco);
-   if (sel == "ROUND_ROBIN") selector = new RoundRobinSelector(sco);
-   if (sel == "HYBRID_DOM_ROBIN")
-   {
-      int n = env_->getParam()->getIntParam("SPLIT_DOM_ROBIN");
-      selector = new HybridDomRobinSelector(sco, n);
-   }
-   if (sel == "MAX_SMEAR")
-   {
-      selector = makeMaxSmearStrategy();   
-   }
+   NcspSelector* selector = nullptr;
 
+   if (sel == "RR")              selector = new NcspSelectorRR(sco);
+   else if (sel == "LF")         selector = new NcspSelectorLF(sco);
+   else if (sel == "SF")         selector = new NcspSelectorSF(sco);
+   else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(sco);
+   else if (sel == "SSR")        selector = makeSelectorSSR();
+
+   // makes the slicer
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
-   
-   if (sli == "BISECTION") slicer = new IntervalBisecter();
-   if (sli == "PEELING")
-   {
-      double f = env_->getParam()->getDblParam("SPLIT_PEEL_FACTOR");
-      slicer = new IntervalPeeler(f);
-   }
-   if (sli == "PARTITION")
-   {
-      size_t n = env_->getParam()->getIntParam("SPLIT_NB_SLICES");
-      slicer = new IntervalPartitionMaker(n);
-   }
+   std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
-   THROW_IF(selector == nullptr || slicer == nullptr,
+   if (sli == "BISECTION") 
+      smap = DomainSlicerFactory::makeBisectionStrategy(sco);   
+
+   THROW_IF(selector == nullptr || smap == nullptr,
             "Unable to make the split object in a Ncsp solver");
 
-   std::unique_ptr<VariableSelector> pselector(selector);
-   std::unique_ptr<IntervalSlicer> pslicer(slicer);
+   std::unique_ptr<NcspSelector> pselector(selector);
 
-   split_ = new NcspSplit(std::move(pselector), std::move(pslicer));
+   split_ = new NcspSplit(std::move(pselector), std::move(smap));
 }
 
-bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
+bool NcspSolver::isAnInnerRegion(const IntervalBox& box) const
 {
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
       Constraint c = preprob_->ctrAt(i);
-      if (c.isSatisfied(reg) != Proof::Inner)
+      if (c.isSatisfied(box) != Proof::Inner)
          return false;
    }
 
@@ -394,19 +380,22 @@ bool NcspSolver::isAnInnerRegion(const IntervalRegion& reg) const
 void NcspSolver::bpStep(int depthlimit)
 {
    SharedNcspNode node = space_->nextPendingNode();
-   IntervalRegion* reg = node->region();
+
+   // the contractor processes an interval box generated
+   // as the hull of the domain box
+   IntervalBox box(*node->box());
 
    LOG_INTER("Extracts node " << node->index() << " (depth "
                               << node->depth() << ")");
-   LOG_LOW("Region: " << *reg);
+   LOG_LOW("Interval box: " << box);
 
    node->setProof(Proof::Maybe);
 
-   // contracts the region
-   Proof proof = contractor_->contract(*reg);
+   // contracts the box
+   Proof proof = contractor_->contract(box);
 
    LOG_INTER("Contraction -> " << proof);
-   LOG_INTER("Contracted region: " << *reg);
+   LOG_INTER("Contracted box: " << box);
 
    if (proof == Proof::Empty)
    {
@@ -414,25 +403,25 @@ void NcspSolver::bpStep(int depthlimit)
       return;
    }
 
-   if (isAnInnerRegion(*reg))
+   // contracts the domain box   
+   for (const auto& v : box.scope())
+      node->box()->get(v)->contract(box.get(v));
+
+   if (isAnInnerRegion(box))
    {
+      LOG_INTER("Node " << node->index() << " is an inner box");
+
       node->setProof(Proof::Inner);
 
       std::string str = env_->getParam()->getStrParam("SPLIT_INNER");
       if (str == "NO")
       {
-         LOG_INTER("Solution node (inner region)");
          space_->pushSolNode(node);
-
          return;
-      }
-      else
-      {
-         LOG_INTER("Inner region detected but split required");        
       }
    }
 
-   // node depth
+   // node depth limit
    int depth = node->depth() + 1;
    if (depth >= depthlimit)
    {
@@ -446,13 +435,15 @@ void NcspSolver::bpStep(int depthlimit)
 
    if (split_->getNbNodes() <= 1)
    {
-      LOG_INTER("Solution node (small enough)");
+      LOG_INTER("Node " << node->index() << " is a solution");
+      LOG_LOW(*node->box());
+
       space_->pushSolNode(node);
    }
    else
    {
-      LOG_INTER("Splits node " << node->index() << " > "
-                               << split_->getNbNodes() << " sub-nodes");
+      LOG_INTER("Node " << node->index() << " is split into "
+                        << split_->getNbNodes() << " sub-nodes");
 
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
@@ -463,6 +454,7 @@ void NcspSolver::bpStep(int depthlimit)
          subnode->setDepth(depth);
    
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
+         LOG_LOW(*subnode->box());
       }
 
       space_->insertPendingNodes(split_->begin(), split_->end());
@@ -471,7 +463,7 @@ void NcspSolver::bpStep(int depthlimit)
 
 void NcspSolver::branchAndPrune()
 {
-   LOG_MAIN("Branch-and-prune algorithm on problem\n" << preprob_);
+   LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
    LOG_INTER("Parameters\n" << *env_->getParam());
 
    stimer_.start();
@@ -537,7 +529,6 @@ void NcspSolver::branchAndPrune()
       }
       else
       {
-
          if (trace && nnodes % 1000 == 0)
          {
             std::cout << "\tnb nod: " << "\033[34m" << tnodes << "\033[39m"
@@ -592,10 +583,30 @@ void NcspSolver::certifySolutions()
    while (space_->nbSolNodes() > 0)
    {
       SharedNcspNode node = space_->popSolNode();
-      Proof proof = prover_->certify(*node->region());
+      Proof proof = node->getProof();
+
+      DomainBox* dbox = node->box();
+      IntervalBox B(*dbox);
+
+      proof = prover_->certify(B);
       
       if (proof != Proof::Empty)
       {
+         // B may be different from the hull of dbox, typically when
+         // a Newton operator is applied by the prover; it is then necessary
+         // to modify dbox
+         for (const auto& v : B.scope())
+         {
+            Interval x = B.get(v),
+                     y = dbox->get(v)->intervalHull();
+
+            if (x.isSetNeq(y))
+            {               
+               std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
+               dbox->set(v, std::move(dom));
+            }
+         }
+
          node->setProof(proof);
          lsol.push_back(node);
       }
@@ -623,7 +634,7 @@ Preprocessor* NcspSolver::getPreprocessor() const
    return preproc_;
 }
 
-size_t NcspSolver::getNbSolutions() const
+size_t NcspSolver::nbSolutions() const
 {
    if (preproc_->isSolved())
       return preproc_->isUnfeasible() ? 0 : 1;
@@ -632,20 +643,22 @@ size_t NcspSolver::getNbSolutions() const
       return space_->nbSolNodes();
 }
 
-std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
+std::pair<DomainBox, Proof> NcspSolver::getSolution(size_t i) const
 {
-   ASSERT(i < getNbSolutions(), "Bad access to a solution in a Ncsp solver");
+   ASSERT(i < nbSolutions(), "Bad access to a solution in a Ncsp solver");
 
    if (withPreprocessing_)
    {
-      IntervalRegion reg(problem_->getDomains());
+      DomainBox box(problem_->scope());
       Proof proof = Proof::Inner;
 
       // assigns the values of the fixed variables
       for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
       {
          Variable v = preproc_->getFixedVar(i);
-         reg.set(v, preproc_->getFixedDomain(v));
+         Interval x = preproc_->getFixedDomain(v);
+         Domain* dom = box.get(v);
+         dom->contract(x);
       }
 
       // assigns the values of the unfixed variables
@@ -654,24 +667,76 @@ std::pair<IntervalRegion, Proof> NcspSolver::getSolution(size_t i) const
          SharedNcspNode node = space_->getSolNode(i);
          proof = node->getProof();
 
-         IntervalRegion* regnode = node->region();
+         DomainBox* aux = node->box();
 
          for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
          {
             Variable v = preproc_->getUnfixedVar(i);
             Variable w = preproc_->srcToDestVar(v);
-            reg.set(v, regnode->get(w));
+            std::unique_ptr<Domain> p(aux->get(w)->clone());
+            box.set(v, std::move(p));
          }
       }
 
-      return std::make_pair(reg, proof);
+      return std::make_pair(box, proof);
    }
    else
    {
       SharedNcspNode node = space_->getSolNode(i);
       Proof proof = node->getProof();
-      IntervalRegion* regnode = node->region();
-      return std::make_pair(*regnode, proof);
+      DomainBox aux(*node->box());
+      return std::make_pair(aux, proof);
+   }
+}
+
+size_t NcspSolver::nbPendingBoxes() const
+{
+   if (preproc_->isSolved())
+      return 0;
+
+   else
+      return space_->nbPendingNodes();
+}
+
+DomainBox NcspSolver::getPendingBox(size_t i) const
+{
+   ASSERT(i < nbPendingBoxes(), "Bad access to a pending box in a Ncsp solver");
+
+   if (withPreprocessing_)
+   {
+      DomainBox box(problem_->scope());
+
+      // assigns the values of the fixed variables
+      for (size_t i=0; i<preproc_->nbFixedVars(); ++i)
+      {
+         Variable v = preproc_->getFixedVar(i);
+         Interval x = preproc_->getFixedDomain(v);
+         Domain* dom = box.get(v);
+         dom->contract(x);
+      }
+
+      // assigns the values of the unfixed variables
+      if (!preproc_->allVarsFixed())
+      {
+         SharedNcspNode node = space_->getPendingNode(i);
+         DomainBox* aux = node->box();
+
+         for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
+         {
+            Variable v = preproc_->getUnfixedVar(i);
+            Variable w = preproc_->srcToDestVar(v);
+            std::unique_ptr<Domain> p(aux->get(w)->clone());
+            box.set(v, std::move(p));
+         }
+      }
+
+      return box;
+   }
+   else
+   {
+      SharedNcspNode node = space_->getPendingNode(i);
+      DomainBox aux(*node->box());
+      return aux;
    }
 }
 

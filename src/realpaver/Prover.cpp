@@ -8,80 +8,132 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Prover.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
 
 namespace realpaver {
 
 Prover::Prover(const Problem& p)
-      : newton_(nullptr),
-        ctr_(),
-        canprove_(true),
+      : v_(),
+        dag_(nullptr),
+        mnewton_(nullptr),
+        unewton_(nullptr),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
         maxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
         dtol_(Param::GetTolParam("NEWTON_CERTIFY_DTOL"))
 {
-   IntervalFunctionVector F;
+   dag_ = std::make_shared<Dag>();
 
    for (size_t i=0; i<p.nbCtrs(); ++i)
    {
       Constraint c = p.ctrAt(i);
+      bool eq = c.isEquation();
 
-      if (c.isEquation())
-      {
-         Constraint::SharedRep rep = c.rep();
-         ArithCtrEq* eq = static_cast<ArithCtrEq*>(rep.get());
-         Term t = eq->left() - eq->right();
+      Item it = {c, eq, Proof::Maybe};
+      v_.push_back(it);
 
-         F.addFun(IntervalFunction(t));   
-      }
-      else
-         ctr_.push_back(c);
+      if (eq)
+         dag_->insert(c);
    }
 
-   if (F.nbFuns() > 0)
+   if (dag_->nbFuns() > 0)
    {
-      if (F.isSquare() && F.nbVars() > 1)
+      IntervalFunctionVector F(dag_);
+
+      if (F.isSquare())
       {
-         newton_ = new IntervalNewton(F);
-         newton_->setInflationDelta(delta_);
-         newton_->setInflationChi(chi_);
-         newton_->setCertifyMaxIter(maxiter_);
-         newton_->setCertifyDTol(dtol_);
+         if (F.nbVars() == 1)
+         {
+            unewton_ = new IntervalNewtonUni();
+            unewton_->setMaxIter(maxiter_);
+            unewton_->setLocalDTol(dtol_);
+            unewton_->getInflator().setDelta(delta_);
+            unewton_->getInflator().setChi(chi_);
+         }
+         else
+         {
+            mnewton_ = new IntervalNewton(F);
+            mnewton_->setInflationDelta(delta_);
+            mnewton_->setInflationChi(chi_);
+            mnewton_->setCertifyMaxIter(maxiter_);
+            mnewton_->setCertifyDTol(dtol_);
+         }
       }
-
-      else
-         canprove_ = false;
    }
-
-   else
-      canprove_ = false;
 }
 
 Prover::~Prover()
 {
-   if (newton_ != nullptr)
-      delete newton_;
+   if (mnewton_ != nullptr) delete mnewton_;
+   if (unewton_ != nullptr) delete unewton_;
 }
 
-Proof Prover::certify(IntervalRegion& reg)
+Proof Prover::certify(IntervalBox& box)
 {
-   if (!canprove_) return Proof::Maybe;
+   bool inner = true;     // Iner certificate for the problem
+   bool innerbis = true;  // Inner certificate for the problem but the equations
 
-   Proof proof = Proof::Inner;
+   LOG_INTER("Certification of the box " << box);
 
-   for (auto& c : ctr_)
+   for (auto& it : v_)
    {
-      Proof certif = c.isSatisfied(reg);
-      proof = std::min(proof, certif);
+      it.proof = it.ctr.isSatisfied(box);
+
+      if (it.proof == Proof::Empty)
+         return Proof::Empty;
+
+      if (it.proof != Proof::Inner)
+      {
+         inner = false;
+         
+         if (!it.iseq)
+            innerbis = false;
+      }
    }
 
-   if (newton_ != nullptr && proof != Proof::Empty)
+   if (inner)
    {
-      proof = newton_->certify(reg);
+      LOG_INTER(" -> inner box");
+      return Proof::Inner;
    }
 
+   if (!innerbis)
+   {
+      LOG_INTER(" -> no proof since one consraint is not validated");
+      return Proof::Maybe;
+   }
+
+   // now only the equations are not certainly satisfied
+   Proof proof = Proof::Maybe;
+
+   // applies the multivariate Newton operator for systems
+   if (mnewton_ != nullptr)
+   {
+      LOG_INTER("Certification by the multivariate interval Newton");
+
+      proof = mnewton_->certify(box);
+
+      LOG_INTER(" -> " << box);
+   }
+
+   // applies the univariate Newton operator for one equation
+   if (unewton_ != nullptr)
+   {
+      LOG_INTER("Certification by the univariate interval Newton");
+
+      Variable v = dag_->fun(0)->scope().var(0);
+      Interval x = box.get(v);
+      IntervalThickFunction f(dag_, 0, v);
+      proof = unewton_->localSearch(f, x);
+      box.set(v, x);
+
+      LOG_INTER(" -> " << box);
+   }
+
+   LOG_INTER(" -> " << proof);
    return proof;
 }
 
@@ -94,9 +146,12 @@ void Prover::setInflationDelta(const double& val)
 {
    ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
    delta_ = val;
-   
-   if (newton_ != nullptr)
-      newton_->setInflationDelta(val);
+
+   if (mnewton_ != nullptr)
+      mnewton_->setInflationDelta(val);
+
+   if (unewton_ != nullptr)
+      unewton_->getInflator().setDelta(val);
 }
 
 double Prover::getInflationChi() const
@@ -109,16 +164,22 @@ void Prover::setInflationChi(const double& val)
    ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
    chi_ = val;
 
-   if (newton_ != nullptr)
-      newton_->setInflationChi(val);
+   if (mnewton_ != nullptr)
+      mnewton_->setInflationChi(val);
+
+   if (unewton_ != nullptr)
+      unewton_->getInflator().setChi(val);
 }
 
 void Prover::setMaxIter(size_t n)
 {
    maxiter_ = n;
 
-   if (newton_ != nullptr)
-      newton_->setCertifyMaxIter(n);
+   if (mnewton_ != nullptr)
+      mnewton_->setCertifyMaxIter(n);
+
+   if (unewton_ != nullptr)
+      unewton_->setMaxIter(n);
 }
 
 size_t Prover::getMaxIter() const
@@ -135,8 +196,11 @@ void Prover::setDTol(const Tolerance& tol)
 {
    dtol_ = tol;
 
-   if (newton_ != nullptr)
-      newton_->setCertifyDTol(tol);
+   if (mnewton_ != nullptr)
+      mnewton_->setCertifyDTol(tol);
+
+   if (unewton_ != nullptr)
+      unewton_->setLocalDTol(tol);
 }
 
 } // namespace

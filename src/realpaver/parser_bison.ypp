@@ -1,7 +1,9 @@
 %{
 #include <cstring>
+#include <memory>
 #include <sstream>
 #include <string>
+#include "realpaver/Domain.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/SymbolTable.hpp"
@@ -18,6 +20,9 @@ extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern std::vector<realpaver::Variable>* realpaver_var_vector;
 extern std::vector<realpaver::Interval>* realpaver_itv_vector;
+
+extern realpaver::IntervalUnion* realpaver_itv_union;
+extern realpaver::RangeUnion* realpaver_range_union;
 
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
@@ -53,7 +58,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
-%token TK_STR_INT TK_STR_TOL TK_STR_BIN
+%token TK_STR_INT TK_STR_TOL TK_STR_BIN TK_STR_REAL
 %token TK_TABLE TK_TOL
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
@@ -150,102 +155,113 @@ var_def
         YYABORT;         
       }
 
-      realpaver::Variable v =
-         realpaver_bison_problem->addRealVar(realpaver::Interval::universe(),
-                                             $1);
+      realpaver::Variable v = realpaver_bison_problem->addVar($1);
 
       realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
       v.setTolerance(tol);
 
       realpaver_bison_symtab->insertVariable($1, v);
     }
-    var_dom
+    var_type
     ;
 
-var_dom
+var_type
+  : var_bin
+  | var_int
+  | var_real
+  ;
+
+var_bin
   : TK_STR_BIN
     {
       realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setDomain(0, 1);
-      v.setInteger();
-      v.setTolerance(realpaver::Tolerance::makeAbs(0.0));
+      std::unique_ptr<realpaver::Domain> dom(new realpaver::BinaryDomain());
 
-      // the domain must also be assigned in the problem's initial region
-      realpaver_bison_problem->setDomain(v, 0, 1);
+      v.setDomain(std::move(dom))
+       .setTolerance(realpaver::Tolerance::makeAbs(0.0));
     }
-  | TK_IN var_dom_def
   ;
- 
-var_dom_def
-  : itv
+
+var_real
+  : var_real_type TK_IN var_real_dom
+  ;
+
+var_real_type
+  :
+  | TK_STR_REAL
+  ;
+
+var_real_dom
+  : itv var_tol
     {
-		realpaver::Term::SharedRep e($1);
-      realpaver::Interval x = e->evalConst();
-
-      if (x.isEmpty())
-      {
-         realpaver_bison_error("Empty domain");
+       realpaver::Term::SharedRep e($1);
+       realpaver::Interval x = e->evalConst();
+       
+       if (x.isEmpty())
+       {
+         realpaver_bison_error("Real variable with empty domain");
          YYABORT;
-      }
-
-      realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setDomain(x);
-
-      // the domain must also be assigned in the problem's initial region
-      realpaver_bison_problem->setDomain(v, x);
-	 }
-	 var_info
+       }
+       else
+       {
+         realpaver::Variable v = realpaver_bison_problem->lastVar();
+         std::unique_ptr<realpaver::Domain>
+            dom(new realpaver::IntervalDomain(x));
+         v.setDomain(std::move(dom));
+       }
+    }
   | TK_LCBR
     {
-      if (realpaver_var_vector != nullptr)
-         realpaver_var_vector->clear();
+      if (realpaver_itv_union != nullptr)
+         realpaver_itv_union->clear();
       else
-        realpaver_var_vector = new std::vector<realpaver::Variable>();
-
-      if (realpaver_itv_vector != nullptr)
-         realpaver_itv_vector->clear();
-      else
-        realpaver_itv_vector = new std::vector<realpaver::Interval>();
-	 }
-    table_list_val TK_RCBR
+        realpaver_itv_union = new realpaver::IntervalUnion();
+    }
+    var_real_list TK_RCBR
     {
-      realpaver::Variable v = realpaver_bison_problem->lastVar();
-		realpaver_var_vector->push_back(v);
-
-
-		if (realpaver_itv_vector->size() == 0)
+      if (realpaver_itv_union->isEmpty())
       {
-         realpaver_bison_error("Bad initialization of a real variable");
-         YYABORT;
+        realpaver_bison_error("Real variable with empty domain");
+        YYABORT;
       }
+      else
+      {
+        realpaver::Variable v = realpaver_bison_problem->lastVar();
+        v.setTolerance(realpaver::Tolerance::makeAbs(0));
 
-      realpaver::Constraint c( table(realpaver_var_vector->data(),
-                                     realpaver_var_vector->size(),
-                                     realpaver_itv_vector->data(),
-                                     realpaver_itv_vector->size()) );
-
-      realpaver_bison_problem->addCtr(c);
- 
-		// assigns the variable domain
-		realpaver::Interval x = realpaver_itv_vector->at(0);
-		for (size_t i=1; i<realpaver_itv_vector->size(); ++i)
-			x |= realpaver_itv_vector->at(i);
-
-      v.setDomain(x);
-
-      // the domain must also be assigned in the problem's initial region
-      realpaver_bison_problem->setDomain(v, x);
-	 }
+        if (realpaver_itv_union->size() == 1)
+        {
+          std::unique_ptr<realpaver::Domain>
+             dom(new realpaver::IntervalDomain(realpaver_itv_union->hull()));
+          v.setDomain(std::move(dom));
+        }
+        else
+        {
+          std::unique_ptr<realpaver::Domain>
+             dom(new realpaver::IntervalUnionDomain(*realpaver_itv_union));
+          v.setDomain(std::move(dom));
+         }
+       }
+    }
   ;
 
-var_info
-  :
-  | TK_STR_INT
+var_real_list
+  : const_expr
     {
-      realpaver::Variable v = realpaver_bison_problem->lastVar();
-      v.setInteger();
-      v.setTolerance(realpaver::Tolerance::makeAbs(0.0));    
+      realpaver::Term::SharedRep e($1);
+      realpaver::Interval x = e->evalConst();
+      realpaver_itv_union->insert(x);
     }
+    var_real_tail
+  ;
+
+var_real_tail
+  :
+  | TK_COMMA var_real_list
+  ;
+
+var_tol
+  :
   | TK_STR_TOL TK_TOL
     {
       try
@@ -260,6 +276,78 @@ var_info
         YYABORT;
       }
     }
+  ;
+
+var_int
+  : TK_STR_INT TK_IN var_int_dom
+  ;
+
+var_int_dom
+  : itv
+    {
+      realpaver::Term::SharedRep e($1);
+      realpaver::Range x = realpaver::Range::roundInward(e->evalConst());
+       
+      if (x.isEmpty())
+      {
+        realpaver_bison_error("Integer variable with empty domain");
+        YYABORT;
+      }
+      else
+      {
+        realpaver::Variable v = realpaver_bison_problem->lastVar();
+        std::unique_ptr<realpaver::Domain>
+          dom(new realpaver::RangeDomain(x));
+        v.setDomain(std::move(dom));
+      }
+    }
+  | TK_LCBR
+    {
+      if (realpaver_range_union != nullptr)
+         realpaver_range_union->clear();
+      else
+        realpaver_range_union= new realpaver::RangeUnion();
+    }
+    var_int_list TK_RCBR
+    {
+       if (realpaver_range_union->isEmpty())
+       {
+         realpaver_bison_error("Integer variable with empty domain");
+         YYABORT;
+       }
+       else
+       {
+          if (realpaver_range_union->size() == 1)
+          {
+            realpaver::Variable v = realpaver_bison_problem->lastVar();
+            std::unique_ptr<realpaver::Domain>
+               dom(new realpaver::RangeDomain(realpaver_range_union->hull()));
+            v.setDomain(std::move(dom));
+          }
+          else
+          {
+            realpaver::Variable v = realpaver_bison_problem->lastVar();
+            std::unique_ptr<realpaver::Domain>
+               dom(new realpaver::RangeUnionDomain(*realpaver_range_union));
+            v.setDomain(std::move(dom));
+          }
+       }
+    }
+  ;
+
+var_int_list
+  : const_expr
+    {
+      realpaver::Term::SharedRep e($1);
+      realpaver::Range x = realpaver::Range::roundInward(e->evalConst());
+      realpaver_range_union->insert(x);
+    }
+    var_int_tail
+  ;
+
+var_int_tail
+  :
+  | TK_COMMA var_int_list
   ;
 
 alias_statement

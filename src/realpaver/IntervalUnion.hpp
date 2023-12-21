@@ -46,7 +46,12 @@ public:
    /// Gets an interval of this
    /// @param i index of an interval between 0 and size()-1
    /// @return the i-th interval of this
-   Interval operator[](size_t i) const;
+   const Interval& operator[](size_t i) const;
+
+   /// Gets a part of this
+   /// @param i index between 0 and size()-1
+   /// @param j index between 0 and size()-1 such that j >= i
+   IntervalUnion subUnion(size_t i, size_t j) const;
 
    /// @return true if this is empty
    bool isEmpty() const;
@@ -65,12 +70,24 @@ public:
    /// Contracts an interval
    /// @param x an interval
    ///
-   /// x is assigned tohull(x inter this)
-   void contract(Interval& x) const;
+   /// x is assigned to hull(x inter this)
+   void contractInterval(Interval& x) const;
+
+   /// Contracts this
+   /// @param x an interval
+   ///
+   /// this is assigned to (this inter x)
+   void contract(const Interval& x);
 
    /// Output on a stream
    /// @param os output stream
    void print(std::ostream& os) const;
+
+   /// Clears this, which becomes empty
+   void clear();
+
+   /// @return the sum of the widths of the components of this
+   double width() const;
 
 private:
    typedef std::vector<Interval> VectorType;

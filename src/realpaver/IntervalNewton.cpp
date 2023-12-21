@@ -97,7 +97,7 @@ IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
    return gs_;
 }
 
-Proof IntervalNewton::contract(IntervalRegion& X)
+Proof IntervalNewton::contract(IntervalBox& X)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
@@ -160,7 +160,7 @@ Proof IntervalNewton::contract(IntervalRegion& X)
    return proof;
 }
 
-void IntervalNewton::makeY(IntervalRegion& X)
+void IntervalNewton::makeY(IntervalBox& X)
 {
    // y := X - c
    int i = 0;
@@ -171,7 +171,7 @@ void IntervalNewton::makeY(IntervalRegion& X)
    }
 }
 
-Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
+Proof IntervalNewton::reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol)
 {
    int i = 0;
    Proof proof = Proof::Feasible;
@@ -204,14 +204,14 @@ Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
    return proof;
 }
 
-Proof IntervalNewton::certify(IntervalRegion& reg)
+Proof IntervalNewton::certify(IntervalBox& box)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
 
-   IntervalRegion X(scope());
-   X.setOnScope(reg, scope());
+   IntervalBox X(scope());
+   X.setOnScope(box, scope());
 
    do
    {
@@ -251,8 +251,8 @@ Proof IntervalNewton::certify(IntervalRegion& reg)
       }
 
       // X := y + c
-      bool hasdtol;
-      certif = certifyX(X, hasdtol);
+      bool hascdtol;
+      certif = certifyX(X, hascdtol);
 
       if (certif == Proof::Feasible)
       {
@@ -262,24 +262,24 @@ Proof IntervalNewton::certify(IntervalRegion& reg)
       }
 
       // checks the stopping criteria
-      if (nb_steps > cmaxiter_ || (!hasdtol))
+      if (nb_steps > cmaxiter_ || (!hascdtol))
          iter = false;
 
    }
    while (iter);
 
    if (proof == Proof::Feasible)
-      reg.setOnScope(X, scope());
+      box.setOnScope(X, scope());
 
    return proof;
 }
 
-Proof IntervalNewton::certifyX(IntervalRegion& X, bool& hasdtol)
+Proof IntervalNewton::certifyX(IntervalBox& X, bool& hascdtol)
 {
    // X := y + c
    int i = 0;
    Proof proof = Proof::Feasible;
-   hasdtol = true;
+   hascdtol = true;
 
    for (const auto& v : scope())
    {
@@ -289,8 +289,8 @@ Proof IntervalNewton::certifyX(IntervalRegion& X, bool& hasdtol)
       if (!dom.strictlyContains(z))
          proof = Proof::Maybe;
 
-      if (!dtol_.haveDistTolerance(z, dom))
-         hasdtol = false;
+      if (!cdtol_.haveDistTolerance(z, dom))
+         hascdtol = false;
 
       X.set(v, z);
       i = i+1;
