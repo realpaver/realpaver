@@ -117,8 +117,8 @@ private:
    Tolerance ctol_;       // tolerance on the distance between two intervals
 
    void makeY(IntervalBox& X);
-   Proof reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol);
-   Proof certifyX(IntervalBox& X, bool& hasdtol);
+   Proof reduceX(IntervalBox& X, bool& hastol);
+   Proof certifyX(IntervalBox& X, bool& hastol);
 };
 
 } // namespace
