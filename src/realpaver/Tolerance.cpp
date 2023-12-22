@@ -167,8 +167,8 @@ double Tolerance::discreteSize(const Interval& x) const
 
 std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
 {
-   os << tol.getRelTol() << "R" << ", "
-      << tol.getAbsTol() << "A";
+   os << "tol(" << tol.getRelTol() << ", "
+      << tol.getAbsTol() << ")";
    return os;
 }
 

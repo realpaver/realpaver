@@ -1,18 +1,11 @@
 --------------------
 
-Precision des floats du Logger
-Logger::setPrecision
-
-
 Log propagation :
 afficher quand on stoppe sur max steps
 afficher quand on a réduit une var mais qu'on ne propage dessus car la
 rédution n'est pas suffisante
 
-
-
-
-
+Interval Newton : log
 
 -------------------------------------------------------------------------------
 - Constraints
