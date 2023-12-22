@@ -71,15 +71,15 @@ public:
 
    /// @return the tolerance on the distance between two consecutive boxes
    ///         in the certification technique of the Newton operator
-   Tolerance getDTol() const;
+   Tolerance getTol() const;
 
    /// Sets the tolerance on the distance between two consecutive regions
    /// in the certification technique of the Newton operator
-   /// @param tol absolute or relative tolerance
+   /// @param tol a tolerance
    ///
    /// The iteration stops if two consecutive regions are far enough, i.e.
    /// the distance between them is greater than tol
-   void setDTol(const Tolerance& tol);
+   void setTol(const Tolerance& tol);
 
 private:
    struct Item {
@@ -94,7 +94,7 @@ private:
    double delta_;                   // parameter delta of inflation
    double chi_;                     // parameter chi of inflation
    size_t maxiter_;                 // maximum number of iterations
-   Tolerance dtol_;                 // tolerance for the certification technique
+   Tolerance tol_;                  // tolerance for the certification technique
 };
 
 } // namespace

@@ -23,8 +23,8 @@ NLPModel::NLPModel(const Problem& pb)
       m_(pb.nbCtrs()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
-      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
-      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     bool ismin = pb.getObjective().isMinimization();
@@ -60,8 +60,8 @@ NLPModel::NLPModel(const RealFunction& obj)
       m_(0), 
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
-      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
-      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     scope_.insert(obj.scope());
@@ -78,8 +78,8 @@ NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
       m_(ctrs.nbFuns()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
-      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
-      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     scope_.insert(obj.scope());
@@ -173,26 +173,14 @@ std::string NLPModel::getAlgorithm() const
    return alg_;
 }
 
-Tolerance NLPModel::atol() const
+Tolerance NLPModel::tol() const
 {
-   return atol_;
+   return tol_;
 }
 
-void NLPModel::setAtol(Tolerance tol)
+void NLPModel::setTol(Tolerance tol)
 {
-   ASSERT(tol.isAbsolute(), "This tolerance must be absolute");
-   atol_ = tol;
-}
-
-Tolerance NLPModel::rtol() const
-{
-   return rtol_;
-}
-
-void NLPModel::setRtol(Tolerance tol)
-{
-   ASSERT(tol.isRelative(), "This tolerance must be relative");
-   rtol_ = tol;
+   tol_ = tol;
 }
 
 Scope NLPModel::scope() const

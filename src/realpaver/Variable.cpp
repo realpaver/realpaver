@@ -19,7 +19,7 @@ VariableRep::VariableRep(const std::string& name)
       : name_(name),
         id_(NEXT_ID++),
         dom_(nullptr),
-        tol_(Tolerance::makeAbs(0.0))
+        tol_(0.0, 0.0)
 {
    dom_ = new IntervalDomain(Interval::universe());
 }

@@ -231,24 +231,6 @@ struct IntervalTraits<RawInterval> {
          return x.width() / 2.0;
    }
 
-   static inline double relWidth(const interval& x)
-   {
-      if (!x.is_finite())
-         return 1.0;
-
-      else if (x.is_zero())
-         return 0.0;
-
-      else
-      {
-         interval y(x.width()),
-                  a(std::fabs(x.left())),
-                  b(std::fabs(x.right())),
-                  z(y / (a+b));
-         return z.right();
-      }
-   }
-
    static inline double midpoint(const interval& x)
    {
       return x.midpoint();
@@ -939,7 +921,7 @@ struct IntervalTraits<RawInterval> {
       return y & sgn(x);
    }
 
-   // TODO: the role of this function is just to remove a warning due to
+   // the role of this function is just to remove a warning due to
    // the constant NaN_val that is defined but not used.
    static inline gaol::uintdouble useless_remove_warnings()
    {

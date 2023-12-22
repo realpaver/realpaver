@@ -16,8 +16,8 @@ namespace realpaver {
 
 IntervalGaussSeidel::IntervalGaussSeidel()
       : maxiter_(Param::GetIntParam("GAUSS_SEIDEL_ITER_LIMIT")),
-        xtol_(Param::GetTolParam("GAUSS_SEIDEL_XTOL")),
-        dtol_(Param::GetTolParam("GAUSS_SEIDEL_DTOL"))
+        tol_(Param::GetDblParam("GAUSS_SEIDEL_REL_TOL"),
+             Param::GetDblParam("GAUSS_SEIDEL_ABS_TOL"))
 {}
 
 size_t IntervalGaussSeidel::getMaxIter() const
@@ -32,24 +32,14 @@ void IntervalGaussSeidel::setMaxIter(size_t n)
    maxiter_ = n;
 }
 
-Tolerance IntervalGaussSeidel::getXTol() const
+Tolerance IntervalGaussSeidel::getTol() const
 {
-   return xtol_;
+   return tol_;
 }
 
-void IntervalGaussSeidel::setXTol(const Tolerance& tol)
+void IntervalGaussSeidel::setTol(const Tolerance& tol)
 {
-   xtol_ = tol;
-}
-
-Tolerance IntervalGaussSeidel::getDTol() const
-{
-   return dtol_;
-}
-
-void IntervalGaussSeidel::setDTol(const Tolerance& tol)
-{
-   dtol_ = tol;
+   tol_ = tol;
 }
 
 Proof IntervalGaussSeidel::contractPrecond(const IntervalMatrix& A,
@@ -81,7 +71,7 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix& A, IntervalVector& x,
    LOG_LOW("Interval Gauss-Seidel on A:\n" <<
            A << "\nx: " << x << "\nb: " << b);
 
-   LOG_LOW("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
+   LOG_LOW("Tol: " << tol_);
 
    Proof proof = Proof::Maybe;
 
@@ -107,9 +97,6 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix& A, IntervalVector& x,
          iter = false;
 
       else if (nb_steps > maxiter_)
-         iter = false;
-
-      else if (xtol_.hasTolerance(x))
          iter = false;
    }
    while (iter);
@@ -144,7 +131,7 @@ int IntervalGaussSeidel::innerStep(const IntervalMatrix& A, IntervalVector& x,
       if (z.isEmpty()) return 0;
       else
       {
-         if (!dtol_.haveDistTolerance(z, x.get(i)))
+         if (!tol_.areClose(z, x.get(i)))
             res = 2;    // contraction large enough to iterate
 
          x.set(i, z);

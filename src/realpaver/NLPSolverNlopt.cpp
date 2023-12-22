@@ -142,8 +142,8 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox& box,
     optimizer_->set_min_objective(f_nlopt, this);
 
     // assigns the parameters
-    optimizer_->set_ftol_rel(rtol_.getVal());
-    optimizer_->set_ftol_abs(atol_.getVal());
+    optimizer_->set_ftol_rel(tol_.getRelTol());
+    optimizer_->set_ftol_abs(tol_.getAbsTol());
     optimizer_->set_maxeval(iter_limit_);
     optimizer_->set_maxtime(this->timeLimit());
 
@@ -162,7 +162,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox& box,
     makeCtrs();
     for (size_t i=0; i<nl_ctrs_.size(); ++i)
         optimizer_->add_inequality_constraint(ctr_nlopt, &nl_ctrs_[i],
-                                              atol_.getVal());
+                                              tol_.getAbsTol());
 
     // calls the optimizer
     nlopt::result status;

@@ -97,7 +97,7 @@ bool DomainBox::isSplitable(const Variable& v) const
    Domain* dom = get(v);
 
    if (dom->isReal())
-      return !v.getTolerance().hasTolerance(dom->intervalHull());
+      return !v.getTolerance().isTight(dom->intervalHull());
 
    else
       return !dom->isCanonical();
@@ -214,14 +214,8 @@ double DomainBox::gridPerimeterOnScope(const Scope& sco) const
       Interval x = get(v)->intervalHull();
       Tolerance tol = v.getTolerance();
 
-      if (!tol.hasTolerance(x))
-      {
-         if (tol.isAbsolute())
-            p += x.width() / tol.getVal();
-
-         else
-            p += x.relWidth() / tol.getVal();
-      }
+      if (tol.isTight(x))
+         p += x.width() / tol.getAbsTol();
    }
 
    return p;

@@ -277,14 +277,8 @@ double IntervalBox::gridPerimeterOnScope(const Scope& sco) const
       Interval x = get(v);
       Tolerance tol = v.getTolerance();
 
-      if (!tol.hasTolerance(x))
-      {
-         if (tol.isAbsolute())
-            p += x.width() / tol.getVal();
-
-         else
-            p += x.relWidth() / tol.getVal();
-      }
+      if (tol.isTight(x))
+         p += x.width() / tol.getAbsTol();
    }
 
    return p;
@@ -328,7 +322,7 @@ void IntervalBox::vecPrint(std::ostream& os) const
 
 bool IntervalBox::isSplitable(const Variable& v) const
 {
-      return !v.getTolerance().hasTolerance(get(v));
+      return !v.getTolerance().isTight(get(v));
 }
 
 } // namespace

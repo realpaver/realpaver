@@ -50,17 +50,9 @@ public:
    /// @return the maximum number of iterations of the contraction method
    size_t getMaxIter() const;
 
-   /// @return the tolerance on the width of an interval in the contraction
-   ///         method
-   Tolerance getXTol() const;
-
-   /// Sets the tolerance on the width of an interval in the contraction method
-   /// @param tol absolute or relative tolerance
-   void setXTol(const Tolerance& tol);
-
    /// @return the tolerance on the distance between two consecutive intervals
    ///         in the contraction method
-   Tolerance getDTol() const;
+   Tolerance getTol() const;
 
    /// Sets the tolerance on the distance between two consecutive intervals
    /// in the contraction method
@@ -68,7 +60,7 @@ public:
    ///
    /// The iteration stops if two consecutive boxes are close enough, i.e.
    /// their distance is smaller than tol
-   void setDTol(const Tolerance& tol);
+   void setTol(const Tolerance& tol);
 
    /// Tries to derive a proof certificate for the existence of a solution
    /// in an interval box using an inflation-based algorithm
@@ -99,7 +91,7 @@ public:
 
    /// @return the tolerance on the distance between two consecutive intervals
    ///         in the certification method
-   Tolerance getCertifyDTol() const;
+   Tolerance getCertifyTol() const;
 
    /// Sets the tolerance on the distance between two consecutive intervals
    /// in the certification method
@@ -107,7 +99,7 @@ public:
    ///
    /// The iteration stops if two consecutive boxes are far enough, i.e.
    /// their distance is greater than tol
-   void setCertifyDTol(const Tolerance& tol);
+   void setCertifyTol(const Tolerance& tol);
 
 private:
    IntervalFunctionVector F_;       // vector of interval functions
@@ -116,16 +108,13 @@ private:
    RealPoint c_;                    // point of expansion
    IntervalGaussSeidel* gs_;        // Gauss-Seidel operator
 
-   // parameters of the contraction method
-   size_t maxiter_;           // maximum number of iterations (contraction)
-   Tolerance xtol_;           // tolerance on the width of an interval
-   Tolerance dtol_;           // tolerance on the distance between two intervals
+   size_t maxiter_;       // maximum number of iterations (contraction)
+   Tolerance tol_;        // tolerance on the distance between two intervals
 
-   // parameters of the certification method
-   double delta_;             // parameter delta of inflation
-   double chi_;               // parameter chi of inflation
-   size_t cmaxiter_;          // maximum number of iterations
-   Tolerance cdtol_;          // tolerance on the distance between two intervals
+   double delta_;         // parameter delta of inflation
+   double chi_;           // parameter chi of inflation
+   size_t cmaxiter_;      // maximum number of iterations
+   Tolerance ctol_;       // tolerance on the distance between two intervals
 
    void makeY(IntervalBox& X);
    Proof reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol);

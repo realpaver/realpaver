@@ -23,7 +23,8 @@ Prover::Prover(const Problem& p)
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
         maxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
-        dtol_(Param::GetTolParam("NEWTON_CERTIFY_DTOL"))
+        tol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
+             Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL"))
 {
    dag_ = std::make_shared<Dag>();
 
@@ -49,7 +50,7 @@ Prover::Prover(const Problem& p)
          {
             unewton_ = new IntervalNewtonUni();
             unewton_->setMaxIter(maxiter_);
-            unewton_->setLocalDTol(dtol_);
+            unewton_->setLocalTol(tol_);
             unewton_->getInflator().setDelta(delta_);
             unewton_->getInflator().setChi(chi_);
          }
@@ -59,7 +60,7 @@ Prover::Prover(const Problem& p)
             mnewton_->setInflationDelta(delta_);
             mnewton_->setInflationChi(chi_);
             mnewton_->setCertifyMaxIter(maxiter_);
-            mnewton_->setCertifyDTol(dtol_);
+            mnewton_->setCertifyTol(tol_);
          }
       }
    }
@@ -187,20 +188,20 @@ size_t Prover::getMaxIter() const
    return maxiter_;
 }
 
-Tolerance Prover::getDTol() const
+Tolerance Prover::getTol() const
 {
-   return dtol_;
+   return tol_;
 }
 
-void Prover::setDTol(const Tolerance& tol)
+void Prover::setTol(const Tolerance& tol)
 {
-   dtol_ = tol;
+   tol_ = tol;
 
    if (mnewton_ != nullptr)
-      mnewton_->setCertifyDTol(tol);
+      mnewton_->setCertifyTol(tol);
 
    if (unewton_ != nullptr)
-      unewton_->setLocalDTol(tol);
+      unewton_->setLocalTol(tol);
 }
 
 } // namespace

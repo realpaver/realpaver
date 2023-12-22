@@ -15,23 +15,19 @@ int main(void)
 {
    try
    {
+      
+      double lb = -1.90558487645,
+             rb = -1.9064672114;
 
-      Problem P;
-      Variable x = P.addRealVar(0, 10, "x");
-      Constraint c( in(x, Interval(0.5, 1)) );
+      cout << Double::isClose(lb, rb, 1.0e-4, 0.0) << endl;
+      
 
-      Scope scop( {x} );
-      IntervalBox B(scop);
-      cout << B << endl;
-
-      shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
-      unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(10);
-
-      Contractor3B ctc3b(ctc, x, std::move(slicer));
-
-      Proof proof = ctc3b.contract(B);
-      cout << proof << endl;
-      cout << B << endl;
+/*
+LOW.   Propagation test on x [0.001R]
+LOW.     [-1.90670349983, -1.90558487645] -> [-1.90670349983, -1.9064672114] not reduced enough
+LOW.   Propagation test on y [0.001R]
+LOW.     [0.603723250967, 0.604468999883] -> [0.604311474273, 0.604468999883] not reduced enough
+*/
 
 /*
       

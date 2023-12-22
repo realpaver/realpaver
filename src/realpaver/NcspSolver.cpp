@@ -189,8 +189,10 @@ void NcspSolver::makeContractor()
       pool->push(dop);
 
    SharedPropagator propagator = std::make_shared<Propagator>(pool);
-   Tolerance dtol = env_->getParam()->getTolParam("PROPAGATION_DTOL");
-   propagator->setDistTol(dtol);
+
+   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
+   double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
+   propagator->setTol(Tolerance(rtol, atol));
 
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
    propagator->setMaxIter(niter);
@@ -266,11 +268,9 @@ void NcspSolver::makeContractor()
 
          if (newton != nullptr)
          {
-            Tolerance tol = env_->getParam()->getTolParam("NEWTON_XTOL");
-            newton->setXTol(tol);
-            
-            tol = env_->getParam()->getTolParam("NEWTON_DTOL");
-            newton->setDTol(tol);
+            double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL"),
+                   atol = env_->getParam()->getDblParam("NEWTON_ABS_TOL");
+            newton->setTol(Tolerance(rtol, atol));
 
             int niter = env_->getParam()->getIntParam("NEWTON_ITER_LIMIT");
             newton->setMaxIter(niter);
@@ -281,11 +281,9 @@ void NcspSolver::makeContractor()
             double chi = env_->getParam()->getDblParam("INFLATION_CHI");
             newton->setInflationChi(chi);
 
-            tol = env_->getParam()->getTolParam("GAUSS_SEIDEL_XTOL");
-            newton->getGaussSeidel()->setXTol(tol);
-
-            tol = env_->getParam()->getTolParam("GAUSS_SEIDEL_DTOL");
-            newton->getGaussSeidel()->setDTol(tol);
+            rtol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_REL_TOL");
+            atol = env_->getParam()->getDblParam("GAUSS_SEIDEL_ABS_TOL");
+            newton->getGaussSeidel()->setTol(Tolerance(rtol, atol));
 
             niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
             newton->getGaussSeidel()->setMaxIter(niter);
@@ -484,8 +482,9 @@ void NcspSolver::branchAndPrune()
    double chi = env_->getParam()->getDblParam("INFLATION_CHI");
    prover_->setInflationChi(chi);
 
-   Tolerance tol = env_->getParam()->getTolParam("NEWTON_CERTIFY_DTOL");
-   prover_->setDTol(tol);
+   double rtol = env_->getParam()->getDblParam("NEWTON_CERTIFY_REL_TOL"),
+          atol = env_->getParam()->getDblParam("NEWTON_CERTIFY_ABS_TOL");
+   prover_->setTol(Tolerance(rtol, atol));
 
    // parameters
    double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");

@@ -75,27 +75,18 @@ public:
    /// @return the maximum number of iterations of the iterative method
    size_t getMaxIter() const;
 
-   /// @return the tolerance on the width of an interval in the contraction
-   ///         method
-   Tolerance getXTol() const;
-
-   /// Sets the tolerance on the width of an interval in the contraction method
-   /// @param tol absolute or relative tolerance
-   void setXTol(const Tolerance& tol);
-
    /// @return the tolerance on the distance between two consecutive intervals
    ///         in the contraction method
-   Tolerance getDTol() const;
+   Tolerance getTol() const;
 
    /// Sets the tolerance on the distance between two consecutive intervals
    /// in the contraction method
-   /// @param tol absolute or relative tolerance
-   void setDTol(const Tolerance& tol);
+   /// @param tol a tolerance
+   void setTol(const Tolerance& tol);
 
 private:
    size_t maxiter_;  // maximum number of iterations
-   Tolerance xtol_;  // tolerance on the width of an interval
-   Tolerance dtol_;  // tolerance on the distance between two intervals
+   Tolerance tol_;   // tolerance on the distance between two intervals
 
    // inner step
    // returns 0 if the system is not satisfiable; 1 if the system is satisfiable

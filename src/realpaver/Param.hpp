@@ -61,16 +61,6 @@ public:
    /// @param val value assigned
    void setDblParam(const std::string& name, double val);
 
-   /// Gets the value of a tolerance parameter
-   /// @param name name of parameter
-   /// @return value of parameter
-   Tolerance getTolParam(const std::string& name) const;
-
-   /// Sets the value of a tolerance parameter
-   /// @param name name of parameter
-   /// @param val value assigned
-   void setTolParam(const std::string& name, const Tolerance& val);
-
    /// Gets the value of a string parameter
    /// @param name name of parameter
    /// @return value of parameter
@@ -138,7 +128,6 @@ private:
 
    std::string path_;
    int lineno_;
-   std::unordered_map<std::string, Tolerance> tolmap_;
    std::unordered_map<std::string, int> intmap_;
    std::unordered_map<std::string, double> dblmap_;
    std::unordered_map<std::string, std::string> strmap_;

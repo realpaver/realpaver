@@ -313,7 +313,22 @@ size_t Interval::hashCode() const
 
 double Interval::relWidth() const
 {
-   return Interval::Traits::relWidth(impl_);
+   if (isInf())
+      return 1.0;
+
+   else if (isSingleton())
+      return 0.0;
+
+   else
+   {
+      double w = width(),
+             a = Double::abs(left()),
+             b = Double::abs(right()),
+             m = Double::max(a, b);
+
+      Interval x = Interval(w) / Interval(m);
+      return x.right();
+   }   
 }
 
 double Interval::midpoint() const

@@ -13,108 +13,66 @@
 
 namespace realpaver {
 
-Tolerance::Tolerance(double val, bool absolute) :
-   val_(val), abs_(absolute)
+Tolerance::Tolerance(double rtol, double atol)
+      : rtol_(rtol),
+        atol_(atol)
 {
-   ASSERT(val >= 0.0 && (val <= 1.0 || absolute), "bad tolerance: " << val);
+   ASSERT(rtol >= 0.0, "A relative tolerance must be positive");
+   ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
 }
 
-Tolerance::Tolerance(const std::string& str)
+double Tolerance::getRelTol() const
 {
-   if (str.size() < 2) THROW("Bad tolerance format: " + str);
-
-   size_t k = str.size()-1;
-   char c = str[k];
-
-   if (c != 'A' && c != 'R') THROW("Bad tolerance format: " + str);
-
-   Interval x(str.substr(0, k));
-   if (x.isEmpty() || x.right() < 0.0) THROW("Bad tolerance format: " + str);
-
-   abs_ = (c == 'A');
-   val_ = x.right();
+   return rtol_;
 }
 
-double Tolerance::getVal() const
+double Tolerance::getAbsTol() const
 {
-   return val_;
+   return atol_;
 }
 
-void Tolerance::setVal(double m)
+void Tolerance::setRelTol(double val)
 {
-   val_ = m;
+   ASSERT(val >= 0.0, "A relative tolerance must be positive");
+
+   rtol_ = val;
 }
 
-bool Tolerance::isAbsolute() const
+void Tolerance::setAbsTol(double val)
 {
-   return abs_;
+   ASSERT(val >= 0.0, "An absolute tolerance must be positive");
+
+   atol_ = val;
 }
 
-bool Tolerance::isRelative() const
-{
-   return !abs_;
-}
-
-Tolerance Tolerance::makeAbs(double val)
-{
-   return Tolerance(val, true);
-}
-
-Tolerance Tolerance::makeRel(double val)
-{
-   return Tolerance(val, false);
-}
-
-double Tolerance::toleranceOf(const Interval& x)
+bool Tolerance::isTight(const Interval& x) const
 {
    if (x.isEmpty())
-      return -1.0;
-
-   else if (x.isCanonical())
-      return 0.0;
- 
-   else if (abs_ || Interval::minusOnePlusOne().contains(x))
-      return x.width();
-
-   else
-      return x.relWidth();
-}
-
-bool Tolerance::hasTolerance(const Interval& x) const
-{
-   if (x.isEmpty() || x.isInf())
       return false;
 
    else if (x.isCanonical())
       return true;
 
    else
-   {
-      double px = (isAbsolute() || Interval::minusOnePlusOne().contains(x)) ?
-                     x.width() : x.relWidth();
-
-      return px <= val_;
-   }
+      return Double::isClose(x.left(), x.right(), rtol_, atol_);
 }
 
-bool Tolerance::hasTolerance(const IntervalVector& X) const
+bool Tolerance::isTight(const IntervalVector& X) const
 {
    for (size_t i=0; i<X.size(); ++i)
-      if (!hasTolerance(X.get(i)))
+      if (!isTight(X.get(i)))
          return false;
 
    return true;
 }
 
-bool Tolerance::hasTolerance(double x, double y) const
+bool Tolerance::isTight(double x, double y) const
 {
-   if (x == y) return true;
-
-   return (x < y) ? hasTolerance(Interval(x, y)) :
-                    hasTolerance(Interval(y, x));
+   return (x < y) ? isTight(Interval(x, y)) :
+                    isTight(Interval(y, x));
 }
 
-bool Tolerance::haveDistTolerance(const Interval& x, const Interval& y) const
+bool Tolerance::areClose(const Interval& x, const Interval& y) const
 {
    if (x.isEmpty() || y.isEmpty() || x.isInf() || y.isInf())
       return false;
@@ -122,10 +80,11 @@ bool Tolerance::haveDistTolerance(const Interval& x, const Interval& y) const
    double u = Double::abs(x.left() - y.left()),
           v = Double::abs(x.right() - y.right());
 
-   return (u > v) ? hasTolerance(x.left(), y.left()) :
-                    hasTolerance(x.right(), y.right());
+   return (u > v) ? isTight(x.left(), y.left()) :
+                    isTight(x.right(), y.right());
 }
 
+/*
 Interval Tolerance::maxIntervalDn(double ub) const
 {
    if (Double::isInf(ub)) return Interval::universe();
@@ -183,6 +142,7 @@ Interval Tolerance::maxIntervalUp(double lb) const
 {
    return -maxIntervalDn(-lb); 
 }
+*/
 
 double Tolerance::discreteSize(const Interval& x) const
 {
@@ -195,19 +155,10 @@ double Tolerance::discreteSize(const Interval& x) const
    else if (x.isInf())
       return Double::floor(Double::greatest());
 
-   else if (Interval::minusOnePlusOne().contains(x))
-   {
-      // absolute
-      double a = x.width() / val_,
-             b = Double::floor(a);
-
-      return (a == b) ? b : b+1.0;
-   }
-
    else
    {
-      // relative
-      double a = x.relWidth() / val_,
+      // absolute
+      double a = x.width() / atol_,
              b = Double::floor(a);
 
       return (a == b) ? b : b+1.0;
@@ -216,8 +167,8 @@ double Tolerance::discreteSize(const Interval& x) const
 
 std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
 {
-   os << tol.getVal()
-      << (tol.isAbsolute() ? "A" : "R");
+   os << tol.getRelTol() << "R" << ", "
+      << tol.getAbsTol() << "A";
    return os;
 }
 
