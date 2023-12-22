@@ -127,7 +127,7 @@ SPLIT_INNER = NO
 # iteration and Xk' the reduced domain, the variable is considered as modified
 # if the distance between Xk and Xk' is greater than this tolerance and it
 # leads to a propagation step with respect to this variable.
-PROPAGATION_REL_TOL = 1.0e-4
+PROPAGATION_REL_TOL = 1.0e-9
 PROPAGATION_ABS_TOL = 0.0
 
 # Iteration limit for the main constraint propagation loop
@@ -227,7 +227,7 @@ GAUSS_SEIDEL_ITER_LIMIT = 50
 
 # Tolerances (relative, absolute)  on the distance between consecutive interval
 # vectors in the interval Gauss-Seidel method.
-GAUSS_SEIDEL_REL_TOL = 1.0e-6
+GAUSS_SEIDEL_REL_TOL = 1.0e-9
 GAUSS_SEIDEL_ABS_TOL = 0.0
 
 # Iteration limit on the number of (outer) steps in the contraction technique
@@ -242,14 +242,14 @@ NEWTON_CERTIFY_ITER_LIMIT = 20
 # vectors in the contraction technique of the interval Newton method.
 # An iteration stops if two consecutive vectors are close enough, i.e. the
 # distance between then is smaller than this tolerance.
+NEWTON_REL_TOL = 1.0e-9
 NEWTON_ABS_TOL = 0.0
-NEWTON_REL_TOL = 1.0e-4
 
 # Tolerances (relative, absolute) on the distance between consecutive interval
 # vectors in the certification technique of the interval Newton method.
 # An iteration stops if two consecutive vectors are far enough, i.e. the
 # distance between then is greater than this tolerance.
-NEWTON_CERTIFY_REL_TOL = 1.0e-4
+NEWTON_CERTIFY_REL_TOL = 1.0e-3
 NEWTON_CERTIFY_ABS_TOL = 0.0
 
 # Let x be an interval and let m(x) be its midpoint. An inflation of x returns
