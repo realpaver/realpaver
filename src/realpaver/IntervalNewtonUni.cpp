@@ -17,12 +17,13 @@
 
 namespace realpaver {
 
-IntervalNewtonUni::IntervalNewtonUni() :
-   maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
-   xtol_(Param::GetTolParam("XTOL")),
-   dtol_(Param::GetTolParam("NEWTON_DTOL")),
-   ldtol_(Param::GetTolParam("NEWTON_CERTIFY_DTOL")),
-   inflator_()
+IntervalNewtonUni::IntervalNewtonUni()
+      : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
+        tol_(Param::GetDblParam("NEWTON_REL_TOL"),
+             Param::GetDblParam("NEWTON_ABS_TOL")),
+        ltol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
+              Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL")),
+        inflator_()
 {}
 
 size_t IntervalNewtonUni::getMaxIter() const
@@ -37,34 +38,24 @@ void IntervalNewtonUni::setMaxIter(size_t n)
    maxiter_ = n;
 }
 
-Tolerance IntervalNewtonUni::getXTol() const
+Tolerance IntervalNewtonUni::getTol() const
 {
-   return xtol_;
+   return tol_;
 }
 
-void IntervalNewtonUni::setXTol(const Tolerance& tol)
+void IntervalNewtonUni::setTol(const Tolerance& tol)
 {
-   xtol_ = tol;
+   tol_ = tol;
 }
 
-Tolerance IntervalNewtonUni::getDTol() const
+Tolerance IntervalNewtonUni::getLocalTol() const
 {
-   return dtol_;
+   return ltol_;
 }
 
-void IntervalNewtonUni::setDTol(const Tolerance& tol)
+void IntervalNewtonUni::setLocalTol(const Tolerance& tol)
 {
-   dtol_ = tol;
-}
-
-Tolerance IntervalNewtonUni::getLocalDTol() const
-{
-   return ldtol_;
-}
-
-void IntervalNewtonUni::setLocalDTol(const Tolerance& tol)
-{
-   ldtol_ = tol;
+   ltol_ = tol;
 }
 
 Inflator& IntervalNewtonUni::getInflator()
@@ -80,8 +71,7 @@ void IntervalNewtonUni::setInflator(const Inflator& inflator)
 Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
                                   Interval& x)
 {
-   LOG_LOW("Interval Newton: contract " << x);
-   LOG_LOW("Xtol: " << xtol_ << ", " << "DTol: " << dtol_);
+   LOG_LOW("Interval Newton: contract " << x << " (" << tol_ << ")");
 
    Proof proof = Proof::Maybe;
    Interval y = x;
@@ -108,11 +98,8 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
 
          if (++nbiter >= maxiter_)
             iter = false;
-
-         if (xtol_.hasTolerance(y))
-            iter = false;
  
-         if (dtol_.haveDistTolerance(prev, y))
+         if (tol_.areClose(prev, y))
             iter = false;
       }
    }
@@ -297,7 +284,7 @@ Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)
          iter = false;
       }
 
-      else if (!ldtol_.haveDistTolerance(prev, y))
+      else if (!ltol_.areClose(prev, y))
       {
          y = x;
          iter = false;

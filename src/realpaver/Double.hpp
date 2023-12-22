@@ -74,6 +74,23 @@ struct Double {
       return x != x;
    }
 
+   /// Test of closeness of two numbers
+   /// @param x a number
+   /// @param y a number
+   /// @param rel_tol a relative tolerance
+   /// @param abs_tol an absolute tolerance
+   /// @return true if x is close to y, i.e. if
+   ///         |x - y| <= max( rtol*max(|x|, |y|), atol)
+   ///          false if x or y is a NaN or +/-inf
+   static inline bool isClose(ValueType x, ValueType y, ValueType rel_tol,
+                              ValueType abs_tol)
+   {
+      if (isNan(x) || isNan(y) || isInf(x) || isInf(y))
+         return false;
+
+      return abs(y-x) <= max(rel_tol*max(abs(x), abs(y)), abs_tol);
+   }
+
    /// @param x a number
    /// @return the double before x
    static inline ValueType prevDouble(ValueType x)

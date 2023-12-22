@@ -16,30 +16,14 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a tolerance.
-///
-/// The tolerance of an interval x is equal to
-/// # -1 if x is empty
-/// # 0 if x is canonical
-/// # the width of x if the precision is ABSOLUTE
-/// # otherwise
-///     ## the width of x if x is included in [-1,+1]
-///     ## the relative width of x otherwise
+/// This is a couple of a relative tolerance and an absolute tolerance.
 ///////////////////////////////////////////////////////////////////////////////
 class Tolerance {
 public:
    /// Creates a tolerance
-   /// @param val      magnitude given as a positive real number
-   /// @param absolute true for an absolute tolerance,
-   ///                 false for a relative tolerance
-   Tolerance(double val = 0.0, bool absolute = true);
-
-   /// Creates a tolerance
-   /// @param str string representation of the tolerance, e.g.
-   ///        1.0e-6A for an absolute tolerance, 1.0-6R for a relative tolerance
-   ///
-   /// Throws an exception if the format is not respected.
-   Tolerance(const std::string& str);
+   /// @param rtol relative tolerance
+   /// @param atol absolute tolerance
+   Tolerance(double rtol = 0.0, double atol = 0.0);
 
    /// Default copy constructor
    Tolerance(const Tolerance&) = default;
@@ -50,82 +34,65 @@ public:
    /// Default destructor
    ~Tolerance() = default;
 
-   /// Creates an absolute precision
-   /// @param val magnitude given as a positive real number
-   /// @return an absolute tolerance having the given magnitude
-   static Tolerance makeAbs(double val);
+   /// @return the relative tolerance of this
+   double getRelTol() const;
 
-   /// Creates a relative precision
-   /// @param val magnitude given as a positive real number
-   /// @return an relative tolerance having the given magnitude
-   static Tolerance makeRel(double val);
+   /// @return the absolute tolerance of this
+   double getAbsTol() const;
 
-   /// @return the magnitude of this
-   double getVal() const;
+   /// Sets the relative tolerance of this
+   /// @param val a positive real number
+   void setRelTol(double val);
 
-   /// Sets the magnitude of this
-   /// @param val magnitude given as a positive real number
-   void setVal(double val);
+   /// Sets the absolute tolerance of this
+   /// @param val a positive real number
+   void setAbsTol(double val);
 
-   /// @return true if this is absolute, false otherwise
-   bool isAbsolute() const;
-
-   /// @return true if this is relative, false otherwise
-   bool isRelative() const;
-
-   /// Calculates the tolerance of an interval
+   /// Tests if an interval is tight enough with respect to this
    /// @param x an interval
-   /// @return -1 if 'x' is empty,
-   ///         0 if 'x' is canonical,
-   ///         the width of 'x' if this is absolute,
-   ///         the width of 'x' if 'x' is included in [-1, 1],
-   ///         the relative width of 'x' otherwise
-   double toleranceOf(const Interval& x);
+   /// @return true if x is tight enough, false otherwise
+   bool isTight(const Interval& x) const;
 
-   /// Tests if the tolerance of an interval is less than this
-   /// @param x an interval
-   /// @return true if the tolerance of 'x' is less than this
-   bool hasTolerance(const Interval& x) const;
-
-   /// Tests if the tolerance of every component of an interval vector is less
-   /// than this
+   /// Tests if every component of an interval vector is tight enough with
+   /// respect to this
    /// @param X an interval vector
-   /// @return true if the tolerance of 'X' is less than this
-   bool hasTolerance(const IntervalVector& X) const;
+   /// @return true if X is tight enough, false otherwise
+   bool isTight(const IntervalVector& X) const;
 
-   /// Tests if the distance between two real numbers is less than this
+   /// Tests if the distance between two real numbers is tight enough with
+   /// respect to this
    /// @param x a number
    /// @param y a number
-   /// @return true if the distance between 'x' and 'y' is less than this
-   bool hasTolerance(double x, double y) const;
+   /// @return true if the distance between 'x' and 'y' is tight enough,
+   ///         false otherwise
+   bool isTight(double x, double y) const;
 
    /// Tests if the distance between two intervals is less than this
    /// @param x an interval
    /// @param y an interval
    /// @return true if the distance between 'x' and 'y' is less than this
-   bool haveDistTolerance(const Interval& x, const Interval& y) const;
+   bool areClose(const Interval& x, const Interval& y) const;
 
    /// Gets the largest interval having this tolerance given its upper bound
    /// @param ub upper of the resulting interval
    /// @return the largest interval [lb, ub] having this tolerance
-   Interval maxIntervalDn(double ub) const;
+   //Interval maxIntervalDn(double ub) const;
 
    /// Gets the largest interval having this tolerance given its lower bound
    /// @param lb lower of the resulting interval
    /// @return the largest interval [lb, ub] having this tolerance
-   Interval maxIntervalUp(double lb) const;
+   //Interval maxIntervalUp(double lb) const;
 
-   /// Calculates the size of a partition of an interval with respect to this
+   /// Calculates the size of a partition of an interval with respect to the
+   /// absolute tolerance of this
    /// @param x an interval
    /// @return 0 if x is empty, 1 if x is canonical, the width of x divided
-   ///         by the magnitude of this rounded upward if x is included in
-   ///         [-1, +1], the relative width of x divided by the magnitude of
-   ///         this rounded upward otherwise
+   ///         by the absolute tolerance of this rounded upward otherwise
    double discreteSize(const Interval& x) const;
 
 private:
-   double val_;   // magnitude
-   bool abs_;     // true for an absolute precision
+   double rtol_;   // relative tolerance
+   double atol_;   // absolute tolerance
 };
 
 /// Output on a stream

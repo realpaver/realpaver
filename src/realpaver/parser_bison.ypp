@@ -157,8 +157,9 @@ var_def
 
       realpaver::Variable v = realpaver_bison_problem->addVar($1);
 
-      realpaver::Tolerance tol = realpaver_bison_param->getTolParam("XTOL");
-      v.setTolerance(tol);
+      double rtol = realpaver_bison_param->getDblParam("VAR_REL_TOL"),
+             atol = realpaver_bison_param->getDblParam("VAR_ABS_TOL");
+      v.setTolerance(realpaver::Tolerance(rtol, atol));
 
       realpaver_bison_symtab->insertVariable($1, v);
     }
@@ -178,7 +179,7 @@ var_bin
       std::unique_ptr<realpaver::Domain> dom(new realpaver::BinaryDomain());
 
       v.setDomain(std::move(dom))
-       .setTolerance(realpaver::Tolerance::makeAbs(0.0));
+       .setTolerance(realpaver::Tolerance(0.0, 0.0));
     }
   ;
 
@@ -227,7 +228,7 @@ var_real_dom
       else
       {
         realpaver::Variable v = realpaver_bison_problem->lastVar();
-        v.setTolerance(realpaver::Tolerance::makeAbs(0));
+        v.setTolerance(realpaver::Tolerance(0.0, 0.0));
 
         if (realpaver_itv_union->size() == 1)
         {
@@ -266,9 +267,11 @@ var_tol
     {
       try
       {
+      /* TODO, tolerance of variable
         realpaver::Tolerance tol(realpaver_bison_text);
         realpaver::Variable v = realpaver_bison_problem->lastVar();
         v.setTolerance(tol);
+        */
       }
       catch(realpaver::Exception& e)
       {

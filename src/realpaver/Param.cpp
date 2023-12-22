@@ -23,30 +23,10 @@ Param Param::instance_;
 Param::Param()
       : path_(""),
         lineno_(0),
-        tolmap_(),
         intmap_(),
         dblmap_(),
         strmap_()
 {
-   Tolerance rtol3 = Tolerance::makeRel(1.0e-3),
-             rtol4 = Tolerance::makeRel(1.0e-4),
-             rtol6 = Tolerance::makeRel(1.0e-6),
-             rtol8 = Tolerance::makeRel(1.0e-8),
-             atol9 = Tolerance::makeAbs(1.0e-9);
-
-   // tolerance
-   tolmap_.insert(std::make_pair("XTOL",                      rtol8));
-   tolmap_.insert(std::make_pair("DTOL",                      rtol6));
-   tolmap_.insert(std::make_pair("OBJ_TOL",                   rtol6));
-   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",          rtol3));
-   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_XTOL",         rtol8));
-   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_DTOL",         rtol6));
-   tolmap_.insert(std::make_pair("NEWTON_XTOL",               rtol8));
-   tolmap_.insert(std::make_pair("NEWTON_DTOL",               rtol6));
-   tolmap_.insert(std::make_pair("NEWTON_CERTIFY_DTOL",       rtol3));
-   tolmap_.insert(std::make_pair("NLP_SOLVER_ATOL",           atol9));
-   tolmap_.insert(std::make_pair("NLP_SOLVER_RTOL",           rtol4));
-
    // integer
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
    intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
@@ -74,6 +54,20 @@ Param::Param()
    dblmap_.insert(std::make_pair("INFLATION_DELTA",           1.125));
    dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
    dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT",     10.0));
+
+
+   dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
+   dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    1.0e-9));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
+   dblmap_.insert(std::make_pair("PROPAGATION_ABS_TOL",       1.0e-9));
+   dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-4));
+   dblmap_.insert(std::make_pair("NEWTON_ABS_TOL",            0.0));
+   dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-4));
+   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_ABS_TOL",    0.0));
+   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_REL_TOL",    1.0e-4));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-6));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_ABS_TOL",      0.0));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
@@ -183,36 +177,6 @@ void Param::SetStrParam(const std::string& name, const std::string& val)
    instance_.setStrParam(name, val);
 }
 
-Tolerance Param::getTolParam(const std::string& name) const
-{
-   auto it = tolmap_.find(name);
-
-   if (it == tolmap_.end())
-      THROW("Symbol '" << name << "' is not a tolerance parameter");
-
-   return it->second;
-}
-
-Tolerance Param::GetTolParam(const std::string& name)
-{
-   return instance_.getTolParam(name);
-}
-
-void Param::setTolParam(const std::string& name, const Tolerance& val)
-{
-   auto it = tolmap_.find(name);
-
-   if (it == tolmap_.end())
-      THROW("Symbol '" << name << "' is not a tolerance parameter");
-
-   tolmap_[name] = val;
-}
-
-void Param::SetTolParam(const std::string& name, const Tolerance& val)
-{
-   instance_.setTolParam(name, val);
-}
-
 void Param::throwEx()
 {
    THROW("Settings error in file '" << path_ << "' at line " << lineno_);
@@ -298,14 +262,6 @@ void Param::processParam(const std::string& name, const std::string& val)
    if (its != strmap_.end())
    {
       strmap_[name] = val;      
-      return;
-   }
-
-   // Tolerance   
-   auto itt = tolmap_.find(name);
-   if (itt != tolmap_.end())
-   {
-      tolmap_[name] = Tolerance(val);
       return;
    }
 
@@ -415,18 +371,6 @@ void Param::print(std::ostream& os) const
    for (auto it = strmap_.begin(); it != strmap_.end(); ++it)
    {
       smap.insert(std::make_pair(it->first, it->second));
-      size_t l = it->first.length();
-      if (l > lmax) lmax = l;
-   }
-
-   // tolerances
-   for (auto it = tolmap_.begin(); it != tolmap_.end(); ++it)
-   {
-      Tolerance tol = it->second;
-      std::ostringstream ostr;
-      ostr << tol;
-
-      smap.insert(std::make_pair(it->first, ostr.str()));
       size_t l = it->first.length();
       if (l > lmax) lmax = l;
    }

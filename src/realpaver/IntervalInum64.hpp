@@ -190,11 +190,6 @@ struct IntervalTraits<RawInterval> {
       return x.rad();
    }
 
-   static inline double relWidth(const interval& x)
-   {
-      return x.rel_wid();
-   }
-
    static inline double midpoint(const interval& x)
    {
       return x.mid();

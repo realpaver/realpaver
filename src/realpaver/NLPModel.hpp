@@ -99,19 +99,12 @@ public:
    /// @return the optimization status
    OptimizationStatus status() const;
 
-   /// @return the absolute tolerance on the objective function
-   Tolerance atol() const;
+   /// @return the tolerance on the objective function
+   Tolerance tol() const;
 
-   /// Assigns the absolute tolerance on the objective function
+   /// Assigns the tolerance on the objective function
    /// @param tol new value
-   void setAtol(Tolerance tol);
-
-   /// @return the relative tolerance on the objective function
-   Tolerance rtol() const;
-
-   /// Assigns the relative tolerance on the objective function
-   /// @param tol new value
-   void setRtol(Tolerance tol);
+   void setTol(Tolerance tol);
 
    /// @return the scope of this
    Scope scope() const;
@@ -125,14 +118,13 @@ protected:
    size_t n_;     // number of variables
    size_t m_;     // number of constraints
 
-   RealPoint* best_;                    // Optimal point
-   double best_val_;                    // objective function value for optimal point
+   RealPoint* best_;             // Optimal point
+   double best_val_;             // objective function value for optimal point
    OptimizationStatus status_;
 
-   double time_limit_;                             // Stop criterion based on time spend to optimize
-   size_t iter_limit_;                             // Stop criterion based on the number of iterations
-   Tolerance atol_;                                // Stop criterion based on absolute tolerance on the objective
-   Tolerance rtol_;                                // Stop criterion based on relative tolerance on the objective
+   double time_limit_;  // Stop criterion based on time spend to optimize
+   size_t iter_limit_;  // Stop criterion based on the number of iterations
+   Tolerance tol_;      // Stop criterion based on tolerance on the objective
 
    std::string alg_;                               // Local optimization algorithm
 };

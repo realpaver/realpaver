@@ -42,7 +42,7 @@ Variable Problem::addVar(const std::string& name)
 
    Variable v(os.str());
    v.setId(id)
-    .setTolerance(Tolerance::makeAbs(0.0));
+    .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -66,7 +66,7 @@ Variable Problem::addBinaryVar(const std::string& name)
    Variable v(os.str());
    v.setId(id)
     .setDomain(std::move(dom))
-    .setTolerance(Tolerance::makeAbs(0.0));
+    .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -88,7 +88,7 @@ VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
 
       v.setId(id)
        .setDomain(std::move(dom))
-       .setTolerance(Tolerance::makeAbs(0.0));
+       .setTolerance(Tolerance(0.0, 0.0));
 
       vars_.push_back(v);
       scope_.insert(v);
@@ -120,7 +120,7 @@ Variable Problem::addIntVar(const Range& r, const std::string& name)
    Variable v(os.str());
    v.setId(id)
     .setDomain(std::move(dom))
-    .setTolerance(Tolerance::makeAbs(0.0));
+    .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -146,7 +146,7 @@ Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
    Variable v(os.str());
    v.setId(id)
     .setDomain(std::move(dom))
-    .setTolerance(Tolerance::makeAbs(0.0));
+    .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -168,7 +168,7 @@ VariableVector Problem::addIntVarVector(const std::string& name, int first, int 
 
       v.setId(id)
        .setDomain(std::move(dom))
-       .setTolerance(Tolerance::makeAbs(0.0));
+       .setTolerance(Tolerance(0.0, 0.0));
 
       vars_.push_back(v);
       scope_.insert(v);
@@ -197,10 +197,13 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
 
    std::unique_ptr<Domain> dom(new IntervalDomain(x));
 
+   double rtol = Param::GetDblParam("VAR_REL_TOL"),
+          atol = Param::GetDblParam("VAR_ABS_TOL");
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(std::move(dom))
-    .setTolerance(Param::GetTolParam("XTOL"));
+    .setTolerance(Tolerance(rtol, atol));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -223,10 +226,13 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
 
    std::unique_ptr<Domain> dom(new IntervalUnionDomain(u));
 
+   double rtol = Param::GetDblParam("VAR_REL_TOL"),
+          atol = Param::GetDblParam("VAR_ABS_TOL");
+
    Variable v(os.str());
    v.setId(id)
     .setDomain(std::move(dom))
-    .setTolerance(Param::GetTolParam("XTOL"));
+    .setTolerance(Tolerance(rtol, atol));
 
    vars_.push_back(v);
    scope_.insert(v);
@@ -239,6 +245,9 @@ VariableVector Problem::addRealVarVector(const std::string& name, int first,
 {
    VariableVector vec(name, first, last);
 
+   double rtol = Param::GetDblParam("VAR_REL_TOL"),
+          atol = Param::GetDblParam("VAR_ABS_TOL");
+
    for (int i=first; i<=last; ++i)
    {
       Variable v = vec[i];
@@ -248,7 +257,7 @@ VariableVector Problem::addRealVarVector(const std::string& name, int first,
 
       v.setId(id)
        .setDomain(std::move(dom))
-       .setTolerance(Param::GetTolParam("XTOL"));
+       .setTolerance(Tolerance(rtol, atol));
 
       vars_.push_back(v);
       scope_.insert(v);

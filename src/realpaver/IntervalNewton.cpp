@@ -23,12 +23,13 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
         c_(F.scope()),
         gs_(nullptr),
         maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
-        xtol_(Param::GetTolParam("NEWTON_XTOL")),
-        dtol_(Param::GetTolParam("NEWTON_DTOL")),
+        tol_(Param::GetDblParam("NEWTON_REL_TOL"),
+             Param::GetDblParam("NEWTON_ABS_TOL")),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
         cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
-        cdtol_(Param::GetTolParam("NEWTON_CERTIFY_DTOL"))
+        ctol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
+              Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL"))
 {
    ASSERT(F.nbVars() == F.nbFuns(),
           "Interval Newton defined with a non-square system");
@@ -46,8 +47,11 @@ IntervalNewton::IntervalNewton(const IntervalNewton& N)
         c_(N.c_),
         gs_(nullptr),
         maxiter_(N.maxiter_),
-        xtol_(N.xtol_),
-        dtol_(N.dtol_)
+        tol_(N.tol_),
+        delta_(N.delta_),
+        chi_(N.chi_),
+        cmaxiter_(N.cmaxiter_),
+        ctol_(N.ctol_)
 {
    gs_ = new IntervalGaussSeidel(*N.gs_);
 }
@@ -72,24 +76,14 @@ size_t IntervalNewton::getMaxIter() const
    return maxiter_;
 }
 
-Tolerance IntervalNewton::getXTol() const
+Tolerance IntervalNewton::getTol() const
 {
-   return xtol_;
+   return tol_;
 }
 
-void IntervalNewton::setXTol(const Tolerance& tol)
+void IntervalNewton::setTol(const Tolerance& tol)
 {
-   xtol_ = tol;
-}
-
-Tolerance IntervalNewton::getDTol() const
-{
-   return dtol_;
-}
-
-void IntervalNewton::setDTol(const Tolerance& tol)
-{
-   dtol_ = tol;
+   tol_ = tol;
 }
 
 IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
@@ -192,11 +186,8 @@ Proof IntervalNewton::reduceX(IntervalBox& X, bool& hasxtol, bool& hasdtol)
 
       Interval reduced = dom & z;
 
-      if (!dtol_.haveDistTolerance(reduced, dom))
+      if (!tol_.areClose(reduced, dom))
          hasdtol = false;
-
-      if (!xtol_.hasTolerance(reduced))
-         hasxtol = false;
 
       X.set(v, reduced);
       i = i+1;
@@ -289,7 +280,7 @@ Proof IntervalNewton::certifyX(IntervalBox& X, bool& hascdtol)
       if (!dom.strictlyContains(z))
          proof = Proof::Maybe;
 
-      if (!cdtol_.haveDistTolerance(z, dom))
+      if (!ctol_.areClose(z, dom))
          hascdtol = false;
 
       X.set(v, z);
@@ -330,14 +321,14 @@ size_t IntervalNewton::getCertifyMaxIter() const
    return cmaxiter_;
 }
 
-Tolerance IntervalNewton::getCertifyDTol() const
+Tolerance IntervalNewton::getCertifyTol() const
 {
-   return cdtol_;
+   return ctol_;
 }
 
-void IntervalNewton::setCertifyDTol(const Tolerance& tol)
+void IntervalNewton::setCertifyTol(const Tolerance& tol)
 {
-   cdtol_ = tol;
+   ctol_ = tol;
 }
 
 void IntervalNewton::print(std::ostream& os) const

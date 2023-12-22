@@ -76,8 +76,6 @@ struct IntervalTraits
 
    static double radius(const interval& x);
 
-   static double relWidth(const interval& x);
-
    static double midpoint(const interval& x);
 
    static double mig(const interval& x);

@@ -18,19 +18,20 @@ namespace realpaver {
 Propagator::Propagator(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
-        dtol_(Param::GetTolParam("PROPAGATION_DTOL")),
+        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"),
+             Param::GetDblParam("PROPAGATION_ABS_TOL")),
         maxiter_(Param::GetIntParam("PROPAGATION_ITER_LIMIT")),
         certif_()
 {}
 
-Tolerance Propagator::getDistTol() const
+Tolerance Propagator::getTol() const
 {
-   return dtol_;
+   return tol_;
 }
 
-void Propagator::setDistTol(Tolerance tol)
+void Propagator::setTol(Tolerance tol)
 {
-   dtol_ = tol;
+   tol_ = tol;
 }
 
 size_t Propagator::poolSize() const
@@ -103,7 +104,7 @@ Proof Propagator::contract(IntervalBox& box)
    size_t nb_steps = 0;
 
    LOG_NL();
-   LOG_INTER("Propagator [" << dtol_ << "]");
+   LOG_INTER("Propagator [" << tol_ << "]");
    LOG_INTER("Current box: " << box);
 
    do
@@ -134,10 +135,10 @@ Proof Propagator::contract(IntervalBox& box)
                   const Interval& prev = copy->get(v);
                   const Interval& curr = box.get(v);
 
-                  LOG_LOW("Propagation test on " << v.getName() << " ["
-                                                 << dtol_ << "]");
+                  LOG_LOW("Propagation test on " << v.getName() << " ("
+                                                 << tol_ << ")");
 
-                  if (!dtol_.haveDistTolerance(prev, curr))
+                  if (!tol_.areClose(prev, curr))
                   {
                      LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
                                   << " -> propagation");

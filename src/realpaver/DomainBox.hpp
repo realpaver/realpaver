@@ -136,11 +136,10 @@ public:
 
    /// @return the grid perimeter of this
    ///
-   /// Given xi in Di with tolerance Ei (Absolute or Relative) for each i,
-   /// the grid perimeter is the sum for each i of the following quantity:
+   /// Given xi in Di with tolerance Ei for each i, the grid perimeter is the
+   /// sum for each i of the following quantity:
    /// - 0.0 if Di has tolerance Ei
-   /// - width(Di) / Ei if Ei is absolute
-   /// - relative width(Di) / Ei if Ei is relative
+   /// - width(Di) / Ei (where Ei is the absolute tolerance) otherwise
    double gridPerimeter() const;
 
    /// @return the grid perimeter for some components of this

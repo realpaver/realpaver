@@ -60,11 +60,11 @@ public:
    ///@}
 
    /// @return the tolerance used as stopping criterion
-   Tolerance getDistTol() const;
+   Tolerance getTol() const;
 
    /// Sets the tolerance used as stopping criterion
    /// @param tol new value of the tolerance
-   void setDistTol(Tolerance tol);
+   void setTol(Tolerance tol);
 
    /// @return the maximum number of propagation steps
    size_t getMaxIter() const;
@@ -80,7 +80,7 @@ public:
 
 private:
    SharedContractorPool pool_;   // pool of contractors
-   Tolerance dtol_;              // tolerance used for propagation
+   Tolerance tol_;               // tolerance used for propagation
    size_t maxiter_;              // maximum number of propagation steps
    std::vector<Proof> certif_;   // proof certificates of contractors
 

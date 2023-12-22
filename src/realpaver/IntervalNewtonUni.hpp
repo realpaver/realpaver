@@ -96,34 +96,26 @@ public:
    /// @return the maximum number of iterations of the iterative method
    size_t getMaxIter() const;
 
-   /// @return the tolerance on the width of an interval in the contraction
-   ///         method
-   Tolerance getXTol() const;
-
-   /// Sets the tolerance on the width of an interval in the contraction method
-   /// @param tol absolute or relative tolerance
-   void setXTol(const Tolerance& tol);
-
    /// @return the tolerance on the distance between two consecutive intervals
    ///         in the contraction method
-   Tolerance getDTol() const;
+   Tolerance getTol() const;
 
    /// Sets the tolerance on the distance between two consecutive intervals
    /// in the contraction method
    /// @param tol absolute or relative tolerance
-   void setDTol(const Tolerance& tol);
+   void setTol(const Tolerance& tol);
 
    /// @return the tolerance on the distance between two consecutive intervals
    ///         in the local search method
-   Tolerance getLocalDTol() const;
+   Tolerance getLocalTol() const;
 
    /// Sets the tolerance on the distance between two consecutive intervals
    /// in the local search method
-   /// @param tol absolute or relative tolerance`
+   /// @param tol a tolerance`
    ///
    /// An iteration stops if the distance between two consecutive is greater
    /// than the tolerance, i.e. the method diverges.
-   void setLocalDTol(const Tolerance& tol);
+   void setLocalTol(const Tolerance& tol);
 
    /// @returns the inflator used by the local search method
    Inflator& getInflator();
@@ -134,9 +126,8 @@ public:
 
 private:
    size_t maxiter_;
-   Tolerance xtol_;
-   Tolerance dtol_;
-   Tolerance ldtol_;
+   Tolerance tol_;
+   Tolerance ltol_;
    Inflator inflator_;
 
    Proof shrinkLeft(IntervalFunctionUni& f, Interval& x);
