@@ -59,7 +59,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT TK_STR_TOL TK_STR_BIN TK_STR_REAL
-%token TK_TABLE TK_TOL
+%token TK_TABLE
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
@@ -263,15 +263,30 @@ var_real_tail
 
 var_tol
   :
-  | TK_STR_TOL TK_TOL
+  | TK_STR_TOL TK_LPAR real TK_COMMA real TK_RPAR
     {
       try
       {
-      /* TODO, tolerance of variable
-        realpaver::Tolerance tol(realpaver_bison_text);
-        realpaver::Variable v = realpaver_bison_problem->lastVar();
-        v.setTolerance(tol);
-        */
+        // relative tolerance
+        realpaver::Term::SharedRep er($3);
+        realpaver::Interval xr = er->evalConst();
+        double rtol = xr.right();
+
+        // absolute tolerance
+        realpaver::Term::SharedRep ea($5);
+        realpaver::Interval xa = ea->evalConst();
+        double atol = xa.right();
+         
+        if ((rtol<0.0) || (atol<0.0))
+        {
+          YYABORT;         
+        }
+        else
+        {
+          realpaver::Tolerance tol(rtol, atol);
+          realpaver::Variable v = realpaver_bison_problem->lastVar();
+          v.setTolerance(tol);
+        }
       }
       catch(realpaver::Exception& e)
       {

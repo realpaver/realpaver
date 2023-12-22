@@ -176,7 +176,7 @@ std::ostream& operator<<(std::ostream& os, const Variable& v)
       << " in " << (*v.getDomain());
 
    if (v.isReal())
-      os << " tol " << v.getTolerance();
+      os << " " << v.getTolerance();
 
    return os;
 }
