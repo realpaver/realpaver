@@ -124,6 +124,7 @@ Proof Propagator::contract(IntervalBox& box)
             if (++nb_steps > maxiter_)
             {
                count = 0;
+               LOG_INTER("Stops on maxiter: " << maxiter_);
             }
             else
             {
