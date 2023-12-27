@@ -142,7 +142,7 @@ public:
 private:
    std::vector<Variable> args_;
    Term t_;
-   Scope scope_;
+   Scope scop_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

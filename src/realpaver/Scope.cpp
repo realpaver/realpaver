@@ -17,6 +17,7 @@ namespace realpaver {
 ScopeRep::ScopeRep()
       : m_(),
         scopeMap_(nullptr),
+        hcode_(0),
         minid_(0),
         maxid_(0)
 {}
@@ -24,6 +25,7 @@ ScopeRep::ScopeRep()
 ScopeRep::ScopeRep(const ScopeRep& other)
       : m_(other.m_),
         scopeMap_(nullptr),
+        hcode_(other.hcode_),
         minid_(other.minid_),
         maxid_(other.maxid_)
 {
@@ -60,6 +62,8 @@ void ScopeRep::makeMap()
       for (auto it : m_) aux->insert(it.first.id());
       scopeMap_ = aux;
    }
+
+   hcode_ = scopeMap_->hashCode();
 }
 
 size_t ScopeRep::size() const
@@ -171,6 +175,11 @@ void ScopeRep::remove(const Variable& v, size_t n)
    }
 }
 
+size_t ScopeRep::hashCode() const
+{
+   return hcode_;
+}
+
 void ScopeRep::print(std::ostream& os) const
 {
    os << "{";
@@ -203,6 +212,11 @@ Scope::Scope(std::shared_ptr<ScopeRep> rep) : rep_(rep)
 void Scope::insert(Variable v)
 {
    insert(v, 1);
+}
+
+size_t Scope::hashCode() const
+{
+   return rep_->hashCode();
 }
 
 void Scope::insert(Variable v, size_t n)

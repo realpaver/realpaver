@@ -16,10 +16,13 @@ int main(void)
    try
    {
       
-      double lb = -1.90558487645,
-             rb = -1.9064672114;
+      Problem P;
+      Variable x = P.addRealVar(-1, 2, "x"),
+               y = P.addRealVar(0, 6, "y"),
+               n = P.addIntVar(1, 7, "n"),
+               b = P.addBinaryVar("b");
 
-      cout << Double::isClose(lb, rb, 1.0e-4, 0.0) << endl;
+      cout << P.scope() << " " << P.scope().hashCode() << endl;
       
 
 /*

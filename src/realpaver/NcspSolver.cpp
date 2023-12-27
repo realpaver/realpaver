@@ -688,7 +688,7 @@ std::pair<DomainBox, Proof> NcspSolver::getSolution(size_t i) const
    }
 }
 
-size_t NcspSolver::nbPendingBoxes() const
+size_t NcspSolver::nbPendingNodes() const
 {
    if (preproc_->isSolved())
       return 0;
@@ -699,7 +699,7 @@ size_t NcspSolver::nbPendingBoxes() const
 
 DomainBox NcspSolver::getPendingBox(size_t i) const
 {
-   ASSERT(i < nbPendingBoxes(), "Bad access to a pending box in a Ncsp solver");
+   ASSERT(i < nbPendingNodes(), "Bad access to a pending box in a Ncsp solver");
 
    if (withPreprocessing_)
    {

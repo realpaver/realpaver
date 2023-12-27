@@ -128,8 +128,8 @@ public:
    virtual bool dependsOn(const Variable& v) const = 0;
 
    /// Makes the scope of this
-   /// @param s the set of variables occurring in this
-   virtual void makeScope(Scope& s) const = 0;
+   /// @param scop the set of variables occurring in this
+   virtual void makeScope(Scope& scop) const = 0;
 
    /// @return a new representation such that the root of this is cloned and
    ///         its sub-terms are shared
@@ -264,10 +264,10 @@ public:
    bool dependsOn(const Variable& v) const;
 
    /// Inserts the variables of this in a scope
-   /// @param s scope modified
-   void makeScope(Scope& s) const;
+   /// @param scop scope modified
+   void makeScope(Scope& scop) const;
 
-   /// @return creates and returns thz scope of this
+   /// @return creates and returns the scope of this
    Scope scope() const;
 
    ///@{
@@ -369,7 +369,7 @@ public:
    bool isMinusOne() const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
-   void makeScope(Scope& s) const override;
+   void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -398,7 +398,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
-   void makeScope(Scope& s) const override;
+   void makeScope(Scope& scop) const override;
    bool isVar() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -467,7 +467,7 @@ public:
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
    virtual bool isLinear() const override;
-   void makeScope(Scope& s) const override;
+   void makeScope(Scope& scop) const override;
    ///@}
 
 protected:
@@ -869,7 +869,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
    bool dependsOn(const Variable& v) const override;
-   void makeScope(Scope& s) const override;
+   void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}

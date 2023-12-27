@@ -91,11 +91,11 @@ public:
    /// include the variables fixed at preprocessing time.
    std::pair<DomainBox, Proof> getSolution(size_t i) const;
 
-   /// @return the number of unexplored boxes after the solving phase
-   size_t nbPendingBoxes() const;
+   /// @return the number of unexplored nodes after the solving phase
+   size_t nbPendingNodes() const;
 
    /// Gets a pending box after the solving phase
-   /// @param i an index between 0 and nbPendingBoxes()-1
+   /// @param i an index between 0 and nbPendingNodes()-1
    /// @return the i-th pending box in this
    ///
    /// The scope of the box is the scope of the initial problem, i.e. it must

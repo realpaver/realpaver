@@ -824,8 +824,8 @@ public:
    Scope scope() const;
 
    /// Assigns the scope of this
-   /// @param s scope assigned
-   void setScope(Scope s);
+   /// @param scop scope assigned
+   void setScope(Scope scop);
 
    /// Interval evaluation of this
    /// @param box the variable domains
@@ -959,7 +959,7 @@ private:
    std::vector<DagVar*> vnode_;  // vector of variable nodes of the function
                                  // sorted by an ascending ordering of the
                                  // identifiers of the variables
-   Scope scope_;                 // the set of variables
+   Scope scop_;                  // the set of variables
    Interval image_;              // bounds of the function, i.e. the co-domain
    size_t idx_;                  // index in the dag
 
@@ -1205,7 +1205,7 @@ private:
    std::unordered_map<size_t, IndexList> omap_;
 
    // scope
-   Scope scope_;
+   Scope scop_;
 
    // current context that stores an interval domain for each node of this dag
    DagContext* context_;

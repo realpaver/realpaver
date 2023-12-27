@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Constraint.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -31,7 +32,7 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel)
 ///////////////////////////////////////////////////////////////////////////////
 
 ConstraintRep::ConstraintRep()
-      : scope_(),
+      : scop_(),
         hcode_(0)
 {}
 
@@ -45,17 +46,17 @@ size_t ConstraintRep::hashCode() const
 
 Scope ConstraintRep::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
-void ConstraintRep::setScope(Scope s)
+void ConstraintRep::setScope(Scope scop)
 {
-   scope_ = s;
+   scop_ = ScopeBank::getInstance()->insertScope(scop);
 }
 
 bool ConstraintRep::dependsOn(Variable v) const
 {
-   return scope_.contains(v);
+   return scop_.contains(v);
 }
 
 bool ConstraintRep::isEquation() const

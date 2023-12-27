@@ -359,10 +359,10 @@ int main(int argc, char** argv)
          }
 
          // writes the hull of the pending nodes
-         if (solver.nbPendingBoxes() > 0)
+         if (solver.nbPendingNodes() > 0)
          {
             IntervalBox hp(solver.getPendingBox(0));
-            for (size_t i=1; i<solver.nbPendingBoxes(); ++i)
+            for (size_t i=1; i<solver.nbPendingNodes(); ++i)
             {
                IntervalBox aux(solver.getPendingBox(i));
                hp.glue(aux);

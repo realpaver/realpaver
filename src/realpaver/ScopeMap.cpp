@@ -39,6 +39,16 @@ ScopeIdMap* ScopeIdMap::clone() const
    return new ScopeIdMap(*this);
 }
 
+size_t ScopeIdMap::hashCode() const
+{
+   size_t h = 0;
+
+   for (size_t i=1; i<=last_; ++i)
+      h = hash2(h, i);
+
+   return h;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ScopeSeqMap::ScopeSeqMap(size_t first, size_t last)
@@ -62,6 +72,16 @@ ScopeSeqMap::ScopeSeqMap(const ScopeSeqMap& other)
 ScopeSeqMap* ScopeSeqMap::clone() const
 {
    return new ScopeSeqMap(*this);
+}
+
+size_t ScopeSeqMap::hashCode() const
+{
+   size_t h = first_;
+
+   for (size_t i=first_+1; i<=last_; ++i)
+      h = hash2(h, i);
+
+   return h;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,6 +115,25 @@ ScopeHashMap::ScopeHashMap(const ScopeHashMap& other)
 ScopeHashMap* ScopeHashMap::clone() const
 {
    return new ScopeHashMap(*this);
+}
+
+size_t ScopeHashMap::hashCode() const
+{
+   auto it = m_.begin();
+
+   if (it == m_.end())
+      return 0;
+
+   size_t h = it->first;
+   ++it;
+
+   while (it != m_.end())
+   {
+      h = hash2(h, it->first);
+      ++it;
+   }
+
+   return h;
 }
 
 } // namespace

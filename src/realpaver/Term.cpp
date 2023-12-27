@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/ScopeBank.hpp"
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
@@ -219,9 +220,9 @@ bool Term::dependsOn(const Variable& v) const
    return rep_->dependsOn(v);
 }
 
-void Term::makeScope(Scope& s) const
+void Term::makeScope(Scope& scop) const
 {
-   rep_->makeScope(s);
+   rep_->makeScope(scop);
 }
 
 Term::SharedRep Term::rep() const
@@ -314,9 +315,9 @@ Term Term::clone() const
 
 Scope Term::scope() const
 {
-   Scope s;
-   makeScope(s);
-   return s;
+   Scope scop;
+   makeScope(scop);
+   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 Proof Term::contract(IntervalBox& box, const Interval& img)
@@ -1029,7 +1030,7 @@ bool TermConst::isLinear() const
    return true;
 }
 
-void TermConst::makeScope(Scope& s) const
+void TermConst::makeScope(Scope& scop) const
 {}
 
 TermRep* TermConst::cloneRoot() const
@@ -1100,9 +1101,9 @@ bool TermVar::isLinear() const
    return true;
 }
 
-void TermVar::makeScope(Scope& s) const
+void TermVar::makeScope(Scope& scop) const
 {
-   s.insert(v_);
+   scop.insert(v_);
 }
 
 bool TermVar::isVar() const
@@ -1234,10 +1235,10 @@ bool TermOp::isLinear() const
    return isConstant();
 }
 
-void TermOp::makeScope(Scope& s) const
+void TermOp::makeScope(Scope& scop) const
 {
    for (auto sub : v_)
-      sub->makeScope(s);
+      sub->makeScope(scop);
 }
 
 size_t TermOp::arity() const
@@ -2290,10 +2291,10 @@ bool TermLin::dependsOn(const Variable& v) const
    return it != terms_.end();
 }
 
-void TermLin::makeScope(Scope& s) const
+void TermLin::makeScope(Scope& scop) const
 {
    for (const auto& itm : terms_)
-      s.insert(itm.var);
+      scop.insert(itm.var);
 }
 
 TermRep* TermLin::cloneRoot() const

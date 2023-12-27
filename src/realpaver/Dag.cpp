@@ -14,6 +14,7 @@
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -1408,7 +1409,7 @@ DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
       : dag_(dag),
         node_(),
         vnode_(),
-        scope_(),
+        scop_(),
         image_(image),
         idx_(0),
         inode_()
@@ -1485,12 +1486,12 @@ size_t DagFun::index() const
 
 Scope DagFun::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
-void DagFun::setScope(Scope s)
+void DagFun::setScope(Scope scop)
 {
-   scope_ = s;
+   scop_ = ScopeBank::getInstance()->insertScope(scop);
 }
 
 double DagFun::realDeriv(size_t i) const
@@ -1863,7 +1864,7 @@ Dag::Dag()
         fun_(),
         vmap_(),
         omap_(),
-        scope_()
+        scop_()
 {
    defaultContext_ = new DagContext();
    context_ = defaultContext_;
@@ -2009,8 +2010,8 @@ size_t Dag::insertVarNode(const Variable& v)
    else
       index = it->second;
 
-   // insertion in the scope
-   scope_.insert(v);
+   // insertion in the scope, TODO: use of the bank of scopes
+   scop_.insert(v);
 
    return index;
 }
@@ -2095,7 +2096,7 @@ DagVar* Dag::findVarNode(size_t id) const
 
 Scope Dag::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 bool Dag::intervalPointEval(const RealPoint& pt, IntervalVector& val)

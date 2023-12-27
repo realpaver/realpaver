@@ -25,30 +25,30 @@ class DomainBox;
 class IntervalBox : public IntervalVector {
 public:
    /// Creates an interval box
-   /// @param sco scope of this
+   /// @param scop scope of this
    ///
    /// The domains in this are assigned to the hull of domains enclosed in the
    /// variables
-   IntervalBox(Scope sco);
+   IntervalBox(Scope scop);
 
    /// Creates an interval box
-   /// @param sco scope of this
+   /// @param scop scope of this
    /// @param x interval assigned to each element of this
-   IntervalBox(Scope sco, const Interval& x);
+   IntervalBox(Scope scop, const Interval& x);
 
    /// Creates an interval box
-   /// sco scope of this
-   /// X interval vector having the same size than sco
+   /// @param scop scope of this
+   /// @param X interval vector having the same size than sco
    ///
-   /// The i-th variable in sco is assigned to X[i] for each i.
-   IntervalBox(Scope sco, const IntervalVector& X);
+   /// The i-th variable in scop is assigned to X[i] for each i.
+   IntervalBox(Scope scop, const IntervalVector& X);
 
    /// Creates an interval box
-   /// @param sco scope of this
-   /// @param X real vector having the same size than sco
+   /// @param scop scope of this
+   /// @param X real vector having the same size than scop
    ///
-   /// The i-th variable in sco is assigned to X[i] for each i.
-   IntervalBox(Scope sco, const RealVector& X);
+   /// The i-th variable in scop is assigned to X[i] for each i.
+   IntervalBox(Scope scop, const RealVector& X);
 
    /// Creates an interval box
    /// @param pt a real point assigned to this
@@ -65,10 +65,10 @@ public:
 
    /// Creates a box from another box projected on a scope
    /// @param B an interval box
-   /// @param sco a scope that is included in the scope of B
+   /// @param scop a scope that is included in the scope of B
    ///
-   /// this is equal to B restricted to sco
-   IntervalBox(const IntervalBox& B, Scope sco);
+   /// this is equal to B restricted to scop
+   IntervalBox(const IntervalBox& B, Scope scop);
 
    /// Default assignment operator
    IntervalBox& operator=(const IntervalBox&) = default;
@@ -155,18 +155,18 @@ public:
 
    /// Glue a box in this, restricted to some scope
    /// @param B an interval box
-   /// @param sco a scope included in the scope of this and B
+   /// @param scop a scope included in the scope of this and B
    ///
    /// for each variable v in the given scope, its domain in this is
    /// assigned to the hull of its domain in this and its domain in B
-   void glueOnScope(const IntervalBox& B, const Scope& sco);
+   void glueOnScope(const IntervalBox& B, const Scope& scop);
 
    /// Assignment on a scope
    /// @param B an interval box
-   /// @param sco a scope included in the scope of this and B
+   /// @param scop a scope included in the scope of this and B
    ///
-   /// this[sco] is assigned to B[sco]
-   void setOnScope(const IntervalBox& B, const Scope& sco);
+   /// this[scop] is assigned to B[sco]
+   void setOnScope(const IntervalBox& B, const Scope& scop);
 
    /// Midpoint of this on a scope
    /// @param sco a scope included in the scope of this
@@ -174,14 +174,14 @@ public:
    RealPoint midpointOnScope(const Scope& sco) const;
 
    /// Midpoint of this on a scope
-   /// @param sco a scope included in the scope of this
-   /// @param pt midpoint of this restricted to sco
-   void midpointOnScope(const Scope& sco, RealPoint& pt) const;
+   /// @param scop a scope included in the scope of this
+   /// @param pt midpoint of this restricted to scop
+   void midpointOnScope(const Scope& scop, RealPoint& pt) const;
 
    /// Gets a sub-box
-   /// @param sco a scope included in the scope of this
-   /// @return this restricted to sco
-   IntervalBox subRegion(const Scope& sco) const;
+   /// @param scop a scope included in the scope of this
+   /// @return this restricted to scop
+   IntervalBox subRegion(const Scope& scop) const;
 
    /// Hausdorff distance between boxes
    /// @param B an interval box
@@ -192,12 +192,12 @@ public:
 
    /// Hausdorff distance between boxes on a scope
    /// @param B an interval box
-   /// @param sco a scope
+   /// @param scop a scope
    /// @return the maximum distance componentwise between this and B
-   ///         restricted to sco
+   ///         restricted to scop
    ///
-   /// Assumption: sco is included in the scopes of this and B
-   double distanceOnScope(const IntervalBox& B, const Scope& sco) const;
+   /// Assumption: scop is included in the scopes of this and B
+   double distanceOnScope(const IntervalBox& B, const Scope& scop) const;
 
    /// Gap between boxes
    /// @param B an interval box
@@ -208,28 +208,28 @@ public:
 
    /// Gap between boxes on a scope
    /// @param B an interval box
-   /// @param sco a scope
+   /// @param scop a scope
    /// @return the maximum gap componentwise between this and B
-   ///         restricted to sco
+   ///         restricted to scop
    ///
-   /// Assumption: sco is included in the scopes of this and B
-   double gapOnScope(const IntervalBox& B, const Scope& sco) const;
+   /// Assumption: scop is included in the scopes of this and B
+   double gapOnScope(const IntervalBox& B, const Scope& scop) const;
 
    /// Inflation method
-   /// @param sco a scope
+   /// @param scop a scope
    /// @param delta a real > 1.0
    /// @param chi a real > 0.0
    ///
-   /// Let x be an interval of sco and let m(x) be its midpoint.
+   /// Let x be an interval of scop and let m(x) be its midpoint.
    /// Then x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
-   void inflateOnScope(const Scope& sco, double delta, double chi);
+   void inflateOnScope(const Scope& scop, double delta, double chi);
 
    /// @return the sum of the widths of the components of this
    double perimeter() const;
 
    /// @return the sum of the widths of some components of this
-   /// @param sco the components considered
-   double perimeterOnScope(const Scope& sco) const;
+   /// @param scop the components considered
+   double perimeterOnScope(const Scope& scop) const;
 
    /// @return the grid perimeter of this
    ///
@@ -240,8 +240,8 @@ public:
    double gridPerimeter() const;
 
    /// @return the grid perimeter for some components of this
-   /// @param sco the components considered   
-   double gridPerimeterOnScope(const Scope& sco) const;
+   /// @param scop the components considered   
+   double gridPerimeterOnScope(const Scope& scop) const;
 
    ///@{
    IntervalBox* clone() const override;
@@ -269,7 +269,7 @@ public:
    bool isSplitable(const Variable& v) const;
 
 private:
-   Scope scope_;
+   Scope scop_;
 };
 
 /// This is a shared interval box.

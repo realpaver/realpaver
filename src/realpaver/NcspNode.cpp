@@ -12,8 +12,6 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-
 NcspNode::NcspNode(Scope scope, int depth)
       : scope_(scope),
         box_(nullptr),

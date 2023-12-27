@@ -214,9 +214,9 @@ void NcspSelectorSSR::calculateSSR(const IntervalBox& B)
          S.set(i, j, smear);
          sum += smear;
       }
-      for (size_t j=0; j<F_.nbVars(); ++j)
+      if (sum != 0.0)
       {
-         if (sum != 0.0)
+         for (size_t j=0; j<F_.nbVars(); ++j)
             S.set(i, j, S.get(i, j) / sum);
       }
    }
@@ -226,9 +226,7 @@ void NcspSelectorSSR::calculateSSR(const IntervalBox& B)
    {
       ssr_[j] = 0.0;
       for (size_t i=0; i<F_.nbFuns(); ++i)
-      {
          ssr_[j] += S.get(i, j);
-      }
    }
 }
 

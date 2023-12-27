@@ -100,11 +100,11 @@ protected:
    friend class Constraint;
 
    /// Scope assignment
-   /// @param s scope assigned to this
-   void setScope(Scope s);
+   /// @param scop scope assigned to this
+   void setScope(Scope scop);
 
 private:
-   Scope scope_;
+   Scope scop_;
 
 protected:
    size_t hcode_;

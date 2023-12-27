@@ -13,6 +13,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -24,7 +25,7 @@ Problem::Problem(const std::string& name)
         vars_(),
         ctrs_(),
         obj_(MIN(Term(0))),
-        scope_(),
+        scop_(),
         vname_(),
         id_(++NP)
 {}
@@ -45,7 +46,6 @@ Variable Problem::addVar(const std::string& name)
     .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
-   scope_.insert(v);
 
    return v;
 }
@@ -69,7 +69,6 @@ Variable Problem::addBinaryVar(const std::string& name)
     .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
-   scope_.insert(v);
 
    return v;
 }
@@ -91,7 +90,6 @@ VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
        .setTolerance(Tolerance(0.0, 0.0));
 
       vars_.push_back(v);
-      scope_.insert(v);
    }
 
    return vec;
@@ -123,7 +121,6 @@ Variable Problem::addIntVar(const Range& r, const std::string& name)
     .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
-   scope_.insert(v);
 
    return v;
 }
@@ -149,7 +146,6 @@ Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
     .setTolerance(Tolerance(0.0, 0.0));
 
    vars_.push_back(v);
-   scope_.insert(v);
 
    return v;
 }
@@ -171,7 +167,6 @@ VariableVector Problem::addIntVarVector(const std::string& name, int first, int 
        .setTolerance(Tolerance(0.0, 0.0));
 
       vars_.push_back(v);
-      scope_.insert(v);
    }
 
    return vec;
@@ -206,7 +201,6 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
     .setTolerance(Tolerance(rtol, atol));
 
    vars_.push_back(v);
-   scope_.insert(v);
 
    return v;
 }
@@ -235,7 +229,6 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
     .setTolerance(Tolerance(rtol, atol));
 
    vars_.push_back(v);
-   scope_.insert(v);
 
    return v;
 }
@@ -260,7 +253,6 @@ VariableVector Problem::addRealVarVector(const std::string& name, int first,
        .setTolerance(Tolerance(rtol, atol));
 
       vars_.push_back(v);
-      scope_.insert(v);
    }
 
    return vec;
@@ -274,7 +266,6 @@ Variable Problem::addClonedVar(Variable v)
    res.setId(id);
 
    vars_.push_back(res);
-   scope_.insert(res);
 
    return res;
 }
@@ -478,7 +469,17 @@ Objective Problem::getObjective() const
 
 Scope Problem::scope() const
 {
-   return scope_;
+   if (scop_.size() != vars_.size())
+   {
+      Scope scop;
+
+      for (const auto& v : vars_)
+         scop.insert(v);
+
+      Problem* prob = const_cast<Problem*>(this);
+      prob->scop_ = ScopeBank::getInstance()->insertScope(scop);
+   }
+   return scop_;
 }
 
 bool Problem::isConstrained() const
