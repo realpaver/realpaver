@@ -58,20 +58,20 @@ public:
    virtual bool isConstant() const = 0;
 
    /// Satisfaction test
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return a certificate of proof
-   virtual Proof isSatisfied(const IntervalBox& box) = 0;
+   virtual Proof isSatisfied(const IntervalBox& B) = 0;
 
    /// Calculates the magnitude of violation
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return 0 if the constraint is satisfied, otherwise a positive real
    ///         number that indicates how much the constraint is violated
-   virtual double violation(const IntervalBox& box) = 0;
+   virtual double violation(const IntervalBox& B) = 0;
 
    /// Contraction of domains
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return a certificate of proof
-   virtual Proof contract(IntervalBox& box) = 0;
+   virtual Proof contract(IntervalBox& B) = 0;
 
    /// Output on a stream
    /// @param os a stream
@@ -128,20 +128,20 @@ public:
    bool isConstant() const;
 
    /// Satisfaction test
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return a certificate of proof
-   Proof isSatisfied(const IntervalBox& box);
+   Proof isSatisfied(const IntervalBox& B);
 
    /// Calculates the magnitude of violation
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return 0 if the constraint is satisfied, otherwise a positive real
    ///         number that indicates how much the constraint is violated
-   double violation(const IntervalBox& box);
+   double violation(const IntervalBox& B);
 
    /// Contraction of domains
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return a certificate of proof
-   Proof contract(IntervalBox& box);
+   Proof contract(IntervalBox& B);
 
    /// Output on a stream
    /// @param os a stream
@@ -237,9 +237,9 @@ public:
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    ///@}
 };
 
@@ -261,9 +261,9 @@ public:
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    ///@}
 };
 
@@ -285,9 +285,9 @@ public:
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    ///@}
 };
 
@@ -309,9 +309,9 @@ public:
    
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    ///@}
 };
 
@@ -333,9 +333,9 @@ public:
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    ///@}
 };
 
@@ -365,9 +365,9 @@ public:
 
    ///@{
    void acceptVisitor(ConstraintVisitor& vis) const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    ///@}
 
 private:
@@ -471,9 +471,9 @@ public:
 
    ///@{
    bool isConstant() const override;
-   Proof isSatisfied(const IntervalBox& box) override;
-   double violation(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    void acceptVisitor(ConstraintVisitor& vis) const override;
    ///@}
@@ -482,8 +482,8 @@ private:
    std::vector<TableCtrCol> vcol_; // vector of columns
 
    void makeScopeAndHashCode();
-   bool isRowConsistent(size_t i, const IntervalBox& box) const;
-   double rowViolation(const IntervalBox& box, size_t i);
+   bool isRowConsistent(size_t i, const IntervalBox& B) const;
+   double rowViolation(const IntervalBox& B, size_t i);
 };
 
 /// Creates a table constraint
