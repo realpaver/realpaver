@@ -39,10 +39,10 @@ public:
    Prover& operator=(const Prover&) = delete;
 
    /// Certification method
-   /// @param box a box
-   /// @return a certificate of proof of the box with respect to the constraints
+   /// @param B a box
+   /// @return a certificate of proof of B with respect to the constraints
    ///         of the given problem
-   Proof certify(IntervalBox& box);
+   Proof certify(IntervalBox& B);
 
    /// Sets a limit of iterations of the Newton operator
    /// @param n new value of the limit

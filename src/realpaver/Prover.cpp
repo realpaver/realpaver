@@ -72,16 +72,16 @@ Prover::~Prover()
    if (unewton_ != nullptr) delete unewton_;
 }
 
-Proof Prover::certify(IntervalBox& box)
+Proof Prover::certify(IntervalBox& B)
 {
    bool inner = true;     // Iner certificate for the problem
    bool innerbis = true;  // Inner certificate for the problem but the equations
 
-   LOG_INTER("Certification of the box " << box);
+   LOG_INTER("Certification of the box " << B);
 
    for (auto& it : v_)
    {
-      it.proof = it.ctr.isSatisfied(box);
+      it.proof = it.ctr.isSatisfied(B);
 
       if (it.proof == Proof::Empty)
          return Proof::Empty;
@@ -115,9 +115,9 @@ Proof Prover::certify(IntervalBox& box)
    {
       LOG_INTER("Certification by the multivariate interval Newton");
 
-      proof = mnewton_->certify(box);
+      proof = mnewton_->certify(B);
 
-      LOG_INTER(" -> " << box);
+      LOG_INTER(" -> " << B);
    }
 
    // applies the univariate Newton operator for one equation
@@ -126,12 +126,12 @@ Proof Prover::certify(IntervalBox& box)
       LOG_INTER("Certification by the univariate interval Newton");
 
       Variable v = dag_->fun(0)->scope().var(0);
-      Interval x = box.get(v);
+      Interval x = B.get(v);
       IntervalThickFunction f(dag_, 0, v);
       proof = unewton_->localSearch(f, x);
-      box.set(v, x);
+      B.set(v, x);
 
-      LOG_INTER(" -> " << box);
+      LOG_INTER(" -> " << B);
    }
 
    LOG_INTER(" -> " << proof);

@@ -117,11 +117,11 @@ void IntervalFunctionVector::addFun(IntervalFunction f)
    }
 }
 
-void IntervalFunctionVector::eval(const IntervalBox& box, IntervalVector& val)
+void IntervalFunctionVector::eval(const IntervalBox& B, IntervalVector& val)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   return rep_->eval(box, val);
+   return rep_->eval(B, val);
 }
 
 void IntervalFunctionVector::pointEval(const RealPoint& pt, IntervalVector& val)
@@ -131,27 +131,27 @@ void IntervalFunctionVector::pointEval(const RealPoint& pt, IntervalVector& val)
    rep_->pointEval(pt, val);
 }
 
-void IntervalFunctionVector::diff(const IntervalBox& box, IntervalMatrix& J)
+void IntervalFunctionVector::diff(const IntervalBox& B, IntervalMatrix& J)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->diff(box, J);
+   rep_->diff(B, J);
 }
 
-void IntervalFunctionVector::evalDiff(const IntervalBox& box,
+void IntervalFunctionVector::evalDiff(const IntervalBox& B,
                                       IntervalVector& val, IntervalMatrix& J)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->evalDiff(box, val, J);
+   rep_->evalDiff(B, val, J);
 }
 
-void IntervalFunctionVector::violation(const IntervalBox& box,
+void IntervalFunctionVector::violation(const IntervalBox& B,
                                        IntervalVector& val, RealVector& viol)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->violation(box, val, viol);
+   rep_->violation(B, val, viol);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,10 +219,9 @@ IntervalFunction IntervalFunctionVectorDag::fun(size_t i) const
    return IntervalFunction(dag_, i);
 }
 
-void IntervalFunctionVectorDag::eval(const IntervalBox& box,
-                                     IntervalVector& val)
+void IntervalFunctionVectorDag::eval(const IntervalBox& B, IntervalVector& val)
 {
-   dag_->intervalEval(box, val);
+   dag_->intervalEval(B, val);
 }
 
 void IntervalFunctionVectorDag::pointEval(const RealPoint& pt,
@@ -231,40 +230,40 @@ void IntervalFunctionVectorDag::pointEval(const RealPoint& pt,
    dag_->intervalPointEval(pt, val);
 }
 
-void IntervalFunctionVectorDag::diff(const IntervalBox& box, IntervalMatrix& J)
+void IntervalFunctionVectorDag::diff(const IntervalBox& B, IntervalMatrix& J)
 {
    IntervalVector val(nbFuns());
 
    if (nbVars() == nbFuns())
    {
-      dag_->hansenDiff(box, J);
+      dag_->hansenDiff(B, J);
    }
    else
    {
-      dag_->intervalEval(box, val);
+      dag_->intervalEval(B, val);
       dag_->intervalDiff(J);
    }
 }
 
-void IntervalFunctionVectorDag::evalDiff(const IntervalBox& box,
+void IntervalFunctionVectorDag::evalDiff(const IntervalBox& B,
                                          IntervalVector& val, IntervalMatrix& J) 
 {
    if (nbVars() == nbFuns())
    {
-      dag_->intervalEval(box, val);
-      dag_->hansenDiff(box, J);
+      dag_->intervalEval(B, val);
+      dag_->hansenDiff(B, J);
    }
    else
    {
-      dag_->intervalEval(box, val);
+      dag_->intervalEval(B, val);
       dag_->intervalDiff(J);
    }
 }
 
-void IntervalFunctionVectorDag::violation(const IntervalBox& box,
+void IntervalFunctionVectorDag::violation(const IntervalBox& B,
                                           IntervalVector& val, RealVector& viol)
 {
-   dag_->intervalEval(box, val);
+   dag_->intervalEval(B, val);
    dag_->intervalViolation(viol);
 }
 
@@ -312,14 +311,13 @@ IntervalFunction IntervalFunctionVectorList::fun(size_t i) const
    return vf_[i];
 }
 
-void IntervalFunctionVectorList::eval(const IntervalBox& box,
-                                      IntervalVector& val)
+void IntervalFunctionVectorList::eval(const IntervalBox& B, IntervalVector& val)
 {
    ASSERT(val.size() == nbFuns(),
           "Bad size of vector given for the evaluation of a function vector");
 
    for (size_t i=0; i<nbFuns(); ++i)
-      val[i] = vf_[i].eval(box);
+      val[i] = vf_[i].eval(B);
 }
 
 void IntervalFunctionVectorList::pointEval(const RealPoint& pt,
@@ -332,7 +330,7 @@ void IntervalFunctionVectorList::pointEval(const RealPoint& pt,
       val[i] = vf_[i].pointEval(pt);
 }
 
-void IntervalFunctionVectorList::diff(const IntervalBox& box, IntervalMatrix& J)
+void IntervalFunctionVectorList::diff(const IntervalBox& B, IntervalMatrix& J)
 {
    ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
           "Bad dimensions of a Jacobian matrix used in a function vector");
@@ -342,7 +340,7 @@ void IntervalFunctionVectorList::diff(const IntervalBox& box, IntervalMatrix& J)
       auto& f = vf_[i];
 
       IntervalVector G(f.nbVars());
-      f.diff(box, G);
+      f.diff(B, G);
 
       // fills the i-th row of the matrix
       size_t j = 0;
@@ -359,7 +357,7 @@ void IntervalFunctionVectorList::diff(const IntervalBox& box, IntervalMatrix& J)
    }
 }
 
-void IntervalFunctionVectorList::evalDiff(const IntervalBox& box,
+void IntervalFunctionVectorList::evalDiff(const IntervalBox& B,
                                           IntervalVector& val,
                                           IntervalMatrix& J)
 {
@@ -374,11 +372,11 @@ void IntervalFunctionVectorList::evalDiff(const IntervalBox& box,
       auto& f = vf_[i];
 
       IntervalVector G(f.nbVars());
-      f.evalDiff(box, val[i], G);
+      f.evalDiff(B, val[i], G);
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (const auto& v : scope())
       {
          if (f.scope().contains(v))
             J.set(i, j, G.get(f.scope().index(v)));
@@ -391,12 +389,12 @@ void IntervalFunctionVectorList::evalDiff(const IntervalBox& box,
    }
 }
 
-void IntervalFunctionVectorList::violation(const IntervalBox& box,
+void IntervalFunctionVectorList::violation(const IntervalBox& B,
                                            IntervalVector& val,
                                            RealVector& viol)
 {
    for (size_t i=0; i<nbFuns(); ++i)
-      vf_[i].violation(box, val[i], viol[i]);
+      vf_[i].violation(B, val[i], viol[i]);
 }
 
 } // namespace

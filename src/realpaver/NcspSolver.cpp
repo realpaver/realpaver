@@ -363,12 +363,12 @@ void NcspSolver::makeSplit()
    split_ = new NcspSplit(std::move(pselector), std::move(smap));
 }
 
-bool NcspSolver::isAnInnerRegion(const IntervalBox& box) const
+bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
 {
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
       Constraint c = preprob_->ctrAt(i);
-      if (c.isSatisfied(box) != Proof::Inner)
+      if (c.isSatisfied(B) != Proof::Inner)
          return false;
    }
 

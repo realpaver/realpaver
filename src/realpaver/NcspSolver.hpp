@@ -124,7 +124,7 @@ private:
    void makeContractor();
    void makeSplit();
    void bpStep(int depthlimit);
-   bool isAnInnerRegion(const IntervalBox& box) const;
+   bool isAnInnerRegion(const IntervalBox& B) const;
    void certifySolutions();
    NcspSelector* makeSelectorSSR();
 };

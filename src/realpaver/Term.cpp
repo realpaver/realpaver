@@ -188,18 +188,18 @@ Interval Term::evalConst() const
    return rep_->evalConst();
 }
 
-Interval Term::eval(const IntervalBox& box) const
+Interval Term::eval(const IntervalBox& B) const
 {
-   rep_->eval(box);
+   rep_->eval(B);
    return rep_->ival_;
 }
 
-Interval Term::hc4ReviseForward(const IntervalBox& box) const
+Interval Term::hc4ReviseForward(const IntervalBox& B) const
 {
-   return eval(box);
+   return eval(B);
 }
 
-Proof Term::hc4ReviseBackward(IntervalBox& box, const Interval& img)
+Proof Term::hc4ReviseBackward(IntervalBox& B, const Interval& img)
 {
    if (rep_->ival_.isEmpty())       return Proof::Empty;
    if (img.isDisjoint(rep_->ival_)) return Proof::Empty;
@@ -207,7 +207,7 @@ Proof Term::hc4ReviseBackward(IntervalBox& box, const Interval& img)
 
    rep_->ival_ &= img;
 
-   return rep_->contract(box);   
+   return rep_->contract(B);   
 }
 
 void Term::acceptVisitor(TermVisitor& vis) const
@@ -320,10 +320,10 @@ Scope Term::scope() const
    return ScopeBank::getInstance()->insertScope(scop);
 }
 
-Proof Term::contract(IntervalBox& box, const Interval& img)
+Proof Term::contract(IntervalBox& B, const Interval& img)
 {
-   hc4ReviseForward(box);
-   return hc4ReviseBackward(box, img);
+   hc4ReviseForward(B);
+   return hc4ReviseBackward(B, img);
 }
 
 std::ostream& operator<<(std::ostream& os, const Term& t)
@@ -977,12 +977,12 @@ Interval TermConst::evalConst() const
    return x_;
 }
 
-void TermConst::eval(const IntervalBox& box)
+void TermConst::eval(const IntervalBox& B)
 {
    ival_ = x_;
 }
 
-Proof TermConst::contract(IntervalBox& box)
+Proof TermConst::contract(IntervalBox& B)
 {
    return Proof::Maybe;
 }
@@ -1064,20 +1064,20 @@ Interval TermVar::evalConst() const
    return Interval::universe();
 }
 
-void TermVar::eval(const IntervalBox& box)
+void TermVar::eval(const IntervalBox& B)
 {
-   ival_ = box.get(v_);
+   ival_ = B.get(v_);
 }
 
-Proof TermVar::contract(IntervalBox& box)
+Proof TermVar::contract(IntervalBox& B)
 {
-   ival_ &= box.get(v_);
+   ival_ &= B.get(v_);
 
 #if LOG_ON
    LOG_FULL("term contract variable " << v_.getName() << " -> " << ival_);
 #endif
 
-   box.set(v_, ival_);
+   B.set(v_, ival_);
    return ival_.isEmpty() ? Proof::Empty : Proof::Maybe;
 }
 
@@ -1202,21 +1202,21 @@ void TermOp::print(std::ostream& os) const
    os << ")";
 }
 
-void TermOp::eval(const IntervalBox& box)
+void TermOp::eval(const IntervalBox& B)
 {
-   for (auto sub : v_) sub->eval(box);
+   for (auto sub : v_) sub->eval(B);
 
    evalRoot();
 }
 
-Proof TermOp::contract(IntervalBox& box)
+Proof TermOp::contract(IntervalBox& B)
 {
    if (ival_.isEmpty()) return Proof::Empty;
 
    contractRoot();
 
    for (auto sub : v_)
-      if (sub->contract(box) == Proof::Empty) return Proof::Empty;
+      if (sub->contract(B) == Proof::Empty) return Proof::Empty;
 
    return Proof::Maybe;
 }
@@ -2228,7 +2228,7 @@ Interval TermLin::evalConst() const
    return cst_;
 }
 
-void TermLin::eval(const IntervalBox& box)
+void TermLin::eval(const IntervalBox& B)
 {
    ival_ = cst_;
 
@@ -2238,12 +2238,12 @@ void TermLin::eval(const IntervalBox& box)
       // we do that since the modification of ival does not affect the ordering
       // of the elements (only the variable identifiers are used as keys)
       Item& itm = const_cast<Item&>(citm);
-      itm.ival = itm.coef * box.get(itm.var);
+      itm.ival = itm.coef * B.get(itm.var);
       ival_ += itm.ival;
    }
 }
 
-Proof TermLin::contract(IntervalBox& box)
+Proof TermLin::contract(IntervalBox& B)
 {
    for (auto it=terms_.begin(); it!=terms_.end(); ++it)
    {
@@ -2263,9 +2263,9 @@ Proof TermLin::contract(IntervalBox& box)
          ++jt;
       }
 
-      Interval dom = box.get(it->var);
+      Interval dom = B.get(it->var);
       dom = mulPY(it->coef, dom, x);
-      box.set(it->var, dom);
+      B.set(it->var, dom);
 
       if (dom.isEmpty())
          return Proof::Empty;

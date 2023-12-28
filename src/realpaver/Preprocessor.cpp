@@ -346,11 +346,11 @@ IntervalBox Preprocessor::fixedRegion() const
 {
    ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
 
-   IntervalBox box(fixedScope());
+   IntervalBox B(fixedScope());
    for (auto p : vim_)
-      box.set(p.first, p.second);
+      B.set(p.first, p.second);
 
-   return box;
+   return B;
 }
 
 bool Preprocessor::isUnfeasible() const
