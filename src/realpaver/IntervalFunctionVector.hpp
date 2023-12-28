@@ -319,7 +319,7 @@ public:
 
 private:
    std::vector<IntervalFunction> vf_;
-   Scope scope_;
+   Scope scop_;
 };
 
 } // namespace

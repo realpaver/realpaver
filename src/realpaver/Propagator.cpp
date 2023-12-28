@@ -69,11 +69,11 @@ Scope Propagator::scope() const
    return pool_->scope();
 }
 
-Proof Propagator::contract(IntervalBox& box)
+Proof Propagator::contract(IntervalBox& B)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
-   Scope scope = pool_->scope();
+   Scope scop = pool_->scope();
 
    // initialization: activates all contractors
    size_t N = pool_->poolSize();
@@ -92,7 +92,7 @@ Proof Propagator::contract(IntervalBox& box)
    ModifSetType modif;
 
    // copy used to check the domain modifications
-   IntervalBox* copy = box.clone();
+   IntervalBox* copy = B.clone();
 
    // result of the algorithm
    Proof proof;
@@ -105,13 +105,13 @@ Proof Propagator::contract(IntervalBox& box)
 
    LOG_NL();
    LOG_INTER("Propagator [" << tol_ << "]");
-   LOG_INTER("Current box: " << box);
+   LOG_INTER("Current box: " << B);
 
    do
    {
       // apply the next contractor from the queue
       size_t j = queue[next];
-      proof = pool_->contractorAt(j)->contract(box);
+      proof = pool_->contractorAt(j)->contract(B);
       certif_[j] = proof;
 
       if (proof != Proof::Empty)
@@ -131,10 +131,10 @@ Proof Propagator::contract(IntervalBox& box)
                // detects the variables whose domains have been modified
                modif.clear();
 
-               for (auto v : scope)
+               for (const auto& v : scop)
                {
                   const Interval& prev = copy->get(v);
-                  const Interval& curr = box.get(v);
+                  const Interval& curr = B.get(v);
 
                   LOG_LOW("Propagation test on " << v.getName() << " ("
                                                  << tol_ << ")");
@@ -170,7 +170,7 @@ Proof Propagator::contract(IntervalBox& box)
                   // save the current box for the next propagation step
                   if (count != 0)
                   {
-                     copy->setOnScope(box, scope);
+                     copy->setOnScope(B, scop);
                   }
                }
             }
@@ -188,7 +188,7 @@ Proof Propagator::contract(IntervalBox& box)
 
    delete copy;
 
-   LOG_INTER(" -> " << proof << ", " << box);
+   LOG_INTER(" -> " << proof << ", " << B);
    LOG_INTER("End of propagator, " << nb_steps << " loop(s)");
 
    return proof;

@@ -22,13 +22,13 @@ ContractorHC4::ContractorHC4(SharedDag dag, size_t i)
                              " function index " << i);
 }
 
-Proof ContractorHC4::contract(IntervalBox& box)
+Proof ContractorHC4::contract(IntervalBox& B)
 {
-   LOG_LOW("HC4 contractor @ " << if_ << " on " << box);
+   LOG_LOW("HC4 contractor @ " << if_ << " on " << B);
 
-   Proof proof = dag_->fun(if_)->hc4Revise(box);
+   Proof proof = dag_->fun(if_)->hc4Revise(B);
 
-   LOG_LOW(" -> " << proof << ", " << box);
+   LOG_LOW(" -> " << proof << ", " << B);
 
    return proof;
 }

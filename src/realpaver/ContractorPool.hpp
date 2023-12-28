@@ -86,7 +86,7 @@ public:
 
 private:
    std::vector<SharedContractor> v_;
-   Scope s_;
+   Scope scop_;
 };
 
 /// Type of shared contractor vectors.

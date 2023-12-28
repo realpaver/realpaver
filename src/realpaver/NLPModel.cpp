@@ -9,7 +9,7 @@
 
 #include "realpaver/NLPModel.hpp"
 #include "realpaver/Param.hpp"
-
+#include "realpaver/ScopeBank.hpp"
 #include "realpaver/Term.hpp"
 #include "realpaver/TermDeriver.hpp"
 
@@ -18,7 +18,7 @@ namespace realpaver {
 NLPModel::NLPModel(const Problem& pb)
     : obj_(nullptr),
       ctrs_(nullptr),
-      scope_(pb.scope()),
+      scop_(pb.scope()),
       n_(pb.nbVars()),
       m_(pb.nbCtrs()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
@@ -55,7 +55,7 @@ NLPModel::NLPModel(const Problem& pb)
 NLPModel::NLPModel(const RealFunction& obj)
     : obj_(nullptr),
       ctrs_(nullptr),
-      scope_(),
+      scop_(obj.scope()),
       n_(obj.nbVars()),
       m_(0), 
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
@@ -64,7 +64,6 @@ NLPModel::NLPModel(const RealFunction& obj)
            Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
-    scope_.insert(obj.scope());
     obj_ = new RealFunction(obj);
     best_ = nullptr;
     best_val_ = Interval::universe().right();
@@ -73,7 +72,7 @@ NLPModel::NLPModel(const RealFunction& obj)
 NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
     : obj_(nullptr),
       ctrs_(nullptr),
-      scope_(),
+      scop_(),
       n_(obj.nbVars()),
       m_(ctrs.nbFuns()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
@@ -82,8 +81,9 @@ NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
            Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
-    scope_.insert(obj.scope());
-    scope_.insert(ctrs.scope());
+    scop_.insert(obj.scope());
+    scop_.insert(ctrs.scope());
+    scop_ = ScopeBank::getInstance()->insertScope(scop_);
     obj_ = new RealFunction(obj);
     ctrs_ = new RealFunctionVector(ctrs);
     best_ = nullptr;
@@ -185,7 +185,7 @@ void NLPModel::setTol(Tolerance tol)
 
 Scope NLPModel::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 } // namespace

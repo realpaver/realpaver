@@ -134,7 +134,7 @@ private:
    VarVarMapType vvm_;                 // map for non fixed variables
    VarIntervalMapType vim_;            // map for fixed variables
 
-   IntervalBox* box_;                  // box used for propagation
+   IntervalBox* B_;                    // box used for propagation
 
    std::vector<Constraint> inactive_;  // constraints inactive
    std::vector<Constraint> active_;    // constraints not inactive
@@ -143,7 +143,7 @@ private:
    Timer timer_;
 
    bool occursInActiveConstraint(const Variable& v) const;
-   bool propagate(const Problem& problem, IntervalBox& box);
+   bool propagate(const Problem& problem, IntervalBox& B);
    void applyImpl(const Problem& src, Problem& dest);
 };
 

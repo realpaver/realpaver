@@ -42,12 +42,12 @@ Scope ContractorBC4::scope() const
    return dag_->fun(if_)->scope();
 }
 
-Proof ContractorBC4::contract(IntervalBox& box)
+Proof ContractorBC4::contract(IntervalBox& B)
 {
-   LOG_LOW("BC4 contractor @ " << if_ << " on " << box);
+   LOG_LOW("BC4 contractor @ " << if_ << " on " << B);
    
    // HC4
-   Proof proof = hc4_->contract(box);
+   Proof proof = hc4_->contract(B);
 
    if (proof != Proof::Maybe)
    {
@@ -58,7 +58,7 @@ Proof ContractorBC4::contract(IntervalBox& box)
    // BC3
    for (size_t i=0; i<bc3_.size(); ++i)
    {
-      Proof certif = bc3_[i]->contract(box);
+      Proof certif = bc3_[i]->contract(B);
 
       if (certif == Proof::Empty)
       {

@@ -15,25 +15,25 @@
 namespace realpaver {
 
 ContractorDomain::ContractorDomain()
-      : s_()
+      : scop_()
 {}
 
 ContractorDomain::ContractorDomain(Variable v)
-      : s_()
+      : scop_()
 {
    insertVar(v);
 }
 
 ContractorDomain::ContractorDomain(const std::initializer_list<Variable>& l)
-      : s_()
+      : scop_()
 {
-   for (auto v : l)
+   for (const auto& v : l)
       insertVar(v);
 }
 
 size_t ContractorDomain::nbVars() const
 {
-   return s_.size();
+   return scop_.size();
 }
 
 void ContractorDomain::insertVar(Variable v)
@@ -41,14 +41,14 @@ void ContractorDomain::insertVar(Variable v)
    ASSERT(!v.getDomain()->isConnected(),
           "Domain contractor applied to a continuous variable " << v.getName());
 
-   s_.insert(v);
+   scop_.insert(v);
 }
 
-Proof ContractorDomain::contract(IntervalBox& box)
+Proof ContractorDomain::contract(IntervalBox& B)
 {
-   for (auto v : s_)
+   for (const auto& v : scop_)
    {
-      Interval x = box.get(v);
+      Interval x = B.get(v);
 
 #if LOG_ON
    std::ostringstream os;
@@ -56,7 +56,7 @@ Proof ContractorDomain::contract(IntervalBox& box)
 #endif
 
       v.getDomain()->contractInterval(x);
-      box.set(v, x);
+      B.set(v, x);
 
 #if LOG_ON
    os << " -> " << x;
@@ -71,12 +71,12 @@ Proof ContractorDomain::contract(IntervalBox& box)
 void ContractorDomain::print(std::ostream& os) const
 {
    os << "Domain contractor: ";
-   for (auto v : s_) os << v.getName() << " ";
+   for (const auto& v : scop_) os << v.getName() << " ";
 }
 
 Scope ContractorDomain::scope() const
 {
-   return s_;
+   return scop_;
 }
 
 } // namespace

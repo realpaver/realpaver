@@ -36,13 +36,13 @@ Scope ContractorList::scope() const
    return pool_->scope();
 }
 
-Proof ContractorList::contract(IntervalBox& box)
+Proof ContractorList::contract(IntervalBox& B)
 {
    Proof proof;
 
    for (size_t i=0; i<poolSize(); ++i)
    {
-      proof = pool_->contractorAt(i)->contract(box);
+      proof = pool_->contractorAt(i)->contract(B);
       if (proof == Proof::Empty) return Proof::Empty;
    }
    return Proof::Maybe;

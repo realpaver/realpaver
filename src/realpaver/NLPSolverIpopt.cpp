@@ -93,8 +93,8 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m,
     std::shared_ptr<RealFunction> obj = ls_->obj();
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     
-    Scope s = ls_->obj()->scope();
-    if (m>0) s.insert(ls_->ctrs()->scope());
+    Scope scop = ls_->obj()->scope();
+    if (m>0) scop.insert(ls_->ctrs()->scope());
     // nnz_jac_g: number of nonzeros in jacobian
     // TODO
     nnz_jac_g = 0;
@@ -102,7 +102,7 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m,
     {
         for(size_t i=0; i<n;i++)
         {
-            if (ctrs->fun(j).scope().contains(s.var(i)))
+            if (ctrs->fun(j).scope().contains(scop.var(i)))
                 nnz_jac_g++;
         }
     }
@@ -164,11 +164,11 @@ bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x,
 {
     // compute obj_value, i.e. the value of the objective function, from x vector
     const std::shared_ptr<RealFunction> obj = ls_->obj();
-    Scope s = ls_->obj()->scope();
-    if (ls_->nbCtrs()>0) s.insert(ls_->ctrs()->scope());
+    Scope scop = ls_->obj()->scope();
+    if (ls_->nbCtrs()>0) scop.insert(ls_->ctrs()->scope());
     
-    RealPoint pt(s);
-    for(size_t i=0; i<s.size();i++)
+    RealPoint pt(scop);
+    for(size_t i=0; i<scop.size();i++)
         pt[i] = x[i];
     obj_value = obj->eval(pt);
 
@@ -179,20 +179,20 @@ bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x,
                                        bool new_x, Ipopt::Number* grad_f)
 {
     std::shared_ptr<RealFunction> obj = ls_->obj();
-    Scope s = ls_->obj()->scope();
-    if (ls_->nbCtrs()>0) s.insert(ls_->ctrs()->scope());
+    Scope scop = ls_->obj()->scope();
+    if (ls_->nbCtrs()>0) scop.insert(ls_->ctrs()->scope());
     const Scope os = obj->scope();
     // compute grad_f, i.e. the gradient of the objective function, from x vector
-    RealPoint pt(s);
+    RealPoint pt(scop);
     for(size_t i=0; i<os.size();i++)
     {
         pt[i] = x[i]; //x[s.index(os.var(i))];
     }
     RealPoint gf(obj->scope());
-    obj->diff(pt.subPoint(os),gf);
+    obj->diff(pt.subPoint(os), gf);
     // std::cerr<<"gf: "<<gf<<" with x: "<<pt<<std::endl;
     for(size_t i=0; i<os.size();i++)
-        grad_f[s.index(os.var(i))] = gf[i];
+        grad_f[scop.index(os.var(i))] = gf[i];
 
     return true;
 }

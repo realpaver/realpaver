@@ -69,7 +69,7 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalBox& box) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 

@@ -12,11 +12,11 @@
 
 namespace realpaver {
 
-DomainSlicerMap::DomainSlicerMap(Scope sco)
-      : sco_(sco),
-        sli_(sco.size(), nullptr)
+DomainSlicerMap::DomainSlicerMap(Scope scop)
+      : scop_(scop),
+        sli_(scop.size(), nullptr)
 {
-   ASSERT(!sco.isEmpty(),
+   ASSERT(!scop.isEmpty(),
           "Creation of a domain slicer map with an empty scope");
 }
 
@@ -27,12 +27,12 @@ DomainSlicerMap::~DomainSlicerMap()
          delete slicer;
 }
 
-void DomainSlicerMap::setSlicer(Variable v,
+void DomainSlicerMap::setSlicer(const Variable& v,
                                 std::unique_ptr<DomainSlicer> pslicer)
 {
-   ASSERT(sco_.contains(v), "Bad assignment in a domain slicer map");
+   ASSERT(scop_.contains(v), "Bad assignment in a domain slicer map");
 
-   size_t i = sco_.index(v);
+   size_t i = scop_.index(v);
    if (sli_[i] != nullptr) delete sli_[i];
 
    sli_[i] = pslicer.release();
@@ -40,10 +40,11 @@ void DomainSlicerMap::setSlicer(Variable v,
 
 DomainSlicer* DomainSlicerMap::getSlicer(const Variable& v) const
 {
-   ASSERT(sco_.contains(v),
-          "Variable " << v.getName() << " not handled by the domain slicer map");
+   ASSERT(scop_.contains(v),
+          "Variable " << v.getName()
+                      << " not handled by the domain slicer map");
 
-   return sli_[sco_.index(v)];
+   return sli_[scop_.index(v)];
 }
 
 } // namespace

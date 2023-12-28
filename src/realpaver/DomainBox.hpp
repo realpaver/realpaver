@@ -25,8 +25,9 @@ namespace realpaver {
 class DomainBox {
 public:
    /// Creates a box
-   /// sco scope of this such that the domains are extracted from the variables
-   DomainBox(Scope sco);
+   /// @param scop scope of this such that the domains are extracted from
+   ///        the variables
+   DomainBox(Scope scop);
 
    /// Copy constructor
    DomainBox(const DomainBox& box);
@@ -95,44 +96,44 @@ public:
    double width() const;
 
    /// Gap between boxes
-   /// @param B a box
+   /// @param box a box
    /// @return the maximum gap componentwise between this and B
    ///
-   /// Assumption: this and B have the same scope
-   double gap(const DomainBox& B) const;
+   /// Assumption: this and box have the same scope
+   double gap(const DomainBox& box) const;
 
    /// Gap between boxes on a scope
-   /// @param B an interval box
-   /// @param sco a scope
-   /// @return the maximum gap componentwise between this and B
-   ///         restricted to sco
+   /// @param box a box
+   /// @param scop a scope
+   /// @return the maximum gap componentwise between this and box
+   ///         restricted to scop
    ///
-   /// Assumption: sco is included in the scopes of this and B
-   double gapOnScope(const DomainBox& B, const Scope& sco) const;
+   /// Assumption: sco is included in the scopes of this and box
+   double gapOnScope(const DomainBox& box, const Scope& scop) const;
 
    /// Glue another box in this
-   /// @param B a box whose scope contains the scope of this
+   /// @param box a box whose scope contains the scope of this
    ///
    /// for each variable v in the scope of this, the domain of v in this
    /// is assigned to an interval domain that is the hull of the input
-   /// domain of v in this and the domain of v in B
-   void glue(const DomainBox& B);
+   /// domain of v in this and the domain of v in box
+   void glue(const DomainBox& box);
 
    /// Glue another box in this, restricted to some scope
-   /// @param B a box
-   /// @param sco a scope included in the scope of this and B
+   /// @param box a box
+   /// @param scop a scope included in the scope of this and box
    ///
    /// for each variable v in the given scope, the domain of v in this
    /// is assigned to an interval domain that is the hull of the input
-   /// domain of v in this and the domain of v in B
-   void glueOnScope(const DomainBox& B, const Scope& sco);
+   /// domain of v in this and the domain of v in box
+   void glueOnScope(const DomainBox& box, const Scope& scop);
 
    /// @return the sum of the widths of the hulls of the components of this
    double perimeter() const;
 
    /// @return the sum of the widths of some components of this
-   /// @param sco the components considered
-   double perimeterOnScope(const Scope& sco) const;
+   /// @param scop the components considered
+   double perimeterOnScope(const Scope& scop) const;
 
    /// @return the grid perimeter of this
    ///
@@ -143,11 +144,11 @@ public:
    double gridPerimeter() const;
 
    /// @return the grid perimeter for some components of this
-   /// @param sco the components considered   
-   double gridPerimeterOnScope(const Scope& sco) const;
+   /// @param scop the components considered   
+   double gridPerimeterOnScope(const Scope& scop) const;
 
 private:
-   Scope sco_;                   // ordered set of variables
+   Scope scop_;                  // ordered set of variables
    std::vector<Domain*> doms_;   // domains
 };
 

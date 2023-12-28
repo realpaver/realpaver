@@ -22,8 +22,8 @@ namespace realpaver {
 class NcspSelector {
 public:
    /// Creates a selector on a set of variables
-   /// @param s a scope
-   NcspSelector(Scope s);
+   /// @param scop a scope
+   NcspSelector(Scope scop);
 
    /// Virtual destructor
    virtual ~NcspSelector();
@@ -44,7 +44,7 @@ public:
    virtual std::pair<bool, Variable> selectVar(NcspNode& node) = 0;
 
 protected:
-   Scope scope_;
+   Scope scop_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,8 +53,8 @@ protected:
 class NcspSelectorRR : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
-   /// @param s a scope
-   NcspSelectorRR(Scope s);
+   /// @param scop a scope
+   NcspSelectorRR(Scope scop);
 
    /// Destructor
    ~NcspSelectorRR() = default;
@@ -75,8 +75,8 @@ public:
 class NcspSelectorLF : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
-   /// @param s a scope
-   NcspSelectorLF(Scope s);
+   /// @param scop a scope
+   NcspSelectorLF(Scope scop);
 
    /// Destructor
    ~NcspSelectorLF() = default;
@@ -97,8 +97,8 @@ public:
 class NcspSelectorSF : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
-   /// @param s a scope
-   NcspSelectorSF(Scope s);
+   /// @param scop a scope
+   NcspSelectorSF(Scope scop);
 
    /// Destructor
    ~NcspSelectorSF() = default;
@@ -121,8 +121,8 @@ public:
 class NcspSelectorMixedSLF : public NcspSelector {
 public:
    /// Creates a selector on a set of variables
-   /// @param s a scope
-   NcspSelectorMixedSLF(Scope s);
+   /// @param scop a scope
+   NcspSelectorMixedSLF(Scope scop);
 
    /// Destructor
    ~NcspSelectorMixedSLF() = default;

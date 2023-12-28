@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorPool.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -20,7 +21,7 @@ ContractorPool::~ContractorPool()
 ContractorVector::ContractorVector()
       : ContractorPool(),
         v_(),
-        s_()
+        scop_()
 {}
 
 size_t ContractorVector::poolSize() const
@@ -30,7 +31,7 @@ size_t ContractorVector::poolSize() const
 
 Scope ContractorVector::scope() const
 {
-   return s_;
+   return scop_;
 }
 
 void ContractorVector::push(SharedContractor op)
@@ -38,7 +39,8 @@ void ContractorVector::push(SharedContractor op)
    ASSERT(op != nullptr, "Bad insertion in a vector of contractors");
 
    v_.push_back(op);
-   s_.insert(op->scope());
+   scop_.insert(op->scope());
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 SharedContractor ContractorVector::contractorAt(size_t i) const
@@ -54,7 +56,7 @@ void ContractorVector::removeContractorAt(size_t i)
    ASSERT(i < v_.size(),
           "Access out of range in a vector of contractors @ " << i);
 
-   s_.remove(v_[i]->scope());
+   scop_.remove(v_[i]->scope());
    v_.erase(v_.begin() + i);
 }
 

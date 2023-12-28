@@ -31,11 +31,11 @@ namespace realpaver {
 class NcspNode {
 public:
    /// Creates a node
-   /// @param scope set of variables
+   /// @param scop set of variables
    /// @param depth depth of this
    ///
    /// The domains are extracted from the variables of the given scope.
-   NcspNode(Scope scope, int depth = 0);
+   NcspNode(Scope scop, int depth = 0);
 
    /// Creates a node
    /// @param box the variables and their domains
@@ -89,7 +89,7 @@ public:
    void setProof(Proof p);
 
 private:
-   Scope scope_;
+   Scope scop_;
    DomainBox* box_;
    int depth_, index_;
    Variable v_;

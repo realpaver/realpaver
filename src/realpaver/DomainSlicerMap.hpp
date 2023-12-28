@@ -23,8 +23,8 @@ namespace realpaver {
 class DomainSlicerMap {
 public:
    /// Creates a map
-   /// @param sco set of variables
-   DomainSlicerMap(Scope sco);
+   /// @param scop set of variables
+   DomainSlicerMap(Scope scop);
 
    /// Destructor
    ~DomainSlicerMap();
@@ -38,7 +38,7 @@ public:
    /// Associates a slicer with a variable
    /// @param v a variable
    /// @param pslicer slicer associated with v in this
-   void setSlicer(Variable v, std::unique_ptr<DomainSlicer> pslicer);
+   void setSlicer(const Variable& v, std::unique_ptr<DomainSlicer> pslicer);
 
    /// Gets a slicer
    /// @param v a variable
@@ -46,7 +46,7 @@ public:
    DomainSlicer* getSlicer(const Variable& v) const;
 
 private:
-   Scope sco_;                         // scope
+   Scope scop_;                        // scope
    std::vector<DomainSlicer*> sli_;    // slicers
 };
 

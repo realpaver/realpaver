@@ -8,11 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/RLTRelaxation.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -32,7 +33,7 @@ std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style)
 
 PolytopeCreator::PolytopeCreator(SharedDag dag)
       : dag_(dag),
-        scope_(dag->scope()),
+        scop_(dag->scope()),
         mvv_(),
         lfun_(),
         eqtol_(Param::GetDblParam("RELAXATION_EQ_TOL"))
@@ -41,11 +42,13 @@ PolytopeCreator::PolytopeCreator(SharedDag dag)
 
    for (size_t i=0; i<dag->nbFuns(); ++i)
       lfun_.push_back(i);
+
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 PolytopeCreator::PolytopeCreator(SharedDag dag, const IndexList& lfun)
       : dag_(dag),
-        scope_(),
+        scop_(),
         lfun_(),
         eqtol_(Param::GetDblParam("RELAXATION_TOL"))
 {
@@ -57,8 +60,10 @@ PolytopeCreator::PolytopeCreator(SharedDag dag, const IndexList& lfun)
       ASSERT(i<dag_->nbFuns(), "Bad function index in a polytope maker");
 
       lfun_.push_back(i);
-      scope_.insert(dag->fun(i)->scope());
+      scop_.insert(dag->fun(i)->scope());
    }
+
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 PolytopeCreator::~PolytopeCreator()
@@ -71,7 +76,7 @@ SharedDag PolytopeCreator::dag() const
 
 Scope PolytopeCreator::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 size_t PolytopeCreator::linVarIndex(Variable v) const
@@ -126,9 +131,9 @@ void PolytopeRLTCreator::createLinVar(LPModel& lpm, DagNode* node)
       mvv_.insert(std::make_pair(vnode->getVar().id(), v.getIndex()));
 }
 
-bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalBox& box)
+bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalBox& B)
 {
-   if (!dag_->intervalEval(box)) return false;
+   if (!dag_->intervalEval(B)) return false;
 
    if (lfun_.size() == dag_->nbFuns())
    {
@@ -208,25 +213,23 @@ PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
    corner_.setAllZero();
 }
 
-bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& box)
+bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
 {
-   Scope sco = scope();
-
    // creates the linear variables
-   for (auto v : sco)
+   for (const auto& v : scop_)
    {
-      Interval val = box.get(v);
+      Interval val = B.get(v);
       LinVar lv = lpm.makeVar(val.left(), val.right());
       lv.setName(v.getName());
       mvv_.insert(std::make_pair(v.id(), lv.getIndex()));
    }
 
    // makes the opposite corners
-   RealPoint c1(sco), c2(sco);
-   for (auto v : sco)
+   RealPoint c1(scop_), c2(scop_);
+   for (const auto& v : scop_)
    {
-      Interval dom = box.get(v);
-      if (corner_.get(sco.index(v)))
+      Interval dom = B.get(v);
+      if (corner_.get(scop_.index(v)))
       {
          c1.set(v, dom.right());
          c2.set(v, dom.left());
@@ -255,7 +258,7 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& box)
 
    // interval evaluation on the given box, used to calculate
    // the derivatives thereafter
-   if (!dag_->intervalEval(box)) return false;
+   if (!dag_->intervalEval(B)) return false;
 
    // generates the constraints
    for (size_t i : lfun_)
@@ -281,13 +284,13 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& box)
 
          LinExpr lo1, lo2;
 
-         for (auto v : f->scope())
+         for (const auto& v : f->scope())
          {
             LinVar lv = lpm.getLinVar(linVarIndex(v));
             Interval z = f->intervalDeriv(v);
             if (z.isEmpty() || z.isInf()) return false;
 
-            if (corner_.get(sco.index(v)))
+            if (corner_.get(scop_.index(v)))
             {  // right bound used for this variable (bit = 1)
 
                // first corner => right bound of the derivative
@@ -328,12 +331,12 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& box)
 
          LinExpr up1, up2;
 
-         for (auto v : f->scope())
+         for (const auto& v : f->scope())
          {
             LinVar lv = lpm.getLinVar(linVarIndex(v));
             Interval z = f->intervalDeriv(v);
 
-            if (corner_.get(sco.index(v)))
+            if (corner_.get(scop_.index(v)))
             {  // right bound used for this variable (bit = 1)
 
                // first corner => left bound of the derivative
@@ -404,21 +407,21 @@ Scope ContractorPolytope::scope() const
    return creator_->scope();
 }
 
-Proof ContractorPolytope::contract(IntervalBox& box)
+Proof ContractorPolytope::contract(IntervalBox& B)
 {
-   Proof proof = contractImpl(box);
+   Proof proof = contractImpl(B);
    return proof;
 }
 
 // TODO
 #include <iomanip>
 
-Proof ContractorPolytope::contractImpl(IntervalBox& box)
+Proof ContractorPolytope::contractImpl(IntervalBox& B)
 {
    LPSolver solver;
 
    // linearizes the constraints
-   if (!creator_->make(solver, box)) return Proof::Maybe;
+   if (!creator_->make(solver, B)) return Proof::Maybe;
 
    // first is true if a call to solver.optimize() is required, false false
    // after a successfull optimization, then the next call to the solver can use
@@ -426,9 +429,9 @@ Proof ContractorPolytope::contractImpl(IntervalBox& box)
    bool first = true;
    OptimizationStatus status;
 
-   for (auto v : creator_->scope())
+   for (const auto& v : creator_->scope())
    {
-      Interval x = box.get(v);
+      Interval x = B.get(v);
       LinVar lv = solver.getLinVar(creator_->linVarIndex(v));
       LinExpr e({1.0}, {lv});
       solver.setObj(e);
@@ -475,7 +478,7 @@ Proof ContractorPolytope::contractImpl(IntervalBox& box)
          first = true;
       }
 
-      box.set(v, x);
+      B.set(v, x);
    }
 
    return Proof::Maybe;

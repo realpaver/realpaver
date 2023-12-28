@@ -54,14 +54,14 @@ void ContractorCID::setVar(Variable v)
    v_ = v;
 }
 
-Proof ContractorCID::contract(IntervalBox& box)
+Proof ContractorCID::contract(IntervalBox& B)
 {
-   slicer_->apply(box.get(v_));
+   slicer_->apply(B.get(v_));
 
    if (slicer_->nbSlices() == 1)
-      return op_->contract(box);
+      return op_->contract(B);
 
-   IntervalBox* init = box.clone();
+   IntervalBox* init = B.clone();
    Proof proof = Proof::Empty, certif;
 
    for (auto it = slicer_->begin(); it != slicer_->end(); ++it)
@@ -74,12 +74,12 @@ Proof ContractorCID::contract(IntervalBox& box)
       {
          if (proof == Proof::Empty)
          {
-            box.setOnScope(*slice, scope());
+            B.setOnScope(*slice, scope());
             proof = certif;
          }
          else
          {
-            box.glueOnScope(*slice, scope());
+            B.glueOnScope(*slice, scope());
             proof = std::min(proof, certif);
          }
       }

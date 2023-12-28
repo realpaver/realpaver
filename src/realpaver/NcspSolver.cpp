@@ -336,16 +336,16 @@ NcspSelector* NcspSolver::makeSelectorSSR()
 
 void NcspSolver::makeSplit()
 {
-   Scope sco = preprob_->scope();
+   Scope scop = preprob_->scope();
 
    // makes the selector
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
    NcspSelector* selector = nullptr;
 
-   if (sel == "RR")              selector = new NcspSelectorRR(sco);
-   else if (sel == "LF")         selector = new NcspSelectorLF(sco);
-   else if (sel == "SF")         selector = new NcspSelectorSF(sco);
-   else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(sco);
+   if (sel == "RR")              selector = new NcspSelectorRR(scop);
+   else if (sel == "LF")         selector = new NcspSelectorLF(scop);
+   else if (sel == "SF")         selector = new NcspSelectorSF(scop);
+   else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(scop);
    else if (sel == "SSR")        selector = makeSelectorSSR();
 
    // makes the slicer
@@ -353,7 +353,7 @@ void NcspSolver::makeSplit()
    std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
    if (sli == "BISECTION") 
-      smap = DomainSlicerFactory::makeBisectionStrategy(sco);   
+      smap = DomainSlicerFactory::makeBisectionStrategy(scop);   
 
    THROW_IF(selector == nullptr || smap == nullptr,
             "Unable to make the split object in a Ncsp solver");

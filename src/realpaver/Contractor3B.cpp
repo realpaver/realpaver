@@ -54,14 +54,14 @@ void Contractor3B::setVar(Variable v)
    v_ = v;
 }
 
-Proof Contractor3B::contract(IntervalBox& box)
+Proof Contractor3B::contract(IntervalBox& B)
 {
-   Interval dom = box.get(v_);
+   Interval dom = B.get(v_);
    slicer_->apply(dom);
    size_t nbs = slicer_->nbSlices();
 
    if (nbs == 1)
-      return op_->contract(box);
+      return op_->contract(B);
 
    // left to right
    size_t nbl = 0;               // number of left inconsistent facets
@@ -71,7 +71,7 @@ Proof Contractor3B::contract(IntervalBox& box)
 
    while (iter)
    {
-      IntervalBox* facet = box.clone();
+      IntervalBox* facet = B.clone();
       lslice = *it;
       facet->set(v_, lslice);
 
@@ -98,7 +98,7 @@ Proof Contractor3B::contract(IntervalBox& box)
 
    while (iter)
    {
-      IntervalBox* facet = box.clone();
+      IntervalBox* facet = B.clone();
       rslice = *jt;
       facet->set(v_, rslice);
 
@@ -119,14 +119,14 @@ Proof Contractor3B::contract(IntervalBox& box)
       delete facet;
    }
 
-   box.set(v_, Interval(lslice.left(), rslice.right()));
+   B.set(v_, Interval(lslice.left(), rslice.right()));
 
    return Proof::Maybe;
 }
 
 void Contractor3B::print(std::ostream& os) const
 {
-   os << "CID contractor on " << v_.getName();
+   os << "3B contractor on " << v_.getName();
 }
 
 } // namespace

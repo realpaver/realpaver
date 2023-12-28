@@ -12,19 +12,19 @@
 
 namespace realpaver {
 
-DomainBox::DomainBox(Scope sco)
-      : sco_(sco),
-        doms_(sco.size())
+DomainBox::DomainBox(Scope scop)
+      : scop_(scop),
+        doms_(scop.size())
 {
-   ASSERT(!sco_.isEmpty(), "Creation of a domain box with an empty scope");
+   ASSERT(!scop_.isEmpty(), "Creation of a domain box with an empty scope");
 
    for (size_t i=0; i<size(); ++i)
-      doms_[i] = sco_.var(i).getDomain()->clone();
+      doms_[i] = scop_.var(i).getDomain()->clone();
 }
 
 DomainBox::DomainBox(const DomainBox& box)
-      : sco_(box.sco_),
-        doms_(box.sco_.size())
+      : scop_(box.scop_),
+        doms_(box.scop_.size())
 {
    for (size_t i=0; i<size(); ++i)
       doms_[i] = box.doms_[i]->clone();
@@ -38,12 +38,12 @@ DomainBox::~DomainBox()
 
 Scope DomainBox::scope() const
 {
-   return sco_;
+   return scop_;
 }
 
 size_t DomainBox::size() const
 {
-   return sco_.size();
+   return scop_.size();
 }
 
 bool DomainBox::isEmpty() const
@@ -57,10 +57,10 @@ bool DomainBox::isEmpty() const
 
 Domain* DomainBox::get(const Variable& v) const
 {
-   ASSERT(sco_.contains(v),
+   ASSERT(scop_.contains(v),
           "Bad access in a domain box to variable " << v.getName());
 
-   return doms_[sco_.index(v)];
+   return doms_[scop_.index(v)];
 }
 
 Domain* DomainBox::get(size_t i) const
@@ -74,17 +74,17 @@ Variable DomainBox::var(size_t i) const
 {
    ASSERT(i>=0 && i<size(), "Bad access in a domain box at index " << i);
 
-   return sco_.var(i);
+   return scop_.var(i);
 }
 
 void DomainBox::set(const Variable& v, std::unique_ptr<Domain> p)
 {
-   ASSERT(sco_.contains(v),
+   ASSERT(scop_.contains(v),
           "Bad access in a domain box to variable " << v.getName());
 
    ASSERT((p != nullptr) && (!p->isEmpty()), "Bad domain assignment in a box");
 
-   doms_[sco_.index(v)] = p.release();
+   doms_[scop_.index(v)] = p.release();
 }
 
 DomainBox* DomainBox::clone() const
@@ -105,11 +105,11 @@ bool DomainBox::isSplitable(const Variable& v) const
 
 void DomainBox::listPrint(std::ostream& os) const
 {
-   size_t lmax = sco_.nameMaxLength();
+   size_t lmax = scop_.nameMaxLength();
 
    for (size_t i=0; i<size(); ++i)
    {
-      Variable v = sco_.var(i);
+      Variable v = scop_.var(i);
       os << v.getName();
 
       size_t n = v.getName().length();
@@ -126,7 +126,7 @@ void DomainBox::vecPrint(std::ostream& os) const
    {
       if (i!=0) os << ", ";
 
-      Variable v = sco_.var(i);
+      Variable v = scop_.var(i);
       os << v.getName() << " = " << (*doms_[i]);
    }
    os << ')'; 
@@ -151,35 +151,35 @@ double DomainBox::width() const
    return wid;
 }
 
-double DomainBox::gap(const DomainBox& B) const
+double DomainBox::gap(const DomainBox& box) const
 {
-   return gapOnScope(B, sco_);
+   return gapOnScope(box, scop_);
 }
 
-double DomainBox::gapOnScope(const DomainBox& B, const Scope& sco) const
+double DomainBox::gapOnScope(const DomainBox& box, const Scope& scop) const
 {
-   ASSERT(sco_.contains(sco) && B.sco_.contains(sco),
+   ASSERT(scop_.contains(scop) && box.scop_.contains(scop),
           "Bad scopes used to calculate the gap between domain boxes");
 
    double gap = 0.0;
-   for (const auto& v : sco)
+   for (const auto& v : scop)
    {
-      double e = get(v)->intervalHull().gap(B.get(v)->intervalHull());
+      double e = get(v)->intervalHull().gap(box.get(v)->intervalHull());
       if (e > gap) gap = e;
    }
    return gap;
 }
 
-void DomainBox::glue(const DomainBox& B)
+void DomainBox::glue(const DomainBox& box)
 {
-   glueOnScope(B, sco_);
+   glueOnScope(box, scop_);
 }
 
-void DomainBox::glueOnScope(const DomainBox& B, const Scope& sco)
+void DomainBox::glueOnScope(const DomainBox& box, const Scope& scop)
 {
-   for (const auto& v : sco)
+   for (const auto& v : scop)
    {
-      Interval x = get(v)->intervalHull() | B.get(v)->intervalHull();
+      Interval x = get(v)->intervalHull() | box.get(v)->intervalHull();
       std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
       set(v, std::move(dom));
    }
@@ -187,14 +187,14 @@ void DomainBox::glueOnScope(const DomainBox& B, const Scope& sco)
 
 double DomainBox::perimeter() const
 {
-   return perimeterOnScope(sco_);
+   return perimeterOnScope(scop_);
 }
 
-double DomainBox::perimeterOnScope(const Scope& sco) const
+double DomainBox::perimeterOnScope(const Scope& scop) const
 {
    double p = 0.0;
 
-   for (const auto& v : sco)
+   for (const auto& v : scop)
       p += get(v)->intervalHull().width();
 
    return p;
@@ -202,14 +202,14 @@ double DomainBox::perimeterOnScope(const Scope& sco) const
 
 double DomainBox::gridPerimeter() const
 {
-   return gridPerimeterOnScope(sco_);
+   return gridPerimeterOnScope(scop_);
 }
 
-double DomainBox::gridPerimeterOnScope(const Scope& sco) const
+double DomainBox::gridPerimeterOnScope(const Scope& scop) const
 {
    double p = 0.0;
 
-   for (const auto& v : sco)
+   for (const auto& v : scop)
    {
       Interval x = get(v)->intervalHull();
       Tolerance tol = v.getTolerance();

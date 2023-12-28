@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/RealFunctionVector.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -235,13 +236,13 @@ void RealFunctionVectorDag::violation(const RealPoint& pt, RealVector& val,
 
 RealFunctionVectorList::RealFunctionVectorList()
       : vf_(),
-        scope_()
+        scop_()
 {}
 
 RealFunctionVectorList::RealFunctionVectorList(
    const std::initializer_list<RealFunction>& lf)
       : vf_(),
-        scope_()
+        scop_()
 {
    for (const auto& f : lf)
       addFun(f);
@@ -250,17 +251,18 @@ RealFunctionVectorList::RealFunctionVectorList(
 void RealFunctionVectorList::addFun(RealFunction f)
 {
    vf_.push_back(f);
-   scope_.insert(f.scope());
+   scop_.insert(f.scope());
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 Scope RealFunctionVectorList::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 size_t RealFunctionVectorList::nbVars() const
 {
-   return scope_.size();
+   return scop_.size();
 }
 
 size_t RealFunctionVectorList::nbFuns() const

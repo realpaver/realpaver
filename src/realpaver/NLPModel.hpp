@@ -113,7 +113,7 @@ protected:
    RealFunction* obj_;            // Objective function on real numbers
    RealFunctionVector* ctrs_;     // Vector of functions for the constraints
 
-   Scope scope_;     // union of scopes of the objective function and the constraints
+   Scope scop_;   // union of scopes of the objective function and the constraints
 
    size_t n_;     // number of variables
    size_t m_;     // number of constraints

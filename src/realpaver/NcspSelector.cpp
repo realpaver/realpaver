@@ -12,9 +12,10 @@
 
 namespace realpaver {
 
-NcspSelector::NcspSelector(Scope s) : scope_(s)
+NcspSelector::NcspSelector(Scope scop)
+      : scop_(scop)
 {
-   ASSERT(s.size() > 0, "Creation of a selector with an empty scope");
+   ASSERT(scop.size() > 0, "Creation of a selector with an empty scope");
 }
 
 NcspSelector::~NcspSelector()
@@ -22,31 +23,32 @@ NcspSelector::~NcspSelector()
 
 Scope NcspSelector::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NcspSelectorRR::NcspSelectorRR(Scope s) : NcspSelector(s)
+NcspSelectorRR::NcspSelectorRR(Scope scop)
+      : NcspSelector(scop)
 {}
 
 std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
 {
    DomainBox* box = node.box();
    Variable v = node.splitVariable();
-   auto it = scope_.begin();
+   auto it = scop_.begin();
 
    if (!v.hasNullPointer())
    {
-      it = scope_.find(v);
+      it = scop_.find(v);
       ++it;
-      if (it == scope_.end()) it = scope_.begin();
+      if (it == scop_.end()) it = scop_.begin();
    }
 
    bool found = false;
    size_t nb = 0;
 
-   while (!found && nb<scope_.size())
+   while (!found && nb<scop_.size())
    {
       v = *it;
 
@@ -59,7 +61,7 @@ std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
       {
          ++nb;
          ++it;
-         if (it == scope_.end()) it = scope_.begin();
+         if (it == scop_.end()) it = scop_.begin();
       }
    }
 
@@ -93,7 +95,7 @@ std::pair<bool, Variable> NcspSelectorLF::selectVar(NcspNode& node)
    double dres;
    bool found = false;
 
-   for (const auto& v : scope_)
+   for (const auto& v : scop_)
    {
       if (box->isSplitable(v))
       {
@@ -123,7 +125,7 @@ std::pair<bool, Variable> NcspSelectorSF::selectVar(NcspNode& node)
    double dres;
    bool found = false;
 
-   for (const auto& v : scope_)
+   for (const auto& v : scop_)
    {
       if (box->isSplitable(v))
       {
@@ -155,7 +157,7 @@ std::pair<bool, Variable> NcspSelectorMixedSLF::selectVar(NcspNode& node)
 
    ifound = rfound = false;
 
-   for (const auto& v : scope_)
+   for (const auto& v : scop_)
    {
       if (box->isSplitable(v))
       {
@@ -209,7 +211,7 @@ void NcspSelectorSSR::calculateSSR(const IntervalBox& B)
       double sum = 0.0;
       for (size_t j=0; j<F_.nbVars(); ++j)
       {
-         const auto& v = scope_.var(j);
+         const auto& v = scop_.var(j);
          double smear = jac.get(i, j).mag() * B.get(v).width();
          S.set(i, j, smear);
          sum += smear;
@@ -240,7 +242,7 @@ std::pair<bool, Variable> NcspSelectorSSR::selectVar(const IntervalBox& B)
    double smax;
    Variable vmax;
 
-   for (const auto& v : scope_)
+   for (const auto& v : scop_)
    {
       if (B.isSplitable(v))
       {
@@ -266,7 +268,7 @@ std::pair<bool, Variable> NcspSelectorSSR::selectVar(NcspNode& node)
 
 double NcspSelectorSSR::getSSR(const Variable& v) const
 {
-   return ssr_[scope_.index(v)];
+   return ssr_[scop_.index(v)];
 }
 
 } // namespace

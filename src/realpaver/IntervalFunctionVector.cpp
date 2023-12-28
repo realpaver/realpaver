@@ -9,6 +9,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalFunctionVector.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -271,13 +272,13 @@ void IntervalFunctionVectorDag::violation(const IntervalBox& box,
 
 IntervalFunctionVectorList::IntervalFunctionVectorList()
       : vf_(),
-        scope_()
+        scop_()
 {}
 
 IntervalFunctionVectorList::IntervalFunctionVectorList(
    const std::initializer_list<IntervalFunction>& lf)
       : vf_(),
-        scope_()
+        scop_()
 {
    for (const auto& f : lf)
       addFun(f);
@@ -286,17 +287,18 @@ IntervalFunctionVectorList::IntervalFunctionVectorList(
 void IntervalFunctionVectorList::addFun(IntervalFunction f)
 {
    vf_.push_back(f);
-   scope_.insert(f.scope());
+   scop_.insert(f.scope());
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 Scope IntervalFunctionVectorList::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 size_t IntervalFunctionVectorList::nbVars() const
 {
-   return scope_.size();
+   return scop_.size();
 }
 
 size_t IntervalFunctionVectorList::nbFuns() const

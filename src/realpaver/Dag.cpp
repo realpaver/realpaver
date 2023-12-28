@@ -2171,7 +2171,7 @@ void Dag::intervalDiff(IntervalMatrix& jac)
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (const auto& v : scope())
       {
          if (f->dependsOn(v))
             jac.set(i, j, f->intervalDeriv(v));
@@ -2194,7 +2194,7 @@ void Dag::hansenDiff(const IntervalBox& box, IntervalMatrix& jac)
    IntervalBox X =  box.midpoint();
 
    size_t j = 0;
-   for (auto v : scope())
+   for (const auto& v : scope())
    {
       // assigns the domain of v
       X.set(v, box.get(v));
@@ -2279,7 +2279,7 @@ void Dag::realDiff(RealMatrix& jac)
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (const auto& v : scope())
       {
          if (f->dependsOn(v))
             jac.set(i, j, f->realDeriv(v));
