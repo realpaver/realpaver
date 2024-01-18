@@ -16,8 +16,15 @@
 
 namespace realpaver {
 
+// forward declaration
+class NcspSplit;
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a selector of variables used by splitting strategies.
+///
+/// A selector can be linked to a splitting object, which can be useful
+/// if some informations about the search context are required. This link
+/// is created when a selector is inserted in a splitting object.
 ///////////////////////////////////////////////////////////////////////////////
 class NcspSelector {
 public:
@@ -37,6 +44,13 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
+   /// Gets the splitting object in this
+   NcspSplit* getSplit() const;
+
+   /// Sets the splitting object in this
+   /// @param split splitting object that uses this selector
+   void setSplit(NcspSplit* split);
+
    /// Selection method
    /// @param node a search node
    /// @return a pair <b, v> such that no variable is selected if b = false,
@@ -45,6 +59,7 @@ public:
 
 protected:
    Scope scop_;
+   NcspSplit* split_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

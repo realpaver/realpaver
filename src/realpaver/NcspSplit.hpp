@@ -12,10 +12,13 @@
 
 #include <list>
 #include "realpaver/DomainSlicerFactory.hpp"
-#include "realpaver/NcspSelector.hpp"
+#include "realpaver/NcspNodeInfoMap.hpp"
 #include "realpaver/SplitStrategy.hpp"
 
 namespace realpaver {
+
+// forward declaration
+class NcspSelector;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This implements a splitting strategy for NCSP nodes.
@@ -38,6 +41,9 @@ public:
    /// No assignment
    NcspSplit& operator=(const NcspSplit&) = delete;
 
+   /// @return the node info map
+   NcspNodeInfoMap* getInfoMap() const;
+
    ///@
    bool applyImpl(SharedNcspNode node) override;
    ///@}
@@ -46,8 +52,9 @@ public:
    typedef typename SplitStrategy<SharedNcspNode>::iterator iterator;
 
 private:
-   NcspSelector* selector_;
-   DomainSlicerMap* smap_;
+   NcspSelector* selector_;   // selector
+   DomainSlicerMap* smap_;    // slicer
+   NcspNodeInfoMap* imap_;    // info map
 };
 
 } // namespace

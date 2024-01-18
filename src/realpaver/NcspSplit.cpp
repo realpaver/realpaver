@@ -8,26 +8,38 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/NcspSelector.hpp"
 #include "realpaver/NcspSplit.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-
 NcspSplit::NcspSplit(std::unique_ptr<NcspSelector> selector,
                      std::unique_ptr<DomainSlicerMap> smap)
       : SplitStrategy<SharedNcspNode>(),
         selector_(selector.release()),
-        smap_(smap.release())
+        smap_(smap.release()),
+        imap_(nullptr)
 {
    ASSERT(selector_ != nullptr, "No selector in a split object");
    ASSERT(smap_ != nullptr, "No slicer map in a split object");
+
+   imap_ = new NcspNodeInfoMap();
+
+   // links this to the selector
+   selector_->setSplit(this);
 }
 
 NcspSplit::~NcspSplit()
 {
+   delete imap_;
    delete selector_;
    delete smap_;
+}
+
+NcspNodeInfoMap* NcspSplit::getInfoMap() const
+{
+   return imap_;
 }
 
 bool NcspSplit::applyImpl(SharedNcspNode node)

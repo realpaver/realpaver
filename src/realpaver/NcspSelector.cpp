@@ -9,11 +9,13 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/NcspSelector.hpp"
+#include "realpaver/NcspSplit.hpp"
 
 namespace realpaver {
 
 NcspSelector::NcspSelector(Scope scop)
-      : scop_(scop)
+      : scop_(scop),
+        split_(nullptr)
 {
    ASSERT(scop.size() > 0, "Creation of a selector with an empty scope");
 }
@@ -26,6 +28,16 @@ Scope NcspSelector::scope() const
    return scop_;
 }
 
+NcspSplit* NcspSelector::getSplit() const
+{
+   return split_;
+}
+
+void NcspSelector::setSplit(NcspSplit* split)
+{
+   split_ = split;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 NcspSelectorRR::NcspSelectorRR(Scope scop)
@@ -34,28 +46,58 @@ NcspSelectorRR::NcspSelectorRR(Scope scop)
 
 std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
 {
-   DomainBox* box = node.box();
-   Variable v = node.splitVariable();
-   auto it = scop_.begin();
+   ASSERT(getSplit() != nullptr, "No splitting object in a RR selector");
 
+   DomainBox* box = node.box();
+   //Variable v = node.splitVariable(); TODO
+   //auto it = scop_.begin();
+
+   Scope::const_iterator it;
+
+// ----
+// TODO
+
+   NcspNodeInfoMap* imap = getSplit()->getInfoMap();
+   int index = node.index();
+   std::shared_ptr<NcspNodeInfo>
+      info = imap->getInfo(index, NcspNodeInfoType::SplitVar);
+
+   if (info == nullptr)
+   {
+      it = scop_.begin();
+   }
+   else
+   {
+      NcspNodeInfoVar* infovar =
+         static_cast<NcspNodeInfoVar*>(info.get());
+
+      it = scop_.find(infovar->getVar());
+      ++it;
+      if (it == scop_.end()) it = scop_.begin();
+   }
+
+// ----
+
+/*
    if (!v.hasNullPointer())
    {
       it = scop_.find(v);
       ++it;
       if (it == scop_.end()) it = scop_.begin();
    }
+*/
 
    bool found = false;
    size_t nb = 0;
 
    while (!found && nb<scop_.size())
    {
-      v = *it;
+      Variable v = *it;
 
       if (box->isSplitable(v))
       {
          found = true;
-         node.setSplitVariable(v);
+         //node.setSplitVariable(v);  TODO
       }
       else
       {
@@ -65,7 +107,7 @@ std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
       }
    }
 
-   return std::make_pair(found, v);
+   return std::make_pair(found, *it);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
