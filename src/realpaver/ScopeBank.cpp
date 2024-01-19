@@ -31,9 +31,7 @@ size_t ScopeBank::nbInsertions() const
 }
 
 Scope ScopeBank::insertScope(Scope scop)
-{
-std::cout << "ScopeBank: " << size() << "  " << nb_ << std::endl;
-   
+{   
    ++nb_;
    auto it = bank_.find(scop);
    

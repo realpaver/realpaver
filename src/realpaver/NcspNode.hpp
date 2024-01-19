@@ -74,13 +74,6 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
-   /// @return the variable chosen by the last splitting step
-   Variable splitVariable() const;
-
-   /// Assigns the variable whose domain has been split
-   /// @param v a variablein the scope of this
-   void setSplitVariable(Variable v);
-
    /// @return the proof certificate
    Proof getProof() const;
 
@@ -92,7 +85,6 @@ private:
    Scope scop_;
    DomainBox* box_;
    int depth_, index_;
-   Variable v_;
    Proof proof_;
 };
 

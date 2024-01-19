@@ -7,10 +7,19 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "AssertDebug.hpp"
-#include "NcspNodeInfoMap.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/NcspNodeInfoMap.hpp"
 
 namespace realpaver {
+
+std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ)
+{
+   switch(typ)
+   {
+      case NcspNodeInfoType::SplitVar: return os << "split variable";
+   }
+   return os;   
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +51,9 @@ Variable NcspNodeInfoVar::getVar() const
 
 void NcspNodeInfoMap::insert(int index, std::shared_ptr<NcspNodeInfo> info)
 {
-   ASSERT(!hasInfo(index, info->getType()), "Bad insertion in a node info map");
+   ASSERT(!hasInfo(index, info->getType()),
+          "Info '" << info->getType()
+                   << "' already present in the map for node " << index);
    
    auto it = map_.find(index);
    if (it == map_.end())
@@ -55,6 +66,11 @@ void NcspNodeInfoMap::insert(int index, std::shared_ptr<NcspNodeInfo> info)
    {
       it->second.push_back(info);
    }
+}
+
+size_t NcspNodeInfoMap::size() const
+{
+   return map_.size();
 }
 
 void NcspNodeInfoMap::remove(int index)
@@ -79,7 +95,7 @@ NcspNodeInfoMap::getInfo(int index, NcspNodeInfoType typ) const
    }
 }
 
-bool NcspNodeInfoMap::hasInfo(int index,  NcspNodeInfoType typ) const
+bool NcspNodeInfoMap::hasInfo(int index, NcspNodeInfoType typ) const
 {
    auto it = map_.find(index);
    if (it == map_.end())

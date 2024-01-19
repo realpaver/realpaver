@@ -171,7 +171,6 @@ rp_headers += [
   'Scope.hpp',
   'ScopeBank.hpp',
   'ScopeMap.hpp',
-  'SplitStrategy.hpp',
   'Stat.hpp',
   'SymbolTable.hpp',
   'Term.hpp',

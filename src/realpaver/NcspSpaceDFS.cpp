@@ -36,7 +36,8 @@ SharedNcspNode NcspSpaceDFS::popSolNode()
 
 SharedNcspNode NcspSpaceDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a NCSP space");
+   ASSERT(i < vsol_.size(),
+          "Bad access to a solution node in a NCSP space @ " << i);
 
    return vsol_[i];
 }
@@ -71,7 +72,8 @@ void NcspSpaceDFS::insertPendingNode(const SharedNcspNode& node)
 
 SharedNcspNode NcspSpaceDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < vnode_.size(), "Bad access to a pending node in a NCSP space");
+   ASSERT(i < vnode_.size(),
+          "Bad access to a pending node in a NCSP space @ " << i);
 
    return vnode_[i];
 }

@@ -197,6 +197,10 @@ int main(int argc, char** argv)
             fsol << endl;
          }
       }
+      else
+      {
+         cout << BLUE("No preprocessing") << endl;
+      }
 
       NcspEnv* env = solver.getEnv();
 
@@ -241,7 +245,7 @@ int main(int argc, char** argv)
 
          fsol << WP("Solution status", wpl);
          cout << indent << WP("Solution status", wpl);
-         if (space->nbSolNodes() == 0)
+         if (solver.nbSolutions() == 0)
          {
             if (complete)
             {
@@ -269,17 +273,17 @@ int main(int argc, char** argv)
          }
 
          fsol << WP("Number of solutions", wpl)
-              << space->nbSolNodes() << endl;
+              << solver.nbSolutions() << endl;
 
-         if (space->nbSolNodes() > 0)
+         if (solver.nbSolutions() > 0)
          {
             cout << indent << WP("Number of solutions", wpl)
-                 << GREEN(space->nbSolNodes()) << endl;
+                 << GREEN(solver.nbSolutions()) << endl;
          }
          else
          {
             cout << indent << WP("Number of solutions", wpl)
-                 << RED(space->nbSolNodes()) << endl;
+                 << RED(solver.nbSolutions()) << endl;
          }
 
          // limits

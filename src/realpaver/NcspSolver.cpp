@@ -129,7 +129,7 @@ void NcspSolver::makeSpace()
 
    // creates and inserts the root node
    SharedNcspNode node = std::make_shared<NcspNode>(preprob_->scope());
-   node->setIndex(1);
+   node->setIndex(0);
 
    space_->insertPendingNode(node);
    ++nbnodes_;
@@ -302,6 +302,7 @@ void NcspSolver::makeContractor()
    contractor_ = std::make_shared<ContractorList>(mainpool);
 }
 
+/* TODO
 NcspSelector* NcspSolver::makeSelectorSSR()
 {
    IntervalFunctionVector F;
@@ -333,12 +334,15 @@ NcspSelector* NcspSolver::makeSelectorSSR()
       return new NcspSelectorRR(preprob_->scope());
    }
 }
+*/
 
 void NcspSolver::makeSplit()
 {
    Scope scop = preprob_->scope();
 
    // makes the selector
+
+/*
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
    NcspSelector* selector = nullptr;
 
@@ -347,6 +351,7 @@ void NcspSolver::makeSplit()
    else if (sel == "SF")         selector = new NcspSelectorSF(scop);
    else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(scop);
    else if (sel == "SSR")        selector = makeSelectorSSR();
+*/
 
    // makes the slicer
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
@@ -355,12 +360,13 @@ void NcspSolver::makeSplit()
    if (sli == "BISECTION") 
       smap = DomainSlicerFactory::makeBisectionStrategy(scop);   
 
-   THROW_IF(selector == nullptr || smap == nullptr,
+   THROW_IF(smap == nullptr,
             "Unable to make the split object in a Ncsp solver");
 
-   std::unique_ptr<NcspSelector> pselector(selector);
+//   std::unique_ptr<NcspSelector> pselector(selector);
 
-   split_ = new NcspSplit(std::move(pselector), std::move(smap));
+// TODO
+   split_ = new NcspSplitRR(scop, std::move(smap));
 }
 
 bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
@@ -375,10 +381,21 @@ bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
    return true;
 }
 
+
 void NcspSolver::bpStep(int depthlimit)
 {
-   SharedNcspNode node = space_->nextPendingNode();
+   // extracts a node from the space
+    SharedNcspNode node = space_->nextPendingNode();
 
+   // processes it
+    bpStepAux(node, depthlimit);
+
+   // removes the node informations
+   split_->removeInfo(node->index());
+}
+
+void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
+{
    // the contractor processes an interval box generated
    // as the hull of the domain box
    IntervalBox box(*node->box());
@@ -443,18 +460,16 @@ void NcspSolver::bpStep(int depthlimit)
       LOG_INTER("Node " << node->index() << " is split into "
                         << split_->getNbNodes() << " sub-nodes");
 
+#if LOG_ON
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
-         ++nbnodes_;
-
-         SharedNcspNode subnode = *it;
-         subnode->setIndex(nbnodes_);
-         subnode->setDepth(depth);
-   
+         SharedNcspNode subnode = *it;   
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
          LOG_LOW(*subnode->box());
       }
+#endif
 
+      nbnodes_ += std::distance(split_->begin(), split_->end());
       space_->insertPendingNodes(split_->begin(), split_->end());
    }
 }
@@ -635,7 +650,7 @@ Preprocessor* NcspSolver::getPreprocessor() const
 
 size_t NcspSolver::nbSolutions() const
 {
-   if (preproc_->isSolved())
+   if (withPreprocessing_ && preproc_->isSolved())
       return preproc_->isUnfeasible() ? 0 : 1;
 
    else
@@ -644,7 +659,8 @@ size_t NcspSolver::nbSolutions() const
 
 std::pair<DomainBox, Proof> NcspSolver::getSolution(size_t i) const
 {
-   ASSERT(i < nbSolutions(), "Bad access to a solution in a Ncsp solver");
+   ASSERT(i < nbSolutions(),
+          "Bad access to a solution in a Ncsp solver @ " << i);
 
    if (withPreprocessing_)
    {

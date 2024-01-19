@@ -13,14 +13,21 @@
 #include <list>
 #include <memory>
 #include <unordered_map>
-#include "Variable.hpp"
+#include "realpaver/Variable.hpp"
 
 namespace realpaver {
+   
+   // TODO : commenter !!!
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Type of informations that can be associated with search nodes
+///////////////////////////////////////////////////////////////////////////////
 enum class NcspNodeInfoType {
-   SplitVar
+   SplitVar    // selected variable in a splitting step
 };
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ);
 
 ///////////////////////////////////////////////////////////////////////////////
 class NcspNodeInfo {
@@ -54,6 +61,8 @@ public:
    void remove(int index);
 
    std::shared_ptr<NcspNodeInfo> getInfo(int index, NcspNodeInfoType typ) const;
+
+   size_t size() const;
 
 private:
    // map node index -> list of infos

@@ -14,66 +14,165 @@
 
 namespace realpaver {
 
-NcspSplit::NcspSplit(std::unique_ptr<NcspSelector> selector,
-                     std::unique_ptr<DomainSlicerMap> smap)
-      : SplitStrategy<SharedNcspNode>(),
-        selector_(selector.release()),
-        smap_(smap.release()),
-        imap_(nullptr)
+NcspSplit::NcspSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : scop_(scop),
+        slicerMap_(smap.release()),
+        infoMap_(nullptr),
+        cont_(),
+        nbs_(0),
+        idx_(0)
 {
-   ASSERT(selector_ != nullptr, "No selector in a split object");
-   ASSERT(smap_ != nullptr, "No slicer map in a split object");
+   ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
+   ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
 
-   imap_ = new NcspNodeInfoMap();
-
-   // links this to the selector
-   selector_->setSplit(this);
+   infoMap_ = new NcspNodeInfoMap();
 }
 
 NcspSplit::~NcspSplit()
 {
-   delete imap_;
-   delete selector_;
-   delete smap_;
+   delete slicerMap_;
+   delete infoMap_;
 }
 
-NcspNodeInfoMap* NcspSplit::getInfoMap() const
+Scope NcspSplit::scope() const
 {
-   return imap_;
+   return scop_;
 }
 
-bool NcspSplit::applyImpl(SharedNcspNode node)
+void NcspSplit::apply(SharedNcspNode& node)
+{
+   LOG_INTER("Split node " << node->index() << ": " << (*node->box()));
+
+   cont_.clear();
+   ++nbs_;
+   applyImpl(node);
+
+   LOG_INTER("  -> " << getNbNodes() << " sub-node(s)");
+}
+
+size_t NcspSplit::getNbNodes() const
+{
+   return cont_.size();
+}
+
+size_t NcspSplit::getNbSplits() const
+{
+   return nbs_;
+}
+
+void NcspSplit::removeInfo(int index)
+{
+   infoMap_->remove(index);
+}
+
+SharedNcspNode NcspSplit::cloneNode(const SharedNcspNode& node)
+{
+   SharedNcspNode aux = std::make_shared<NcspNode>(*node);
+   aux->setIndex(++idx_);
+   aux->setDepth(1+node->depth());
+   return aux;
+}
+
+void NcspSplit::splitOne(SharedNcspNode& node, Variable v)
 {
    DomainBox* B = node->box();
-
-   LOG_INTER("Split node " << node->index() << ": " << (*B));
-
-   std::pair<bool, Variable> p = selector_->selectVar(*node);
-
-   if (!p.first) return false;
-
-   Variable v = p.second;
-   DomainSlicer* slicer = smap_->getSlicer(v);
+   DomainSlicer* slicer = slicerMap_->getSlicer(v);
 
    size_t n = slicer->apply(B->get(v));
-   if (n < 2) return false;
+   if (n < 2) return;
 
-   // reuses the input node with the first slice
    auto it = slicer->begin();
-   std::unique_ptr<Domain> slice = slicer->next(it);
-   B->set(v, std::move(slice));
-   push(node);
-
-   // new nodes for the other slices
    while (it != slicer->end())
    {
-      slice = slicer->next(it);
-      SharedNcspNode aux = std::make_shared<NcspNode>(*node);
+      std::unique_ptr<Domain> slice = slicer->next(it);
+      SharedNcspNode aux = cloneNode(node);
       aux->box()->set(v, std::move(slice));
-      push(aux);      
+      cont_.push_back(aux);
+   }
+}
+
+void NcspSplit::reset()
+{
+   nbs_ = idx_ = 0;
+}
+
+NcspSplit::iterator NcspSplit::begin()
+{
+   return cont_.begin();
+}
+
+NcspSplit::iterator NcspSplit::end()
+{
+   return cont_.end();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspSplitRR::NcspSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : NcspSplit(scop, std::move(smap))
+{}
+
+void NcspSplitRR::applyImpl(SharedNcspNode& node)
+{
+   // variable selection
+   std::pair<bool, Variable> res = selectVar(node);
+   if (!res.first) return;
+   Variable v = res.second;
+
+   // splits the variable domain
+   splitOne(node, v);
+
+   LOG_INTER("Round-Robin selects " << v.getName()
+                                    << " in node " << node->index());
+
+   if (getNbNodes() < 2) return;
+
+   // assigns the split variable in the sub-nodes
+   std::shared_ptr<NcspNodeInfoVar> p = std::make_shared<NcspNodeInfoVar>(v);
+
+   for (SharedNcspNode& aux : cont_)
+      infoMap_->insert(aux->index(), p);
+}
+
+std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node)
+{
+   DomainBox* box = node->box();
+
+   std::shared_ptr<NcspNodeInfo>
+      info = infoMap_->getInfo(node->index(), NcspNodeInfoType::SplitVar);
+
+   // assigns an iterator on the next variable
+   Scope::const_iterator it;
+   if (info == nullptr)
+   {
+      it = scop_.begin();
+   }
+   else
+   {
+      NcspNodeInfoVar* infovar = static_cast<NcspNodeInfoVar*>(info.get());
+      it = scop_.find(infovar->getVar());
+      ++it;
+      if (it == scop_.end()) it = scop_.begin();
    }
 
-   return true;
+   bool found = false;
+   size_t nb = 0;
+
+   while (!found && nb<scop_.size())
+   {
+      if (box->isSplitable(*it))
+      {
+         found = true;
+      }
+      else
+      {
+         ++nb;
+         ++it;
+         if (it == scop_.end()) it = scop_.begin();
+      }
+   }
+
+   return std::make_pair(found, *it);
 }
 
 } // namespace

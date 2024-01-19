@@ -57,6 +57,7 @@ std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
 // ----
 // TODO
 
+/*
    NcspNodeInfoMap* imap = getSplit()->getInfoMap();
    int index = node.index();
    std::shared_ptr<NcspNodeInfo>
@@ -75,7 +76,7 @@ std::pair<bool, Variable> NcspSelectorRR::selectVar(NcspNode& node)
       ++it;
       if (it == scop_.end()) it = scop_.begin();
    }
-
+*/
 // ----
 
 /*

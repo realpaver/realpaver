@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "AssertDebug.hpp"
-#include "NcspNode.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/NcspNode.hpp"
 
 namespace realpaver {
 
@@ -17,7 +17,6 @@ NcspNode::NcspNode(Scope scop, int depth)
         box_(nullptr),
         depth_(depth),
         index_(0),
-        v_(),
         proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
@@ -31,7 +30,6 @@ NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
         box_(box.release()),
         depth_(depth),
         index_(0),
-        v_(),
         proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
@@ -40,8 +38,7 @@ NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
 NcspNode::NcspNode(const NcspNode& node)
       : scop_(node.scop_),
         box_(nullptr),
-        depth_(node.depth_),
-        v_(node.v_)
+        depth_(node.depth_)
 {
    box_ = node.box_->clone();
 }
@@ -86,18 +83,6 @@ DomainBox* NcspNode::box() const
 Scope NcspNode::scope() const
 {
    return scop_;
-}
-
-Variable NcspNode::splitVariable() const
-{
-   return v_;
-}
-
-void NcspNode::setSplitVariable(Variable v)
-{
-   ASSERT(scop_.contains(v), "Bad assignment of the last split variable");
-
-   v_ = v;
 }
 
 Proof NcspNode::getProof() const

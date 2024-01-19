@@ -124,9 +124,12 @@ private:
    void makeContractor();
    void makeSplit();
    void bpStep(int depthlimit);
+   void bpStepAux(SharedNcspNode node, int depthlimit);
    bool isAnInnerRegion(const IntervalBox& B) const;
    void certifySolutions();
-   NcspSelector* makeSelectorSSR();
+   
+   // TODO
+   //NcspSelector* makeSelectorSSR();
 };
 
 } // namespace
