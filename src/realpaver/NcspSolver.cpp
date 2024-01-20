@@ -342,7 +342,6 @@ void NcspSolver::makeSplit()
 
 
 /*
-   else if (sel == "SF")         selector = new NcspSelectorSF(scop);
    else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(scop);
    else if (sel == "SSR")        selector = makeSelectorSSR();
 */
@@ -365,6 +364,12 @@ void NcspSolver::makeSplit()
 
    else if (sel == "LF")
       split_ = new NcspSplitLF(scop, std::move(smap));
+
+   else if (sel == "SF")
+      split_ = new NcspSplitSF(scop, std::move(smap));
+
+   else if (sel == "SLF")
+      split_ = new NcspSplitSLF(scop, std::move(smap));
 
    THROW_IF(split_ == nullptr,
             "Unable to make the split object in a Ncsp solver");

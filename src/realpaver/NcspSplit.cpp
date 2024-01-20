@@ -235,4 +235,111 @@ std::pair<bool, Variable> NcspSplitLF::selectVar(SharedNcspNode& node)
    return std::make_pair(found, vres);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+NcspSplitSF::NcspSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : NcspSplit(scop, std::move(smap))
+{}
+
+void NcspSplitSF::applyImpl(SharedNcspNode& node)
+{
+   // variable selection
+   std::pair<bool, Variable> res = selectVar(node);
+   if (!res.first) return;
+   Variable v = res.second;
+
+   // splits the variable domain
+   splitOne(node, v);
+
+   LOG_INTER("Smallest-First selects " << v.getName()
+                                       << " in node " << node->index());
+}
+
+std::pair<bool, Variable> NcspSplitSF::selectVar(SharedNcspNode& node)
+{
+   DomainBox* box = node->box();
+   Variable vres;
+   double dres;
+   bool found = false;
+
+   for (const auto& v : scop_)
+   {
+      if (box->isSplitable(v))
+      {
+         double d = domainSize(v, box->get(v));
+
+         if ((!found) || (d < dres))
+         {
+            vres = v;
+            dres = d;
+            found = true;
+         }
+      }
+   }
+
+   return std::make_pair(found, vres);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspSplitSLF::NcspSplitSLF(Scope scop,
+                                     std::unique_ptr<DomainSlicerMap> smap)
+      : NcspSplit(scop, std::move(smap))
+{}
+
+void NcspSplitSLF::applyImpl(SharedNcspNode& node)
+{
+   // variable selection
+   std::pair<bool, Variable> res = selectVar(node);
+   if (!res.first) return;
+   Variable v = res.second;
+
+   // splits the variable domain
+   splitOne(node, v);
+
+   LOG_INTER("Smallest-Largest-First selects " << v.getName()
+                                               << " in node " << node->index());
+}
+
+std::pair<bool, Variable> NcspSplitSLF::selectVar(SharedNcspNode& node)
+{
+   DomainBox* box = node->box();
+   Variable ivmin, rvmax;
+   double idmin, rdmax;
+   bool ifound, rfound;
+
+   ifound = rfound = false;
+
+   for (const auto& v : scop_)
+   {
+      if (box->isSplitable(v))
+      {
+         double d = domainSize(v, box->get(v));
+
+         if (v.isReal())
+         {
+            if ((!rfound) || (d > rdmax))
+            {
+               rvmax = v;
+               rdmax = d;
+               rfound = true;
+               
+            }
+         }
+         else
+         {
+            if ((!ifound) || (d < idmin))
+            {
+               ivmin = v;
+               idmin = d;
+               ifound = true;
+            }
+         }
+      }
+   }
+
+   return (ifound) ? std::make_pair(ifound, ivmin) :
+                     std::make_pair(rfound, rvmax);
+}
+
 } // namespace

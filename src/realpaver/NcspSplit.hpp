@@ -158,6 +158,66 @@ private:
    std::pair<bool, Variable> selectVar(SharedNcspNode& node);
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// This implements the Smallest-First strategy.
+///////////////////////////////////////////////////////////////////////////////
+class NcspSplitSF : public NcspSplit {
+public:
+   /// Creates a splitting object
+   /// @param scop set of variables that are examined
+   /// @param smap a domain slicer map
+   NcspSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap);
+
+   /// Default destructor
+   ~NcspSplitSF() = default;
+
+   /// No copy
+   NcspSplitSF(const NcspSplitSF&) = delete;
+
+   /// No assignment
+   NcspSplitSF& operator=(const NcspSplitSF&) = delete;
+
+   ///@{
+   void applyImpl(SharedNcspNode& node) override;
+   ///@}
+
+private:
+   // variable selection method
+   std::pair<bool, Variable> selectVar(SharedNcspNode& node);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This implements a splitting strategy for mixed problems.
+///
+/// If there is an integer variable whose domain is splitable, then it selects
+/// the integer variable having the smallest domain. Otherwise, it selects the
+/// real variable having the largest domain.
+///////////////////////////////////////////////////////////////////////////////
+class NcspSplitSLF : public NcspSplit {
+public:
+   /// Creates a splitting object
+   /// @param scop set of variables that are examined
+   /// @param smap a domain slicer map
+   NcspSplitSLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap);
+
+   /// Default destructor
+   ~NcspSplitSLF() = default;
+
+   /// No copy
+   NcspSplitSLF(const NcspSplitSLF&) = delete;
+
+   /// No assignment
+   NcspSplitSLF& operator=(const NcspSplitSLF&) = delete;
+
+   ///@{
+   void applyImpl(SharedNcspNode& node) override;
+   ///@}
+
+private:
+   // variable selection method
+   std::pair<bool, Variable> selectVar(SharedNcspNode& node);
+};
+
 } // namespace
 
 #endif
