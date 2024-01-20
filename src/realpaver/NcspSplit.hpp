@@ -81,15 +81,15 @@ protected:
    virtual void applyImpl(SharedNcspNode& node) = 0;
 
    // Splits a node given a selected variable
-   // It can be used by applyImpl in the sub-classes
+   // It may be used by applyImpl in the sub-classes
    void splitOne(SharedNcspNode& node, Variable v);
 
-   // Clones a node, assigns an index to the clone and inbcrements its depth
+   // Clones a node, assigns an index to the clone and increments its depth
    SharedNcspNode cloneNode(const SharedNcspNode& node);
 
 private:
-   size_t nbs_;      // number of splitting steps
-   size_t idx_;      // next node index
+   size_t nbs_;   // number of splitting steps
+   size_t idx_;   // next node index
 
 public:
    /// Type of iterators on the set of sub-nodes
@@ -120,6 +120,34 @@ public:
 
    /// No assignment
    NcspSplitRR& operator=(const NcspSplitRR&) = delete;
+
+   ///@{
+   void applyImpl(SharedNcspNode& node) override;
+   ///@}
+
+private:
+   // variable selection method
+   std::pair<bool, Variable> selectVar(SharedNcspNode& node);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This implements the Largest-First strategy.
+///////////////////////////////////////////////////////////////////////////////
+class NcspSplitLF : public NcspSplit {
+public:
+   /// Creates a splitting object
+   /// @param scop set of variables that are examined
+   /// @param smap a domain slicer map
+   NcspSplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap);
+
+   /// Default destructor
+   ~NcspSplitLF() = default;
+
+   /// No copy
+   NcspSplitLF(const NcspSplitLF&) = delete;
+
+   /// No assignment
+   NcspSplitLF& operator=(const NcspSplitLF&) = delete;
 
    ///@{
    void applyImpl(SharedNcspNode& node) override;

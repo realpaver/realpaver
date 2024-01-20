@@ -340,14 +340,8 @@ void NcspSolver::makeSplit()
 {
    Scope scop = preprob_->scope();
 
-   // makes the selector
 
 /*
-   std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
-   NcspSelector* selector = nullptr;
-
-   if (sel == "RR")              selector = new NcspSelectorRR(scop);
-   else if (sel == "LF")         selector = new NcspSelectorLF(scop);
    else if (sel == "SF")         selector = new NcspSelectorSF(scop);
    else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(scop);
    else if (sel == "SSR")        selector = makeSelectorSSR();
@@ -363,10 +357,17 @@ void NcspSolver::makeSplit()
    THROW_IF(smap == nullptr,
             "Unable to make the split object in a Ncsp solver");
 
-//   std::unique_ptr<NcspSelector> pselector(selector);
+   // makes the spliting object acording the variable selection strategy
+   std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
 
-// TODO
-   split_ = new NcspSplitRR(scop, std::move(smap));
+   if (sel == "RR")
+      split_ = new NcspSplitRR(scop, std::move(smap));
+
+   else if (sel == "LF")
+      split_ = new NcspSplitLF(scop, std::move(smap));
+
+   THROW_IF(split_ == nullptr,
+            "Unable to make the split object in a Ncsp solver");
 }
 
 bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
@@ -380,7 +381,6 @@ bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
 
    return true;
 }
-
 
 void NcspSolver::bpStep(int depthlimit)
 {

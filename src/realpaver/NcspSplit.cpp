@@ -141,7 +141,7 @@ std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node)
    std::shared_ptr<NcspNodeInfo>
       info = infoMap_->getInfo(node->index(), NcspNodeInfoType::SplitVar);
 
-   // assigns an iterator on the next variable
+   // assigns an iterator pointing to the next variable
    Scope::const_iterator it;
    if (info == nullptr)
    {
@@ -173,6 +173,66 @@ std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node)
    }
 
    return std::make_pair(found, *it);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+double domainSize(const Variable& v, Domain* dom)
+{
+   double d;
+
+   if (v.isReal())
+   {
+      Tolerance tol = v.getTolerance();
+      d = tol.discreteSize(dom->intervalHull());
+   }
+   else
+      d = dom->size();
+
+   return d; 
+}
+
+NcspSplitLF::NcspSplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : NcspSplit(scop, std::move(smap))
+{}
+
+void NcspSplitLF::applyImpl(SharedNcspNode& node)
+{
+   // variable selection
+   std::pair<bool, Variable> res = selectVar(node);
+   if (!res.first) return;
+   Variable v = res.second;
+
+   // splits the variable domain
+   splitOne(node, v);
+
+   LOG_INTER("Largest-First selects " << v.getName()
+                                      << " in node " << node->index());
+}
+
+std::pair<bool, Variable> NcspSplitLF::selectVar(SharedNcspNode& node)
+{
+   DomainBox* box = node->box();
+   Variable vres;
+   double dres;
+   bool found = false;
+
+   for (const auto& v : scop_)
+   {
+      if (box->isSplitable(v))
+      {
+         double d = domainSize(v, box->get(v));
+
+         if ((!found) || (d > dres))
+         {
+            vres = v;
+            dres = d;
+            found = true;
+         }
+      }
+   }
+
+   return std::make_pair(found, vres);
 }
 
 } // namespace
