@@ -7,21 +7,24 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_NCSP_NODE_INFO_MAP_HPP
-#define REALPAVER_NCSP_NODE_INFO_MAP_HPP
+#ifndef REALPAVER_NCSP_NODE_INFO_HPP
+#define REALPAVER_NCSP_NODE_INFO_HPP
 
 #include <list>
 #include <memory>
 #include <unordered_map>
+#include <vector>
+#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/Variable.hpp"
 
 namespace realpaver {
-   
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Type of informations that can be associated with search nodes.
 ///////////////////////////////////////////////////////////////////////////////
 enum class NcspNodeInfoType {
-   SplitVar    // selected variable in a splitting step
+   SplitVar,      // selected variable in a splitting step
+   SmearSumRel    // smar relative values of variables
 };
 
 /// Output on a stream
@@ -62,20 +65,109 @@ public:
    /// @param v a variable
    NcspNodeInfoVar(Variable v);
 
-   /// Defauklt destructor
+   /// Default destructor
    ~NcspNodeInfoVar() = default;
 
    /// Default copy constructor
    NcspNodeInfoVar(const NcspNodeInfoVar&) = default;
 
-   /// Default assignment operator
-   NcspNodeInfoVar& operator=(const NcspNodeInfoVar&) = default;
+   /// No assignment
+   NcspNodeInfoVar& operator=(const NcspNodeInfoVar&) = delete;
 
    /// @return the variable enclosed in this
    Variable getVar() const;
 
 private:
    Variable v_;   // variable
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is an information that contains smear sum relative values.
+///
+/// Let F(x) be a vector of functions obtained from all the numeric constraints
+/// of a problem and let B be a box. We first calculate the real matrix S
+/// such that sij is the smear value of xi in fj, which is equal to the product
+/// of the width of the domain of xi in B and the magnitude of the interval
+/// derivative of fj with respect to xi evaluated in B. Then S is normalized
+/// by considering each row to derive the smear relative values 0 <= rij <= 1.0.
+/// Then for each column these values are addded.
+///
+/// For example, let F = (f1, f2) and x = (x1, x2). Let the smear matrix be
+///   S = (s11, s12)
+///       (s21, s22)
+///
+/// Then S is normalized as
+///   R = (s11 / (s11+s12), s12 / (s11+s12))
+///       (s21 / (s21+s22), s22 / (s21+s22))
+///
+/// Then the sums are calculated by columns to derive
+///   smearSumRel(x1) = s11 / (s11+s12) + s21 / (s21+s22)
+///   smearSumRel(x2) = s12 / (s11+s12) + s22 / (s21+s22)
+///
+/// These values are stored in this. They can be accessed using getSSR(v).
+///////////////////////////////////////////////////////////////////////////////
+class NcspNodeInfoSSR : public NcspNodeInfo {
+public:
+   /// Creates a selector on a set of variables
+   /// @param f a function
+   NcspNodeInfoSSR(IntervalFunctionVector F);
+
+   /// Destructor
+   ~NcspNodeInfoSSR();
+
+   /// Copy constructor
+   /// @param other value assigned to this, except the sorted vector
+   NcspNodeInfoSSR(const NcspNodeInfoSSR& other);
+
+   /// No assignment
+   NcspNodeInfoSSR& operator=(const NcspNodeInfoSSR&) = delete;
+
+   /// @return the scope of this
+   Scope scope() const;
+
+   /// Calculates the smearSumRel value of the variables in a box
+   /// @param B an interval box
+   void calculateSSR(const IntervalBox& B);
+
+   /// Gets the smearSumRel value of a variable
+   /// @param v a variable
+   /// @return the smear sum rel value of v in this
+   double getSSR(const Variable& v) const;
+
+   /// Sorts the variables by decreasing ordering of their smearSumRel values
+   /// It lmust be done after a call to calculateSSR.
+   void sort();
+
+   /// @return true if the variables have been sorted, false otherwise
+   bool isSorted() const;
+
+   /// Access to a variable after sorting
+   /// @param i an index between 0 and n-1 where n is the number of variables
+   /// @return the i-th sorted variable
+   Variable getSortedVar(size_t i) const;
+
+   /// @return the size of the scope of this
+   size_t nbVars() const;
+
+private:
+   struct Item {
+      Variable var;  // variable
+      double val;    // smearSumRel of var
+   };
+
+   struct CompItem {
+      bool operator()(const Item itm1, const Item& itm2) const
+      {
+         return (itm1.val > itm2.val) ||
+                (itm1.val == itm2.val && itm1.var.id() < itm2.var.id());
+      }
+   };
+
+   IntervalFunctionVector F_;    // function vector
+   Scope scop_;                  // scope of function vector
+   std::vector<Item> ssr_;       // vector of smearSumRel values
+                                 // ordered by the scope
+   std::vector<Item>* sv_;       // sorted vector
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@
 
 #include <list>
 #include "realpaver/DomainSlicerFactory.hpp"
-#include "realpaver/NcspNodeInfoMap.hpp"
+#include "realpaver/NcspNodeInfo.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -68,6 +68,9 @@ public:
 
    /// Resets this
    void reset();
+
+   /// @return the information map of this
+   NcspNodeInfoMap* getInfoMap() const;
 
 protected:
    typedef std::list<SharedNcspNode> ContainerType;

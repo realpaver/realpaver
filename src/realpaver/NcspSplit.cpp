@@ -106,6 +106,11 @@ NcspSplit::iterator NcspSplit::end()
    return cont_.end();
 }
 
+NcspNodeInfoMap* NcspSplit::getInfoMap() const
+{
+   return infoMap_;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 NcspSplitRR::NcspSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)

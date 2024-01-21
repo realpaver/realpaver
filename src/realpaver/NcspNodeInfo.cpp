@@ -7,8 +7,9 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspNodeInfoMap.hpp"
+#include "realpaver/NcspNodeInfo.hpp"
 
 namespace realpaver {
 
@@ -16,7 +17,8 @@ std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ)
 {
    switch(typ)
    {
-      case NcspNodeInfoType::SplitVar: return os << "split variable";
+      case NcspNodeInfoType::SplitVar:    return os << "split variable";
+      case NcspNodeInfoType::SmearSumRel: return os << "smear sum relative";
    }
    return os;   
 }
@@ -45,6 +47,105 @@ NcspNodeInfoVar::NcspNodeInfoVar(Variable v)
 Variable NcspNodeInfoVar::getVar() const
 {
    return v_;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspNodeInfoSSR::NcspNodeInfoSSR(IntervalFunctionVector F)
+      : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
+        F_(F),
+        scop_(F.scope()),
+        ssr_(),
+        sv_(nullptr)
+{
+   for (size_t i=0; i<F_.nbVars(); ++i)
+   {
+      Item itm = { scop_.var(i), 0.0 };
+      ssr_.push_back(itm);
+   }
+}
+
+NcspNodeInfoSSR::NcspNodeInfoSSR(const NcspNodeInfoSSR& other)
+      : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
+        F_(other.F_),
+        scop_(other.scop_),
+        ssr_(other.ssr_),
+        sv_(nullptr)
+{}
+
+NcspNodeInfoSSR::~NcspNodeInfoSSR()
+{
+   if (sv_ != nullptr) delete sv_;
+}
+
+Scope NcspNodeInfoSSR::scope() const
+{
+   return scop_;
+}
+
+bool NcspNodeInfoSSR::isSorted() const
+{
+   return sv_ != nullptr;
+}
+
+void NcspNodeInfoSSR::calculateSSR(const IntervalBox& B)
+{
+   IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
+   RealMatrix S(F_.nbFuns(), F_.nbVars(), 0.0);
+
+   // calculates the partial derivatives
+   F_.diff(B, jac);
+
+   // calculates the relative smear values
+   for (size_t i=0; i<F_.nbFuns(); ++i)
+   {
+      double sum = 0.0;
+      for (size_t j=0; j<F_.nbVars(); ++j)
+      {
+         const auto& v = scop_.var(j);
+         double smear = jac.get(i, j).mag() * B.get(v).width();
+         S.set(i, j, smear);
+         sum += smear;
+      }
+      if (sum != 0.0)
+      {
+         for (size_t j=0; j<F_.nbVars(); ++j)
+            S.set(i, j, S.get(i, j) / sum);
+      }
+   }
+
+   // calculates the smearRelSum values
+   for (size_t j=0; j<F_.nbVars(); ++j)
+   {
+      ssr_[j].val = 0.0;
+
+      for (size_t i=0; i<F_.nbFuns(); ++i)
+         ssr_[j].val += S.get(i, j);
+   }
+}
+
+double NcspNodeInfoSSR::getSSR(const Variable& v) const
+{
+   return ssr_[scop_.index(v)].val;
+}
+
+void NcspNodeInfoSSR::sort()
+{
+   if (sv_ == nullptr) return;
+   sv_ = new std::vector<Item>(ssr_);
+   std::sort(sv_->begin(), sv_->end(), CompItem());
+}
+
+Variable NcspNodeInfoSSR::getSortedVar(size_t i) const
+{
+   ASSERT(sv_ != nullptr, "Vector of smear sum relative values not sorted");
+
+   return (*sv_)[i].var;
+}
+
+size_t NcspNodeInfoSSR::nbVars() const
+{
+   return scop_.size();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
