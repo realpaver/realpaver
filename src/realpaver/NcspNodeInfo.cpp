@@ -51,25 +51,15 @@ Variable NcspNodeInfoVar::getVar() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NcspNodeInfoSSR::NcspNodeInfoSSR(IntervalFunctionVector F)
+NcspNodeInfoSSR::NcspNodeInfoSSR(std::shared_ptr<IntervalSmearSumRel> obj)
       : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
-        F_(F),
-        scop_(F.scope()),
-        ssr_(),
+        obj_(obj),
         sv_(nullptr)
-{
-   for (size_t i=0; i<F_.nbVars(); ++i)
-   {
-      Item itm = { scop_.var(i), 0.0 };
-      ssr_.push_back(itm);
-   }
-}
+{}
 
 NcspNodeInfoSSR::NcspNodeInfoSSR(const NcspNodeInfoSSR& other)
       : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
-        F_(other.F_),
-        scop_(other.scop_),
-        ssr_(other.ssr_),
+        obj_(other.obj_),
         sv_(nullptr)
 {}
 
@@ -80,7 +70,7 @@ NcspNodeInfoSSR::~NcspNodeInfoSSR()
 
 Scope NcspNodeInfoSSR::scope() const
 {
-   return scop_;
+   return obj_->scope();
 }
 
 bool NcspNodeInfoSSR::isSorted() const
@@ -88,51 +78,31 @@ bool NcspNodeInfoSSR::isSorted() const
    return sv_ != nullptr;
 }
 
-void NcspNodeInfoSSR::calculateSSR(const IntervalBox& B)
+void NcspNodeInfoSSR::calculate(const IntervalBox& B)
 {
-   IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
-   RealMatrix S(F_.nbFuns(), F_.nbVars(), 0.0);
-
-   // calculates the partial derivatives
-   F_.diff(B, jac);
-
-   // calculates the relative smear values
-   for (size_t i=0; i<F_.nbFuns(); ++i)
-   {
-      double sum = 0.0;
-      for (size_t j=0; j<F_.nbVars(); ++j)
-      {
-         const auto& v = scop_.var(j);
-         double smear = jac.get(i, j).mag() * B.get(v).width();
-         S.set(i, j, smear);
-         sum += smear;
-      }
-      if (sum != 0.0)
-      {
-         for (size_t j=0; j<F_.nbVars(); ++j)
-            S.set(i, j, S.get(i, j) / sum);
-      }
-   }
-
-   // calculates the smearRelSum values
-   for (size_t j=0; j<F_.nbVars(); ++j)
-   {
-      ssr_[j].val = 0.0;
-
-      for (size_t i=0; i<F_.nbFuns(); ++i)
-         ssr_[j].val += S.get(i, j);
-   }
+   obj_->calculate(B);
 }
 
-double NcspNodeInfoSSR::getSSR(const Variable& v) const
+double NcspNodeInfoSSR::getSmearSumRel(const Variable& v) const
 {
-   return ssr_[scop_.index(v)].val;
+   return obj_->getSmearSumRel(v);
 }
 
 void NcspNodeInfoSSR::sort()
 {
-   if (sv_ == nullptr) return;
-   sv_ = new std::vector<Item>(ssr_);
+   // already sorted => nothing to do
+   if (sv_ != nullptr) return;
+
+   // copies the values from the shared object
+   sv_ = new std::vector<Item>();
+   for (size_t i=0; i<nbVars(); ++i)
+   {
+      Variable v = scope().var(i);
+      Item itm = { v, obj_->getSmearSumRel(v) };
+      sv_->push_back(itm);
+   }
+
+   // sorting
    std::sort(sv_->begin(), sv_->end(), CompItem());
 }
 
@@ -145,7 +115,7 @@ Variable NcspNodeInfoSSR::getSortedVar(size_t i) const
 
 size_t NcspNodeInfoSSR::nbVars() const
 {
-   return scop_.size();
+   return obj_->scope().size();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
