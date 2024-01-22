@@ -92,8 +92,8 @@ public:
    /// @param f a function
    NcspNodeInfoSSR(std::shared_ptr<IntervalSmearSumRel> obj);
 
-   /// Destructor
-   ~NcspNodeInfoSSR();
+   /// Default destructor
+   ~NcspNodeInfoSSR() = default;
 
    /// Copy constructor
    /// @param other value assigned to this, except the sorted vector
@@ -144,7 +144,8 @@ private:
    };
 
    std::shared_ptr<IntervalSmearSumRel> obj_;
-   std::vector<Item>* sv_;       // sorted vector
+   std::vector<Item> sv_;        // vector of smear sum rel values
+   bool sorted_;                 // true if the vector has been sorted
 };
 
 ///////////////////////////////////////////////////////////////////////////////
