@@ -16,7 +16,6 @@
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/NcspSelector.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/NcspSpaceBFS.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
@@ -340,7 +339,6 @@ void NcspSolver::makeSplit()
 
 
 /*
-   else if (sel == "MIXED_SLF")  selector = new NcspSelectorMixedSLF(scop);
    else if (sel == "SSR")        selector = makeSelectorSSR();
 */
 
@@ -368,6 +366,9 @@ void NcspSolver::makeSplit()
 
    else if (sel == "SLF")
       split_ = new NcspSplitSLF(scop, std::move(smap));
+
+   else if (sel == "SSR")
+      split_ = new NcspSplitSSR(ssr_, std::move(smap));
 
    THROW_IF(split_ == nullptr,
             "Unable to make the split object in a Ncsp solver");

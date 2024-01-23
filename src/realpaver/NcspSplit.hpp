@@ -12,6 +12,7 @@
 
 #include <list>
 #include "realpaver/DomainSlicerFactory.hpp"
+#include "realpaver/NcspNode.hpp"
 #include "realpaver/NcspNodeInfo.hpp"
 #include "realpaver/Scope.hpp"
 
