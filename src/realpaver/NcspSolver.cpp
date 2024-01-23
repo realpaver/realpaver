@@ -23,7 +23,7 @@
 #include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
 #include "realpaver/ContractorPolytope.hpp"
-#include "realpaver/Propagator.hpp"
+#include "realpaver/PropagatorAC3.hpp"
 
 namespace realpaver {
 
@@ -35,6 +35,7 @@ NcspSolver::NcspSolver(const Problem& problem)
         space_(nullptr),
         contractor_(nullptr),
         split_(nullptr),
+        ssr_(nullptr),
         prover_(nullptr),
         stimer_(),
         nbnodes_(0),
@@ -188,7 +189,7 @@ void NcspSolver::makeContractor()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   SharedPropagator propagator = std::make_shared<Propagator>(pool);
+   SharedPropagatorAC3 propagator = std::make_shared<PropagatorAC3>(pool);
 
    double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
    double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
@@ -302,8 +303,7 @@ void NcspSolver::makeContractor()
    contractor_ = std::make_shared<ContractorList>(mainpool);
 }
 
-/* TODO
-NcspSelector* NcspSolver::makeSelectorSSR()
+void NcspSolver::makeSSR()
 {
    IntervalFunctionVector F;
    bool ok = true;
@@ -326,15 +326,13 @@ NcspSelector* NcspSolver::makeSelectorSSR()
 
    if (ok && (preprob_->nbVars() == F.nbVars()))
    {
-      return new NcspSelectorSSR(F);
+      ssr_ = std::make_shared<IntervalSmearSumRel>(F);
    }
    else
    {
       LOG_INTER("Unable to create a SmearSumRel variable selection strategy");
-      return new NcspSelectorRR(preprob_->scope());
    }
 }
-*/
 
 void NcspSolver::makeSplit()
 {
@@ -487,6 +485,7 @@ void NcspSolver::branchAndPrune()
    stimer_.start();
 
    makeSpace();
+   makeSSR();
    makeContractor();
    makeSplit();
 

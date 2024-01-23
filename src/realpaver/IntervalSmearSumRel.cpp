@@ -29,6 +29,28 @@ Scope IntervalSmearSumRel::scope() const
    return scop_;
 }
 
+IntervalFunctionVector IntervalSmearSumRel::getFun() const
+{
+   return F_;
+}
+
+Variable IntervalSmearSumRel::getMaxVar() const
+{
+   size_t imax = 0;
+   double smax = ssr_[0].val;
+
+   for (size_t i=0; i<F_.nbVars(); ++i)
+   {
+      double d = ssr_[i].val;
+      if (d > smax)
+      {
+         smax = d;
+         imax = i;
+      }
+   }
+   return ssr_[imax].var;
+}
+
 void IntervalSmearSumRel::calculate(const IntervalBox& B)
 {
    IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
@@ -58,6 +80,7 @@ void IntervalSmearSumRel::calculate(const IntervalBox& B)
    // calculates the smearRelSum values
    for (size_t j=0; j<F_.nbVars(); ++j)
    {
+      ssr_[j].var = scop_.var(j);
       ssr_[j].val = 0.0;
 
       for (size_t i=0; i<F_.nbFuns(); ++i)
@@ -65,9 +88,24 @@ void IntervalSmearSumRel::calculate(const IntervalBox& B)
    }
 }
 
-double IntervalSmearSumRel::getSmearSumRel(const Variable& v) const
+void IntervalSmearSumRel::sort()
 {
-   return ssr_[scop_.index(v)].val;
+   std::sort(ssr_.begin(), ssr_.end(), CompItem());
+}
+
+Variable IntervalSmearSumRel::getVar(size_t i) const
+{
+   return ssr_[i].var;
+}
+
+double IntervalSmearSumRel::getSmearSumRel(size_t i) const
+{
+   return ssr_[i].val;
+}
+
+size_t IntervalSmearSumRel::nbVars() const
+{
+   return ssr_.size();
 }
 
 } // namespace

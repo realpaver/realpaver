@@ -53,66 +53,13 @@ Variable NcspNodeInfoVar::getVar() const
 
 NcspNodeInfoSSR::NcspNodeInfoSSR(std::shared_ptr<IntervalSmearSumRel> obj)
       : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
-        obj_(obj),
-        sv_(),
-        sorted_(false)
-{
-   for (const auto& v : obj->scope())
-   {
-      Item itm = { v, 0.0 };
-      sv_.push_back(itm);
-   }
-}
-
-NcspNodeInfoSSR::NcspNodeInfoSSR(const NcspNodeInfoSSR& other)
-      : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
-        obj_(other.obj_),
-        sv_(other.sv_),
-        sorted_(false)
+        obj_(obj)
 {}
 
-Scope NcspNodeInfoSSR::scope() const
+std::shared_ptr<IntervalSmearSumRel>
+NcspNodeInfoSSR::getIntervalSmearSumRel() const
 {
-   return obj_->scope();
-}
-
-bool NcspNodeInfoSSR::isSorted() const
-{
-   return sorted_;
-}
-
-void NcspNodeInfoSSR::calculate(const IntervalBox& B)
-{
-   obj_->calculate(B);
-}
-
-double NcspNodeInfoSSR::getSmearSumRel(const Variable& v) const
-{
-   return obj_->getSmearSumRel(v);
-}
-
-void NcspNodeInfoSSR::sort()
-{
-   // already sorted => nothing to do
-   if (sorted_) return;
-
-   // copies the values from the shared object
-   for (size_t i=0; i<nbVars(); ++i)
-      sv_[i].val = obj_->getSmearSumRel(sv_[i].var);
-
-   // sorting
-   std::sort(sv_.begin(), sv_.end(), CompItem());
-   sorted_ = true;
-}
-
-Variable NcspNodeInfoSSR::getSortedVar(size_t i) const
-{
-   return sv_[i].var;
-}
-
-size_t NcspNodeInfoSSR::nbVars() const
-{
-   return sv_.size();
+   return obj_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -10,9 +10,11 @@
 #ifndef REALPAVER_NCSP_SOLVER_HPP
 #define REALPAVER_NCSP_SOLVER_HPP
 
+#include <memory>
 #include "realpaver/Contractor.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Env.hpp"
+#include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/NcspEnv.hpp"
 #include "realpaver/NcspSpace.hpp"
 #include "realpaver/NcspSplit.hpp"
@@ -113,6 +115,8 @@ private:
    SharedContractor contractor_; // contraction operator
    NcspSplit* split_;            // splitting strategy
 
+   std::shared_ptr<IntervalSmearSumRel> ssr_;
+
    Prover* prover_;              // solution prover
 
    Timer stimer_;                // timer for the solving phase
@@ -121,15 +125,13 @@ private:
 
    void branchAndPrune();
    void makeSpace();
+   void makeSSR();
    void makeContractor();
    void makeSplit();
    void bpStep(int depthlimit);
    void bpStepAux(SharedNcspNode node, int depthlimit);
    bool isAnInnerRegion(const IntervalBox& B) const;
    void certifySolutions();
-   
-   // TODO
-   //NcspSelector* makeSelectorSSR();
 };
 
 } // namespace

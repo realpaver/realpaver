@@ -156,9 +156,15 @@ public:
    void applyImpl(SharedNcspNode& node) override;
    ///@}
 
-private:
-   // variable selection method
+   /// Variable selection method
+   /// @param 
+   /// @param node a node
+   /// @return a couple (b, v) such that b is false if no variable has been
+   ///         selected, b is true if v has ben selected
    std::pair<bool, Variable> selectVar(SharedNcspNode& node);
+
+   static std::pair<bool, Variable> selectVar(const Scope& scop,
+                                              const DomainBox& box);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,6 +223,41 @@ public:
    ///@}
 
 private:
+   // variable selection method
+   std::pair<bool, Variable> selectVar(SharedNcspNode& node);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This implements a splitting strategy for mixed problems.
+///
+/// If there is an integer variable whose domain is splitable, then it selects
+/// the integer variable having the smallest domain. Otherwise, it selects the
+/// real variable having the largest domain.
+///////////////////////////////////////////////////////////////////////////////
+class NcspSplitSSR : public NcspSplit {
+public:
+   /// Creates a splitting object
+   /// @param scop set of variables that are examined
+   /// @param smap a domain slicer map
+   NcspSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
+                std::unique_ptr<DomainSlicerMap> smap);
+
+   /// Default destructor
+   ~NcspSplitSSR() = default;
+
+   /// No copy
+   NcspSplitSSR(const NcspSplitSSR&) = delete;
+
+   /// No assignment
+   NcspSplitSSR& operator=(const NcspSplitSSR&) = delete;
+
+   ///@{
+   void applyImpl(SharedNcspNode& node) override;
+   ///@}
+
+private:
+   std::shared_ptr<IntervalSmearSumRel> ssr_;
+
    // variable selection method
    std::pair<bool, Variable> selectVar(SharedNcspNode& node);
 };

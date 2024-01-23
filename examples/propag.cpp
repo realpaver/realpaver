@@ -4,7 +4,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/Propagator.hpp"
+#include "realpaver/PropagatorAC3.hpp"
 #include "realpaver/Timer.hpp"
 
 using namespace realpaver;
@@ -39,7 +39,7 @@ int main(void)
       pool->push(std::make_shared<ContractorHC4>(dag, i));
       pool->push(std::make_shared<ContractorHC4>(dag, j));
 
-      Propagator tor(pool);
+      PropagatorAC3 tor(pool);
       tor.setTol(Tolerance(1.0e-4, 0.0));
 
       Proof proof = tor.contract(B);

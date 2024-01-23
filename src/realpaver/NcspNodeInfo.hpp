@@ -96,56 +96,17 @@ public:
    ~NcspNodeInfoSSR() = default;
 
    /// Copy constructor
-   /// @param other value assigned to this, except the sorted vector
+   /// @param other value assigned to this
    NcspNodeInfoSSR(const NcspNodeInfoSSR& other);
 
    /// No assignment
    NcspNodeInfoSSR& operator=(const NcspNodeInfoSSR&) = delete;
 
-   /// @return the scope of this
-   Scope scope() const;
-
-   /// Calculates the smearSumRel value of the variables in a box
-   /// @param B an interval box
-   void calculate(const IntervalBox& B);
-
-   /// Gets the smearSumRel value of a variable
-   /// @param v a variable
-   /// @return the smear sum rel value of v in this
-   double getSmearSumRel(const Variable& v) const;
-
-   /// Sorts the variables by decreasing ordering of their smearSumRel values
-   /// It lmust be done after a call to calculateSSR.
-   void sort();
-
-   /// @return true if the variables have been sorted, false otherwise
-   bool isSorted() const;
-
-   /// Access to a variable after sorting
-   /// @param i an index between 0 and n-1 where n is the number of variables
-   /// @return the i-th sorted variable
-   Variable getSortedVar(size_t i) const;
-
-   /// @return the size of the scope of this
-   size_t nbVars() const;
+   /// @return the object enclosed in this
+   std::shared_ptr<IntervalSmearSumRel> getIntervalSmearSumRel() const;
 
 private:
-   struct Item {
-      Variable var;  // variable
-      double val;    // smearSumRel of var
-   };
-
-   struct CompItem {
-      bool operator()(const Item itm1, const Item& itm2) const
-      {
-         return (itm1.val > itm2.val) ||
-                (itm1.val == itm2.val && itm1.var.id() < itm2.var.id());
-      }
-   };
-
    std::shared_ptr<IntervalSmearSumRel> obj_;
-   std::vector<Item> sv_;        // vector of smear sum rel values
-   bool sorted_;                 // true if the vector has been sorted
 };
 
 ///////////////////////////////////////////////////////////////////////////////

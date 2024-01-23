@@ -133,10 +133,10 @@ void NcspSplitRR::applyImpl(SharedNcspNode& node)
    if (getNbNodes() < 2) return;
 
    // assigns the split variable in the sub-nodes
-   std::shared_ptr<NcspNodeInfoVar> p = std::make_shared<NcspNodeInfoVar>(v);
+   std::shared_ptr<NcspNodeInfoVar> info = std::make_shared<NcspNodeInfoVar>(v);
 
    for (SharedNcspNode& aux : cont_)
-      infoMap_->insert(aux->index(), p);
+      infoMap_->insert(aux->index(), info);
 }
 
 std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node)
@@ -217,16 +217,21 @@ void NcspSplitLF::applyImpl(SharedNcspNode& node)
 
 std::pair<bool, Variable> NcspSplitLF::selectVar(SharedNcspNode& node)
 {
-   DomainBox* box = node->box();
+   return selectVar(scop_, *node->box());
+}
+
+std::pair<bool, Variable> NcspSplitLF::selectVar(const Scope& scop,
+                                                 const DomainBox& box)
+{
    Variable vres;
    double dres;
    bool found = false;
 
-   for (const auto& v : scop_)
+   for (const auto& v : scop)
    {
-      if (box->isSplitable(v))
+      if (box.isSplitable(v))
       {
-         double d = domainSize(v, box->get(v));
+         double d = domainSize(v, box.get(v));
 
          if ((!found) || (d > dres))
          {
@@ -345,6 +350,50 @@ std::pair<bool, Variable> NcspSplitSLF::selectVar(SharedNcspNode& node)
 
    return (ifound) ? std::make_pair(ifound, ivmin) :
                      std::make_pair(rfound, rvmax);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspSplitSSR::NcspSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
+                           std::unique_ptr<DomainSlicerMap> smap)
+      : NcspSplit(ssr->scope(), std::move(smap)),
+        ssr_(ssr)
+{
+   ASSERT(ssr != nullptr,
+          "No interval smear sum rel object in a splitting object");
+}
+
+void NcspSplitSSR::applyImpl(SharedNcspNode& node)
+{
+   // variable selection
+   std::pair<bool, Variable> res = selectVar(node);
+   if (!res.first) return;
+   Variable v = res.second;
+
+   // splits the variable domain
+   splitOne(node, v);
+
+   LOG_INTER("Smear-Sum-Rel selects " << v.getName()
+                                      << " in node " << node->index());
+}
+
+std::pair<bool, Variable> NcspSplitSSR::selectVar(SharedNcspNode& node)
+{
+   IntervalBox B(*node->box());
+   ssr_->calculate(B);
+
+   Variable v = ssr_->getMaxVar();
+   if (node->box()->isSplitable(v))
+      return std::make_pair(true, v);
+
+   for (size_t i=0; i<ssr_->nbVars(); ++i)
+   {
+      v = ssr_->getVar(i);
+      if (node->box()->isSplitable(v))
+         return std::make_pair(true, v);
+   }
+
+   return std::make_pair(false, v);
 }
 
 } // namespace

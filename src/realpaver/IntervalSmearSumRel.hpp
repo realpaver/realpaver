@@ -42,7 +42,7 @@ namespace realpaver {
 class IntervalSmearSumRel {
 public:
    /// Constructor
-   /// @param f a function
+   /// @param f a function vector
    IntervalSmearSumRel(IntervalFunctionVector F);
 
    /// Default destructor
@@ -57,19 +57,52 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
+   /// @return the interval function vector of this
+   IntervalFunctionVector getFun() const;
+
    /// Calculates the smearSumRel value of the variables in a box
    /// @param B an interval box
    void calculate(const IntervalBox& B);
 
-   /// Gets the smearSumRel value of a variable
-   /// @param v a variable
-   /// @return the smear sum rel value of v in this
-   double getSmearSumRel(const Variable& v) const;
+   /// Sorts the variables by decreasing ordering of their smearSumRel values
+   /// It lmust be done after a call to calculateSSR.
+   void sort();
+
+   /// Access to a variable
+   /// @param i an index between 0 and n-1 where n is the number of variables
+   /// @return the i-th variable
+   ///
+   /// After a call to calculate, the i-th variable corresponds to the i-th
+   /// variable of the scope of the interval function vector.
+   ///
+   /// After a call to sort, the i-th variable is the variable having index i
+   /// in the decreasing ordering of the smear sum rel values, in particular
+   /// getVar(0) returns the variable having the maximum smear sum rel value.
+   Variable getVar(size_t i) const;
+
+   /// Access to a smear sum rel value
+   /// @param i an index between 0 and n-1 where n is the number of variables
+   /// @return the smear sum rel value of getVar(i)
+   double getSmearSumRel(size_t i) const;
+
+   /// @return the size of the scope of this
+   size_t nbVars() const;
+
+   /// @return the variable having the maximum smear sum rel value
+   Variable getMaxVar() const;
 
 private:
    struct Item {
       Variable var;  // variable
       double val;    // smearSumRel of var
+   };
+
+   struct CompItem {
+      bool operator()(const Item itm1, const Item& itm2) const
+      {
+         return (itm1.val > itm2.val) ||
+                (itm1.val == itm2.val && itm1.var.id() < itm2.var.id());
+      }
    };
 
    IntervalFunctionVector F_;    // function vector
