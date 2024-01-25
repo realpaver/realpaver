@@ -22,7 +22,7 @@
 #include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
 #include "realpaver/ContractorPolytope.hpp"
-#include "realpaver/PropagatorAC3.hpp"
+#include "realpaver/ContractorPropag.hpp"
 
 namespace realpaver {
 
@@ -188,7 +188,7 @@ void NcspSolver::makeContractor()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   SharedPropagatorAC3 propagator = std::make_shared<PropagatorAC3>(pool);
+   SharedContractorPropag propagator = std::make_shared<ContractorPropag>(pool);
 
    double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
    double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");

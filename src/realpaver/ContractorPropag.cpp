@@ -11,11 +11,11 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/PropagatorAC3.hpp"
+#include "realpaver/ContractorPropag.hpp"
 
 namespace realpaver {
 
-PropagatorAC3::PropagatorAC3(SharedContractorPool pool)
+ContractorPropag::ContractorPropag(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
         tol_(Param::GetDblParam("PROPAGATION_REL_TOL"),
@@ -24,52 +24,52 @@ PropagatorAC3::PropagatorAC3(SharedContractorPool pool)
         certif_()
 {}
 
-Tolerance PropagatorAC3::getTol() const
+Tolerance ContractorPropag::getTol() const
 {
    return tol_;
 }
 
-void PropagatorAC3::setTol(Tolerance tol)
+void ContractorPropag::setTol(Tolerance tol)
 {
    tol_ = tol;
 }
 
-size_t PropagatorAC3::poolSize() const
+size_t ContractorPropag::poolSize() const
 {
    return pool_->poolSize();
 }
 
-size_t PropagatorAC3::getMaxIter() const
+size_t ContractorPropag::getMaxIter() const
 {
    return maxiter_;
 }
 
-void PropagatorAC3::setMaxIter(size_t n)
+void ContractorPropag::setMaxIter(size_t n)
 {
    maxiter_ = n;
 }
 
-Proof PropagatorAC3::proofAt(size_t i) const
+Proof ContractorPropag::proofAt(size_t i) const
 {
    return certif_[i];
 }
 
-SharedContractorPool PropagatorAC3::getPool() const
+SharedContractorPool ContractorPropag::getPool() const
 {
    return pool_;
 }
 
-void PropagatorAC3::setPool(SharedContractorPool pool)
+void ContractorPropag::setPool(SharedContractorPool pool)
 {
    pool_ = pool;
 }
 
-Scope PropagatorAC3::scope() const
+Scope ContractorPropag::scope() const
 {
    return pool_->scope();
 }
 
-Proof PropagatorAC3::contract(IntervalBox& B)
+Proof ContractorPropag::contract(IntervalBox& B)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
@@ -104,7 +104,7 @@ Proof PropagatorAC3::contract(IntervalBox& B)
    size_t nb_steps = 0;
 
    LOG_NL();
-   LOG_INTER("PropagatorAC3 [" << tol_ << "]");
+   LOG_INTER("ContractorPropag [" << tol_ << "]");
    LOG_INTER("Current box: " << B);
 
    do
@@ -194,12 +194,12 @@ Proof PropagatorAC3::contract(IntervalBox& B)
    return proof;
 }
 
-void PropagatorAC3::print(std::ostream& os) const
+void ContractorPropag::print(std::ostream& os) const
 {
-   os << "PropagatorAC3 on " << pool_->poolSize() << " contractors";
+   os << "ContractorPropag on " << pool_->poolSize() << " contractors";
 }
 
-bool PropagatorAC3::contractorDependsOn(size_t i, const ModifSetType& ms)
+bool ContractorPropag::contractorDependsOn(size_t i, const ModifSetType& ms)
 {
    SharedContractor op = pool_->contractorAt(i);
 

@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_PROPAGATOR_AC3_HPP
-#define REALPAVER_PROPAGATOR_AC3_HPP
+#ifndef REALPAVER_CONTRACTOR_PROPAG_HPP
+#define REALPAVER_CONTRACTOR_PROPAG_HPP
 
 #include "realpaver/ContractorPool.hpp"
 
@@ -28,20 +28,20 @@ namespace realpaver {
 ///   i.e. for every variable the distance between two consecutive domains
 ///   is smaller than the tolerance.
 ///////////////////////////////////////////////////////////////////////////////
-class PropagatorAC3 : public Contractor {
+class ContractorPropag : public Contractor {
 public:
    /// Creates a propagator over a pool of contractors
    /// @param pool a pool of contractors
-   PropagatorAC3(SharedContractorPool pool = nullptr);
+   ContractorPropag(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
-   PropagatorAC3(const PropagatorAC3&) = default;
+   ContractorPropag(const ContractorPropag&) = default;
 
    /// No assignment
-   PropagatorAC3& operator=(const PropagatorAC3&) = delete;
+   ContractorPropag& operator=(const ContractorPropag&) = delete;
 
    /// Default destructor
-   ~PropagatorAC3() = default;
+   ~ContractorPropag() = default;
 
    /// @return the number of contractors
    size_t poolSize() const;
@@ -94,7 +94,7 @@ private:
 };
 
 /// Type of shared pointers on propagators
-typedef std::shared_ptr<PropagatorAC3> SharedPropagatorAC3;
+typedef std::shared_ptr<ContractorPropag> SharedContractorPropag;
 
 } // namespace
 

@@ -7,9 +7,10 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_NCSP_PROPAGATOR_ACID_HPP
-#define REALPAVER_NCSP_PROPAGATOR_ACID_HPP
+#ifndef REALPAVER_NCSP_CONTRACTOR_ACID_HPP
+#define REALPAVER_NCSP_CONTRACTOR_ACID_HPP
 
+#include <memory>
 #include "realpaver/ContractorCID.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/IntervalSlicer.hpp"
@@ -19,24 +20,24 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 /// This is a propagator that implements the adaptive CID strategy.
 ///////////////////////////////////////////////////////////////////////////////
-class PropagatorACID : public Contractor {
+class ContractorACID : public Contractor {
 public:
    /// Constructor
    /// @param ssr calculator of smear sum rel values
    /// @param op contractor of slices
    /// @param nbs number of slices of CID contractors
-   PropagatorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
+   ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
                   SharedContractor op,
                   size_t nbs);
 
    /// Default copy constructor
-   PropagatorACID(const PropagatorACID&) = default;
+   ContractorACID(const ContractorACID&) = default;
 
    /// No assignment
-   PropagatorACID& operator=(const PropagatorACID&) = delete;
+   ContractorACID& operator=(const ContractorACID&) = delete;
 
    /// Default destructor
-   ~PropagatorACID() = default;
+   ~ContractorACID() = default;
 
    /// @return the number of slices of CID contractors
    size_t nbSlices() const;
@@ -66,6 +67,9 @@ private:
    size_t nbs_;            // number of slices of CID contractors
    size_t nbcid_;          // number of CID contractors applied
 };
+
+/// Type of shared pointers on propagators
+typedef std::shared_ptr<ContractorACID> SharedContractorACID;
 
 } // namespace
 
