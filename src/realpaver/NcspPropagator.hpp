@@ -10,6 +10,8 @@
 #ifndef REALPAVER_NCSP_PROPAGATOR_HPP
 #define REALPAVER_NCSP_PROPAGATOR_HPP
 
+#include "realpaver/ContractorFactory.hpp"
+#include "realpaver/NcspContext.hpp"
 #include "realpaver/NcspNode.hpp"
 
 namespace realpaver {
@@ -32,15 +34,43 @@ public:
    virtual ~NcspPropagator();
 
    /// Contraction method
-   /// @param a node whose boxt is contracted
+   /// @param a node whose box is contracted
+   /// @param ctx a solving context
    /// @return a certificate of proof
-   virtual Proof contract(NcspNode& node) = 0;
+   virtual Proof contract(NcspNode& node, NcspContext& ctx) = 0;
    
    // TODO : ajouter un contexte
 };
 
-class NcspPropagatorHC4 : public NcspPropagator {
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs based on HC4 contractors.
+///////////////////////////////////////////////////////////////////////////////
+class NcspHC4 : public NcspPropagator {
+public:
+   /// @param facto a factory
+   NcspHC4(ContractorFactory& facto);
 
+   Proof contract(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   SharedContractor op_;   // HC4
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs based on HC4 contractors and the interval
+/// Newton operator.
+///
+/// Interval Newton is used only for square systems of equations.
+///////////////////////////////////////////////////////////////////////////////
+class NcspHC4Newton : public NcspPropagator {
+public:
+   /// @param facto a factory
+   NcspHC4Newton(ContractorFactory& facto);
+
+   Proof contract(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   SharedContractor op_;   // HC4 + Newton
 };
 
 } // namespace

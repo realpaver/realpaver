@@ -11,10 +11,11 @@
 #define REALPAVER_CONTRACTOR_FACTORY_HPP
 
 #include <vector>
+#include "realpaver/ContractorACID.hpp"
+#include "realpaver/ContractorDomain.hpp"
+#include "realpaver/ContractorPropag.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/IntervalNewton.hpp"
-#include "realpaver/ContractorPropag.hpp"
-#include "realpaver/ContractorACID.hpp"
 #include "realpaver/Problem.hpp"
 
 namespace realpaver {
