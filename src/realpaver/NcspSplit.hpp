@@ -12,8 +12,8 @@
 
 #include <list>
 #include "realpaver/DomainSlicerFactory.hpp"
+#include "realpaver/NcspContext.hpp"
 #include "realpaver/NcspNode.hpp"
-#include "realpaver/NcspNodeInfo.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -71,14 +71,14 @@ public:
    void reset();
 
    /// @return the information map of this
-   NcspNodeInfoMap* getInfoMap() const;
+   NcspContext* getInfoMap() const;
 
 protected:
    typedef std::list<SharedNcspNode> ContainerType;
 
    Scope scop_;                  // set of variables
    DomainSlicerMap* slicerMap_;  // slicer of domains
-   NcspNodeInfoMap* infoMap_;    // map of informations about nodes
+   NcspContext* infoMap_;    // map of informations about nodes
    ContainerType cont_;          // container for the sub-nodes
 
    // Implements the splitting method

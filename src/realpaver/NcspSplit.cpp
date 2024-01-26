@@ -24,7 +24,7 @@ NcspSplit::NcspSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
    ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
    ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
 
-   infoMap_ = new NcspNodeInfoMap();
+   infoMap_ = new NcspContext();
 }
 
 NcspSplit::~NcspSplit()
@@ -105,7 +105,7 @@ NcspSplit::iterator NcspSplit::end()
    return cont_.end();
 }
 
-NcspNodeInfoMap* NcspSplit::getInfoMap() const
+NcspContext* NcspSplit::getInfoMap() const
 {
    return infoMap_;
 }

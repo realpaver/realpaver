@@ -9,7 +9,7 @@
 
 #include <algorithm>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspNodeInfo.hpp"
+#include "realpaver/NcspContext.hpp"
 
 namespace realpaver {
 
@@ -64,7 +64,7 @@ NcspNodeInfoSSR::getIntervalSmearSumRel() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void NcspNodeInfoMap::insert(int index, std::shared_ptr<NcspNodeInfo> info)
+void NcspContext::insert(int index, std::shared_ptr<NcspNodeInfo> info)
 {
    ASSERT(!hasInfo(index, info->getType()),
           "Info '" << info->getType()
@@ -83,18 +83,18 @@ void NcspNodeInfoMap::insert(int index, std::shared_ptr<NcspNodeInfo> info)
    }
 }
 
-size_t NcspNodeInfoMap::size() const
+size_t NcspContext::size() const
 {
    return map_.size();
 }
 
-void NcspNodeInfoMap::remove(int index)
+void NcspContext::remove(int index)
 {
    map_.erase(index);
 }
 
 std::shared_ptr<NcspNodeInfo>
-NcspNodeInfoMap::getInfo(int index, NcspNodeInfoType typ) const
+NcspContext::getInfo(int index, NcspNodeInfoType typ) const
 {
    auto it = map_.find(index);
    if (it == map_.end())
@@ -110,7 +110,7 @@ NcspNodeInfoMap::getInfo(int index, NcspNodeInfoType typ) const
    }
 }
 
-bool NcspNodeInfoMap::hasInfo(int index, NcspNodeInfoType typ) const
+bool NcspContext::hasInfo(int index, NcspNodeInfoType typ) const
 {
    auto it = map_.find(index);
    if (it == map_.end())

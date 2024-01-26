@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_NCSP_NODE_INFO_HPP
-#define REALPAVER_NCSP_NODE_INFO_HPP
+#ifndef REALPAVER_NCSP_CONTEXT_HPP
+#define REALPAVER_NCSP_CONTEXT_HPP
 
 #include <list>
 #include <memory>
@@ -114,19 +114,19 @@ private:
 ///
 /// An entry is a couple (node index, list of infos).
 ///////////////////////////////////////////////////////////////////////////////
-class NcspNodeInfoMap {
+class NcspContext {
 public:
    /// Default constructor
-   NcspNodeInfoMap() = default;
+   NcspContext() = default;
 
    /// Default destructor
-   ~NcspNodeInfoMap() = default;
+   ~NcspContext() = default;
 
    /// No copy
-   NcspNodeInfoMap(const NcspNodeInfoMap&) = delete;
+   NcspContext(const NcspContext&) = delete;
 
    /// No assignment
-   NcspNodeInfoMap& operator=(const NcspNodeInfoMap&) = delete;
+   NcspContext& operator=(const NcspContext&) = delete;
 
    /// Inserts a new entry in this
    /// @param index a node index
