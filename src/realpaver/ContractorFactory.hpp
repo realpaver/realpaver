@@ -82,6 +82,13 @@ public:
    ///         nullptr otherwise
    std::shared_ptr<ContractorDomain> makeContractorDomain();
 
+   /// Creates a contractor that applies HC4 followed by intervzal Newton.
+   /// @return the contractor
+   ///
+   /// HC4 is created by makeHC4()
+   /// Newton is created by makeIntervalNewton()
+   SharedContractor makeHC4Newton();
+
 private:
    std::shared_ptr<Env> env_;    // environment for parameters
    SharedDag dag_;               // DAG of numerical constraints

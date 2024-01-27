@@ -13,6 +13,7 @@
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
 #include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorList.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/ScopeBank.hpp"
 
@@ -234,9 +235,28 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
    return op;
 }
 
+SharedContractor ContractorFactory::makeHC4Newton()
+{
+   SharedContractorPropag hc4 = makeHC4();
+   std::shared_ptr<IntervalNewton> newton = makeIntervalNewton();
+
+   if (newton != nullptr)
+   {
+      SharedContractorVector pool = std::make_shared<ContractorVector>();
+      pool->push(hc4);
+      pool->push(newton);
+      return std::make_shared<ContractorList>(pool);
+   }
+   else
+   {
+      return hc4;
+   }
+}
+
 SharedContractorACID ContractorFactory::makeACID(size_t nbs)
 {
    SharedContractorPropag hc4 = makeHC4();
+
 
 
 // TODO
