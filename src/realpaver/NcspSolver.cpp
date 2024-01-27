@@ -43,14 +43,13 @@ NcspSolver::NcspSolver(const Problem& problem)
    THROW_IF(!problem.isCSP(), "Ncsp solver applied to a problem that is " <<
                               "not a constraint satisfaction problem");
 
-   env_ = new NcspEnv();
+   env_ = std::make_shared<NcspEnv>();
    preproc_ = new Preprocessor();
    problem_ = new Problem(problem);
 }
 
 NcspSolver::~NcspSolver()
 {
-   if (env_ != nullptr) delete env_;
    if (preproc_ != nullptr) delete preproc_;
    if (space_ != nullptr) delete space_;
    if (split_ != nullptr) delete split_;
@@ -638,7 +637,7 @@ void NcspSolver::certifySolutions()
    }
 }
 
-NcspEnv* NcspSolver::getEnv() const
+std::shared_ptr<NcspEnv> NcspSolver::getEnv() const
 {
    return env_;
 }

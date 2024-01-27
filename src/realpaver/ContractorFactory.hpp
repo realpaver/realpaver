@@ -15,6 +15,7 @@
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorPropag.hpp"
 #include "realpaver/Dag.hpp"
+#include "realpaver/Env.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
 
@@ -27,7 +28,8 @@ class ContractorFactory {
 public:
    /// Creates a factory on a problem
    /// @param pbm the input problem
-   ContractorFactory(const Problem& pbm);
+   /// @param env an environment for the parameters
+   ContractorFactory(const Problem& pbm, std::shared_ptr<Env> env);
 
    /// Default destructor
    ~ContractorFactory() = default;
@@ -81,6 +83,7 @@ public:
    std::shared_ptr<ContractorDomain> makeContractorDomain();
 
 private:
+   std::shared_ptr<Env> env_;    // environment for parameters
    SharedDag dag_;               // DAG of numerical constraints
    std::vector<size_t> ve_;      // indexes of equations in the DAG
    std::vector<size_t> vi_;      // indexes of inequalities in the DAG

@@ -74,7 +74,7 @@ public:
    int getTotalNodes() const;
 
    /// @return the environment of this
-   NcspEnv* getEnv() const;
+   std::shared_ptr<NcspEnv> getEnv() const;
 
    /// @return the space of this
    NcspSpace* getSpace() const;
@@ -105,23 +105,23 @@ public:
    DomainBox getPendingBox(size_t i) const;
 
 private:
-   Problem* problem_;            // initial problem
-   Problem* preprob_;            // problem resulting from preprocessing
-   Preprocessor* preproc_;       // preprocessor
+   Problem* problem_;               // initial problem
+   Problem* preprob_;               // problem resulting from preprocessing
+   Preprocessor* preproc_;          // preprocessor
 
-   NcspEnv* env_;                // environment
-   NcspSpace* space_;            // search tree
-   SharedDag dag_;               // dag
-   SharedContractor contractor_; // contraction operator
-   NcspSplit* split_;            // splitting strategy
+   std::shared_ptr<NcspEnv> env_;   // environment
+   NcspSpace* space_;               // search tree
+   SharedDag dag_;                  // dag
+   SharedContractor contractor_;    // contraction operator
+   NcspSplit* split_;               // splitting strategy
 
    std::shared_ptr<IntervalSmearSumRel> ssr_;
 
-   Prover* prover_;              // solution prover
+   Prover* prover_;                 // solution prover
 
-   Timer stimer_;                // timer for the solving phase
-   int nbnodes_;                 // number of nodes processed
-   bool withPreprocessing_;      // true if preprocessing enabled
+   Timer stimer_;                   // timer for the solving phase
+   int nbnodes_;                    // number of nodes processed
+   bool withPreprocessing_;         // true if preprocessing enabled
 
    void branchAndPrune();
    void makeSpace();

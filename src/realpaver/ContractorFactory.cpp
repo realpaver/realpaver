@@ -18,8 +18,10 @@
 
 namespace realpaver {
 
-ContractorFactory::ContractorFactory(const Problem& pbm)
-      : dag_(nullptr),
+ContractorFactory::ContractorFactory(const Problem& pbm,
+                                     std::shared_ptr<Env> env)
+      : env_(env),
+        dag_(nullptr),
         ve_(),
         vi_(),
         vc_(),
@@ -27,6 +29,10 @@ ContractorFactory::ContractorFactory(const Problem& pbm)
         si_(),
         sc_()
 {
+   // environment
+   if (env == nullptr)
+      env_ = std::make_shared<Env>();
+
    // creates the shared DAG
    dag_ = std::make_shared<Dag>();
 
@@ -100,7 +106,16 @@ SharedContractorPropag ContractorFactory::makeHC4()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   return std::make_shared<ContractorPropag>(pool);
+   SharedContractorPropag hc4 = std::make_shared<ContractorPropag>(pool);
+
+   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
+   double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
+   hc4->setTol(Tolerance(rtol, atol));
+
+   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
+   hc4->setMaxIter(niter);
+
+   return hc4;
 }
 
 SharedContractorPropag ContractorFactory::makeBC4()
@@ -137,7 +152,16 @@ SharedContractorPropag ContractorFactory::makeBC4()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   return std::make_shared<ContractorPropag>(pool);
+   SharedContractorPropag bc4 = std::make_shared<ContractorPropag>(pool);
+
+   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
+   double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
+   bc4->setTol(Tolerance(rtol, atol));
+
+   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
+   bc4->setMaxIter(niter);
+
+   return bc4;
 }
 
 std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
@@ -163,6 +187,29 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
          F.addFun(g);
       }
       newton = std::make_shared<IntervalNewton>(F);
+   }
+
+   if (newton != nullptr)
+   {
+      double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL"),
+             atol = env_->getParam()->getDblParam("NEWTON_ABS_TOL");
+      newton->setTol(Tolerance(rtol, atol));
+
+      int niter = env_->getParam()->getIntParam("NEWTON_ITER_LIMIT");
+      newton->setMaxIter(niter);
+
+      double delta = env_->getParam()->getDblParam("INFLATION_DELTA");
+      newton->setInflationDelta(delta);
+
+      double chi = env_->getParam()->getDblParam("INFLATION_CHI");
+      newton->setInflationChi(chi);
+
+      rtol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_REL_TOL");
+      atol = env_->getParam()->getDblParam("GAUSS_SEIDEL_ABS_TOL");
+      newton->getGaussSeidel()->setTol(Tolerance(rtol, atol));
+
+      niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
+      newton->getGaussSeidel()->setMaxIter(niter);
    }
 
    return newton;

@@ -202,7 +202,7 @@ int main(int argc, char** argv)
          cout << BLUE("No preprocessing") << endl;
       }
 
-      NcspEnv* env = solver.getEnv();
+      std::shared_ptr<NcspEnv> env = solver.getEnv();
 
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
