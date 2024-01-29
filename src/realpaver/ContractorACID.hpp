@@ -54,6 +54,9 @@ public:
    ///        variables
    void setNbCID(size_t nbcid);
 
+   /// @return the contractor used to reduce the slices
+   SharedContractor getContractor() const;
+
    ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;

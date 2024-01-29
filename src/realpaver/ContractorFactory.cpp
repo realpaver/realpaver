@@ -253,14 +253,32 @@ SharedContractor ContractorFactory::makeHC4Newton()
    }
 }
 
-SharedContractorACID ContractorFactory::makeACID(size_t nbs)
+SharedContractorACID ContractorFactory::makeACID()
 {
+   if (dag_->isEmpty()) return nullptr;
    SharedContractorPropag hc4 = makeHC4();
+   int nbs = env_->getParam()->getIntParam("NB_SLICE_CID");
 
+   std::shared_ptr<IntervalSmearSumRel> ssr;
 
+   if (vc_.empty())
+   {
+      IntervalFunctionVector F(dag_);
+      ssr = std::make_shared<IntervalSmearSumRel>(F);
+      return std::make_shared<ContractorACID>(ssr, hc4, nbs);
+   }
+   else
+   {
+      IntervalFunctionVector F;
+      for (size_t i : ve_)
+         F.addFun(IntervalFunction(dag_, i));
 
-// TODO
-   
+      for (size_t i : vi_)
+         F.addFun(IntervalFunction(dag_, i));
+
+      ssr = std::make_shared<IntervalSmearSumRel>(F);
+      return std::make_shared<ContractorACID>(ssr, hc4, nbs);
+   }
 }
 
 } // namespace

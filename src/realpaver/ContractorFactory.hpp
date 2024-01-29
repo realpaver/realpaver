@@ -64,11 +64,10 @@ public:
    SharedContractorPropag makeBC4();
 
    /// Creates a contractor that applies CID contractors in sequence
-   /// @param nbs number of slices of CID contractors
    /// @return the contractor
    ///
    /// The contractor for slices is created by makeHC4().
-   SharedContractorACID makeACID(size_t nbs);
+   SharedContractorACID makeACID();
 
    /// Creates an interval Newton operator associated with the equations
    /// @return the interval Newton operator associated with the equations

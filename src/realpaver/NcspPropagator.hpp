@@ -38,8 +38,11 @@ public:
    /// @param ctx a solving context
    /// @return a certificate of proof
    virtual Proof contract(NcspNode& node, NcspContext& ctx) = 0;
-   
-   // TODO : ajouter un contexte
+
+   /// Intersection with assignment between boxes
+   /// @param B a reduced box
+   /// @param box a box to be reduced as B inter box
+   static Proof contractBox(const IntervalBox& B, DomainBox& box);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,6 +74,22 @@ public:
 
 private:
    SharedContractor op_;   // HC4 + Newton
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that implements the ACID strategy
+/// based on HC4 contractors.
+///////////////////////////////////////////////////////////////////////////////
+class NcspACID : public NcspPropagator {
+public:
+   /// @param facto a factory
+   NcspACID(ContractorFactory& facto);
+
+   Proof contract(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   SharedContractor hc4_;        // HC4
+   SharedContractorACID acid_;   // ACID
 };
 
 } // namespace

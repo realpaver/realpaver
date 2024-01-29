@@ -16,6 +16,7 @@
 #include "realpaver/Env.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/NcspEnv.hpp"
+#include "realpaver/NcspPropagator.hpp"
 #include "realpaver/NcspSpace.hpp"
 #include "realpaver/NcspSplit.hpp"
 #include "realpaver/Preprocessor.hpp"
@@ -59,10 +60,6 @@ public:
 
    /// No assignment
    NcspSolver& operator=(const NcspSolver&) = delete;
-
-   /// Assigns the contractor of this
-   /// @param contractor new contractor
-   void setContractor(SharedContractor contractor);
 
    /// Solving method
    void solve();
@@ -109,10 +106,12 @@ private:
    Problem* preprob_;               // problem resulting from preprocessing
    Preprocessor* preproc_;          // preprocessor
 
+   NcspContext* context_;           // solving context for the BP algorithm
+
    std::shared_ptr<NcspEnv> env_;   // environment
    NcspSpace* space_;               // search tree
    SharedDag dag_;                  // dag
-   SharedContractor contractor_;    // contraction operator
+   NcspPropagator* propagator_;     // contraction method
    NcspSplit* split_;               // splitting strategy
 
    std::shared_ptr<IntervalSmearSumRel> ssr_;
@@ -126,7 +125,7 @@ private:
    void branchAndPrune();
    void makeSpace();
    void makeSSR();
-   void makeContractor();
+   void makePropagator();
    void makeSplit();
    void bpStep(int depthlimit);
    void bpStepAux(SharedNcspNode node, int depthlimit);

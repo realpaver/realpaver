@@ -30,9 +30,10 @@ NcspSolver::NcspSolver(const Problem& problem)
       : problem_(nullptr),
         preprob_(nullptr),
         preproc_(nullptr),
+        context_(nullptr),
         env_(nullptr),
         space_(nullptr),
-        contractor_(nullptr),
+        propagator_(nullptr),
         split_(nullptr),
         ssr_(nullptr),
         prover_(nullptr),
@@ -50,9 +51,11 @@ NcspSolver::NcspSolver(const Problem& problem)
 
 NcspSolver::~NcspSolver()
 {
+   if (context_ != nullptr) delete context_;
    if (preproc_ != nullptr) delete preproc_;
    if (space_ != nullptr) delete space_;
    if (split_ != nullptr) delete split_;
+   if (propagator_ != nullptr) delete propagator_;
    if (prover_ != nullptr) delete prover_;
    if (preprob_ != nullptr) delete preprob_;
    if (problem_ != nullptr) delete problem_;
@@ -95,12 +98,6 @@ void NcspSolver::solve()
    }
 }
 
-void NcspSolver::setContractor(SharedContractor contractor)
-{
-   ASSERT(contractor != nullptr, "Null contractor assigned in a Ncsp solver");
-   contractor_ = contractor;
-}
-
 void NcspSolver::makeSpace()
 {
    // gets the strategy from the parameters
@@ -134,7 +131,39 @@ void NcspSolver::makeSpace()
    ++nbnodes_;
 }
 
-void NcspSolver::makeContractor()
+void NcspSolver::makePropagator()
+{
+   // Contractors: HC4 or BC4
+   std::string base = env_->getParam()->getStrParam("PROPAGATION_BASE");
+
+   // Newton: YES or NO
+   std::string with_newton =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_NEWTON");
+
+   // CID: YES or NO
+   std::string with_cid =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_CID");
+
+   // Polytope hull contractor: YES or NO
+   std::string with_polytope =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
+
+
+   // TODO
+   ContractorFactory facto(*preprob_, env_);
+
+   if (with_newton == "YES")
+      propagator_ = new NcspHC4Newton(facto);
+
+   else if (with_cid == "YES")
+      propagator_ = new NcspACID(facto);
+
+   else
+      propagator_ = new NcspHC4(facto);
+}
+
+/*
+void makeContractor()
 {
    // creates an empty dag
    dag_ = std::make_shared<Dag>();
@@ -300,7 +329,10 @@ void NcspSolver::makeContractor()
    // the main pool in sequence
    contractor_ = std::make_shared<ContractorList>(mainpool);
 }
+*/
 
+
+// TODO : uyiliser la factory pour cela
 void NcspSolver::makeSSR()
 {
    IntervalFunctionVector F;
@@ -394,26 +426,23 @@ void NcspSolver::bpStep(int depthlimit)
     bpStepAux(node, depthlimit);
 
    // removes the node informations
-   split_->removeInfo(node->index());
+   // TODO
+   context_->remove(node->index());
 }
 
 void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 {
-   // the contractor processes an interval box generated
-   // as the hull of the domain box
-   IntervalBox box(*node->box());
-
    LOG_INTER("Extracts node " << node->index() << " (depth "
                               << node->depth() << ")");
-   LOG_LOW("Interval box: " << box);
+   LOG_LOW("Nox: " << (*node->box()));
 
    node->setProof(Proof::Maybe);
 
    // contracts the box
-   Proof proof = contractor_->contract(box);
+   Proof proof = propagator_->contract(*node, *context_);
 
    LOG_INTER("Contraction -> " << proof);
-   LOG_INTER("Contracted box: " << box);
+   LOG_INTER("Contracted box: " << (*node->box()));
 
    if (proof == Proof::Empty)
    {
@@ -421,10 +450,8 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
       return;
    }
 
-   // contracts the domain box   
-   for (const auto& v : box.scope())
-      node->box()->get(v)->contract(box.get(v));
 
+/*
    if (isAnInnerRegion(box))
    {
       LOG_INTER("Node " << node->index() << " is an inner box");
@@ -438,6 +465,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
          return;
       }
    }
+*/
 
    // node depth limit
    int depth = node->depth() + 1;
@@ -449,7 +477,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
    }
 
    // splits the node
-   split_->apply(node);
+   split_->apply(node, *context_);
 
    if (split_->getNbNodes() <= 1)
    {
@@ -484,9 +512,10 @@ void NcspSolver::branchAndPrune()
 
    stimer_.start();
 
+   context_ = new NcspContext();
    makeSpace();
    makeSSR();
-   makeContractor();
+   makePropagator();
    makeSplit();
 
    // prover that derives proof certificates of the solutions

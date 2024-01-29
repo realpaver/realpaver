@@ -57,6 +57,11 @@ void ContractorACID::setNbCID(size_t nbcid)
    nbcid_ = nbcid;
 }
 
+SharedContractor ContractorACID::getContractor() const
+{
+   return op_;
+}
+
 Proof ContractorACID::contract(IntervalBox& B)
 {
    ssr_->calculate(B);

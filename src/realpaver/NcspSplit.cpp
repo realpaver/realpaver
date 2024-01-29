@@ -16,21 +16,17 @@ namespace realpaver {
 NcspSplit::NcspSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : scop_(scop),
         slicerMap_(smap.release()),
-        infoMap_(nullptr),
         cont_(),
         nbs_(0),
         idx_(0)
 {
    ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
    ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
-
-   infoMap_ = new NcspContext();
 }
 
 NcspSplit::~NcspSplit()
 {
    delete slicerMap_;
-   delete infoMap_;
 }
 
 Scope NcspSplit::scope() const
@@ -38,13 +34,13 @@ Scope NcspSplit::scope() const
    return scop_;
 }
 
-void NcspSplit::apply(SharedNcspNode& node)
+void NcspSplit::apply(SharedNcspNode& node, NcspContext& context)
 {
    LOG_INTER("Split node " << node->index() << ": " << (*node->box()));
 
    cont_.clear();
    ++nbs_;
-   applyImpl(node);
+   applyImpl(node, context);
 
    LOG_INTER("  -> " << getNbNodes() << " sub-node(s)");
 }
@@ -57,11 +53,6 @@ size_t NcspSplit::getNbNodes() const
 size_t NcspSplit::getNbSplits() const
 {
    return nbs_;
-}
-
-void NcspSplit::removeInfo(int index)
-{
-   infoMap_->remove(index);
 }
 
 SharedNcspNode NcspSplit::cloneNode(const SharedNcspNode& node)
@@ -105,21 +96,16 @@ NcspSplit::iterator NcspSplit::end()
    return cont_.end();
 }
 
-NcspContext* NcspSplit::getInfoMap() const
-{
-   return infoMap_;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 NcspSplitRR::NcspSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : NcspSplit(scop, std::move(smap))
 {}
 
-void NcspSplitRR::applyImpl(SharedNcspNode& node)
+void NcspSplitRR::applyImpl(SharedNcspNode& node, NcspContext& context)
 {
    // variable selection
-   std::pair<bool, Variable> res = selectVar(node);
+   std::pair<bool, Variable> res = selectVar(node, context);
    if (!res.first) return;
    Variable v = res.second;
 
@@ -135,15 +121,16 @@ void NcspSplitRR::applyImpl(SharedNcspNode& node)
    std::shared_ptr<NcspNodeInfoVar> info = std::make_shared<NcspNodeInfoVar>(v);
 
    for (SharedNcspNode& aux : cont_)
-      infoMap_->insert(aux->index(), info);
+      context.insert(aux->index(), info);
 }
 
-std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node)
+std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node,
+                                                 NcspContext& context)
 {
    DomainBox* box = node->box();
 
    std::shared_ptr<NcspNodeInfo>
-      info = infoMap_->getInfo(node->index(), NcspNodeInfoType::SplitVar);
+      info = context.getInfo(node->index(), NcspNodeInfoType::SplitVar);
 
    // assigns an iterator pointing to the next variable
    Scope::const_iterator it;
@@ -200,7 +187,7 @@ NcspSplitLF::NcspSplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : NcspSplit(scop, std::move(smap))
 {}
 
-void NcspSplitLF::applyImpl(SharedNcspNode& node)
+void NcspSplitLF::applyImpl(SharedNcspNode& node, NcspContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -250,7 +237,7 @@ NcspSplitSF::NcspSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : NcspSplit(scop, std::move(smap))
 {}
 
-void NcspSplitSF::applyImpl(SharedNcspNode& node)
+void NcspSplitSF::applyImpl(SharedNcspNode& node, NcspContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -296,7 +283,7 @@ NcspSplitSLF::NcspSplitSLF(Scope scop,
       : NcspSplit(scop, std::move(smap))
 {}
 
-void NcspSplitSLF::applyImpl(SharedNcspNode& node)
+void NcspSplitSLF::applyImpl(SharedNcspNode& node, NcspContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -362,7 +349,7 @@ NcspSplitSSR::NcspSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
           "No interval smear sum rel object in a splitting object");
 }
 
-void NcspSplitSSR::applyImpl(SharedNcspNode& node)
+void NcspSplitSSR::applyImpl(SharedNcspNode& node, NcspContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);

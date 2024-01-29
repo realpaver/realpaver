@@ -15,6 +15,18 @@ namespace realpaver {
 NcspPropagator::~NcspPropagator()
 {}
 
+Proof NcspPropagator::contractBox(const IntervalBox& B, DomainBox& box)
+{
+   for (const auto& v : box.scope())
+   {
+      Domain* dom = box.get(v);
+      dom->contract(B.get(v));
+
+      if (dom->isEmpty()) return Proof::Empty;
+   }
+   return Proof::Maybe;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 NcspHC4::NcspHC4(ContractorFactory& facto)
@@ -36,8 +48,13 @@ NcspHC4::NcspHC4(ContractorFactory& facto)
 
 Proof NcspHC4::contract(NcspNode& node, NcspContext& ctx)
 {
-   IntervalBox B(*node.box());
-   return op_->contract(B);
+   DomainBox* box = node.box();
+   IntervalBox B(*box);
+
+   Proof proof = op_->contract(B);
+
+   return (proof == Proof::Empty) ? Proof::Empty :
+                                    contractBox(B, *box);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,8 +88,41 @@ NcspHC4Newton::NcspHC4Newton(ContractorFactory& facto)
 
 Proof NcspHC4Newton::contract(NcspNode& node, NcspContext& ctx)
 {
-   IntervalBox B(*node.box());
-   return op_->contract(B);
+   DomainBox* box = node.box();
+   IntervalBox B(*box);
+
+   Proof proof = op_->contract(B);
+
+   return (proof == Proof::Empty) ? Proof::Empty :
+                                    contractBox(B, *box);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspACID::NcspACID(ContractorFactory& facto)
+      : NcspPropagator()
+{
+   hc4_ = facto.makeHC4();
+   acid_ = facto.makeACID();
+}
+
+Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
+{
+   DomainBox* box = node.box();
+   IntervalBox B(*box);
+
+   if (acid_ == nullptr)
+   {
+      Proof proof = hc4_->contract(B);
+      return (proof == Proof::Empty) ? Proof::Empty :
+                                       contractBox(B, *box);
+   }
+   else
+   {
+      Proof proof = acid_->contract(B);
+      return (proof == Proof::Empty) ? Proof::Empty :
+                                       contractBox(B, *box);
+   }
 }
 
 } // namespace
