@@ -24,7 +24,7 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 enum class NcspNodeInfoType {
    SplitVar,      // selected variable in a splitting step
-   SmearSumRel    // smar relative values of variables
+   NbCID          // number of CID contractors
 };
 
 /// Output on a stream
@@ -82,31 +82,32 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is an information that contains smear sum relative values.
-///
-/// See the IntervalSmearSumRel class.
+/// This is an information that contains a number of CID contractors.
 ///////////////////////////////////////////////////////////////////////////////
-class NcspNodeInfoSSR : public NcspNodeInfo {
+class NcspNodeInfoCID : public NcspNodeInfo {
 public:
    /// Constructor
-   /// @param f a function
-   NcspNodeInfoSSR(std::shared_ptr<IntervalSmearSumRel> obj);
+   /// @param nbcid number of CID contractors applied
+   NcspNodeInfoCID(int nbcid = 0);
 
    /// Default destructor
-   ~NcspNodeInfoSSR() = default;
+   ~NcspNodeInfoCID() = default;
 
-   /// Copy constructor
-   /// @param other value assigned to this
-   NcspNodeInfoSSR(const NcspNodeInfoSSR& other);
+   /// Default copy constructor
+   NcspNodeInfoCID(const NcspNodeInfoCID&) = default;
 
    /// No assignment
-   NcspNodeInfoSSR& operator=(const NcspNodeInfoSSR&) = delete;
+   NcspNodeInfoCID& operator=(const NcspNodeInfoCID&) = delete;
 
-   /// @return the object enclosed in this
-   std::shared_ptr<IntervalSmearSumRel> getIntervalSmearSumRel() const;
+   /// @return the number of CID contractors
+   size_t getNbCID() const;
+
+   /// Assigns the number of CID contractors
+   /// @param nbcid the new value
+   void setNbCID(size_t nbcid);
 
 private:
-   std::shared_ptr<IntervalSmearSumRel> obj_;
+   size_t nbcid_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

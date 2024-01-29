@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/ContractorList.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/NcspPropagator.hpp"
 
 namespace realpaver {
@@ -119,9 +120,39 @@ Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
    }
    else
    {
-      Proof proof = acid_->contract(B);
-      return (proof == Proof::Empty) ? Proof::Empty :
-                                       contractBox(B, *box);
+      // learning or exploitation phase?
+      int depth = node.depth();
+
+      // TODO
+
+      bool learning = true;
+
+      if (learning)
+      {
+         std::shared_ptr<IntervalSmearSumRel>
+            ssr = acid_->getIntervalSmearSumRel();
+
+         ssr->calculate(B);
+         ssr->sort();
+
+         // TODO
+
+
+
+         // TODO
+         // il faut enregistrer le nombre de slices pour le noeud
+      }
+      else
+      {
+         // TODO
+         // on recupere le nombre de slices du noeud  parent
+         // acid_->setNbCID(nbs);
+         
+         
+         Proof proof = acid_->contract(B);
+         return (proof == Proof::Empty) ? Proof::Empty :
+                                          contractBox(B, *box);
+      }
    }
 }
 

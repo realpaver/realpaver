@@ -60,6 +60,7 @@ SharedNcspNode NcspSplit::cloneNode(const SharedNcspNode& node)
    SharedNcspNode aux = std::make_shared<NcspNode>(*node);
    aux->setIndex(++idx_);
    aux->setDepth(1+node->depth());
+   aux->setParent(node->index());
    return aux;
 }
 

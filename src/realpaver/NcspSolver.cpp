@@ -434,7 +434,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 {
    LOG_INTER("Extracts node " << node->index() << " (depth "
                               << node->depth() << ")");
-   LOG_LOW("Nox: " << (*node->box()));
+   LOG_LOW("Node: " << (*node->box()));
 
    node->setProof(Proof::Maybe);
 

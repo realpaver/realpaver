@@ -65,6 +65,13 @@ public:
    /// @param id new index
    void setIndex(int id);
 
+   /// @return the index of the parent of this in the search tree
+   int parent() const;
+
+   /// Sets the index of the parent node
+   /// @param p the index
+   void setParent(int p);
+
    /// Increments the depth of this
    void incrementDepth();
 
@@ -84,7 +91,7 @@ public:
 private:
    Scope scop_;
    DomainBox* box_;
-   int depth_, index_;
+   int depth_, index_, parent_;
    Proof proof_;
 };
 

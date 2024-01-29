@@ -16,7 +16,8 @@ NcspNode::NcspNode(Scope scop, int depth)
       : scop_(scop),
         box_(nullptr),
         depth_(depth),
-        index_(0),
+        index_(-1),
+        parent_(-1),
         proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
@@ -29,7 +30,8 @@ NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
       : scop_(box->scope()),
         box_(box.release()),
         depth_(depth),
-        index_(0),
+        index_(-1),
+        parent_(-1),
         proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
@@ -38,7 +40,10 @@ NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
 NcspNode::NcspNode(const NcspNode& node)
       : scop_(node.scop_),
         box_(nullptr),
-        depth_(node.depth_)
+        depth_(node.depth_),
+        index_(-1),
+        parent_(-1),
+        proof_(Proof::Maybe)
 {
    box_ = node.box_->clone();
 }
@@ -68,6 +73,16 @@ int NcspNode::index() const
 void NcspNode::setIndex(int id)
 {
    index_ = id;
+}
+
+int NcspNode::parent() const
+{
+   return parent_;
+}
+
+void NcspNode::setParent(int p)
+{
+   parent_ = p;
 }
 
 void NcspNode::incrementDepth()

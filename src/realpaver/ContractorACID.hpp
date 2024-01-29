@@ -57,6 +57,9 @@ public:
    /// @return the contractor used to reduce the slices
    SharedContractor getContractor() const;
 
+   /// @return the interval sum rel object enclosed in this
+   std::shared_ptr<IntervalSmearSumRel> getIntervalSmearSumRel() const;
+
    ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;

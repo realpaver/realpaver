@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ)
    switch(typ)
    {
       case NcspNodeInfoType::SplitVar:    return os << "split variable";
-      case NcspNodeInfoType::SmearSumRel: return os << "smear sum relative";
+      case NcspNodeInfoType::NbCID:       return os << "nb CID";
    }
    return os;   
 }
@@ -51,15 +51,19 @@ Variable NcspNodeInfoVar::getVar() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NcspNodeInfoSSR::NcspNodeInfoSSR(std::shared_ptr<IntervalSmearSumRel> obj)
-      : NcspNodeInfo(NcspNodeInfoType::SmearSumRel),
-        obj_(obj)
+NcspNodeInfoCID::NcspNodeInfoCID(int nbcid)
+      : NcspNodeInfo(NcspNodeInfoType::NbCID),
+        nbcid_(nbcid)
 {}
 
-std::shared_ptr<IntervalSmearSumRel>
-NcspNodeInfoSSR::getIntervalSmearSumRel() const
+size_t NcspNodeInfoCID::getNbCID() const
 {
-   return obj_;
+   return nbcid_;
+}
+
+void NcspNodeInfoCID::setNbCID(size_t nbcid)
+{
+   nbcid_ = nbcid;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorCID.hpp"
 #include "realpaver/ContractorACID.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -62,8 +63,16 @@ SharedContractor ContractorACID::getContractor() const
    return op_;
 }
 
+std::shared_ptr<IntervalSmearSumRel>
+ContractorACID::getIntervalSmearSumRel() const
+{
+   return ssr_;
+}
+
 Proof ContractorACID::contract(IntervalBox& B)
 {
+   LOG_INTER("ACID on " << B);
+
    ssr_->calculate(B);
    ssr_->sort();
 
