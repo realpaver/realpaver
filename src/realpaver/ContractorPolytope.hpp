@@ -10,6 +10,7 @@
 #ifndef REALPAVER_CONTRACTOR_POLYTOPE_HPP
 #define REALPAVER_CONTRACTOR_POLYTOPE_HPP
 
+#include <memory>
 #include <vector>
 #include <unordered_map>
 #include "realpaver/Contractor.hpp"
@@ -19,10 +20,10 @@
 namespace realpaver {
 
 /// Types of linearizations
-enum class PolytopeCreatorStyle { RLT, Affine, Taylor };
+enum class PolytopeStyle { RLT, Affine, Taylor };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style);
+std::ostream& operator<<(std::ostream& os, const PolytopeStyle& style);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This the abstract class of polytope makers used to linearize nonlinear
@@ -135,14 +136,14 @@ public:
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param style kind of relaxation method
-   ContractorPolytope(SharedDag dag, PolytopeCreatorStyle style);
+   ContractorPolytope(SharedDag dag, PolytopeStyle style);
 
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param lfun list of indexes of the DAG functions to be relaxed
    /// @param style kind of relaxation method
    ContractorPolytope(SharedDag dag, const IndexList& lfun,
-                      PolytopeCreatorStyle style);
+                      PolytopeStyle style);
 
    /// Destructor
    ~ContractorPolytope();
@@ -171,6 +172,9 @@ private:
 
    Proof contractImpl(IntervalBox& B);
 };
+
+/// type of shared contractors
+typedef std::shared_ptr<ContractorPolytope> SharedContractorPolytope;
 
 } // namespace
 

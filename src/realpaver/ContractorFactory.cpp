@@ -261,8 +261,6 @@ SharedContractor ContractorFactory::makeHC4Newton()
 SharedContractorACID ContractorFactory::makeACID()
 {
    if (dag_->isEmpty()) return nullptr;
-   SharedContractorPropag hc4 = makeHC4();
-   int nbs = env_->getParam()->getIntParam("NB_SLICE_CID");
 
    std::shared_ptr<IntervalSmearSumRel> ssr;
 
@@ -270,7 +268,6 @@ SharedContractorACID ContractorFactory::makeACID()
    {
       IntervalFunctionVector F(dag_);
       ssr = std::make_shared<IntervalSmearSumRel>(F);
-      return std::make_shared<ContractorACID>(ssr, hc4, nbs);
    }
    else
    {
@@ -282,8 +279,43 @@ SharedContractorACID ContractorFactory::makeACID()
          F.addFun(IntervalFunction(dag_, i));
 
       ssr = std::make_shared<IntervalSmearSumRel>(F);
-      return std::make_shared<ContractorACID>(ssr, hc4, nbs);
    }
+
+   SharedContractorPropag hc4 = makeHC4();
+
+   int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
+   int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");
+   int learnLength = env_->getParam()->getIntParam("LEARN_LENGTH_ACID");
+   int cycleLength = env_->getParam()->getIntParam("CYCLE_LENGTH_ACID");
+   double ctRatio = env_->getParam()->getDblParam("CT_RATIO_ACID");
+
+   return std::make_shared<ContractorACID>(ssr, hc4, ns3B, nsCID, learnLength,
+                                           cycleLength, ctRatio);
 }
 
+SharedContractorPolytope ContractorFactory::makePolytope()
+{
+   if (dag_->isEmpty()) return nullptr;
+
+   SharedContractorPolytope op = nullptr;
+   std::string
+      creator = env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
+
+   if (creator == "TAYLOR")
+      op = std::make_shared<ContractorPolytope>(dag_,
+                                                PolytopeStyle::Taylor);
+
+   else if (creator == "RLT")
+      op = std::make_shared<ContractorPolytope>(dag_,
+                                                PolytopeStyle::RLT);
+
+   if (op != nullptr)
+   {
+      double tol = env_->getParam()->getDblParam("RELAXATION_EQ_TOL");
+      op->setRelaxEqTol(tol);
+   }
+
+   return op;
+}
+ 
 } // namespace

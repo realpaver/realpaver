@@ -17,13 +17,13 @@
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style)
+std::ostream& operator<<(std::ostream& os, const PolytopeStyle& style)
 {
    switch(style)
    {
-      case PolytopeCreatorStyle::Affine: return os << "Affine maker";
-      case PolytopeCreatorStyle::RLT:    return os << "RLT maker";
-      case PolytopeCreatorStyle::Taylor: return os << "Taylor maker";
+      case PolytopeStyle::Affine: return os << "Affine maker";
+      case PolytopeStyle::RLT:    return os << "RLT maker";
+      case PolytopeStyle::Taylor: return os << "Taylor maker";
       default:                           os.setstate(std::ios::failbit);
    }
    return os;
@@ -370,13 +370,13 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
 ///////////////////////////////////////////////////////////////////////////////
 
 ContractorPolytope::ContractorPolytope(SharedDag dag,
-                                       PolytopeCreatorStyle style)
+                                       PolytopeStyle style)
       : creator_(nullptr)
 {
-   if (style == PolytopeCreatorStyle::RLT)
+   if (style == PolytopeStyle::RLT)
       creator_ = new PolytopeRLTCreator(dag);
 
-   else if (style == PolytopeCreatorStyle::Taylor)
+   else if (style == PolytopeStyle::Taylor)
       creator_ = new PolytopeTaylorCreator(dag);
 
    else
@@ -384,13 +384,13 @@ ContractorPolytope::ContractorPolytope(SharedDag dag,
 }
 
 ContractorPolytope::ContractorPolytope(SharedDag dag, const IndexList& lfun,
-                                       PolytopeCreatorStyle style)
+                                       PolytopeStyle style)
       : creator_(nullptr)
 {
-   if (style == PolytopeCreatorStyle::RLT)
+   if (style == PolytopeStyle::RLT)
       creator_ = new PolytopeRLTCreator(dag, lfun);
 
-   else if (style == PolytopeCreatorStyle::Taylor)
+   else if (style == PolytopeStyle::Taylor)
       creator_ = new PolytopeTaylorCreator(dag, lfun);
 
    else

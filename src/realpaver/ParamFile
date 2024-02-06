@@ -153,7 +153,6 @@ PROPAGATION_BASE = HC4
 # Propagation with a polytope hull contractor
 # - NO: contractor not used
 # - RLT: contractor based on a RLT-based relaxation
-# - AFFINE: contractor based an an affine relaxation
 # - TAYLOR: contractor based on a Taylor relaxation
 PROPAGATION_WITH_POLYTOPE = NO
 

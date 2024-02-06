@@ -58,7 +58,8 @@ protected:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator for NCSPs based on HC4 contractors.
+/// This is a propagator for NCSPs corresponding to the HC4 constraint
+/// propagation algorithm.
 ///////////////////////////////////////////////////////////////////////////////
 class NcspHC4 : public NcspPropagator {
 public:
@@ -73,7 +74,8 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator for NCSPs based on BC4 contractors.
+/// This is a propagator for NCSPs corresponding to the BC4 constraint
+/// propagation algorithm.
 ///////////////////////////////////////////////////////////////////////////////
 class NcspBC4 : public NcspPropagator {
 public:
@@ -103,6 +105,21 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies the polytope contractor.
+///////////////////////////////////////////////////////////////////////////////
+class NcspPolytope : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspPolytope(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   SharedContractor op_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is a propagator for NCSPs that implements the ACID strategy
 /// based on HC4 contractors.
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,55 +129,17 @@ public:
    /// @param facto a factory
    NcspACID(ContractorFactory& facto);
 
-   /// Destructor
-   ~NcspACID();
-
    Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
 
 private:
-   SharedContractor hc4_;           // HC4
-   Scope scop_;                     // scope
-   SharedContractorACID acid_;      // ACID
-
-   std::vector<ContractorVar3BCID*>
-      var3BCID_;                    // var3BCID_[i] is the var3BCID contractor
-                                    // associated with the i-th variable
-                                    // of the scope
-
-   size_t n_;        // number of variables of the scope
-   int numVarCID_;   // number of var3BCID contractors that must be applied
-                     // in a call to the contract method
-
-   std::vector<size_t> kVarCID_;
-
-   size_t call_;        // number of calls of the contract method
-   int cycleLength_;    // number of calls in a cycle made of an exploitation
-                        // phase and a learning phase
-   int learnLength_;    // number of calls in the learning phase
-   double ctRatio_;     // threshold on the reduction gain
-
-   // Let ctcGains = g_0, ..., g_(p-1) be the reduction ratios obtained by the
-   // p var3BCID contractors applied in some call of the contract method.
-   //
-   // If g_i <= ctRatio for each i then it returns 0, which means that no
-   // contractor is efficient enough.
-   //
-   // Otherwise let k be the greatest integer such that g_k > ctRatio, which
-   // indicates that the gains are not enough after k. Then it returns k+1,
-   // which the maximum number of contractors that must be applied in order to
-   // obtain a sufficient gain.
-   static int lastSignificantGain(std::vector<double>& ctcGains,
-                                  double ctRatio);
-
-   // It returns the average
-   static size_t avgNbVarCID(std::vector<size_t>& v);
+   SharedContractor op_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator for NCSPs based on HC4 contractors and the interval
-/// Newton operator.
+/// This is a propagator for NCSPs that applies in sequence a NcspHC4
+/// operator and a NcspNewton operator.
 ///
-/// Interval Newton is used only for square systems of equations.
+/// The Newton operator is used only for square systems of equations.
 ///////////////////////////////////////////////////////////////////////////////
 class NcspHC4Newton : public NcspPropagator {
 public:
@@ -176,10 +155,10 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator for NCSPs based on BC4 contractors and the interval
-/// Newton operator.
+/// This is a propagator for NCSPs that applies in sequence a NcspBC4
+/// operator and a NcspNewton operator.
 ///
-/// Interval Newton is used only for square systems of equations.
+/// The Newton operator is used only for square systems of equations.
 ///////////////////////////////////////////////////////////////////////////////
 class NcspBC4Newton : public NcspPropagator {
 public:
@@ -195,6 +174,12 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspACID
+/// operator and a NcspNewton operator.
+
+///
+/// The Newton operator is used only for square systems of equations.
+///////////////////////////////////////////////////////////////////////////////
 class NcspACIDNewton : public NcspPropagator {
 public:
    /// Creates a contractor
@@ -206,6 +191,109 @@ public:
 private:
    NcspACID acid_;
    NcspNewton newton_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspHC4
+/// operator and a NcspPolytope operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspHC4Polytope : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspHC4Polytope(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspHC4 hc4_;
+   NcspPolytope poly_;;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspBC4
+/// operator and a NcspPolytope operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspBC4Polytope : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspBC4Polytope(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspBC4 bc4_;
+   NcspPolytope poly_;;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspACID
+/// operator and a NcspPolytope operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspACIDPolytope : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspACIDPolytope(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspACID acid_;
+   NcspPolytope poly_;;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspHC4
+/// operator, a NcspPolytope operator and a NcspNewton operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspHC4PolytopeNewton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspHC4PolytopeNewton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspHC4Polytope hc4poly_;
+   NcspNewton newton_;;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspBC4
+/// operator, a NcspPolytope operator and a NcspNewton operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspBC4PolytopeNewton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspBC4PolytopeNewton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspBC4Polytope bc4poly_;
+   NcspNewton newton_;;
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies in sequence a NcspACID
+/// operator, a NcspPolytope operator and a NcspNewton operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspACIDPolytopeNewton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspACIDPolytopeNewton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspACIDPolytope acidpoly_;
+   NcspNewton newton_;;
 };
 
 } // namespace

@@ -154,7 +154,7 @@ void NcspSolver::makePropagator()
 
    ContractorFactory facto(*preprob_, env_);
 
-   if ((newton == false) & (polytope == false))
+   if ((newton == false) && (polytope == false))
    {
       if (hc4)
          propagator_ = new NcspHC4(facto);
@@ -178,15 +178,29 @@ void NcspSolver::makePropagator()
    }
    else if (newton == false)
    {
-      
+      if (hc4)
+         propagator_ = new NcspHC4Polytope(facto);
+
+      else if (bc4)
+         propagator_ = new NcspBC4Polytope(facto);
+
+      else
+         propagator_ = new NcspACIDPolytope(facto);
    }
    else
    {
-      
+      if (hc4)
+         propagator_ = new NcspHC4PolytopeNewton(facto);
+
+      else if (bc4)
+         propagator_ = new NcspBC4PolytopeNewton(facto);
+
+      else
+         propagator_ = new NcspACIDPolytopeNewton(facto);
    }
 }
 
-// TODO : uyiliser la factory pour cela
+// TODO : utiliser la factory pour cela
 void NcspSolver::makeSSR()
 {
    IntervalFunctionVector F;
@@ -275,8 +289,7 @@ void NcspSolver::bpStep(int depthlimit)
     bpStepAux(node, depthlimit);
 
    // removes the node informations
-   // TODO
-   //context_->remove(node->index());
+   context_->remove(node->index());
 }
 
 void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
