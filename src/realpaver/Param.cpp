@@ -77,13 +77,12 @@ Param::Param()
    strmap_.insert(std::make_pair("SPLIT_SELECTOR",            "RR"));
    strmap_.insert(std::make_pair("SPLIT_SLICER",              "BISECTION"));
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_ACID",     "NO"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
    strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
    strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
 

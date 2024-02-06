@@ -133,33 +133,57 @@ void NcspSolver::makeSpace()
 
 void NcspSolver::makePropagator()
 {
-   // Contractors: HC4 or BC4
-   std::string base = env_->getParam()->getStrParam("PROPAGATION_BASE");
+   // Propagation: HC4 or BC4 or ACID
+   std::string propag = env_->getParam()->getStrParam("PROPAGATION_BASE");
+   bool hc4 = (propag == "HC4"),
+        bc4 = (propag == "BC4"),
+        acid = (propag == "ACID");
+
+   THROW_IF(!(hc4 || bc4 || acid),
+             "Bad parameter value for the propagation algorithm");
 
    // Newton: YES or NO
    std::string with_newton =
       env_->getParam()->getStrParam("PROPAGATION_WITH_NEWTON");
-
-   // CID: YES or NO
-   std::string with_cid =
-      env_->getParam()->getStrParam("PROPAGATION_WITH_ACID");
+   bool newton = (with_newton == "YES");
 
    // Polytope hull contractor: YES or NO
    std::string with_polytope =
       env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
+   bool polytope = (with_polytope == "YES");
 
-
-   // TODO
    ContractorFactory facto(*preprob_, env_);
 
-   if (with_newton == "YES")
-      propagator_ = new NcspHC4Newton(facto);
+   if ((newton == false) & (polytope == false))
+   {
+      if (hc4)
+         propagator_ = new NcspHC4(facto);
 
-   else if (with_cid == "YES")
-      propagator_ = new NcspACID(facto);
+      else if (bc4)
+         propagator_ = new NcspBC4(facto);
 
+      else
+         propagator_ = new NcspACID(facto);
+   }
+   else if (polytope == false)
+   {
+      if (hc4)
+         propagator_ = new NcspHC4Newton(facto);
+
+      else if (bc4)
+         propagator_ = new NcspBC4Newton(facto);
+
+      else
+         propagator_ = new NcspACIDNewton(facto);
+   }
+   else if (newton == false)
+   {
+      
+   }
    else
-      propagator_ = new NcspHC4(facto);
+   {
+      
+   }
 }
 
 // TODO : uyiliser la factory pour cela

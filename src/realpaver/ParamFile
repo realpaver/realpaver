@@ -145,8 +145,9 @@ BC3_ITER_LIMIT = 30
 
 # Propagation strategy: the default one is a classical propagation algorithm
 # that uses one contractor per constraint
-# HC4: HC4 contractor
-# BC4: BC4 contractor
+# HC4:   HC4 contractor
+# BC4:   BC4 contractor
+# ACID : ACID contractor
 PROPAGATION_BASE = HC4
 
 # Propagation with a polytope hull contractor
@@ -167,9 +168,7 @@ RELAXATION_EQ_TOL = 1.0e-10
 
 ###################################################
 # Adaptive Constructive Interval Disjunction (ACID)
-
-# Use of ACID (YES or NO)
-PROPAGATION_WITH_ACID = NO
+# Parameters used if PROPAGATION_BASE = ACID
 
 # Number of slices of a domain handled by var3B contractors
 NB_SLICE_3B = 7

@@ -23,8 +23,8 @@ namespace realpaver {
 ///////////////////////////////////////////////////////////////////////////////
 class NcspPropagator {
 public:
-   /// Default constructor
-   NcspPropagator() = default;
+   /// Constructor
+   NcspPropagator();
 
    /// Default copy constructor
    NcspPropagator(const NcspPropagator&) = default;
@@ -35,16 +35,26 @@ public:
    /// Virtual destructor
    virtual ~NcspPropagator();
 
-   /// Contraction method
+   /// Contraction method that applies first contractImpl and then
+   /// the domain contractors for variables with disconnected domains
    /// @param a node whose box is contracted
    /// @param ctx a solving context
    /// @return a certificate of proof
-   virtual Proof contract(NcspNode& node, NcspContext& ctx) = 0;
+   Proof contract(NcspNode& node, NcspContext& ctx);
 
    /// Intersection with assignment between boxes
    /// @param B a reduced box
    /// @param box a box to be reduced as B inter box
    static Proof contractBox(const IntervalBox& B, DomainBox& box);
+
+protected:
+   IntervalBox* B_;
+
+   /// Contraction method to be overriden
+   /// @param a node whose box is contracted
+   /// @param ctx a solving context
+   /// @return a certificate of proof
+   virtual Proof contractImpl(NcspNode& node, NcspContext& ctx) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,30 +62,44 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 class NcspHC4 : public NcspPropagator {
 public:
+   /// Creates a contractor
    /// @param facto a factory
    NcspHC4(ContractorFactory& facto);
 
-   Proof contract(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
 
 private:
-   SharedContractor op_;   // HC4
+   SharedContractor op_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator for NCSPs based on HC4 contractors and the interval
-/// Newton operator.
-///
-/// Interval Newton is used only for square systems of equations.
+/// This is a propagator for NCSPs based on BC4 contractors.
 ///////////////////////////////////////////////////////////////////////////////
-class NcspHC4Newton : public NcspPropagator {
+class NcspBC4 : public NcspPropagator {
 public:
+   /// Creates a contractor
    /// @param facto a factory
-   NcspHC4Newton(ContractorFactory& facto);
+   NcspBC4(ContractorFactory& facto);
 
-   Proof contract(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
 
 private:
-   SharedContractor op_;   // HC4 + Newton
+   SharedContractor op_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs that applies the interval Newton operator.
+///////////////////////////////////////////////////////////////////////////////
+class NcspNewton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspNewton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   SharedContractor op_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,12 +108,14 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 class NcspACID : public NcspPropagator {
 public:
+   /// Creates a contractor
    /// @param facto a factory
    NcspACID(ContractorFactory& facto);
 
+   /// Destructor
    ~NcspACID();
 
-   Proof contract(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
 
 private:
    SharedContractor hc4_;           // HC4
@@ -123,10 +149,63 @@ private:
    // indicates that the gains are not enough after k. Then it returns k+1,
    // which the maximum number of contractors that must be applied in order to
    // obtain a sufficient gain.
-   int lastSignificantGain(std::vector<double>& ctcGains, double ctRatio);
+   static int lastSignificantGain(std::vector<double>& ctcGains,
+                                  double ctRatio);
 
    // It returns the average
-   size_t avgNbVarCID(std::vector<size_t>& v);
+   static size_t avgNbVarCID(std::vector<size_t>& v);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs based on HC4 contractors and the interval
+/// Newton operator.
+///
+/// Interval Newton is used only for square systems of equations.
+///////////////////////////////////////////////////////////////////////////////
+class NcspHC4Newton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspHC4Newton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspHC4 hc4_;
+   NcspNewton newton_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a propagator for NCSPs based on BC4 contractors and the interval
+/// Newton operator.
+///
+/// Interval Newton is used only for square systems of equations.
+///////////////////////////////////////////////////////////////////////////////
+class NcspBC4Newton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspBC4Newton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspBC4 bc4_;
+   NcspNewton newton_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+class NcspACIDNewton : public NcspPropagator {
+public:
+   /// Creates a contractor
+   /// @param facto a factory
+   NcspACIDNewton(ContractorFactory& facto);
+
+   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+
+private:
+   NcspACID acid_;
+   NcspNewton newton_;
 };
 
 } // namespace

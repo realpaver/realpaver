@@ -14,8 +14,14 @@
 
 namespace realpaver {
 
-NcspPropagator::~NcspPropagator()
+NcspPropagator::NcspPropagator()
+      : B_(nullptr)
 {}
+
+NcspPropagator::~NcspPropagator()
+{
+   if (B_ != nullptr) delete B_;
+}
 
 Proof NcspPropagator::contractBox(const IntervalBox& B, DomainBox& box)
 {
@@ -29,74 +35,88 @@ Proof NcspPropagator::contractBox(const IntervalBox& B, DomainBox& box)
    return Proof::Maybe;
 }
 
+Proof NcspPropagator::contract(NcspNode& node, NcspContext& ctx)
+{
+   if (B_ != nullptr)
+   {
+      delete B_;
+      B_ = nullptr;
+   }
+
+   // contractor of sub-class
+   Proof proof = contractImpl(node, ctx);
+
+   // contracts the domains using a reduced interval box from contractImpl
+   // if any
+   if ((proof != Proof::Empty) && (B_ != nullptr))
+   {
+      DomainBox* box = node.box();
+      auto it = box->scope().begin();
+
+      while ((proof != Proof::Empty) && (it != box->scope().end()))
+      {
+         Variable v = *it;
+         Domain* dom = box->get(v);
+         dom->contract(B_->get(v));
+
+         if (dom->isEmpty())
+            proof = Proof::Empty;
+
+         else
+            ++it;
+      }
+   }
+
+   return proof;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 NcspHC4::NcspHC4(ContractorFactory& facto)
       : NcspPropagator()
 {
-   // HC4
    op_ = facto.makeHC4();
-
-   // Contractors for disconnected variable domains
-   SharedContractor dop = facto.makeContractorDomain();
-   if (dop != nullptr)
-   {
-      SharedContractorVector pool = std::make_shared<ContractorVector>();
-      pool->push(op_);
-      pool->push(dop);
-      op_ = std::make_shared<ContractorList>(pool);
-   }
 }
 
-Proof NcspHC4::contract(NcspNode& node, NcspContext& ctx)
+Proof NcspHC4::contractImpl(NcspNode& node, NcspContext& ctx)
 {
-   DomainBox* box = node.box();
-   IntervalBox B(*box);
-
-   Proof proof = op_->contract(B);
-
-   return (proof == Proof::Empty) ? Proof::Empty :
-                                    contractBox(B, *box);
+   B_ = new IntervalBox(*node.box());
+   return op_->contract(*B_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NcspHC4Newton::NcspHC4Newton(ContractorFactory& facto)
+NcspBC4::NcspBC4(ContractorFactory& facto)
       : NcspPropagator()
 {
-   // HC4
-   op_ = facto.makeHC4();
-
-   // Interval Newton
-   SharedContractor newton = facto.makeIntervalNewton();
-   if (newton != nullptr)
-   {
-      SharedContractorVector pool = std::make_shared<ContractorVector>();
-      pool->push(op_);
-      pool->push(newton);
-      op_ = std::make_shared<ContractorList>(pool);
-   }
-
-   // Contractors for disconnected variable domains
-   SharedContractor dop = facto.makeContractorDomain();
-   if (dop != nullptr)
-   {
-      SharedContractorVector pool = std::make_shared<ContractorVector>();
-      pool->push(op_);
-      pool->push(dop);
-      op_ = std::make_shared<ContractorList>(pool);
-   }
+   op_ = facto.makeBC4();
 }
 
-Proof NcspHC4Newton::contract(NcspNode& node, NcspContext& ctx)
+Proof NcspBC4::contractImpl(NcspNode& node, NcspContext& ctx)
 {
-   DomainBox* box = node.box();
-   IntervalBox B(*box);
+   B_ = new IntervalBox(*node.box());
+   return op_->contract(*B_);
+}
 
-   Proof proof = op_->contract(B);
+///////////////////////////////////////////////////////////////////////////////
 
-   return (proof == Proof::Empty) ? Proof::Empty :
-                                    contractBox(B, *box);
+NcspNewton::NcspNewton(ContractorFactory& facto)
+      : NcspPropagator()
+{
+   op_ = facto.makeIntervalNewton();
+}
+
+Proof NcspNewton::contractImpl(NcspNode& node, NcspContext& ctx)
+{
+   Proof proof = Proof::Maybe;
+
+   if (op_ != nullptr)
+   {
+      B_ = new IntervalBox(*node.box());
+      proof = op_->contract(*B_);
+   }
+
+   return proof;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -163,17 +183,18 @@ size_t NcspACID::avgNbVarCID(std::vector<size_t>& v)
    return (int)res;
 }
 
-Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
+Proof NcspACID::contractImpl(NcspNode& node, NcspContext& ctx)
 {
    DomainBox* box = node.box();
-   IntervalBox B(*box);
+   B_ = new IntervalBox(*box);
+
    Proof proof = Proof::Maybe;
 
    // sorts the variables according to their impact
    std::shared_ptr<IntervalSmearSumRel>
       ssr = acid_->getIntervalSmearSumRel();
 
-   ssr->calculate(B);
+   ssr->calculate(*B_);
    ssr->sort();
 
    size_t mcall = call_ % cycleLength_;
@@ -187,21 +208,22 @@ Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
       int i = 0;
       while ((proof != Proof::Empty) && (i<nVarCID))
       {
-         IntervalBox save(B);
+         IntervalBox save(*B_);
 
          size_t j = i % n_;
          Variable v = ssr->getVar(j);
          size_t k = scop_.index(v);
 
-         proof = var3BCID_[k]->contract(B);
+         proof = var3BCID_[k]->contract(*B_);
 
          if (proof != Proof::Empty)
          {
-            ctcGains[i] = B.gainRatio(save);
+            ctcGains[i] = B_->gainRatio(save);
             ++i;
          }
       }
 
+      // number of contractors that have been applied till a significant gain
       if (proof == Proof::Empty)
       {
          kVarCID_[mcall] = i+1;
@@ -222,7 +244,7 @@ Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
       // exploitation phase
       if (numVarCID_ == 0)
       {
-         proof = hc4_->contract(B);
+         proof = hc4_->contract(*B_);
       }
       else
       {
@@ -233,7 +255,7 @@ Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
             Variable v = ssr->getVar(j);
             size_t k = scop_.index(v);
 
-            proof = var3BCID_[k]->contract(B);
+            proof = var3BCID_[k]->contract(*B_);
             ++i;
          }
       }
@@ -241,8 +263,67 @@ Proof NcspACID::contract(NcspNode& node, NcspContext& ctx)
 
    ++call_;
 
-   return (proof == Proof::Empty) ? Proof::Empty :
-                                    contractBox(B, *box);
+   return proof;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspHC4Newton::NcspHC4Newton(ContractorFactory& facto)
+      : NcspPropagator(),
+        hc4_(facto),
+        newton_(facto)
+{}
+
+Proof NcspHC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
+{
+   Proof proof = hc4_.contract(node, ctx);
+
+   if (proof != Proof::Empty)
+   {
+      proof = newton_.contract(node, ctx);
+   }
+
+   return proof;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NcspBC4Newton::NcspBC4Newton(ContractorFactory& facto)
+      : NcspPropagator(),
+        bc4_(facto),
+        newton_(facto)
+{}
+
+Proof NcspBC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
+{
+   Proof proof = bc4_.contract(node, ctx);
+
+   if (proof != Proof::Empty)
+   {
+      proof = newton_.contract(node, ctx);
+   }
+
+   return proof;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+NcspACIDNewton::NcspACIDNewton(ContractorFactory& facto)
+      : NcspPropagator(),
+        acid_(facto),
+        newton_(facto)
+{}
+
+Proof NcspACIDNewton::contractImpl(NcspNode& node, NcspContext& ctx)
+{
+   Proof proof = acid_.contract(node, ctx);
+
+   if (proof != Proof::Empty)
+   {
+      proof = newton_.contract(node, ctx);
+   }
+
+   return proof;
 }
 
 } // namespace
