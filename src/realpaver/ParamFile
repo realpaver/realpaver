@@ -149,14 +149,6 @@ BC3_ITER_LIMIT = 30
 # BC4: BC4 contractor
 PROPAGATION_BASE = HC4
 
-##########
-# Now it is possible to increase the contraction power of the algorithm by
-# activating strong contractors, as follows:
-##########
-
-# Propagation with CID contractors (YES or NO)
-PROPAGATION_WITH_CID = NO
-
 # Propagation with a polytope hull contractor
 # - NO: contractor not used
 # - RLT: contractor based on a RLT-based relaxation
@@ -173,11 +165,28 @@ PROPAGATION_WITH_NEWTON = NO
 # The value 0.0 implies that a linear equation is generated.
 RELAXATION_EQ_TOL = 1.0e-10
 
-# Number of slices of a domain handled by 3B contractors
+###################################################
+# Adaptive Constructive Interval Disjunction (ACID)
+
+# Use of ACID (YES or NO)
+PROPAGATION_WITH_ACID = NO
+
+# Number of slices of a domain handled by var3B contractors
 NB_SLICE_3B = 7
 
-# Number of slices of a domain handled by CID contractors
+# Number of slices of a domain handled by varCID contractors
 NB_SLICE_CID = 3
+
+# Number of consecutive nodes handled in the learning phase of ACID
+LEARN_LENGTH_ACID = 50
+
+# Number of nodes in a learning phase and an exploitation phase of ACID
+CYCLE_LENGTH_ACID = 1000
+
+# Gain ratio between two consecutive boxes handed by var3BCID contractors
+# in ACID. It is used to adapt the nuber of var3BCID contractors that are
+# applied in the contraction procedure.
+CT_RATIO_ACID = 0.002
 
 ###############################################################################
 ## LOCAL OPTIMIZATION                                                        ##

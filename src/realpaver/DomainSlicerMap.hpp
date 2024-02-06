@@ -35,6 +35,9 @@ public:
    /// No assignment
    DomainSlicerMap& operator=(const DomainSlicerMap&) = delete;
 
+   /// @return the scope of this
+   Scope scope() const;
+
    /// Associates a slicer with a variable
    /// @param v a variable
    /// @param pslicer slicer associated with v in this

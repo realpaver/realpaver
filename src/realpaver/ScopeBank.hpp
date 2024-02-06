@@ -34,7 +34,7 @@ public:
    /// Inserts a scope in this
    /// @param scop a scope
    /// @return if there is a scope S in this that is equal to scop then S is
-   ///         returned, scop, is returned otherwise
+   ///         returned, scop is returned otherwise
    Scope insertScope(Scope scop);
 
 private:

@@ -108,4 +108,18 @@ size_t IntervalSmearSumRel::nbVars() const
    return ssr_.size();
 }
 
+void IntervalSmearSumRel::print(std::ostream& os) const
+{
+   for (size_t i=0; i<ssr_.size(); ++i)
+   {
+      os << "(" << ssr_[i].var.getName() << "," << ssr_[i].val << ") ";
+   }
+}
+
+std::ostream& operator<<(std::ostream& os, const IntervalSmearSumRel& ssr)
+{
+   ssr.print(os);
+   return os;
+}
+
 } // namespace

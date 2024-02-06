@@ -91,6 +91,10 @@ public:
    /// @return the variable having the maximum smear sum rel value
    Variable getMaxVar() const;
 
+   /// Display on a stream
+   /// @param os a stream
+   void print(std::ostream& os) const;
+
 private:
    struct Item {
       Variable var;  // variable
@@ -110,6 +114,8 @@ private:
    std::vector<Item> ssr_;       // vector of smearSumRel values
                                  // ordered by the scope
 };
+
+std::ostream& operator<<(std::ostream& os, const IntervalSmearSumRel& ssr);
 
 } // namespace
 

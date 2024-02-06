@@ -7,46 +7,47 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_CID_HPP
-#define REALPAVER_CONTRACTOR_CID_HPP
+#ifndef REALPAVER_CONTRACTOR_VAR_3BCID_HPP
+#define REALPAVER_CONTRACTOR_VAR_3BCID_HPP
 
-#include "realpaver/Contractor.hpp"
-#include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/ContractorVar3B.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor implementing Constructive Interval Disjunction.
+/// This is a contractor that combines a 3B contractor and a CID contractor.
 ///
-/// Given a box B, a variable v, a slicer and a contractor, the domain of
-/// v in B is divided by the slicer, each slice is reduced by the contractor,
-/// and the hull of the contracted slices is returned.
-///
-/// The scope of this corresponds to the scope of the given contractor.
+/// Given a variable and a box B, the 3B contractor is applied. If the domain
+/// of v in B is not reduced then B is returned. Oherwise, the CID
+/// contractor is applied.
 ///////////////////////////////////////////////////////////////////////////////
-class ContractorCID : public Contractor {
+class ContractorVar3BCID : public Contractor {
 public:
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
-   /// @param slicer a slicer
-   ContractorCID(SharedContractor op, Variable v,
-                 std::unique_ptr<IntervalSlicer> slicer);
+   /// @param slicer3B a slicer for the 3B contractor
+   /// @param slicerCID  a slicer for the CID contractor
+   ContractorVar3BCID(SharedContractor op, Variable v,
+                      std::unique_ptr<IntervalSlicer> slicer3B,
+                      std::unique_ptr<IntervalSlicer> slicerCID);
 
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
-   /// @param n number of slices (at least 2)
-   ContractorCID(SharedContractor op, Variable v, size_t n);
+   /// @param n3B number of slices for the 3B contractor (at least 2)
+   /// @param nCID  number of slices for the CID contractor (at least 2)
+   ContractorVar3BCID(SharedContractor op, Variable v, size_t n3B, size_t nCID);
 
-   /// Default destructor
-   ~ContractorCID() = default;
+   /// Destructor
+   ~ContractorVar3BCID();
 
    /// No copy
-   ContractorCID(const ContractorCID&) = delete;
+   ContractorVar3BCID(const ContractorVar3BCID&) = delete;
 
    /// No assignment
-   ContractorCID& operator=(const ContractorCID&) = delete;
+   ContractorVar3BCID& operator=(const ContractorVar3BCID&) = delete;
 
    /// @return the variable whose domain is sliced
    Variable getVar() const;
@@ -62,10 +63,11 @@ public:
    ///@}
 
 private:
-   SharedContractor op_;
    Variable v_;
-   std::unique_ptr<IntervalSlicer> slicer_;
+   ContractorVar3B* ctc3B_;
+   ContractorVarCID* ctcCID_;
 };
+
 
 } // namespace
 

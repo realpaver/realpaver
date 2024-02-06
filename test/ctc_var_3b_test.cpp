@@ -1,5 +1,5 @@
 #include "test_config.hpp"
-#include "realpaver/Contractor3B.hpp"
+#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/Problem.hpp"
 
@@ -24,7 +24,7 @@ Result my_test(const Interval& I)
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
    unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(10);
 
-   Contractor3B ctc3b(ctc, x, std::move(slicer));
+   ContractorVar3B ctc3b(ctc, x, std::move(slicer));
    Proof p = ctc3b.contract(B);
 
    return make_pair(p, B.get(x));

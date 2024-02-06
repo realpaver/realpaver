@@ -8,53 +8,54 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Contractor3B.hpp"
+#include "realpaver/ContractorVar3B.hpp"
 
 namespace realpaver {
 
-Contractor3B::Contractor3B(SharedContractor op, Variable v,
-                             std::unique_ptr<IntervalSlicer> slicer)
+ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v,
+                                 std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(v),
            slicer_(std::move(slicer))
 {
-   ASSERT(op_.get() != nullptr, "No operator in a 3B contractor");
+   ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
    ASSERT(op->scope().contains(v), "Bad variable " << v <<
-                                   " in a 3B contractor");
-   ASSERT(slicer_ != nullptr, "No slicer in a 3B contractor");
+                                   " in a var3B contractor");
+   ASSERT(slicer_ != nullptr, "No slicer in a var3B contractor");
 }
 
-Contractor3B::Contractor3B(SharedContractor op, Variable v, size_t n)
+ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
          : op_(op),
            v_(v),
            slicer_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a 3B contractor");
+   ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
    ASSERT(op->scope().contains(v), "Bad variable " << v <<
-                                   " in a 3B contractor");
-   ASSERT(n > 1, "Bad number of slices in a CID contractor: " << n);
+                                   " in a var3B contractor");
+   ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
 
    slicer_ = std::make_unique<IntervalPartitionMaker>(n);
 }
 
-Scope Contractor3B::scope() const
+Scope ContractorVar3B::scope() const
 {
    return op_->scope();
 }
 
-Variable Contractor3B::getVar() const
+Variable ContractorVar3B::getVar() const
 {
    return v_;
 }
 
-void Contractor3B::setVar(Variable v)
+void ContractorVar3B::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a 3B contractor");
+   ASSERT(scope().contains(v),
+          "Bad variable " << v << " in a var3B contractor");
 
    v_ = v;
 }
 
-Proof Contractor3B::contract(IntervalBox& B)
+Proof ContractorVar3B::contract(IntervalBox& B)
 {
    Interval dom = B.get(v_);
    slicer_->apply(dom);
@@ -124,9 +125,9 @@ Proof Contractor3B::contract(IntervalBox& B)
    return Proof::Maybe;
 }
 
-void Contractor3B::print(std::ostream& os) const
+void ContractorVar3B::print(std::ostream& os) const
 {
-   os << "3B contractor on " << v_.getName();
+   os << "var3B contractor on " << v_.getName();
 }
 
 } // namespace

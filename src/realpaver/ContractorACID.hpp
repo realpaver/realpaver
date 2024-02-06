@@ -11,7 +11,6 @@
 #define REALPAVER_NCSP_CONTRACTOR_ACID_HPP
 
 #include <memory>
-#include "realpaver/ContractorCID.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 
@@ -47,12 +46,11 @@ public:
    void setNbSlices(size_t nbs);
 
    /// @return the number of CID contractors applied in the contraction method
-   size_t nbCID() const;
+   size_t nbVarCID() const;
 
    /// Assigns the number of CID contractors applied in the contraction method
-   /// @param nbcid an integer between 1 and n where n is the number of
-   ///        variables
-   void setNbCID(size_t nbcid);
+   /// @param n an integer
+   void setNbVarCID(size_t n);
 
    /// @return the contractor used to reduce the slices
    SharedContractor getContractor() const;
@@ -71,7 +69,7 @@ private:
                                                 // sum rel values
    SharedContractor op_;   // contractor of slices
    size_t nbs_;            // number of slices of CID contractors
-   size_t nbcid_;          // number of CID contractors applied
+   size_t nbVarCID_;       // number of CID contractors applied
 };
 
 /// Type of shared pointers on propagators

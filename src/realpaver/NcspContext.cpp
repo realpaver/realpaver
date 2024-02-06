@@ -17,10 +17,10 @@ std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ)
 {
    switch(typ)
    {
-      case NcspNodeInfoType::SplitVar:    return os << "split variable";
-      case NcspNodeInfoType::NbCID:       return os << "nb CID";
+      case NcspNodeInfoType::SplitVar: return os << "split variable";
+      case NcspNodeInfoType::NbCID:    return os << "nb CID";
    }
-   return os;   
+   return os;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

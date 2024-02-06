@@ -243,6 +243,20 @@ public:
    /// @param scop the components considered   
    double gridPerimeterOnScope(const Scope& scop) const;
 
+   /// Measures the gain ratio between two boxes
+   /// @param B a box that contains this, i.e. this is a reduced box
+   /// @return the gain ratio between this and B
+   ///
+   /// Given this = (X1, ..., Xn) and B = (B1, ..., Bn), the gain ratio
+   /// is equal to (1/n)*Sum(i=1, ..., n) (1 - wid(Xi)/wid(Bi))
+   double gainRatio(const IntervalBox& B) const;
+
+   /// Measures the gain ratio between two boxes on a scope
+   /// @param B a box that contains this, i.e. this is a reduced box
+   /// @param scop a sub-scope of this and B
+   /// @return the gain ratio between this and B on the given scope
+   double gainRatioOnScope(const IntervalBox& B, const Scope& scop) const;
+
    ///@{
    IntervalBox* clone() const override;
    void print(std::ostream& os) const override;

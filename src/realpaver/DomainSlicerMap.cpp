@@ -27,6 +27,11 @@ DomainSlicerMap::~DomainSlicerMap()
          delete slicer;
 }
 
+Scope DomainSlicerMap::scope() const
+{
+   return scop_;
+}
+
 void DomainSlicerMap::setSlicer(const Variable& v,
                                 std::unique_ptr<DomainSlicer> pslicer)
 {
@@ -40,9 +45,18 @@ void DomainSlicerMap::setSlicer(const Variable& v,
 
 DomainSlicer* DomainSlicerMap::getSlicer(const Variable& v) const
 {
+   /*
+DEBUG("DomainSlicerMap::getSlicer");
+DEBUG("var : " << v.getName());
+DEBUG("SCOPE : " << scop_);
+
    ASSERT(scop_.contains(v),
           "Variable " << v.getName()
                       << " not handled by the domain slicer map");
+
+DEBUG("number of slicers : " << sli_.size());
+DEBUG("index : " << scop_.index(v));
+*/
 
    return sli_[scop_.index(v)];
 }

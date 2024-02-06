@@ -65,6 +65,9 @@ public:
    /// Resets this
    void reset();
 
+   /// @return the slicer map
+   DomainSlicerMap* getSlicerMap() const;
+
 protected:
    typedef std::list<SharedNcspNode> ContainerType;
 

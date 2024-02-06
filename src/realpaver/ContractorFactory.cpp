@@ -68,6 +68,11 @@ ContractorFactory::ContractorFactory(const Problem& pbm,
    sc_ = ScopeBank::getInstance()->insertScope(sc_);
 }
 
+std::shared_ptr<Env> ContractorFactory::getEnv() const
+{
+   return env_;
+}
+
 SharedDag ContractorFactory::ContractorFactory::getDag() const
 {
    return dag_;

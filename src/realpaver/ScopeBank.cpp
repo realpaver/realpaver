@@ -31,10 +31,10 @@ size_t ScopeBank::nbInsertions() const
 }
 
 Scope ScopeBank::insertScope(Scope scop)
-{   
+{
    ++nb_;
    auto it = bank_.find(scop);
-   
+
    if (it != bank_.end())
       return *it;
 

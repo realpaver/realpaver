@@ -216,6 +216,8 @@ void Scope::insert(Variable v)
 
 size_t Scope::hashCode() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->hashCode();
 }
 
@@ -247,6 +249,8 @@ void Scope::remove(const Variable& v, size_t n)
 
 size_t Scope::size() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->size();
 }
 
@@ -262,42 +266,58 @@ bool Scope::contains(const Variable& v) const
 
 size_t Scope::minVarId() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->minVarId();
 }
 
 size_t Scope::maxVarId() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->maxVarId();
 }
 
 void Scope::print(std::ostream& os) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    rep_->print(os);
 }
 
 typename Scope::const_iterator Scope::begin() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->begin();
 }
 
 typename Scope::const_iterator Scope::end() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->end();   
 }
 
 typename Scope::const_iterator Scope::find(const Variable& v) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->find(v);
 }
 
 size_t Scope::index(const Variable& v) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->index(v);
 }
 
 Variable Scope::var(size_t i) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
    ASSERT(i < size(), "Bad access to a variable in a scope @ " << i);
+
    return rep_->var(i);
 }
 
@@ -375,7 +395,7 @@ bool Scope::overlaps(const Scope& other) const
 
 bool Scope::operator==(const Scope& other) const
 {
-   if (isEmpty() && other.isEmpty()) return true;
+   if (rep_.get() == other.rep_.get()) return true;
 
    if (size() != other.size()) return false;
 

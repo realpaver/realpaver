@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorCID.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/ContractorACID.hpp"
 #include "realpaver/Logger.hpp"
 
@@ -27,7 +27,7 @@ ContractorACID::ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
           "Bad scopes in an ACID contractor");
 
    setNbSlices(nbs);
-   setNbCID(ssr->nbVars());
+   setNbVarCID(ssr->nbVars());
 }
 
 Scope ContractorACID::scope() const
@@ -46,16 +46,14 @@ void ContractorACID::setNbSlices(size_t nbs)
    nbs_ = nbs;
 }
 
-size_t ContractorACID::nbCID() const
+size_t ContractorACID::nbVarCID() const
 {
-   return nbcid_;
+   return nbVarCID_;
 }
 
-void ContractorACID::setNbCID(size_t nbcid)
+void ContractorACID::setNbVarCID(size_t n)
 {
-   ASSERT(nbcid > 0, 
-          "Bad number of CID contractors applied in ACID: " << nbcid);
-   nbcid_ = nbcid;
+   nbVarCID_ = n;
 }
 
 SharedContractor ContractorACID::getContractor() const
@@ -73,13 +71,18 @@ Proof ContractorACID::contract(IntervalBox& B)
 {
    LOG_INTER("ACID on " << B);
 
+   if (nbVarCID_ == 0)
+   {
+      return op_->contract(B);
+   }
+
    ssr_->calculate(B);
    ssr_->sort();
 
-   for (size_t i=0; i<nbcid_; ++i)
+   for (size_t i=0; i<nbVarCID_; ++i)
    {
       Variable v = ssr_->getVar(i);
-      ContractorCID cid(op_, v, nbs_);
+      ContractorVarCID cid(op_, v, nbs_);
 
       Proof proof = cid.contract(B);
       if (proof == Proof::Empty)

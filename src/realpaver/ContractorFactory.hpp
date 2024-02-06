@@ -40,6 +40,9 @@ public:
    /// No assignment
    ContractorFactory& operator=(const ContractorFactory&) = delete;
 
+   /// @return the environment of this
+   std::shared_ptr<Env> getEnv() const;
+
    /// @return the dag of equations and inequality constraints
    SharedDag getDag() const;
 

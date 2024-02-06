@@ -1,5 +1,5 @@
 #include <iostream>
-#include "realpaver/Contractor3B.hpp"
+#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"

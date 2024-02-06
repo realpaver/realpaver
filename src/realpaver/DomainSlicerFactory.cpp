@@ -12,12 +12,12 @@
 namespace realpaver {
 
 std::unique_ptr<DomainSlicerMap>
-   DomainSlicerFactory::makeBisectionStrategy(Scope sco)
+   DomainSlicerFactory::makeBisectionStrategy(Scope scop)
 {
    std::unique_ptr<DomainSlicerMap>
-      smap = std::make_unique<DomainSlicerMap>(sco);
+      smap = std::make_unique<DomainSlicerMap>(scop);
 
-   for (const auto& v : sco)
+   for (const auto& v : scop)
    {
       Domain* dom = v.getDomain();
       std::unique_ptr<DomainSlicer> pslicer;
