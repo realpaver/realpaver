@@ -35,7 +35,7 @@ NcspSolver::NcspSolver(const Problem& problem)
         space_(nullptr),
         propagator_(nullptr),
         split_(nullptr),
-        ssr_(nullptr),
+        factory_(nullptr),
         prover_(nullptr),
         stimer_(),
         nbnodes_(0),
@@ -54,6 +54,7 @@ NcspSolver::~NcspSolver()
    if (context_ != nullptr) delete context_;
    if (preproc_ != nullptr) delete preproc_;
    if (space_ != nullptr) delete space_;
+   if (factory_ != nullptr) delete factory_;
    if (split_ != nullptr) delete split_;
    if (propagator_ != nullptr) delete propagator_;
    if (prover_ != nullptr) delete prover_;
@@ -152,83 +153,49 @@ void NcspSolver::makePropagator()
       env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
    bool polytope = (with_polytope == "YES");
 
-   ContractorFactory facto(*preprob_, env_);
-
    if ((newton == false) && (polytope == false))
    {
       if (hc4)
-         propagator_ = new NcspHC4(facto);
+         propagator_ = new NcspHC4(*factory_);
 
       else if (bc4)
-         propagator_ = new NcspBC4(facto);
+         propagator_ = new NcspBC4(*factory_);
 
       else
-         propagator_ = new NcspACID(facto);
+         propagator_ = new NcspACID(*factory_);
    }
    else if (polytope == false)
    {
       if (hc4)
-         propagator_ = new NcspHC4Newton(facto);
+         propagator_ = new NcspHC4Newton(*factory_);
 
       else if (bc4)
-         propagator_ = new NcspBC4Newton(facto);
+         propagator_ = new NcspBC4Newton(*factory_);
 
       else
-         propagator_ = new NcspACIDNewton(facto);
+         propagator_ = new NcspACIDNewton(*factory_);
    }
    else if (newton == false)
    {
       if (hc4)
-         propagator_ = new NcspHC4Polytope(facto);
+         propagator_ = new NcspHC4Polytope(*factory_);
 
       else if (bc4)
-         propagator_ = new NcspBC4Polytope(facto);
+         propagator_ = new NcspBC4Polytope(*factory_);
 
       else
-         propagator_ = new NcspACIDPolytope(facto);
+         propagator_ = new NcspACIDPolytope(*factory_);
    }
    else
    {
       if (hc4)
-         propagator_ = new NcspHC4PolytopeNewton(facto);
+         propagator_ = new NcspHC4PolytopeNewton(*factory_);
 
       else if (bc4)
-         propagator_ = new NcspBC4PolytopeNewton(facto);
+         propagator_ = new NcspBC4PolytopeNewton(*factory_);
 
       else
-         propagator_ = new NcspACIDPolytopeNewton(facto);
-   }
-}
-
-// TODO : utiliser la factory pour cela
-void NcspSolver::makeSSR()
-{
-   IntervalFunctionVector F;
-   bool ok = true;
-
-   for (size_t i=0; i<preprob_->nbCtrs(); ++i)
-   {
-      Constraint c = preprob_->ctrAt(i);
-
-      if (c.isEquation() || c.isInequality())
-      {
-         Constraint::SharedRep rep = c.rep();
-         ArithCtrBinary* eq = static_cast<ArithCtrBinary*>(rep.get());
-
-         Term t = eq->left() - eq->right();
-         F.addFun(IntervalFunction(t));
-      }
-      else
-         ok = false;
-   }
-
-   if (ok && (preprob_->nbVars() == F.nbVars()))
-   {
-      ssr_ = std::make_shared<IntervalSmearSumRel>(F);
-   }
-   else
-   {
-      LOG_INTER("Unable to create a SmearSumRel variable selection strategy");
+         propagator_ = new NcspACIDPolytopeNewton(*factory_);
    }
 }
 
@@ -262,14 +229,27 @@ void NcspSolver::makeSplit()
       split_ = new NcspSplitSLF(scop, std::move(smap));
 
    else if (sel == "SSR")
-      split_ = new NcspSplitSSR(ssr_, std::move(smap));
+   {
+      std::shared_ptr<IntervalSmearSumRel>
+         ssr = factory_->makeSSR();
+
+      if ((ssr != nullptr) && (preprob_->nbVars() == ssr->nbVars()))
+      {
+         split_ = new NcspSplitSSR(ssr, std::move(smap));
+      }
+      else
+      {
+         LOG_INTER("Unable to create a SmearSumRel variable selection strategy");
+      }
+   }
 
    THROW_IF(split_ == nullptr,
             "Unable to make the split object in a Ncsp solver");
 }
 
-bool NcspSolver::isAnInnerRegion(const IntervalBox& B) const
+bool NcspSolver::isInner(DomainBox* box) const
 {
+   IntervalBox B(*box);
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
    {
       Constraint c = preprob_->ctrAt(i);
@@ -312,10 +292,9 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
       return;
    }
 
-/*
-   if (isAnInnerRegion(box))
+   if (isInner(node->box()))
    {
-      LOG_INTER("Node " << node->index() << " is an inner box");
+      LOG_INTER("Node " << node->index() << " contains an inner box");
 
       node->setProof(Proof::Inner);
 
@@ -326,7 +305,6 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
          return;
       }
    }
-*/
 
    // node depth limit
    int depth = node->depth() + 1;
@@ -374,8 +352,9 @@ void NcspSolver::branchAndPrune()
    stimer_.start();
 
    context_ = new NcspContext();
+   factory_ = new ContractorFactory(*preprob_, env_);
+
    makeSpace();
-   makeSSR();
    makePropagator();
    makeSplit();
 

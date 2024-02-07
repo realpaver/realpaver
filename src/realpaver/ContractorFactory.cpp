@@ -78,6 +78,32 @@ SharedDag ContractorFactory::ContractorFactory::getDag() const
    return dag_;
 }
 
+std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
+{
+   if (dag_->isEmpty()) return nullptr;
+
+   std::shared_ptr<IntervalSmearSumRel> ssr;
+
+   if (vc_.empty())
+   {
+      IntervalFunctionVector F(dag_);
+      ssr = std::make_shared<IntervalSmearSumRel>(F);
+   }
+   else
+   {
+      IntervalFunctionVector F;
+      for (size_t i : ve_)
+         F.addFun(IntervalFunction(dag_, i));
+
+      for (size_t i : vi_)
+         F.addFun(IntervalFunction(dag_, i));
+
+      ssr = std::make_shared<IntervalSmearSumRel>(F);
+   }
+
+   return ssr;
+}
+
 SharedContractorPropag ContractorFactory::makeHC4()
 {
    SharedContractorVector pool = std::make_shared<ContractorVector>();
@@ -262,24 +288,7 @@ SharedContractorACID ContractorFactory::makeACID()
 {
    if (dag_->isEmpty()) return nullptr;
 
-   std::shared_ptr<IntervalSmearSumRel> ssr;
-
-   if (vc_.empty())
-   {
-      IntervalFunctionVector F(dag_);
-      ssr = std::make_shared<IntervalSmearSumRel>(F);
-   }
-   else
-   {
-      IntervalFunctionVector F;
-      for (size_t i : ve_)
-         F.addFun(IntervalFunction(dag_, i));
-
-      for (size_t i : vi_)
-         F.addFun(IntervalFunction(dag_, i));
-
-      ssr = std::make_shared<IntervalSmearSumRel>(F);
-   }
+   std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
    SharedContractorPropag hc4 = makeHC4();
 

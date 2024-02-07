@@ -49,6 +49,10 @@ public:
    /// @return the dag of equations and inequality constraints
    SharedDag getDag() const;
 
+   /// @return an interval smear sum rel object created for each equation and
+   ///         inequality constraint
+   std::shared_ptr<IntervalSmearSumRel> makeSSR();
+
    /// Creates a contractor that implements a constraint propagation algorithm
    /// based on HC4 contractors
    /// @return the contractor

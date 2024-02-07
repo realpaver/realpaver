@@ -113,8 +113,7 @@ private:
    SharedDag dag_;                  // dag
    NcspPropagator* propagator_;     // contraction method
    NcspSplit* split_;               // splitting strategy
-
-   std::shared_ptr<IntervalSmearSumRel> ssr_;
+   ContractorFactory* factory_;     // contractor factory
 
    Prover* prover_;                 // solution prover
 
@@ -124,12 +123,11 @@ private:
 
    void branchAndPrune();
    void makeSpace();
-   void makeSSR();
    void makePropagator();
    void makeSplit();
    void bpStep(int depthlimit);
    void bpStepAux(SharedNcspNode node, int depthlimit);
-   bool isAnInnerRegion(const IntervalBox& B) const;
+   bool isInner(DomainBox* box) const;
    void certifySolutions();
 };
 
