@@ -18,7 +18,26 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator that implements the adaptive CID strategy.
+/// This is a propagator that implements the adaptive CID strategy (Alg. 1).
+///
+/// The ACID1 algorithm works as follows.
+/// With each variable of the problem is associated a 3BCID contractor.
+/// In each call of the contraction method, numVarCID 3BCID contractors
+/// are applied.
+///
+/// Which ordering for these contractors? The one given by the smear sum
+/// relative strategy that evaluates the derivatives in the current box.
+///
+/// How many of the contractors? numVarCID which is first assigned to the
+/// number of variables. This number then evolves in learning phases. And
+/// it is just used in exploitation phases.
+///
+/// Let learLength be the number of calls of the contraction method in every
+/// learning phase. In each of these calls, the numVarCID 3BCID contractors
+/// are applied and we seek for the last one that has reduced the box enough
+/// with a respect to a ratio called ctRatio. At the end of the learning phase,
+/// an average is calculated and it is assigned to numVarCID for the next
+/// exploitation phase.
 ///////////////////////////////////////////////////////////////////////////////
 class ContractorACID : public Contractor {
 public:
@@ -42,6 +61,20 @@ public:
 
    /// Default destructor
    ~ContractorACID() = default;
+
+   /// @return the number of calls of the contraction method in a learning
+   ///         phase
+   int learnLength() const;
+
+   /// @return the number of calls of the contraction method in a learning
+   ///         phase followed by an exploitation phase
+   int cycleLength() const;
+
+   /// @return the threshold on the reduction gain
+   double ctRatio() const;
+
+   /// @return the contractor of slices
+   SharedContractor sliceContractor() const;
 
    ///@{
    Scope scope() const override;

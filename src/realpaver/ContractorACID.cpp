@@ -56,6 +56,26 @@ Scope ContractorACID::scope() const
    return ssr_->scope();
 }
 
+int ContractorACID::learnLength() const
+{
+   return learnLength_;
+}
+
+int ContractorACID::cycleLength() const
+{
+   return cycleLength_;
+}
+
+double ContractorACID::ctRatio() const
+{
+   return ctRatio_;
+}
+
+SharedContractor ContractorACID::sliceContractor() const
+{
+   return op_;
+}
+
 Proof ContractorACID::contract(IntervalBox& B)
 {
    LOG_INTER("ACID on " << B);
