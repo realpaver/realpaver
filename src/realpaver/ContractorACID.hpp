@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_NCSP_CONTRACTOR_ACID_HPP
-#define REALPAVER_NCSP_CONTRACTOR_ACID_HPP
+#ifndef REALPAVER_CONTRACTOR_ACID_HPP
+#define REALPAVER_CONTRACTOR_ACID_HPP
 
 #include <memory>
 #include "realpaver/ContractorVar3BCID.hpp"
