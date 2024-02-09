@@ -64,8 +64,6 @@ Param::Param()
    dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
    dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-3));
    dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-3));
-   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_ABS_TOL",    0.0));
-   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_REL_TOL",    1.0e-3));
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-3));
 
    // string

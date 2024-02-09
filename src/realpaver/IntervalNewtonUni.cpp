@@ -20,8 +20,6 @@ namespace realpaver {
 IntervalNewtonUni::IntervalNewtonUni()
       : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
         tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
-        ltol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
-              Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL")),
         inflator_()
 {}
 
@@ -45,16 +43,6 @@ Tolerance IntervalNewtonUni::getTol() const
 void IntervalNewtonUni::setTol(const Tolerance& tol)
 {
    tol_ = tol;
-}
-
-Tolerance IntervalNewtonUni::getLocalTol() const
-{
-   return ltol_;
-}
-
-void IntervalNewtonUni::setLocalTol(const Tolerance& tol)
-{
-   ltol_ = tol;
 }
 
 Inflator& IntervalNewtonUni::getInflator()
@@ -97,7 +85,7 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
 
          if (++nbiter >= maxiter_)
             iter = false;
- 
+
          if (!tol_.testRelativeReduction(prev, y))
             iter = false;
       }
@@ -256,6 +244,12 @@ Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)
    bool iter = true;
    size_t nbiter = 0;
 
+   // given x_(k-2), x_(k-1), x_k three intervals from the sequence calculated
+   // by this method, dprev is the distance between x_(k-2) and x_(k-1), dcurr
+   // is the distance between x_(k-1) and x_k ; the method diverges if we have
+   // dcurr > dprev
+   double dprev = Double::inf(), dcurr;
+
    LOG_INTER("Local search using the univariate Newton operator on " << x);
 
    do
@@ -263,31 +257,40 @@ Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)
       Interval prev(y);
       Proof p = localStep(f, y);
 
+      dcurr = prev.distance(y);
+
       LOG_LOW("Step: " << p << ", " << y);
 
       if (p == Proof::Empty)
       {
          y = x;
          iter = false;
+         LOG_LOW("Stopson local step -> empty");
       }
 
       else if (p == Proof::Feasible)
       {
          proof = p;
          iter = false;
+
+         LOG_LOW("Stops on feasibility");
       }
-   
+
+      else if (dcurr > dprev)
+      {
+         y = x;
+         iter = false;
+         LOG_LOW("Stops since the method diverges");
+      }
+
       else if (++nbiter >= maxiter_)
       {
          y = x;
          iter = false;
+         LOG_LOW("Stops on a maximum number of iterations");
       }
 
-      else if (!ltol_.areClose(prev, y))
-      {
-         y = x;
-         iter = false;
-      }
+      dprev = dcurr;
    }
    while (iter);
 

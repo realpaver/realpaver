@@ -47,7 +47,6 @@ namespace realpaver {
 /// - Xk is empty
 /// - the existence of a zero in Xk is proven
 /// - the limit on the number of iterations is reached
-/// - the distance between Xk and Xk-1 is greater than a given tolerance
 /// - the method diverges
 ///////////////////////////////////////////////////////////////////////////////
 class IntervalNewtonUni {
@@ -104,18 +103,6 @@ public:
    /// in the contraction method
    /// @param tol absolute or relative tolerance
    void setTol(const Tolerance& tol);
-
-   /// @return the tolerance on the distance between two consecutive intervals
-   ///         in the local search method
-   Tolerance getLocalTol() const;
-
-   /// Sets the tolerance on the distance between two consecutive intervals
-   /// in the local search method
-   /// @param tol a tolerance`
-   ///
-   /// An iteration stops if the distance between two consecutive is greater
-   /// than the tolerance, i.e. the method diverges.
-   void setLocalTol(const Tolerance& tol);
 
    /// @returns the inflator used by the local search method
    Inflator& getInflator();

@@ -10,6 +10,8 @@
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
 #include "realpaver/Tolerance.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -18,6 +20,18 @@ int main(void)
 {
    try
    {
+      Problem P;
+      Variable x = P.addRealVar(-3, 0, "x");
+
+      SharedDag dag = make_shared<Dag>();
+      dag->insert(sqr(x) - 2 == 0);
+      IntervalThickFunction f(dag, 0, x);
+
+      IntervalNewtonUni nwt;
+      Interval I(3, 3);
+      Proof p = nwt.localSearch(f, I);
+      cout << p << " " << I << endl;
+      
 /*
       Tolerance tol(0.5, 2);
       
@@ -25,6 +39,7 @@ int main(void)
       cout << tol.isTight(x) << endl;
 */
 
+/*
       Problem P;
       Variable x = P.addRealVar(-3, 0, "x"),
                y = P.addRealVar(0, 5, "y"),
@@ -74,7 +89,7 @@ int main(void)
       }
       tom.stop();
       cout << tom.elapsedTime() << " (s)" << endl;
-
+*/
    }
    catch(Exception e)
    {

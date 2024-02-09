@@ -114,11 +114,10 @@ private:
    double delta_;         // parameter delta of inflation
    double chi_;           // parameter chi of inflation
    size_t cmaxiter_;      // maximum number of iterations
-   Tolerance ctol_;       // tolerance on the distance between two intervals
 
    void makeY(IntervalBox& X);
    Proof reduceX(IntervalBox& X, bool& hastol);
-   Proof certifyX(IntervalBox& X, bool& hastol);
+   Proof certifyX(IntervalBox& X);
 };
 
 } // namespace

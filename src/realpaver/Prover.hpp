@@ -69,18 +69,6 @@ public:
    /// @param val new value
    void setInflationChi(const double& val);
 
-   /// @return the tolerance on the distance between two consecutive boxes
-   ///         in the certification technique of the Newton operator
-   Tolerance getTol() const;
-
-   /// Sets the tolerance on the distance between two consecutive regions
-   /// in the certification technique of the Newton operator
-   /// @param tol a tolerance
-   ///
-   /// The iteration stops if two consecutive regions are far enough, i.e.
-   /// the distance between them is greater than tol
-   void setTol(const Tolerance& tol);
-
 private:
    struct Item {
       Constraint ctr;
@@ -94,7 +82,6 @@ private:
    double delta_;                   // parameter delta of inflation
    double chi_;                     // parameter chi of inflation
    size_t maxiter_;                 // maximum number of iterations
-   Tolerance tol_;                  // tolerance for the certification technique
 };
 
 } // namespace

@@ -373,10 +373,6 @@ void NcspSolver::branchAndPrune()
    double chi = env_->getParam()->getDblParam("INFLATION_CHI");
    prover_->setInflationChi(chi);
 
-   double rtol = env_->getParam()->getDblParam("NEWTON_CERTIFY_REL_TOL"),
-          atol = env_->getParam()->getDblParam("NEWTON_CERTIFY_ABS_TOL");
-   prover_->setTol(Tolerance(rtol, atol));
-
    // parameters
    double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");
    env_->setTimeLimit(false);

@@ -249,13 +249,6 @@ NEWTON_CERTIFY_ITER_LIMIT = 20
 #(1 - width(next) / width(prev)) > tol.
 NEWTON_REL_TOL = 1.0e-3
 
-# Tolerances (relative, absolute) on the distance between consecutive interval
-# vectors in the certification technique of the interval Newton method.
-# An iteration stops if two consecutive vectors are far enough, i.e. the
-# distance between then is greater than this tolerance.
-NEWTON_CERTIFY_REL_TOL = 1.0e-3
-NEWTON_CERTIFY_ABS_TOL = 0.0
-
 # Let x be an interval and let m(x) be its midpoint. An inflation of x returns
 # m(x) + delta*(x - m(x)) + chi*[-1,1]. The following parameter delta is a real
 # number > 1.0.

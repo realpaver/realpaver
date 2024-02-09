@@ -27,9 +27,7 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
         tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
-        cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
-        ctol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
-              Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL"))
+        cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
    ASSERT(F.nbVars() == F.nbFuns(),
           "Interval Newton defined with a non-square system");
@@ -50,8 +48,7 @@ IntervalNewton::IntervalNewton(const IntervalNewton& N)
         tol_(N.tol_),
         delta_(N.delta_),
         chi_(N.chi_),
-        cmaxiter_(N.cmaxiter_),
-        ctol_(N.ctol_)
+        cmaxiter_(N.cmaxiter_)
 {
    gs_ = new IntervalGaussSeidel(*N.gs_);
 }
@@ -223,11 +220,19 @@ Proof IntervalNewton::certify(IntervalBox& box)
    IntervalBox X(scope());
    X.setOnScope(box, scope());
 
+   // given X(k-2), X(k-1), Xk three boxes from the sequence calculated
+   // by this method, dprev is the distance between X(k-2) and X(k-1), dcurr
+   // is the distance between X(k-1) and Xk ; the method diverges if we have
+   // dcurr > dprev
+   double dprev = Double::inf(), dcurr;
+
    LOG_INTER("Interval Newton certification on " << X);
 
    do
    {
       ++ nb_steps;
+
+      IntervalBox prev(X);
 
       // inflation
       X.inflate(delta_, chi_);
@@ -268,32 +273,27 @@ Proof IntervalNewton::certify(IntervalBox& box)
       }
 
       // X := y + c
-      bool hastol;
-      certif = certifyX(X, hastol);
+      certif = certifyX(X);
+      dcurr = X.distance(prev);
 
       if (certif == Proof::Feasible)
       {
          proof = Proof::Feasible;
          iter = false;
          LOG_INTER("Feasibility proved");
-         continue;
       }
-
-      // checks the stopping criteria
-      if (nb_steps > cmaxiter_)
+      else if (dcurr > dprev)
+      {
+         iter = false;
+         LOG_INTER("Stops since the method diverges");
+      }
+      else if (nb_steps > cmaxiter_)
       {
          iter = false;
          LOG_INTER("Stops on a maximum number of iterations: " << maxiter_);
       }
 
-      else if (!hastol)
-      {
-         iter = false;
-         LOG_INTER("Stops on divergence wrt. " << ctol_)
-      }
-      
       LOG_LOW("Inner step of interval Newton certification  -> " << X);
-
    }
    while (iter);
 
@@ -306,12 +306,11 @@ Proof IntervalNewton::certify(IntervalBox& box)
    return proof;
 }
 
-Proof IntervalNewton::certifyX(IntervalBox& X, bool& hastol)
+Proof IntervalNewton::certifyX(IntervalBox& X)
 {
    // X := y + c
    int i = 0;
    Proof proof = Proof::Feasible;
-   hastol = true;
 
    for (const auto& v : scope())
    {
@@ -320,9 +319,6 @@ Proof IntervalNewton::certifyX(IntervalBox& X, bool& hastol)
 
       if (!dom.strictlyContains(z))
          proof = Proof::Maybe;
-
-      if (!ctol_.areClose(z, dom))
-         hastol = false;
 
       X.set(v, z);
       i = i+1;
@@ -360,16 +356,6 @@ void IntervalNewton::setCertifyMaxIter(size_t n)
 size_t IntervalNewton::getCertifyMaxIter() const
 {
    return cmaxiter_;
-}
-
-Tolerance IntervalNewton::getCertifyTol() const
-{
-   return ctol_;
-}
-
-void IntervalNewton::setCertifyTol(const Tolerance& tol)
-{
-   ctol_ = tol;
 }
 
 void IntervalNewton::print(std::ostream& os) const
