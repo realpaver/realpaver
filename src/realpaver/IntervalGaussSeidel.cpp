@@ -16,8 +16,7 @@ namespace realpaver {
 
 IntervalGaussSeidel::IntervalGaussSeidel()
       : maxiter_(Param::GetIntParam("GAUSS_SEIDEL_ITER_LIMIT")),
-        tol_(Param::GetDblParam("GAUSS_SEIDEL_REL_TOL"),
-             Param::GetDblParam("GAUSS_SEIDEL_ABS_TOL"))
+        tol_(Param::GetDblParam("GAUSS_SEIDEL_REL_TOL"), 0.0)
 {}
 
 size_t IntervalGaussSeidel::getMaxIter() const
@@ -131,7 +130,7 @@ int IntervalGaussSeidel::innerStep(const IntervalMatrix& A, IntervalVector& x,
       if (z.isEmpty()) return 0;
       else
       {
-         if (!tol_.areClose(z, x.get(i)))
+         if (tol_.testRelativeReduction(x.get(i), z))
             res = 2;    // contraction large enough to iterate
 
          x.set(i, z);

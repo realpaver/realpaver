@@ -24,8 +24,7 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
         c_(F.scope()),
         gs_(nullptr),
         maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_REL_TOL"),
-             Param::GetDblParam("NEWTON_ABS_TOL")),
+        tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
         cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
@@ -206,7 +205,7 @@ Proof IntervalNewton::reduceX(IntervalBox& X, bool& hastol)
 
       Interval reduced = dom & z;
 
-      if (!tol_.areClose(reduced, dom))
+      if (tol_.testRelativeReduction(dom, reduced))
          hastol = false;
 
       X.set(v, reduced);

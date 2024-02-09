@@ -19,8 +19,7 @@ namespace realpaver {
 
 IntervalNewtonUni::IntervalNewtonUni()
       : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_REL_TOL"),
-             Param::GetDblParam("NEWTON_ABS_TOL")),
+        tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
         ltol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
               Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL")),
         inflator_()
@@ -99,7 +98,7 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
          if (++nbiter >= maxiter_)
             iter = false;
  
-         if (tol_.areClose(prev, y))
+         if (!tol_.testRelativeReduction(prev, y))
             iter = false;
       }
    }

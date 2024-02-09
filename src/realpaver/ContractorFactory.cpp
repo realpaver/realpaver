@@ -222,9 +222,8 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
 
    if (newton != nullptr)
    {
-      double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL"),
-             atol = env_->getParam()->getDblParam("NEWTON_ABS_TOL");
-      newton->setTol(Tolerance(rtol, atol));
+      double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL");
+      newton->setTol(Tolerance(rtol, 0.0));
 
       int niter = env_->getParam()->getIntParam("NEWTON_ITER_LIMIT");
       newton->setMaxIter(niter);
@@ -236,8 +235,7 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
       newton->setInflationChi(chi);
 
       rtol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_REL_TOL");
-      atol = env_->getParam()->getDblParam("GAUSS_SEIDEL_ABS_TOL");
-      newton->getGaussSeidel()->setTol(Tolerance(rtol, atol));
+      newton->getGaussSeidel()->setTol(Tolerance(rtol, 0.0));
 
       niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
       newton->getGaussSeidel()->setMaxIter(niter);
