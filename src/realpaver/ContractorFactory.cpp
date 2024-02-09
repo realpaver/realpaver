@@ -141,8 +141,7 @@ SharedContractorPropag ContractorFactory::makeHC4()
    SharedContractorPropag hc4 = std::make_shared<ContractorPropag>(pool);
 
    double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
-   hc4->setTol(Tolerance(rtol, atol));
+   hc4->setTol(Tolerance(rtol, 0.0));
 
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
    hc4->setMaxIter(niter);

@@ -84,6 +84,15 @@ bool Tolerance::areClose(const Interval& x, const Interval& y) const
                     isTight(x.right(), y.right());
 }
 
+bool Tolerance::testRelativeReduction(const Interval& old,
+                                      const Interval& x) const
+{
+   if (old.isEmpty() || x.isEmpty())
+      return false;
+
+   return (1 - x.width() / old.width()) > rtol_;
+}
+
 /*
 Interval Tolerance::maxIntervalDn(double ub) const
 {

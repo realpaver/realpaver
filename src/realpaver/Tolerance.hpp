@@ -73,6 +73,15 @@ public:
    /// @return true if the distance between 'x' and 'y' is less than this
    bool areClose(const Interval& x, const Interval& y) const;
 
+   /// Tests if two consecutive intervals of a nested sequence are such that
+   /// the width of the second one has been reduced enough with respect to the
+   /// width of the first one
+   /// @param old an interval
+   /// @param x an interval included in old
+   /// @return true if (1 - wid(x)/wid(old)) > rtol where rtol is the
+   ///         relative tolerance, false otherwise
+   bool testRelativeReduction(const Interval& old, const Interval& x) const;
+
    /// Gets the largest interval having this tolerance given its upper bound
    /// @param ub upper of the resulting interval
    /// @return the largest interval [lb, ub] having this tolerance

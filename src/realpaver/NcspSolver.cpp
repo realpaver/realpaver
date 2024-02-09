@@ -284,12 +284,15 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
    Proof proof = propagator_->contract(*node, *context_);
 
    LOG_INTER("Contraction -> " << proof);
-   LOG_INTER("Contracted box: " << (*node->box()));
 
    if (proof == Proof::Empty)
    {
       node->setProof(Proof::Empty);
       return;
+   }
+   else
+   {
+      LOG_INTER("Contracted box: " << (*node->box()));      
    }
 
    if (isInner(node->box()))

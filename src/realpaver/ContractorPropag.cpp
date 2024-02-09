@@ -18,8 +18,7 @@ namespace realpaver {
 ContractorPropag::ContractorPropag(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
-        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"),
-             Param::GetDblParam("PROPAGATION_ABS_TOL")),
+        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
         maxiter_(Param::GetIntParam("PROPAGATION_ITER_LIMIT")),
         certif_()
 {}
@@ -104,8 +103,7 @@ Proof ContractorPropag::contract(IntervalBox& B)
    size_t nb_steps = 0;
 
    LOG_NL();
-   LOG_INTER("ContractorPropag [" << tol_ << "]");
-   LOG_INTER("Current box: " << B);
+   LOG_INTER("ContractorPropag on " << B);
 
    do
    {
@@ -139,7 +137,7 @@ Proof ContractorPropag::contract(IntervalBox& B)
                   LOG_LOW("Propagation test on " << v.getName() << " ("
                                                  << tol_ << ")");
 
-                  if (!tol_.areClose(prev, curr))
+                  if (tol_.testRelativeReduction(prev, curr))
                   {
                      LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
                                   << " -> propagation");

@@ -78,7 +78,7 @@ SharedContractor ContractorACID::sliceContractor() const
 
 Proof ContractorACID::contract(IntervalBox& B)
 {
-   LOG_INTER("ACID on " << B);
+   LOG_INTER("ACID call " << call_ << " on " << B);
 
    Proof proof = Proof::Maybe;
 
@@ -105,10 +105,14 @@ Proof ContractorACID::contract(IntervalBox& B)
 
          proof = var3BCID_[k]->contract(B);
 
+         LOG_LOW("learning: " << k << "-th var3BCID on " << v.getName());
+         LOG_LOW(" -> " << proof << ", " << B);
+
          if (proof != Proof::Empty)
          {
             ctcGains[i] = B.gainRatio(save);
             ++i;
+            LOG_LOW("gain: " << ctcGains[i]);
          }
       }
 
@@ -116,16 +120,21 @@ Proof ContractorACID::contract(IntervalBox& B)
       if (proof == Proof::Empty)
       {
          kVarCID_[mcall] = i+1;
+
       }
       else
       {
          kVarCID_[mcall] = lastSignificantGain(ctcGains, ctRatio_);
       }
 
+      LOG_LOW("kVarCID[" << mcall << "] <- " << kVarCID_[mcall]);
+
       // end of learning phase
       if (mcall == learnLength_-1)
       {
          numVarCID_ = avgNbVarCID(kVarCID_);
+
+         LOG_LOW("end of learning, nummVarCID <- " << numVarCID_);
       }
    }
    else
@@ -134,6 +143,8 @@ Proof ContractorACID::contract(IntervalBox& B)
       if (numVarCID_ == 0)
       {
          proof = op_->contract(B);
+
+         LOG_LOW("exploitation, HC4 -> " << proof << ", " << B);
       }
       else
       {
@@ -146,11 +157,17 @@ Proof ContractorACID::contract(IntervalBox& B)
 
             proof = var3BCID_[k]->contract(B);
             ++i;
+
+            LOG_LOW("exploitaion: " << k << "-th var3BCID on " << v.getName());
+            LOG_LOW(" -> " << proof << ", " << B);
          }
       }
    }
 
    ++call_;
+
+   LOG_INTER(" -> " << proof << ", " << B);
+   LOG_INTER("End of ACID");
 
    return proof;
 }
@@ -164,15 +181,10 @@ void ContractorACID::print(std::ostream& os) const
 int ContractorACID::lastSignificantGain(std::vector<double>& ctcGains,
                                   double ctRatio)
 {
-
-DEBUG("lastSignificantGain");
-
    int i = ctcGains.size()-1;
 
    while ((i>=0) && (ctcGains[i]<=ctRatio))
       --i;
-
-DEBUG("END lastSignificantGain");
 
    return i+1;
 }
