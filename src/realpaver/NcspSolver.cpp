@@ -204,7 +204,7 @@ void NcspSolver::makeSplit()
    Scope scop = preprob_->scope();
 
    // makes the slicer
-   std::string sli = env_->getParam()->getStrParam("SPLIT_SLICER");
+   std::string sli = env_->getParam()->getStrParam("SPLIT_SLICING");
    std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
    if (sli == "BISECTION") 
@@ -214,7 +214,7 @@ void NcspSolver::makeSplit()
             "Unable to make the split object in a Ncsp solver");
 
    // makes the spliting object acording the variable selection strategy
-   std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTOR");
+   std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
       split_ = new NcspSplitRR(scop, std::move(smap));
@@ -301,7 +301,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 
       node->setProof(Proof::Inner);
 
-      std::string str = env_->getParam()->getStrParam("SPLIT_INNER");
+      std::string str = env_->getParam()->getStrParam("SPLIT_INNER_BOX");
       if (str == "NO")
       {
          space_->pushSolNode(node);

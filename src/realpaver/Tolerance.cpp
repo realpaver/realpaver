@@ -66,31 +66,14 @@ bool Tolerance::isTight(const IntervalVector& X) const
    return true;
 }
 
-bool Tolerance::isTight(double x, double y) const
-{
-   return (x < y) ? isTight(Interval(x, y)) :
-                    isTight(Interval(y, x));
-}
-
-bool Tolerance::areClose(const Interval& x, const Interval& y) const
-{
-   if (x.isEmpty() || y.isEmpty() || x.isInf() || y.isInf())
-      return false;
-
-   double u = Double::abs(x.left() - y.left()),
-          v = Double::abs(x.right() - y.right());
-
-   return (u > v) ? isTight(x.left(), y.left()) :
-                    isTight(x.right(), y.right());
-}
-
-bool Tolerance::testRelativeReduction(const Interval& old,
-                                      const Interval& x) const
+bool Tolerance::isImproved(const Interval& old, const Interval& x) const
 {
    if (old.isEmpty() || x.isEmpty())
       return false;
 
-   return (1 - x.width() / old.width()) > rtol_;
+   ASSERT(old.contains(x), "Bad use of is Imporoved " << old << " " << x);
+
+   return (1.0 - x.width() / old.width()) > rtol_;
 }
 
 /*

@@ -37,7 +37,7 @@ TRACE = YES
 
 # Display of regions
 # STD: standard display with one variable and its domain per line
-# VEC: display of the vector of domains
+# VEC: display as a vector of domains
 DISPLAY_REGION = STD
 
 # Preprocessing phase of the solving process enabled or disabled (YES or NO)
@@ -75,7 +75,7 @@ BB_SPACE_FREQUENCY = 1
 # - GPDFS: Hybrid Best-First Depth-First strategy such that the next node
 #          after a DFS stage is a node whose grid perimeter is maximal
 #
-# Assigns SPLIT_INNER = true for DMDFS and the hybrid DFS in order to calculate
+# Assigns SPLIT_INNER_BOX = true for DMDFS and the hybrid DFS in order to calculate
 # solutions at the given tolerance, and not to consider larger inner boxes
 # as solutions
 BP_NODE_SELECTION = DFS
@@ -100,22 +100,22 @@ SOLUTION_CLUSTER_GAP = 0.0
 SPLIT_OBJECTIVE = NO
 
 # Variable selection strategy that chooses the next variable to split
-# - RR:       round-robin strategy
-# - LF:       largest domain
-# - SF:       smallest domain
-# - SSR:      smear sum relative (using derivatives)
-# - MIXED_SLF integer variable with smallest first and then real variable
-#             with largest domain
-SPLIT_SELECTOR = RR
+# - RR:        round-robin strategy
+# - LF:        largest domain
+# - SF:        smallest domain
+# - SSR:       smear sum relative (using derivatives)
+# - MIXED_SLF: integer variable with smallest first and then real variable
+#              with largest domain
+SPLIT_SELECTION = RR
 
 # Domain splitting strategy
 # - BISECTION: divides a domain in two equal parts
-SPLIT_SLICER = BISECTION
+SPLIT_SLICING = BISECTION
 
-# An inner region can be considered as a solution or it can be split.
+# An inner box can be considered as a solution or it can be split.
 # - YES: it is split;
 # - NO:  it is considered as a solution.
-SPLIT_INNER = NO
+SPLIT_INNER_BOX = NO
 
 ###############################################################################
 ## CONTRACTORS AND PROPAGATION                                               ##
@@ -173,15 +173,15 @@ NB_SLICE_3B = 7
 NB_SLICE_CID = 3
 
 # Number of consecutive nodes handled in the learning phase of ACID
-LEARN_LENGTH_ACID = 50
+ACID_LEARN_LENGTH = 50
 
 # Number of nodes in a learning phase and an exploitation phase of ACID
-CYCLE_LENGTH_ACID = 1000
+ACID_CYCLE_LENGTH = 1000
 
 # Gain ratio between two consecutive boxes handed by var3BCID contractors
-# in ACID. It is used to adapt the nuber of var3BCID contractors that are
+# in ACID. It is used to adapt the number of var3BCID contractors that are
 # applied in the contraction procedure.
-CT_RATIO_ACID = 0.002
+ACID_CT_RATIO = 0.002
 
 ###############################################################################
 ## LOCAL OPTIMIZATION                                                        ##

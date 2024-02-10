@@ -130,7 +130,7 @@ int IntervalGaussSeidel::innerStep(const IntervalMatrix& A, IntervalVector& x,
       if (z.isEmpty()) return 0;
       else
       {
-         if (tol_.testRelativeReduction(x.get(i), z))
+         if (tol_.isImproved(x.get(i), z))
             res = 2;    // contraction large enough to iterate
 
          x.set(i, z);

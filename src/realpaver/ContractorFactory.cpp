@@ -291,9 +291,9 @@ SharedContractorACID ContractorFactory::makeACID()
 
    int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
    int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");
-   int learnLength = env_->getParam()->getIntParam("LEARN_LENGTH_ACID");
-   int cycleLength = env_->getParam()->getIntParam("CYCLE_LENGTH_ACID");
-   double ctRatio = env_->getParam()->getDblParam("CT_RATIO_ACID");
+   int learnLength = env_->getParam()->getIntParam("ACID_LEARN_LENGTH");
+   int cycleLength = env_->getParam()->getIntParam("ACID_CYCLE_LENGTH");
+   double ctRatio = env_->getParam()->getDblParam("ACID_CT_RATIO");
 
    return std::make_shared<ContractorACID>(ssr, hc4, ns3B, nsCID, learnLength,
                                            cycleLength, ctRatio);

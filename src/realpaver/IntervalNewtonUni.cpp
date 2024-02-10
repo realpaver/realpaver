@@ -86,7 +86,7 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
          if (++nbiter >= maxiter_)
             iter = false;
 
-         if (!tol_.testRelativeReduction(prev, y))
+         if (!tol_.isImproved(prev, y))
             iter = false;
       }
    }

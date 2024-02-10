@@ -134,8 +134,8 @@ Proof IntervalNewton::contract(IntervalBox& X)
       }
 
       // X := X inter (y + c)
-      bool hastol;
-      certif = reduceX(X, hastol);
+      bool improved;
+      certif = reduceX(X, improved);
 
       if (certif == Proof::Empty)
       {
@@ -155,7 +155,7 @@ Proof IntervalNewton::contract(IntervalBox& X)
          LOG_INTER("Stops on a maximum number of iterations: " << maxiter_);
       }
 
-      else if (hastol)
+      else if (!improved)
       {
          iter = false;
          LOG_INTER("Stops on the tolerance " << tol_);
@@ -182,12 +182,12 @@ void IntervalNewton::makeY(IntervalBox& X)
    }
 }
 
-Proof IntervalNewton::reduceX(IntervalBox& X, bool& hastol)
+Proof IntervalNewton::reduceX(IntervalBox& X, bool& improved)
 {
    int i = 0;
    Proof proof = Proof::Feasible;
 
-   hastol = true;
+   improved = false;
 
    for (const auto& v : scope())
    {
@@ -202,8 +202,8 @@ Proof IntervalNewton::reduceX(IntervalBox& X, bool& hastol)
 
       Interval reduced = dom & z;
 
-      if (tol_.testRelativeReduction(dom, reduced))
-         hastol = false;
+      if (tol_.isImproved(dom, reduced))
+         improved = true;
 
       X.set(v, reduced);
       i = i+1;
