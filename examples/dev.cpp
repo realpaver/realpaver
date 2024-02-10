@@ -20,17 +20,8 @@ int main(void)
 {
    try
    {
-      Problem P;
-      Variable x = P.addRealVar(-3, 0, "x");
-
-      SharedDag dag = make_shared<Dag>();
-      dag->insert(sqr(x) - 2 == 0);
-      IntervalThickFunction f(dag, 0, x);
-
-      IntervalNewtonUni nwt;
-      Interval I(3, 3);
-      Proof p = nwt.localSearch(f, I);
-      cout << p << " " << I << endl;
+      Tolerance tol( 0.25, 2.0 );
+      cout << tol.maxIntervalDn(4.0) << endl;
       
 /*
       Tolerance tol(0.5, 2);

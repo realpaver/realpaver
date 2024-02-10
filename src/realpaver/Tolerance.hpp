@@ -72,13 +72,15 @@ public:
 
    /// Gets the largest interval having this tolerance given its upper bound
    /// @param ub upper of the resulting interval
-   /// @return the largest interval [lb, ub] having this tolerance
-   //Interval maxIntervalDn(double ub) const;
+   /// @return the largest interval [lb, ub] having the absolute or the
+   ///         relative tolerance
+   Interval maxIntervalDn(double ub) const;
 
    /// Gets the largest interval having this tolerance given its lower bound
    /// @param lb lower of the resulting interval
-   /// @return the largest interval [lb, ub] having this tolerance
-   //Interval maxIntervalUp(double lb) const;
+   /// @return the largest interval [lb, ub] having the absolute or the
+   ///         relative tolerance
+   Interval maxIntervalUp(double lb) const;
 
    /// Calculates the size of a partition of an interval with respect to the
    /// absolute tolerance of this
