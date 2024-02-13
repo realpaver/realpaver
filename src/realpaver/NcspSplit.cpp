@@ -8,8 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspSplit.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/NcspSplit.hpp"
 
 namespace realpaver {
 

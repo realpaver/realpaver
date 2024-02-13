@@ -16,21 +16,13 @@
 using namespace realpaver;
 using namespace std;
 
+
+// meson setup build -DLP_LIB=Highs -DASSERT=false -DLOG=false -Dbuild_type=debug
+
 int main(void)
 {
    try
    {
-      Tolerance tol( 0.25, 2.0 );
-      cout << tol.maxIntervalDn(4.0) << endl;
-      
-/*
-      Tolerance tol(0.5, 2);
-      
-      Interval x(10, 20);
-      cout << tol.isTight(x) << endl;
-*/
-
-/*
       Problem P;
       Variable x = P.addRealVar(-3, 0, "x"),
                y = P.addRealVar(0, 5, "y"),
@@ -80,7 +72,6 @@ int main(void)
       }
       tom.stop();
       cout << tom.elapsedTime() << " (s)" << endl;
-*/
    }
    catch(Exception e)
    {

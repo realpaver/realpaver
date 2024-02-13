@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <ctime>
+#include <limits>
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -19,7 +20,7 @@ Logger::Logger() :
       level_(LogLevel::none),
       ofs_(),
       path_(""),
-      maxsize_(1048576),
+      maxsize_(std::numeric_limits<unsigned long>::max()),
       fprec_(8)
 {}
 
@@ -44,19 +45,19 @@ void Logger::setLogLevel(LogLevel level)
    level_ = level;
 }
 
-size_t Logger::getSize() const
+unsigned long Logger::getSize() const
 {
    std::ifstream f(path_, std::ios::in | std::ios::binary);
    f.seekg(0, std::ios::end);
    return f.tellg();
 }
 
-size_t Logger::getMaxSize() const
+unsigned long Logger::getMaxSize() const
 {
    return maxsize_;
 }
 
-void Logger::setMaxSize(size_t nbytes)
+void Logger::setMaxSize(unsigned long nbytes)
 {
    maxsize_ = nbytes;
 }

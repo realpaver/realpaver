@@ -91,6 +91,10 @@ private:
    // returns true if the i-th contractor of this depends on a variable that
    // belongs to the set ms
    bool contractorDependsOn(size_t i, const ModifSetType& ms);
+
+   // algorithm that propagates after each application of one contractor
+   Proof contractBis(IntervalBox& B);
+
 };
 
 /// Type of shared pointers on propagators

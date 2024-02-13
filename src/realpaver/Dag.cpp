@@ -1382,7 +1382,7 @@ DagLin::const_iterator DagLin::begin() const
 {
    return terms_.begin();
 }
-   
+
 DagLin::const_iterator DagLin::end() const
 {
    return terms_.end();
@@ -1563,7 +1563,10 @@ Interval DagFun::intervalEval(const IntervalBox& B)
 Interval DagFun::intervalEval(const RealPoint& pt)
 {
    for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(pt);
+   {
+      size_t j = (size_t)i;
+      node_[j]->eval(pt);
+   }
 
    return rootNode()->val();
 }
@@ -1705,14 +1708,11 @@ Proof DagFun::sharedHc4Revise(IntervalBox& B)
 Proof DagFun::hc4ReviseBack(IntervalBox& B)
 {
    for (int i=nbNodes()-1; i>=0; --i)
-   {
-      size_t j = (size_t)i;
-      node_[j]->proj(B);
-   }
+      node_[i]->proj(B);
 
    for (size_t i=0; i<nbVars(); ++i)
    {
-      Variable v = varNode(i)->getVar();
+      const Variable& v = varNode(i)->getVar();
 
       if (B.get(v).isEmpty())
          return Proof::Empty;

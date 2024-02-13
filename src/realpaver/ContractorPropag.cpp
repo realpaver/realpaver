@@ -9,9 +9,12 @@
 
 #include <unordered_set>
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorPropag.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/ContractorPropag.hpp"
+
+#include <queue>
+#include "realpaver/Bitset.hpp"
 
 namespace realpaver {
 
@@ -68,6 +71,75 @@ Scope ContractorPropag::scope() const
    return pool_->scope();
 }
 
+Proof ContractorPropag::contractBis(IntervalBox& B)
+{
+   // initialization: activates all contractors
+   size_t N = pool_->poolSize();
+
+   // propagation queue
+   std::queue<size_t> queue;
+   for (size_t i=0; i<N; ++i) queue.push(i);
+
+   // vector of proof certificates
+   certif_.resize(N);
+
+   Bitset active(N);
+   active.setAllOne();
+
+   Proof proof = Proof::Maybe;
+   IntervalBox copy(B);
+
+   while ((proof != Proof::Empty) && (queue.size() > 0))
+   {
+      size_t j = queue.front();
+      queue.pop();
+      SharedContractor op = pool_->contractorAt(j);
+
+      copy.setOnScope(B, op->scope());
+
+      proof = op->contract(B);
+      certif_[j] = proof;
+      active.setZero(j);
+
+      if (proof != Proof::Empty)
+      {
+         for (const auto& v : op->scope())
+         {
+            const Interval& prev = copy.get(v);
+            const Interval& curr = B.get(v);
+
+            LOG_LOW("Propagation test on " << v.getName() << " ("
+                                           << tol_ << ")");
+
+            if (tol_.isImproved(prev, curr))
+            {
+               LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
+                            << " -> propagation");
+
+               for (size_t i=0; i<N; ++i)
+               {
+                  if (!active.get(i))
+                  {
+                     SharedContractor ctc = pool_->contractorAt(i);
+                     if (ctc->dependsOn(v))
+                     {
+                        queue.push(i);
+                        active.setOne(i);
+                     }
+                  }
+               }
+            }
+            else
+            {
+               LOG_LOW("  " << prev << " -> " << curr
+                            << " not reduced enough");
+            }
+         }
+      }
+   }
+   return proof;
+}
+
 Proof ContractorPropag::contract(IntervalBox& B)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
@@ -102,8 +174,7 @@ Proof ContractorPropag::contract(IntervalBox& B)
    // number of propagation steps
    size_t nb_steps = 0;
 
-   LOG_NL();
-   LOG_INTER("ContractorPropag on " << B);
+   LOG_INTER("Propagation algorithm on " << B);
 
    do
    {
@@ -187,7 +258,7 @@ Proof ContractorPropag::contract(IntervalBox& B)
    delete copy;
 
    LOG_INTER(" -> " << proof << ", " << B);
-   LOG_INTER("End of propagator, " << nb_steps << " loop(s)");
+   LOG_INTER("End of propagation, " << nb_steps << " loop(s)");
 
    return proof;
 }

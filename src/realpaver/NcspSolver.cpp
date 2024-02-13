@@ -13,6 +13,8 @@
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorDomain.hpp"
+#include "realpaver/ContractorPolytope.hpp"
+#include "realpaver/ContractorPropag.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
@@ -21,8 +23,7 @@
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
-#include "realpaver/ContractorPolytope.hpp"
-#include "realpaver/ContractorPropag.hpp"
+#include "realpaver/Timer.hpp"
 
 namespace realpaver {
 
@@ -262,6 +263,11 @@ bool NcspSolver::isInner(DomainBox* box) const
 
 void NcspSolver::bpStep(int depthlimit)
 {
+#if LOG_ON
+   static Timer timerStep;
+   timerStep.start();
+#endif
+
    // extracts a node from the space
     SharedNcspNode node = space_->nextPendingNode();
 
@@ -270,18 +276,38 @@ void NcspSolver::bpStep(int depthlimit)
 
    // removes the node informations
    context_->remove(node->index());
+
+#if LOG_ON
+   timerStep.stop();
+   LOG_INTER("Total time steps : " << timerStep.elapsedTime() << "(s)");
+#endif
 }
 
 void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 {
+#if LOG_ON
+   static Timer timerPropag, timerSplit;
+#endif
+
+   LOG_NL_INTER();
    LOG_INTER("Extracts node " << node->index() << " (depth "
                               << node->depth() << ")");
    LOG_LOW("Node: " << (*node->box()));
 
    node->setProof(Proof::Maybe);
 
+#if LOG_ON
+   timerPropag.start();
+#endif
+
    // contracts the box
    Proof proof = propagator_->contract(*node, *context_);
+
+#if LOG_ON
+   timerPropag.stop();
+   LOG_INTER("Total time contraction : " << timerPropag.elapsedTime() << "(s)");
+#endif
+
 
    LOG_INTER("Contraction -> " << proof);
 
@@ -318,6 +344,10 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
       return;
    }
 
+#if LOG_ON
+   timerSplit.start();
+#endif
+
    // splits the node
    split_->apply(node, *context_);
 
@@ -345,6 +375,11 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
       nbnodes_ += std::distance(split_->begin(), split_->end());
       space_->insertPendingNodes(split_->begin(), split_->end());
    }
+
+#if LOG_ON
+   timerSplit.stop();
+   LOG_INTER("Total time split : " << timerSplit.elapsedTime() << "(s)");
+#endif
 }
 
 void NcspSolver::branchAndPrune()
@@ -391,6 +426,11 @@ void NcspSolver::branchAndPrune()
 
    size_t nsol = 0;
    size_t nnodes = 0, tnodes = 0;
+
+#if LOG_ON
+   static Timer timerBP;
+   timerBP.start();
+#endif
 
    do
    {
@@ -452,12 +492,22 @@ void NcspSolver::branchAndPrune()
          env_->setSolutionLimit(true);
          iter = false;         
       }
+
+#if LOG_ON
+   LOG_INTER("Total time BP : " << timerBP.elapsedTime() << "(s)");
+#endif
    }
    while (iter);
 
    double gap = env_->getParam()->getDblParam("SOLUTION_CLUSTER_GAP");
    space_->makeSolClusters(gap);
 
+#if LOG_ON
+   timerBP.stop();
+   LOG_INTER("Total time BP : " << timerBP.elapsedTime() << "(s)");
+#endif
+
+   LOG_NL_MAIN();
    certifySolutions();
 
    stimer_.stop();
