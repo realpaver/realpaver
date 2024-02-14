@@ -15,18 +15,19 @@ namespace realpaver {
 
 ContractorHC4Revise::ContractorHC4Revise(SharedDag dag, size_t i)
       : dag_(dag),
-        if_(i)
+        idx_(i)
 {
-   ASSERT(dag != nullptr, "Creation of HC4 contractor from a null pointer");
-   ASSERT(i < dag->nbFuns(), "Creation of HC4 contractor given a bad " <<
+   ASSERT(dag != nullptr,
+          "Creation of HC4Revise contractor from a null pointer");
+   ASSERT(i < dag->nbFuns(), "Creation of HC4Revise contractor given a bad " <<
                              " function index " << i);
 }
 
 Proof ContractorHC4Revise::contract(IntervalBox& B)
 {
-   LOG_LOW("HC4 contractor @ " << if_ << " on " << B);
+   LOG_LOW("HC4Revise contractor @ " << idx_ << " on " << B);
 
-   Proof proof = dag_->fun(if_)->hc4Revise(B);
+   Proof proof = dag_->fun(idx_)->hc4Revise(B);
 
    LOG_LOW(" -> " << proof << ", " << B);
 
@@ -35,12 +36,12 @@ Proof ContractorHC4Revise::contract(IntervalBox& B)
 
 void ContractorHC4Revise::print(std::ostream& os) const
 {
-   os << "HC4 contractor / function " << " @ " << if_;
+   os << "HC4Revise contractor / function " << " @ " << idx_;
 }
 
 size_t ContractorHC4Revise::getFunIndex() const
 {
-   return if_;
+   return idx_;
 }
 
 SharedDag ContractorHC4Revise::getDag() const
@@ -50,7 +51,7 @@ SharedDag ContractorHC4Revise::getDag() const
 
 Scope ContractorHC4Revise::scope() const
 {
-   return dag_->fun(if_)->scope();
+   return dag_->fun(idx_)->scope();
 }
 
 } // namespace

@@ -998,6 +998,9 @@ struct DagContext
 
    /// @return a clone
    DagContext* clone() const;
+
+   /// assigns every interval to the universe
+   void reset();
 };
 
 ///////////////////////////////////////////////////////////////////////////////

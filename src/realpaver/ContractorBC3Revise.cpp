@@ -214,7 +214,7 @@ Proof ContractorBC3Revise::contract(IntervalBox& B)
 
 void ContractorBC3Revise::print(std::ostream& os) const
 {
-   os << "BC3 contractor #" << f_.getFun()->index();
+   os << "BC3Revise contractor #" << f_.getFun()->index();
 }
 
 } // namespace

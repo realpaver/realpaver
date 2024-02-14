@@ -1858,6 +1858,11 @@ DagContext* DagContext::clone() const
    return new DagContext(*this);
 }
 
+void DagContext::reset()
+{
+   dom.setAll(Interval::universe());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Dag::Dag()

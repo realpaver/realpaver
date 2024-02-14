@@ -57,7 +57,7 @@ public:
 
 private:
    SharedDag dag_;   // dag
-   size_t if_;       // function index in the dag
+   size_t idx_;      // function index in the dag
 };
 
 } // namespace

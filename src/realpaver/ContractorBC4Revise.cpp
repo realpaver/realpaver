@@ -44,14 +44,14 @@ Scope ContractorBC4Revise::scope() const
 
 Proof ContractorBC4Revise::contract(IntervalBox& B)
 {
-   LOG_LOW("BC4 contractor @ " << if_ << " on " << B);
+   LOG_LOW("BC4Revise contractor @ " << if_ << " on " << B);
    
    // HC4
    Proof proof = hc4_->contract(B);
 
    if (proof != Proof::Maybe)
    {
-      LOG_LOW("BC4 -> " << proof);
+      LOG_LOW("BC4Revise -> " << proof);
       return proof;
    }
 
@@ -62,20 +62,20 @@ Proof ContractorBC4Revise::contract(IntervalBox& B)
 
       if (certif == Proof::Empty)
       {
-         LOG_LOW("BC4 -> " << certif);
+         LOG_LOW("BC4Revise -> " << certif);
          return certif;
       }
       else
          proof = std::max(proof, certif);
    }
 
-   LOG_LOW("BC4 -> " << proof);
+   LOG_LOW("BC4Revise -> " << proof);
    return proof;
 }
 
 void ContractorBC4Revise::print(std::ostream& os) const
 {
-   os << "BC4 contractor #" << if_;
+   os << "BC4Revise contractor #" << if_;
 }
 
 } // namespace
