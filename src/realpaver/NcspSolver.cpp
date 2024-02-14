@@ -9,20 +9,12 @@
 
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorConstraint.hpp"
-#include "realpaver/ContractorHC4.hpp"
-#include "realpaver/ContractorDomain.hpp"
-#include "realpaver/ContractorPolytope.hpp"
-#include "realpaver/ContractorPropag.hpp"
-#include "realpaver/IntervalNewton.hpp"
-#include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
 #include "realpaver/NcspSpaceBFS.hpp"
 #include "realpaver/NcspSpaceDFS.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
-#include "realpaver/Timer.hpp"
 
 namespace realpaver {
 

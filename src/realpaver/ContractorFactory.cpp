@@ -12,7 +12,7 @@
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/ContractorList.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -111,16 +111,16 @@ SharedContractorPropag ContractorFactory::makeHC4()
    // equations
    for (size_t i : ve_)
    {
-      std::shared_ptr<ContractorHC4>
-         op = std::make_shared<ContractorHC4>(dag_, i);
+      std::shared_ptr<ContractorHC4Revise>
+         op = std::make_shared<ContractorHC4Revise>(dag_, i);
       pool->push(op);
    }
 
    // inequality constraints
    for (size_t i : vi_)
    {
-      std::shared_ptr<ContractorHC4>
-         op = std::make_shared<ContractorHC4>(dag_, i);
+      std::shared_ptr<ContractorHC4Revise>
+         op = std::make_shared<ContractorHC4Revise>(dag_, i);
       pool->push(op);
    }
 

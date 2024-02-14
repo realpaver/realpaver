@@ -1,5 +1,5 @@
 #include <iostream>
-#include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorFactory.hpp"
@@ -39,8 +39,8 @@ int main(void)
       ContractorFactory factory(P, env);
       SharedDag dag = factory.getDag();
 
-      ContractorHC4 h0(dag, 0);
-      ContractorHC4 h1(dag, 1);
+      ContractorHC4Revise h0(dag, 0);
+      ContractorHC4Revise h1(dag, 1);
 
       Scope S( {x, y, z} );
       IntervalBox B(S);

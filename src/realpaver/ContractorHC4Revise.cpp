@@ -8,12 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorHC4::ContractorHC4(SharedDag dag, size_t i)
+ContractorHC4Revise::ContractorHC4Revise(SharedDag dag, size_t i)
       : dag_(dag),
         if_(i)
 {
@@ -22,7 +22,7 @@ ContractorHC4::ContractorHC4(SharedDag dag, size_t i)
                              " function index " << i);
 }
 
-Proof ContractorHC4::contract(IntervalBox& B)
+Proof ContractorHC4Revise::contract(IntervalBox& B)
 {
    LOG_LOW("HC4 contractor @ " << if_ << " on " << B);
 
@@ -33,22 +33,22 @@ Proof ContractorHC4::contract(IntervalBox& B)
    return proof;
 }
 
-void ContractorHC4::print(std::ostream& os) const
+void ContractorHC4Revise::print(std::ostream& os) const
 {
    os << "HC4 contractor / function " << " @ " << if_;
 }
 
-size_t ContractorHC4::getFunIndex() const
+size_t ContractorHC4Revise::getFunIndex() const
 {
    return if_;
 }
 
-SharedDag ContractorHC4::getDag() const
+SharedDag ContractorHC4Revise::getDag() const
 {
    return dag_;
 }
 
-Scope ContractorHC4::scope() const
+Scope ContractorHC4Revise::scope() const
 {
    return dag_->fun(if_)->scope();
 }

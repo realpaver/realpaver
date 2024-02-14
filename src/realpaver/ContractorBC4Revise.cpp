@@ -19,7 +19,7 @@ ContractorBC4Revise::ContractorBC4Revise(SharedDag dag, size_t i)
         hc4_(nullptr),
         bc3_()
 {
-   hc4_ = new ContractorHC4(dag, i);
+   hc4_ = new ContractorHC4Revise(dag, i);
 
    DagFun* f = dag->fun(i);
    Scope s = f->scope();

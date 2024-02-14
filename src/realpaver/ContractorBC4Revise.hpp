@@ -12,7 +12,7 @@
 
 #include <vector>
 #include "realpaver/ContractorBC3Revise.hpp"
-#include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 
 namespace realpaver {
 
@@ -48,7 +48,7 @@ public:
 private:
    SharedDag dag_;                     // a dag
    size_t if_;                         // index of a function f in the dag
-   ContractorHC4* hc4_;                // hc4 contractor associated with f
+   ContractorHC4Revise* hc4_;                // hc4 contractor associated with f
    std::vector<ContractorBC3Revise*> bc3_;   // bc3 contractors associated with
                                              // the variables having multiple
                                        // occurrences in f

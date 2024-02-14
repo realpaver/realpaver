@@ -11,10 +11,6 @@
 #define REALPAVER_NCSP_SOLVER_HPP
 
 #include <memory>
-#include "realpaver/Contractor.hpp"
-#include "realpaver/Dag.hpp"
-#include "realpaver/Env.hpp"
-#include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/NcspEnv.hpp"
 #include "realpaver/NcspPropagator.hpp"
 #include "realpaver/NcspSpace.hpp"
