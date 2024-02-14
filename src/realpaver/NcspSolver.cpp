@@ -9,7 +9,6 @@
 
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorBC4.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorDomain.hpp"

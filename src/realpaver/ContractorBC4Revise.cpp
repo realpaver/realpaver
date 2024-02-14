@@ -8,12 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorBC4.hpp"
+#include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorBC4::ContractorBC4(SharedDag dag, size_t i)
+ContractorBC4Revise::ContractorBC4Revise(SharedDag dag, size_t i)
       : dag_(dag),
         if_(i),
         hc4_(nullptr),
@@ -30,19 +30,19 @@ ContractorBC4::ContractorBC4(SharedDag dag, size_t i)
    }
 }
 
-ContractorBC4::~ContractorBC4()
+ContractorBC4Revise::~ContractorBC4Revise()
 {
    delete hc4_;
 
    for (auto it : bc3_) delete it;
 }
 
-Scope ContractorBC4::scope() const
+Scope ContractorBC4Revise::scope() const
 {
    return dag_->fun(if_)->scope();
 }
 
-Proof ContractorBC4::contract(IntervalBox& B)
+Proof ContractorBC4Revise::contract(IntervalBox& B)
 {
    LOG_LOW("BC4 contractor @ " << if_ << " on " << B);
    
@@ -73,7 +73,7 @@ Proof ContractorBC4::contract(IntervalBox& B)
    return proof;
 }
 
-void ContractorBC4::print(std::ostream& os) const
+void ContractorBC4Revise::print(std::ostream& os) const
 {
    os << "BC4 contractor #" << if_;
 }

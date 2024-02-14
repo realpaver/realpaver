@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_BC4_HPP
-#define REALPAVER_CONTRACTOR_BC4_HPP
+#ifndef REALPAVER_CONTRACTOR_BC4_REVISE_HPP
+#define REALPAVER_CONTRACTOR_BC4_REVISE_HPP
 
 #include <vector>
 #include "realpaver/ContractorBC3Revise.hpp"
@@ -23,21 +23,21 @@ namespace realpaver {
 /// contractor. Then it applies a BC3 contractor for each variable with multiple
 /// occurrences in f.
 ///////////////////////////////////////////////////////////////////////////////
-class ContractorBC4 : public Contractor {
+class ContractorBC4Revise : public Contractor {
 public:
    /// Creates a contractor
    /// @param dag a DAG
    /// @param i index of a function in the DAG
-   ContractorBC4(SharedDag dag, size_t i);
+   ContractorBC4Revise(SharedDag dag, size_t i);
 
    /// Destructor
-   ~ContractorBC4();
+   ~ContractorBC4Revise();
 
    /// No copy
-   ContractorBC4(const ContractorBC4&) = delete;
+   ContractorBC4Revise(const ContractorBC4Revise&) = delete;
 
    /// No assignment
-   ContractorBC4& operator=(const ContractorBC4&) = delete;
+   ContractorBC4Revise& operator=(const ContractorBC4Revise&) = delete;
 
    ///@{
    Scope scope() const override;
