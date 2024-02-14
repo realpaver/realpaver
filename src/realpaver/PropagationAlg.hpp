@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_PROPAG_HPP
-#define REALPAVER_CONTRACTOR_PROPAG_HPP
+#ifndef REALPAVER_PROPAGATION_ALG_HPP
+#define REALPAVER_PROPAGATION_ALG_HPP
 
 #include "realpaver/ContractorPool.hpp"
 
@@ -28,20 +28,20 @@ namespace realpaver {
 ///   i.e. for every variable the distance between two consecutive domains
 ///   is smaller than the tolerance.
 ///////////////////////////////////////////////////////////////////////////////
-class ContractorPropag : public Contractor {
+class PropagationAlg : public Contractor {
 public:
    /// Creates a propagator over a pool of contractors
    /// @param pool a pool of contractors
-   ContractorPropag(SharedContractorPool pool = nullptr);
+   PropagationAlg(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
-   ContractorPropag(const ContractorPropag&) = default;
+   PropagationAlg(const PropagationAlg&) = default;
 
    /// No assignment
-   ContractorPropag& operator=(const ContractorPropag&) = delete;
+   PropagationAlg& operator=(const PropagationAlg&) = delete;
 
    /// Default destructor
-   ~ContractorPropag() = default;
+   ~PropagationAlg() = default;
 
    /// @return the number of contractors
    size_t poolSize() const;
@@ -94,11 +94,10 @@ private:
 
    // algorithm that propagates after each application of one contractor
    Proof contractBis(IntervalBox& B);
-
 };
 
 /// Type of shared pointers on propagators
-typedef std::shared_ptr<ContractorPropag> SharedContractorPropag;
+typedef std::shared_ptr<PropagationAlg> SharedPropagationAlg;
 
 } // namespace
 

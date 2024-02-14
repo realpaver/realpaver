@@ -14,11 +14,11 @@
 #include "realpaver/ContractorACID.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorPolytope.hpp"
-#include "realpaver/ContractorPropag.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Env.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/PropagationAlg.hpp"
 
 namespace realpaver {
 
@@ -61,7 +61,7 @@ public:
    /// A constraint contractor is created for each other constraint.
    /// A domain contractor is created for each variable whose initial domain
    /// is not connected.
-   SharedContractorPropag makeHC4();
+   SharedPropagationAlg makeHC4();
 
    /// Creates a contractor that implements a constraint propagation algorithm
    /// based on BC4 contractors
@@ -71,7 +71,7 @@ public:
    /// A constraint contractor is created for each other constraint.
    /// A domain contractor is created for each variable whose initial domain
    /// is not connected.
-   SharedContractorPropag makeBC4();
+   SharedPropagationAlg makeBC4();
 
    /// Creates a contractor that applies CID contractors in sequence
    /// @return the contractor

@@ -9,7 +9,7 @@
 
 #include <unordered_set>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorPropag.hpp"
+#include "realpaver/PropagationAlg.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
@@ -18,7 +18,7 @@
 
 namespace realpaver {
 
-ContractorPropag::ContractorPropag(SharedContractorPool pool)
+PropagationAlg::PropagationAlg(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
         tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
@@ -26,52 +26,52 @@ ContractorPropag::ContractorPropag(SharedContractorPool pool)
         certif_()
 {}
 
-Tolerance ContractorPropag::getTol() const
+Tolerance PropagationAlg::getTol() const
 {
    return tol_;
 }
 
-void ContractorPropag::setTol(Tolerance tol)
+void PropagationAlg::setTol(Tolerance tol)
 {
    tol_ = tol;
 }
 
-size_t ContractorPropag::poolSize() const
+size_t PropagationAlg::poolSize() const
 {
    return pool_->poolSize();
 }
 
-size_t ContractorPropag::getMaxIter() const
+size_t PropagationAlg::getMaxIter() const
 {
    return maxiter_;
 }
 
-void ContractorPropag::setMaxIter(size_t n)
+void PropagationAlg::setMaxIter(size_t n)
 {
    maxiter_ = n;
 }
 
-Proof ContractorPropag::proofAt(size_t i) const
+Proof PropagationAlg::proofAt(size_t i) const
 {
    return certif_[i];
 }
 
-SharedContractorPool ContractorPropag::getPool() const
+SharedContractorPool PropagationAlg::getPool() const
 {
    return pool_;
 }
 
-void ContractorPropag::setPool(SharedContractorPool pool)
+void PropagationAlg::setPool(SharedContractorPool pool)
 {
    pool_ = pool;
 }
 
-Scope ContractorPropag::scope() const
+Scope PropagationAlg::scope() const
 {
    return pool_->scope();
 }
 
-Proof ContractorPropag::contractBis(IntervalBox& B)
+Proof PropagationAlg::contractBis(IntervalBox& B)
 {
    // initialization: activates all contractors
    size_t N = pool_->poolSize();
@@ -140,7 +140,7 @@ Proof ContractorPropag::contractBis(IntervalBox& B)
    return proof;
 }
 
-Proof ContractorPropag::contract(IntervalBox& B)
+Proof PropagationAlg::contract(IntervalBox& B)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
@@ -263,12 +263,12 @@ Proof ContractorPropag::contract(IntervalBox& B)
    return proof;
 }
 
-void ContractorPropag::print(std::ostream& os) const
+void PropagationAlg::print(std::ostream& os) const
 {
-   os << "ContractorPropag on " << pool_->poolSize() << " contractors";
+   os << "PropagationAlg on " << pool_->poolSize() << " contractors";
 }
 
-bool ContractorPropag::contractorDependsOn(size_t i, const ModifSetType& ms)
+bool PropagationAlg::contractorDependsOn(size_t i, const ModifSetType& ms)
 {
    SharedContractor op = pool_->contractorAt(i);
 

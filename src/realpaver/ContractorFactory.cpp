@@ -104,7 +104,7 @@ std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
    return ssr;
 }
 
-SharedContractorPropag ContractorFactory::makeHC4()
+SharedPropagationAlg ContractorFactory::makeHC4()
 {
    SharedContractorVector pool = std::make_shared<ContractorVector>();
 
@@ -138,7 +138,7 @@ SharedContractorPropag ContractorFactory::makeHC4()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   SharedContractorPropag hc4 = std::make_shared<ContractorPropag>(pool);
+   SharedPropagationAlg hc4 = std::make_shared<PropagationAlg>(pool);
 
    double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
    hc4->setTol(Tolerance(rtol, 0.0));
@@ -149,7 +149,7 @@ SharedContractorPropag ContractorFactory::makeHC4()
    return hc4;
 }
 
-SharedContractorPropag ContractorFactory::makeBC4()
+SharedPropagationAlg ContractorFactory::makeBC4()
 {
    SharedContractorVector pool = std::make_shared<ContractorVector>();
 
@@ -183,7 +183,7 @@ SharedContractorPropag ContractorFactory::makeBC4()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   SharedContractorPropag bc4 = std::make_shared<ContractorPropag>(pool);
+   SharedPropagationAlg bc4 = std::make_shared<PropagationAlg>(pool);
 
    double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
    double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
@@ -265,7 +265,7 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
 
 SharedContractor ContractorFactory::makeHC4Newton()
 {
-   SharedContractorPropag hc4 = makeHC4();
+   SharedPropagationAlg hc4 = makeHC4();
    std::shared_ptr<IntervalNewton> newton = makeIntervalNewton();
 
    if (newton != nullptr)
@@ -287,7 +287,7 @@ SharedContractorACID ContractorFactory::makeACID()
 
    std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
-   SharedContractorPropag hc4 = makeHC4();
+   SharedPropagationAlg hc4 = makeHC4();
 
    int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
    int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");
