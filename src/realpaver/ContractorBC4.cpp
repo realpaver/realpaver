@@ -26,7 +26,7 @@ ContractorBC4::ContractorBC4(SharedDag dag, size_t i)
    for (auto v : s)
    {
       if (f->nbOccurrences(v) > 1)
-         bc3_.push_back(new ContractorBC3(dag_, if_, v));
+         bc3_.push_back(new ContractorBC3Revise(dag_, if_, v));
    }
 }
 

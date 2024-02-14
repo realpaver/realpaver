@@ -1583,9 +1583,13 @@ Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
 
 Proof DagFun::hc4Revise(IntervalBox& B)
 {
-   // assigns the projections to the universe
+   // assigns the projections to the universe for the shared nodes
    for (size_t i=0; i<nbNodes(); ++i)
-         node_[i]->setDom(Interval::universe());
+   {
+      DagNode* node = node_[i];
+      if (node->parArity() > 1)
+         node->setDom(Interval::universe());
+   }
 
    return sharedHc4Revise(B);
 }
@@ -1919,8 +1923,15 @@ void Dag::setDom(size_t i, const Interval& x)
 
 void Dag::reduceDom(size_t i, const Interval& x)
 {
-   Interval aux( x & context_->dom[i]);
-   context_->dom.set(i, aux);
+   if (node_[i]->parArity() > 1)
+   {
+      Interval aux( x & context_->dom[i]);
+      context_->dom.set(i, aux);
+   }
+   else
+   {
+      context_->dom.set(i, x);
+   }
 }
 
 DagContext* Dag::cloneDefaultContext() const
