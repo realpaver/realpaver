@@ -104,6 +104,9 @@ public:
    /// @return true if this depends on bs
    bool dependsOn(const Bitset& bs) const;
 
+   /// @return true f this has more than one parent node.
+   bool isShared() const;
+
    /// Dependency test
    /// @param v a variable
    /// @return true if v occurs in the tree rooted by this
@@ -171,12 +174,17 @@ public:
 
    /// Interval evaluation of this
    /// @param B the variable domains
-   /// The result is assigned in the interval value enclosed in this.
    virtual void eval(const IntervalBox& B) = 0;
+
+   /// Interval evaluation of this with domain intersection
+   /// @param B the variable domains
+   ///
+   /// It calls eval(B) and the value is intersected with the domain
+   /// from the dag's context if this is a shard node.
+   void sharedEval(const IntervalBox& B);
 
    /// Interval evaluation of this
    /// @param pt the variable values
-   /// The result is assigned in the interval value enclosed in this.
    virtual void eval(const RealPoint& pt) = 0;
 
    /// Restricted interval evaluation
@@ -831,6 +839,11 @@ public:
    /// @param B the variable domains
    /// @return the evaluation of this in B
    Interval intervalEval(const IntervalBox& B);
+
+   /// Interval evaluation of this with domain intersection
+   /// @param B the variable domains
+   /// @return the evaluation of this in B
+   Interval sharedIntervalEval(const IntervalBox& B);
 
   /// Interval evaluation
    /// @param pt variable values

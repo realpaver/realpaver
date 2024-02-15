@@ -31,6 +31,13 @@ public:
    void print(std::ostream& os) const override;
    ///@}
 
+   /// Inserts a contractor in this
+   /// @param op a contractor
+   ///
+   /// This is typically used to call new contractors in the propagation
+   /// loop, these ones being independent from the DAG
+   void push(SharedContractor op);
+
    /// @return the tolerance used as stopping criterion
    Tolerance getTol() const;
 
@@ -66,6 +73,9 @@ private:
       size_t idx_;
    };
 };
+
+/// Type of shared pointers of HC4 contractors
+typedef std::shared_ptr<ContractorHC4> SharedContractorHC4;
 
 } // namespace
 

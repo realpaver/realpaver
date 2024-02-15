@@ -128,6 +128,11 @@ bool DagNode::dependsOn(const Variable& v) const
    return bitset_.get(v.id());
 }
 
+bool DagNode::isShared() const
+{
+   return parArity() > 1;
+}
+
 Interval DagNode::val() const
 {
    return val_;
@@ -136,6 +141,14 @@ Interval DagNode::val() const
 void DagNode::setVal(const Interval& x)
 {
    val_ = x;
+}
+
+void DagNode::sharedEval(const IntervalBox& B)
+{
+   eval(B);
+
+   if (isShared())
+      val_ &= dag()->dom(index_);
 }
 
 Interval DagNode::dv() const
@@ -1560,6 +1573,14 @@ Interval DagFun::intervalEval(const IntervalBox& B)
    return rootNode()->val();
 }
 
+Interval DagFun::sharedIntervalEval(const IntervalBox& B)
+{
+   for (size_t i=0; i<nbNodes(); ++i)
+      node_[i]->sharedEval(B);
+
+   return rootNode()->val();
+}
+
 Interval DagFun::intervalEval(const RealPoint& pt)
 {
    for (size_t i=0; i<nbNodes(); ++i)
@@ -1579,19 +1600,6 @@ Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
 
    rootNode()->evalOnly(v, x);
    return rootNode()->val();
-}
-
-Proof DagFun::hc4Revise(IntervalBox& B)
-{
-   // assigns the projections to the universe for the shared nodes
-   for (size_t i=0; i<nbNodes(); ++i)
-   {
-      DagNode* node = node_[i];
-      if (node->parArity() > 1)
-         node->setDom(Interval::universe());
-   }
-
-   return sharedHc4Revise(B);
 }
 
 Proof DagFun::hc4ReviseNeg(IntervalBox& B)
@@ -1689,9 +1697,37 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& B)
    }
 }
 
+Proof DagFun::hc4Revise(IntervalBox& B)
+{
+   // assigns the projections to the universe for the shared nodes
+   for (size_t i=0; i<nbNodes(); ++i)
+   {
+      DagNode* node = node_[i];
+      if (node->isShared())
+         node->setDom(Interval::universe());
+   }
+
+   Interval e = intervalEval(B);
+
+   if (e.isEmpty())
+      return Proof::Empty;
+
+   else if (image_.contains(e))
+      return Proof::Inner;
+
+   else if (!image_.overlaps(e))
+      return Proof::Empty;
+
+   else
+   {
+      rootNode()->setDom(e & image_);
+      return hc4ReviseBack(B);
+   }
+}
+
 Proof DagFun::sharedHc4Revise(IntervalBox& B)
 {
-   Interval e = intervalEval(B);
+   Interval e = sharedIntervalEval(B);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1927,8 +1963,8 @@ void Dag::setDom(size_t i, const Interval& x)
 }
 
 void Dag::reduceDom(size_t i, const Interval& x)
-{
-   if (node_[i]->parArity() > 1)
+{   
+   if (node_[i]->isShared())
    {
       Interval aux( x & context_->dom[i]);
       context_->dom.set(i, aux);

@@ -17,7 +17,8 @@ using namespace realpaver;
 using namespace std;
 
 
-// meson setup build -DLP_LIB=Highs -DASSERT=false -DLOG=false -Dbuild_type=debug
+// meson setup build -DLP_LIB=Highs -DASSERT=true -DLOG=true -Dbuildtype=debug
+// meson setup build -DLP_LIB=Highs -DASSERT=false -DLOG=false -Dbuildtype=release
 
 int main(void)
 {

@@ -12,7 +12,6 @@
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/ContractorList.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -104,8 +103,36 @@ std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
    return ssr;
 }
 
-SharedPropagationAlg ContractorFactory::makeHC4()
+SharedContractorHC4 ContractorFactory::makeHC4()
 {
+   // constraints from the dag
+   SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(dag_);
+
+   // other constraints
+   for (const Constraint& c : vc_)
+   {
+      std::shared_ptr<ContractorConstraint>
+         op = std::make_shared<ContractorConstraint>(c);
+      hc4->push(op);
+   }
+
+   // variables with disconnected domains
+   std::shared_ptr<ContractorDomain> dop = makeContractorDomain();
+
+   if (dop->nbVars() > 0)
+      hc4->push(dop);
+
+   // tuning of propagation
+   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
+   hc4->setTol(Tolerance(rtol, 0.0));
+
+   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
+   hc4->setMaxIter(niter);   
+
+   // TODO
+   // ajouter les domain contractors
+/*
+
    SharedContractorVector pool = std::make_shared<ContractorVector>();
 
    // equations
@@ -138,13 +165,15 @@ SharedPropagationAlg ContractorFactory::makeHC4()
    if (dop->nbVars() > 0)
       pool->push(dop);
 
-   SharedPropagationAlg hc4 = std::make_shared<PropagationAlg>(pool);
+   SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(pool);
 
    double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
    hc4->setTol(Tolerance(rtol, 0.0));
 
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
    hc4->setMaxIter(niter);
+
+*/
 
    return hc4;
 }
@@ -265,7 +294,7 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
 
 SharedContractor ContractorFactory::makeHC4Newton()
 {
-   SharedPropagationAlg hc4 = makeHC4();
+   SharedContractorHC4 hc4 = makeHC4();
    std::shared_ptr<IntervalNewton> newton = makeIntervalNewton();
 
    if (newton != nullptr)
@@ -287,7 +316,7 @@ SharedContractorACID ContractorFactory::makeACID()
 
    std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
-   SharedPropagationAlg hc4 = makeHC4();
+   SharedContractorHC4 hc4 = makeHC4();
 
    int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
    int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");

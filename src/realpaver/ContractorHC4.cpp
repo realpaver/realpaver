@@ -77,6 +77,11 @@ void ContractorHC4::setMaxIter(size_t n)
    propag_->setMaxIter(n);
 }
 
+void ContractorHC4::push(SharedContractor op)
+{
+   propag_->push(op);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ContractorHC4::SharedHC4Revise::SharedHC4Revise(SharedDag dag, size_t i)

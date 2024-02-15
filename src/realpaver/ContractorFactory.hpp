@@ -13,6 +13,7 @@
 #include <vector>
 #include "realpaver/ContractorACID.hpp"
 #include "realpaver/ContractorDomain.hpp"
+#include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Env.hpp"
@@ -61,7 +62,7 @@ public:
    /// A constraint contractor is created for each other constraint.
    /// A domain contractor is created for each variable whose initial domain
    /// is not connected.
-   SharedPropagationAlg makeHC4();
+   SharedContractorHC4 makeHC4();
 
    /// Creates a contractor that implements a constraint propagation algorithm
    /// based on BC4 contractors
