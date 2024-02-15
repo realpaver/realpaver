@@ -14,7 +14,12 @@ namespace realpaver {
 
 ContractorList::ContractorList(SharedContractorPool pool)
       : pool_(pool)
-{}
+{
+   if (pool == nullptr)
+   {
+      pool_ = std::make_shared<ContractorVector>();
+   }
+}
 
 size_t ContractorList::poolSize() const
 {
@@ -29,6 +34,11 @@ SharedContractorPool ContractorList::getPool() const
 void ContractorList::setPool(SharedContractorPool pool)
 {
    pool_ = pool;
+}
+
+void ContractorList::push(SharedContractor op)
+{
+   pool_->push(op);
 }
 
 Scope ContractorList::scope() const

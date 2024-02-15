@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
-#include "realpaver/ContractorList.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspPropagator.hpp"
 

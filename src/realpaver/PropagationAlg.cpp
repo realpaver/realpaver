@@ -24,7 +24,12 @@ PropagationAlg::PropagationAlg(SharedContractorPool pool)
         tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
         maxiter_(Param::GetIntParam("PROPAGATION_ITER_LIMIT")),
         certif_()
-{}
+{
+   if (pool == nullptr)
+   {
+      pool_ = std::make_shared<ContractorVector>();
+   }
+}
 
 Tolerance PropagationAlg::getTol() const
 {
@@ -39,6 +44,11 @@ void PropagationAlg::setTol(Tolerance tol)
 size_t PropagationAlg::poolSize() const
 {
    return pool_->poolSize();
+}
+
+void PropagationAlg::push(SharedContractor op)
+{
+   pool_->push(op);
 }
 
 size_t PropagationAlg::getMaxIter() const

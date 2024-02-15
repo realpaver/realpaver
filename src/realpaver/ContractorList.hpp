@@ -42,6 +42,10 @@ public:
    /// @param pool new pool of contractors
    void setPool(SharedContractorPool pool);
 
+   /// Inserts a contractor at the end of this
+   /// @param op a contractor
+   void push(SharedContractor op);
+
    ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
