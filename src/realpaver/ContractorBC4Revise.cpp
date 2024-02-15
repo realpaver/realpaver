@@ -73,6 +73,18 @@ Proof ContractorBC4Revise::contract(IntervalBox& B)
    return proof;
 }
 
+void ContractorBC4Revise::setPeelFactor(double f)
+{
+   for (size_t i=0; i<bc3_.size(); ++i)
+      bc3_[i]->setPeelFactor(f);
+}
+
+void ContractorBC4Revise::setMaxIter(size_t val)
+{
+   for (size_t i=0; i<bc3_.size(); ++i)
+      bc3_[i]->setMaxIter(val);
+}
+
 void ContractorBC4Revise::print(std::ostream& os) const
 {
    os << "BC4Revise contractor #" << if_;

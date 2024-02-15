@@ -7,33 +7,33 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_HC4_HPP
-#define REALPAVER_CONTRACTOR_HC4_HPP
+#ifndef REALPAVER_CONTRACTOR_BC4_HPP
+#define REALPAVER_CONTRACTOR_BC4_HPP
 
-#include "realpaver/ContractorHC4Revise.hpp"
+#include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/PropagationAlg.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This is a constraint propagation algorithm applying HC4Revise contractors
+/// This is a constraint propagation algorithm applying BC4Revise contractors
 /// on a DAG.
 ///////////////////////////////////////////////////////////////////////////////
-class ContractorHC4 : public Contractor {
+class ContractorBC4 : public Contractor {
 public:
    /// Constructor
    /// @param dag a shared dag
-   ContractorHC4(SharedDag dag);
+   ContractorBC4(SharedDag dag);
 
    /// Destructor
-   ~ContractorHC4();
+   ~ContractorBC4();
 
    /// No copy
-   ContractorHC4(const ContractorHC4&) = delete;
+   ContractorBC4(const ContractorBC4&) = delete;
 
    /// No asignment
-   ContractorHC4& operator=(const ContractorHC4&) = delete;
+   ContractorBC4& operator=(const ContractorBC4&) = delete;
 
    ///@{
    Scope scope() const override;
@@ -62,30 +62,22 @@ public:
    /// @param n new value
    void setMaxIter(size_t n);
 
+   /// Sets the peel factor of the BC4Revise operators
+   /// @param f f/100 is a percentage with f >= 0.0 and f <= 100.0
+   void setBC4RevisePeelFactor(double f);
+
+   /// Sets the maximum number of steps in the BC4Revise operators
+   /// @param val new value
+   void setBC4ReviseMaxIter(size_t val);
+
 private:
    SharedDag dag_;
-   DagContext* context_;
    PropagationAlg* propag_;
-
-   //////////
-   class SharedHC4Revise : public Contractor {
-   public:
-      SharedHC4Revise(SharedDag dag, size_t i);
-
-      ///@{
-      Scope scope() const override;
-      Proof contract(IntervalBox& B) override;
-      void print(std::ostream& os) const override;
-      ///@}
-
-   private:
-      SharedDag dag_;
-      size_t idx_;
-   };
+   std::vector<std::shared_ptr<ContractorBC4Revise>> vop_;
 };
 
-/// Type of shared pointers of HC4 contractors
-typedef std::shared_ptr<ContractorHC4> SharedContractorHC4;
+/// Type of shared pointers of BC4 contractors
+typedef std::shared_ptr<ContractorBC4> SharedContractorBC4;
 
 } // namespace
 

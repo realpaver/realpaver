@@ -39,6 +39,14 @@ public:
    /// No assignment
    ContractorBC4Revise& operator=(const ContractorBC4Revise&) = delete;
 
+   /// Sets the peel factor of the BC3Revise operators
+   /// @param f f/100 is a percentage with f >= 0.0 and f <= 100.0
+   void setPeelFactor(double f);
+
+   /// Sets the maximum number of steps in the BC3Revise operators
+   /// @param val new value
+   void setMaxIter(size_t val);
+
    ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;

@@ -129,97 +129,41 @@ SharedContractorHC4 ContractorFactory::makeHC4()
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
    hc4->setMaxIter(niter);   
 
-   // TODO
-   // ajouter les domain contractors
-/*
-
-   SharedContractorVector pool = std::make_shared<ContractorVector>();
-
-   // equations
-   for (size_t i : ve_)
-   {
-      std::shared_ptr<ContractorHC4Revise>
-         op = std::make_shared<ContractorHC4Revise>(dag_, i);
-      pool->push(op);
-   }
-
-   // inequality constraints
-   for (size_t i : vi_)
-   {
-      std::shared_ptr<ContractorHC4Revise>
-         op = std::make_shared<ContractorHC4Revise>(dag_, i);
-      pool->push(op);
-   }
-
-   // constraints
-   for (const Constraint& c : vc_)
-   {
-      std::shared_ptr<ContractorConstraint>
-         op = std::make_shared<ContractorConstraint>(c);
-      pool->push(op);
-   }
-
-   // variables with disconnected domains
-   std::shared_ptr<ContractorDomain> dop = makeContractorDomain();
-
-   if (dop->nbVars() > 0)
-      pool->push(dop);
-
-   SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(pool);
-
-   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   hc4->setTol(Tolerance(rtol, 0.0));
-
-   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
-   hc4->setMaxIter(niter);
-
-*/
-
    return hc4;
 }
 
-SharedPropagationAlg ContractorFactory::makeBC4()
+SharedContractorBC4 ContractorFactory::makeBC4()
 {
-   SharedContractorVector pool = std::make_shared<ContractorVector>();
+   // constraints from the dag
+   SharedContractorBC4 bc4 = std::make_shared<ContractorBC4>(dag_);
 
-   // equations
-   for (size_t i : ve_)
-   {
-      std::shared_ptr<ContractorBC4Revise>
-         op = std::make_shared<ContractorBC4Revise>(dag_, i);
-      pool->push(op);
-   }
-
-   // inequality constraints
-   for (size_t i : vi_)
-   {
-      std::shared_ptr<ContractorBC4Revise>
-         op = std::make_shared<ContractorBC4Revise>(dag_, i);
-      pool->push(op);
-   }
-
-   // constraints
+   // other constraints
    for (const Constraint& c : vc_)
    {
       std::shared_ptr<ContractorConstraint>
          op = std::make_shared<ContractorConstraint>(c);
-      pool->push(op);
+      bc4->push(op);
    }
 
    // variables with disconnected domains
    std::shared_ptr<ContractorDomain> dop = makeContractorDomain();
 
    if (dop->nbVars() > 0)
-      pool->push(dop);
+      bc4->push(dop);
 
-   SharedPropagationAlg bc4 = std::make_shared<PropagationAlg>(pool);
-
-   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   double atol = env_->getParam()->getDblParam("PROPAGATION_ABS_TOL");
-   bc4->setTol(Tolerance(rtol, atol));
+   // tuning of propagation
+   double val = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
+   bc4->setTol(Tolerance(val, 0.0));
 
    int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
-   bc4->setMaxIter(niter);
+   bc4->setMaxIter(niter);   
+
+   // tuning of BC4Revise operators
+   val = env_->getParam()->getDblParam("BC3_PEEL_FACTOR");
+   bc4->setBC4RevisePeelFactor(val);
+
+   niter = env_->getParam()->getIntParam("BC3_ITER_LIMIT");
+   bc4->setBC4ReviseMaxIter(niter);   
 
    return bc4;
 }

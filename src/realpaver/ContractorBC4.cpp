@@ -1,0 +1,90 @@
+///////////////////////////////////////////////////////////////////////////////
+// This file is part of Realpaver, an interval constraint and NLP solver.    //
+//                                                                           //
+// Copyright (c) 2017-2023 LS2N, Nantes                                      //
+//                                                                           //
+// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
+// COPYING for information.                                                  //
+///////////////////////////////////////////////////////////////////////////////
+
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorBC4.hpp"
+#include "realpaver/Logger.hpp"
+
+namespace realpaver {
+
+ContractorBC4::ContractorBC4(SharedDag dag)
+      : dag_(dag),
+        vop_()
+{
+   SharedContractorVector pool = std::make_shared<ContractorVector>();
+
+   for (size_t i=0; i<dag_->nbFuns(); ++i)
+   {
+      std::shared_ptr<ContractorBC4Revise>
+         op = std::make_shared<ContractorBC4Revise>(dag_, i);
+      pool->push(op);
+      vop_.push_back(op);
+   }
+
+   propag_ = new PropagationAlg(pool);
+}
+
+ContractorBC4::~ContractorBC4()
+{
+   if (propag_ != nullptr) delete propag_;
+}
+
+Scope ContractorBC4::scope() const
+{
+   return dag_->scope();
+}
+
+Proof ContractorBC4::contract(IntervalBox& B)
+{
+   return propag_->contract(B);
+}
+
+void ContractorBC4::print(std::ostream& os) const
+{
+   os << "BC4";
+}
+
+void ContractorBC4::setBC4RevisePeelFactor(double f)
+{
+   for (auto& op : vop_)
+      op->setPeelFactor(f);
+}
+
+void ContractorBC4::setBC4ReviseMaxIter(size_t val)
+{
+   for (auto& op : vop_)
+      op->setMaxIter(val);
+}
+
+Tolerance ContractorBC4::getTol() const
+{
+   return propag_->getTol();
+}
+
+void ContractorBC4::setTol(Tolerance tol)
+{
+   propag_->setTol(tol);
+}
+
+size_t ContractorBC4::getMaxIter() const
+{
+   return propag_->getMaxIter();
+}
+
+void ContractorBC4::setMaxIter(size_t n)
+{
+   propag_->setMaxIter(n);
+}
+
+void ContractorBC4::push(SharedContractor op)
+{
+   propag_->push(op);
+}
+
+} // namespace
