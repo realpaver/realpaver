@@ -60,6 +60,7 @@ public:
    void apply(const ArithCtrGt* c) override;
    void apply(const ArithCtrIn* c) override;
    void apply(const TableCtr* c) override;
+   void apply(const CondCtr* c) override;
    ///@}
 
 private:

@@ -2755,6 +2755,11 @@ void DagCreator::apply(const ArithCtrIn* c)
    index_ = dag_->insertFun(f);
 }
 
+void DagCreator::apply(const CondCtr* c)
+{
+   // TODO
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagTermCreator::DagTermCreator(Dag* dag)

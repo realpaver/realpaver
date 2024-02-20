@@ -75,6 +75,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 ">="     return TK_GE;
 "<="     return TK_LE;
 "|"		return TK_PIPE;
+"->"     return TK_IMPLY;
 
 {IDENT}     	return TK_IDENT;
 

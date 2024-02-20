@@ -117,6 +117,9 @@ public:
    /// @return true if this is a linear expression
    virtual bool isLinear() const = 0;
 
+   /// @return true if this is an integer term
+   virtual bool isInteger() const = 0;
+
    /// @return true if this has no variable
    ///
    /// test done in O(1)
@@ -250,6 +253,12 @@ public:
    /// @return true if this is a linear expression
    bool isLinear() const;
 
+   /// @return true if this is an integer term
+   ///
+   /// An integer term has only integer variables, integer constants, and
+   /// arithmetic operations
+   bool isInteger() const;
+
    /// @return true if this has no variable
    ///
    /// test done in O(1)
@@ -369,6 +378,7 @@ public:
    bool isMinusOne() const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
+   bool isInteger() const override;
    void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -398,6 +408,7 @@ public:
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
+   bool isInteger() const override;
    void makeScope(Scope& scop) const override;
    bool isVar() const override;
    TermRep* cloneRoot() const override;
@@ -462,6 +473,7 @@ public:
    bool isDiv() const override;
    bool isUsb() const override;
    bool isLin() const override;
+   bool isInteger() const override;
    void eval(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
    virtual void print(std::ostream& os) const override;
@@ -473,6 +485,7 @@ public:
 protected:
    virtual void evalRoot() = 0;
    virtual void contractRoot() = 0;
+   virtual bool isIntegerRoot() const; // default : false
 
 private:
    std::vector<SharedRep> v_;    // sub-terms
@@ -496,6 +509,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -518,6 +532,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -540,6 +555,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -561,6 +577,7 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -581,6 +598,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -601,6 +619,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -622,6 +641,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -641,6 +661,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -660,6 +681,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -680,6 +702,7 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -699,6 +722,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -723,6 +747,7 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -868,6 +893,7 @@ public:
    Proof contract(IntervalBox& B) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isInteger() const override;
    bool dependsOn(const Variable& v) const override;
    void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;

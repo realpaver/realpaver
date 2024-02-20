@@ -133,4 +133,10 @@ void ConstraintFixer::apply(const TableCtr* c)
    c_ = Constraint(srep);
 }
 
+void ConstraintFixer::apply(const CondCtr* c)
+{
+   // TODO
+}
+
+
 } // namespace

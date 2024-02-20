@@ -1337,6 +1337,7 @@ public:
    void apply(const ArithCtrGe* c) override;
    void apply(const ArithCtrGt* c) override;
    void apply(const ArithCtrIn* c) override;
+   void apply(const CondCtr* c) override;
    ///@}
 
 private:

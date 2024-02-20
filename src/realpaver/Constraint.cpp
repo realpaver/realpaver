@@ -160,6 +160,11 @@ std::ostream& operator<<(std::ostream& os, Constraint c)
    return os;
 }
 
+ConstraintRep* Constraint::cloneRoot() const
+{
+   return rep_->cloneRoot();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
@@ -301,6 +306,11 @@ Constraint operator==(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrEq>(l.rep(), r.rep()));
 }
 
+ConstraintRep* ArithCtrEq::cloneRoot() const
+{
+   return new ArithCtrEq(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ArithCtrLe::ArithCtrLe(Term l, Term r)
@@ -371,6 +381,11 @@ Proof ArithCtrLe::contract(IntervalBox& B)
 Constraint operator<=(Term l, Term r)
 {
    return Constraint(std::make_shared<ArithCtrLe>(l.rep(), r.rep()));
+}
+
+ConstraintRep* ArithCtrLe::cloneRoot() const
+{
+   return new ArithCtrLe(left(), right());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -445,6 +460,11 @@ Constraint operator<(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrLt>(l.rep(), r.rep()));
 }
 
+ConstraintRep* ArithCtrLt::cloneRoot() const
+{
+   return new ArithCtrLt(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ArithCtrGe::ArithCtrGe(Term l, Term r)
@@ -517,6 +537,11 @@ Constraint operator>=(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrGe>(l.rep(), r.rep()));
 }
 
+ConstraintRep* ArithCtrGe::cloneRoot() const
+{
+   return new ArithCtrGe(left(), right());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ArithCtrGt::ArithCtrGt(Term l, Term r)
@@ -587,6 +612,11 @@ Proof ArithCtrGt::contract(IntervalBox& B)
 Constraint operator>(Term l, Term r)
 {
    return Constraint(std::make_shared<ArithCtrGt>(l.rep(), r.rep()));
+}
+
+ConstraintRep* ArithCtrGt::cloneRoot() const
+{
+   return new ArithCtrGt(left(), right());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -680,6 +710,11 @@ Constraint in(Term t, const Interval& x)
 Constraint in(Term t, double a, double b)
 {
    return in(t, Interval(a,b));
+}
+
+ConstraintRep* ArithCtrIn::cloneRoot() const
+{
+   return new ArithCtrIn(term(), image());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -994,6 +1029,10 @@ Constraint table(const Variable* vars, size_t nvars,
    return Constraint(srep);
 }
 
+ConstraintRep* TableCtr::cloneRoot() const
+{
+   return new TableCtr(*this);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1031,6 +1070,11 @@ void ConstraintVisitor::apply(const ArithCtrIn* c)
 }
 
 void ConstraintVisitor::apply(const TableCtr* c)
+{
+   THROW("Visit method not implemented");
+}
+
+void ConstraintVisitor::apply(const CondCtr* c)
 {
    THROW("Visit method not implemented");
 }

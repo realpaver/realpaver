@@ -27,12 +27,23 @@ int main(void)
       Problem P;
       Variable x = P.addRealVar(-2, 2, "x"),
                y = P.addRealVar(-2, 2, "y"),
-               z = P.addRealVar(-1e08, 1e08, "z");
+               z = P.addRealVar(-1e08, 1e08, "z"),
+               n = P.addIntVar(1, 8, "n"),
+               m = P.addIntVar(1, 8, "m");
+
+      Term tt( 2*n - 1.5*sqr(m) + 1);
+      cout << tt.isInteger() << endl;
+
+
+
+   
 
       //P.addCtr( sqr(y) * (1 + sqr(z)) + z * (z - 24 * y) == -13 );
       //P.addCtr( sqr(x) * (1 + sqr(y)) + y * (y - 24 * x) == -13 );
       //P.addCtr( sqr(z) * (1 + sqr(x)) + x * (x - 24 * z) == -13 );
 
+
+/*
       P.addCtr( 11*pow(x,8) - 21*pow(y,6) + 44*sqr(x)*pow(y,6) + 11*pow(y,8) == 0);
       P.addCtr( sqr(x) + sqr(y) - 1 == 0 );
 
@@ -70,6 +81,7 @@ int main(void)
       }
       tom.stop();
       cout << tom.elapsedTime() << " (s)" << endl;
+*/
    }
    catch(Exception e)
    {

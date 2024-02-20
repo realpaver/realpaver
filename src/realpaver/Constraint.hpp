@@ -95,6 +95,9 @@ public:
    ///         g is a variable, and R in {=, >, <, >=, <=}.
    virtual bool isBoundConstraint() const;
 
+   /// @return a new representation such that the root of this is cloned
+   virtual ConstraintRep* cloneRoot() const = 0;
+
 protected:
    typedef std::shared_ptr<ConstraintRep> SharedRep;
    friend class Constraint;
@@ -170,6 +173,9 @@ public:
    ///         g is a variable, and R in {=, >, <, >=, <=}.
    bool isBoundConstraint() const;
 
+   /// @return a new representation such that the root of this is cloned
+   ConstraintRep* cloneRoot() const;
+
 public:
    /// type of the shared representation
    typedef ConstraintRep::SharedRep SharedRep;
@@ -240,6 +246,7 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 };
 
@@ -264,6 +271,7 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 };
 
@@ -288,6 +296,7 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 };
 
@@ -312,6 +321,7 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 };
 
@@ -336,6 +346,7 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 };
 
@@ -368,6 +379,7 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 
 private:
@@ -443,7 +455,7 @@ public:
    /// @param vars a list of variables
    /// @param values list of values representing a row oriented matrix
    TableCtr(const std::initializer_list<Variable>& vars,
-                   const std::initializer_list<Interval>& values);   
+            const std::initializer_list<Interval>& values);   
 
    /// @return the number of columns (variables)
    size_t nbCols() const;
@@ -476,6 +488,7 @@ public:
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    void acceptVisitor(ConstraintVisitor& vis) const override;
+   ConstraintRep* cloneRoot() const override;
    ///@}
 
 private:
@@ -507,6 +520,17 @@ Constraint table(const Variable* vars, size_t nvars,
                  const Interval* values, size_t nvalues);
 
 ///////////////////////////////////////////////////////////////////////////////
+/// 
+///////////////////////////////////////////////////////////////////////////////
+class CondCtr : public ConstraintRep {
+public:
+
+private:
+};
+
+// TODO : MODIFIER LES VISITEURS : ConstraintFixer, DagCreator
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is a visitor of constraint representations.
 ///////////////////////////////////////////////////////////////////////////////
 class ConstraintVisitor {
@@ -522,6 +546,7 @@ public:
    virtual void apply(const ArithCtrGt* c);
    virtual void apply(const ArithCtrIn* c);
    virtual void apply(const TableCtr* c);
+   virtual void apply(const CondCtr* c);
    ///@}
 };
 

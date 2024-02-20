@@ -295,6 +295,11 @@ bool Term::isLinear() const
    return rep_->isLinear();
 }
 
+bool Term::isInteger() const
+{
+   return rep_->isInteger();
+}
+
 bool Term::isSumOfSquares() const
 {
    SumOfSquaresCreator creator;
@@ -1030,6 +1035,11 @@ bool TermConst::isLinear() const
    return true;
 }
 
+bool TermConst::isInteger() const
+{
+   return x_.isAnInt();
+}
+
 void TermConst::makeScope(Scope& scop) const
 {}
 
@@ -1099,6 +1109,11 @@ bool TermVar::dependsOn(const Variable& v) const
 bool TermVar::isLinear() const
 {
    return true;
+}
+
+bool TermVar::isInteger() const
+{
+   return v_.getDomain()->isInteger();
 }
 
 void TermVar::makeScope(Scope& scop) const
@@ -1174,6 +1189,22 @@ bool TermOp::isUsb() const
 bool TermOp::isLin() const
 {
    return op_ == OpSymbol::Lin;
+}
+
+bool TermOp::isIntegerRoot() const
+{
+   return false;
+}
+
+bool TermOp::isInteger() const
+{
+   if (!isIntegerRoot()) return false;
+
+   for (const auto& sub : v_)
+      if (!sub->isInteger())
+         return false;
+
+   return true;
 }
 
 void TermOp::insert(const SharedRep& t)
@@ -1301,6 +1332,11 @@ void TermAdd::contractRoot()
    right()->setIval(addPY(left()->ival(), right()->ival(), ival_));
 }
 
+bool TermAdd::isIntegerRoot() const
+{
+   return true;
+}
+
 void TermAdd::print(std::ostream& os) const
 {
    left()->print(os);
@@ -1380,6 +1416,11 @@ bool TermSub::isLinear() const
    return left()->isLinear() && right()->isLinear();
 }
 
+bool TermSub::isIntegerRoot() const
+{
+   return true;
+}
+
 TermRep* TermSub::cloneRoot() const
 {
    return new TermSub(left(), right());
@@ -1452,6 +1493,11 @@ bool TermMul::isLinear() const
           (left()->isLinear() && right()->isConstant());
 }
 
+bool TermMul::isIntegerRoot() const
+{
+   return true;
+}
+
 TermRep* TermMul::cloneRoot() const
 {
    return new TermMul(left(), right());
@@ -1516,6 +1562,11 @@ void TermDiv::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+bool TermDiv::isIntegerRoot() const
+{
+   return true;
+}
+
 TermRep* TermDiv::cloneRoot() const
 {
    return new TermDiv(left(), right());
@@ -1553,6 +1604,11 @@ void TermMin::contractRoot()
 void TermMin::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+bool TermMin::isIntegerRoot() const
+{
+   return true;
 }
 
 TermRep* TermMin::cloneRoot() const
@@ -1594,6 +1650,11 @@ void TermMax::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+bool TermMax::isIntegerRoot() const
+{
+   return true;
+}
+
 TermRep* TermMax::cloneRoot() const
 {
    return new TermMax(left(), right());
@@ -1630,6 +1691,11 @@ void TermUsb::contractRoot()
 void TermUsb::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+bool TermUsb::isIntegerRoot() const
+{
+   return true;
 }
 
 bool TermUsb::isLinear() const
@@ -1691,6 +1757,11 @@ void TermAbs::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+bool TermAbs::isIntegerRoot() const
+{
+   return true;
+}
+
 TermRep* TermAbs::cloneRoot() const
 {
    return new TermAbs(child());
@@ -1726,6 +1797,11 @@ void TermSgn::contractRoot()
 void TermSgn::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+bool TermSgn::isIntegerRoot() const
+{
+   return true;
 }
 
 TermRep* TermSgn::cloneRoot() const
@@ -1783,6 +1859,11 @@ void TermSqr::acceptVisitor(TermVisitor& vis) const
    vis.apply(this);
 }
 
+bool TermSqr::isIntegerRoot() const
+{
+   return true;
+}
+
 TermRep* TermSqr::cloneRoot() const
 {
    return new TermSqr(child());
@@ -1818,6 +1899,11 @@ void TermSqrt::contractRoot()
 void TermSqrt::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+bool TermSqrt::isIntegerRoot() const
+{
+   return true;
 }
 
 TermRep* TermSqrt::cloneRoot() const
@@ -1873,6 +1959,11 @@ void TermPow::print(std::ostream& os) const
 void TermPow::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
+}
+
+bool TermPow::isIntegerRoot() const
+{
+   return true;
 }
 
 TermRep* TermPow::cloneRoot() const
@@ -2173,6 +2264,22 @@ bool TermLin::isVariable() const
    if (terms_.size() != 1) return false;
    auto it = terms_.begin();
    return (*it).coef.isSetEq(1.0);
+}
+
+bool TermLin::isInteger() const
+{
+   if (!cst_.isAnInt()) return false;
+
+   for (const Item& it : terms_)
+   {
+      if (!it.coef.isAnInt())
+         return false;
+
+      if (!it.var.getDomain()->isInteger())
+         return false;
+   }
+
+   return true;
 }
 
 void print_coef(std::ostream& os, const Interval& x, bool first)
