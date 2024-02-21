@@ -20,7 +20,7 @@ class ConstraintVisitor;   // forward declaration
 /// Enumeration of relation symbols.
 ///////////////////////////////////////////////////////////////////////////////
 enum class RelSymbol {
-   Eq, Le, Lt, Ge, Gt, In, Table
+   Eq, Le, Lt, Ge, Gt, In, Table, Cond
 };
 
 /// Output on a stream
@@ -32,7 +32,7 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel);
 class ConstraintRep {
 public:
    /// Creates a representation
-   ConstraintRep();
+   ConstraintRep(RelSymbol rel);
 
    /// Default copy constructor
    ConstraintRep(const ConstraintRep&) = default;
@@ -53,6 +53,9 @@ public:
    /// @param v a variable
    /// @return true if this depends on v
    bool dependsOn(Variable v) const;
+
+   /// @return the relation symbol of this
+   RelSymbol relSymbol() const;
 
    /// @return true if this constraint is variable free
    virtual bool isConstant() const = 0;
@@ -81,14 +84,17 @@ public:
    /// @param vis a visitor
    virtual void acceptVisitor(ConstraintVisitor& vis) const = 0;
 
-   /// @return true if this is an equation
+   /// @return true if this is an equation (default: false)
    virtual bool isEquation() const;
 
-   /// @return true if this is an inequality constraint
+   /// @return true if this is an inequality constraint (default: false)
    virtual bool isInequality() const;
 
-   /// @return true if this is linear
+   /// @return true if this is linear (default: false)
    virtual bool isLinear() const;
+
+   /// @return true if this is an integer arithmetic constraint
+   virtual bool isInteger() const = 0;
 
    /// @return true if this is a bound-constraint of the form f R g where
    ///         f is a variable and g is a constant (or f is a constant and
@@ -108,6 +114,7 @@ protected:
 
 private:
    Scope scop_;
+   RelSymbol rel_;
 
 protected:
    size_t hcode_;
@@ -126,6 +133,9 @@ public:
 
    /// @return the scope of this
    Scope scope() const;
+
+   /// @return the relation symbol of this
+   RelSymbol relSymbol() const;
 
    /// @return true if this is variable free
    bool isConstant() const;
@@ -173,6 +183,9 @@ public:
    ///         g is a variable, and R in {=, >, <, >=, <=}.
    bool isBoundConstraint() const;
 
+   /// @return true if this is an integer constraint
+   bool isInteger() const;
+
    /// @return a new representation such that the root of this is cloned
    ConstraintRep* cloneRoot() const;
 
@@ -214,9 +227,6 @@ public:
    /// @return the right-hand term
    Term right() const;
 
-   /// @return the relation symbol
-   RelSymbol relSymbol() const;
-
    ///@{
    void print(std::ostream& os) const override;
    bool isConstant() const override;
@@ -224,11 +234,11 @@ public:
    bool isInequality() const override;
    bool isLinear() const override;
    bool isBoundConstraint() const override;
+   bool isInteger() const override;
    ///@}
 
 private:
    Term l_, r_;
-   RelSymbol rel_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -427,6 +437,9 @@ public:
    /// @param x value added
    void addValue(const Interval& x);
 
+   /// @return true if this represents an integer variable with integer values
+   bool isInteger() const;
+
 private:
    Variable v_;
    std::vector<Interval> vval_;
@@ -483,6 +496,7 @@ public:
 
    ///@{
    bool isConstant() const override;
+   bool isInteger() const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
@@ -524,8 +538,32 @@ Constraint table(const Variable* vars, size_t nvars,
 ///////////////////////////////////////////////////////////////////////////////
 class CondCtr : public ConstraintRep {
 public:
+   CondCtr(Constraint guard, Constraint body);
+
+   CondCtr(CondCtr&) = default;
+
+   CondCtr& operator=(CondCtr&) = delete;
+
+   ~CondCtr() = default;
+   
+   Constraint guard() const;
+   
+   Constraint body() const;
+
+   ///@{
+   bool isConstant() const override;
+   bool isInteger() const override;
+   Proof isSatisfied(const IntervalBox& B) override;
+   double violation(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(ConstraintVisitor& vis) const override;
+   ConstraintRep* cloneRoot() const override;
+   ///@}
 
 private:
+   Constraint guard_;
+   Constraint body_;
 };
 
 // TODO : MODIFIER LES VISITEURS : ConstraintFixer, DagCreator

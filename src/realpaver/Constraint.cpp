@@ -31,8 +31,9 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstraintRep::ConstraintRep()
+ConstraintRep::ConstraintRep(RelSymbol rel)
       : scop_(),
+        rel_(rel),
         hcode_(0)
 {}
 
@@ -57,6 +58,11 @@ void ConstraintRep::setScope(Scope scop)
 bool ConstraintRep::dependsOn(Variable v) const
 {
    return scop_.contains(v);
+}
+
+RelSymbol ConstraintRep::relSymbol() const
+{
+   return rel_;
 }
 
 bool ConstraintRep::isEquation() const
@@ -97,6 +103,11 @@ size_t Constraint::hashCode() const
 Scope Constraint::scope() const
 {
    return rep_->scope();
+}
+
+RelSymbol Constraint::relSymbol() const
+{
+   return rep_->relSymbol();
 }
 
 bool Constraint::isConstant() const
@@ -154,6 +165,11 @@ bool Constraint::isBoundConstraint() const
    return rep_->isBoundConstraint();
 }
 
+bool Constraint::isInteger() const
+{
+   return rep_->isInteger();
+}
+
 std::ostream& operator<<(std::ostream& os, Constraint c)
 {
    c.print(os);
@@ -168,10 +184,9 @@ ConstraintRep* Constraint::cloneRoot() const
 ///////////////////////////////////////////////////////////////////////////////
 
 ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
-      : ConstraintRep(),
+      : ConstraintRep(rel),
         l_(l),
-        r_(r),
-        rel_(rel)
+        r_(r)
 {
    hcode_ = static_cast<size_t>(rel);
    hcode_ = hash2(l.hashCode(), hcode_);
@@ -196,11 +211,6 @@ Term ArithCtrBinary::right() const
    return r_;
 }
 
-RelSymbol ArithCtrBinary::relSymbol() const
-{
-   return rel_;
-}
-
 bool ArithCtrBinary::isConstant() const
 {
    return l_.isConstant() && r_.isConstant();
@@ -209,20 +219,22 @@ bool ArithCtrBinary::isConstant() const
 void ArithCtrBinary::print(std::ostream& os) const
 {
    l_.print(os);
-   os << " " << rel_ << " ";
+   os << " " << relSymbol() << " ";
    r_.print(os);
 }
 
 bool ArithCtrBinary::isEquation() const
 {
-   return rel_ == RelSymbol::Eq;
+   return relSymbol() == RelSymbol::Eq;
 }
 
 bool ArithCtrBinary::isInequality() const
 {
-   return rel_ == RelSymbol::Ge || rel_ == RelSymbol::Gt ||
-          rel_ == RelSymbol::Le || rel_ == RelSymbol::Lt ||
-          rel_ == RelSymbol::In;
+   RelSymbol rel = relSymbol();
+
+   return rel == RelSymbol::Ge || rel == RelSymbol::Gt ||
+          rel == RelSymbol::Le || rel == RelSymbol::Lt ||
+          rel == RelSymbol::In;
 }
 
 bool ArithCtrBinary::isLinear() const
@@ -233,6 +245,11 @@ bool ArithCtrBinary::isLinear() const
 bool ArithCtrBinary::isBoundConstraint() const
 {
    return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
+}
+
+bool ArithCtrBinary::isInteger() const 
+{
+   return l_.isInteger() && r_.isInteger();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -724,8 +741,7 @@ TableCtrCol::TableCtrCol(Variable v)
         vval_()
 {}
 
-TableCtrCol::TableCtrCol(Variable v,
-                                       const std::initializer_list<Interval>& l)
+TableCtrCol::TableCtrCol(Variable v, const std::initializer_list<Interval>& l)
       : v_(v),
         vval_(l)
 {}
@@ -751,16 +767,21 @@ Interval TableCtrCol::getVal(size_t i) const
    return vval_[i];
 }
 
+bool TableCtrCol::isInteger() const
+{
+   return v_.getDomain()->isInteger();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 TableCtr::TableCtr()
-      : ConstraintRep(),
+      : ConstraintRep(RelSymbol::Table),
         vcol_()
 {}
 
 TableCtr::TableCtr(
    const std::initializer_list<TableCtrCol>& l)
-      : ConstraintRep(),
+      : ConstraintRep(RelSymbol::Table),
         vcol_(l)
 {
    ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
@@ -773,7 +794,7 @@ TableCtr::TableCtr(
 TableCtr::TableCtr(
    const std::initializer_list<Variable>& vars,
    const std::initializer_list<Interval>& values)
-      : ConstraintRep(),
+      : ConstraintRep(RelSymbol::Table),
         vcol_()
 {
    size_t nbvar = vars.size();
@@ -821,6 +842,15 @@ void TableCtr::makeScopeAndHashCode()
    }
 
    setScope(s);
+}
+
+bool TableCtr::isInteger() const
+{
+   for (auto& col : vcol_)
+      if (!col.isInteger())
+         return false;
+
+   return true;
 }
 
 size_t TableCtr::nbCols() const
@@ -1032,6 +1062,92 @@ Constraint table(const Variable* vars, size_t nvars,
 ConstraintRep* TableCtr::cloneRoot() const
 {
    return new TableCtr(*this);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+CondCtr::CondCtr(Constraint guard, Constraint body)
+      : ConstraintRep(RelSymbol::Cond),
+        guard_(guard),
+        body_(body)
+{
+   ASSERT(guard.isInteger() || guard.isBoundConstraint(),
+          "Bad guard of conditional constraint: " << guard);
+
+   hcode_ = guard.hashCode();
+   hcode_ = hash2(body.hashCode(), hcode_);
+
+   Scope scop;
+   scop.insert(guard.scope());
+   scop.insert(body.scope());
+   setScope(scop);
+}
+   
+Constraint CondCtr::guard() const
+{
+   return guard_;
+}
+
+Constraint CondCtr::body() const
+{
+   return body_;
+}
+
+bool CondCtr::isConstant() const
+{
+   return guard_.isConstant() && body_.isConstant();
+}
+
+Proof CondCtr::isSatisfied(const IntervalBox& B)
+{
+   Proof p = guard_.isSatisfied(B);
+
+   if (p == Proof::Empty)
+      return Proof::Inner;
+
+   if (p == Proof::Inner)
+      p = body_.isSatisfied(B);
+
+   return p;
+}
+
+double CondCtr::violation(const IntervalBox& B)
+{
+   Proof p = guard_.isSatisfied(B);
+   return (p == Proof::Inner) ?  body_.violation(B) : 0.0;
+}
+
+Proof CondCtr::contract(IntervalBox& B)
+{
+   Proof p = guard_.isSatisfied(B);
+
+   if (p == Proof::Empty)
+      return Proof::Inner;
+
+   if (p == Proof::Inner)
+      p = body_.contract(B);
+
+   return p;
+}
+
+void CondCtr::print(std::ostream& os) const
+{
+   os << guard_ << " -> " << body_;
+}
+
+void CondCtr::acceptVisitor(ConstraintVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+ConstraintRep* CondCtr::cloneRoot() const
+{
+   return new CondCtr(guard_, body_);
+}
+
+bool CondCtr::isInteger() const
+{
+   return guard_.isInteger() && body_.isInteger();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
