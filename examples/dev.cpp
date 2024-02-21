@@ -12,6 +12,7 @@
 #include "realpaver/Tolerance.hpp"
 #include "realpaver/IntervalThickFunction.hpp"
 #include "realpaver/IntervalNewtonUni.hpp"
+#include "realpaver/ConstraintFixer.hpp"
 
 using namespace realpaver;
 using namespace std;

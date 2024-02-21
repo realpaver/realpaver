@@ -135,8 +135,16 @@ void ConstraintFixer::apply(const TableCtr* c)
 
 void ConstraintFixer::apply(const CondCtr* c)
 {
-   // TODO
-}
+   ConstraintFixer fg(vvm_, vim_, B_);
+   c->guard().acceptVisitor(fg);
 
+   ConstraintFixer bg(vvm_, vim_, B_);
+   c->body().acceptVisitor(bg);
+
+   Constraint guard = fg.getConstraint(),
+              body = bg.getConstraint();
+
+   c_ = cond(guard, body);
+}
 
 } // namespace
