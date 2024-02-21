@@ -25,18 +25,24 @@ int main(void)
    try
    {
       Problem P;
-      Variable x = P.addRealVar(-2, 2, "x"),
+      Variable x = P.addRealVar(2, 2, "x"),
                y = P.addRealVar(-2, 2, "y"),
-               z = P.addRealVar(-1e08, 1e08, "z"),
+               z = P.addRealVar(-1e08, 1, "z"),
                n = P.addIntVar(1, 8, "n"),
                m = P.addIntVar(1, 8, "m");
 
-      Term tt( 2*n - 1.5*sqr(m) + 1);
-      cout << tt.isInteger() << endl;
+      Constraint guard( x == 2 ),
+                 body( y - z == 0 ),
+                 c( cond(guard, body) );
 
+      cout << c << endl;
+      
+      IntervalBox B( c.scope() );
+      cout << B << endl;
 
-
-   
+      cout << c.isSatisfied(B) << endl;
+      cout << c.contract(B) << endl;
+      cout << B << endl;
 
       //P.addCtr( sqr(y) * (1 + sqr(z)) + z * (z - 24 * y) == -13 );
       //P.addCtr( sqr(x) * (1 + sqr(y)) + y * (y - 24 * x) == -13 );

@@ -566,6 +566,12 @@ private:
    Constraint body_;
 };
 
+/// Creates a conditional constraint
+/// @param guard left-hand constraint
+/// @param body right-hand constraint
+/// @return guard -> body
+Constraint cond(Constraint guard, Constraint body);
+
 // TODO : MODIFIER LES VISITEURS : ConstraintFixer, DagCreator
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1071,8 +1071,8 @@ CondCtr::CondCtr(Constraint guard, Constraint body)
         guard_(guard),
         body_(body)
 {
-   ASSERT(guard.isInteger() || guard.isBoundConstraint(),
-          "Bad guard of conditional constraint: " << guard);
+   THROW_IF(!(guard.isInteger() || guard.isBoundConstraint()),
+            "Bad guard of conditional constraint: " << guard);
 
    hcode_ = guard.hashCode();
    hcode_ = hash2(body.hashCode(), hcode_);
@@ -1148,6 +1148,11 @@ ConstraintRep* CondCtr::cloneRoot() const
 bool CondCtr::isInteger() const
 {
    return guard_.isInteger() && body_.isInteger();
+}
+
+Constraint cond(Constraint guard, Constraint body)
+{
+   return Constraint(std::make_shared<CondCtr>(guard, body));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
