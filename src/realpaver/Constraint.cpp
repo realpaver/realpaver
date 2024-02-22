@@ -1071,7 +1071,7 @@ CondCtr::CondCtr(Constraint guard, Constraint body)
         guard_(guard),
         body_(body)
 {
-   THROW_IF(!(guard.isInteger() || guard.isBoundConstraint()),
+   THROW_IF(!(guard.isInteger() || guard.isInequality()),
             "Bad guard of conditional constraint: " << guard);
 
    hcode_ = guard.hashCode();

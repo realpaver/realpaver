@@ -35,7 +35,6 @@ In realpaver root folder, run `meson configure` command, while specifying one of
 - `-DINTERVAL_LIB=LIBNAME`: specify the interval library to use (default: Gaol)
 - `-DLOCAL_SOLVER=LIBNAME`: specify the local optimization solver to use (default: none, can be replaced by NLOPT, IPOPT)
 - `-DASSERT=BOOLVAL`: activate assertions (default: true)
-- `-DDEBUG=BOOLVAL`: activate debug messages (default: false)
 - `-DLOG=BOOLVAL`: activate logging (default: false)
 
 Example of meson setup command:
