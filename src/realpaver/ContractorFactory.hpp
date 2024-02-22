@@ -79,7 +79,7 @@ public:
    /// @return the contractor
    ///
    /// The contractor for slices is created by makeHC4().
-   SharedContractorACID makeACID();
+   SharedContractor makeACID();
 
    /// Creates an interval Newton operator associated with the equations
    /// @return the interval Newton operator associated with the equations

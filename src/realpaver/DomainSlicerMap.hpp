@@ -18,13 +18,12 @@
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This registers slicers associated with variables from a given scope.
+/// This registers slicers associated with domain types.
 ///////////////////////////////////////////////////////////////////////////////
 class DomainSlicerMap {
 public:
    /// Creates a map
-   /// @param scop set of variables
-   DomainSlicerMap(Scope scop);
+   DomainSlicerMap();
 
    /// Destructor
    ~DomainSlicerMap();
@@ -35,22 +34,23 @@ public:
    /// No assignment
    DomainSlicerMap& operator=(const DomainSlicerMap&) = delete;
 
-   /// @return the scope of this
-   Scope scope() const;
-
-   /// Associates a slicer with a variable
-   /// @param v a variable
-   /// @param pslicer slicer associated with v in this
-   void setSlicer(const Variable& v, std::unique_ptr<DomainSlicer> pslicer);
+   /// Associates a slicer with a domain type
+   /// @param type a domain type
+   /// @param slc a slicer
+   void setSlicer(DomainType type, std::unique_ptr<DomainSlicer> slc);
 
    /// Gets a slicer
-   /// @param v a variable
-   /// @return the slicer associated with v
-   DomainSlicer* getSlicer(const Variable& v) const;
+   /// @param type a domain type
+   /// @return the slicer associated with this type
+   DomainSlicer* getSlicer(DomainType type) const;
+
+   /// Tests if a slicer is already associated with a domain type
+   /// @param type a domain type
+   /// @return true if a slicer is associated with this type
+   bool hasSlicer(DomainType type) const;
 
 private:
-   Scope scop_;                        // scope
-   std::vector<DomainSlicer*> sli_;    // slicers
+   std::vector<DomainSlicer*> slc_;
 };
 
 } // namespace

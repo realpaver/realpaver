@@ -99,6 +99,9 @@ std::vector<realpaver::Interval>* realpaver_itv_vector;
 realpaver::IntervalUnion* realpaver_itv_union;
 realpaver::RangeUnion* realpaver_range_union;
 
+// constraint representation used to parse (conditional) constraints
+realpaver::ConstraintRep* realpaver_ctr_rep;
+
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;
 

@@ -79,11 +79,14 @@ void NcspSolver::solve()
       preprob_ = new Problem();
       preproc_->apply(*problem_, *preprob_);
    
-      if (!preproc_->isSolved()) branchAndPrune();
+      if (!preproc_->isSolved())
+         branchAndPrune();
    }
    else
    {
       // only branch-and-prune
+      LOG_MAIN("No preprocessing");
+
       withPreprocessing_ = false;
       preprob_ = problem_;
       problem_ = nullptr;
@@ -93,6 +96,8 @@ void NcspSolver::solve()
 
 void NcspSolver::makeSpace()
 {
+   LOG_LOW("Makes the space in the NCSP solver");
+
    // gets the strategy from the parameters
    std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS")
@@ -126,6 +131,8 @@ void NcspSolver::makeSpace()
 
 void NcspSolver::makePropagator()
 {
+   LOG_LOW("Makes the propagator in the NCSP solver");
+
    // Propagation: HC4 or BC4 or ACID
    std::string propag = env_->getParam()->getStrParam("PROPAGATION_BASE");
    bool hc4 = (propag == "HC4"),
@@ -193,6 +200,8 @@ void NcspSolver::makePropagator()
 
 void NcspSolver::makeSplit()
 {
+   LOG_LOW("Makes the split object in the NCSP solver");
+
    Scope scop = preprob_->scope();
 
    // makes the slicer
@@ -200,7 +209,7 @@ void NcspSolver::makeSplit()
    std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
    if (sli == "BISECTION") 
-      smap = DomainSlicerFactory::makeBisectionStrategy(scop);   
+      smap = DomainSlicerFactory::makeBisectionStrategy();   
 
    THROW_IF(smap == nullptr,
             "Unable to make the split object in a Ncsp solver");
@@ -222,8 +231,7 @@ void NcspSolver::makeSplit()
 
    else if (sel == "SSR")
    {
-      std::shared_ptr<IntervalSmearSumRel>
-         ssr = factory_->makeSSR();
+      std::shared_ptr<IntervalSmearSumRel> ssr = factory_->makeSSR();
 
       if ((ssr != nullptr) && (preprob_->nbVars() == ssr->nbVars()))
       {
@@ -231,7 +239,9 @@ void NcspSolver::makeSplit()
       }
       else
       {
-         LOG_INTER("Unable to create a SmearSumRel variable selection strategy");
+         split_ = new NcspSplitRR(scop, std::move(smap));
+         LOG_INTER("Unable to create a SmearSumRel variable selection " <<
+                   "strategy -> use a round-robin strategy instead");
       }
    }
 
@@ -298,7 +308,6 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
    timerPropag.stop();
    LOG_INTER("Total time contraction : " << timerPropag.elapsedTime() << "(s)");
 #endif
-
 
    LOG_INTER("Contraction -> " << proof);
 
@@ -381,6 +390,9 @@ void NcspSolver::branchAndPrune()
    stimer_.start();
 
    context_ = new NcspContext();
+
+   LOG_NL_LOW();
+   LOG_LOW("Makes the factory in the NCSP solver");
    factory_ = new ContractorFactory(*preprob_, env_);
 
    makeSpace();

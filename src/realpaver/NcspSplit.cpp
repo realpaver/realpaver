@@ -22,8 +22,6 @@ NcspSplit::NcspSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
 {
    ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
    ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
-   ASSERT(slicerMap_->scope().contains(scop),
-          "Bad scopes used for the creation of a NcspSplit object");
 }
 
 NcspSplit::~NcspSplit()
@@ -69,10 +67,10 @@ SharedNcspNode NcspSplit::cloneNode(const SharedNcspNode& node)
 
 void NcspSplit::splitOne(SharedNcspNode& node, Variable v)
 {   
-   DomainBox* B = node->box();
-   DomainSlicer* slicer = slicerMap_->getSlicer(v);
+   Domain* dom = node->box()->get(v);
+   DomainSlicer* slicer = slicerMap_->getSlicer(dom->type());
 
-   size_t n = slicer->apply(B->get(v));
+   size_t n = slicer->apply(dom);
    if (n < 2) return;
 
    auto it = slicer->begin();

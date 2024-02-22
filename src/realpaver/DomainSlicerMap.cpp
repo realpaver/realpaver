@@ -12,53 +12,41 @@
 
 namespace realpaver {
 
-DomainSlicerMap::DomainSlicerMap(Scope scop)
-      : scop_(scop),
-        sli_(scop.size(), nullptr)
-{
-   ASSERT(!scop.isEmpty(),
-          "Creation of a domain slicer map with an empty scope");
-}
+DomainSlicerMap::DomainSlicerMap()
+      : slc_()
+{}
 
 DomainSlicerMap::~DomainSlicerMap()
 {
-   for (DomainSlicer* slicer : sli_)
-      if (slicer != nullptr)
-         delete slicer;
+   for (DomainSlicer* slc : slc_)
+      if (slc != nullptr)
+         delete slc;
 }
 
-Scope DomainSlicerMap::scope() const
+void DomainSlicerMap::setSlicer(DomainType type,
+                                std::unique_ptr<DomainSlicer> slc)
 {
-   return scop_;
+   int i = static_cast<int>(type);
+
+   if (i >= slc_.size())
+   {
+      for (int k=slc_.size(); k<=i; ++k)
+         slc_.push_back(nullptr);
+   }
+
+   if (slc_[i] != nullptr) delete slc_[i];
+   slc_[i] = slc.release();
 }
 
-void DomainSlicerMap::setSlicer(const Variable& v,
-                                std::unique_ptr<DomainSlicer> pslicer)
+DomainSlicer* DomainSlicerMap::getSlicer(DomainType type) const
 {
-   ASSERT(scop_.contains(v), "Bad assignment in a domain slicer map");
-
-   size_t i = scop_.index(v);
-   if (sli_[i] != nullptr) delete sli_[i];
-
-   sli_[i] = pslicer.release();
+   int i = static_cast<int>(type);
+   return (i < slc_.size()) ? slc_[i] : nullptr;
 }
 
-DomainSlicer* DomainSlicerMap::getSlicer(const Variable& v) const
+bool DomainSlicerMap::hasSlicer(DomainType type) const
 {
-   /*
-DEBUG("DomainSlicerMap::getSlicer");
-DEBUG("var : " << v.getName());
-DEBUG("SCOPE : " << scop_);
-
-   ASSERT(scop_.contains(v),
-          "Variable " << v.getName()
-                      << " not handled by the domain slicer map");
-
-DEBUG("number of slicers : " << sli_.size());
-DEBUG("index : " << scop_.index(v));
-*/
-
-   return sli_[scop_.index(v)];
+   return getSlicer(type) != nullptr;
 }
 
 } // namespace

@@ -14,6 +14,7 @@
 #include "realpaver/ContractorFactory.hpp"
 #include "realpaver/ContractorList.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
@@ -195,6 +196,8 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
 
    if (newton != nullptr)
    {
+      LOG_LOW("Newton operator built by the factory");
+      
       double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL");
       newton->setTol(Tolerance(rtol, 0.0));
 
@@ -212,6 +215,10 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
 
       niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
       newton->getGaussSeidel()->setMaxIter(niter);
+   }
+   else
+   {
+      LOG_LOW("Newton operator NOT built by the factory");
    }
 
    return newton;
@@ -254,9 +261,13 @@ SharedContractor ContractorFactory::makeHC4Newton()
    }
 }
 
-SharedContractorACID ContractorFactory::makeACID()
+SharedContractor ContractorFactory::makeACID()
 {
-   if (dag_->isEmpty()) return nullptr;
+   if (dag_->isEmpty() || (!dag_->scope().contains(sc_)))
+   {
+      LOG_LOW("Unable to create an ACID contractor -> HC4 instead");
+      return makeHC4();
+   }
 
    std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
