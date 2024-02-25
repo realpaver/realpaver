@@ -1186,11 +1186,6 @@ bool TermOp::isUsb() const
    return op_ == OpSymbol::Usb;
 }
 
-bool TermOp::isLin() const
-{
-   return op_ == OpSymbol::Lin;
-}
-
 bool TermOp::isIntegerRoot() const
 {
    return false;
@@ -2326,6 +2321,11 @@ void TermLin::print(std::ostream& os) const
          os << cst_;
       }
    }
+}
+
+bool TermLin::isLin() const
+{
+   return true;
 }
 
 Interval TermLin::evalConst() const

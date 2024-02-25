@@ -1284,9 +1284,13 @@ bool DagLin::eqSymbol(const DagOp* other) const
    if (subArity() != other->subArity())
       return false;
 
-   // compares here the constants
-   // the variables are compared in the eq() method
    const DagLin* dl = static_cast<const DagLin*>(other);
+
+   // compares the constant terms
+   if (!cst_.isSetEq(dl->cst_))
+      return false;
+
+   // compares the factors of the linear terms
    auto it = terms_.begin();
    auto jt = dl->terms_.begin();
 
@@ -1298,6 +1302,10 @@ bool DagLin::eqSymbol(const DagOp* other) const
       ++it;
       ++jt;
    }
+
+   // no need to compare the variables / sub-nodes since this is done
+   // in the eq() method
+   
    return true;
 }
 
@@ -1728,6 +1736,8 @@ Proof DagFun::hc4Revise(IntervalBox& B)
 Proof DagFun::sharedHc4Revise(IntervalBox& B)
 {
    Interval e = sharedIntervalEval(B);
+
+   LOG_LOW("SharedHC4Revise evaluation of function: " << e);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -2406,6 +2416,14 @@ DagContext* Dag::unbindContext()
    DagContext* aux = context_;
    context_ = defaultContext_;
    return aux;
+}
+
+void Dag::printIntervalValues(std::ostream& os) const
+{
+   for (size_t i=0; i<nbNodes(); ++i)
+   {
+      os << "node " << i << ": " << node_[i]->val() << std::endl;
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

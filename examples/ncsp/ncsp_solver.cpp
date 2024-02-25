@@ -76,6 +76,7 @@ int main(int argc, char** argv)
 
       ok = parser.parseFile(filename, problem);
       if (!ok) THROW("Parse error: " << parser.getParseError());
+      
       if (!problem.isCSP()) THROW("Not a NCSP");
 
       // solving

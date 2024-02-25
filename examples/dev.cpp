@@ -26,6 +26,56 @@ int main(void)
    try
    {
       Problem P;
+      Variable a1 = P.addRealVar(-0.854470265157, -0.776666666666, "a1"),
+               a2 = P.addRealVar(-0.0300000000001, -0.00999999999999, "a2"),
+               s5 = P.addRealVar(6.89999999999, 7, "s5"),
+               s4 = P.addRealVar(1.34999999999, 1.45000000001, "s4");
+
+      Constraint c( (-89760*(-1 - s4))/(1 - a1 + a2) +
+                    (7312635*(1 - s4))/(32*(1 + a1 + a2)) +
+                    (7677115*s4)/32 - (99586*(-s4 + s5))/(1 + a1*s5 + a2*sqr(s5))
+                    == 0 );
+
+      Term t1( (-89760*(-1 - s4))/(1 - a1 + a2) ),
+           t2( (7312635*(1 - s4))/(32*(1 + a1 + a2)) ),
+           t3( (7677115*s4)/32 - (99586*(-s4 + s5))/(1 + a1*s5 + a2*sqr(s5)) );
+
+      Term tc( t1 + t2 + t3);
+   
+      Term tt( t1 + t2);
+
+      IntervalBox B( P.scope() );
+
+      cout << "c : " << c << endl;
+      cout << c.isSatisfied(B) << endl;
+
+
+      cout << "t1 : " << t1 << endl;
+      cout << t1.eval(B) << endl;
+
+      cout << "t2 : " << t2 << endl;
+      cout << t2.eval(B) << endl;
+
+      cout << "t3 : " << t3 << endl;
+      cout << t3.eval(B) << endl;
+
+
+
+      cout << "tt : " << tt << endl;
+      cout << tt.eval(B) << endl;
+
+      SharedDag dag = std::make_shared<Dag>();
+      dag->insert( t1 + t2 == 0 );
+      DagFun* f = dag->fun(0);
+
+      cout << f->intervalEval(B) << endl;;
+
+
+      cout << (*dag) << endl;
+      
+      dag->printIntervalValues(std::cout);
+/*
+      Problem P;
       Variable x = P.addRealVar(2, 2, "x"),
                y = P.addRealVar(-2, 2, "y"),
                z = P.addRealVar(-1e08, 1, "z"),
@@ -44,6 +94,7 @@ int main(void)
       cout << c.isSatisfied(B) << endl;
       cout << c.contract(B) << endl;
       cout << B << endl;
+      */
 
       //P.addCtr( sqr(y) * (1 + sqr(z)) + z * (z - 24 * y) == -13 );
       //P.addCtr( sqr(x) * (1 + sqr(y)) + y * (y - 24 * x) == -13 );

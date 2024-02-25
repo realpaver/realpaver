@@ -1195,6 +1195,10 @@ public:
    /// It assumes that this dag has been evaluated using realEval.
    void realViolation(RealVector& viol);
 
+   /// Prints the interval values at all nodes on a stream
+   /// @param os a stream
+   void printIntervalValues(std::ostream& os) const;
+
 private:
    // vector of nodes sorted by a topological ordering from the leaves
    // to the roots

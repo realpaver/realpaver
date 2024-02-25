@@ -472,7 +472,6 @@ public:
    bool isMul() const override;
    bool isDiv() const override;
    bool isUsb() const override;
-   bool isLin() const override;
    bool isInteger() const override;
    void eval(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
@@ -892,6 +891,7 @@ public:
    void eval(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isLin() const override;
    bool isLinear() const override;
    bool isInteger() const override;
    bool dependsOn(const Variable& v) const override;
