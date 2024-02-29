@@ -36,6 +36,9 @@ std::ostream& operator<<(std::ostream& os, OpSymbol op)
       case OpSymbol::Sin:  return os << "sin";
       case OpSymbol::Tan:  return os << "tan";
       case OpSymbol::Lin:  return os << "LIN";
+      case OpSymbol::Cosh: return os << "cosh";
+      case OpSymbol::Sinh: return os << "sinh";
+      case OpSymbol::Tanh: return os << "tanh";
       default:             os.setstate(std::ios::failbit);
    }
    return os;
@@ -957,6 +960,51 @@ Term tan(Term t)
 
    else
       return Term(std::make_shared<TermTan>(t.rep()));
+}
+
+Term cosh(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermCosh>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x( cosh(t.evalConst()) );
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermCosh>(t.rep()));
+}
+
+Term sinh(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermSinh>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x( sinh(t.evalConst()) );
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermSinh>(t.rep()));
+}
+
+Term tanh(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermTanh>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x( tanh(t.evalConst()) );
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermTanh>(t.rep()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2462,6 +2510,116 @@ void TermLin::makeHashCode()
    }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+TermCosh::TermCosh(const SharedRep& t)
+      : TermOp(t, OpSymbol::Cosh, OpPriority::High)
+{}
+
+Interval TermCosh::evalConst() const
+{
+   return cosh(child()->evalConst());
+}
+
+void TermCosh::evalRoot()
+{
+   ival_ = cosh(child()->ival());
+}
+
+void TermCosh::contractRoot()
+{
+   child()->setIval(coshPX(child()->ival(), ival_));
+}
+
+void TermCosh::acceptVisitor(TermVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+TermRep* TermCosh::cloneRoot() const
+{
+   return new TermCosh(child());
+}
+
+TermRep* TermCosh::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermCosh(sc);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+TermSinh::TermSinh(const SharedRep& t)
+      : TermOp(t, OpSymbol::Sinh, OpPriority::High)
+{}
+
+Interval TermSinh::evalConst() const
+{
+   return sinh(child()->evalConst());
+}
+
+void TermSinh::evalRoot()
+{
+   ival_ = sinh(child()->ival());
+}
+
+void TermSinh::contractRoot()
+{
+   child()->setIval(sinhPX(child()->ival(), ival_));
+}
+
+void TermSinh::acceptVisitor(TermVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+TermRep* TermSinh::cloneRoot() const
+{
+   return new TermSinh(child());
+}
+
+TermRep* TermSinh::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermSinh(sc);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+TermTanh::TermTanh(const SharedRep& t)
+      : TermOp(t, OpSymbol::Tanh, OpPriority::High)
+{}
+
+Interval TermTanh::evalConst() const
+{
+   return tanh(child()->evalConst());
+}
+
+void TermTanh::evalRoot()
+{
+   ival_ = tanh(child()->ival());
+}
+
+void TermTanh::contractRoot()
+{
+   child()->setIval(tanhPX(child()->ival(), ival_));
+}
+
+void TermTanh::acceptVisitor(TermVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+TermRep* TermTanh::cloneRoot() const
+{
+   return new TermTanh(child());
+}
+
+TermRep* TermTanh::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermTanh(sc);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2568,6 +2726,21 @@ void TermVisitor::apply(const TermLin* t)
    THROW("Visit method not implemented");
 }
 
+void TermVisitor::apply(const TermCosh* t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermSinh* t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermTanh* t)
+{
+   THROW("Visit method not implemented");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 SumOfSquaresCreator::SumOfSquaresCreator()
@@ -2668,6 +2841,15 @@ void SumOfSquaresCreator::apply(const TermTan* t)
 {}
 
 void SumOfSquaresCreator::apply(const TermLin* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermCosh* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermSinh* t)
+{}
+
+void SumOfSquaresCreator::apply(const TermTanh* t)
 {}
 
 } // namespace

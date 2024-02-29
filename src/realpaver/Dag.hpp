@@ -758,6 +758,66 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is a DAG node representing the hyperbolic cosine function.
+///////////////////////////////////////////////////////////////////////////////
+class DagCosh : public DagOp {
+public:
+   /// Creates a node
+   /// @param dag owner of this
+   /// @param lsub list of DAG indexes of the sub-nodes of this
+   DagCosh(Dag* dag, const IndexList& lsub);
+
+   ///@{
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalBox& B) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a DAG node representing the hyperbolic sine function.
+///////////////////////////////////////////////////////////////////////////////
+class DagSinh : public DagOp {
+public:
+   /// Creates a node
+   /// @param dag owner of this
+   /// @param lsub list of DAG indexes of the sub-nodes of this
+   DagSinh(Dag* dag, const IndexList& lsub);
+
+   ///@{
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalBox& B) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is a DAG node representing the hyperbolic tangent function.
+///////////////////////////////////////////////////////////////////////////////
+class DagTanh : public DagOp {
+public:
+   /// Creates a node
+   /// @param dag owner of this
+   /// @param lsub list of DAG indexes of the sub-nodes of this
+   DagTanh(Dag* dag, const IndexList& lsub);
+
+   ///@{
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalBox& B) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is a function in a DAG.
 ///
 /// To every function is associated an image, i.e. we have L <= f(x) <= U.
@@ -1280,6 +1340,9 @@ public:
    virtual void apply(const DagSin* d);
    virtual void apply(const DagTan* d);
    virtual void apply(const DagLin* d);
+   virtual void apply(const DagCosh* d);
+   virtual void apply(const DagSinh* d);
+   virtual void apply(const DagTanh* d);
    ///@}
 };
 
@@ -1313,6 +1376,9 @@ public:
    virtual void apply(const DagSin* d) override;
    virtual void apply(const DagTan* d) override;
    virtual void apply(const DagLin* d) override;
+   virtual void apply(const DagCosh* d) override;
+   virtual void apply(const DagSinh* d) override;
+   virtual void apply(const DagTanh* d) override;
    ///@}
 
 private:
@@ -1382,6 +1448,9 @@ public:
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
    void apply(const TermLin* t) override;
+   void apply(const TermCosh* t) override;
+   void apply(const TermSinh* t) override;
+   void apply(const TermTanh* t) override;
    ///@}
 
 private:

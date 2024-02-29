@@ -715,6 +715,51 @@ struct IntervalTraits<RawInterval> {
       return y & gaol::tan(x);
    }
 
+   static inline interval cosh(const interval& x)
+   {
+      return gaol::cosh(x);
+   }
+
+   static inline interval coshPX(const interval& x, const interval& y)
+   {
+      return x & gaol::acosh_rel(y, x);
+   }
+
+   static inline interval coshPY(const interval& x, const interval& y)
+   {
+      return y & gaol::cosh(x);
+   }
+
+   static inline interval sinh(const interval& x)
+   {
+      return gaol::sinh(x);
+   }
+
+   static inline interval sinhPX(const interval& x, const interval& y)
+   {
+      return x & gaol::asinh_rel(y, x);
+   }
+
+   static inline interval sinhPY(const interval& x, const interval& y)
+   {
+      return y & gaol::sinh(x);
+   }
+
+   static inline interval tanh(const interval& x)
+   {
+      return gaol::tanh(x);
+   }
+
+   static inline interval tanhPX(const interval& x, const interval& y)
+   {
+      return x & gaol::atanh_rel(y, x);
+   }
+
+   static inline interval tanhPY(const interval& x, const interval& y)
+   {
+      return y & gaol::tanh(x);
+   }
+
    static inline interval abs(const interval& x)
    {
       return gaol::abs(x);

@@ -31,49 +31,9 @@ int main(void)
                s5 = P.addRealVar(6.89999999999, 7, "s5"),
                s4 = P.addRealVar(1.34999999999, 1.45000000001, "s4");
 
-      Constraint c( (-89760*(-1 - s4))/(1 - a1 + a2) +
-                    (7312635*(1 - s4))/(32*(1 + a1 + a2)) +
-                    (7677115*s4)/32 - (99586*(-s4 + s5))/(1 + a1*s5 + a2*sqr(s5))
-                    == 0 );
 
-      Term t1( (-89760*(-1 - s4))/(1 - a1 + a2) ),
-           t2( (7312635*(1 - s4))/(32*(1 + a1 + a2)) ),
-           t3( (7677115*s4)/32 - (99586*(-s4 + s5))/(1 + a1*s5 + a2*sqr(s5)) );
+      cout << cosh(Interval(-1, 4)) << endl;
 
-      Term tc( t1 + t2 + t3);
-   
-      Term tt( t1 + t2);
-
-      IntervalBox B( P.scope() );
-
-      cout << "c : " << c << endl;
-      cout << c.isSatisfied(B) << endl;
-
-
-      cout << "t1 : " << t1 << endl;
-      cout << t1.eval(B) << endl;
-
-      cout << "t2 : " << t2 << endl;
-      cout << t2.eval(B) << endl;
-
-      cout << "t3 : " << t3 << endl;
-      cout << t3.eval(B) << endl;
-
-
-
-      cout << "tt : " << tt << endl;
-      cout << tt.eval(B) << endl;
-
-      SharedDag dag = std::make_shared<Dag>();
-      dag->insert( t1 + t2 == 0 );
-      DagFun* f = dag->fun(0);
-
-      cout << f->intervalEval(B) << endl;;
-
-
-      cout << (*dag) << endl;
-      
-      dag->printIntervalValues(std::cout);
 /*
       Problem P;
       Variable x = P.addRealVar(2, 2, "x"),

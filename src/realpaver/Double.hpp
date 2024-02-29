@@ -255,6 +255,24 @@ struct Double {
       return std::tan(x);
    }
 
+   /// Hyperbolic cosine
+   static inline ValueType cosh(ValueType x)
+   {
+      return std::cosh(x);
+   }
+
+   /// Hyperbolic sine
+   static inline ValueType sinh(ValueType x)
+   {
+      return std::sinh(x);
+   }
+
+   /// Hyperbolic tangent
+   static inline ValueType tanh(ValueType x)
+   {
+      return std::tanh(x);
+   }
+
    /// Sign function
    static inline ValueType sgn(ValueType x)
    {

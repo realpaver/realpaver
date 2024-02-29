@@ -533,4 +533,13 @@ void TermQuadraticCreator::apply(const TermLin* t)
    success_ = true;
 }
 
+void TermQuadraticCreator::apply(const TermCosh* t)
+{}
+
+void TermQuadraticCreator::apply(const TermSinh* t)
+{}
+
+void TermQuadraticCreator::apply(const TermTanh* t)
+{}
+
 } // namespace

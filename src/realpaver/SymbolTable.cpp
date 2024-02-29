@@ -501,6 +501,30 @@ void FunctionCallProcessor::apply(const TermLin* t)
    }
 }
 
+void FunctionCallProcessor::apply(const TermCosh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = cosh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermSinh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = sinh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermTanh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = tanh(vis.getTerm());
+}
+
 Term FunctionCallProcessor::getTerm() const
 {
    return t_;

@@ -49,6 +49,9 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "sgn"    return TK_SGN;
 "abs"    return TK_ABS;
 "pow"		return TK_POW;
+"cosh"   return TK_COSH;
+"sinh"   return TK_SINH;
+"tanh"   return TK_TANH;
 
 "in"     return TK_IN;
 "-inf"   return TK_MINUS_INF;

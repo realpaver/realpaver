@@ -25,7 +25,7 @@ class TermVisitor;   // forward declaration
 ///////////////////////////////////////////////////////////////////////////////
 enum class OpSymbol {
    Add, Sub, Mul, Div, Min, Max, Usb, Abs, Sgn, Sqr, Sqrt, Pow,
-   Exp, Log, Cos, Sin, Tan, Lin
+   Exp, Log, Cos, Sin, Tan, Lin, Cosh, Sinh, Tanh
 };
 
 /// Output on a stream
@@ -356,6 +356,9 @@ Term log(Term t);
 Term cos(Term t);
 Term sin(Term t);
 Term tan(Term t);
+Term cosh(Term t);
+Term sinh(Term t);
+Term tanh(Term t);
 ///@}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -953,6 +956,63 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is the hyperbolic cosine of a term.
+///////////////////////////////////////////////////////////////////////////////
+class TermCosh : public TermOp {
+public:
+   /// Creates a term with form cosh(t)
+   /// @param t sub-term
+   TermCosh(const SharedRep& t);
+
+   ///@{
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is the hyperbolic sine of a term.
+///////////////////////////////////////////////////////////////////////////////
+class TermSinh : public TermOp {
+public:
+   /// Creates a term with form sinh(t)
+   /// @param t sub-term
+   TermSinh(const SharedRep& t);
+
+   ///@{
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is the hyperbolic tangent of a term.
+///////////////////////////////////////////////////////////////////////////////
+class TermTanh : public TermOp {
+public:
+   /// Creates a term with form Tanh(t)
+   /// @param t sub-term
+   TermTanh(const SharedRep& t);
+
+   ///@{
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is the base class of visitors of terms.
 ///////////////////////////////////////////////////////////////////////////////
 class TermVisitor {
@@ -981,6 +1041,9 @@ public:
    virtual void apply(const TermSin* t);
    virtual void apply(const TermTan* t);
    virtual void apply(const TermLin* t);
+   virtual void apply(const TermCosh* t);
+   virtual void apply(const TermSinh* t);
+   virtual void apply(const TermTanh* t);
    ///@}
 };
 
@@ -1027,6 +1090,9 @@ public:
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
    void apply(const TermLin* t) override;
+   void apply(const TermCosh* t) override;
+   void apply(const TermSinh* t) override;
+   void apply(const TermTanh* t) override;
    ///@}
 
 private:

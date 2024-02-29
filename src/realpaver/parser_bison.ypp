@@ -67,7 +67,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT TK_IMPLY
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
-%token TK_TAN TK_COS TK_SIN
+%token TK_TAN TK_COS TK_SIN TK_COSH TK_SINH TK_TANH
 %token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_LCBR TK_RCBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
@@ -808,6 +808,24 @@ expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(tan(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_COSH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(cosh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_SINH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(sinh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_TANH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(tanh(t));
       $$ = res.cloneRoot();
     }
   | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR

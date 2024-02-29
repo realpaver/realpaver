@@ -1063,6 +1063,87 @@ Interval tanPY(const Interval& x, const Interval& y)
    return res;
 }
 
+Interval cosh(const Interval& x)
+{
+   return Interval(Interval::Traits::cosh(x.impl_));
+}
+
+Interval coshPX(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::coshPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("coshPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval coshPY(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::coshPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("coshPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval sinh(const Interval& x)
+{
+   return Interval(Interval::Traits::sinh(x.impl_));
+}
+
+Interval sinhPX(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::sinhPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sinhPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval sinhPY(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::sinhPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sinhPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval tanh(const Interval& x)
+{
+   return Interval(Interval::Traits::tanh(x.impl_));
+}
+
+Interval tanhPX(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::tanhPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("tanhPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval tanhPY(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::tanhPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("tanhPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
 Interval abs(const Interval& x)
 {
    return Interval(Interval::Traits::abs(x.impl_));

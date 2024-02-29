@@ -49,6 +49,9 @@ public:
    void apply(const DagSin* node) override;
    void apply(const DagTan* node) override;
    void apply(const DagLin* node) override;
+   void apply(const DagCosh* node) override;
+   void apply(const DagSinh* node) override;
+   void apply(const DagTanh* node) override;
    ///@}
 
 private:
@@ -113,6 +116,7 @@ void underConcave(LPModel& lm, size_t iy, size_t ix,
                   std::function<Interval(Interval)> f);
 
 /// Generates a linear relaxation of a trigonometric function y = f(x)
+/// such that there is no stationary point in the considered domain of x
 /// @param lm linear program in which the new consraint is inserted
 /// @param iy index of y in lm
 /// @param ix index of x in lm

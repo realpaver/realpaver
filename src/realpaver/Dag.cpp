@@ -1426,6 +1426,132 @@ Interval DagLin::getConstantValue() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DagCosh::DagCosh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Cosh, lsub)
+{}
+
+void DagCosh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagCosh::eval()
+{
+   setVal(cosh(child()->val()));
+}
+
+void DagCosh::proj(IntervalBox& B)
+{
+   child()->reduceDom(coshPX(child()->val(), dom()));
+}
+
+bool DagCosh::diff()
+{
+   // d(cosh(u))/du = sinh(u)
+   child()->addDv(dv()*sinh(child()->val()));
+
+   return true;
+}
+
+void DagCosh::reval()
+{
+   setRval(Double::cosh(child()->rval()));
+}
+
+bool DagCosh::rdiff()
+{
+   // d(cosh(u))/du = sinh(u)
+   child()->addRdv(Double::mul(rdv(), Double::sinh(child()->rval())));
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DagSinh::DagSinh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sinh, lsub)
+{}
+
+void DagSinh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagSinh::eval()
+{
+   setVal(sinh(child()->val()));
+}
+
+void DagSinh::proj(IntervalBox& B)
+{
+   child()->reduceDom(sinhPX(child()->val(), dom()));
+}
+
+bool DagSinh::diff()
+{
+   // d(sinh(u))/du = cosh(u)
+   child()->addDv(dv()*cosh(child()->val()));
+
+   return true;
+}
+
+void DagSinh::reval()
+{
+   setRval(Double::sinh(child()->rval()));
+}
+
+bool DagSinh::rdiff()
+{
+   // d(sinh(u))/du = cosh(u)
+   child()->addRdv(Double::mul(rdv(), Double::cosh(child()->rval())));
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DagTanh::DagTanh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Tanh, lsub)
+{}
+
+void DagTanh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagTanh::eval()
+{
+   setVal(tanh(child()->val()));
+}
+
+void DagTanh::proj(IntervalBox& B)
+{
+   child()->reduceDom(tanhPX(child()->val(), dom()));
+}
+
+bool DagTanh::diff()
+{
+   // d(tanh(u))/du = 1-tanh^2(u)
+   child()->addDv(dv()*(1.0-sqr(val())));
+
+   return true;
+}
+
+void DagTanh::reval()
+{
+   setRval(Double::tanh(child()->rval()));
+}
+
+bool DagTanh::rdiff()
+{
+   // d(tanh(u))/du = 1-tanh^2(u)
+   child()->addRdv(Double::mul(rdv(), Double::sub(1.0, Double::sqr(rval()))));
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
       : dag_(dag),
         node_(),
@@ -2531,6 +2657,21 @@ void DagVisitor::apply(const DagLin* d)
    THROW("visit method not implemented");
 }
 
+void DagVisitor::apply(const DagCosh* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagSinh* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagTanh* d)
+{
+   THROW("visit method not implemented");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 DagFunCreator::DagFunCreator(DagFun* f): f_(f)
@@ -2680,6 +2821,27 @@ void DagFunCreator::apply(const DagLin* d)
 {
    visitSubNodes(d);
    DagLin* aux = const_cast<DagLin*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagCosh* d)
+{
+   visitSubNodes(d);
+   DagCosh* aux = const_cast<DagCosh*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagSinh* d)
+{
+   visitSubNodes(d);
+   DagSinh* aux = const_cast<DagSinh*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagTanh* d)
+{
+   visitSubNodes(d);
+   DagTanh* aux = const_cast<DagTanh*>(d);
    f_->insertOpNode(aux);
 }
 
@@ -2936,6 +3098,27 @@ void DagTermCreator::apply(const TermLin* t)
    }
 
    DagLin* node = new DagLin(dag_, t, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermCosh* t)
+{
+   visitSubnodes(t);
+   DagCosh* node = new DagCosh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermSinh* t)
+{
+   visitSubnodes(t);
+   DagSinh* node = new DagSinh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermTanh* t)
+{
+   visitSubnodes(t);
+   DagTanh* node = new DagTanh(dag_, lsub_);
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 

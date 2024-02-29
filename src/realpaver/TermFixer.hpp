@@ -74,6 +74,9 @@ public:
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
    void apply(const TermLin* t) override;
+   void apply(const TermCosh* t) override;
+   void apply(const TermSinh* t) override;
+   void apply(const TermTanh* t) override;
    ///@}
 
 private:

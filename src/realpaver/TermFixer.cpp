@@ -239,4 +239,28 @@ void TermFixer::apply(const TermLin* t)
       t_ = Term(tlin);
 }
 
+void TermFixer::apply(const TermCosh* t)
+{
+   TermFixer vis(vvm_, vim_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = cosh(vis.t_);
+}
+
+void TermFixer::apply(const TermSinh* t)
+{
+   TermFixer vis(vvm_, vim_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = sinh(vis.t_);
+}
+
+void TermFixer::apply(const TermTanh* t)
+{
+   TermFixer vis(vvm_, vim_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = tanh(vis.t_);
+}
+
 } // namespace
