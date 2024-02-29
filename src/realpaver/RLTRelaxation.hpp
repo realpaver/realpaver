@@ -151,6 +151,26 @@ void overLine(LPModel& lm, size_t iy, size_t ix,
 void underLine(LPModel& lm, size_t iy, size_t ix,
                double x1, double y1, double x2, double y2);
 
+/// Generates a linear over-estimator constraint passing through one point
+/// given its slope
+/// @param lm linear program in which the new consraint is inserted
+/// @param iy index of y in lm
+/// @param ix index of x in lm
+/// @param x1 abcissa of the point
+/// @param y1 ordinate of the point
+/// @param m slope
+void overLine(LPModel& lm, size_t iy, size_t ix, double x1, double y1, double m);
+
+/// Generates a linear under-estimator constraint passing through one point
+/// given its slope
+/// @param lm linear program in which the new consraint is inserted
+/// @param iy index of y in lm
+/// @param ix index of x in lm
+/// @param x1 abcissa of the point
+/// @param y1 ordinate of the point
+/// @param m slope
+void underLine(LPModel& lm, size_t iy, size_t ix, double x1, double y1, double m);
+
 } // namespace
 
 #endif

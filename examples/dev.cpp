@@ -26,13 +26,17 @@ int main(void)
    try
    {
       Problem P;
-      Variable a1 = P.addRealVar(-0.854470265157, -0.776666666666, "a1"),
-               a2 = P.addRealVar(-0.0300000000001, -0.00999999999999, "a2"),
-               s5 = P.addRealVar(6.89999999999, 7, "s5"),
-               s4 = P.addRealVar(1.34999999999, 1.45000000001, "s4");
+      Variable x = P.addRealVar(6.4, 8.6),
+               y = P.addRealVar(-27, 8);
 
+      IntervalBox B( P.scope() );
 
-      cout << cosh(Interval(-1, 4)) << endl;
+      LPModel lp;
+      SharedDag dag = std::make_shared<Dag>();
+      dag->insert( y - cos(x) == 0 );
+
+      ContractorPolytope ctc(dag, PolytopeStyle::RLT);
+ctc.contract( B );
 
 /*
       Problem P;
