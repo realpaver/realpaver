@@ -423,11 +423,6 @@ Proof ContractorPolytope::contractImpl(IntervalBox& B)
    // linearizes the constraints
    if (!creator_->make(solver, B)) return Proof::Maybe;
 
-
-DEBUG( solver );
-return Proof::Maybe;
-
-
    // first is true if a call to solver.optimize() is required, false false
    // after a successfull optimization, then the next call to the solver can use
    // reoptimize() after just changing the objective function
