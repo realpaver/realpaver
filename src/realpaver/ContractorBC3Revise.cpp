@@ -9,12 +9,12 @@
 
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorBC3.hpp"
+#include "realpaver/ContractorBC3Revise.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
 
-ContractorBC3::ContractorBC3(SharedDag dag, size_t i, Variable v)
+ContractorBC3Revise::ContractorBC3Revise(SharedDag dag, size_t i, Variable v)
       : f_(dag, i, v),
         peeler_(Param::GetDblParam("BC3_PEEL_FACTOR")),
         maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))
@@ -22,47 +22,47 @@ ContractorBC3::ContractorBC3(SharedDag dag, size_t i, Variable v)
    newton_ = new IntervalNewtonUni();
 }
 
-ContractorBC3::~ContractorBC3()
+ContractorBC3Revise::~ContractorBC3Revise()
 {
    delete newton_;
 }
 
-double ContractorBC3::getPeelFactor() const
+double ContractorBC3Revise::getPeelFactor() const
 {
    return peeler_.getFactor();
 }
 
-void ContractorBC3::setPeelFactor(double f)
+void ContractorBC3Revise::setPeelFactor(double f)
 {
    peeler_.setFactor(f);
 }
 
-size_t ContractorBC3::getMaxIter() const
+size_t ContractorBC3Revise::getMaxIter() const
 {
    return maxiter_;
 }
 
-void ContractorBC3::setMaxIter(size_t val)
+void ContractorBC3Revise::setMaxIter(size_t val)
 {
    maxiter_ = val;
 }
 
-IntervalNewtonUni* ContractorBC3::getNewton() const
+IntervalNewtonUni* ContractorBC3Revise::getNewton() const
 {
    return newton_;
 }
 
-Proof ContractorBC3::shrinkLeft(const Interval& x, Interval& res)
+Proof ContractorBC3Revise::shrinkLeft(const Interval& x, Interval& res)
 {
    return shrink(x, res, splitLeft, peelLeft);
 }
 
-Proof ContractorBC3::shrinkRight(const Interval& x, Interval& res)
+Proof ContractorBC3Revise::shrinkRight(const Interval& x, Interval& res)
 {
    return shrink(x, res, splitRight, peelRight);   
 }
 
-Proof ContractorBC3::isConsistent(const Interval& x)
+Proof ContractorBC3Revise::isConsistent(const Interval& x)
 {
    Interval e = f_.eval(x);
    const Interval& image = f_.getFun()->getImage();
@@ -80,12 +80,13 @@ Proof ContractorBC3::isConsistent(const Interval& x)
       return Proof::Maybe;
 }
 
-Scope ContractorBC3::scope() const
+Scope ContractorBC3Revise::scope() const
 {
    return f_.getFun()->scope();
 }
 
-bool ContractorBC3::splitLeft(const Interval& x, Interval& x1, Interval& x2)
+bool ContractorBC3Revise::splitLeft(const Interval& x, Interval& x1,
+                                    Interval& x2)
 {
    double c = x.midpoint();
    x1 = Interval(c,x.right());
@@ -93,7 +94,8 @@ bool ContractorBC3::splitLeft(const Interval& x, Interval& x1, Interval& x2)
    return x.strictlyContains(c);
 }
 
-bool ContractorBC3::splitRight(const Interval& x, Interval& x1, Interval& x2)
+bool ContractorBC3Revise::splitRight(const Interval& x, Interval& x1,
+                                     Interval& x2)
 {
    double c = x.midpoint();
    x1 = Interval(x.left(), c);
@@ -101,22 +103,22 @@ bool ContractorBC3::splitRight(const Interval& x, Interval& x1, Interval& x2)
    return x.strictlyContains(c);
 }
 
-void ContractorBC3::peelLeft(const Interval& x, IntervalPeeler& peeler,
-                             Interval& b, Interval& r)
+void ContractorBC3Revise::peelLeft(const Interval& x, IntervalPeeler& peeler,
+                                   Interval& b, Interval& r)
 {
    b = peeler.peelLeft(x);
    r = Interval(b.right(), x.right());
 }
 
-void ContractorBC3::peelRight(const Interval& x, IntervalPeeler& peeler,
-                              Interval& b, Interval& r)
+void ContractorBC3Revise::peelRight(const Interval& x, IntervalPeeler& peeler,
+                                    Interval& b, Interval& r)
 {
    b = peeler.peelRight(x);
    r = Interval(x.left(), b.left());
 }
 
-Proof ContractorBC3::shrink(const Interval& x, Interval& res,
-                            SplitFun split_fun, PeelFun peel_fun)
+Proof ContractorBC3Revise::shrink(const Interval& x, Interval& res,
+                                  SplitFun split_fun, PeelFun peel_fun)
 {
    std::stack<Interval> stak;
    Interval b, z, z1, z2;
@@ -173,7 +175,7 @@ Proof ContractorBC3::shrink(const Interval& x, Interval& res,
    return Proof::Empty;
 }
 
-Proof ContractorBC3::contract(IntervalBox& box)
+Proof ContractorBC3Revise::contract(IntervalBox& B)
 {
    Interval lsol, rsol;
    Proof proof, certif;
@@ -182,7 +184,7 @@ Proof ContractorBC3::contract(IntervalBox& box)
    Interval img = f_.getFun()->getImage();
 
    // first interval evaluation that also thickens the function
-   Interval e = f_.update(box);
+   Interval e = f_.update(B);
 
    // consistency checking
    if (e.isEmpty())
@@ -195,24 +197,24 @@ Proof ContractorBC3::contract(IntervalBox& box)
       return Proof::Inner;
 
    // shrinks the left bound
-   proof = shrinkLeft(box.get(v), lsol);
+   proof = shrinkLeft(B.get(v), lsol);
 
    if (proof == Proof::Empty)
       return Proof::Empty;
 
    // shrinks the right bound
-   Interval y(lsol.left(), box.get(v).right());
+   Interval y(lsol.left(), B.get(v).right());
    certif = shrinkRight(y, rsol);
 
    // assigns the contracted domain in V
-   box.set(v, lsol | rsol);
+   B.set(v, lsol | rsol);
 
    return std::max(proof,certif);
 }
 
-void ContractorBC3::print(std::ostream& os) const
+void ContractorBC3Revise::print(std::ostream& os) const
 {
-   os << "BC3 contractor #" << f_.getFun()->index();
+   os << "BC3Revise contractor #" << f_.getFun()->index();
 }
 
 } // namespace

@@ -21,26 +21,26 @@ namespace realpaver {
 class RealPoint : public RealVector {
 public:
    /// Creates a real pooint
-   /// s scope of this
-   /// a value assigned to each element of this
-   RealPoint(Scope s, double a = 0.0);
+   /// @param scop scope of this
+   /// @param a value assigned to each element of this
+   RealPoint(Scope scop, double a = 0.0);
 
    /// Creates a real point
-   /// s scope of this
-   /// X real vector having the same size than s
+   /// @param scop scope of this
+   /// @param X real vector having the same size than s
    ///
-   /// The i-th variable in s is assigned to X[i] for each i.
-   RealPoint(Scope s, const RealVector& X);
+   /// The i-th variable in scop is assigned to X[i] for each i.
+   RealPoint(Scope scop, const RealVector& X);
 
    /// Default copy constructor
    RealPoint(const RealPoint&) = default;
 
    /// Creates a point from another point projected on a scope
    /// @param pt a point
-   /// @param sco a scope that is included in the scope of pt
+   /// @param scop a scope that is included in the scope of pt
    ///
-   /// this is equal to pt restricted to s
-   RealPoint(const RealPoint& pt, Scope s);
+   /// this is equal to pt restricted to scop
+   RealPoint(const RealPoint& pt, Scope scop);
 
    /// Default assignment operator
    RealPoint& operator=(const RealPoint&) = default;
@@ -56,33 +56,33 @@ public:
    /// @return the value of v in this
    ///
    /// This masks the access by index.
-   double get(Variable v) const;
+   double get(const Variable& v) const;
 
    /// Sets an element of this
    /// @param v a variable that belongs to the scope of this
    /// @param a value assigned to v ion this
    ///
    /// This masks the access by index.
-   void set(Variable v, double a);
+   void set(const Variable& v, double a);
 
    /// Assignment on a scope
    /// @param pt a real point
-   /// @param s a scope included in the scope of this and pt
+   /// @param scop a scope included in the scope of this and pt
    ///
-   /// this[s] is assigned to pt[s]
-   void setOnScope(const RealPoint& pt, Scope s);
+   /// this[scop] is assigned to pt[scop]
+   void setOnScope(const RealPoint& pt, const Scope& scop);
 
    /// Gets a sub-point
-   /// @param s a scope included in the scope of this
-   /// @return this restricted to s
-   RealPoint subPoint(Scope s) const;
+   /// @param scop a scope included in the scope of this
+   /// @return this restricted to scop
+   RealPoint subPoint(const Scope& scop) const;
 
    ///@{
    RealPoint* clone() const override;
    ///@}
 
 private:
-   Scope scope_;
+   Scope scop_;
 };
 
 } // namespace

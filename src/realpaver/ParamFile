@@ -37,7 +37,7 @@ TRACE = YES
 
 # Display of regions
 # STD: standard display with one variable and its domain per line
-# VEC: display of the vector of domains
+# VEC: display as a vector of domains
 DISPLAY_REGION = STD
 
 # Preprocessing phase of the solving process enabled or disabled (YES or NO)
@@ -75,7 +75,7 @@ BB_SPACE_FREQUENCY = 1
 # - GPDFS: Hybrid Best-First Depth-First strategy such that the next node
 #          after a DFS stage is a node whose grid perimeter is maximal
 #
-# Assigns SPLIT_INNER = true for DMDFS and the hybrid DFS in order to calculate
+# Assigns SPLIT_INNER_BOX = true for DMDFS and the hybrid DFS in order to calculate
 # solutions at the given tolerance, and not to consider larger inner boxes
 # as solutions
 BP_NODE_SELECTION = DFS
@@ -100,35 +100,32 @@ SOLUTION_CLUSTER_GAP = 0.0
 SPLIT_OBJECTIVE = NO
 
 # Variable selection strategy that chooses the next variable to split
-# - RR:       round-robin strategy
-# - LF:       largest domain
-# - SF:       smallest domain
-# - SSR:      smear sum relative (using derivatives)
-# - MIXED_SLF integer variable with smallest first and then real variable
-#             with largest domain
-SPLIT_SELECTOR = RR
+# - RR:  round-robin strategy
+# - LF:  largest domain
+# - SF:  smallest domain
+# - SSR: smear sum relative (using derivatives)
+# - SLF: integer variable with smallest first and then real variable
+#        with largest domain
+SPLIT_SELECTION = RR
 
 # Domain splitting strategy
 # - BISECTION: divides a domain in two equal parts
-SPLIT_SLICER = BISECTION
+SPLIT_SLICING = BISECTION
 
-# An inner region can be considered as a solution or it can be split.
+# An inner box can be considered as a solution or it can be split.
 # - YES: it is split;
 # - NO:  it is considered as a solution.
-SPLIT_INNER = NO
+SPLIT_INNER_BOX = NO
 
 ###############################################################################
 ## CONTRACTORS AND PROPAGATION                                               ##
 ###############################################################################
 
-# Tolerances (relative, absolute) on the distance between two consecutive
-# intervals in a propagator
-# Given the interval domain Xk of a variable x at the beginning of the k-th
-# iteration and Xk' the reduced domain, the variable is considered as modified
-# if the distance between Xk and Xk' is greater than this tolerance and it
-# leads to a propagation step with respect to this variable.
-PROPAGATION_REL_TOL = 1.0e-9
-PROPAGATION_ABS_TOL = 0.0
+# Tolerance in [0,1] that corresponds to a percentage of reduction of the
+# width of a box driving propagation steps. Given two consecutive domains
+# prev and next of some variable and tol the tolerance, a propagation on this
+# variable occurs if (1 - width(next) / width(prev)) > tol.
+PROPAGATION_REL_TOL = 1.0e-3
 
 # Iteration limit for the main constraint propagation loop
 PROPAGATION_ITER_LIMIT = 50
@@ -145,22 +142,14 @@ BC3_ITER_LIMIT = 30
 
 # Propagation strategy: the default one is a classical propagation algorithm
 # that uses one contractor per constraint
-# HC4: HC4 contractor
-# BC4: BC4 contractor
+# HC4:   HC4 contractor
+# BC4:   BC4 contractor
+# ACID : ACID contractor
 PROPAGATION_BASE = HC4
-
-##########
-# Now it is possible to increase the contraction power of the algorithm by
-# activating strong contractors, as follows:
-##########
-
-# Propagation with CID contractors (YES or NO)
-PROPAGATION_WITH_CID = NO
 
 # Propagation with a polytope hull contractor
 # - NO: contractor not used
 # - RLT: contractor based on a RLT-based relaxation
-# - AFFINE: contractor based an an affine relaxation
 # - TAYLOR: contractor based on a Taylor relaxation
 PROPAGATION_WITH_POLYTOPE = NO
 
@@ -173,11 +162,26 @@ PROPAGATION_WITH_NEWTON = NO
 # The value 0.0 implies that a linear equation is generated.
 RELAXATION_EQ_TOL = 1.0e-10
 
-# Number of slices of a domain handled by 3B contractors
+###################################################
+# Adaptive Constructive Interval Disjunction (ACID)
+# Parameters used if PROPAGATION_BASE = ACID
+
+# Number of slices of a domain handled by var3B contractors
 NB_SLICE_3B = 7
 
-# Number of slices of a domain handled by CID contractors
+# Number of slices of a domain handled by varCID contractors
 NB_SLICE_CID = 3
+
+# Number of consecutive nodes handled in the learning phase of ACID
+ACID_LEARN_LENGTH = 50
+
+# Number of nodes in a learning phase and an exploitation phase of ACID
+ACID_CYCLE_LENGTH = 1000
+
+# Gain ratio between two consecutive boxes handed by var3BCID contractors
+# in ACID. It is used to adapt the number of var3BCID contractors that are
+# applied in the contraction procedure.
+ACID_CT_RATIO = 0.002
 
 ###############################################################################
 ## LOCAL OPTIMIZATION                                                        ##
@@ -225,10 +229,11 @@ UNI_NEWTON_ITER_LIMIT = 20
 # Iteration limit on the number of steps in the interval Gauss-Seidel method
 GAUSS_SEIDEL_ITER_LIMIT = 50
 
-# Tolerances (relative, absolute)  on the distance between consecutive interval
-# vectors in the interval Gauss-Seidel method.
-GAUSS_SEIDEL_REL_TOL = 1.0e-9
-GAUSS_SEIDEL_ABS_TOL = 0.0
+# Tolerance in [0,1] that corresponds to a percentage of reduction of the
+# width of an interval vector. Given two consecutive domains prev and next of
+# some variable and tol the tolerance, the method is iterated if we have
+#(1 - width(next) / width(prev)) > tol.
+GAUSS_SEIDEL_REL_TOL = 1.0e-3
 
 # Iteration limit on the number of (outer) steps in the contraction technique
 # of interval Newton method
@@ -238,19 +243,11 @@ NEWTON_ITER_LIMIT = 30
 # of the interval Newton method
 NEWTON_CERTIFY_ITER_LIMIT = 20
 
-# Absolute and relative tolerance on the distance between consecutive interval
-# vectors in the contraction technique of the interval Newton method.
-# An iteration stops if two consecutive vectors are close enough, i.e. the
-# distance between then is smaller than this tolerance.
-NEWTON_REL_TOL = 1.0e-9
-NEWTON_ABS_TOL = 0.0
-
-# Tolerances (relative, absolute) on the distance between consecutive interval
-# vectors in the certification technique of the interval Newton method.
-# An iteration stops if two consecutive vectors are far enough, i.e. the
-# distance between then is greater than this tolerance.
-NEWTON_CERTIFY_REL_TOL = 1.0e-3
-NEWTON_CERTIFY_ABS_TOL = 0.0
+# Tolerance in [0,1] that corresponds to a percentage of reduction of the
+# width of a box. Given two consecutive domains prev and next of some
+# variable and tol the tolerance, the method is iterated if we have
+#(1 - width(next) / width(prev)) > tol.
+NEWTON_REL_TOL = 1.0e-3
 
 # Let x be an interval and let m(x) be its midpoint. An inflation of x returns
 # m(x) + delta*(x - m(x)) + chi*[-1,1]. The following parameter delta is a real

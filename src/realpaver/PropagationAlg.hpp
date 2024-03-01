@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_PROPAGATOR_HPP
-#define REALPAVER_PROPAGATOR_HPP
+#ifndef REALPAVER_PROPAGATION_ALG_HPP
+#define REALPAVER_PROPAGATION_ALG_HPP
 
 #include "realpaver/ContractorPool.hpp"
 
@@ -28,20 +28,20 @@ namespace realpaver {
 ///   i.e. for every variable the distance between two consecutive domains
 ///   is smaller than the tolerance.
 ///////////////////////////////////////////////////////////////////////////////
-class Propagator : public Contractor {
+class PropagationAlg : public Contractor {
 public:
    /// Creates a propagator over a pool of contractors
    /// @param pool a pool of contractors
-   Propagator(SharedContractorPool pool = nullptr);
+   PropagationAlg(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
-   Propagator(const Propagator&) = default;
+   PropagationAlg(const PropagationAlg&) = default;
 
    /// No assignment
-   Propagator& operator=(const Propagator&) = delete;
+   PropagationAlg& operator=(const PropagationAlg&) = delete;
 
    /// Default destructor
-   ~Propagator() = default;
+   ~PropagationAlg() = default;
 
    /// @return the number of contractors
    size_t poolSize() const;
@@ -53,9 +53,13 @@ public:
    /// @param pool new pool of contractors   
    void setPool(SharedContractorPool pool);
 
+   /// Inserts a contractor in this
+   /// @param op a contractor
+   void push(SharedContractor op);
+
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalBox& box) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 
@@ -91,10 +95,13 @@ private:
    // returns true if the i-th contractor of this depends on a variable that
    // belongs to the set ms
    bool contractorDependsOn(size_t i, const ModifSetType& ms);
+
+   // algorithm that propagates after each application of one contractor
+   Proof contractBis(IntervalBox& B);
 };
 
 /// Type of shared pointers on propagators
-typedef std::shared_ptr<Propagator> SharedPropagator;
+typedef std::shared_ptr<PropagationAlg> SharedPropagationAlg;
 
 } // namespace
 

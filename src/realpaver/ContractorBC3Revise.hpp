@@ -7,8 +7,8 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_BC3_HPP
-#define REALPAVER_CONTRACTOR_BC3_HPP
+#ifndef REALPAVER_CONTRACTOR_BC3_REVISE_HPP
+#define REALPAVER_CONTRACTOR_BC3_REVISE_HPP
 
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalSlicer.hpp"
@@ -31,22 +31,22 @@ namespace realpaver {
 /// at the bounds of domains. The peel factor is a percentage of the width of
 /// an interval.
 //////////////////////////////////////////////////////////////////////////////////
-class ContractorBC3 : public Contractor {
+class ContractorBC3Revise : public Contractor {
 public:
    /// Creates a contractor
    /// @param dag a DAG
    /// @param i index of a function in the DAG
    /// @param v a variable occurring in the function
-   ContractorBC3(SharedDag dag, size_t i, Variable v);
+   ContractorBC3Revise(SharedDag dag, size_t i, Variable v);
 
    /// Destructor
-   ~ContractorBC3();
+   ~ContractorBC3Revise();
 
    /// No copy
-   ContractorBC3(const ContractorBC3&) = delete;
+   ContractorBC3Revise(const ContractorBC3Revise&) = delete;
 
    /// No assignment
-   ContractorBC3& operator=(const ContractorBC3&) = delete;
+   ContractorBC3Revise& operator=(const ContractorBC3Revise&) = delete;
 
    /// @return the peel factor
    double getPeelFactor() const;
@@ -69,7 +69,7 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalBox& box) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 

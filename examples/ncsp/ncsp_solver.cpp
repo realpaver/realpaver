@@ -76,6 +76,7 @@ int main(int argc, char** argv)
 
       ok = parser.parseFile(filename, problem);
       if (!ok) THROW("Parse error: " << parser.getParseError());
+      
       if (!problem.isCSP()) THROW("Not a NCSP");
 
       // solving
@@ -197,8 +198,12 @@ int main(int argc, char** argv)
             fsol << endl;
          }
       }
+      else
+      {
+         cout << BLUE("No preprocessing") << endl;
+      }
 
-      NcspEnv* env = solver.getEnv();
+      std::shared_ptr<NcspEnv> env = solver.getEnv();
 
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
@@ -241,7 +246,7 @@ int main(int argc, char** argv)
 
          fsol << WP("Solution status", wpl);
          cout << indent << WP("Solution status", wpl);
-         if (space->nbSolNodes() == 0)
+         if (solver.nbSolutions() == 0)
          {
             if (complete)
             {
@@ -269,17 +274,17 @@ int main(int argc, char** argv)
          }
 
          fsol << WP("Number of solutions", wpl)
-              << space->nbSolNodes() << endl;
+              << solver.nbSolutions() << endl;
 
-         if (space->nbSolNodes() > 0)
+         if (solver.nbSolutions() > 0)
          {
             cout << indent << WP("Number of solutions", wpl)
-                 << GREEN(space->nbSolNodes()) << endl;
+                 << GREEN(solver.nbSolutions()) << endl;
          }
          else
          {
             cout << indent << WP("Number of solutions", wpl)
-                 << RED(space->nbSolNodes()) << endl;
+                 << RED(solver.nbSolutions()) << endl;
          }
 
          // limits
@@ -359,10 +364,10 @@ int main(int argc, char** argv)
          }
 
          // writes the hull of the pending nodes
-         if (solver.nbPendingBoxes() > 0)
+         if (solver.nbPendingNodes() > 0)
          {
             IntervalBox hp(solver.getPendingBox(0));
-            for (size_t i=1; i<solver.nbPendingBoxes(); ++i)
+            for (size_t i=1; i<solver.nbPendingNodes(); ++i)
             {
                IntervalBox aux(solver.getPendingBox(i));
                hp.glue(aux);

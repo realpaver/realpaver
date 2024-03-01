@@ -31,11 +31,11 @@ namespace realpaver {
 class NcspNode {
 public:
    /// Creates a node
-   /// @param scope set of variables
+   /// @param scop set of variables
    /// @param depth depth of this
    ///
    /// The domains are extracted from the variables of the given scope.
-   NcspNode(Scope scope, int depth = 0);
+   NcspNode(Scope scop, int depth = 0);
 
    /// Creates a node
    /// @param box the variables and their domains
@@ -65,6 +65,13 @@ public:
    /// @param id new index
    void setIndex(int id);
 
+   /// @return the index of the parent of this in the search tree
+   int parent() const;
+
+   /// Sets the index of the parent node
+   /// @param p the index
+   void setParent(int p);
+
    /// Increments the depth of this
    void incrementDepth();
 
@@ -74,13 +81,6 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
-   /// @return the variable chosen by the last splitting step
-   Variable splitVariable() const;
-
-   /// Assigns the variable whose domain has been split
-   /// @param v a variablein the scope of this
-   void setSplitVariable(Variable v);
-
    /// @return the proof certificate
    Proof getProof() const;
 
@@ -89,10 +89,9 @@ public:
    void setProof(Proof p);
 
 private:
-   Scope scope_;
+   Scope scop_;
    DomainBox* box_;
-   int depth_, index_;
-   Variable v_;
+   int depth_, index_, parent_;
    Proof proof_;
 };
 

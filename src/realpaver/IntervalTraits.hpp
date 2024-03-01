@@ -270,6 +270,24 @@ struct IntervalTraits
 
    static interval tanPY(const interval& x, const interval& y);
 
+   static interval cosh(const interval& x);
+
+   static interval coshPX(const interval& x, const interval& y);
+
+   static interval coshPY(const interval& x, const interval& y);
+
+   static interval sinh(const interval& x);
+
+   static interval sinhPX(const interval& x, const interval& y);
+
+   static interval sinhPY(const interval& x, const interval& y);
+
+   static interval tanh(const interval& x);
+
+   static interval tanhPX(const interval& x, const interval& y);
+
+   static interval tanhPY(const interval& x, const interval& y);
+
    static interval abs(const interval& x);
 
    static interval absPX(const interval& x, const interval& y);

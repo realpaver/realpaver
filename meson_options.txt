@@ -1,7 +1,6 @@
 option('LP_LIB', type : 'string', value : 'Clp', description : 'Linear Programming library (Clp, Gurobi, Highs, Soplex)')
 option('INTERVAL_LIB', type : 'string', value : 'Gaol', description : 'Linear Programming library (Gaol)')
 option('ASSERT', type : 'boolean', value : true, description : 'Activate assertions')
-option('DEBUG', type : 'boolean', value : false, description : 'Activate debugging messages')
 option('LOG', type : 'boolean', value : false, description : 'Activate file logging')
 option('GUROBI_DIR', type : 'string', value : '/Library/gurobi1000/macos_universal2', description : 'Path to LP solver Gurobi')
 option('GENERATE_DOC', type : 'boolean', value: false, description : 'Activate the generation of the documentation (Doxygen)')

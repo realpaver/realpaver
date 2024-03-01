@@ -43,6 +43,10 @@ public:
    /// @return the set of variables it depends on
    virtual Scope scope() const = 0;
 
+   /// Inserts a contractor in this
+   /// @param op a contractor
+   virtual void push(SharedContractor op) = 0;
+
    /// Gets a contractor
    /// @param i an index between 0 and poolSize()-1
    /// @return the i-th contractor
@@ -73,20 +77,17 @@ public:
    /// Default destructor
    ~ContractorVector() = default;
 
-   /// Inserts a contractor at the end of this
-   /// @param op a contractor
-   void push(SharedContractor op);
-
    ///@{
    size_t poolSize() const override;
    Scope scope() const override;
+   void push(SharedContractor op) override;
    SharedContractor contractorAt(size_t i) const override;
    void removeContractorAt(size_t i) override;
    ///@}
 
 private:
    std::vector<SharedContractor> v_;
-   Scope s_;
+   Scope scop_;
 };
 
 /// Type of shared contractor vectors.

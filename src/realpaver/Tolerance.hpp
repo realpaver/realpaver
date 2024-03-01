@@ -50,7 +50,9 @@ public:
 
    /// Tests if an interval is tight enough with respect to this
    /// @param x an interval
-   /// @return true if x is tight enough, false otherwise
+   /// @return false if x is empty; true if x is canonical ; otherwise it tests
+   ///         if abs(b-a) <= max(rtol*max(abs(b), abs(a)), atol) where x=[a,b],
+   ///         atol and rtol are respectively absolute and relative tolerances
    bool isTight(const Interval& x) const;
 
    /// Tests if every component of an interval vector is tight enough with
@@ -59,29 +61,26 @@ public:
    /// @return true if X is tight enough, false otherwise
    bool isTight(const IntervalVector& X) const;
 
-   /// Tests if the distance between two real numbers is tight enough with
-   /// respect to this
-   /// @param x a number
-   /// @param y a number
-   /// @return true if the distance between 'x' and 'y' is tight enough,
-   ///         false otherwise
-   bool isTight(double x, double y) const;
-
-   /// Tests if the distance between two intervals is less than this
-   /// @param x an interval
-   /// @param y an interval
-   /// @return true if the distance between 'x' and 'y' is less than this
-   bool areClose(const Interval& x, const Interval& y) const;
+   /// Tests if two consecutive intervals of a nested sequence are such that
+   /// the width of the second one has been reduced enough with respect to the
+   /// width of the first one according to the relative tolerance
+   /// @param old an interval
+   /// @param x an interval included in old
+   /// @return true if (1 - wid(x)/wid(old)) > rtol where rtol is the
+   ///         relative tolerance, false otherwise
+   bool isImproved(const Interval& old, const Interval& x) const;
 
    /// Gets the largest interval having this tolerance given its upper bound
    /// @param ub upper of the resulting interval
-   /// @return the largest interval [lb, ub] having this tolerance
-   //Interval maxIntervalDn(double ub) const;
+   /// @return the largest interval [lb, ub] having the absolute or the
+   ///         relative tolerance
+   Interval maxIntervalDn(double ub) const;
 
    /// Gets the largest interval having this tolerance given its lower bound
    /// @param lb lower of the resulting interval
-   /// @return the largest interval [lb, ub] having this tolerance
-   //Interval maxIntervalUp(double lb) const;
+   /// @return the largest interval [lb, ub] having the absolute or the
+   ///         relative tolerance
+   Interval maxIntervalUp(double lb) const;
 
    /// Calculates the size of a partition of an interval with respect to the
    /// absolute tolerance of this

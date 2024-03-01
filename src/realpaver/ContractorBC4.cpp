@@ -13,69 +13,78 @@
 
 namespace realpaver {
 
-ContractorBC4::ContractorBC4(SharedDag dag, size_t i)
+ContractorBC4::ContractorBC4(SharedDag dag)
       : dag_(dag),
-        if_(i),
-        hc4_(nullptr),
-        bc3_()
+        vop_()
 {
-   hc4_ = new ContractorHC4(dag, i);
+   SharedContractorVector pool = std::make_shared<ContractorVector>();
 
-   DagFun* f = dag->fun(i);
-   Scope s = f->scope();
-   for (auto v : s)
+   for (size_t i=0; i<dag_->nbFuns(); ++i)
    {
-      if (f->nbOccurrences(v) > 1)
-         bc3_.push_back(new ContractorBC3(dag_, if_, v));
+      std::shared_ptr<ContractorBC4Revise>
+         op = std::make_shared<ContractorBC4Revise>(dag_, i);
+      pool->push(op);
+      vop_.push_back(op);
    }
+
+   propag_ = new PropagationAlg(pool);
 }
 
 ContractorBC4::~ContractorBC4()
 {
-   delete hc4_;
-
-   for (auto it : bc3_) delete it;
+   if (propag_ != nullptr) delete propag_;
 }
 
 Scope ContractorBC4::scope() const
 {
-   return dag_->fun(if_)->scope();
+   return dag_->scope();
 }
 
-Proof ContractorBC4::contract(IntervalBox& box)
+Proof ContractorBC4::contract(IntervalBox& B)
 {
-   LOG_LOW("BC4 contractor @ " << if_ << " on " << box);
-   
-   // HC4
-   Proof proof = hc4_->contract(box);
-
-   if (proof != Proof::Maybe)
-   {
-      LOG_LOW("BC4 -> " << proof);
-      return proof;
-   }
-
-   // BC3
-   for (size_t i=0; i<bc3_.size(); ++i)
-   {
-      Proof certif = bc3_[i]->contract(box);
-
-      if (certif == Proof::Empty)
-      {
-         LOG_LOW("BC4 -> " << certif);
-         return certif;
-      }
-      else
-         proof = std::max(proof, certif);
-   }
-
-   LOG_LOW("BC4 -> " << proof);
-   return proof;
+   return propag_->contract(B);
 }
 
 void ContractorBC4::print(std::ostream& os) const
 {
-   os << "BC4 contractor #" << if_;
+   os << "BC4";
+}
+
+void ContractorBC4::setBC4RevisePeelFactor(double f)
+{
+   for (auto& op : vop_)
+      op->setPeelFactor(f);
+}
+
+void ContractorBC4::setBC4ReviseMaxIter(size_t val)
+{
+   for (auto& op : vop_)
+      op->setMaxIter(val);
+}
+
+Tolerance ContractorBC4::getTol() const
+{
+   return propag_->getTol();
+}
+
+void ContractorBC4::setTol(Tolerance tol)
+{
+   propag_->setTol(tol);
+}
+
+size_t ContractorBC4::getMaxIter() const
+{
+   return propag_->getMaxIter();
+}
+
+void ContractorBC4::setMaxIter(size_t n)
+{
+   propag_->setMaxIter(n);
+}
+
+void ContractorBC4::push(SharedContractor op)
+{
+   propag_->push(op);
 }
 
 } // namespace

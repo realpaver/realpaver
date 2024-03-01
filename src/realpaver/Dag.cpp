@@ -14,6 +14,7 @@
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
@@ -127,6 +128,11 @@ bool DagNode::dependsOn(const Variable& v) const
    return bitset_.get(v.id());
 }
 
+bool DagNode::isShared() const
+{
+   return parArity() > 1;
+}
+
 Interval DagNode::val() const
 {
    return val_;
@@ -135,6 +141,14 @@ Interval DagNode::val() const
 void DagNode::setVal(const Interval& x)
 {
    val_ = x;
+}
+
+void DagNode::sharedEval(const IntervalBox& B)
+{
+   eval(B);
+
+   if (isShared())
+      val_ &= dag()->dom(index_);
 }
 
 Interval DagNode::dv() const
@@ -202,7 +216,7 @@ void DagConst::print(std::ostream& os) const
       os << x_;
 }
 
-void DagConst::eval(const IntervalBox& box)
+void DagConst::eval(const IntervalBox& B)
 {
    setVal(x_);
 }
@@ -217,7 +231,7 @@ void DagConst::evalOnly(const Variable& v, const Interval& x)
    setVal(x_);
 }
 
-void DagConst::proj(IntervalBox& box)
+void DagConst::proj(IntervalBox& B)
 {
    // nothing to do
 }
@@ -272,9 +286,9 @@ void DagVar::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagVar::eval(const IntervalBox& box)
+void DagVar::eval(const IntervalBox& B)
 {
-   setVal(box.get(v_));
+   setVal(B.get(v_));
 }
 
 void DagVar::eval(const RealPoint& pt)
@@ -288,9 +302,9 @@ void DagVar::evalOnly(const Variable& v, const Interval& x)
       setVal(x);
 }
 
-void DagVar::proj(IntervalBox& box)
+void DagVar::proj(IntervalBox& B)
 {
-   box.set(v_, box.get(v_) & dom());
+   B.set(v_, B.get(v_) & dom());
 }
 
 bool DagVar::diff()
@@ -408,7 +422,7 @@ OpSymbol DagOp::getSymbol() const
    return symb_;
 }
 
-void DagOp::eval(const IntervalBox& box)
+void DagOp::eval(const IntervalBox& B)
 {
    eval();
 }
@@ -439,7 +453,7 @@ void DagAdd::eval()
    setVal(left()->val()+right()->val());
 }
 
-void DagAdd::proj(IntervalBox& box)
+void DagAdd::proj(IntervalBox& B)
 {
    left()->reduceDom(addPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(addPY(left()->val(), right()->val(), dom()));
@@ -484,7 +498,7 @@ void DagSub::eval()
    setVal(left()->val()-right()->val());
 }
 
-void DagSub::proj(IntervalBox& box)
+void DagSub::proj(IntervalBox& B)
 {
    left()->reduceDom(subPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(subPY(left()->val(), right()->val(), dom()));
@@ -529,7 +543,7 @@ void DagMul::eval()
    setVal(left()->val()*right()->val());
 }
 
-void DagMul::proj(IntervalBox& box)
+void DagMul::proj(IntervalBox& B)
 {
    left()->reduceDom(mulPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(mulPY(left()->val(), right()->val(), dom()));
@@ -574,7 +588,7 @@ void DagDiv::eval()
    setVal(left()->val()/right()->val());
 }
 
-void DagDiv::proj(IntervalBox& box)
+void DagDiv::proj(IntervalBox& B)
 {
    left()->reduceDom(divPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(divPY(left()->val(), right()->val(), dom()));
@@ -620,7 +634,7 @@ void DagMin::eval()
    setVal(min(left()->val(), right()->val()));
 }
 
-void DagMin::proj(IntervalBox& box)
+void DagMin::proj(IntervalBox& B)
 {
    left()->reduceDom(minPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(minPY(left()->val(), right()->val(), dom()));
@@ -690,7 +704,7 @@ void DagMax::eval()
    setVal(max(left()->val(), right()->val()));
 }
 
-void DagMax::proj(IntervalBox& box)
+void DagMax::proj(IntervalBox& B)
 {
    left()->reduceDom(maxPX(left()->val(), right()->val(), dom()));
    right()->reduceDom(maxPY(left()->val(), right()->val(), dom()));
@@ -760,7 +774,7 @@ void DagUsb::eval()
    setVal(-child()->val());
 }
 
-void DagUsb::proj(IntervalBox& box)
+void DagUsb::proj(IntervalBox& B)
 {
    child()->reduceDom(usubPX(child()->val(), dom()));
 }
@@ -802,7 +816,7 @@ void DagAbs::eval()
    setVal(abs(child()->val()));
 }
 
-void DagAbs::proj(IntervalBox& box)
+void DagAbs::proj(IntervalBox& B)
 {
    child()->reduceDom(absPX(child()->val(), dom()));
 }
@@ -862,7 +876,7 @@ void DagSgn::eval()
    setVal(sgn(child()->val()));
 }
 
-void DagSgn::proj(IntervalBox& box)
+void DagSgn::proj(IntervalBox& B)
 {
    child()->reduceDom(sgnPX(child()->val(), dom()));
 }
@@ -900,7 +914,7 @@ void DagSqr::eval()
    setVal(sqr(child()->val()));
 }
 
-void DagSqr::proj(IntervalBox& box)
+void DagSqr::proj(IntervalBox& B)
 {
    child()->reduceDom(sqrPX(child()->val(), dom()));
 }
@@ -942,7 +956,7 @@ void DagSqrt::eval()
    setVal(sqrt(child()->val()));
 }
 
-void DagSqrt::proj(IntervalBox& box)
+void DagSqrt::proj(IntervalBox& B)
 {
    child()->reduceDom(sqrtPX(child()->val(), dom()));
 }
@@ -1006,7 +1020,7 @@ void DagPow::eval()
    setVal(pow(child()->val(), n_));
 }
 
-void DagPow::proj(IntervalBox& box)
+void DagPow::proj(IntervalBox& B)
 {
    child()->reduceDom(powPX(child()->val(), n_, dom()));
 }
@@ -1050,7 +1064,7 @@ void DagExp::eval()
    setVal(exp(child()->val()));
 }
 
-void DagExp::proj(IntervalBox& box)
+void DagExp::proj(IntervalBox& B)
 {
    child()->reduceDom(expPX(child()->val(), dom()));
 }
@@ -1092,7 +1106,7 @@ void DagLog::eval()
    setVal(log(child()->val()));
 }
 
-void DagLog::proj(IntervalBox& box)
+void DagLog::proj(IntervalBox& B)
 {
    child()->reduceDom(logPX(child()->val(), dom()));
 }
@@ -1134,7 +1148,7 @@ void DagCos::eval()
    setVal(cos(child()->val()));
 }
 
-void DagCos::proj(IntervalBox& box)
+void DagCos::proj(IntervalBox& B)
 {
    child()->reduceDom(cosPX(child()->val(), dom()));
 }
@@ -1177,7 +1191,7 @@ void DagSin::eval()
    setVal(sin(child()->val()));
 }
 
-void DagSin::proj(IntervalBox& box)
+void DagSin::proj(IntervalBox& B)
 {
    child()->reduceDom(sinPX(child()->val(), dom()));
 }
@@ -1219,7 +1233,7 @@ void DagTan::eval()
    setVal(tan(child()->val()));
 }
 
-void DagTan::proj(IntervalBox& box)
+void DagTan::proj(IntervalBox& B)
 {
    child()->reduceDom(tanPX(child()->val(), dom()));
 }
@@ -1270,9 +1284,13 @@ bool DagLin::eqSymbol(const DagOp* other) const
    if (subArity() != other->subArity())
       return false;
 
-   // compares here the constants
-   // the variables are compared in the eq() method
    const DagLin* dl = static_cast<const DagLin*>(other);
+
+   // compares the constant terms
+   if (!cst_.isSetEq(dl->cst_))
+      return false;
+
+   // compares the factors of the linear terms
    auto it = terms_.begin();
    auto jt = dl->terms_.begin();
 
@@ -1284,6 +1302,10 @@ bool DagLin::eqSymbol(const DagOp* other) const
       ++it;
       ++jt;
    }
+
+   // no need to compare the variables / sub-nodes since this is done
+   // in the eq() method
+   
    return true;
 }
 
@@ -1318,7 +1340,7 @@ void DagLin::eval()
    }
 }
 
-void DagLin::proj(IntervalBox& box)
+void DagLin::proj(IntervalBox& B)
 {
    for (auto it=terms_.begin(); it!=terms_.end(); ++it)
    {
@@ -1381,7 +1403,7 @@ DagLin::const_iterator DagLin::begin() const
 {
    return terms_.begin();
 }
-   
+
 DagLin::const_iterator DagLin::end() const
 {
    return terms_.end();
@@ -1404,11 +1426,137 @@ Interval DagLin::getConstantValue() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DagCosh::DagCosh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Cosh, lsub)
+{}
+
+void DagCosh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagCosh::eval()
+{
+   setVal(cosh(child()->val()));
+}
+
+void DagCosh::proj(IntervalBox& B)
+{
+   child()->reduceDom(coshPX(child()->val(), dom()));
+}
+
+bool DagCosh::diff()
+{
+   // d(cosh(u))/du = sinh(u)
+   child()->addDv(dv()*sinh(child()->val()));
+
+   return true;
+}
+
+void DagCosh::reval()
+{
+   setRval(Double::cosh(child()->rval()));
+}
+
+bool DagCosh::rdiff()
+{
+   // d(cosh(u))/du = sinh(u)
+   child()->addRdv(Double::mul(rdv(), Double::sinh(child()->rval())));
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DagSinh::DagSinh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Sinh, lsub)
+{}
+
+void DagSinh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagSinh::eval()
+{
+   setVal(sinh(child()->val()));
+}
+
+void DagSinh::proj(IntervalBox& B)
+{
+   child()->reduceDom(sinhPX(child()->val(), dom()));
+}
+
+bool DagSinh::diff()
+{
+   // d(sinh(u))/du = cosh(u)
+   child()->addDv(dv()*cosh(child()->val()));
+
+   return true;
+}
+
+void DagSinh::reval()
+{
+   setRval(Double::sinh(child()->rval()));
+}
+
+bool DagSinh::rdiff()
+{
+   // d(sinh(u))/du = cosh(u)
+   child()->addRdv(Double::mul(rdv(), Double::cosh(child()->rval())));
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DagTanh::DagTanh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, OpSymbol::Tanh, lsub)
+{}
+
+void DagTanh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagTanh::eval()
+{
+   setVal(tanh(child()->val()));
+}
+
+void DagTanh::proj(IntervalBox& B)
+{
+   child()->reduceDom(tanhPX(child()->val(), dom()));
+}
+
+bool DagTanh::diff()
+{
+   // d(tanh(u))/du = 1-tanh^2(u)
+   child()->addDv(dv()*(1.0-sqr(val())));
+
+   return true;
+}
+
+void DagTanh::reval()
+{
+   setRval(Double::tanh(child()->rval()));
+}
+
+bool DagTanh::rdiff()
+{
+   // d(tanh(u))/du = 1-tanh^2(u)
+   child()->addRdv(Double::mul(rdv(), Double::sub(1.0, Double::sqr(rval()))));
+
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
       : dag_(dag),
         node_(),
         vnode_(),
-        scope_(),
+        scop_(),
         image_(image),
         idx_(0),
         inode_()
@@ -1485,12 +1633,12 @@ size_t DagFun::index() const
 
 Scope DagFun::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
-void DagFun::setScope(Scope s)
+void DagFun::setScope(Scope scop)
 {
-   scope_ = s;
+   scop_ = ScopeBank::getInstance()->insertScope(scop);
 }
 
 double DagFun::realDeriv(size_t i) const
@@ -1551,10 +1699,18 @@ void DagFun::insertOpNode(DagOp* node)
    }
 }
 
-Interval DagFun::intervalEval(const IntervalBox& box)
+Interval DagFun::intervalEval(const IntervalBox& B)
 {
    for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(box);
+      node_[i]->eval(B);
+
+   return rootNode()->val();
+}
+
+Interval DagFun::sharedIntervalEval(const IntervalBox& B)
+{
+   for (size_t i=0; i<nbNodes(); ++i)
+      node_[i]->sharedEval(B);
 
    return rootNode()->val();
 }
@@ -1562,7 +1718,10 @@ Interval DagFun::intervalEval(const IntervalBox& box)
 Interval DagFun::intervalEval(const RealPoint& pt)
 {
    for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(pt);
+   {
+      size_t j = (size_t)i;
+      node_[j]->eval(pt);
+   }
 
    return rootNode()->val();
 }
@@ -1577,18 +1736,9 @@ Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
    return rootNode()->val();
 }
 
-Proof DagFun::hc4Revise(IntervalBox& box)
+Proof DagFun::hc4ReviseNeg(IntervalBox& B)
 {
-   // assigns the projections to the universe
-   for (size_t i=0; i<nbNodes(); ++i)
-         node_[i]->setDom(Interval::universe());
-
-   return sharedHc4Revise(box);
-}
-
-Proof DagFun::hc4ReviseNeg(IntervalBox& box)
-{
-   Interval e = intervalEval(box);
+   Interval e = intervalEval(B);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1613,7 +1763,7 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& box)
          // projection over the root node
          rootNode()->setDom(e & Interval::moreThan(image_.right()));
 
-         return hc4ReviseBack(box);
+         return hc4ReviseBack(B);
       }
 
       else if (image_.isInfRight())
@@ -1624,7 +1774,7 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& box)
 
          // projection over the root node
          rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         return hc4ReviseBack(box);                  
+         return hc4ReviseBack(B);                  
       }
 
       else
@@ -1636,7 +1786,7 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& box)
          for (size_t i=0; i<nbNodes()-1; ++i)
             node_[i]->setDom(Interval::universe());
 
-         IntervalBox Xl(box);
+         IntervalBox Xl(B);
          rootNode()->setDom(e & Interval::lessThan(image_.left()));
          Proof pl = hc4ReviseBack(Xl);
 
@@ -1644,7 +1794,7 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& box)
          for (size_t i=0; i<nbNodes(); ++i)
             node_[i]->setDom(Interval::universe());
 
-         IntervalBox Xr(box);
+         IntervalBox Xr(B);
          rootNode()->setDom(e & Interval::moreThan(image_.right()));
          Proof pr = hc4ReviseBack(Xr);
 
@@ -1666,13 +1816,13 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& box)
                Variable v = varNode(i)->getVar();
 
                if (pl == Proof::Empty)
-                  box.set(v, Xr.get(v));
+                  B.set(v, Xr.get(v));
 
                else if (pr == Proof::Empty)
-                  box.set(v, Xl.get(v));
+                  B.set(v, Xl.get(v));
 
                else
-                  box.set(v, Xl.get(v) | Xr.get(v));
+                  B.set(v, Xl.get(v) | Xr.get(v));
             }
          }
 
@@ -1681,9 +1831,17 @@ Proof DagFun::hc4ReviseNeg(IntervalBox& box)
    }
 }
 
-Proof DagFun::sharedHc4Revise(IntervalBox& box)
+Proof DagFun::hc4Revise(IntervalBox& B)
 {
-   Interval e = intervalEval(box);
+   // assigns the projections to the universe for the shared nodes
+   for (size_t i=0; i<nbNodes(); ++i)
+   {
+      DagNode* node = node_[i];
+      if (node->isShared())
+         node->setDom(Interval::universe());
+   }
+
+   Interval e = intervalEval(B);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1697,23 +1855,42 @@ Proof DagFun::sharedHc4Revise(IntervalBox& box)
    else
    {
       rootNode()->setDom(e & image_);
-      return hc4ReviseBack(box);
+      return hc4ReviseBack(B);
    }
 }
 
-Proof DagFun::hc4ReviseBack(IntervalBox& box)
+Proof DagFun::sharedHc4Revise(IntervalBox& B)
+{
+   Interval e = sharedIntervalEval(B);
+
+   LOG_LOW("SharedHC4Revise evaluation of function: " << e);
+
+   if (e.isEmpty())
+      return Proof::Empty;
+
+   else if (image_.contains(e))
+      return Proof::Inner;
+
+   else if (!image_.overlaps(e))
+      return Proof::Empty;
+
+   else
+   {
+      rootNode()->setDom(e & image_);
+      return hc4ReviseBack(B);
+   }
+}
+
+Proof DagFun::hc4ReviseBack(IntervalBox& B)
 {
    for (int i=nbNodes()-1; i>=0; --i)
-   {
-      size_t j = (size_t)i;
-      node_[j]->proj(box);
-   }
+      node_[i]->proj(B);
 
    for (size_t i=0; i<nbVars(); ++i)
    {
-      Variable v = varNode(i)->getVar();
+      const Variable& v = varNode(i)->getVar();
 
-      if (box.get(v).isEmpty())
+      if (B.get(v).isEmpty())
          return Proof::Empty;
    }
 
@@ -1853,6 +2030,11 @@ DagContext* DagContext::clone() const
    return new DagContext(*this);
 }
 
+void DagContext::reset()
+{
+   dom.setAll(Interval::universe());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Dag::Dag()
@@ -1863,7 +2045,7 @@ Dag::Dag()
         fun_(),
         vmap_(),
         omap_(),
-        scope_()
+        scop_()
 {
    defaultContext_ = new DagContext();
    context_ = defaultContext_;
@@ -1917,9 +2099,16 @@ void Dag::setDom(size_t i, const Interval& x)
 }
 
 void Dag::reduceDom(size_t i, const Interval& x)
-{
-   Interval aux( x & context_->dom[i]);
-   context_->dom.set(i, aux);
+{   
+   if (node_[i]->isShared())
+   {
+      Interval aux( x & context_->dom[i]);
+      context_->dom.set(i, aux);
+   }
+   else
+   {
+      context_->dom.set(i, x);
+   }
 }
 
 DagContext* Dag::cloneDefaultContext() const
@@ -2009,8 +2198,8 @@ size_t Dag::insertVarNode(const Variable& v)
    else
       index = it->second;
 
-   // insertion in the scope
-   scope_.insert(v);
+   // insertion in the scope, TODO: use of the bank of scopes
+   scop_.insert(v);
 
    return index;
 }
@@ -2095,7 +2284,7 @@ DagVar* Dag::findVarNode(size_t id) const
 
 Scope Dag::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 bool Dag::intervalPointEval(const RealPoint& pt, IntervalVector& val)
@@ -2117,12 +2306,12 @@ bool Dag::intervalPointEval(const RealPoint& pt, IntervalVector& val)
    return res;
 }
 
-bool Dag::intervalEval(const IntervalBox& box)
+bool Dag::intervalEval(const IntervalBox& B)
 {
    bool res = true;
 
    for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(box);
+      node_[i]->eval(B);
 
    for (size_t i=0; i<nbFuns(); ++i)
       if (fun_[i]->intervalValue().isEmpty()) res = false;
@@ -2130,7 +2319,7 @@ bool Dag::intervalEval(const IntervalBox& box)
    return res;
 }
 
-bool Dag::intervalEval(const IntervalBox& box, IntervalVector& val)
+bool Dag::intervalEval(const IntervalBox& B, IntervalVector& val)
 {
    ASSERT(val.size() == nbFuns(), "Size of interval vector different from " <<
                                   "the number of functions in a dag");
@@ -2138,7 +2327,7 @@ bool Dag::intervalEval(const IntervalBox& box, IntervalVector& val)
    bool res = true;
 
    for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(box);
+      node_[i]->eval(B);
 
    for (size_t i=0; i<nbFuns(); ++i)
    {
@@ -2170,7 +2359,7 @@ void Dag::intervalDiff(IntervalMatrix& jac)
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (const auto& v : scope())
       {
          if (f->dependsOn(v))
             jac.set(i, j, f->intervalDeriv(v));
@@ -2182,7 +2371,7 @@ void Dag::intervalDiff(IntervalMatrix& jac)
    }
 }
 
-void Dag::hansenDiff(const IntervalBox& box, IntervalMatrix& jac)
+void Dag::hansenDiff(const IntervalBox& B, IntervalMatrix& jac)
 {
    ASSERT(nbVars() == jac.ncols() && nbFuns() == jac.nrows(),
           "Bad dimensions of a Jacobian matrix used in a DAG");
@@ -2190,13 +2379,13 @@ void Dag::hansenDiff(const IntervalBox& box, IntervalMatrix& jac)
    ASSERT(nbVars() == nbFuns(),
           "Hansen's derivatives can be computed only for square systems");
 
-   IntervalBox X =  box.midpoint();
+   IntervalBox X =  B.midpoint();
 
    size_t j = 0;
-   for (auto v : scope())
+   for (const auto& v : scope())
    {
       // assigns the domain of v
-      X.set(v, box.get(v));
+      X.set(v, B.get(v));
 
       // evaluates the DAG
       intervalEval(X);
@@ -2278,7 +2467,7 @@ void Dag::realDiff(RealMatrix& jac)
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (const auto& v : scope())
       {
          if (f->dependsOn(v))
             jac.set(i, j, f->realDeriv(v));
@@ -2353,6 +2542,14 @@ DagContext* Dag::unbindContext()
    DagContext* aux = context_;
    context_ = defaultContext_;
    return aux;
+}
+
+void Dag::printIntervalValues(std::ostream& os) const
+{
+   for (size_t i=0; i<nbNodes(); ++i)
+   {
+      os << "node " << i << ": " << node_[i]->val() << std::endl;
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2456,6 +2653,21 @@ void DagVisitor::apply(const DagTan* d)
 }
 
 void DagVisitor::apply(const DagLin* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagCosh* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagSinh* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagTanh* d)
 {
    THROW("visit method not implemented");
 }
@@ -2609,6 +2821,27 @@ void DagFunCreator::apply(const DagLin* d)
 {
    visitSubNodes(d);
    DagLin* aux = const_cast<DagLin*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagCosh* d)
+{
+   visitSubNodes(d);
+   DagCosh* aux = const_cast<DagCosh*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagSinh* d)
+{
+   visitSubNodes(d);
+   DagSinh* aux = const_cast<DagSinh*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagTanh* d)
+{
+   visitSubNodes(d);
+   DagTanh* aux = const_cast<DagTanh*>(d);
    f_->insertOpNode(aux);
 }
 
@@ -2865,6 +3098,27 @@ void DagTermCreator::apply(const TermLin* t)
    }
 
    DagLin* node = new DagLin(dag_, t, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermCosh* t)
+{
+   visitSubnodes(t);
+   DagCosh* node = new DagCosh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermSinh* t)
+{
+   visitSubnodes(t);
+   DagSinh* node = new DagSinh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermTanh* t)
+{
+   visitSubnodes(t);
+   DagTanh* node = new DagTanh(dag_, lsub_);
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 

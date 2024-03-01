@@ -25,7 +25,7 @@ class TermVisitor;   // forward declaration
 ///////////////////////////////////////////////////////////////////////////////
 enum class OpSymbol {
    Add, Sub, Mul, Div, Min, Max, Usb, Abs, Sgn, Sqr, Sqrt, Pow,
-   Exp, Log, Cos, Sin, Tan, Lin
+   Exp, Log, Cos, Sin, Tan, Lin, Cosh, Sinh, Tanh
 };
 
 /// Output on a stream
@@ -67,15 +67,15 @@ public:
    virtual Interval evalConst() const = 0;
 
    /// Interval evaluation
-   /// @param box domains of variables
+   /// @param B domains of variables
    ///
    /// The result is assigned in the interval value enclosed.
-   virtual void eval(const IntervalBox& box) = 0;
+   virtual void eval(const IntervalBox& B) = 0;
 
    /// Contraction of domains
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @return a certificate of proof
-   virtual Proof contract(IntervalBox& box) = 0;
+   virtual Proof contract(IntervalBox& B) = 0;
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -117,6 +117,9 @@ public:
    /// @return true if this is a linear expression
    virtual bool isLinear() const = 0;
 
+   /// @return true if this is an integer term
+   virtual bool isInteger() const = 0;
+
    /// @return true if this has no variable
    ///
    /// test done in O(1)
@@ -128,8 +131,8 @@ public:
    virtual bool dependsOn(const Variable& v) const = 0;
 
    /// Makes the scope of this
-   /// @param s the set of variables occurring in this
-   virtual void makeScope(Scope& s) const = 0;
+   /// @param scop the set of variables occurring in this
+   virtual void makeScope(Scope& scop) const = 0;
 
    /// @return a new representation such that the root of this is cloned and
    ///         its sub-terms are shared
@@ -183,32 +186,32 @@ public:
    Interval evalConst() const;
 
    /// Interval evaluation
-   /// @param box domains of variables
-   /// @return the interval evaluation of this in the box
-   Interval eval(const IntervalBox& box) const;
+   /// @param B domains of variables
+   /// @return the interval evaluation of this in B
+   Interval eval(const IntervalBox& B) const;
 
    /// Reduction of domains using the HC4 Revise contractor
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param img image or bounds of this considered as a function
    /// @return a certificate of proof
    ///
    /// This algorithm first evaluates the nodes from the leaves to the root
    /// (forward phase) and then calculates the projections from the root to
    /// the leaves (backward phase).
-   Proof contract(IntervalBox& box, const Interval& img);
+   Proof contract(IntervalBox& B, const Interval& img);
 
    /// Forward phase of the HC4 Revise contractor
-   /// @param box domains of variables
-   /// @return the interval evaluation of this in the box
-   Interval hc4ReviseForward(const IntervalBox& box) const;
+   /// @param B domains of variables
+   /// @return the interval evaluation of this in B
+   Interval hc4ReviseForward(const IntervalBox& B) const;
 
    /// Backward phase of the HC4 Revise contractor
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param img image or bounds of this considered as a function
    /// @return a certificate of proof
    ///
    /// Assumes that the forward phase has been executed using hc4ReviseForward.
-   Proof hc4ReviseBackward(IntervalBox& box, const Interval& img);
+   Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
 
    /// Visitor pattern
    /// @param vis a visitor
@@ -250,6 +253,12 @@ public:
    /// @return true if this is a linear expression
    bool isLinear() const;
 
+   /// @return true if this is an integer term
+   ///
+   /// An integer term has only integer variables, integer constants, and
+   /// arithmetic operations
+   bool isInteger() const;
+
    /// @return true if this has no variable
    ///
    /// test done in O(1)
@@ -264,10 +273,10 @@ public:
    bool dependsOn(const Variable& v) const;
 
    /// Inserts the variables of this in a scope
-   /// @param s scope modified
-   void makeScope(Scope& s) const;
+   /// @param scop scope modified
+   void makeScope(Scope& scop) const;
 
-   /// @return creates and returns thz scope of this
+   /// @return creates and returns the scope of this
    Scope scope() const;
 
    ///@{
@@ -347,6 +356,9 @@ Term log(Term t);
 Term cos(Term t);
 Term sin(Term t);
 Term tan(Term t);
+Term cosh(Term t);
+Term sinh(Term t);
+Term tanh(Term t);
 ///@}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -360,8 +372,8 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isNumber() const override;
    bool isZero() const override;
@@ -369,7 +381,8 @@ public:
    bool isMinusOne() const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
-   void makeScope(Scope& s) const override;
+   bool isInteger() const override;
+   void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -393,12 +406,13 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
-   void makeScope(Scope& s) const override;
+   bool isInteger() const override;
+   void makeScope(Scope& scop) const override;
    bool isVar() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -461,18 +475,19 @@ public:
    bool isMul() const override;
    bool isDiv() const override;
    bool isUsb() const override;
-   bool isLin() const override;
-   void eval(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   bool isInteger() const override;
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
    virtual bool isLinear() const override;
-   void makeScope(Scope& s) const override;
+   void makeScope(Scope& scop) const override;
    ///@}
 
 protected:
    virtual void evalRoot() = 0;
    virtual void contractRoot() = 0;
+   virtual bool isIntegerRoot() const; // default : false
 
 private:
    std::vector<SharedRep> v_;    // sub-terms
@@ -496,6 +511,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -518,6 +534,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -540,6 +557,7 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -561,6 +579,7 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -581,6 +600,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -601,6 +621,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -622,6 +643,7 @@ public:
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -641,6 +663,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -660,6 +683,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -680,6 +704,7 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -699,6 +724,7 @@ public:
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -723,6 +749,7 @@ public:
    void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -864,12 +891,14 @@ public:
    ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& box) override;
-   Proof contract(IntervalBox& box) override;
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void acceptVisitor(TermVisitor& vis) const override;
+   bool isLin() const override;
    bool isLinear() const override;
+   bool isInteger() const override;
    bool dependsOn(const Variable& v) const override;
-   void makeScope(Scope& s) const override;
+   void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
    ///@}
@@ -927,6 +956,63 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This is the hyperbolic cosine of a term.
+///////////////////////////////////////////////////////////////////////////////
+class TermCosh : public TermOp {
+public:
+   /// Creates a term with form cosh(t)
+   /// @param t sub-term
+   TermCosh(const SharedRep& t);
+
+   ///@{
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is the hyperbolic sine of a term.
+///////////////////////////////////////////////////////////////////////////////
+class TermSinh : public TermOp {
+public:
+   /// Creates a term with form sinh(t)
+   /// @param t sub-term
+   TermSinh(const SharedRep& t);
+
+   ///@{
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is the hyperbolic tangent of a term.
+///////////////////////////////////////////////////////////////////////////////
+class TermTanh : public TermOp {
+public:
+   /// Creates a term with form Tanh(t)
+   /// @param t sub-term
+   TermTanh(const SharedRep& t);
+
+   ///@{
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void contractRoot() override;
+   void acceptVisitor(TermVisitor& vis) const override;
+   TermRep* cloneRoot() const override;
+   TermRep* clone() const override;
+   ///@}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// This is the base class of visitors of terms.
 ///////////////////////////////////////////////////////////////////////////////
 class TermVisitor {
@@ -955,6 +1041,9 @@ public:
    virtual void apply(const TermSin* t);
    virtual void apply(const TermTan* t);
    virtual void apply(const TermLin* t);
+   virtual void apply(const TermCosh* t);
+   virtual void apply(const TermSinh* t);
+   virtual void apply(const TermTanh* t);
    ///@}
 };
 
@@ -1001,6 +1090,9 @@ public:
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
    void apply(const TermLin* t) override;
+   void apply(const TermCosh* t) override;
+   void apply(const TermSinh* t) override;
+   void apply(const TermTanh* t) override;
    ///@}
 
 private:

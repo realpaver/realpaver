@@ -22,9 +22,7 @@ Prover::Prover(const Problem& p)
         unewton_(nullptr),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
-        maxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_CERTIFY_REL_TOL"),
-             Param::GetDblParam("NEWTON_CERTIFY_ABS_TOL"))
+        maxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
    dag_ = std::make_shared<Dag>();
 
@@ -50,7 +48,6 @@ Prover::Prover(const Problem& p)
          {
             unewton_ = new IntervalNewtonUni();
             unewton_->setMaxIter(maxiter_);
-            unewton_->setLocalTol(tol_);
             unewton_->getInflator().setDelta(delta_);
             unewton_->getInflator().setChi(chi_);
          }
@@ -60,7 +57,6 @@ Prover::Prover(const Problem& p)
             mnewton_->setInflationDelta(delta_);
             mnewton_->setInflationChi(chi_);
             mnewton_->setCertifyMaxIter(maxiter_);
-            mnewton_->setCertifyTol(tol_);
          }
       }
    }
@@ -72,16 +68,16 @@ Prover::~Prover()
    if (unewton_ != nullptr) delete unewton_;
 }
 
-Proof Prover::certify(IntervalBox& box)
+Proof Prover::certify(IntervalBox& B)
 {
    bool inner = true;     // Iner certificate for the problem
    bool innerbis = true;  // Inner certificate for the problem but the equations
 
-   LOG_INTER("Certification of the box " << box);
+   LOG_INTER("Certification of the box " << B);
 
    for (auto& it : v_)
    {
-      it.proof = it.ctr.isSatisfied(box);
+      it.proof = it.ctr.isSatisfied(B);
 
       if (it.proof == Proof::Empty)
          return Proof::Empty;
@@ -115,9 +111,9 @@ Proof Prover::certify(IntervalBox& box)
    {
       LOG_INTER("Certification by the multivariate interval Newton");
 
-      proof = mnewton_->certify(box);
+      proof = mnewton_->certify(B);
 
-      LOG_INTER(" -> " << box);
+      LOG_INTER(" -> " << B);
    }
 
    // applies the univariate Newton operator for one equation
@@ -126,12 +122,12 @@ Proof Prover::certify(IntervalBox& box)
       LOG_INTER("Certification by the univariate interval Newton");
 
       Variable v = dag_->fun(0)->scope().var(0);
-      Interval x = box.get(v);
+      Interval x = B.get(v);
       IntervalThickFunction f(dag_, 0, v);
       proof = unewton_->localSearch(f, x);
-      box.set(v, x);
+      B.set(v, x);
 
-      LOG_INTER(" -> " << box);
+      LOG_INTER(" -> " << B);
    }
 
    LOG_INTER(" -> " << proof);
@@ -186,22 +182,6 @@ void Prover::setMaxIter(size_t n)
 size_t Prover::getMaxIter() const
 {
    return maxiter_;
-}
-
-Tolerance Prover::getTol() const
-{
-   return tol_;
-}
-
-void Prover::setTol(const Tolerance& tol)
-{
-   tol_ = tol;
-
-   if (mnewton_ != nullptr)
-      mnewton_->setCertifyTol(tol);
-
-   if (unewton_ != nullptr)
-      unewton_->setLocalTol(tol);
 }
 
 } // namespace

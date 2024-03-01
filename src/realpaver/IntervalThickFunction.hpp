@@ -53,9 +53,9 @@ public:
    Interval diff(const Interval& x) override;
 
    /// Updates the associated function in the DAG
-   /// @param box domains of variables
-   /// @return interval evaluation of this in the box
-   Interval update(const IntervalBox& box);
+   /// @param B domains of variables
+   /// @return interval evaluation of this in B
+   Interval update(const IntervalBox& B);
 
    /// @return the index of the variable of this
    Variable getVar() const;

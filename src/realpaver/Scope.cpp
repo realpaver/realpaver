@@ -17,6 +17,7 @@ namespace realpaver {
 ScopeRep::ScopeRep()
       : m_(),
         scopeMap_(nullptr),
+        hcode_(0),
         minid_(0),
         maxid_(0)
 {}
@@ -24,6 +25,7 @@ ScopeRep::ScopeRep()
 ScopeRep::ScopeRep(const ScopeRep& other)
       : m_(other.m_),
         scopeMap_(nullptr),
+        hcode_(other.hcode_),
         minid_(other.minid_),
         maxid_(other.maxid_)
 {
@@ -60,6 +62,8 @@ void ScopeRep::makeMap()
       for (auto it : m_) aux->insert(it.first.id());
       scopeMap_ = aux;
    }
+
+   hcode_ = scopeMap_->hashCode();
 }
 
 size_t ScopeRep::size() const
@@ -171,6 +175,11 @@ void ScopeRep::remove(const Variable& v, size_t n)
    }
 }
 
+size_t ScopeRep::hashCode() const
+{
+   return hcode_;
+}
+
 void ScopeRep::print(std::ostream& os) const
 {
    os << "{";
@@ -205,6 +214,13 @@ void Scope::insert(Variable v)
    insert(v, 1);
 }
 
+size_t Scope::hashCode() const
+{
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
+   return rep_->hashCode();
+}
+
 void Scope::insert(Variable v, size_t n)
 {
    if (isShared())
@@ -233,6 +249,8 @@ void Scope::remove(const Variable& v, size_t n)
 
 size_t Scope::size() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->size();
 }
 
@@ -248,42 +266,58 @@ bool Scope::contains(const Variable& v) const
 
 size_t Scope::minVarId() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->minVarId();
 }
 
 size_t Scope::maxVarId() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->maxVarId();
 }
 
 void Scope::print(std::ostream& os) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    rep_->print(os);
 }
 
 typename Scope::const_iterator Scope::begin() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->begin();
 }
 
 typename Scope::const_iterator Scope::end() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->end();   
 }
 
 typename Scope::const_iterator Scope::find(const Variable& v) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->find(v);
 }
 
 size_t Scope::index(const Variable& v) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->index(v);
 }
 
 Variable Scope::var(size_t i) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
    ASSERT(i < size(), "Bad access to a variable in a scope @ " << i);
+
    return rep_->var(i);
 }
 
@@ -361,7 +395,7 @@ bool Scope::overlaps(const Scope& other) const
 
 bool Scope::operator==(const Scope& other) const
 {
-   if (isEmpty() && other.isEmpty()) return true;
+   if (rep_.get() == other.rep_.get()) return true;
 
    if (size() != other.size()) return false;
 

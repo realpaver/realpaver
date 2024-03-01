@@ -11,13 +11,14 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 Preprocessor::Preprocessor()
       : vvm_(),
         vim_(),
-        box_(nullptr),
+        B_(nullptr),
         inactive_(),
         active_(),
         unfeasible_(false),
@@ -26,7 +27,7 @@ Preprocessor::Preprocessor()
 
 Preprocessor::~Preprocessor()
 {
-   if (box_!=nullptr) delete box_;
+   if (B_!=nullptr) delete B_;
 }
 
 bool Preprocessor::allVarsFixed() const
@@ -58,20 +59,20 @@ Variable Preprocessor::srcToDestVar(Variable v) const
 
 Scope Preprocessor::destScope() const
 {
-   Scope sco;
+   Scope scop;
    for (auto p : vvm_)
-      sco.insert(p.second);
+      scop.insert(p.second);
 
-   return sco;
+   return scop;
 }
 
 IntervalBox Preprocessor::destRegion() const
 {
-   IntervalBox box(destScope());
+   IntervalBox B(destScope());
    for (auto p : vvm_)
-      box.set(p.second, box_->get(p.first));
+      B.set(p.second, B_->get(p.first));
 
-   return box;
+   return B;
 }
 
 void Preprocessor::apply(const Problem& src, Problem& dest)
@@ -87,11 +88,11 @@ void Preprocessor::apply(const Problem& src, Problem& dest)
    unfeasible_ = false;
 
    // makes the interval box used for propagation
-   if (box_!=nullptr) delete box_;
-   box_ = new IntervalBox(src.scope());
+   if (B_!=nullptr) delete B_;
+   B_ = new IntervalBox(src.scope());
 
    LOG_MAIN("Preprocessing");
-   LOG_INTER("Box: " << (*box_));
+   LOG_INTER("Box: " << (*B_));
 
    timer_.reset();
    timer_.start();
@@ -106,8 +107,8 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    // test empty domains
    for (size_t i=0; i<src.nbVars(); ++i)
    {
-      Variable v        = src.varAt(i);
-      Interval domain   = box_->get(v);
+      Variable v      = src.varAt(i);
+      Interval domain = B_->get(v);
 
       if (domain.isEmpty())
       {
@@ -118,20 +119,20 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 
    // propagation
-   bool ok = propagate(src, *box_);
+   bool ok = propagate(src, *B_);
    if (!ok)
    {
       unfeasible_ = true;
       return;
    }
 
-   LOG_INTER("Contracted box: " << (*box_));
+   LOG_INTER("Contracted box: " << (*B_));
 
    // satisfaction tests
    for (size_t i=0; i<src.nbCtrs(); ++i)
    {
       Constraint c = src.ctrAt(i);
-      Proof proof = c.isSatisfied(*box_);
+      Proof proof = c.isSatisfied(*B_);
 
       if (proof == Proof::Empty)
       {
@@ -157,9 +158,9 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    // rewrites the variables
    for (size_t i=0; i<src.nbVars(); ++i)
    {
-      Variable v        = src.varAt(i);
-      Interval domain   = box_->get(v);
-      bool isReal       = v.isReal();
+      Variable v      = src.varAt(i);
+      Interval domain = B_->get(v);
+      bool isReal     = v.isReal();
 
       bool isFixed = isReal ? domain.isCanonical() : domain.isSingleton();
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
@@ -194,7 +195,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    // rewrites the constraints
    for (Constraint input : active_)
    {
-      ConstraintFixer fixer(&vvm_, &vim_, *box_);
+      ConstraintFixer fixer(&vvm_, &vim_, *B_);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
 
@@ -208,7 +209,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(*box_);
+   Interval dobj = obj.getTerm().eval(*B_);
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");
@@ -234,7 +235,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 }
 
-bool Preprocessor::propagate(const Problem& problem, IntervalBox& box)
+bool Preprocessor::propagate(const Problem& problem, IntervalBox& B)
 {
    // AC1 propagation algorithm
    bool modified;
@@ -244,12 +245,12 @@ bool Preprocessor::propagate(const Problem& problem, IntervalBox& box)
    {
       modified = false;
       --nbsteps;
-      IntervalBox save(box);
+      IntervalBox save(B);
 
       for (size_t i=0; i<problem.nbCtrs(); ++i)
       {
          Constraint c = problem.ctrAt(i);
-         Proof proof = c.contract(box);
+         Proof proof = c.contract(B);
          if (proof == Proof::Empty)
          {
             LOG_INTER("Constraint violated: " << c);
@@ -257,19 +258,19 @@ bool Preprocessor::propagate(const Problem& problem, IntervalBox& box)
          }
       }
 
-      if (!save.equals(box)) modified = true;
+      if (!save.equals(B)) modified = true;
    }
    while (modified && nbsteps>0);
 
    // variables with disconnected domains
-   Scope sco = box.scope();
-   for (auto v : sco)
+   Scope scop = B.scope();
+   for (const auto& v : scop)
    {
       if (!v.getDomain()->isConnected())
       {
-         Interval y = box.get(v);
+         Interval y = B.get(v);
          v.getDomain()->contractInterval(y);
-         box.set(v, y);
+         B.set(v, y);
 
          if (y.isEmpty()) return false;
       }
@@ -288,16 +289,16 @@ bool Preprocessor::occursInActiveConstraint(const Variable& v) const
 
 Scope Preprocessor::fixedScope() const
 {
-   Scope sco;
-   for (auto p : vim_) sco.insert(p.first);
-   return sco;
+   Scope scop;
+   for (auto p : vim_) scop.insert(p.first);
+   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 Scope Preprocessor::unfixedScope() const
 {
-   Scope sco;
-   for (auto p : vvm_) sco.insert(p.first);
-   return sco;
+   Scope scop;
+   for (auto p : vvm_) scop.insert(p.first);
+   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 size_t Preprocessor::nbInactiveCtrs() const
@@ -345,11 +346,11 @@ IntervalBox Preprocessor::fixedRegion() const
 {
    ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
 
-   IntervalBox box(fixedScope());
+   IntervalBox B(fixedScope());
    for (auto p : vim_)
-      box.set(p.first, p.second);
+      B.set(p.first, p.second);
 
-   return box;
+   return B;
 }
 
 bool Preprocessor::isUnfeasible() const

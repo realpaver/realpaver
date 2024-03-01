@@ -35,6 +35,10 @@ public:
 
    /// @return a clone of this
    virtual AbstractScopeMap* clone() const = 0;
+
+   /// Calculates an hash code
+   /// @return the hash code of this
+   virtual size_t hashCode() const = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,6 +60,7 @@ public:
    ///@{
    size_t index(size_t id) const override;
    ScopeIdMap* clone() const override;
+   size_t hashCode() const override;
    ///@}
 
 private:
@@ -80,6 +85,7 @@ public:
    ///@{
    size_t index(size_t id) const override;
    ScopeSeqMap* clone() const override;
+   size_t hashCode() const override;
    ///@}
 
 private:
@@ -106,6 +112,7 @@ public:
    ///@{
    size_t index(size_t id) const override;
    ScopeHashMap* clone() const override;
+   size_t hashCode() const override;
    ///@}
 
 private:

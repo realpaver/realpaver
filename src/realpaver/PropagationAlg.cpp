@@ -9,71 +9,152 @@
 
 #include <unordered_set>
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/PropagationAlg.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/Propagator.hpp"
+
+#include <queue>
+#include "realpaver/Bitset.hpp"
 
 namespace realpaver {
 
-Propagator::Propagator(SharedContractorPool pool)
+PropagationAlg::PropagationAlg(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
-        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"),
-             Param::GetDblParam("PROPAGATION_ABS_TOL")),
+        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
         maxiter_(Param::GetIntParam("PROPAGATION_ITER_LIMIT")),
         certif_()
-{}
+{
+   if (pool == nullptr)
+   {
+      pool_ = std::make_shared<ContractorVector>();
+   }
+}
 
-Tolerance Propagator::getTol() const
+Tolerance PropagationAlg::getTol() const
 {
    return tol_;
 }
 
-void Propagator::setTol(Tolerance tol)
+void PropagationAlg::setTol(Tolerance tol)
 {
    tol_ = tol;
 }
 
-size_t Propagator::poolSize() const
+size_t PropagationAlg::poolSize() const
 {
    return pool_->poolSize();
 }
 
-size_t Propagator::getMaxIter() const
+void PropagationAlg::push(SharedContractor op)
+{
+   pool_->push(op);
+}
+
+size_t PropagationAlg::getMaxIter() const
 {
    return maxiter_;
 }
 
-void Propagator::setMaxIter(size_t n)
+void PropagationAlg::setMaxIter(size_t n)
 {
    maxiter_ = n;
 }
 
-Proof Propagator::proofAt(size_t i) const
+Proof PropagationAlg::proofAt(size_t i) const
 {
    return certif_[i];
 }
 
-SharedContractorPool Propagator::getPool() const
+SharedContractorPool PropagationAlg::getPool() const
 {
    return pool_;
 }
 
-void Propagator::setPool(SharedContractorPool pool)
+void PropagationAlg::setPool(SharedContractorPool pool)
 {
    pool_ = pool;
 }
 
-Scope Propagator::scope() const
+Scope PropagationAlg::scope() const
 {
    return pool_->scope();
 }
 
-Proof Propagator::contract(IntervalBox& box)
+Proof PropagationAlg::contractBis(IntervalBox& B)
+{
+   // initialization: activates all contractors
+   size_t N = pool_->poolSize();
+
+   // propagation queue
+   std::queue<size_t> queue;
+   for (size_t i=0; i<N; ++i) queue.push(i);
+
+   // vector of proof certificates
+   certif_.resize(N);
+
+   Bitset active(N);
+   active.setAllOne();
+
+   Proof proof = Proof::Maybe;
+   IntervalBox copy(B);
+
+   while ((proof != Proof::Empty) && (queue.size() > 0))
+   {
+      size_t j = queue.front();
+      queue.pop();
+      SharedContractor op = pool_->contractorAt(j);
+
+      copy.setOnScope(B, op->scope());
+
+      proof = op->contract(B);
+      certif_[j] = proof;
+      active.setZero(j);
+
+      if (proof != Proof::Empty)
+      {
+         for (const auto& v : op->scope())
+         {
+            const Interval& prev = copy.get(v);
+            const Interval& curr = B.get(v);
+
+            LOG_LOW("Propagation test on " << v.getName() << " ("
+                                           << tol_ << ")");
+
+            if (tol_.isImproved(prev, curr))
+            {
+               LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
+                            << " -> propagation");
+
+               for (size_t i=0; i<N; ++i)
+               {
+                  if (!active.get(i))
+                  {
+                     SharedContractor ctc = pool_->contractorAt(i);
+                     if (ctc->dependsOn(v))
+                     {
+                        queue.push(i);
+                        active.setOne(i);
+                     }
+                  }
+               }
+            }
+            else
+            {
+               LOG_LOW("  " << prev << " -> " << curr
+                            << " not reduced enough");
+            }
+         }
+      }
+   }
+   return proof;
+}
+
+Proof PropagationAlg::contract(IntervalBox& B)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
-   Scope scope = pool_->scope();
+   Scope scop = pool_->scope();
 
    // initialization: activates all contractors
    size_t N = pool_->poolSize();
@@ -92,7 +173,7 @@ Proof Propagator::contract(IntervalBox& box)
    ModifSetType modif;
 
    // copy used to check the domain modifications
-   IntervalBox* copy = box.clone();
+   IntervalBox* copy = B.clone();
 
    // result of the algorithm
    Proof proof;
@@ -103,15 +184,13 @@ Proof Propagator::contract(IntervalBox& box)
    // number of propagation steps
    size_t nb_steps = 0;
 
-   LOG_NL();
-   LOG_INTER("Propagator [" << tol_ << "]");
-   LOG_INTER("Current box: " << box);
+   LOG_INTER("Propagation algorithm on " << B);
 
    do
    {
       // apply the next contractor from the queue
       size_t j = queue[next];
-      proof = pool_->contractorAt(j)->contract(box);
+      proof = pool_->contractorAt(j)->contract(B);
       certif_[j] = proof;
 
       if (proof != Proof::Empty)
@@ -131,15 +210,15 @@ Proof Propagator::contract(IntervalBox& box)
                // detects the variables whose domains have been modified
                modif.clear();
 
-               for (auto v : scope)
+               for (const auto& v : scop)
                {
                   const Interval& prev = copy->get(v);
-                  const Interval& curr = box.get(v);
+                  const Interval& curr = B.get(v);
 
                   LOG_LOW("Propagation test on " << v.getName() << " ("
                                                  << tol_ << ")");
 
-                  if (!tol_.areClose(prev, curr))
+                  if (tol_.isImproved(prev, curr))
                   {
                      LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
                                   << " -> propagation");
@@ -170,7 +249,7 @@ Proof Propagator::contract(IntervalBox& box)
                   // save the current box for the next propagation step
                   if (count != 0)
                   {
-                     copy->setOnScope(box, scope);
+                     copy->setOnScope(B, scop);
                   }
                }
             }
@@ -188,18 +267,18 @@ Proof Propagator::contract(IntervalBox& box)
 
    delete copy;
 
-   LOG_INTER(" -> " << proof << ", " << box);
-   LOG_INTER("End of propagator, " << nb_steps << " loop(s)");
+   LOG_INTER(" -> " << proof << ", " << B);
+   LOG_INTER("End of propagation, " << nb_steps << " loop(s)");
 
    return proof;
 }
 
-void Propagator::print(std::ostream& os) const
+void PropagationAlg::print(std::ostream& os) const
 {
-   os << "Propagator on " << pool_->poolSize() << " contractors";
+   os << "PropagationAlg on " << pool_->poolSize() << " contractors";
 }
 
-bool Propagator::contractorDependsOn(size_t i, const ModifSetType& ms)
+bool PropagationAlg::contractorDependsOn(size_t i, const ModifSetType& ms)
 {
    SharedContractor op = pool_->contractorAt(i);
 
@@ -210,3 +289,4 @@ bool Propagator::contractorDependsOn(size_t i, const ModifSetType& ms)
 }
 
 } // namespace
+

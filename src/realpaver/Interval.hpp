@@ -384,6 +384,30 @@ public:
    ///@}
 
    ///@{
+   /// Hyperbolic cosine
+   friend Interval cosh(const Interval& x);
+
+   friend Interval coshPX(const Interval& x, const Interval& y);
+   friend Interval coshPY(const Interval& x, const Interval& y);
+   ///@}
+
+   ///@{
+   /// Hyperbolic sine
+   friend Interval sinh(const Interval& x);
+
+   friend Interval sinhPX(const Interval& x, const Interval& y);
+   friend Interval sinhPY(const Interval& x, const Interval& y);
+   ///@}
+
+   ///@{
+   /// Hyperbolic tangent
+   friend Interval tanh(const Interval& x);
+
+   friend Interval tanhPX(const Interval& x, const Interval& y);
+   friend Interval tanhPY(const Interval& x, const Interval& y);
+   ///@}
+
+   ///@{
    /// Absolute value
    friend Interval abs(const Interval& x);
 

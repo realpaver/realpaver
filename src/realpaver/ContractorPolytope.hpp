@@ -10,6 +10,7 @@
 #ifndef REALPAVER_CONTRACTOR_POLYTOPE_HPP
 #define REALPAVER_CONTRACTOR_POLYTOPE_HPP
 
+#include <memory>
 #include <vector>
 #include <unordered_map>
 #include "realpaver/Contractor.hpp"
@@ -19,10 +20,10 @@
 namespace realpaver {
 
 /// Types of linearizations
-enum class PolytopeCreatorStyle { RLT, Affine, Taylor };
+enum class PolytopeStyle { RLT, Affine, Taylor };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const PolytopeCreatorStyle& style);
+std::ostream& operator<<(std::ostream& os, const PolytopeStyle& style);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This the abstract class of polytope makers used to linearize nonlinear
@@ -52,9 +53,9 @@ public:
 
    /// Makes the linear relaxation
    /// @param lpm resulting linear model
-   /// @param box input box
+   /// @param B input box
    /// @return true in case of sucess, false otherwise
-   virtual bool make(LPModel& lpm, const IntervalBox& box) = 0;
+   virtual bool make(LPModel& lpm, const IntervalBox& B) = 0;
 
    /// @param v a variable
    /// @return the index of the linear variable associated with v
@@ -69,7 +70,7 @@ public:
 
 protected:
    SharedDag dag_;                           // DAG
-   Scope scope_;                             // scope
+   Scope scop_;                              // scope
    std::unordered_map<size_t, size_t> mvv_;  // map var index ->lin var index
    IndexList lfun_;                          // list of indexes of functions
    double eqtol_;                            // relaxation tol for the equations
@@ -90,7 +91,7 @@ public:
    /// @param lfun list of indexes of the DAG functions to be relaxed
    PolytopeRLTCreator(SharedDag dag, const IndexList& lfun);
 
-   bool make(LPModel& lpm, const IntervalBox& box) override;
+   bool make(LPModel& lpm, const IntervalBox& B) override;
 
 private:
    size_t nodeToLinVar(DagNode* node) const;
@@ -114,7 +115,7 @@ public:
    /// @param corner 
    PolytopeTaylorCreator(SharedDag dag, const IndexList& lfun);
 
-   bool make(LPModel& lpm, const IntervalBox& box) override;
+   bool make(LPModel& lpm, const IntervalBox& B) override;
 
 private:
    Bitset corner_;
@@ -135,14 +136,14 @@ public:
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param style kind of relaxation method
-   ContractorPolytope(SharedDag dag, PolytopeCreatorStyle style);
+   ContractorPolytope(SharedDag dag, PolytopeStyle style);
 
    /// Constructor
    /// @param dag a DAG representing a set of constraints
    /// @param lfun list of indexes of the DAG functions to be relaxed
    /// @param style kind of relaxation method
    ContractorPolytope(SharedDag dag, const IndexList& lfun,
-                      PolytopeCreatorStyle style);
+                      PolytopeStyle style);
 
    /// Destructor
    ~ContractorPolytope();
@@ -162,15 +163,18 @@ public:
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalBox& box) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 
 private:
    PolytopeCreator* creator_;    // creator of the relaxation
 
-   Proof contractImpl(IntervalBox& box);
+   Proof contractImpl(IntervalBox& B);
 };
+
+/// type of shared contractors
+typedef std::shared_ptr<ContractorPolytope> SharedContractorPolytope;
 
 } // namespace
 

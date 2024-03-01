@@ -7,11 +7,11 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALPAVER_CONTRACTOR_3BCID_HPP
-#define REALPAVER_CONTRACTOR_3BCID_HPP
+#ifndef REALPAVER_CONTRACTOR_VAR_3BCID_HPP
+#define REALPAVER_CONTRACTOR_VAR_3BCID_HPP
 
-#include "realpaver/Contractor3B.hpp"
-#include "realpaver/ContractorCID.hpp"
+#include "realpaver/ContractorVar3B.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 
 namespace realpaver {
 
@@ -22,32 +22,32 @@ namespace realpaver {
 /// of v in B is not reduced then B is returned. Oherwise, the CID
 /// contractor is applied.
 ///////////////////////////////////////////////////////////////////////////////
-class Contractor3BCID : public Contractor {
+class ContractorVar3BCID : public Contractor {
 public:
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
    /// @param slicer3B a slicer for the 3B contractor
    /// @param slicerCID  a slicer for the CID contractor
-   Contractor3BCID(SharedContractor op, Variable v,
-                   std::unique_ptr<IntervalSlicer> slicer3B,
-                   std::unique_ptr<IntervalSlicer> slicerCID);
+   ContractorVar3BCID(SharedContractor op, Variable v,
+                      std::unique_ptr<IntervalSlicer> slicer3B,
+                      std::unique_ptr<IntervalSlicer> slicerCID);
 
    /// Creates a contractor
    /// @param op a contractor
    /// @param v a variable
    /// @param n3B number of slices for the 3B contractor (at least 2)
    /// @param nCID  number of slices for the CID contractor (at least 2)
-   Contractor3BCID(SharedContractor op, Variable v, size_t n3B, size_t nCID);
+   ContractorVar3BCID(SharedContractor op, Variable v, size_t n3B, size_t nCID);
 
    /// Destructor
-   ~Contractor3BCID();
+   ~ContractorVar3BCID();
 
    /// No copy
-   Contractor3BCID(const Contractor3BCID&) = delete;
+   ContractorVar3BCID(const ContractorVar3BCID&) = delete;
 
    /// No assignment
-   Contractor3BCID& operator=(const Contractor3BCID&) = delete;
+   ContractorVar3BCID& operator=(const ContractorVar3BCID&) = delete;
 
    /// @return the variable whose domain is sliced
    Variable getVar() const;
@@ -64,8 +64,8 @@ public:
 
 private:
    Variable v_;
-   Contractor3B* ctc3B_;
-   ContractorCID* ctcCID_;
+   ContractorVar3B* ctc3B_;
+   ContractorVarCID* ctcCID_;
 };
 
 

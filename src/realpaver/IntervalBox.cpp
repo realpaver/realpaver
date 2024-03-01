@@ -13,109 +13,109 @@
 
 namespace realpaver {
 
-IntervalBox::IntervalBox(Scope sco)
-      : IntervalVector(sco.size()),
-        scope_(sco)
+IntervalBox::IntervalBox(Scope scop)
+      : IntervalVector(scop.size()),
+        scop_(scop)
 {
-   ASSERT(!sco.isEmpty(), "Empty scope used to create an interval box");   
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");   
 
-   for (const auto& v : sco)
+   for (const auto& v : scop)
       set(v, v.getDomain()->intervalHull());
 }
 
-IntervalBox::IntervalBox(Scope sco, const Interval& x)
-      : IntervalVector(sco.size(), x),
-        scope_(sco)
+IntervalBox::IntervalBox(Scope scop, const Interval& x)
+      : IntervalVector(scop.size(), x),
+        scop_(scop)
 {
-   ASSERT(!sco.isEmpty(), "Empty scope used to create an interval box");   
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");   
 }
 
-IntervalBox::IntervalBox(Scope sco, const IntervalVector& X)
+IntervalBox::IntervalBox(Scope scop, const IntervalVector& X)
       : IntervalVector(X),
-        scope_(sco)
+        scop_(scop)
 {
-   ASSERT(!sco.isEmpty(), "Empty scope used to create an interval box");      
-   ASSERT(sco.size() == X.size(), "Bad initialization of an interval box");      
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");      
+   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");      
 }
 
 IntervalBox::IntervalBox(const RealPoint& pt)
       : IntervalVector(pt),
-        scope_(pt.scope())
+        scop_(pt.scope())
 {}
 
-IntervalBox::IntervalBox(Scope sco, const RealVector& X)
+IntervalBox::IntervalBox(Scope scop, const RealVector& X)
       : IntervalVector(X),
-        scope_(sco)
+        scop_(scop)
 {
-   ASSERT(!sco.isEmpty(), "Empty scope used to create an interval box");      
-   ASSERT(sco.size() == X.size(), "Bad initialization of an interval box");      
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");      
+   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");      
 }
 
-IntervalBox::IntervalBox(const IntervalBox& B, Scope sco)
-      : IntervalVector(sco.size()),
-        scope_(sco)
+IntervalBox::IntervalBox(const IntervalBox& B, Scope scop)
+      : IntervalVector(scop.size()),
+        scop_(scop)
 {
-   ASSERT(B.scope().contains(sco), "Bad scope used to create a sub-box");
+   ASSERT(B.scope().contains(scop), "Bad scope used to create a sub-box");
 
-   for (Variable v : sco)
+   for (const auto& v : scop)
       set(v, B.get(v));
 }
 
 IntervalBox::IntervalBox(const DomainBox& box)
       : IntervalVector(box.scope().size()),
-        scope_(box.scope())
+        scop_(box.scope())
 {
-   for (Variable v : scope_)
+   for (const auto& v : scop_)
       set(v, box.get(v)->intervalHull());
 }
 
 Scope IntervalBox::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 Interval IntervalBox::get(const Variable& v) const
 {
-   ASSERT(scope_.contains(v), "Bad access in an interval box");
+   ASSERT(scop_.contains(v), "Bad access in an interval box");
 
-   return operator[](scope_.index(v));
+   return operator[](scop_.index(v));
 }
 
 void IntervalBox::set(const Variable& v, const Interval& x)
 {
-   ASSERT(scope_.contains(v), "Bad access in an interval box");
+   ASSERT(scop_.contains(v), "Bad access in an interval box");
 
-   operator[](scope_.index(v)) = x;
+   operator[](scop_.index(v)) = x;
 }
 
 RealPoint IntervalBox::midpoint() const
 {
-   return RealPoint(scope_, IntervalVector::midpoint());
+   return RealPoint(scop_, IntervalVector::midpoint());
 }
 
 RealPoint IntervalBox::lCorner() const
 {
-   return RealPoint(scope_, IntervalVector::lCorner());   
+   return RealPoint(scop_, IntervalVector::lCorner());   
 }
 
 RealPoint IntervalBox::rCorner() const
 {
-   return RealPoint(scope_, IntervalVector::rCorner());   
+   return RealPoint(scop_, IntervalVector::rCorner());   
 }
 
 RealPoint IntervalBox::corner(const Bitset& bs) const
 {
-   return RealPoint(scope_, IntervalVector::corner(bs));
+   return RealPoint(scop_, IntervalVector::corner(bs));
 }
 
 RealPoint IntervalBox::oppositeCorner(const Bitset& bs) const
 {
-   return RealPoint(scope_, IntervalVector::oppositeCorner(bs));
+   return RealPoint(scop_, IntervalVector::oppositeCorner(bs));
 }
 
 bool IntervalBox::contains(const IntervalBox& B) const
 {
-   for (auto v : B.scope())
+   for (const auto& v : B.scope())
       if (!get(v).contains(B.get(v))) return false;
 
    return true;
@@ -123,7 +123,7 @@ bool IntervalBox::contains(const IntervalBox& B) const
 
 bool IntervalBox::strictlyContains(const IntervalBox& B) const
 {
-   for (auto v : B.scope())
+   for (const auto& v : B.scope())
       if (!get(v).strictlyContains(B.get(v))) return false;
 
    return true;
@@ -131,7 +131,7 @@ bool IntervalBox::strictlyContains(const IntervalBox& B) const
 
 bool IntervalBox::contains(const RealPoint& pt) const
 {
-   for (auto v : pt.scope())
+   for (const auto& v : pt.scope())
       if (!get(v).contains(pt.get(v))) return false;
 
    return true;
@@ -139,7 +139,7 @@ bool IntervalBox::contains(const RealPoint& pt) const
 
 bool IntervalBox::strictlyContains(const RealPoint& pt) const
 {
-   for (auto v : pt.scope())
+   for (const auto& v : pt.scope())
       if (!get(v).strictlyContains(pt.get(v))) return false;
 
    return true;
@@ -149,7 +149,7 @@ bool IntervalBox::overlaps(const IntervalBox& B) const
 {
    if (size() != B.size()) return false;
 
-   for (auto v : scope_)
+   for (const auto& v : scop_)
       if (!get(v).overlaps(B.get(v))) return false;
 
    return true;
@@ -157,62 +157,64 @@ bool IntervalBox::overlaps(const IntervalBox& B) const
 
 void IntervalBox::glue(const IntervalBox& B)
 {
-   glueOnScope(B, scope_);
+   glueOnScope(B, scop_);
 }
 
-void IntervalBox::glueOnScope(const IntervalBox& B, const Scope& sco)
+void IntervalBox::glueOnScope(const IntervalBox& B, const Scope& scop)
 {
-   for (auto v : sco) set(v, get(v) | B.get(v));
+   for (const auto& v : scop)
+      set(v, get(v) | B.get(v));
 }
 
-void IntervalBox::setOnScope(const IntervalBox& B, const Scope& sco)
+void IntervalBox::setOnScope(const IntervalBox& B, const Scope& scop)
 {
-   for (auto v : sco) set(v, B.get(v));
+   for (const auto& v : scop)
+      set(v, B.get(v));
 }
 
-RealPoint IntervalBox::midpointOnScope(const Scope& sco) const
+RealPoint IntervalBox::midpointOnScope(const Scope& scop) const
 {
-   RealPoint pt(sco);
-   midpointOnScope(sco, pt);
+   RealPoint pt(scop);
+   midpointOnScope(scop, pt);
    return pt;
 }
 
-void IntervalBox::midpointOnScope(const Scope& sco, RealPoint& pt) const
+void IntervalBox::midpointOnScope(const Scope& scop, RealPoint& pt) const
 {
-   ASSERT(scope_.contains(sco),
-          "Bad scope used t create the midpoint of a box" << sco);
+   ASSERT(scop_.contains(scop),
+          "Bad scope used t create the midpoint of a box" << scop);
 
-   ASSERT(pt.scope().contains(sco),
-          "Bad scope used t create the midpoint of a box" << sco);
+   ASSERT(pt.scope().contains(scop),
+          "Bad scope used t create the midpoint of a box" << scop);
 
-   for (auto v : sco)
+   for (const auto& v : scop)
       pt.set(v, get(v).midpoint());
 }
 
 
-IntervalBox IntervalBox::subRegion(const Scope& sco) const
+IntervalBox IntervalBox::subRegion(const Scope& scop) const
 {
-   ASSERT(scope_.contains(sco),
-          "Bad scope used to create a sub-box " << sco);
+   ASSERT(scop_.contains(scop),
+          "Bad scope used to create a sub-box " << scop);
 
-   IntervalBox B(sco);
-   for (auto v : sco) B.set(v, get(v));
+   IntervalBox B(scop);
+   for (const auto& v : scop) B.set(v, get(v));
    return B;
 }
 
 double IntervalBox::distance(const IntervalBox& B) const
 {
-   return distanceOnScope(B, scope_);
+   return distanceOnScope(B, scop_);
 }
 
 double IntervalBox::distanceOnScope(const IntervalBox& B,
-                                    const Scope& sco) const
+                                    const Scope& scop) const
 {
-   ASSERT(scope_.contains(sco) && B.scope_.contains(sco),
+   ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
           "Bad scopes used to calculate the distance between interval boxes");
 
    double d = 0.0;
-   for (auto v : sco)
+   for (const auto& v : scop)
    {
       double e = get(v).distance(B.get(v));
       if (e > d) d = e;
@@ -222,16 +224,16 @@ double IntervalBox::distanceOnScope(const IntervalBox& B,
 
 double IntervalBox::gap(const IntervalBox& B) const
 {
-   return gapOnScope(B, scope_);
+   return gapOnScope(B, scop_);
 }
 
-double IntervalBox::gapOnScope(const IntervalBox& B, const Scope& sco) const
+double IntervalBox::gapOnScope(const IntervalBox& B, const Scope& scop) const
 {
-   ASSERT(scope_.contains(sco) && B.scope_.contains(sco),
+   ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
           "Bad scopes used to calculate the gap between interval boxes");
 
    double gap = 0.0;
-   for (auto v : sco)
+   for (const auto& v : scop)
    {
       double e = get(v).gap(B.get(v));
       if (e > gap) gap = e;
@@ -239,25 +241,25 @@ double IntervalBox::gapOnScope(const IntervalBox& B, const Scope& sco) const
    return gap;
 }
 
-void IntervalBox::inflateOnScope(const Scope& sco, double delta, double chi)
+void IntervalBox::inflateOnScope(const Scope& scop, double delta, double chi)
 {
    ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
    ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
 
-   for (auto v : sco)
+   for (const auto& v : scop)
       set(v, get(v).inflate(delta, chi));
 }
 
 double IntervalBox::perimeter() const
 {
-   return perimeterOnScope(scope_);
+   return perimeterOnScope(scop_);
 }
 
-double IntervalBox::perimeterOnScope(const Scope& sco) const
+double IntervalBox::perimeterOnScope(const Scope& scop) const
 {
    double p = 0.0;
 
-   for (const auto& v : sco)
+   for (const auto& v : scop)
       p += get(v).width();
 
    return p;
@@ -265,14 +267,14 @@ double IntervalBox::perimeterOnScope(const Scope& sco) const
 
 double IntervalBox::gridPerimeter() const
 {
-   return gridPerimeterOnScope(scope_);
+   return gridPerimeterOnScope(scop_);
 }
 
-double IntervalBox::gridPerimeterOnScope(const Scope& sco) const
+double IntervalBox::gridPerimeterOnScope(const Scope& scop) const
 {
    double p = 0.0;
 
-   for (const auto& v : sco)
+   for (const auto& v : scop)
    {
       Interval x = get(v);
       Tolerance tol = v.getTolerance();
@@ -289,6 +291,29 @@ IntervalBox* IntervalBox::clone() const
    return new IntervalBox(*this);
 }
 
+double IntervalBox::gainRatio(const IntervalBox& B) const
+{
+   return gainRatioOnScope(B, scop_);
+}
+
+double IntervalBox::gainRatioOnScope(const IntervalBox& B,
+                                     const Scope& scop) const
+{
+   ASSERT(scop_.contains(scop),
+          "Bad scope used to calculate a gan ratio " << scop);
+   ASSERT(B.scop_.contains(scop),
+          "Bad scope used to calculate a gan ratio " << scop);
+   ASSERT(!scop.isEmpty(),
+          "Empty scope used to calculate a gan ratio");
+
+   double s = 0.0;
+
+   for (const auto& v : scop)
+      s += (1.0 - get(v).width() / B.get(v).width());
+
+   return s / scop.size();
+}
+
 void IntervalBox::print(std::ostream& os) const
 {
    vecPrint(os);
@@ -296,9 +321,9 @@ void IntervalBox::print(std::ostream& os) const
 
 void IntervalBox::listPrint(std::ostream& os) const
 {
-   size_t lmax = scope_.nameMaxLength();
+   size_t lmax = scop_.nameMaxLength();
 
-   for (const auto& v : scope_)
+   for (const auto& v : scop_)
    {
       os << v.getName();
       size_t n = v.getName().length();
@@ -314,7 +339,7 @@ void IntervalBox::vecPrint(std::ostream& os) const
    {
       if (i!=0) os << ", ";
 
-      Variable v = scope_.var(i);
+      Variable v = scop_.var(i);
       os << v.getName() << " = " << get(v);
    }
    os << ')'; 

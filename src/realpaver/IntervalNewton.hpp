@@ -89,18 +89,6 @@ public:
    /// @return the maximum number of iterations of the certification method
    size_t getCertifyMaxIter() const;
 
-   /// @return the tolerance on the distance between two consecutive intervals
-   ///         in the certification method
-   Tolerance getCertifyTol() const;
-
-   /// Sets the tolerance on the distance between two consecutive intervals
-   /// in the certification method
-   /// @param tol absolute or relative tolerance
-   ///
-   /// The iteration stops if two consecutive boxes are far enough, i.e.
-   /// their distance is greater than tol
-   void setCertifyTol(const Tolerance& tol);
-
 private:
    IntervalFunctionVector F_;       // vector of interval functions
    IntervalMatrix jac_;             // Jacobian matrix
@@ -114,11 +102,10 @@ private:
    double delta_;         // parameter delta of inflation
    double chi_;           // parameter chi of inflation
    size_t cmaxiter_;      // maximum number of iterations
-   Tolerance ctol_;       // tolerance on the distance between two intervals
 
    void makeY(IntervalBox& X);
-   Proof reduceX(IntervalBox& X, bool& hastol);
-   Proof certifyX(IntervalBox& X, bool& hastol);
+   Proof reduceX(IntervalBox& X, bool& improved);
+   Proof certifyX(IntervalBox& X);
 };
 
 } // namespace

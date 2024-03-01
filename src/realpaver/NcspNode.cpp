@@ -7,43 +7,43 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "AssertDebug.hpp"
-#include "NcspNode.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/NcspNode.hpp"
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-
-NcspNode::NcspNode(Scope scope, int depth)
-      : scope_(scope),
+NcspNode::NcspNode(Scope scop, int depth)
+      : scop_(scop),
         box_(nullptr),
         depth_(depth),
-        index_(0),
-        v_(),
+        index_(-1),
+        parent_(-1),
         proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
-   ASSERT(!scope.isEmpty(), "Empty scope used to create a NCSP node");
+   ASSERT(!scop.isEmpty(), "Empty scope used to create a NCSP node");
 
-   box_ = new DomainBox(scope);
+   box_ = new DomainBox(scop);
 }
 
 NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
-      : scope_(box->scope()),
+      : scop_(box->scope()),
         box_(box.release()),
         depth_(depth),
-        index_(0),
-        v_(),
+        index_(-1),
+        parent_(-1),
         proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
 }
 
 NcspNode::NcspNode(const NcspNode& node)
-      : scope_(node.scope_),
+      : scop_(node.scop_),
         box_(nullptr),
         depth_(node.depth_),
-        v_(node.v_)
+        index_(-1),
+        parent_(-1),
+        proof_(Proof::Maybe)
 {
    box_ = node.box_->clone();
 }
@@ -75,6 +75,16 @@ void NcspNode::setIndex(int id)
    index_ = id;
 }
 
+int NcspNode::parent() const
+{
+   return parent_;
+}
+
+void NcspNode::setParent(int p)
+{
+   parent_ = p;
+}
+
 void NcspNode::incrementDepth()
 {
    ++depth_;
@@ -87,19 +97,7 @@ DomainBox* NcspNode::box() const
 
 Scope NcspNode::scope() const
 {
-   return scope_;
-}
-
-Variable NcspNode::splitVariable() const
-{
-   return v_;
-}
-
-void NcspNode::setSplitVariable(Variable v)
-{
-   ASSERT(scope_.contains(v), "Bad assignment of the last split variable");
-
-   v_ = v;
+   return scop_;
 }
 
 Proof NcspNode::getProof() const

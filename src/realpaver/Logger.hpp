@@ -63,14 +63,14 @@ public:
    void setLogLevel(LogLevel level);
 
    /// @return the maximum size of a log file in bytes
-   size_t getMaxSize() const;
+   unsigned long getMaxSize() const;
 
    /// @return the current size of the log file in bytes
-   size_t getSize() const;
+   unsigned long getSize() const;
 
    /// Sets the maximum size of a log file
    /// @param nbytes maximum size of a log file in bytes
-   void setMaxSize(size_t nbytes);
+   void setMaxSize(unsigned long nbytes);
 
    /// Writes a message
    void log(LogLevel level, const std::string& msg);
@@ -92,7 +92,7 @@ private:
    LogLevel level_;           // current log level
    std::ofstream ofs_;        // log file
    std::string path_;         // path of the log file
-   size_t maxsize_;           // maximum size of a log file in bytes
+   unsigned long maxsize_;    // maximum size of a log file in bytes
    std::streamsize fprec_;    // float precision (number of digits)
 
    Logger();
@@ -124,8 +124,8 @@ private:
 #define LOG_FULL(msg)  LOG(LogLevel::full, msg)
 
 #if LOG_ON
-#  define LOG_NL()                                                \
-   if (Logger::getInstance()->getLogLevel() > LogLevel::none)     \
+#  define LOG_NL(level)                                           \
+   if (level <= Logger::getInstance()->getLogLevel())             \
    {                                                              \
       do                                                          \
       {                                                           \
@@ -134,8 +134,13 @@ private:
       while(0);                                                   \
    }
 #else
-#  define LOG_NL()
+#  define LOG_NL(level)
 #endif
+
+#define LOG_NL_MAIN()  LOG_NL(LogLevel::main)
+#define LOG_NL_INTER() LOG_NL(LogLevel::inter)
+#define LOG_NL_LOW()   LOG_NL(LogLevel::low)
+#define LOG_NL_FULL()  LOG_NL(LogLevel::full)
 
 } // namespace
 

@@ -10,55 +10,82 @@
 #ifndef REALPAVER_CONTRACTOR_HC4_HPP
 #define REALPAVER_CONTRACTOR_HC4_HPP
 
-#include "realpaver/Contractor.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Dag.hpp"
+#include "realpaver/PropagationAlg.hpp"
 
 namespace realpaver {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This implements the HC4Revise operator.
-///
-/// This contractor traverses the tree-representation of a constraint.
-/// The first phase is an interval evaluation from the leaves to the root.
-/// The second phase calculates the projections from the root to the leaves.
-///
-/// The expression of the constraint comes from a DAG.
+/// This is a constraint propagation algorithm applying HC4Revise contractors
+/// on a DAG.
 ///////////////////////////////////////////////////////////////////////////////
 class ContractorHC4 : public Contractor {
 public:
-   /// Creates a contractor
-   /// @param dag a DAG
-   /// @param i index of a function / constraint in the dag
-   ///
-   /// We have 0 <= i < dag->nbFuns().
-   /// This does not own the dag.
-   ContractorHC4(SharedDag dag, size_t i);
+   /// Constructor
+   /// @param dag a shared dag
+   ContractorHC4(SharedDag dag);
 
-   /// Default copy constructor
-   ContractorHC4(const ContractorHC4&) = default;
+   /// Destructor
+   ~ContractorHC4();
 
-   /// Default assignment operator
+   /// No copy
+   ContractorHC4(const ContractorHC4&) = delete;
+
+   /// No asignment
    ContractorHC4& operator=(const ContractorHC4&) = delete;
-
-   /// Default destructor
-   ~ContractorHC4() = default;
 
    ///@{
    Scope scope() const override;
-   Proof contract(IntervalBox& box) override;
+   Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
    ///@}
 
-   /// @return the dag
-   SharedDag getDag() const;
+   /// Inserts a contractor in this
+   /// @param op a contractor
+   ///
+   /// This is typically used to call new contractors in the propagation
+   /// loop, these ones being independent from the DAG
+   void push(SharedContractor op);
 
-   /// @return the function index in the dag
-   size_t getFunIndex() const;
+   /// @return the tolerance used as stopping criterion
+   Tolerance getTol() const;
+
+   /// Sets the tolerance used as stopping criterion
+   /// @param tol new value of the tolerance
+   void setTol(Tolerance tol);
+
+   /// @return the maximum number of propagation steps
+   size_t getMaxIter() const;
+
+   /// Sets the maximum number of propagation steps
+   /// @param n new value
+   void setMaxIter(size_t n);
 
 private:
-   SharedDag dag_;   // dag
-   size_t if_;       // function index in the dag
+   SharedDag dag_;
+   DagContext* context_;
+   PropagationAlg* propag_;
+
+   //////////
+   class SharedHC4Revise : public Contractor {
+   public:
+      SharedHC4Revise(SharedDag dag, size_t i);
+
+      ///@{
+      Scope scope() const override;
+      Proof contract(IntervalBox& B) override;
+      void print(std::ostream& os) const override;
+      ///@}
+
+   private:
+      SharedDag dag_;
+      size_t idx_;
+   };
 };
+
+/// Type of shared pointers of HC4 contractors
+typedef std::shared_ptr<ContractorHC4> SharedContractorHC4;
 
 } // namespace
 

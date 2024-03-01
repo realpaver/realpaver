@@ -10,10 +10,9 @@
 #ifndef REALPAVER_NCSP_SOLVER_HPP
 #define REALPAVER_NCSP_SOLVER_HPP
 
-#include "realpaver/Contractor.hpp"
-#include "realpaver/Dag.hpp"
-#include "realpaver/Env.hpp"
+#include <memory>
 #include "realpaver/NcspEnv.hpp"
+#include "realpaver/NcspPropagator.hpp"
 #include "realpaver/NcspSpace.hpp"
 #include "realpaver/NcspSplit.hpp"
 #include "realpaver/Preprocessor.hpp"
@@ -58,10 +57,6 @@ public:
    /// No assignment
    NcspSolver& operator=(const NcspSolver&) = delete;
 
-   /// Assigns the contractor of this
-   /// @param contractor new contractor
-   void setContractor(SharedContractor contractor);
-
    /// Solving method
    void solve();
 
@@ -72,7 +67,7 @@ public:
    int getTotalNodes() const;
 
    /// @return the environment of this
-   NcspEnv* getEnv() const;
+   std::shared_ptr<NcspEnv> getEnv() const;
 
    /// @return the space of this
    NcspSpace* getSpace() const;
@@ -91,11 +86,11 @@ public:
    /// include the variables fixed at preprocessing time.
    std::pair<DomainBox, Proof> getSolution(size_t i) const;
 
-   /// @return the number of unexplored boxes after the solving phase
-   size_t nbPendingBoxes() const;
+   /// @return the number of unexplored nodes after the solving phase
+   size_t nbPendingNodes() const;
 
    /// Gets a pending box after the solving phase
-   /// @param i an index between 0 and nbPendingBoxes()-1
+   /// @param i an index between 0 and nbPendingNodes()-1
    /// @return the i-th pending box in this
    ///
    /// The scope of the box is the scope of the initial problem, i.e. it must
@@ -103,30 +98,33 @@ public:
    DomainBox getPendingBox(size_t i) const;
 
 private:
-   Problem* problem_;            // initial problem
-   Problem* preprob_;            // problem resulting from preprocessing
-   Preprocessor* preproc_;       // preprocessor
+   Problem* problem_;               // initial problem
+   Problem* preprob_;               // problem resulting from preprocessing
+   Preprocessor* preproc_;          // preprocessor
 
-   NcspEnv* env_;                // environment
-   NcspSpace* space_;            // search tree
-   SharedDag dag_;               // dag
-   SharedContractor contractor_; // contraction operator
-   NcspSplit* split_;            // splitting strategy
+   NcspContext* context_;           // solving context for the BP algorithm
 
-   Prover* prover_;              // solution prover
+   std::shared_ptr<NcspEnv> env_;   // environment
+   NcspSpace* space_;               // search tree
+   SharedDag dag_;                  // dag
+   NcspPropagator* propagator_;     // contraction method
+   NcspSplit* split_;               // splitting strategy
+   ContractorFactory* factory_;     // contractor factory
 
-   Timer stimer_;                // timer for the solving phase
-   int nbnodes_;                 // number of nodes processed
-   bool withPreprocessing_;      // true if preprocessing enabled
+   Prover* prover_;                 // solution prover
+
+   Timer stimer_;                   // timer for the solving phase
+   int nbnodes_;                    // number of nodes processed
+   bool withPreprocessing_;         // true if preprocessing enabled
 
    void branchAndPrune();
    void makeSpace();
-   void makeContractor();
+   void makePropagator();
    void makeSplit();
    void bpStep(int depthlimit);
-   bool isAnInnerRegion(const IntervalBox& box) const;
+   void bpStepAux(SharedNcspNode node, int depthlimit);
+   bool isInner(DomainBox* box) const;
    void certifySolutions();
-   NcspSelector* makeSelectorSSR();
 };
 
 } // namespace

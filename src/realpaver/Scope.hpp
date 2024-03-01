@@ -74,6 +74,9 @@ public:
    /// @return the greatest variable identifier in this
    size_t maxVarId() const;
 
+   /// @return the hash code of this
+   size_t hashCode() const;
+
 private:
    struct Comp {
       bool operator()(Variable x, Variable y) const
@@ -87,6 +90,7 @@ private:
    MapType m_;
 
    AbstractScopeMap* scopeMap_;   // map v.id() -> 0..size()-1
+   size_t hcode_;                 // hash code
    size_t minid_;                 // min {v.id() : v in this}
    size_t maxid_;                 // max {v.id() : v in this}
 
@@ -185,6 +189,9 @@ public:
 
    /// @return the number of variables
    size_t size() const;
+
+   /// @return the hash code of this
+   size_t hashCode() const;
 
    /// @return true if this is empty
    bool isEmpty() const;

@@ -17,7 +17,7 @@ Tolerance::Tolerance(double rtol, double atol)
       : rtol_(rtol),
         atol_(atol)
 {
-   ASSERT(rtol >= 0.0, "A relative tolerance must be positive");
+   ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
    ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
 }
 
@@ -66,75 +66,94 @@ bool Tolerance::isTight(const IntervalVector& X) const
    return true;
 }
 
-bool Tolerance::isTight(double x, double y) const
+bool Tolerance::isImproved(const Interval& old, const Interval& x) const
 {
-   return (x < y) ? isTight(Interval(x, y)) :
-                    isTight(Interval(y, x));
-}
-
-bool Tolerance::areClose(const Interval& x, const Interval& y) const
-{
-   if (x.isEmpty() || y.isEmpty() || x.isInf() || y.isInf())
+   if (old.isEmpty() || x.isEmpty())
       return false;
 
-   double u = Double::abs(x.left() - y.left()),
-          v = Double::abs(x.right() - y.right());
+   ASSERT(old.contains(x), "Bad use of is Imporoved " << old << " " << x);
 
-   return (u > v) ? isTight(x.left(), y.left()) :
-                    isTight(x.right(), y.right());
+   return (1.0 - x.width() / old.width()) > rtol_;
 }
 
-/*
-Interval Tolerance::maxIntervalDn(double ub) const
+double maxIntervalDnAbs(double ub, double atol)
 {
-   if (Double::isInf(ub)) return Interval::universe();
+   Double::rndUp();
+   return ub - atol;
+}
 
-   if (val_ == 0.0) return Interval(Double::prevDouble(ub), ub);
-
-   if (isAbsolute())
+double maxIntervalDnRel(double ub, double rtol)
+{
+   if (ub > 1.0)
    {
-      Double::rndUp();
-      return Interval(ub - val_, ub);
-   }
-   else if (ub > 1.0)
-   {
-      Interval v(val_), lb(ub*(1.0-v)/(1.0+v));
-      return Interval(lb.right(), ub);
+      Interval v(rtol), lb(ub*(1.0-v)/(1.0+v));
+      return lb.right();
    }
    else if (ub <= -1.0)
    {
-      if (val_ == 1.0)
+      if (rtol == 1.0)
       {
-         return Interval(Double::lowest(), ub);
+         return Double::lowest();
       }
       else
       {
-         Interval v(val_), lb(ub*(1.0+v)/(1.0-v));
-         return Interval(lb.right(), ub);
+         Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+         return lb.right();
       }
    }
    else
    {
       Double::rndUp();
-      double lb = ub - val_;
+      double lb = ub - rtol;
 
       if (lb >= -1.0)
       {
-         return Interval(lb, ub);
+         return lb;
       }
       else
       {
-         // we have ub < 0.0 since val_ <= 1.0
-         if (val_ == 1.0)
+         // we have ub < 0.0 since rtol <= 1.0
+         if (rtol == 1.0)
          {
-            return Interval(Double::lowest(), ub);
+            return Double::lowest();
          }
          else
          {
-            Interval v(val_), lb(ub*(1.0+v)/(1.0-v));
-            return Interval(lb.right(), ub);
+            Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+            return lb.right();
          }
       }
+   }
+}
+
+Interval Tolerance::maxIntervalDn(double ub) const
+{
+   if (Double::isNan(ub))
+      return Interval::emptyset();
+
+   if (Double::isInf(ub))
+      return Interval::universe();
+
+   else if (atol_ == 0.0 && rtol_ == 0.0)
+      return Interval(Double::prevDouble(ub), ub);
+
+   else if (rtol_ == 0.0)
+   {
+      double lb = maxIntervalDnAbs(ub, atol_);
+      return Interval(lb, ub);
+   }
+
+   else if (atol_ == 0.0)
+   {
+      double lb = maxIntervalDnRel(ub, rtol_);
+      return Interval(lb, ub);
+   }
+
+   else
+   {
+      double lb1 = maxIntervalDnAbs(ub, atol_),
+             lb2 = maxIntervalDnRel(ub, rtol_);
+      return Interval(Double::min(lb1, lb2), ub);
    }
 }
 
@@ -142,7 +161,6 @@ Interval Tolerance::maxIntervalUp(double lb) const
 {
    return -maxIntervalDn(-lb); 
 }
-*/
 
 double Tolerance::discreteSize(const Interval& x) const
 {

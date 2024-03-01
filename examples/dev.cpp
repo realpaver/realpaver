@@ -1,65 +1,108 @@
 #include <iostream>
-#include "realpaver/Contractor3B.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
+#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/ContractorConstraint.hpp"
+#include "realpaver/ContractorFactory.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Exception.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/Timer.hpp"
 #include "realpaver/Tolerance.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
+#include "realpaver/ConstraintFixer.hpp"
 
 using namespace realpaver;
 using namespace std;
+
+
+// meson setup build -DLP_LIB=Highs -DASSERT=true -DLOG=true -Dbuildtype=debug
+// meson setup build -DLP_LIB=Highs -DASSERT=false -DLOG=false -Dbuildtype=release
 
 int main(void)
 {
    try
    {
-      
-      double lb = -1.90558487645,
-             rb = -1.9064672114;
-
-      cout << Double::isClose(lb, rb, 1.0e-4, 0.0) << endl;
-      
-
-/*
-LOW.   Propagation test on x [0.001R]
-LOW.     [-1.90670349983, -1.90558487645] -> [-1.90670349983, -1.9064672114] not reduced enough
-LOW.   Propagation test on y [0.001R]
-LOW.     [0.603723250967, 0.604468999883] -> [0.604311474273, 0.604468999883] not reduced enough
-*/
-
-/*
-      
-      
       Problem P;
-      Variable x = P.addRealVar(-1, 2, "x"),
-               y = P.addRealVar(0, 6, "y"),
-               n = P.addIntVar(1, 7, "n"),
-               b = P.addBinaryVar("b");
+      Variable x = P.addRealVar(6.4, 8.6),
+               y = P.addRealVar(-27, 8);
 
-      std::unique_ptr<DomainSlicerMap>
-         map = DomainSlicerFactory::makeBisectionStrategy(P.scope());   
+      IntervalBox B( P.scope() );
 
-      DomainBox reg(P.scope());
-      cout << reg << endl;
+      LPModel lp;
+      SharedDag dag = std::make_shared<Dag>();
+      dag->insert( y - cos(x) == 0 );
 
-      Variable vsel = b;
-      cout << "split var: " << vsel.getName() << endl;
+      ContractorPolytope ctc(dag, PolytopeStyle::RLT);
+ctc.contract( B );
 
-      DomainSlicer* slicer = map->getSlicer(vsel);
+/*
+      Problem P;
+      Variable x = P.addRealVar(2, 2, "x"),
+               y = P.addRealVar(-2, 2, "y"),
+               z = P.addRealVar(-1e08, 1, "z"),
+               n = P.addIntVar(1, 8, "n"),
+               m = P.addIntVar(1, 8, "m");
 
-      Domain* dom = reg.get(vsel);
+      Constraint guard( x == 2 ),
+                 body( y - z == 0 ),
+                 c( cond(guard, body) );
 
-      size_t ns = slicer->apply(dom);
-      cout << "nb slices: " << ns << endl;
+      cout << c << endl;
+      
+      IntervalBox B( c.scope() );
+      cout << B << endl;
 
-      DomainSlicer::iterator it = slicer->begin();
-      while (it != slicer->end())
+      cout << c.isSatisfied(B) << endl;
+      cout << c.contract(B) << endl;
+      cout << B << endl;
+      */
+
+      //P.addCtr( sqr(y) * (1 + sqr(z)) + z * (z - 24 * y) == -13 );
+      //P.addCtr( sqr(x) * (1 + sqr(y)) + y * (y - 24 * x) == -13 );
+      //P.addCtr( sqr(z) * (1 + sqr(x)) + x * (x - 24 * z) == -13 );
+
+
+/*
+      P.addCtr( 11*pow(x,8) - 21*pow(y,6) + 44*sqr(x)*pow(y,6) + 11*pow(y,8) == 0);
+      P.addCtr( sqr(x) + sqr(y) - 1 == 0 );
+
+      std::shared_ptr<Env> env = std::make_shared<Env>();
+      ContractorFactory factory(P, env);
+      SharedDag dag = factory.getDag();
+
+      ContractorHC4Revise h0(dag, 0);
+      ContractorHC4Revise h1(dag, 1);
+
+      Scope S( {x, y, z} );
+      IntervalBox B(S);
+      cout << "B =: " << B << endl;
+
+      int NS = 10000;
+      Timer tim;
+      tim.start();
+      for (int i=0; i<NS; ++i)
       {
-         std::unique_ptr<Domain> slice = slicer->next(it);
-         cout << "a slice: " << (*slice) << endl;
+         B.set(x, Interval(-2, 2));
+         B.set(y, Interval(-2, 2));
+         h1.contract(B);
       }
+      tim.stop();
+      cout << tim.elapsedTime() << " (s)" << endl;
+
+      Constraint c1 = P.ctrAt(1);
+      Timer tom;
+      tom.start();
+      for (int i=0; i<NS; ++i)
+      {
+         B.set(x, Interval(-2, 2));
+         B.set(y, Interval(-2, 2));
+         c1.contract(B);
+      }
+      tom.stop();
+      cout << tom.elapsedTime() << " (s)" << endl;
 */
    }
    catch(Exception e)

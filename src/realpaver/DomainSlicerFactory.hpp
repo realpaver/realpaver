@@ -20,9 +20,8 @@ namespace realpaver {
 class DomainSlicerFactory {
 public:
    /// Bisection strategy
-   /// @param sco set of variables
    /// @return the domain slicer map
-   static std::unique_ptr<DomainSlicerMap> makeBisectionStrategy(Scope sco);
+   static std::unique_ptr<DomainSlicerMap> makeBisectionStrategy();
 };
 
 } // namespace

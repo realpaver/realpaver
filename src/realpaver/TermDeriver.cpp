@@ -164,7 +164,7 @@ void TermDeriver::apply(const TermTan* t)
 {
    TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
-   dt_ = (1 + sqr(tan(t->child())))*vis.dt_;
+   dt_ = (1.0 + sqr(tan(t->child())))*vis.dt_;
 }
 
 void TermDeriver::apply(const TermLin* t)
@@ -175,6 +175,27 @@ void TermDeriver::apply(const TermLin* t)
 
    else
       dt_ = Term(t->getCoefSub(it));
+}
+
+void TermDeriver::apply(const TermCosh* t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*sinh(t->child());
+}
+
+void TermDeriver::apply(const TermSinh* t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*cosh(t->child());
+}
+
+void TermDeriver::apply(const TermTanh* t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*(1.0 - sqr(tanh(t->child())));
 }
 
 } // namespace

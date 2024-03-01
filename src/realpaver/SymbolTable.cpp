@@ -73,7 +73,7 @@ FunctionSymbol::FunctionSymbol(const std::string& name)
       : ParsingSymbol(name),
         args_(),
         t_(0),
-        scope_()
+        scop_()
 {}
 
 void FunctionSymbol::addArgument(const std::string& name)
@@ -83,7 +83,7 @@ void FunctionSymbol::addArgument(const std::string& name)
    Variable v(name);
    v.setId(1000000 + args_.size());
    args_.push_back(v);
-   scope_.insert(v);
+   scop_.insert(v);
 }
 
 Variable FunctionSymbol::getArgument(size_t i) const
@@ -110,11 +110,11 @@ size_t FunctionSymbol::arity() const
 
 bool FunctionSymbol::setTerm(const Term& t)
 {
-   Scope s;
-   t.makeScope(s);
+   Scope scop;
+   t.makeScope(scop);
 
-   if (scope_.size() != s.size()) return false;
-   if (!scope_.contains(s)) return false;
+   if (scop_.size() != scop.size()) return false;
+   if (!scop_.contains(scop)) return false;
 
    t_ = t;
    return true;
@@ -499,6 +499,30 @@ void FunctionCallProcessor::apply(const TermLin* t)
       size_t i = fc_->getFunctionSymbol()->getIndexVar(v);
       t_ += coef*fc_->getTerm(i);
    }
+}
+
+void FunctionCallProcessor::apply(const TermCosh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = cosh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermSinh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = sinh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermTanh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = tanh(vis.getTerm());
 }
 
 Term FunctionCallProcessor::getTerm() const

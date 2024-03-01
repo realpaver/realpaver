@@ -38,7 +38,7 @@ public:
    /// @param vim map Variable -> Interval
    /// @param B domains of the variables in vvm
    ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
-                   const IntervalBox& box);
+                   const IntervalBox& B);
 
    /// No copy
    ConstraintFixer(const ConstraintFixer&) = delete;
@@ -60,12 +60,13 @@ public:
    void apply(const ArithCtrGt* c) override;
    void apply(const ArithCtrIn* c) override;
    void apply(const TableCtr* c) override;
+   void apply(const CondCtr* c) override;
    ///@}
 
 private:
    VarVarMapType* vvm_;
    VarIntervalMapType* vim_;
-   IntervalBox box_;
+   IntervalBox B_;
    Constraint c_;
 };
 

@@ -19,13 +19,13 @@
 
 namespace realpaver {
    
-/// domain types
+/// domain types with explicit values that can be used as array indexes
 enum class DomainType {
-   Binary,
-   Interval,
-   IntervalUnion,
-   Range,
-   RangeUnion
+   Binary        = 0,
+   Interval      = 1,
+   IntervalUnion = 2,
+   Range         = 3,
+   RangeUnion    = 4
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -48,12 +48,12 @@ public:
    virtual IntervalFunction fun(size_t i) const = 0;
 
    /// Evaluates this
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in the box
+   ///        of the i-th function of this in B
    ///
    /// val must have nbFuns() components.
-   virtual void eval(const IntervalBox& box, IntervalVector& val) = 0;
+   virtual void eval(const IntervalBox& B, IntervalVector& val) = 0;
 
    /// Evaluates this
    /// @param pt values of variables
@@ -64,32 +64,32 @@ public:
    virtual void pointEval(const RealPoint& pt, IntervalVector& val) = 0;
 
    /// Differentiates this (calculates an interval Jacobian matrix)
-   /// @param box domains of variables
-   /// @param J Jacobian matrix of this in the box such that we have the partial
+   /// @param B domains of variables
+   /// @param J Jacobian matrix of this in B such that we have the partial
    ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
    /// J must have nbFuns() rows and nbVars() columns.
-   virtual void diff(const IntervalBox& box, IntervalMatrix& J) = 0;
+   virtual void diff(const IntervalBox& B, IntervalMatrix& J) = 0;
 
    /// Evaluates and differentiates this
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in the box
+   ///        of the i-th function of this in B
    /// @param J Jacobian matrix of this in the box such that we have the partial
    ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
    /// J must have nbFuns() rows and nbVars() columns; val must have
    /// nbFuns() components.
-   virtual void evalDiff(const IntervalBox& box, IntervalVector& val,
+   virtual void evalDiff(const IntervalBox& B, IntervalVector& val,
                          IntervalMatrix& J) = 0;
 
    /// Evaluates this and calculates the violation of the constraints
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param val output vector such that val[i] is the evaluation of
-   ///        the i-th function in the box
+   ///        the i-th function in B
    /// @param viol output vector such that viol[i] is the violation of the
-   ///        i-th function / constraint in the box
-   virtual void violation(const IntervalBox& box, IntervalVector& val,
+   ///        i-th function / constraint in B
+   virtual void violation(const IntervalBox& B, IntervalVector& val,
                           RealVector& viol) = 0;
 };
 
@@ -154,12 +154,12 @@ public:
    void addFun(IntervalFunction f);
 
    /// Evaluates this
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in the box
+   ///        of the i-th function of this in B
    ///
    /// val must have nbFuns() components.
-   void eval(const IntervalBox& box, IntervalVector& val);
+   void eval(const IntervalBox& B, IntervalVector& val);
 
    /// Evaluates this
    /// @param pt values of variables
@@ -170,31 +170,31 @@ public:
    void pointEval(const RealPoint& pt, IntervalVector& val);
 
    /// Differentiates this (calculates an interval Jacobian matrix)
-   /// @param box domains of variables
-   /// @param J Jacobian matrix of this in the box such that we have the partial
+   /// @param B domains of variables
+   /// @param J Jacobian matrix of this in B such that we have the partial
    ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
    /// J must have nbFuns() rows and nbVars() columns.
-   void diff(const IntervalBox& box, IntervalMatrix& J);
+   void diff(const IntervalBox& B, IntervalMatrix& J);
 
    /// Evaluates and differentiates this
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in the box
+   ///        of the i-th function of this in B
    /// @param J Jacobian matrix of this in the box such that we have the partial
    ///        derivative dfi / dxj in the i-th row and j-th column of J
    ///
    /// J must have nbFuns() rows and nbVars() columns; val must have
    /// nbFuns() components.
-   void evalDiff(const IntervalBox& box, IntervalVector& val, IntervalMatrix& J);
+   void evalDiff(const IntervalBox& B, IntervalVector& val, IntervalMatrix& J);
 
    /// Evaluates this and calculates the violation of the constraints
-   /// @param box domains of variables
+   /// @param B domains of variables
    /// @param val output vector such that val[i] is the evaluation of
-   ///        the i-th function in the box
+   ///        the i-th function in B
    /// @param viol output vector such that viol[i] is the violation of the
-   ///        i-th function / constraint in the box
-   void violation(const IntervalBox& box, IntervalVector& val, RealVector& viol);
+   ///        i-th function / constraint in B
+   void violation(const IntervalBox& B, IntervalVector& val, RealVector& viol);
 
    /// type of the representation of interval functions vectors
    typedef std::shared_ptr<IntervalFunctionVectorRep> SharedRep;
@@ -252,16 +252,16 @@ public:
 
    IntervalFunction fun(size_t i) const override;
 
-   void eval(const IntervalBox& box, IntervalVector& val) override;
+   void eval(const IntervalBox& B, IntervalVector& val) override;
 
    void pointEval(const RealPoint& pt, IntervalVector& val) override;
 
-   void diff(const IntervalBox& box, IntervalMatrix& J) override;
+   void diff(const IntervalBox& B, IntervalMatrix& J) override;
 
-   void evalDiff(const IntervalBox& box, IntervalVector& val,
+   void evalDiff(const IntervalBox& B, IntervalVector& val,
                  IntervalMatrix& J) override;
 
-   void violation(const IntervalBox& box, IntervalVector& val,
+   void violation(const IntervalBox& B, IntervalVector& val,
                   RealVector& viol) override;
    ///@}
 
@@ -304,22 +304,22 @@ public:
 
    IntervalFunction fun(size_t i) const override;
 
-   void eval(const IntervalBox& box, IntervalVector& val) override;
+   void eval(const IntervalBox& B, IntervalVector& val) override;
 
    void pointEval(const RealPoint& pt, IntervalVector& val) override;
 
-   void diff(const IntervalBox& box, IntervalMatrix& J) override;
+   void diff(const IntervalBox& B, IntervalMatrix& J) override;
 
-   void evalDiff(const IntervalBox& box, IntervalVector& val,
+   void evalDiff(const IntervalBox& B, IntervalVector& val,
                  IntervalMatrix& J) override;
 
-   void violation(const IntervalBox& box, IntervalVector& val,
+   void violation(const IntervalBox& B, IntervalVector& val,
                   RealVector& viol) override;
    ///@}
 
 private:
    std::vector<IntervalFunction> vf_;
-   Scope scope_;
+   Scope scop_;
 };
 
 } // namespace

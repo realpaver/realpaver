@@ -2,7 +2,7 @@
 
 
 Variables
-   a in [-10, 10] integer,
+   a integer in [-10, 10],
    b in [-10, 10],
    x in [-10, 10],
    y in [-10, 10];

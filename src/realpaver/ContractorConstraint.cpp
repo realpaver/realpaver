@@ -20,9 +20,9 @@ Scope ContractorConstraint::scope() const
    return c_.scope();
 }
 
-Proof ContractorConstraint::contract(IntervalBox& box)
+Proof ContractorConstraint::contract(IntervalBox& B)
 {
-   return c_.contract(box);
+   return c_.contract(B);
 }
 
 void ContractorConstraint::print(std::ostream& os) const

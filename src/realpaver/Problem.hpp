@@ -230,7 +230,7 @@ private:
    std::vector<Variable> vars_;     // vector of variables
    std::vector<Constraint> ctrs_;   // vector of constraints
    Objective obj_;                  // objective function
-   Scope scope_;                    // set of variables
+   Scope scop_;                     // set of variables
 
    // set of symbols used in this problem
    std::unordered_set<std::string> vname_;

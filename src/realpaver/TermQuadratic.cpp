@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ScopeBank.hpp"
 #include "realpaver/TermQuadratic.hpp"
 
 namespace realpaver {
@@ -173,21 +174,21 @@ std::ostream& operator<<(std::ostream& os, const TermQuadratic& t)
 
 Scope TermQuadratic::makeScope() const
 {
-   Scope sco;
+   Scope scop;
 
    for (const auto& s : sq_)
-      sco.insert(s.v);
+      scop.insert(s.v);
 
    for (const auto& s : sb_)
    {
-      sco.insert(s.v1);
-      sco.insert(s.v2);
+      scop.insert(s.v1);
+      scop.insert(s.v2);
    }
 
    for (const auto& s : sl_)
-      sco.insert(s.v);
+      scop.insert(s.v);
 
-   return sco;
+   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 Term TermQuadratic::factorize() const
@@ -531,5 +532,14 @@ void TermQuadraticCreator::apply(const TermLin* t)
 
    success_ = true;
 }
+
+void TermQuadraticCreator::apply(const TermCosh* t)
+{}
+
+void TermQuadraticCreator::apply(const TermSinh* t)
+{}
+
+void TermQuadraticCreator::apply(const TermTanh* t)
+{}
 
 } // namespace

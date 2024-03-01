@@ -14,7 +14,12 @@ namespace realpaver {
 
 ContractorList::ContractorList(SharedContractorPool pool)
       : pool_(pool)
-{}
+{
+   if (pool == nullptr)
+   {
+      pool_ = std::make_shared<ContractorVector>();
+   }
+}
 
 size_t ContractorList::poolSize() const
 {
@@ -31,18 +36,23 @@ void ContractorList::setPool(SharedContractorPool pool)
    pool_ = pool;
 }
 
+void ContractorList::push(SharedContractor op)
+{
+   pool_->push(op);
+}
+
 Scope ContractorList::scope() const
 {
    return pool_->scope();
 }
 
-Proof ContractorList::contract(IntervalBox& box)
+Proof ContractorList::contract(IntervalBox& B)
 {
    Proof proof;
 
    for (size_t i=0; i<poolSize(); ++i)
    {
-      proof = pool_->contractorAt(i)->contract(box);
+      proof = pool_->contractorAt(i)->contract(B);
       if (proof == Proof::Empty) return Proof::Empty;
    }
    return Proof::Maybe;

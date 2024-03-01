@@ -280,7 +280,7 @@ public:
 
 private:
    std::vector<RealFunction> vf_;
-   Scope scope_;
+   Scope scop_;
 };
 
 } // namespace

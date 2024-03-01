@@ -24,6 +24,8 @@ extern std::vector<realpaver::Interval>* realpaver_itv_vector;
 extern realpaver::IntervalUnion* realpaver_itv_union;
 extern realpaver::RangeUnion* realpaver_range_union;
 
+extern realpaver::ConstraintRep* realpaver_ctr_rep;
+
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
 
@@ -42,6 +44,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 {
   char u_str[256];
   realpaver::TermRep* u_term;
+  realpaver::ConstraintRep* u_ctr;
 }
 
 %type <u_str>     ident
@@ -55,15 +58,16 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    itv_left
 %type <u_term>    itv_right
 %type <u_term>    table_list_val_def
+%type <u_ctr>     ctr_atom
 
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT TK_STR_TOL TK_STR_BIN TK_STR_REAL
 %token TK_TABLE
-%token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT
+%token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT TK_IMPLY
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
-%token TK_TAN TK_COS TK_SIN
+%token TK_TAN TK_COS TK_SIN TK_COSH TK_SINH TK_TANH
 %token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_LCBR TK_RCBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
@@ -412,13 +416,48 @@ ctr_tail
   ;
 
 ctr_def
+  : ctr_atom
+    {
+      realpaver_ctr_rep = $1;
+    }
+    ctr_cond
+  ;
+
+ctr_cond
+  :
+    {
+      realpaver::Constraint::SharedRep rep(realpaver_ctr_rep);
+      realpaver::Constraint c(rep);
+      realpaver_bison_problem->addCtr(c);
+    }
+  | TK_IMPLY ctr_atom
+    {
+      realpaver::Constraint::SharedRep grep(realpaver_ctr_rep);
+      realpaver::Constraint guard(grep);
+
+      realpaver::Constraint::SharedRep brep($2);
+      realpaver::Constraint body(brep);
+
+      try {
+         realpaver::Constraint c(cond(guard, body));
+         realpaver_bison_problem->addCtr(c);
+      }
+      catch (realpaver::Exception& e)
+      {
+        realpaver_bison_error("Bad definition of a conditional constraint");
+        YYABORT;
+      }
+    }
+  ;
+
+ctr_atom
   : expr TK_EQ_EQ expr
     {
       realpaver::Term lhs(realpaver::Term::SharedRep($1));
       realpaver::Term rhs(realpaver::Term::SharedRep($3));
 
       realpaver::Constraint c(lhs == rhs);
-      realpaver_bison_problem->addCtr(c);
+      $$ = c.cloneRoot();
     }
   | expr TK_LE expr
     {
@@ -426,7 +465,7 @@ ctr_def
       realpaver::Term rhs(realpaver::Term::SharedRep($3));
 
       realpaver::Constraint c(lhs <= rhs);
-      realpaver_bison_problem->addCtr(c);
+      $$ = c.cloneRoot();
     }
   | expr TK_GE expr
     {
@@ -434,7 +473,7 @@ ctr_def
       realpaver::Term rhs(realpaver::Term::SharedRep($3));
 
       realpaver::Constraint c(lhs >= rhs);
-      realpaver_bison_problem->addCtr(c);
+      $$ = c.cloneRoot();
     }
   | expr TK_IN itv
     {
@@ -444,11 +483,11 @@ ctr_def
 
       if (x.isEmpty())
       {
-         realpaver_bison_error("Empty function image");
-         YYABORT;
+        realpaver_bison_error("Empty function image");
+        YYABORT;
       }
       realpaver::Constraint c(in(lhs, x));
-      realpaver_bison_problem->addCtr(c);
+      $$ = c.cloneRoot();
     }
   | TK_TABLE
     {
@@ -476,8 +515,7 @@ ctr_def
                                      realpaver_var_vector->size(),
                                      realpaver_itv_vector->data(),
                                      realpaver_itv_vector->size()) );
-
-      realpaver_bison_problem->addCtr(c);
+      $$ = c.cloneRoot();
     }
   ;
 
@@ -770,6 +808,24 @@ expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(tan(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_COSH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(cosh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_SINH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(sinh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_TANH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(tanh(t));
       $$ = res.cloneRoot();
     }
   | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR

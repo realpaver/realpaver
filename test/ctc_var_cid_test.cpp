@@ -1,5 +1,5 @@
 #include "test_config.hpp"
-#include "realpaver/ContractorCID.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/Problem.hpp"
 
@@ -9,7 +9,7 @@ using namespace std;
 
 Problem* P;
 Variable x, y;
-ContractorCID* cid;
+ContractorVarCID* cid;
 IntervalBox* B;
 
 void init()
@@ -23,7 +23,7 @@ void init()
 
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
    unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(3);
-   cid = new ContractorCID(ctc, x, std::move(slicer));
+   cid = new ContractorVarCID(ctc, x, std::move(slicer));
 }
 
 void clean()

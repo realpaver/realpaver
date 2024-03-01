@@ -1,7 +1,5 @@
 ## Configuration of Realpaver using meson build
-project('Realpaver','cpp',version: '1.0.0',
-    default_options: ['cpp_std=c++17'])
-
+project('Realpaver','cpp',version: '1.0.0', default_options: ['cpp_std=c++17'])
 
 ## Main compiler and linker configs
 cpp_comp = meson.get_compiler('cpp')
@@ -121,10 +119,15 @@ endif
 
 assert_opt = get_option('ASSERT')
 conf_data.set('ASSERT_ON',assert_opt.to_int())
-debug_opt = get_option('DEBUG')
-conf_data.set('DEBUG_ON',debug_opt.to_int())
 log_opt = get_option('LOG')
 conf_data.set('LOG_ON',log_opt.to_int())
+
+buildtype = get_option('buildtype')
+if buildtype == 'debug'
+  conf_data.set('DEBUG_ON',1)
+else
+  conf_data.set('DEBUG_ON',0)
+endif
 
 check_headers = [
   'dlfcn.h',

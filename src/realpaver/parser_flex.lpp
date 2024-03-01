@@ -49,6 +49,9 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "sgn"    return TK_SGN;
 "abs"    return TK_ABS;
 "pow"		return TK_POW;
+"cosh"   return TK_COSH;
+"sinh"   return TK_SINH;
+"tanh"   return TK_TANH;
 
 "in"     return TK_IN;
 "-inf"   return TK_MINUS_INF;
@@ -75,6 +78,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 ">="     return TK_GE;
 "<="     return TK_LE;
 "|"		return TK_PIPE;
+"->"     return TK_IMPLY;
 
 {IDENT}     	return TK_IDENT;
 
@@ -97,6 +101,9 @@ std::vector<realpaver::Interval>* realpaver_itv_vector;
 // unions used to parse the variable domains
 realpaver::IntervalUnion* realpaver_itv_union;
 realpaver::RangeUnion* realpaver_range_union;
+
+// constraint representation used to parse (conditional) constraints
+realpaver::ConstraintRep* realpaver_ctr_rep;
 
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;

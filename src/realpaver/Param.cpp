@@ -43,6 +43,8 @@ Param::Param()
    intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT",     100));
    intmap_.insert(std::make_pair("NB_SLICE_3B",               7));
    intmap_.insert(std::make_pair("NB_SLICE_CID",              3));
+   intmap_.insert(std::make_pair("ACID_LEARN_LENGTH",         50));
+   intmap_.insert(std::make_pair("ACID_CYCLE_LENGTH",         1000));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
@@ -54,6 +56,15 @@ Param::Param()
    dblmap_.insert(std::make_pair("INFLATION_DELTA",           1.125));
    dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
    dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT",     10.0));
+   dblmap_.insert(std::make_pair("ACID_CT_RATIO",             0.002));
+
+   dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
+   dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
+   dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-3));
+   dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-3));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-3));
 
 
    dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
@@ -72,16 +83,15 @@ Param::Param()
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
    strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",           "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR",            "RR"));
-   strmap_.insert(std::make_pair("SPLIT_SLICER",              "BISECTION"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTION",           "RR"));
+   strmap_.insert(std::make_pair("SPLIT_SLICING",             "BISECTION"));
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_CID",      "NO"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
-   strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
+   strmap_.insert(std::make_pair("SPLIT_INNER_BOX",            "NO"));
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
    strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
 
