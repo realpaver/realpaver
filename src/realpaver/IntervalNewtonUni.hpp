@@ -114,7 +114,6 @@ public:
 private:
    size_t maxiter_;
    Tolerance tol_;
-   Tolerance ltol_;
    Inflator inflator_;
 
    Proof shrinkLeft(IntervalFunctionUni& f, Interval& x);
