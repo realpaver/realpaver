@@ -201,6 +201,9 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
       double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL");
       newton->setTol(Tolerance(rtol, 0.0));
 
+      double wl = env_->getParam()->getDblParam("NEWTON_WIDTH_LIMIT");
+      newton->setWidthLimit(wl);
+
       int niter = env_->getParam()->getIntParam("NEWTON_ITER_LIMIT");
       newton->setMaxIter(niter);
 

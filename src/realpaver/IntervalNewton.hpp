@@ -89,6 +89,16 @@ public:
    /// @return the maximum number of iterations of the certification method
    size_t getCertifyMaxIter() const;
 
+   /// Assigns the threshold on the width of a box
+   /// @param val new value   
+   ///
+   /// The contration method is not applied if the width of the inut box
+   /// is greater than this value.
+   void setWidthLimit(double val);
+
+   /// @return the threshold on the width of a box
+   double getWidthLimit() const;
+
 private:
    IntervalFunctionVector F_;       // vector of interval functions
    IntervalMatrix jac_;             // Jacobian matrix
@@ -96,12 +106,15 @@ private:
    RealPoint c_;                    // point of expansion
    IntervalGaussSeidel* gs_;        // Gauss-Seidel operator
 
-   size_t maxiter_;       // maximum number of iterations (contraction)
-   Tolerance tol_;        // tolerance on the distance between two intervals
+   size_t maxiter_;     // maximum number of iterations (contraction)
+   Tolerance tol_;      // tolerance on the distance between two intervals
+   double wlim_;        // threshold on the width of a box: no application
+                        // of the contraction method if the width of the
+                        // input box is greater than this value
 
-   double delta_;         // parameter delta of inflation
-   double chi_;           // parameter chi of inflation
-   size_t cmaxiter_;      // maximum number of iterations
+   double delta_;       // parameter delta of inflation
+   double chi_;         // parameter chi of inflation
+   size_t cmaxiter_;    // maximum number of iterations
 
    void makeY(IntervalBox& X);
    Proof reduceX(IntervalBox& X, bool& improved);

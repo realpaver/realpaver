@@ -249,6 +249,10 @@ NEWTON_CERTIFY_ITER_LIMIT = 20
 #(1 - width(next) / width(prev)) > tol.
 NEWTON_REL_TOL = 1.0e-3
 
+# Threshold on the width of an input box of the contration method, whih is not
+# applied if the width of the box is greater than this value
+NEWTON_WIDTH_LIMIT = 1.5
+
 # Let x be an interval and let m(x) be its midpoint. An inflation of x returns
 # m(x) + delta*(x - m(x)) + chi*[-1,1]. The following parameter delta is a real
 # number > 1.0.

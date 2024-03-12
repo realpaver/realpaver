@@ -25,6 +25,7 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
         gs_(nullptr),
         maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
         tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
+        wlim_(Param::GetDblParam("NEWTON_WIDTH_LIMIT")),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
         cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
@@ -83,6 +84,18 @@ void IntervalNewton::setTol(const Tolerance& tol)
    tol_ = tol;
 }
 
+void IntervalNewton::setWidthLimit(double val)
+{
+   ASSERT(val > 0.0, "Bad threshold on the width of a box: " << val);
+
+   wlim_ = val;
+}
+
+double IntervalNewton::getWidthLimit() const
+{
+   return wlim_;
+}
+
 IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
 {
    return gs_;
@@ -90,11 +103,19 @@ IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
 
 Proof IntervalNewton::contract(IntervalBox& X)
 {
+   
+   if (X.width() >= wlim_) return Proof::Maybe;
+   
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
 
    LOG_INTER("Interval Newton contractor on " << X);
+
+// analysis of the degree of contraction
+#if LOG_ON
+   IntervalBox saveX(X);
+#endif
 
    do
    {
@@ -167,6 +188,18 @@ Proof IntervalNewton::contract(IntervalBox& X)
 
    LOG_INTER("End of interval Newton -> " << proof);
    LOG_INTER("Reduced box -> " << X);
+
+// analysis of the degree of contraction
+#if LOG_ON
+   if (proof != Proof::Empty)
+   {
+      LOG_INTER("Newton reduction: " << saveX.width() << ", " << X.width());
+   }
+   else
+   {
+      LOG_INTER("Newton reduction: " << saveX.width() << ", empty");
+   }
+#endif
 
    return proof;
 }
