@@ -7,6 +7,7 @@
 // COPYING for information.                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 

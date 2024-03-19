@@ -13,6 +13,7 @@
 #include "realpaver/IntervalThickFunction.hpp"
 #include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/ConstraintFixer.hpp"
+#include "realpaver/Logger.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -21,22 +22,32 @@ using namespace std;
 // meson setup build -DLP_LIB=Highs -DASSERT=true -DLOG=true -Dbuildtype=debug
 // meson setup build -DLP_LIB=Highs -DASSERT=false -DLOG=false -Dbuildtype=release
 
+// pour le calcul des zeros de la dérivée de sinc(x) = sin(x)/x
+// les zeros sont à l'intersection de la courbe de y = sinc(x) et de y = cos(x)
+// i.e. x*cos(x) = sin(x)
+class MyFun : public IntervalFunctionUni {
+   Interval eval(const Interval& x)  { return x*cos(x)-sin(x); }
+   Interval diff(const Interval& x) { return -x*sin(x); }
+};
+
 int main(void)
 {
+   Logger::init(LogLevel::full, "newton.log");
+
    try
    {
-      Problem P;
-      Variable x = P.addRealVar(6.4, 8.6),
-               y = P.addRealVar(-27, 8);
+      IntervalNewtonUni newton;
+      MyFun f;
+      Interval I(6.3, 9);
 
-      IntervalBox B( P.scope() );
+      Proof p = newton.contract(f, I);
+      cout << "Proof: " << p << endl;
 
-      LPModel lp;
-      SharedDag dag = std::make_shared<Dag>();
-      dag->insert( y - cos(x) == 0 );
-
-      ContractorPolytope ctc(dag, PolytopeStyle::RLT);
-ctc.contract( B );
+      if (p != Proof::Empty)
+      {
+         cout << "New domain: " << I << endl;
+         cout << "sinc(x):    " << sin(I) / I << endl;
+      }
 
 /*
       Problem P;
