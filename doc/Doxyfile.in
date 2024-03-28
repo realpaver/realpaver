@@ -1,3 +1,18 @@
+# ------------------------------------------------------------------------------
+# Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+#              interval computations.
+# ------------------------------------------------------------------------------
+# Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+#                         France
+# Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+#                         France
+# ------------------------------------------------------------------------------
+# Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+# file for information.
+# ------------------------------------------------------------------------------
+# Configuration file processed by Doxygen.
+# ------------------------------------------------------------------------------
+
 # Doxyfile 1.8.13
 
 # This file describes the settings to be used by the documentation system
@@ -44,7 +59,7 @@ PROJECT_NUMBER         = @REALPAVER_VERSION@
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "A reliable interval solver of nonlinear problems"
+PROJECT_BRIEF          = "Rigorous nonlinear constraint solver based on interval computations"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -226,7 +241,7 @@ SEPARATE_MEMBER_PAGES  = NO
 # uses this value to replace tabs by spaces in code fragments.
 # Minimum value: 1, maximum value: 16, default value: 4.
 
-TAB_SIZE               = 4
+TAB_SIZE               = 3
 
 # This tag can be used to specify a number of aliases that act as commands in
 # the documentation. An alias has the form:
@@ -778,7 +793,7 @@ WARN_FORMAT            = "$file:$line: $text"
 # messages should be written. If left blank the output is written to standard
 # error (stderr).
 
-WARN_LOGFILE           =
+WARN_LOGFILE           = "realpaver_doxygen.log"
 
 #---------------------------------------------------------------------------
 # Configuration options related to the input files

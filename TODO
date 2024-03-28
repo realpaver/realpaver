@@ -1,28 +1,4 @@
---------------------
-
-Log propagation :
-afficher quand on stoppe sur max steps
-afficher quand on a réduit une var mais qu'on ne propage dessus car la
-rédution n'est pas suffisante
-
-Interval Newton : log
-
--------------------------------------------------------------------------------
-- Constraints
-  * piecewise constraints
-  * conditional constraints
-
--------------------------------------------------------------------------------
-- Contractors
-  * ACID
-
--------------------------------------------------------------------------------
-- DAG
-  * new nodes
-  * create a DAG from a .nl file
-  * Hansen's derivative
-  * affine forms
-
--------------------------------------------------------------------------------
-- Newton
-  * Parametric operator
+* Piecewise constraints
+* Create a DAG from a .nl file
+* Affine forms
+* Parametric Newton operator

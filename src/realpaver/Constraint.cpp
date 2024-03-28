@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Constraint.cpp
+ * @brief  Classes of constraints
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Constraint.hpp"
@@ -24,12 +35,12 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel)
       case RelSymbol::Gt:     return os << ">";
       case RelSymbol::In:     return os << "in";
       case RelSymbol::Table:  return os << "table";
-      default:            os.setstate(std::ios::failbit);
+      default: os.setstate(std::ios::failbit);
    }
    return os;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ConstraintRep::ConstraintRep(RelSymbol rel)
       : scop_(),
@@ -85,7 +96,7 @@ bool ConstraintRep::isBoundConstraint() const
    return false;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 Constraint::Constraint(const SharedRep& rep) : rep_(rep)
 {}
@@ -181,7 +192,7 @@ ConstraintRep* Constraint::cloneRoot() const
    return rep_->cloneRoot();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
       : ConstraintRep(rel),
@@ -252,7 +263,7 @@ bool ArithCtrBinary::isInteger() const
    return l_.isInteger() && r_.isInteger();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrEq::ArithCtrEq(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Eq)
@@ -328,7 +339,7 @@ ConstraintRep* ArithCtrEq::cloneRoot() const
    return new ArithCtrEq(left(), right());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrLe::ArithCtrLe(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Le)
@@ -405,7 +416,7 @@ ConstraintRep* ArithCtrLe::cloneRoot() const
    return new ArithCtrLe(left(), right());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrLt::ArithCtrLt(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Lt)
@@ -482,7 +493,7 @@ ConstraintRep* ArithCtrLt::cloneRoot() const
    return new ArithCtrLt(left(), right());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrGe::ArithCtrGe(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Ge)
@@ -559,7 +570,7 @@ ConstraintRep* ArithCtrGe::cloneRoot() const
    return new ArithCtrGe(left(), right());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrGt::ArithCtrGt(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Gt)
@@ -636,7 +647,7 @@ ConstraintRep* ArithCtrGt::cloneRoot() const
    return new ArithCtrGt(left(), right());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ArithCtrIn::ArithCtrIn(Term t, const Interval& x)
       : ArithCtrBinary(t, x, RelSymbol::In), x_(x)
@@ -734,7 +745,7 @@ ConstraintRep* ArithCtrIn::cloneRoot() const
    return new ArithCtrIn(term(), image());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TableCtrCol::TableCtrCol(Variable v)
       : v_(v),
@@ -772,7 +783,7 @@ bool TableCtrCol::isInteger() const
    return v_.getDomain()->isInteger();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TableCtr::TableCtr()
       : ConstraintRep(RelSymbol::Table),
@@ -1064,7 +1075,7 @@ ConstraintRep* TableCtr::cloneRoot() const
    return new TableCtr(*this);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 CondCtr::CondCtr(Constraint guard, Constraint body)
       : ConstraintRep(RelSymbol::Cond),
@@ -1155,7 +1166,7 @@ Constraint cond(Constraint guard, Constraint body)
    return Constraint(std::make_shared<CondCtr>(guard, body));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ConstraintVisitor::~ConstraintVisitor()
 {}

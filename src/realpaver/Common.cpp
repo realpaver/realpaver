@@ -1,4 +1,22 @@
-// This file is part of Realpaver. License: see COPYING file.
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Common.cpp
+ * @brief  Common types and functions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #include "realpaver/Common.hpp"
 
@@ -29,6 +47,7 @@ std::ostream& operator<<(std::ostream& os, OptimizationStatus status)
       case OptimizationStatus::StopOnTimeLimit: return os << "StopOnTimeLimit";
       case OptimizationStatus::StopOnNodeLimit: return os << "StopOnNodeLimit";
       case OptimizationStatus::Other:           return os << "Other";
+      default: os.setstate(std::ios::failbit);
    }
    return os;
 }
