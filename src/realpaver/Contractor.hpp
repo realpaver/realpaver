@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Contractor.hpp
+ * @brief  Base class of interval contractors
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_HPP
 #define REALPAVER_CONTRACTOR_HPP
@@ -16,57 +27,58 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an interface for interval contractors.
-///
-/// An interval contractor is in general associated with a constraint.
-/// Given an interval box, it removes infeasible facets (or it prunes
-/// interval bounds) and returns a certificate of proof:
-/// - Proof::Empty if there is no solution;
-/// - Proof::Feasible if it is proved that there is a solution;
-/// - Proof::Inner if the vector is included in the feasible set;
-/// - Proof::Maybe otherwise, i.e. no proof is done.
-///
-/// This class is a pure abstract class.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Base class of interval contractors
+ *
+ * An interval contractor is in general associated with a constraint. Given an
+ * interval box, it removes infeasible facets (it prunes interval bounds) and 
+ * returns a certificate of proof:
+ * - Proof::Empty if there is no solution;
+ * - Proof::Feasible if it is proved that there is a solution;
+ * - Proof::Inner if the vector is included in the feasible set;
+ * - Proof::Maybe otherwise, i.e. no proof is done.
+ *
+ * This class is a pure abstract class.
+ */
 class Contractor {
 public:
-   /// Default constructor
+   /** @brief Default constructor */
    Contractor() = default;
 
-   /// Default copy constructor
+   /** @brief Default copy constructor */
    Contractor(const Contractor&) = default;
 
-   /// No assignment
+   /** @brief No assignment */
    Contractor& operator=(const Contractor&) = delete;
 
-   /// Virtual destructor
+   /** @brief Virtual destructor */
    virtual ~Contractor();
 
-   /// Tests if this contractor depends on a variable
-   /// @param v a variable
-   /// @return true if the scope of this contains v
+   /**
+    * @brief Dependency test
+    * @param v a variable
+    * @return true if the scope of this contains v
+    */
    bool dependsOn(const Variable& v) const;
 
-   /// @return the set of variable on which this depends on
+   /** @brief @return the set of variable on which this depends on */
    virtual Scope scope() const = 0;
 
-   /// Contraction method
-   /// @param B interval box that is contracted
-   /// @return a certificate of proof
+   /**
+    * @brief Contraction method
+    * @param B interval box that is contracted
+    * @return a certificate of proof
+    */
    virtual Proof contract(IntervalBox& B) = 0;
 
-   /// Output on a stream
-   /// param os an output stream
-   ///
-   /// The default implementation does nothing.
+   /** @brief Output on a stream */
    virtual void print(std::ostream& os) const;
 };
 
-/// Output on a stream
+/** @brief Output on a stream */
 std::ostream& operator<<(std::ostream& os, const Contractor& op);
 
-/// Type of shared pointers on contractors
+/** @brief Type of shared pointers on contractors */
 typedef std::shared_ptr<Contractor> SharedContractor;
 
 } // namespace

@@ -128,7 +128,9 @@ public:
    virtual ConstraintRep* cloneRoot() const = 0;
 
 protected:
+   /** @brief type of shared constraint representation */
    typedef std::shared_ptr<ConstraintRep> SharedRep;
+
    friend class Constraint;
 
    /**
@@ -539,7 +541,7 @@ public:
 
    /**
     * @brief Gets a variable
-    * @param a column index between 0 and nbCols()
+    * @param j a column index between 0 and nbCols()
     * @return the j-th variable
     */
    Variable getVar(size_t j) const;
@@ -547,7 +549,7 @@ public:
    /**
     * @brief Gets a value
     * @param i a row index between 0 and nbRows()-1
-    * @param a column index between 0 and nbCols()-1
+    * @param j a column index between 0 and nbCols()-1
     * @return the value at position (i, j)
     */
    Interval getVal(size_t i, size_t j) const;
