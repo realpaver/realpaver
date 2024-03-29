@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   TermFixer.hpp
+ * @brief  Rewriting of terms
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_TERM_FIXER_HPP
 #define REALPAVER_TERM_FIXER_HPP
@@ -14,46 +25,49 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor of terms that replaces variables.
-///
-/// Let t be a term, let vvm be a map Variable -> Variable, and let vim
-/// be a map Variable -> Interval.
-/// - for every entry (v, x) in vvm, every occurrence of v in t is replaced
-///   by x;
-/// - for every entry (v, d) in vim, every occurrence of v in t is replaced
-/// - by d.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Visitor that rewrites terms
+ * 
+ * Let t be a term, let vvm be a map Variable -> Variable, and let vim
+ * be a map Variable -> Interval.
+ * - for every entry (v, x) in vvm, every occurrence of v in t is replaced
+ *   by x.
+ * - for every entry (v, d) in vim, every occurrence of v in t is replaced
+ *   by d.
+ */
 class TermFixer : public TermVisitor {
 public:
-   /// map type Variable -> Variable
+   /** @brief map type Variable -> Variable */
    typedef std::unordered_map<Variable,
                               Variable,
                               VariableHasher> VarVarMapType;
 
-   /// map type Variable -> Interval
+   /** @brief map type Variable -> Interval */
    typedef std::unordered_map<Variable,
                               Interval,
                               VariableHasher> VarIntervalMapType;
 
-   /// Creates a fixer given the two maps
-   /// @param vvm map Variable -> Variable
-   /// @param vim map Variable -> Interval
+   /**
+    * @brief Constructor
+    * @param vvm map Variable -> Variable
+    * @param vim map Variable -> Interval
+    */
    TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim);
 
-   /// No copy
+   /** @brief No copy */
    TermFixer(const TermFixer&) = delete;
 
-   /// No assignment
+   /** @brief No assignment */
    TermFixer& operator=(const TermFixer&) = delete;
 
-   /// Default destructor
+   /** @brief Default destructor */
    ~TermFixer() = default;
 
-   /// @return the new term after a visit
+   /** @return the new term after a visit */
    Term getTerm() const;
 
-   ///@{
+   /** @name Visit methods */
+   /** @{ */
    void apply(const TermConst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
@@ -77,12 +91,12 @@ public:
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;
-   ///@}
+   /** @} */
 
 private:
-   VarVarMapType* vvm_;
-   VarIntervalMapType* vim_;
-   Term t_;
+   VarVarMapType* vvm_;       // map Variable -> Variable
+   VarIntervalMapType* vim_;  // map Variable -> Interval
+   Term t_;                   // new term after a visit
 };
 
 } // namespace

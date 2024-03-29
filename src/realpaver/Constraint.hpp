@@ -669,9 +669,8 @@ public:
    /** @brief Virtual destructor */
    virtual ~ConstraintVisitor();
 
-   /** @addtogroup Visit methods
-    *  @{
-    */
+   /** @name Visit methods */
+   /** @{ */
    virtual void apply(const ArithCtrEq* c);
    virtual void apply(const ArithCtrLe* c);
    virtual void apply(const ArithCtrLt* c);
@@ -680,7 +679,7 @@ public:
    virtual void apply(const ArithCtrIn* c);
    virtual void apply(const TableCtr* c);
    virtual void apply(const CondCtr* c);
-   /** @}*/
+   /** @} */
 };
 
 } // namespace

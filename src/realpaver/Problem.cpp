@@ -9,7 +9,6 @@
 
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
