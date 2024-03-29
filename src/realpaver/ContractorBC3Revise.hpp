@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorBC3Revise.hpp
+ * @brief  BC3Revise contractor
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_BC3_REVISE_HPP
 #define REALPAVER_CONTRACTOR_BC3_REVISE_HPP
@@ -17,26 +28,24 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the BC3Revise contractor implementing box consistency.
-///
-/// It applies to a bounded thick interval function with form a <= F(x) <= b.
-/// Given x in X, it finds the outermost consistent values by combining
-/// search with an interval Newton method. It returns the interval [c, d]
-/// such that c is the smallest value in X verifying a <= F(c) <= b and d
-/// is the greatest value in X such that a <= F(d) <= b. If there is no
-/// consistent value in X, it returns the empty set. This is the theory.
-///
-/// In practice, we use a tolerance to check the consistency of small intervals
-/// at the bounds of domains. The peel factor is a percentage of the width of
-/// an interval.
-//////////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief BC3Revise contractor implementing box consistency.
+ *
+ * It applies to a bounded thick interval function with form a <= F(x) <= b.
+ * Given x in X, it finds the outermost consistent values by combining
+ * search with an interval Newton method. It returns the interval [c, d]
+ * such that c is the smallest value in X verifying a <= F(c) <= b and d
+ * is the greatest value in X such that a <= F(d) <= b. If there is no
+ * consistent value in X, it returns the empty set. This is the theory.
+ *
+ * In practice, a peel factor f in [0,100] is used to check the consistency of
+ * small intervals at the bounds of domains during the search. Given an interval
+ * [u, v], these small intervals are [u,u+w] and [v-w,v] with w = (f/100)*(v-u).
+ * The search stops if these small intervals are consistent.
+ */
 class ContractorBC3Revise : public Contractor {
 public:
-   /// Creates a contractor
-   /// @param dag a DAG
-   /// @param i index of a function in the DAG
-   /// @param v a variable occurring in the function
+   /// Contractor associated with the i-th function of a DAG and v
    ContractorBC3Revise(SharedDag dag, size_t i, Variable v);
 
    /// Destructor
@@ -48,30 +57,24 @@ public:
    /// No assignment
    ContractorBC3Revise& operator=(const ContractorBC3Revise&) = delete;
 
-   /// @return the peel factor
+   /// Returns the peel factor
    double getPeelFactor() const;
 
    /// Sets the peel factor
-   /// @param f f/100 is a percentage with f >= 0.0 and f <= 100.0
    void setPeelFactor(double f);
 
-   /// @return the maximum number of steps in the iterative method
+   /// Returns the maximum number of steps in the iterative method
    size_t getMaxIter() const;
 
    /// Sets the maximum number of steps in the iterative method
-   /// @param val new value
    void setMaxIter(size_t val);
 
-   /// @return the Newton operator enclosed
-   ///
-   /// Useful to change its parameters
+   /// Returns the Newton operator enclosed
    IntervalNewtonUni* getNewton() const;
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    IntervalThickFunction f_;     // univariate thick interval function

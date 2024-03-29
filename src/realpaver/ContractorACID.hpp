@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorACID.hpp
+ * @brief  ACID contractor
+ * @author Laurent Granvilliers
+ * @date   2023-11-20
+*/
 
 #ifndef REALPAVER_CONTRACTOR_ACID_HPP
 #define REALPAVER_CONTRACTOR_ACID_HPP
@@ -17,38 +28,40 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a propagator that implements the adaptive CID strategy (Alg. 1).
-///
-/// The ACID1 algorithm works as follows.
-/// With each variable of the problem is associated a 3BCID contractor.
-/// In each call of the contraction method, numVarCID 3BCID contractors
-/// are applied.
-///
-/// Which ordering for these contractors? The one given by the smear sum
-/// relative strategy that evaluates the derivatives in the current box.
-///
-/// How many of the contractors? numVarCID which is first assigned to the
-/// number of variables. This number then evolves in learning phases. And
-/// it is just used in exploitation phases.
-///
-/// Let learLength be the number of calls of the contraction method in every
-/// learning phase. In each of these calls, the numVarCID 3BCID contractors
-/// are applied and we seek for the last one that has reduced the box enough
-/// with a respect to a ratio called ctRatio. At the end of the learning phase,
-/// an average is calculated and it is assigned to numVarCID for the next
-/// exploitation phase.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Propagation algorithm implementing the adaptive CID strategy (Alg. 1).
+ *
+ * The ACID1 algorithm works as follows.
+ * With each variable of the problem is associated a 3BCID contractor.
+ * In each call of the contraction method, numVarCID 3BCID contractors
+ * are applied.
+ *
+ * Which ordering for these contractors? The one given by the smear sum
+ * relative strategy that evaluates the derivatives in the current box.
+ *
+ * How many of the contractors? numVarCID which is first assigned to the
+ * number of variables. This number then evolves in learning phases. And
+ * it is just used in exploitation phases.
+ *
+ * Let learnLength be the number of calls of the contraction method in every
+ * learning phase. In each of these calls, the numVarCID 3BCID contractors
+ * are applied and we seek for the last one that has reduced the box enough
+ * with a respect to a ratio called ctRatio. At the end of the learning phase,
+ * an average is calculated and it is assigned to numVarCID for the next
+ * exploitation phase.
+ */
 class ContractorACID : public Contractor {
 public:
-   /// Constructor
-   /// @param ssr calculator of smear sum rel values
-   /// @param op contractor of slices
-   /// @param ns3B number of slices for 3B contractors
-   /// @param nsCID number of slices for CID contractors
-   /// @param learnLength length of the learning phase
-   /// @param cycleLength length of the learning+exploitation phase
-   /// @param ctRatio threshold on the quality of contractions
+   /**
+    * @brief Constructor.
+    * @param ssr calculator of smear sum rel values
+    * @param op contractor of slices
+    * @param ns3B number of slices for 3B contractors
+    * @param nsCID number of slices for CID contractors
+    * @param learnLength length of the learning phase
+    * @param cycleLength length of the learning+exploitation phase
+    * @param ctRatio threshold on the quality of contractions
+    */
    ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
                   SharedContractor op, int ns3B, int nsCID,
                   int learnLength, int cycleLength, double ctRatio);
@@ -62,25 +75,21 @@ public:
    /// Default destructor
    ~ContractorACID() = default;
 
-   /// @return the number of calls of the contraction method in a learning
-   ///         phase
+   /// Returns the length of the learning phase
    int learnLength() const;
 
-   /// @return the number of calls of the contraction method in a learning
-   ///         phase followed by an exploitation phase
+   /// Returns the length of the learning+exploitation phase
    int cycleLength() const;
 
-   /// @return the threshold on the reduction gain
+   /// Returns the threshold on the reduction gain
    double ctRatio() const;
 
-   /// @return the contractor of slices
+   /// Returns the contractor of slices
    SharedContractor sliceContractor() const;
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    std::shared_ptr<IntervalSmearSumRel> ssr_;   // calculator of smear
@@ -121,7 +130,7 @@ private:
    static size_t avgNbVarCID(std::vector<size_t>& v);
 };
 
-/// Type of shared pointers on contractors
+/** @brief Type of shared pointers on contractors */
 typedef std::shared_ptr<ContractorACID> SharedContractorACID;
 
 } // namespace

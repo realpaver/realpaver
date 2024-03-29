@@ -26,7 +26,7 @@
 
 namespace realpaver {
 
-/** @brief Calculates the hash code of a value using std::hash */
+/// Returns the hash code of a value using std::hash
 template <typename T>
 std::size_t hash1(const T& x)
 {
@@ -34,17 +34,19 @@ std::size_t hash1(const T& x)
    return fun(x);
 }
 
-/** @brief Combines two hash codes */
+/// Combines two hash codes
 std::size_t hash2(std::size_t h1, std::size_t h2);
 
-/** @brief Combines three hash codes */
+/// Combines three hash codes
 std::size_t hash3(std::size_t h1, std::size_t h2, std::size_t h3);
 
-/** @brief Combines four hash codes */
+/// Combines four hash codes
 std::size_t hash4(std::size_t h1, std::size_t h2,
                   std::size_t h3, std::size_t h4);
 
-/** @brief Certificate returned by solvers of optimization problems */
+/*----------------------------------------------------------------------------*/
+
+/// Certificate returned by solvers of optimization problems
 enum class OptimizationStatus {
    Optimal,            ///< optimum found
    Infeasible,         ///< proved infeasible
@@ -54,8 +56,10 @@ enum class OptimizationStatus {
    Other               ///< other status
 };
 
-/** @brief Output on a stream of an optimization status */
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, OptimizationStatus status);
+
+/*----------------------------------------------------------------------------*/
 
 /** @brief Certificate returned by interval solvers */
 enum class Proof {
@@ -65,7 +69,7 @@ enum class Proof {
    Inner       ///< proof of inner region
 };
 
-/** @brief Output on a stream of a certificate of proof */
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, Proof proof);
 
 } // namespace

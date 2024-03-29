@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorBC4.hpp
+ * @brief  BC4 contractor
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_BC4_HPP
 #define REALPAVER_CONTRACTOR_BC4_HPP
@@ -16,14 +27,16 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a constraint propagation algorithm applying BC4Revise contractors
-/// on a DAG.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Propagation algorithm implementing the BC4 strategy.
+ * 
+ * A BC4Revise contractor is associated with each constraint from a DAG. The
+ * contraction method implements an AC3-like propagation algorithm on the set
+ * of contractors.
+ */
 class ContractorBC4 : public Contractor {
 public:
    /// Constructor
-   /// @param dag a shared dag
    ContractorBC4(SharedDag dag);
 
    /// Destructor
@@ -35,49 +48,43 @@ public:
    /// No asignment
    ContractorBC4& operator=(const ContractorBC4&) = delete;
 
-   ///@{
-   Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
-   ///@}
-
    /// Inserts a contractor in this
-   /// @param op a contractor
-   ///
-   /// This is typically used to call new contractors in the propagation
-   /// loop, these ones being independent from the DAG
    void push(SharedContractor op);
 
-   /// @return the tolerance used as stopping criterion
+   /// Returns the tolerance used as stopping criterion
    Tolerance getTol() const;
 
    /// Sets the tolerance used as stopping criterion
-   /// @param tol new value of the tolerance
    void setTol(Tolerance tol);
 
-   /// @return the maximum number of propagation steps
+   /// Returns the maximum number of propagation steps
    size_t getMaxIter() const;
 
    /// Sets the maximum number of propagation steps
-   /// @param n new value
    void setMaxIter(size_t n);
 
-   /// Sets the peel factor of the BC4Revise operators
-   /// @param f f/100 is a percentage with f >= 0.0 and f <= 100.0
+   /**
+    * @brief Sets the peel factor of the BC4Revise operators.
+    * 
+    * Condition: 0.0 <= f <= 100.0
+    */
    void setBC4RevisePeelFactor(double f);
 
    /// Sets the maximum number of steps in the BC4Revise operators
-   /// @param val new value
    void setBC4ReviseMaxIter(size_t val);
 
+   Scope scope() const override;
+   Proof contract(IntervalBox& B) override;
+   void print(std::ostream& os) const override;
+
 private:
-   SharedDag dag_;
-   PropagationAlg* propag_;
-   std::vector<std::shared_ptr<ContractorBC4Revise>> vop_;
+   SharedDag dag_;            // the DAG
+   PropagationAlg* propag_;   // propagation algorithm
+   std::vector<std::shared_ptr<ContractorBC4Revise>> vop_;  // contractors
 };
 
-/// Type of shared pointers of BC4 contractors
-typedef std::shared_ptr<ContractorBC4> SharedContractorBC4;
+/// Type of shared pointers to BC4 contractors
+using SharedContractorBC4 = std::shared_ptr<ContractorBC4>;
 
 } // namespace
 

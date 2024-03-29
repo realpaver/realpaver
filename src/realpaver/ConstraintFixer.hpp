@@ -27,7 +27,7 @@
 namespace realpaver {
 
 /**
- * @brief Visitor that rewrites constraints
+ * @brief Visitor that rewrites constraints.
  * 
  * Let c be a constraint, let vvm be a map Variable -> Variable, and let vim
  * be a map Variable -> Interval.
@@ -38,14 +38,14 @@ namespace realpaver {
  */
 class ConstraintFixer : public ConstraintVisitor {
 public:
-   /** @brief map type Variable -> Variable */
-   typedef TermFixer::VarVarMapType VarVarMapType;
+   /// Map type Variable -> Variable
+   using VarVarMapType = TermFixer::VarVarMapType;
 
-   /** @brief map type Variable -> Interval */
-   typedef TermFixer::VarIntervalMapType VarIntervalMapType;
+   /// Map type Variable -> Interval
+   using VarIntervalMapType = TermFixer::VarIntervalMapType;
 
    /**
-    * @brief Constructor
+    * @brief Constructor.
     * @param vvm map Variable -> Variable
     * @param vim map Variable -> Interval
     * @param B domains of the variables in vvm
@@ -53,16 +53,16 @@ public:
    ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
                    const IntervalBox& B);
 
-   /** @brief No copy */
+   /// No copy
    ConstraintFixer(const ConstraintFixer&) = delete;
 
-   /** @brief No assignment */
+   /// No assignment
    ConstraintFixer& operator=(const ConstraintFixer&) = delete;
 
-   /** @brief Default destructor */
+   /// Default destructor
    ~ConstraintFixer() = default;
 
-   /** @return the new constraint after a visit */
+   /// Returns the new constraint after a visit
    Constraint getConstraint() const;
 
    void apply(const ArithCtrEq* c) override;

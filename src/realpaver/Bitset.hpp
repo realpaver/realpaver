@@ -33,130 +33,91 @@ namespace realpaver {
  */
 class Bitset {
 public:
-   /** @brief Creates an empty bitset */
+   /// Creates an empty bitset
    Bitset();
 
-   /**
-    * @brief Creates a bitset initialized to (0,0,...,0)
-    * @param n number of bits
-    * 
-    * Indexes of bits: 0..n-1
-    */
+   /// Creates a bitset initialized to (0,0,...,0) with indexes 0..n-1
    Bitset(size_t n);
 
-   /**
-    * @brief Creates a bitset initialized to (0,0,...,0)
-    * @param first index of the first bit
-    * @param last index of the last bit
-    * 
-    * Indexes of bits: first..last
-    */
+   /// Creates a bitset initialized to (0,0,...,0) with indexes first..last
    Bitset(int first, int last);
 
-   /**
-    * @brief Creates a bitset in extension given a list of bits
-    * @param l list of bits, each bit is equal to 0 or 1
-    */
+   /// Creates a bitset in extension given a list of bits
    Bitset(const std::initializer_list<int>& l);
 
-   /** @brief Copy constructor */
+   /// Copy constructor
    Bitset(const Bitset& other);
 
-   /** @brief Move constructor */
+   /// Move constructor
    Bitset(Bitset&& other);
 
-   /** @brief Destructor */
+   /// Destructor
    ~Bitset();
 
-   /** @brief Assignment */
+   /// Assignment
    Bitset& operator=(const Bitset& other);
 
-   /** @brief Move assignment */
+   /// Move assignment
    Bitset& operator=(Bitset&& other);
 
-   /** @return the number of bits */
+   /// Rreturns the number of bits
    size_t size() const;
 
-   /** @return the index of the first bit */
+   /// Rreturns the index of the first bit
    int first() const;
 
-   /** @return the index of the last bit */
+   /// Returns the index of the last bit
    int last() const;
 
-   /** @return the number of words used to store the bits */
+   /// Returns the number of words used to store the bits
    size_t wordCount() const;
 
-   /** @return 0 if the i-th bit is equal to 0, another value otherwise */
+   /// Returns 0 if the i-th bit is equal to 0, another value otherwise
    size_t get(int i) const;
 
-   /**
-    * @brief Sets a bit to 0
-    * @param i bit index
-    */
+   /// Sets the i-th bit to 0
    Bitset& setZero(int i);
 
-   /** @brief Sets all bits to 0 */
+   /// Sets all bits to 0
    Bitset& setAllZero();
 
-   /**
-    * @brief Sets a bit to 1
-    * @param i bit index
-    */
+   /// Sets the i-th bit to 1
    Bitset& setOne(int i);
 
-   /** @brief Sets all bits to 1 */
+   /// Sets all bits to 1
    Bitset& setAllOne();
 
-   /**
-    * @brief Flips the value of one bit
-    * @param i bit index
-    */
+   /// Flips the value of the i-th bit
    void flip(int i);
 
-   /** @brief Flips all bits */
+   /// Flips all bits
    void flipAll();
 
-   /** @return the number of 0 in this */
+   /// Returns the number of 0 in this
    size_t nbZeros() const;
 
-   /** @return the number of 1 in this */
+   /// Returns the number of 1 in this
    size_t nbOnes() const;
 
-   /** @return true if all the bits are equal to 1 */
+   /// Returns true if all the bits are equal to 1
    bool areAllOnes() const;
 
-   /** @return true if all the bits are equal to 0 */
+   /// Returns true if all the bits are equal to 0
    bool areAllZeros() const;
 
-   /** @brief Output on a stream. */
+   /// Output on a stream
    void print(std::ostream& os) const;
 
-   /** @return hash code of this */
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   /**
-    * @brief Overlapping test
-    * @param other a bitset
-    * @return true if this and other share at least one bit equal to 1
-    */
+   /// Returns true if this and other share at least one bit equal to 1
    bool overlaps(const Bitset& other) const;
 
-   /**
-    * @brief Bitwise AND with assignment
-    * @param other a bitset
-    * @return a reference to this
-    * 
-    * this(i) := this(i) AND other(i) for each common bit index i.
-    */
+   /// Bitwise AND with assignment
    Bitset& operator&=(const Bitset& other);
 
-   /**
-    * @brief Bitwise OR with assignment
-    * @param other a bitset
-    * @return a reference to this
-    * 
-    * this(i) := this(i) OR other(i) for each common bit index i.
-    */
+   /// Bitwise OR with assignment
    Bitset& operator|=(const Bitset& other);
 
    friend Bitset operator&(const Bitset& b1, const Bitset& b2);
@@ -195,36 +156,16 @@ private:
    word_t shadow_word_;
 };
 
-/** @brief Output on a stream */
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Bitset& b);
 
-/**
- * @brief Bitwise AND
- * @param b1 a bitset
- * @param b2 a bitset
- * @return b1 AND b2
- * 
- * The resulting bitset b is such that b(i) := b1(i) AND b2(i) for each
- * common bit index i of b1 and b2.
- */
+/// Bitwise AND of b1 and b2
 Bitset operator&(const Bitset& b1, const Bitset& b2);
 
-/**
- * @brief Bitwise OR
- * @param b1 a bitset
- * @param b2 a bitset
- * @return b1 OR b2
- * 
- * The resulting bitset b is such that b(i) := b1(i) OR b2(i) for each
- * common bit index i of b1 and b2.
- */
+/// Bitwise OR of b1 and b2
 Bitset operator|(const Bitset& b1, const Bitset& b2);
 
-/**
- * @brief Bitwise NOT
- * @param b a bitset
- * @return NOT b
- */
+/// Bitwise NOT of b
 Bitset operator~(const Bitset& b);
 
 } // namespace

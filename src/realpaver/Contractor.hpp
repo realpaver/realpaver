@@ -28,7 +28,7 @@
 namespace realpaver {
 
 /**
- * @brief Base class of interval contractors
+ * @brief Base class of interval contractors.
  *
  * An interval contractor is in general associated with a constraint. Given an
  * interval box, it removes infeasible facets (it prunes interval bounds) and 
@@ -42,44 +42,36 @@ namespace realpaver {
  */
 class Contractor {
 public:
-   /** @brief Default constructor */
+   /// Default constructor
    Contractor() = default;
 
-   /** @brief Default copy constructor */
+   /// Default copy constructor
    Contractor(const Contractor&) = default;
 
-   /** @brief No assignment */
+   /// No assignment
    Contractor& operator=(const Contractor&) = delete;
 
-   /** @brief Virtual destructor */
+   /// Virtual destructor
    virtual ~Contractor();
 
-   /**
-    * @brief Dependency test
-    * @param v a variable
-    * @return true if the scope of this contains v
-    */
+   /// Returns true if v belongs to the scope of this
    bool dependsOn(const Variable& v) const;
 
-   /** @brief @return the set of variable on which this depends on */
+   /// Returns the set of variable on which this depends on
    virtual Scope scope() const = 0;
 
-   /**
-    * @brief Contraction method
-    * @param B interval box that is contracted
-    * @return a certificate of proof
-    */
+   /// Contracts a box B and returns a certificate of proof
    virtual Proof contract(IntervalBox& B) = 0;
 
-   /** @brief Output on a stream */
+   /// Output on a stream
    virtual void print(std::ostream& os) const;
 };
 
-/** @brief Output on a stream */
+/// Output on a stream 
 std::ostream& operator<<(std::ostream& os, const Contractor& op);
 
-/** @brief Type of shared pointers on contractors */
-typedef std::shared_ptr<Contractor> SharedContractor;
+/// Type of shared pointers on contractors
+using SharedContractor = std::shared_ptr<Contractor>;
 
 } // namespace
 

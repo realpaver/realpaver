@@ -26,7 +26,7 @@
 namespace realpaver {
 
 /**
- * @brief Visitor used to relax a constraint
+ * @brief Visitor used to relax a constraint.
  * 
  * Given a real number nu>0, every equation f(x) = 0 is relaxed as
  * f(x) in [-nu, +nu]. Every other constraint is not handled and the apply
@@ -34,25 +34,22 @@ namespace realpaver {
  */
 class ConstraintRelaxor : public ConstraintVisitor {
 public:
-   /**
-    * @brief Constructor
-    * @param nu relaxation value
-    */
+   /// Constructor given the relaxation value
    ConstraintRelaxor(double nu);
 
-   /** @brief Default copy constructor */
+   /// Default copy constructor
    ConstraintRelaxor(const ConstraintRelaxor&) = default;
 
-   /** @brief No assignment */
+   /// No assignment
    ConstraintRelaxor& operator=(const ConstraintRelaxor&) = delete;
 
-   /** @brief Default destructor */
+   /// Default destructor
    ~ConstraintRelaxor() = default;
 
-   void apply(const ArithCtrEq* c) override;
-
-   /** @return the relaxed constraint after a visit */
+   /// Returns the relaxed constraint after a visit
    Constraint getRelaxedCtr() const;
+
+   void apply(const ArithCtrEq* c) override;
 
 private:
    double nu_;             // relaxation value

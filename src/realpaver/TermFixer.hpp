@@ -26,7 +26,7 @@
 namespace realpaver {
 
 /**
- * @brief Visitor that rewrites terms
+ * @brief Visitor that rewrites terms.
  * 
  * Let t be a term, let vvm be a map Variable -> Variable, and let vim
  * be a map Variable -> Interval.
@@ -37,33 +37,27 @@ namespace realpaver {
  */
 class TermFixer : public TermVisitor {
 public:
-   /** @brief map type Variable -> Variable */
-   typedef std::unordered_map<Variable,
-                              Variable,
-                              VariableHasher> VarVarMapType;
+   /// Map type Variable -> Variable
+   using VarVarMapType = std::unordered_map<Variable, Variable,
+                                            VariableHasher>;
 
-   /** @brief map type Variable -> Interval */
-   typedef std::unordered_map<Variable,
-                              Interval,
-                              VariableHasher> VarIntervalMapType;
+   /// Map type Variable -> Interval
+   using VarIntervalMapType = std::unordered_map<Variable, Interval,
+                                                 VariableHasher>;
 
-   /**
-    * @brief Constructor
-    * @param vvm map Variable -> Variable
-    * @param vim map Variable -> Interval
-    */
+   /// Constructor
    TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim);
 
-   /** @brief No copy */
+   /// No copy
    TermFixer(const TermFixer&) = delete;
 
-   /** @brief No assignment */
+   /// No assignment
    TermFixer& operator=(const TermFixer&) = delete;
 
-   /** @brief Default destructor */
+   /// Default destructor
    ~TermFixer() = default;
 
-   /** @return the new term after a visit */
+   /// Return the new term after a visit
    Term getTerm() const;
 
    /** @name Visit methods */

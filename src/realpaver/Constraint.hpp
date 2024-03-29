@@ -27,7 +27,7 @@ namespace realpaver {
 
 class ConstraintVisitor;
 
-/** @brief Enumeration of relation symbols */
+/// Enumeration of relation symbols
 enum class RelSymbol {
    Eq,    ///< equation
    Le,    ///< less than
@@ -39,102 +39,90 @@ enum class RelSymbol {
    Cond   ///< conditional constraint
 };
 
-/** @brief Output on a stream */
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, RelSymbol rel);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Base class of the hierarchy of constraint representations */
+/**
+ * @brief Base class of the hierarchy of constraint representations.
+ * 
+ * The common attributes are a scope, a relation symbol, and an hash code.
+ */
 class ConstraintRep {
 public:
-   /**
-    * @brief Creates a representation
-    * @param rel relation symbol
-    */
+   /// Constructor
    ConstraintRep(RelSymbol rel);
 
-   /** @brief Default copy constructor */
+   /// Default copy constructor
    ConstraintRep(const ConstraintRep&) = default;
 
-   /** @brief No assignment */
+   /// No assignment
    ConstraintRep& operator=(const ConstraintRep&) = delete;
 
-   /** @brief Virtual destructor */
+   /// Virtual destructor
    virtual ~ConstraintRep();
 
-   /** @return the hash code of this */
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   /** @return the scope of this */
+   /// Returns the scope of this
    Scope scope() const;
 
-   /**
-    * @brief Dependency test
-    * @param v a variable
-    * @return true if this depends on v
-    */
+   /// Returns true if v belongs to the scope of this
    bool dependsOn(Variable v) const;
 
-   /** @return the relation symbol of this */
+   /// Returns the relation symbol of this
    RelSymbol relSymbol() const;
 
-   /** @return true if this constraint is variable free */
+   /// Returns true if this constraint is variable free
    virtual bool isConstant() const = 0;
 
-   /**
-    * @brief Satisfaction test
-    * @param B domains of variables
-    * @return a certificate of proof
-    */
+   /// Checks the satisfaction of this on a box
    virtual Proof isSatisfied(const IntervalBox& B) = 0;
 
    /**
-    * @brief Magnitude of violation
-    * @param B domains of variables
-    * @return 0 if the constraint is satisfied, otherwise a positive real
-    *         number that indicates how much the constraint is violated
+    * @brief Returns the violation of this on a box.
+    * 
+    * Returns 0 if the constraint is satisfied, otherwise a positive real
+    * number that indicates how much the constraint is violated.
     */
    virtual double violation(const IntervalBox& B) = 0;
 
-   /**
-    * @brief Contraction of domains
-    * @param B domains of variables
-    * @return a certificate of proof
-    */
+   /// Contracts a box and returns a certificate of proof
    virtual Proof contract(IntervalBox& B) = 0;
 
-   /** @brief Output on a stream */
+   /// Output on a stream
    virtual void print(std::ostream& os) const = 0;
 
-   /** @brief Visitor pattern */
+   /// Visitor pattern
    virtual void acceptVisitor(ConstraintVisitor& vis) const = 0;
 
-   /** @return true if this is an equation */
+   /// Returns true if this is an equation
    virtual bool isEquation() const;
 
-   /** @return true if this is an inequality constraint (default: false) */
+   /// Returns true if this is an inequality constraint (default: false)
    virtual bool isInequality() const;
 
-   /** @return true if this is linear */
+   /// Returns true if this is linear
    virtual bool isLinear() const;
 
-   /** @return true if this is an integer arithmetic constraint */
+   /// Returns true if this is an integer arithmetic constraint
    virtual bool isInteger() const = 0;
 
-   /** @return true if this just bounds a variable */
+   /// Return true if this just bounds a variable
    virtual bool isBoundConstraint() const;
 
-   /** @return a new representation such that the root of this is cloned */
+   /// Returns a new representation such that only the root of this is cloned
    virtual ConstraintRep* cloneRoot() const = 0;
 
 protected:
-   /** @brief type of shared constraint representation */
-   typedef std::shared_ptr<ConstraintRep> SharedRep;
+   /// Type of shared constraint representation
+   using SharedRep = std::shared_ptr<ConstraintRep>;
 
    friend class Constraint;
 
-   /**
-    * @brief Sets the scope */
+   /// Sets the scope
    void setScope(Scope scop);
 
 private:
@@ -148,118 +136,98 @@ protected:
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief The main Constraint class
+ * @brief The main Constraint class.
  * 
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
  */
 class Constraint {
 public:
-   /** @return the hash code of this */
+   /// ReturnS the hash code of this
    size_t hashCode() const;
 
-   /** @return the scope of this */
+   /// Returns the scope of this
    Scope scope() const;
 
-   /** @return the relation symbol of this */
+   /// Returns the relation symbol of this
    RelSymbol relSymbol() const;
 
-   /** @return true if this is variable free */
+   /// Returns true if this is variable free */
    bool isConstant() const;
 
-   /**
-    * @brief Satisfaction test
-    * @param B domains of variables
-    * @return a certificate of proof
-    */
+   /// Checks the satisfaction of this on a box
    Proof isSatisfied(const IntervalBox& B);
 
    /**
-    * @brief Magnitude of violation
-    * @param B domains of variables
-    * @return 0 if the constraint is satisfied, otherwise a positive real
-    *         number that indicates how much the constraint is violated
+    * @brief Returns the violation of this on a box.
+    * 
+    * Returns 0 if the constraint is satisfied, otherwise a positive real
+    * number that indicates how much the constraint is violated.
     */
    double violation(const IntervalBox& B);
 
-   /**
-    * @brief Contraction of domains
-    * @param B domains of variables
-    * @return a certificate of proof
-    */
+   /// Contracts a box and returns a certificate of proof
    Proof contract(IntervalBox& B);
 
-   /** @brief Output on a stream */
+   /// Output on a stream
    void print(std::ostream& os) const;
 
-   /** @brief Visitor pattern */
+   /// Visitor pattern
    void acceptVisitor(ConstraintVisitor& vis) const;
 
-   /**
-    * @brief Dependency test
-    * @param v a variable
-    * @return true if this depends on v
-    */
+   /// Returns true if v belongs to the scope of this
    bool dependsOn(Variable v) const;
 
    /** @return true if this is an equation */
    bool isEquation() const;
 
-   /** @return true if this is an inequality constraint */
+   /// Returns true if this is an inequality constraint
    bool isInequality() const;
 
-   /** @return true if this is linear */
+   /// Returns true if this is linear
    bool isLinear() const;
 
-   /** @return true if this just bounds a variable */
+   /// Returns true if this is a bound constraint
    bool isBoundConstraint() const;
 
-   /** @return true if this is an integer constraint */
+   /// Returns true if this is an integer constraint
    bool isInteger() const;
 
-   /** @return a new representation such that the root of this is cloned */
+   /// Returns a new representation such that only the root of this is cloned
    ConstraintRep* cloneRoot() const;
 
 public:
-   /** @brief type of the shared representation */
-   typedef ConstraintRep::SharedRep SharedRep;
+   /// Type of the shared representation
+   using SharedRep = ConstraintRep::SharedRep;
 
-   /**
-    * @brief Constructor
-    * @param rep the representation of this
-    */
+   /// Constructor
    Constraint(const SharedRep& rep = nullptr);
 
-   /** @return the representation of this */
+   /// Returns the representation of this
    SharedRep rep() const;
 
 private:
    SharedRep rep_;   // shared representation
 };
 
-/** @brief Output on a stream */
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, Constraint c);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Base class of arithmetic constraints between two terms */
+/// Base class of arithmetic constraints between two terms 
 class ArithCtrBinary : public ConstraintRep {
 public:
-   /**
-    * @brief Constructor
-    * @param l left-hand side
-    * @param r right-hand side
-    * @param rel relation symbol
-    */
+   /// Creates a constraint rel(l, r)
    ArithCtrBinary(Term l, Term r, RelSymbol rel);
 
-   /** @brief Virtual destructor */
+   /// Virtual destructor
    virtual ~ArithCtrBinary();
 
-   /** @return the left-hand term */
+   /// Returns the left-hand term
    Term left() const;
 
-   /** @return the right-hand term */
+   /// Returns the right-hand term
    Term right() const;
 
    void print(std::ostream& os) const override;
@@ -276,14 +244,10 @@ private:
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Class of equations l == r */
+/// Representation of an equation l == r
 class ArithCtrEq : public ArithCtrBinary {
 public:
-   /**
-    * @brief Constructor
-    * @param l left-hand side
-    * @param r right-hand side
-    */
+   /// Creates l == r
    ArithCtrEq(Term l, Term r);
 
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -293,24 +257,15 @@ public:
    ConstraintRep* cloneRoot() const override;
 };
 
-/**
- * Generator
- * @param l left-hand side
- * @param r right-hand side
- * @return l == r
- */
+/// Generator of l == r
 Constraint operator==(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Class of inequality constraint l <= r */
+/// Representation of an inequality constraint l <= r
 class ArithCtrLe : public ArithCtrBinary {
 public:
-   /**
-    * @brief Constructor
-    * @param l left-hand side
-    * @param r right-hand side
-    */
+   /// Creates l <= r
    ArithCtrLe(Term l, Term r);
 
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -320,24 +275,15 @@ public:
    ConstraintRep* cloneRoot() const override;
 };
 
-/**
- * Generator
- * @param l left-hand side
- * @param r right-hand side
- * @return l <= r
- */
+/// Generates l <= r
 Constraint operator<=(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Class of inequality constraint l < r */
+/// Representation of an inequality constraint l < r
 class ArithCtrLt : public ArithCtrBinary {
 public:
-   /**
-    * @brief Constructor
-    * @param l left-hand side
-    * @param r right-hand side
-    */
+   /// Creates l < r
    ArithCtrLt(Term l, Term r);
    
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -347,25 +293,15 @@ public:
    ConstraintRep* cloneRoot() const override;
 };
 
-
-/**
- * Generator
- * @param l left-hand side
- * @param r right-hand side
- * @return l < r
- */
+/// Generates l < r
 Constraint operator<(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Class of inequality constraint l >= r */
+/// Representation of an inequality constraint l >= r
 class ArithCtrGe : public ArithCtrBinary {
 public:
-   /**
-    * @brief Constructor
-    * @param l left-hand side
-    * @param r right-hand side
-    */
+   /// Creates l >= r
    ArithCtrGe(Term l, Term r);
    
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -375,24 +311,15 @@ public:
    ConstraintRep* cloneRoot() const override;
 };
 
-/**
- * Generator
- * @param l left-hand side
- * @param r right-hand side
- * @return l >= r
- */
+/// Generates l >= r
 Constraint operator>=(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Class of inequality constraint l > r */
+/// Representation of an inequality constraint l > r
 class ArithCtrGt : public ArithCtrBinary {
 public:
-   /**
-    * @brief Constructor
-    * @param l left-hand side
-    * @param r right-hand side
-    */
+   /// Creates l > r
    ArithCtrGt(Term l, Term r);
 
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -402,34 +329,25 @@ public:
    ConstraintRep* cloneRoot() const override;
 };
 
-/**
- * Generator
- * @param l left-hand side
- * @param r right-hand side
- * @return l > r
- */
+/// Generates l > r
 Constraint operator>(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Class of inequality constraint f in I
+ * @brief Representation of an inequality constraint f in I.
  * 
- * The constraint f in I is equivalent to min(I) <= f <= max(I).
+ * It is equivalent to min(I) <= f <= max(I).
  */
 class ArithCtrIn : public ArithCtrBinary {
 public:
-   /**
-    * @brief Constructor
-    * @param t term representing a function
-    * @param x the bounds
-    */
+   /// Creates t in x
    ArithCtrIn(Term t, const Interval& x);
 
-   /** @return the bounds of the function */
+   /// Rreturns the bounds of the function
    Interval image() const;
 
-   /** @return the term */
+   /// Returns the term
    Term term() const;
 
    void acceptVisitor(ConstraintVisitor& vis) const override;
@@ -442,64 +360,40 @@ private:
    Interval x_;
 };
 
-/**
- * Generator
- * @param t term representing a function
- * @param x the bounds
- * @return the constraint t in x
- */
+/// Generates t in x
 Constraint in(Term t, const Interval& x);
 
-/** Generator
- * @param t term representing a function
- * @param a the lower bound
- * @param b the upper bound
- * @return the constraint t in [a, b]
- */
+/// Generates t in [a, b]
 Constraint in(Term t, double a, double b);
 
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Column of a table constraint
+ * @brief Column of a table constraint.
  * 
- * A column is a variable with a list of values.
+ * A column is a variable with a list of values (assignments).
  */
 class TableCtrCol {
 public:
-   /**
-    * @brief Constructor
-    * @param v a variable
-    */
+   /// Constructor v in {}
    TableCtrCol(Variable v);
 
-   /**
-    * @brief Constructor
-    * @param v a variable
-    * @param l list of values of the variable
-    */
+   /// Constructor v in l
    TableCtrCol(Variable v, const std::initializer_list<Interval>& l);
 
-   /** @return the number of values of the variable */
+   /// Returns the number of values of the variable
    size_t size() const;
 
-   /**
-    * @brief Gets a value
-    * @param i an index between 0 and size()
-    * @return the i-th value of this
-    */
+   /// Gets the i-th value
    Interval getVal(size_t i) const;
 
-   /** @return the variable */
+   /// Returns the variable
    Variable getVar() const;
 
-   /**
-    * @brief Adds a value at the end
-    * @param x value added
-    */
+   /// Adds a value at the end
    void addValue(const Interval& x);
 
-   /** @return true if this is an integer variable with integer values */
+   /// Returns true if this is an integer variable with integer values
    bool isInteger() const;
 
 private:
@@ -510,7 +404,7 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Table constraint.
+ * @brief Representation of a table constraint.
  * 
  * Example: x  y  z
  *          0  1  2
@@ -518,53 +412,37 @@ private:
  */
 class TableCtr : public ConstraintRep {
 public:
-   /** @brief Constructor of an empty constraint */
+   /// Creates an empty constraint
    TableCtr();
 
-   /// Constructor
-   /// @param l list of columns of this
+   /// Constructor given a list of columns
    TableCtr(const std::initializer_list<TableCtrCol>& l);
 
    /**
-    * @brief Constructor
-    * @param vars a list of variables
-    * @param values list of values representing a row oriented matrix
+    * @brief Constructor.
+    * 
+    * Input: a list of variables vars and a list of values representing a
+    * row-oriented matrix.
     */
    TableCtr(const std::initializer_list<Variable>& vars,
             const std::initializer_list<Interval>& values);   
 
-   /** @return the number of columns (variables) */
+   /// Returns the number of columns (variables)
    size_t nbCols() const;
 
-   /** @return the number of rows (assignments) */
+   /// Returns the number of rows (assignments)
    size_t nbRows() const;
 
-   /**
-    * @brief Gets a variable
-    * @param j a column index between 0 and nbCols()
-    * @return the j-th variable
-    */
+   /// Gets the j-th variable (0 <= j < nbCols)
    Variable getVar(size_t j) const;
 
-   /**
-    * @brief Gets a value
-    * @param i a row index between 0 and nbRows()-1
-    * @param j a column index between 0 and nbCols()-1
-    * @return the value at position (i, j)
-    */
+   /// Gets the value at position (i, j)
    Interval getVal(size_t i, size_t j) const;
 
-   /**
-    * Gets a column
-    * @param j a column index between 0 and nbCols()-1
-    * @return the j-th column of this
-    */
+   /// Gets the j-th column
    TableCtrCol getCol(size_t j) const;
 
-   /**
-    * Inserts a column at the end
-    * @param col column added to this
-    */
+   /// Inserts a column at the end
    void addCol(const TableCtrCol& col);
 
    bool isConstant() const override;
@@ -585,7 +463,8 @@ private:
 };
 
 /**
- * @brief Generator
+ * @brief Generates a table constraint.
+ * 
  * @param vars a list of variables
  * @param values a list of values representing the list of tuples assigned
  *        to the variables, i.e. we have the first tuple in the list,
@@ -596,7 +475,8 @@ Constraint table(const std::initializer_list<Variable>& vars,
                  const std::initializer_list<Interval>& values);
 
 /**
- * @brief Generator
+ * @brief Generates a table constraint.
+ *
  * @param vars an array of variables
  * @param nvars the size of vars
  * @param values an array of values representing the list of tuples assigned
@@ -611,7 +491,7 @@ Constraint table(const Variable* vars, size_t nvars,
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Conditional constraint guard -> body
+ * @brief Representation of a conditional constraint guard -> body.
  * 
  * The guard must be an integer constraint or an inequality constraint, i.e.
  * a constraint that can be certainly satisfied in a box. The body is any
@@ -619,26 +499,22 @@ Constraint table(const Variable* vars, size_t nvars,
  */
 class CondCtr : public ConstraintRep {
 public:
-   /**
-    * @brief Constructor
-    * @param guard the guard
-    * @param body the bofy
-    */
+   /// Constructor
    CondCtr(Constraint guard, Constraint body);
 
-   /** @brief Default copy constructor */
+   /// Default copy constructor
    CondCtr(CondCtr&) = default;
 
-   /** @brief No assignment */
+   /// No assignment
    CondCtr& operator=(CondCtr&) = delete;
 
-   /** @brief Defaut destructor */
+   /// Defaut destructor
    ~CondCtr() = default;
 
-   /** @return the guard */
+   /// Returns the guard
    Constraint guard() const;
 
-   /** @return the body */
+   /// Returns the body
    Constraint body() const;
 
    bool isConstant() const override;
@@ -655,20 +531,15 @@ private:
    Constraint body_;    // body
 };
 
-/**
- * @brief Generator
- * @param guard left-hand constraint
- * @param body right-hand constraint
- * @return the constraint guard -> body
- */
+/// Generates the conditional constraint guard -> body
 Constraint cond(Constraint guard, Constraint body);
 
 /*----------------------------------------------------------------------------*/
 
-/** @brief Base class of visitors of constraint representations */
+/// Base class of visitors of constraint representations
 class ConstraintVisitor {
 public:
-   /** @brief Virtual destructor */
+   /// Virtual destructor
    virtual ~ConstraintVisitor();
 
    /** @name Visit methods */
