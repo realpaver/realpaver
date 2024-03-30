@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorHC4Revise.hpp
+ * @brief  HC4Revise contractor
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_HC4_REVISE_HPP
 #define REALPAVER_CONTRACTOR_HC4_REVISE_HPP
@@ -15,23 +26,21 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This implements the HC4Revise operator.
-///
-/// This contractor traverses the tree-representation of a constraint.
-/// The first phase is an interval evaluation from the leaves to the root.
-/// The second phase calculates the projections from the root to the leaves.
-///
-/// The expression of the constraint comes from a DAG.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief HC4Revise contractor.
+ *
+ * This contractor traverses the tree-representation of a constraint.
+ * The first phase is an interval evaluation from the leaves to the root.
+ * The second phase calculates the projections from the root to the leaves.
+ * The expression of the constraint comes from a DAG.
+ */
 class ContractorHC4Revise : public Contractor {
 public:
-   /// Creates a contractor
-   /// @param dag a DAG
-   /// @param i index of a function / constraint in the dag
-   ///
-   /// We have 0 <= i < dag->nbFuns().
-   /// This does not own the dag.
+   /**
+    * @brief Constructor.
+    * @param dag a DAG
+    * @param i index of a function in the dag with 0 <= i < dag->nbFuns()
+    */
    ContractorHC4Revise(SharedDag dag, size_t i);
 
    /// Default copy constructor
@@ -43,16 +52,14 @@ public:
    /// Default destructor
    ~ContractorHC4Revise() = default;
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
-   /// @return the dag
+   /// Returns the dag
    SharedDag getDag() const;
 
-   /// @return the function index in the dag
+   /// Returns the function index in the dag
    size_t getFunIndex() const;
 
 private:

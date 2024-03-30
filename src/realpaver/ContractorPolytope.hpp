@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorPolytope.hpp
+ * @brief  Polytope Hull contractor
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_POLYTOPE_HPP
 #define REALPAVER_CONTRACTOR_POLYTOPE_HPP
@@ -25,21 +36,16 @@ enum class PolytopeStyle { RLT, Affine, Taylor };
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, const PolytopeStyle& style);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This the abstract class of polytope makers used to linearize nonlinear
-/// systems.
-///////////////////////////////////////////////////////////////////////////////
+/// Base class of polytope makers used to linearize nonlinear systems
 class PolytopeCreator {
 public:
-   typedef std::vector<size_t> IndexList;
+   /// Type of lists of indexes
+   using IndexList = std::vector<size_t>;
 
-   /// Creates a creator for a whole DAG
-   /// @param dag dag-representation of a nonlinear system
+   /// Creates a creator for a DAG
    PolytopeCreator(SharedDag dag);
 
-   /// Creates a creator for a subset of the  DAG
-   /// @param dag dag-representation of a nonlinear system
-   /// @param lfun list of indexes of the DAG functions to be relaxed
+   /// Creates a creator for a subset of a DAG given by a list of indexes
    PolytopeCreator(SharedDag dag, const IndexList& lfun);
 
    /// Destructor
@@ -51,21 +57,22 @@ public:
    /// @return the scope of this
    Scope scope() const;
 
-   /// Makes the linear relaxation
-   /// @param lpm resulting linear model
-   /// @param B input box
-   /// @return true in case of sucess, false otherwise
+   /**
+    * @brief Makes the linear relaxation.
+    * 
+    * @param lpm resulting linear model
+    * @param B input box
+    * @return true in case of sucess, false otherwise
+    */
    virtual bool make(LPModel& lpm, const IntervalBox& B) = 0;
 
-   /// @param v a variable
-   /// @return the index of the linear variable associated with v
+   /// Returns the index of the linear variable associated with v
    size_t linVarIndex(Variable v) const;
 
-   /// @return the relaxation tolerance for the equations
+   /// Returns the relaxation tolerance for the equations
    double getRelaxEqTol() const;
 
    /// Assigns the relaxation tolerance for the equations
-   /// @param tol a positive real number
    void setRelaxEqTol(double tol);
 
 protected:
@@ -76,19 +83,15 @@ protected:
    double eqtol_;                            // relaxation tol for the equations
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a polytope maker implementing the Reformulation-Linearization-
-/// Technique (RLT).
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Polytope maker implementing the Reformulation-Linearization-Technique (RLT)
 class PolytopeRLTCreator : public PolytopeCreator {
 public:
-   /// Creates a creator for a whole DAG
-   /// @param dag dag-representation of a nonlinear system
+   /// Creates a creator for a DAG
    PolytopeRLTCreator(SharedDag dag);
 
-   /// Creates a creator for a part of a DAG
-   /// @param dag dag-representation of a nonlinear system
-   /// @param lfun list of indexes of the DAG functions to be relaxed
+   /// Creates a creator for a subset of a DAG given by a list of indexes
    PolytopeRLTCreator(SharedDag dag, const IndexList& lfun);
 
    bool make(LPModel& lpm, const IntervalBox& B) override;
@@ -100,19 +103,15 @@ private:
    std::unordered_map<size_t, size_t > mnv_; // node index -> lin var index
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a polytope maker that generates Taylor forms.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+///Polytope maker that generates Taylor forms
 class PolytopeTaylorCreator : public PolytopeCreator {
 public:
-   /// Creates a creator for a whole DAG
-   /// @param dag dag-representation of a nonlinear system
+   /// Creates a creator for a DAG
    PolytopeTaylorCreator(SharedDag dag);
 
-   /// Creates a creator for a part of a DAG
-   /// @param dag dag-representation of a nonlinear system
-   /// @param lfun list of indexes of the DAG functions to be relaxed
-   /// @param corner 
+   /// Creates a creator for a subset of the  DAG given by a list of indexes
    PolytopeTaylorCreator(SharedDag dag, const IndexList& lfun);
 
    bool make(LPModel& lpm, const IntervalBox& B) override;
@@ -121,27 +120,25 @@ private:
    Bitset corner_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor based on linear relaxations of constraint systems.
-///
-/// Given a constraint system S, and a region R, it generates an outer
-/// approximation A of the set of solutions to S in R defined by a polytope.
-/// For each variable x, two LPs are solved: min or max x s.t. A in
-/// order to contract the domain of x in R.
-///
-/// This contractor is parameterized by the relaxation method.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Polytope Hull contractor.
+ * 
+ * This is a contractor based on linear relaxations of constraint systems,
+ * which is parameterized by the relaxation method.
+ * 
+ * Given a constraint system S, and a region R, it generates an outer
+ * approximation A of the set of solutions to S in R defined by a polytope.
+ * For each variable x, two LPs are solved: min or max x s.t. A in
+ * order to contract the domain of x in R.
+ */
 class ContractorPolytope : public Contractor {
 public:
-   /// Constructor
-   /// @param dag a DAG representing a set of constraints
-   /// @param style kind of relaxation method
+   /// Creates a contractor for a DAG
    ContractorPolytope(SharedDag dag, PolytopeStyle style);
 
-   /// Constructor
-   /// @param dag a DAG representing a set of constraints
-   /// @param lfun list of indexes of the DAG functions to be relaxed
-   /// @param style kind of relaxation method
+   /// Creates a creator for a subset of a  DAG
    ContractorPolytope(SharedDag dag, const IndexList& lfun,
                       PolytopeStyle style);
 
@@ -154,18 +151,15 @@ public:
    /// No assignment
    ContractorPolytope& operator=(const ContractorPolytope&) = delete;
 
-   /// @return the relaxation tolerance for the equations
+   /// Returns the relaxation tolerance for the equations
    double getRelaxEqTol() const;
 
    /// Assigns the relaxation tolerance for the equations
-   /// @param tol a positive real number
    void setRelaxEqTol(double tol);
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    PolytopeCreator* creator_;    // creator of the relaxation
@@ -174,7 +168,7 @@ private:
 };
 
 /// type of shared contractors
-typedef std::shared_ptr<ContractorPolytope> SharedContractorPolytope;
+using SharedContractorPolytope = std::shared_ptr<ContractorPolytope>;
 
 } // namespace
 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorList.hpp
+ * @brief  List of contractors applied in sequence
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_LIST_HPP
 #define REALPAVER_CONTRACTOR_LIST_HPP
@@ -14,13 +25,10 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor applying a group of contractors in sequence.
-///////////////////////////////////////////////////////////////////////////////
+/// Contractor applying a list of contractors in sequence
 class ContractorList : public Contractor {
 public:
    /// Constructor
-   /// @param pool a pool of contractors
    ContractorList(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
@@ -32,32 +40,28 @@ public:
    /// Default destructor
    ~ContractorList() = default;
 
-   /// @return the number of contractors
+   /// Returns the number of contractors
    size_t poolSize() const;
 
-   /// @return the pool
+   /// Returns the pool
    SharedContractorPool getPool() const;
 
    /// Sets the pool
-   /// @param pool new pool of contractors
    void setPool(SharedContractorPool pool);
 
    /// Inserts a contractor at the end of this
-   /// @param op a contractor
    void push(SharedContractor op);
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    SharedContractorPool pool_;
 };
 
 /// Type of shared pointers on list contractors
-typedef std::shared_ptr<ContractorList> SharedContractorList;
+using SharedContractorList = std::shared_ptr<ContractorList>;
 
 } // namespace
 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorFactory.hpp
+ * @brief  Factory of interval contractors
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_FACTORY_HPP
 #define REALPAVER_CONTRACTOR_FACTORY_HPP
@@ -24,16 +35,16 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a factory of interval contractors given a problem.
-///
-/// The contractors are paramleterized by values found in an environment.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Factory of interval contractors on a problem.
+ *
+ * The contractors are parameterized by values found in an environment.
+ * A DAG is created from equations and inequality constraints of the given
+ * problem and the contractors are based on it.
+ */
 class ContractorFactory {
 public:
-   /// Creates a factory on a problem
-   /// @param pbm the input problem
-   /// @param env an environment for the parameters
+   /// Creates a factory given a problem and an environment for the parameters
    ContractorFactory(const Problem& pbm, std::shared_ptr<Env> env);
 
    /// Default destructor
@@ -45,64 +56,81 @@ public:
    /// No assignment
    ContractorFactory& operator=(const ContractorFactory&) = delete;
 
-   /// @return the environment of this
+   /// Returns the environment of this
    std::shared_ptr<Env> getEnv() const;
 
-   /// @return the dag of equations and inequality constraints
+   /// Returns the dag of equations and inequality constraints
    SharedDag getDag() const;
 
-   /// @return an interval smear sum rel object created for each equation and
-   ///         inequality constraint
+   /// Returns an IntervalSmearSumRel object on the DAG
    std::shared_ptr<IntervalSmearSumRel> makeSSR();
 
-   /// Creates a contractor that implements a constraint propagation algorithm
-   /// based on HC4 contractors
-   /// @return the contractor
-   ///
-   /// An HC4 contractor is created for each equation and inequality constraint.
-   /// A constraint contractor is created for each other constraint.
-   /// A domain contractor is created for each variable whose initial domain
-   /// is not connected.
+   /**
+    * @brief Returns an HC4 contractor.
+    * 
+    * Creates a contractor that implements a constraint propagation algorithm
+    * based on HC4 contractors.
+    * - An HC4 contractor is created for each equation and inequality
+    *   constraint.
+    * - A constraint contractor is created for each other constraint.
+    * - A domain contractor is created for each variable whose initial domain
+    *   is not connected.
+    */
    SharedContractorHC4 makeHC4();
 
-   /// Creates a contractor that implements a constraint propagation algorithm
-   /// based on BC4 contractors
-   /// @return the propagator
-   ///
-   /// A BC4 contractor is created for each equation or inequality constraint.
-   /// A constraint contractor is created for each other constraint.
-   /// A domain contractor is created for each variable whose initial domain
-   /// is not connected.
+   /**
+    * @brief Returns a BC4 contractor.
+    * 
+    * Creates a contractor that implements a constraint propagation algorithm
+    * based on BC4 contractors.
+    * - A BC4 contractor is created for each equation or inequality constraint.
+    * - A constraint contractor is created for each other constraint.
+    * - A domain contractor is created for each variable whose initial domain
+    *   is not connected.
+    */
    SharedContractorBC4 makeBC4();
 
-   /// Creates a contractor that applies CID contractors in sequence
-   /// @return the contractor
-   ///
-   /// The contractor for slices is created by makeHC4().
+   /**
+    * @brief Returns an ACID contractor.
+    * 
+    * Creates a contractor that applies CID contractors in sequence. The
+    * contractor for slices is created by makeHC4().
+    */
    SharedContractor makeACID();
 
-   /// Creates an interval Newton operator associated with the equations
-   /// @return the interval Newton operator associated with the equations
-   ///         if there are at least two equations and the system is square,
-   ///         nullptr otherwise
+   /**
+    * @brief Returns an interval Newton operator.
+    * 
+    * Creates an interval Newton operator associated with the equations if
+    * there are at least two equations and the system is square, nullptr
+    * otherwise.
+    */
    std::shared_ptr<IntervalNewton> makeIntervalNewton();
 
-   /// Creates a domain contractor for each variable whose initial domain
-   /// is not connected
-   /// @return the contractor if there is at least one such variable,
-   ///         nullptr otherwise
+   /**
+    * @brief Returns a domain contractor.
+    * 
+    * Creates a domain contractor for each variable whose initial domain
+    * is not connected if there is at least one such variable, nullptr
+    * otherwise.
+    */
    std::shared_ptr<ContractorDomain> makeContractorDomain();
 
-   /// Creates a contractor that applies HC4 followed by intervzal Newton.
-   /// @return the contractor
-   ///
-   /// HC4 is created by makeHC4()
-   /// Newton is created by makeIntervalNewton()
+   /**
+    * @brief Returns an HC4+Newton contractor.
+    * 
+    * Creates a contractor that applies HC4 followed by interval Newton.
+    * - HC4 is created by makeHC4().
+    * - Newton is created by makeIntervalNewton().
+    */
    SharedContractor makeHC4Newton();
 
-   /// Creates a contractor that calculates the hull of a polytope
-   /// generated by a relaxation method.
-   /// @return the contractor
+   /**
+    * @brief Returns a polytope hull contractor.
+    * 
+    * Creates a contractor that calculates the hull of a polytope
+    * generated by a relaxation method.
+    */
    SharedContractorPolytope makePolytope();
 
 private:

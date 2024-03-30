@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorConstraint.hpp
+ * @brief  Contractor associated with a constraint
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_CONTRACTOR_CONSTRAINT_HPP
 #define REALPAVER_CONTRACTOR_CONSTRAINT_HPP
@@ -15,15 +26,14 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a contractor associated with a constraint.
-///
-/// This contractor simply calls the default contraction of the constraint.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Contractor associated with a constraint.
+ *
+ * This contractor simply calls the default contraction of the constraint.
+ */
 class ContractorConstraint : public Contractor {
 public:
    /// Constructor
-   /// @param c constraint of this
    ContractorConstraint(Constraint c);
 
    /// Default copy constructor
@@ -35,13 +45,11 @@ public:
    /// Default destructor
    ~ContractorConstraint() = default;
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
-   /// @return the constraint enclosed in this
+   /// Returns the constraint enclosed in this
    Constraint getConstraint() const;
 
 private:
