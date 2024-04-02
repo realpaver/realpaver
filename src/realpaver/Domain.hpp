@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Domain.hpp
+ * @brief  Classes of domains
+ * @author Laurent Granvilliers
+ * @date   2023-11-19
+*/
 
 #ifndef REALPAVER_DOMAIN_HPP
 #define REALPAVER_DOMAIN_HPP
@@ -19,20 +30,24 @@
 
 namespace realpaver {
    
-/// domain types with explicit values that can be used as array indexes
+/// Domain types with explicit values that can be used as array indexes
 enum class DomainType {
-   Binary        = 0,
-   Interval      = 1,
-   IntervalUnion = 2,
-   Range         = 3,
-   RangeUnion    = 4
+   Binary        = 0,   ///< binary
+   Interval      = 1,   ///< continuous interval
+   IntervalUnion = 2,   ///< union of continuous intervals
+   Range         = 3,   ///< discrete range
+   RangeUnion    = 4    ///< union of discrete ranges
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a pure abstract class representing a variable domain.
-///
-/// The compatibility with intervals is ensured.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Base class representing a variable domain.
+ * 
+ * A domain is a set of values that can be assigned to a variable. It can be
+ * either discrete or continuous, connected or not. The compatibility with
+ * intervals is ensured.
+*/
 class Domain {
 public:
    /// Constructor
@@ -41,57 +56,51 @@ public:
    /// Virtual destructor
    virtual ~Domain();
 
-   /// @return the domain type
+   /// Returns the domain type
    DomainType type() const;
 
-   /// @return if this is a real domain then returns the width of this,
-   ///         returns the number of values in this otherwise
-   ///
-   /// If this is empty then the size must be equal to 0.
+   /**
+    * @brief Returns the size of this.
+    * 
+    * The size is defined as:
+    * - the width of the hull of this (continuous domain)
+    * - the number of values in this (discrete domain)
+    *
+    * If this is empty then the size must be equal to 0.
+    */
    virtual double size() const = 0;
 
-   /// @return true if this is empty
+   /// Returns true if this is empty
    virtual bool isEmpty() const = 0;
 
-   /// @return true if this is canonical (non empty and not splitable)
+   /// Returns true if this is canonical (non empty and not splitable)
    virtual bool isCanonical() const = 0;
 
    /// Returns the interval hull of this
    virtual Interval intervalHull() const = 0;
 
-   /// Contraction method
-   /// @param x an interval assigned to hull(x inter this)
+   /// Contracts x as hull(x inter this)
    virtual void contractInterval(Interval& x) const = 0;
 
-   /// Contraction method
-   /// @param x an interval such that this is assigned to (x inter this)
+   /// Contracts this as (x inter this)
    virtual void contract(const Interval& x) = 0;
 
-   /// @return true if this is connected, typically if it is a real interval
-   ///
-   /// The default implementation returns false
+   /// Returns true if this is connected (e.g. real interval)
    virtual bool isConnected() const;
 
-   /// @return true if this is a binary domain
-   ///
-   /// The default implementation returns false
+   /// Returns true if this is a binary domain
    virtual bool isBinary() const;
 
-   /// @return true if this is an integer domain
-   ///
-   /// The default implementation returns false
+   /// Returns true if this is an integer domain
    virtual bool isInteger() const;
 
-   /// @return true if this is a real domain
-   ///
-   /// The default implementation returns false
+   /// Rsturns true if this is a real domain
    virtual bool isReal() const;
 
-   /// @return a clone of this
+   /// Returns a clone of this
    virtual Domain* clone() const = 0;
 
-   /// prints this on a stream
-   /// @param os an output stream
+   /// Output a stream
    virtual void print(std::ostream& os) const = 0;
 
 private:
@@ -101,12 +110,12 @@ private:
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Domain& dom);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an interval domain.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Interval domain
 class IntervalDomain : public Domain {
 public:
-   /// Creates a domain
+   /// Constructor
    IntervalDomain(const Interval& x);
 
    /// Default copy constructor
@@ -118,14 +127,12 @@ public:
    /// Default destructor
    ~IntervalDomain() = default;
 
-   /// @return the interval enclosed
+   /// Returns the interval enclosed
    const Interval& getVal() const;
 
-   /// Setter
-   /// @param x an interval assigned to this
+   /// Assigns an interval to this
    void setVal(const Interval& x);
 
-   ///@{
    double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
@@ -136,23 +143,20 @@ public:
    bool isConnected() const override;
    IntervalDomain* clone() const override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    Interval val_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an interval union domain.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Interval union domain
 class IntervalUnionDomain : public Domain {
 public:
-   /// Creates a domain
-   /// @param u value assigned to this
+   /// Constructor
    IntervalUnionDomain(const IntervalUnion& u);
 
-   /// Creates a domain
-   /// @param l value assigned to this
+   /// Constructor
    IntervalUnionDomain(const std::initializer_list<Interval>& l);
 
    /// Default copy constructor
@@ -164,14 +168,12 @@ public:
    /// Default destructor
    ~IntervalUnionDomain() = default;
 
-   /// @return the interval union enclosed
+   /// Returns the interval union enclosed
    const IntervalUnion& getVal() const;
 
-   /// Setter
-   /// @param u an interval union assigned to this
+   /// Assigns an interval union to this
    void setVal(const IntervalUnion& u);
 
-   ///@{
    double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
@@ -181,19 +183,17 @@ public:
    void contract(const Interval& x) override;
    IntervalUnionDomain* clone() const override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    IntervalUnion val_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a range domain.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Range domain
 class RangeDomain : public Domain {
 public:
-   /// Creates a domain
-   /// @param r value assigned to this
+   /// Constructor
    RangeDomain(const Range& r);
 
    /// Default copy constructor
@@ -205,14 +205,12 @@ public:
    /// Default destructor
    ~RangeDomain() = default;
 
-   /// @return the range enclosed
+   /// Returns the range enclosed
    const Range& getVal() const;
 
-   /// Setter
-   /// @param r a range assigned to this
+   /// Assigns a range to this
    void setVal(const Range& r);
 
-   ///@{
    double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
@@ -222,23 +220,20 @@ public:
    void contract(const Interval& x) override;
    RangeDomain* clone() const override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    Range val_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a range union domain.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Range union domain
 class RangeUnionDomain : public Domain {
 public:
-   /// Creates a domain
-   /// @param u value assigned to this
+   /// Constructor
    RangeUnionDomain(const RangeUnion& u);
 
-   /// Creates a domain
-   /// @param l value assigned to this
+   /// Constructor
    RangeUnionDomain(const std::initializer_list<Range>& l);
 
    /// Default copy constructor
@@ -250,14 +245,12 @@ public:
    /// Default destructor
    ~RangeUnionDomain() = default;
 
-   /// @return the range union enclosed
+   /// Returns the range union enclosed
    const RangeUnion& getVal() const;
 
-   /// Setter
-   /// @param u a range union assigned to this
+   /// Assigns a range union to this
    void setVal(const RangeUnion& u);
 
-   ///@{
    double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
@@ -267,22 +260,20 @@ public:
    void contract(const Interval& x) override;
    RangeUnionDomain* clone() const override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    RangeUnion val_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a 0/1 domain.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// 0/1 domain
 class BinaryDomain : public Domain {
 public:
-   /// Creates a 0/1 domain
+   /// Constructor
    BinaryDomain();
 
-   /// Creates a 0/1 domain
-   /// @param zo value of this
+   /// Constructor
    BinaryDomain(const ZeroOne& zo);
 
    /// Default copy constructor
@@ -294,14 +285,12 @@ public:
    /// Default destructor
    ~BinaryDomain() = default;
 
-   /// @return the zero-one enclosed
+   /// Returns the zero-one enclosed
    const ZeroOne& getVal() const;
 
-   /// Setter
-   /// @param z a zero-one assigned to this
+   /// Assigns a zero-one to this
    void setVal(const ZeroOne& zo);
 
-   ///@{
    double size() const override;
    bool isEmpty() const override;
    bool isCanonical() const override;
@@ -311,7 +300,6 @@ public:
    void contract(const Interval& x) override;
    BinaryDomain* clone() const override;
    void print(std::ostream& os) const override;
-   ///@}
 
 private:
    ZeroOne val_;

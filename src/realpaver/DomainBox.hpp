@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   DomainBox.hpp
+ * @brief  Box of domains
+ * @author Laurent Granvilliers
+ * @date   2023-11-19
+*/
 
 #ifndef REALPAVER_DOMAIN_BOX_HPP
 #define REALPAVER_DOMAIN_BOX_HPP
@@ -16,17 +27,29 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a list of couples variable / domain.
-///
-/// It associates a scope and a vector of variable domains indexed by the
-/// local indexes of the variables from the scope.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Box of domains.
+ * 
+ * A box associates a scope and a vector of variable domains indexed by the
+ * local indexes of the variables from the scope.
+ * 
+ * The perimeter of a box is defined from its hull as the sum of the widths
+ * of its components.
+ * 
+ * The grid perimeter of a box is defined from its hull as the sum of the
+ * following quantities for each xi in Di with tolerance Ei:
+ * - 0.0 if Di has tolerance Ei
+ * - width(Di) / Ei (where Ei is the absolute tolerance of xi) otherwise
+ * 
+ * The gap between two boxes is defined as the gap between their interval hulls.
+ * 
+ * The glue method considers this and another box. For each variable v in some
+ * scope, the domain of v in this is assigned to an interval domain defined as
+ * the hull of this(v) and box(v).
+ */
 class DomainBox {
 public:
-   /// Creates a box
-   /// @param scop scope of this such that the domains are extracted from
-   ///        the variables
+   /// Constructor from a scope
    DomainBox(Scope scop);
 
    /// Copy constructor
@@ -38,113 +61,69 @@ public:
    /// Destructor
    ~DomainBox();
 
-   /// @return the scope of this (sorted set of variables)
+   /// Returns the scope of this (sorted set of variables)
    Scope scope() const;
 
-   /// @return the number of couples variable-domain
+   /// Returns the number of couples (variable, domain)
    size_t size() const;
 
-   /// @reeturn true if this is empty
+   /// Returns true if this is empty
    bool isEmpty() const;
 
-   /// Gets a domain in this
-   /// @param v a variable that belongs to the scope of this
-   /// @return the domain of v in this
+   /// Gets the domain of v in this
    Domain* get(const Variable& v) const;
 
-   /// Gets a domain in this
-   /// @param i an index between 0 and size()-1
-   /// @return the domain of the i-th variable in this
+   /// Gets the i-th domain in this with 0 <= i < size()
    Domain* get(size_t i) const;
 
-   /// Gets a variable in this
-   /// @param i an index between 0 and size()-1
-   /// @return the i-th variable of (the scope of) this
+   /// Gets the i-th variable in this with 0 <= i < size()
    Variable var(size_t i) const;
 
-   /// Assigns the domain of a variable in this
-   /// @param v a variable
-   /// @param p the new domain of v
-   ///
-   /// The ownership of the domain pointer is moved from p to this.
+   /**
+    * @brief Domain assignment.
+    * 
+    * Assigns the domain of v in this. The ownership of the domain pointer is
+    * moved from p to this.
+    */
    void set(const Variable& v, std::unique_ptr<Domain> p);
 
-   /// @return a clone of this
+   /// Returns a clone of this
    DomainBox* clone() const;
 
    /// Tests if the domain of a variable is splitable
-   /// @param v a variable in this
-   /// @return true if the domain of v in this has the desired tolerance
    bool isSplitable(const Variable& v) const;
 
-   /// Display on a stream with one variable per line
-   /// @param os an output stream
-   ///
-   /// Example:
-   /// x = [1.35, 1.36]
-   /// y = 2
+   /// Output on a stream with one couple (variable, domain) per line
    void listPrint(std::ostream& os) const;
 
-   /// Display on a stream using a vector notation
-   /// @param os an output stream
-   ///
-   /// Example:
-   /// (x = [1.35, 1.36], y = 2)
+   /// Output on a stream using a vector notation
    void vecPrint(std::ostream& os) const;
 
-   /// @return the width of the interval box corresponding to the hull of this
+   /// Returns the width of the interval box corresponding to the hull of this
    double width() const;
 
-   /// Gap between boxes
-   /// @param box a box
-   /// @return the maximum gap componentwise between this and B
-   ///
-   /// Assumption: this and box have the same scope
+   /// Returns the gap between this and box which must have the same scope
    double gap(const DomainBox& box) const;
 
-   /// Gap between boxes on a scope
-   /// @param box a box
-   /// @param scop a scope
-   /// @return the maximum gap componentwise between this and box
-   ///         restricted to scop
-   ///
-   /// Assumption: sco is included in the scopes of this and box
+   /// Returns the gap between this and box restricted to scop
    double gapOnScope(const DomainBox& box, const Scope& scop) const;
 
-   /// Glue another box in this
-   /// @param box a box whose scope contains the scope of this
-   ///
-   /// for each variable v in the scope of this, the domain of v in this
-   /// is assigned to an interval domain that is the hull of the input
-   /// domain of v in this and the domain of v in box
+   /// Glues another box in this
    void glue(const DomainBox& box);
 
-   /// Glue another box in this, restricted to some scope
-   /// @param box a box
-   /// @param scop a scope included in the scope of this and box
-   ///
-   /// for each variable v in the given scope, the domain of v in this
-   /// is assigned to an interval domain that is the hull of the input
-   /// domain of v in this and the domain of v in box
+   /// Glues another box in this restricted to scop
    void glueOnScope(const DomainBox& box, const Scope& scop);
 
-   /// @return the sum of the widths of the hulls of the components of this
+   /// Returns the perimeter of this
    double perimeter() const;
 
-   /// @return the sum of the widths of some components of this
-   /// @param scop the components considered
+   /// Returns the perimeter of this restricted to scop
    double perimeterOnScope(const Scope& scop) const;
 
-   /// @return the grid perimeter of this
-   ///
-   /// Given xi in Di with tolerance Ei for each i, the grid perimeter is the
-   /// sum for each i of the following quantity:
-   /// - 0.0 if Di has tolerance Ei
-   /// - width(Di) / Ei (where Ei is the absolute tolerance) otherwise
+   /// Returns the grid perimeter of this
    double gridPerimeter() const;
 
-   /// @return the grid perimeter for some components of this
-   /// @param scop the components considered   
+   /// Returns the grid perimeter of this restricted to scop
    double gridPerimeterOnScope(const Scope& scop) const;
 
 private:
@@ -152,7 +131,7 @@ private:
    std::vector<Domain*> doms_;   // domains
 };
 
-/// Display in a stream, calls vecPrint
+/// Output on a stream that calls box.vecPrint()
 std::ostream& operator<<(std::ostream& os, const DomainBox& box);
 
 } // namespace

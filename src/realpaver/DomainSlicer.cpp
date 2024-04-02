@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   DomainSlicer.cpp
+ * @brief  Classes of domain slicers
+ * @author Laurent Granvilliers
+ * @date   2023-11-19
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainSlicer.hpp"
@@ -62,7 +73,7 @@ std::unique_ptr<Domain> DomainSlicer::next(iterator& it)
    return p;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void BinaryDomainSlicer::applyImpl(Domain* dom)
 {
@@ -76,7 +87,7 @@ void BinaryDomainSlicer::applyImpl(Domain* dom)
    push(new BinaryDomain(ZeroOne::one()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void IntervalDomainBisecter::applyImpl(Domain* dom)
 {
@@ -93,7 +104,7 @@ void IntervalDomainBisecter::applyImpl(Domain* dom)
    push(new IntervalDomain(Interval(m, x.right())));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void IntervalUnionDomainBisecter::applyImpl(Domain* dom)
 {
@@ -124,7 +135,7 @@ void IntervalUnionDomainBisecter::applyImpl(Domain* dom)
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangeDomainBisecter::applyImpl(Domain* dom)
 {
@@ -141,7 +152,7 @@ void RangeDomainBisecter::applyImpl(Domain* dom)
    push(new RangeDomain(Range(m+1, r.right())));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangeUnionDomainBisecter::applyImpl(Domain* dom)
 {

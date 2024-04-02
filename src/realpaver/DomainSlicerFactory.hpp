@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   DomainSlicerFactory.hpp
+ * @brief  Factory of domain slicer maps
+ * @author Laurent Granvilliers
+ * @date   2023-11-19
+*/
 
 #ifndef REALPAVER_DOMAIN_SLICER_FACTORY_HPP
 #define REALPAVER_DOMAIN_SLICER_FACTORY_HPP
@@ -14,13 +25,14 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This class implements strategies for creating domain slicer maps.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Factory of domain slicer maps.
+ * 
+ * A factory implements various strategies for creating domain slicer maps.
+ */
 class DomainSlicerFactory {
 public:
-   /// Bisection strategy
-   /// @return the domain slicer map
+   /// Returns the domain slicer map implementing bisection
    static std::unique_ptr<DomainSlicerMap> makeBisectionStrategy();
 };
 

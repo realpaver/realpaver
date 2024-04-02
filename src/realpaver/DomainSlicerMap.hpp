@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   DomainSlicerMap.hpp
+ * @brief  Map of domain slicers
+ * @author Laurent Granvilliers
+ * @date   2023-11-19
+*/
 
 #ifndef REALPAVER_DOMAIN_SLICER_MAP_HPP
 #define REALPAVER_DOMAIN_SLICER_MAP_HPP
@@ -17,12 +28,10 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This registers slicers associated with domain types.
-///////////////////////////////////////////////////////////////////////////////
+/// Maps domain types to slicers
 class DomainSlicerMap {
 public:
-   /// Creates a map
+   /// Constructor
    DomainSlicerMap();
 
    /// Destructor
@@ -35,18 +44,12 @@ public:
    DomainSlicerMap& operator=(const DomainSlicerMap&) = delete;
 
    /// Associates a slicer with a domain type
-   /// @param type a domain type
-   /// @param slc a slicer
    void setSlicer(DomainType type, std::unique_ptr<DomainSlicer> slc);
 
-   /// Gets a slicer
-   /// @param type a domain type
-   /// @return the slicer associated with this type
+   /// Gets the slicer associated with a domain type
    DomainSlicer* getSlicer(DomainType type) const;
 
    /// Tests if a slicer is already associated with a domain type
-   /// @param type a domain type
-   /// @return true if a slicer is associated with this type
    bool hasSlicer(DomainType type) const;
 
 private:
