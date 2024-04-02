@@ -207,7 +207,7 @@ public:
 
 private:
    NcspHC4 hc4_;
-   NcspPolytope poly_;;
+   NcspPolytope poly_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ public:
 
 private:
    NcspBC4 bc4_;
-   NcspPolytope poly_;;
+   NcspPolytope poly_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -241,7 +241,7 @@ public:
 
 private:
    NcspACID acid_;
-   NcspPolytope poly_;;
+   NcspPolytope poly_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ public:
 
 private:
    NcspHC4Polytope hc4poly_;
-   NcspNewton newton_;;
+   NcspNewton newton_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -275,7 +275,7 @@ public:
 
 private:
    NcspBC4Polytope bc4poly_;
-   NcspNewton newton_;;
+   NcspNewton newton_;
 };
 
 
@@ -293,7 +293,7 @@ public:
 
 private:
    NcspACIDPolytope acidpoly_;
-   NcspNewton newton_;;
+   NcspNewton newton_;
 };
 
 } // namespace

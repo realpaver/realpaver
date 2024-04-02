@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Dag.cpp
+ * @brief  DAG of constraints
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
@@ -196,7 +207,7 @@ size_t DagNode::nbOccurrences(const Variable& v) const
    return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
       : DagNode(dag, index),
@@ -261,7 +272,7 @@ Interval DagConst::getConst() const
    return x_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagVar::DagVar(Dag* dag, size_t index, Variable v)
       : DagNode(dag, index),
@@ -332,7 +343,7 @@ Variable DagVar::getVar() const
    return v_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagOp::DagOp(Dag* dag, OpSymbol symb, const IndexList& lsub)
       : DagNode(dag),
@@ -437,7 +448,7 @@ void DagOp::reval(const RealPoint& pt)
    reval();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagAdd::DagAdd(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Add, lsub)
@@ -482,7 +493,7 @@ bool DagAdd::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSub::DagSub(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Sub, lsub)
@@ -527,7 +538,7 @@ bool DagSub::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagMul::DagMul(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Mul, lsub)
@@ -572,7 +583,7 @@ bool DagMul::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagDiv::DagDiv(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Div, lsub)
@@ -618,7 +629,7 @@ bool DagDiv::rdiff()
    return right()->rval() != 0.0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagMin::DagMin(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Min, lsub)
@@ -688,7 +699,7 @@ bool DagMin::rdiff()
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagMax::DagMax(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Max, lsub)
@@ -758,7 +769,7 @@ bool DagMax::rdiff()
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagUsb::DagUsb(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Usb, lsub)
@@ -800,7 +811,7 @@ bool DagUsb::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagAbs::DagAbs(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Abs, lsub)
@@ -860,7 +871,7 @@ bool DagAbs::rdiff()
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSgn::DagSgn(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Sgn, lsub)
@@ -898,7 +909,7 @@ bool DagSgn::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSqr::DagSqr(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Sqr, lsub)
@@ -940,7 +951,7 @@ bool DagSqr::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Sqrt, lsub)
@@ -982,7 +993,7 @@ bool DagSqrt::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagPow::DagPow(Dag* dag, int n, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Pow, lsub),
@@ -1048,7 +1059,7 @@ bool DagPow::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagExp::DagExp(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Exp, lsub)
@@ -1090,7 +1101,7 @@ bool DagExp::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagLog::DagLog(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Log, lsub)
@@ -1132,7 +1143,7 @@ bool DagLog::rdiff()
    return child()->val().isCertainlyGtZero();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagCos::DagCos(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Cos, lsub)
@@ -1175,7 +1186,7 @@ bool DagCos::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSin::DagSin(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Sin, lsub)
@@ -1217,7 +1228,7 @@ bool DagSin::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagTan::DagTan(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Tan, lsub)
@@ -1259,7 +1270,7 @@ bool DagTan::rdiff()
    return val().isFinite();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagLin::DagLin(Dag* dag, const TermLin* t, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Lin, lsub),
@@ -1424,7 +1435,7 @@ Interval DagLin::getConstantValue() const
    return cst_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagCosh::DagCosh(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Cosh, lsub)
@@ -1466,7 +1477,7 @@ bool DagCosh::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSinh::DagSinh(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Sinh, lsub)
@@ -1508,7 +1519,7 @@ bool DagSinh::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagTanh::DagTanh(Dag* dag, const IndexList& lsub)
       : DagOp(dag, OpSymbol::Tanh, lsub)
@@ -1550,7 +1561,7 @@ bool DagTanh::rdiff()
    return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
       : dag_(dag),
@@ -2011,7 +2022,7 @@ double DagFun::realDeriv(const Variable& v) const
    return dag_->findVarNode(v.id())->rdv();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagContext::DagContext() : dom()
 {}
@@ -2035,7 +2046,7 @@ void DagContext::reset()
    dom.setAll(Interval::universe());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 Dag::Dag()
       : node_(),
@@ -2552,7 +2563,7 @@ void Dag::printIntervalValues(std::ostream& os) const
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagVisitor::~DagVisitor()
 {}
@@ -2672,7 +2683,7 @@ void DagVisitor::apply(const DagTanh* d)
    THROW("visit method not implemented");
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagFunCreator::DagFunCreator(DagFun* f): f_(f)
 {}
@@ -2845,7 +2856,7 @@ void DagFunCreator::apply(const DagTanh* d)
    f_->insertOpNode(aux);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagCreator::DagCreator(Dag* dag, Constraint c)
       : dag_(dag),
@@ -2935,7 +2946,7 @@ void DagCreator::apply(const ArithCtrIn* c)
    index_ = dag_->insertFun(f);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagTermCreator::DagTermCreator(Dag* dag)
       : dag_(dag),
