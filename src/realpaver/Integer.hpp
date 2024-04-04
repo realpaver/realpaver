@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Integer.hpp
+ * @brief  Class of safe integers
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTEGER_HPP
 #define REALPAVER_INTEGER_HPP
@@ -15,24 +26,23 @@
 
 namespace realpaver {
    
-///////////////////////////////////////////////////////////////////////////////
-/// This is a signed integer with checked underflows and overflows.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Signed integer with checked underflows and overflows.
+ * 
+ * Exceptions are thrown when underflows and overflows are detected.
+ */
 class Integer {
 public:
    /// type of value encapsulated in this
-   typedef long ValueType;
+   using ValueType = typedef long;
 
-   /// Creates an integer
-   /// @param n value of this
+   /// Constructor
    Integer(const int& n = 0);
 
-   /// Creates an integer
-   /// @param n value of this
+   /// Constructor
    Integer(const size_t& n);
 
-   /// Creates an integer
-   /// @param n value of this
+   /// Constructor
    Integer(const ValueType& n);
 
    /// Default copy constructor
@@ -44,52 +54,62 @@ public:
    /// Default destructor
    ~Integer() = default;
 
-   /// @return the smallest integer
+   /// Returns the smallest integer
    static ValueType MIN();
 
-   /// @return the greatest integer
+   /// Returns the greatest integer
    static ValueType MAX();
 
-   /// @return the value of this in double precision
+   /// Returns the value of this in double precision
    double toDouble() const;
 
-   /// @return casts this to an int if it is possible, throws an exception
-   ///         otherwise
+   /// Returns an int equivalent to this to an int if it is possible, throws an exception
+   /// otherwise
    int toInt() const;
 
-   /// Floor function
-   /// @param a a real number
-   /// @return the largest integer smaller than a if 'a' is representable,
-   ///         throws an exception otherwise
+   /**
+    * @brief Floor function.
+    * 
+    * Returns the largest integer smaller than a if 'a' is representable,
+    * throws an exception otherwise
+    */
    static Integer floor(const double& a);
 
-   /// Ceiling function
-   /// @param a a real number
-   /// @return the smallest integer greater than a if 'a' is representable,
-   ///         throws an exception otherwise
+   /**
+    * @brief Ceil function.
+    * 
+    * Return thes smallest integer greater than a if 'a' is representable,
+    * throws an exception otherwise
+    */
    static Integer ceil(const double& a);
 
-   /// @return the value of this
+   /// REeturns the value of this
    ValueType get() const;
 
-   /// @return true if this is even
+   /// Returns true if this is even
    bool isEven() const;
 
-   /// @return true if this is odd
+   /// Returns true if this is odd
    bool isOdd() const;
 
-   ///@{
-   /// Arithmetic operations with assignment
+   /// Addition with assignment
    Integer& operator+=(const Integer& other);
-   Integer& operator-=(const Integer& other);
-   Integer& operator*=(const Integer& other);
-   Integer& operator/=(const Integer& other);
-   Integer& operator++();
-   Integer& operator--();
-   ///@}
 
-   ///@{
-   /// Arithmetic operations and functions
+   /// Subtraction with assignment
+   Integer& operator-=(const Integer& other);
+
+   /// Multiplication with assignment
+   Integer& operator*=(const Integer& other);
+
+   /// Division with assignment
+   Integer& operator/=(const Integer& other);
+
+   /// Incrementation (prefix)
+   Integer& operator++();
+
+   /// Decrementation (prefix)
+   Integer& operator--();
+
    friend Integer operator+(const Integer& a, const Integer& b);
    friend Integer operator-(const Integer& a, const Integer& b);
    friend Integer operator-(const Integer& a);
@@ -106,17 +126,13 @@ public:
 
    friend Integer min(const Integer& a, const Integer& b);
    friend Integer max(const Integer& a, const Integer& b);
-   ///@}
 
-   ///@{
-   /// Comparison operators
    friend bool operator==(const Integer& a, const Integer& b);
    friend bool operator!=(const Integer& a, const Integer& b);
    friend bool operator>=(const Integer& a, const Integer& b);
    friend bool operator>(const Integer& a, const Integer& b);
    friend bool operator<=(const Integer& a, const Integer& b);
    friend bool operator<(const Integer& a, const Integer& b);
-   ///@}
 
    /// Output on a stream
    friend std::ostream& operator<<(std::ostream& os, const Integer& a);
@@ -134,27 +150,69 @@ private:
    static ValueType Abs(const ValueType& a);
 };
 
-/// output on a stream
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Integer& a);
 
-///@{
-/// Arithmetic operations and functions
+/// Addition
 Integer operator+(const Integer& a, const Integer& b);
+
+/// Subtraction
 Integer operator-(const Integer& a, const Integer& b);
+
+/// Unaru subtraction
 Integer operator-(const Integer& a);
+
+/// Multiplication
 Integer operator*(const Integer& a, const Integer& b);
+
+/// Division
 Integer operator/(const Integer& a, const Integer& b);
+
+/// Modulo
 Integer operator%(const Integer& a, int n);
+
+/// Absolute value
 Integer abs(const Integer& a);
+
+/// Square
 Integer sqr(const Integer& a);
+
+/// Division rounded downward
 Integer divFloor(const Integer& a, const Integer& b);
+
+/// Division rounded upward
 Integer divCeil(const Integer& a, const Integer& b);
+
+/// Square root rounded downward
 Integer sqrtFloor(const Integer& a);
+
+/// Square root rounded upward
 Integer sqrtCeil(const Integer& a);
+
+/// Minimum
 Integer min(const Integer& a, const Integer& b);
+
+/// Maximum
 Integer max(const Integer& a, const Integer& b);
-///@}
-   
+
+/// Comparison
+bool operator==(const Integer& a, const Integer& b);
+
+/// Comparison
+bool operator!=(const Integer& a, const Integer& b);
+
+/// Comparison
+bool operator>=(const Integer& a, const Integer& b);
+
+/// Comparison
+bool operator>(const Integer& a, const Integer& b);
+
+/// Comparison
+bool operator<=(const Integer& a, const Integer& b);
+
+/// Comparison
+bool operator<(const Integer& a, const Integer& b);
+
 } // namespace
 
 #endif

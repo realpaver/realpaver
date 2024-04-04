@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Exception.hpp
+ * @brief  Class of exceptions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_EXCEPTION_HPP
 #define REALPAVER_EXCEPTION_HPP
@@ -16,20 +27,22 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an exception.
-///
-/// Two macros are defined for convenience:
-/// - THROW(msg) throws an exception with message 'msg';
-/// - THROW_IF(cond,msg) throws an exception with message 'msg' if the
-///   condition 'cond' is true.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Class of exceptions.
+ * 
+ * Two macros are defined for convenience:
+ * - THROW(msg) throws an exception with message 'msg';
+ * - THROW_IF(cond,msg) throws an exception with message 'msg' if the
+ *   condition 'cond' is true.
+ */
 class Exception {
 public:
-   /// Creates an exception
-   /// @param msg      a message
-   /// @param filename name of the file where this exception is thrown
-   /// @param lineno   line number in the file
+   /**
+    * @brief Constructor.
+    * @param msg a message
+    * @param filename name of the file where this exception is thrown
+    * @param lineno line number in the file
+    */
    Exception(const std::string& msg, const std::string& filename = "",
              size_t lineno = 0);
 
@@ -42,16 +55,16 @@ public:
    /// Default destructor
    ~Exception() = default;
 
-   /// @return the full explanation of this
+   /// Returns the full explanation of this
    std::string what() const;
 
-   /// @return the message of this
+   /// Returns the message of this
    std::string message() const;
 
-   /// @return the name of the file where this exception is thrown
+   /// Returns the name of the file where this exception is thrown
    std::string filename() const;
 
-   /// @return the line number in the file
+   /// Returns the line number in the file
    size_t lineno() const;
 
 private:
