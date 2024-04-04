@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Interval.hpp
+ * @brief  Class of intervals
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_HPP
 #define REALPAVER_INTERVAL_HPP
@@ -17,70 +28,63 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an interval bounded by floats in double precision.
-///
-/// This class is a wrapper for an arithmetic interval library selected at
-/// configuration-time. An interval of this class just encloses an interval
-/// of the external library.
-///
-/// It provides the classical interval operations and the relational
-/// operations used to calculate constraint projections.
-///
-/// For example, let us consider the relation
-/// R = { (x, y, z) in R3 : z = x + y, x in Ix, y in Iy, z in Iz }.
-/// - addPX(Ix, Iy, Iz) returns the hull of the projection of R on x;
-/// - addPY(Ix, Iy, Iz) returns the hull of the projection of R on y;
-/// - addPZ(Ix, Iy, Iz) returns the hull of the projection of R on z.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Interval bounded by floats in double precision
+ *
+ * This class is a wrapper for an arithmetic interval library selected at
+ * configuration-time. An interval of this class just encloses an interval
+ * of the external library.
+ *
+ * It provides the classical interval operations and the relational
+ * operations used to calculate constraint projections.
+ *
+ * For example, let us consider the relation
+ * R = { (x, y, z) in R3 : z = x + y, x in Ix, y in Iy, z in Iz }.
+ * - addPX(Ix, Iy, Iz) returns the hull of the projection of R on x;
+ * - addPY(Ix, Iy, Iz) returns the hull of the projection of R on y;
+ * - addPZ(Ix, Iy, Iz) returns the hull of the projection of R on z.
+ */
 class Interval {
 public:
-   /// Creates an interval equal to the universe
+   /// @name Constructors
+   ///@{
+
+   /// Creates [-oo, +oo]
    Interval();
 
-   /// Creates a point interval
-   /// @param a value of the point interval
+   /// Creates [a, a]
    Interval(double a);
 
-   /// Creates an interval given its bounds
-   /// @param l left bound
-   /// @param r right bound
+   /// Creates [l, r]
    Interval(double l, double r);
 
-   /// Creates an interval fron a string
-   /// @param s string representation of a floating-point number
+   /// Creates [s, s]
    Interval(const std::string& s);
 
-   /// Creates an interval given its bounds
-   /// @param sl string representation of the left bound 
-   /// @param sr string representation of the right bound 
+   /// Creates [sl, sr]
    Interval(const std::string& sl, const std::string& sr);
 
-   /// Creates an interval fron a string
-   /// @param s string representation of a floating-point number
+   /// Creates [s, s]
    Interval(const char* s);
 
-   /// Creates an interval given its bounds
-   /// @param sl string representation of the left bound 
-   /// @param sr string representation of the right bound 
+   /// Creates [sl, sr]
    Interval(const char* sl, const char* sr);
 
    /// Default copy constructor
    Interval(const Interval&) = default;
+   ///@}
 
-   /// Creates a right-bounded interval
-   /// @param a value of the right bound
+   /// Creates [-oo, a]
    static Interval lessThan(double a);
 
-   /// Creates a left-bounded interval
-   /// @param a value of the left bound
+   /// Creates [a, +oo]
    static Interval moreThan(double a);
 
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   ///@{
-   /// Interval constants
+   /** @name Interval constants */
+   /** @{ */
    static Interval universe();
    static Interval positive();
    static Interval negative();
@@ -97,48 +101,46 @@ public:
    static Interval minusPiPlusPi();
    static Interval zeroPi();
    static Interval zeroTwoPi();
-   ///@}
+   /** @} */
 
-   ///@return the value of +infinity
+   /// Returns the value of +infinity
    static double infinity();
 
-   /// @return the left bound of this
+   /// Returns the left bound of this
    double left() const;
 
-   /// return the right bound of this
+   /// Returns the right bound of this
    double right() const;
 
    /// Assigns the left bound of this
-   /// @param a new value of the left bound
    void setLeft(double a);
 
    /// Assigns the right bound of this
-   /// @param a new value of the right bound
    void setRight(double a);
 
-   /// @return the width of this
+   /// Returns the width of this
    double width() const;
 
-   /// @return the radius of this
+   /// Returns the radius of this
    double radius() const;
 
-   /// @return the relative width of this
+   /// Returns the relative width of this
    double relWidth() const;
 
-   /// @return the midpoint of this
+   /// Returns the midpoint of this
    double midpoint() const;
 
-   /// @return the mignitude of this
+   /// Returns the mignitude of this
    double mig() const;
 
-   /// @return the magnitude of this
+   /// Returns the magnitude of this
    double mag() const;
 
    /// Assigns this interval to the empty set
    void setEmpty();
 
+   /// @name Tests
    ///@{
-   /// Tests
    bool isEmpty() const;
    bool isCanonical() const;
    bool isFinite() const;
@@ -151,8 +153,8 @@ public:
    bool isAnInt() const;
    ///@}
 
+   /// @name Set operations
    ///@{
-   /// Set operations
    bool contains(double a) const;
    bool strictlyContains(double a) const;
    bool contains(const Interval& other) const;
@@ -192,46 +194,42 @@ public:
    bool isStrictlyPositive() const;
    ///@}
 
-   /// Non intersection test
-   /// @param other an interval
-   /// @return true if this and other do not overlap
+   /// Returns true if this and other do not overlap
    bool isDisjoint(const Interval& other) const;
 
-   /// Intersection test
-   /// @param other an interval
-   /// @return true if this and other overlap
+   /// Returns true if this and other overlap
    bool overlaps(const Interval& other) const;
 
-   /// Hausdorff distance between intervals
-   /// @param other an interval
-   /// @return the distance between this and other
-   ///
-   /// Given this = [a, b] and other = [c, d], the distance is defined by
-   ///         max(|a-c|, |b-d|)
+   /**
+    * @brief Returns the Hausdorff distance between this and other.
+    *
+    * Given this = [a, b] and other = [c, d], the distance is defined by
+    * max(|a-c|, |b-d|)
+    */
    double distance(const Interval& other) const;
 
-   /// Gap between intervals
-   /// @param other an interval
-   /// @return the gap between this and other
-   ///
-   /// Given this = [a, b] and other = [c, d], the gap is equal to
-   ///    - +oo if an interval is empty
-   ///    - 0.0 if both intervals overlap
-   ///    - c-b if c>b
-   ///    - a-d if a>d
+   /**
+    * @brief Returns the Gap between this and other.
+    *
+    * Given this = [a, b] and other = [c, d], the gap is equal to:
+    * - +oo if an interval is empty
+    * - 0.0 if both intervals overlap
+    * - c-b if c>b
+    * - a-d if a>d
+    */
    double gap(const Interval& other) const;
 
-   ///@{
-   /// Intersection
+   /// Intersection with assignment
    Interval& operator&=(const Interval& other);
-   friend Interval operator&(const Interval& x, const Interval& y);
-   ///@}
 
-   ///@{
-   /// Interval hull
+   /// Intersection
+   friend Interval operator&(const Interval& x, const Interval& y);
+
+   /// Interval hull with assignment
    Interval& operator|=(const Interval& other);
+
+   /// Interval hull
    friend Interval operator|(const Interval& x, const Interval& y);
-   ///@}
 
    /// Set complement
    friend std::pair<Interval,Interval> complement(const Interval& x);
@@ -240,28 +238,28 @@ public:
    friend std::pair<Interval,Interval> setminus(const Interval& x,
                                                 const Interval& y);
 
-   /// Rounds an interval to integral bounds
-   /// @param x an interval
-   /// @return the largest interval of integers included in x
+   /**
+    * @brief Rounds an interval to integral bounds.
+    * 
+    * Returns the largest interval of integers included in x
+    */
    friend Interval round(const Interval& x);
 
-   /// Inflation method
-   /// @param delta a real > 1.0
-   /// @param chi a real > 0.0
-   /// @return the inflated interval
-   ///
-   /// Let x be this interval and let m(x) be the midpoint.
-   /// Returns m(x) + delta*(x - m(x)) + chi*[-1,1]
+   /**
+    * @brief Inflation method.
+    *
+    * Given delta > 1.0 and chi > 0.0, returns
+    * m(this) + delta*(this - m(this)) + chi*[-1,1]
+    */
    Interval inflate(double delta, double chi) const;
 
    /// Output on a stream
    friend std::ostream& operator<<(std::ostream& os, const Interval& x);
 
+   /// @name Addition
    ///@{
-   /// Addition
    Interval& operator+=(const Interval& other);
    friend Interval operator+(const Interval& x, const Interval& y);
-
    friend Interval addPX(const Interval& x, const Interval& y,
                          const Interval& z);
    friend Interval addPY(const Interval& x, const Interval& y,
@@ -270,11 +268,10 @@ public:
                          const Interval& z);
    ///@}
 
+   /// @name Subtraction
    ///@{
-   /// Subtraction
    Interval& operator-=(const Interval& other);
    friend Interval operator-(const Interval& x, const Interval& y);
-
    friend Interval subPX(const Interval& x, const Interval& y,
                          const Interval& z);
    friend Interval subPY(const Interval& x, const Interval& y,
@@ -283,19 +280,17 @@ public:
                          const Interval& z);
    ///@}
 
+   /// @name Unary subtraction
    ///@{
-   /// Unary subtraction
    friend Interval operator-(const Interval& x);
-
    friend Interval usubPX(const Interval& x, const Interval& y);
    friend Interval usubPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Multiplication
    ///@{
-   /// Multiplication
    Interval& operator*=(const Interval& other);
    friend Interval operator*(const Interval& x, const Interval& y);
-
    friend Interval mulPX(const Interval& x, const Interval& y,
                          const Interval& z);
    friend Interval mulPY(const Interval& x, const Interval& y,
@@ -304,14 +299,13 @@ public:
                          const Interval& z);
    ///@}
 
+   /// @name Division
    ///@{
-   /// Division
    Interval& operator/=(const Interval& other);
    friend Interval operator/(const Interval& x, const Interval& y);
 
    friend std::pair<Interval,Interval> extDiv(const Interval& x,
                                               const Interval& y);
-
    friend Interval divPX(const Interval& x, const Interval& y,
                          const Interval& z);
    friend Interval divPY(const Interval& x, const Interval& y,
@@ -320,81 +314,72 @@ public:
                          const Interval& z);
    ///@}
 
+   /// @name Square
    ///@{
-   /// Square
    friend Interval sqr(const Interval& x);
-
    friend Interval sqrPX(const Interval& x, const Interval& y);
    friend Interval sqrPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Square root
    ///@{
-   /// Square root
    friend Interval sqrt(const Interval& x);
-
    friend Interval sqrtPX(const Interval& x, const Interval& y);
    friend Interval sqrtPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Power function
    ///@{
-   /// Power function
    friend Interval pow(const Interval& x, int n);
-
    friend Interval powPX(const Interval& x, int n, const Interval& y);
    friend Interval powPY(const Interval& x, int n, const Interval& y);
    ///@}
 
+   /// @name Exponential
    ///@{
-   /// Exponential
    friend Interval exp(const Interval& x);
-
    friend Interval expPX(const Interval& x, const Interval& y);
    friend Interval expPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Logarithm
    ///@{
-   /// Logarithm
    friend Interval log(const Interval& x);
-
    friend Interval logPX(const Interval& x, const Interval& y);
    friend Interval logPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Sine
    ///@{
-   /// Sine
    friend Interval sin(const Interval& x);
-
    friend Interval sinPX(const Interval& x, const Interval& y);
    friend Interval sinPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Cosine
    ///@{
-   /// Cosine
    friend Interval cos(const Interval& x);
-
    friend Interval cosPX(const Interval& x, const Interval& y);
    friend Interval cosPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Tangent
    ///@{
-   /// Tangent
    friend Interval tan(const Interval& x);
    friend Interval tanPX(const Interval& x, const Interval& y);
    friend Interval tanPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Hyperbolic cosine
    ///@{
-   /// Hyperbolic cosine
    friend Interval cosh(const Interval& x);
-
    friend Interval coshPX(const Interval& x, const Interval& y);
    friend Interval coshPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Hyperbolic sine
    ///@{
-   /// Hyperbolic sine
    friend Interval sinh(const Interval& x);
-
    friend Interval sinhPX(const Interval& x, const Interval& y);
    friend Interval sinhPY(const Interval& x, const Interval& y);
    ///@}
@@ -402,23 +387,20 @@ public:
    ///@{
    /// Hyperbolic tangent
    friend Interval tanh(const Interval& x);
-
    friend Interval tanhPX(const Interval& x, const Interval& y);
    friend Interval tanhPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Absolute value
    ///@{
-   /// Absolute value
    friend Interval abs(const Interval& x);
-
    friend Interval absPX(const Interval& x, const Interval& y);
    friend Interval absPY(const Interval& x, const Interval& y);
    ///@}
 
+   /// @name Minimum function
    ///@{
-   /// Minimum function
    friend Interval min(const Interval& x, const Interval& y);
-
    friend Interval minPX(const Interval& x, const Interval& y,
                          const Interval& z);
    friend Interval minPY(const Interval& x, const Interval& y,
@@ -427,10 +409,9 @@ public:
                          const Interval& z);
    ///@}
 
+   /// @name Maximum function
    ///@{
-   /// Maximum function
    friend Interval max(const Interval& x, const Interval& y);
-
    friend Interval maxPX(const Interval& x, const Interval& y,
                          const Interval& z);
    friend Interval maxPY(const Interval& x, const Interval& y,
@@ -439,20 +420,18 @@ public:
                          const Interval& z);
    ///@}
 
+   /// @name Sign function
    ///@{
-   /// Sign function
    friend Interval sgn(const Interval& x);
-
    friend Interval sgnPX(const Interval& x, const Interval& y);
    friend Interval sgnPY(const Interval& x, const Interval& y);   
    ///@}
 
 private:
-   typedef IntervalTraits<RawInterval> Traits;
+   using Traits = IntervalTraits<RawInterval>;
    RawInterval impl_;    // interval enclosed
 
-   /// Creates an interval
-   /// @param x raw interval enclosed in this
+   /// Constructor
    Interval(const Interval::Traits::interval& x);
 };
 

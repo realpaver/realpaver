@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalBox.hpp
+ * @brief  Class of interval boxes
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_BOX_HPP
 #define REALPAVER_INTERVAL_BOX_HPP
@@ -19,56 +30,56 @@ namespace realpaver {
 
 class DomainBox;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a scoped interval vector.
-///////////////////////////////////////////////////////////////////////////////
+/// Scoped interval vector
 class IntervalBox : public IntervalVector {
 public:
-   /// Creates an interval box
-   /// @param scop scope of this
-   ///
-   /// The domains in this are assigned to the hull of domains enclosed in the
-   /// variables
+   /// @name Constructors
+   ///@{
+
+   /**
+    * @brief Constructor from a scope.
+    * 
+    * Each variable from scop is assigned to the hull of its domain.
+    */
    IntervalBox(Scope scop);
 
-   /// Creates an interval box
-   /// @param scop scope of this
-   /// @param x interval assigned to each element of this
+   /**
+    * @brief Constructor from a scope and an interval.
+    * 
+    * Each variable from scop is assigned to x.
+    */
    IntervalBox(Scope scop, const Interval& x);
 
-   /// Creates an interval box
-   /// @param scop scope of this
-   /// @param X interval vector having the same size than sco
-   ///
-   /// The i-th variable in scop is assigned to X[i] for each i.
+   /**
+    * @brief Constructor from a scope and an interval vector.
+    * 
+    * For each i, the i-th variable from scop is assigned to X[i].
+    */
    IntervalBox(Scope scop, const IntervalVector& X);
 
-   /// Creates an interval box
-   /// @param scop scope of this
-   /// @param X real vector having the same size than scop
-   ///
-   /// The i-th variable in scop is assigned to X[i] for each i.
+   /**
+    * @brief Constructor from a scope and a real vector.
+    * 
+    * For each i, the i-th variable from scop is assigned to X[i].
+    */
    IntervalBox(Scope scop, const RealVector& X);
 
-   /// Creates an interval box
-   /// @param pt a real point assigned to this
+   /// Constructor from a point
    IntervalBox(const RealPoint& pt);
 
-   /// Creates an interval box
-   /// @param box a domain box
-   ///
-   /// this is the interval hull of the given box
+   /// Constructor of the hull of a domain box
    IntervalBox(const DomainBox& box);
 
    /// Default copy constructor
    IntervalBox(const IntervalBox&) = default;
 
-   /// Creates a box from another box projected on a scope
-   /// @param B an interval box
-   /// @param scop a scope that is included in the scope of B
-   ///
-   /// this is equal to B restricted to scop
+   /**
+    * @brief Constructor of a sub-box.
+    * 
+    * Assigns this to B restricted to scop
+    */
    IntervalBox(const IntervalBox& B, Scope scop);
+   ///@}
 
    /// Default assignment operator
    IntervalBox& operator=(const IntervalBox&) = default;
@@ -76,210 +87,160 @@ public:
    /// Default destructor
    ~IntervalBox() = default;
 
-   /// @return the scope of this (sorted set of variables)
+   /// Returns the scope of this (sorted set of variables)
    Scope scope() const;
 
-   /// Gets an element in this
-   /// @param v a variable that belongs to the scope of this
-   /// @return the interval value of v in this
-   ///
-   /// This masks the access by index.
+   /// Gets the domain of v
    Interval get(const Variable& v) const;
 
-   /// Sets an element of this
-   /// @param v a variable that belongs to the scope of this
-   /// @param x interval assigned to v in this
-   ///
-   /// This masks the access by index.
+   /// Sets the domain of v to x
    void set(const Variable& v, const Interval& x);
 
-   /// @return the midpoint of this
+   /// Returns the midpoint of this
    RealPoint midpoint() const;
 
-   /// @return the corner of this made from all the left bounds
+   /// Returns the corner of this made from all the left bounds
    RealPoint lCorner() const;
 
-   /// @return the corner of this made from all the right bounds
+   /// Returns the corner of this made from all the right bounds
    RealPoint rCorner() const;
 
-   /// Gets a corner of this
-   /// @param bs a bitset having the same size than the scope of this
-   /// @return a corner of this defined by 'bs'
-   ///
-   /// Let res be the result. For each i, res[i] is equal to the left bound of
-   /// the i-th component of this (the i-th variable in the scope) if bs[i] is
-   /// true, the right bound otherwise.
+   /**
+    * @brief Gets a corner of this.
+    * 
+    * The bitset bs defines the corner as follows. For each i, the i-th variable
+    * is assigned to the left bound in the resulting point if bs[i] is true, to
+    * the right bound otherwise.
+    */
    RealPoint corner(const Bitset& bs) const;
 
-   /// Gets a corner of this
-   /// @param bs a bitset having the same size than the scope of this
-   /// @return a corner of this defined by 'bs'
-   ///
-   /// Let res be the result. For each i, res[i] is equal to the right bound of
-   /// the i-th component of this (the i-th variable in the scope) if bs[i] is
-   /// true, the left bound otherwise.
+   /**
+    * @brief Gets a corner of this.
+    * 
+    * The bitset bs defines the corner as follows. For each i, the i-th variable
+    * is assigned to the left bound in the resulting point if bs[i] is false, to
+    * the right bound otherwise.
+    */
    RealPoint oppositeCorner(const Bitset& bs) const;
 
-   /// Set containment test
-   /// @param B a box whose scope is contained in the scope of this
-   /// @return true if B[v] is included in this[v] for each variable v
+   /// @name Set containment tests
+   ///@{
+
+   /// Returns true if this contains B
    bool contains(const IntervalBox& B) const;
 
-   /// Set containment test
-   /// @param B a box whose scope is contained in the scope of this
-   /// @return true if B[v] is strictly included in this[v] for each
-   ///         variable v
+   /// Returns true if this strictly contains B
    bool strictlyContains(const IntervalBox& B) const;
 
-   /// Set containment test
-   /// @param pt a point whose scope is contained in the scope of this
-   /// @return true if pt[v] belongs to this[v] for each variable v
+   /// Returns true if this contains pt
    bool contains(const RealPoint& pt) const;
 
-   /// Set containment test
-   /// @param pt a point whose scope is contained in the scope of this
-   /// @return true if pt[v] strictly belongs to this[v] for each variable v
+   /// Returns true if this strictly contains pt
    bool strictlyContains(const RealPoint& pt) const;
+   ///@}
 
    /// Tests if two boxes overlap
-   /// @param B a box having the same scope than this
-   /// @return true if this and B overlap
    bool overlaps(const IntervalBox& B) const;
 
-   /// Glue a box in this
-   /// @param B an interval box whose scope is included in the scope of this
-   ///
-   /// for each variable v in the scope of this, its domain in this is
-   /// assigned to the hull of its domain in this and its domain in B
+   /**
+    * @brief Glues a box in this.
+    * 
+    * For each variable v in the scope of this, its domain in this is assigned
+    * to the hull of its domain in this and its domain in B.
+    */
    void glue(const IntervalBox& B);
 
-   /// Glue a box in this, restricted to some scope
-   /// @param B an interval box
-   /// @param scop a scope included in the scope of this and B
-   ///
-   /// for each variable v in the given scope, its domain in this is
-   /// assigned to the hull of its domain in this and its domain in B
+   /**
+    * @brief Glues a box in this.
+    * 
+    * For each variable v in scop, its domain in this is assigned to the hull
+    * of its domain in this and its domain in B.
+    */
    void glueOnScope(const IntervalBox& B, const Scope& scop);
 
-   /// Assignment on a scope
-   /// @param B an interval box
-   /// @param scop a scope included in the scope of this and B
-   ///
-   /// this[scop] is assigned to B[sco]
+   /**
+    * @brief Assignment on a scope.
+    * 
+    * For each v in scope, this[v] is assigned to B[v].
+    */
    void setOnScope(const IntervalBox& B, const Scope& scop);
 
-   /// Midpoint of this on a scope
-   /// @param sco a scope included in the scope of this
-   /// @return midpoint of this restricted to sco
-   RealPoint midpointOnScope(const Scope& sco) const;
+   /**
+    * @brief Midpoint on a scope.
+    * 
+    * For each v in scop, the value of v in the resulting point is assigned
+    * to the midpoint of the domain of v in this.
+    */
+   RealPoint midpointOnScope(const Scope& scop) const;
 
-   /// Midpoint of this on a scope
-   /// @param scop a scope included in the scope of this
-   /// @param pt midpoint of this restricted to scop
+   /**
+    * @brief Midpoint on a scope.
+    * 
+    * For each v in scop, the value of v in pt is assigned to the midpoint of
+    * the domain of v in this.
+    */
    void midpointOnScope(const Scope& scop, RealPoint& pt) const;
 
-   /// Gets a sub-box
-   /// @param scop a scope included in the scope of this
-   /// @return this restricted to scop
+   /// Gets a sub-box of this restricted to scop
    IntervalBox subRegion(const Scope& scop) const;
 
-   /// Hausdorff distance between boxes
-   /// @param B an interval box
-   /// @return the maximum distance componentwise between this and B
-   ///
-   /// Assumption: this and B have the same scope
+   /// Returns Hausdorff distance between this and B
    double distance(const IntervalBox& B) const;
 
-   /// Hausdorff distance between boxes on a scope
-   /// @param B an interval box
-   /// @param scop a scope
-   /// @return the maximum distance componentwise between this and B
-   ///         restricted to scop
-   ///
-   /// Assumption: scop is included in the scopes of this and B
+   /// Returns the Hausdorff distance between this and B restricted to scop
    double distanceOnScope(const IntervalBox& B, const Scope& scop) const;
 
-   /// Gap between boxes
-   /// @param B an interval box
-   /// @return the maximum gap componentwise between this and B
-   ///
-   /// Assumption: this and B have the same scope
+   /// Returns the gap componentwise between this and B
    double gap(const IntervalBox& B) const;
 
-   /// Gap between boxes on a scope
-   /// @param B an interval box
-   /// @param scop a scope
-   /// @return the maximum gap componentwise between this and B
-   ///         restricted to scop
-   ///
-   /// Assumption: scop is included in the scopes of this and B
+   /// Returns the gap componentwise between this and B restricted to scop
    double gapOnScope(const IntervalBox& B, const Scope& scop) const;
 
-   /// Inflation method
-   /// @param scop a scope
-   /// @param delta a real > 1.0
-   /// @param chi a real > 0.0
-   ///
-   /// Let x be an interval of scop and let m(x) be its midpoint.
-   /// Then x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
+   /// Inflation method restricted to scop
    void inflateOnScope(const Scope& scop, double delta, double chi);
 
-   /// @return the sum of the widths of the components of this
+   /// Returns the sum of the widths of the components of this
    double perimeter() const;
 
-   /// @return the sum of the widths of some components of this
-   /// @param scop the components considered
+   /// Returns the sum of the widths of the components of this from scop
    double perimeterOnScope(const Scope& scop) const;
 
-   /// @return the grid perimeter of this
-   ///
-   /// Given xi in Di with tolerance Ei for each i, the grid perimeter is the
-   /// sum for each i of the following quantity:
-   /// - 0.0 if Di has tolerance Ei
-   /// - width(Di) / Ei (where Ei is the absolute tolerance) otherwise
+   /**
+    * @brief Returns the grid perimeter of this.
+    * 
+    *
+    * Given xi in Di with tolerance Ei for each i, the grid perimeter is the
+    * sum for each i of the following quantity:
+    * - 0.0 if Di has tolerance Ei
+    * - width(Di) / Ei (where Ei is the absolute tolerance) otherwise
+    */
    double gridPerimeter() const;
 
-   /// @return the grid perimeter for some components of this
-   /// @param scop the components considered   
+   /// Returns the grid perimeter of this restricted to scop
    double gridPerimeterOnScope(const Scope& scop) const;
 
-   /// Measures the gain ratio between two boxes
-   /// @param B a box that contains this, i.e. this is a reduced box
-   /// @return the gain ratio between this and B
-   ///
-   /// Given this = (X1, ..., Xn) and B = (B1, ..., Bn), the gain ratio
-   /// is equal to (1/n)*Sum(i=1, ..., n) (1 - wid(Xi)/wid(Bi))
+   /**
+    * @brief Measures the gain ratio between two boxes.
+    * 
+    *
+    * Given this = (X1, ..., Xn) and B = (B1, ..., Bn), the gain ratio
+    * is equal to (1/n)*Sum(i=1, ..., n) (1 - wid(Xi)/wid(Bi))
+    */
    double gainRatio(const IntervalBox& B) const;
 
    /// Measures the gain ratio between two boxes on a scope
-   /// @param B a box that contains this, i.e. this is a reduced box
-   /// @param scop a sub-scope of this and B
-   /// @return the gain ratio between this and B on the given scope
    double gainRatioOnScope(const IntervalBox& B, const Scope& scop) const;
 
-   ///@{
    IntervalBox* clone() const override;
    void print(std::ostream& os) const override;
-   ///@}
 
-   /// Display on a stream with one variable per line
-   /// @param os an output stream
-   ///
-   /// Example:
-   /// x = [1.35, 1.36]
-   /// y = [0, 0.01]
+   /// Outout on a stream with one variable per line
    void listPrint(std::ostream& os) const;
 
-   /// Display on a stream using a vector notation
-   /// @param os an output stream
-   ///
-   /// Example:
-   /// (x = [1.35, 1.36], y = [Ø, 0.01])
+   /// Output on a stream using a vector notation
    void vecPrint(std::ostream& os) const;
 
    /// Tests if the domain of a variable is splitable
-   /// @param v a variable in this
-   /// @return true if the domain of v in this has the desired tolerance
    bool isSplitable(const Variable& v) const;
 
 private:
@@ -287,7 +248,7 @@ private:
 };
 
 /// This is a shared interval box.
-typedef std::shared_ptr<IntervalBox> SharedIntervalBox;
+using SharedIntervalBox = std::shared_ptr<IntervalBox>;
 
 } // namespace
 

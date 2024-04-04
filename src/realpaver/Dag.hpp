@@ -1319,8 +1319,8 @@ public:
    /// Virtual destructor
    virtual ~DagVisitor();
 
-   /** @name Visit methods */
-   /** @{ */
+   /// @name Visit methods
+   ///@{
    virtual void apply(const DagConst* d);
    virtual void apply(const DagVar* d);
    virtual void apply(const DagAdd* d);
@@ -1344,7 +1344,7 @@ public:
    virtual void apply(const DagCosh* d);
    virtual void apply(const DagSinh* d);
    virtual void apply(const DagTanh* d);
-   /** @} */
+   ///@}
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1355,8 +1355,8 @@ public:
    /// Constructor given f the function built by the visit
    DagFunCreator(DagFun* f);
 
-   /** @name Visit methods */
-   /** @{ */
+   /// @name Visit methods
+   ///@{
    virtual void apply(const DagConst* d) override;
    virtual void apply(const DagVar* d) override;
    virtual void apply(const DagAdd* d) override;
@@ -1380,7 +1380,7 @@ public:
    virtual void apply(const DagCosh* d) override;
    virtual void apply(const DagSinh* d) override;
    virtual void apply(const DagTanh* d) override;
-   /** @} */
+   ///@}
 
 private:
    DagFun* f_;
