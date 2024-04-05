@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalFunctionUni.hpp
+ * @brief  Base class of univariate interval functions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_FUNCTION_UNI_HPP
 #define REALPAVER_INTERVAL_FUNCTION_UNI_HPP
@@ -14,9 +25,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of univariate interval functions.
-///////////////////////////////////////////////////////////////////////////////
+/// Base class of univariate interval functions
 class IntervalFunctionUni {
 public:
    /// Default constructor
@@ -31,14 +40,10 @@ public:
    /// Virtual destructor
    virtual ~IntervalFunctionUni();
 
-   /// Evaluates this
-   /// @param x
-   /// @return interval evaluation of this at x
+   /// Returns the evaluation of this on x
    virtual Interval eval(const Interval& x) = 0;
 
-   /// Differentiates this
-   /// @param x
-   /// @return interval derivative of this at x
+   /// Returns the interval derivative of this on x
    virtual Interval diff(const Interval& x) = 0;
 };
 
