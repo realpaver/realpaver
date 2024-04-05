@@ -64,7 +64,7 @@ public:
    bool usedNodeLimit() const;
 
    /// Sets a flag related to the preprocessing
--  void setPresolved(bool b = false);
+   void setPresolved(bool b = false);
 
    /// Returns true if a problem is solved at preprocessing
    bool isPresolved() const;

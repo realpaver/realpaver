@@ -34,7 +34,7 @@ namespace realpaver {
 class Integer {
 public:
    /// type of value encapsulated in this
-   using ValueType = typedef long;
+   using ValueType = long;
 
    /// Constructor
    Integer(const int& n = 0);
