@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalFunctionVector.hpp
+ * @brief  Vector of interval functions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 #define REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
@@ -16,10 +27,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of the hierarchy of representations of interval
-/// function vectors.
-///////////////////////////////////////////////////////////////////////////////
+/// Base class of the hierarchy of representations of interval function vectors
 class IntervalFunctionVectorRep {
 public:
    /// Default constructor
@@ -35,95 +43,107 @@ public:
    IntervalFunctionVectorRep&
    operator=(const IntervalFunctionVectorRep&) = delete;
 
-   /// @return the scope of this, i.e. the set of variables
+   /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
 
-   /// @return the number of variables in this
+   /// Returns the number of variables in this
    virtual size_t nbVars() const = 0;
 
-   /// @return the number of functions in this
+   /// Returns the number of functions in this
    virtual size_t nbFuns() const = 0;
 
-   /// @return the i-th function of this
+   /// Returns the i-th function of this
    virtual IntervalFunction fun(size_t i) const = 0;
 
-   /// Evaluates this
-   /// @param B domains of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in B
-   ///
-   /// val must have nbFuns() components.
+   /**
+    * @brief Evaluates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on B
+    * and val must have nbFuns() components
+    */
    virtual void eval(const IntervalBox& B, IntervalVector& val) = 0;
 
-   /// Evaluates this
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
-   ///
-   /// val must have nbFuns() components.
+   /**
+    * @brief Evaluates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * and val must have nbFuns() components
+    */
    virtual void pointEval(const RealPoint& pt, IntervalVector& val) = 0;
 
-   /// Differentiates this (calculates an interval Jacobian matrix)
-   /// @param B domains of variables
-   /// @param J Jacobian matrix of this in B such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns.
+   /**
+    * @brief Differentiates this (calculates an interval Jacobian matrix).
+    * 
+    * J is the Jacobian matrix of this on B such that we have the partial
+    * derivative dfi / dxj in the i-th row and j-th column of J.
+    * 
+    * J must have nbFuns() rows and nbVars() columns.
+    */
    virtual void diff(const IntervalBox& B, IntervalMatrix& J) = 0;
 
-   /// Evaluates and differentiates this
-   /// @param B domains of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in B
-   /// @param J Jacobian matrix of this in the box such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns; val must have
-   /// nbFuns() components.
+   /**
+    * @brief Evaluates and differentiates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * and val must have nbFuns() components
+    * 
+    * J is the Jacobian matrix of this on B such that we have the partial
+    * derivative dfi / dxj in the i-th row and j-th column of J.
+    * 
+    * J must have nbFuns() rows and nbVars() columns.
+    */
    virtual void evalDiff(const IntervalBox& B, IntervalVector& val,
                          IntervalMatrix& J) = 0;
 
-   /// Evaluates this and calculates the violation of the constraints
-   /// @param B domains of variables
-   /// @param val output vector such that val[i] is the evaluation of
-   ///        the i-th function in B
-   /// @param viol output vector such that viol[i] is the violation of the
-   ///        i-th function / constraint in B
+   /**
+    * @brief Evaluates this and calculates the violation of the constraints.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * and val must have nbFuns() components
+    * 
+    * viol[i] is the violation of the i-th function / constraint on B
+    */
    virtual void violation(const IntervalBox& B, IntervalVector& val,
                           RealVector& viol) = 0;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the main of interval function vectors.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Main class of interval function vectors.
+ * 
+ *  This encloses a shared pointer to its representation. It is a lightweight
+ *  object that can be copied and assigned.
+ */
 class IntervalFunctionVector {
 public:
+   /// @name Constructors
+   ///@{
+
    /// Creates an empty vector
    IntervalFunctionVector();
 
-   /// Constructor
-   /// @param dag a dag whose functions are added in this in the same order
+   /// Creates a vector corresponding to a DAG
    IntervalFunctionVector(SharedDag dag);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
+   /// Creates  a vector corresponding to a DAG built from a list of terms
    IntervalFunctionVector(const std::initializer_list<Term>& lt);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
-   /// @param li list of images (bounds) of those terms
+   /**
+    * @brief Constructor.
+    * 
+    * Creates  a vector corresponding to a DAG built from a list of terms and
+    * a list of bounds. For each i, we have lt[i] IN li[i].
+    */
    IntervalFunctionVector(const std::initializer_list<Term>& lt,
                           const std::initializer_list<Interval>& li);
 
-   /// Constructor
-   /// @param lf list of functions
+   /// Crestes a vector from a list of conctions
    IntervalFunctionVector(const std::initializer_list<IntervalFunction>& lf);
 
    /// Default copy constructor
    IntervalFunctionVector(const IntervalFunctionVector&) = default;
+   ///@}
 
    /// No assignment
    IntervalFunctionVector& operator=(const IntervalFunctionVector&) = delete;
@@ -131,102 +151,108 @@ public:
    /// Default destructor
    ~IntervalFunctionVector() = default;
 
-   /// @return the scope of this, i.e. the set of variables
+   /// Returns the scope of this, i.e. the set of variables
    Scope scope() const;
 
-   /// @return the number of variables in this
+   /// Returns the number of variables in this
    size_t nbVars() const;
 
-   /// @return the number of functions in this
+   /// Returns the number of functions in this
    size_t nbFuns() const;
 
-   /// @return true if nbVars() == nbFuns() and this is non empty
+   /// Returns true if nbVars() == nbFuns() and this is non empty
    bool isSquare() const;
 
-   /// @return the i-th function of this
+   /// Return sthe i-th function of this
    IntervalFunction fun(size_t i) const;
 
-   /// Inserts a function at the end
-   /// @param f function inserted
-   ///
-   /// It may be necessary to switch to another representation if the current
-   /// one is not a list.
+   /**
+    * @brief Inserts a function at the end.
+    * 
+    * It may be necessary to switch to another representation if the current
+    * one is not a list.
+    */
    void addFun(IntervalFunction f);
 
-   /// Evaluates this
-   /// @param B domains of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in B
-   ///
-   /// val must have nbFuns() components.
+   /**
+    * @brief Evaluates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on B
+    * and val must have nbFuns() components
+    */
    void eval(const IntervalBox& B, IntervalVector& val);
 
-   /// Evaluates this
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
-   ///
-   /// val must have nbFuns() components.
+   /**
+    * @brief Evaluates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * and val must have nbFuns() components
+    */
    void pointEval(const RealPoint& pt, IntervalVector& val);
 
-   /// Differentiates this (calculates an interval Jacobian matrix)
-   /// @param B domains of variables
-   /// @param J Jacobian matrix of this in B such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns.
+   /**
+    * @brief Differentiates this (calculates an interval Jacobian matrix).
+    * 
+    * J is the Jacobian matrix of this on B such that we have the partial
+    * derivative dfi / dxj in the i-th row and j-th column of J.
+    * 
+    * J must have nbFuns() rows and nbVars() columns.
+    */
    void diff(const IntervalBox& B, IntervalMatrix& J);
 
-   /// Evaluates and differentiates this
-   /// @param B domains of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this in B
-   /// @param J Jacobian matrix of this in the box such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns; val must have
-   /// nbFuns() components.
+   /**
+    * @brief Evaluates and differentiates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * and val must have nbFuns() components
+    * 
+    * J is the Jacobian matrix of this on B such that we have the partial
+    * derivative dfi / dxj in the i-th row and j-th column of J.
+    * 
+    * J must have nbFuns() rows and nbVars() columns.
+    */
    void evalDiff(const IntervalBox& B, IntervalVector& val, IntervalMatrix& J);
 
-   /// Evaluates this and calculates the violation of the constraints
-   /// @param B domains of variables
-   /// @param val output vector such that val[i] is the evaluation of
-   ///        the i-th function in B
-   /// @param viol output vector such that viol[i] is the violation of the
-   ///        i-th function / constraint in B
+   /**
+    * @brief Evaluates this and calculates the violation of the constraints.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * and val must have nbFuns() components
+    * 
+    * viol[i] is the violation of the i-th function / constraint on B
+    */
    void violation(const IntervalBox& B, IntervalVector& val, RealVector& viol);
 
-   /// type of the representation of interval functions vectors
-   typedef std::shared_ptr<IntervalFunctionVectorRep> SharedRep;
+   /// Type of the representation of interval functions vectors
+   using SharedRep = std::shared_ptr<IntervalFunctionVectorRep>;
 
-   /// @return the representation of this
+   /// Returns the representation of this
    SharedRep rep() const;
 
    /// Constructor
-   /// @param rep representation of this
    IntervalFunctionVector(SharedRep rep);
 
 private:
    SharedRep rep_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a vector of interval-valued functions based on a DAG such that
-/// all the functions of the DAG are considered.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Vector of interval functions reflecting a DAG
 class IntervalFunctionVectorDag : public IntervalFunctionVectorRep {
 public:
-   /// Constructor
-   /// @param dag a dag whose functions are added in this in the same order
+   /// Creates a vector corresponding to a DAG
    IntervalFunctionVectorDag(SharedDag dag);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
+   /// Creates  a vector corresponding to a DAG built from a list of terms
    IntervalFunctionVectorDag(const std::initializer_list<Term>& lt);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
-   /// @param li list of images (bounds) of those terms
+   /**
+    * @brief Constructor.
+    * 
+    * Creates  a vector corresponding to a DAG built from a list of terms and
+    * a list of bounds. For each i, we have lt[i] IN li[i].
+    */
    IntervalFunctionVectorDag(const std::initializer_list<Term>& lt,
                              const std::initializer_list<Interval>& li);
 
@@ -240,45 +266,34 @@ public:
    /// Default destructor
    ~IntervalFunctionVectorDag() = default;
 
-   /// @return the dag enclosed in this
+   /// Returns the dag enclosed in this
    SharedDag dag() const;
 
-   ///@{
    Scope scope() const override;
-
    size_t nbVars() const override;
-
    size_t nbFuns() const override;
-
    IntervalFunction fun(size_t i) const override;
-
    void eval(const IntervalBox& B, IntervalVector& val) override;
-
    void pointEval(const RealPoint& pt, IntervalVector& val) override;
-
    void diff(const IntervalBox& B, IntervalMatrix& J) override;
-
    void evalDiff(const IntervalBox& B, IntervalVector& val,
                  IntervalMatrix& J) override;
-
    void violation(const IntervalBox& B, IntervalVector& val,
                   RealVector& viol) override;
-   ///@}
 
 private:
    SharedDag dag_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a vector of interval-valued functions based on a a list.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Vector of interval-valued functions based on a list
 class IntervalFunctionVectorList : public IntervalFunctionVectorRep {
 public:
    /// Constructor of an empty function vector
    IntervalFunctionVectorList();
 
    /// Constructor
-   /// @param lf list of functions
    IntervalFunctionVectorList(const std::initializer_list<IntervalFunction>& lf);
 
    /// Default copy constructor
@@ -292,30 +307,19 @@ public:
    ~IntervalFunctionVectorList() = default;
 
    /// Inserts a function at the end
-   /// @param f function inserted
    void addFun(IntervalFunction f);
 
-   ///@{
    Scope scope() const override;
-
    size_t nbVars() const override;
-
    size_t nbFuns() const override;
-
    IntervalFunction fun(size_t i) const override;
-
    void eval(const IntervalBox& B, IntervalVector& val) override;
-
    void pointEval(const RealPoint& pt, IntervalVector& val) override;
-
    void diff(const IntervalBox& B, IntervalMatrix& J) override;
-
    void evalDiff(const IntervalBox& B, IntervalVector& val,
                  IntervalMatrix& J) override;
-
    void violation(const IntervalBox& B, IntervalVector& val,
                   RealVector& viol) override;
-   ///@}
 
 private:
    std::vector<IntervalFunction> vf_;

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalFunctionVector.cpp
+ * @brief  Vector of interval functions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalFunctionVector.hpp"
@@ -16,7 +27,7 @@ namespace realpaver {
 IntervalFunctionVectorRep::~IntervalFunctionVectorRep()
 {}
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionVector::IntervalFunctionVector()
       : rep_(nullptr)
@@ -154,7 +165,7 @@ void IntervalFunctionVector::violation(const IntervalBox& B,
    rep_->violation(B, val, viol);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorDag::IntervalFunctionVectorDag(SharedDag dag)
       : dag_(dag)
@@ -267,7 +278,7 @@ void IntervalFunctionVectorDag::violation(const IntervalBox& B,
    dag_->intervalViolation(viol);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorList::IntervalFunctionVectorList()
       : vf_(),

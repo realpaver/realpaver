@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalGaol.hpp
+ * @brief  Interface of the Gaol library
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_GAOL_HPP
 #define REALPAVER_INTERVAL_GAOL_HPP
@@ -42,14 +53,16 @@
 namespace realpaver {
 
 /// Raw interval type
-typedef gaol::interval RawInterval;
+using RawInterval = gaol::interval;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a specialization of the interval traits for Gaol.
-///
-/// The operations are either delegated to gaol if they are available in this
-/// library or implemented otherwise.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Specialization of the interval traits for Gaol.
+ * 
+ * @see IntervalTraits
+ * 
+ *  The operations are either delegated to gaol if they are available in this
+ *  library or implemented otherwise.
+ */
 template <>
 struct IntervalTraits<RawInterval> {
    typedef RawInterval interval;

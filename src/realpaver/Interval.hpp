@@ -58,16 +58,16 @@ public:
    /// Creates [l, r]
    Interval(double l, double r);
 
-   /// Creates [s, s]
+   /// Creates [s rounded downward, s rounded upward]
    Interval(const std::string& s);
 
-   /// Creates [sl, sr]
+   /// Creates [sl rounded downward, sr rounded upward]
    Interval(const std::string& sl, const std::string& sr);
 
-   /// Creates [s, s]
+   /// Creates [s rounded downward, s rounded upward]
    Interval(const char* s);
 
-   /// Creates [sl, sr]
+   /// Creates [sl rounded downward, sr rounded upward]
    Interval(const char* sl, const char* sr);
 
    /// Default copy constructor
