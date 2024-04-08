@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalNewton.hpp
+ * @brief  Interval Newton method
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_NEWTON_HPP
 #define REALPAVER_INTERVAL_NEWTON_HPP
@@ -16,13 +27,27 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the multivariate interval Newton method.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Multivariate interval Newton method.
+ * 
+ * Given a square system of equations F = 0 and a box, the contraction method
+ * is a fixed-point loop applying an inner step until a stopping criterion is
+ * verified. The inner step linearizes the system and applies the interval
+ * Gauss-Seidel method. The stopping criterion is verified in the following
+ * cases:
+ * - the box is empty;
+ * - the box is not improvement enough, the improvement factor being given by
+ *   a tolerance;
+ * - a maximum number of iterations is reached.
+ * The contraction method is not applied if the width of the box is smaller than
+ * a threshold.
+ * 
+ * The certification method tries to prove the existence of a solution in a box
+ * using an inflation-based algorithm.
+ */
 class IntervalNewton : public Contractor {
 public:
    /// Constructor
-   /// @param F vector of functions
    IntervalNewton(IntervalFunctionVector F);
 
    /// Destructor
@@ -34,70 +59,56 @@ public:
    /// No assignment
    IntervalNewton& operator=(const IntervalNewton&) = delete;
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& X) override;
    void print(std::ostream& os) const override;
-   ///@}
 
-   /// @return the interval GFauss Seidel operator of this
+   /// Returns the interval GFauss Seidel operator of this
    IntervalGaussSeidel* getGaussSeidel() const;
 
    /// Sets a limit of iterations of the contraction method
-   /// @param n new value of the limit
    void setMaxIter(size_t n);
 
-   /// @return the maximum number of iterations of the contraction method
+   /// Returns the maximum number of iterations of the contraction method
    size_t getMaxIter() const;
 
-   /// @return the tolerance on the distance between two consecutive intervals
-   ///         in the contraction method
+   /// Returns the improvement factor
    Tolerance getTol() const;
 
-   /// Sets the tolerance on the distance between two consecutive intervals
-   /// in the contraction method
-   /// @param tol absolute or relative tolerance
-   ///
-   /// The iteration stops if two consecutive boxes are close enough, i.e.
-   /// their distance is smaller than tol
+   /// Sets the improvement factor
    void setTol(const Tolerance& tol);
 
-   /// Tries to derive a proof certificate for the existence of a solution
-   /// in an interval box using an inflation-based algorithm
-   /// @param box a box
-   /// @return proof certificate
+   /// Assigns the threshold on the width of a box of the contraction method
+   void setWidthLimit(double val);
+
+   /// Returns the threshold on the width of a box of the contraction method
+   double getWidthLimit() const;
+
+   /**
+    * @brief Certification method.
+    * 
+    * Tries to derive a proof certificate for the existence of a solution in
+    * a box using an inflation-based algorithm. The box can be modified.
+    */
    Proof certify(IntervalBox& box);
 
-   /// @return parameter delta of inflation
+   /// Returns the parameter delta of the inflation algorithm
    double getInflationDelta() const;
 
-   /// Assigns the parameter delta of inflation
-   /// @param val new value
+   /// Assigns the parameter delta of the inflation algorithm
    void setInflationDelta(const double& val);
 
-   /// @return parameter chi of inflation
+   /// Returns the parameter chi of the inflation algorithm
    double getInflationChi() const;
 
-   /// Assigns the parameter chi of inflation
-   /// @param val new value
+   /// Assigns the parameter chi of the inflation algorithm
    void setInflationChi(const double& val);
 
    /// Sets a limit of iterations of the certification method
-   /// @param n new value of the limit
    void setCertifyMaxIter(size_t n);
 
-   /// @return the maximum number of iterations of the certification method
+   /// Returns the maximum number of iterations of the certification method
    size_t getCertifyMaxIter() const;
-
-   /// Assigns the threshold on the width of a box
-   /// @param val new value   
-   ///
-   /// The contration method is not applied if the width of the inut box
-   /// is greater than this value.
-   void setWidthLimit(double val);
-
-   /// @return the threshold on the width of a box
-   double getWidthLimit() const;
 
 private:
    IntervalFunctionVector F_;       // vector of interval functions

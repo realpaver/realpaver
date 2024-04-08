@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalVector.hpp
+ * @brief  Vector of intervals
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_VECTOR_HPP
 #define REALPAVER_INTERVAL_VECTOR_HPP
@@ -19,27 +30,23 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a vector of intervals.
-///
-/// The elements of a vector of size n are indexed from 0 to n-1.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Vector of intervals.
+ * 
+ * The elements of a vector of size n are indexed from 0 to n-1.
+ */
 class IntervalVector : public NumericVector<Interval> {
 public:
    /// Base class
-   typedef NumericVector<Interval> BaseType;
+   using BaseType = NumericVector<Interval>;
 
-   /// Creates a vector
-   /// @param n number of elements
-   /// @param x initialization value
+   /// Creates a vector with n elements assigned to x
    IntervalVector(size_t n = 0, const Interval& x = Interval::universe());
 
    /// Creates a vector from a list
-   /// @param l list of elements inserted in this
    IntervalVector(const std::initializer_list<Interval>& l);
 
-   /// Creates a vector
-   /// @param pt real vector assigned to this
+   /// Copy constructor
    IntervalVector(const RealVector& pt);
 
    /// Default copy constructor
@@ -51,142 +58,111 @@ public:
    /// Virtual destructor
    virtual ~IntervalVector();
 
-   /// Equality test
-   /// @param X a vector
-   /// @return true if this == X and both intervals are non empty,
-   ///         false otherwise
+   /// Returns true if this == X
    bool equals(const IntervalVector& X) const;
 
-   /// @param i an index between 0 and size()-1
-   /// @return the i-th element of this
+   /// Returns the i-th element of this
    Interval get(size_t i) const;
 
-   /// Sets an element of this
-   /// @param i an index between 0 and size()-1
-   /// @param x an interval
+   /// Sets the i-th element of this to x
    void set(size_t i, const Interval& x);
 
-   /// Assignds this to the empty vector (assigns the first component to empty)
+   /// Assigns this to the empty vector (assigns the first component to empty)
    void setEmpty();
 
-   /// @return true if one element of this is empty
+   /// Returns true if one element of this is empty
    bool isEmpty() const;
 
-   /// @return true every component of this is finite and non empty
+   /// Returns true every component of this is finite and non empty
    bool isFinite() const;
 
-   /// @return the width of this
+   /// Returns the width of this
    double width() const;
 
-   /// @return the midpoint of this
+   /// Returns the midpoint of this
    RealVector midpoint() const;
 
-   /// @return the corner of this made from all the left bounds
+   /// Returns the corner of this made from all the left bounds
    RealVector lCorner() const;
 
-   /// @return the corner of this made from all the right bounds
+   /// Returns the corner of this made from all the right bounds
    RealVector rCorner() const;
 
-   /// Gets a corner of this
-   /// @param bs a bitset indexed from 0 to size()-1
-   /// @return a corner of this defined by 'bs'
-   ///
-   /// Let res be the result. For each i, res[i] is equal to the left bound of
-   /// the i-th component of this if bs[i] is true, the right bound otherwise.
+   /**
+    * @brief Gets a corner of this.
+    * 
+    * Let res be the result. For each i, res[i] is equal to the left bound of
+    * the i-th component of this if bs[i] is true, the right bound otherwise.
+    */
    RealVector corner(const Bitset& bs) const;
 
-   /// Gets a corner of this
-   /// @param bs a bitset indexed from 0 to size()-1
-   /// @return a corner of this defined by 'bs'
-   ///
-   /// Let res be the result. For each i, res[i] is equal to the right bound of
-   /// the i-th component of this if bs[i] is true, the left bound otherwise.
+   /**
+    * @brief Gets a corner of this.
+    * 
+    * Let res be the result. For each i, res[i] is equal to the right bound of
+    * the i-th component of this if bs[i] is true, the left bound otherwise.
+    */
    RealVector oppositeCorner(const Bitset& bs) const;
 
-   /// Set containment test
-   /// @param X a vector having the same size than this
-   /// @return true if each X[i] is included in this[i]
+   /// Returns true if each X[i] is included in this[i]
    bool contains(const IntervalVector& X) const;
 
-   /// Set containment test
-   /// @param X a vector having the same size than this
-   /// @return true if each X[i] is strictly included in this[i]
+   /// Returns true if each X[i] is strictly included in this[i]
    bool strictlyContains(const IntervalVector& X) const;
 
-   /// Set containment test
-   /// @param X a vector having the same size than this
-   /// @return true if each X[i] belongs to this[i]
+   /// Return true if each X[i] belongs to this[i]
    bool contains(const RealVector& X) const;
 
-   /// Set containment test
-   /// @param X a vector having the same size than this
-   /// @return true if each X[i] strictly belongs to this[i]
+   /// Returns true if each X[i] strictly belongs to this[i]
    bool strictlyContains(const RealVector& X) const;
 
-   /// Set containment test
-   /// @return true if this contains 0.0
+   /// Returns true if this contains 0.0
    bool containsZero() const;
 
-   /// Set containment test
-   /// @return true if this strictly contains 0.0
+   /// Returns true if this strictly contains 0.0
    bool strictlyContainsZero() const;
 
-   /// Tests if two intervals overlap
-   /// @param X a vector having the same size than this
-   /// @return true if this and X overlap
+   /// Returns true if this and X overlap
    bool overlaps(const IntervalVector& X) const;
 
-   /// @return the one-norm of this
+   /// Returns the one-norm of this
    double l1Norm() const;
 
-   /// @return the infinite-norm of this
+   /// Returns the infinite-norm of this
    double linfNorm() const;
 
-   /// @return a clone of this
+   /// Returns a clone of this
    virtual IntervalVector* clone() const;
 
-   /// Hausdorff distance between vectors
-   /// @param X an interval vector
-   /// @return the maximum distance componentwise between this and X
+   /// Returns the Hausdorff distance between this and X
    double distance(const IntervalVector& X) const;
 
-   /// Gap between vectors
-   /// @param X an interval vector
-   /// @return the maximum gap componentwise between this and X
+   /// Returns the maximum gap componentwise between this and X
    double gap(const IntervalVector& X) const;
 
-   /// Inflation method
-   /// @param delta a real > 1.0
-   /// @param chi a real > 0.0
-   ///
-   /// Let x be an interval of this and let m(x) be its midpoint.
-   /// Then x is replaced by m(x) + delta*(x - m(x)) + chi*[-1,1].
+   /**
+    * @brief Inflation method.
+    * 
+    * Let delta > 1.0 and let chi > 0.0. Let x be an element of this and let
+    * m(x) be its midpoint. Then x is replaced by
+    * m(x) + delta*(x - m(x)) + chi*[-1,1].
+    */
    void inflate(double delta, double chi);
 
-   /// Scalar product
-   /// @param X a vector
-   /// @return the product of this and X
+   /// Returns the product of this and X
    Interval scalarProduct(const IntervalVector& X) const;
 };
 
-/// Multiplication
-/// @param A a real matrix
-/// @param X an interval vector
-/// @return A*X
+/// Returns A*X
 IntervalVector operator*(const RealMatrix& A, const IntervalVector& X);
 
-/// Unary subtraction
-/// @param X an interval vector
-/// @return -X
+/// Returns -X
 IntervalVector operator-(const IntervalVector& X);
 
-/// Subtraction
-/// @param X an interval vector
-/// @param Y an interval vector
-/// @return X-Y
+/// Returns X-Y
 IntervalVector operator-(const IntervalVector& X, const IntervalVector& Y);
 
-/// output on a stream
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, const IntervalVector& X);
 
 } // namespace

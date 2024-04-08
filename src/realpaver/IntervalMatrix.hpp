@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalMatrix.hpp
+ * @brief  Dense interval matrix
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_INTERVAL_MATRIX_HPP
 #define REALPAVER_INTERVAL_MATRIX_HPP
@@ -16,31 +27,26 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a matrix of intervals.
-///
-/// The elements of a matrix of size (n, m) are indexed from 0 to n-1 and
-/// 0 to m-1.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ *  @brief Dense interval matrix.
+ * 
+ *  The elements of a matrix of size (n, m) are indexed from 0 to n-1 and
+ *  0 to m-1.
+ */
 class IntervalMatrix : public NumericMatrix<Interval> {
 public:
    /// Base class
-   typedef NumericMatrix<Interval> BaseType;
+   using BaseType = NumericMatrix<Interval>;
 
-   /// Creates a matrix
-   /// @param nrows number of rows
-   /// @param ncols number of columns
-   /// @param x initialization value
+   /// Creates a matrix with nrows rows and ncols columns
    IntervalMatrix(size_t nrows, size_t ncols,
                   const Interval& x = Interval::zero());
    
-   /// Creates a matrix from a list
-   /// @param l list of elements inserted in this
+   /// Creates a matrix from a list of rows
    IntervalMatrix(const std::initializer_list<
                            std::initializer_list<Interval>>& l);
 
-   /// Creates a matrix
-   /// @param A matrix copied in this
+   /// Copy constructor from a real matrix
    IntervalMatrix(const RealMatrix& A);
 
    /// Default copy constructor
@@ -52,84 +58,72 @@ public:
    /// Default destructor
    ~IntervalMatrix() = default;
 
-   /// @return true if this is empty
+   /// Returns true if this is empty
    bool isEmpty() const;
 
-   /// Constant access
-   /// @param i a row index between 0 and nrows()-1
-   /// @param j a column index between 0 and ncols()-1
-   /// @return the element at position (i, j) of this
+   /// Gets the coefficient (i, j)
    Interval get(size_t i, size_t j) const;
 
-   /// Sets an element of this
-   /// @param i a row index between 0 and nrows()-1
-   /// @param j a column index between 0 and ncols()-1
-   /// @param x an interval
+   /// Sets the element (i, j) to x
    void set(size_t i, size_t j, const Interval& x);
 
-   /// Maximum absolute column sum norm
-   /// @return the L1-norm of this
+   /// Returns the L1-norm of this
    double l1Norm() const;
 
-   /// Maximum absolute row sum norm
-   /// @return the infinite-norm of this
+   /// Returns the infinite-norm of this
    double linfNorm() const;
 
-   /// @return the midpoint of this
+   /// Returns the midpoint of this
    RealMatrix midpoint() const;
 
-   /// @return the transpose of this
+   /// Returns the transpose of this
    IntervalMatrix transpose() const;
 
    /// Addition with assignment
-   /// @param A a matrix
-   /// @return a reference to this
-   ///
-   /// this is assigned to this + A
    IntervalMatrix& operator+=(const IntervalMatrix& A);
 
    /// Subtraction with assignment
-   /// @param A a matrix
-   /// @return a reference to this
-   ///
-   /// this is assigned to this - A
    IntervalMatrix& operator-=(const IntervalMatrix& A);
 
    /// Multiplication with assignment
-   /// @param a a scalar
-   /// @return a reference to this
-   ///
-   /// this is assigned to this * a
    IntervalMatrix& operator*=(double a);
 
    /// Division with assignment
-   /// @param a a scalar
-   /// @return a reference to this
-   ///
-   /// this is assigned to this / a
    IntervalMatrix& operator/=(double a);
 };
 
 /// Output on s stream
 std::ostream& operator<<(std::ostream& os, const IntervalMatrix& A);
 
-///@{
-/// Operators on real matrices
+/// Returns A+B
 IntervalMatrix operator+(const IntervalMatrix& A, const IntervalMatrix& B);
+
+/// Returns A-B
 IntervalMatrix operator-(const IntervalMatrix& A, const IntervalMatrix& B);
+
+/// Returns -A
 IntervalMatrix operator-(const IntervalMatrix& A);
 
+/// Returns a*B
 IntervalMatrix operator*(double a, const IntervalMatrix& B);
+
+/// Returns B*a
 IntervalMatrix operator*(const IntervalMatrix& B, double a);
+
+/// Returns A*B
 IntervalMatrix operator*(const IntervalMatrix& A, const IntervalMatrix& B);
 
+/// Returns A*X
 IntervalVector operator*(const IntervalMatrix& A, const IntervalVector& X);
+
+/// Returns A*X
 IntervalVector operator*(const IntervalMatrix& A, const RealVector& X);
 
+/// Returns A*B
 IntervalMatrix operator*(const RealMatrix& A, const IntervalMatrix& B);
 
+/// Returns B/a
 IntervalMatrix operator/(const IntervalMatrix& B, double a);
-///@}
 
 } // namespace
 

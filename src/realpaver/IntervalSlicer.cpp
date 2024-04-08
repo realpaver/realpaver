@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalSlicer.cpp
+ * @brief  Interval slicers
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalSlicer.hpp"
@@ -58,7 +69,7 @@ IntervalSlicer::reverse_iterator IntervalSlicer::rend()
    return cont_.rend();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void IntervalBisecter::applyImpl(const Interval& x)
 {
@@ -67,7 +78,7 @@ void IntervalBisecter::applyImpl(const Interval& x)
    push(Interval(m, x.right()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalPeeler::IntervalPeeler(double f) : IntervalSlicer()
 {
@@ -147,7 +158,7 @@ Interval IntervalPeeler::peelRight(const Interval& x) const
    return x.strictlyContains(c) ? Interval(c, x.right()) : x;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalPartitionMaker::IntervalPartitionMaker(size_t n)
 {
