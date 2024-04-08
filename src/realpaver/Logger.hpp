@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Logger.hpp
+ * @brief  Management of log files
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_LOGGER_HPP
 #define REALPAVER_LOGGER_HPP
@@ -31,56 +42,53 @@ enum class LogLevel {
    full         ///< verbose mode
 };
 
+/// Conversion function
 std::string LogLevelToString(LogLevel level);
+
+/// Conversion function
 LogLevel StringToLogLevel(const std::string& s);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a logger.
-///
-/// A logger can write log messages to a log file.
-/// The design of this class follows the singleton design pattern.
-///
-/// LOG(msg) writes a log.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Management of log files.
+ * 
+ * A logger can write log messages to a log file.
+ * The design of this class follows the singleton design pattern.
+ * 
+ * LOG(msg) writes a log.
+ */
 class Logger {
 public:
-   /// Connects the logger to a log file
-   /// @param level log level
-   /// @param filename name of the log file
+   /// Connects the logger to a log file given a log level and a filename
    static void init(LogLevel level, const std::string& path);
 
-   /// @return the instance
+   /// Returns the instance
    static Logger* getInstance();
 
-   /// @return the path of the log file
+   /// Returns the path of the log file
    std::string getPath() const;
 
-   /// @return the current log level of this
+   /// Returns the current log level of this
    LogLevel getLogLevel() const;
 
    /// Sets the log level of this
-   /// @param new log level
    void setLogLevel(LogLevel level);
 
-   /// @return the maximum size of a log file in bytes
+   /// Returns the maximum size of a log file in bytes
    unsigned long getMaxSize() const;
 
-   /// @return the current size of the log file in bytes
+   /// Returns the current size of the log file in bytes
    unsigned long getSize() const;
 
-   /// Sets the maximum size of a log file
-   /// @param nbytes maximum size of a log file in bytes
+   /// Sets the maximum size of a log in bytes
    void setMaxSize(unsigned long nbytes);
 
    /// Writes a message
    void log(LogLevel level, const std::string& msg);
 
-   /// @return the number of digits of floats when printed on a stream
+   /// Returns the number of digits of floats when printed on a stream
    std::streamsize floatPrecision() const;
 
    /// Assigns the number of digits of floats when printed on a stream
-   /// @param n a number of digits
-   /// @return the value before assignment
    std::streamsize setFloatPrecision(std::streamsize n);
 
    /// Inserts a new line in the log file

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2022 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   LPSolverHighs.hpp
+ * @brief  Wrapper class for the LP solver Highs
+ * @author Raphaël Chenouard
+ * @date   2023-2-19
+*/
 
 #ifndef REALPAVER_LPSOLVER_HIGHS_HPP
 #define REALPAVER_LPSOLVER_HIGHS_HPP
@@ -15,12 +26,12 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a wrapper class for the LP solver Highs.
-///
-/// It inherits the methods for creating a model from its base class.
-/// It implements the optimization method.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Wrapper class for the LP solver Highs.
+ *
+ * It inherits the methods for creating a model from its base class.
+ * It implements the optimization method.
+ */
 class LPSolver : public LPModel {
 public:
    /// Default constructor
@@ -35,20 +46,8 @@ public:
    /// No assignment
    LPSolver& operator=(const LPSolver&) = delete;
 
-   /// Optimization method
-   /// @return true if an optimal solution is found
-   ///
-   /// A Gurobi model is created first from the LP model. Then the initialSolve
-   /// method of Clp is executed.
-   bool optimize();
-
-   /// Optimization method which requires that optimize() has been called at
-   /// least once
-   /// @return true if an optimal solution is found
-   ///
-   /// Only the objective function is generated again from the LP model.
-   /// Then the initialSolve method of Clp is executed.
-   bool reoptimize();
+   bool optimize() override;
+   bool reoptimize() override;
 
 private:
    Highs* simplex_;
