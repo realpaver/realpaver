@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NLPSolverIpopt.cpp
+ * @brief  Implementation of NLP solver for Ipopt
+ * @author Raphaël Chenouard
+ * @date   2023-2-17
+*/
 
 #include <IpIpoptApplication.hpp>
 #include "realpaver/NLPSolverIpopt.hpp"
@@ -24,7 +35,6 @@ NLPSolver::NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs)
 
 NLPSolver::~NLPSolver()
 {}
-
 
 OptimizationStatus NLPSolver::minimize(const IntervalBox& box,
                                        const RealPoint& src)
@@ -45,7 +55,8 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox& box,
     status = app->Initialize();
 
     if (status != Ipopt::Solve_Succeeded) {
-        std::cerr << std::endl << std::endl << "*** Error during IPOPT initialization!" << std::endl;
+        std::cerr << std::endl << std::endl
+                  << "*** Error during IPOPT initialization!" << std::endl;
     }
     else
     {
@@ -71,12 +82,15 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox& box,
         }
         else
         {
-           std::cerr << std::endl << std::endl << "*** IPOPT FAILED!" << std::endl;
+           std::cerr << std::endl << std::endl << "*** IPOPT FAILED!"
+                     << std::endl;
         }
     }
 
     return status_;
 }
+
+/*----------------------------------------------------------------------------*/
 
 NLPSolver::LocalTNLP::LocalTNLP(NLPSolver* ls, SharedIntervalBox box,
                                 const RealPoint& start)
@@ -111,7 +125,8 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m,
     // TODO
     nnz_h_lag = 0;
 
-    // use the C style indexing (0-based).the numbering style used for row/col entries in the sparse matrix format 
+    // use the C style indexing (0-based).the numbering style used for row/col
+    // entries in the sparse matrix format 
     index_style = TNLP::C_STYLE;
 
     return true;
@@ -119,7 +134,8 @@ bool NLPSolver::LocalTNLP::get_nlp_info(Ipopt::Index& n, Ipopt::Index& m,
 
 bool NLPSolver::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l,
                                            Ipopt::Number* x_u, Ipopt::Index m,
-                                           Ipopt::Number* g_l, Ipopt::Number* g_u)
+                                           Ipopt::Number* g_l,
+                                           Ipopt::Number* g_u)
 {
     std::shared_ptr<RealFunctionVector> ctrs = ls_->ctrs();
     
@@ -143,7 +159,8 @@ bool NLPSolver::LocalTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l,
 
 bool NLPSolver::LocalTNLP::get_starting_point(Ipopt::Index n, bool init_x,
                                               Ipopt::Number* x, bool init_z,
-                                              Ipopt::Number* z_L, Ipopt::Number* z_U,
+                                              Ipopt::Number* z_L,
+                                              Ipopt::Number* z_U,
                                               Ipopt::Index m, bool init_lambda,
                                               Ipopt::Number* lambda)
 {
@@ -162,7 +179,8 @@ bool NLPSolver::LocalTNLP::get_starting_point(Ipopt::Index n, bool init_x,
 bool NLPSolver::LocalTNLP::eval_f(Ipopt::Index n, const Ipopt::Number* x,
                                   bool new_x, Ipopt::Number& obj_value)
 {
-    // compute obj_value, i.e. the value of the objective function, from x vector
+    // computes obj_value, i.e. the value of the objective function,
+    // from x vector
     const std::shared_ptr<RealFunction> obj = ls_->obj();
     Scope scop = ls_->obj()->scope();
     if (ls_->nbCtrs()>0) scop.insert(ls_->ctrs()->scope());
@@ -182,7 +200,9 @@ bool NLPSolver::LocalTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number* x,
     Scope scop = ls_->obj()->scope();
     if (ls_->nbCtrs()>0) scop.insert(ls_->ctrs()->scope());
     const Scope os = obj->scope();
-    // compute grad_f, i.e. the gradient of the objective function, from x vector
+
+    // computes grad_f, i.e. the gradient of the objective function,
+    // from x vector
     RealPoint pt(scop);
     for(size_t i=0; i<os.size();i++)
     {
@@ -219,7 +239,8 @@ bool NLPSolver::LocalTNLP::eval_g (Ipopt::Index n, const Ipopt::Number *x,
 bool NLPSolver::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x,
                                        bool new_x, Ipopt::Index m,
                                        Ipopt::Index nele_jac, Ipopt::Index *iRow,
-                                       Ipopt::Index *jCol, Ipopt::Number *values)
+                                       Ipopt::Index *jCol,
+                                       Ipopt::Number *values)
 {
     // compute values, i.e. the Jacobian of the constraints, from x vector where:
     // - nele_jac is the number of nonzeros in the Jacobian
@@ -278,7 +299,8 @@ bool NLPSolver::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x,
             {
                 if (ctrs->fun(j).scope().contains(s.var(i)))
                 {
-                    // std::cerr<<"J["<<j<<","<<i<<"]:"<<jac.get(j,cs.index(s.var(i)))<<std::endl;
+                    // std::cerr<<"J["<<j<<","<<i<<"]:"
+                    // <<jac.get(j,cs.index(s.var(i)))<<std::endl;
                     values[nb_val] = jac.get(j,cs.index(s.var(i)));
                 }
             }
@@ -288,9 +310,12 @@ bool NLPSolver::LocalTNLP::eval_jac_g (Ipopt::Index n, const Ipopt::Number *x,
     return true;
 }
 
-// bool NLPSolver::LocalTNLP::eval_h (Ipopt::Index n, const Ipopt::Number *x, bool new_x,Ipopt::Number obj_factor,
-//                         Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda, Ipopt::Index nele_hess,
-//                         Ipopt::Index *iRow, Ipopt::Index *jCol, Ipopt::Number *values)
+// bool NLPSolver::LocalTNLP::eval_h (Ipopt::Index n, const Ipopt::Number *x,
+// bool new_x,Ipopt::Number obj_factor,
+//                         Ipopt::Index m, const Ipopt::Number *lambda,
+// bool new_lambda, Ipopt::Index nele_hess,
+//                         Ipopt::Index *iRow, Ipopt::Index *jCol,
+// Ipopt::Number *values)
 // {
 //     // compute values for the Hessian matrix, where:
 //     // - obj_factor is the factor in front of the objective term in the Hessian, $ \sigma_f$. (input)
@@ -324,7 +349,8 @@ bool NLPSolver::LocalTNLP::get_list_of_nonlinear_variables
 
 void NLPSolver::LocalTNLP::finalize_solution(Ipopt::SolverReturn status,
                                 Ipopt::Index n, const Ipopt::Number* x,
-                                const Ipopt::Number* z_L, const Ipopt::Number* z_U,
+                                const Ipopt::Number* z_L,
+                                const Ipopt::Number* z_U,
                                 Ipopt::Index m, const Ipopt::Number* g,
                                 const Ipopt::Number* lambda,
                                 Ipopt::Number obj_value,

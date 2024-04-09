@@ -16,7 +16,7 @@
  * @brief  Classes of constraints
  * @author Laurent Granvilliers
  * @date   2022-5-6
-*/
+ */
 
 #ifndef REALPAVER_CONSTRAINT_HPP
 #define REALPAVER_CONSTRAINT_HPP
