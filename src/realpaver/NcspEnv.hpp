@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NcspEnv.hpp
+ * @brief  Environment for NCSP solver
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_NCSP_ENV_HPP
 #define REALPAVER_NCSP_ENV_HPP
@@ -14,9 +25,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an environment for NCSP solvers.
-///////////////////////////////////////////////////////////////////////////////
+/// Environment for NCSP solver
 class NcspEnv : public Env {
 public:
    /// Constructor
@@ -31,22 +40,19 @@ public:
    /// No assignment
    NcspEnv& operator=(const NcspEnv&) = delete;
 
-   /// Sets a flag that informs on the termination of a solving process
-   /// @param b true if the solving process is aborted due a solution limit
+   /// Determines if the solving process is aborted due a solution limit
    void setSolutionLimit(bool b = true);
 
-   /// @return true if a solving process is aborted due a solution limit
+   /// Returns true if a solving process is aborted due a solution limit
    bool usedSolutionLimit() const;
 
-   /// Sets a flag that informs on the solving process
-   /// @param b true if the a branch of the search tree is cut due a depth limit
+   /// Determines if the a branch of the search tree is cut due a depth limit
    void setDepthLimit(bool b = true);
 
-   /// @return true if the a branch of the search tree is cut due a depth limit
+   /// Returns true if the a branch of the search tree is cut due a depth limit
    bool usedDepthLimit() const;
 
-   /// @return true if no limit has been activated during the solving process
-   ///         that is a necessary condition for a complete search
+   /// Returns true if no limit has been activated during the solving
    bool usedNoLimit() const;
 
 private:

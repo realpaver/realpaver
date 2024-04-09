@@ -1,12 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
 
+/**
+ * @file   NcspSplit.cpp
+ * @brief  Splitting strategies of NCSP solver
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSplit.hpp"
@@ -103,7 +113,7 @@ DomainSlicerMap* NcspSplit::getSlicerMap() const
    return slicerMap_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspSplitRR::NcspSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : NcspSplit(scop, std::move(smap))
@@ -173,7 +183,7 @@ std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node,
    return std::make_pair(found, *it);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 double domainSize(const Variable& v, Domain* dom)
 {
@@ -238,7 +248,7 @@ std::pair<bool, Variable> NcspSplitLF::selectVar(const Scope& scop,
    return std::make_pair(found, vres);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspSplitSF::NcspSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : NcspSplit(scop, std::move(smap))
@@ -283,10 +293,9 @@ std::pair<bool, Variable> NcspSplitSF::selectVar(SharedNcspNode& node)
    return std::make_pair(found, vres);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
-NcspSplitSLF::NcspSplitSLF(Scope scop,
-                                     std::unique_ptr<DomainSlicerMap> smap)
+NcspSplitSLF::NcspSplitSLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : NcspSplit(scop, std::move(smap))
 {}
 
@@ -345,7 +354,7 @@ std::pair<bool, Variable> NcspSplitSLF::selectVar(SharedNcspNode& node)
                      std::make_pair(rfound, rvmax);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspSplitSSR::NcspSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
                            std::unique_ptr<DomainSlicerMap> smap)

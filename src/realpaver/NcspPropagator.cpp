@@ -1,12 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
 
+/**
+ * @file   NcspPropagator.cpp
+ * @brief  Propagators of NCSP solver
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 #include <algorithm>
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspPropagator.hpp"
@@ -69,7 +79,7 @@ Proof NcspPropagator::contract(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspHC4::NcspHC4(ContractorFactory& facto)
       : NcspPropagator()
@@ -83,7 +93,7 @@ Proof NcspHC4::contractImpl(NcspNode& node, NcspContext& ctx)
    return op_->contract(*B_);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspBC4::NcspBC4(ContractorFactory& facto)
       : NcspPropagator()
@@ -97,7 +107,7 @@ Proof NcspBC4::contractImpl(NcspNode& node, NcspContext& ctx)
    return op_->contract(*B_);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspNewton::NcspNewton(ContractorFactory& facto)
       : NcspPropagator()
@@ -118,8 +128,7 @@ Proof NcspNewton::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspPolytope::NcspPolytope(ContractorFactory& facto)
       : NcspPropagator()
@@ -140,7 +149,7 @@ Proof NcspPolytope::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspACID::NcspACID(ContractorFactory& facto)
       : NcspPropagator()
@@ -154,8 +163,7 @@ Proof NcspACID::contractImpl(NcspNode& node, NcspContext& ctx)
    return op_->contract(*B_);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspHC4Newton::NcspHC4Newton(ContractorFactory& facto)
       : NcspPropagator(),
@@ -175,7 +183,7 @@ Proof NcspHC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspBC4Newton::NcspBC4Newton(ContractorFactory& facto)
       : NcspPropagator(),
@@ -195,7 +203,8 @@ Proof NcspBC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
 NcspACIDNewton::NcspACIDNewton(ContractorFactory& facto)
       : NcspPropagator(),
         acid_(facto),
@@ -214,7 +223,7 @@ Proof NcspACIDNewton::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspHC4Polytope::NcspHC4Polytope(ContractorFactory& facto)
       : NcspPropagator(),
@@ -234,7 +243,7 @@ Proof NcspHC4Polytope::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspBC4Polytope::NcspBC4Polytope(ContractorFactory& facto)
       : NcspPropagator(),
@@ -254,7 +263,7 @@ Proof NcspBC4Polytope::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspACIDPolytope::NcspACIDPolytope(ContractorFactory& facto)
       : NcspPropagator(),
@@ -274,7 +283,7 @@ Proof NcspACIDPolytope::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspHC4PolytopeNewton::NcspHC4PolytopeNewton(ContractorFactory& facto)
       : NcspPropagator(),
@@ -294,7 +303,7 @@ Proof NcspHC4PolytopeNewton::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspBC4PolytopeNewton::NcspBC4PolytopeNewton(ContractorFactory& facto)
       : NcspPropagator(),
@@ -314,7 +323,7 @@ Proof NcspBC4PolytopeNewton::contractImpl(NcspNode& node, NcspContext& ctx)
    return proof;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspACIDPolytopeNewton::NcspACIDPolytopeNewton(ContractorFactory& facto)
       : NcspPropagator(),

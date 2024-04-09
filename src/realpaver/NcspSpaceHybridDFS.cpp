@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NcspSpaceHybridDFS.cpp
+ * @brief  Hybrid strategies
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #include <algorithm>
 #include <list>
@@ -26,12 +37,12 @@ std::ostream& operator<<(std::ostream& os, const HybridDFSStyle& style)
    return os;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 HybridNcspNodeSet::~HybridNcspNodeSet()
 {}
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 bool DepthNcspNodeSet::isEmpty() const
 {
@@ -64,7 +75,7 @@ SharedNcspNode DepthNcspNodeSet::getNode(size_t i) const
    return it->node;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 bool PerimeterNcspNodeSet::isEmpty() const
 {
@@ -97,7 +108,7 @@ SharedNcspNode PerimeterNcspNodeSet::getNode(size_t i) const
    return it->node;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 bool GridPerimeterNcspNodeSet::isEmpty() const
 {
@@ -130,7 +141,7 @@ SharedNcspNode GridPerimeterNcspNodeSet::getNode(size_t i) const
    return it->node;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 NcspSpaceHybridDFS::NcspSpaceHybridDFS(HybridDFSStyle style)
    : sta_(),

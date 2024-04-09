@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NcspSolver.hpp
+ * @brief  NCSP solver
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+*/
 
 #ifndef REALPAVER_NCSP_SOLVER_HPP
 #define REALPAVER_NCSP_SOLVER_HPP
@@ -22,30 +33,36 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a solver for Numerical CSPs.
-///
-/// A solver is a two-phase constraint solving algorithm. The first phase is
-/// a preprocessing step that tries to reduce the variable domains, to
-/// fix and then eliminate some variables, to detect inactive constraints
-/// or unfeasible constraints. The second phase is an interval-based
-/// branch-and-prune algorithm prameterized by several components.
-///
-/// The solver takes as input a problem that must be a NCSP. Its components
-/// are generated according to a Param object prm that can be assigned as
-/// follows:
-/// solver.getEnv()->setParam(prm);
-///
-/// After the solving phase, it is possible to read the solutions as follows:
-/// for (size_t i=0; i<solver.getNbSolutions(); ++i) {
-///    std::pair<IntervalBox, Proof> sol = solver.getSolution(i);
-/// }
-/// The scope of each solution is the one of the input problem.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Solver for Numerical CSPs.
+ *
+ * A solver is a two-phase constraint solving algorithm. The first phase is
+ * a preprocessing step that tries to reduce the variable domains, to
+ * fix and then eliminate some variables, to detect inactive constraints
+ * or unfeasible constraints. The second phase is an interval-based
+ * branch-and-prune algorithm prameterized by several components.
+ *
+ * The solver takes as input a problem that must be a NCSP. Its components
+ * are generated according to a Param object prm that can be assigned as
+ * follows:
+ * 
+   @verbatim
+   solver.getEnv()->setParam(prm);
+   @endverbatim
+ *
+ * After the solving phase, it is possible to read the solutions as follows:
+ * 
+   @verbatim
+   for (size_t i=0; i<solver.getNbSolutions(); ++i) {
+      std::pair<IntervalBox, Proof> sol = solver.getSolution(i);
+   }
+   @endverbatim
+ *
+ * The scope of each solution is the one of the input problem.
+ */
 class NcspSolver {
 public:
-   /// Creates a solver
-   /// @param problem a numerical constraint satisfaction problem
+   /// Constructor
    NcspSolver(const Problem& problem);
 
    /// Destructor
@@ -60,41 +77,41 @@ public:
    /// Solving method
    void solve();
 
-   /// @return the solving time in seconds
+   /// Returns the solving time in seconds
    double getSolvingTime() const;
 
-   /// @return the number of nodes processed
+   /// Returns the number of nodes processed
    int getTotalNodes() const;
 
-   /// @return the environment of this
+   /// Returns the environment of this
    std::shared_ptr<NcspEnv> getEnv() const;
 
-   /// @return the space of this
+   /// Returns the space of this
    NcspSpace* getSpace() const;
 
-   /// @return the preprocessor used by this
+   /// Returns the preprocessor used by this
    Preprocessor* getPreprocessor() const;
 
-   /// @return the number of solutions after the preprocessing / solving phase
+   /// Returns the number of solutions after the preprocessing / solving phase
    size_t nbSolutions() const;
 
-   /// Gets a solution after the preprocessing / solving phase
-   /// @param i an index between 0 and nbSolutions()-1
-   /// @return the i-th solution in this
-   ///
-   /// The scope of the box is the scope of the initial problem, i.e. it must
-   /// include the variables fixed at preprocessing time.
+   /**
+    * @brief Gets the i-th solution after the preprocessing / solving phase.
+    *
+    * The scope of the box is the scope of the initial problem, i.e. it must
+    * include the variables fixed at preprocessing time.
+    */
    std::pair<DomainBox, Proof> getSolution(size_t i) const;
 
-   /// @return the number of unexplored nodes after the solving phase
+   /// Returns the number of unexplored nodes after the solving phase
    size_t nbPendingNodes() const;
 
-   /// Gets a pending box after the solving phase
-   /// @param i an index between 0 and nbPendingNodes()-1
-   /// @return the i-th pending box in this
-   ///
-   /// The scope of the box is the scope of the initial problem, i.e. it must
-   /// include the variables fixed at preprocessing time.
+   /**
+    * @brief Gets the i-th pending box after the solving phase.
+    *
+    * The scope of the box is the scope of the initial problem, i.e. it must
+    * include the variables fixed at preprocessing time.
+    */
    DomainBox getPendingBox(size_t i) const;
 
 private:
