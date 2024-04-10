@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   PropagationAlg.hpp
+ * @brief  Constraint propagation algorithm
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_PROPAGATION_ALG_HPP
 #define REALPAVER_PROPAGATION_ALG_HPP
@@ -14,24 +25,24 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a constraint propagation algorithm.
-///
-/// A propagator implements an AC3-like  constraint propagation algorithm
-/// over a set of contractors. It is itself a contractor, hence it can be
-/// combined with other contractors in new propagators. This is a composite.
-///
-/// A propagator stops in three situations:
-/// - a doman is empty;
-/// - a maximum number of iterations is reached;
-/// - the domains are not reduced enough with respect to a given tolerance,
-///   i.e. for every variable the distance between two consecutive domains
-///   is smaller than the tolerance.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Constraint propagation algorithm.
+ *
+ * A propagator implements an AC3-like  constraint propagation algorithm
+ * over a set of contractors. It is itself a contractor, hence it can be
+ * combined with other contractors in new propagators. This is a composite.
+ *
+ * A propagator stops in three situations:
+ * - a doman is empty;
+ * - a maximum number of iterations is reached;
+ * - the domains are not reduced enough with respect to a given tolerance.
+ * 
+ * The tolerance represents an improvement factor, which is a percentage of
+ * reduction of the width of a box.
+ */
 class PropagationAlg : public Contractor {
 public:
-   /// Creates a propagator over a pool of contractors
-   /// @param pool a pool of contractors
+   /// Constructor given a pool of contractors
    PropagationAlg(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
@@ -43,43 +54,35 @@ public:
    /// Default destructor
    ~PropagationAlg() = default;
 
-   /// @return the number of contractors
+   /// Returns the number of contractors
    size_t poolSize() const;
 
-   /// @return the pool
+   /// Returns the pool
    SharedContractorPool getPool() const;
 
    /// Sets the pool
-   /// @param pool new pool of contractors   
    void setPool(SharedContractorPool pool);
 
    /// Inserts a contractor in this
-   /// @param op a contractor
    void push(SharedContractor op);
 
-   ///@{
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
-   ///@}
 
-   /// @return the tolerance used as stopping criterion
+   /// Returns the tolerance used as stopping criterion
    Tolerance getTol() const;
 
    /// Sets the tolerance used as stopping criterion
-   /// @param tol new value of the tolerance
    void setTol(Tolerance tol);
 
-   /// @return the maximum number of propagation steps
+   /// Returns the maximum number of propagation steps
    size_t getMaxIter() const;
 
    /// Sets the maximum number of propagation steps
-   /// @param n new value
    void setMaxIter(size_t n);
 
-   /// Gets a proof certificate after a contraction
-   /// @param i an index of a contractor between 0 and getNbContractors()
-   /// @return the proof returned by the i-th contractor of this
+   /// Gets the proof returned by the i-th contractor of this
    Proof proofAt(size_t i) const;
 
 private:
@@ -101,7 +104,7 @@ private:
 };
 
 /// Type of shared pointers on propagators
-typedef std::shared_ptr<PropagationAlg> SharedPropagationAlg;
+using SharedPropagationAlg = std::shared_ptr<PropagationAlg>;
 
 } // namespace
 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Prover.hpp
+ * @brief  Prover based on interval Newton
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_PROVER_HPP
 #define REALPAVER_PROVER_HPP
@@ -16,17 +27,20 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This provides proof certificates for solutions.
-///
-/// Given a set of constraints {C1, ..., Cm} and a box B, the certification
-/// process is as follows:
-/// - 
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Prover based on interval Newton.
+ *
+ * It implements an epsilon-inflation algorithm based on an interval Newton
+ * operator applied to square system of equations.
+ * 
+ * The epsilon-inflation algorithm has two parameters, delta and chi.
+ * 
+ * @see Inflator
+ * @see IntervalNewton
+ */
 class Prover {
 public:
    /// Constructor
-   /// @param p a problem
    Prover(const Problem& p);
 
    /// Destructor
@@ -39,34 +53,24 @@ public:
    Prover& operator=(const Prover&) = delete;
 
    /// Certification method
-   /// @param B a box
-   /// @return a certificate of proof of B with respect to the constraints
-   ///         of the given problem
    Proof certify(IntervalBox& B);
 
    /// Sets a limit of iterations of the Newton operator
-   /// @param n new value of the limit
    void setMaxIter(size_t n);
 
-   /// @return the maximum number of iterations of the Newton operator
+   /// Returns the maximum number of iterations of the Newton operator
    size_t getMaxIter() const;
 
-   /// @return parameter delta of the inflation technique of the certification
-   ///         technique of the Newton operator
+   /// Returns the value of delta
    double getInflationDelta() const;
 
-   /// Assigns the parameter delta of the inflation technique of the
-   /// certification technique of the Newton operator
-   /// @param val new value
+   /// Assigns delta
    void setInflationDelta(const double& val);
 
-   /// @return parameter chi of the inflation technique of the certification
-   ///         technique of the Newton operator
+   /// Returns the value of chi
    double getInflationChi() const;
 
-   /// Assigns the parameter chi of the inflation technique of the certification
-   /// technique of the Newton operator
-   /// @param val new value
+   /// Assigns chi
    void setInflationChi(const double& val);
 
 private:

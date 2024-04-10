@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Problem.hpp
+ * @brief  Constraint satisfaction and optimization problem
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_PROBLEM_HPP
 #define REALPAVER_PROBLEM_HPP
@@ -20,28 +31,27 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a problem involving constraints.
-///
-/// A problem in general has a set of variables, a set of constraints and an
-/// objective function.
-///
-/// The variables are indexed by consecutive natural numbers that are
-/// automatically generated. Given NP the number of problem instances already
-/// created and the static variable MAX_NB_VAR initialized to a huge value
-/// (one million), the first variable identifier is NP*MAX_NB_VAR.
-///
-/// The Cartesian product of variable domains can be simply obtained by
-/// creating a domain box from the scope of this.
-///
-/// There are several classes of problems:
-/// - Constraint Satisfaction Problems (CSPs);
-/// - ...
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Constraint satisfaction and optimization problem.
+ *
+ * A problem in general has a set of variables, a set of constraints and an
+ * objective function.
+ *
+ * The variables are indexed by consecutive natural numbers that are
+ * automatically generated. Given NP the number of problem instances already
+ * created and the static variable MAX_NB_VAR initialized to a huge value
+ * (one million), the first variable identifier is NP*MAX_NB_VAR.
+ *
+ * The Cartesian product of variable domains can be simply obtained by
+ * creating a domain box from the scope of this.
+ *
+ * There are several classes of problems:
+ * - Constraint Satisfaction Problems (CSPs);
+ * - ...
+ */
 class Problem {
 public:
-   /// Creates a problem
-   /// @param name name of this problem
+   /// Constructor
    Problem(const std::string& name = "");
 
    /// Default copy constructor
@@ -54,175 +64,143 @@ public:
    ~Problem() = default;
 
    /// Creates a new variable with no domain yet
-   /// @param name name of the variable
-   /// @return the new variable
    Variable addVar(const std::string& name = "");
 
    /// Creates a new variable with domain {0, 1}
-   /// @param name name of the variable
-   /// @return the new variable
    Variable addBinaryVar(const std::string& name = "");
 
-   /// Creates a vector of binary variables
-   /// @param name base name
-   /// @param first index of the first variable
-   /// @param last index of the last variable
-   /// @return the vector created
+   /**
+    * @brief Creates a vector of binary variables.
+    * 
+    * Indexes in the vector: first, first+1, ..., last.
+    */
    VariableVector addBinaryVarVector(const std::string& name, int first, int last);
 
-   /// Creates a new integer variable
-   /// @param lo lower bound
-   /// @param up  bound
-   /// @param name name of the variable
-   /// @return the new variable
+   /// Creates a new integer variable with domain [lo, up]
    Variable addIntVar(int lo, int up, const std::string& name = "");
 
-   /// Creates a new integer variable
-   /// @param r variable domain
-   /// @param up  bound
-   /// @param name name of the variable
-   /// @return the new variable
+   /// Creates a new integer variable with domain r
    Variable addIntVar(const Range& r, const std::string& name = "");
 
-   /// Creates a new integer variable
-   /// @param u variable domain
-   /// @param up  bound
-   /// @param name name of the variable
-   /// @return the new variable
+   /// Creates a new integer variable with domain u
    Variable addIntVar(const RangeUnion& u, const std::string& name = "");
 
-   /// Creates a vector of integer variables
-   /// @param name base name
-   /// @param first index of the first variable
-   /// @param last index of the last variable
-   /// @param r domain of every variable in this
-   /// @return the vector created
+   /**
+    * @brief Creates a vector of integer variables with domain r.
+    * 
+    * Indexes in the vector: first, first+1, ..., last.
+    */
    VariableVector addIntVarVector(const std::string& name, int first, int last,
                                   const Range& r = Range::universe());
 
-   /// Creates a new real variable
-   /// @param lo lower bound
-   /// @param up  bound
-   /// @param name name of the variable
-   /// @return the new variable
+   /// Creates a new real variable with domain [lo,up]
    Variable addRealVar(double lo, double up, const std::string& name = "");
 
-   /// Creates a new real variable
-   /// @param x variable domain
-   /// @param name name of the variable
-   /// @return the new variable
+   /// Creates a new real variable with domain x
    Variable addRealVar(const Interval& x, const std::string& name = "");
 
-   /// Creates a new real variable
-   /// @param u variable domain
-   /// @param name name of the variable
-   /// @return the new variable
+   /// Creates a new real variable with domain u
    Variable addRealVar(const IntervalUnion& u, const std::string& name = "");
 
-   /// Creates a vector of integer variables
-   /// @param name base name
-   /// @param first index of the first variable
-   /// @param last index of the last variable
-   /// @param x domain of every variable
-   /// @return the vector created
+   /**
+    * @brief Creates a vector of real variables with domains x.
+    * 
+    * Indexes in the vector: first, first+1, ..., last.
+    */
    VariableVector addRealVarVector(const std::string& name, int first, int last,
                                    const Interval& x = Interval::universe());
 
    /// Creates a new real variable by cloning
-   /// @param v a variable (from this or another problem)
-   /// @return the new variable (with a new identifier) that is a clone of v
    Variable addClonedVar(Variable v);
 
-   /// @return the number of variables
+   /// Returns the number of variables
    size_t nbVars() const;
 
-   /// Gets a variable
-   /// @param i an index in 0 .. nbVars()-1
-   /// @return the i-th variable of this
+   /// Gets the i-th variable of this
    Variable varAt(size_t i) const;
 
-   /// @return the last variable created in this
+   /// Returns the last variable created in this
    Variable lastVar() const;
 
-   /// Checks if a variable is involved in this
-   /// @param v a variable
-   /// @return true if v a variable of this but it does not occur anywhere
+   /// Checks if a variable is involved in this but it does not occur anywhere
    bool isFakeVar(Variable v) const;
 
-   /// @return the scope of this (sorted set of variables)
+   /// Returns the scope of this (sorted set of variables)
    Scope scope() const;
 
    /// Inserts a constraint
-   /// @param c constraint inserted
    void addCtr(Constraint c);
 
    /// Inserts a list of constraints
-   /// @param l constraints inserted
    void addCtr(const std::initializer_list<Constraint>& l);
 
    /// Adds an objective function
-   /// @param obj objective function
    void addObjective(Objective obj);
 
-   /// @return the objective function
+   /// Returns the objective function
    Objective getObjective() const;
 
-   /// @return the number of constraints
+   /// Returns the number of constraints
    size_t nbCtrs() const;
 
-   /// Gets a constraint
-   /// @param i an index in 0 .. nbCtrs()-1
-   /// @return the i-th constraint of this
+   /// Gets the i-th constraint of this
    Constraint ctrAt(size_t i) const;
 
-   /// @return true if this is a CSP
+   /// Returns true if this is a CSP
    bool isCSP() const;
 
-   /// @return true if this is a BOP
+   /// Returns true if this is a BOP
    bool isBOP() const;
 
-   /// @return true if this is a COP
+   /// Returns true if this is a COP
    bool isCOP() const;
 
-   /// @return true if this has only real variables
+   /// Returns true if this has only real variables
    bool isReal() const;
 
-   /// @return true if this has only integer (or binary) variables
+   /// Returns true if this has only integer (or binary) variables
    bool isInteger() const;
 
-   /// @return true if this has continuous and discrete variables
+   /// Returns true if this has continuous and discrete variables
    bool isMixed() const;
 
-   /// @return true if this has at least one constraint
+   /// Returns true if this has at least one constraint
    bool isConstrained() const;
 
-   /// @return true if this has at least one constraint and its constraints
-   ///         are linear
+   /**
+    * @brief Returns true if this has at least one constraint and its
+    * constraints are linear.
+    */
    bool isLinConstrained() const;
 
-   /// @return true if this has at least one constraint and its constraints
-   ///         are equations
+   /**
+    * @brief Returns true if this has at least one constraint and its
+    * constraints are equations.
+    */
    bool isEqConstrained() const;
 
-   /// @return true if this has at least one constraint and its constraints
-   ///         are inequality constraints
+   /**
+    * @brief Returns true if this has at least one constraint and its
+    * constraints are inequality constraints.
+    */
    bool isIneqConstrained() const;
 
-   /// @return true if this has at least one equation and one inequality
-   ///         constraint
+   /**
+    * @brief Returns true if this has at least one equation and one inequality
+    * constraint.
+    */
    bool isMixedConstrained() const;
 
-   /// @return true if this has a non constant objective function
+   /// Returns true if this has a non constant objective function
    bool hasObjective() const;
 
-   /// @return true if this has a non constant and linear objective function   
+   /// Returns true if this has a non constant and linear objective function   
    bool isLinObjective() const;
 
-   /// @return true if this has no variable, no constraint, no objective
+   /// Returns true if this has no variable, no constraint, no objective
    bool isEmpty() const;
 
-   /// Maximum number of variables in a problem
-   /// The default value is huge
+   /// Maximum number of variables in a problem, the default value is huge
    static int MAX_NB_VAR;
 
 private:
