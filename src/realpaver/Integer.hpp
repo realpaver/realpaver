@@ -15,7 +15,7 @@
  * @file   Integer.hpp
  * @brief  Class of safe integers
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_INTEGER_HPP

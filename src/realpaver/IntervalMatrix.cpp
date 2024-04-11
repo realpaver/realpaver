@@ -15,7 +15,7 @@
  * @file   IntervalMatrix.cpp
  * @brief  Dense interval matrix
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #include "realpaver/AssertDebug.hpp"

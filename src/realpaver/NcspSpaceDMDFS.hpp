@@ -15,7 +15,7 @@
  * @file   NcspSpaceDMDFS.hpp
  * @brief  Distant-Most Depth-First-Search strategy
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_NCSP_SPACE_DMDFS_HPP

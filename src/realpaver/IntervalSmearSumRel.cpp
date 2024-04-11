@@ -15,7 +15,7 @@
  * @file   IntervalSmearSumRel.cpp
  * @brief  Smear sum relative strategy
  * @author Laurent Granvilliers
- * @date   2024-01-12
+ * @date   2024-4-11
 */
 
 #include <algorithm>

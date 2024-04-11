@@ -15,7 +15,7 @@
  * @file   NLPSolverIpopt.hpp
  * @brief  Implementation of NLP solver for Ipopt
  * @author Raphaël Chenouard
- * @date   2023-2-17
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_NLP_SOLVER_IPOPT_HPP

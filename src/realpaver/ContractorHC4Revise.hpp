@@ -15,7 +15,7 @@
  * @file   ContractorHC4Revise.hpp
  * @brief  HC4Revise contractor
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_CONTRACTOR_HC4_REVISE_HPP

@@ -15,7 +15,7 @@
  * @file   IntervalNewton.hpp
  * @brief  Interval Newton method
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_INTERVAL_NEWTON_HPP

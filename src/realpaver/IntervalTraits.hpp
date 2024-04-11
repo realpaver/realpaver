@@ -15,7 +15,7 @@
  * @file   IntervalTraits.hpp
  * @brief  Traits class interfacing interval arithmetic libraries
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 #ifndef REALPAVER_INTERVAL_TRAITS_HPP
 #define REALPAVER_INTERVAL_TRAITS_HPP

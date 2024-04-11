@@ -15,7 +15,7 @@
  * @file   NumericDoubleTraits.hpp
  * @brief  Specialization of template NumericTraits for doubles
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
  */
 
 #ifndef REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP

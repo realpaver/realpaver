@@ -15,7 +15,7 @@
  * @file   LPSolverClp.cpp
  * @brief  Wrapper class for the LP solver Clp.
  * @author Laurent Granvilliers, Raphaël Chenouard
- * @date   2023-2-19
+ * @date   2024-4-11
 */
 
 #include "realpaver/LPSolverClp.hpp"

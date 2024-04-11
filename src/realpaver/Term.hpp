@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Term.hpp
+ * @brief  Terms (nonlinear expressions)
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_TERM_HPP
 #define REALPAVER_TERM_HPP
@@ -18,310 +29,350 @@
 
 namespace realpaver {
 
-class TermVisitor;   // forward declaration
+class TermVisitor;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an enumeration of operation symbols.
-///////////////////////////////////////////////////////////////////////////////
+/// Enumeration of operation symbols
 enum class OpSymbol {
-   Add, Sub, Mul, Div, Min, Max, Usb, Abs, Sgn, Sqr, Sqrt, Pow,
-   Exp, Log, Cos, Sin, Tan, Lin, Cosh, Sinh, Tanh
+   Add,     ///< addition
+   Sub,     ///< subtraction
+   Mul,     ///< multiplication
+   Div,     ///< division
+   Min,     ///< minimum
+   Max,     ///< maximum
+   Usb,     ///< unary subtraction
+   Abs,     ///< absolute value
+   Sgn,     ///< sign
+   Sqr,     ///< square
+   Sqrt,    ///< square root
+   Pow,     ///< power
+   Exp,     ///< exponential
+   Log,     ///< logarithm
+   Cos,     ///< cosine
+   Sin,     ///< sine
+   Tan,     ///< tangent
+   Lin,     ///< linear
+   Cosh,    ///< hyperbolic cosine
+   Sinh,    ///< hyperbolic sine
+   Tanh     ///< hyperbolic tangent
 };
 
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, OpSymbol op);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an enumeration of priority levels of expression nodes.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Enumeration of priority levels of expression nodes
 enum class OpPriority {
-   Low,        // constants, variables
-   AddSub,     // add, sub
-   MulDiv,     // mul, div
-   High        // others
+   Low,        ///< constants, variables
+   AddSub,     ///< add, sub
+   MulDiv,     ///< mul, div
+   High        ///< others
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This the base class of the hierarchy of term nodes.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Base class of the hierarchy of term nodes
 class TermRep {
 public:
-   /// Creates a term node
-   /// @param p priority of this node
+   /// Constructor
    TermRep(OpPriority p);
 
    /// Virtual destructor
    virtual ~TermRep();
 
-   /// @return the priority of this
+   /// Returns the priority of this
    OpPriority priority() const;
 
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
    /// Output on a stream
-   /// @param os an output stream
    virtual void print(std::ostream& os) const = 0;
 
-   /// @return the interval evaluation of a constant term
+   /// Returns the interval evaluation of a constant term
    virtual Interval evalConst() const = 0;
 
-   /// Interval evaluation
-   /// @param B domains of variables
-   ///
-   /// The result is assigned in the interval value enclosed.
+   /**
+    * @brief Interval evaluation on B.
+    * 
+    * The result is assigned in the interval value enclosed.
+    */
    virtual void eval(const IntervalBox& B) = 0;
 
-   /// Contraction of domains
-   /// @param B domains of variables
-   /// @return a certificate of proof
+   /**
+    * @brief Contraction method.
+    * 
+    * Contracts B and returns a certificate of proof
+    */
    virtual Proof contract(IntervalBox& B) = 0;
 
    /// Visitor pattern
-   /// @param vis a visitor
    virtual void acceptVisitor(TermVisitor& vis) const = 0;
 
-   /// @return true if the root node of this has type TermConst (a number)
+   /// Returns true if the root node of this has type TermConst (a number)
    virtual bool isNumber() const;
 
-   /// @return true if this has one node that is equal to 0
+   /// Returns true if this has one node that is equal to 0
    virtual bool isZero() const;
 
-   /// @return true if this has one node that is equal to 1
+   /// Returns true if this has one node that is equal to 1
    virtual bool isOne() const;
 
-   /// @return true if this has one node that is equal to -1
+   /// Returns true if this has one node that is equal to -1
    virtual bool isMinusOne() const;
 
    /// @return true if the root node of this has type TermVar
    virtual bool isVar() const;
 
-   /// @return true if the root node of this has type TermAdd
+   /// Returns true if the root node of this has type TermAdd
    virtual bool isAdd() const;
 
-   /// @return true if the root node of this has type TermSub
+   /// Returns true if the root node of this has type TermSub
    virtual bool isSub() const;
 
-   /// @return true if the root node of this has type TermMul
+   /// Returns true if the root node of this has type TermMul
    virtual bool isMul() const;
 
-   /// @return true if the root node of this has type TermDiv
+   /// Returns true if the root node of this has type TermDiv
    virtual bool isDiv() const;
 
-   /// @return true if the root node of this has type TermUsb
+   /// Returns true if the root node of this has type TermUsb
    virtual bool isUsb() const;
 
-      /// @return true if the root node of this has type TermLin
+   /// Returns true if the root node of this has type TermLin
    virtual bool isLin() const;
 
-   /// @return true if this is a linear expression
+   /// Returns true if this is a linear expression
    virtual bool isLinear() const = 0;
 
-   /// @return true if this is an integer term
+   /// Returns true if this is an integer term
    virtual bool isInteger() const = 0;
 
-   /// @return true if this has no variable
-   ///
-   /// test done in O(1)
+   /// Return true if this has no variable (test done in O(1))
    bool isConstant() const;
 
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if v occurs in this
+   /// Returns true if v occurs in this
    virtual bool dependsOn(const Variable& v) const = 0;
 
    /// Makes the scope of this
-   /// @param scop the set of variables occurring in this
    virtual void makeScope(Scope& scop) const = 0;
 
-   /// @return a new representation such that the root of this is cloned and
-   ///         its sub-terms are shared
+   /**
+    * @brief Cloning.
+    * 
+    * Returns a new representation such that the root of this is cloned and
+    * its sub-terms are shared
+    */
    virtual TermRep* cloneRoot() const = 0;
 
-   /// @return a clone of this (deep copy)
+   /// Returns a clone of this (deep copy)
    virtual TermRep* clone() const = 0;
 
-   /// @return the interval value enclosed
+   /// Returns the interval value enclosed
    Interval ival() const;
 
    /// Assigns the interval value enclosed
-   /// @param x new interval value
    void setIval(const Interval& x);
 
 protected:
-   typedef std::shared_ptr<TermRep> SharedRep;
+   using SharedRep = std::shared_ptr<TermRep>;
    friend class Term;
 
-   size_t hcode_;
-   bool constant_;
-   Interval ival_;
+   size_t hcode_;    // hash code
+   bool constant_;   // true if this is constant
+   Interval ival_;   // used for evaluation
 
 private:
-   OpPriority priority_;
+   OpPriority priority_;   // priority
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the main class of terms.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Main class of terms.
+ *
+ * This encloses a shared pointer to its representation. It is a lightweight
+ * object that can be copied and assigned.
+ */
 class Term {
 public:
+   /// @name Constructors
    ///@{
-   /// Constructors
+
+   /// Constructor of a constant term
    Term(double a = 0.0);
+
+   /// Constructor of a constant term
    Term(const Interval& x);
+
+   /// Constructor of a variable term
    Term(Variable v);
+
+   /// Constructor from a representation
+   Term(const SharedRep& rep);
    ///@}
 
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
    /// Output on a stream
-   /// @param os an output stream
    void print(std::ostream& os) const;
 
-   /// @return the interval evaluation of a constant term
+   /// Returns the interval evaluation of a constant term
    Interval evalConst() const;
 
-   /// Interval evaluation
-   /// @param B domains of variables
-   /// @return the interval evaluation of this in B
+   /// Returns the interval evaluation of this on B
    Interval eval(const IntervalBox& B) const;
 
-   /// Reduction of domains using the HC4 Revise contractor
-   /// @param B domains of variables
-   /// @param img image or bounds of this considered as a function
-   /// @return a certificate of proof
-   ///
-   /// This algorithm first evaluates the nodes from the leaves to the root
-   /// (forward phase) and then calculates the projections from the root to
-   /// the leaves (backward phase).
+   /**
+    * @brief Reduction of domains using the HC4 Revise contractor.
+    * 
+    * @param B domains of variables
+    * @param img image or bounds of this considered as a function
+    * @return a certificate of proof
+    *
+    * This algorithm first evaluates the nodes from the leaves to the root
+    * (forward phase) and then calculates the projections from the root to
+    * the leaves (backward phase).
+    */
    Proof contract(IntervalBox& B, const Interval& img);
 
-   /// Forward phase of the HC4 Revise contractor
-   /// @param B domains of variables
-   /// @return the interval evaluation of this in B
+   /**
+    * @brief Forward phase of the HC4 Revise contractor.
+    * 
+    * @param B domains of variables
+    * @return the interval evaluation of this on B
+    */
    Interval hc4ReviseForward(const IntervalBox& B) const;
 
-   /// Backward phase of the HC4 Revise contractor
-   /// @param B domains of variables
-   /// @param img image or bounds of this considered as a function
-   /// @return a certificate of proof
-   ///
-   /// Assumes that the forward phase has been executed using hc4ReviseForward.
+   /**
+    * @brief Backward phase of the HC4 Revise contractor.
+    * 
+    * @param B domains of variables
+    * @param img image or bounds of this considered as a function
+    * @return a certificate of proof
+    *
+    * Assumes that the forward phase has been executed using hc4ReviseForward.
+    */
    Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
 
    /// Visitor pattern
-   /// @param vis a visitor
    void acceptVisitor(TermVisitor& vis) const;   
 
-   /// @return true if the root node of this has type TermConst (a number)
+   /// Returns true if the root node of this has type TermConst (a number)
    bool isNumber() const;
 
-   /// @return true if this has one node that is equal to 0
+   /// Returns true if this has one node that is equal to 0
    bool isZero() const;
 
-   /// @return true if this has one node that is equal to 1
+   /// Returns true if this has one node that is equal to 1
    bool isOne() const;
 
-   /// @return true if this has one node that is equal to -1
+   /// Returns true if this has one node that is equal to -1
    bool isMinusOne() const;
 
-   /// @return true if the root node of this has type TermVar
+   /// Returns true if the root node of this has type TermVar
    bool isVar() const;
 
-   /// @return true if the root node of this has type TermAdd
+   /// Returns true if the root node of this has type TermAdd
    bool isAdd() const;
 
-   /// @return true if the root node of this has type TermSub
+   /// Returns true if the root node of this has type TermSub
    bool isSub() const;
 
-   /// @return true if the root node of this has type TermMul
+   /// Returns true if the root node of this has type TermMul
    bool isMul() const;
 
-   /// @return true if the root node of this has type TermDiv
+   /// Returns true if the root node of this has type TermDiv
    bool isDiv() const;
 
-   /// @return true if the root node of this has type TermUsb
+   /// Returns true if the root node of this has type TermUsb
    bool isUsb() const;
 
-      /// @return true if the root node of this has type TermLin
+      /// Returns true if the root node of this has type TermLin
    bool isLin() const;
 
-   /// @return true if this is a linear expression
+   /// Returns true if this is a linear expression
    bool isLinear() const;
 
-   /// @return true if this is an integer term
-   ///
-   /// An integer term has only integer variables, integer constants, and
-   /// arithmetic operations
+   /**
+    * @brief Returns true if this is an integer term.
+    *
+    * An integer term has only integer variables, integer constants, and
+    * arithmetic operations
+    */
    bool isInteger() const;
 
-   /// @return true if this has no variable
-   ///
-   /// test done in O(1)
+   /// Returns true if this has no variable (test done in O(1))
    bool isConstant() const;
 
-   /// @return true if this is a sum of squares
+   /// Returns true if this is a sum of squares
    bool isSumOfSquares() const;
 
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if v occurs in this
+   /// Returns true if v occurs in this
    bool dependsOn(const Variable& v) const;
 
    /// Inserts the variables of this in a scope
-   /// @param scop scope modified
    void makeScope(Scope& scop) const;
 
-   /// @return creates and returns the scope of this
+   /// Returns creates and returns the scope of this
    Scope scope() const;
 
-   ///@{
-   /// Arithmetic operations with assignment
+   /// Addition with assignment
    Term& operator+=(Term other);
+
+   /// Subtraction with assignment
    Term& operator-=(Term other);
+
+   /// Multiplication with assignment
    Term& operator*=(Term other);
+
+   /// Division with assignment
    Term& operator/=(Term other);
-   ///@}
 
    /// Type of shared representation
-   typedef TermRep::SharedRep SharedRep;
+   using SharedRep = TermRep::SharedRep;
 
-   /// Creates a term
-   /// @param rep the representation of this
-   Term(const SharedRep& rep);
-
-   /// @return the representation of this
+   /// Returns the representation of this
    SharedRep rep() const;
 
-   /// @return a new representation such that the root of this is cloned and
-   ///         its sub-terms are shared
+   /**
+    * @brief Cloning.
+    * 
+    * Returns a new representation such that the root of this is cloned and
+    * its sub-terms are shared
+    */
    TermRep* cloneRoot() const;
 
-   /// @return a clone of this (deep copy)
+   /// Returns a clone of this (deep copy)
    Term clone() const;
 
-   /// @return true if terms are automatically simplified when they are created
-   ///         and false otherwise
+   /**
+    * @brief Returns the simplification status.
+    * 
+    * Returns true if terms are automatically simplified when they are created
+    * and false otherwise
+    */
    static bool simplification();
 
-   /// Assigns the simplification status of terms
-   /// @param simplify true in order to simplify terms when they are created,
-   ///        false otherwise
-   /// @return the previous status before its assignment
+   /**
+    * @brief Assigns the simplification status.
+    * 
+    * @param simplify true in order to simplify terms when they are created,
+    *        false otherwise
+    * @return the previous status before its assignment
+    */
    static bool simplification(bool simplify);
 
-   /// Gets the display status of constants
-   /// @return true if the constants are displayed as intervals, false
-   ///         if the midpoints are displayed
+   /**
+    * @brief Gets the display status of constants.
+    * 
+    * Returns true if the constants are displayed as intervals, false
+    * if the midpoints are displayed
+    */
    static bool idisplay();
 
    /// Assigns the display status of constants
-   /// @param ok true in order to display the constants as intervals
-   /// @return the previous status before its assignment
    static bool idisplay(bool ok);
 
 private:
@@ -334,42 +385,87 @@ private:
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Term& t);
 
+/// @name Creation of terms
 ///@{
-/// Creation of terms
+
+/// Returns l+r
 Term operator+(Term l, Term r);
+
+/// Returns l-r
 Term operator-(Term l, Term r);
+
+/// Returns l*r
 Term operator*(Term l, Term r);
+
+/// Returns l/r
 Term operator/(Term l, Term r);
+
+/// Returns MIN(l, r)
 Term MIN(Term l, Term r);
+
+/// Returns MAX(l, r)
 Term MAX(Term l, Term r);
+
+/// Returns -t
 Term operator-(Term t);
+
+/// Returns abs(t)
 Term abs(Term t);
+
+/// Returns sign(t)
 Term sgn(Term t);
+
+/// Returns sqr(t)
 Term sqr(Term t);
+
+/// Returns sqrt(t)
 Term sqrt(Term t);
+
+/// Returns t^n
 Term pow(Term t, int n);
+
+/// Returns t^d
 Term pow(Term t, double d);
+
+/// Returns t^x
 Term pow(Term t, const Interval& x);
+
+/// Returns t^e
 Term pow(Term t, Term e);
+
+/// Returns exp(t)
 Term exp(Term t);
+
+/// Returns log(t)
 Term log(Term t);
+
+/// Returns cos(t)
 Term cos(Term t);
+
+/// Returns sin(t)
 Term sin(Term t);
+
+/// Returns tan(t)
 Term tan(Term t);
+
+/// Returns cosh(t)
 Term cosh(Term t);
+
+/// Returns sinh(t)
 Term sinh(Term t);
+
+/// Returns tanh(t)
 Term tanh(Term t);
 ///@}
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a constant node.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Constant node
 class TermConst : public TermRep {
 public:
    /// Constructor
    TermConst(const Interval& x);
 
-   ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
@@ -385,25 +481,23 @@ public:
    void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 
-   /// @returns the value enclosed
+   /// Returns the value enclosed
    Interval getVal() const;
 
 private:
    Interval x_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a variable node.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Variable node
 class TermVar : public TermRep {
 public:
    /// Constructor
    /// @param v the variable enclosed
    TermVar(Variable v);
 
-   ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
@@ -416,60 +510,49 @@ public:
    bool isVar() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 
-   /// @return the variable enclosed
+   /// Returns the variable enclosed
    Variable var() const;
 
 private:
    Variable v_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of operation nodes.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Base class of operation nodes
 class TermOp : public TermRep {
 public:
-   ///@{
-   /// Constructors
+   /// Constructor
    TermOp(const SharedRep& t, OpSymbol op, OpPriority p);
+
+   /// Constructor
    TermOp(const SharedRep& l, const SharedRep& r, OpSymbol op, OpPriority p);
-   ///@}
 
    /// Virtual destructor
    virtual ~TermOp();
 
-   /// @return the number of sub-terms
+   /// Returns the number of sub-terms
    size_t arity() const;
 
-   /// @return the operation symbol
+   /// Returns the operation symbol
    OpSymbol opSymbol() const;
 
-   /// Access to a sub-term
-   /// @param i index of a sub-term between 0 and arity()-1
-   /// @return the i-th sub-term of this
+   /// Returns the i-th sub-term of this
    SharedRep subTerm(size_t i) const;
 
-   /// @return the left-hand term for a binary operation
-   ///
-   ///  equivalent to subTerm(0)
+   /// Returns the left-hand term for a binary operation
    SharedRep left() const;
 
-   /// @return the right-hand term for a binary operation
-   ///
-   ///  equivalent to subTerm(1)
+   /// Returns the right-hand term for a binary operation
    SharedRep right() const;
 
-   /// @return the sub-term for a unary operation
-   ///
-   ///  equivalent to subTerm(0)
+   /// Returns the sub-term for a unary operation
    SharedRep child() const;
 
    /// Inserts a term at the end of the list of sub-terms of this
-   /// @param t a sub-term
    void insert(const SharedRep& t);
 
-   ///@{
    bool isAdd() const override;
    bool isSub() const override;
    bool isMul() const override;
@@ -482,29 +565,30 @@ public:
    bool dependsOn(const Variable& v) const override;
    virtual bool isLinear() const override;
    void makeScope(Scope& scop) const override;
-   ///@}
 
 protected:
+   /// Interval evaluation of the root node
    virtual void evalRoot() = 0;
+
+   /// Contraction with respect to the root node
    virtual void contractRoot() = 0;
-   virtual bool isIntegerRoot() const; // default : false
+
+   /// Returns true if the term rooted by this is an integer term
+   virtual bool isIntegerRoot() const;
 
 private:
    std::vector<SharedRep> v_;    // sub-terms
    OpSymbol op_;                 // operation symbol
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a binary addition.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Binary addition
 class TermAdd : public TermOp {
 public:
-   /// Creates a term with form l + r
-   /// @param l left-hand term
-   /// @param r right-hand term
+   /// Constructor
    TermAdd(const SharedRep& l, const SharedRep& r);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -514,20 +598,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a binary subtraction.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Binary subtraction
 class TermSub : public TermOp {
 public:
-   /// Creates a term with form l - r
-   /// @param l left-hand term
-   /// @param r right-hand term
+   /// Constructor
    TermSub(const SharedRep& l, const SharedRep& r);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -537,20 +617,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a binary multiplication.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Binary multiplication
 class TermMul : public TermOp {
 public:
-   /// Creates a term with form l * r
-   /// @param l left-hand term
-   /// @param r right-hand term
+   /// Constructor
    TermMul(const SharedRep& l, const SharedRep& r);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -560,20 +636,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a binary division.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Binary division
 class TermDiv : public TermOp {
 public:
-   /// Creates a term with form l / r
-   /// @param l left-hand term
-   /// @param r right-hand term
+   /// Constructor
    TermDiv(const SharedRep& l, const SharedRep& r);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -582,20 +654,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a binary minimum.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Binary minimum
 class TermMin : public TermOp {
 public:
-   /// Creates a term with form min(l, r)
-   /// @param l left-hand term
-   /// @param r right-hand term
+   /// Constructor
    TermMin(const SharedRep& l, const SharedRep& r);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -603,20 +671,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a binary maximum.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Binary maximum
 class TermMax : public TermOp {
 public:
-   /// Creates a term with form max(l, r)
-   /// @param l left-hand term
-   /// @param r right-hand term
+   /// Constructor
    TermMax(const SharedRep& l, const SharedRep& r);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -624,19 +688,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a unary subtraction.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Unary subtraction
 class TermUsb : public TermOp {
 public:
-   /// Creates a term with form -t
-   /// @param t sub-term
+   /// Constructor
    TermUsb(const SharedRep& t);
 
-   ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void evalRoot() override;
@@ -646,19 +707,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an absolute value.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Absolute value
 class TermAbs : public TermOp {
 public:
-   /// Creates a term with form |t|
-   /// @param t sub-term
+   /// Constructor
    TermAbs(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -666,19 +724,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the sign of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Sign of a term
 class TermSgn : public TermOp {
 public:
-   /// Creates a term with form sgn(t)
-   /// @param t sub-term
+   /// Constructor
    TermSgn(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -686,19 +741,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the square of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Square of a term
 class TermSqr : public TermOp {
 public:
-   /// Creates a term with form t^2
-   /// @param t sub-term
+   /// Constructor
    TermSqr(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -707,19 +759,16 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the square root of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Square root of a term
 class TermSqrt : public TermOp {
 public:
-   /// Creates a term with form sqrt(t)
-   /// @param t sub-term
+   /// Constructor
    TermSqrt(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -727,23 +776,19 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the power of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Power of a term
 class TermPow : public TermOp {
 public:
-   /// Creates a term with form t^n
-   /// @param t sub-term
-   /// @param n exponent
+   /// Constructor
    TermPow(const SharedRep& t, int n);
 
-   /// @return the exponent
+   /// Returns the exponent
    int exponent() const;
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
@@ -752,143 +797,119 @@ public:
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 
 private:
    int n_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the exponential of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Exponential of a term
 class TermExp : public TermOp {
 public:
-   /// Creates a term with form exp(t)
-   /// @param t sub-term
+   /// Constructor
    TermExp(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the logarithm of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Logarithm of a term
 class TermLog : public TermOp {
 public:
-   /// Creates a term with form log(t)
-   /// @param t sub-term
+   /// Constructor
    TermLog(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the cosine of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Cosine of a term
 class TermCos : public TermOp {
 public:
-   /// Creates a term with form cos(t)
-   /// @param t sub-term
+   /// Constructor
    TermCos(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the sine of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Sine of a term
 class TermSin : public TermOp {
 public:
-   /// Creates a term with form sin(t)
-   /// @param t sub-term
+   /// Constructor
    TermSin(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the tangent of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Tangent of a term
 class TermTan : public TermOp {
 public:
-   /// Creates a term with form tan(t)
-   /// @param t sub-term
+   /// Constructor
    TermTan(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a (non constant) linear expression.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Linear expression
 class TermLin : public TermRep {
 public:
-   /// Creates a linear term equal to zero
-   /// @param t sub-term
+   /// Constructor
    TermLin();
 
    /// Adds a constant to this
-   /// @param val constant
    void addConstant(const Interval& val);
 
    /// Adds the opposite of a constant to this
-   /// @param val constant
    void subConstant(const Interval& val);
 
-   /// Adds a product of a constant and a variable to this
-   /// @param x constant
-   /// @param v variable
+   /// Adds a product of x*v to this
    void addTerm(const Interval& x, Variable v);
 
-   /// Adds the opposite of a product of a constant and a variable to this
+   /// Adds the opposite of x*v to this
    /// @param x constant
    /// @param v variable
    void subTerm(const Interval& x, Variable v);
 
    /// Adds a linear term to this
-   /// @param t linear term
    void addTermLin(const TermLin& t);
 
    /// Adds the opposite of a linear term to this
-   /// @param t linear term
    void subTermLin(const TermLin& t);
 
-   ///@{
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
@@ -901,25 +922,20 @@ public:
    void makeScope(Scope& scop) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 
-   /// @return the constant value of this
+   /// Returns the constant value of this
    Interval getConstantValue() const;
 
-   /// @return the number of sub-terms (variables) in this
+   /// Returns the number of sub-terms (variables) in this
    size_t getNbSub() const;
 
-   /// Access to a sub-term
-   /// @param i an index between 0 and getNbVars()-1
-   /// @return the coefficient of the i-th linear sub-term in this
+   /// Returns the coefficient of the i-th linear sub-term in this
    Interval getCoefSub(size_t i) const;
 
-   /// Access to a sub-term
-   /// @param i an index between 0 and getNbVars()-1
-   /// @return the variable of the i-th linear sub-term in this
+   /// Returns the variable of the i-th linear sub-term in this
    Variable getVarSub(size_t i) const;
 
-   /// @return true if this is reduced to a variable
+   /// Returns true if this is reduced to a variable
    bool isVariable() const;
 
    /// Changes the sign of the constant and each coefficient in this
@@ -955,72 +971,62 @@ private:
    std::set<Item, CompItem> terms_;    // set of linear terms
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the hyperbolic cosine of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic cosine of a term
 class TermCosh : public TermOp {
 public:
-   /// Creates a term with form cosh(t)
-   /// @param t sub-term
+   /// Constructor
    TermCosh(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the hyperbolic sine of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic sine of a term
 class TermSinh : public TermOp {
 public:
-   /// Creates a term with form sinh(t)
-   /// @param t sub-term
+   /// Constructor
    TermSinh(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the hyperbolic tangent of a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic tangent of a term
 class TermTanh : public TermOp {
 public:
-   /// Creates a term with form Tanh(t)
-   /// @param t sub-term
+   /// Constructor
    TermTanh(const SharedRep& t);
 
-   ///@{
    Interval evalConst() const override;
    void evalRoot() override;
    void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of visitors of terms.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Base class of visitors of terms
 class TermVisitor {
 public:
    /// Virtual destructor
    virtual ~TermVisitor();
 
-   ///@{
    virtual void apply(const TermConst* t);
    virtual void apply(const TermVar* t);
    virtual void apply(const TermAdd* t);
@@ -1044,32 +1050,30 @@ public:
    virtual void apply(const TermCosh* t);
    virtual void apply(const TermSinh* t);
    virtual void apply(const TermTanh* t);
-   ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to transform (or not) a term into a sum of squares.
-///
-/// If the visited term has the form t1^2 + t2^2 + ... + tk^2 then the terms
-/// t1^2, t2^2, ..., tk^2 are stored in a vector.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Visitor used to transform (or not) a term into a sum of squares.
+ *
+ * If the visited term has the form t1^2 + t2^2 + ... + tk^2 then the terms
+ * t1^2, t2^2, ..., tk^2 are stored in a vector.
+ */
 class SumOfSquaresCreator : public TermVisitor {
 public:
    /// Constructor
    SumOfSquaresCreator();
 
-   /// @return true if this has visited a term representing a sum of squares
+   /// Returns true if this has visited a term representing a sum of squares
    bool sumOfSquaresVisited() const;
 
-   /// @return the number of squares after a visit
+   /// Returns the number of squares after a visit
    size_t nbSquares() const;
 
-   /// Gets a square in this after a visit
-   /// @param i an index between 0 and nbSquares()-1
-   /// @return the i-th square in this
+   /// Gets the i-th square in this after a visit
    Term getSquare(size_t i) const;
 
-   ///@{
    void apply(const TermConst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
@@ -1093,7 +1097,6 @@ public:
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;
-   ///@}
 
 private:
    bool sos_;              // true if this has visited a sum of squares

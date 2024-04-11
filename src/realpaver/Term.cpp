@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Term.cpp
+ * @brief  Terms (nonlinear expressions)
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
@@ -44,7 +55,7 @@ std::ostream& operator<<(std::ostream& os, OpSymbol op)
    return os;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermRep::TermRep(OpPriority p)
       : hcode_(0),
@@ -135,7 +146,7 @@ void TermRep::setIval(const Interval& x)
    ival_ = x;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 bool Term::simplify_ = true;
 bool Term::idisplay_ = false;
@@ -1007,7 +1018,7 @@ Term tanh(Term t)
       return Term(std::make_shared<TermTanh>(t.rep()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermConst::TermConst(const Interval& x)
       : TermRep(OpPriority::Low),
@@ -1101,7 +1112,7 @@ TermRep* TermConst::clone() const
    return new TermConst(x_);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermVar::TermVar(Variable v)
       : TermRep(OpPriority::Low),
@@ -1184,7 +1195,7 @@ TermRep* TermVar::clone() const
    return new TermVar(v_);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermOp::TermOp(const SharedRep& t, OpSymbol op, OpPriority p)
       : TermRep(p),
@@ -1353,7 +1364,7 @@ TermRep::SharedRep TermOp::child() const
    return v_[0];
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermAdd::TermAdd(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Add, OpPriority::AddSub)
@@ -1409,7 +1420,7 @@ TermRep* TermAdd::clone() const
    return new TermAdd(sl, sr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermSub::TermSub(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Sub, OpPriority::AddSub)
@@ -1476,7 +1487,7 @@ TermRep* TermSub::clone() const
    return new TermSub(sl, sr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermMul::TermMul(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Mul, OpPriority::MulDiv)
@@ -1553,7 +1564,7 @@ TermRep* TermMul::clone() const
    return new TermMul(sl, sr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 TermDiv::TermDiv(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Div, OpPriority::MulDiv)
 {}
@@ -1622,7 +1633,7 @@ TermRep* TermDiv::clone() const
    return new TermDiv(sl, sr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermMin::TermMin(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Min, OpPriority::High)
@@ -1666,7 +1677,7 @@ TermRep* TermMin::clone() const
    return new TermMin(sl, sr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermMax::TermMax(const SharedRep& l, const SharedRep& r)
       : TermOp(l, r, OpSymbol::Max, OpPriority::High)
@@ -1710,7 +1721,7 @@ TermRep* TermMax::clone() const
    return new TermMax(sl, sr);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermUsb::TermUsb(const SharedRep& t)
       : TermOp(t, OpSymbol::Usb, OpPriority::AddSub)
@@ -1774,7 +1785,7 @@ TermRep* TermUsb::clone() const
    return new TermUsb(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermAbs::TermAbs(const SharedRep& t)
       : TermOp(t, OpSymbol::Abs, OpPriority::High)
@@ -1816,7 +1827,7 @@ TermRep* TermAbs::clone() const
    return new TermAbs(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermSgn::TermSgn(const SharedRep& t)
       : TermOp(t, OpSymbol::Sgn, OpPriority::High)
@@ -1858,7 +1869,7 @@ TermRep* TermSgn::clone() const
    return new TermSgn(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermSqr::TermSqr(const SharedRep& t)
       : TermOp(t, OpSymbol::Sqr, OpPriority::High)
@@ -1918,7 +1929,7 @@ TermRep* TermSqr::clone() const
    return new TermSqr(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermSqrt::TermSqrt(const SharedRep& t)
       : TermOp(t, OpSymbol::Sqrt, OpPriority::High)
@@ -1960,7 +1971,7 @@ TermRep* TermSqrt::clone() const
    return new TermSqrt(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermPow::TermPow(const SharedRep& t, int n)
       : TermOp(t, OpSymbol::Pow, OpPriority::High),
@@ -2020,7 +2031,7 @@ TermRep* TermPow::clone() const
    return new TermPow(sc, n_);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermExp::TermExp(const SharedRep& t)
       : TermOp(t, OpSymbol::Exp, OpPriority::High)
@@ -2057,7 +2068,7 @@ TermRep* TermExp::clone() const
    return new TermExp(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermLog::TermLog(const SharedRep& t)
       : TermOp(t, OpSymbol::Log, OpPriority::High)
@@ -2094,7 +2105,7 @@ TermRep* TermLog::clone() const
    return new TermLog(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermCos::TermCos(const SharedRep& t)
       : TermOp(t, OpSymbol::Cos, OpPriority::High)
@@ -2131,7 +2142,7 @@ TermRep* TermCos::clone() const
    return new TermCos(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermSin::TermSin(const SharedRep& t)
       : TermOp(t, OpSymbol::Sin, OpPriority::High)
@@ -2168,7 +2179,7 @@ TermRep* TermSin::clone() const
    return new TermSin(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermTan::TermTan(const SharedRep& t)
       : TermOp(t, OpSymbol::Tan, OpPriority::High)
@@ -2205,7 +2216,7 @@ TermRep* TermTan::clone() const
    return new TermTan(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermLin::TermLin()
       : TermRep(OpPriority::AddSub),
@@ -2510,7 +2521,7 @@ void TermLin::makeHashCode()
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermCosh::TermCosh(const SharedRep& t)
       : TermOp(t, OpSymbol::Cosh, OpPriority::High)
@@ -2547,7 +2558,7 @@ TermRep* TermCosh::clone() const
    return new TermCosh(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermSinh::TermSinh(const SharedRep& t)
       : TermOp(t, OpSymbol::Sinh, OpPriority::High)
@@ -2584,7 +2595,7 @@ TermRep* TermSinh::clone() const
    return new TermSinh(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermTanh::TermTanh(const SharedRep& t)
       : TermOp(t, OpSymbol::Tanh, OpPriority::High)
@@ -2621,7 +2632,7 @@ TermRep* TermTanh::clone() const
    return new TermTanh(sc);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 TermVisitor::~TermVisitor()
 {}
@@ -2741,7 +2752,7 @@ void TermVisitor::apply(const TermTanh* t)
    THROW("Visit method not implemented");
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 SumOfSquaresCreator::SumOfSquaresCreator()
       : sos_(false),

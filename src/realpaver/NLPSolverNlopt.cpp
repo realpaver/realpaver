@@ -15,7 +15,7 @@
  * @file   NLPSolverNlopt.cpp
  * @brief  Implementation of NLP solver for Nlopt
  * @author Raphaël Chenouard
- * @date   2023-2-17
+ * @date   2024-4-11
 */
 
 #include "realpaver/AssertDebug.hpp"

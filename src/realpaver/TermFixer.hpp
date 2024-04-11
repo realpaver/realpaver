@@ -15,7 +15,7 @@
  * @file   TermFixer.hpp
  * @brief  Rewriting of terms
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_TERM_FIXER_HPP
@@ -60,8 +60,6 @@ public:
    /// Return the new term after a visit
    Term getTerm() const;
 
-   /** @name Visit methods */
-   /** @{ */
    void apply(const TermConst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
@@ -85,7 +83,6 @@ public:
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;
-   /** @} */
 
 private:
    VarVarMapType* vvm_;       // map Variable -> Variable

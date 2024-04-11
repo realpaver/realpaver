@@ -15,7 +15,7 @@
  * @file   Double.hpp
  * @brief  Management of floating-point numbers
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_DOUBLE_HPP

@@ -15,7 +15,7 @@
  * @file   Logger.hpp
  * @brief  Management of log files
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_LOGGER_HPP

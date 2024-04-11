@@ -15,7 +15,7 @@
  * @file   ContractorBC3Revise.cpp
  * @brief  BC3Revise contractor
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #include <stack>

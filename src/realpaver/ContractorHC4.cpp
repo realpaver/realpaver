@@ -15,7 +15,7 @@
  * @file   ContractorHC4.cpp
  * @brief  HC4 contractor
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #include "realpaver/AssertDebug.hpp"

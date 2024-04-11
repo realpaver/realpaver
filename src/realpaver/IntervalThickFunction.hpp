@@ -15,7 +15,7 @@
  * @file   IntervalThickFunction.hpp
  * @brief  Thick interval function
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_INTERVAL_THICK_FUNCTION_HPP

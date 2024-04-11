@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ZeroOne.hpp
+ * @brief  Subset of {0, 1}
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_ZERO_ONE_HPP
 #define REALPAVER_ZERO_ONE_HPP
@@ -16,17 +27,21 @@ namespace realpaver {
 
 class Range;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This represents a subset of {0, 1}.
-///////////////////////////////////////////////////////////////////////////////
+/// Subset of {0, 1}
 class ZeroOne {
 public:
    /// Creates the set {0, 1}
    ZeroOne();
 
-   /// Creates an element
-   /// @param zro true if 0 belongs to this
-   /// @param one true if 1 belongs to this
+   /**
+    * @brief Constructor.
+    * 
+    * 4 cases given the parameters:
+    * - (true, true) -> {0, 1}
+    * - (true, false) -> {0}
+    * - (false, true) -> {1}
+    * - (false, false) -> {}
+    */
    ZeroOne(bool zro, bool one);
 
    /// Default copy constructor
@@ -38,42 +53,53 @@ public:
    /// Default destructor
    ~ZeroOne() = default;
 
-   ///@{
+   /// Returns {0, 1}
    static ZeroOne universe();
-   static ZeroOne zero();
-   static ZeroOne one();
-   static ZeroOne emptyset();
-   ///@}
 
-   /// @return true if this is empty
+   /// Returns {0}
+   static ZeroOne zero();
+
+   /// Returns {1}
+   static ZeroOne one();
+
+   /// Returns {}
+   static ZeroOne emptyset();
+
+   /// Returns true if this is empty
    bool isEmpty() const;
 
-   /// @return true if this is reduced to 0
+   /// Returns true if this is reduced to 0
    bool isZero() const;
 
-   /// @return true if this is reduced to 1
+   /// Returns true if this is reduced to 1
    bool isOne() const;
 
-   /// @return true if this is {0, 1}
+   /// Returns true if this is {0, 1}
    bool isUniverse() const;
 
-   /// @return true if 0 is in this
+   /// Returns true if 0 is in this
    bool hasZero() const;
 
-   /// @return true if 1 is in this
+   /// Returns true if 1 is in this
    bool hasOne() const;
 
-   /// Assignment method
-   /// @param b true in order to insert 0 in this, false to remove it
-   /// @return a reference to this
+   /**
+    * @brief Assignment method.
+    * 
+    * Inserts 0 in this if b = true, removes it otherwise.
+    * Returns a reference to this.
+    */
    ZeroOne& setZero(bool b);
 
-   /// Assignment method
-   /// @param b true in order to insert 1 in this, false to remove it
-   /// @return a reference to this
+   /**
+    * @brief Assignment method.
+    * 
+    * Inserts 1 in this if b = true, removes it otherwise.
+    * Returns a reference to this.
+    */
    ZeroOne& setOne(bool b);
 
-   /// @return a range that corresponds to this
+   /// Returns a range that corresponds to this
    Range toRange() const;
 
 private:

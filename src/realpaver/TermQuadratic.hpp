@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   TermQuadratic.hpp
+ * @brief  Quadratic expression
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_TERM_QUADRATIC_HPP
 #define REALPAVER_TERM_QUADRATIC_HPP
@@ -16,16 +27,13 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This represents a quadratic expression.
-///////////////////////////////////////////////////////////////////////////////
+/// Quadratic expression
 class TermQuadratic {
 public:
    /// Constructor of a 0 term
    TermQuadratic();
 
-   /// Constructor
-   /// @param t a term to be transformed into a quadratic term
+   /// Constructor from a term
    TermQuadratic(const Term& t);
 
    /// Default copy constructor
@@ -38,47 +46,43 @@ public:
    ~TermQuadratic() = default;
 
    /// Adds a constant in this
-   /// @param a an interval
    void addConstant(const Interval& a);
 
    /// Adds a square term of the form a*v^2 in this
-   /// @param a coefficient
-   /// @param v variable
    void addSquare(const Interval& a, const Variable& v);
 
    /// Adds a bilinear  term of the form a*v1*v2 in this
-   /// @param a coefficient
-   /// @param v1 first variable
-   /// @param v2 second variable
    void addBilin(const Interval& a, const Variable& v1, const Variable& v2);
 
    /// Adds a linear term of the form a*v in this
-   /// @param a coefficient
-   /// @param v variable
    void addLin(const Interval& a, const Variable& v);
 
-   /// @return term represented by this
+   /// Returns the term represented by this
    Term toTerm() const;
 
-   /// Creates and return the scope of this
-   /// @return the scope of this
+   /// Creates and return sthe scope of this
    Scope makeScope() const;
 
-   /// Factorizes this such that the variables are ordered by a decreasing
-   /// number of occurrences
-   /// @return a term resulting from the factorization of this
-   ///
-   /// Given x the variable occurring the more in this the first step
-   /// generates the equivalent expression x*f + g such that x does not occur
-   /// in g, then g is factorized following the same process, and so on
+   /**
+    * @brief Factorization method.
+    * 
+    * Return a term resulting from the factorization of this such that the
+    * variables are ordered by a decreasing number of occurrences
+    *
+    * Given x the variable occurring the more in this the first step
+    * generates the equivalent expression x*f + g such that x does not occur
+    * in g, then g is factorized following the same process, and so on
+    */
    Term factorize() const;
 
 private:
+   // square term
    struct Square {
       Interval coef;
       Variable v;
    };
 
+   // comparator of square terms
    struct CompSquare {
       bool operator()(const Square& s1, const Square& s2) const
       {
@@ -86,11 +90,13 @@ private:
       }
    };
 
+   // linear term
    struct Lin {
       Interval coef;
       Variable v;
    };
 
+   // comparator of linear term
    struct CompLin {
       bool operator()(const Lin& l1, const Lin& l2) const
       {
@@ -98,12 +104,14 @@ private:
       }
    };
 
+   // bilinear term
    struct Bilin {
       Interval coef;
       Variable v1;
       Variable v2;
    };
 
+   // comparator of bilinear term
    struct CompBilin {
       bool operator()(const Bilin& b1, const Bilin& b2) const
       {
@@ -128,22 +136,20 @@ private:
 /// @return a reference to the given stream
 std::ostream& operator<<(std::ostream& os, const TermQuadratic& t);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to transform (or not) a term into a quadratic term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Visitor used to transform (or not) a term into a quadratic term
 class TermQuadraticCreator : public TermVisitor {
 public:
-   /// Constructor
-   /// @param qt a pointer to the quadratic term modified by a visit
+   /// Constructor given a pointer to the quadratic term modified by a visit
    TermQuadraticCreator(TermQuadratic* qt);
 
-   /// @return true if this has visited a term representing a quadratic term
+   /// Returns true if this has visited a term representing a quadratic term
    bool visitSuccessfull() const;
 
-   /// @return the quadratic term in this
+   /// Returns the quadratic term in this
    TermQuadratic* getTermQuadratic() const;
 
-   ///@{
    void apply(const TermConst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
@@ -167,7 +173,6 @@ public:
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;
-   ///@}
 
 private:
    TermQuadratic* qt_;

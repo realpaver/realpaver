@@ -15,7 +15,7 @@
  * @file   ConstraintFixer.hpp
  * @brief  Rewriting of constraints
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_CONSTRAINT_FIXER_HPP

@@ -15,7 +15,7 @@
  * @file   AssertDebug.hpp
  * @brief  Macros for assertion checking and debugging
  * @author Laurent Granvilliers
- * @date   2022-5-6
+ * @date   2024-4-11
 */
 
 #ifndef REALPAVER_ASSERT_DEBUG_HPP

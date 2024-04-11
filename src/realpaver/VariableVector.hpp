@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   VariableVector.hpp
+ * @brief  Vector of variables
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_VARIABLE_VECTOR_HPP
 #define REALPAVER_VARIABLE_VECTOR_HPP
@@ -16,15 +27,16 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the representation of a vector of variables.
-///////////////////////////////////////////////////////////////////////////////
+/// Representation of a vector of variables
 class VariableVectorRep {
 public:
-   /// Constructor
-   /// @param name base name
-   /// @param first index of the first variable in this
-   /// @param last index of the last variable in this
+   /**
+    * @brief Constructor.
+    * 
+    * @param name base name
+    * @param first index of the first variable in this
+    * @param last index of the last variable in this
+    */
    VariableVectorRep(const std::string& name, int first, int last);
 
    /// Default destructor
@@ -37,28 +49,24 @@ public:
    VariableVectorRep& operator=(const VariableVectorRep&) = delete;
 
    /// Output on a stream
-   /// @param os a stream
    void print(std::ostream& os) const;
 
-   /// @return the size of this
+   /// Returns the size of this
    int size() const;
 
-   /// @return the index of the first variable of this
+   /// Returns the index of the first variable of this
    int firstIndex() const;
 
-   /// @return the index of the last variable of this
+   /// Returns the index of the last variable of this
    int lastIndex() const;
 
-   /// Gets one variable
-   /// @param i an index of this
-   /// @return the variable at index i in this
+   /// Gets the variable at index i in this
    Variable get(int i) const;
 
    /// Sets the tolerance of all the variables of this
-   /// @param tol new tolerance
    void setTolerance(const Tolerance& tol);
 
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
 private:
@@ -67,18 +75,23 @@ private:
    std::vector<Variable> vars_;  // the variables
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a vector of variables.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Vector of variables.
+ *
+ * This encloses a shared pointer to its representation. It is a lightweight
+ * object that can be copied and assigned.
+ */
 class VariableVector {
 public:
-   /// Constructor of a vector of continuous variables
-   /// @param name base name
-   /// @param first index of the first variable in this
-   /// @param last index of the last variable in this
+   /**
+    * @brief Constructor.
+    * 
+    * @param name base name
+    * @param first index of the first variable in this
+    * @param last index of the last variable in this
+    */
    VariableVector(const std::string& name, int first, int last);
 
    /// Default copy constructor
@@ -91,34 +104,27 @@ public:
    ~VariableVector() = default;
 
    /// Output on a stream
-   /// @param os a stream
    void print(std::ostream& os) const;
 
-   /// @return the size of this
+   /// Returns the size of this
    int size() const;
 
-   /// @return the index of the first variable of this
+   /// Returns the index of the first variable of this
    int firstIndex() const;
 
-   /// @return the index of the last variable of this
+   /// Returns the index of the last variable of this
    int lastIndex() const;
 
-   /// Gets one variable
-   /// @param i an index of this
-   /// @return the variable at index i in this
+   /// Gets the variable at index i in this
    Variable get(int i) const;
 
-   /// Gets one variable
-   /// @param i an index of this
-   /// @return the variable at index i in this
+   /// Gets the variable at index i in this
    Variable operator[](int i) const;
 
    /// Sets the tolerance of all the variables of this
-   /// @param tol new tolerance
-   /// @return a reference to this
    VariableVector& setTolerance(const Tolerance& tol);
 
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
 private:
@@ -126,9 +132,6 @@ private:
 };
 
 /// Output on a stream
-/// @param os a stream
-/// @param v a variable vector written on os
-/// @return os
 std::ostream& operator<<(std::ostream& os, const VariableVector& v);
 
 } // namespace
