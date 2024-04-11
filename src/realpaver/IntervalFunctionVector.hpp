@@ -84,7 +84,7 @@ public:
    /**
     * @brief Evaluates and differentiates this.
     * 
-    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * val[i] is the result of the evaluation of the i-th function of this on B
     * and val must have nbFuns() components
     * 
     * J is the Jacobian matrix of this on B such that we have the partial
@@ -98,7 +98,7 @@ public:
    /**
     * @brief Evaluates this and calculates the violation of the constraints.
     * 
-    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * val[i] is the result of the evaluation of the i-th function of this on B
     * and val must have nbFuns() components
     * 
     * viol[i] is the violation of the i-th function / constraint on B
@@ -138,7 +138,7 @@ public:
    IntervalFunctionVector(const std::initializer_list<Term>& lt,
                           const std::initializer_list<Interval>& li);
 
-   /// Crestes a vector from a list of conctions
+   /// Creates a vector from a list of fonctions
    IntervalFunctionVector(const std::initializer_list<IntervalFunction>& lf);
 
    /// Default copy constructor
@@ -203,7 +203,7 @@ public:
    /**
     * @brief Evaluates and differentiates this.
     * 
-    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * val[i] is the result of the evaluation of the i-th function of this on B
     * and val must have nbFuns() components
     * 
     * J is the Jacobian matrix of this on B such that we have the partial
@@ -216,7 +216,7 @@ public:
    /**
     * @brief Evaluates this and calculates the violation of the constraints.
     * 
-    * val[i] is the result of the evaluation of the i-th function of this on pt
+    * val[i] is the result of the evaluation of the i-th function of this on B
     * and val must have nbFuns() components
     * 
     * viol[i] is the violation of the i-th function / constraint on B

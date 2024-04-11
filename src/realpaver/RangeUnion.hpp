@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RangeUnion.hpp
+ * @brief  Union of ranges
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_RANGE_UNION_HPP
 #define REALPAVER_RANGE_UNION_HPP
@@ -18,9 +29,7 @@ namespace realpaver {
 
 class Interval;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an ordered set of disjoint ranges.
-///////////////////////////////////////////////////////////////////////////////
+/// Ordered set of disjoint ranges
 class RangeUnion {
 public:
    /// Creates an empty range union
@@ -29,12 +38,10 @@ public:
    /// Creates a range union reduced to one range
    RangeUnion(const Range& r);
 
-   /// Creates a range union
-   /// @para l list of ranges inserted in this
+   /// Creates a range union from a list
    RangeUnion(const std::initializer_list<Range>& l);
 
-   /// Creates a range union
-   /// @para l list of integers inserted in this
+   /// Creates a range union from a list of int
    RangeUnion(const std::initializer_list<int>& l);
 
    /// Default copy constructor
@@ -46,53 +53,40 @@ public:
    /// Default destructor
    ~RangeUnion() = default;
 
-   /// @return the number of disjoint ranges in this
+   /// Returns the number of disjoint ranges in this
    size_t size() const;
 
-   /// Gets a range of this
-   /// @param i index of a range between 0 and size()-1
-   /// @return the i-th range of this
+   /// Gets the i-th range of this
    Range operator[](size_t i) const;
 
-   /// @return true if this is empty
+   /// Returns true if this is empty
    bool isEmpty() const;
 
    /// Assigns this to the empty set
    void setEmpty();
 
-   /// Gets a part of this
-   /// @param i index between 0 and size()-1
-   /// @param j index between 0 and size()-1 such that j >= i
+   /// Gets a part of this between the indexes i and j
    RangeUnion subUnion(size_t i, size_t j) const;
 
-   /// Inserts an element in this
-   /// @param r range inserted in this
-   /// @return a reference to this
+   /// Inserts r in this and returns a reference to this
    RangeUnion& insert(const Range& r);
 
-   /// @return the hull of this
+   /// Returns the hull of this
    Range hull() const;
 
-   /// Contracts an interval
-   /// @param x an interval
-   ///
-   /// x is assigned tohull(x inter this)
+   /// Contracts x as hull(x inter this)
    void contractInterval(Interval& x) const;
 
-   /// Contracts this
-   /// @param x an interval
-   ///
-   /// this is assigned to (this inter x)
+   /// Contracts this as (this inter x)
    void contract(const Interval& x);
 
    /// Output on a stream
-   /// @param os output stream
    void print(std::ostream& os) const;
 
    /// Clears this, which becomes empty
    void clear();
 
-   /// @return the number of elements in this
+   /// Returns the number of elements in this
    unsigned long nbElems() const;
 
 private:
@@ -111,12 +105,12 @@ private:
 
 public:
    /// Type of iterators in an interval union
-   typedef VectorType::iterator iterator;
+   using iterator = VectorType::iterator;
 
-   /// @return an iterator to the beginning of this
+   /// Returns an iterator to the beginning of this
    iterator begin();
 
-   /// @return an iterator to the end of this
+   /// Returns an iterator to the end of this
    iterator end();
 };
 

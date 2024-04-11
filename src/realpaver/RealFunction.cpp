@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealFunction.hpp
+ * @brief  Real functions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/RealFunction.hpp"
@@ -25,7 +36,7 @@ Interval RealFunctionRep::getImage() const
    return img_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunction::RealFunction(SharedDag dag, size_t i)
       : rep_(std::make_shared<RealFunctionDag>(dag, i))
@@ -87,13 +98,13 @@ void RealFunction::violation(const RealPoint& pt, double& val, double& viol)
    rep_->violation(pt, val, viol);
 }
 
-void RealFunction::violation(const RealPoint& pt, double lo, double up, double& val,
-                             double& viol)
+void RealFunction::violation(const RealPoint& pt, double lo, double up,
+                             double& val, double& viol)
 {
    rep_->violation(pt, lo, up, val, viol);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunctionDag::RealFunctionDag(SharedDag dag, size_t i)
       : RealFunctionRep(),

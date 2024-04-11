@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RangeSlicer.cpp
+ * @brief  Classes of range slicers
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/RangeSlicer.hpp"
@@ -50,7 +61,7 @@ size_t RangeSlicer::nbSlices() const
    return cont_.size();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangeBisecter::applyImpl(const Range& x)
 {
@@ -72,7 +83,7 @@ void RangeBisecter::applyImpl(const Range& x)
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangePeeler::applyImpl(const Range& x)
 {
@@ -86,7 +97,7 @@ void RangePeeler::applyImpl(const Range& x)
       push(Range(a,b));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangeLeftFixer::applyImpl(const Range& x)
 {
@@ -94,7 +105,7 @@ void RangeLeftFixer::applyImpl(const Range& x)
    push(Range(x.left()+1,x.right()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangeRightFixer::applyImpl(const Range& x)
 {
@@ -102,7 +113,7 @@ void RangeRightFixer::applyImpl(const Range& x)
    push(Range(x.right(),x.right()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void RangeSprayer::applyImpl(const Range& x)
 {

@@ -45,37 +45,39 @@ void test_inv_4()
    TEST_FALSE(b);
 }
 
-void test_LU()
+void test_LU_1()
 {
    RealMatrix M({{4,3}, {6, 3}});
-
    RealMatrix L(2,2), U(2,2);
-   M.LU(&L,&U);
+
+   M.LU(L,U);
    TEST_TRUE(M==L*U);
 }
-void test_LU1()
+
+void test_LU_2()
 {
    RealMatrix M({{2, -1, 2}, {-4, 6, 3}, {-4, -2, 8}});
-
    RealMatrix L(3,3), U(3,3);
-   M.LU(&L,&U);
+
+   M.LU(L, U);
    TEST_TRUE(M==L*U);
 }
-void test_LU2()
+
+void test_LU_3()
 {
    RealMatrix M({ { 2, -1, -2 }, { -4, 6, 3 }, { -4, -2, 8 } });
-
    RealMatrix L(3,3), U(3,3);
-   M.LU(&L,&U);
+   
+   M.LU(L,U);
    TEST_TRUE(M==L*U);
 }
 
-void test_LU3()
+void test_LU_4()
 {
    RealMatrix M({{25, 5, 4}, {10, 8, 16}, {8, 12, 22}});
-
    RealMatrix L(3,3), U(3,3);
-   M.LU(&L,&U);
+
+   M.LU(L,U);
    TEST_TRUE(M==L*U);
 }
 
@@ -85,10 +87,10 @@ int main()
    TEST(test_inv_2)
    TEST(test_inv_3)
    TEST(test_inv_4)
-   TEST(test_LU)
-   TEST(test_LU1)
-   TEST(test_LU2)
-   TEST(test_LU3)
+   TEST(test_LU_1)
+   TEST(test_LU_2)
+   TEST(test_LU_3)
+   TEST(test_LU_4)
 
    END_TEST
 }

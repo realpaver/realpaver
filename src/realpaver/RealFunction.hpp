@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealFunction.hpp
+ * @brief  Real functions
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_REAL_FUNCTION_HPP
 #define REALPAVER_REAL_FUNCTION_HPP
@@ -14,10 +25,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of the hierarchy of representations of real
-/// functions.
-///////////////////////////////////////////////////////////////////////////////
+/// Base class of the hierarchy of representations of real functions
 class RealFunctionRep {
 public:
    /// Default constructor
@@ -35,55 +43,59 @@ public:
    /// Assigns the image of this
    void setImage(const Interval& img);
 
-   /// @return the image of this
+   /// Returns the image of this
    Interval getImage() const;
 
-   /// @return the scope of this, i.e. the set of variables
+   /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
 
-   /// @return the number of arguments of this
+   /// Returns the number of arguments of this
    virtual size_t nbVars() const = 0;
 
-   /// Evaluates this
-   /// @param pt values of variables
-   /// @return value of this at pt
+   /// Returns the evaluation of this on pt
    virtual double eval(const RealPoint& pt) = 0;
 
-   /// Differentiates this
-   /// @param pt values of variables
-   /// @param grad output vector such that grad[i] if the derivative of this
-   /// at pt with respect to the i-th variable of its scope
+   /**
+    * @brief Differentiates this.
+    * 
+    * grad is the output vector such that grad[i] if the derivative of this
+    * at pt with respect to the i-th variable of its scope
+    */
    virtual void diff(const RealPoint& pt, RealVector& grad) = 0;
 
-   /// Evaluates and differentiates this
-   /// @param pt values of variables
-   /// @param val result of evaluation of this at pt
-   /// @param grad output vector such that grad[i] if the derivative of this
-   /// at pt with respect to the i-th variable of its scope
+   /**
+    * @brief Evaluates and differentiates this.
+    * 
+    * val is the the evaluation of this at pt
+    * 
+    * grad is the output vector such that grad[i] if the derivative of this
+    * at pt with respect to the i-th variable of its scope
+    */
    virtual void evalDiff(const RealPoint& pt, double& val,
                          RealVector& grad) = 0;
 
-   /// Evaluates this and calculates the violation of the underlying constraint
-   /// @param pt values of variables
-   /// @param val evaluation of this at reg
-   /// @param viol 0.0 if the constraint is satisfied, a positive real number
-   ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at pt
-   ///
-   /// Given [lo, up] the image of this in the DagFun object, the underlying
-   /// constraint is defined by lo <= f(x) <= up.
+   /**
+    * @brief Evaluates this and calculates the violation of the constraint.
+    * 
+    * val is the the evaluation of this at pt
+    * 
+    * viol is equal to 0.0 if the constraint is satisfied, a positive real
+    * number otherwise equal to the width of the gap between the image of the
+    * function and the result of its evaluation at pt
+    */
    virtual void violation(const RealPoint& pt, double& val, double& viol) = 0;
 
-   /// Evaluates this and calculates the violation of the underlying constraint
-   /// @param pt values of variables
-   /// @param lo left bound for this
-   /// @param up right bound for this
-   /// @param val evaluation of this at pt
-   /// @param viol 0.0 if the constraint is satisfied, a positive real number
-   ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at pt
-   ///
-   /// The underlying constraint is defined by lo <= f(x) <= up.
+   /**
+    * @brief Evaluates this and calculates the violation of the constraint.
+    * 
+    * The image of the function is locally assigned to [lo, up].
+    * 
+    * val is the the evaluation of this at pt
+    * 
+    * viol is equal to 0.0 if the constraint is satisfied, a positive real
+    * number otherwise equal to the width of the gap between the image of the
+    * function and the result of its evaluation at pt
+    */
    virtual void violation(const RealPoint& pt, double lo, double up,
                           double& val, double& viol) = 0;
 
@@ -91,22 +103,26 @@ protected:
    Interval img_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the main class of real functions.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Main class of real functions.
+ * 
+ * A real function is supposed to be differentiable.
+ * 
+ * A real function is supposed to be associated with an image which makes
+ * it an inequality constraint of the form L <= F(x) <= U and allows to
+ * calculate violations. Fix L = -oo and U = +oo to eliminate the constraint.
+ * 
+ * This encloses a shared pointer to its representation. It is a lightweight
+ * object that can be copied and assigned.
+ */
 class RealFunction {
 public:
-   /// Constructor given an existing dag
-   /// @param dag expression graph
-   /// @param i index of function in the DAG
+   /// Constructor from the i-th function of a DAG
    RealFunction(SharedDag dag, size_t i);
 
-   /// Constructor that creates a DAG from a term
-   /// @param t a trerm
-   /// @param img the image of t
+   /// Constructor that creates a DAG from a term and assigns its image
    RealFunction(Term t, const Interval& img = Interval::universe());
 
    /// Default destructor
@@ -121,86 +137,87 @@ public:
    /// Assigns the image of this
    void setImage(const Interval& img);
 
-   /// @return the image of this
+   /// Returns the image of this
    Interval getImage() const;
 
-   /// @return the scope of this, i.e. the set of variables
+   /// Returns the scope of this, i.e. the set of variables
    Scope scope() const;
 
-   /// @return the number of arguments of this
+   /// Returns the number of arguments of this
    size_t nbVars() const;
 
-   /// Evaluates this
-   /// @param pt values of variables
-   /// @return value of this at pt
+   /// Evaluates this at pt
    double eval(const RealPoint& pt);
 
-   /// Differentiates this
-   /// @param pt values of variables
-   /// @param grad output vector such that grad[i] if the derivative of this
-   /// at pt with respect to the i-th variable of its scope
+   /**
+    * @brief Differentiates this.
+    * 
+    * grad is the output vector such that grad[i] if the derivative of this
+    * at pt with respect to the i-th variable of its scope
+    */
    void diff(const RealPoint& pt, RealVector& grad);
 
-   /// Evaluates and differentiates this
-   /// @param pt values of variables
-   /// @param val result of evaluation of this at pt
-   /// @param grad output vector such that grad[i] if the derivative of this
-   /// at pt with respect to the i-th variable of its scope
+   /**
+    * @brief Evaluates and differentiates this.
+    * 
+    * val is the the evaluation of this at pt
+    * 
+    * grad is the output vector such that grad[i] if the derivative of this
+    * at pt with respect to the i-th variable of its scope
+    */
    void evalDiff(const RealPoint& pt, double& val, RealVector& grad);
 
-   /// Evaluates this and calculates the violation of the underlying constraint
-   /// @param pt values of variables
-   /// @param val evaluation of this at reg
-   /// @param viol 0.0 if the constraint is satisfied, a positive real number
-   ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at pt
-   ///
-   /// Given [lo, up] the image of this in the DagFun object, the underlying
-   /// constraint is defined by lo <= f(x) <= up.
+   /**
+    * @brief Evaluates this and calculates the violation of the constraint.
+    * 
+    * val is the the evaluation of this at pt
+    * 
+    * viol is equal to 0.0 if the constraint is satisfied, a positive real
+    * number otherwise equal to the width of the gap between the image of the
+    * function and the result of its evaluation at pt
+    */
    void violation(const RealPoint& pt, double& val, double& viol);
 
-   /// Evaluates this and calculates the violation of the underlying constraint
-   /// @param pt values of variables
-   /// @param lo left bound for this
-   /// @param up right bound for this
-   /// @param val evaluation of this at pt
-   /// @param viol 0.0 if the constraint is satisfied, a positive real number
-   ///        otherwise equal to the width of the gap between the image of the
-   ///        function and the result of its evaluation at pt
-   ///
-   /// The underlying constraint is defined by lo <= f(x) <= up.
+   /**
+    * @brief Evaluates this and calculates the violation of the constraint.
+    * 
+    * The image of the function is locally assigned to [lo, up].
+    * 
+    * val is the the evaluation of this at pt
+    * 
+    * viol is equal to 0.0 if the constraint is satisfied, a positive real
+    * number otherwise equal to the width of the gap between the image of the
+    * function and the result of its evaluation at pt
+    */
    void violation(const RealPoint& pt, double lo, double up, double& val,
                   double& viol);
 
-   /// type of shared pointer to a representation
-   typedef std::shared_ptr<RealFunctionRep> SharedRep;
+   /// Type of shared pointer to a representation
+   using SharedRep = std::shared_ptr<RealFunctionRep>;
 
    /// Constructor
-   /// @param rep representation of this
    RealFunction(SharedRep rep);
 
-   /// @return the representation of this
+   /// Returns the representation of this
    SharedRep rep() const;
 
 private:
    SharedRep rep_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a real-valued function in a DAG.
-///
-/// This class is an adapter of the DagFun class.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Representation of a real function in a DAG.
+ *
+ * This class is an adapter of the DagFun class.
+ */
 class RealFunctionDag : public RealFunctionRep {
 public:
-   /// Constructor given an existing dag
-   /// @param dag expression graph
-   /// @param i index of function in the DAG
+   /// Constructor from the i-th function of a DAG
    RealFunctionDag(SharedDag dag, size_t i);
 
-   /// Constructor that creates a DAG from a term
-   /// @param t a trerm
-   /// @param img the image of t
+   /// Constructor that creates a DAG from a term and assigns its image
    RealFunctionDag(Term t, const Interval& img = Interval::universe());
 
    /// Default destructor
@@ -212,13 +229,12 @@ public:
    /// No asssignment
    RealFunctionDag& operator=(const RealFunctionDag&) = delete;
 
-   /// @return the dag
+   /// Returns the dag
    SharedDag dag() const;
 
-   /// @return the function index in the dag
+   /// Returns the function index in the dag
    size_t index() const;
 
-   ///@{
    Scope scope() const override;
    size_t nbVars() const override;
    double eval(const RealPoint& pt) override;
@@ -227,7 +243,6 @@ public:
    void violation(const RealPoint& pt, double& val, double& viol) override;
    void violation(const RealPoint& pt, double lo, double up, double& val,
                   double& viol) override;
-   ///@}
 
 private:
    SharedDag dag_;         // DAG

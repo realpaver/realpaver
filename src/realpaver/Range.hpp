@@ -184,11 +184,6 @@ public:
 
    bool isDisjoint(const Range& other) const;
    bool overlaps(const Range& other) const;
-
-   /**
-    * @brief Returns true if (this union other) = hull(this union other)
-    *        and if this and other are non empty.
-    */
    bool isJoinable(const Range& other) const;
 
    bool isCertainlyLeZero() const;

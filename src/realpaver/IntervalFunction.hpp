@@ -100,7 +100,7 @@ public:
    /**
     * @brief Evaluates this and calculates the violation of the constraint.
     * 
-    * The ilmage of the function is locally assigned to [lo, up].
+    * The image of the function is locally assigned to [lo, up].
     * 
     * val is the the evaluation of this on B
     * 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RLTRelaxation.hpp
+ * @brief  Reformulation-Linearization Techniques
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_RLT_RELAXATION_HPP
 #define REALPAVER_RLT_RELAXATION_HPP
@@ -17,18 +28,22 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This visits any dag node and generates linear under-estimation and
-/// over-estimation constraints.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Visitor used to linearize a DAG.
+ * 
+ * This visits any dag node and generates linear under-estimation and
+ * over-estimation constraints.
+ */
 class RltVisitor : public DagVisitor {
 public:
-   /// Creates a visitor
-   /// @param lpm linear program
-   /// @param mpi map node index -> index of linear variable in lpm
+   /**
+    * @brief Constructor.
+    * 
+    * lpm is the resulting linear program and mpi is a map that associates
+    * the index of a linear variable in lpm to a node index in the DAG.
+    */
    RltVisitor(LPModel* lpm, std::unordered_map<size_t, size_t>* mpi);
 
-   ///@{
    void apply(const DagConst* node) override;
    void apply(const DagVar* node) override;
    void apply(const DagAdd* node) override;
@@ -52,123 +67,166 @@ public:
    void apply(const DagCosh* node) override;
    void apply(const DagSinh* node) override;
    void apply(const DagTanh* node) override;
-   ///@}
 
 private:
    LPModel* lpm_;
    std::unordered_map<size_t, size_t>* mpi_;
 
-   /// @param node a node
-   /// @return the index of the linear variable associated with this node
+   /// Returns the index of the linear variable associated with this node
    size_t indexLinVar(const DagNode* node) const;
 };
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
-/// Generates a linear under-estimator constraint of a convex function y = f(x)
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param a left bound of x
-/// @param b right bound of x
-/// @param c point where the new constraint and the curve of f are tangent
-/// @param f the considered function
-/// @param df the derivative of f
+/**
+ * @brief Under-estimator constraint of a convex function.
+ * 
+ * Generates a linear under-estimator constraint of a convex function y = f(x).
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param a left bound of x
+ * @param b right bound of x
+ * @param c point where the new constraint and the curve of f are tangent
+ * @param f the considered function
+ * @param df the derivative of f
+ */
 void underConvex(LPModel& lm, size_t iy, size_t ix,
                  double a, double b, double c,
                  std::function<Interval(Interval)> f, 
                  std::function<Interval(Interval)> df);
 
-/// Generates a linear over-estimator constraint of a convex function y = f(x)
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param a left bound of x
-/// @param b right bound of x
-/// @param f the considered function
-void overConvex(LPModel& lm, size_t iy, size_t ix,
-                double a, double b,
+/**
+ * @brief Over-estimator constraint of a convex function.
+ * 
+ * Generates a linear over-estimator constraint of a convex function y = f(x).
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param a left bound of x
+ * @param b right bound of x
+ * @param f the considered function
+ */
+void overConvex(LPModel& lm, size_t iy, size_t ix, double a, double b,
                 std::function<Interval(Interval)> f);
 
-/// Generates a linear over-estimator constraint of a concave function y = f(x)
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param a left bound of x
-/// @param b right bound of x
-/// @param c point where the new constraint and the curve of f are tangent
-/// @param f the considered function
-/// @param df the derivative of f
+/**
+ * @brief Over-estimator constraint of a concave function.
+ * 
+ * Generates a linear over-estimator constraint of a concave function y = f(x).
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param a left bound of x
+ * @param b right bound of x
+ * @param c point where the new constraint and the curve of f are tangent
+ * @param f the considered function
+ * @param df the derivative of f
+ */
 void overConcave(LPModel& lm, size_t iy, size_t ix,
                  double a, double b, double c,
                  std::function<Interval(Interval)> f, 
                  std::function<Interval(Interval)> df);
 
-/// Generates a linear under-estimator constraint of a convex function y = f(x)
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param a left bound of x
-/// @param b right bound of x
-/// @param f the considered function
+/**
+ * @brief Under-estimator constraint of a concave function.
+ * 
+ * Generates a linear under-estimator constraint of a concave function y = f(x).
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param a left bound of x
+ * @param b right bound of x
+ * @param f the considered function
+ */
 void underConcave(LPModel& lm, size_t iy, size_t ix,
                   double a, double b,
                   std::function<Interval(Interval)> f);
 
-/// Generates a linear relaxation of a trigonometric function y = f(x)
-/// such that there is no stationary point in the considered domain of x
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param a left bound of x
-/// @param b right bound of x
-/// @param f the considered function
-/// @param df the derivative of f
+/**
+ * @brief Relaxation of a concavo-convex trigonometric function.
+ * 
+ * Generates a linear relaxation of a concavo-convex trigonometric function
+ * y = f(x).
+ * 
+ * such that there is no stationary point in the considered domain of x
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param a left bound of x
+ * @param b right bound of x
+ * @param f the considered function
+ * @param df the derivative of f
+ */
 void relaxConcavoConvexCosSin(LPModel& lm, size_t iy, size_t ix,
                               double a, double b,
                               std::function<Interval(Interval)> f, 
                               std::function<Interval(Interval)> df);
 
-/// Generates a linear over-estimator constraint passing through two points
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param x1 abcissa of the first point
-/// @param y1 ordinate of the first point
-/// @param x2 abcissa of the second point
-/// @param y2 ordinate of the second point
+/**
+ * @brief Over-estimator constraint passing through two points.
+ * 
+ * Generates a linear over-estimator constraint passing through two points.
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param x1 abcissa of the first point
+ * @param y1 ordinate of the first point
+ * @param x2 abcissa of the second point
+ * @param y2 ordinate of the second point
+ */
 void overLine(LPModel& lm, size_t iy, size_t ix,
               double x1, double y1, double x2, double y2);
 
-/// Generates a linear under-estimator constraint passing through two points
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param x1 abcissa of the first point
-/// @param y1 ordinate of the first point
-/// @param x2 abcissa of the second point
-/// @param y2 ordinate of the second point
+/**
+ * @brief Under-estimator constraint passing through two points.
+ * 
+ * Generates a linear under-estimator constraint passing through two points.
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param x1 abcissa of the first point
+ * @param y1 ordinate of the first point
+ * @param x2 abcissa of the second point
+ * @param y2 ordinate of the second point
+ */
 void underLine(LPModel& lm, size_t iy, size_t ix,
                double x1, double y1, double x2, double y2);
 
-/// Generates a linear over-estimator constraint passing through one point
-/// given its slope
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param x1 abcissa of the point
-/// @param y1 ordinate of the point
-/// @param m slope
+/**
+ * @brief Over-estimator constraint passing through one point given its slope.
+ * 
+ * Generates a linear over-estimator constraint passing through one point
+ * given its slope.
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param x1 abcissa of the point
+ * @param y1 ordinate of the point
+ * @param m slope
+ */
 void overLine(LPModel& lm, size_t iy, size_t ix, double x1, double y1, double m);
 
-/// Generates a linear under-estimator constraint passing through one point
-/// given its slope
-/// @param lm linear program in which the new consraint is inserted
-/// @param iy index of y in lm
-/// @param ix index of x in lm
-/// @param x1 abcissa of the point
-/// @param y1 ordinate of the point
-/// @param m slope
+/**
+ * @brief Under-estimator constraint passing through one point given its slope.
+ * 
+ * Generates a linear under-estimator constraint passing through one point
+ * given its slope.
+ * 
+ * @param lm linear program in which the new consraint is inserted
+ * @param iy index of y in lm
+ * @param ix index of x in lm
+ * @param x1 abcissa of the point
+ * @param y1 ordinate of the point
+ * @param m slope
+ */
 void underLine(LPModel& lm, size_t iy, size_t ix, double x1, double y1, double m);
 
 } // namespace

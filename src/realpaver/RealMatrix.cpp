@@ -1,11 +1,23 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealMatrix.cpp
+ * @brief  Dense real matrix
+ * @author Laurent Granvilliers
+ * @author Raphaël Chenouard (LU decomposition)
+ * @date   2022-5-6
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Param.hpp"
@@ -336,29 +348,22 @@ void RealMatrix::setMinPivot(double val)
 }
 
 // Doolittle algorithm
-void RealMatrix::LU(RealMatrix* L, RealMatrix* U) const
+void RealMatrix::LU(RealMatrix& L, RealMatrix& U) const
 {
-   ASSERT(this->nrows()==this->ncols(), "LU decomposition only apply to square matrices");
-   if (L != nullptr)
+   ASSERT(nrows()==ncols(), "LU decomposition only apply to square matrices");
+
+   ASSERT(nrows()==L.nrows(),"L has a wrong number of rows");
+   ASSERT(ncols()==L.ncols(),"L has a wrong number of columns");
+
+   ASSERT(nrows()==U.nrows(),"U has a wrong number of rows");
+   ASSERT(ncols()==U.ncols(),"U has a wrong number of columns");
+
+   // Decomposing matrix into Upper and Lower triangular matrix
+   // Adaptation from:
+   // https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
+   for (size_t i=0; i<nrows(); i++) 
    {
-      ASSERT(this->nrows()==L->nrows(),"L has a wrong number of rows");
-      ASSERT(this->ncols()==L->ncols(),"L has a wrong number of columns");
-   }
-   else
-      L = new RealMatrix(this->nrows(),this->ncols());
-   if (U != nullptr)
-   {
-      ASSERT(this->nrows()==U->nrows(),"U has a wrong number of rows");
-      ASSERT(this->ncols()==U->ncols(),"U has a wrong number of columns");
-   }
-   else
-      U = new RealMatrix(this->nrows(),this->ncols());
-   // Adaptation from: https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
-   // Decomposing matrix into Upper and Lower
-   // triangular matrix
-   for (size_t i = 0; i < this->nrows(); i++) 
-   { // i is the row number
-      for (size_t j = 0; j < this->ncols(); j++)
+      for (size_t j=0; j<ncols(); j++)
       {
          if (i<=j)
          {
@@ -366,42 +371,38 @@ void RealMatrix::LU(RealMatrix* L, RealMatrix* U) const
             double sum_U = 0;
             for (size_t k = 0; k < i; k++)
             {  
-               sum_U += ((*L)(i,k) * (*U)(k,j));
+               sum_U += (L(i,k) * U(k,j));
             }
             // Evaluating U(i, k)
-            (*U)(i,j) = (*this)(i,j) - sum_U; // sum_U = 0 when i=0
+            U(i,j) = (*this)(i,j) - sum_U; // sum_U = 0 when i=0
             
             if (i == j)
-               (*L)(i,i) = 1; // Diagonal as 1
+               L(i,i) = 1; // Diagonal as 1
          }
          else
          {
             // Summation of L(i, k) * U(k, i)
             double sum_L = 0;
             for (size_t k = 0; k < j; k++)
-               sum_L += ((*L)(i,k) * (*U)(k,j));
+               sum_L += (L(i,k) * U(k,j));
             // Evaluating L(k, i)
-            (*L)(i,j) = ((*this)(i,j) - sum_L) / (*U)(j,j); // sum_L = 0 when i=0
+            L(i,j) = ((*this)(i,j) - sum_L) / U(j,j); // sum_L = 0 when i=0
          }
-         
       }
-    }
+   }
 }
 
 bool RealMatrix::isPositiveDefinite() const
 {
-   RealMatrix L(this->nrows(),this->ncols());
-   RealMatrix U(this->nrows(),this->ncols());
-   this->LU(&L,&U);
-   for (size_t i = 0; i < U.nrows(); i++)
-   {
-      if (U(i,i)<0)
-         return false;
-   }
+   RealMatrix L(nrows(), ncols());
+   RealMatrix U(nrows(), ncols());
+   LU(L,U);
+
+   for (size_t i=0; i<U.nrows(); i++)
+      if (U(i,i)<0.0) return false;
+
    return true;
 }
-
-
 
 bool RealMatrix::operator==(const RealMatrix& A) const
 {
