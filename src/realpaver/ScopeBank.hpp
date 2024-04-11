@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ScopeBank.hpp
+ * @brief  Bank of scopes
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_SCOPE_BANK_HPP
 #define REALPAVER_SCOPE_BANK_HPP
@@ -15,26 +26,28 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a bank of scopes in order to share them.
-///
-/// This class implements the Singleton pattern.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Bank of scopes in order to share them.
+ *
+ * This class implements the Singleton pattern.
+ */
 class ScopeBank {
 public:
-   /// @return the instance
+   /// Returns the instance
    static ScopeBank* getInstance();
 
-   /// @return the number of scopes in this
+   /// Returns the number of scopes in this
    size_t size() const;
 
-   /// @return the number of scopes that have been inserted in this
+   /// Returns the number of scopes that have been inserted in this
    size_t nbInsertions() const;
 
-   /// Inserts a scope in this
-   /// @param scop a scope
-   /// @return if there is a scope S in this that is equal to scop then S is
-   ///         returned, scop is returned otherwise
+   /**
+    * @brief Inserts a scope in this.
+    * 
+    * If there is a scope S in this that is equal to scop then S is eturned,
+    * scop is inserted and returned otherwise.
+    */
    Scope insertScope(Scope scop);
 
 private:

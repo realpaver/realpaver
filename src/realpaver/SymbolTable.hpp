@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   SymbolTable.hpp
+ * @brief  Symbol table for parsing
+ * @author Laurent Granvilliers
+ * @date   2022-5-6
+ */
 
 #ifndef REALPAVER_SYMBOL_TABLE_HPP
 #define REALPAVER_SYMBOL_TABLE_HPP
@@ -18,21 +29,16 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of symbols managed by parsers.
-///////////////////////////////////////////////////////////////////////////////
+/// Base class of symbols managed by parsers
 class ParsingSymbol {
 public:
    /// Constructor
-   /// @param name symbol name
-   ///
-   /// Throws an exception if name is empty.
    ParsingSymbol(const std::string& name);
 
    /// Virtual destructor
    virtual ~ParsingSymbol();
 
-   /// @return the name of the symbol
+   /// Returns the name of the symbol
    std::string getName() const;
 
 private:
@@ -40,103 +46,93 @@ private:
    size_t hcode_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a symbol representing an interval constant.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Symbol representing an interval constant
 class ConstantSymbol : public ParsingSymbol {
 public:
    /// Constructor
-   /// @param name symbol name
-   /// @param x value
    ConstantSymbol(const std::string& name, const Interval& x);
 
-   /// @return the value of this
+   /// Returns the value of this
    Interval getValue() const;
 
 private:
    Interval x_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a symbol representing a variable.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Symbol representing a variable
 class VariableSymbol : public ParsingSymbol {
 public:
    /// Constructor
-   /// @param v a variable
    VariableSymbol(Variable v);
 
-   /// @return the variable in this
+   /// Returns the variable in this
    Variable getVar() const;
 
 private:
    Variable v_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a symbol representing a term.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Symbol representing a term
 class AliasSymbol : public ParsingSymbol {
 public:
    /// Constructor
-   /// @param name name of the alias
    AliasSymbol(const std::string& name, const Term& t);
 
-   /// @return the term enclosed
+   /// Returns the term enclosed
    Term getTerm() const;
 
 private:
    Term t_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a symbol representing a function.
-///
-/// A function symbol has a name, a list of arguments represented by variables
-/// and an expression.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Symbol representing a function.
+ *
+ * A function symbol has a name, a list of arguments represented by variables
+ * and an expression.
+ */
 class FunctionSymbol : public ParsingSymbol {
 public:
    /// Constructor
-   /// @param name name of the function
    FunctionSymbol(const std::string& name);
 
    /// Adds an argument to this in the last place
-   /// @param name name of the argument
    void addArgument(const std::string& name);
 
-   /// @return the number of arguments of this
+   /// Returns the number of arguments of this
    size_t arity() const;
 
-   /// Gets an argument
-   /// @param i an index such that 0 <= i < arity()
+   /// Gets the i-th argument with 0 <= i < arity()
    Variable getArgument(size_t i) const;
 
-   /// Gets an argument
-   /// @param name name of the variable
-   /// @return the argument of this having this name
+   /// Gets an argument given its name
    Variable getVar(const std::string& name) const;
 
    /// Tests if this has an argument
-   /// @param name name of an argument
-   /// @return true if this has the argument, false otherwise
    bool hasArgument(const std::string& name) const;
 
-   /// Assigns the expression of this
-   /// @param t term assigned
-   /// @return true if the variables of t are the arguments of this
+   /**
+    * @brief Assigns an expression of this.
+    * 
+    * Returns true if the variables of t correspond to the arguments of this.
+    */
    bool setTerm(const Term& t);
 
-   /// @return the expression of this
+   /// Returns the expression of this
    Term getTerm() const;
 
-   /// Gets the index of an argument
-   /// @param v an argument of this
-   /// @return the index of v in this
+   /// Gets the index of v in this
    size_t getIndexVar(const Variable& v) const;
 
    /// Output on a stream
-   /// @param os an output stream
    void print(std::ostream& os) const;
 
 private:
@@ -145,31 +141,29 @@ private:
    Scope scop_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a call to a function.
-///
-/// A function call is defined by a function symbol and list of terms
-/// assigned to its arguments.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Call to a function.
+ *
+ * A function call is defined by a function symbol and list of terms
+ * assigned to its arguments.
+ */
 class FunctionCall {
 public:
    /// Constructor
-   /// @param f function called
    FunctionCall(FunctionSymbol* f);
 
    /// Adds a term in the last place
-   /// @param t term assigned to an argument
    void addTerm(Term t);
 
-   /// @return the function symbol enclosed
+   /// Returns the function symbol enclosed
    FunctionSymbol* getFunctionSymbol() const;
 
-   /// @return the number of terms assigned to the arguments
+   /// Returns the number of terms assigned to the arguments
    size_t nbTerms() const;
 
-   /// Gets a term assigned to an argument
-   /// @param i index of an argument
-   /// @return the term assigned to the i-th argument
+   /// Gets the term assigned to the i-th argument
    Term getTerm(size_t i) const;
 
 private:
@@ -177,18 +171,20 @@ private:
    std::vector<Term> lt_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a table of symbols managed by parsers.
-///
-/// There are several types of symbols:
-/// - constants;
-/// - variables;
-/// - aliases;
-/// - functions.
-///
-/// This has a stack of function calls which supports the composition of
-/// function calls.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Table of symbols managed by parsers.
+ *
+ * There are several types of symbols:
+ * - constants;
+ * - variables;
+ * - aliases;
+ * - functions.
+ *
+ * This has a stack of function calls which supports the composition of
+ * function calls.
+ */
 class SymbolTable {
 public:
    /// Creates an empty table
@@ -204,83 +200,58 @@ public:
    SymbolTable& operator=(const SymbolTable&) = delete;
 
    /// Membership test
-   /// @param name a string
-   /// @return true if this contains a symbol having this name
    bool hasSymbol(const std::string& name) const;
 
    /// Clears this
    void clear();
 
    /// Inserts a keyword
-   /// @param name a string
    void insertKeyword(const std::string& name);
 
    /// Finds a constant
-   /// @param name a string
-   /// @return the constant symbol having this name if it exists,
-   ///         nullptr otherwise
    ConstantSymbol* findConstant(const std::string& name) const;
 
    /// Creates and inserts a constant symbol
-   /// @param name symbol name
-   /// @param x value
-   /// @return the new symbol
    ConstantSymbol* insertConstant(const std::string& name, const Interval& x);
 
    /// Finds a variable
-   /// @param name a string
-   /// @return the variable symbol having this name if it exists,
-   ///         nullptr otherwise
    VariableSymbol* findVariable(const std::string& name) const;
 
    /// Creates and inserts a variable symbol
-   /// @param name symbol name
-   /// @param v the variable object
-   /// @return the new symbol
    VariableSymbol* insertVariable(const std::string& name, Variable v);
 
    /// Finds an alias
-   /// @param name a string
-   /// @return the alias symbol having this name if it exists,
-   ///         nullptr otherwise
    AliasSymbol* findAlias(const std::string& name) const;
 
    /// Creates and inserts an alias symbol
-   /// @param name symbol name
-   /// @param t term assigned to this symbol
-   /// @return the new symbol
    AliasSymbol* insertAlias(const std::string& name, const Term& t);
 
    /// Finds a function
-   /// @param name a string
-   /// @return the function symbol having this name if it exists,
-   ///         nullptr otherwise
    FunctionSymbol* findFunction(const std::string& name) const;
 
    /// Creates and inserts a function symbol
-   /// @param name symbol name
-   /// @return the new symbol
    FunctionSymbol* insertFunction(const std::string& name);
 
    /// Opens and pushes a new function call
-   /// @param f the function called
    void pushFunctionCall(FunctionSymbol* f);
 
    /// Pops the last function call
    void popFunctionCall();
 
    /// Assigns a term to an argument of the last function called
-   /// @param t term assigned
    void addFunctionArgument(Term t);
 
-   /// @return true if there is at least one function called
+   /// Returns true if there is at least one function called
    bool hasFunctionCall() const;
 
-   /// Processes and pops the last function call
-   /// @return a pair (res, t) such that res is false in case of failure
-   ///         (the number of terms assigned is different fron the arity of
-   ///         the function), res is true otherwise and in this case t is
-   ///         the term corresponding to the function call
+   /**
+    * @brief Processes and pops the last function call.
+    * 
+    * Returns a pair (res, t) such that res is false in case of failure (the
+    * number of terms assigned is different fron the arity of the function),
+    * res is true otherwise and in this case t is the term corresponding to the
+    * function call.
+    */
    std::pair<bool, Term> processFunCall();
 
 private:
@@ -293,16 +264,14 @@ private:
    std::stack<FunctionCall> call_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor of terms used to process a function call.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Visitor of terms used to process a function call
 class FunctionCallProcessor : public TermVisitor {
 public:
    /// Creates a visitor
-   /// @param fc a function call
    FunctionCallProcessor(FunctionCall* fc);
 
-   ///@{
    void apply(const TermConst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
@@ -326,8 +295,8 @@ public:
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;
-   ///@}
 
+   /// Returns the new term
    Term getTerm() const;
 
 private:
