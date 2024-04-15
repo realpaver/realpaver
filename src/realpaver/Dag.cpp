@@ -76,7 +76,7 @@ void DagNode::setDom(const Interval& x)
 
 void DagNode::reduceDom(const Interval& x)
 {
-   dag_->reduceDom(index_, x);
+   dag_->reduceDom(index_, isShared(), x);
 }
 
 size_t DagNode::index() const
@@ -2109,17 +2109,12 @@ void Dag::setDom(size_t i, const Interval& x)
    context_->dom.set(i, x);
 }
 
-void Dag::reduceDom(size_t i, const Interval& x)
-{   
-   if (node_[i]->isShared())
-   {
-      Interval aux( x & context_->dom[i]);
-      context_->dom.set(i, aux);
-   }
+void Dag::reduceDom(size_t i, bool shared, const Interval& x)
+{
+   if (shared)
+      context_->dom.set(i, x & context_->dom[i]);
    else
-   {
       context_->dom.set(i, x);
-   }
 }
 
 DagContext* Dag::cloneDefaultContext() const

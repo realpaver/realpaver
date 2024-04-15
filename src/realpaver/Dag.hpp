@@ -1179,7 +1179,7 @@ public:
    void setDom(size_t i, const Interval& x);
 
    /// Reduces the domain of the i-th node
-   void reduceDom(size_t i, const Interval& x);
+   void reduceDom(size_t i, bool shared, const Interval& x);
 
    /**
     * @brief Interval evaluation on B.
