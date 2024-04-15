@@ -196,6 +196,9 @@ private:
  */
 class Term {
 public:
+   /// Type of shared representation
+   using SharedRep = std::shared_ptr<TermRep>;
+
    /// @name Constructors
    ///@{
 
@@ -329,10 +332,7 @@ public:
 
    /// Division with assignment
    Term& operator/=(Term other);
-
-   /// Type of shared representation
-   using SharedRep = TermRep::SharedRep;
-
+ 
    /// Returns the representation of this
    SharedRep rep() const;
 
