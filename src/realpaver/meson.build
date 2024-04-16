@@ -27,20 +27,23 @@ rp_headers = []
 
 # Interval library
 if interval_lib_name.to_upper() == 'GAOL'
-  gaol_header = custom_target('gen-interval-header',
+  interval_header = custom_target('gen-interval-header',
     input: 'IntervalGaol.hpp',
     output: 'IntervalImpl.hpp',
     command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
     install: true,
     install_dir: 'include/realpaver')
 elif interval_lib_name.to_upper() == 'INUM64'
-  inum64_header = custom_target('gen-interval-header',
+  interval_header = custom_target('gen-interval-header',
     input: 'IntervalInum64.hpp',
     output: 'IntervalImpl.hpp',
     command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
     install: true,
     install_dir: 'include/realpaver')
+else
+  error('Invalid interval library: ' + interval_lib_name)
 endif
+rp_sources += [interval_header]
 
 # LP library
 lp_header_hpp = ''
@@ -57,6 +60,8 @@ elif lp_lib_name.to_upper() == 'SOPLEX'
 elif lp_lib_name.to_upper() == 'HIGHS'
   lp_header_hpp += 'LPSolverHighs.hpp'
   rp_sources += ['LPSolverHighs.cpp']
+else
+  error('Invalid linear solver library: ' + lp_lib_name)
 endif
 
 lp_header = custom_target('gen-lp-header',
@@ -65,6 +70,7 @@ lp_header = custom_target('gen-lp-header',
     command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
     install: true,
     install_dir : 'include/realpaver')
+rp_sources += [lp_header]
 
 # Local NLP solver
 if local_solver_dep.found()
@@ -83,7 +89,7 @@ if local_solver_dep.found()
     command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
     install: true,
     install_dir: 'include/realpaver')
-rp_sources += [nlp_header]
+  rp_sources += [nlp_header]
 endif
 
 # flex, bison
