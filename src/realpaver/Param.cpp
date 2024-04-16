@@ -68,7 +68,7 @@ Param::Param()
    dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
    dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT",     10.0));
    dblmap_.insert(std::make_pair("ACID_CT_RATIO",             0.002));
-   dblmap_.insert(std::make_pair("NEWTON_WIDTH_LIMIT",        1.5));
+   dblmap_.insert(std::make_pair("NEWTON_WIDTH_LIMIT",        0.5));
 
    dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
    dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
