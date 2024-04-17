@@ -993,7 +993,7 @@ Range operator%(const Range& x, int n)
    else if (n==1)
       return Range(0);
 
-   else if (xx.nbElems() >= n)
+   else if (xx.nbElems() >= (unsigned long)n)
       return Range(0, n-1);
 
    else

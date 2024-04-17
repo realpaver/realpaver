@@ -107,7 +107,7 @@ private:
 
    std::vector<size_t> kVarCID_;
 
-   size_t call_;        // number of calls of the contract method
+   int call_;           // number of calls of the contract method
    int learnLength_;    // number of calls in the learning phase
    int cycleLength_;    // number of calls in a cycle made of an exploitation
                         // phase and a learning phase

@@ -97,7 +97,7 @@ Proof ContractorACID::contract(IntervalBox& B)
    ssr_->calculate(B);
    ssr_->sort();
 
-   size_t mcall = call_ % cycleLength_;
+   int mcall = call_ % cycleLength_;
 
    if (mcall < learnLength_)
    {

@@ -38,7 +38,7 @@ int main(int argc, char** argv)
       {
          if (j == i) continue;
          of << "cos(x" << j << ")";
-         if ((i<dim && j<dim) || (i==dim & j<dim-1)) of << "+";
+         if ((i<dim && j<dim) || (i==dim && j<dim-1)) of << "+";
       }
       of << ")-";
       of << i+1 << "*cos(x" << i << ")-sin(x" << i << ") == 0";

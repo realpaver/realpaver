@@ -39,7 +39,7 @@ void DomainSlicerMap::setSlicer(DomainType type,
 {
    int i = static_cast<int>(type);
 
-   if (i >= slc_.size())
+   if (i >= (int)slc_.size())
    {
       for (int k=slc_.size(); k<=i; ++k)
          slc_.push_back(nullptr);
@@ -52,7 +52,7 @@ void DomainSlicerMap::setSlicer(DomainType type,
 DomainSlicer* DomainSlicerMap::getSlicer(DomainType type) const
 {
    int i = static_cast<int>(type);
-   return (i < slc_.size()) ? slc_[i] : nullptr;
+   return (i < (int)slc_.size()) ? slc_[i] : nullptr;
 }
 
 bool DomainSlicerMap::hasSlicer(DomainType type) const

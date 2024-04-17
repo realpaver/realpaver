@@ -214,7 +214,7 @@ void RangeUnion::contract(const Interval& x)
    v_[last] &= r;
 
    // removes the intervals after last
-   if (last < v_.size()-1)
+   if (last < (int)(v_.size()-1))
    {
       auto it = v_.begin();
       std::advance(it, last+1);
