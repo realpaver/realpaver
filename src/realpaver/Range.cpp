@@ -1022,7 +1022,7 @@ std::pair<Range,Range> extMod(const Range& x, int n)
    else if (n==1)
       return std::make_pair(Range(0), Range::emptyset());
 
-   else if (xx.nbElems() >= n)
+   else if (xx.nbElems() >= (unsigned long)n)
       return std::make_pair(Range(0, n-1), Range::emptyset());
 
    else

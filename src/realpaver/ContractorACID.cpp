@@ -160,7 +160,7 @@ Proof ContractorACID::contract(IntervalBox& B)
       else
       {
          size_t i=0;
-         while ((proof != Proof::Empty) && (i<numVarCID_))
+         while ((proof != Proof::Empty) && (i<(size_t)numVarCID_))
          {
             size_t j = i % n_;
             Variable v = ssr_->getVar(j);
