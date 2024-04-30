@@ -22,6 +22,7 @@
 #include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/NcspSpaceDMDFS.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -170,6 +171,9 @@ void NcspSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
       if (e < d)
          d = e;
    }
+
+   LOG_INTER("Insert node " << node->index()
+                            << " / distance to the closest solution : " << d);
 
    Elem elem = { node, d };
    vnode_.push_back(elem);

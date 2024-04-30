@@ -20,6 +20,7 @@
 
 #include "AssertDebug.hpp"
 #include "DomainBox.hpp"
+#include "Logger.hpp"
 
 namespace realpaver {
 
@@ -220,14 +221,26 @@ double DomainBox::gridPerimeterOnScope(const Scope& scop) const
 {
    double p = 0.0;
 
+   LOG_FULL("Grid perimeter");
+
    for (const auto& v : scop)
    {
       Interval x = get(v)->intervalHull();
       Tolerance tol = v.getTolerance();
 
-      if (tol.isTight(x))
-         p += x.width() / tol.getAbsTol();
+      if (!tol.isTight(x))
+      {
+         double w = x.width();
+         double z = w / tol.getAbsTol();
+         
+         LOG_FULL("   > " << v.getName() << " : " << w << " / "
+                          << tol.getAbsTol() << " = " << z);
+         
+         p += z;
+      }
    }
+
+   LOG_FULL("   > " << p);
 
    return p;
 }

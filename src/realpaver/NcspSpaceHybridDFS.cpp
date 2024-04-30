@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <list>
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/NcspSpaceHybridDFS.hpp"
 
 namespace realpaver {
@@ -64,6 +65,9 @@ SharedNcspNode DepthNcspNodeSet::extract()
 {
    auto it = set_.begin();
    SharedNcspNode node = it->node;
+
+   LOG_INTER("Extract node " << node->index() << " / depth : " << it->depth);
+
    set_.erase(it);
    return node;
 }
@@ -89,7 +93,11 @@ size_t PerimeterNcspNodeSet::size() const
 
 void PerimeterNcspNodeSet::insert(const SharedNcspNode& node)
 {
-   Elem e = { node, node->box()->perimeter() };
+   double p = node->box()->perimeter();
+
+   LOG_INTER("Insert node " << node->index() << " / perimeter : " << p);
+
+   Elem e = { node, p };
    set_.insert(e);
 }
 
@@ -97,6 +105,9 @@ SharedNcspNode PerimeterNcspNodeSet::extract()
 {
    auto it = set_.begin();
    SharedNcspNode node = it->node;
+
+   LOG_INTER("Extract node " << node->index() << " / perimeter : " << it->peri);
+
    set_.erase(it);
    return node;
 }
@@ -122,7 +133,11 @@ size_t GridPerimeterNcspNodeSet::size() const
 
 void GridPerimeterNcspNodeSet::insert(const SharedNcspNode& node)
 {
-   Elem e = { node, node->box()->gridPerimeter() };
+   double p = node->box()->gridPerimeter();
+
+   LOG_INTER("Insert node " << node->index() << " / grid perimeter : " << p);
+
+   Elem e = { node, p };
    set_.insert(e);
 }
 
@@ -130,6 +145,10 @@ SharedNcspNode GridPerimeterNcspNodeSet::extract()
 {
    auto it = set_.begin();
    SharedNcspNode node = it->node;
+
+   LOG_INTER("Extract node " << node->index() << " / grid perimeter : "
+                             << it->peri);
+
    set_.erase(it);
    return node;
 }
