@@ -22,6 +22,7 @@
 #define REALPAVER_DOMAIN_SLICER_HPP
 
 #include <list>
+#include <memory>
 #include "realpaver/Domain.hpp"
 
 namespace realpaver {
