@@ -56,6 +56,7 @@ Param::Param()
    intmap_.insert(std::make_pair("NB_SLICE_CID",              3));
    intmap_.insert(std::make_pair("ACID_LEARN_LENGTH",         50));
    intmap_.insert(std::make_pair("ACID_CYCLE_LENGTH",         1000));
+   intmap_.insert(std::make_pair("TRACE_FREQUENCY",           1000));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));

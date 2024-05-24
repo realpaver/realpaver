@@ -42,6 +42,9 @@ LOG_LEVEL = NONE
 # Trace displayed in a terminal (YES or NO)
 TRACE = YES
 
+# Trace displayed every N nodes where N is the value of this parameter
+TRACE_FREQUENCY = 1000
+
 # Display of regions
 # STD: standard display with one variable and its domain per line
 # VEC: display as a vector of domains

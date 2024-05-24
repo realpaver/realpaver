@@ -435,11 +435,12 @@ void NcspSolver::branchAndPrune()
    int depthlimit = env_->getParam()->getIntParam("DEPTH_LIMIT");
 
    bool trace = env_->getParam()->getStrParam("TRACE") == "YES";
+   int tracefreq = env_->getParam()->getIntParam("TRACE_FREQUENCY");
 
    bool iter = true;
 
-   size_t nsol = 0;
-   size_t nnodes = 0, tnodes = 0;
+   size_t last_nb_sol = 0;
+   size_t nb_nodes_processed = 0;
 
 #if LOG_ON
    static Timer timerBP;
@@ -448,37 +449,36 @@ void NcspSolver::branchAndPrune()
 
    do
    {
-      ++nnodes;
-      ++tnodes;
+      ++nb_nodes_processed;
       bpStep(depthlimit);
-      size_t soln = space_->nbSolNodes();
 
-      if (soln > nsol)
+      // trace every new solution
+      size_t nb_sol = space_->nbSolNodes();
+      if (nb_sol > last_nb_sol)
       {
-         nsol = soln;
+         last_nb_sol = nb_sol;
          if (trace)
          {
-            std::cout << "\tnb sol: " << "\033[34m" << nsol << "\033[39m"
+            std::cout << "\tnb sol: " << "\033[34m" << nb_sol << "\033[39m"
                       << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime()
                       << "s" << "\033[39m"
-                      << "\t\tspace size: " << "\033[31m" << space_->nbPendingNodes()
-                      << "\033[39m" << std::endl;
-         }
-         
-         nnodes = 0;
-      }
-      else
-      {
-         if (trace && nnodes % 1000 == 0)
-         {
-            std::cout << "\tnb nod: " << "\033[34m" << tnodes << "\033[39m"
-                      << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime()
-                      << "s" << "\033[39m"
-                      << "\t\tspace size: " << "\033[31m" << space_->nbPendingNodes()
+                      << "\t\tspace size: " << "\033[31m"
+                      << space_->nbPendingNodes()
                       << "\033[39m" << std::endl;
          }
       }
 
+      // trace every N nodes where N is the frequency
+      if (trace && nb_nodes_processed % tracefreq == 0)
+      {
+         std::cout << "\tnb nod: " << "\033[34m" << nb_nodes_processed
+                   << "\033[39m" << "\t\ttime: " << "\033[32m"
+                   << stimer_.elapsedTime() << "s" << "\033[39m"
+                   << "\t\tspace size: " << "\033[31m"
+                   << space_->nbPendingNodes() << "\033[39m" << std::endl;
+      }
+
+      // tests the stopping criteria
       if (space_->nbPendingNodes() == 0)
       {
          LOG_MAIN("Stops since there is no more pending node");
