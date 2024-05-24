@@ -70,7 +70,6 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    fun_call
 %type <u_term>    integer
 %type <u_term>    real
-%type <u_term>    exponent
 %type <u_term>    positive_number
 %type <u_term>    itv
 %type <u_term>    itv_left
@@ -751,11 +750,11 @@ expr
                       res(pow(t, e));
       $$ = res.cloneRoot();
     }
-  | TK_POW TK_LPAR expr TK_COMMA exponent TK_RPAR
+  | TK_POW TK_LPAR expr TK_COMMA expr TK_RPAR
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
-                      d(realpaver::Term::SharedRep($5)),
-                      res(pow(t, d.evalConst()));
+                      e(realpaver::Term::SharedRep($5)),
+                      res(pow(t, e));
       $$ = res.cloneRoot();
     }
   | TK_MINUS expr %prec TK_UMINUS
@@ -987,17 +986,6 @@ expr_list
 expr_tail
   :
   | TK_COMMA expr_list
-  ;
-
-exponent
-  : integer
-    {
-      $$ = $1;
-    }
-  | real
-    {
-      $$ = $1;
-    }
   ;
 
 positive_number
