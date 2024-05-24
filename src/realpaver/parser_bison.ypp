@@ -71,6 +71,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_term>    integer
 %type <u_term>    real
 %type <u_term>    exponent
+%type <u_term>    positive_number
 %type <u_term>    itv
 %type <u_term>    itv_left
 %type <u_term>    itv_right
@@ -284,7 +285,7 @@ var_real_tail
 
 var_tol
   :
-  | TK_STR_TOL TK_LPAR real TK_COMMA real TK_RPAR
+  | TK_STR_TOL TK_LPAR positive_number TK_COMMA positive_number TK_RPAR
     {
       try
       {
@@ -989,6 +990,17 @@ expr_tail
   ;
 
 exponent
+  : integer
+    {
+      $$ = $1;
+    }
+  | real
+    {
+      $$ = $1;
+    }
+  ;
+
+positive_number
   : integer
     {
       $$ = $1;
