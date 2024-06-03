@@ -151,6 +151,9 @@ struct IntervalTraits
    /// Returns true if x is [0, 0]
    static bool isZero(const interval& x);
 
+   /// Returns true if x is [1, 1]
+   static bool isOne(const interval& x);
+
    /// Returns true if x is an int
    static bool isAnInt(const interval& x);
 

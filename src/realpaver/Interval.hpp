@@ -150,6 +150,7 @@ public:
    bool isInfRight() const;
    bool isSingleton() const;
    bool isZero() const;
+   bool isOne() const;
    bool isAnInt() const;
    ///@}
 

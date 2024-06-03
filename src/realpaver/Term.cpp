@@ -2403,17 +2403,29 @@ void TermLin::eval(const IntervalBox& B)
       // const cast necessary since the elements of a set must be constants
       // we do that since the modification of ival does not affect the ordering
       // of the elements (only the variable identifiers are used as keys)
-      Item& itm = const_cast<Item&>(citm);
-      itm.ival = itm.coef * B.get(itm.var);
+      Item& itm = const_cast<Item&>(citm);      
+      itm.ival = itm.coef.isOne() ? B.get(itm.var) : itm.coef * B.get(itm.var);
       ival_ += itm.ival;
    }
+
+#if LOG_ON
+   LOG_FULL("term lin eval " << " -> " << ival_);
+#endif
 }
 
 Proof TermLin::contract(IntervalBox& B)
 {
+   // re-evaluation of the linear terms (items) that is useful if a variable
+   // domain has been modified since the last evaluation
+   for (const Item& citm : terms_)
+   {
+      Item& itm = const_cast<Item&>(citm);      
+      itm.ival = itm.coef.isOne() ? B.get(itm.var) : itm.coef * B.get(itm.var);
+   }
+
+   // contracts the domain of each it->var
    for (auto it=terms_.begin(); it!=terms_.end(); ++it)
    {
-      // contracts the domain of it->var
       Interval x = ival_ - cst_;
 
       auto jt = terms_.begin();
@@ -2432,6 +2444,10 @@ Proof TermLin::contract(IntervalBox& B)
       Interval dom = B.get(it->var);
       dom = mulPY(it->coef, dom, x);
       B.set(it->var, dom);
+
+#if LOG_ON
+   LOG_FULL("term lin contract variable " << it->var.getName() << " -> " << dom);
+#endif
 
       if (dom.isEmpty())
          return Proof::Empty;

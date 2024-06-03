@@ -298,6 +298,11 @@ struct IntervalTraits<RawInterval> {
       return x.is_zero();
    }
 
+   static inline bool isOne(const interval& x)
+   {
+      return (x.left() == 1.0) && (x.right() == 1.0);
+   }
+
    static inline bool isAnInt(const interval& x)
    {
       return x.is_an_int();

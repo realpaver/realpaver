@@ -407,6 +407,11 @@ bool Interval::isZero() const
    return Interval::Traits::isZero(impl_);
 }
 
+bool Interval::isOne() const
+{
+   return Interval::Traits::isOne(impl_);
+}
+
 bool Interval::isAnInt() const
 {
   return Interval::Traits::isAnInt(impl_);   
@@ -652,7 +657,13 @@ Interval& Interval::operator+=(const Interval& other)
 
 Interval operator+(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::add(x.impl_, y.impl_));      
+   Interval res = Interval(Interval::Traits::add(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("add on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval addPX(const Interval& x, const Interval& y,
@@ -699,7 +710,13 @@ Interval& Interval::operator-=(const Interval& other)
 
 Interval operator-(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sub(x.impl_, y.impl_));      
+   Interval res = Interval(Interval::Traits::sub(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sub on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval subPX(const Interval& x, const Interval& y,
@@ -773,7 +790,13 @@ Interval& Interval::operator*=(const Interval& other)
 
 Interval operator*(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::mul(x.impl_, y.impl_));      
+   Interval res = Interval(Interval::Traits::mul(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("mul on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval mulPX(const Interval& x, const Interval& y,
@@ -860,7 +883,13 @@ Interval divPZ(const Interval& x, const Interval& y,
 
 Interval sqr(const Interval& x)
 {
-   return Interval(Interval::Traits::sqr(x.impl_));
+   Interval res = Interval(Interval::Traits::sqr(x.impl_));
+
+#if LOG_ON
+   LOG_FULL("sqr on " << x << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sqrPX(const Interval& x, const Interval& y)

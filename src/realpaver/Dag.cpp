@@ -1346,13 +1346,26 @@ void DagLin::eval()
    for (const Item& citm : terms_)
    {
       Item& itm = const_cast<Item&>(citm);
-      itm.ival = itm.coef * itm.node->val();
+      itm.ival = (itm.coef.isOne()) ? itm.node->val() :
+                                      itm.coef * itm.node->val();
       setVal(val() + itm.ival);
    }
 }
 
 void DagLin::proj(IntervalBox& B)
 {
+   // re-evaluation of the linear terms (items) that is useful if a variable
+   // domain has been modified since the last evaluation
+   if (parArity() > 0)
+   {
+      for (const Item& citm : terms_)
+      {
+         Item& itm = const_cast<Item&>(citm);
+         Interval aux = itm.node->val() & itm.node->dom();
+         itm.ival = (itm.coef.isOne()) ? aux : itm.coef * aux;
+      }
+   }
+   
    for (auto it=terms_.begin(); it!=terms_.end(); ++it)
    {
       // contracts the domain of the variable node
