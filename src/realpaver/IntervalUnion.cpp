@@ -297,6 +297,18 @@ double IntervalUnion::width() const
    return s;
 }
 
+bool IntervalUnion::equals(const IntervalUnion& other) const
+{
+   if (isEmpty() || other.isEmpty()) return false;
+   if (size() != other.size()) return false;
+
+   for (size_t i=0; i<size(); ++i)
+      if (v_[i].isSetNeq(other.v_[i]))
+         return false;
+
+   return true;
+}
+
 std::ostream& operator<<(std::ostream& os, const IntervalUnion& u)
 {
    u.print(os);

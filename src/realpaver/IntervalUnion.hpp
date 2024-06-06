@@ -84,6 +84,9 @@ public:
    /// Returns the sum of the widths of the components of this
    double width() const;
 
+   /// Equality test
+   bool equals(const IntervalUnion& other) const;
+
 private:
    typedef std::vector<Interval> VectorType;
    VectorType v_;

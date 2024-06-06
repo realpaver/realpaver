@@ -127,6 +127,12 @@ void IntervalDomain::print(std::ostream& os) const
    os << val_;
 }
 
+bool IntervalDomain::equals(const Domain& dom) const
+{
+   const IntervalDomain* d = dynamic_cast<const IntervalDomain*>(&dom);
+   return (d == nullptr) ? false : d->val_.isSetEq(val_);
+}
+
 /*----------------------------------------------------------------------------*/
 
 IntervalUnionDomain::IntervalUnionDomain(const IntervalUnion& u)
@@ -195,6 +201,13 @@ void IntervalUnionDomain::print(std::ostream& os) const
    os << val_;
 }
 
+bool IntervalUnionDomain::equals(const Domain& dom) const
+{
+   const IntervalUnionDomain* d =
+      dynamic_cast<const IntervalUnionDomain*>(&dom);
+   return (d == nullptr) ? false : d->val_.equals(val_);
+}
+
 /*----------------------------------------------------------------------------*/
 
 RangeDomain::RangeDomain(const Range& r)
@@ -255,6 +268,12 @@ RangeDomain* RangeDomain::clone() const
 void RangeDomain::print(std::ostream& os) const
 {
    os << val_;
+}
+
+bool RangeDomain::equals(const Domain& dom) const
+{
+   const RangeDomain* d = dynamic_cast<const RangeDomain*>(&dom);
+   return (d == nullptr) ? false : d->val_.isSetEq(val_);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -322,6 +341,12 @@ RangeUnionDomain* RangeUnionDomain::clone() const
 void RangeUnionDomain::print(std::ostream& os) const
 {
    os << val_;
+}
+
+bool RangeUnionDomain::equals(const Domain& dom) const
+{
+   const RangeUnionDomain* d = dynamic_cast<const RangeUnionDomain*>(&dom);
+   return (d == nullptr) ? false : d->val_.equals(val_);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -398,6 +423,12 @@ BinaryDomain* BinaryDomain::clone() const
 void BinaryDomain::print(std::ostream& os) const
 {
    os << val_;
+}
+
+bool BinaryDomain::equals(const Domain& dom) const
+{
+   const BinaryDomain* d = dynamic_cast<const BinaryDomain*>(&dom);
+   return (d == nullptr) ? false : d->val_.equals(val_);
 }
 
 } // namespace

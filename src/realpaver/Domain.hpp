@@ -39,6 +39,13 @@ enum class DomainType {
    RangeUnion    = 4    ///< union of discrete ranges
 };
 
+// forward declarations
+class IntervalDomain;
+class IntervalUnionDomain;
+class RangeDomain;
+class RangeUnionDomain;
+class BinaryDomain;
+
 /*----------------------------------------------------------------------------*/
 
 /**
@@ -103,6 +110,9 @@ public:
    /// Output a stream
    virtual void print(std::ostream& os) const = 0;
 
+   /// Test of equality
+   virtual bool equals(const Domain& dom) const = 0;
+
 private:
    DomainType type_;
 };
@@ -143,6 +153,7 @@ public:
    bool isConnected() const override;
    IntervalDomain* clone() const override;
    void print(std::ostream& os) const override;
+   bool equals(const Domain& dom) const override;
 
 private:
    Interval val_;
@@ -183,6 +194,7 @@ public:
    void contract(const Interval& x) override;
    IntervalUnionDomain* clone() const override;
    void print(std::ostream& os) const override;
+   bool equals(const Domain& dom) const override;
 
 private:
    IntervalUnion val_;
@@ -220,6 +232,7 @@ public:
    void contract(const Interval& x) override;
    RangeDomain* clone() const override;
    void print(std::ostream& os) const override;
+   bool equals(const Domain& dom) const override;
 
 private:
    Range val_;
@@ -260,6 +273,7 @@ public:
    void contract(const Interval& x) override;
    RangeUnionDomain* clone() const override;
    void print(std::ostream& os) const override;
+   bool equals(const Domain& dom) const override;
 
 private:
    RangeUnion val_;
@@ -300,6 +314,7 @@ public:
    void contract(const Interval& x) override;
    BinaryDomain* clone() const override;
    void print(std::ostream& os) const override;
+   bool equals(const Domain& dom) const override;
 
 private:
    ZeroOne val_;

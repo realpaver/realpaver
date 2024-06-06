@@ -112,6 +112,13 @@ Range ZeroOne::toRange() const
    else
       return Range::emptyset();
 }
+
+bool ZeroOne::equals(const ZeroOne& other) const
+{
+   return (isZero() && other.isZero()) ||
+          (isOne() && other.isOne()) ||
+          (isUniverse() || other.isUniverse());
+}
  
 std::ostream& operator<<(std::ostream& os, const ZeroOne& zo)
 {

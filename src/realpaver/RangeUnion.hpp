@@ -89,6 +89,9 @@ public:
    /// Returns the number of elements in this
    unsigned long nbElems() const;
 
+   /// Equality test
+   bool equals(const RangeUnion& other) const;
+
 private:
    typedef std::vector<Range> VectorType;
    VectorType v_;

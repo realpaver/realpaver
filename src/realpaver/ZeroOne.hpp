@@ -102,6 +102,9 @@ public:
    /// Returns a range that corresponds to this
    Range toRange() const;
 
+   /// Equality test
+   bool equals(const ZeroOne& other) const;
+
 private:
    bool zro_, one_;
 };
