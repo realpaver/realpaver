@@ -24,15 +24,18 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include "realpaver/IntervalBox.hpp"
+#include "realpaver/DomainBox.hpp"
+#include "realpaver/IntervalBox.hpp"   // DEPRECATED
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
 class TermVisitor;
 
-/// Enumeration of operation symbols
-enum class OpSymbol {
+/// Enumeration of node symbols
+enum class NodeSymbol {
+   Cst,     ///< constant
+   Var,     ///< variable
    Add,     ///< addition
    Sub,     ///< subtraction
    Mul,     ///< multiplication
@@ -57,12 +60,12 @@ enum class OpSymbol {
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, OpSymbol op);
+std::ostream& operator<<(std::ostream& os, NodeSymbol op);
 
 /*----------------------------------------------------------------------------*/
 
 /// Enumeration of priority levels of expression nodes
-enum class OpPriority {
+enum class NodePriority {
    Low,        ///< constants, variables
    AddSub,     ///< add, sub
    MulDiv,     ///< mul, div
@@ -75,13 +78,16 @@ enum class OpPriority {
 class TermRep {
 public:
    /// Constructor
-   TermRep(OpPriority p);
+   TermRep(NodeSymbol symb, NodePriority p);
 
    /// Virtual destructor
    virtual ~TermRep();
 
+   /// Returns the node symbol
+   NodeSymbol symbol() const;
+
    /// Returns the priority of this
-   OpPriority priority() const;
+   NodePriority priority() const;
 
    /// Returns the hash code of this
    size_t hashCode() const;
@@ -96,20 +102,37 @@ public:
     * @brief Interval evaluation on B.
     * 
     * The result is assigned in the interval value enclosed.
+    * 
+    * DEPRECATED
     */
    virtual void eval(const IntervalBox& B) = 0;
+
+   /**
+    * @brief Interval evaluation on box.
+    * 
+    * The result is assigned in the interval value enclosed.
+    */
+   virtual void eval(const DomainBox& box) = 0;
 
    /**
     * @brief Contraction method.
     * 
     * Contracts B and returns a certificate of proof
+    * DEPRECATED
     */
    virtual Proof contract(IntervalBox& B) = 0;
+
+   /**
+    * @brief Contraction method.
+    * 
+    * Contracts box and returns a certificate of proof
+    */
+   virtual Proof contract(DomainBox& box) = 0;
 
    /// Visitor pattern
    virtual void acceptVisitor(TermVisitor& vis) const = 0;
 
-   /// Returns true if the root node of this has type TermConst (a number)
+   /// Returns true if the root node of this has type TermCst (a number)
    virtual bool isNumber() const;
 
    /// Returns true if this has one node that is equal to 0
@@ -178,12 +201,13 @@ protected:
    using SharedRep = std::shared_ptr<TermRep>;
    friend class Term;
 
+   NodeSymbol symb_; // symbol
    size_t hcode_;    // hash code
    bool constant_;   // true if this is constant
    Interval ival_;   // used for evaluation
 
 private:
-   OpPriority priority_;   // priority
+   NodePriority priority_;   // priority
 };
 
 /*----------------------------------------------------------------------------*/
@@ -225,7 +249,11 @@ public:
    Interval evalConst() const;
 
    /// Returns the interval evaluation of this on B
+   // DEPRECATED
    Interval eval(const IntervalBox& B) const;
+
+   /// Returns the interval evaluation of this on box
+   Interval eval(const DomainBox& box) const;
 
    /**
     * @brief Reduction of domains using the HC4 Revise contractor.
@@ -237,16 +265,39 @@ public:
     * This algorithm first evaluates the nodes from the leaves to the root
     * (forward phase) and then calculates the projections from the root to
     * the leaves (backward phase).
+    * DEPRECATED
     */
    Proof contract(IntervalBox& B, const Interval& img);
+
+   /**
+    * @brief Reduction of domains using the HC4 Revise contractor.
+    * 
+    * @param box domains of variables
+    * @param img image or bounds of this considered as a function
+    * @return a certificate of proof
+    *
+    * This algorithm first evaluates the nodes from the leaves to the root
+    * (forward phase) and then calculates the projections from the root to
+    * the leaves (backward phase).
+    */
+   Proof contract(DomainBox& box, const Interval& img);
 
    /**
     * @brief Forward phase of the HC4 Revise contractor.
     * 
     * @param B domains of variables
     * @return the interval evaluation of this on B
+    * DEPRECATED
     */
    Interval hc4ReviseForward(const IntervalBox& B) const;
+
+   /**
+    * @brief Forward phase of the HC4 Revise contractor.
+    * 
+    * @param box domains of variables
+    * @return the interval evaluation of this on B
+    */
+   Interval hc4ReviseForward(const DomainBox& box) const;
 
    /**
     * @brief Backward phase of the HC4 Revise contractor.
@@ -256,13 +307,25 @@ public:
     * @return a certificate of proof
     *
     * Assumes that the forward phase has been executed using hc4ReviseForward.
+    * DEPRECATED
     */
    Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
+
+   /**
+    * @brief Backward phase of the HC4 Revise contractor.
+    * 
+    * @param box domains of variables
+    * @param img image or bounds of this considered as a function
+    * @return a certificate of proof
+    *
+    * Assumes that the forward phase has been executed using hc4ReviseForward.
+    */
+   Proof hc4ReviseBackward(DomainBox& box, const Interval& img);
 
    /// Visitor pattern
    void acceptVisitor(TermVisitor& vis) const;   
 
-   /// Returns true if the root node of this has type TermConst (a number)
+   /// Returns true if the root node of this has type TermCst (a number)
    bool isNumber() const;
 
    /// Returns true if this has one node that is equal to 0
@@ -461,15 +524,17 @@ Term tanh(Term t);
 /*----------------------------------------------------------------------------*/
 
 /// Constant node
-class TermConst : public TermRep {
+class TermCst : public TermRep {
 public:
    /// Constructor
-   TermConst(const Interval& x);
+   TermCst(const Interval& x);
 
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& B) override;  // DEPRECATED
+   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isNumber() const override;
    bool isZero() const override;
@@ -500,8 +565,10 @@ public:
 
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& B) override;  // DEPRECATED
+   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
@@ -524,19 +591,16 @@ private:
 class TermOp : public TermRep {
 public:
    /// Constructor
-   TermOp(const SharedRep& t, OpSymbol op, OpPriority p);
+   TermOp(const SharedRep& t, NodeSymbol symb, NodePriority p);
 
    /// Constructor
-   TermOp(const SharedRep& l, const SharedRep& r, OpSymbol op, OpPriority p);
+   TermOp(const SharedRep& l, const SharedRep& r, NodeSymbol op, NodePriority p);
 
    /// Virtual destructor
    virtual ~TermOp();
 
    /// Returns the number of sub-terms
    size_t arity() const;
-
-   /// Returns the operation symbol
-   OpSymbol opSymbol() const;
 
    /// Returns the i-th sub-term of this
    SharedRep subTerm(size_t i) const;
@@ -559,8 +623,10 @@ public:
    bool isDiv() const override;
    bool isUsb() const override;
    bool isInteger() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& B) override;  // DEPRECATED
+   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
    virtual bool isLinear() const override;
@@ -578,7 +644,6 @@ protected:
 
 private:
    std::vector<SharedRep> v_;    // sub-terms
-   OpSymbol op_;                 // operation symbol
 };
 
 /*----------------------------------------------------------------------------*/
@@ -912,8 +977,10 @@ public:
 
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
+   void eval(const IntervalBox& B) override;  // DEPRECATED
+   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLin() const override;
    bool isLinear() const override;
@@ -1027,7 +1094,7 @@ public:
    /// Virtual destructor
    virtual ~TermVisitor();
 
-   virtual void apply(const TermConst* t);
+   virtual void apply(const TermCst* t);
    virtual void apply(const TermVar* t);
    virtual void apply(const TermAdd* t);
    virtual void apply(const TermSub* t);
@@ -1074,7 +1141,7 @@ public:
    /// Gets the i-th square in this after a visit
    Term getSquare(size_t i) const;
 
-   void apply(const TermConst* t) override;
+   void apply(const TermCst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
    void apply(const TermSub* t) override;

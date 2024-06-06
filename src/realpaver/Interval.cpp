@@ -656,7 +656,7 @@ Interval& Interval::operator+=(const Interval& other)
 }
 
 Interval operator+(const Interval& x, const Interval& y)
-{
+{   
    Interval res = Interval(Interval::Traits::add(x.impl_, y.impl_));
 
 #if LOG_ON

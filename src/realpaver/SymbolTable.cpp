@@ -333,7 +333,7 @@ FunctionCallProcessor::FunctionCallProcessor(FunctionCall* fc)
         t_(Term::SharedRep(nullptr))
 {}
 
-void FunctionCallProcessor::apply(const TermConst* t)
+void FunctionCallProcessor::apply(const TermCst* t)
 {
    t_ = Term(t->getVal());
 }

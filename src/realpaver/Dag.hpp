@@ -47,8 +47,8 @@ using IndexList = std::vector<size_t>;
 */
 class DagNode {
 public:
-   /// Constructor given the node index
-   DagNode(Dag* dag, size_t index = 0);
+   /// Constructor given the symbol and node index
+   DagNode(Dag* dag, NodeSymbol symb, size_t index = 0);
 
    /// Virtual destructor
    virtual ~DagNode();
@@ -91,6 +91,9 @@ public:
 
    /// Returns the DAG
    Dag* dag() const;
+
+   /// Returns the symbol
+   NodeSymbol symbol() const;
 
    /// Returns the bitset this depends on
    const Bitset& bitset() const;
@@ -218,6 +221,7 @@ protected:
 
 private:
    Dag* dag_;        // the DAG
+   NodeSymbol symb_; // symbol
    size_t index_;    // index of this node in the DAG
    IndexList vpar_;  // list of indexes of parent nodes in the DAG
    IndexList vsub_;  // list of indexes of sub-nodes in the DAG
@@ -301,7 +305,7 @@ public:
     * @param symb operation symbol
     * @param lsub list of DAG indexes of the sub-nodes of this
     */
-   DagOp(Dag* dag, OpSymbol symb, const IndexList& lsub);
+   DagOp(Dag* dag, NodeSymbol symb, const IndexList& lsub);
 
    /// Virtual destructor
    virtual ~DagOp();
@@ -312,9 +316,6 @@ public:
     * It makes the links between this node and its sub-nodes.
     */
    void setIndex(size_t index);
-
-   /// Returns the symbol enclosed
-   OpSymbol getSymbol() const;
 
    /// Equality test
    bool eq(const DagOp* other) const;
@@ -335,9 +336,6 @@ public:
    void evalOnly(const Variable& v, const Interval& x) override;
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
-
-private:
-   OpSymbol symb_;      // operation symbol
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1428,7 +1426,7 @@ public:
    /// Returns the DAG index of the root node of the visited term
    size_t index();
 
-   void apply(const TermConst* t) override;
+   void apply(const TermCst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
    void apply(const TermSub* t) override;

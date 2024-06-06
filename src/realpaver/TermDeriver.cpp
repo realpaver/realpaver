@@ -33,7 +33,7 @@ Term TermDeriver::getDerivative() const
    return dt_;
 }
 
-void TermDeriver::apply(const TermConst* t)
+void TermDeriver::apply(const TermCst* t)
 {
    dt_ = Term(0);
 }

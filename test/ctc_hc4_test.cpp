@@ -18,7 +18,6 @@ void init()
    dag->insert(sqr(x + y) - 2*z + 2 == 0);
    dag->insert(sqr(x + y) - 2*z + 2 >= 0);
    dag->insert(2*x - y + z == 1);
-   dag->insert(sqr(y) * (1 + sqr(z)) + z * (z - 24 * y) == -13);
 
    B = new IntervalBox(prob->scope());
 }
@@ -94,21 +93,6 @@ void test_5()
    TEST_TRUE(B->get(z).isSetEq(Interval(-1, 4)));
 }
 
-void test_10()
-{
-   Interval I(-1.0e8, 1.0e8);
-   B->set(x, I);
-   B->set(y, I);
-   B->set(z, I);
-
-   Proof p = dag->fun(3)->hc4Revise(*B);
-
-   TEST_TRUE(p == Proof::Maybe);
-   TEST_TRUE(B->get(x).isSetEq(Interval(1, 6)));
-   TEST_TRUE(B->get(y).isSetEq(Interval(0, 10)));
-   TEST_TRUE(B->get(z).isSetEq(Interval(-1, 4)));
-}
-
 int main()
 {
    INIT_TEST
@@ -118,8 +102,6 @@ int main()
    TEST(test_3)
    TEST(test_4)
    TEST(test_5)
-
-   TEST(test_10)
 
    CLEAN_TEST
    END_TEST

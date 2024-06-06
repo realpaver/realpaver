@@ -34,7 +34,7 @@ Term TermFixer::getTerm() const
    return t_;
 }
 
-void TermFixer::apply(const TermConst* t)
+void TermFixer::apply(const TermCst* t)
 {
    t_ = Term(t->getVal());
 }

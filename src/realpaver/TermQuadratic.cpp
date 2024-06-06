@@ -322,7 +322,7 @@ TermQuadratic* TermQuadraticCreator::getTermQuadratic() const
    return qt_;
 }
 
-void TermQuadraticCreator::apply(const TermConst* t)
+void TermQuadraticCreator::apply(const TermCst* t)
 {
    qt_->addConstant(plus_ ? t->getVal() : -t->getVal());
    success_ = true;
@@ -362,8 +362,8 @@ void TermQuadraticCreator::apply(const TermSub* t)
 
 void TermQuadraticCreator::apply(const TermMul* t)
 {
-   const TermConst* lcst = dynamic_cast<const TermConst*>(t->left().get());
-   const TermConst* rcst = dynamic_cast<const TermConst*>(t->right().get());
+   const TermCst* lcst = dynamic_cast<const TermCst*>(t->left().get());
+   const TermCst* rcst = dynamic_cast<const TermCst*>(t->right().get());
 
    const TermVar* lvar = dynamic_cast<const TermVar*>(t->left().get());
    const TermVar* rvar = dynamic_cast<const TermVar*>(t->right().get());
@@ -421,7 +421,7 @@ void TermQuadraticCreator::apply(const TermMul* t)
    }
 }
 
-bool TermQuadraticCreator::makeProd(const TermConst* tc, const TermMul* tm)
+bool TermQuadraticCreator::makeProd(const TermCst* tc, const TermMul* tm)
 {
    const TermVar* tvl = dynamic_cast<const TermVar*>(tm->left().get());
    const TermVar* tvr = dynamic_cast<const TermVar*>(tm->right().get());
@@ -437,7 +437,7 @@ bool TermQuadraticCreator::makeProd(const TermConst* tc, const TermMul* tm)
    }
 }
 
-bool TermQuadraticCreator::makeProd(const TermConst* tc, const TermSqr* ts)
+bool TermQuadraticCreator::makeProd(const TermCst* tc, const TermSqr* ts)
 {
    const TermVar* tv = dynamic_cast<const TermVar* >(ts->child().get());
    if (tv == nullptr)
@@ -452,8 +452,8 @@ bool TermQuadraticCreator::makeProd(const TermConst* tc, const TermSqr* ts)
 
 bool TermQuadraticCreator::makeProd(const TermVar* tv, const TermMul* tm)
 {
-   const TermConst* tcl = dynamic_cast<const TermConst*>(tm->left().get());
-   const TermConst* tcr = dynamic_cast<const TermConst*>(tm->right().get());
+   const TermCst* tcl = dynamic_cast<const TermCst*>(tm->left().get());
+   const TermCst* tcr = dynamic_cast<const TermCst*>(tm->right().get());
 
    const TermVar* tvl = dynamic_cast<const TermVar*>(tm->left().get());
    const TermVar* tvr = dynamic_cast<const TermVar*>(tm->right().get());

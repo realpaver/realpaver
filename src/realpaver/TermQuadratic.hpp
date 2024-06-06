@@ -150,7 +150,7 @@ public:
    /// Returns the quadratic term in this
    TermQuadratic* getTermQuadratic() const;
 
-   void apply(const TermConst* t) override;
+   void apply(const TermCst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
    void apply(const TermSub* t) override;
@@ -179,8 +179,8 @@ private:
    bool plus_;
    bool success_;
 
-   bool makeProd(const TermConst* tc, const TermMul* tm);
-   bool makeProd(const TermConst* tc, const TermSqr* ts);
+   bool makeProd(const TermCst* tc, const TermMul* tm);
+   bool makeProd(const TermCst* tc, const TermSqr* ts);
    bool makeProd(const TermVar* tv, const TermMul* tm);
 };
 

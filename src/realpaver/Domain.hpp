@@ -29,7 +29,7 @@
 #include "realpaver/ZeroOne.hpp"
 
 namespace realpaver {
-   
+
 /// Domain types with explicit values that can be used as array indexes
 enum class DomainType {
    Binary        = 0,   ///< binary

@@ -96,7 +96,9 @@ void DomainBox::set(const Variable& v, std::unique_ptr<Domain> p)
 
    ASSERT((p != nullptr) && (!p->isEmpty()), "Bad domain assignment in a box");
 
-   doms_[scop_.index(v)] = p.release();
+   size_t i = scop_.index(v);
+   delete doms_[i];
+   doms_[i] = p.release();
 }
 
 DomainBox* DomainBox::clone() const

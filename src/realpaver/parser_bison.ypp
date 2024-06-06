@@ -670,7 +670,7 @@ table_list_var_def
 table_list_val
   : table_list_val_def
     {
-      realpaver::TermConst* cst = static_cast<realpaver::TermConst*>($1);
+      realpaver::TermCst* cst = static_cast<realpaver::TermCst*>($1);
       realpaver::Interval x(cst->evalConst());
       delete cst;
       
@@ -888,7 +888,7 @@ expr
 
         if (cs != nullptr)
         {
-           $$ = new realpaver::TermConst(cs->getValue());
+           $$ = new realpaver::TermCst(cs->getValue());
            found = true;
         }
      }
@@ -1006,7 +1006,7 @@ integer
       {
         std::string str(realpaver_bison_text);
         realpaver::Interval x(str);
-        $$ = new realpaver::TermConst(x);
+        $$ = new realpaver::TermCst(x);
       }
       catch(realpaver::Exception& e)
       {
@@ -1023,7 +1023,7 @@ real
       {
         std::string str(realpaver_bison_text);
         realpaver::Interval x(str);
-        $$ = new realpaver::TermConst(x);
+        $$ = new realpaver::TermCst(x);
       }
       catch(realpaver::Exception& e)
       {
@@ -1049,7 +1049,7 @@ itv
         YYABORT;
       }
 
-      $$ = new realpaver::TermConst(z);
+      $$ = new realpaver::TermCst(z);
     }
   ;
 
@@ -1061,7 +1061,7 @@ itv_left
   | TK_MINUS_INF
     {
       // it is necessary to return a non-empty interval with -inf as left bound
-      $$ = new realpaver::TermConst(realpaver::Interval::universe());
+      $$ = new realpaver::TermCst(realpaver::Interval::universe());
     }
   ;
 
@@ -1073,7 +1073,7 @@ itv_right
   | TK_PLUS_INF
     {
       // it is necessary to return a non-empty interval with +inf as right bound
-      $$ = new realpaver::TermConst(realpaver::Interval::universe());
+      $$ = new realpaver::TermCst(realpaver::Interval::universe());
     }
   ;
 

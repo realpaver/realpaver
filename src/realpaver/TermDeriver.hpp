@@ -34,7 +34,7 @@ public:
    /// Returns the partial derivative after a visit
    Term getDerivative() const;
 
-   void apply(const TermConst* t) override;
+   void apply(const TermCst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
    void apply(const TermSub* t) override;
