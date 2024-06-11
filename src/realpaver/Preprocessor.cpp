@@ -29,7 +29,7 @@ namespace realpaver {
 Preprocessor::Preprocessor()
       : vvm_(),
         vim_(),
-        B_(nullptr),
+        box_(nullptr),
         inactive_(),
         active_(),
         unfeasible_(false),
@@ -38,7 +38,7 @@ Preprocessor::Preprocessor()
 
 Preprocessor::~Preprocessor()
 {
-   if (B_!=nullptr) delete B_;
+   if (box_!=nullptr) delete box_;
 }
 
 bool Preprocessor::allVarsFixed() const
@@ -77,13 +77,16 @@ Scope Preprocessor::destScope() const
    return scop;
 }
 
-IntervalBox Preprocessor::destRegion() const
+DomainBox Preprocessor::destRegion() const
 {
-   IntervalBox B(destScope());
+   DomainBox box(destScope());
    for (auto p : vvm_)
-      B.set(p.second, B_->get(p.first));
+   {
+      std::unique_ptr<Domain> domain(box_->get(p.first)->clone());
+      box.set(p.second, std::move(domain));
+   }
 
-   return B;
+   return box;
 }
 
 void Preprocessor::apply(const Problem& src, Problem& dest)
@@ -99,11 +102,11 @@ void Preprocessor::apply(const Problem& src, Problem& dest)
    unfeasible_ = false;
 
    // makes the interval box used for propagation
-   if (B_!=nullptr) delete B_;
-   B_ = new IntervalBox(src.scope());
+   if (box_!=nullptr) delete box_;
+   box_ = new DomainBox(src.scope());
 
    LOG_MAIN("Preprocessing");
-   LOG_INTER("Box: " << (*B_));
+   LOG_INTER("Box: " << (*box_));
 
    timer_.reset();
    timer_.start();
@@ -118,10 +121,10 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    // test empty domains
    for (size_t i=0; i<src.nbVars(); ++i)
    {
-      Variable v      = src.varAt(i);
-      Interval domain = B_->get(v);
+      Variable v = src.varAt(i);
+      Domain* domain = box_->get(v);
 
-      if (domain.isEmpty())
+      if (domain->isEmpty())
       {
          LOG_MAIN("Empty domain of variable: " << v.getName());
          unfeasible_ = true;
@@ -130,20 +133,20 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 
    // propagation
-   bool ok = propagate(src, *B_);
+   bool ok = propagate(src, *box_);
    if (!ok)
    {
       unfeasible_ = true;
       return;
    }
 
-   LOG_INTER("Contracted box: " << (*B_));
+   LOG_INTER("Contracted box: " << (*box_));
 
    // satisfaction tests
    for (size_t i=0; i<src.nbCtrs(); ++i)
    {
       Constraint c = src.ctrAt(i);
-      Proof proof = c.isSatisfied(*B_);
+      Proof proof = c.isSatisfied(*box_);
 
       if (proof == Proof::Empty)
       {
@@ -169,22 +172,21 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    // rewrites the variables
    for (size_t i=0; i<src.nbVars(); ++i)
    {
-      Variable v      = src.varAt(i);
-      Interval domain = B_->get(v);
-      bool isReal     = v.isReal();
+      Variable v = src.varAt(i);
+      Domain* domain = box_->get(v);
 
-      bool isFixed = isReal ? domain.isCanonical() : domain.isSingleton();
+      bool isFixed = domain->isCanonical();
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
    
       if (isFake)
       {
-         LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
-         vim_.insert(std::make_pair(v, domain));
+         LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
+         vim_.insert(std::make_pair(v, domain->intervalHull()));
       }
       else if (isFixed)
       {
-         LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
-         vim_.insert(std::make_pair(v, domain));
+         LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
+         vim_.insert(std::make_pair(v, domain->intervalHull()));
       }
       else
       {
@@ -192,8 +194,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
          Variable w = dest.addClonedVar(v);
 
          // assigns the reduced domain to it
-         std::unique_ptr<Domain> wdom(v.getDomain()->clone());
-         wdom->contract(domain);
+         std::unique_ptr<Domain> wdom(domain->clone());
          w.setDomain(std::move(wdom));
 
          // new map entry
@@ -206,7 +207,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    // rewrites the constraints
    for (Constraint input : active_)
    {
-      ConstraintFixer fixer(&vvm_, &vim_, *B_);
+      ConstraintFixer fixer(&vvm_, &vim_, *box_);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
 
@@ -220,7 +221,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(*B_);
+   Interval dobj = obj.getTerm().eval(*box_);
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");
@@ -246,7 +247,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 }
 
-bool Preprocessor::propagate(const Problem& problem, IntervalBox& B)
+bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
 {
    // AC1 propagation algorithm
    bool modified;
@@ -256,12 +257,12 @@ bool Preprocessor::propagate(const Problem& problem, IntervalBox& B)
    {
       modified = false;
       --nbsteps;
-      IntervalBox save(B);
+      DomainBox save(box);
 
       for (size_t i=0; i<problem.nbCtrs(); ++i)
       {
          Constraint c = problem.ctrAt(i);
-         Proof proof = c.contract(B);
+         Proof proof = c.contract(box);
          if (proof == Proof::Empty)
          {
             LOG_INTER("Constraint violated: " << c);
@@ -269,23 +270,9 @@ bool Preprocessor::propagate(const Problem& problem, IntervalBox& B)
          }
       }
 
-      if (!save.equals(B)) modified = true;
+      if (!save.equals(box)) modified = true;
    }
    while (modified && nbsteps>0);
-
-   // variables with disconnected domains
-   Scope scop = B.scope();
-   for (const auto& v : scop)
-   {
-      if (!v.getDomain()->isConnected())
-      {
-         Interval y = B.get(v);
-         v.getDomain()->contractInterval(y);
-         B.set(v, y);
-
-         if (y.isEmpty()) return false;
-      }
-   }
 
    return true;
 }
@@ -353,7 +340,7 @@ Variable Preprocessor::getUnfixedVar(size_t i) const
    return (*it).first;
 }
 
-IntervalBox Preprocessor::fixedRegion() const
+DomainBox Preprocessor::fixedRegion() const
 {
    ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
 
@@ -361,7 +348,7 @@ IntervalBox Preprocessor::fixedRegion() const
    for (auto p : vim_)
       B.set(p.first, p.second);
 
-   return B;
+   return DomainBox(B);
 }
 
 bool Preprocessor::isUnfeasible() const

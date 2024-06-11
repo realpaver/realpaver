@@ -27,6 +27,8 @@
 
 namespace realpaver {
 
+class IntervalBox;
+
 /**
  * @brief Box of domains.
  * 
@@ -54,6 +56,9 @@ public:
 
    /// Copy constructor
    DomainBox(const DomainBox& box);
+
+   /// Constructor from an interval box
+   DomainBox(const IntervalBox& B);
 
    /// No asignment
    DomainBox& operator=(const DomainBox&) = delete;
@@ -125,6 +130,9 @@ public:
 
    /// Returns the grid perimeter of this restricted to scop
    double gridPerimeterOnScope(const Scope& scop) const;
+
+   /// Equality test
+   bool equals(const DomainBox& box) const;
 
 private:
    Scope scop_;                  // ordered set of variables

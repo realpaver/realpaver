@@ -56,6 +56,12 @@ interval_test = executable( 'interval_test',
                             include_directories: ['../src'] )
 test('Test of interval', interval_test)
 
+preprocessor_test = executable( 'preprocessor_test',
+                            sources: 'preprocessor_test.cpp',
+                            link_with: realpaver_lib,
+                            include_directories: ['../src'] )
+test('Test of preprocessor', preprocessor_test)
+
 range_test = executable( 'range_test',
                          sources: 'range_test.cpp',
                          link_with: realpaver_lib,

@@ -81,6 +81,9 @@ public:
    /// Checks the satisfaction of this on a box
    virtual Proof isSatisfied(const IntervalBox& B) = 0;
 
+   /// Checks the satisfaction of this on a box
+   virtual Proof isSatisfied(const DomainBox& box) = 0;
+
    /**
     * @brief Returns the violation of this on a box.
     * 
@@ -89,8 +92,19 @@ public:
     */
    virtual double violation(const IntervalBox& B) = 0;
 
+   /**
+    * @brief Returns the violation of this on a box.
+    * 
+    * Returns 0 if the constraint is satisfied, otherwise a positive real
+    * number that indicates how much the constraint is violated.
+    */
+   virtual double violation(const DomainBox& box) = 0;
+
    /// Contracts a box and returns a certificate of proof
    virtual Proof contract(IntervalBox& B) = 0;
+
+   /// Contracts a box and returns a certificate of proof
+   virtual Proof contract(DomainBox& box) = 0;
 
    /// Output on a stream
    virtual void print(std::ostream& os) const = 0;
@@ -158,6 +172,9 @@ public:
    /// Checks the satisfaction of this on a box
    Proof isSatisfied(const IntervalBox& B);
 
+   /// Checks the satisfaction of this on a box
+   Proof isSatisfied(const DomainBox& box);
+
    /**
     * @brief Returns the violation of this on a box.
     * 
@@ -166,8 +183,19 @@ public:
     */
    double violation(const IntervalBox& B);
 
+   /**
+    * @brief Returns the violation of this on a box.
+    * 
+    * Returns 0 if the constraint is satisfied, otherwise a positive real
+    * number that indicates how much the constraint is violated.
+    */
+   double violation(const DomainBox& box);
+
    /// Contracts a box and returns a certificate of proof
    Proof contract(IntervalBox& B);
+
+   /// Contracts a box and returns a certificate of proof
+   Proof contract(DomainBox& box);
 
    /// Output on a stream
    void print(std::ostream& os) const;
@@ -254,6 +282,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -272,6 +303,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -290,6 +324,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -308,6 +345,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -326,6 +366,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -354,6 +397,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 
 private:
@@ -450,6 +496,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    void print(std::ostream& os) const override;
    void acceptVisitor(ConstraintVisitor& vis) const override;
    ConstraintRep* cloneRoot() const override;
@@ -458,7 +507,9 @@ private:
    std::vector<TableCtrCol> vcol_; // vector of columns
 
    void makeScopeAndHashCode();
+   bool isRowConsistent(size_t i, const DomainBox& box) const;
    bool isRowConsistent(size_t i, const IntervalBox& B) const;
+   double rowViolation(const DomainBox& box, size_t i);
    double rowViolation(const IntervalBox& B, size_t i);
 };
 
@@ -522,6 +573,9 @@ public:
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
+   Proof isSatisfied(const DomainBox& box) override;
+   double violation(const DomainBox& box) override;
+   Proof contract(DomainBox& box) override;
    void print(std::ostream& os) const override;
    void acceptVisitor(ConstraintVisitor& vis) const override;
    ConstraintRep* cloneRoot() const override;

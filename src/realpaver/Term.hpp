@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <vector>
 #include "realpaver/DomainBox.hpp"
-#include "realpaver/IntervalBox.hpp"   // DEPRECATED
+#include "realpaver/IntervalBox.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -102,8 +102,6 @@ public:
     * @brief Interval evaluation on B.
     * 
     * The result is assigned in the interval value enclosed.
-    * 
-    * DEPRECATED
     */
    virtual void eval(const IntervalBox& B) = 0;
 
@@ -118,7 +116,6 @@ public:
     * @brief Contraction method.
     * 
     * Contracts B and returns a certificate of proof
-    * DEPRECATED
     */
    virtual Proof contract(IntervalBox& B) = 0;
 
@@ -249,7 +246,6 @@ public:
    Interval evalConst() const;
 
    /// Returns the interval evaluation of this on B
-   // DEPRECATED
    Interval eval(const IntervalBox& B) const;
 
    /// Returns the interval evaluation of this on box
@@ -265,7 +261,6 @@ public:
     * This algorithm first evaluates the nodes from the leaves to the root
     * (forward phase) and then calculates the projections from the root to
     * the leaves (backward phase).
-    * DEPRECATED
     */
    Proof contract(IntervalBox& B, const Interval& img);
 
@@ -287,7 +282,6 @@ public:
     * 
     * @param B domains of variables
     * @return the interval evaluation of this on B
-    * DEPRECATED
     */
    Interval hc4ReviseForward(const IntervalBox& B) const;
 
@@ -307,7 +301,6 @@ public:
     * @return a certificate of proof
     *
     * Assumes that the forward phase has been executed using hc4ReviseForward.
-    * DEPRECATED
     */
    Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
 
@@ -531,8 +524,8 @@ public:
 
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;  // DEPRECATED
-   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
    Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
@@ -565,8 +558,8 @@ public:
 
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;  // DEPRECATED
-   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
    Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
@@ -623,8 +616,8 @@ public:
    bool isDiv() const override;
    bool isUsb() const override;
    bool isInteger() const override;
-   void eval(const IntervalBox& B) override;  // DEPRECATED
-   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
    Proof contract(DomainBox& box) override;
    virtual void print(std::ostream& os) const override;
@@ -977,8 +970,8 @@ public:
 
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;  // DEPRECATED
-   Proof contract(IntervalBox& B) override;   // DEPRECATED
+   void eval(const IntervalBox& B) override;
+   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
    Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;

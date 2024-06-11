@@ -110,7 +110,12 @@ public:
    /// Output a stream
    virtual void print(std::ostream& os) const = 0;
 
-   /// Test of equality
+   /**
+    * @brief Test of equality.
+    * 
+    * Returns false if the two domains do not have the same type.
+    * Otherwise, returns true if they correspond.
+    */
    virtual bool equals(const Domain& dom) const = 0;
 
 private:

@@ -123,14 +123,14 @@ public:
     * The scope of this region is equal to fixedScope() having only variables
     * of the source problem.
     */
-   IntervalBox fixedRegion() const;
+   DomainBox fixedRegion() const;
 
    /**
     * @brief Returns the domains of the non fixed variables.
     *
     * The scope of this region is the scope of the destination problem.
     */
-   IntervalBox destRegion() const;
+   DomainBox destRegion() const;
 
    /// Returns true if the source problem is not feasible
    bool isUnfeasible() const;
@@ -145,7 +145,7 @@ private:
    VarVarMapType vvm_;                 // map for non fixed variables
    VarIntervalMapType vim_;            // map for fixed variables
 
-   IntervalBox* B_;                    // box used for propagation
+   DomainBox* box_;                    // box used for propagation
 
    std::vector<Constraint> inactive_;  // constraints inactive
    std::vector<Constraint> active_;    // constraints not inactive
@@ -154,7 +154,7 @@ private:
    Timer timer_;
 
    bool occursInActiveConstraint(const Variable& v) const;
-   bool propagate(const Problem& problem, IntervalBox& B);
+   bool propagate(const Problem& problem, DomainBox& box);
    void applyImpl(const Problem& src, Problem& dest);
 };
 

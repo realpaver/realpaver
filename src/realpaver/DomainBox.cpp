@@ -20,6 +20,7 @@
 
 #include "AssertDebug.hpp"
 #include "DomainBox.hpp"
+#include "IntervalBox.hpp"
 #include "Logger.hpp"
 
 namespace realpaver {
@@ -40,6 +41,14 @@ DomainBox::DomainBox(const DomainBox& box)
 {
    for (size_t i=0; i<size(); ++i)
       doms_[i] = box.doms_[i]->clone();
+}
+
+DomainBox::DomainBox(const IntervalBox& B)
+      : scop_(B.scope()),
+        doms_(B.scope().size())
+{
+   for (size_t i=0; i<size(); ++i)
+      doms_[i] = new IntervalDomain(B.get(scop_.var(i)));
 }
 
 DomainBox::~DomainBox()
@@ -245,6 +254,17 @@ double DomainBox::gridPerimeterOnScope(const Scope& scop) const
    LOG_FULL("   > " << p);
 
    return p;
+}
+
+bool DomainBox::equals(const DomainBox& box) const
+{
+   if (scop_ != box.scop_) return false;
+   
+   for (size_t i=0; i<doms_.size(); ++i)
+      if (!doms_[i]->equals(*box.doms_[i]))
+         return false;
+
+   return true;
 }
 
 } // namespace

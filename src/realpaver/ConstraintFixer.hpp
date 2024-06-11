@@ -51,7 +51,7 @@ public:
     * @param B domains of the variables in vvm
     */
    ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
-                   const IntervalBox& B);
+                   const DomainBox& box);
 
    /// No copy
    ConstraintFixer(const ConstraintFixer&) = delete;
@@ -77,7 +77,7 @@ public:
 private:
    VarVarMapType* vvm_;       // map Variable -> Variable
    VarIntervalMapType* vim_;  // map Variable -> Interval
-   IntervalBox B_;            // domainsd of variables
+   DomainBox box_;            // domains of variables
    Constraint c_;             // new constraint
 };
 

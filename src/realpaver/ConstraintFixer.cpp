@@ -24,10 +24,10 @@
 namespace realpaver {
 
 ConstraintFixer::ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
-                                 const IntervalBox& B)
+                                 const DomainBox& box)
       : vvm_(vvm),
         vim_(vim),
-        B_(B),
+        box_(box),
         c_()
 {}
 
@@ -115,7 +115,7 @@ void ConstraintFixer::apply(const TableCtr* c)
          if (it != vvm_->end())
          {
             Variable v = it->first;
-            if (c->getVal(i, j).isDisjoint(B_.get(v)))
+            if (c->getVal(i, j).isDisjoint(box_.get(v)->intervalHull()))
                cons = false;
          }
          ++j;
@@ -146,10 +146,10 @@ void ConstraintFixer::apply(const TableCtr* c)
 
 void ConstraintFixer::apply(const CondCtr* c)
 {
-   ConstraintFixer fg(vvm_, vim_, B_);
+   ConstraintFixer fg(vvm_, vim_, box_);
    c->guard().acceptVisitor(fg);
 
-   ConstraintFixer bg(vvm_, vim_, B_);
+   ConstraintFixer bg(vvm_, vim_, box_);
    c->body().acceptVisitor(bg);
 
    Constraint guard = fg.getConstraint(),
