@@ -346,8 +346,8 @@ Proof ArithCtrEq::contract(IntervalBox& B)
 
 Proof ArithCtrEq::isSatisfied(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -364,8 +364,8 @@ Proof ArithCtrEq::isSatisfied(const DomainBox& box)
 
 double ArithCtrEq::violation(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyEq(r)) return 0.0;
@@ -376,8 +376,8 @@ double ArithCtrEq::violation(const DomainBox& box)
 
 Proof ArithCtrEq::contract(DomainBox& box)
 {
-   Interval l = left().hc4ReviseForward(box),
-            r = right().hc4ReviseForward(box);
+   Interval l = left().hc4ReviseForward(box)->intervalHull(),
+            r = right().hc4ReviseForward(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -478,8 +478,8 @@ Proof ArithCtrLe::contract(IntervalBox& B)
 
 Proof ArithCtrLe::isSatisfied(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -496,8 +496,8 @@ Proof ArithCtrLe::isSatisfied(const DomainBox& box)
 
 double ArithCtrLe::violation(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLe(r)) return 0.0;
@@ -508,8 +508,8 @@ double ArithCtrLe::violation(const DomainBox& box)
 
 Proof ArithCtrLe::contract(DomainBox& box)
 {
-   Interval l = left().hc4ReviseForward(box),
-            r = right().hc4ReviseForward(box);
+   Interval l = left().hc4ReviseForward(box)->intervalHull(),
+            r = right().hc4ReviseForward(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -611,8 +611,8 @@ Proof ArithCtrLt::contract(IntervalBox& B)
 
 Proof ArithCtrLt::isSatisfied(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -629,8 +629,8 @@ Proof ArithCtrLt::isSatisfied(const DomainBox& box)
 
 double ArithCtrLt::violation(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLt(r)) return 0.0;
@@ -641,8 +641,8 @@ double ArithCtrLt::violation(const DomainBox& box)
 
 Proof ArithCtrLt::contract(DomainBox& box)
 {
-   Interval l = left().hc4ReviseForward(box),
-            r = right().hc4ReviseForward(box);
+   Interval l = left().hc4ReviseForward(box)->intervalHull(),
+            r = right().hc4ReviseForward(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -744,8 +744,8 @@ Proof ArithCtrGe::contract(IntervalBox& B)
 
 Proof ArithCtrGe::isSatisfied(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -762,19 +762,20 @@ Proof ArithCtrGe::isSatisfied(const DomainBox& box)
 
 double ArithCtrGe::violation(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGe(r)) return 0.0;
  
    Double::rndNear();
-   return r.left() - l.right();}
+   return r.left() - l.right();
+}
 
 Proof ArithCtrGe::contract(DomainBox& box)
 {
-   Interval l = left().hc4ReviseForward(box),
-            r = right().hc4ReviseForward(box);
+   Interval l = left().hc4ReviseForward(box)->intervalHull(),
+            r = right().hc4ReviseForward(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -876,8 +877,8 @@ Proof ArithCtrGt::contract(IntervalBox& B)
 
 Proof ArithCtrGt::isSatisfied(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -893,8 +894,8 @@ Proof ArithCtrGt::isSatisfied(const DomainBox& box)
 
 double ArithCtrGt::violation(const DomainBox& box)
 {
-   Interval l = left().eval(box),
-            r = right().eval(box);
+   Interval l = left().eval(box)->intervalHull(),
+            r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGt(r)) return 0.0;
@@ -905,8 +906,8 @@ double ArithCtrGt::violation(const DomainBox& box)
 
 Proof ArithCtrGt::contract(DomainBox& box)
 {
-   Interval l = left().hc4ReviseForward(box),
-            r = right().hc4ReviseForward(box);
+   Interval l = left().hc4ReviseForward(box)->intervalHull(),
+            r = right().hc4ReviseForward(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -1029,7 +1030,7 @@ Constraint in(Term t, const Interval& x)
 
 Proof ArithCtrIn::isSatisfied(const DomainBox& box)
 {
-   Interval e = term().eval(box);
+   Interval e = term().eval(box)->intervalHull();
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -1046,7 +1047,7 @@ Proof ArithCtrIn::isSatisfied(const DomainBox& box)
 
 double ArithCtrIn::violation(const DomainBox& box)
 {
-   Interval e = term().eval(box);
+   Interval e = term().eval(box)->intervalHull();
 
    if (e.isEmpty()) return Double::inf();
    if (x_.overlaps(e)) return 0.0;
@@ -1057,7 +1058,7 @@ double ArithCtrIn::violation(const DomainBox& box)
 
 Proof ArithCtrIn::contract(DomainBox& box)
 {
-   Interval e = term().hc4ReviseForward(box);
+   Interval e = term().hc4ReviseForward(box)->intervalHull();
 
    if (e.isEmpty())
       return Proof::Empty;

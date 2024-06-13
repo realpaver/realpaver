@@ -216,10 +216,10 @@ Interval Term::eval(const IntervalBox& B) const
    return rep_->ival_;
 }
 
-Interval Term::eval(const DomainBox& box) const
+std::unique_ptr<Domain> Term::eval(const DomainBox& box) const
 {
    rep_->eval(box);
-   return rep_->ival_;
+   return std::make_unique<IntervalDomain>(rep_->ival_);
 }
 
 Interval Term::hc4ReviseForward(const IntervalBox& B) const
@@ -227,7 +227,7 @@ Interval Term::hc4ReviseForward(const IntervalBox& B) const
    return eval(B);
 }
 
-Interval Term::hc4ReviseForward(const DomainBox& box) const
+std::unique_ptr<Domain> Term::hc4ReviseForward(const DomainBox& box) const
 {
    return eval(box);
 }

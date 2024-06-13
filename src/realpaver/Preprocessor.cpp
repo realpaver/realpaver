@@ -221,7 +221,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(*box_);
+   Interval dobj = obj.getTerm().eval(*box_)->intervalHull();
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");

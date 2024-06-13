@@ -249,7 +249,7 @@ public:
    Interval eval(const IntervalBox& B) const;
 
    /// Returns the interval evaluation of this on box
-   Interval eval(const DomainBox& box) const;
+   std::unique_ptr<Domain> eval(const DomainBox& box) const;
 
    /**
     * @brief Reduction of domains using the HC4 Revise contractor.
@@ -289,9 +289,9 @@ public:
     * @brief Forward phase of the HC4 Revise contractor.
     * 
     * @param box domains of variables
-    * @return the interval evaluation of this on B
+    * @return the evaluation of this on B
     */
-   Interval hc4ReviseForward(const DomainBox& box) const;
+   std::unique_ptr<Domain> hc4ReviseForward(const DomainBox& box) const;
 
    /**
     * @brief Backward phase of the HC4 Revise contractor.
