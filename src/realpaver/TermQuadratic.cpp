@@ -533,16 +533,6 @@ void TermQuadraticCreator::apply(const TermSin* t)
 
 void TermQuadraticCreator::apply(const TermTan* t)
 {}
-   
-void TermQuadraticCreator::apply(const TermLin* t)
-{
-   qt_->addConstant(t->getConstantValue());
-
-   for (auto it=t->begin(); it!=t->end(); ++it)
-      qt_->addLin(t->getCoefSub(it), t->getVarSub(it));
-
-   success_ = true;
-}
 
 void TermQuadraticCreator::apply(const TermCosh* t)
 {}

@@ -178,16 +178,6 @@ void TermDeriver::apply(const TermTan* t)
    dt_ = (1.0 + sqr(tan(t->child())))*vis.dt_;
 }
 
-void TermDeriver::apply(const TermLin* t)
-{
-   auto it = t->find(v_);
-   if (it == t->end())
-      dt_ = Term(0);
-
-   else
-      dt_ = Term(t->getCoefSub(it));
-}
-
 void TermDeriver::apply(const TermCosh* t)
 {
    TermDeriver vis(v_);

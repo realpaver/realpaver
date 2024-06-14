@@ -689,66 +689,6 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// DAG node representing a (non-constant) linear expression
-class DagLin : public DagOp {
-public:
-   /**
-    * @brief Constructor.
-    * @param dag owner of this
-    * @param t linear term
-    * @param lsub list of DAG indexes of the sub-nodes of this
-    */
-   DagLin(Dag* dag, const TermLin* t, const IndexList& lsub);
-
-   bool eqSymbol(const DagOp* other) const override;
-   size_t nbOccurrences(const Variable& v) const override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalBox& B) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-
-   /// Returns the constant value of this linear expression
-   Interval getConstantValue() const;
-
-private:
-   struct Item {
-      Interval coef;    // coefficient
-      DagVar* node;     // variable node
-      Interval ival;    // used for the evaluation
-   };
-
-   struct CompItem {
-      bool operator()(const Item& i1, const Item& i2) const
-      {
-         return i1.node->getVar().id() < i2.node->getVar().id();
-      }
-   };
-
-   Interval cst_;                      // constant value
-   std::set<Item, CompItem> terms_;    // set of linear terms
-
-public:
-   /// Type of iterators on the list of linear terms
-   typedef std::set<Item, CompItem>::const_iterator const_iterator;
-
-   /// Returns an iterator on the beginning of the list of linear terms
-   const_iterator begin() const;
-
-   /// Returns an iterator on the end of the list of linear terms
-   const_iterator end() const;
-
-   /// Returns the coefficient of a linear term pointed by an iterator
-   Interval getCoefSub(const_iterator it) const;
-
-   /// Returns the variable of a linear term pointed by an iterator
-   DagVar* getNodeSub(const_iterator it) const;
-};
-
-/*----------------------------------------------------------------------------*/
-
 /// DAG node representing the hyperbolic cosine function
 class DagCosh : public DagOp {
 public:
@@ -1338,7 +1278,6 @@ public:
    virtual void apply(const DagCos* d);
    virtual void apply(const DagSin* d);
    virtual void apply(const DagTan* d);
-   virtual void apply(const DagLin* d);
    virtual void apply(const DagCosh* d);
    virtual void apply(const DagSinh* d);
    virtual void apply(const DagTanh* d);
@@ -1374,7 +1313,6 @@ public:
    virtual void apply(const DagCos* d) override;
    virtual void apply(const DagSin* d) override;
    virtual void apply(const DagTan* d) override;
-   virtual void apply(const DagLin* d) override;
    virtual void apply(const DagCosh* d) override;
    virtual void apply(const DagSinh* d) override;
    virtual void apply(const DagTanh* d) override;
@@ -1445,7 +1383,6 @@ public:
    void apply(const TermCos* t) override;
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
-   void apply(const TermLin* t) override;
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;

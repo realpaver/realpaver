@@ -499,19 +499,6 @@ void FunctionCallProcessor::apply(const TermTan* t)
    t_ = tan(vis.getTerm());
 }
 
-void FunctionCallProcessor::apply(const TermLin* t)
-{
-   t_ = t->getConstantValue();
-
-   for (auto it=t->begin(); it!=t->end(); ++it)
-   {
-      Interval coef = t->getCoefSub(it);
-      Variable v = t->getVarSub(it);
-      size_t i = fc_->getFunctionSymbol()->getIndexVar(v);
-      t_ += coef*fc_->getTerm(i);
-   }
-}
-
 void FunctionCallProcessor::apply(const TermCosh* t)
 {
    FunctionCallProcessor vis(fc_);

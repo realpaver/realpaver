@@ -32,6 +32,9 @@ class FlatFunction : public Contractor {
 public:
    FlatFunction(DagFun* f);
 
+
+   Interval eval(const IntervalBox& B) const;
+
 private:
    Scope scop_;
 
@@ -44,8 +47,7 @@ private:
    size_t* var_;
 
    Interval img_;
-   Interval* val_;
-   Interval* dom_;
+   Interval* itv_;
 
    void makeFun(DagFun* f);
    void extendCapacity();

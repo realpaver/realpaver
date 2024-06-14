@@ -23,7 +23,7 @@
 
 namespace realpaver {
 
-FlatFunction::FlatFunction(DagFun* f)
+FlatFunction::FlatFunction(DagFun* f) : scop_(f->scope())
 {
    capa_ = 8;
    symb_ = new NodeSymbol[capa_];
@@ -35,8 +35,7 @@ FlatFunction::FlatFunction(DagFun* f)
 
    makeFun(f);
    
-   val_ = new Interval[nb_];
-   dom_ = new Interval[nb_];
+   itv_ = new Interval[nb_];
 }
 
 void FlatFunction::makeFun(DagFun* f)
@@ -52,9 +51,12 @@ void FlatFunction::makeFun(DagFun* f)
          extendCapacity();
       }
 
+      symb_[nb_] = node->symbol();
+
       switch(node->symbol())
       {
          case NodeSymbol::Cst:
+            arg_[nb_] = 0;
             break;
 
          case NodeSymbol::Var:
@@ -125,6 +127,88 @@ void FlatFunction::makeFun(DagFun* f)
 
       }
    }
+}
+
+Interval FlatFunction::eval(const IntervalBox& B) const
+{
+   for (size_t i=0; i<nb_; ++i)
+   {
+      switch(symb_[nb_])
+      {
+         case NodeSymbol::Cst:
+            arg_[nb_] = 0;
+            break;
+
+         case NodeSymbol::Var:
+            break;
+
+         case NodeSymbol::Add:
+            break;
+
+         case NodeSymbol::Sub:
+            break;
+
+         case NodeSymbol::Mul:
+            break;
+
+         case NodeSymbol::Div:
+            break;
+
+         case NodeSymbol::Min:
+            break;
+
+         case NodeSymbol::Max:
+            break;
+
+         case NodeSymbol::Usb:
+            break;
+
+         case NodeSymbol::Abs:
+            break;
+
+         case NodeSymbol::Sgn:
+            break;
+
+         case NodeSymbol::Sqr:
+            break;
+
+         case NodeSymbol::Sqrt:
+            break;
+
+         case NodeSymbol::Pow:
+            break;
+
+         case NodeSymbol::Exp:
+            break;
+
+         case NodeSymbol::Log:
+            break;
+
+         case NodeSymbol::Cos:
+            break;
+
+         case NodeSymbol::Sin:
+            break;
+
+         case NodeSymbol::Tan:
+            break;
+
+         case NodeSymbol::Lin:
+            break;
+
+         case NodeSymbol::Cosh:
+            break;
+
+         case NodeSymbol::Sinh:
+            break;
+
+         case NodeSymbol::Tanh:
+            break;
+
+      }
+   }
+
+   return itv_[nb_];
 }
 
 void FlatFunction::extendCapacity()

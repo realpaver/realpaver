@@ -63,7 +63,6 @@ public:
    void apply(const DagCos* node) override;
    void apply(const DagSin* node) override;
    void apply(const DagTan* node) override;
-   void apply(const DagLin* node) override;
    void apply(const DagCosh* node) override;
    void apply(const DagSinh* node) override;
    void apply(const DagTanh* node) override;

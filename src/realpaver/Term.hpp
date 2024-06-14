@@ -159,9 +159,6 @@ public:
    /// Returns true if the root node of this has type TermUsb
    virtual bool isUsb() const;
 
-   /// Returns true if the root node of this has type TermLin
-   virtual bool isLin() const;
-
    /// Returns true if this is a linear expression
    virtual bool isLinear() const = 0;
 
@@ -347,9 +344,6 @@ public:
 
    /// Returns true if the root node of this has type TermUsb
    bool isUsb() const;
-
-      /// Returns true if the root node of this has type TermLin
-   bool isLin() const;
 
    /// Returns true if this is a linear expression
    bool isLinear() const;
@@ -942,97 +936,6 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// Linear expression
-class TermLin : public TermRep {
-public:
-   /// Constructor
-   TermLin();
-
-   /// Adds a constant to this
-   void addConstant(const Interval& val);
-
-   /// Adds the opposite of a constant to this
-   void subConstant(const Interval& val);
-
-   /// Adds a product of x*v to this
-   void addTerm(const Interval& x, Variable v);
-
-   /// Adds the opposite of x*v to this
-   /// @param x constant
-   /// @param v variable
-   void subTerm(const Interval& x, Variable v);
-
-   /// Adds a linear term to this
-   void addTermLin(const TermLin& t);
-
-   /// Adds the opposite of a linear term to this
-   void subTermLin(const TermLin& t);
-
-   void print(std::ostream& os) const override;
-   Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
-   void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   bool isLin() const override;
-   bool isLinear() const override;
-   bool isInteger() const override;
-   bool dependsOn(const Variable& v) const override;
-   void makeScope(Scope& scop) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
-
-   /// Returns the constant value of this
-   Interval getConstantValue() const;
-
-   /// Returns the number of sub-terms (variables) in this
-   size_t getNbSub() const;
-
-   /// Returns the coefficient of the i-th linear sub-term in this
-   Interval getCoefSub(size_t i) const;
-
-   /// Returns the variable of the i-th linear sub-term in this
-   Variable getVarSub(size_t i) const;
-
-   /// Returns true if this is reduced to a variable
-   bool isVariable() const;
-
-   /// Changes the sign of the constant and each coefficient in this
-   void toOpposite();
-
-private:
-   struct Item {
-      Interval coef;    // coefficient
-      Variable var;     // variable term
-      Interval ival;    // used for the evaluation
-   };
-
-   struct CompItem {
-      bool operator()(const Item& i1, const Item& i2) const
-      {
-         return i1.var.id() < i2.var.id();
-      }
-   };
-
-   void makeHashCode();
-
-public:
-   typedef std::set<Item, CompItem>::const_iterator const_iterator;
-   const_iterator begin() const;
-   const_iterator end() const;
-   const_iterator find(const Variable& v) const;
-
-   Interval getCoefSub(const_iterator it) const;
-   Variable getVarSub(const_iterator it) const;
-
-private:
-   Interval cst_;                      // constant value
-   std::set<Item, CompItem> terms_;    // set of linear terms
-};
-
-/*----------------------------------------------------------------------------*/
-
 /// Hyperbolic cosine of a term
 class TermCosh : public TermOp {
 public:
@@ -1106,7 +1009,6 @@ public:
    virtual void apply(const TermCos* t);
    virtual void apply(const TermSin* t);
    virtual void apply(const TermTan* t);
-   virtual void apply(const TermLin* t);
    virtual void apply(const TermCosh* t);
    virtual void apply(const TermSinh* t);
    virtual void apply(const TermTanh* t);
@@ -1153,7 +1055,6 @@ public:
    void apply(const TermCos* t) override;
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
-   void apply(const TermLin* t) override;
    void apply(const TermCosh* t) override;
    void apply(const TermSinh* t) override;
    void apply(const TermTanh* t) override;
