@@ -37,13 +37,11 @@ namespace realpaver {
  * A problem in general has a set of variables, a set of constraints and an
  * objective function.
  *
- * The variables are indexed by consecutive natural numbers that are
- * automatically generated. Given NP the number of problem instances already
- * created and the static variable MAX_NB_VAR initialized to a huge value
- * (one million), the first variable identifier is NP*MAX_NB_VAR.
+ * The variables are indexed by consecutive natural numbers 0, 1, ... that are
+ * automatically generated.
  *
- * The Cartesian product of variable domains can be simply obtained by
- * creating a domain box from the scope of this.
+ * The Cartesian product of variable domains can be simply obtained by creating
+ * a domain box from the scope of this.
  *
  * There are several classes of problems:
  * - Constraint Satisfaction Problems (CSPs);
@@ -200,9 +198,6 @@ public:
    /// Returns true if this has no variable, no constraint, no objective
    bool isEmpty() const;
 
-   /// Maximum number of variables in a problem, the default value is huge
-   static int MAX_NB_VAR;
-
 private:
    std::string name_;               // name
    std::vector<Variable> vars_;     // vector of variables
@@ -218,6 +213,8 @@ private:
 
    static int NP;    // problem counter
    int id_;          // problem id
+
+   size_t nextVarId() const;
 };
 
 /// Output on a stream

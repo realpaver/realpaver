@@ -27,7 +27,6 @@
 
 namespace realpaver {
 
-int Problem::MAX_NB_VAR = 1000000;
 int Problem::NP = 0;
 
 Problem::Problem(const std::string& name)
@@ -37,12 +36,12 @@ Problem::Problem(const std::string& name)
         obj_(MIN(Term(0))),
         scop_(),
         vname_(),
-        id_(++NP)
+        id_(NP++)
 {}
 
 Variable Problem::addVar(const std::string& name)
 {
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
 
    std::ostringstream os;
 
@@ -62,7 +61,7 @@ Variable Problem::addVar(const std::string& name)
 
 Variable Problem::addBinaryVar(const std::string& name)
 {
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
 
    std::ostringstream os;
 
@@ -92,7 +91,7 @@ VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
    {
       Variable v = vec[i];
 
-      size_t id = MAX_NB_VAR*id_ + vars_.size();
+      size_t id = nextVarId();
       std::unique_ptr<Domain> dom(new BinaryDomain());
 
       v.setId(id)
@@ -114,7 +113,7 @@ Variable Problem::addIntVar(const Range& r, const std::string& name)
 {
    THROW_IF(r.isEmpty(), "Integer variable with an empty domain");
    
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
 
    std::ostringstream os;
 
@@ -139,7 +138,7 @@ Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
 {
    THROW_IF(u.isEmpty(), "Integer variable with an empty domain");
    
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
 
    std::ostringstream os;
 
@@ -168,7 +167,7 @@ VariableVector Problem::addIntVarVector(const std::string& name, int first, int 
    for (int i=first; i<=last; ++i)
    {
       Variable v = vec[i];
-      size_t id = MAX_NB_VAR*id_ + vars_.size();
+      size_t id = nextVarId();
 
       std::unique_ptr<Domain> dom(new RangeDomain(r));
 
@@ -191,7 +190,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
 {
    THROW_IF(x.isEmpty(), "Real variable with an empty domain");
 
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
 
    std::ostringstream os;
 
@@ -219,7 +218,7 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
 {
    THROW_IF(u.isEmpty(), "Real variable with an empty domain");
 
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
 
    std::ostringstream os;
 
@@ -254,7 +253,7 @@ VariableVector Problem::addRealVarVector(const std::string& name, int first,
    for (int i=first; i<=last; ++i)
    {
       Variable v = vec[i];
-      size_t id = MAX_NB_VAR*id_ + vars_.size();
+      size_t id = nextVarId();
 
       std::unique_ptr<Domain> dom(new IntervalDomain(x));
 
@@ -272,7 +271,7 @@ Variable Problem::addClonedVar(Variable v)
 {
    Variable res = v.clone();
 
-   size_t id = MAX_NB_VAR*id_ + vars_.size();
+   size_t id = nextVarId();
    res.setId(id);
 
    vars_.push_back(res);
@@ -534,6 +533,11 @@ void Problem::checkSymbol(const std::string& name)
       THROW("Symbol [" << name << "] already defined");
    else
       vname_.insert(name);
+}
+
+size_t Problem::nextVarId() const
+{
+   return vars_.size();
 }
 
 } // namespace
