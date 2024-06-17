@@ -70,7 +70,9 @@ void ScopeRep::makeMap()
    else
    {
       ScopeHashMap* aux = new ScopeHashMap();
-      for (auto it : m_) aux->insert(it.first.id());
+      for (auto it : m_)
+         aux->insert(it.first.id());
+
       scopeMap_ = aux;
    }
 
@@ -121,8 +123,14 @@ void ScopeRep::insert(Variable v, size_t n)
    auto it = m_.find(v);
 
    if (it != m_.end())
-      it->second += n;
+   {
+      if (it->first != v)
+         THROW("Bad insertion in a scope: two different variables " <<
+               "have the same index : " << v.id());
 
+      else
+         it->second += n;
+   }
    else
    {
       m_.insert(std::make_pair(v,n));
@@ -205,9 +213,15 @@ void ScopeRep::print(std::ostream& os) const
    os << "}";
 }
 
+bool ScopeRep::isIdentity() const
+{
+   return scopeMap_->isIdentity();
+}
+
 /*----------------------------------------------------------------------------*/
 
-Scope::Scope() : rep_(std::make_shared< ScopeRep >())
+Scope::Scope()
+      : rep_(std::make_shared< ScopeRep >())
 {}
 
 Scope::Scope(const std::initializer_list<Variable>& l)
@@ -239,6 +253,7 @@ void Scope::insert(Variable v, size_t n)
       // copy-on-write (cow) pointer
       rep_ = std::make_shared<ScopeRep>(*rep_.get());
    }
+
    rep_->insert(v, n);
 }
 
@@ -249,6 +264,8 @@ void Scope::remove(const Variable& v)
 
 void Scope::remove(const Variable& v, size_t n)
 {
+   ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
+   
    if (isShared())
    {
       // copy-on-write (cow) pointer
@@ -272,7 +289,13 @@ bool Scope::isEmpty() const
 
 bool Scope::contains(const Variable& v) const
 {
-   return find(v) != end();
+   auto it = rep_->find(v);
+
+   // no variable having the same index
+   if (it == end()) return false;
+
+   // checks if the two variables correspond
+   return (*it) == v;
 }
 
 size_t Scope::minVarId() const
@@ -307,19 +330,31 @@ typename Scope::const_iterator Scope::end() const
 {
    ASSERT(rep_ != nullptr, "Scope with null pointer");
 
-   return rep_->end();   
+   return rep_->end();
 }
 
 typename Scope::const_iterator Scope::find(const Variable& v) const
 {
    ASSERT(rep_ != nullptr, "Scope with null pointer");
 
-   return rep_->find(v);
+   auto it = rep_->find(v);
+
+   // no variable having the same index
+   if (it == rep_->end())
+      return it;
+
+   // one variable havibg the same index but different from v
+   if (*it != v)
+      return rep_->end();
+
+   // variable found
+   return it;
 }
 
 size_t Scope::index(const Variable& v) const
 {
    ASSERT(rep_ != nullptr, "Scope with null pointer");
+   ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
 
    return rep_->index(v);
 }
@@ -406,9 +441,11 @@ bool Scope::overlaps(const Scope& other) const
 
 bool Scope::operator==(const Scope& other) const
 {
-   if (rep_.get() == other.rep_.get()) return true;
+   if (rep_.get() == other.rep_.get())
+      return true;
 
-   if (size() != other.size()) return false;
+   if (size() != other.size())
+      return false;
 
    return contains(other);
 }
@@ -454,6 +491,11 @@ size_t Scope::nameMaxLength() const
       if (n > l) l = n;
    }
    return l;
+}
+
+bool Scope::isIdentity() const
+{
+   return rep_->isIdentity();
 }
 
 } // namespace

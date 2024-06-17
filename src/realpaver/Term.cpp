@@ -48,7 +48,6 @@ std::ostream& operator<<(std::ostream& os, NodeSymbol op)
       case NodeSymbol::Cos:  return os << "cos";
       case NodeSymbol::Sin:  return os << "sin";
       case NodeSymbol::Tan:  return os << "tan";
-      case NodeSymbol::Lin:  return os << "LIN";
       case NodeSymbol::Cosh: return os << "cosh";
       case NodeSymbol::Sinh: return os << "sinh";
       case NodeSymbol::Tanh: return os << "tanh";
@@ -193,6 +192,11 @@ Term::Term(const SharedRep& rep): rep_(rep)
 size_t Term::hashCode() const
 {
    return rep_->hashCode();
+}
+
+size_t Term::nbNodes() const
+{
+   return rep_->nbNodes();
 }
 
 void Term::print(std::ostream& os) const
@@ -837,6 +841,11 @@ TermCst::TermCst(const Interval& x)
    ival_ = x_;
 }
 
+size_t TermCst::nbNodes() const
+{
+   return 1;
+}
+
 Interval TermCst::getVal() const
 {
    return x_;
@@ -936,6 +945,11 @@ TermVar::TermVar(Variable v)
 {
    hcode_ = v.hashCode();
    constant_ = false;
+}
+
+size_t TermVar::nbNodes() const
+{
+   return 1;
 }
 
 Variable TermVar::var() const
@@ -1053,6 +1067,14 @@ TermOp::TermOp(const SharedRep& l, const SharedRep& r, NodeSymbol symb,
 
 TermOp::~TermOp()
 {}
+
+size_t TermOp::nbNodes() const
+{
+   size_t nb = 1;
+   for (const auto& sub : v_)
+      nb += sub->nbNodes();
+   return nb;
+}
 
 bool TermOp::isAdd() const
 {

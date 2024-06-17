@@ -162,6 +162,9 @@ public:
    /// Tests the equality of two variables
    bool operator==(const Variable& other) const;
 
+   /// Tests the difference of two variables
+   bool operator!=(const Variable& other) const;
+
    /// Returns true if this has no representation (nullptr)
    bool hasNullPointer() const;
 

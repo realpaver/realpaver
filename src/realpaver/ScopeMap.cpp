@@ -27,6 +27,11 @@ namespace realpaver {
 AbstractScopeMap::~AbstractScopeMap()
 {}
 
+bool AbstractScopeMap::isIdentity() const
+{
+   return false;
+}
+
 /*----------------------------------------------------------------------------*/
 
 ScopeIdMap::ScopeIdMap(size_t last)
@@ -58,6 +63,11 @@ size_t ScopeIdMap::hashCode() const
       h = hash2(h, i);
 
    return h;
+}
+
+bool ScopeIdMap::isIdentity() const
+{
+   return true;
 }
 
 /*----------------------------------------------------------------------------*/

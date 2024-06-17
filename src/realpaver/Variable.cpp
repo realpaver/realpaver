@@ -181,6 +181,11 @@ bool Variable::operator==(const Variable& other) const
    return rep_.get() == other.rep_.get();
 }
 
+bool Variable::operator!=(const Variable& other) const
+{
+   return rep_.get() != other.rep_.get();
+}
+
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
    os << v.getName()

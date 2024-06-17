@@ -59,6 +59,59 @@ void test_overlap()
    TEST_FALSE(s2.contains(s1));
 }
 
+void test_id()
+{
+   Variable a("a");
+   a.setId(0);
+
+   Variable b("b");
+   b.setId(0);
+
+   Scope S;
+   S.insert(a);
+
+   TEST_TRUE(S.find(a) != S.end());
+   TEST_TRUE(S.find(b) == S.end());
+   TEST_TRUE(S.contains(a));
+   TEST_TRUE(!S.contains(b));
+}
+
+void test_id_eq()
+{
+   Variable a("a");
+   a.setId(0);
+
+   Variable b("b");
+   b.setId(0);
+
+   Scope S;
+   S.insert(a);
+
+   Scope T;
+   T.insert(b);
+
+   Scope R(S);
+
+   TEST_TRUE (R == S);
+   TEST_TRUE (S == S);
+   TEST_TRUE (S != T);
+}
+
+
+void test_id_insert()
+{
+   Variable a("a");
+   a.setId(0);
+
+   Variable b("b");
+   b.setId(0);
+
+   Scope S;
+   S.insert(a);
+
+   TEST_THROW(S.insert(b));
+}
+
 int main()
 {
    TEST(test_init)
@@ -67,6 +120,9 @@ int main()
    TEST(test_counter)
    TEST(test_remove)
    TEST(test_overlap)
+   TEST(test_id)
+   TEST(test_id_eq)
+   TEST(test_id_insert)
 
    END_TEST
 }

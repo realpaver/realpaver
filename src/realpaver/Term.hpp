@@ -53,7 +53,6 @@ enum class NodeSymbol {
    Cos,     ///< cosine
    Sin,     ///< sine
    Tan,     ///< tangent
-   Lin,     ///< linear
    Cosh,    ///< hyperbolic cosine
    Sinh,    ///< hyperbolic sine
    Tanh     ///< hyperbolic tangent
@@ -91,6 +90,13 @@ public:
 
    /// Returns the hash code of this
    size_t hashCode() const;
+
+   /**
+    * @brief Returns the number of nodes in this considered as a tree.
+    * 
+    * For instance the number of nodes in (1 + x) - (1 + x) is 7.
+    */
+   virtual size_t nbNodes() const = 0;
 
    /// Output on a stream
    virtual void print(std::ostream& os) const = 0;
@@ -235,6 +241,13 @@ public:
 
    /// Returns the hash code of this
    size_t hashCode() const;
+
+   /**
+    * @brief Returns the number of nodes in this considered as a tree.
+    * 
+    * For instance the number of nodes in (1 + x) - (1 + x) is 7.
+    */
+   size_t nbNodes() const;
 
    /// Output on a stream
    void print(std::ostream& os) const;
@@ -516,6 +529,7 @@ public:
    /// Constructor
    TermCst(const Interval& x);
 
+   size_t nbNodes() const override;
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
@@ -550,6 +564,7 @@ public:
    /// @param v the variable enclosed
    TermVar(Variable v);
 
+   size_t nbNodes() const override;
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
@@ -604,6 +619,7 @@ public:
    /// Inserts a term at the end of the list of sub-terms of this
    void insert(const SharedRep& t);
 
+   size_t nbNodes() const override;
    bool isAdd() const override;
    bool isSub() const override;
    bool isMul() const override;

@@ -89,7 +89,6 @@ Scope IntervalBox::scope() const
 Interval IntervalBox::get(const Variable& v) const
 {
    ASSERT(scop_.contains(v), "Bad access in an interval box");
-
    return operator[](scop_.index(v));
 }
 

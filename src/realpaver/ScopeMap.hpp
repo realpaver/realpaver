@@ -47,6 +47,9 @@ public:
 
    /// Calculates an hash code
    virtual size_t hashCode() const = 0;
+
+   /// Returns true if this is an identity map, i.e. every index maps to itself
+   virtual bool isIdentity() const;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -67,6 +70,7 @@ public:
    size_t index(size_t id) const override;
    ScopeIdMap* clone() const override;
    size_t hashCode() const override;
+   bool isIdentity() const override;
 
 private:
    size_t last_;

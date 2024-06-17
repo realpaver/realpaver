@@ -78,6 +78,9 @@ public:
    /// Returns the hash code of this
    size_t hashCode() const;
 
+   /// Returns true if this has an identity map, i.e. every index maps to itself
+   bool isIdentity() const;
+
 private:
    struct Comp {
       bool operator()(Variable x, Variable y) const
@@ -154,7 +157,7 @@ public:
    /// Returns an iterator to the end of this
    const_iterator end() const;
 
-   /// Finds a variable in this
+   /// Finds a variable having the same index as v in this
    const_iterator find(const Variable& v);
 };
 
@@ -199,10 +202,10 @@ public:
    /// Returns true if this is empty
    bool isEmpty() const;
 
-   /// Gets the index of v in this
+   /// Gets the index of v in this (index between 0 and size() -1)
    size_t index(const Variable& v) const;
 
-   /// Returns the i-th variable in this
+   /// Returns the i-th variable in this (i between 0 and size() -1)
    Variable var(size_t i) const;
 
    /// Returns the number of occurrences of v in this
@@ -281,6 +284,15 @@ public:
 
    /// Returns the length of the longest variable name of this
    size_t nameMaxLength() const;
+
+   /**
+    * @brief Returns true if this has an identity map.
+    * 
+    * It means that the indexes of the variables in this scope are the
+    * consecutive integers 0, 1, 2, etc. and the method index(v) is equivalent
+    * to v.id().
+    */
+   bool isIdentity() const;
 
 private:
    std::shared_ptr<ScopeRep> rep_;  // shared representation

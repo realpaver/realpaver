@@ -21,36 +21,70 @@
 #ifndef REALPAVER_FLAT_FUNCTION_HPP
 #define REALPAVER_FLAT_FUNCTION_HPP
 
-#include "realpaver/Contractor.hpp"
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
 
 class DagFun;
 
-class FlatFunction : public Contractor {
+class FlatFunction {
 public:
-   FlatFunction(DagFun* f);
+   FlatFunction(const Term& t, const Interval& img);
 
+   ~FlatFunction();
 
    Interval eval(const IntervalBox& B) const;
 
+   size_t insertCst(const Interval& val);
+   size_t insertVar(const Variable& v);
+   size_t insertUnary(NodeSymbol symb, size_t ic);
+   size_t insertBinary(NodeSymbol symb, size_t il, size_t ir);
+
 private:
    Scope scop_;
+   Interval img_;
 
    NodeSymbol* symb_;
-   size_t capa_;
-   size_t nb_;
+   size_t nb_, capa_;
 
-   size_t* arg_;
-   size_t** child_;
-   size_t* var_;
+   size_t** arg_;
 
-   Interval img_;
    Interval* itv_;
+};
 
-   void makeFun(DagFun* f);
-   void extendCapacity();
+/*----------------------------------------------------------------------------*/
+
+class FlatFunctionCreator : public TermVisitor {
+public:
+   /// Creates a deriver with respect to v
+   FlatFunctionCreator(FlatFunction* f);
+
+   void apply(const TermCst* t) override;
+   void apply(const TermVar* t) override;
+   void apply(const TermAdd* t) override;
+   void apply(const TermSub* t) override;
+   void apply(const TermMul* t) override;
+   void apply(const TermDiv* t) override;
+   void apply(const TermMin* t) override;
+   void apply(const TermMax* t) override;
+   void apply(const TermUsb* t) override;
+   void apply(const TermAbs* t) override;
+   void apply(const TermSgn* t) override;
+   void apply(const TermSqr* t) override;
+   void apply(const TermSqrt* t) override;
+   void apply(const TermPow* t) override;
+   void apply(const TermExp* t) override;
+   void apply(const TermLog* t) override;
+   void apply(const TermCos* t) override;
+   void apply(const TermSin* t) override;
+   void apply(const TermTan* t) override;
+   void apply(const TermCosh* t) override;
+   void apply(const TermSinh* t) override;
+   void apply(const TermTanh* t) override;
+
+private:
+   FlatFunction* f_;
+   size_t idx_;
 };
 
 } // namespace
