@@ -373,4 +373,9 @@ bool IntervalBox::isSplitable(const Variable& v) const
       return !v.getTolerance().isTight(get(v));
 }
 
+bool IntervalBox::isVectorizable() const
+{
+   return scop_.isIdentity();
+}
+
 } // namespace

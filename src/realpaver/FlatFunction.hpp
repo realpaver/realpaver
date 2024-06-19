@@ -13,7 +13,7 @@
 
 /**
  * @file   FlatFunction.hpp
- * @brief  Function with fast hc4Revise
+ * @brief  Function used to implement a fast version of hc4Revise
  * @author Laurent Granvilliers
  * @date   2024-6-11
 */
@@ -21,42 +21,81 @@
 #ifndef REALPAVER_FLAT_FUNCTION_HPP
 #define REALPAVER_FLAT_FUNCTION_HPP
 
+#include <vector>
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
 
-class DagFun;
-
+/**
+ * @brief Function used to implement a fast version of hc4Revise.
+ * 
+ * The nodes of the tree-representation of a function are stored in arrays
+ * sorted by a topological ordering from the leaves to the root.
+ */
 class FlatFunction {
 public:
+   /// Creates a flat function representing t with image img
    FlatFunction(const Term& t, const Interval& img);
 
+   /// Destructor
    ~FlatFunction();
 
+   /// No copy
+   FlatFunction(const FlatFunction&) = delete;
+
+   /// No assignment
+   FlatFunction& operator=(const FlatFunction&) = delete;
+
+   /// Evaluates this on B
    Interval eval(const IntervalBox& B) const;
 
+   /// Contracts B with respect to this using an hc4Revise algorithm
+   Proof contract(IntervalBox& B) const;
+
+   /// @name Creation methods
+   ///@{
+   
+   /// Inserts a constant node and returns its index
    size_t insertCst(const Interval& val);
+
+   /// Inserts a variable node and returns its index
    size_t insertVar(const Variable& v);
+
+   /// Inserts a unary node and returns its index
    size_t insertUnary(NodeSymbol symb, size_t ic);
+
+   /// Inserts a binary node and returns its index
    size_t insertBinary(NodeSymbol symb, size_t il, size_t ir);
 
+   /// Inserts a power node and returns its index
+   size_t insertPow(NodeSymbol symb, size_t ic, int e);
+   ///@}
+
 private:
-   Scope scop_;
-   Interval img_;
+   Scope scop_;         // set of variables occurring in this
+   Interval img_;       // image
 
-   NodeSymbol* symb_;
-   size_t nb_, capa_;
+   NodeSymbol* symb_;   // node symbols sorted from the leaves to the root
+   size_t nb_, capa_;   // number of symbols and capacity of symb_
 
-   size_t** arg_;
+   size_t** arg_;       // arguments representing the indexes of the child nodes
 
-   Interval* itv_;
+   Interval* itv_;      // used for evaluation and projection
+
+   std::vector<Interval> cst_;   // list of constants
+   std::vector<Variable> var_;   // list of variables (with multi-occurrences)
+
+   Interval eval(const IntervalVector& V) const;
+   Proof backward(IntervalBox& B) const;
+   Proof backward(IntervalVector& V) const;
 };
 
 /*----------------------------------------------------------------------------*/
 
+/// Visitor of terms that creates a flat function
 class FlatFunctionCreator : public TermVisitor {
 public:
-   /// Creates a deriver with respect to v
+   /// Constructor given the target function f
    FlatFunctionCreator(FlatFunction* f);
 
    void apply(const TermCst* t) override;
@@ -83,8 +122,8 @@ public:
    void apply(const TermTanh* t) override;
 
 private:
-   FlatFunction* f_;
-   size_t idx_;
+   FlatFunction* f_;    // target function
+   size_t idx_;         // index of node in f_ resulting from a visit
 };
 
 } // namespace
