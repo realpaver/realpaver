@@ -23,6 +23,47 @@
 
 namespace realpaver {
 
+std::ostream& operator<<(std::ostream& os, FlatSymbol op)
+{
+   switch(op)
+   {
+      case FlatSymbol::Cst:  return os << "cst";
+      case FlatSymbol::Var:  return os << "var";
+      case FlatSymbol::Add:  return os << "+";
+      case FlatSymbol::AddL: return os << "+";
+      case FlatSymbol::AddR: return os << "+";
+      case FlatSymbol::Sub:  return os << "-";
+      case FlatSymbol::SubL: return os << "-";
+      case FlatSymbol::SubR: return os << "-";
+      case FlatSymbol::Mul:  return os << "*";
+      case FlatSymbol::MulL: return os << "*";
+      case FlatSymbol::MulR: return os << "*";
+      case FlatSymbol::Div:  return os << "/";
+      case FlatSymbol::DivL: return os << "/";
+      case FlatSymbol::DivR: return os << "/";
+      case FlatSymbol::Min:  return os << "min";
+      case FlatSymbol::Max:  return os << "max";
+      case FlatSymbol::Usb:  return os << "-";
+      case FlatSymbol::Abs:  return os << "abs";
+      case FlatSymbol::Sgn:  return os << "sgn";
+      case FlatSymbol::Sqr:  return os << "sqr";
+      case FlatSymbol::Sqrt: return os << "sqrt";
+      case FlatSymbol::Pow:  return os << "pow";
+      case FlatSymbol::Exp:  return os << "exp";
+      case FlatSymbol::Log:  return os << "log";
+      case FlatSymbol::Cos:  return os << "cos";
+      case FlatSymbol::Sin:  return os << "sin";
+      case FlatSymbol::Tan:  return os << "tan";
+      case FlatSymbol::Cosh: return os << "cosh";
+      case FlatSymbol::Sinh: return os << "sinh";
+      case FlatSymbol::Tanh: return os << "tanh";
+      default:             os.setstate(std::ios::failbit);
+   }
+   return os;
+}
+
+/*----------------------------------------------------------------------------*/
+
 FlatFunction::FlatFunction(const Term& t, const Interval& img)
    : scop_(),
      img_(img),
@@ -31,7 +72,7 @@ FlatFunction::FlatFunction(const Term& t, const Interval& img)
 {
    t.makeScope(scop_);
    capa_ = t.nbNodes();
-   symb_ = new TermSymbol[capa_];
+   symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
    itv_ = new Interval[capa_];
    nb_ = 0;
@@ -47,7 +88,7 @@ FlatFunction::FlatFunction(const DagFun* f)
      var_()
 {
    capa_ = 8;
-   symb_ = new TermSymbol[capa_];
+   symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
    itv_ = new Interval[capa_];
    nb_ = 0;
@@ -62,7 +103,7 @@ void FlatFunction::extendCapacity()
    {
       // doubles the capacity
       capa_ *= 2;
-      TermSymbol* symb2 = new TermSymbol[capa_];
+      FlatSymbol* symb2 = new FlatSymbol[capa_];
       size_t** arg2 = new size_t*[capa_];
       Interval* itv2 = new Interval[capa_];
 
@@ -118,7 +159,7 @@ size_t FlatFunction::insertCst(const Interval& val)
    extendCapacity();
 
    size_t i = nb_++;
-   symb_[i] = TermSymbol::Cst;
+   symb_[i] = FlatSymbol::Cst;
    arg_[i] = new size_t[2];
    arg_[i][0] = 2;
    arg_[i][1] = cst_.size();
@@ -131,7 +172,7 @@ size_t FlatFunction::insertVar(const Variable& v)
    extendCapacity();
 
    size_t i = nb_++;
-   symb_[i] = TermSymbol::Var;
+   symb_[i] = FlatSymbol::Var;
    arg_[i] = new size_t[3];
    arg_[i][0] = 3;
    arg_[i][1] = v.id();
@@ -140,7 +181,7 @@ size_t FlatFunction::insertVar(const Variable& v)
    return i;
 }
 
-size_t FlatFunction::insertUnary(TermSymbol symb, size_t ic)
+size_t FlatFunction::insertUnary(FlatSymbol symb, size_t ic)
 {
    extendCapacity();
 
@@ -152,20 +193,58 @@ size_t FlatFunction::insertUnary(TermSymbol symb, size_t ic)
    return i;
 }
 
-size_t FlatFunction::insertBinary(TermSymbol symb, size_t il, size_t ir)
+size_t FlatFunction::insertBinary(FlatSymbol symb, size_t il, size_t ir)
 {
    extendCapacity();
 
    size_t i = nb_++;
-   symb_[i] = symb;
    arg_[i] = new size_t[3];
    arg_[i][0] = 3;
    arg_[i][1] = il;
    arg_[i][2] = ir;
+
+   symb_[i] = symb;
+
+   if (symb == FlatSymbol::Add)
+   {      
+      if (symb_[il] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::AddL;
+
+      else if (symb_[ir] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::AddR;
+   }
+
+   if (symb == FlatSymbol::Sub)
+   {      
+      if (symb_[il] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::SubL;
+
+      else if (symb_[ir] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::SubR;
+   }
+
+   if (symb == FlatSymbol::Mul)
+   {      
+      if (symb_[il] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::MulL;
+
+      else if (symb_[ir] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::MulR;
+   }
+
+   if (symb == FlatSymbol::Div)
+   {      
+      if (symb_[il] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::DivL;
+
+      else if (symb_[ir] == FlatSymbol::Cst)
+         symb_[i] = FlatSymbol::DivR;
+   }
+
    return i;   
 }
 
-size_t FlatFunction::insertPow(TermSymbol symb, size_t ic, int e)
+size_t FlatFunction::insertPow(FlatSymbol symb, size_t ic, int e)
 {
    extendCapacity();
 
@@ -184,91 +263,99 @@ Interval FlatFunction::eval(const IntervalVector& V) const
    {
       switch(symb_[i])
       {
-         case TermSymbol::Cst:
+         case FlatSymbol::Cst:
             itv_[i] = cst_[arg_[i][1]];
             break;
 
-         case TermSymbol::Var:
+         case FlatSymbol::Var:
             itv_[i] = V[arg_[i][1]];
             break;
 
-         case TermSymbol::Add:
+         case FlatSymbol::Add:
+         case FlatSymbol::AddL:
+         case FlatSymbol::AddR:
             itv_[i] = itv_[arg_[i][1]] + itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Sub:
+         case FlatSymbol::Sub:
+         case FlatSymbol::SubL:
+         case FlatSymbol::SubR:
             itv_[i] = itv_[arg_[i][1]] - itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Mul:
+         case FlatSymbol::Mul:
+         case FlatSymbol::MulL:
+         case FlatSymbol::MulR:
             itv_[i] = itv_[arg_[i][1]] * itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Div:
+         case FlatSymbol::Div:
+         case FlatSymbol::DivL:
+         case FlatSymbol::DivR:
             itv_[i] = itv_[arg_[i][1]] / itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Min:
+         case FlatSymbol::Min:
             itv_[i] = min(itv_[arg_[i][1]], itv_[arg_[i][2]]);
             break;
 
-         case TermSymbol::Max:
+         case FlatSymbol::Max:
             itv_[i] = max(itv_[arg_[i][1]], itv_[arg_[i][2]]);
             break;
 
-         case TermSymbol::Usb:
+         case FlatSymbol::Usb:
             itv_[i] = -itv_[arg_[i][1]];
             break;
 
-         case TermSymbol::Abs:
+         case FlatSymbol::Abs:
             itv_[i] = abs(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sgn:
+         case FlatSymbol::Sgn:
             itv_[i] = sgn(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sqr:
+         case FlatSymbol::Sqr:
             itv_[i] = sqr(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sqrt:
+         case FlatSymbol::Sqrt:
             itv_[i] = sqrt(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Pow:
+         case FlatSymbol::Pow:
             itv_[i] = pow(itv_[arg_[i][1]], arg_[i][2]);
             break;
 
-         case TermSymbol::Exp:
+         case FlatSymbol::Exp:
             itv_[i] = exp(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Log:
+         case FlatSymbol::Log:
             itv_[i] = log(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Cos:
+         case FlatSymbol::Cos:
             itv_[i] = cos(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sin:
+         case FlatSymbol::Sin:
             itv_[i] = sin(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Tan:
+         case FlatSymbol::Tan:
             itv_[i] = tan(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Cosh:
+         case FlatSymbol::Cosh:
             itv_[i] = cosh(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sinh:
+         case FlatSymbol::Sinh:
             itv_[i] = sinh(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Tanh:
+         case FlatSymbol::Tanh:
             itv_[i] = tanh(itv_[arg_[i][1]]);
             break;
       }
@@ -288,91 +375,99 @@ Interval FlatFunction::eval(const IntervalBox& B) const
    {
       switch(symb_[i])
       {
-         case TermSymbol::Cst:
+         case FlatSymbol::Cst:
             itv_[i] = cst_[arg_[i][1]];
             break;
 
-         case TermSymbol::Var:
+         case FlatSymbol::Var:
             itv_[i] = B.get(var_[arg_[i][2]]);
             break;
 
-         case TermSymbol::Add:
+         case FlatSymbol::Add:
+         case FlatSymbol::AddL:
+         case FlatSymbol::AddR:
             itv_[i] = itv_[arg_[i][1]] + itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Sub:
+         case FlatSymbol::Sub:
+         case FlatSymbol::SubL:
+         case FlatSymbol::SubR:
             itv_[i] = itv_[arg_[i][1]] - itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Mul:
+         case FlatSymbol::Mul:
+         case FlatSymbol::MulL:
+         case FlatSymbol::MulR:
             itv_[i] = itv_[arg_[i][1]] * itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Div:
+         case FlatSymbol::Div:
+         case FlatSymbol::DivL:
+         case FlatSymbol::DivR:
             itv_[i] = itv_[arg_[i][1]] / itv_[arg_[i][2]];
             break;
 
-         case TermSymbol::Min:
+         case FlatSymbol::Min:
             itv_[i] = min(itv_[arg_[i][1]], itv_[arg_[i][2]]);
             break;
 
-         case TermSymbol::Max:
+         case FlatSymbol::Max:
             itv_[i] = max(itv_[arg_[i][1]], itv_[arg_[i][2]]);
             break;
 
-         case TermSymbol::Usb:
+         case FlatSymbol::Usb:
             itv_[i] = -itv_[arg_[i][1]];
             break;
 
-         case TermSymbol::Abs:
+         case FlatSymbol::Abs:
             itv_[i] = abs(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sgn:
+         case FlatSymbol::Sgn:
             itv_[i] = sgn(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sqr:
+         case FlatSymbol::Sqr:
             itv_[i] = sqr(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sqrt:
+         case FlatSymbol::Sqrt:
             itv_[i] = sqrt(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Pow:
+         case FlatSymbol::Pow:
             itv_[i] = pow(itv_[arg_[i][1]], arg_[i][2]);
             break;
 
-         case TermSymbol::Exp:
+         case FlatSymbol::Exp:
             itv_[i] = exp(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Log:
+         case FlatSymbol::Log:
             itv_[i] = log(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Cos:
+         case FlatSymbol::Cos:
             itv_[i] = cos(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sin:
+         case FlatSymbol::Sin:
             itv_[i] = sin(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Tan:
+         case FlatSymbol::Tan:
             itv_[i] = tan(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Cosh:
+         case FlatSymbol::Cosh:
             itv_[i] = cosh(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Sinh:
+         case FlatSymbol::Sinh:
             itv_[i] = sinh(itv_[arg_[i][1]]);
             break;
 
-         case TermSymbol::Tanh:
+         case FlatSymbol::Tanh:
             itv_[i] = tanh(itv_[arg_[i][1]]);
             break;
       }
@@ -420,11 +515,11 @@ Proof FlatFunction::backward(IntervalBox& B) const
    {
       switch(symb_[i])
       {
-         case TermSymbol::Cst:
+         case FlatSymbol::Cst:
             // nothing
             break;
 
-         case TermSymbol::Var:
+         case FlatSymbol::Var:
             {
                Interval x = B.get(var_[arg_[i][2]]) & itv_[i];
                B.set(var_[arg_[i][2]], x);
@@ -432,89 +527,121 @@ Proof FlatFunction::backward(IntervalBox& B) const
             }
             break;
 
-         case TermSymbol::Add:
+         case FlatSymbol::Add:
             itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Sub:
+         case FlatSymbol::AddL:
+            itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::AddR:
+            itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Sub:
             itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Mul:
+         case FlatSymbol::SubL:
+            itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::SubR:
+            itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Mul:
             itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Div:
+         case FlatSymbol::MulL:
+            itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::MulR:
+            itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Div:
             itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Min:
+         case FlatSymbol::DivL:
+            itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::DivR:
+            itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Min:
             itv_[arg_[i][1]] = minPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = minPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Max:
+         case FlatSymbol::Max:
             itv_[arg_[i][1]] = maxPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = maxPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Usb:
+         case FlatSymbol::Usb:
             itv_[arg_[i][1]] = usubPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Abs:
+         case FlatSymbol::Abs:
             itv_[arg_[i][1]] = absPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sgn:
+         case FlatSymbol::Sgn:
             itv_[arg_[i][1]] = sgnPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sqr:
+         case FlatSymbol::Sqr:
             itv_[arg_[i][1]] = sqrPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sqrt:
+         case FlatSymbol::Sqrt:
             itv_[arg_[i][1]] = sqrtPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Pow:
+         case FlatSymbol::Pow:
             itv_[arg_[i][1]] = powPX(itv_[arg_[i][1]], arg_[i][2], itv_[i]);
             break;
 
-         case TermSymbol::Exp:
+         case FlatSymbol::Exp:
             itv_[arg_[i][1]] = expPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Log:
+         case FlatSymbol::Log:
             itv_[arg_[i][1]] = logPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Cos:
+         case FlatSymbol::Cos:
             itv_[arg_[i][1]] = cosPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sin:
+         case FlatSymbol::Sin:
             itv_[arg_[i][1]] = sinPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Tan:
+         case FlatSymbol::Tan:
             itv_[arg_[i][1]] = tanPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Cosh:
+         case FlatSymbol::Cosh:
             itv_[arg_[i][1]] = coshPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sinh:
+         case FlatSymbol::Sinh:
             itv_[arg_[i][1]] = sinhPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Tanh:
+         case FlatSymbol::Tanh:
             itv_[arg_[i][1]] = tanhPX(itv_[arg_[i][1]], itv_[i]);
             break;
       }
@@ -531,99 +658,131 @@ Proof FlatFunction::backward(IntervalVector& V) const
    {
       switch(symb_[i])
       {
-         case TermSymbol::Cst:
+         case FlatSymbol::Cst:
             // nothing
             break;
 
-         case TermSymbol::Var:
+         case FlatSymbol::Var:
             V[arg_[i][1]] &= itv_[i];
             res = V[arg_[i][1]].isEmpty() ?
                      Proof::Empty : Proof::Maybe;
             break;
 
-         case TermSymbol::Add:
+         case FlatSymbol::Add:
             itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Sub:
+         case FlatSymbol::AddL:
+            itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::AddR:
+            itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Sub:
             itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Mul:
+         case FlatSymbol::SubL:
+            itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::SubR:
+            itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Mul:
             itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Div:
+         case FlatSymbol::MulL:
+            itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::MulR:
+            itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Div:
             itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Min:
+         case FlatSymbol::DivL:
+            itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::DivR:
+            itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            break;
+
+         case FlatSymbol::Min:
             itv_[arg_[i][1]] = minPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = minPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Max:
+         case FlatSymbol::Max:
             itv_[arg_[i][1]] = maxPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             itv_[arg_[i][2]] = maxPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
             break;
 
-         case TermSymbol::Usb:
+         case FlatSymbol::Usb:
             itv_[arg_[i][1]] = usubPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Abs:
+         case FlatSymbol::Abs:
             itv_[arg_[i][1]] = absPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sgn:
+         case FlatSymbol::Sgn:
             itv_[arg_[i][1]] = sgnPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sqr:
+         case FlatSymbol::Sqr:
             itv_[arg_[i][1]] = sqrPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sqrt:
+         case FlatSymbol::Sqrt:
             itv_[arg_[i][1]] = sqrtPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Pow:
+         case FlatSymbol::Pow:
             itv_[arg_[i][1]] = powPX(itv_[arg_[i][1]], arg_[i][2], itv_[i]);
             break;
 
-         case TermSymbol::Exp:
+         case FlatSymbol::Exp:
             itv_[arg_[i][1]] = expPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Log:
+         case FlatSymbol::Log:
             itv_[arg_[i][1]] = logPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Cos:
+         case FlatSymbol::Cos:
             itv_[arg_[i][1]] = cosPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sin:
+         case FlatSymbol::Sin:
             itv_[arg_[i][1]] = sinPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Tan:
+         case FlatSymbol::Tan:
             itv_[arg_[i][1]] = tanPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Cosh:
+         case FlatSymbol::Cosh:
             itv_[arg_[i][1]] = coshPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Sinh:
+         case FlatSymbol::Sinh:
             itv_[arg_[i][1]] = sinhPX(itv_[arg_[i][1]], itv_[i]);
             break;
 
-         case TermSymbol::Tanh:
+         case FlatSymbol::Tanh:
             itv_[arg_[i][1]] = tanhPX(itv_[arg_[i][1]], itv_[i]);
             break;
       }
@@ -656,7 +815,7 @@ void FlatFunTermCreator::apply(const TermAdd* t)
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(t->symbol(), vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Add, vl.idx_, vr.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermSub* t)
@@ -667,7 +826,7 @@ void FlatFunTermCreator::apply(const TermSub* t)
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(t->symbol(), vl.idx_, vr.idx_);   
+   idx_ = f_->insertBinary(FlatSymbol::Sub, vl.idx_, vr.idx_);   
 }
    
 void FlatFunTermCreator::apply(const TermMul* t)
@@ -678,7 +837,7 @@ void FlatFunTermCreator::apply(const TermMul* t)
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(t->symbol(), vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Mul, vl.idx_, vr.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermDiv* t)
@@ -689,7 +848,7 @@ void FlatFunTermCreator::apply(const TermDiv* t)
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(t->symbol(), vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Div, vl.idx_, vr.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermMin* t)
@@ -700,7 +859,7 @@ void FlatFunTermCreator::apply(const TermMin* t)
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(t->symbol(), vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Min, vl.idx_, vr.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermMax* t)
@@ -711,7 +870,7 @@ void FlatFunTermCreator::apply(const TermMax* t)
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(t->symbol(), vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Max, vl.idx_, vr.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermUsb* t)
@@ -719,7 +878,7 @@ void FlatFunTermCreator::apply(const TermUsb* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Usb, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermAbs* t)
@@ -727,7 +886,7 @@ void FlatFunTermCreator::apply(const TermAbs* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Abs, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermSgn* t)
@@ -735,7 +894,7 @@ void FlatFunTermCreator::apply(const TermSgn* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sgn, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermSqr* t)
@@ -743,7 +902,7 @@ void FlatFunTermCreator::apply(const TermSqr* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sqr, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermSqrt* t)
@@ -751,7 +910,7 @@ void FlatFunTermCreator::apply(const TermSqrt* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sqrt, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermPow* t)
@@ -759,7 +918,7 @@ void FlatFunTermCreator::apply(const TermPow* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertPow(t->symbol(), vc.idx_, t->exponent());
+   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, t->exponent());
 }
    
 void FlatFunTermCreator::apply(const TermExp* t)
@@ -767,7 +926,7 @@ void FlatFunTermCreator::apply(const TermExp* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Exp, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermLog* t)
@@ -775,7 +934,7 @@ void FlatFunTermCreator::apply(const TermLog* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Log, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermCos* t)
@@ -783,7 +942,7 @@ void FlatFunTermCreator::apply(const TermCos* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Cos, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermSin* t)
@@ -791,7 +950,7 @@ void FlatFunTermCreator::apply(const TermSin* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sin, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermTan* t)
@@ -799,7 +958,7 @@ void FlatFunTermCreator::apply(const TermTan* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Tan, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermCosh* t)
@@ -807,7 +966,7 @@ void FlatFunTermCreator::apply(const TermCosh* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Cosh, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermSinh* t)
@@ -815,7 +974,7 @@ void FlatFunTermCreator::apply(const TermSinh* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sinh, vc.idx_);
 }
    
 void FlatFunTermCreator::apply(const TermTanh* t)
@@ -823,7 +982,7 @@ void FlatFunTermCreator::apply(const TermTanh* t)
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(t->symbol(), vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -850,7 +1009,7 @@ void FlatFunDagCreator::apply(const DagAdd* d)
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(TermSymbol::Add, vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Add, vl.idx_, vr.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagSub* d)
@@ -861,7 +1020,7 @@ void FlatFunDagCreator::apply(const DagSub* d)
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(TermSymbol::Sub, vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Sub, vl.idx_, vr.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagMul* d)
@@ -872,7 +1031,7 @@ void FlatFunDagCreator::apply(const DagMul* d)
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(TermSymbol::Mul, vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Mul, vl.idx_, vr.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagDiv* d)
@@ -883,7 +1042,7 @@ void FlatFunDagCreator::apply(const DagDiv* d)
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(TermSymbol::Div, vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Div, vl.idx_, vr.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagMin* d)
@@ -894,7 +1053,7 @@ void FlatFunDagCreator::apply(const DagMin* d)
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(TermSymbol::Min, vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Min, vl.idx_, vr.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagMax* d)
@@ -905,7 +1064,7 @@ void FlatFunDagCreator::apply(const DagMax* d)
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
 
-   idx_ = f_->insertBinary(TermSymbol::Max, vl.idx_, vr.idx_);
+   idx_ = f_->insertBinary(FlatSymbol::Max, vl.idx_, vr.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagUsb* d)
@@ -913,7 +1072,7 @@ void FlatFunDagCreator::apply(const DagUsb* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Usb, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Usb, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagAbs* d)
@@ -921,7 +1080,7 @@ void FlatFunDagCreator::apply(const DagAbs* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Abs, vc.idx_);   
+   idx_ = f_->insertUnary(FlatSymbol::Abs, vc.idx_);   
 }
 
 void FlatFunDagCreator::apply(const DagSgn* d)
@@ -929,7 +1088,7 @@ void FlatFunDagCreator::apply(const DagSgn* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Sgn, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sgn, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagSqr* d)
@@ -937,7 +1096,7 @@ void FlatFunDagCreator::apply(const DagSqr* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Sqr, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sqr, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagSqrt* d)
@@ -945,7 +1104,7 @@ void FlatFunDagCreator::apply(const DagSqrt* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Sqrt, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sqrt, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagPow* d)
@@ -953,7 +1112,7 @@ void FlatFunDagCreator::apply(const DagPow* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertPow(TermSymbol::Pow, vc.idx_, d->exponent());
+   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, d->exponent());
 }
 
 void FlatFunDagCreator::apply(const DagExp* d)
@@ -961,7 +1120,7 @@ void FlatFunDagCreator::apply(const DagExp* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Exp, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Exp, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagLog* d)
@@ -969,7 +1128,7 @@ void FlatFunDagCreator::apply(const DagLog* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Log, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Log, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagCos* d)
@@ -977,7 +1136,7 @@ void FlatFunDagCreator::apply(const DagCos* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Cos, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Cos, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagSin* d)
@@ -985,7 +1144,7 @@ void FlatFunDagCreator::apply(const DagSin* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Sin, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sin, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagTan* d)
@@ -993,7 +1152,7 @@ void FlatFunDagCreator::apply(const DagTan* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Tan, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Tan, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagCosh* d)
@@ -1001,7 +1160,7 @@ void FlatFunDagCreator::apply(const DagCosh* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Cosh, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Cosh, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagSinh* d)
@@ -1009,7 +1168,7 @@ void FlatFunDagCreator::apply(const DagSinh* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Sinh, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Sinh, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagTanh* d)
@@ -1017,7 +1176,7 @@ void FlatFunDagCreator::apply(const DagTanh* d)
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertUnary(TermSymbol::Tanh, vc.idx_);
+   idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
 }
 
 } // namespace

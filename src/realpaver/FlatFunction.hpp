@@ -27,6 +27,45 @@
 
 namespace realpaver {
 
+/// Enumeration of flat function node symbols
+enum class FlatSymbol {
+   Cst,     ///< constant
+   Var,     ///< variable
+   Add,     ///< addition
+   AddL,    ///< addition with a constant in the left node
+   AddR,    ///< addition with a constant in the right node
+   Sub,     ///< subtraction
+   SubL,    ///< subtraction with a constant in the left node
+   SubR,    ///< subtraction with a constant in the right node
+   Mul,     ///< multiplication
+   MulL,     ///< multiplication with a constant in the left node
+   MulR,    ///< multiplication with a constant in the right node
+   Div,     ///< division
+   DivL,    ///< division with a constant in the left node
+   DivR,    ///< division with a constant in the right node
+   Min,     ///< minimum
+   Max,     ///< maximum
+   Usb,     ///< unary subtraction
+   Abs,     ///< absolute value
+   Sgn,     ///< sign
+   Sqr,     ///< square
+   Sqrt,    ///< square root
+   Pow,     ///< power
+   Exp,     ///< exponential
+   Log,     ///< logarithm
+   Cos,     ///< cosine
+   Sin,     ///< sine
+   Tan,     ///< tangent
+   Cosh,    ///< hyperbolic cosine
+   Sinh,    ///< hyperbolic sine
+   Tanh     ///< hyperbolic tangent
+};
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, FlatSymbol op);
+
+/*----------------------------------------------------------------------------*/
+
 /**
  * @brief Function used to implement a fast version of hc4Revise.
  * 
@@ -68,20 +107,20 @@ public:
    size_t insertVar(const Variable& v);
 
    /// Inserts a unary node and returns its index
-   size_t insertUnary(TermSymbol symb, size_t ic);
+   size_t insertUnary(FlatSymbol symb, size_t ic);
 
    /// Inserts a binary node and returns its index
-   size_t insertBinary(TermSymbol symb, size_t il, size_t ir);
+   size_t insertBinary(FlatSymbol symb, size_t il, size_t ir);
 
    /// Inserts a power node and returns its index
-   size_t insertPow(TermSymbol symb, size_t ic, int e);
+   size_t insertPow(FlatSymbol symb, size_t ic, int e);
    ///@}
 
 private:
    Scope scop_;         // set of variables occurring in this
    Interval img_;       // image
 
-   TermSymbol* symb_;   // node symbols sorted from the leaves to the root
+   FlatSymbol* symb_;   // node symbols sorted from the leaves to the root
    size_t nb_, capa_;   // number of symbols and capacity of symb_
 
    size_t** arg_;       // arguments representing the indexes of the child nodes
