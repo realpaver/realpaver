@@ -22,6 +22,7 @@
 #define REALPAVER_FLAT_FUNCTION_HPP
 
 #include <vector>
+#include "realpaver/Dag.hpp"
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
@@ -31,11 +32,16 @@ namespace realpaver {
  * 
  * The nodes of the tree-representation of a function are stored in arrays
  * sorted by a topological ordering from the leaves to the root.
+ * 
+ * First implementation of this concept in Realpaver 0.4.
  */
 class FlatFunction {
 public:
    /// Creates a flat function representing t with image img
    FlatFunction(const Term& t, const Interval& img);
+
+   /// Creates a flat function representing a function f from a DAG
+   FlatFunction(const DagFun* f);
 
    /// Destructor
    ~FlatFunction();
@@ -62,20 +68,20 @@ public:
    size_t insertVar(const Variable& v);
 
    /// Inserts a unary node and returns its index
-   size_t insertUnary(NodeSymbol symb, size_t ic);
+   size_t insertUnary(TermSymbol symb, size_t ic);
 
    /// Inserts a binary node and returns its index
-   size_t insertBinary(NodeSymbol symb, size_t il, size_t ir);
+   size_t insertBinary(TermSymbol symb, size_t il, size_t ir);
 
    /// Inserts a power node and returns its index
-   size_t insertPow(NodeSymbol symb, size_t ic, int e);
+   size_t insertPow(TermSymbol symb, size_t ic, int e);
    ///@}
 
 private:
    Scope scop_;         // set of variables occurring in this
    Interval img_;       // image
 
-   NodeSymbol* symb_;   // node symbols sorted from the leaves to the root
+   TermSymbol* symb_;   // node symbols sorted from the leaves to the root
    size_t nb_, capa_;   // number of symbols and capacity of symb_
 
    size_t** arg_;       // arguments representing the indexes of the child nodes
@@ -85,18 +91,30 @@ private:
    std::vector<Interval> cst_;   // list of constants
    std::vector<Variable> var_;   // list of variables (with multi-occurrences)
 
+   // evaluation (forward phase)
    Interval eval(const IntervalVector& V) const;
+
+   // backward phase
    Proof backward(IntervalBox& B) const;
    Proof backward(IntervalVector& V) const;
+
+   // creation functions
+   void make(const DagFun& f);
+
+   // extends the capacity
+   void extendCapacity();
+
+   // deallocates the dynamic memory
+   void destroy();
 };
 
 /*----------------------------------------------------------------------------*/
 
 /// Visitor of terms that creates a flat function
-class FlatFunctionCreator : public TermVisitor {
+class FlatFunTermCreator : public TermVisitor {
 public:
    /// Constructor given the target function f
-   FlatFunctionCreator(FlatFunction* f);
+   FlatFunTermCreator(FlatFunction* f);
 
    void apply(const TermCst* t) override;
    void apply(const TermVar* t) override;
@@ -124,6 +142,45 @@ public:
 private:
    FlatFunction* f_;    // target function
    size_t idx_;         // index of node in f_ resulting from a visit
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Visitor of dag functions that creates a flat function
+class FlatFunDagCreator : public DagVisitor {
+public:
+   /// Constructor given the target function f
+   FlatFunDagCreator(FlatFunction* f);
+
+   /// @name Visit methods
+   ///@{
+   void apply(const DagConst* d) override;
+   void apply(const DagVar* d) override;
+   void apply(const DagAdd* d) override;
+   void apply(const DagSub* d) override;
+   void apply(const DagMul* d) override;
+   void apply(const DagDiv* d) override;
+   void apply(const DagMin* d) override;
+   void apply(const DagMax* d) override;
+   void apply(const DagUsb* d) override;
+   void apply(const DagAbs* d) override;
+   void apply(const DagSgn* d) override;
+   void apply(const DagSqr* d) override;
+   void apply(const DagSqrt* d) override;
+   void apply(const DagPow* d) override;
+   void apply(const DagExp* d) override;
+   void apply(const DagLog* d) override;
+   void apply(const DagCos* d) override;
+   void apply(const DagSin* d) override;
+   void apply(const DagTan* d) override;
+   void apply(const DagCosh* d) override;
+   void apply(const DagSinh* d) override;
+   void apply(const DagTanh* d) override;
+   ///@}
+
+private:
+   FlatFunction* f_;    // target function
+   size_t idx_;         // index of node in f_ resulting from a visit   
 };
 
 } // namespace

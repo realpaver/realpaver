@@ -25,32 +25,32 @@
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, NodeSymbol op)
+std::ostream& operator<<(std::ostream& os, TermSymbol op)
 {
    switch(op)
    {
-      case NodeSymbol::Cst:  return os << "cst";
-      case NodeSymbol::Var:  return os << "var";
-      case NodeSymbol::Add:  return os << "+";
-      case NodeSymbol::Sub:  return os << "-";
-      case NodeSymbol::Mul:  return os << "*";
-      case NodeSymbol::Div:  return os << "/";
-      case NodeSymbol::Min:  return os << "min";
-      case NodeSymbol::Max:  return os << "max";
-      case NodeSymbol::Usb:  return os << "-";
-      case NodeSymbol::Abs:  return os << "abs";
-      case NodeSymbol::Sgn:  return os << "sgn";
-      case NodeSymbol::Sqr:  return os << "sqr";
-      case NodeSymbol::Sqrt: return os << "sqrt";
-      case NodeSymbol::Pow:  return os << "pow";
-      case NodeSymbol::Exp:  return os << "exp";
-      case NodeSymbol::Log:  return os << "log";
-      case NodeSymbol::Cos:  return os << "cos";
-      case NodeSymbol::Sin:  return os << "sin";
-      case NodeSymbol::Tan:  return os << "tan";
-      case NodeSymbol::Cosh: return os << "cosh";
-      case NodeSymbol::Sinh: return os << "sinh";
-      case NodeSymbol::Tanh: return os << "tanh";
+      case TermSymbol::Cst:  return os << "cst";
+      case TermSymbol::Var:  return os << "var";
+      case TermSymbol::Add:  return os << "+";
+      case TermSymbol::Sub:  return os << "-";
+      case TermSymbol::Mul:  return os << "*";
+      case TermSymbol::Div:  return os << "/";
+      case TermSymbol::Min:  return os << "min";
+      case TermSymbol::Max:  return os << "max";
+      case TermSymbol::Usb:  return os << "-";
+      case TermSymbol::Abs:  return os << "abs";
+      case TermSymbol::Sgn:  return os << "sgn";
+      case TermSymbol::Sqr:  return os << "sqr";
+      case TermSymbol::Sqrt: return os << "sqrt";
+      case TermSymbol::Pow:  return os << "pow";
+      case TermSymbol::Exp:  return os << "exp";
+      case TermSymbol::Log:  return os << "log";
+      case TermSymbol::Cos:  return os << "cos";
+      case TermSymbol::Sin:  return os << "sin";
+      case TermSymbol::Tan:  return os << "tan";
+      case TermSymbol::Cosh: return os << "cosh";
+      case TermSymbol::Sinh: return os << "sinh";
+      case TermSymbol::Tanh: return os << "tanh";
       default:             os.setstate(std::ios::failbit);
    }
    return os;
@@ -58,7 +58,7 @@ std::ostream& operator<<(std::ostream& os, NodeSymbol op)
 
 /*----------------------------------------------------------------------------*/
 
-TermRep::TermRep(NodeSymbol symb, NodePriority p)
+TermRep::TermRep(TermSymbol symb, NodePriority p)
       : symb_(symb),
         hcode_(0),
         constant_(true),
@@ -118,7 +118,7 @@ bool TermRep::isDiv() const
    return false;
 }
 
-NodeSymbol TermRep::symbol() const
+TermSymbol TermRep::symbol() const
 {
    return symb_;
 }
@@ -831,7 +831,7 @@ Term tanh(Term t)
 /*----------------------------------------------------------------------------*/
 
 TermCst::TermCst(const Interval& x)
-      : TermRep(NodeSymbol::Cst, NodePriority::Low),
+      : TermRep(TermSymbol::Cst, NodePriority::Low),
         x_(x)
 {
    ASSERT(!x.isEmpty(), "Bad constant term " << x);
@@ -940,7 +940,7 @@ TermRep* TermCst::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermVar::TermVar(Variable v)
-      : TermRep(NodeSymbol::Var, NodePriority::Low),
+      : TermRep(TermSymbol::Var, NodePriority::Low),
         v_(v)
 {
    hcode_ = v.hashCode();
@@ -1047,7 +1047,7 @@ TermRep* TermVar::clone() const
 
 /*----------------------------------------------------------------------------*/
 
-TermOp::TermOp(const SharedRep& t, NodeSymbol symb, NodePriority p)
+TermOp::TermOp(const SharedRep& t, TermSymbol symb, NodePriority p)
       : TermRep(symb, p),
         v_()
 {
@@ -1055,7 +1055,7 @@ TermOp::TermOp(const SharedRep& t, NodeSymbol symb, NodePriority p)
    insert(t);
 }
 
-TermOp::TermOp(const SharedRep& l, const SharedRep& r, NodeSymbol symb,
+TermOp::TermOp(const SharedRep& l, const SharedRep& r, TermSymbol symb,
                NodePriority p)
       : TermRep(symb, p),
         v_()
@@ -1078,27 +1078,27 @@ size_t TermOp::nbNodes() const
 
 bool TermOp::isAdd() const
 {
-   return symbol() == NodeSymbol::Add;
+   return symbol() == TermSymbol::Add;
 }
 
 bool TermOp::isSub() const
 {
-   return symbol() == NodeSymbol::Sub;
+   return symbol() == TermSymbol::Sub;
 }
 
 bool TermOp::isMul() const
 {
-   return symbol() == NodeSymbol::Mul;
+   return symbol() == TermSymbol::Mul;
 }
 
 bool TermOp::isDiv() const
 {
-   return symbol() == NodeSymbol::Div;
+   return symbol() == TermSymbol::Div;
 }
 
 bool TermOp::isUsb() const
 {
-   return symbol() == NodeSymbol::Usb;
+   return symbol() == TermSymbol::Usb;
 }
 
 bool TermOp::isIntegerRoot() const
@@ -1235,7 +1235,7 @@ TermRep::SharedRep TermOp::child() const
 /*----------------------------------------------------------------------------*/
 
 TermAdd::TermAdd(const SharedRep& l, const SharedRep& r)
-      : TermOp(l, r, NodeSymbol::Add, NodePriority::AddSub)
+      : TermOp(l, r, TermSymbol::Add, NodePriority::AddSub)
 {}
 
 Interval TermAdd::evalConst() const
@@ -1291,7 +1291,7 @@ TermRep* TermAdd::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermSub::TermSub(const SharedRep& l, const SharedRep& r)
-      : TermOp(l, r, NodeSymbol::Sub, NodePriority::AddSub)
+      : TermOp(l, r, TermSymbol::Sub, NodePriority::AddSub)
 {}
 
 Interval TermSub::evalConst() const
@@ -1358,7 +1358,7 @@ TermRep* TermSub::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermMul::TermMul(const SharedRep& l, const SharedRep& r)
-      : TermOp(l, r, NodeSymbol::Mul, NodePriority::MulDiv)
+      : TermOp(l, r, TermSymbol::Mul, NodePriority::MulDiv)
 {}
 
 Interval TermMul::evalConst() const
@@ -1434,7 +1434,7 @@ TermRep* TermMul::clone() const
 
 /*----------------------------------------------------------------------------*/
 TermDiv::TermDiv(const SharedRep& l, const SharedRep& r)
-      : TermOp(l, r, NodeSymbol::Div, NodePriority::MulDiv)
+      : TermOp(l, r, TermSymbol::Div, NodePriority::MulDiv)
 {}
 
 Interval TermDiv::evalConst() const
@@ -1504,7 +1504,7 @@ TermRep* TermDiv::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermMin::TermMin(const SharedRep& l, const SharedRep& r)
-      : TermOp(l, r, NodeSymbol::Min, NodePriority::High)
+      : TermOp(l, r, TermSymbol::Min, NodePriority::High)
 {}
 
 Interval TermMin::evalConst() const
@@ -1548,7 +1548,7 @@ TermRep* TermMin::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermMax::TermMax(const SharedRep& l, const SharedRep& r)
-      : TermOp(l, r, NodeSymbol::Max, NodePriority::High)
+      : TermOp(l, r, TermSymbol::Max, NodePriority::High)
 {}
 
 Interval TermMax::evalConst() const
@@ -1592,7 +1592,7 @@ TermRep* TermMax::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermUsb::TermUsb(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Usb, NodePriority::AddSub)
+      : TermOp(t, TermSymbol::Usb, NodePriority::AddSub)
 {}
 
 Interval TermUsb::evalConst() const
@@ -1656,7 +1656,7 @@ TermRep* TermUsb::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermAbs::TermAbs(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Abs, NodePriority::High)
+      : TermOp(t, TermSymbol::Abs, NodePriority::High)
 {}
 
 Interval TermAbs::evalConst() const
@@ -1698,7 +1698,7 @@ TermRep* TermAbs::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermSgn::TermSgn(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Sgn, NodePriority::High)
+      : TermOp(t, TermSymbol::Sgn, NodePriority::High)
 {}
 
 Interval TermSgn::evalConst() const
@@ -1740,7 +1740,7 @@ TermRep* TermSgn::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermSqr::TermSqr(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Sqr, NodePriority::High)
+      : TermOp(t, TermSymbol::Sqr, NodePriority::High)
 {}
 
 Interval TermSqr::evalConst() const
@@ -1800,7 +1800,7 @@ TermRep* TermSqr::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermSqrt::TermSqrt(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Sqrt, NodePriority::High)
+      : TermOp(t, TermSymbol::Sqrt, NodePriority::High)
 {}
 
 Interval TermSqrt::evalConst() const
@@ -1842,7 +1842,7 @@ TermRep* TermSqrt::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermPow::TermPow(const SharedRep& t, int n)
-      : TermOp(t, NodeSymbol::Pow, NodePriority::High),
+      : TermOp(t, TermSymbol::Pow, NodePriority::High),
         n_(n)
 {
    ASSERT(n > 0, "Bad integral exponent in a term " << n);
@@ -1902,7 +1902,7 @@ TermRep* TermPow::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermExp::TermExp(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Exp, NodePriority::High)
+      : TermOp(t, TermSymbol::Exp, NodePriority::High)
 {}
 
 Interval TermExp::evalConst() const
@@ -1939,7 +1939,7 @@ TermRep* TermExp::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermLog::TermLog(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Log, NodePriority::High)
+      : TermOp(t, TermSymbol::Log, NodePriority::High)
 {}
 
 Interval TermLog::evalConst() const
@@ -1976,7 +1976,7 @@ TermRep* TermLog::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermCos::TermCos(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Cos, NodePriority::High)
+      : TermOp(t, TermSymbol::Cos, NodePriority::High)
 {}
 
 Interval TermCos::evalConst() const
@@ -2013,7 +2013,7 @@ TermRep* TermCos::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermSin::TermSin(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Sin, NodePriority::High)
+      : TermOp(t, TermSymbol::Sin, NodePriority::High)
 {}
 
 Interval TermSin::evalConst() const
@@ -2050,7 +2050,7 @@ TermRep* TermSin::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermTan::TermTan(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Tan, NodePriority::High)
+      : TermOp(t, TermSymbol::Tan, NodePriority::High)
 {}
 
 Interval TermTan::evalConst() const
@@ -2087,7 +2087,7 @@ TermRep* TermTan::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermCosh::TermCosh(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Cosh, NodePriority::High)
+      : TermOp(t, TermSymbol::Cosh, NodePriority::High)
 {}
 
 Interval TermCosh::evalConst() const
@@ -2124,7 +2124,7 @@ TermRep* TermCosh::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermSinh::TermSinh(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Sinh, NodePriority::High)
+      : TermOp(t, TermSymbol::Sinh, NodePriority::High)
 {}
 
 Interval TermSinh::evalConst() const
@@ -2161,7 +2161,7 @@ TermRep* TermSinh::clone() const
 /*----------------------------------------------------------------------------*/
 
 TermTanh::TermTanh(const SharedRep& t)
-      : TermOp(t, NodeSymbol::Tanh, NodePriority::High)
+      : TermOp(t, TermSymbol::Tanh, NodePriority::High)
 {}
 
 Interval TermTanh::evalConst() const

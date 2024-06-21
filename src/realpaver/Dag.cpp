@@ -29,7 +29,42 @@
 
 namespace realpaver {
 
-DagNode::DagNode(Dag* dag, NodeSymbol symb, size_t index)
+std::ostream& operator<<(std::ostream& os, DagSymbol op)
+{
+   switch(op)
+   {
+      case DagSymbol::Cst:  return os << "cst";
+      case DagSymbol::Var:  return os << "var";
+      case DagSymbol::Add:  return os << "+";
+      case DagSymbol::Sub:  return os << "-";
+      case DagSymbol::Mul:  return os << "*";
+      case DagSymbol::Div:  return os << "/";
+      case DagSymbol::Min:  return os << "min";
+      case DagSymbol::Max:  return os << "max";
+      case DagSymbol::Usb:  return os << "-";
+      case DagSymbol::Abs:  return os << "abs";
+      case DagSymbol::Sgn:  return os << "sgn";
+      case DagSymbol::Sqr:  return os << "sqr";
+      case DagSymbol::Sqrt: return os << "sqrt";
+      case DagSymbol::Pow:  return os << "pow";
+      case DagSymbol::Exp:  return os << "exp";
+      case DagSymbol::Log:  return os << "log";
+      case DagSymbol::Cos:  return os << "cos";
+      case DagSymbol::Sin:  return os << "sin";
+      case DagSymbol::Tan:  return os << "tan";
+      case DagSymbol::Cosh: return os << "cosh";
+      case DagSymbol::Sinh: return os << "sinh";
+      case DagSymbol::Tanh: return os << "tanh";
+      case DagSymbol::Lin: return os << "lin";
+
+      default: os.setstate(std::ios::failbit);
+   }
+   return os;
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagNode::DagNode(Dag* dag, DagSymbol symb, size_t index)
       : bitset_(),
         dag_(dag),
         symb_(symb),
@@ -120,7 +155,7 @@ void DagNode::addSubNode(size_t i)
    vsub_.push_back(i);
 }
 
-NodeSymbol DagNode::symbol() const
+DagSymbol DagNode::symbol() const
 {
    return symb_;
 }
@@ -216,7 +251,7 @@ size_t DagNode::nbOccurrences(const Variable& v) const
 /*----------------------------------------------------------------------------*/
 
 DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
-      : DagNode(dag, NodeSymbol::Cst, index),
+      : DagNode(dag, DagSymbol::Cst, index),
         x_(x)
 {}
 
@@ -281,7 +316,7 @@ Interval DagConst::getConst() const
 /*----------------------------------------------------------------------------*/
 
 DagVar::DagVar(Dag* dag, size_t index, Variable v)
-      : DagNode(dag, NodeSymbol::Var, index),
+      : DagNode(dag, DagSymbol::Var, index),
         v_(v)
 {
    bitset_ = Bitset(v.id(), v.id());
@@ -351,7 +386,7 @@ Variable DagVar::getVar() const
 
 /*----------------------------------------------------------------------------*/
 
-DagOp::DagOp(Dag* dag, NodeSymbol symb, const IndexList& lsub)
+DagOp::DagOp(Dag* dag, DagSymbol symb, const IndexList& lsub)
       : DagNode(dag, symb)
 {
    for (size_t i : lsub)
@@ -451,7 +486,7 @@ void DagOp::reval(const RealPoint& pt)
 /*----------------------------------------------------------------------------*/
 
 DagAdd::DagAdd(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Add, lsub)
+      : DagOp(dag, DagSymbol::Add, lsub)
 {}
 
 void DagAdd::acceptVisitor(DagVisitor& vis) const
@@ -496,7 +531,7 @@ bool DagAdd::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagSub::DagSub(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Sub, lsub)
+      : DagOp(dag, DagSymbol::Sub, lsub)
 {}
 
 void DagSub::acceptVisitor(DagVisitor& vis) const
@@ -541,7 +576,7 @@ bool DagSub::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagMul::DagMul(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Mul, lsub)
+      : DagOp(dag, DagSymbol::Mul, lsub)
 {}
 
 void DagMul::acceptVisitor(DagVisitor& vis) const
@@ -586,7 +621,7 @@ bool DagMul::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagDiv::DagDiv(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Div, lsub)
+      : DagOp(dag, DagSymbol::Div, lsub)
 {}
 
 void DagDiv::acceptVisitor(DagVisitor& vis) const
@@ -632,7 +667,7 @@ bool DagDiv::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagMin::DagMin(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Min, lsub)
+      : DagOp(dag, DagSymbol::Min, lsub)
 {}
 
 void DagMin::acceptVisitor(DagVisitor& vis) const
@@ -702,7 +737,7 @@ bool DagMin::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagMax::DagMax(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Max, lsub)
+      : DagOp(dag, DagSymbol::Max, lsub)
 {}
 
 void DagMax::acceptVisitor(DagVisitor& vis) const
@@ -772,7 +807,7 @@ bool DagMax::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagUsb::DagUsb(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Usb, lsub)
+      : DagOp(dag, DagSymbol::Usb, lsub)
 {}
 
 void DagUsb::acceptVisitor(DagVisitor& vis) const
@@ -814,7 +849,7 @@ bool DagUsb::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagAbs::DagAbs(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Abs, lsub)
+      : DagOp(dag, DagSymbol::Abs, lsub)
 {}
 
 void DagAbs::acceptVisitor(DagVisitor& vis) const
@@ -874,7 +909,7 @@ bool DagAbs::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagSgn::DagSgn(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Sgn, lsub)
+      : DagOp(dag, DagSymbol::Sgn, lsub)
 {}
 
 void DagSgn::acceptVisitor(DagVisitor& vis) const
@@ -912,7 +947,7 @@ bool DagSgn::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagSqr::DagSqr(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Sqr, lsub)
+      : DagOp(dag, DagSymbol::Sqr, lsub)
 {}
 
 void DagSqr::acceptVisitor(DagVisitor& vis) const
@@ -954,7 +989,7 @@ bool DagSqr::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Sqrt, lsub)
+      : DagOp(dag, DagSymbol::Sqrt, lsub)
 {}
 
 void DagSqrt::acceptVisitor(DagVisitor& vis) const
@@ -996,7 +1031,7 @@ bool DagSqrt::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagPow::DagPow(Dag* dag, int n, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Pow, lsub),
+      : DagOp(dag, DagSymbol::Pow, lsub),
         n_(n)
 {}
 
@@ -1062,7 +1097,7 @@ bool DagPow::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagExp::DagExp(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Exp, lsub)
+      : DagOp(dag, DagSymbol::Exp, lsub)
 {}
 
 void DagExp::acceptVisitor(DagVisitor& vis) const
@@ -1104,7 +1139,7 @@ bool DagExp::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagLog::DagLog(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Log, lsub)
+      : DagOp(dag, DagSymbol::Log, lsub)
 {}
 
 void DagLog::acceptVisitor(DagVisitor& vis) const
@@ -1146,7 +1181,7 @@ bool DagLog::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagCos::DagCos(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Cos, lsub)
+      : DagOp(dag, DagSymbol::Cos, lsub)
 {}
 
 void DagCos::acceptVisitor(DagVisitor& vis) const
@@ -1189,7 +1224,7 @@ bool DagCos::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagSin::DagSin(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Sin, lsub)
+      : DagOp(dag, DagSymbol::Sin, lsub)
 {}
 
 void DagSin::acceptVisitor(DagVisitor& vis) const
@@ -1231,7 +1266,7 @@ bool DagSin::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagTan::DagTan(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Tan, lsub)
+      : DagOp(dag, DagSymbol::Tan, lsub)
 {}
 
 void DagTan::acceptVisitor(DagVisitor& vis) const
@@ -1273,7 +1308,7 @@ bool DagTan::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagCosh::DagCosh(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Cosh, lsub)
+      : DagOp(dag, DagSymbol::Cosh, lsub)
 {}
 
 void DagCosh::acceptVisitor(DagVisitor& vis) const
@@ -1315,7 +1350,7 @@ bool DagCosh::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagSinh::DagSinh(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Sinh, lsub)
+      : DagOp(dag, DagSymbol::Sinh, lsub)
 {}
 
 void DagSinh::acceptVisitor(DagVisitor& vis) const
@@ -1357,7 +1392,7 @@ bool DagSinh::rdiff()
 /*----------------------------------------------------------------------------*/
 
 DagTanh::DagTanh(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, NodeSymbol::Tanh, lsub)
+      : DagOp(dag, DagSymbol::Tanh, lsub)
 {}
 
 void DagTanh::acceptVisitor(DagVisitor& vis) const

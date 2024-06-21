@@ -35,8 +35,38 @@ namespace realpaver {
 class Dag;
 class DagVisitor;
 
-/// Type of ists of indexes
+/// Type of lists of indexes
 using IndexList = std::vector<size_t>;
+
+/// Enumeration of dag node symbols
+enum class DagSymbol {
+   Cst,     ///< constant
+   Var,     ///< variable
+   Add,     ///< addition
+   Sub,     ///< subtraction
+   Mul,     ///< multiplication
+   Div,     ///< division
+   Min,     ///< minimum
+   Max,     ///< maximum
+   Usb,     ///< unary subtraction
+   Abs,     ///< absolute value
+   Sgn,     ///< sign
+   Sqr,     ///< square
+   Sqrt,    ///< square root
+   Pow,     ///< power
+   Exp,     ///< exponential
+   Log,     ///< logarithm
+   Cos,     ///< cosine
+   Sin,     ///< sine
+   Tan,     ///< tangent
+   Cosh,    ///< hyperbolic cosine
+   Sinh,    ///< hyperbolic sine
+   Tanh,    ///< hyperbolic tangent
+   Lin      ///< linear expression
+};
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, DagSymbol op);
 
 /**
  * @brief Base class of DAG nodes.
@@ -48,7 +78,7 @@ using IndexList = std::vector<size_t>;
 class DagNode {
 public:
    /// Constructor given the symbol and node index
-   DagNode(Dag* dag, NodeSymbol symb, size_t index = 0);
+   DagNode(Dag* dag, DagSymbol symb, size_t index = 0);
 
    /// Virtual destructor
    virtual ~DagNode();
@@ -93,7 +123,7 @@ public:
    Dag* dag() const;
 
    /// Returns the symbol
-   NodeSymbol symbol() const;
+   DagSymbol symbol() const;
 
    /// Returns the bitset this depends on
    const Bitset& bitset() const;
@@ -221,7 +251,7 @@ protected:
 
 private:
    Dag* dag_;        // the DAG
-   NodeSymbol symb_; // symbol
+   DagSymbol symb_; // symbol
    size_t index_;    // index of this node in the DAG
    IndexList vpar_;  // list of indexes of parent nodes in the DAG
    IndexList vsub_;  // list of indexes of sub-nodes in the DAG
@@ -305,7 +335,7 @@ public:
     * @param symb operation symbol
     * @param lsub list of DAG indexes of the sub-nodes of this
     */
-   DagOp(Dag* dag, NodeSymbol symb, const IndexList& lsub);
+   DagOp(Dag* dag, DagSymbol symb, const IndexList& lsub);
 
    /// Virtual destructor
    virtual ~DagOp();

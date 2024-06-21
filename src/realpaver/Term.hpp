@@ -32,8 +32,8 @@ namespace realpaver {
 
 class TermVisitor;
 
-/// Enumeration of node symbols
-enum class NodeSymbol {
+/// Enumeration of term node symbols
+enum class TermSymbol {
    Cst,     ///< constant
    Var,     ///< variable
    Add,     ///< addition
@@ -59,7 +59,7 @@ enum class NodeSymbol {
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, NodeSymbol op);
+std::ostream& operator<<(std::ostream& os, TermSymbol op);
 
 /*----------------------------------------------------------------------------*/
 
@@ -77,13 +77,13 @@ enum class NodePriority {
 class TermRep {
 public:
    /// Constructor
-   TermRep(NodeSymbol symb, NodePriority p);
+   TermRep(TermSymbol symb, NodePriority p);
 
    /// Virtual destructor
    virtual ~TermRep();
 
    /// Returns the node symbol
-   NodeSymbol symbol() const;
+   TermSymbol symbol() const;
 
    /// Returns the priority of this
    NodePriority priority() const;
@@ -201,7 +201,7 @@ protected:
    using SharedRep = std::shared_ptr<TermRep>;
    friend class Term;
 
-   NodeSymbol symb_; // symbol
+   TermSymbol symb_; // symbol
    size_t hcode_;    // hash code
    bool constant_;   // true if this is constant
    Interval ival_;   // used for evaluation
@@ -593,10 +593,10 @@ private:
 class TermOp : public TermRep {
 public:
    /// Constructor
-   TermOp(const SharedRep& t, NodeSymbol symb, NodePriority p);
+   TermOp(const SharedRep& t, TermSymbol symb, NodePriority p);
 
    /// Constructor
-   TermOp(const SharedRep& l, const SharedRep& r, NodeSymbol op, NodePriority p);
+   TermOp(const SharedRep& l, const SharedRep& r, TermSymbol op, NodePriority p);
 
    /// Virtual destructor
    virtual ~TermOp();
