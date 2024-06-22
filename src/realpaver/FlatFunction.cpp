@@ -1179,4 +1179,9 @@ void FlatFunDagCreator::apply(const DagTanh* d)
    idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
 }
 
+void FlatFunDagCreator::apply(const DagLin* d)
+{
+   // TODO DAGLIN
+}
+
 } // namespace

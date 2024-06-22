@@ -1433,6 +1433,179 @@ bool DagTanh::rdiff()
 
 /*----------------------------------------------------------------------------*/
 
+DagLin::DagLin(Dag* dag, const Term& t, const IndexList& lsub)
+      : DagOp(dag, DagSymbol::Lin, lsub),
+        cst_(),
+        terms_()
+{   
+
+// TODO
+
+}
+
+bool DagLin::eqSymbol(const DagOp* other) const
+{
+   if (symbol() != other->symbol())
+      return false;
+
+   if (subArity() != other->subArity())
+      return false;
+
+   const DagLin* dl = static_cast<const DagLin*>(other);
+
+   // compares the constant terms
+   if (!cst_.isSetEq(dl->cst_))
+      return false;
+
+   // compares the factors of the linear terms
+   auto it = terms_.begin();
+   auto jt = dl->terms_.begin();
+
+   while (it != terms_.end())
+   {
+      if (!(*it).coef.isSetEq((*jt).coef))
+         return false;
+
+      ++it;
+      ++jt;
+   }
+
+   // no need to compare the variables / sub-nodes since this is done
+   // in the eq() method
+   
+   return true;
+}
+
+size_t DagLin::nbOccurrences(const Variable& v) const
+{
+   return dependsOn(v) ? 1 : 0;
+}
+
+void DagLin::print(std::ostream& os) const
+{
+   os << symbol() << "(" << cst_ << ")";
+   for (const auto& t : terms_)
+   {
+      os << "(" << t.coef << ", " << t.node->index() << ")";
+   }
+}
+
+void DagLin::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagLin::eval()
+{
+   setVal(cst_);
+
+   for (const Item& citm : terms_)
+   {
+      Item& itm = const_cast<Item&>(citm);
+      itm.ival = (itm.coef.isOne()) ? itm.node->val() :
+                                      itm.coef * itm.node->val();
+      setVal(val() + itm.ival);
+   }
+}
+
+void DagLin::proj(IntervalBox& B)
+{
+   // re-evaluation of the linear terms (items) that is useful if a variable
+   // domain has been modified since the last evaluation
+   if (parArity() > 0)
+   {
+      for (const Item& citm : terms_)
+      {
+         Item& itm = const_cast<Item&>(citm);
+         Interval aux = itm.node->val() & itm.node->dom();
+         itm.ival = (itm.coef.isOne()) ? aux : itm.coef * aux;
+      }
+   }
+   
+   for (auto it=terms_.begin(); it!=terms_.end(); ++it)
+   {
+      // contracts the domain of the variable node
+      Interval x = dom() - cst_;
+      DagVar* node = (*it).node;
+
+      auto jt = terms_.begin();
+      while (jt != it)
+      {
+         x -= jt->ival;
+         ++jt;
+      }
+      ++jt;
+      while (jt != terms_.end())
+      {
+         x -= jt->ival;
+         ++jt;
+      }
+
+      node->reduceDom(mulPY(it->coef, node->dom(), x));
+   }
+}
+
+bool DagLin::diff()
+{
+   for (const Item& itm : terms_)
+   {
+      // d(a * v) / dv = a
+      DagVar* node = itm.node;
+      node->addDv(dv() * itm.coef);
+   }
+   return true;
+}
+
+void DagLin::reval()
+{
+   setRval(cst_.midpoint());
+
+   for (const Item& citm : terms_)
+   {
+      Item& itm = const_cast<Item&>(citm);
+      itm.ival = itm.coef * itm.node->rval();
+      setRval(rval() + itm.ival.midpoint());
+   }
+}
+
+bool DagLin::rdiff()
+{
+   for (const Item& itm : terms_)
+   {
+      // d(a * v) / dv = a
+      DagVar* node = itm.node;
+      node->addRdv(rdv() * itm.coef.midpoint());
+   }   
+   return true;
+}
+
+DagLin::const_iterator DagLin::begin() const
+{
+   return terms_.begin();
+}
+
+DagLin::const_iterator DagLin::end() const
+{
+   return terms_.end();
+}
+
+Interval DagLin::getCoefSub(const_iterator it) const
+{
+   return (*it).coef;
+}
+
+DagVar* DagLin::getNodeSub(const_iterator it) const
+{
+   return (*it).node;
+}
+
+Interval DagLin::getConstantValue() const
+{
+   return cst_;
+}
+
+/*----------------------------------------------------------------------------*/
+
 DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
       : dag_(dag),
         node_(),
@@ -2543,6 +2716,11 @@ void DagVisitor::apply(const DagTanh* d)
    THROW("visit method not implemented");
 }
 
+void DagVisitor::apply(const DagLin* d)
+{
+   THROW("visit method not implemented");
+}
+
 /*----------------------------------------------------------------------------*/
 
 DagFunCreator::DagFunCreator(DagFun* f): f_(f)
@@ -2709,6 +2887,13 @@ void DagFunCreator::apply(const DagTanh* d)
    f_->insertOpNode(aux);
 }
 
+void DagFunCreator::apply(const DagLin* d)
+{
+   visitSubNodes(d);
+   DagLin* aux = const_cast<DagLin*>(d);
+   f_->insertOpNode(aux);
+}
+
 /*----------------------------------------------------------------------------*/
 
 DagCreator::DagCreator(Dag* dag, Constraint c)
@@ -2724,78 +2909,58 @@ size_t DagCreator::index()
 
 void DagCreator::apply(const ArithCtrEq* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t(c->left() - c->right());  
-   t.acceptVisitor(vis);
-
-   // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::zero());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::zero());
 }
 
 void DagCreator::apply(const ArithCtrLe* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::negative());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::negative());
 }
 
 void DagCreator::apply(const ArithCtrLt* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::negative());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::negative());
 }
 
 void DagCreator::apply(const ArithCtrGe* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creation of the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::positive());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::positive());
 }
 
 void DagCreator::apply(const ArithCtrGt* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creation of the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::positive());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::positive());
 }
 
 void DagCreator::apply(const ArithCtrIn* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
-   c->term().acceptVisitor(vis);
+   make(c->term(), c->scope(), c->image());
+}
+
+void DagCreator::make(const Term& t, Scope scop, const Interval& img)
+{
+   size_t root = 0;  // index of root node
+   
+   if (t.isLinear())
+   {
+      // TODO
+   }
+   else
+   {
+      // visits the term
+      DagTermCreator vis(dag_);
+      t.acceptVisitor(vis);
+      root = vis.index();
+   }
 
    // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), c->image());
-   f->setScope(c->scope());
+   DagFun* f = new DagFun(dag_, root, img);
+   f->setScope(scop);
    index_ = dag_->insertFun(f);
 }
 

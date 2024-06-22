@@ -779,6 +779,66 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
+/// DAG node representing a (non-constant) linear expression
+class DagLin : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param t linear term
+    * @param lsub list of DAG indexes of the sub-nodes (variables) of this
+    */
+   DagLin(Dag* dag, const Term& t, const IndexList& lsub);
+
+   bool eqSymbol(const DagOp* other) const override;
+   size_t nbOccurrences(const Variable& v) const override;
+   void print(std::ostream& os) const override;
+   void acceptVisitor(DagVisitor& vis) const override;
+   void eval() override;
+   void proj(IntervalBox& B) override;
+   bool diff() override;
+   void reval() override;
+   bool rdiff() override;
+
+   /// Returns the constant value of this linear expression
+   Interval getConstantValue() const;
+
+private:
+   struct Item {
+      Interval coef;    // coefficient
+      DagVar* node;     // variable node
+      Interval ival;    // used for the evaluation
+   };
+
+   struct CompItem {
+      bool operator()(const Item& i1, const Item& i2) const
+      {
+         return i1.node->getVar().id() < i2.node->getVar().id();
+      }
+   };
+
+   Interval cst_;                      // constant value
+   std::set<Item, CompItem> terms_;    // set of linear terms
+
+public:
+   /// Type of iterators on the list of linear terms
+   typedef std::set<Item, CompItem>::const_iterator const_iterator;
+
+   /// Returns an iterator on the beginning of the list of linear terms
+   const_iterator begin() const;
+
+   /// Returns an iterator on the end of the list of linear terms
+   const_iterator end() const;
+
+   /// Returns the coefficient of a linear term pointed by an iterator
+   Interval getCoefSub(const_iterator it) const;
+
+   /// Returns the variable of a linear term pointed by an iterator
+   DagVar* getNodeSub(const_iterator it) const;
+};
+
+/*----------------------------------------------------------------------------*/
+
 /**
  * @brief Function in a DAG.
  *
@@ -1311,6 +1371,7 @@ public:
    virtual void apply(const DagCosh* d);
    virtual void apply(const DagSinh* d);
    virtual void apply(const DagTanh* d);
+   virtual void apply(const DagLin* d);
    ///@}
 };
 
@@ -1324,28 +1385,29 @@ public:
 
    /// @name Visit methods
    ///@{
-   virtual void apply(const DagConst* d) override;
-   virtual void apply(const DagVar* d) override;
-   virtual void apply(const DagAdd* d) override;
-   virtual void apply(const DagSub* d) override;
-   virtual void apply(const DagMul* d) override;
-   virtual void apply(const DagDiv* d) override;
-   virtual void apply(const DagMin* d) override;
-   virtual void apply(const DagMax* d) override;
-   virtual void apply(const DagUsb* d) override;
-   virtual void apply(const DagAbs* d) override;
-   virtual void apply(const DagSgn* d) override;
-   virtual void apply(const DagSqr* d) override;
-   virtual void apply(const DagSqrt* d) override;
-   virtual void apply(const DagPow* d) override;
-   virtual void apply(const DagExp* d) override;
-   virtual void apply(const DagLog* d) override;
-   virtual void apply(const DagCos* d) override;
-   virtual void apply(const DagSin* d) override;
-   virtual void apply(const DagTan* d) override;
-   virtual void apply(const DagCosh* d) override;
-   virtual void apply(const DagSinh* d) override;
-   virtual void apply(const DagTanh* d) override;
+   void apply(const DagConst* d) override;
+   void apply(const DagVar* d) override;
+   void apply(const DagAdd* d) override;
+   void apply(const DagSub* d) override;
+   void apply(const DagMul* d) override;
+   void apply(const DagDiv* d) override;
+   void apply(const DagMin* d) override;
+   void apply(const DagMax* d) override;
+   void apply(const DagUsb* d) override;
+   void apply(const DagAbs* d) override;
+   void apply(const DagSgn* d) override;
+   void apply(const DagSqr* d) override;
+   void apply(const DagSqrt* d) override;
+   void apply(const DagPow* d) override;
+   void apply(const DagExp* d) override;
+   void apply(const DagLog* d) override;
+   void apply(const DagCos* d) override;
+   void apply(const DagSin* d) override;
+   void apply(const DagTan* d) override;
+   void apply(const DagCosh* d) override;
+   void apply(const DagSinh* d) override;
+   void apply(const DagTanh* d) override;
+   void apply(const DagLin* d) override;
    ///@}
 
 private:
@@ -1381,6 +1443,8 @@ private:
    Dag* dag_;        // DAG
    Constraint c_;    // constraint visited
    size_t index_;    // resulting constraint index in the DAG
+
+   void make(const Term& t, Scope scop, const Interval& img);
 };
 
 /*----------------------------------------------------------------------------*/

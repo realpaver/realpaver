@@ -66,6 +66,7 @@ public:
    void apply(const DagCosh* node) override;
    void apply(const DagSinh* node) override;
    void apply(const DagTanh* node) override;
+   void apply(const DagLin* node) override;
 
 private:
    LPModel* lpm_;

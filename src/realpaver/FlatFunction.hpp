@@ -215,6 +215,7 @@ public:
    void apply(const DagCosh* d) override;
    void apply(const DagSinh* d) override;
    void apply(const DagTanh* d) override;
+   void apply(const DagLin* d) override;
    ///@}
 
 private:

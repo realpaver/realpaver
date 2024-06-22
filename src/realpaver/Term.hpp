@@ -626,13 +626,13 @@ public:
    bool isDiv() const override;
    bool isUsb() const override;
    bool isInteger() const override;
+   virtual bool isLinear() const override;
    void eval(const IntervalBox& B) override;
    Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
    Proof contract(DomainBox& box) override;
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
-   virtual bool isLinear() const override;
    void makeScope(Scope& scop) const override;
 
 protected:

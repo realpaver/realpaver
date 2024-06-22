@@ -1117,6 +1117,11 @@ bool TermOp::isInteger() const
    return true;
 }
 
+bool TermOp::isLinear() const
+{
+   return isConstant();
+}
+
 void TermOp::insert(const SharedRep& t)
 {
    v_.push_back(t);
@@ -1186,11 +1191,6 @@ bool TermOp::dependsOn(const Variable& v) const
          return true;
 
    return false;
-}
-
-bool TermOp::isLinear() const
-{
-   return isConstant();
 }
 
 void TermOp::makeScope(Scope& scop) const
