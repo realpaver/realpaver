@@ -1251,4 +1251,37 @@ void FlatFunDagCreator::apply(const DagLin* d)
    idx_ = jdx;
 }
 
+void FlatFunction::print(std::ostream& os) const
+{
+   for (size_t i=0; i<nb_; ++i)
+   {
+      os << i << ": ";
+
+      if (symb_[i] == FlatSymbol::Cst)
+      {
+         os << cst_[arg_[i][1]];
+      }
+      else if (symb_[i] == FlatSymbol::Var)
+      {
+         os << var_[arg_[i][2]].getName();
+      }
+      else
+      {
+         os << symb_[i] << " ";
+         for (size_t j=1; j<arg_[i][0]; ++j)
+         {
+            os << "(" << arg_[i][j] << ") ";
+         }
+      }
+
+      os << std::endl;
+   }
+}
+
+std::ostream& operator<<(std::ostream& os, const FlatFunction& f)
+{
+   f.print(os);
+   return os;
+}
+
 } // namespace

@@ -38,7 +38,7 @@ enum class FlatSymbol {
    SubL,    ///< subtraction with a constant in the left node
    SubR,    ///< subtraction with a constant in the right node
    Mul,     ///< multiplication
-   MulL,     ///< multiplication with a constant in the left node
+   MulL,    ///< multiplication with a constant in the left node
    MulR,    ///< multiplication with a constant in the right node
    Div,     ///< division
    DivL,    ///< division with a constant in the left node
@@ -71,8 +71,6 @@ std::ostream& operator<<(std::ostream& os, FlatSymbol op);
  * 
  * The nodes of the tree-representation of a function are stored in arrays
  * sorted by a topological ordering from the leaves to the root.
- * 
- * First implementation of this concept in Realpaver 0.4.
  */
 class FlatFunction {
 public:
@@ -119,6 +117,9 @@ public:
    size_t insertLin(const Interval& x, Variable v);
    ///@}
 
+   /// Output on a stream
+   void print(std::ostream& os) const;
+
 private:
    Scope scop_;         // set of variables occurring in this
    Interval img_;       // image
@@ -149,6 +150,9 @@ private:
    // deallocates the dynamic memory
    void destroy();
 };
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, const FlatFunction& f);
 
 /*----------------------------------------------------------------------------*/
 
