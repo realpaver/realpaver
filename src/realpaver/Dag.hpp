@@ -29,6 +29,7 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include "realpaver/TermLin.hpp"
 
 namespace realpaver {
 
@@ -788,7 +789,7 @@ public:
     * @param t linear term
     * @param lsub list of DAG indexes of the sub-nodes (variables) of this
     */
-   DagLin(Dag* dag, const Term& t, const IndexList& lsub);
+   DagLin(Dag* dag, const TermLin& tl, const IndexList& lsub);
 
    bool eqSymbol(const DagOp* other) const override;
    size_t nbOccurrences(const Variable& v) const override;
@@ -801,7 +802,16 @@ public:
    bool rdiff() override;
 
    /// Returns the constant value of this linear expression
-   Interval getConstantValue() const;
+   Interval getCst() const;
+
+   /// Returns the number of linear terms
+   size_t nbTerms() const;
+
+   /// Returns the variable node of the i-th linear term
+   DagVar* varNode(size_t i) const;
+
+   /// Returns the factor of the i-th linear term
+   Interval coef(size_t i) const;
 
 private:
    struct Item {

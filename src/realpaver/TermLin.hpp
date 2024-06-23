@@ -31,10 +31,14 @@ namespace realpaver {
 /// Quadratic expression
 class TermLin {
 public:
-   /// Constructor of a 0 term
+   /// Creates 0
    TermLin();
 
-   /// Constructor from a term
+   /**
+    * @brief Creates a linear term representing t
+    * 
+    * Throws an exception if t is not linear
+    */
    TermLin(const Term& t);
 
    /// Default copy constructor
@@ -45,6 +49,9 @@ public:
 
    /// Default destructor
    ~TermLin() = default;
+
+   /// Returns the hash code
+   size_t hashCode() const;
 
    /// Returns true if this is reduced to a constant
    bool isConstant() const;
@@ -60,6 +67,18 @@ public:
 
    /// Creates and returns the scope of this
    Scope makeScope() const;
+
+   /// Returns the value of the constant term
+   Interval getCst() const;
+
+   /// Returns the number of linear terms
+   size_t nbTerms() const;
+
+   /// Returns the coefficient of the i-th linear term
+   Interval coef(size_t i) const;
+
+   /// Returns the variable of the i-th linear term
+   Variable var(size_t i) const;
 
 private:
    // linear term

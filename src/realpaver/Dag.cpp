@@ -1433,14 +1433,19 @@ bool DagTanh::rdiff()
 
 /*----------------------------------------------------------------------------*/
 
-DagLin::DagLin(Dag* dag, const Term& t, const IndexList& lsub)
+DagLin::DagLin(Dag* dag, const TermLin& tl, const IndexList& lsub)
       : DagOp(dag, DagSymbol::Lin, lsub),
         cst_(),
         terms_()
 {   
+   cst_ = tl.getCst();
 
-// TODO
-
+   for (size_t i=0; i<tl.nbTerms(); ++i)
+   {
+      DagVar* node = dag->findVarNode(tl.var(i).id());
+      Item it = { tl.coef(i), node, Interval::universe() };
+      terms_.insert(it);      
+   }
 }
 
 bool DagLin::eqSymbol(const DagOp* other) const
@@ -1599,9 +1604,32 @@ DagVar* DagLin::getNodeSub(const_iterator it) const
    return (*it).node;
 }
 
-Interval DagLin::getConstantValue() const
+Interval DagLin::getCst() const
 {
    return cst_;
+}
+
+size_t DagLin::nbTerms() const
+{
+   return terms_.size();
+}
+
+DagVar* DagLin::varNode(size_t i) const
+{
+   ASSERT(i<nbTerms(), "Bad access in a DagLin node @ " << i);
+
+   auto it = terms_.begin();
+   std::advance(it, i);
+   return it->node;
+}
+
+Interval DagLin::coef(size_t i) const
+{
+   ASSERT(i<nbTerms(), "Bad access in a DagLin node @ " << i);
+
+   auto it = terms_.begin();
+   std::advance(it, i);
+   return it->coef;   
 }
 
 /*----------------------------------------------------------------------------*/
@@ -2945,14 +2973,28 @@ void DagCreator::apply(const ArithCtrIn* c)
 void DagCreator::make(const Term& t, Scope scop, const Interval& img)
 {
    size_t root = 0;  // index of root node
-   
-   if (t.isLinear())
+
+   try
    {
-      // TODO
+      // tries to make a linear term
+      TermLin tl(t);
+
+      // lsub is the list of indexes of variable nodes
+      IndexList lsub;
+      for (size_t i=0; i<tl.nbTerms(); ++i)
+      {
+         size_t index = dag_->insertVarNode(tl.var(i));
+         lsub.push_back(index);
+      }
+
+      // creates and inserts the node
+      DagLin* node = new DagLin(dag_, tl, lsub);
+      root = dag_->insertOpNode(tl.hashCode(), node);
+      scop = tl.makeScope();
    }
-   else
+   catch(Exception e)
    {
-      // visits the term
+      // handles a non-linear term
       DagTermCreator vis(dag_);
       t.acceptVisitor(vis);
       root = vis.index();

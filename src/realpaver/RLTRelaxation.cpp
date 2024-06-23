@@ -745,7 +745,7 @@ void RltVisitor::apply(const DagLin* node)
    //`y <= a_0 + sum_i MAX(a_i*x_i)
 
    LPModel& lm = *lpm_;
-   Interval a0 = node->getConstantValue();
+   Interval a0 = node->getCst();
 
    size_t iy = indexLinVar(node);
    LinVar y = lm.getLinVar(iy);

@@ -90,6 +90,47 @@ Term TermLin::toTerm() const
    return t;
 }
 
+size_t TermLin::hashCode() const
+{
+   size_t hcode = cst_.hashCode();
+
+   for (const auto& s : sl_)
+   {
+      hcode = hash2(s.coef.hashCode(), hcode);
+      hcode = hash2(s.v.hashCode(), hcode);
+   }
+
+   return hcode;
+}
+
+Interval TermLin::getCst() const
+{
+   return cst_;
+}
+
+size_t TermLin::nbTerms() const
+{
+   return sl_.size();
+}
+
+Interval TermLin::coef(size_t i) const
+{
+   ASSERT(i<nbTerms(), "Bad access in a linear term @ " << i);
+
+   auto it = sl_.cbegin();
+   std::advance(it, i);
+   return it->coef;   
+}
+
+Variable TermLin::var(size_t i) const
+{
+   ASSERT(i<nbTerms(), "Bad access in a linear term @ " << i);
+
+   auto it = sl_.cbegin();
+   std::advance(it, i);
+   return it->v;
+}
+
 Scope TermLin::makeScope() const
 {
    Scope scop;

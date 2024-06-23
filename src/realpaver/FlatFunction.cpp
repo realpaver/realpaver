@@ -244,6 +244,21 @@ size_t FlatFunction::insertBinary(FlatSymbol symb, size_t il, size_t ir)
    return i;   
 }
 
+size_t FlatFunction::insertLin(const Interval& x, Variable v)
+{
+   size_t i = insertVar(v);
+
+   if (x.isOne())
+   {
+      return i;
+   }
+   else
+   {
+      size_t j = insertCst(x);
+      return insertBinary(FlatSymbol::MulL, j, i);
+   }
+}
+
 size_t FlatFunction::insertPow(FlatSymbol symb, size_t ic, int e)
 {
    extendCapacity();
@@ -1181,7 +1196,59 @@ void FlatFunDagCreator::apply(const DagTanh* d)
 
 void FlatFunDagCreator::apply(const DagLin* d)
 {
-   // TODO DAGLIN
+   Interval cst = d->getCst();
+
+   if (d->nbTerms() == 0)
+   {
+      idx_ = f_->insertCst(cst);
+      return;
+   }
+
+   size_t jdx;
+
+   // first linear term
+   Variable v = d->varNode(0)->getVar();
+   Interval x = d->coef(0),
+            a = abs(x);
+
+   size_t kdx = f_->insertLin(a, v);
+
+   if (x.isPositive())
+   {
+      jdx = kdx;
+   }
+   else
+   {
+      jdx = f_->insertUnary(FlatSymbol::Usb, kdx);
+   }
+
+   // other linear terms
+   for (size_t i=1; i<d->nbTerms(); ++i)
+   {
+      Variable v = d->varNode(i)->getVar();
+      Interval x = d->coef(i),
+               a = abs(x);
+
+      size_t kdx = f_->insertLin(a, v);
+
+      if (x.isPositive())
+      {
+         jdx = f_->insertBinary(FlatSymbol::Add, jdx, kdx);
+      }
+      else
+      {
+         jdx = f_->insertBinary(FlatSymbol::Sub, jdx, kdx);         
+      }
+   }
+
+   // constant
+   if (!cst.isZero())
+   {
+      size_t kdx = f_->insertCst(cst);
+      jdx = f_->insertBinary(FlatSymbol::Add, jdx, kdx);
+   }
+
+   idx_ = jdx;
 }
 
 } // namespace

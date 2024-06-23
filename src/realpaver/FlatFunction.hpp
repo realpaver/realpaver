@@ -114,6 +114,9 @@ public:
 
    /// Inserts a power node and returns its index
    size_t insertPow(FlatSymbol symb, size_t ic, int e);
+
+   /// Inserts a linear term x*v
+   size_t insertLin(const Interval& x, Variable v);
    ///@}
 
 private:
