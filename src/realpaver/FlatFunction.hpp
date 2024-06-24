@@ -67,7 +67,7 @@ std::ostream& operator<<(std::ostream& os, FlatSymbol op);
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Function used to implement a fast version of hc4Revise.
+ * @brief Function used to implement a fast version of HC4Revise.
  * 
  * The nodes of the tree-representation of a function are stored in arrays
  * sorted by a topological ordering from the leaves to the root.
@@ -92,7 +92,7 @@ public:
    /// Evaluates this on B
    Interval eval(const IntervalBox& B);
 
-   /// Contracts B with respect to this using an hc4Revise algorithm
+   /// Contracts B with respect to this using HC4Revise
    Proof contract(IntervalBox& B);
 
    /// Contracts B with respect to the negation of this using hc4Revise

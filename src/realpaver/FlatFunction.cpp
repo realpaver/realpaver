@@ -564,8 +564,8 @@ Proof FlatFunction::contractNeg(IntervalBox& B)
          for (size_t i=0; i<nb_; ++i)
             aux[i] = itv_[i];
 
-         // contracts the first
-         IntervalBox Xl(B);
+         // contracts the first part
+         IntervalBox Xl(B, scop_);
          itv_[nb_-1] = e & Interval::lessThan(img_.left());
          Proof pl = backward(Xl);
 
@@ -574,7 +574,7 @@ Proof FlatFunction::contractNeg(IntervalBox& B)
             itv_[i] = aux[i];
 
          // contracts the second part
-         IntervalBox Xr(B);   
+         IntervalBox Xr(B, scop_);   
          itv_[nb_-1] = e & Interval::moreThan(img_.right());
          Proof pr = backward(Xr);
 
