@@ -272,7 +272,7 @@ size_t FlatFunction::insertPow(FlatSymbol symb, size_t ic, int e)
    return i;   
 }
 
-Interval FlatFunction::eval(const IntervalVector& V) const
+Interval FlatFunction::eval(const IntervalVector& V)
 {
    for (size_t i=0; i<nb_; ++i)
    {
@@ -379,7 +379,7 @@ Interval FlatFunction::eval(const IntervalVector& V) const
    return itv_[nb_-1];
 }
 
-Interval FlatFunction::eval(const IntervalBox& B) const
+Interval FlatFunction::eval(const IntervalBox& B)
 {
    if (B.isVectorizable())
    {
@@ -491,7 +491,7 @@ Interval FlatFunction::eval(const IntervalBox& B) const
    return itv_[nb_-1];
 }
 
-Proof FlatFunction::contract(IntervalBox& B) const
+Proof FlatFunction::contract(IntervalBox& B)
 {
    if (B.isVectorizable())
    {
@@ -522,7 +522,101 @@ Proof FlatFunction::contract(IntervalBox& B) const
    }
 }
 
-Proof FlatFunction::backward(IntervalBox& B) const
+Proof FlatFunction::contractNeg(IntervalBox& B)
+{
+   Interval e = eval(B);
+
+   if (e.isEmpty())
+      return Proof::Empty;
+
+   else if (img_.contains(e))
+      return Proof::Empty;
+
+   else if (!img_.overlaps(e))
+      return Proof::Inner;
+
+   else
+   {
+      if (img_.isSingleton() || img_.isUniverse())
+         return Proof::Maybe;
+
+      else if (img_.isInfLeft())
+      {
+         // projection over the root node
+         itv_[nb_-1] = e & Interval::moreThan(img_.right());
+         return backward(B);
+      }
+
+      else if (img_.isInfRight())
+      {
+         // projection over the root node
+         itv_[nb_-1] = e & Interval::lessThan(img_.left());
+         return backward(B);
+      }
+
+      else
+      {
+         // given the image [a, b] calculates the projections for each
+         // part [-oo, a] and [b, +oo] and makes the interval disjunction
+
+         // copies the interval values
+         Interval* aux = new Interval[nb_];
+         for (size_t i=0; i<nb_; ++i)
+            aux[i] = itv_[i];
+
+         // contracts the first
+         IntervalBox Xl(B);
+         itv_[nb_-1] = e & Interval::lessThan(img_.left());
+         Proof pl = backward(Xl);
+
+         // restores the interval values
+         for (size_t i=0; i<nb_; ++i)
+            itv_[i] = aux[i];
+
+         // contracts the second part
+         IntervalBox Xr(B);   
+         itv_[nb_-1] = e & Interval::moreThan(img_.right());
+         Proof pr = backward(Xr);
+
+         // deallocates the memory
+         delete[] aux;
+
+         // constructive disjunction
+         Proof proof;
+
+         if (pl == Proof::Empty)
+            proof = pr;
+
+         else if (pr == Proof::Empty)
+            proof = pl;
+
+         else
+            proof = std::min(pl, pr);
+
+         if (proof != Proof::Empty)
+         {
+            for (size_t i=0; i<var_.size(); ++i)
+            {
+               Variable v = var_[i];
+
+               if (pl == Proof::Empty)
+                  B.set(v, Xr.get(v));
+
+               else if (pr == Proof::Empty)
+                  B.set(v, Xl.get(v));
+
+               else
+                  B.set(v, Xl.get(v) | Xr.get(v));
+            }
+         }
+
+         return proof;
+      }
+   }
+}
+
+
+Proof FlatFunction::backward(IntervalBox& B)
 {
    Proof res = Proof::Maybe;
 
@@ -665,7 +759,7 @@ Proof FlatFunction::backward(IntervalBox& B) const
    return res;
 }
 
-Proof FlatFunction::backward(IntervalVector& V) const
+Proof FlatFunction::backward(IntervalVector& V)
 {
    Proof res = Proof::Maybe;
 

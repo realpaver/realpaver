@@ -90,10 +90,13 @@ public:
    FlatFunction& operator=(const FlatFunction&) = delete;
 
    /// Evaluates this on B
-   Interval eval(const IntervalBox& B) const;
+   Interval eval(const IntervalBox& B);
 
    /// Contracts B with respect to this using an hc4Revise algorithm
-   Proof contract(IntervalBox& B) const;
+   Proof contract(IntervalBox& B);
+
+   /// Contracts B with respect to the negation of this using hc4Revise
+   Proof contractNeg(IntervalBox& B);
 
    /// @name Creation methods
    ///@{
@@ -135,11 +138,11 @@ private:
    std::vector<Variable> var_;   // list of variables (with multi-occurrences)
 
    // evaluation (forward phase)
-   Interval eval(const IntervalVector& V) const;
+   Interval eval(const IntervalVector& V);
 
    // backward phase
-   Proof backward(IntervalBox& B) const;
-   Proof backward(IntervalVector& V) const;
+   Proof backward(IntervalBox& B);
+   Proof backward(IntervalVector& V);
 
    // creation functions
    void make(const DagFun& f);

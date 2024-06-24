@@ -21,7 +21,6 @@
 #ifndef REALPAVER_CONTRACTOR_HC4_HPP
 #define REALPAVER_CONTRACTOR_HC4_HPP
 
-#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/PropagationAlg.hpp"
 
@@ -68,23 +67,7 @@ public:
 
 private:
    SharedDag dag_;            // DAG
-   DagContext* context_;      // context
    PropagationAlg* propag_;   // propagation algorithm
-
-   /// HC4Revise contractor intersecting the projections at shared nodes
-   class SharedHC4Revise : public Contractor {
-   public:
-      /// Creates a contractor associated with the i-th constraint of a DAG
-      SharedHC4Revise(SharedDag dag, size_t i);
-
-      Scope scope() const override;
-      Proof contract(IntervalBox& B) override;
-      void print(std::ostream& os) const override;
-
-   private:
-      SharedDag dag_;   // DAG
-      size_t idx_;      // function index
-   };
 };
 
 /// Type of shared pointers of HC4 contractors

@@ -35,6 +35,7 @@ namespace realpaver {
 
 class Dag;
 class DagVisitor;
+class FlatFunction;
 
 /// Type of lists of indexes
 using IndexList = std::vector<size_t>;
@@ -144,15 +145,6 @@ public:
    /// Assigns the interval value
    void setVal(const Interval& x);
 
-   /// Returns the domain (projection)
-   Interval dom() const;
-
-   /// Assigns the domain (projection)
-   void setDom(const Interval& x);
-
-   /// Reduces the domain (projection) by intersecting x
-   void reduceDom(const Interval& x);
-
    /// Returns the interval derivative
    Interval dv() const;
 
@@ -189,14 +181,6 @@ public:
    /// Interval evaluation of this on B
    virtual void eval(const IntervalBox& B) = 0;
 
-   /**
-    * @brief Interval evaluation of this with domain intersection on B
-    *
-    * It calls eval(B) and the value is intersected with the domain
-    * from the dag's context if this is a shared node.
-    */
-   void sharedEval(const IntervalBox& B);
-
    /// Interval evaluation of this on pt
    virtual void eval(const RealPoint& pt) = 0;
 
@@ -207,14 +191,6 @@ public:
     * in the interval value enclosed in this.
     */
    virtual void evalOnly(const Variable& v, const Interval& x) = 0;
-
-   /**
-    * @brief Interval projection on B.
-    *
-    * It assumes that an interval evaluation has been done.
-    * The new projections are assigned in B.
-    */
-   virtual void proj(IntervalBox& B) = 0;
 
    /**
     * @brief Interval differentiation in reverse mode.
@@ -280,7 +256,6 @@ public:
    void eval(const IntervalBox& B) override;
    void eval(const RealPoint& pt) override;
    void evalOnly(const Variable& v, const Interval& x) override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
@@ -315,7 +290,6 @@ public:
    void eval(const IntervalBox& B) override;
    void eval(const RealPoint& pt) override;
    void evalOnly(const Variable& v, const Interval& x) override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
@@ -383,7 +357,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -403,7 +376,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -423,7 +395,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -443,7 +414,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -463,7 +433,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -483,7 +452,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -503,7 +471,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -523,7 +490,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -543,7 +509,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -563,7 +528,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -583,7 +547,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -609,7 +572,6 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -632,7 +594,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -652,7 +613,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -672,7 +632,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -692,7 +651,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -712,7 +670,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -732,7 +689,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -752,7 +708,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -772,7 +727,6 @@ public:
 
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -796,7 +750,6 @@ public:
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
    void eval() override;
-   void proj(IntervalBox& B) override;
    bool diff() override;
    void reval() override;
    bool rdiff() override;
@@ -864,6 +817,9 @@ public:
     */
    DagFun(Dag* dag, size_t root, const Interval& image);
 
+   /// Destructor
+   ~DagFun();
+
    /// Returns the image of this
    Interval getImage() const;
 
@@ -918,9 +874,6 @@ public:
    /// Returns the interval evaluation of this on B
    Interval intervalEval(const IntervalBox& B);
 
-   /// Returns the interval evaluation of this on B with domain intersection
-   Interval sharedIntervalEval(const IntervalBox& B);
-
   ///Returns the interval evaluation of this at pt
    Interval intervalEval(const RealPoint& pt);
 
@@ -950,16 +903,6 @@ public:
     * The projections of this onto its variables are assigned in B.
     */
    Proof hc4ReviseNeg(IntervalBox& B);
-
-   /**
-    * @brief HC4Revise contractor with node sharing.
-    * 
-    * Applies the contractor on B and returns a certificate of proof.
-    * The projections of this onto its variables are assigned in B.
-    *
-    * It assumes that a DagContext has been initialized.
-    */
-   Proof sharedHc4Revise(IntervalBox& B);
 
    /**
     * @brief Calculates the violation of the underlying constraint.
@@ -1064,42 +1007,13 @@ private:
    Scope scop_;                  // the set of variables
    Interval image_;              // bounds of the function, i.e. the co-domain
    size_t idx_;                  // index in the dag
+   FlatFunction* flat_;          // implements hc4Revise
 
    // tests if a node is already present in this function
    bool hasNode(DagNode* node) const;
 
    // set of node indexes used to implement hasNode in O(1)
    std::unordered_set<size_t> inode_;
-
-   // backward phase of the Hc4Revise contractor
-   // to be called after the assignment of the projection over the root node 
-   Proof hc4ReviseBack(IntervalBox& B);
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Context such that every dag node is associated with an interval domain
-struct DagContext
-{
-   IntervalVector dom;
-
-   /// Creates an empty context
-   DagContext();
-
-   /// Creates a context with n domains
-   DagContext(size_t n);
-
-   /// Default copy constructor
-   DagContext(const DagContext&) = default;
-
-   /// Extends a context with n new domains
-   void extend(size_t n = 1);
-
-   /// Returns a clone
-   DagContext* clone() const;
-
-   /// Assigns every interval to the universe
-   void reset();
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1200,24 +1114,6 @@ public:
 
    /// Output on a stream
    void print(std::ostream& os) const;
-
-   /// Binds a context
-   void bindContext(DagContext* context);
-
-   /// Unbinds a context and returns it
-   DagContext* unbindContext();
-
-   /// Returns a clone of the default context
-   DagContext* cloneDefaultContext() const;
-
-   /// Gets the domain of the i-th node
-   Interval dom(size_t i) const;
-
-   /// Assigns the domain of the i-th node
-   void setDom(size_t i, const Interval& x);
-
-   /// Reduces the domain of the i-th node
-   void reduceDom(size_t i, bool shared, const Interval& x);
 
    /**
     * @brief Interval evaluation on B.
@@ -1328,18 +1224,11 @@ private:
    // scope
    Scope scop_;
 
-   // current context that stores an interval domain for each node of this dag
-   DagContext* context_;
-
-   // default context
-   DagContext* defaultContext_;
-
    // find methods
    DagConst* findConstNode(const Interval& x) const;
    DagOp* findOpNode(size_t hcode, DagOp* node) const;
 
    // pushes a new node in the vector of nodes
-   // extends the size of the default context
    void pushNode(DagNode* node);
 };
 
