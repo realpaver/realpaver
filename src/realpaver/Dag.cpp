@@ -1644,152 +1644,12 @@ Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
 Proof DagFun::hc4ReviseNeg(IntervalBox& B)
 {
    return flat_->contractNeg(B);
-
-   /*
-   Interval e = intervalEval(B);
-
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (image_.contains(e))
-      return Proof::Empty;
-
-   else if (!image_.overlaps(e))
-      return Proof::Inner;
-
-   else
-   {
-      if (image_.isSingleton() || image_.isUniverse())
-         return Proof::Maybe;
-
-      else if (image_.isInfLeft())
-      {
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes()-1; ++i)
-            node_[i]->setDom(Interval::universe());
-
-         // projection over the root node
-         rootNode()->setDom(e & Interval::moreThan(image_.right()));
-
-         return hc4ReviseBack(B);
-      }
-
-      else if (image_.isInfRight())
-      {
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes()-1; ++i)
-            node_[i]->setDom(Interval::universe());
-
-         // projection over the root node
-         rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         return hc4ReviseBack(B);                  
-      }
-
-      else
-      {
-         // given the image [a, b] calculates the projections for each
-         // part [-oo, a] and [b, +oo] and makes the interval disjunction
-
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes()-1; ++i)
-            node_[i]->setDom(Interval::universe());
-
-         IntervalBox Xl(B);
-         rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         Proof pl = hc4ReviseBack(Xl);
-
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes(); ++i)
-            node_[i]->setDom(Interval::universe());
-
-         IntervalBox Xr(B);
-         rootNode()->setDom(e & Interval::moreThan(image_.right()));
-         Proof pr = hc4ReviseBack(Xr);
-
-         Proof proof;
-
-         if (pl == Proof::Empty)
-            proof = pr;
-
-         else if (pr == Proof::Empty)
-            proof = pl;
-
-         else
-            proof = std::min(pl, pr);
-
-         if (proof != Proof::Empty)
-         {
-            for (size_t i=0; i<nbVars(); ++i)
-            {
-               Variable v = varNode(i)->getVar();
-
-               if (pl == Proof::Empty)
-                  B.set(v, Xr.get(v));
-
-               else if (pr == Proof::Empty)
-                  B.set(v, Xl.get(v));
-
-               else
-                  B.set(v, Xl.get(v) | Xr.get(v));
-            }
-         }
-
-         return proof;
-      }
-   }
-   */
 }
 
 Proof DagFun::hc4Revise(IntervalBox& B)
 {
    return flat_->contract(B);
-
-/*   
-   
-   // assigns the projections to the universe for the shared nodes
-   for (size_t i=0; i<nbNodes(); ++i)
-   {
-      DagNode* node = node_[i];
-      if (node->isShared())
-         node->setDom(Interval::universe());
-   }
-
-   Interval e = intervalEval(B);
-
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (image_.contains(e))
-      return Proof::Inner;
-
-   else if (!image_.overlaps(e))
-      return Proof::Empty;
-
-   else
-   {
-      rootNode()->setDom(e & image_);
-      return hc4ReviseBack(B);
-   }
-   */
 }
-
-/*
-Proof DagFun::hc4ReviseBack(IntervalBox& B)
-{
-   for (int i=nbNodes()-1; i>=0; --i)
-      node_[i]->proj(B);
-
-   for (size_t i=0; i<nbVars(); ++i)
-   {
-      const Variable& v = varNode(i)->getVar();
-
-      if (B.get(v).isEmpty())
-         return Proof::Empty;
-   }
-
-   return Proof::Maybe;
-}
-*/
 
 double DagFun::intervalViolation()
 {
@@ -2034,7 +1894,7 @@ size_t Dag::insertVarNode(const Variable& v)
    else
       index = it->second;
 
-   // insertion in the scope, TODO: use of the bank of scopes
+   // insertion in the scope
    scop_.insert(v);
 
    return index;

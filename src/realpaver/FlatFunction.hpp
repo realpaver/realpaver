@@ -71,6 +71,32 @@ std::ostream& operator<<(std::ostream& os, FlatSymbol op);
  * 
  * The nodes of the tree-representation of a function are stored in arrays
  * sorted by a topological ordering from the leaves to the root.
+ * 
+ * Example : (x - sqr(y)) + 1 = 0
+ * Topological ordering: x y sqr - 1 +
+ * 
+ * Suppose that the identifiers of x and y are respectively 28 and 43.
+ * 
+ * Attributes:
+ * - Image img_ : [0, 0]
+ * - Scope scop_ : {x, y}
+ * - Number of nodes nb_ : 6
+ * - Array symb_: Var Var Sqr Sub Cst AddR
+ * - Constants cst_ : [1, 1] (one constant node)
+ * - Variables var_ : x, y (two variable nodes)
+ * - Values itv_ : array of nb_ intervals, one per node
+ * - arg_[0] : 3 28 0 (node x, 3 is the size of arg_[0], 28 is the id of x
+ *             and 0 is the index of the variable in var_)
+ * - arg_[1] : 3 43 1 (node y)
+ * - arg_[2] : 2 1 (node sqr, 2 is the size of arg_[2], 0 is the index of
+ *             its argument, i.e. the node y)
+ * - arg_[3] : 3 0 2 (node - between nodes at positions 0 and 2)
+ * - arg_[4] : 2 0 (constant node, 0 is the index of the constant in cst_)
+ * - arg_[5] : 3 3 4 (node + between nodes at positions 3 and 4)
+ * 
+ * The symbol AddR means that we have an addition between a left-hand non
+ * constant expression and a right-hand constant expression (value 1). The
+ * advantage is to save projection operations on constant nodes.
  */
 class FlatFunction {
 public:
