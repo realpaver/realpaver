@@ -117,7 +117,12 @@ public:
    bool make(LPModel& lpm, const IntervalBox& B) override;
 
 private:
-   Bitset corner_;
+   Bitset corner_;   // one bit per variable: 0 left bound, 1 right bound
+                     // this corner and its opposite will be considered
+                     // to generate the Taylor relaxation
+
+   // Selects and assigns the first corner (corner_) before solving in B
+   void selectCorner(const IntervalBox& B);
 };
 
 /*----------------------------------------------------------------------------*/
@@ -156,6 +161,9 @@ public:
 
    /// Assigns the relaxation tolerance for the equations
    void setRelaxEqTol(double tol);
+
+   /// Generates a linear relaxation on B and returns true if successfull
+   bool relax(LPModel& lpm, IntervalBox& B);
 
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;

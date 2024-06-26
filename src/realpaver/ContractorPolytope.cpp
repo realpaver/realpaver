@@ -207,25 +207,25 @@ bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalBox& B)
 
 PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag)
       : PolytopeCreator(dag),
-        corner_()
-{
-   // current strategy: corner of left bounds (each bit = 0)
-   corner_ = Bitset(scope().size());
-   corner_.setAllZero();
-}
+        corner_(scope().size())
+{}
 
 PolytopeTaylorCreator::PolytopeTaylorCreator(SharedDag dag,
                                              const IndexList& lfun)
       : PolytopeCreator(dag, lfun),
-        corner_()
+        corner_(scope().size())
+{}
+
+void PolytopeTaylorCreator::selectCorner(const IntervalBox& B)
 {
-   // current strategy: corner of left bounds (each bit = 0)
-   corner_ = Bitset(scope().size());
    corner_.setAllZero();
 }
 
 bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
 {
+   // selects the first corner
+   selectCorner(B);
+
    // creates the linear variables
    for (const auto& v : scop_)
    {
@@ -424,15 +424,17 @@ Proof ContractorPolytope::contract(IntervalBox& B)
    return proof;
 }
 
-// TODO
-#include <iomanip>
+bool ContractorPolytope::relax(LPModel& lpm, IntervalBox& B)
+{
+   return creator_->make(lpm, B);
+}
 
 Proof ContractorPolytope::contractImpl(IntervalBox& B)
 {
    LPSolver solver;
 
    // linearizes the constraints
-   if (!creator_->make(solver, B)) return Proof::Maybe;
+   if (!relax(solver, B)) return Proof::Maybe;
 
    // first is true if a call to solver.optimize() is required, false false
    // after a successfull optimization, then the next call to the solver can use
