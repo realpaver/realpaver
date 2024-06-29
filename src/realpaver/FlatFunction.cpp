@@ -75,6 +75,7 @@ FlatFunction::FlatFunction(const Term& t, const Interval& img)
    symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
    itv_ = new Interval[capa_];
+   dv_ = new Interval[capa_];
    nb_ = 0;
 
    FlatFunTermCreator creator(this);
@@ -91,6 +92,7 @@ FlatFunction::FlatFunction(const DagFun* f)
    symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
    itv_ = new Interval[capa_];
+   dv_ = new Interval[capa_];
    nb_ = 0;
 
    FlatFunDagCreator creator(this);
@@ -106,12 +108,13 @@ void FlatFunction::extendCapacity()
       FlatSymbol* symb2 = new FlatSymbol[capa_];
       size_t** arg2 = new size_t*[capa_];
       Interval* itv2 = new Interval[capa_];
+      Interval* dv2 = new Interval[capa_];
 
       // copy of data
       for (size_t i=0; i<nb_; ++i)
       {
          symb2[i] = symb_[i];
-         
+
          if (arg_[i] == nullptr)
          {
             arg2[i] = nullptr;
@@ -125,6 +128,7 @@ void FlatFunction::extendCapacity()
          }
          
          itv2[i] = itv_[i];
+         dv2[i] = dv_[i];
       }
 
       // deallocation
@@ -134,13 +138,15 @@ void FlatFunction::extendCapacity()
       symb_ = symb2;
       arg_ = arg2;
       itv_ = itv2;
+      dv_ = dv2;
    }
 }
 
 void FlatFunction::destroy()
 {
-  delete[] symb_;
+   delete[] symb_;
    delete[] itv_;
+   delete[] dv_;
 
    for (size_t i=0; i<nb_; ++i)
       if (arg_[i] != nullptr)
@@ -170,13 +176,13 @@ size_t FlatFunction::insertCst(const Interval& val)
 size_t FlatFunction::insertVar(const Variable& v)
 {
    extendCapacity();
-
    size_t i = nb_++;
    symb_[i] = FlatSymbol::Var;
-   arg_[i] = new size_t[3];
-   arg_[i][0] = 3;
-   arg_[i][1] = v.id();
-   arg_[i][2] = var_.size();
+   arg_[i] = new size_t[4];
+   arg_[i][0] = 4;
+   arg_[i][1] = v.id();          // identifier of v
+   arg_[i][2] = var_.size();     // position of this occurrence in var_
+   arg_[i][3] = scop_.index(v);  // index of v in scop_
    var_.push_back(v);
    return i;
 }
@@ -272,7 +278,23 @@ size_t FlatFunction::insertPow(FlatSymbol symb, size_t ic, int e)
    return i;   
 }
 
-Interval FlatFunction::eval(const IntervalVector& V)
+Scope FlatFunction::scope() const
+{
+   return scop_;
+}
+
+bool FlatFunction::dependsOn(const Variable& v) const
+{
+   return scop_.contains(v);
+}
+
+Interval FlatFunction::ival() const
+{
+   return itv_[nb_-1];;
+}
+
+
+Interval FlatFunction::iEval(const IntervalVector& V)
 {
    for (size_t i=0; i<nb_; ++i)
    {
@@ -379,11 +401,11 @@ Interval FlatFunction::eval(const IntervalVector& V)
    return itv_[nb_-1];
 }
 
-Interval FlatFunction::eval(const IntervalBox& B)
+Interval FlatFunction::iEval(const IntervalBox& B)
 {
    if (B.isVectorizable())
    {
-      return eval(static_cast<const IntervalVector&>(B));
+      return iEval(static_cast<const IntervalVector&>(B));
    }
 
    for (size_t i=0; i<nb_; ++i)
@@ -491,12 +513,12 @@ Interval FlatFunction::eval(const IntervalBox& B)
    return itv_[nb_-1];
 }
 
-Proof FlatFunction::contract(IntervalBox& B)
+Proof FlatFunction::hc4Revise(IntervalBox& B)
 {
    if (B.isVectorizable())
    {
       IntervalVector& V = static_cast<IntervalVector&>(B);
-      Interval e = eval(V);
+      Interval e = iEval(V);
 
       if (e.isEmpty() || img_.isDisjoint(e))
          return Proof::Empty;
@@ -505,11 +527,11 @@ Proof FlatFunction::contract(IntervalBox& B)
          return Proof::Inner;
 
       itv_[nb_-1] &= img_;
-      return backward(V);
+      return hc4ReviseBackward(V);
    }
    else
    {
-      Interval e = eval(B);
+      Interval e = iEval(B);
 
       if (e.isEmpty() || img_.isDisjoint(e))
          return Proof::Empty;
@@ -518,13 +540,13 @@ Proof FlatFunction::contract(IntervalBox& B)
          return Proof::Inner;
 
       itv_[nb_-1] &= img_;
-      return backward(B);
+      return hc4ReviseBackward(B);
    }
 }
 
-Proof FlatFunction::contractNeg(IntervalBox& B)
+Proof FlatFunction::hc4ReviseNeg(IntervalBox& B)
 {
-   Interval e = eval(B);
+   Interval e = iEval(B);
 
    if (e.isEmpty())
       return Proof::Empty;
@@ -544,14 +566,14 @@ Proof FlatFunction::contractNeg(IntervalBox& B)
       {
          // projection over the root node
          itv_[nb_-1] = e & Interval::moreThan(img_.right());
-         return backward(B);
+         return hc4ReviseBackward(B);
       }
 
       else if (img_.isInfRight())
       {
          // projection over the root node
          itv_[nb_-1] = e & Interval::lessThan(img_.left());
-         return backward(B);
+         return hc4ReviseBackward(B);
       }
 
       else
@@ -567,7 +589,7 @@ Proof FlatFunction::contractNeg(IntervalBox& B)
          // contracts the first part
          IntervalBox Xl(B, scop_);
          itv_[nb_-1] = e & Interval::lessThan(img_.left());
-         Proof pl = backward(Xl);
+         Proof pl = hc4ReviseBackward(Xl);
 
          // restores the interval values
          for (size_t i=0; i<nb_; ++i)
@@ -576,7 +598,7 @@ Proof FlatFunction::contractNeg(IntervalBox& B)
          // contracts the second part
          IntervalBox Xr(B, scop_);   
          itv_[nb_-1] = e & Interval::moreThan(img_.right());
-         Proof pr = backward(Xr);
+         Proof pr = hc4ReviseBackward(Xr);
 
          // deallocates the memory
          delete[] aux;
@@ -615,8 +637,7 @@ Proof FlatFunction::contractNeg(IntervalBox& B)
    }
 }
 
-
-Proof FlatFunction::backward(IntervalBox& B)
+Proof FlatFunction::hc4ReviseBackward(IntervalBox& B)
 {
    Proof res = Proof::Maybe;
 
@@ -759,7 +780,7 @@ Proof FlatFunction::backward(IntervalBox& B)
    return res;
 }
 
-Proof FlatFunction::backward(IntervalVector& V)
+Proof FlatFunction::hc4ReviseBackward(IntervalVector& V)
 {
    Proof res = Proof::Maybe;
 
@@ -898,6 +919,241 @@ Proof FlatFunction::backward(IntervalVector& V)
    }
 
    return res;
+}
+
+void FlatFunction::iDiff(const IntervalBox& B, IntervalVector& G)
+{
+   ASSERT(scop_.size() == G.size(),
+          "The size of the gradient must be equal to the number " <<
+          "of variables of the flat function");
+
+   // forward phase: evaluates this on B
+   Interval val = iEval(B);
+
+   if (val.isEmpty())
+   {
+      G.setEmpty();
+      return;
+   }
+
+   // backward phase
+   iDiff();
+
+   // fills the gradient
+   G.setAll(Interval::zero());
+
+   for (size_t i=0; i<nb_; ++i)      
+      if (symb_[i] == FlatSymbol::Var)
+         G[arg_[i][3]] += dv_[i];
+}
+
+void FlatFunction::iDiff()
+{
+   // derivative with respect to the root node
+   dv_[nb_-1] = Interval::one();
+
+   // differentiates the other nodes from the root to the leaves
+   for (int i=(int)nb_-1; i>= 0; --i)
+   {
+      switch(symb_[i])
+      {
+         case FlatSymbol::Cst:
+         case FlatSymbol::Var:
+            break;
+
+         case FlatSymbol::Add:
+            // d(l+r)/dl = 1, d(l+r)/dr = 1
+            dv_[arg_[i][1]] = dv_[i];
+            dv_[arg_[i][2]] = dv_[i];
+            break;
+
+         case FlatSymbol::AddL:
+            // d(l+r)/dr = 1
+            dv_[arg_[i][2]] = dv_[i];
+            break;
+
+         case FlatSymbol::AddR:
+            // d(l+r)/dl = 1
+            dv_[arg_[i][1]] = dv_[i];
+            break;
+
+         case FlatSymbol::Sub:
+            // d(l-r)/dl = 1, d(l-r)/dr = -1
+            dv_[arg_[i][1]] = dv_[i];
+            dv_[arg_[i][2]] = -dv_[i];
+            break;
+
+         case FlatSymbol::SubL:
+            // d(l-r)/dr = -1
+            dv_[arg_[i][2]] = -dv_[i];
+            break;
+
+         case FlatSymbol::SubR:
+            // d(l-r)/dl = 1
+            dv_[arg_[i][1]] = dv_[i];
+            break;
+
+         case FlatSymbol::Mul:
+            // d(l*r)/dl = r, d(l*r)/dr = l
+            dv_[arg_[i][1]] = itv_[arg_[i][2]]*dv_[i];
+            dv_[arg_[i][2]] = itv_[arg_[i][1]]*dv_[i];
+            break;
+
+         case FlatSymbol::MulL:
+            // d(l*r)/dr = l
+            dv_[arg_[i][2]] = itv_[arg_[i][1]]*dv_[i];
+            break;
+
+         case FlatSymbol::MulR:
+            // d(l*r)/dl = r
+            dv_[arg_[i][1]] = itv_[arg_[i][2]]*dv_[i];
+            break;
+
+         case FlatSymbol::Div:
+            // d(l/r)/dl = 1/r, d(l/r)/dr = -l/r^2
+            dv_[arg_[i][1]] = dv_[i]/itv_[arg_[i][2]];
+            dv_[arg_[i][2]] = (-dv_[i]*itv_[arg_[i][1]])/sqr(itv_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::DivL:
+            // d(l/r)/dr = -l/r^2
+            dv_[arg_[i][2]] = (-dv_[i]*itv_[arg_[i][1]])/sqr(itv_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::DivR:
+            // d(l/r)/dl = 1/r
+            dv_[arg_[i][1]] = dv_[i]/itv_[arg_[i][2]];
+            break;
+
+         case FlatSymbol::Min:
+            if (itv_[arg_[i][1]].isCertainlyLt(itv_[arg_[i][2]]))
+            {
+               // d(min(l,r))/dl = 1, d(min(l,r))/dr = 0 if l < r
+               dv_[arg_[i][1]] = dv_[i];
+               dv_[arg_[i][2]] = Interval::zero();
+            }
+            else if (itv_[arg_[i][2]].isCertainlyLt(itv_[arg_[i][1]]))
+            {
+               // d(min(l,r))/dl = 0, d(min(l,r))/dr = 1 if r < l
+               dv_[arg_[i][1]] = Interval::zero();
+               dv_[arg_[i][2]] = dv_[i];
+            }
+            else
+            {
+               // d(min(l,r))/dl = d(min(l,r))/dr = [0,1] otherwise
+               Interval x = Interval(0.0, 1.0)*dv_[i];
+               dv_[arg_[i][1]] = x;
+               dv_[arg_[i][2]] = x;
+            }
+            break;
+
+         case FlatSymbol::Max:
+            if (itv_[arg_[i][1]].isCertainlyGt(itv_[arg_[i][2]]))
+            {
+               // d(max(l,r))/dl = 1 and d(max(l,r))/dr = 0 if l > r
+               dv_[arg_[i][1]] = dv_[i];
+               dv_[arg_[i][2]] = Interval::zero();
+            }
+            else if (itv_[arg_[i][2]].isCertainlyGt(itv_[arg_[i][1]]))
+            {
+               // d(max(l,r))/dl = 0 and d(max(l,r))/dr = 1 if r > l
+               dv_[arg_[i][1]] = Interval::zero();
+               dv_[arg_[i][2]] = dv_[i];
+            }
+            else
+            {
+               // d(max(l,r))/dl = d(max(l,r))/dr = [0,1] otherwise
+               Interval x = Interval(0.0, 1.0)*dv_[i];
+               dv_[arg_[i][1]] = x;
+               dv_[arg_[i][2]] = x;
+            }
+            break;
+   
+         case FlatSymbol::Usb:
+            // d(-u)/du = -1
+            dv_[arg_[i][1]] = -dv_[i];
+            break;
+
+         case FlatSymbol::Abs:
+            // d(abs(u))/du = 1 if u>0, -1 if u<0, [-1,1] otherwise
+            if (itv_[arg_[i][1]].isCertainlyGtZero())
+            {
+               dv_[arg_[i][1]] = dv_[i];
+            }
+            else if (itv_[arg_[i][1]].isCertainlyLtZero())
+            {
+               dv_[arg_[i][1]] = -dv_[i];
+            }
+            else
+            {
+               dv_[arg_[i][1]] = dv_[i] | (-dv_[i]);
+            }
+            break;
+
+         case FlatSymbol::Sgn:
+            // d(sgn(u))/du = 0 except at 0
+            dv_[arg_[i][1]] = Interval::zero();
+            break;
+
+         case FlatSymbol::Sqr:
+            // d(u^2)/du = 2u
+            dv_[arg_[i][1]] = 2.0*itv_[arg_[i][1]]*dv_[i];   
+            break;
+
+         case FlatSymbol::Sqrt:
+            // d(sqrt(u))/du = 0.5/sqrt(u)
+            dv_[arg_[i][1]] = 0.5*dv_[i]*itv_[i];
+            break;
+
+         case FlatSymbol::Pow:
+         {
+            // d(u^n)/du = n * u^(n-1)
+            int e = (int)arg_[i][2];
+            dv_[arg_[i][1]] = Interval(e)*dv_[i]*pow(itv_[arg_[i][1]], e-1);
+         }
+            break;
+
+         case FlatSymbol::Exp:
+            // d(exp(u))/du = exp(u)
+            dv_[arg_[i][1]] = dv_[i]*itv_[i];
+            break;
+
+         case FlatSymbol::Log:
+            // d(log(u))/du = 1/u
+            dv_[arg_[i][1]] = dv_[i] / itv_[arg_[i][1]];
+            break;
+
+         case FlatSymbol::Cos:
+            // d(cos(u))/du = -sin(u)
+            dv_[arg_[i][1]] = -dv_[i]*sin(itv_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sin:
+            // d(sin(u))/du = cos(u)
+            dv_[arg_[i][1]] = dv_[i]*cos(itv_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Tan:
+            // d(tan(u))/du = 1+tan^2(u)
+            dv_[arg_[i][1]] = dv_[i]*(1.0+sqr(itv_[i]));
+            break;
+
+         case FlatSymbol::Cosh:
+            // d(cosh(u))/du = sinh(u)
+            dv_[arg_[i][1]] = dv_[i]*sinh(itv_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sinh:
+            // d(sinh(u))/du = cosh(u)
+            dv_[arg_[i][1]] = dv_[i]*cosh(itv_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Tanh:
+            // d(tanh(u))/du = 1-tanh^2(u)
+            dv_[arg_[i][1]] = dv_[i]*(1.0-sqr(itv_[i]));
+            break;
+      }
+   }
 }
 
 /*----------------------------------------------------------------------------*/

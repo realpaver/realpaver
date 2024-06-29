@@ -114,7 +114,6 @@ IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
 
 Proof IntervalNewton::contract(IntervalBox& X)
 {
-   
    if (X.width() >= wlim_) return Proof::Maybe;
    
    bool iter = true;
@@ -122,6 +121,11 @@ Proof IntervalNewton::contract(IntervalBox& X)
    size_t nb_steps = 0;
 
    LOG_INTER("Interval Newton contractor on " << X);
+
+
+std::cout << "INPUT Newton : " << X << std::endl;
+
+
 
 // analysis of the degree of contraction
 #if LOG_ON
@@ -132,7 +136,8 @@ Proof IntervalNewton::contract(IntervalBox& X)
    {
       ++ nb_steps;
 
-      F_.evalDiff(X, val_, jac_);
+      // evaluates the function on X
+      F_.eval(X, val_);
 
       if (!val_.containsZero())
       {
@@ -142,8 +147,8 @@ Proof IntervalNewton::contract(IntervalBox& X)
          continue;
       }
 
-      X.midpointOnScope(scope(), c_);
-      F_.pointEval(c_, val_);
+      makeC(X);          // c := midpoint of X
+      F_.eval(c_, val_);
 
       if (val_.isEmpty())
       {
@@ -154,6 +159,9 @@ Proof IntervalNewton::contract(IntervalBox& X)
 
       makeY(X);      // y := X - c
       b_ = -val_;    // b := -F(c)
+
+      // calculates the Hansen's matrix
+      F_.diffHansen(X, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
             
@@ -226,6 +234,13 @@ void IntervalNewton::makeY(IntervalBox& X)
    }
 }
 
+void IntervalNewton::makeC(IntervalBox& X)
+{
+   for (const auto& v : scope())
+      c_.set(v, X.get(v).midpoint());
+}
+
+
 Proof IntervalNewton::reduceX(IntervalBox& X, bool& improved)
 {
    int i = 0;
@@ -283,7 +298,8 @@ Proof IntervalNewton::certify(IntervalBox& box)
 
       LOG_LOW("Inflated box -> " << X);
 
-      F_.evalDiff(X, val_, jac_);
+      // evaluates the function on X
+      F_.eval(X, val_);
 
       if (!val_.containsZero())
       {
@@ -293,8 +309,8 @@ Proof IntervalNewton::certify(IntervalBox& box)
          continue;
       }
 
-      X.midpointOnScope(scope(), c_);
-      F_.pointEval(c_, val_);
+      makeC(X);            // c := midpoint of X
+      F_.eval(c_, val_);
 
       if (val_.isEmpty())
       {
@@ -305,6 +321,9 @@ Proof IntervalNewton::certify(IntervalBox& box)
 
       makeY(X);      // y := X - c
       b_ = -val_;    // b := -F(c)
+
+      // calculates the Hansen's matrix
+      F_.diffHansen(X, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
             

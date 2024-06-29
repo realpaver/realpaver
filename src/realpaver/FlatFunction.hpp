@@ -115,18 +115,32 @@ public:
    /// No assignment
    FlatFunction& operator=(const FlatFunction&) = delete;
 
-   /// Evaluates this on B
-   Interval eval(const IntervalBox& B);
+   /// Interval evaluation of this on B
+   Interval iEval(const IntervalBox& B);
+
+   /// Returns the result of the last interval evaluation
+   Interval ival() const;
 
    /// Contracts B with respect to this using HC4Revise
-   Proof contract(IntervalBox& B);
+   Proof hc4Revise(IntervalBox& B);
 
    /// Contracts B with respect to the negation of this using hc4Revise
-   Proof contractNeg(IntervalBox& B);
+   Proof hc4ReviseNeg(IntervalBox& B);
+
+   /**
+    * @brief Interval differentiation method.
+    * 
+    * Calculates the gradient of this on B (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    * 
+    * This function is also evaluated using interval arithmetic. The result
+    * can be obtained by a call to ival().
+    */
+   void iDiff(const IntervalBox& B, IntervalVector& G);
 
    /// @name Creation methods
    ///@{
-   
+
    /// Inserts a constant node and returns its index
    size_t insertCst(const Interval& val);
 
@@ -146,6 +160,12 @@ public:
    size_t insertLin(const Interval& x, Variable v);
    ///@}
 
+   /// Returns the scope of this
+   Scope scope() const;
+
+   /// Returns true if this depends on v
+   bool dependsOn(const Variable& v) const;
+
    /// Output on a stream
    void print(std::ostream& os) const;
 
@@ -159,16 +179,17 @@ private:
    size_t** arg_;       // arguments representing the indexes of the child nodes
 
    Interval* itv_;      // used for evaluation and projection
+   Interval* dv_;       // used for differentiation
 
    std::vector<Interval> cst_;   // list of constants
    std::vector<Variable> var_;   // list of variables (with multi-occurrences)
 
-   // evaluation (forward phase)
-   Interval eval(const IntervalVector& V);
+   // Interval evaluation of this on V
+   Interval iEval(const IntervalVector& V);
 
-   // backward phase
-   Proof backward(IntervalBox& B);
-   Proof backward(IntervalVector& V);
+   // backward phase of hc4Revise
+   Proof hc4ReviseBackward(IntervalBox& B);
+   Proof hc4ReviseBackward(IntervalVector& V);
 
    // creation functions
    void make(const DagFun& f);
@@ -178,6 +199,9 @@ private:
 
    // deallocates the dynamic memory
    void destroy();
+
+   // backward phase of interval differentiation in reverse mode
+   void iDiff();
 };
 
 /// Output on a stream

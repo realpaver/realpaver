@@ -813,9 +813,10 @@ public:
     * @brief Constructor.
     * @param dag owner of this
     * @param root DAG index of the root node
+    * @param scop set of variables
     * @param image image of this
     */
-   DagFun(Dag* dag, size_t root, const Interval& image);
+   DagFun(Dag* dag, size_t root, Scope scop, const Interval& image);
 
    /// Destructor
    ~DagFun();
@@ -867,9 +868,6 @@ public:
 
    /// Returns the scope of this (set of variables)
    Scope scope() const;
-
-   /// Assigns the scope of this
-   void setScope(Scope scop);
 
    /// Returns the interval evaluation of this on B
    Interval intervalEval(const IntervalBox& B);
@@ -995,6 +993,25 @@ public:
 
    /// Gets the real derivative with respect to v
    double realDeriv(const Variable& v) const;
+
+   /// Returns the interval evaluation of this on B
+   Interval iEval(const IntervalBox& B);
+
+   /**
+    * @brief Interval differentiation method.
+    * 
+    * Calculates the gradient of this on B (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    */
+   void iDiff(const IntervalBox& B, IntervalVector& G);
+
+   /**
+    * @brief Interval differentiation method using Hansen's strategy.
+    * 
+    * Calculates the gradient of this on B (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    */
+   void iDiffHansen(const IntervalBox& B, IntervalVector& G);
 
 private:
    Dag* dag_;                    // the DAG
@@ -1195,6 +1212,15 @@ public:
 
    /// Prints the interval values at all nodes on a stream
    void printIntervalValues(std::ostream& os) const;
+
+
+
+   void iEval(const IntervalBox& B, IntervalVector& V);
+
+   void iDiff(const IntervalBox& B, IntervalMatrix& J);
+
+   void iDiffHansen(const IntervalBox& B, IntervalMatrix& H);
+
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

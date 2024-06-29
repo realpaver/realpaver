@@ -64,14 +64,6 @@ public:
    virtual void eval(const IntervalBox& B, IntervalVector& val) = 0;
 
    /**
-    * @brief Evaluates this.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this on pt
-    * and val must have nbFuns() components
-    */
-   virtual void pointEval(const RealPoint& pt, IntervalVector& val) = 0;
-
-   /**
     * @brief Differentiates this (calculates an interval Jacobian matrix).
     * 
     * J is the Jacobian matrix of this on B such that we have the partial
@@ -82,29 +74,12 @@ public:
    virtual void diff(const IntervalBox& B, IntervalMatrix& J) = 0;
 
    /**
-    * @brief Evaluates and differentiates this.
+    * @brief Differentiates this using Hansen's strategy.
     * 
-    * val[i] is the result of the evaluation of the i-th function of this on B
-    * and val must have nbFuns() components
-    * 
-    * J is the Jacobian matrix of this on B such that we have the partial
-    * derivative dfi / dxj in the i-th row and j-th column of J.
-    * 
-    * J must have nbFuns() rows and nbVars() columns.
+    * H[i, j] is the partial derivative dfi / dxj. H must have nbFuns() rows
+    * and nbVars() columns.
     */
-   virtual void evalDiff(const IntervalBox& B, IntervalVector& val,
-                         IntervalMatrix& J) = 0;
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraints.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this on B
-    * and val must have nbFuns() components
-    * 
-    * viol[i] is the violation of the i-th function / constraint on B
-    */
-   virtual void violation(const IntervalBox& B, IntervalVector& val,
-                          RealVector& viol) = 0;
+   virtual void diffHansen(const IntervalBox& B, IntervalMatrix& H) = 0;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -183,14 +158,6 @@ public:
    void eval(const IntervalBox& B, IntervalVector& val);
 
    /**
-    * @brief Evaluates this.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this on pt
-    * and val must have nbFuns() components
-    */
-   void pointEval(const RealPoint& pt, IntervalVector& val);
-
-   /**
     * @brief Differentiates this (calculates an interval Jacobian matrix).
     * 
     * J is the Jacobian matrix of this on B such that we have the partial
@@ -201,27 +168,12 @@ public:
    void diff(const IntervalBox& B, IntervalMatrix& J);
 
    /**
-    * @brief Evaluates and differentiates this.
+    * @brief Differentiates this using Hansen's strategy.
     * 
-    * val[i] is the result of the evaluation of the i-th function of this on B
-    * and val must have nbFuns() components
-    * 
-    * J is the Jacobian matrix of this on B such that we have the partial
-    * derivative dfi / dxj in the i-th row and j-th column of J.
-    * 
-    * J must have nbFuns() rows and nbVars() columns.
+    * H[i, j] is the partial derivative dfi / dxj. H must have nbFuns() rows
+    * and nbVars() columns.
     */
-   void evalDiff(const IntervalBox& B, IntervalVector& val, IntervalMatrix& J);
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraints.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this on B
-    * and val must have nbFuns() components
-    * 
-    * viol[i] is the violation of the i-th function / constraint on B
-    */
-   void violation(const IntervalBox& B, IntervalVector& val, RealVector& viol);
+   void diffHansen(const IntervalBox& B, IntervalMatrix& H);
 
    /// Type of the representation of interval functions vectors
    using SharedRep = std::shared_ptr<IntervalFunctionVectorRep>;
@@ -274,12 +226,8 @@ public:
    size_t nbFuns() const override;
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox& B, IntervalVector& val) override;
-   void pointEval(const RealPoint& pt, IntervalVector& val) override;
    void diff(const IntervalBox& B, IntervalMatrix& J) override;
-   void evalDiff(const IntervalBox& B, IntervalVector& val,
-                 IntervalMatrix& J) override;
-   void violation(const IntervalBox& B, IntervalVector& val,
-                  RealVector& viol) override;
+   void diffHansen(const IntervalBox& B, IntervalMatrix& H) override;
 
 private:
    SharedDag dag_;
@@ -314,12 +262,8 @@ public:
    size_t nbFuns() const override;
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox& B, IntervalVector& val) override;
-   void pointEval(const RealPoint& pt, IntervalVector& val) override;
    void diff(const IntervalBox& B, IntervalMatrix& J) override;
-   void evalDiff(const IntervalBox& B, IntervalVector& val,
-                 IntervalMatrix& J) override;
-   void violation(const IntervalBox& B, IntervalVector& val,
-                  RealVector& viol) override;
+   void diffHansen(const IntervalBox& B, IntervalMatrix& H) override;
 
 private:
    std::vector<IntervalFunction> vf_;

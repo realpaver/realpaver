@@ -315,4 +315,22 @@ std::ostream& operator<<(std::ostream& os, const IntervalUnion& u)
    return os;
 }
 
+IntervalUnion addPX(const Interval& x, const Interval& y,
+                    const IntervalUnion& Z)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Z.size(); ++i)
+      U.insert(addPX(x, y, Z.v_[i]));
+   return U;
+}
+
+IntervalUnion addPY(const Interval& x, const Interval& y,
+                    const IntervalUnion& Z)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Z.size(); ++i)
+      U.insert(addPY(x, y, Z.v_[i]));
+   return U;
+}
+
 } // namespace

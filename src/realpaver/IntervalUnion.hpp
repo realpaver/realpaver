@@ -87,6 +87,14 @@ public:
    /// Equality test
    bool equals(const IntervalUnion& other) const;
 
+   /// @name Addition
+   ///@{
+   friend IntervalUnion addPX(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   friend IntervalUnion addPY(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   ///@}
+
 private:
    typedef std::vector<Interval> VectorType;
    VectorType v_;

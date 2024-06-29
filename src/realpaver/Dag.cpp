@@ -1459,7 +1459,7 @@ Interval DagLin::coef(size_t i) const
 
 /*----------------------------------------------------------------------------*/
 
-DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
+DagFun::DagFun(Dag* dag, size_t root, Scope scop, const Interval& image)
       : dag_(dag),
         node_(),
         vnode_(),
@@ -1468,6 +1468,7 @@ DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
         idx_(0),
         inode_()
 {
+   scop_ = ScopeBank::getInstance()->insertScope(scop);
    DagFunCreator vis(this);
    DagNode* node = dag->node(root);
    node->acceptVisitor(vis);
@@ -1547,11 +1548,6 @@ size_t DagFun::index() const
 Scope DagFun::scope() const
 {
    return scop_;
-}
-
-void DagFun::setScope(Scope scop)
-{
-   scop_ = ScopeBank::getInstance()->insertScope(scop);
 }
 
 double DagFun::realDeriv(size_t i) const
@@ -1643,12 +1639,12 @@ Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
 
 Proof DagFun::hc4ReviseNeg(IntervalBox& B)
 {
-   return flat_->contractNeg(B);
+   return flat_->hc4ReviseNeg(B);
 }
 
 Proof DagFun::hc4Revise(IntervalBox& B)
 {
-   return flat_->contract(B);
+   return flat_->hc4Revise(B);
 }
 
 double DagFun::intervalViolation()
@@ -1763,6 +1759,31 @@ void DagFun::realDiff(RealVector& grad)
 double DagFun::realDeriv(const Variable& v) const
 {
    return dag_->findVarNode(v.id())->rdv();
+}
+
+Interval DagFun::iEval(const IntervalBox& B)
+{
+   return flat_->iEval(B);
+}
+
+void DagFun::iDiff(const IntervalBox& B, IntervalVector& G)
+{
+   flat_->iDiff(B, G);   
+}
+
+void DagFun::iDiffHansen(const IntervalBox& B, IntervalVector& G)
+{
+   IntervalBox X = B.midpoint();
+   IntervalVector V(G.size());
+
+   size_t i = 0;
+   for (const auto& v : scop_)
+   {
+      X.set(v, B.get(v));
+      flat_->iDiff(B, V);
+      G[i] = V[i];
+      ++i;
+   }
 }
 
 /*----------------------------------------------------------------------------*/
@@ -2234,6 +2255,78 @@ void Dag::printIntervalValues(std::ostream& os) const
    }
 }
 
+void Dag::iEval(const IntervalBox& B, IntervalVector& V)
+{
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      V.set(i, fun(i)->iEval(B));
+   }
+}
+
+void Dag::iDiff(const IntervalBox& B, IntervalMatrix& J)
+{
+   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+          "Bad dimensions of a Jacobian matrix used in a DAG");
+
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      // differentiates the i-th function
+      DagFun* f = fun_[i];
+      IntervalVector G(f->nbVars());
+      f->iDiff(B, G);
+
+      // fills the i-th row of the matrix
+      size_t j = 0;
+      for (const auto& v : scope())
+      {
+         if (f->dependsOn(v))
+            J.set(i, j, G[f->scope().index(v)]);
+         else
+            J.set(i, j, Interval::zero());
+
+         ++j;
+      }
+   }
+}
+
+void Dag::iDiffHansen(const IntervalBox& B, IntervalMatrix& H)
+{
+   ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
+          "Bad dimensions of a Hansen matrix used in a DAG");
+
+   ASSERT(nbVars() == nbFuns(),
+          "Hansen's derivatives can be computed only for square systems");
+
+   IntervalBox X =  B.midpoint();
+
+   size_t j = 0;
+   for (const auto& v : scope())
+   {
+      // assigns the domain of v
+      X.set(v, B.get(v));
+
+      // calculates every dfi/dv and assigns it in the Jacobian matrix
+      for (size_t i=0; i<nbFuns(); ++i)
+      {
+         DagFun* f = fun_[i];
+
+         if (f->dependsOn(v))
+         {
+            IntervalVector G(f->nbVars());
+            f->iDiff(X, G);
+            H.set(i, j, G[f->scope().index(v)]);
+         }
+         else
+         {
+            H.set(i, j, Interval::zero());
+         }
+      }
+
+      ++j;
+   }   
+}
+
+
 /*----------------------------------------------------------------------------*/
 
 DagVisitor::~DagVisitor()
@@ -2606,8 +2699,7 @@ void DagCreator::make(const Term& t, Scope scop, const Interval& img)
    }
 
    // creates the function
-   DagFun* f = new DagFun(dag_, root, img);
-   f->setScope(scop);
+   DagFun* f = new DagFun(dag_, root, scop, img);
    index_ = dag_->insertFun(f);
 }
 

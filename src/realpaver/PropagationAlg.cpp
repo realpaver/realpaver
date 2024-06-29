@@ -229,6 +229,7 @@ Proof PropagationAlg::contract(IntervalBox& B)
                   LOG_LOW("Propagation test on " << v.getName() << " ("
                                                  << tol_ << ")");
 
+
                   if (tol_.isImproved(prev, curr))
                   {
                      LOG_LOW("  " << prev << " -> " << curr << " reduced enough"

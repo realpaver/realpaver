@@ -31,8 +31,8 @@ namespace realpaver {
  * An interval function is supposed to be differentiable.
  * 
  * An interval function is supposed to be associated with an image which makes
- * it an inequality constraint of the form L <= F(x) <= U and allows to
- * calculate violations. Fix L = -oo and U = +oo to eliminate the constraint.
+ * it an inequality constraint of the form L <= F(x) <= U . Fix L = -oo and
+ * U = +oo to eliminate the constraint.
  */
 class IntervalFunctionRep {
 public:
@@ -63,53 +63,21 @@ public:
    /// Returns the evaluation of this on B
    virtual Interval eval(const IntervalBox& B) = 0;
 
-   /// Returns the evaluation of this on pt
-   virtual Interval pointEval(const RealPoint& pt) = 0;
-
    /**
     * @brief Differentiates this.
     * 
-    * grad is the output vector such that grad[i] if the derivative of this
-    * in B with respect to the i-th variable of its scope
+    * G is the output vector such that G[i] if the derivative of this in B
+    * with respect to the i-th variable of its scope.
     */
-   virtual void diff(const IntervalBox& B, IntervalVector& grad) = 0;
+   virtual void diff(const IntervalBox& B, IntervalVector& G) = 0;
 
    /**
-    * @brief Evaluates and differentiates this.
+    * @brief Differentiates this using Hansen's strategy.
     * 
-    * val is the the evaluation of this on B
-    * 
-    * grad is the output vector such that grad[i] if the derivative of this
-    * in B with respect to the i-th variable of its scope
+    * G is the output vector such that G[i] if the derivative of this in B
+    * with respect to the i-th variable of its scope.
     */
-   virtual void evalDiff(const IntervalBox& B, Interval& val,
-                         IntervalVector& grad) = 0;
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * val is the the evaluation of this on B
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation in B
-    */
-   virtual void violation(const IntervalBox& B, Interval& val,
-                          double& viol) = 0;
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * The image of the function is locally assigned to [lo, up].
-    * 
-    * val is the the evaluation of this on B
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation in B
-    */
-   virtual void violation(const IntervalBox& B, double lo, double up,
-                          Interval& val, double& viol) = 0;
+   virtual void diffHansen(const IntervalBox& B, IntervalVector& G) = 0;
 
 private:
    Interval img_;
@@ -123,8 +91,8 @@ private:
  * An interval function is supposed to be differentiable.
  * 
  * An interval function is supposed to be associated with an image which makes
- * it an inequality constraint of the form L <= F(x) <= U and allows to
- * calculate violations. Fix L = -oo and U = +oo to eliminate the constraint.
+ * it an inequality constraint of the form L <= F(x) <= U . Fix L = -oo and
+ * U = +oo to eliminate the constraint.
  * 
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
@@ -161,51 +129,21 @@ public:
    /// Returns the evaluation of this on B
    Interval eval(const IntervalBox& B);
 
-   /// Returns the evaluation of this on pt
-   Interval pointEval(const RealPoint& pt);
-
    /**
     * @brief Differentiates this.
     * 
-    * grad is the output vector such that grad[i] if the derivative of this
-    * in B with respect to the i-th variable of its scope
+    * G is the output vector such that G[i] if the derivative of this in B
+    * with respect to the i-th variable of its scope
     */
-   void diff(const IntervalBox& B, IntervalVector& grad);
+   void diff(const IntervalBox& B, IntervalVector& G);
 
    /**
-    * @brief Evaluates and differentiates this.
+    * @brief Differentiates this using Hansen's strategy.
     * 
-    * val is the the evaluation of this on B
-    * 
-    * grad is the output vector such that grad[i] if the derivative of this
-    * in B with respect to the i-th variable of its scope
+    * G is the output vector such that G[i] if the derivative of this in B
+    * with respect to the i-th variable of its scope
     */
-   void evalDiff(const IntervalBox& B, Interval& val, IntervalVector& grad);
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * val is the the evaluation of this on B
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation in B
-    */
-   void violation(const IntervalBox& B, Interval& val, double& viol);
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * The ilmage of the function is locally assigned to [lo, up].
-    * 
-    * val is the the evaluation of this on B
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation in B
-    */
-   void violation(const IntervalBox& B, double lo, double up, Interval& val,
-                  double& viol);
+   void diffHansen(const IntervalBox& B, IntervalVector& G);
 
    /// Type of shared pointer to a representation
    using SharedRep = std::shared_ptr<IntervalFunctionRep>;
@@ -253,14 +191,8 @@ public:
    Scope scope() const override;
    size_t nbVars() const override;
    Interval eval(const IntervalBox& B) override;
-   Interval pointEval(const RealPoint& pt) override;
-   void diff(const IntervalBox& B, IntervalVector& grad) override;
-   void evalDiff(const IntervalBox& B, Interval& val,
-                 IntervalVector& grad) override;
-   void violation(const IntervalBox& B, Interval& val,
-                  double& viol) override;
-   void violation(const IntervalBox& B, double lo, double up,
-                  Interval& val, double& viol) override;
+   void diff(const IntervalBox& B, IntervalVector& G) override;
+   void diffHansen(const IntervalBox& B, IntervalVector& G) override;
 
 private:
    SharedDag dag_;         // DAG
