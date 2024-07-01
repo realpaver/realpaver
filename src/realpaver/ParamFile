@@ -53,6 +53,10 @@ DISPLAY_REGION = STD
 # Preprocessing phase of the solving process enabled or disabled (YES or NO)
 PREPROCESSING = YES
 
+# Postprocessing of solution nodes in order to handle clusters and to
+# provide certificate of proofs
+CERTIFICATION = NO
+
 #-------------------------------------------------------------------------------
 # BRANCH-AND-CONTRACT ALGORITHMS
 #-------------------------------------------------------------------------------

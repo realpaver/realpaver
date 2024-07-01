@@ -79,7 +79,6 @@ Param::Param()
    dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-3));
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-3));
 
-
    dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
    dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
    dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
@@ -107,7 +106,7 @@ Param::Param()
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
    strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
-
+   strmap_.insert(std::make_pair("CERTIFICATION",             "NO"));
 }
 
 int Param::getIntParam(const std::string& name) const

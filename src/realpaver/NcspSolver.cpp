@@ -522,8 +522,17 @@ void NcspSolver::branchAndPrune()
 #endif
 
    LOG_NL_MAIN();
-   
-   certifySolutions();
+
+   std::string sc = env_->getParam()->getStrParam("CERTIFICATION");
+   if (sc == "YES")
+   {
+      LOG_INTER("Certification a posteriori");
+      certifySolutions();
+   }
+   else
+   {
+      LOG_INTER("No Certification a posteriori");      
+   }
 
    stimer_.stop();
 }
