@@ -82,8 +82,6 @@ bool Tolerance::isImproved(const Interval& old, const Interval& x) const
    if (old.isEmpty() || x.isEmpty())
       return false;
 
-   ASSERT(old.contains(x), "Bad use of is Imporoved " << old << " " << x);
-
    return (1.0 - x.width() / old.width()) > rtol_;
 }
 

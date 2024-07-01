@@ -639,8 +639,6 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox& B)
 
 Proof FlatFunction::hc4ReviseBackward(IntervalBox& B)
 {
-   Proof res = Proof::Maybe;
-
    for (int i=(int)nb_-1; i>= 0; --i)
    {
       switch(symb_[i])
@@ -653,7 +651,7 @@ Proof FlatFunction::hc4ReviseBackward(IntervalBox& B)
             {
                Interval x = B.get(var_[arg_[i][2]]) & itv_[i];
                B.set(var_[arg_[i][2]], x);
-               res = x.isEmpty() ? Proof::Empty : Proof::Maybe;
+               if (x.isEmpty()) return Proof::Empty;
             }
             break;
 
@@ -777,13 +775,11 @@ Proof FlatFunction::hc4ReviseBackward(IntervalBox& B)
       }
    }
 
-   return res;
+   return Proof::Maybe;
 }
 
 Proof FlatFunction::hc4ReviseBackward(IntervalVector& V)
 {
-   Proof res = Proof::Maybe;
-
    for (int i=(int)nb_-1; i>= 0; --i)
    {
       switch(symb_[i])
@@ -794,8 +790,7 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector& V)
 
          case FlatSymbol::Var:
             V[arg_[i][1]] &= itv_[i];
-            res = V[arg_[i][1]].isEmpty() ?
-                     Proof::Empty : Proof::Maybe;
+            if (V[arg_[i][1]].isEmpty()) return Proof::Empty;
             break;
 
          case FlatSymbol::Add:
@@ -918,7 +913,7 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector& V)
       }
    }
 
-   return res;
+   return Proof::Maybe;
 }
 
 void FlatFunction::iDiff(const IntervalBox& B, IntervalVector& G)

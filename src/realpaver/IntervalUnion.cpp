@@ -333,4 +333,83 @@ IntervalUnion addPY(const Interval& x, const Interval& y,
    return U;
 }
 
+IntervalUnion subPX(const Interval& x, const Interval& y,
+                    const IntervalUnion& Z)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Z.size(); ++i)
+      U.insert(subPX(x, y, Z.v_[i]));
+   return U;
+}
+
+IntervalUnion subPY(const Interval& x, const Interval& y,
+                    const IntervalUnion& Z)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Z.size(); ++i)
+      U.insert(subPY(x, y, Z.v_[i]));
+   return U;
+}
+
+IntervalUnion mulPX(const Interval& x, const Interval& y,
+                    const IntervalUnion& Z)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Z.size(); ++i)
+   {
+      Interval z = Z.v_[i];
+      if (y.strictlyContainsZero())
+      {
+         U.insert(mulPX(x, Interval(y.left(), 0.0), z));
+         U.insert(mulPX(x, Interval(0.0, y.right()), z));
+      }
+      else
+      {
+         U.insert(mulPX(x, y, z));
+      }
+   }
+   return U;
+}
+
+IntervalUnion mulPY(const Interval& x, const Interval& y,
+                    const IntervalUnion& Z)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Z.size(); ++i)
+   {
+      Interval z = Z.v_[i];
+      if (x.strictlyContainsZero())
+      {
+         U.insert(mulPY(Interval(x.left(), 0.0), y, z));
+         U.insert(mulPY(Interval(0.0, x.right()), y, z));
+      }
+      else
+      {
+         U.insert(mulPY(x, y, z));
+      }
+   }
+   return U;
+}
+
+IntervalUnion sqrPX(const Interval& x, const IntervalUnion& Y)
+{
+   IntervalUnion U;
+   for (size_t i=0; i<Y.size(); ++i)
+   {
+      Interval y = Y.v_[i];
+      if (y.left() > 0.0)
+      {
+         Interval z = sqrt(y);
+         U.insert(x & z);
+         U.insert(x & (-z));
+      }
+      else if (y.right() >= 0.0)
+      {
+         Interval z = sqrt(Interval(y.right()));
+         U.insert(x & Interval(-z.right(), z.right()));
+      }
+   }
+   return U;
+}
+
 } // namespace

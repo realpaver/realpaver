@@ -23,7 +23,7 @@
 
 #include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/Dag.hpp"
-#include "realpaver/PropagationAlg.hpp"
+#include "realpaver/IntervalPropagator.hpp"
 
 namespace realpaver {
 
@@ -78,8 +78,8 @@ public:
    void print(std::ostream& os) const override;
 
 private:
-   SharedDag dag_;            // the DAG
-   PropagationAlg* propag_;   // propagation algorithm
+   SharedDag dag_;               // DAG
+   IntervalPropagator* propag_;  // propagation algorithm
    std::vector<std::shared_ptr<ContractorBC4Revise>> vop_;  // contractors
 };
 

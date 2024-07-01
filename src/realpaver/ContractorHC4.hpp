@@ -22,7 +22,7 @@
 #define REALPAVER_CONTRACTOR_HC4_HPP
 
 #include "realpaver/Dag.hpp"
-#include "realpaver/PropagationAlg.hpp"
+#include "realpaver/IntervalPropagator.hpp"
 
 namespace realpaver {
 
@@ -66,8 +66,8 @@ public:
    void setMaxIter(size_t n);
 
 private:
-   SharedDag dag_;            // DAG
-   PropagationAlg* propag_;   // propagation algorithm
+   SharedDag dag_;               // DAG
+   IntervalPropagator* propag_;  // propagation algorithm
 };
 
 /// Type of shared pointers of HC4 contractors

@@ -31,7 +31,6 @@
 #include "realpaver/Env.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/PropagationAlg.hpp"
 
 namespace realpaver {
 

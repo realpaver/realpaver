@@ -27,7 +27,7 @@
 namespace realpaver {
 
 /**
- * @brief Base class for pools of contractors.
+ * @brief Pool of contractors.
  *
  * A pool manages a set of contractors. Its scopes is the union of the scopes
  * of those contractors. The contractors must be accessed through shared
@@ -35,8 +35,8 @@ namespace realpaver {
  */
 class ContractorPool {
 public:
-   /// Default constructor
-   ContractorPool() = default;
+   /// Creates an empty pool
+   ContractorPool();
 
    /// Default copy constructor
    ContractorPool(const ContractorPool&) = default;
@@ -44,58 +44,46 @@ public:
    /// No assignment
    ContractorPool& operator=(const ContractorPool&) = delete;
 
-   /// Virtual destructor
-   virtual ~ContractorPool();
+   /// Default destructor
+   ~ContractorPool() = default;
 
    /// Returns the number of contractors
-   virtual size_t poolSize() const = 0;
+   size_t poolSize() const;
 
-   /// Returns the set of variables it depends on
-   virtual Scope scope() const = 0;
+   /// Returns the scope of this
+   Scope scope() const;
 
-   /// Inserts a contractor in this
-   virtual void push(SharedContractor op) = 0;
+   /// Inserts a contractor
+   void push(SharedContractor op);
 
-   /// Gets the i-th contractor given 0 <= i < poolSize()
-   virtual SharedContractor contractorAt(size_t i) const = 0;
+   /// Gets the i-th contractor
+   SharedContractor contractorAt(size_t i) const;
 
-   /// Removes the i-th contractor given 0 <= i < poolSize()
-   virtual void removeContractorAt(size_t i) = 0;
-};
+   /// Returns the number of contractors depending on v
+   size_t depSize(const Variable& v) const;
 
-/// Type of shared contractor pools
-using SharedContractorPool = std::shared_ptr<ContractorPool>;
+   /// Returns the index in this pool of the i-th contractor depending on v
+   size_t depAt(const Variable& v, size_t i) const;
 
-/*----------------------------------------------------------------------------*/
-
-/// Pool of contractors implemented as a vector
-class ContractorVector : public ContractorPool {
-public:
-   /// Creates an empty pool
-   ContractorVector();
-
-   /// Default copy constructor
-   ContractorVector(const ContractorVector&) = default;
-
-   /// No assignment
-   ContractorVector& operator=(const ContractorVector&) = delete;
-
-   /// Default destructor
-   ~ContractorVector() = default;
-
-   size_t poolSize() const override;
-   Scope scope() const override;
-   void push(SharedContractor op) override;
-   SharedContractor contractorAt(size_t i) const override;
-   void removeContractorAt(size_t i) override;
+   /// Output on a stream
+   void print(std::ostream& os) const;
 
 private:
    std::vector<SharedContractor> v_;
    Scope scop_;
+
+   // dependency structure
+   // what is dep_[i] ? i with 0 <= i < scop_ < size() is a variable index in
+   // scop_ and dep_[i] is a list of indexes of contractors in v_ that depend
+   // on this variable
+   std::vector<std::vector<size_t>> dep_;
+
+   // makes the dependency relation between the variables and the contractors
+   void makeDep();
 };
 
-/// Type of shared contractor vectors
-using SharedContractorVector = std::shared_ptr<ContractorVector>;
+/// Type of shared contractor pools
+using SharedContractorPool = std::shared_ptr<ContractorPool>;
 
 } // namespace
 

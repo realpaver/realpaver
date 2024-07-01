@@ -122,11 +122,6 @@ Proof IntervalNewton::contract(IntervalBox& X)
 
    LOG_INTER("Interval Newton contractor on " << X);
 
-
-std::cout << "INPUT Newton : " << X << std::endl;
-
-
-
 // analysis of the degree of contraction
 #if LOG_ON
    IntervalBox saveX(X);

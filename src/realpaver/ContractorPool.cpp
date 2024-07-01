@@ -24,37 +24,32 @@
 
 namespace realpaver {
 
-ContractorPool::~ContractorPool()
-{}
-
-/*----------------------------------------------------------------------------*/
-
-ContractorVector::ContractorVector()
-      : ContractorPool(),
-        v_(),
+ContractorPool::ContractorPool()
+      : v_(),
         scop_()
 {}
 
-size_t ContractorVector::poolSize() const
+size_t ContractorPool::poolSize() const
 {
    return v_.size();
 }
 
-Scope ContractorVector::scope() const
+Scope ContractorPool::scope() const
 {
    return scop_;
 }
 
-void ContractorVector::push(SharedContractor op)
+void ContractorPool::push(SharedContractor op)
 {
    ASSERT(op != nullptr, "Bad insertion in a vector of contractors");
 
    v_.push_back(op);
    scop_.insert(op->scope());
    scop_ = ScopeBank::getInstance()->insertScope(scop_);
+   makeDep();
 }
 
-SharedContractor ContractorVector::contractorAt(size_t i) const
+SharedContractor ContractorPool::contractorAt(size_t i) const
 {
    ASSERT(i < v_.size(),
           "Access out of range in a vector of contractors @ " << i);
@@ -62,13 +57,49 @@ SharedContractor ContractorVector::contractorAt(size_t i) const
    return v_[i];
 }
 
-void ContractorVector::removeContractorAt(size_t i)
+void ContractorPool::makeDep()
 {
-   ASSERT(i < v_.size(),
-          "Access out of range in a vector of contractors @ " << i);
+   dep_.clear();
+   dep_.resize(scop_.size());
 
-   scop_.remove(v_[i]->scope());
-   v_.erase(v_.begin() + i);
+   for (size_t i=0; i<scop_.size(); ++i)
+   {
+      Variable v = scop_.var(i);
+      
+      for (size_t j=0; j<v_.size(); ++j)
+      {
+         if (v_[j]->dependsOn(v))
+         {
+            dep_[i].push_back(j);
+         }
+      }
+   }
+}
+
+size_t ContractorPool::depSize(const Variable& v) const
+{
+   return dep_[scop_.index(v)].size();
+}
+
+size_t ContractorPool::depAt(const Variable& v, size_t i) const
+{
+   return dep_[scop_.index(v)][i];
+}
+
+void ContractorPool::print(std::ostream& os) const
+{
+   os << "Pool of " << v_.size() << " contractors" << std::endl;
+   for (size_t i=0; i<scop_.size(); ++i)
+   {
+      Variable v = scop_.var(i);
+      os << v.getName() << ": ";
+      
+      for (size_t j=0; j<dep_[i].size(); ++j)
+      {
+         os << dep_[i][j] << " ";
+      }
+      os << std::endl;
+   }
 }
 
 } // namespace

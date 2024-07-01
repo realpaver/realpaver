@@ -264,7 +264,7 @@ SharedContractor ContractorFactory::makeHC4Newton()
 
    if (newton != nullptr)
    {
-      SharedContractorVector pool = std::make_shared<ContractorVector>();
+      SharedContractorPool pool = std::make_shared<ContractorPool>();
       pool->push(hc4);
       pool->push(newton);
       return std::make_shared<ContractorList>(pool);

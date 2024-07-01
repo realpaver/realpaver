@@ -28,7 +28,7 @@ ContractorBC4::ContractorBC4(SharedDag dag)
       : dag_(dag),
         vop_()
 {
-   SharedContractorVector pool = std::make_shared<ContractorVector>();
+   SharedContractorPool pool = std::make_shared<ContractorPool>();
 
    for (size_t i=0; i<dag_->nbFuns(); ++i)
    {
@@ -38,7 +38,7 @@ ContractorBC4::ContractorBC4(SharedDag dag)
       vop_.push_back(op);
    }
 
-   propag_ = new PropagationAlg(pool);
+   propag_ = new IntervalPropagator(pool);
 }
 
 ContractorBC4::~ContractorBC4()

@@ -28,7 +28,7 @@ namespace realpaver {
 ContractorHC4::ContractorHC4(SharedDag dag)
       : dag_(dag)
 {
-   SharedContractorVector pool = std::make_shared<ContractorVector>();
+   SharedContractorPool pool = std::make_shared<ContractorPool>();
 
    for (size_t i=0; i<dag_->nbFuns(); ++i)
    {
@@ -36,7 +36,7 @@ ContractorHC4::ContractorHC4(SharedDag dag)
       pool->push(op);
    }
 
-   propag_ = new PropagationAlg(pool);
+   propag_ = new IntervalPropagator(pool);
 }
 
 ContractorHC4::~ContractorHC4()

@@ -95,6 +95,26 @@ public:
                               const IntervalUnion& Z);
    ///@}
 
+   /// @name Subtraction
+   ///@{
+   friend IntervalUnion subPX(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   friend IntervalUnion subPY(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   ///@}
+
+   /// @name Multiplication
+   ///@{
+   friend IntervalUnion mulPX(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   friend IntervalUnion mulPY(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   ///@}
+
+
+   /// Square
+   friend IntervalUnion sqrPX(const Interval& x, const IntervalUnion& Y);
+
 private:
    typedef std::vector<Interval> VectorType;
    VectorType v_;

@@ -283,15 +283,8 @@ void NcspSolver::bpStep(int depthlimit)
    // extracts a node from the space
     SharedNcspNode node = space_->nextPendingNode();
 
-
-std::cout << "\n\nNEXT : " << (*node->box()) << std::endl;
-
-
    // processes it
     bpStepAux(node, depthlimit);
-
-std::cout << "\n\nAFTER FILTERING : " << (*node->box()) << std::endl;
-
 
    // removes the node informations
    context_->remove(node->index());
@@ -529,6 +522,7 @@ void NcspSolver::branchAndPrune()
 #endif
 
    LOG_NL_MAIN();
+   
    certifySolutions();
 
    stimer_.stop();

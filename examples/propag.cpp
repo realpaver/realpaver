@@ -1,10 +1,10 @@
 #include <iostream>
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/ContractorHC4Revise.hpp"
+#include "realpaver/IntervalPropagator.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/PropagationAlg.hpp"
 #include "realpaver/Timer.hpp"
 
 using namespace realpaver;
@@ -35,11 +35,11 @@ int main(void)
 
       cout << (*dag) << endl;
 
-      SharedContractorVector pool = std::make_shared<ContractorVector>();
+      SharedContractorPool pool = std::make_shared<ContractorPool>();
       pool->push(std::make_shared<ContractorHC4Revise>(dag, i));
       pool->push(std::make_shared<ContractorHC4Revise>(dag, j));
 
-      PropagationAlg tor(pool);
+      IntervalPropagator tor(pool);
       tor.setTol(Tolerance(1.0e-4, 0.0));
 
       Proof proof = tor.contract(B);

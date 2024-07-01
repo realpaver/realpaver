@@ -28,7 +28,7 @@ ContractorList::ContractorList(SharedContractorPool pool)
 {
    if (pool == nullptr)
    {
-      pool_ = std::make_shared<ContractorVector>();
+      pool_ = std::make_shared<ContractorPool>();
    }
 }
 
