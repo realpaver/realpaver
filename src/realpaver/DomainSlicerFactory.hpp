@@ -32,8 +32,19 @@ namespace realpaver {
  */
 class DomainSlicerFactory {
 public:
-   /// Returns the domain slicer map implementing bisection
-   static std::unique_ptr<DomainSlicerMap> makeBisectionStrategy();
+   /**
+    * @brief Bisection strategy.
+    * 
+    * Returns a domain slicer map such that every doman is split in two parts.
+    * - range: bisection
+    * - interval: [a, b] -> a + sip*(b-a)
+    * - interval union: split along with a hole if any, otherwise same as
+    *   interval
+    * - range union split along with a hole if any, otherwise same as
+    *   range
+    * - binary: trivial
+    */
+   static std::unique_ptr<DomainSlicerMap> makeBiStrategy(double sip);
 };
 
 } // namespace

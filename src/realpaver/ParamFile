@@ -123,8 +123,12 @@ SPLIT_OBJECTIVE = NO
 SPLIT_SELECTION = RR
 
 # Domain splitting strategy
-# - BISECTION: divides a domain in two equal parts
-SPLIT_SLICING = BISECTION
+# - BI: divides a domain in two parts
+SPLIT_SLICING = BI
+
+# An interval [a, b] is split in two parts at a+sip*(b-a) where 0 < sip < 1
+# denotes this parameter. For example, 0.5 corresponds to the midpoint.
+SPLIT_INTERVAL_POINT = 0.45
 
 # An inner box can be considered as a solution or it can be split.
 # - YES: it is split;

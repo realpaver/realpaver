@@ -89,6 +89,13 @@ void BinaryDomainSlicer::applyImpl(Domain* dom)
 
 /*----------------------------------------------------------------------------*/
 
+IntervalDomainBisecter::IntervalDomainBisecter(double sip)
+      : DomainSlicer(),
+        sip_(sip)
+{
+   ASSERT(sip>0.0 && sip<1.0, "Bad parameter of interval bisecter");
+}
+
 void IntervalDomainBisecter::applyImpl(Domain* dom)
 {
    IntervalDomain* ptr = dynamic_cast<IntervalDomain*>(dom);
@@ -99,12 +106,21 @@ void IntervalDomainBisecter::applyImpl(Domain* dom)
    ASSERT(!ptr->isCanonical(), "Interval domain not splitable");
 
    const Interval& x = ptr->getVal();
-   double m = x.midpoint();
+   double m = (x.isInf()) ? x.midpoint() : x.left()+sip_*x.width();
+
    push(new IntervalDomain(Interval(x.left(), m)));
    push(new IntervalDomain(Interval(m, x.right())));
 }
 
 /*----------------------------------------------------------------------------*/
+
+IntervalUnionDomainBisecter::IntervalUnionDomainBisecter(double sip)
+
+      : DomainSlicer(),
+        sip_(sip)
+{
+   ASSERT(sip>0.0 && sip<1.0, "Bad parameter of interval bisecter");
+}
 
 void IntervalUnionDomainBisecter::applyImpl(Domain* dom)
 {
@@ -129,7 +145,8 @@ void IntervalUnionDomainBisecter::applyImpl(Domain* dom)
    {
       // u is reduced to one interval -> bisects it
       const Interval& x = u[0];
-      double m = x.midpoint();
+      double m = (x.isInf()) ? x.midpoint() : x.left()+sip_*x.width();
+      
       push(new IntervalDomain(Interval(x.left(), m)));
       push(new IntervalDomain(Interval(m, x.right())));
    }

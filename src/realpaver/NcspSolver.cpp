@@ -219,8 +219,11 @@ void NcspSolver::makeSplit()
    std::string sli = env_->getParam()->getStrParam("SPLIT_SLICING");
    std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
-   if (sli == "BISECTION") 
-      smap = DomainSlicerFactory::makeBisectionStrategy();   
+   if (sli == "BI")
+   {
+      double sip = env_->getParam()->getDblParam("SPLIT_INTERVAL_POINT");
+      smap = DomainSlicerFactory::makeBiStrategy(sip);
+   }
 
    THROW_IF(smap == nullptr,
             "Unable to make the split object in a Ncsp solver");

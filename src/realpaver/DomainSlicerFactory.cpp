@@ -22,7 +22,8 @@
 
 namespace realpaver {
 
-std::unique_ptr<DomainSlicerMap> DomainSlicerFactory::makeBisectionStrategy()
+std::unique_ptr<DomainSlicerMap>
+DomainSlicerFactory::makeBiStrategy(double sip)
 {
    std::unique_ptr<DomainSlicerMap> smap = std::make_unique<DomainSlicerMap>();
    std::unique_ptr<DomainSlicer> slc;
@@ -32,11 +33,11 @@ std::unique_ptr<DomainSlicerMap> DomainSlicerFactory::makeBisectionStrategy()
    smap->setSlicer(DomainType::Binary, std::move(slc));
 
    // interval
-   slc = std::make_unique<IntervalDomainBisecter>();
+   slc = std::make_unique<IntervalDomainBisecter>(sip);
    smap->setSlicer(DomainType::Interval, std::move(slc));
 
    // interval union
-   slc = std::make_unique<IntervalUnionDomainBisecter>();
+   slc = std::make_unique<IntervalUnionDomainBisecter>(sip);
    smap->setSlicer(DomainType::IntervalUnion, std::move(slc));
 
    // range

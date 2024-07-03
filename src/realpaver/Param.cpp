@@ -92,12 +92,13 @@ Param::Param()
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-9));
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_ABS_TOL",      0.0));
    dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
+   dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT",      0.45));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
    strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",           "NO"));
    strmap_.insert(std::make_pair("SPLIT_SELECTION",           "RR"));
-   strmap_.insert(std::make_pair("SPLIT_SLICING",             "BISECTION"));
+   strmap_.insert(std::make_pair("SPLIT_SLICING",             "BI"));
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
    strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));

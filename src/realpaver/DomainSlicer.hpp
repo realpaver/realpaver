@@ -106,8 +106,8 @@ public:
 /// Slicer that bisects an interval domain
 class IntervalDomainBisecter : public DomainSlicer {
 public:
-   /// Default constructor
-   IntervalDomainBisecter() = default;
+   /// Constructor
+   IntervalDomainBisecter(double sip);
 
    /// No copy
    IntervalDomainBisecter(const IntervalDomainBisecter&) = delete;
@@ -119,6 +119,9 @@ public:
    ~IntervalDomainBisecter() = default;
 
    void applyImpl(Domain* dom) override;
+
+private:
+   double sip_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -126,13 +129,14 @@ public:
 /**
  * @brief Slicer that divides an interval union domain.
  * 
- * If the union is reduced to one interval, then it is bisected. Otherwise the
- * list of elements of the union is split in two equal parts.
+ * If the union is reduced to one interval, then it is split at a+sip*(b-a)
+ * with 0<sip<1. Otherwise the list of elements of the union is split in two
+ * equal parts.
  */
 class IntervalUnionDomainBisecter : public DomainSlicer {
 public:
-   /// Default constructor
-   IntervalUnionDomainBisecter() = default;
+   /// Constructor
+   IntervalUnionDomainBisecter(double sip);
 
    /// Default copy constructor
    IntervalUnionDomainBisecter(const IntervalUnionDomainBisecter&) = delete;
@@ -145,6 +149,9 @@ public:
    ~IntervalUnionDomainBisecter() = default;
 
    void applyImpl(Domain* dom) override;
+
+private:
+   double sip_;
 };
 
 /*----------------------------------------------------------------------------*/

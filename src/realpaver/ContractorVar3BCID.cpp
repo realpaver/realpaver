@@ -228,8 +228,6 @@ bool ContractorVar3BCID::contractCID(IntervalBox& Bcid, IntervalBox& B3bCid)
 //~ std::cout << "contract CID on Bcid " << Bcid << std::endl;
 //~ std::cout << "with B3bCid " << B3bCid << std::endl;
 
-
-
    IntervalBox B(Bcid);
    Interval dom(Bcid.get(v_));
 
