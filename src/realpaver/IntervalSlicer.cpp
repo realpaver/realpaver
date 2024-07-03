@@ -49,6 +49,12 @@ size_t IntervalSlicer::nbSlices() const
    return cont_.size();
 }
 
+Interval IntervalSlicer::slice(size_t i) const
+{
+   return cont_[i];
+}
+
+
 IntervalSlicer::iterator IntervalSlicer::begin()
 {
    return cont_.begin();

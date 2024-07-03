@@ -292,9 +292,10 @@ SharedContractor ContractorFactory::makeACID()
    int learnLength = env_->getParam()->getIntParam("ACID_LEARN_LENGTH");
    int cycleLength = env_->getParam()->getIntParam("ACID_CYCLE_LENGTH");
    double ctRatio = env_->getParam()->getDblParam("ACID_CT_RATIO");
+   double varMinWidth = env_->getParam()->getDblParam("VAR3BCID_MIN_WIDTH");
 
    return std::make_shared<ContractorACID>(ssr, hc4, ns3B, nsCID, learnLength,
-                                           cycleLength, ctRatio);
+                                           cycleLength, ctRatio, varMinWidth);
 }
 
 SharedContractorPolytope ContractorFactory::makePolytope()

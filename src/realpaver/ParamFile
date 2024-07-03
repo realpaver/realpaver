@@ -197,6 +197,9 @@ ACID_CYCLE_LENGTH = 1000
 # applied in the contraction procedure.
 ACID_CT_RATIO = 0.002
 
+# Threshold on the width of a variable domain used by var3BCID contractors
+VAR3BCID_MIN_WIDTH = 1.0e-11
+
 #-------------------------------------------------------------------------------
 # LOCAL OPTIMIZATION
 #-------------------------------------------------------------------------------

@@ -68,6 +68,12 @@ public:
    /// Assigns the variable whose domain is sliced
    void setVar(Variable v);
 
+   /// Returns the threshold on the width of a variable domain
+   double varMinWidth() const;
+
+   /// Assigns the threshold on the width of a variable domain
+   void setVarMinWidth(double val);
+
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
@@ -76,6 +82,9 @@ private:
    SharedContractor op_;                     // contractors for slices
    Variable v_;                              // variable whose domain is sliced
    std::unique_ptr<IntervalSlicer> slicer_;  // slicer
+   double var_min_width_;                    // threshold
+   Interval left_, right_;                   // left and right consistent slices
+                                             // in the last call of contract
 };
 
 } // namespace

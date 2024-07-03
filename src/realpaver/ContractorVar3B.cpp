@@ -20,6 +20,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorVar3B.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
@@ -27,7 +28,8 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v,
                                  std::unique_ptr<IntervalSlicer> slicer)
          : op_(op),
            v_(v),
-           slicer_(std::move(slicer))
+           slicer_(std::move(slicer)),
+           var_min_width_(Param::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
    ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
    ASSERT(op->scope().contains(v), "Bad variable " << v <<
@@ -66,9 +68,29 @@ void ContractorVar3B::setVar(Variable v)
    v_ = v;
 }
 
+double ContractorVar3B::varMinWidth() const
+{
+   return var_min_width_;
+}
+
+void ContractorVar3B::setVarMinWidth(double val)
+{
+   var_min_width_ = val;
+}
+
 Proof ContractorVar3B::contract(IntervalBox& B)
 {
    Interval dom = B.get(v_);
+
+   // not handles too small domains
+   if (dom.width() < var_min_width_)
+      return Proof::Maybe;
+
+   // not handles infinite domains
+   if (dom.isInf())
+      return Proof::Maybe;
+
+   // slices the domain
    slicer_->apply(dom);
    size_t nbs = slicer_->nbSlices();
 

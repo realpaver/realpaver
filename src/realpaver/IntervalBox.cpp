@@ -378,4 +378,30 @@ bool IntervalBox::isVectorizable() const
    return scop_.isIdentity();
 }
 
+bool IntervalBox::equals(const IntervalBox& B) const
+{
+   if (scop_ != B.scop_) return false;
+
+   for (size_t i=0; i<size(); ++i)
+   {
+      if (operator[](i).isSetNeq(B.operator[](i)))
+         return false;
+   }
+   return true;
+}
+
+bool IntervalBox::equals(const IntervalBox& B, const Variable& v) const
+{
+   if (scop_ != B.scop_) return false;
+
+   size_t j = scop_.index(v);
+
+   for (size_t i=0; i<size(); ++i)
+   {
+      if (i != j && operator[](i).isSetNeq(B.operator[](i)))
+         return false;
+   }
+   return true;   
+}
+
 } // namespace

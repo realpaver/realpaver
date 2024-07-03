@@ -61,10 +61,12 @@ public:
     * @param learnLength length of the learning phase
     * @param cycleLength length of the learning+exploitation phase
     * @param ctRatio threshold on the quality of contractions
+    * @param varMinWidth threshold on the wodth of variable domains
     */
    ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
                   SharedContractor op, int ns3B, int nsCID,
-                  int learnLength, int cycleLength, double ctRatio);
+                  int learnLength, int cycleLength, double ctRatio,
+                  double varMinWidth);
 
    /// Default copy constructor
    ContractorACID(const ContractorACID&) = default;

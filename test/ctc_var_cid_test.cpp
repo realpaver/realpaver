@@ -22,8 +22,7 @@ void init()
    Constraint c( x - y == 0 );
 
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
-   unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(3);
-   cid = new ContractorVarCID(ctc, x, std::move(slicer));
+   cid = new ContractorVarCID(ctc, x, 3);
 }
 
 void clean()

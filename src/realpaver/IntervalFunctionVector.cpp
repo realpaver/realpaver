@@ -313,7 +313,7 @@ void IntervalFunctionVectorList::diff(const IntervalBox& B, IntervalMatrix& J)
 void IntervalFunctionVectorList::diffHansen(const IntervalBox& B,
                                             IntervalMatrix& H)
 {
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+   ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
           "Bad dimensions of a Jacobian matrix used in a function vector");
 
    for (size_t i=0; i<nbFuns(); ++i)

@@ -30,12 +30,12 @@ ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v,
            slicer_(std::move(slicer))
 {
    ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
-   ASSERT(op->scope().contains(v),
+   ASSERT(op->scope().contains(v), 
           "Bad variable " << v << " in a varCID contractor");
-   ASSERT(slicer_ != nullptr, "No slicer in a varCID contractor");
+   ASSERT(slicer != nullptr, "No slicer given");   
 }
 
-ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t n)
+ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t nsCID)
          : op_(op),
            v_(v),
            slicer_(nullptr)
@@ -45,7 +45,7 @@ ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t n)
           "Bad variable " << v << " in a varCID contractor");
    ASSERT(n > 1, "Bad number of slices in a varCID contractor: " << n);
 
-   slicer_ = std::make_unique<IntervalPartitionMaker>(n);
+   slicer_ = std::make_unique<IntervalPartitionMaker>(nsCID);
 }
 
 Scope ContractorVarCID::scope() const

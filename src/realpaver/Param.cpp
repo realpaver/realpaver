@@ -91,6 +91,7 @@ Param::Param()
    dblmap_.insert(std::make_pair("NEWTON_CERTIFY_REL_TOL",    1.0e-3));
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-9));
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_ABS_TOL",      0.0));
+   dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));

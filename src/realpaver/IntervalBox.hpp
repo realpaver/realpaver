@@ -253,6 +253,12 @@ public:
     */
    bool isVectorizable() const;
 
+   /// Equality test
+   bool equals(const IntervalBox& B) const;
+
+   /// Equality test on all dimensions but one variable
+   bool equals(const IntervalBox& B, const Variable& v) const;
+
 private:
    Scope scop_;
 };

@@ -22,9 +22,7 @@ Result my_test(const Interval& I)
    IntervalBox B(scop);
 
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
-   unique_ptr<IntervalSlicer> slicer = make_unique<IntervalPartitionMaker>(10);
-
-   ContractorVar3B ctc3b(ctc, x, std::move(slicer));
+   ContractorVar3B ctc3b(ctc, x, 10);
    Proof p = ctc3b.contract(B);
 
    return make_pair(p, B.get(x));

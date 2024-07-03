@@ -29,9 +29,9 @@ namespace realpaver {
 /**
  * @brief Contractor implementing Constructive Interval Disjunction.
  *
- * Given a box B, a variable v, a slicer and a contractor, the domain of
- * v in B is divided by the slicer, each slice is reduced by the contractor,
- * and the hull of the contracted slices is returned.
+ * Given a box B, a variable v, a slicer and a number of slices, the domain of
+ * v in B is divided, each slice is reduced by the contractor and the hull of
+ * the contracted slices is returned.
  *
  * The scope of this corresponds to the scope of the given contractor.
  */
@@ -42,7 +42,7 @@ public:
                     std::unique_ptr<IntervalSlicer> slicer);
 
    /// Constructor given a number of slices (at least 2)
-   ContractorVarCID(SharedContractor op, Variable v, size_t n);
+   ContractorVarCID(SharedContractor op, Variable v, size_t nsCID);
 
    /// Default destructor
    ~ContractorVarCID() = default;
