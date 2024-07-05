@@ -69,16 +69,6 @@ void ContractorHC4::setTol(Tolerance tol)
    propag_->setTol(tol);
 }
 
-size_t ContractorHC4::getMaxIter() const
-{
-   return propag_->getMaxIter();
-}
-
-void ContractorHC4::setMaxIter(size_t n)
-{
-   propag_->setMaxIter(n);
-}
-
 void ContractorHC4::push(SharedContractor op)
 {
    propag_->push(op);

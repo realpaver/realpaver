@@ -138,6 +138,7 @@ public:
    Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
 
 private:
+   SharedContractor hc4_;
    SharedContractor op_;
 };
 

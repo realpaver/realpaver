@@ -33,7 +33,6 @@ IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
         tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
-        maxiter_(Param::GetIntParam("PROPAGATION_ITER_LIMIT")),
         certif_()
 {
    if (pool == nullptr)
@@ -60,16 +59,6 @@ size_t IntervalPropagator::poolSize() const
 void IntervalPropagator::push(SharedContractor op)
 {
    pool_->push(op);
-}
-
-size_t IntervalPropagator::getMaxIter() const
-{
-   return maxiter_;
-}
-
-void IntervalPropagator::setMaxIter(size_t n)
-{
-   maxiter_ = n;
 }
 
 Proof IntervalPropagator::proofAt(size_t i) const

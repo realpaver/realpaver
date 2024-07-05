@@ -314,29 +314,6 @@ IntervalBox* IntervalBox::clone() const
    return new IntervalBox(*this);
 }
 
-double IntervalBox::gainRatio(const IntervalBox& B) const
-{
-   return gainRatioOnScope(B, scop_);
-}
-
-double IntervalBox::gainRatioOnScope(const IntervalBox& B,
-                                     const Scope& scop) const
-{
-   ASSERT(scop_.contains(scop),
-          "Bad scope used to calculate a gan ratio " << scop);
-   ASSERT(B.scop_.contains(scop),
-          "Bad scope used to calculate a gan ratio " << scop);
-   ASSERT(!scop.isEmpty(),
-          "Empty scope used to calculate a gan ratio");
-
-   double s = 0.0;
-
-   for (const auto& v : scop)
-      s += (1.0 - get(v).width() / B.get(v).width());
-
-   return s / scop.size();
-}
-
 void IntervalBox::print(std::ostream& os) const
 {
    vecPrint(os);

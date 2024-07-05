@@ -115,7 +115,7 @@ std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
    return ssr;
 }
 
-SharedContractorHC4 ContractorFactory::makeHC4()
+SharedContractorHC4 ContractorFactory::makeHC4(Tolerance tol)
 {
    // constraints from the dag
    SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(dag_);
@@ -135,13 +135,15 @@ SharedContractorHC4 ContractorFactory::makeHC4()
       hc4->push(dop);
 
    // tuning of propagation
-   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   hc4->setTol(Tolerance(rtol, 0.0));
-
-   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
-   hc4->setMaxIter(niter);   
+   hc4->setTol(tol);
 
    return hc4;
+}
+
+SharedContractorHC4 ContractorFactory::makeHC4()
+{
+   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
+   return makeHC4(Tolerance(rtol, 0.0));
 }
 
 SharedContractorBC4 ContractorFactory::makeBC4()
@@ -167,20 +169,17 @@ SharedContractorBC4 ContractorFactory::makeBC4()
    double val = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
    bc4->setTol(Tolerance(val, 0.0));
 
-   int niter = env_->getParam()->getIntParam("PROPAGATION_ITER_LIMIT");
-   bc4->setMaxIter(niter);   
-
    // tuning of BC4Revise operators
    val = env_->getParam()->getDblParam("BC3_PEEL_FACTOR");
    bc4->setBC4RevisePeelFactor(val);
 
-   niter = env_->getParam()->getIntParam("BC3_ITER_LIMIT");
+   int niter = env_->getParam()->getIntParam("BC3_ITER_LIMIT");
    bc4->setBC4ReviseMaxIter(niter);   
 
    return bc4;
 }
 
-std::shared_ptr<IntervalNewton> ContractorFactory::makeIntervalNewton()
+std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
 {
    size_t ne = ve_.size(),
           nv = se_.size();
@@ -260,7 +259,7 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
 SharedContractor ContractorFactory::makeHC4Newton()
 {
    SharedContractorHC4 hc4 = makeHC4();
-   std::shared_ptr<IntervalNewton> newton = makeIntervalNewton();
+   std::shared_ptr<IntervalNewton> newton = makeNewton();
 
    if (newton != nullptr)
    {
@@ -285,7 +284,8 @@ SharedContractor ContractorFactory::makeACID()
 
    std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
-   SharedContractorHC4 hc4 = makeHC4();
+   double rtol = env_->getParam()->getDblParam("ACID_HC4_REL_TOL");
+   SharedContractorHC4 hc4 = makeHC4(Tolerance(rtol, 0.0));
 
    int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
    int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");

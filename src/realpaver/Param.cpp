@@ -42,7 +42,6 @@ Param::Param()
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
    intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
    intmap_.insert(std::make_pair("SOLUTION_LIMIT",            100));
-   intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
    intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT",     20));
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
@@ -93,6 +92,7 @@ Param::Param()
    dblmap_.insert(std::make_pair("GAUSS_SEIDEL_ABS_TOL",      0.0));
    dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
    dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT",      0.45));
+   dblmap_.insert(std::make_pair("ACID_HC4_REL_TOL",          1.0e-1));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));

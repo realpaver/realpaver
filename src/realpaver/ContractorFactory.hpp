@@ -74,7 +74,12 @@ public:
     * - A constraint contractor is created for each other constraint.
     * - A domain contractor is created for each variable whose initial domain
     *   is not connected.
+    * 
+    * tol is the tolerance driving propagation steps.
     */
+   SharedContractorHC4 makeHC4(Tolerance tol);
+
+   /// Same as SharedContractorHC4(tol) with tol extracted from the environment
    SharedContractorHC4 makeHC4();
 
    /**
@@ -104,7 +109,7 @@ public:
     * there are at least two equations and the system is square, nullptr
     * otherwise.
     */
-   std::shared_ptr<IntervalNewton> makeIntervalNewton();
+   std::shared_ptr<IntervalNewton> makeNewton();
 
    /**
     * @brief Returns a domain contractor.
@@ -120,7 +125,7 @@ public:
     * 
     * Creates a contractor that applies HC4 followed by interval Newton.
     * - HC4 is created by makeHC4().
-    * - Newton is created by makeIntervalNewton().
+    * - Newton is created by makeNewton().
     */
    SharedContractor makeHC4Newton();
 

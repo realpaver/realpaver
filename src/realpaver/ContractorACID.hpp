@@ -107,9 +107,11 @@ private:
       var3BCID_;                    // associated with the i-th variable
                                     // of the scope
 
-   std::vector<size_t> kVarCID_;
+   int sumGood_;  // during the learning phase, it counts the number of
+                  // applications of var3BCID contractors that have reduced
+                  // enough the box with respect to ctRatio_
 
-   int call_;           // number of calls of the contract method
+   int nbCalls_;        // number of calls of the contract method
    int learnLength_;    // number of calls in the learning phase
    int cycleLength_;    // number of calls in a cycle made of an exploitation
                         // phase and a learning phase
@@ -125,11 +127,11 @@ private:
    // indicates that the gains are not enough after k. Then it returns k+1,
    // which the maximum number of contractors that must be applied in order to
    // obtain a sufficient gain.
-   static int lastSignificantGain(std::vector<double>& ctcGains,
-                                  double ctRatio);
+   static int lastSignificantGain(double* ctcGains, double ctRatio, int imax);
 
-   // It computes the average of v.
-   static size_t avgNbVarCID(std::vector<size_t>& v);
+   // Calculates the gain ratio between prev and the reduced box next
+   static double gainRatio(const IntervalBox& prev, const IntervalBox& next,
+                           const Scope& scop);
 };
 
 /** @brief Type of shared pointers on contractors */

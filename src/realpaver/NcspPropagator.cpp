@@ -112,7 +112,7 @@ Proof NcspBC4::contractImpl(NcspNode& node, NcspContext& ctx)
 NcspNewton::NcspNewton(ContractorFactory& facto)
       : NcspPropagator()
 {
-   op_ = facto.makeIntervalNewton();
+   op_ = facto.makeNewton();
 }
 
 Proof NcspNewton::contractImpl(NcspNode& node, NcspContext& ctx)
@@ -154,12 +154,20 @@ Proof NcspPolytope::contractImpl(NcspNode& node, NcspContext& ctx)
 NcspACID::NcspACID(ContractorFactory& facto)
       : NcspPropagator()
 {
+   hc4_ = facto.makeHC4();
    op_ = facto.makeACID();
 }
 
 Proof NcspACID::contractImpl(NcspNode& node, NcspContext& ctx)
 {
    B_ = new IntervalBox(*node.box());
+
+   // applies HC4
+   Proof proof = hc4_->contract(*B_);
+   if (proof == Proof::Empty)
+      return proof;
+
+   // applies ACID
    return op_->contract(*B_);
 }
 

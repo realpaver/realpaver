@@ -59,12 +59,6 @@ public:
    /// Sets the tolerance used as stopping criterion
    void setTol(Tolerance tol);
 
-   /// Returns the maximum number of propagation steps
-   size_t getMaxIter() const;
-
-   /// Sets the maximum number of propagation steps
-   void setMaxIter(size_t n);
-
 private:
    SharedDag dag_;               // DAG
    IntervalPropagator* propag_;  // propagation algorithm

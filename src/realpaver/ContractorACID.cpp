@@ -57,9 +57,8 @@ ContractorACID::ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
       var3BCID_.push_back(c3bc);
    }
 
-   kVarCID_.insert(kVarCID_.begin(), learnLength, 0);
-
-   call_ = 0;
+   sumGood_ = 0.0;
+   nbCalls_ = 0;
    cycleLength_ = cycleLength;
    learnLength_ = learnLength;
    ctRatio_ = ctRatio;
@@ -90,104 +89,136 @@ SharedContractor ContractorACID::sliceContractor() const
    return op_;
 }
 
-//~ Proof ContractorACID::contract(IntervalBox& B)
-//~ {
-   //~ LOG_INTER("ACID call " << call_ << " on " << B);
-
-//~ }
-
-
-
-
 Proof ContractorACID::contract(IntervalBox& B)
 {
-   LOG_INTER("ACID call " << call_ << " on " << B);
-
+   LOG_INTER("ACID call " << nbCalls_ << " on " << B);
    Proof proof = Proof::Maybe;
 
-   // sorts the variables according to their impact
-   ssr_->calculate(B);
-   ssr_->sort();
 
-   int mcall = call_ % cycleLength_;
+//~ std::cout << "\n\nACID call " << nbCalls_ << " on " << B << std::endl;
 
+
+   int nbvarmax = 5*scop_.size();
+   double* ctcGains = new double[nbvarmax];
+
+   IntervalBox initbox(B);
+   int vhandled;
+
+   int mcall = nbCalls_ % cycleLength_;
+
+//~ std::cout << "mcall " << mcall << std::endl;
+
+
+   // learning phase ?
    if (mcall < learnLength_)
    {
-      // learning phase
-      int nVarCID = std::max(2, 2*numVarCID_);
-      std::vector<double> ctcGains(nVarCID);
+//~ std::cout << "*** LEARNING" << std::endl;
 
-      int i = 0;
-      while ((proof != Proof::Empty) && (i<nVarCID))
-      {
-         IntervalBox save(B);
 
-         size_t j = i % n_;
-         Variable v = ssr_->getVar(j);
-         size_t k = scop_.index(v);
+      // first learning phase: one var3BCID per variable
+      // next phases: two times the number of the previous number of var3BCID
+      vhandled = (nbCalls_ < learnLength_) ? n_ : 2*numVarCID_;
 
-         proof = var3BCID_[k]->contract(B);
+      if (vhandled < 2) vhandled = 2;
 
-         LOG_LOW("learning: " << k << "-th var3BCID on " << v.getName());
-         LOG_LOW(" -> " << proof << ", " << B);
+      for (int i =0; i<nbvarmax; i++)
+         ctcGains[i] = 0;
 
-         if (proof != Proof::Empty)
-         {
-            ctcGains[i] = B.gainRatio(save);
-            ++i;
-            LOG_LOW("gain: " << ctcGains[i]);
-         }
-      }
 
-      // number of contractors that have been applied till a significant gain
-      if (proof == Proof::Empty)
-      {
-         kVarCID_[mcall] = i+1;
+//~ std::cout << "learning : vhandled = " << vhandled << std::endl;
 
-      }
-      else
-      {
-         kVarCID_[mcall] = lastSignificantGain(ctcGains, ctRatio_);
-      }
-
-      LOG_LOW("kVarCID[" << mcall << "] <- " << kVarCID_[mcall]);
-
-      // end of learning phase
-      if (mcall == learnLength_-1)
-      {
-         numVarCID_ = avgNbVarCID(kVarCID_);
-
-         LOG_LOW("end of learning, nummVarCID <- " << numVarCID_);
-      }
    }
    else
    {
+//~ std::cout << "*** EXPLOITATION" << std::endl;
+
       // exploitation phase
-      if (numVarCID_ == 0)
-      {
-         proof = op_->contract(B);
+      vhandled = numVarCID_;
 
-         LOG_LOW("exploitation, HC4 -> " << proof << ", " << B);
-      }
-      else
-      {
-         size_t i=0;
-         while ((proof != Proof::Empty) && (i<(size_t)numVarCID_))
-         {
-            size_t j = i % n_;
-            Variable v = ssr_->getVar(j);
-            size_t k = scop_.index(v);
+//~ std::cout << "exploitation : vhandled = " << vhandled << std::endl;
 
-            proof = var3BCID_[k]->contract(B);
-            ++i;
-
-            LOG_LOW("exploitaion: " << k << "-th var3BCID on " << v.getName());
-            LOG_LOW(" -> " << proof << ", " << B);
-         }
-      }
    }
 
-   ++call_;
+   if (vhandled > nbvarmax)
+      vhandled = nbvarmax;
+
+//~ std::cout << "vhandled = " << vhandled << std::endl;
+
+
+   if (vhandled > 0)
+   {
+      // sorts the variables according to their impact
+      ssr_->calculate(B);
+      ssr_->sort();
+   }
+
+   IntervalBox save(B);
+
+   int stop = 0;
+
+   for (int i=0; i<vhandled; ++i)
+   {
+      size_t j = i % n_;
+      Variable v = ssr_->getVar(j);
+      size_t k = scop_.index(v);
+
+      proof = var3BCID_[k]->contract(B);
+
+//~ std::cout << k << "-th var3BCID on " << v.getName() << " -> " << proof << ", " << B << std::endl;
+
+
+      LOG_LOW(k << "-th var3BCID on " << v.getName());
+      LOG_LOW(" -> " << proof << ", " << B);
+
+      if (proof == Proof::Empty)
+      {
+         stop = i;
+         break;
+      }
+
+      // learning phase: gains
+      if (mcall < learnLength_)
+      {
+         ctcGains[i] = gainRatio(save, B, scop_);
+
+//~ std::cout << "ctcGains[" << i << "] = " << ctcGains[i] << std::endl;
+      }
+
+      save = B;
+   }
+
+   // learning phase: calculates the number of interesting variables
+   if (mcall < learnLength_)
+   {
+      sumGood_ += (proof == Proof::Empty) ?
+                     (stop+1) :
+                     lastSignificantGain(ctcGains, ctRatio_, vhandled-1);
+
+//~ std::cout << "sumGood_      = " << sumGood_ << std::endl;
+
+   }
+
+   // end of learning phase
+   if (mcall == learnLength_-1)
+   {
+   //~ std::cout << "----- END LEARNING ------" << std::endl;
+
+
+      // fixes the number of var cided for the next exploitation phases
+      numVarCID_ = (int)(std::ceil((double)sumGood_ / learnLength_));
+
+//~ std::cout << "numVarCID_ = " << numVarCID_ << std::endl;
+
+
+
+      sumGood_ = 0;
+
+
+      LOG_LOW("end of learning, nummVarCID <- " << numVarCID_);
+   }
+
+   delete[] ctcGains;
+   ++nbCalls_;
 
    LOG_INTER(" -> " << proof << ", " << B);
    LOG_INTER("End of ACID");
@@ -195,19 +226,16 @@ Proof ContractorACID::contract(IntervalBox& B)
    return proof;
 }
 
-
-
-
 void ContractorACID::print(std::ostream& os) const
 {
    os << "ACID contractor";
 }
 
-
-int ContractorACID::lastSignificantGain(std::vector<double>& ctcGains,
-                                  double ctRatio)
+int ContractorACID::lastSignificantGain(double* ctcGains,
+                                        double ctRatio,
+                                        int imax)
 {
-   int i = ctcGains.size()-1;
+   int i = imax;
 
    while ((i>=0) && (ctcGains[i]<=ctRatio))
       --i;
@@ -215,18 +243,22 @@ int ContractorACID::lastSignificantGain(std::vector<double>& ctcGains,
    return i+1;
 }
 
-size_t ContractorACID::avgNbVarCID(std::vector<size_t>& v)
-{   
-   double s = 0;
-   for (const size_t& n : v)
-      s += n;
+double ContractorACID::gainRatio(const IntervalBox& prev,
+                                 const IntervalBox& next,
+                                 const Scope& scop)
+{
+   double s = 0.0;
 
-   double a = s / v.size(),
-          f = std::floor(a),
-          d = a - f,
-          res = (d <= 0.5) ? f : f+1;
+   for (const auto& v : scop)
+   {
+      Interval x = next.get(v),
+               y = prev.get(v);
 
-   return (int)res;
+      if (!x.isInf() && !y.isSingleton())
+         s += (1.0 - x.width() / y.width());
+   }
+
+   return s / scop.size();
 }
 
 } // namespace
