@@ -251,12 +251,10 @@ bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
 {
    // AC1 propagation algorithm
    bool modified;
-   int nbsteps = Param::GetIntParam("PROPAGATION_ITER_LIMIT");
 
    do
    {
       modified = false;
-      --nbsteps;
       DomainBox save(box);
 
       for (size_t i=0; i<problem.nbCtrs(); ++i)
@@ -272,7 +270,7 @@ bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
 
       if (!save.equals(box)) modified = true;
    }
-   while (modified && nbsteps>0);
+   while (modified);
 
    return true;
 }
