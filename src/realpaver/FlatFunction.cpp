@@ -74,8 +74,8 @@ FlatFunction::FlatFunction(const Term& t, const Interval& img)
    capa_ = t.nbNodes();
    symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
-   itv_ = new Interval[capa_];
-   dv_ = new Interval[capa_];
+   ival_ = new Interval[capa_];
+   idv_ = new Interval[capa_];
    nb_ = 0;
 
    FlatFunTermCreator creator(this);
@@ -91,8 +91,8 @@ FlatFunction::FlatFunction(const DagFun* f)
    capa_ = 8;
    symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
-   itv_ = new Interval[capa_];
-   dv_ = new Interval[capa_];
+   ival_ = new Interval[capa_];
+   idv_ = new Interval[capa_];
    nb_ = 0;
 
    FlatFunDagCreator creator(this);
@@ -113,8 +113,8 @@ FlatFunction::FlatFunction(const DagFun* f, const IntervalBox& B, Variable v)
    capa_ = 8;
    symb_ = new FlatSymbol[capa_];
    arg_ = new size_t*[capa_];
-   itv_ = new Interval[capa_];
-   dv_ = new Interval[capa_];
+   ival_ = new Interval[capa_];
+   idv_ = new Interval[capa_];
    nb_ = 0;
 
    FlatFunUniCreator creator(this, B, v);
@@ -149,8 +149,8 @@ void FlatFunction::extendCapacity()
                arg2[i][j] = arg_[i][j];
          }
          
-         itv2[i] = itv_[i];
-         dv2[i] = dv_[i];
+         itv2[i] = ival_[i];
+         dv2[i] = idv_[i];
       }
 
       // deallocation
@@ -159,16 +159,16 @@ void FlatFunction::extendCapacity()
       // copy of pointers
       symb_ = symb2;
       arg_ = arg2;
-      itv_ = itv2;
-      dv_ = dv2;
+      ival_ = itv2;
+      idv_ = dv2;
    }
 }
 
 void FlatFunction::destroy()
 {
    delete[] symb_;
-   delete[] itv_;
-   delete[] dv_;
+   delete[] ival_;
+   delete[] idv_;
 
    for (size_t i=0; i<nb_; ++i)
       if (arg_[i] != nullptr)
@@ -312,7 +312,7 @@ bool FlatFunction::dependsOn(const Variable& v) const
 
 Interval FlatFunction::ival() const
 {
-   return itv_[nb_-1];;
+   return ival_[nb_-1];;
 }
 
 
@@ -323,104 +323,104 @@ Interval FlatFunction::iEval(const IntervalVector& V)
       switch(symb_[i])
       {
          case FlatSymbol::Cst:
-            itv_[i] = cst_[arg_[i][1]];
+            ival_[i] = cst_[arg_[i][1]];
             break;
 
          case FlatSymbol::Var:
-            itv_[i] = V[arg_[i][1]];
+            ival_[i] = V[arg_[i][1]];
             break;
 
          case FlatSymbol::Add:
          case FlatSymbol::AddL:
          case FlatSymbol::AddR:
-            itv_[i] = itv_[arg_[i][1]] + itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] + ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Sub:
          case FlatSymbol::SubL:
          case FlatSymbol::SubR:
-            itv_[i] = itv_[arg_[i][1]] - itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] - ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Mul:
          case FlatSymbol::MulL:
          case FlatSymbol::MulR:
-            itv_[i] = itv_[arg_[i][1]] * itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] * ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Div:
          case FlatSymbol::DivL:
          case FlatSymbol::DivR:
-            itv_[i] = itv_[arg_[i][1]] / itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] / ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Min:
-            itv_[i] = min(itv_[arg_[i][1]], itv_[arg_[i][2]]);
+            ival_[i] = min(ival_[arg_[i][1]], ival_[arg_[i][2]]);
             break;
 
          case FlatSymbol::Max:
-            itv_[i] = max(itv_[arg_[i][1]], itv_[arg_[i][2]]);
+            ival_[i] = max(ival_[arg_[i][1]], ival_[arg_[i][2]]);
             break;
 
          case FlatSymbol::Usb:
-            itv_[i] = -itv_[arg_[i][1]];
+            ival_[i] = -ival_[arg_[i][1]];
             break;
 
          case FlatSymbol::Abs:
-            itv_[i] = abs(itv_[arg_[i][1]]);
+            ival_[i] = abs(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sgn:
-            itv_[i] = sgn(itv_[arg_[i][1]]);
+            ival_[i] = sgn(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sqr:
-            itv_[i] = sqr(itv_[arg_[i][1]]);
+            ival_[i] = sqr(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sqrt:
-            itv_[i] = sqrt(itv_[arg_[i][1]]);
+            ival_[i] = sqrt(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Pow:
-            itv_[i] = pow(itv_[arg_[i][1]], arg_[i][2]);
+            ival_[i] = pow(ival_[arg_[i][1]], arg_[i][2]);
             break;
 
          case FlatSymbol::Exp:
-            itv_[i] = exp(itv_[arg_[i][1]]);
+            ival_[i] = exp(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Log:
-            itv_[i] = log(itv_[arg_[i][1]]);
+            ival_[i] = log(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Cos:
-            itv_[i] = cos(itv_[arg_[i][1]]);
+            ival_[i] = cos(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sin:
-            itv_[i] = sin(itv_[arg_[i][1]]);
+            ival_[i] = sin(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Tan:
-            itv_[i] = tan(itv_[arg_[i][1]]);
+            ival_[i] = tan(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Cosh:
-            itv_[i] = cosh(itv_[arg_[i][1]]);
+            ival_[i] = cosh(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sinh:
-            itv_[i] = sinh(itv_[arg_[i][1]]);
+            ival_[i] = sinh(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Tanh:
-            itv_[i] = tanh(itv_[arg_[i][1]]);
+            ival_[i] = tanh(ival_[arg_[i][1]]);
             break;
       }
    }
 
-   return itv_[nb_-1];
+   return ival_[nb_-1];
 }
 
 Interval FlatFunction::iEval(const IntervalBox& B)
@@ -435,104 +435,104 @@ Interval FlatFunction::iEval(const IntervalBox& B)
       switch(symb_[i])
       {
          case FlatSymbol::Cst:
-            itv_[i] = cst_[arg_[i][1]];
+            ival_[i] = cst_[arg_[i][1]];
             break;
 
          case FlatSymbol::Var:
-            itv_[i] = B.get(var_[arg_[i][2]]);
+            ival_[i] = B.get(var_[arg_[i][2]]);
             break;
 
          case FlatSymbol::Add:
          case FlatSymbol::AddL:
          case FlatSymbol::AddR:
-            itv_[i] = itv_[arg_[i][1]] + itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] + ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Sub:
          case FlatSymbol::SubL:
          case FlatSymbol::SubR:
-            itv_[i] = itv_[arg_[i][1]] - itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] - ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Mul:
          case FlatSymbol::MulL:
          case FlatSymbol::MulR:
-            itv_[i] = itv_[arg_[i][1]] * itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] * ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Div:
          case FlatSymbol::DivL:
          case FlatSymbol::DivR:
-            itv_[i] = itv_[arg_[i][1]] / itv_[arg_[i][2]];
+            ival_[i] = ival_[arg_[i][1]] / ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Min:
-            itv_[i] = min(itv_[arg_[i][1]], itv_[arg_[i][2]]);
+            ival_[i] = min(ival_[arg_[i][1]], ival_[arg_[i][2]]);
             break;
 
          case FlatSymbol::Max:
-            itv_[i] = max(itv_[arg_[i][1]], itv_[arg_[i][2]]);
+            ival_[i] = max(ival_[arg_[i][1]], ival_[arg_[i][2]]);
             break;
 
          case FlatSymbol::Usb:
-            itv_[i] = -itv_[arg_[i][1]];
+            ival_[i] = -ival_[arg_[i][1]];
             break;
 
          case FlatSymbol::Abs:
-            itv_[i] = abs(itv_[arg_[i][1]]);
+            ival_[i] = abs(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sgn:
-            itv_[i] = sgn(itv_[arg_[i][1]]);
+            ival_[i] = sgn(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sqr:
-            itv_[i] = sqr(itv_[arg_[i][1]]);
+            ival_[i] = sqr(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sqrt:
-            itv_[i] = sqrt(itv_[arg_[i][1]]);
+            ival_[i] = sqrt(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Pow:
-            itv_[i] = pow(itv_[arg_[i][1]], arg_[i][2]);
+            ival_[i] = pow(ival_[arg_[i][1]], arg_[i][2]);
             break;
 
          case FlatSymbol::Exp:
-            itv_[i] = exp(itv_[arg_[i][1]]);
+            ival_[i] = exp(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Log:
-            itv_[i] = log(itv_[arg_[i][1]]);
+            ival_[i] = log(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Cos:
-            itv_[i] = cos(itv_[arg_[i][1]]);
+            ival_[i] = cos(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sin:
-            itv_[i] = sin(itv_[arg_[i][1]]);
+            ival_[i] = sin(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Tan:
-            itv_[i] = tan(itv_[arg_[i][1]]);
+            ival_[i] = tan(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Cosh:
-            itv_[i] = cosh(itv_[arg_[i][1]]);
+            ival_[i] = cosh(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sinh:
-            itv_[i] = sinh(itv_[arg_[i][1]]);
+            ival_[i] = sinh(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Tanh:
-            itv_[i] = tanh(itv_[arg_[i][1]]);
+            ival_[i] = tanh(ival_[arg_[i][1]]);
             break;
       }
    }
 
-   return itv_[nb_-1];
+   return ival_[nb_-1];
 }
 
 Proof FlatFunction::hc4Revise(IntervalBox& B)
@@ -548,7 +548,7 @@ Proof FlatFunction::hc4Revise(IntervalBox& B)
       if (img_.contains(e))
          return Proof::Inner;
 
-      itv_[nb_-1] &= img_;
+      ival_[nb_-1] &= img_;
       return hc4ReviseBackward(V);
    }
    else
@@ -561,7 +561,7 @@ Proof FlatFunction::hc4Revise(IntervalBox& B)
       if (img_.contains(e))
          return Proof::Inner;
 
-      itv_[nb_-1] &= img_;
+      ival_[nb_-1] &= img_;
       return hc4ReviseBackward(B);
    }
 }
@@ -587,14 +587,14 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox& B)
       else if (img_.isInfLeft())
       {
          // projection over the root node
-         itv_[nb_-1] = e & Interval::moreThan(img_.right());
+         ival_[nb_-1] = e & Interval::moreThan(img_.right());
          return hc4ReviseBackward(B);
       }
 
       else if (img_.isInfRight())
       {
          // projection over the root node
-         itv_[nb_-1] = e & Interval::lessThan(img_.left());
+         ival_[nb_-1] = e & Interval::lessThan(img_.left());
          return hc4ReviseBackward(B);
       }
 
@@ -606,20 +606,20 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox& B)
          // copies the interval values
          Interval* aux = new Interval[nb_];
          for (size_t i=0; i<nb_; ++i)
-            aux[i] = itv_[i];
+            aux[i] = ival_[i];
 
          // contracts the first part
          IntervalBox Xl(B, scop_);
-         itv_[nb_-1] = e & Interval::lessThan(img_.left());
+         ival_[nb_-1] = e & Interval::lessThan(img_.left());
          Proof pl = hc4ReviseBackward(Xl);
 
          // restores the interval values
          for (size_t i=0; i<nb_; ++i)
-            itv_[i] = aux[i];
+            ival_[i] = aux[i];
 
          // contracts the second part
          IntervalBox Xr(B, scop_);   
-         itv_[nb_-1] = e & Interval::moreThan(img_.right());
+         ival_[nb_-1] = e & Interval::moreThan(img_.right());
          Proof pr = hc4ReviseBackward(Xr);
 
          // deallocates the memory
@@ -671,128 +671,128 @@ Proof FlatFunction::hc4ReviseBackward(IntervalBox& B)
 
          case FlatSymbol::Var:
             {
-               Interval x = B.get(var_[arg_[i][2]]) & itv_[i];
+               Interval x = B.get(var_[arg_[i][2]]) & ival_[i];
                B.set(var_[arg_[i][2]], x);
                if (x.isEmpty()) return Proof::Empty;
             }
             break;
 
          case FlatSymbol::Add:
-            itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = addPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = addPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::AddL:
-            itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = addPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::AddR:
-            itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = addPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Sub:
-            itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = subPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = subPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::SubL:
-            itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = subPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::SubR:
-            itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = subPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Mul:
-            itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = mulPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = mulPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::MulL:
-            itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = mulPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::MulR:
-            itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = mulPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Div:
-            itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = divPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = divPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::DivL:
-            itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = divPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::DivR:
-            itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = divPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Min:
-            itv_[arg_[i][1]] = minPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = minPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = minPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = minPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Max:
-            itv_[arg_[i][1]] = maxPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = maxPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = maxPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = maxPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Usb:
-            itv_[arg_[i][1]] = usubPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = usubPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Abs:
-            itv_[arg_[i][1]] = absPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = absPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sgn:
-            itv_[arg_[i][1]] = sgnPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sgnPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sqr:
-            itv_[arg_[i][1]] = sqrPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sqrPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sqrt:
-            itv_[arg_[i][1]] = sqrtPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sqrtPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Pow:
-            itv_[arg_[i][1]] = powPX(itv_[arg_[i][1]], arg_[i][2], itv_[i]);
+            ival_[arg_[i][1]] = powPX(ival_[arg_[i][1]], arg_[i][2], ival_[i]);
             break;
 
          case FlatSymbol::Exp:
-            itv_[arg_[i][1]] = expPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = expPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Log:
-            itv_[arg_[i][1]] = logPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = logPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Cos:
-            itv_[arg_[i][1]] = cosPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = cosPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sin:
-            itv_[arg_[i][1]] = sinPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sinPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Tan:
-            itv_[arg_[i][1]] = tanPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = tanPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Cosh:
-            itv_[arg_[i][1]] = coshPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = coshPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sinh:
-            itv_[arg_[i][1]] = sinhPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sinhPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Tanh:
-            itv_[arg_[i][1]] = tanhPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = tanhPX(ival_[arg_[i][1]], ival_[i]);
             break;
       }
    }
@@ -811,126 +811,126 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector& V)
             break;
 
          case FlatSymbol::Var:
-            V[arg_[i][1]] &= itv_[i];
+            V[arg_[i][1]] &= ival_[i];
             if (V[arg_[i][1]].isEmpty()) return Proof::Empty;
             break;
 
          case FlatSymbol::Add:
-            itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = addPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = addPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::AddL:
-            itv_[arg_[i][2]] = addPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = addPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::AddR:
-            itv_[arg_[i][1]] = addPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = addPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Sub:
-            itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = subPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = subPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::SubL:
-            itv_[arg_[i][2]] = subPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = subPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::SubR:
-            itv_[arg_[i][1]] = subPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = subPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Mul:
-            itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = mulPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = mulPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::MulL:
-            itv_[arg_[i][2]] = mulPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = mulPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::MulR:
-            itv_[arg_[i][1]] = mulPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = mulPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Div:
-            itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = divPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = divPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::DivL:
-            itv_[arg_[i][2]] = divPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][2]] = divPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::DivR:
-            itv_[arg_[i][1]] = divPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = divPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Min:
-            itv_[arg_[i][1]] = minPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = minPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = minPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = minPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Max:
-            itv_[arg_[i][1]] = maxPX(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
-            itv_[arg_[i][2]] = maxPY(itv_[arg_[i][1]], itv_[arg_[i][2]], itv_[i]);
+            ival_[arg_[i][1]] = maxPX(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
+            ival_[arg_[i][2]] = maxPY(ival_[arg_[i][1]], ival_[arg_[i][2]], ival_[i]);
             break;
 
          case FlatSymbol::Usb:
-            itv_[arg_[i][1]] = usubPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = usubPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Abs:
-            itv_[arg_[i][1]] = absPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = absPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sgn:
-            itv_[arg_[i][1]] = sgnPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sgnPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sqr:
-            itv_[arg_[i][1]] = sqrPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sqrPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sqrt:
-            itv_[arg_[i][1]] = sqrtPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sqrtPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Pow:
-            itv_[arg_[i][1]] = powPX(itv_[arg_[i][1]], arg_[i][2], itv_[i]);
+            ival_[arg_[i][1]] = powPX(ival_[arg_[i][1]], arg_[i][2], ival_[i]);
             break;
 
          case FlatSymbol::Exp:
-            itv_[arg_[i][1]] = expPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = expPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Log:
-            itv_[arg_[i][1]] = logPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = logPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Cos:
-            itv_[arg_[i][1]] = cosPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = cosPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sin:
-            itv_[arg_[i][1]] = sinPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sinPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Tan:
-            itv_[arg_[i][1]] = tanPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = tanPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Cosh:
-            itv_[arg_[i][1]] = coshPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = coshPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Sinh:
-            itv_[arg_[i][1]] = sinhPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = sinhPX(ival_[arg_[i][1]], ival_[i]);
             break;
 
          case FlatSymbol::Tanh:
-            itv_[arg_[i][1]] = tanhPX(itv_[arg_[i][1]], itv_[i]);
+            ival_[arg_[i][1]] = tanhPX(ival_[arg_[i][1]], ival_[i]);
             break;
       }
    }
@@ -961,13 +961,13 @@ void FlatFunction::iDiff(const IntervalBox& B, IntervalVector& G)
 
    for (size_t i=0; i<nb_; ++i)      
       if (symb_[i] == FlatSymbol::Var)
-         G[arg_[i][3]] += dv_[i];
+         G[arg_[i][3]] += idv_[i];
 }
 
 void FlatFunction::iDiff()
 {
    // derivative with respect to the root node
-   dv_[nb_-1] = Interval::one();
+   idv_[nb_-1] = Interval::one();
 
    // differentiates the other nodes from the root to the leaves
    for (int i=(int)nb_-1; i>= 0; --i)
@@ -980,194 +980,194 @@ void FlatFunction::iDiff()
 
          case FlatSymbol::Add:
             // d(l+r)/dl = 1, d(l+r)/dr = 1
-            dv_[arg_[i][1]] = dv_[i];
-            dv_[arg_[i][2]] = dv_[i];
+            idv_[arg_[i][1]] = idv_[i];
+            idv_[arg_[i][2]] = idv_[i];
             break;
 
          case FlatSymbol::AddL:
             // d(l+r)/dr = 1
-            dv_[arg_[i][2]] = dv_[i];
+            idv_[arg_[i][2]] = idv_[i];
             break;
 
          case FlatSymbol::AddR:
             // d(l+r)/dl = 1
-            dv_[arg_[i][1]] = dv_[i];
+            idv_[arg_[i][1]] = idv_[i];
             break;
 
          case FlatSymbol::Sub:
             // d(l-r)/dl = 1, d(l-r)/dr = -1
-            dv_[arg_[i][1]] = dv_[i];
-            dv_[arg_[i][2]] = -dv_[i];
+            idv_[arg_[i][1]] = idv_[i];
+            idv_[arg_[i][2]] = -idv_[i];
             break;
 
          case FlatSymbol::SubL:
             // d(l-r)/dr = -1
-            dv_[arg_[i][2]] = -dv_[i];
+            idv_[arg_[i][2]] = -idv_[i];
             break;
 
          case FlatSymbol::SubR:
             // d(l-r)/dl = 1
-            dv_[arg_[i][1]] = dv_[i];
+            idv_[arg_[i][1]] = idv_[i];
             break;
 
          case FlatSymbol::Mul:
             // d(l*r)/dl = r, d(l*r)/dr = l
-            dv_[arg_[i][1]] = itv_[arg_[i][2]]*dv_[i];
-            dv_[arg_[i][2]] = itv_[arg_[i][1]]*dv_[i];
+            idv_[arg_[i][1]] = ival_[arg_[i][2]]*idv_[i];
+            idv_[arg_[i][2]] = ival_[arg_[i][1]]*idv_[i];
             break;
 
          case FlatSymbol::MulL:
             // d(l*r)/dr = l
-            dv_[arg_[i][2]] = itv_[arg_[i][1]]*dv_[i];
+            idv_[arg_[i][2]] = ival_[arg_[i][1]]*idv_[i];
             break;
 
          case FlatSymbol::MulR:
             // d(l*r)/dl = r
-            dv_[arg_[i][1]] = itv_[arg_[i][2]]*dv_[i];
+            idv_[arg_[i][1]] = ival_[arg_[i][2]]*idv_[i];
             break;
 
          case FlatSymbol::Div:
             // d(l/r)/dl = 1/r, d(l/r)/dr = -l/r^2
-            dv_[arg_[i][1]] = dv_[i]/itv_[arg_[i][2]];
-            dv_[arg_[i][2]] = (-dv_[i]*itv_[arg_[i][1]])/sqr(itv_[arg_[i][2]]);
+            idv_[arg_[i][1]] = idv_[i]/ival_[arg_[i][2]];
+            idv_[arg_[i][2]] = (-idv_[i]*ival_[arg_[i][1]])/sqr(ival_[arg_[i][2]]);
             break;
 
          case FlatSymbol::DivL:
             // d(l/r)/dr = -l/r^2
-            dv_[arg_[i][2]] = (-dv_[i]*itv_[arg_[i][1]])/sqr(itv_[arg_[i][2]]);
+            idv_[arg_[i][2]] = (-idv_[i]*ival_[arg_[i][1]])/sqr(ival_[arg_[i][2]]);
             break;
 
          case FlatSymbol::DivR:
             // d(l/r)/dl = 1/r
-            dv_[arg_[i][1]] = dv_[i]/itv_[arg_[i][2]];
+            idv_[arg_[i][1]] = idv_[i]/ival_[arg_[i][2]];
             break;
 
          case FlatSymbol::Min:
-            if (itv_[arg_[i][1]].isCertainlyLt(itv_[arg_[i][2]]))
+            if (ival_[arg_[i][1]].isCertainlyLt(ival_[arg_[i][2]]))
             {
                // d(min(l,r))/dl = 1, d(min(l,r))/dr = 0 if l < r
-               dv_[arg_[i][1]] = dv_[i];
-               dv_[arg_[i][2]] = Interval::zero();
+               idv_[arg_[i][1]] = idv_[i];
+               idv_[arg_[i][2]] = Interval::zero();
             }
-            else if (itv_[arg_[i][2]].isCertainlyLt(itv_[arg_[i][1]]))
+            else if (ival_[arg_[i][2]].isCertainlyLt(ival_[arg_[i][1]]))
             {
                // d(min(l,r))/dl = 0, d(min(l,r))/dr = 1 if r < l
-               dv_[arg_[i][1]] = Interval::zero();
-               dv_[arg_[i][2]] = dv_[i];
+               idv_[arg_[i][1]] = Interval::zero();
+               idv_[arg_[i][2]] = idv_[i];
             }
             else
             {
                // d(min(l,r))/dl = d(min(l,r))/dr = [0,1] otherwise
-               Interval x = Interval(0.0, 1.0)*dv_[i];
-               dv_[arg_[i][1]] = x;
-               dv_[arg_[i][2]] = x;
+               Interval x = Interval(0.0, 1.0)*idv_[i];
+               idv_[arg_[i][1]] = x;
+               idv_[arg_[i][2]] = x;
             }
             break;
 
          case FlatSymbol::Max:
-            if (itv_[arg_[i][1]].isCertainlyGt(itv_[arg_[i][2]]))
+            if (ival_[arg_[i][1]].isCertainlyGt(ival_[arg_[i][2]]))
             {
                // d(max(l,r))/dl = 1 and d(max(l,r))/dr = 0 if l > r
-               dv_[arg_[i][1]] = dv_[i];
-               dv_[arg_[i][2]] = Interval::zero();
+               idv_[arg_[i][1]] = idv_[i];
+               idv_[arg_[i][2]] = Interval::zero();
             }
-            else if (itv_[arg_[i][2]].isCertainlyGt(itv_[arg_[i][1]]))
+            else if (ival_[arg_[i][2]].isCertainlyGt(ival_[arg_[i][1]]))
             {
                // d(max(l,r))/dl = 0 and d(max(l,r))/dr = 1 if r > l
-               dv_[arg_[i][1]] = Interval::zero();
-               dv_[arg_[i][2]] = dv_[i];
+               idv_[arg_[i][1]] = Interval::zero();
+               idv_[arg_[i][2]] = idv_[i];
             }
             else
             {
                // d(max(l,r))/dl = d(max(l,r))/dr = [0,1] otherwise
-               Interval x = Interval(0.0, 1.0)*dv_[i];
-               dv_[arg_[i][1]] = x;
-               dv_[arg_[i][2]] = x;
+               Interval x = Interval(0.0, 1.0)*idv_[i];
+               idv_[arg_[i][1]] = x;
+               idv_[arg_[i][2]] = x;
             }
             break;
    
          case FlatSymbol::Usb:
             // d(-u)/du = -1
-            dv_[arg_[i][1]] = -dv_[i];
+            idv_[arg_[i][1]] = -idv_[i];
             break;
 
          case FlatSymbol::Abs:
             // d(abs(u))/du = 1 if u>0, -1 if u<0, [-1,1] otherwise
-            if (itv_[arg_[i][1]].isCertainlyGtZero())
+            if (ival_[arg_[i][1]].isCertainlyGtZero())
             {
-               dv_[arg_[i][1]] = dv_[i];
+               idv_[arg_[i][1]] = idv_[i];
             }
-            else if (itv_[arg_[i][1]].isCertainlyLtZero())
+            else if (ival_[arg_[i][1]].isCertainlyLtZero())
             {
-               dv_[arg_[i][1]] = -dv_[i];
+               idv_[arg_[i][1]] = -idv_[i];
             }
             else
             {
-               dv_[arg_[i][1]] = dv_[i] | (-dv_[i]);
+               idv_[arg_[i][1]] = idv_[i] | (-idv_[i]);
             }
             break;
 
          case FlatSymbol::Sgn:
             // d(sgn(u))/du = 0 except at 0
-            dv_[arg_[i][1]] = Interval::zero();
+            idv_[arg_[i][1]] = Interval::zero();
             break;
 
          case FlatSymbol::Sqr:
             // d(u^2)/du = 2u
-            dv_[arg_[i][1]] = 2.0*itv_[arg_[i][1]]*dv_[i];   
+            idv_[arg_[i][1]] = 2.0*ival_[arg_[i][1]]*idv_[i];   
             break;
 
          case FlatSymbol::Sqrt:
             // d(sqrt(u))/du = 0.5/sqrt(u)
-            dv_[arg_[i][1]] = 0.5*dv_[i]*itv_[i];
+            idv_[arg_[i][1]] = 0.5*idv_[i]*ival_[i];
             break;
 
          case FlatSymbol::Pow:
          {
             // d(u^n)/du = n * u^(n-1)
             int e = (int)arg_[i][2];
-            dv_[arg_[i][1]] = Interval(e)*dv_[i]*pow(itv_[arg_[i][1]], e-1);
+            idv_[arg_[i][1]] = Interval(e)*idv_[i]*pow(ival_[arg_[i][1]], e-1);
          }
             break;
 
          case FlatSymbol::Exp:
             // d(exp(u))/du = exp(u)
-            dv_[arg_[i][1]] = dv_[i]*itv_[i];
+            idv_[arg_[i][1]] = idv_[i]*ival_[i];
             break;
 
          case FlatSymbol::Log:
             // d(log(u))/du = 1/u
-            dv_[arg_[i][1]] = dv_[i] / itv_[arg_[i][1]];
+            idv_[arg_[i][1]] = idv_[i] / ival_[arg_[i][1]];
             break;
 
          case FlatSymbol::Cos:
             // d(cos(u))/du = -sin(u)
-            dv_[arg_[i][1]] = -dv_[i]*sin(itv_[arg_[i][1]]);
+            idv_[arg_[i][1]] = -idv_[i]*sin(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sin:
             // d(sin(u))/du = cos(u)
-            dv_[arg_[i][1]] = dv_[i]*cos(itv_[arg_[i][1]]);
+            idv_[arg_[i][1]] = idv_[i]*cos(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Tan:
             // d(tan(u))/du = 1+tan^2(u)
-            dv_[arg_[i][1]] = dv_[i]*(1.0+sqr(itv_[i]));
+            idv_[arg_[i][1]] = idv_[i]*(1.0+sqr(ival_[i]));
             break;
 
          case FlatSymbol::Cosh:
             // d(cosh(u))/du = sinh(u)
-            dv_[arg_[i][1]] = dv_[i]*sinh(itv_[arg_[i][1]]);
+            idv_[arg_[i][1]] = idv_[i]*sinh(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Sinh:
             // d(sinh(u))/du = cosh(u)
-            dv_[arg_[i][1]] = dv_[i]*cosh(itv_[arg_[i][1]]);
+            idv_[arg_[i][1]] = idv_[i]*cosh(ival_[arg_[i][1]]);
             break;
 
          case FlatSymbol::Tanh:
             // d(tanh(u))/du = 1-tanh^2(u)
-            dv_[arg_[i][1]] = dv_[i]*(1.0-sqr(itv_[i]));
+            idv_[arg_[i][1]] = idv_[i]*(1.0-sqr(ival_[i]));
             break;
       }
    }

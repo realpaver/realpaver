@@ -84,7 +84,7 @@ std::ostream& operator<<(std::ostream& os, FlatSymbol op);
  * - Array symb_: Var Var Sqr Sub Cst AddR
  * - Constants cst_ : [1, 1] (one constant node)
  * - Variables var_ : x, y (two variable nodes)
- * - Values itv_ : array of nb_ intervals, one per node
+ * - Values ival_ : array of nb_ intervals, one per node
  * - arg_[0] : 3 28 0 (node x, 3 is the size of arg_[0], 28 is the id of x
  *             and 0 is the index of the variable in var_)
  * - arg_[1] : 3 43 1 (node y)
@@ -186,8 +186,8 @@ private:
 
    size_t** arg_;       // arguments representing the indexes of the child nodes
 
-   Interval* itv_;      // used for evaluation and projection
-   Interval* dv_;       // used for differentiation
+   Interval* ival_;     // used for interval evaluation and projection
+   Interval* idv_;      // used for interval differentiation
 
    std::vector<Interval> cst_;   // list of constants
    std::vector<Variable> var_;   // list of variables (with multi-occurrences)
