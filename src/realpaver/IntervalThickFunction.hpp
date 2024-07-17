@@ -22,6 +22,7 @@
 #define REALPAVER_INTERVAL_THICK_FUNCTION_HPP
 
 #include "realpaver/Dag.hpp"
+#include "realpaver/FlatFunction.hpp"
 #include "realpaver/IntervalFunctionUni.hpp"
 
 namespace realpaver {
@@ -52,23 +53,22 @@ public:
    /// No assignment
    IntervalThickFunction& operator=(const IntervalThickFunction&) = delete;
 
-   /// Default destructor
-   ~IntervalThickFunction() = default;
+   /// Destructor
+   ~IntervalThickFunction();
+
+   /**
+    * @brief Creates the univariate function.
+    * 
+    * A flat function is created such that the sub-terms that do not depend on
+    * the variable enclosed in this are evaluated once.
+    */
+   void update(const IntervalBox& B);
 
    /// Returns the evaluation of this on x
    Interval eval(const Interval& x) override;
 
    /// Returns the derivative of this on x
    Interval diff(const Interval& x) override;
-
-   /**
-    * @brief Updates the associated function in the DAG.
-    * 
-    * Returns the evaluation of this on B. The sub-terms that do not depend on
-    * the variable enclosed in this are evaluated once and their values will be
-    * used by the next calls of eval() and diff().
-    */
-   Interval update(const IntervalBox& B);
 
    /// Returns the variable enclosed in this
    Variable getVar() const;
@@ -77,9 +77,11 @@ public:
    DagFun* getFun() const;
 
 private:
-   SharedDag dag_;   // dag
-   DagFun* f_;       // function in the dag
-   Variable v_;      // variable index
+   DagFun* f_;             // function in the dag
+   Variable v_;            // variable of this univariate function
+   FlatFunction* flat_;    // flat function
+   IntervalBox B_;         // auxiliary box used to evaluate the function
+   IntervalVector G_;      // auxiliary gradient vector
 };
 
 } // namespace

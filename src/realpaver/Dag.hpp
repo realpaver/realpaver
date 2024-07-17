@@ -139,21 +139,6 @@ public:
    /// Returns true if v belongs to the tree rooted by this
    bool dependsOn(const Variable& v) const;
 
-   /// Returns true if this depends onthe interval value
-   Interval val() const;
-
-   /// Assigns the interval value
-   void setVal(const Interval& x);
-
-   /// Returns the interval derivative
-   Interval dv() const;
-
-   /// Assigns the interval derivative
-   void setDv(const Interval& x);
-
-   /// Adds an interval derivative
-   void addDv(const Interval& x);
-
    /// Returnsthe real value
    double rval() const;
 
@@ -178,35 +163,24 @@ public:
    /// Output on a stream
    virtual void print(std::ostream& os) const = 0;
 
-   /// Interval evaluation of this on B
-   virtual void eval(const IntervalBox& B) = 0;
+   /// @name Interval evaluation
+   ///@{
+
+   /// Returns the interval value
+   Interval ival() const;
+
+   /// Assigns the interval value
+   void setIval(const Interval& x);
+
+   /// Interval evaluation of this node on B
+   virtual void iEvalNode(const IntervalBox& B) = 0;
+
+   /// Interval evaluation of the tree rooted by this on B
+   virtual void iEvalTree(const IntervalBox& B) = 0;
 
    /// Interval evaluation of this on pt
    virtual void eval(const RealPoint& pt) = 0;
-
-   /**
-    * @brief Restricted interval evaluation.
-    *
-    * This is evaluated only if it depends on v and the result is assigned
-    * in the interval value enclosed in this.
-    */
-   virtual void evalOnly(const Variable& v, const Interval& x) = 0;
-
-   /**
-    * @brief Interval differentiation in reverse mode.
-    * 
-    * Returns false if some operation at this node is not continuous.
-    * It assumes that an interval evaluation has been done.
-    */
-   virtual bool diff() = 0;
-
-   /**
-    * @brief Restricted interval differentiation in reverse mode.
-    *
-    * This is differentiated only if it depends on v.
-    * It assumes that an interval evaluation has been done.
-    */
-   virtual bool diffOnly(const Variable& v) = 0;
+   ///@}
 
    /**
     * @brief Real (point) evaluation on pt.
@@ -228,12 +202,11 @@ protected:
 
 private:
    Dag* dag_;        // the DAG
-   DagSymbol symb_; // symbol
+   DagSymbol symb_;  // symbol
    size_t index_;    // index of this node in the DAG
    IndexList vpar_;  // list of indexes of parent nodes in the DAG
    IndexList vsub_;  // list of indexes of sub-nodes in the DAG
-   Interval val_;    // result of an interval evaluation
-   Interval dv_;     // interval derivative
+   Interval ival_;   // result of an interval evaluation
    double rval_;     // result of a point evaluation
    double rdv_;      // point derivative
 };
@@ -253,11 +226,10 @@ public:
 
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval(const IntervalBox& B) override;
+   void iEvalNode(const IntervalBox& B) override;
+   void iEvalTree(const IntervalBox& B) override;
+
    void eval(const RealPoint& pt) override;
-   void evalOnly(const Variable& v, const Interval& x) override;
-   bool diff() override;
-   bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
    bool rdiff() override;
 
@@ -287,11 +259,10 @@ public:
    size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval(const IntervalBox& B) override;
+   void iEvalNode(const IntervalBox& B) override;
+   void iEvalTree(const IntervalBox& B) override;
+
    void eval(const RealPoint& pt) override;
-   void evalOnly(const Variable& v, const Interval& x) override;
-   bool diff() override;
-   bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
    bool rdiff() override;
 
@@ -329,17 +300,17 @@ public:
    virtual bool eqSymbol(const DagOp* other) const;
 
    /// Interval evaluation using the interval values of the children nodes
-   virtual void eval() = 0;
+   virtual void iEvalNode() = 0;
 
    /// Real evaluation using the real values of the children nodes
    virtual void reval() = 0;
 
    virtual size_t nbOccurrences(const Variable& v) const override;
    virtual void print(std::ostream& os) const override;
-   void eval(const IntervalBox& B) override;
+   void iEvalNode(const IntervalBox& B) override;
+   void iEvalTree(const IntervalBox& B) override;
+
    void eval(const RealPoint& pt) override;
-   void evalOnly(const Variable& v, const Interval& x) override;
-   bool diffOnly(const Variable& v) override;
    void reval(const RealPoint& pt) override;
 };
 
@@ -356,8 +327,7 @@ public:
    DagAdd(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -375,8 +345,7 @@ public:
    DagSub(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -394,8 +363,7 @@ public:
    DagMul(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -413,8 +381,7 @@ public:
    DagDiv(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -432,8 +399,7 @@ public:
    DagMin(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -451,8 +417,7 @@ public:
    DagMax(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -470,8 +435,7 @@ public:
    DagUsb(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -489,8 +453,7 @@ public:
    DagAbs(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -508,8 +471,7 @@ public:
    DagSgn(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -527,8 +489,7 @@ public:
    DagSqr(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -546,8 +507,7 @@ public:
    DagSqrt(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -571,8 +531,7 @@ public:
    bool eqSymbol(const DagOp* other) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 
@@ -593,8 +552,7 @@ public:
    DagExp(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -612,8 +570,7 @@ public:
    DagLog(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -631,8 +588,7 @@ public:
    DagCos(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -650,8 +606,7 @@ public:
    DagSin(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -669,8 +624,7 @@ public:
    DagTan(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -688,8 +642,7 @@ public:
    DagCosh(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -707,8 +660,7 @@ public:
    DagSinh(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -726,8 +678,7 @@ public:
    DagTanh(Dag* dag, const IndexList& lsub);
 
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 };
@@ -749,8 +700,7 @@ public:
    size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   bool diff() override;
+   void iEvalNode() override;
    void reval() override;
    bool rdiff() override;
 
@@ -869,23 +819,6 @@ public:
    /// Returns the scope of this (set of variables)
    Scope scope() const;
 
-   /// Returns the interval evaluation of this on B
-   Interval intervalEval(const IntervalBox& B);
-
-  ///Returns the interval evaluation of this at pt
-   Interval intervalEval(const RealPoint& pt);
-
-   /// Returns the result of an interval evaluation
-   Interval intervalValue() const;
-
-   /**
-    * @brief Restricted interval evaluation.
-    * 
-    * Returns the interval evaluation of this such that only the nodes depending
-    * on v with domain x are evaluated.
-    */
-   Interval intervalEvalOnly(const Variable& v, const Interval& x);
-
    /**
     * @brief HC4Revise contractor.
     * 
@@ -901,71 +834,6 @@ public:
     * The projections of this onto its variables are assigned in B.
     */
    Proof hc4ReviseNeg(IntervalBox& B);
-
-   /**
-    * @brief Calculates the violation of the underlying constraint.
-    * 
-    * Returns
-    * - 0.0 if the constraint is satisfied,
-    * - a positive real number therwise equal to the width of the gap between
-    *   the image of the function and the result of its evaluation.
-    *
-    * It assumes that this function has been evaluated using intervalEval().
-    */
-   double intervalViolation();
-
-   /**
-    * @brief Calculates the violation of the underlying constraint.
-    * 
-    * Returns
-    * - 0.0 if the constraint is satisfied,
-    * - a positive real number therwise equal to the width of the gap between
-    *   the image of the function and the result of its evaluation.
-    *
-    *
-    * It assumes that this function has been evaluated using realEval().
-    */
-   double realViolation();
-
-   /**
-    * @brief Interval differentiation in reverse mode.
-    *
-    * It assumes that this function has been evaluated.
-    */
-   void intervalDiff();
-
-   /**
-    * @brief Interval differentiation in reverse mode.
-    * 
-    * The derivatives are assigned to the gradient vector grad.
-    *
-    * It assumes that this function has been evaluated.
-    */
-   void intervalDiff(IntervalVector& grad);
-
-   /**
-    * @brief Restricted interval differentiation in forward mode.
-    *
-    * Returns false if some operation at this node is not continuous.
-    * It assumes that this function has been evaluated.
-    * Only the nodes depending on the considered variable are differentiated.
-    */
-   bool intervalDiffOnly(const Variable& v);
-
-   /**
-    * @brief Restricted interval differentiation in forward mode.
-    *
-    * Returns false if some operation at this node is not continuous.
-    * It assumes that this function has been evaluated.
-    * Only the nodes depending on the considered variable are differentiated.
-    */
-   bool intervalDiffOnly(const Variable& v, const Interval& x);
-
-   /// Gets the i-th interval derivative with 0 <= i < nbVars()
-   Interval intervalDeriv(size_t i) const;
-
-   /// Gets the derivative with respect to v
-   Interval intervalDeriv(const Variable& v) const;
 
    /// Returns the real (point) evaluation of this at pt
    double realEval(const RealPoint& pt);
@@ -1133,53 +1001,6 @@ public:
    void print(std::ostream& os) const;
 
    /**
-    * @brief Interval evaluation on B.
-    *
-    * Returns false if an empty interval occurs in the computation
-    */
-   bool intervalEval(const IntervalBox& B);
-
-   /**
-    * @brief Interval evaluation on B.
-    * 
-    * Returns false if the output vector is empty, othertwise val[i] is
-    * the value of the i-th function.
-    */
-   bool intervalEval(const IntervalBox& B, IntervalVector& val);
-
-   /**
-    * @brief Interval evaluation at pt.
-    * 
-    * Returns false if the output vector is empty, othertwise val[i] is
-    * the value of the i-th function.
-    */
-   bool intervalPointEval(const RealPoint& pt, IntervalVector& val);
-
-   /**
-    * @brief Interval differentiation in reverse mode.
-    * 
-    * To be called after an evaluation.
-    * The derivatives are assigned to the Jacobian matrix jac.
-    */
-   void intervalDiff(IntervalMatrix& jac);
-
-   /**
-    * @brief Interval differentiation for square systems using Hansen's method.
-    * 
-    * The derivatives are assigned to the Jacobian matrix jac.
-    */
-   void hansenDiff(const IntervalBox& B, IntervalMatrix& jac);
-
-   /**
-    * @brief Calculates the violation of the constraints.
-    * 
-    * The output vector is such that viol[i] is the violation of the i-th
-    * constraint. It asumes that this dag has been evaluated using
-    * intervalEval() or intervalPointEval().
-    */
-   void intervalViolation(RealVector& viol);
-
-   /**
     * @brief Real (point) evaluation at pt.
     * 
     * Return false if a NaN occurs in the computation, true othewise.
@@ -1188,9 +1009,6 @@ public:
 
    /**
     * @brief Real (point) evaluation at pt.
-    * 
-    * The output vector is such that viol[i] is the violation of the i-th
-    * function. Returns false if a NaN occurs, true othewise.
     */
    bool realEval(const RealPoint& pt, RealVector& val);
 
@@ -1203,24 +1021,36 @@ public:
    void realDiff(RealMatrix& jac);
 
    /**
-    * @brief Calculates the violation of the constraints.
-    * 
-    * The output vector is such that viol[i] is the violation of the i-th
-    * constraint. It assumes that this dag has been evaluated using realEval().
+    * @brief Interval evaluation of the DAG nodes on B.
+    *
+    * Returns false if an empty interval occurs in the computation.
+    * The method ival() can be used to get the interval value at each node.
     */
-   void realViolation(RealVector& viol);
+   bool iEvalNodes(const IntervalBox& B);
 
-   /// Prints the interval values at all nodes on a stream
-   void printIntervalValues(std::ostream& os) const;
-
-
-
+   /**
+    * @brief Interval evaluation of the functions on B.
+    * 
+    * V[i] is the value of the i-th function.
+    * The method ival() CANNOT be used to get the interval value at each node.
+    */
    void iEval(const IntervalBox& B, IntervalVector& V);
-
+   
+   /**
+    * @brief Interval diferentiation of this on B.
+    * 
+    * J[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the scope of this.
+    */
    void iDiff(const IntervalBox& B, IntervalMatrix& J);
 
+   /**
+    * @brief Calculates the Hansen matrix of this on B.
+    * 
+    * H[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the scope of this.
+    */
    void iDiffHansen(const IntervalBox& B, IntervalMatrix& H);
-
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves

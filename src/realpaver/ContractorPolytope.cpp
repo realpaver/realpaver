@@ -128,7 +128,7 @@ size_t PolytopeRLTCreator::nodeToLinVar(DagNode* node) const
 
 void PolytopeRLTCreator::createLinVar(LPModel& lpm, DagNode* node)
 {
-   Interval val = node->val();
+   Interval val = node->ival();
 
    // creates a linear variable for this node
    LinVar v = lpm.makeVar(val.left(), val.right());
@@ -144,7 +144,7 @@ void PolytopeRLTCreator::createLinVar(LPModel& lpm, DagNode* node)
 
 bool PolytopeRLTCreator::make(LPModel& lpm, const IntervalBox& B)
 {
-   if (!dag_->intervalEval(B)) return false;
+   if (!dag_->iEvalNodes(B)) return false;
 
    if (lfun_.size() == dag_->nbFuns())
    {
@@ -258,9 +258,14 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
    for (size_t i : lfun_)
    {
       DagFun* f = dag_->fun(i);
-      Interval x1 = f->intervalEval(c1),
-               x2 = f->intervalEval(c2);
 
+      //~ Interval x1 = f->intervalEval(c1),
+               //~ x2 = f->intervalEval(c2);
+      // MODIF
+      Interval x1 = f->iEval(c1),
+               x2 = f->iEval(c2);
+
+      
       if (x1.isEmpty() || x2.isEmpty()) return false;
 
       fc1.set(i, x1);
@@ -269,7 +274,8 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
 
    // interval evaluation on the given box, used to calculate
    // the derivatives thereafter
-   if (!dag_->intervalEval(B)) return false;
+//~ if (!dag_->intervalEval(B)) return false;
+// MODIF
 
    // generates the constraints
    for (size_t i : lfun_)
@@ -280,7 +286,12 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
          img += Interval(-eqtol_, eqtol_);
 
       // differentiates the function
-      f->intervalDiff();
+      //~ f->intervalDiff();
+      // MODIF
+      
+      
+      IntervalVector G(f->nbVars());
+      f->iDiff(B, G);
 
       // lower bounding constraints
       // assume that the right bound of the image of the function is finite
@@ -298,7 +309,12 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
          for (const auto& v : f->scope())
          {
             LinVar lv = lpm.getLinVar(linVarIndex(v));
-            Interval z = f->intervalDeriv(v);
+
+            //~ Interval z = f->intervalDeriv(v);
+            // MODIF
+            Interval z = G[f->scope().index(v)];
+            
+
             if (z.isEmpty() || z.isInf()) return false;
 
             if (corner_.get(scop_.index(v)))
@@ -345,7 +361,11 @@ bool PolytopeTaylorCreator::make(LPModel& lpm, const IntervalBox& B)
          for (const auto& v : f->scope())
          {
             LinVar lv = lpm.getLinVar(linVarIndex(v));
-            Interval z = f->intervalDeriv(v);
+            //~ Interval z = f->intervalDeriv(v);
+
+            // MODIF
+            Interval z = G[f->scope().index(v)];
+
 
             if (corner_.get(scop_.index(v)))
             {  // right bound used for this variable (bit = 1)

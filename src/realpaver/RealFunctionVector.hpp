@@ -86,17 +86,6 @@ public:
     */
    virtual void evalDiff(const RealPoint& pt, RealVector& val,
                          RealMatrix& J) = 0;
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraints.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this at pt
-    * and val must have nbFuns() components
-    * 
-    * viol[i] is the violation of the i-th function / constraint on B
-    */
-   virtual void violation(const RealPoint& pt, RealVector& val,
-                          RealVector& viol) = 0;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -190,16 +179,6 @@ public:
     */
    void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J);
 
-   /**
-    * @brief Evaluates this and calculates the violation of the constraints.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this at pt
-    * and val must have nbFuns() components
-    * 
-    * viol[i] is the violation of the i-th function / constraint on B
-    */
-   void violation(const RealPoint& pt, RealVector& val, RealVector& viol);
-
    /// Type of the representation of interval functions vectors
    using SharedRep = std::shared_ptr<RealFunctionVectorRep>;
 
@@ -253,8 +232,6 @@ public:
    void eval(const RealPoint& pt, RealVector& val) override;
    void diff(const RealPoint& pt, RealMatrix& J) override;
    void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J) override;
-   void violation(const RealPoint& pt, RealVector& val,
-                  RealVector& viol) override;
 
 private:
    SharedDag dag_;
@@ -291,8 +268,6 @@ public:
    void eval(const RealPoint& pt, RealVector& val) override;
    void diff(const RealPoint& pt, RealMatrix& J) override;
    void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J) override;
-   void violation(const RealPoint& pt, RealVector& val,
-                  RealVector& viol) override;
 
 private:
    std::vector<RealFunction> vf_;

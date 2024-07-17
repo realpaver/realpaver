@@ -141,14 +141,6 @@ void RealFunctionVector::evalDiff(const RealPoint& pt, RealVector& val,
    rep_->evalDiff(pt, val, J);
 }
 
-void RealFunctionVector::violation(const RealPoint& pt, RealVector& val,
-                                   RealVector& viol)
-{
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
-
-   rep_->violation(pt, val, viol);
-}
-
 /*----------------------------------------------------------------------------*/
 
 RealFunctionVectorDag::RealFunctionVectorDag(SharedDag dag)
@@ -234,13 +226,6 @@ void RealFunctionVectorDag::evalDiff(const RealPoint& pt, RealVector& val,
 {
    dag_->realEval(pt, val);
    dag_->realDiff(J);
-}
-
-void RealFunctionVectorDag::violation(const RealPoint& pt, RealVector& val,
-                                      RealVector& viol)
-{
-   dag_->realEval(pt, val);
-   dag_->realViolation(viol);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -352,13 +337,6 @@ void RealFunctionVectorList::evalDiff(const RealPoint& pt, RealVector& val,
          ++j;
       }
    }
-}
-
-void RealFunctionVectorList::violation(const RealPoint& pt, RealVector& val,
-                                       RealVector& viol)
-{
-   for (size_t i=0; i<nbFuns(); ++i)
-      vf_[i].violation(pt, val[i], viol[i]);
 }
 
 } // namespace

@@ -26,27 +26,35 @@ namespace realpaver {
 IntervalThickFunction::IntervalThickFunction(SharedDag dag, size_t i,
                                              Variable v)
       : IntervalFunctionUni(),
-        dag_(dag),
-        f_(nullptr),
-        v_(v)
+        f_(dag->fun(i)),
+        v_(v),
+        flat_(nullptr),
+        B_({v}),
+        G_(1)
+{}
+
+IntervalThickFunction::~IntervalThickFunction()
 {
-   f_ = dag->fun(i);
+   if (flat_ != nullptr) delete flat_;
 }
 
 Interval IntervalThickFunction::eval(const Interval& x)
 {
-   return f_->intervalEvalOnly(v_, x);
+   B_.set(v_, x);
+   return flat_->iEval(B_);
 }
 
 Interval IntervalThickFunction::diff(const Interval& x)
 {
-   return f_->intervalDiffOnly(v_, x) ? f_->intervalDeriv(v_) :
-                                        Interval::universe();
+   B_.set(v_, x);
+   flat_->iDiff(B_, G_);
+   return G_[0];
 }
 
-Interval IntervalThickFunction::update(const IntervalBox& B)
+void IntervalThickFunction::update(const IntervalBox& B)
 {
-   return f_->intervalEval(B);
+   if (flat_ != nullptr) delete flat_;
+   flat_ = new FlatFunction(f_, B, v_);
 }
 
 Variable IntervalThickFunction::getVar() const

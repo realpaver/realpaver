@@ -93,17 +93,6 @@ void RealFunction::evalDiff(const RealPoint& pt, double& val, RealVector& grad)
    return rep_->evalDiff(pt, val, grad);
 }
 
-void RealFunction::violation(const RealPoint& pt, double& val, double& viol)
-{
-   rep_->violation(pt, val, viol);
-}
-
-void RealFunction::violation(const RealPoint& pt, double lo, double up,
-                             double& val, double& viol)
-{
-   rep_->violation(pt, lo, up, val, viol);
-}
-
 /*----------------------------------------------------------------------------*/
 
 RealFunctionDag::RealFunctionDag(SharedDag dag, size_t i)
@@ -165,29 +154,6 @@ void RealFunctionDag::evalDiff(const RealPoint& pt, double& val,
    DagFun* f = dag_->fun(index_);
    val = f->realEval(pt);
    f->realDiff(grad);
-}
-
-void RealFunctionDag::violation(const RealPoint& pt, double& val, double& viol)
-{
-   DagFun* f = dag_->fun(index_);
-   val = f->realEval(pt);
-   viol = f->realViolation();   
-}
-
-void RealFunctionDag::violation(const RealPoint& pt, double lo, double up,
-                                double& val, double& viol)
-{
-   Interval img(lo, up);
-   ASSERT(!img.isEmpty(), "Empty image for a real function");
-
-   DagFun* f = dag_->fun(index_);
-   Interval tmp = f->getImage();
-   f->setImage(img);
-
-   val = f->realEval(pt);
-   viol = f->realViolation();
-
-   f->setImage(tmp);
 }
 
 } // namespace

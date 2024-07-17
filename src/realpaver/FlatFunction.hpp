@@ -105,6 +105,14 @@ public:
 
    /// Creates a flat function representing a function f from a DAG
    FlatFunction(const DagFun* f);
+   
+   /**
+    * @brief Creates a univariate flat function.
+    * 
+    * It represents f where all the variables but v are replaced with their
+    * domains in B.
+    */
+   FlatFunction(const DagFun* f, const IntervalBox& B, Variable v);
 
    /// Destructor
    ~FlatFunction();
@@ -184,9 +192,6 @@ private:
    std::vector<Interval> cst_;   // list of constants
    std::vector<Variable> var_;   // list of variables (with multi-occurrences)
 
-   // Interval evaluation of this on V
-   Interval iEval(const IntervalVector& V);
-
    // backward phase of hc4Revise
    Proof hc4ReviseBackward(IntervalBox& B);
    Proof hc4ReviseBackward(IntervalVector& V);
@@ -199,6 +204,9 @@ private:
 
    // deallocates the dynamic memory
    void destroy();
+
+   // Interval evaluation of this on V
+   Interval iEval(const IntervalVector& V);
 
    // backward phase of interval differentiation in reverse mode
    void iDiff();
@@ -281,6 +289,54 @@ public:
 private:
    FlatFunction* f_;    // target function
    size_t idx_;         // index of node in f_ resulting from a visit   
+};
+
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Visitor of dag functions that creates a thick flat function.
+ * 
+ * Given a dag function f, an interval box B, and a variable v, it creates a
+ * flat function corresponding to f where all the variables but v are replaced
+ * with their domains in B.
+ */
+class FlatFunUniCreator : public DagVisitor {
+public:
+   /// Constructor
+   FlatFunUniCreator(FlatFunction* f, const IntervalBox& B, Variable v);
+
+   /// @name Visit methods
+   ///@{
+   void apply(const DagConst* d) override;
+   void apply(const DagVar* d) override;
+   void apply(const DagAdd* d) override;
+   void apply(const DagSub* d) override;
+   void apply(const DagMul* d) override;
+   void apply(const DagDiv* d) override;
+   void apply(const DagMin* d) override;
+   void apply(const DagMax* d) override;
+   void apply(const DagUsb* d) override;
+   void apply(const DagAbs* d) override;
+   void apply(const DagSgn* d) override;
+   void apply(const DagSqr* d) override;
+   void apply(const DagSqrt* d) override;
+   void apply(const DagPow* d) override;
+   void apply(const DagExp* d) override;
+   void apply(const DagLog* d) override;
+   void apply(const DagCos* d) override;
+   void apply(const DagSin* d) override;
+   void apply(const DagTan* d) override;
+   void apply(const DagCosh* d) override;
+   void apply(const DagSinh* d) override;
+   void apply(const DagTanh* d) override;
+   void apply(const DagLin* d) override;
+   ///@}
+
+private:
+   FlatFunction* f_;       // target function
+   const IntervalBox& B_;  // box used to fix all the variables but one
+   Variable v_;            // the variable of the target function
+   size_t idx_;            // index of node in f_ resulting from a visit   
 };
 
 } // namespace

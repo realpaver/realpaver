@@ -99,6 +99,28 @@ FlatFunction::FlatFunction(const DagFun* f)
    f->rootNode()->acceptVisitor(creator);
 }
 
+FlatFunction::FlatFunction(const DagFun* f, const IntervalBox& B, Variable v)
+   : scop_(),
+     img_(f->getImage()),
+     cst_(),
+     var_()
+{
+   ASSERT(f->scope().contains(v), "The DAG function lustr depend on "
+                                    << v.getName());
+   
+   scop_.insert(v);
+
+   capa_ = 8;
+   symb_ = new FlatSymbol[capa_];
+   arg_ = new size_t*[capa_];
+   itv_ = new Interval[capa_];
+   dv_ = new Interval[capa_];
+   nb_ = 0;
+
+   FlatFunUniCreator creator(this, B, v);
+   f->rootNode()->acceptVisitor(creator);
+}
+
 void FlatFunction::extendCapacity()
 {
    if (nb_ >= capa_)
@@ -1151,6 +1173,39 @@ void FlatFunction::iDiff()
    }
 }
 
+void FlatFunction::print(std::ostream& os) const
+{
+   for (size_t i=0; i<nb_; ++i)
+   {
+      os << i << ": ";
+
+      if (symb_[i] == FlatSymbol::Cst)
+      {
+         os << cst_[arg_[i][1]];
+      }
+      else if (symb_[i] == FlatSymbol::Var)
+      {
+         os << var_[arg_[i][2]].getName();
+      }
+      else
+      {
+         os << symb_[i] << " ";
+         for (size_t j=1; j<arg_[i][0]; ++j)
+         {
+            os << "(" << arg_[i][j] << ") ";
+         }
+      }
+
+      os << std::endl;
+   }
+}
+
+std::ostream& operator<<(std::ostream& os, const FlatFunction& f)
+{
+   f.print(os);
+   return os;
+}
+
 /*----------------------------------------------------------------------------*/
 
 FlatFunTermCreator::FlatFunTermCreator(FlatFunction* f)
@@ -1596,37 +1651,364 @@ void FlatFunDagCreator::apply(const DagLin* d)
    idx_ = jdx;
 }
 
-void FlatFunction::print(std::ostream& os) const
-{
-   for (size_t i=0; i<nb_; ++i)
-   {
-      os << i << ": ";
+/*----------------------------------------------------------------------------*/
 
-      if (symb_[i] == FlatSymbol::Cst)
+FlatFunUniCreator::FlatFunUniCreator(FlatFunction* f, const IntervalBox& B,
+                                     Variable v)
+      : f_(f),
+        B_(B),
+        v_(v)
+{}
+
+void FlatFunUniCreator::apply(const DagConst* d)
+{
+   idx_ = f_->insertCst(d->getConst());
+}
+
+void FlatFunUniCreator::apply(const DagVar* d)
+{
+   idx_ = f_->insertVar(d->getVar());
+}
+
+void FlatFunUniCreator::apply(const DagAdd* d)
+{
+   size_t idxl, idxr;
+
+   if (d->left()->dependsOn(v_))
+   {
+      FlatFunUniCreator vl(f_, B_, v_);
+      d->left()->acceptVisitor(vl);
+      idxl = vl.idx_;
+   }
+   else
+   {
+      d->left()->iEvalTree(B_);
+      idxl = f_->insertCst(d->left()->ival());
+   }
+
+   if (d->right()->dependsOn(v_))
+   {
+      FlatFunUniCreator vr(f_, B_, v_);
+      d->right()->acceptVisitor(vr);
+      idxr = vr.idx_;
+   }
+   else
+   {
+      d->right()->iEvalTree(B_);
+      idxr = f_->insertCst(d->right()->ival());      
+   }
+
+   idx_ = f_->insertBinary(FlatSymbol::Add, idxl, idxr);
+}
+
+void FlatFunUniCreator::apply(const DagSub* d)
+{
+   size_t idxl, idxr;
+
+   if (d->left()->dependsOn(v_))
+   {
+      FlatFunUniCreator vl(f_, B_, v_);
+      d->left()->acceptVisitor(vl);
+      idxl = vl.idx_;
+   }
+   else
+   {
+      d->left()->iEvalTree(B_);
+      idxl = f_->insertCst(d->left()->ival());
+   }
+
+   if (d->right()->dependsOn(v_))
+   {
+      FlatFunUniCreator vr(f_, B_, v_);
+      d->right()->acceptVisitor(vr);
+      idxr = vr.idx_;
+   }
+   else
+   {
+      d->right()->iEvalTree(B_);
+      idxr = f_->insertCst(d->right()->ival());      
+   }
+
+   idx_ = f_->insertBinary(FlatSymbol::Sub, idxl, idxr);
+}
+
+void FlatFunUniCreator::apply(const DagMul* d)
+{
+   size_t idxl, idxr;
+
+   if (d->left()->dependsOn(v_))
+   {
+      FlatFunUniCreator vl(f_, B_, v_);
+      d->left()->acceptVisitor(vl);
+      idxl = vl.idx_;
+   }
+   else
+   {
+      d->left()->iEvalTree(B_);
+      idxl = f_->insertCst(d->left()->ival());
+   }
+
+   if (d->right()->dependsOn(v_))
+   {
+      FlatFunUniCreator vr(f_, B_, v_);
+      d->right()->acceptVisitor(vr);
+      idxr = vr.idx_;
+   }
+   else
+   {
+      d->right()->iEvalTree(B_);
+      idxr = f_->insertCst(d->right()->ival());      
+   }
+
+   idx_ = f_->insertBinary(FlatSymbol::Mul, idxl, idxr);
+}
+
+void FlatFunUniCreator::apply(const DagDiv* d)
+{
+   size_t idxl, idxr;
+
+   if (d->left()->dependsOn(v_))
+   {
+      FlatFunUniCreator vl(f_, B_, v_);
+      d->left()->acceptVisitor(vl);
+      idxl = vl.idx_;
+   }
+   else
+   {
+      d->left()->iEvalTree(B_);
+      idxl = f_->insertCst(d->left()->ival());
+   }
+
+   if (d->right()->dependsOn(v_))
+   {
+      FlatFunUniCreator vr(f_, B_, v_);
+      d->right()->acceptVisitor(vr);
+      idxr = vr.idx_;
+   }
+   else
+   {
+      d->right()->iEvalTree(B_);
+      idxr = f_->insertCst(d->right()->ival());      
+   }
+
+   idx_ = f_->insertBinary(FlatSymbol::Div, idxl, idxr);
+}
+
+void FlatFunUniCreator::apply(const DagMin* d)
+{
+   size_t idxl, idxr;
+
+   if (d->left()->dependsOn(v_))
+   {
+      FlatFunUniCreator vl(f_, B_, v_);
+      d->left()->acceptVisitor(vl);
+      idxl = vl.idx_;
+   }
+   else
+   {
+      d->left()->iEvalTree(B_);
+      idxl = f_->insertCst(d->left()->ival());
+   }
+
+   if (d->right()->dependsOn(v_))
+   {
+      FlatFunUniCreator vr(f_, B_, v_);
+      d->right()->acceptVisitor(vr);
+      idxr = vr.idx_;
+   }
+   else
+   {
+      d->right()->iEvalTree(B_);
+      idxr = f_->insertCst(d->right()->ival());      
+   }
+
+   idx_ = f_->insertBinary(FlatSymbol::Min, idxl, idxr);
+}
+
+void FlatFunUniCreator::apply(const DagMax* d)
+{
+   size_t idxl, idxr;
+
+   if (d->left()->dependsOn(v_))
+   {
+      FlatFunUniCreator vl(f_, B_, v_);
+      d->left()->acceptVisitor(vl);
+      idxl = vl.idx_;
+   }
+   else
+   {
+      d->left()->iEvalTree(B_);
+      idxl = f_->insertCst(d->left()->ival());
+   }
+
+   if (d->right()->dependsOn(v_))
+   {
+      FlatFunUniCreator vr(f_, B_, v_);
+      d->right()->acceptVisitor(vr);
+      idxr = vr.idx_;
+   }
+   else
+   {
+      d->right()->iEvalTree(B_);
+      idxr = f_->insertCst(d->right()->ival());      
+   }
+
+   idx_ = f_->insertBinary(FlatSymbol::Max, idxl, idxr);
+}
+
+void FlatFunUniCreator::apply(const DagUsb* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Usb, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAbs* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Abs, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagSgn* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Sgn, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagSqr* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Sqr, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagSqrt* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Sqrt, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagPow* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, d->exponent());
+}
+
+void FlatFunUniCreator::apply(const DagExp* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Exp, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagLog* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Log, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagCos* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Cos, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagSin* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Sin, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagTan* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Tan, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagCosh* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Cosh, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagSinh* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Sinh, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagTanh* d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagLin* d)
+{
+   // creates an expression a + b*v
+   Interval a = d->getCst(), b;
+
+   for (size_t i=0; i<d->nbTerms(); ++i)
+   {
+      Variable v = d->varNode(i)->getVar();
+      Interval x = d->coef(i);
+
+      if (v == v_)
       {
-         os << cst_[arg_[i][1]];
-      }
-      else if (symb_[i] == FlatSymbol::Var)
-      {
-         os << var_[arg_[i][2]].getName();
+         b = x;
       }
       else
       {
-         os << symb_[i] << " ";
-         for (size_t j=1; j<arg_[i][0]; ++j)
-         {
-            os << "(" << arg_[i][j] << ") ";
-         }
+         a += x*B_.get(v);
       }
-
-      os << std::endl;
    }
-}
 
-std::ostream& operator<<(std::ostream& os, const FlatFunction& f)
-{
-   f.print(os);
-   return os;
+   // creates b
+   size_t idxb = f_->insertCst(b);
+
+   // creates v
+   size_t idxv = f_->insertVar(v_);
+
+   // creates b*v
+   size_t idxm = f_->insertBinary(FlatSymbol::Mul, idxb, idxv);
+
+   if (a.isZero())
+   {
+      idx_ = idxm;
+   }
+   else
+   {
+      // creates a
+      size_t idxa = f_->insertCst(a);
+
+      // creates a + b*x
+      idx_ = f_->insertBinary(FlatSymbol::Add, idxa, idxm);
+   }
 }
 
 } // namespace

@@ -86,10 +86,10 @@ void RltVisitor::apply(const DagMul* node)
           y = lm.getLinVar(indexLinVar(node->right()));
 
    // z = x*y, a <= x <= b, c <= y <= d
-   double a = node->left()->val().left(),
-          b = node->left()->val().right(),
-          c = node->right()->val().left(),
-          d = node->right()->val().right();
+   double a = node->left()->ival().left(),
+          b = node->left()->ival().right(),
+          c = node->right()->ival().left(),
+          d = node->right()->ival().right();
 
    bool xvar = (a != b),   // left subterm not fixed?
         yvar = (c != d);   // right subterm not fixed?
@@ -142,12 +142,12 @@ void RltVisitor::apply(const DagDiv* node)
           y = lm.getLinVar(indexLinVar(node->right()));
 
    // z = x/y, a <= x <= b, c <= y <= d
-   double a = node->left()->val().left(),
-          b = node->left()->val().right(),
-          c = node->right()->val().left(),
-          d = node->right()->val().right(),
-          u = node->val().left(),
-          v = node->val().right();
+   double a = node->left()->ival().left(),
+          b = node->left()->ival().right(),
+          c = node->right()->ival().left(),
+          d = node->right()->ival().right(),
+          u = node->ival().left(),
+          v = node->ival().right();
 
    bool xvar = (a != b),   // left subterm not fixed?
         yvar = (c != d);   // right subterm not fixed?
@@ -194,10 +194,10 @@ void RltVisitor::apply(const DagMin* node)
           y = lm.getLinVar(indexLinVar(node->right()));
 
    // z = min(x,y), a <= x <= b, c <= y <= d
-   double a = node->left()->val().left(),
-          b = node->left()->val().right(),
-          c = node->right()->val().left(),
-          d = node->right()->val().right();
+   double a = node->left()->ival().left(),
+          b = node->left()->ival().right(),
+          c = node->right()->ival().left(),
+          d = node->right()->ival().right();
 
    if (b < c)
    {
@@ -232,10 +232,10 @@ void RltVisitor::apply(const DagMax* node)
           y = lm.getLinVar(indexLinVar(node->right()));
 
    // z = min(x,y), a <= x <= b, c <= y <= d
-   double a = node->left()->val().left(),
-          b = node->left()->val().right(),
-          c = node->right()->val().left(),
-          d = node->right()->val().right();
+   double a = node->left()->ival().left(),
+          b = node->left()->ival().right(),
+          c = node->right()->ival().left(),
+          d = node->right()->ival().right();
 
    if (d < a)
    {
@@ -283,8 +283,8 @@ void RltVisitor::apply(const DagAbs* node)
    LinVar y = lm.getLinVar(iy),
           x = lm.getLinVar(ix);
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    if (a >= 0.0)
    {
@@ -326,8 +326,8 @@ void RltVisitor::apply(const DagSqr* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return sqr(x); };
    auto df = [](const Interval& x) { return 2.0*x; };
@@ -346,8 +346,8 @@ void RltVisitor::apply(const DagSqrt* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    if (a < 0.0) return;
 
@@ -373,8 +373,8 @@ void RltVisitor::apply(const DagPow* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    int n = node->exponent();
 
@@ -426,8 +426,8 @@ void RltVisitor::apply(const DagExp* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return exp(x); };
    auto df = [](const Interval& x) { return exp(x); };
@@ -443,13 +443,13 @@ void RltVisitor::apply(const DagLog* node)
 {
    LPModel& lm = *lpm_;
 
-   if (node->val().isInf()) return;
+   if (node->ival().isInf()) return;
 
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return log(x); };
    auto df = [](const Interval& x) { return 1.0/x; };
@@ -464,13 +464,13 @@ void RltVisitor::apply(const DagLog* node)
 void RltVisitor::apply(const DagCos* node)
 {
    LPModel& lm = *lpm_;
-   Interval val = node->val();
+   Interval val = node->ival();
 
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return cos(x); };
    auto df = [](const Interval& x) { return -sin(x); };
@@ -504,13 +504,13 @@ void RltVisitor::apply(const DagCos* node)
 void RltVisitor::apply(const DagSin* node)
 {
    LPModel& lm = *lpm_;
-   Interval val = node->val();
+   Interval val = node->ival();
 
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return sin(x); };
    auto df = [](const Interval& x) { return cos(x); };
@@ -544,15 +544,15 @@ void RltVisitor::apply(const DagSin* node)
 void RltVisitor::apply(const DagTan* node)
 {
    LPModel& lm = *lpm_;
-   Interval val = node->val();
+   Interval val = node->ival();
 
    if (val.isInf()) return;
 
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return tan(x); };
    auto df = [](const Interval& x) { return 1.0/sqr(cos(x)); };
@@ -585,13 +585,13 @@ void RltVisitor::apply(const DagTan* node)
 
       // underestimation: under the line passing through
       // (b, tan(b)) with slope 1, i.e. y <= x + p
-      Interval p1(node->val().right() - Interval(b));
+      Interval p1(node->ival().right() - Interval(b));
       LinExpr e1( {1.0, -1.0}, {y, x} );
       lm.addCtr(e1, p1.right());
 
       // overestimation: over the line passing through
       // (a, tan(a)) with slope 1, i.e. y >= x + p
-      Interval p2(node->val().left() - Interval(a));
+      Interval p2(node->ival().left() - Interval(a));
       LinExpr e2( {1.0, -1.0}, {y, x} );
       lm.addCtr(p2.left(), e2);
    }
@@ -604,8 +604,8 @@ void RltVisitor::apply(const DagCosh* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return cosh(x); };
    auto df = [](const Interval& x) { return sinh(x); };
@@ -624,8 +624,8 @@ void RltVisitor::apply(const DagSinh* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return sinh(x); };
    auto df = [](const Interval& x) { return cosh(x); };
@@ -684,8 +684,8 @@ void RltVisitor::apply(const DagTanh* node)
    size_t iy = indexLinVar(node),
           ix = indexLinVar(node->child());
 
-   double a = node->child()->val().left(),
-          b = node->child()->val().right();
+   double a = node->child()->ival().left(),
+          b = node->child()->ival().right();
 
    auto f  = [](const Interval& x) { return tanh(x); };
    auto df = [](const Interval& x) { return 1.0 - sqr(tanh(x)); };

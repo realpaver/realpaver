@@ -194,8 +194,11 @@ Proof ContractorBC3Revise::contract(IntervalBox& B)
    Variable v = f_.getVar();
    Interval img = f_.getFun()->getImage();
 
-   // first interval evaluation that also thickens the function
-   Interval e = f_.update(B);
+   // thickens the function
+   f_.update(B);
+
+   // evaluates the function
+   Interval e = f_.eval(B.get(v));
 
    // consistency checking
    if (e.isEmpty())

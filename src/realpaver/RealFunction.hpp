@@ -74,31 +74,6 @@ public:
    virtual void evalDiff(const RealPoint& pt, double& val,
                          RealVector& grad) = 0;
 
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * val is the the evaluation of this at pt
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation at pt
-    */
-   virtual void violation(const RealPoint& pt, double& val, double& viol) = 0;
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * The image of the function is locally assigned to [lo, up].
-    * 
-    * val is the the evaluation of this at pt
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation at pt
-    */
-   virtual void violation(const RealPoint& pt, double lo, double up,
-                          double& val, double& viol) = 0;
-
 protected:
    Interval img_;
 };
@@ -111,8 +86,8 @@ protected:
  * A real function is supposed to be differentiable.
  * 
  * A real function is supposed to be associated with an image which makes
- * it an inequality constraint of the form L <= F(x) <= U and allows to
- * calculate violations. Fix L = -oo and U = +oo to eliminate the constraint.
+ * it an inequality constraint of the form L <= F(x) <= U. Fix L = -oo and
+ * U = +oo to eliminate the constraint.
  * 
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
@@ -167,31 +142,6 @@ public:
     */
    void evalDiff(const RealPoint& pt, double& val, RealVector& grad);
 
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * val is the the evaluation of this at pt
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation at pt
-    */
-   void violation(const RealPoint& pt, double& val, double& viol);
-
-   /**
-    * @brief Evaluates this and calculates the violation of the constraint.
-    * 
-    * The image of the function is locally assigned to [lo, up].
-    * 
-    * val is the the evaluation of this at pt
-    * 
-    * viol is equal to 0.0 if the constraint is satisfied, a positive real
-    * number otherwise equal to the width of the gap between the image of the
-    * function and the result of its evaluation at pt
-    */
-   void violation(const RealPoint& pt, double lo, double up, double& val,
-                  double& viol);
-
    /// Type of shared pointer to a representation
    using SharedRep = std::shared_ptr<RealFunctionRep>;
 
@@ -240,9 +190,6 @@ public:
    double eval(const RealPoint& pt) override;
    void diff(const RealPoint& pt, RealVector& grad) override;
    void evalDiff(const RealPoint& pt, double& val, RealVector& grad) override;
-   void violation(const RealPoint& pt, double& val, double& viol) override;
-   void violation(const RealPoint& pt, double lo, double up, double& val,
-                  double& viol) override;
 
 private:
    SharedDag dag_;         // DAG
