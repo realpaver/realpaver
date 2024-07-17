@@ -76,6 +76,8 @@ FlatFunction::FlatFunction(const Term& t, const Interval& img)
    arg_ = new size_t*[capa_];
    ival_ = new Interval[capa_];
    idv_ = new Interval[capa_];
+   rval_ = new double[capa_];
+   rdv_ = new double[capa_];
    nb_ = 0;
 
    FlatFunTermCreator creator(this);
@@ -93,6 +95,8 @@ FlatFunction::FlatFunction(const DagFun* f)
    arg_ = new size_t*[capa_];
    ival_ = new Interval[capa_];
    idv_ = new Interval[capa_];
+   rval_ = new double[capa_];
+   rdv_ = new double[capa_];
    nb_ = 0;
 
    FlatFunDagCreator creator(this);
@@ -115,6 +119,8 @@ FlatFunction::FlatFunction(const DagFun* f, const IntervalBox& B, Variable v)
    arg_ = new size_t*[capa_];
    ival_ = new Interval[capa_];
    idv_ = new Interval[capa_];
+   rval_ = new double[capa_];
+   rdv_ = new double[capa_];
    nb_ = 0;
 
    FlatFunUniCreator creator(this, B, v);
@@ -129,8 +135,10 @@ void FlatFunction::extendCapacity()
       capa_ *= 2;
       FlatSymbol* symb2 = new FlatSymbol[capa_];
       size_t** arg2 = new size_t*[capa_];
-      Interval* itv2 = new Interval[capa_];
-      Interval* dv2 = new Interval[capa_];
+      Interval* ival2 = new Interval[capa_];
+      Interval* idv2 = new Interval[capa_];
+      double* rval2 = new double[capa_];
+      double* rdv2 = new double[capa_];
 
       // copy of data
       for (size_t i=0; i<nb_; ++i)
@@ -148,9 +156,11 @@ void FlatFunction::extendCapacity()
             for (size_t j=0; j<n; ++j)
                arg2[i][j] = arg_[i][j];
          }
-         
-         itv2[i] = ival_[i];
-         dv2[i] = idv_[i];
+
+         ival2[i] = ival_[i];
+         idv2[i] = idv_[i];
+         rval2[i] = rval_[i];
+         rdv2[i] = rdv_[i];
       }
 
       // deallocation
@@ -159,8 +169,10 @@ void FlatFunction::extendCapacity()
       // copy of pointers
       symb_ = symb2;
       arg_ = arg2;
-      ival_ = itv2;
-      idv_ = dv2;
+      ival_ = ival2;
+      idv_ = idv2;
+      rval_ = rval2;
+      rdv_ = rdv2;
    }
 }
 
@@ -169,6 +181,8 @@ void FlatFunction::destroy()
    delete[] symb_;
    delete[] ival_;
    delete[] idv_;
+   delete[] rval_;
+   delete[] rdv_;
 
    for (size_t i=0; i<nb_; ++i)
       if (arg_[i] != nullptr)
@@ -314,7 +328,6 @@ Interval FlatFunction::ival() const
 {
    return ival_[nb_-1];;
 }
-
 
 Interval FlatFunction::iEval(const IntervalVector& V)
 {
@@ -533,6 +546,230 @@ Interval FlatFunction::iEval(const IntervalBox& B)
    }
 
    return ival_[nb_-1];
+}
+
+double FlatFunction::rval() const
+{
+   return rval_[nb_-1];;
+}
+
+double FlatFunction::rEval(const RealVector& V)
+{
+   for (size_t i=0; i<nb_; ++i)
+   {
+      switch(symb_[i])
+      {
+         case FlatSymbol::Cst:
+            rval_[i] = cst_[arg_[i][1]].left();
+            break;
+
+         case FlatSymbol::Var:
+            rval_[i] = V[arg_[i][1]];
+            break;
+
+         case FlatSymbol::Add:
+         case FlatSymbol::AddL:
+         case FlatSymbol::AddR:
+            rval_[i] = Double::add(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Sub:
+         case FlatSymbol::SubL:
+         case FlatSymbol::SubR:
+            rval_[i] = Double::sub(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Mul:
+         case FlatSymbol::MulL:
+         case FlatSymbol::MulR:
+            rval_[i] = Double::mul(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Div:
+         case FlatSymbol::DivL:
+         case FlatSymbol::DivR:
+            rval_[i] = Double::div(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Min:
+            rval_[i] = Double::min(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Max:
+            rval_[i] = Double::max(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Usb:
+            rval_[i] = Double::usb(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Abs:
+            rval_[i] = Double::abs(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sgn:
+            rval_[i] = Double::sgn(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sqr:
+            rval_[i] = Double::sqr(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sqrt:
+            rval_[i] = Double::sqrt(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Pow:
+            rval_[i] = Double::pow(rval_[arg_[i][1]], arg_[i][2]);
+            break;
+
+         case FlatSymbol::Exp:
+            rval_[i] = Double::exp(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Log:
+            rval_[i] = Double::log(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Cos:
+            rval_[i] = Double::cos(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sin:
+            rval_[i] = Double::sin(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Tan:
+            rval_[i] = Double::tan(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Cosh:
+            rval_[i] = Double::cosh(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sinh:
+            rval_[i] = Double::sinh(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Tanh:
+            rval_[i] = Double::tanh(rval_[arg_[i][1]]);
+            break;
+      }
+   }
+
+   return rval_[nb_-1];
+}
+
+double FlatFunction::rEval(const RealPoint& pt)
+{
+   if (pt.isVectorizable())
+   {
+      return rEval(static_cast<const RealVector&>(pt));
+   }
+
+   for (size_t i=0; i<nb_; ++i)
+   {
+      switch(symb_[i])
+      {
+         case FlatSymbol::Cst:
+            rval_[i] = cst_[arg_[i][1]].left();
+            break;
+
+         case FlatSymbol::Var:
+            rval_[i] = pt.get(var_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Add:
+         case FlatSymbol::AddL:
+         case FlatSymbol::AddR:
+            rval_[i] = Double::add(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Sub:
+         case FlatSymbol::SubL:
+         case FlatSymbol::SubR:
+            rval_[i] = Double::sub(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Mul:
+         case FlatSymbol::MulL:
+         case FlatSymbol::MulR:
+            rval_[i] = Double::mul(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Div:
+         case FlatSymbol::DivL:
+         case FlatSymbol::DivR:
+            rval_[i] = Double::div(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Min:
+            rval_[i] = Double::min(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Max:
+            rval_[i] = Double::max(rval_[arg_[i][1]], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Usb:
+            rval_[i] = Double::usb(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Abs:
+            rval_[i] = Double::abs(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sgn:
+            rval_[i] = Double::sgn(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sqr:
+            rval_[i] = Double::sqr(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sqrt:
+            rval_[i] = Double::sqrt(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Pow:
+            rval_[i] = Double::pow(rval_[arg_[i][1]], arg_[i][2]);
+            break;
+
+         case FlatSymbol::Exp:
+            rval_[i] = Double::exp(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Log:
+            rval_[i] = Double::log(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Cos:
+            rval_[i] = Double::cos(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sin:
+            rval_[i] = Double::sin(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Tan:
+            rval_[i] = Double::tan(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Cosh:
+            rval_[i] = Double::cosh(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Sinh:
+            rval_[i] = Double::sinh(rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Tanh:
+            rval_[i] = Double::tanh(rval_[arg_[i][1]]);
+            break;
+      }
+   }
+
+   return rval_[nb_-1];
 }
 
 Proof FlatFunction::hc4Revise(IntervalBox& B)
@@ -1119,7 +1356,7 @@ void FlatFunction::iDiff()
 
          case FlatSymbol::Sqrt:
             // d(sqrt(u))/du = 0.5/sqrt(u)
-            idv_[arg_[i][1]] = 0.5*idv_[i]*ival_[i];
+            idv_[arg_[i][1]] = (0.5*idv_[i])/ival_[i];
             break;
 
          case FlatSymbol::Pow:
@@ -1171,6 +1408,262 @@ void FlatFunction::iDiff()
             break;
       }
    }
+}
+
+void FlatFunction::rDiff(const RealPoint& pt, RealVector& G)
+{
+   ASSERT(scop_.size() == G.size(),
+          "The size of the gradient must be equal to the number " <<
+          "of variables of the flat function");
+
+   // forward phase: evaluates this at pt
+   double val = rEval(pt);
+
+   if (Double::isNan(val))
+   {
+      G.setNan();
+      return;
+   }
+
+   // backward phase
+   bool res = rDiff();
+
+   if (!res)
+   {
+      G.setNan();
+      return;
+   }
+
+   // fills the gradient
+   G.setAll(0.0);
+
+   for (size_t i=0; i<nb_; ++i)      
+      if (symb_[i] == FlatSymbol::Var)
+         G[arg_[i][3]] += rdv_[i];
+}
+
+bool FlatFunction::rDiff()
+{
+   // derivative with respect to the root node
+   rdv_[nb_-1] = 1.0;
+
+   // differentiates the other nodes from the root to the leaves
+   for (int i=(int)nb_-1; i>= 0; --i)
+   {
+      switch(symb_[i])
+      {
+         case FlatSymbol::Cst:
+         case FlatSymbol::Var:
+            break;
+
+         case FlatSymbol::Add:
+            // d(l+r)/dl = 1, d(l+r)/dr = 1
+            rdv_[arg_[i][1]] = rdv_[i];
+            rdv_[arg_[i][2]] = rdv_[i];
+            break;
+
+         case FlatSymbol::AddL:
+            // d(l+r)/dr = 1
+            rdv_[arg_[i][2]] = rdv_[i];
+            break;
+
+         case FlatSymbol::AddR:
+            // d(l+r)/dl = 1
+            rdv_[arg_[i][1]] = rdv_[i];
+            break;
+
+         case FlatSymbol::Sub:
+            // d(l-r)/dl = 1, d(l-r)/dr = -1
+            rdv_[arg_[i][1]] = rdv_[i];
+            rdv_[arg_[i][2]] = Double::usb(rdv_[i]);
+            break;
+
+         case FlatSymbol::SubL:
+            // d(l-r)/dr = -1
+            rdv_[arg_[i][2]] = Double::usb(rdv_[i]);
+            break;
+
+         case FlatSymbol::SubR:
+            // d(l-r)/dl = 1
+            rdv_[arg_[i][1]] = rdv_[i];
+            break;
+
+         case FlatSymbol::Mul:
+            // d(l*r)/dl = r, d(l*r)/dr = l
+            rdv_[arg_[i][1]] = Double::mul(rval_[arg_[i][2]], rdv_[i]);
+            rdv_[arg_[i][2]] = Double::mul(rval_[arg_[i][1]], rdv_[i]);
+            break;
+
+         case FlatSymbol::MulL:
+            // d(l*r)/dr = l
+            rdv_[arg_[i][2]] = Double::mul(rval_[arg_[i][1]], rdv_[i]);
+            break;
+
+         case FlatSymbol::MulR:
+            // d(l*r)/dl = r
+            rdv_[arg_[i][1]] = Double::mul(rval_[arg_[i][2]], rdv_[i]);
+            break;
+
+         case FlatSymbol::Div:
+            // d(l/r)/dl = 1/r, d(l/r)/dr = -l/r^2
+            rdv_[arg_[i][1]] = Double::div(rdv_[i], rval_[arg_[i][2]]);
+            rdv_[arg_[i][2]] =
+               Double::div(Double::mul(Double::usb(rdv_[i]), rval_[arg_[i][1]]),
+                           Double::sqr(rval_[arg_[i][2]]));
+            break;
+
+         case FlatSymbol::DivL:
+            // d(l/r)/dr = -l/r^2
+            rdv_[arg_[i][2]] =
+               Double::div(Double::mul(Double::usb(rdv_[i]), rval_[arg_[i][1]]),
+                           Double::sqr(rval_[arg_[i][2]]));
+            break;
+
+         case FlatSymbol::DivR:
+            // d(l/r)/dl = 1/r
+            rdv_[arg_[i][1]] = Double::div(rdv_[i], rval_[arg_[i][2]]);
+            break;
+
+         case FlatSymbol::Min:
+            if (rval_[arg_[i][1]] < rval_[arg_[i][2]])
+            {
+               // d(min(l,r))/dl = 1, d(min(l,r))/dr = 0 if l < r
+               rdv_[arg_[i][1]] = rdv_[i];
+               rdv_[arg_[i][2]] = 0.0;
+            }
+            else if (rval_[arg_[i][2]] < rval_[arg_[i][1]])
+            {
+               // d(min(l,r))/dl = 0, d(min(l,r))/dr = 1 if r < l
+               rdv_[arg_[i][1]] = 0.0;
+               rdv_[arg_[i][2]] = rdv_[i];
+            }
+            else
+            {
+               // l = r, not differentiable
+               return false;
+            }
+            break;
+
+         case FlatSymbol::Max:
+            if (rval_[arg_[i][1]] > rval_[arg_[i][2]])
+            {
+               // d(max(l,r))/dl = 1 and d(max(l,r))/dr = 0 if l > r
+               rdv_[arg_[i][1]] = rdv_[i];
+               rdv_[arg_[i][2]] = 0.0;
+            }
+            else if (rval_[arg_[i][2]] > rval_[arg_[i][1]])
+            {
+               // d(max(l,r))/dl = 0 and d(max(l,r))/dr = 1 if r > l
+               rdv_[arg_[i][1]] = 0.0;
+               rdv_[arg_[i][2]] = rdv_[i];
+            }
+            else
+            {
+               // l = r, not differentiable
+               return false;
+            }
+            break;
+   
+         case FlatSymbol::Usb:
+            // d(-u)/du = -1
+            rdv_[arg_[i][1]] = Double::usb(rdv_[i]);
+            break;
+
+         case FlatSymbol::Abs:
+            // d(abs(u))/du = 1 if u>0, -1 if u<0
+            if (rval_[arg_[i][1]] > 0.0)
+            {
+               rdv_[arg_[i][1]] = rdv_[i];
+            }
+            else if (rval_[arg_[i][1]] < 0.0)
+            {
+               rdv_[arg_[i][1]] = Double::usb(rdv_[i]);
+            }
+            else
+            {
+               // u = 0, not differentiable
+               return false;
+            }
+            break;
+
+         case FlatSymbol::Sgn:
+            // d(sgn(u))/du = 0 except at 0
+            rdv_[arg_[i][1]] = 0.0;
+            break;
+
+         case FlatSymbol::Sqr:
+            // d(u^2)/du = 2u
+            rdv_[arg_[i][1]] =
+               Double::mul(2.0, Double::mul(rval_[arg_[i][1]], rdv_[i]));   
+            break;
+
+         case FlatSymbol::Sqrt:
+            // d(sqrt(u))/du = 0.5/sqrt(u)
+            rdv_[arg_[i][1]] = Double::div(Double::mul(0.5, rdv_[i]), rval_[i]);
+            break;
+
+         case FlatSymbol::Pow:
+         {
+            // d(u^n)/du = n * u^(n-1)
+            int e = (int)arg_[i][2];
+            rdv_[arg_[i][1]] =
+               Double::mul(Double::mul(e, rdv_[i]),
+                           Double::pow(rval_[arg_[i][1]], e-1));
+         }
+            break;
+
+         case FlatSymbol::Exp:
+            // d(exp(u))/du = exp(u)
+            rdv_[arg_[i][1]] = Double::mul(rdv_[i], rval_[i]);
+            break;
+
+         case FlatSymbol::Log:
+            // d(log(u))/du = 1/u
+            rdv_[arg_[i][1]] = Double::div(rdv_[i], rval_[arg_[i][1]]);
+            break;
+
+         case FlatSymbol::Cos:
+            // d(cos(u))/du = -sin(u)
+            rdv_[arg_[i][1]] =
+               Double::usb(Double::mul(rdv_[i],
+                                       Double::sin(rval_[arg_[i][1]])));
+            break;
+
+         case FlatSymbol::Sin:
+            // d(sin(u))/du = cos(u)
+            rdv_[arg_[i][1]] =
+               Double::mul(rdv_[i], Double::cos(rval_[arg_[i][1]]));
+            break;
+
+         case FlatSymbol::Tan:
+            // d(tan(u))/du = 1+tan^2(u)
+            rdv_[arg_[i][1]] =
+               Double::mul(rdv_[i],
+                           Double::add(1.0, Double::sqr(rval_[i])));
+            break;
+
+         case FlatSymbol::Cosh:
+            // d(cosh(u))/du = sinh(u)
+            rdv_[arg_[i][1]] =
+               Double::mul(rdv_[i], Double::sinh(rval_[arg_[i][1]]));
+            break;
+
+         case FlatSymbol::Sinh:
+            // d(sinh(u))/du = cosh(u)
+            rdv_[arg_[i][1]] =
+               Double::mul(rdv_[i], Double::cosh(rval_[arg_[i][1]]));
+            break;
+
+         case FlatSymbol::Tanh:
+            // d(tanh(u))/du = 1-tanh^2(u)
+            rdv_[arg_[i][1]] =
+               Double::mul(rdv_[i],
+                           Double::sub(1.0, Double::sqr(rval_[i])));
+            break;
+      }
+   }
+
+   return true;
 }
 
 void FlatFunction::print(std::ostream& os) const

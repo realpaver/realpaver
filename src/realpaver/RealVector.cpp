@@ -51,6 +51,11 @@ bool RealVector::isNan() const
    return false;
 }
 
+void RealVector::setNan()
+{
+   set(0, Double::nan());
+}
+
 bool RealVector::isFinite() const
 {
    for (size_t i=0; i<size(); ++i)

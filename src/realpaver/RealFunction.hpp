@@ -58,21 +58,10 @@ public:
    /**
     * @brief Differentiates this.
     * 
-    * grad is the output vector such that grad[i] if the derivative of this
+    * G is the output vector such that G[i] if the derivative of this
     * at pt with respect to the i-th variable of its scope
     */
-   virtual void diff(const RealPoint& pt, RealVector& grad) = 0;
-
-   /**
-    * @brief Evaluates and differentiates this.
-    * 
-    * val is the the evaluation of this at pt
-    * 
-    * grad is the output vector such that grad[i] if the derivative of this
-    * at pt with respect to the i-th variable of its scope
-    */
-   virtual void evalDiff(const RealPoint& pt, double& val,
-                         RealVector& grad) = 0;
+   virtual void diff(const RealPoint& pt, RealVector& G) = 0;
 
 protected:
    Interval img_;
@@ -127,20 +116,10 @@ public:
    /**
     * @brief Differentiates this.
     * 
-    * grad is the output vector such that grad[i] if the derivative of this
+    * G is the output vector such that G[i] if the derivative of this
     * at pt with respect to the i-th variable of its scope
     */
-   void diff(const RealPoint& pt, RealVector& grad);
-
-   /**
-    * @brief Evaluates and differentiates this.
-    * 
-    * val is the the evaluation of this at pt
-    * 
-    * grad is the output vector such that grad[i] if the derivative of this
-    * at pt with respect to the i-th variable of its scope
-    */
-   void evalDiff(const RealPoint& pt, double& val, RealVector& grad);
+   void diff(const RealPoint& pt, RealVector& G);
 
    /// Type of shared pointer to a representation
    using SharedRep = std::shared_ptr<RealFunctionRep>;
@@ -188,8 +167,7 @@ public:
    Scope scope() const override;
    size_t nbVars() const override;
    double eval(const RealPoint& pt) override;
-   void diff(const RealPoint& pt, RealVector& grad) override;
-   void evalDiff(const RealPoint& pt, double& val, RealVector& grad) override;
+   void diff(const RealPoint& pt, RealVector& G) override;
 
 private:
    SharedDag dag_;         // DAG

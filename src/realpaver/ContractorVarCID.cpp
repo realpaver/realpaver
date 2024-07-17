@@ -43,7 +43,7 @@ ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t nsCID
    ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
    ASSERT(op->scope().contains(v), 
           "Bad variable " << v << " in a varCID contractor");
-   ASSERT(n > 1, "Bad number of slices in a varCID contractor: " << n);
+   ASSERT(nsCID > 1, "Bad number of slices in a varCID contractor: " << nsCID);
 
    slicer_ = std::make_unique<IntervalPartitionMaker>(nsCID);
 }

@@ -89,4 +89,9 @@ RealPoint* RealPoint::clone() const
    return new RealPoint(*this);
 }
 
+bool RealPoint::isVectorizable() const
+{
+   return scop_.isIdentity();
+}
+
 } // namespace

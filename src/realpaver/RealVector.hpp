@@ -62,6 +62,9 @@ public:
    /// Returns true if at least one component is a NaN
    bool isNan() const;
 
+   /// Sets this to NaN
+   void setNan();
+
    /// Returns true if every component is not a NaN and is finite
    bool isFinite() const;
 

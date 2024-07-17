@@ -133,14 +133,6 @@ void RealFunctionVector::diff(const RealPoint& pt, RealMatrix& J)
    rep_->diff(pt, J);
 }
 
-void RealFunctionVector::evalDiff(const RealPoint& pt, RealVector& val,
-                                  RealMatrix& J)
-{
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
-
-   rep_->evalDiff(pt, val, J);
-}
-
 /*----------------------------------------------------------------------------*/
 
 RealFunctionVectorDag::RealFunctionVectorDag(SharedDag dag)
@@ -210,22 +202,12 @@ RealFunction RealFunctionVectorDag::fun(size_t i) const
 
 void RealFunctionVectorDag::eval(const RealPoint& pt, RealVector& val)
 {
-   dag_->realEval(pt, val);
+   dag_->rEval(pt, val);
 }
 
 void RealFunctionVectorDag::diff(const RealPoint& pt, RealMatrix& J)
 {
-   RealVector val(nbFuns());
-
-   dag_->realEval(pt, val);
-   dag_->realDiff(J);
-}
-
-void RealFunctionVectorDag::evalDiff(const RealPoint& pt, RealVector& val,
-                                     RealMatrix& J) 
-{
-   dag_->realEval(pt, val);
-   dag_->realDiff(J);
+   dag_->rDiff(pt, J);  
 }
 
 /*----------------------------------------------------------------------------*/
@@ -292,37 +274,6 @@ void RealFunctionVectorList::diff(const RealPoint& pt, RealMatrix& J)
 
       RealVector G(f.nbVars());
       f.diff(pt, G);
-
-      // fills the i-th row of the matrix
-      size_t j = 0;
-      for (auto v : scope())
-      {
-         if (f.scope().contains(v))
-            J.set(i, j, G.get(f.scope().index(v)));
- 
-         else
-            J.set(i, j, 0.0);
-
-         ++j;
-      }
-   }
-}
-
-void RealFunctionVectorList::evalDiff(const RealPoint& pt, RealVector& val,
-                                      RealMatrix& J)
-{
-   ASSERT(val.size() == nbFuns(),
-          "Bad size of vector given for the evaluation of a function vector");
-
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a function vector");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      auto& f = vf_[i];
-
-      RealVector G(f.nbVars());
-      f.evalDiff(pt, val[i], G);
 
       // fills the i-th row of the matrix
       size_t j = 0;

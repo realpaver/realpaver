@@ -76,6 +76,16 @@ public:
 
    RealPoint* clone() const override;
 
+   /**
+    * @brief Tests if this behaves like a vector.
+    * 
+    * Returns true if the scope of this contains the variables whose
+    * identifiers are 0, 1, 2, ..., which permits to consider this as a vector.
+    * In other words, it is possible to cast this to a RealVector and to access
+    * the domains using the variable ids.
+    */
+   bool isVectorizable() const;
+
 private:
    Scope scop_;
 };

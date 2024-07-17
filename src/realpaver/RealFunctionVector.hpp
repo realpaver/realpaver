@@ -72,20 +72,6 @@ public:
     * J must have nbFuns() rows and nbVars() columns.
     */
    virtual void diff(const RealPoint& pt, RealMatrix& J) = 0;
-
-   /**
-    * @brief Evaluates and differentiates this.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this at pt
-    * and val must have nbFuns() components
-    * 
-    * J is the Jacobian matrix of this on B such that we have the partial
-    * derivative dfi / dxj in the i-th row and j-th column of J.
-    * 
-    * J must have nbFuns() rows and nbVars() columns.
-    */
-   virtual void evalDiff(const RealPoint& pt, RealVector& val,
-                         RealMatrix& J) = 0;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -166,19 +152,6 @@ public:
     */
    void diff(const RealPoint& pt, RealMatrix& J);
 
-   /**
-    * @brief Evaluates and differentiates this.
-    * 
-    * val[i] is the result of the evaluation of the i-th function of this at pt
-    * and val must have nbFuns() components
-    * 
-    * J is the Jacobian matrix of this on B such that we have the partial
-    * derivative dfi / dxj in the i-th row and j-th column of J.
-    * 
-    * J must have nbFuns() rows and nbVars() columns.
-    */
-   void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J);
-
    /// Type of the representation of interval functions vectors
    using SharedRep = std::shared_ptr<RealFunctionVectorRep>;
 
@@ -231,7 +204,6 @@ public:
    RealFunction fun(size_t i) const override;
    void eval(const RealPoint& pt, RealVector& val) override;
    void diff(const RealPoint& pt, RealMatrix& J) override;
-   void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J) override;
 
 private:
    SharedDag dag_;
@@ -267,7 +239,6 @@ public:
    RealFunction fun(size_t i) const override;
    void eval(const RealPoint& pt, RealVector& val) override;
    void diff(const RealPoint& pt, RealMatrix& J) override;
-   void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J) override;
 
 private:
    std::vector<RealFunction> vf_;

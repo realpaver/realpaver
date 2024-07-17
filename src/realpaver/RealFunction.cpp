@@ -83,14 +83,9 @@ double RealFunction::eval(const RealPoint& pt)
    return rep_->eval(pt);
 }
 
-void RealFunction::diff(const RealPoint& pt, RealVector& grad)
+void RealFunction::diff(const RealPoint& pt, RealVector& G)
 {
-   return rep_->diff(pt, grad);
-}
-
-void RealFunction::evalDiff(const RealPoint& pt, double& val, RealVector& grad)
-{
-   return rep_->evalDiff(pt, val, grad);
+   return rep_->diff(pt, G);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -137,23 +132,13 @@ size_t RealFunctionDag::nbVars() const
 
 double RealFunctionDag::eval(const RealPoint& pt)
 {
-   return dag_->fun(index_)->realEval(pt);
+   return dag_->fun(index_)->rEval(pt);
 }
 
-void RealFunctionDag::diff(const RealPoint& pt, RealVector& grad)
+void RealFunctionDag::diff(const RealPoint& pt, RealVector& G)
 {
-   double val;
-   evalDiff(pt, val, grad);
-}
-
-void RealFunctionDag::evalDiff(const RealPoint& pt, double& val,
-                               RealVector& grad)
-{
-   ASSERT(nbVars() == grad.size(), "Bad size of gradient");
-
    DagFun* f = dag_->fun(index_);
-   val = f->realEval(pt);
-   f->realDiff(grad);
+   return f->rDiff(pt, G);
 }
 
 } // namespace

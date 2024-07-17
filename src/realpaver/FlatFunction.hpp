@@ -146,6 +146,27 @@ public:
     */
    void iDiff(const IntervalBox& B, IntervalVector& G);
 
+   /**
+    * @brief Real evaluation of this on pt.
+    * 
+    * The left bounds of the interval constants are used.
+    */
+   double rEval(const RealPoint& pt);
+
+   /// Returns the result of the last real evaluation
+   double rval() const;
+
+   /**
+    * @brief Real differentiation method.
+    * 
+    * Calculates the gradient of this at pt (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    * 
+    * This function is also evaluated using real arithmetic. The result
+    * can be obtained by a call to rval().
+    */
+   void rDiff(const RealPoint& pt, RealVector& G);
+
    /// @name Creation methods
    ///@{
 
@@ -189,6 +210,9 @@ private:
    Interval* ival_;     // used for interval evaluation and projection
    Interval* idv_;      // used for interval differentiation
 
+   double* rval_;       // used for real evaluation
+   double* rdv_;        // used for real differentiation
+
    std::vector<Interval> cst_;   // list of constants
    std::vector<Variable> var_;   // list of variables (with multi-occurrences)
 
@@ -210,6 +234,12 @@ private:
 
    // backward phase of interval differentiation in reverse mode
    void iDiff();
+
+   // Real evaluation of this on V
+   double rEval(const RealVector& V);
+
+   // backward phase of real differentiation in reverse mode
+   bool rDiff();
 };
 
 /// Output on a stream
