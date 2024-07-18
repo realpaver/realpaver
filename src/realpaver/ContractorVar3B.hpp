@@ -83,8 +83,6 @@ private:
    Variable v_;                              // variable whose domain is sliced
    std::unique_ptr<IntervalSlicer> slicer_;  // slicer
    double var_min_width_;                    // threshold
-   Interval left_, right_;                   // left and right consistent slices
-                                             // in the last call of contract
 };
 
 } // namespace

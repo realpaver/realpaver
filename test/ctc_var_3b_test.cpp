@@ -32,35 +32,35 @@ void test_1()
 {
    Result res = my_test(Interval(0.5, 1));
    TEST_TRUE(res.first == Proof::Maybe);
-   TEST_TRUE(res.second.isSetEq(Interval(0, 2)));
+   TEST_TRUE(res.second.isSetEq(Interval(0.5, 1)));
 }
 
 void test_2()
 {
    Result res = my_test(Interval(1.5, 5.5));
    TEST_TRUE(res.first == Proof::Maybe);
-   TEST_TRUE(res.second.isSetEq(Interval(1, 6)));
+   TEST_TRUE(res.second.isSetEq(Interval(1.5, 5.5)));
 }
 
 void test_3()
 {
    Result res = my_test(Interval(1.5, 1.75));
    TEST_TRUE(res.first == Proof::Maybe);
-   TEST_TRUE(res.second.isSetEq(Interval(1, 2)));
+   TEST_TRUE(res.second.isSetEq(Interval(1.5, 1.75)));
 }
 
 void test_4()
 {
    Result res = my_test(Interval(-1, 3.5));
    TEST_TRUE(res.first == Proof::Maybe);
-   TEST_TRUE(res.second.isSetEq(Interval(0, 4)));
+   TEST_TRUE(res.second.isSetEq(Interval(0, 3.5)));
 }
 
 void test_5()
 {
    Result res = my_test(Interval(3.5, 11));
    TEST_TRUE(res.first == Proof::Maybe);
-   TEST_TRUE(res.second.isSetEq(Interval(3, 10)));
+   TEST_TRUE(res.second.isSetEq(Interval(3.5, 10)));
 }
 
 void test_6()

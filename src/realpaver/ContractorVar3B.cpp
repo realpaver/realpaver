@@ -110,6 +110,7 @@ Proof ContractorVar3B::contract(IntervalBox& B)
       facet->set(v_, lslice);
 
       Proof certif = op_->contract(*facet);
+
       if (certif == Proof::Empty)
       {
          ++nbl;
@@ -117,7 +118,10 @@ Proof ContractorVar3B::contract(IntervalBox& B)
          if (nbl == nbs) iter = false;
       }
       else
+      {
+         lslice = facet->get(v_);
          iter = false;
+      }
 
       delete facet;
    }
@@ -137,18 +141,23 @@ Proof ContractorVar3B::contract(IntervalBox& B)
       facet->set(v_, rslice);
 
       Proof certif = op_->contract(*facet);
+
       if (certif == Proof::Empty)
       {
          ++nbr;
          ++jt;
          if (nbr == nbs - nbl - 1)
          {
+            // only one consistent facet
             iter = false;
-            rslice = *jt;
+            rslice = lslice;
          }
       }
       else
+      {
+         rslice = facet->get(v_);
          iter = false;
+      }
 
       delete facet;
    }
