@@ -162,12 +162,6 @@ BC3_ITER_LIMIT = 30
 # ACID : ACID contractor
 PROPAGATION_BASE = HC4
 
-# Propagation with a polytope hull contractor
-# - NO: contractor not used
-# - RLT: contractor based on a RLT-based relaxation
-# - TAYLOR: contractor based on a Taylor relaxation
-PROPAGATION_WITH_POLYTOPE = NO
-
 # Propagation with the interval Newton method applied to a square system
 # of equations (YES or NO)
 PROPAGATION_WITH_NEWTON = YES
@@ -286,5 +280,5 @@ INFLATION_DELTA = 1.125
 # Let x be an interval and let m(x) be its midpoint. An inflation of x returns
 # m(x) + delta*(x - m(x)) + chi*[-1,1]. The following parameter chi is a small
 # real number > 0.0 which is necessary to inflate degenerated intervals.
-# intervals. 
+# intervals.
 INFLATION_CHI = 1.0e-12

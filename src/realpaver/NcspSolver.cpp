@@ -67,7 +67,7 @@ NcspSolver::~NcspSolver()
 
 double NcspSolver::getSolvingTime() const
 {
-   return stimer_.elapsedTime();   
+   return stimer_.elapsedTime();
 }
 
 int NcspSolver::getTotalNodes() const
@@ -89,7 +89,7 @@ void NcspSolver::solve()
       withPreprocessing_ = true;
       preprob_ = new Problem();
       preproc_->apply(*problem_, *preprob_);
-   
+
       if (!preproc_->isSolved())
          branchAndPrune();
    }
@@ -158,12 +158,7 @@ void NcspSolver::makePropagator()
       env_->getParam()->getStrParam("PROPAGATION_WITH_NEWTON");
    bool newton = (with_newton == "YES");
 
-   // Polytope hull contractor: YES or NO
-   std::string with_polytope =
-      env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
-   bool polytope = (with_polytope == "YES");
-
-   if ((newton == false) && (polytope == false))
+   if (newton == false)
    {
       if (hc4)
          propagator_ = new NcspHC4(*factory_);
@@ -174,7 +169,7 @@ void NcspSolver::makePropagator()
       else
          propagator_ = new NcspACID(*factory_);
    }
-   else if (polytope == false)
+   else
    {
       if (hc4)
          propagator_ = new NcspHC4Newton(*factory_);
@@ -184,28 +179,6 @@ void NcspSolver::makePropagator()
 
       else
          propagator_ = new NcspACIDNewton(*factory_);
-   }
-   else if (newton == false)
-   {
-      if (hc4)
-         propagator_ = new NcspHC4Polytope(*factory_);
-
-      else if (bc4)
-         propagator_ = new NcspBC4Polytope(*factory_);
-
-      else
-         propagator_ = new NcspACIDPolytope(*factory_);
-   }
-   else
-   {
-      if (hc4)
-         propagator_ = new NcspHC4PolytopeNewton(*factory_);
-
-      else if (bc4)
-         propagator_ = new NcspBC4PolytopeNewton(*factory_);
-
-      else
-         propagator_ = new NcspACIDPolytopeNewton(*factory_);
    }
 }
 
@@ -332,7 +305,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
    }
    else
    {
-      LOG_INTER("Contracted box: " << (*node->box()));      
+      LOG_INTER("Contracted box: " << (*node->box()));
    }
 
    if (isInner(node->box()))
@@ -380,7 +353,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 #if LOG_ON
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
-         SharedNcspNode subnode = *it;   
+         SharedNcspNode subnode = *it;
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
          LOG_LOW(*subnode->box());
       }
@@ -507,7 +480,7 @@ void NcspSolver::branchAndPrune()
       {
          LOG_MAIN("Stops on solution limit (" << sollimit << ")");
          env_->setSolutionLimit(true);
-         iter = false;         
+         iter = false;
       }
 
 #if LOG_ON
@@ -534,7 +507,7 @@ void NcspSolver::branchAndPrune()
    }
    else
    {
-      LOG_INTER("No Certification a posteriori");      
+      LOG_INTER("No Certification a posteriori");
    }
 
    stimer_.stop();
@@ -552,7 +525,7 @@ void NcspSolver::certifySolutions()
       IntervalBox B(*dbox);
 
       proof = prover_->certify(B);
-      
+
       if (proof != Proof::Empty)
       {
          // B may be different from the hull of dbox, typically when
@@ -564,7 +537,7 @@ void NcspSolver::certifySolutions()
                      y = dbox->get(v)->intervalHull();
 
             if (x.isSetNeq(y))
-            {               
+            {
                std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
                dbox->set(v, std::move(dom));
             }

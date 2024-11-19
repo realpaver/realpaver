@@ -100,7 +100,6 @@ Param::Param()
    strmap_.insert(std::make_pair("SPLIT_SELECTION",           "RR"));
    strmap_.insert(std::make_pair("SPLIT_SLICING",             "BI"));
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
    strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
@@ -148,7 +147,7 @@ double Param::getDblParam(const std::string& name) const
    if (it == dblmap_.end())
       THROW("Symbol '" << name << "' is not a real parameter");
 
-   return it->second;   
+   return it->second;
 }
 
 double Param::GetDblParam(const std::string& name)
@@ -178,7 +177,7 @@ std::string Param::getStrParam(const std::string& name) const
    if (it == strmap_.end())
       THROW("Symbol '" << name << "' is not a string parameter");
 
-   return it->second;      
+   return it->second;
 }
 
 std::string Param::GetStrParam(const std::string& name)
@@ -193,7 +192,7 @@ void Param::setStrParam(const std::string& name, const std::string& val)
    if (it == strmap_.end())
       THROW("Symbol '" << name << "' is not a string parameter");
 
-   strmap_[name] = val;   
+   strmap_[name] = val;
 }
 
 void Param::SetStrParam(const std::string& name, const std::string& val)
@@ -285,7 +284,7 @@ void Param::processParam(const std::string& name, const std::string& val)
    auto its = strmap_.find(name);
    if (its != strmap_.end())
    {
-      strmap_[name] = val;      
+      strmap_[name] = val;
       return;
    }
 
@@ -309,7 +308,7 @@ void Param::readParam(const std::string& line, size_t first)
 
    if (line[j] != '=') throwEx();
 
-   // eats = 
+   // eats =
    ++j;
 
    size_t k = eatSpaces(line, j);
@@ -332,7 +331,7 @@ void Param::processLine(const std::string& line)
 {
    size_t i = eatSpaces(line, 0);
 
-   // line with spaces 
+   // line with spaces
    if (i == line.size()) return;
 
    // comment line
@@ -355,9 +354,9 @@ void Param::loadParam(const std::string& filename)
    {
       std::string line;
       lineno_ = 0;
-      
+
       while (getline(f, line))
-      {         
+      {
          ++ lineno_;
          processLine(line);
       }
@@ -380,7 +379,7 @@ void Param::print(std::ostream& os) const
       size_t l = it->first.length();
       if (l > lmax) lmax = l;
    }
-   
+
    // doubles
    for (auto it = dblmap_.begin(); it != dblmap_.end(); ++it)
    {

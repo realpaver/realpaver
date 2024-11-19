@@ -51,7 +51,7 @@ if lp_lib_name.to_upper() == 'CLP'
   lp_header_hpp += 'LPSolverClp.hpp'
   rp_sources += ['LPSolverClp.cpp']
 elif lp_lib_name.to_upper() == 'GUROBI'
-#### NOT WORKING FOR NOW 
+#### NOT WORKING FOR NOW
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
 elif lp_lib_name.to_upper() == 'SOPLEX'
@@ -129,7 +129,6 @@ rp_headers += [
   'ContractorHC4.hpp',
   'ContractorHC4Revise.hpp',
   'ContractorList.hpp',
-  'ContractorPolytope.hpp',
   'ContractorPool.hpp',
   'ContractorVar3B.hpp',
   'ContractorVar3BCID.hpp',
@@ -195,7 +194,6 @@ rp_headers += [
   'RealMatrix.hpp',
   'RealPoint.hpp',
   'RealVector.hpp',
-  'RLTRelaxation.hpp',
   'Scope.hpp',
   'ScopeBank.hpp',
   'ScopeMap.hpp',
@@ -234,7 +232,6 @@ rp_sources += [
   'ContractorHC4.cpp',
   'ContractorHC4Revise.cpp',
   'ContractorList.cpp',
-  'ContractorPolytope.cpp',
   'ContractorPool.cpp',
   'ContractorVar3B.cpp',
   'ContractorVar3BCID.cpp',
@@ -293,7 +290,6 @@ rp_sources += [
   'RealMatrix.cpp',
   'RealPoint.cpp',
   'RealVector.cpp',
-  'RLTRelaxation.cpp',
   'Scope.cpp',
   'ScopeBank.cpp',
   'ScopeMap.cpp',

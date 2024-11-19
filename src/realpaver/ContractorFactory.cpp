@@ -174,7 +174,7 @@ SharedContractorBC4 ContractorFactory::makeBC4()
    bc4->setBC4RevisePeelFactor(val);
 
    int niter = env_->getParam()->getIntParam("BC3_ITER_LIMIT");
-   bc4->setBC4ReviseMaxIter(niter);   
+   bc4->setBC4ReviseMaxIter(niter);
 
    return bc4;
 }
@@ -183,7 +183,7 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
 {
    size_t ne = ve_.size(),
           nv = se_.size();
-   
+
    if ((ne < 2) || (ne != nv)) return nullptr;
 
    std::shared_ptr<IntervalNewton> newton;
@@ -207,7 +207,7 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
    if (newton != nullptr)
    {
       LOG_LOW("Newton operator built by the factory");
-      
+
       double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL");
       newton->setTol(Tolerance(rtol, 0.0));
 
@@ -298,29 +298,4 @@ SharedContractor ContractorFactory::makeACID()
                                            cycleLength, ctRatio, varMinWidth);
 }
 
-SharedContractorPolytope ContractorFactory::makePolytope()
-{
-   if (dag_->isEmpty()) return nullptr;
-
-   SharedContractorPolytope op = nullptr;
-   std::string
-      creator = env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE");
-
-   if (creator == "TAYLOR")
-      op = std::make_shared<ContractorPolytope>(dag_,
-                                                PolytopeStyle::Taylor);
-
-   else if (creator == "RLT")
-      op = std::make_shared<ContractorPolytope>(dag_,
-                                                PolytopeStyle::RLT);
-
-   if (op != nullptr)
-   {
-      double tol = env_->getParam()->getDblParam("RELAXATION_EQ_TOL");
-      op->setRelaxEqTol(tol);
-   }
-
-   return op;
-}
- 
 } // namespace

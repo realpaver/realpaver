@@ -31,10 +31,10 @@ namespace realpaver {
 
 /**
  * @brief Base class of propagators of NCSP solver.
- * 
+ *
  * A propagator is an algorithm / operator that contracts the domains of
  * variables occurring in a NCSP search node.
- * 
+ *
  * Concrete propagators are built in contractor factories.
  */
 class NcspPropagator {
@@ -53,10 +53,10 @@ public:
 
    /**
     * @brief Contraction method.
-    * 
+    *
     * It applies first contractImpl and then the domain contractors for
     * variables with disconnected domains.
-    * 
+    *
     * Returns a certificate of proof
     */
    Proof contract(NcspNode& node, NcspContext& ctx);
@@ -106,20 +106,6 @@ class NcspNewton : public NcspPropagator {
 public:
    /// Constructor
    NcspNewton(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   SharedContractor op_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Polytope contractor
-class NcspPolytope : public NcspPropagator {
-public:
-   /// Constructor
-   NcspPolytope(ContractorFactory& facto);
 
    Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
 
@@ -184,7 +170,7 @@ private:
 
 /**
  * @brief Applies in sequence NcspACID and NcspNewton.
- * 
+ *
  * The Newton operator is used only for square systems of equations.
  */
 class NcspACIDNewton : public NcspPropagator {
@@ -196,96 +182,6 @@ public:
 
 private:
    NcspACID acid_;
-   NcspNewton newton_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Applies in sequence NcspHC4 and NcspPolytope
-class NcspHC4Polytope : public NcspPropagator {
-public:
-   /// Constructor
-   NcspHC4Polytope(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   NcspHC4 hc4_;
-   NcspPolytope poly_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Applies in sequence NcspBC4 and NcspPolytope
-class NcspBC4Polytope : public NcspPropagator {
-public:
-   /// Constructor
-   NcspBC4Polytope(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   NcspBC4 bc4_;
-   NcspPolytope poly_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Applies in sequence NcspACID and NcspPolytope
-class NcspACIDPolytope : public NcspPropagator {
-public:
-   /// Constructor
-   NcspACIDPolytope(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   NcspACID acid_;
-   NcspPolytope poly_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Applies in sequence NcspHC4, NcspPolytope and NcspNewton
-class NcspHC4PolytopeNewton : public NcspPropagator {
-public:
-   /// Constructor
-   NcspHC4PolytopeNewton(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   NcspHC4Polytope hc4poly_;
-   NcspNewton newton_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Applies in sequence NcspBC4, NcspPolytope, and NcspNewton
-class NcspBC4PolytopeNewton : public NcspPropagator {
-public:
-   /// Constructor
-   NcspBC4PolytopeNewton(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   NcspBC4Polytope bc4poly_;
-   NcspNewton newton_;
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Aplies in sequence NcspACID, NcspPolytope, and NcspNewton
-class NcspACIDPolytopeNewton : public NcspPropagator {
-public:
-   /// Constructor
-   NcspACIDPolytopeNewton(ContractorFactory& facto);
-
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
-
-private:
-   NcspACIDPolytope acidpoly_;
    NcspNewton newton_;
 };
 
