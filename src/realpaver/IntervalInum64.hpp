@@ -36,15 +36,15 @@ using RawInterval = inum64::interval;
 
 /**
  * @brief Specialization of the interval traits for inum64.
- * 
+ *
  * @see IntervalTraits
- * 
+ *
  *  The operations are either delegated to gaol if they are available in this
  *  library or implemented otherwise.
  */
 template <>
 struct IntervalTraits<RawInterval> {
-   using Interval = RawInterval;
+   using interval = RawInterval;
 
    static inline interval create()
    {
@@ -255,7 +255,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isOne(const interval& x)
    {
-      return return (x.left() == 1.0) && (x.right() == 1.0);
+      return (x.left() == 1.0) && (x.right() == 1.0);
    }
 
    static inline bool isAnInt(const interval& x)
@@ -265,7 +265,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool contains(const interval& x, double a)
    {
-      return x.contains(a);      
+      return x.contains(a);
    }
 
    static inline bool strictlyContains(const interval& x, double a)
@@ -301,7 +301,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isSetNeq(const interval& x, const interval& y)
    {
-      return x != y;      
+      return x != y;
    }
 
    static inline bool isNegative(const interval& x)
@@ -331,7 +331,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isPossiblyNeq(const interval& x, const interval& y)
    {
-      return x.is_possibly_neq(y);      
+      return x.is_possibly_neq(y);
    }
 
    static inline bool isPossiblyLe(const interval& x, const interval& y)
@@ -341,7 +341,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isPossiblyLt(const interval& x, const interval& y)
    {
-      return x.is_possibly_lt(y);      
+      return x.is_possibly_lt(y);
    }
 
    static inline bool isPossiblyGe(const interval& x, const interval& y)
@@ -427,7 +427,7 @@ struct IntervalTraits<RawInterval> {
    static inline void print(std::ostream& os, const interval& x)
    {
       os << x;
-   } 
+   }
 
    static inline void addAssign(interval& x, const interval& y)
    {
@@ -553,7 +553,7 @@ struct IntervalTraits<RawInterval> {
    static inline interval divPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return inum64::div_pz(x, y, z);     
+      return inum64::div_pz(x, y, z);
    }
 
    static inline interval sqr(const interval& x)
@@ -729,7 +729,7 @@ struct IntervalTraits<RawInterval> {
    }
 
    static inline interval absPX(const interval& x, const interval& y)
-   {      
+   {
       return inum64::abs_px(x, y);
    }
 

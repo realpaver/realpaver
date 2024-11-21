@@ -52,8 +52,9 @@ if interval_lib_name.to_upper() == 'GAOL'
   endif
   interval_dep = cpp_comp.find_library('gaol', required: true)
 elif interval_lib_name.to_upper() == 'INUM64'
-  mathlib_dep = cpp_comp.find_library('mpfr', required: true)
-  interval_dep = cpp_comp.find_library('inum64', required: true)
+  #mathlib_dep = cpp_comp.find_library('mpfr', required: true)
+  #interval_dep = cpp_comp.find_library('inum64', required: true)
+  interval_dep = dependency('inum64', required: true)
 else
   error('No suitable interval library found!')
 endif
