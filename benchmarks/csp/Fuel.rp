@@ -1,0 +1,79 @@
+# MINLP World	[ MINLP World Home | MINLPLib | Contact ]
+# fuel.gms:
+# References:
+# GAMS Development, GAMS Model Library.
+# Wood, A J, and Wollenberg, B F, Example Problem 4e. In Power Generation, Operation and Control. John Wiley and Sons, 1984, pp. 85-88.
+# Original source: GAMS model feedtray.gms from Gams Model Library
+# Point: p1 
+# Best known point (p1): Solution value 8566.12 (global optimum, BARON certificate)
+
+# * MINLP written by GAMS Convert at 04/18/01 12:07:24
+# * 
+# * Equation counts
+# * Total  E  G  L  N  X
+# * 16  7  6  3  0  0
+# * 
+# * Variable counts
+# * x  b  i s1s s2s sc si
+# * Total cont binary integer sos1 sos2  scont sint
+# * 16 13  3  0  0  0  0  0
+# * FX 0  0  0  0  0  0  0  0
+# * 
+# * Nonzero counts
+# * Total  const NL DLL
+# * 39 33  6  0
+# *
+# * Solve m using MINLP minimizing objvar;
+
+
+Variables
+    b1 binary,
+    b2 binary,
+    b3 binary,
+    x4 in [-1e8, 1e8],
+    x5 in [-1e8, 1e8],
+    x6 in [-1e8, 1e8],
+    x7 in [50, 700],
+    x8 in [50, 700],
+    x9 in [50, 700],
+    x10 in [0, 1e8],
+    x11 in [0, 1e8],
+    x12 in [0, 1e8],
+    x13 in [0, 4000],
+    x14 in [0, 4000],
+    x15 in [2000, 4000],
+    objvar in [-1e8, 1e8];
+
+Constraints
+
+    -(0.0025*x7^2 + 6*x7 + 0.0025*x8^2 + 6*x8 + 0.0025*x9^2 + 6*x9) + objvar == 900,
+
+    -100*b1 + x4 >= 0,
+
+    -100*b2 + x5 >= 0,
+
+    -100*b3 + x6 >= 0,
+
+    -500*b1 + x4 <= 0,
+
+    -500*b2 + x5 <= 0,
+
+    -500*b3 + x6 <= 0,
+
+    x10 + x13 == 3500,
+
+    x11 -x13 + x14 == 500,
+
+    x12 -x14 + x15 == 500,
+
+    x4 + x7 >= 400,
+
+    x5 + x8 >= 900,
+
+    x6 + x9 >= 700,
+
+    -(0.005*x4^2 + x4) -50*b1 + x10 == 0,
+
+    -(0.005*x5^2 + x5) -50*b2 + x11 == 0,
+    
+    -(0.005*x6^2 + x6) -50*b3 + x12 == 0;
