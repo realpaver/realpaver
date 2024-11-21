@@ -1,0 +1,10 @@
+Variables
+   x in [-4.5, 4.5],
+   y in [-4.5, 4.5]
+;
+
+Objectives
+   MIN (1.5 - x + x*y)^2 + (2.25 - x + x*y^2)^2 + (2.625 - x + x*y^3)^2;
+
+Constraints
+   x*y >= 0;

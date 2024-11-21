@@ -1,0 +1,13 @@
+Variables
+x2 integer in [12,60],
+x3 integer in [12,60],
+x4 integer in [12,60],
+x5 integer in [12,60];
+
+
+# minimize
+# (0.14427932477276 - (x2*x3)/(x4*x5))^2;
+
+Constraints
+
+    (0.14427932477276 - (x2*x3)/(x4*x5))^2 <= 1E-8;
