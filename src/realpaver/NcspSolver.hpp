@@ -53,7 +53,7 @@ namespace realpaver {
  * After the solving phase, it is possible to read the solutions as follows:
  *
    @verbatim
-   for (size_t i=0; i<solver.getNbSolutions(); ++i) {
+   for (size_t i=0; i<solver.nbSolutions(); ++i) {
       std::pair<DomainBox, Proof> sol = solver.getSolution(i);
    }
    @endverbatim
