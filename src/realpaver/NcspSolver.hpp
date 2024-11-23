@@ -40,21 +40,21 @@ namespace realpaver {
  * a preprocessing step that tries to reduce the variable domains, to
  * fix and then eliminate some variables, to detect inactive constraints
  * or unfeasible constraints. The second phase is an interval-based
- * branch-and-prune algorithm prameterized by several components.
+ * branch-and-prune algorithm parameterized by several components.
  *
  * The solver takes as input a problem that must be a NCSP. Its components
  * are generated according to a Param object prm that can be assigned as
  * follows:
- * 
+ *
    @verbatim
    solver.getEnv()->setParam(prm);
    @endverbatim
  *
  * After the solving phase, it is possible to read the solutions as follows:
- * 
+ *
    @verbatim
    for (size_t i=0; i<solver.getNbSolutions(); ++i) {
-      std::pair<IntervalBox, Proof> sol = solver.getSolution(i);
+      std::pair<DomainBox, Proof> sol = solver.getSolution(i);
    }
    @endverbatim
  *
