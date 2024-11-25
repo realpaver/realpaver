@@ -39,5 +39,5 @@ $$
 $$
 Each of these boxes encloses one solution at a given precision $\epsilon=10^{-8}$, _i.e._ the diameter (width) of each output interval is smaller than $\epsilon$. The first solution is depicted in the figure above and the second solution is a symetric one.
 
-The solver implements a _branch-and-prune algorithm_ that alternates pruning (contraction) and branching (separation) steps from the initial interval box $[-\pi,+\pi]^2$. It is guaranteed that <span style="color:red">no solution is lost</span>. In particular, it is proved that there is no solution when no solution is found.
+The solver implements a _branch-and-prune algorithm_ that alternates pruning (contraction) and branching (separation) steps from the initial interval box $[-\pi,+\pi]^2$. It is guaranteed that <span style="color:red">no solution is lost</span> when the solving process is _complete_ (no timeout is activated). In particular, it is proved that there is no solution when no solution is found.
 
