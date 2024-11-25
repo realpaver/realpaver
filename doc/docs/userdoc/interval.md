@@ -1,12 +1,28 @@
 ## Introduction to interval computations
-Let $C=d\times\pi$ be the circumference of a circle of diameter $d$. Given $d=2$ it comes $$C = 2\times\pi\approx 6.2831853$$
-using floating-point arithmetic. Now let $[\pi]=[3.1415926,3.1415927]$ be an _interval enclosure_ of $\pi$, _i.e._ a tight interval that contains $\pi$. An interval enclosure of $C$ is derived by an interval multiplication $$C\in 2\times [\pi] = [6.2831852,6.2831854].$$ As shown above, intervals are useful to bound rounding errors that occur in numerical computations.
+Let $C=d\times\pi$ be the circumference of a circle of diameter $d$. Given $d=2$ it comes
+<!-- Math blocks must preceded and followed by an empty line -->
+
+$$C = 2\times\pi\approx 6.2831853$$
+
+using floating-point arithmetic. Now let $[\pi]=[3.1415926,3.1415927]$ be an _interval enclosure_ of $\pi$, _i.e._ a tight interval that contains $\pi$. An interval enclosure of $C$ is derived by an interval multiplication
+
+$$C\in 2\times [\pi] = [6.2831852,6.2831854].$$
+
+As shown above, intervals are useful to bound rounding errors that occur in numerical computations.
 
 More generally, <span style="color:orange">intervals are propagated through numerical algorithms to find interval enclosures of solutions to continuous problems</span>, _e.g._ constraint satisfaction or global optimization problems.
 
 ### Interval arithmetic
-The resistance of a series circuit with two resistors $R_1$ and $R_2$ is equal to $R = R_1+R_2$. Suppose that the resistors are not exactly known, _e.g._ $R_1=3\Omega$ and $R_2=5\Omega$ plus or minus $1\%$. An interval enclosure
+The resistance of a series circuit with two resistors $R_1$ and $R_2$ is equal to $R = R_1+R_2$.
+
+<figure markdown="span">
+![2 resistors in series](img/2resistors.svg){ width=250 }
+</figure>
+
+ Suppose that the resistors are not exactly known, _e.g._ $R_1=3\Omega\pm1\%$ and $R_2=5\Omega\pm1\%$$. An interval enclosure
+
 $$R\in [2.97,3.03]+[4.95,5.05] = [7.92,8.08]\Omega$$
+
 follows from an interval addition of the domains of $R_1$ and $R_2$. In this way, interval arithmetic extends real arithmetic to intervals so as to calculate the tightest possible interval enclosures.
 
 This example also shows that intervals are useful to represent uncertain quantities.
@@ -14,11 +30,12 @@ This example also shows that intervals are useful to represent uncertain quantit
 ### Constraint satisfaction problems
 A 2R planar robot with two revolute joints and two links is depicted below.
 
-<p align="center">
-<img src="img/robot-2r.png" height="200">
-</p>
+<figure markdown="span">
+![2R planar robot](img/robot-2r.svg){ width=500 }
+</figure>
 
 It is described by the following system of equations:
+
 $$
 \left\lbrace
 \begin{array}{l}
@@ -28,7 +45,9 @@ p_y = l_1\sin(q_1) + l_2\sin(q_1+q_2)
 \right.
 $$
 
-The inverse kinematics is the problem of finding the angles $q_1$ and $q_2$ when the position of the end effector $(p_x,p_y)$ is known. Given $(l_1,l_2,p_x,p_y) = (4.5,3,5.75,4.25)$ and $q_1,q_2\in [-\pi,+\pi]$, RealPaver returns two _interval boxes_:
+The inverse kinematics is the problem of finding the angles $q_1$ and $q_2$ when the position of the end effector $(p_x,p_y)$ is known.
+
+Given $(l_1,l_2,p_x,p_y) = (4.5,3,5.75,4.25)$ and $q_1,q_2\in [-\pi,+\pi]$, RealPaver returns two _interval boxes_:
 
 $$
 (q_1,q_2)\in\left\lbrace
