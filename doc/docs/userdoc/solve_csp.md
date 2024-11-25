@@ -1,1 +1,1 @@
-## How to solve a constraint satisfaction problem
+# How to solve a constraint satisfaction problem
