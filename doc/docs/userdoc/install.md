@@ -1,3 +1,4 @@
+# How to install
 
 No binary distribution is provided, so it must be compiled from source code.
 

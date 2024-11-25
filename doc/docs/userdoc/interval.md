@@ -1,4 +1,5 @@
-## Introduction to interval computations
+# Introduction to interval computations
+
 Let $C=d\times\pi$ be the circumference of a circle of diameter $d$. Given $d=2$ it comes
 <!-- Math blocks must preceded and followed by an empty line -->
 
@@ -12,7 +13,7 @@ As shown above, intervals are useful to bound rounding errors that occur in nume
 
 More generally, <span style="color:orange">intervals are propagated through numerical algorithms to find interval enclosures of solutions to continuous problems</span>, _e.g._ constraint satisfaction or global optimization problems.
 
-### Interval arithmetic
+## Interval arithmetic
 The resistance of a series circuit with two resistors $R_1$ and $R_2$ is equal to $R = R_1+R_2$.
 
 <figure markdown="span">
@@ -27,7 +28,7 @@ follows from an interval addition of the domains of $R_1$ and $R_2$. In this way
 
 This example also shows that intervals are useful to represent uncertain quantities.
 
-### Constraint satisfaction problems
+## Constraint satisfaction problems
 A 2R planar robot with two revolute joints and two links is depicted below.
 
 <figure markdown="span">
