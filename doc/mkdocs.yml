@@ -6,8 +6,16 @@ theme:
   logo: img/logo.svg
 
 markdown_extensions:
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - pymdownx.blocks.caption
   - pymdownx.arithmatex:
       generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      use_pygments: true
 
 extra:
   version:

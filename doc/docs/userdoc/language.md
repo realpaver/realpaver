@@ -5,7 +5,7 @@ to state *Constraint Satisfaction Problems* (CSPs) or *Constrained Optimization 
 This section describes this dedicated language that can be used to define files parsed as `Problem`
 in any C++ code or directly as input for the NCSP solver binary.
 
-The language supports 6 types of statements:
+The language supports 6 different statements at the global scope:
 
 - `Constants` definitions
 - `Variables` definitions
@@ -14,8 +14,8 @@ The language supports 6 types of statements:
 - `Constraints` definitions
 - `Objectives` definitions
 
-These 6 kinds of statements allow to define a list of each type of element.
-Namely, the `Constants` statement define a list of constants, all seperated by a `,`and terminated by a `;`.
+These 6 kinds of statements allow to define a **list** of each type of elements.
+Namely, the `Constants` statement defines a list of constants, all separated by a `,`and terminated by a `;`, even in the case of a single constant definition.
 
 These statements can be used several times in the same file.
 
@@ -23,7 +23,7 @@ These statements can be used several times in the same file.
 
 Single line comments can be defined using the `#` character:
 
-```
+``` py
 # This is a comment
 ```
 
@@ -53,8 +53,7 @@ Constants
   name_n = expr_n;
 ```
 
-**NB:** The expression used to defined a constant can use a previously defined constant
-and any constant arithmetic expression is valid.
+**NB:** The expression used to defined a constant can use a previously defined constant and any constant arithmetic expression is valid.
 
 A few constants are already defined and shouldn't be redefined as:
 `PI`, `-inf` (for $-\infty$) and  `+inf` (for $\infty$).
