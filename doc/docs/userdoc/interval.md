@@ -20,7 +20,7 @@ The resistance of a series circuit with two resistors $R_1$ and $R_2$ is equal t
 ![2 resistors in series](img/2resistors.svg){ width=250 }
 </figure>
 
- Suppose that the resistors are not exactly known, _e.g._ $R_1=3\Omega\pm1\%$ and $R_2=5\Omega\pm1\%$$. An interval enclosure
+ Suppose that the resistors are not exactly known, _e.g._ $R_1=3\Omega\pm1\%$ and $R_2=5\Omega\pm1\%$. An interval enclosure
 
 $$R\in [2.97,3.03]+[4.95,5.05] = [7.92,8.08]\Omega$$
 
@@ -32,7 +32,7 @@ This example also shows that intervals are useful to represent uncertain quantit
 A 2R planar robot with two revolute joints and two links is depicted below.
 
 <figure markdown="span">
-![2R planar robot](img/robot-2r.svg){ width=500 }
+![2R planar robot](img/robot-2r.svg){ width=400 }
 </figure>
 
 It is described by the following system of equations:
@@ -61,6 +61,10 @@ $$
 
 Each of these boxes encloses one solution at a given precision $\epsilon=10^{-8}$, _i.e._ the diameter (width) of each output interval is smaller than $\epsilon$. The first solution is depicted in the figure above and the second solution is a symetric one.
 
-The solver implements a _branch-and-prune algorithm_ that alternates pruning (contraction) and branching (separation) steps from the initial interval box $[-\pi,+\pi]^2$. It is guaranteed that <span style="color:orange">no solution is lost</span> when the solving process is _complete_ (no timeout is activated). In particular, it is proved that there is no solution when no solution is found.
+The solver implements a _branch-and-prune algorithm_ that alternates pruning (contraction) and branching (separation) steps from the initial interval box $[-\pi,+\pi]^2$. It is guaranteed that <span style="color:orange">no solution is lost</span> when the solving process is _complete_ (no limit or timeout is activated). In particular, it is proved that there is no solution when no solution is found.
 
-The work space of the 2R robot is the set of positions of the end effector given domains for the angles (the lenghs of the links are fixed). For example, we can define domains $q_1\in[\pi/6,\pi/4]$, $q_2\in[-\pi/6,0]$ and $(p_x,p_y)\in[-10,10]^2$. Given $\epsilon=0.5$, RealPaver calculates $21$ interval boxes, the union of which is a <span style="color:orange">_paving_</span> covering the 2D-solution space.
+The workspace of the 2R robot is the set of positions of the end effector given domains for the angles (the lenghs of the links are fixed). Given $q_1\in[\pi/12,\pi/6]$, $q_2\in[\pi/6,\pi/4]$ and $(p_x,p_y)\in[-10,10]^2$, RealPaver calculates $9$ interval boxes at precision $\epsilon=0.5$, the union of which is a <span style="color:orange">_paving_</span> covering the solution space, as depicted below.
+
+<figure markdown="span">
+![2R planar robot workspace](img/robot-2r-workspace.svg){ width=400 }
+</figure>
