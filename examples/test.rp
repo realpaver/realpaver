@@ -1,11 +1,27 @@
+Constants
+  g = 9.81;
+
 Variables
-    x in [-2.5,5],
-    y in [-2.5,5],
-    z in [-2.5,5];
+    x real in [-2.5,5] tol(0.1,0.1),
+    y integer in [-2.5,5],
+    z in [-2.5,5],
+    a binary,
+    b integer in {1,2},
+    c in [-inf,+inf];
 
+Aliases
+  x2 = x^2,
+  gg = g^2;
 
-Objectives
-   MIN 2*x+3*y-2;
+Functions
+  sum(d,e) = d+e,
+  test(a,b) = a*g+b*PI,
+  test2(a,b) = test(a,b)+1,
+  monom(a,x,d)=a*x^d,
+  poly2d(a,b,c,x)= monom(a,x,2)+monom(b,x,1)+monom(c,x,0);
+
+# Objectives
+#    MIN 2*x+3*y-2;
 
 Constraints
    x^2 + z <= 2;
