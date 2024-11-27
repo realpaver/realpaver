@@ -4,6 +4,22 @@ theme:
   name: material
   favicon: img/favicon.ico
   logo: img/logo.svg
+  features:
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - content.code.select
+  #    - content.action.edit
+  #    - navigation.footer
+  icon:
+    repo: fontawesome/brands/git-alt
+    # edit: material/pencil
+    # view: material/eye
+
+## Options dedicated to git repository
+repo_url: https://gitlab.univ-nantes.fr/realpavergroup/realpaver/
+repo_name: realpavergroup/realpaver
+edit_uri: edit/main/doc/docs/
 
 markdown_extensions:
   - attr_list
@@ -16,10 +32,16 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
       use_pygments: true
+      pygments_lang_class: true
+  - pymdownx.snippets
+  - pymdownx.superfences
 
-extra:
-  version:
-    provider: mike
+#extra:
+#  version:
+#    provider: mike
+#  social:
+#    - icon: fontawesome/brands/gitlab
+#      link: https://gitlab.univ-nantes.fr/realpavergroup/realpaver/
 
 extra_javascript:
   - javascripts/katex.js
@@ -31,6 +53,7 @@ extra_css:
 
 plugins:
   - search
+  - tags
   - mkdoxy:
       projects:
         api: # name of project must be alphanumeric + numbers (without spaces)
@@ -45,6 +68,45 @@ plugins:
       full-doc: True
       debug: False
       ignore-errors: False
+
+#  - with-pdf:
+#      author: Laurent Granvilliers and Raphaël Chenouard
+#copyright: TBD
+#
+#cover: false
+#back_cover: true
+#cover_title: RealPaver
+#cover_subtitle: SUBTITLE TEXT
+#custom_template_path: TEMPLATES PATH
+#
+#toc_title: TOC TITLE TEXT
+#heading_shift: false
+#toc_level: 3
+#ordered_chapter_level: 2
+#excludes_children:
+#    - 'release-notes/:upgrading'
+#    - 'release-notes/:changelog'
+#
+#      exclude_pages:
+#        - "api/"
+#    - 'bugs/'
+#    - 'appendix/contribute/'
+#convert_iframe:
+#    - src: IFRAME SRC
+#      img: POSTER IMAGE URL
+#      text: ALTERNATE TEXT
+#    - src: ...
+#two_columns_level: 3
+#
+#render_js: true
+#headless_chrome_path: headless-chromium
+#
+#output_path: any-place/document.pdf
+#enabled_if_env: ENABLE_PDF_EXPORT
+#
+#debug_html: true
+#show_anchors: true
+#verbose: true
 
 nav:
   - Home: index.md

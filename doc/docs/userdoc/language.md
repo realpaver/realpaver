@@ -46,7 +46,7 @@ Additional user-functions can be defined (see [functions definition](#functions)
 Defining constants starts with the `Constants` keyword followed by the list of constants definition as names
 with assigned value. The generic syntax is:
 
-```
+``` py
 Constants
   name_1 = expr_1,
   ...,
@@ -60,14 +60,14 @@ A few constants are already defined and shouldn't be redefined as:
 
 Here are 2 examples with a single constant definition and a list of 2 constants:
 
-```
+``` py
 Constants
   g = 9.81;
 ```
 
-```
+``` py
 Constants
-  R = 8,31446261815324, # Ideal gas constant in J.K^−1.mol^-1
+  R = 8,31446261815324,   # Ideal gas constant in J.K^−1.mol^-1
   k_B = 1.380649*1e-23;   # Boltzmann constant in J.K^−1
 ```
 
@@ -93,14 +93,14 @@ whereas enumerated set values are defined with brackets: `{1,4,10}`.
 Like for constants, variables can only be defined as list of variables with the keyword `Variables`.
 Here are two examples with the definition of a single variable and the definition of a list of 3 variables:
 
-```
+``` py
 Variables
   a in [-inf,+inf];
 ```
 
 The variable $a$ in defined over the interval $[\-infty,\infty]$ with default tolerances.
 
-```
+``` py
 Variables
   x in [-PI,2*PI/3] tol(0.,1e-3),
   y integer in {0,1,2,4,8},
@@ -125,7 +125,7 @@ alias_name = expression
 Aliases are defined in list, with the `Aliases` keyword.
 Here are two examples:
 
-```
+``` py
 Aliases
   cos2x = cos(x)^2;
 ```
@@ -133,7 +133,7 @@ Aliases
 The alias $cos2x$ is a shortcut for the expression $cos(x)^2$.
 Here, we make the assumption that variable $x$ is previously defined.
 
-```
+``` py
 Variables
   radius in [1,5];
 Aliases
@@ -159,7 +159,7 @@ Like other statements, functions are defined as lists, using the keyword `Functi
 
 Here are two examples:
 
-```
+``` py
 Constants
   R = 8,31446261815324;
 Functions
@@ -169,7 +169,7 @@ Functions
 In this example, the volume is a function of the pressure $p$, the number of moles $n$, the temperature ($T$)
 and the ideal gas constant $R$.
 
-```
+``` py
 Functions
   monomial(a,x,d) = a*x^d,
   poly3(a,b,c,d,x) = monomial(a,x,3) + monomial(b,x,2) + c*x + d;
@@ -203,7 +203,7 @@ table(var_set,tuple_set)
 
 Here are some example constraints:
 
-```
+``` py
 Constraints
   x^2 + y^2 <= r^2,
   x + 2*y in [1,2],
@@ -222,7 +222,7 @@ An objective is defined by a direction (`MIN` or `MAX`) and an arithmetic expres
 
 For instance minimizing the Sphere function over 3 dimensions can be expressed as:
 
-```
+``` py
 Variables
   x1 in [-inf,+inf],
   x2 in [-inf,+inf],
@@ -233,7 +233,7 @@ Objectives
 
 The Schaffer bi-objective optimization problem is simply defined as:
 
-```
+``` py
 Variables
   x in [-10,10];
 Objectives
@@ -246,7 +246,7 @@ Objectives
 
 ## A complete example
 
-```
+``` py
 # Coil compression spring design problem, finds minimum volume
 # of wire for the production of a coil compression spring.
 #

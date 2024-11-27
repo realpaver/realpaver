@@ -2,7 +2,7 @@
 
 No binary distribution is provided, so it must be compiled from source code.
 
-RealPaver installation process is based on mesonbuild system (https://mesonbuild.com/).
+RealPaver installation process is based on [mesonbuild system](https://mesonbuild.com/).
 
 ## Requirements
 
