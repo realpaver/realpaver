@@ -7,13 +7,14 @@ hide:
 
 ## History
 
+The development of RealPaver has been initiated in the late nineties by Laurent Granvilliers during his PhD thesis. Version 0.4, written in C, has been released and described in the following article:
 
+- L. Granvilliers and F. Benhamou. Algorithm 852: Realpaver: an Interval Solver using Constraint Satisfaction Techniques. ACM TOMS, 32(1):138-156, 2006.
+
+More recently in the early twenties, Laurent Granvilliers produced a C++ implementation of RealPaver with new algorithms. Raphaël Chenouard joined the project and brought his experience about modern software development techniques and tools. From their collaboration resulted Version 1.0.
+
+Other contributors are: Aida Amerkhanova, Jean Bigeon.
 
 ## References
 
-Please use the reference to ACM TOMS 2006 if you want to cite Realpaver.
-
-- L. Granvilliers and F. Benhamou. Algorithm 852: Realpaver: an Interval Solver using Constraint Satisfaction Techniques. ACM TOMS, 32(1):138-156, 2006.
-- L. Granvilliers and E. Monfroy. Implementing Constraint Propagation by Composition of Reductions. In Proceedings of ICLP 2003, LNCS 2916, pages 300-314.
-- L. Granvilliers. On the Combination of Interval Constraint Solvers. Reliable Computing, 7(6):467-483, 2001.
-- L. Granvilliers and F. Benhamou. Progress in the Solving of a Circuit Design Problem. J. Global Optim., 20(2):155-168, 2001.
+Please use the (old) reference above if you want to cite the software.
