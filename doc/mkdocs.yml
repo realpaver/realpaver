@@ -135,8 +135,8 @@ nav:
           - "Namespace Member Variables": "api/namespace_member_variables.md"
           - "Namespace Member Typedefs": "api/namespace_member_typedefs.md"
           - "Namespace Member Enumerations": "api/namespace_member_enums.md"
-      - "Functions": "api/functions.md"
-      - "Variables": "api/variables.md"
+      #      - "Functions": "api/functions.md"
+      #      - "Variables": "api/variables.md"
       - "Macros": "api/macros.md"
       - "Files": "api/files.md"
   - About: about.md
