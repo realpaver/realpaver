@@ -22,8 +22,10 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Timer.hpp"
 
+#include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
 
 #include "realpaver/ContractorFactory.hpp"
+#include "realpaver/LPSolver.hpp"
 #include "realpaver/NcspSolver.hpp"

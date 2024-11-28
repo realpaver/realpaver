@@ -1,9 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/Param.hpp"
-#include "realpaver/Parser.hpp"
-#include "realpaver/Problem.hpp"
+#include "realpaver_api.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -29,7 +26,7 @@ int main(int argc, char** argv)
 
       cout << problem << endl;
    }
-   
+
    catch(Exception e) {
       cout << e.what() << endl;
    }

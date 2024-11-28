@@ -1,9 +1,5 @@
 #include <iostream>
-#include "realpaver/Dag.hpp"
-#include "realpaver/IntervalNewtonUni.hpp"
-#include "realpaver/Logger.hpp"
-#include "realpaver/Problem.hpp"
-#include "realpaver/IntervalFunctionUni.hpp"
+#include "realpaver_api.hpp"
 
 using namespace realpaver;
 using namespace std;

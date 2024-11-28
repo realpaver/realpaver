@@ -1,11 +1,5 @@
 #include <iostream>
-#include "realpaver/DomainBox.hpp"
-#include "realpaver/ContractorHC4Revise.hpp"
-#include "realpaver/IntervalPropagator.hpp"
-#include "realpaver/Logger.hpp"
-#include "realpaver/Param.hpp"
-#include "realpaver/Problem.hpp"
-#include "realpaver/Timer.hpp"
+#include "realpaver_api.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -17,8 +11,8 @@ int main(void)
    try {
       Problem problem;
 
-      Variable x = problem.addRealVar(-7,  3, "x"),
-               y = problem.addRealVar( -3, 6, "y");
+      Variable x = problem.addRealVar(-7, 3, "x"),
+               y = problem.addRealVar(-3, 6, "y");
 
       DomainBox dbox(problem.scope());
       cout << "Box:    " << dbox << endl;
@@ -47,7 +41,7 @@ int main(void)
       cout << "Proof:      " << proof << endl;
 
       if (proof != Proof::Empty)
-         cout << "New box: " << B << endl;      
+         cout << "New box: " << B << endl;
    }
    catch(Exception e) {
       cout << e.what() << endl;
