@@ -3,7 +3,7 @@
 The RealPaver library provides a parser for the dedicated RealPaver modeling language
 to state *Constraint Satisfaction Problems* (CSPs) or *Constrained Optimization Problems* (COPs).
 This section describes this dedicated language that can be used to define files parsed as `Problem`
-in any C++ code or directly as input for the NCSP solver binary.
+in any C++ code or directly as input for the CSP solver binary.
 
 The language supports 6 different statements at the global scope:
 

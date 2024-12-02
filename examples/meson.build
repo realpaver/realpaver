@@ -14,48 +14,69 @@
 # Author: Raphaël Chenouard
 #-------------------------------------------------------------------------------
 
-lp = executable('lp',
+lp = executable(
+  'lp',
   sources: 'lp.cpp',
   link_with: realpaver_lib,
-  include_directories: ['../src']+incdir,
-  dependencies: deps_lib
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
 )
 
 if local_solver_dep.found()
-  nlp = executable('nlp',
+  nlp = executable(
+    'nlp',
     sources: 'nlp.cpp',
     link_with: realpaver_lib,
-    include_directories: ['../src']+incdir,
-    dependencies: deps_lib
+    include_directories: ['../src'] + incdir,
+    dependencies: deps_lib,
   )
 endif
 
-csp = executable('csp',
+csp = executable(
+  'csp',
   sources: 'csp.cpp',
   link_with: realpaver_lib,
-  include_directories: ['../src']+incdir,
-  dependencies: deps_lib
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
 )
 
-parsing = executable('parsing',
+parsing = executable(
+  'parsing',
   sources: 'parsing.cpp',
   link_with: realpaver_lib,
-  include_directories: ['../src']+incdir,
-  dependencies: deps_lib
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
 )
 
-propag = executable('propag',
+propag = executable(
+  'propag',
   sources: 'propag.cpp',
   link_with: realpaver_lib,
-  include_directories: ['../src']+incdir,
-  dependencies: deps_lib
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
 )
 
-uni_newton = executable('uni_newton',
+uni_newton = executable(
+  'uni_newton',
   sources: 'uni_newton.cpp',
   link_with: realpaver_lib,
-  include_directories: ['../src']+incdir,
-  dependencies: deps_lib
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
+solve_2r_v1 = executable(
+  'solve_2r_v1',
+  sources: 'solve_2r_v1.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+solve_2r_v2 = executable(
+  'solve_2r_v2',
+  sources: 'solve_2r_v2.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
 )
 
 # Sub-directories

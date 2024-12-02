@@ -1,6 +1,6 @@
 # Parameters description
 
-RealPaver behavior can be controlled using some parameters. These parameters are defined by the class [`Param`](../api/classrealpaver_1_1_param.md) implemented by the file [`src/realpaver/Param.hpp`](../api/_param_8hpp.md) and [`src/realpaver/Param.cpp`](../api/_param_8cpp.md). Parameters can be handled more globally with environments using the class [`Env`](../api/classrealpaver_1_1_env.md) like for the NCSP solver.
+RealPaver behavior can be controlled using some parameters. These parameters are defined by the class [`Param`](../api/classrealpaver_1_1_param.md) implemented by the file [`src/realpaver/Param.hpp`](../api/_param_8hpp.md) and [`src/realpaver/Param.cpp`](../api/_param_8cpp.md). Parameters can be handled more globally with environments using the class [`Env`](../api/classrealpaver_1_1_env.md) like for the CSP solver.
 
 Parameters can also be defined in a text file and a default one is provided in `src/realpaver/ParamFile`.
 
@@ -8,7 +8,7 @@ Parameters are (key,value) pairs and three types of values are supported: intege
 
 Several categories of parameters can be defined:
 
-- general ones, that mainly apply to global algorithms like the NCSP solver, or that are common to most of mechanisms
+- general ones, that mainly apply to global algorithms like the CSP solver, or that are common to most of mechanisms
 - specific ones, that are dedicated to some mechanisms like the branching or splitting strategies, the linear solver configuration, etc.
 
 ## General parameters
@@ -25,7 +25,7 @@ Several categories of parameters can be defined:
     - LOW:   low level e.g. display quantities in iterative methods
     - FULL:  verbose mode
 - PREPROCESSING: preprocessing phase of the solving process enabled or disabled (default: YES)
-- TIME_LIMIT: time limit used to stop the NCSP solver (default value: 100.0)
+- TIME_LIMIT: time limit used to stop the CSP solver (default value: 100.0)
 - TRACE: display traces in terminal (default value: YES)
 - TRACE_FREQUENCY: trace displayed every N nodes where N is the value of this parameter (default: 1000)
 - VAR_REL_TOL: relative tolerance on the width of an interval of a constrained variable (default value: 0.0)
