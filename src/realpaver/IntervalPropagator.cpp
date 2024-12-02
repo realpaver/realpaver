@@ -18,7 +18,6 @@
  * @date   2024-7-1
 */
 
-
 #include <queue>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
@@ -27,7 +26,6 @@
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
-
 
 IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
       : Contractor(),
