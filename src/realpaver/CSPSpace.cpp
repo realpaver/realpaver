@@ -12,7 +12,7 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpace.cpp
+ * @file   CSPSpace.cpp
  * @brief  Spaces of NCSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
@@ -20,20 +20,20 @@
 
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspSpace.hpp"
+#include "realpaver/CSPSpace.hpp"
 
 namespace realpaver {
 
-NcspSpace::~NcspSpace() {}
+CSPSpace::~CSPSpace() {}
 
-void NcspSpace::insertPendingNodes(NcspSplit::iterator first,
+void CSPSpace::insertPendingNodes(NcspSplit::iterator first,
                                    NcspSplit::iterator last)
 {
    for (auto it = first; it != last; ++it)
       insertPendingNode(*it);
 }
 
-void NcspSpace::makeSolClusters(double gap)
+void CSPSpace::makeSolClusters(double gap)
 {
    // no clustering if the gap is negative
    if (gap < 0.0) return;

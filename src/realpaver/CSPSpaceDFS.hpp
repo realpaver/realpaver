@@ -12,37 +12,37 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceDFS.hpp
+ * @file   CSPSpaceDFS.hpp
  * @brief  Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_SPACE_DFS_HPP
-#define REALPAVER_NCSP_SPACE_DFS_HPP
+#ifndef REALPAVER_CSP_SPACE_DFS_HPP
+#define REALPAVER_CSP_SPACE_DFS_HPP
 
-#include "realpaver/NcspSpace.hpp"
+#include "realpaver/CSPSpace.hpp"
 
 namespace realpaver {
 
 /**
  * @brief Depth-First-Search strategy.
- * 
+ *
  * The pending nodes are stored in a stack in order to implement a DFS strategy.
  */
-class NcspSpaceDFS : public NcspSpace {
+class CSPSpaceDFS : public CSPSpace {
 public:
    /// Constructor
-   NcspSpaceDFS();
+   CSPSpaceDFS();
 
    /// Default destructor
-   ~NcspSpaceDFS() = default;
+   ~CSPSpaceDFS() = default;
 
    /// No assignment
-   NcspSpaceDFS& operator=(const NcspSpaceDFS&) = delete;
+   CSPSpaceDFS& operator=(const CSPSpaceDFS&) = delete;
 
    /// Default copy constructor
-   NcspSpaceDFS(const NcspSpaceDFS&) = default;
+   CSPSpaceDFS(const CSPSpaceDFS&) = default;
 
    size_t nbSolNodes() const override;
    void pushSolNode(const SharedNcspNode& node) override;

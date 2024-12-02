@@ -12,39 +12,39 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceBFS.hpp
+ * @file   CSPSpaceBFS.hpp
  * @brief  Breadth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_SPACE_BFS_HPP
-#define REALPAVER_NCSP_SPACE_BFS_HPP
+#ifndef REALPAVER_CSP_SPACE_BFS_HPP
+#define REALPAVER_CSP_SPACE_BFS_HPP
 
 #include <list>
-#include "realpaver/NcspSpace.hpp"
+#include "realpaver/CSPSpace.hpp"
 
 namespace realpaver {
 
 /**
  * @brief Breadth-First-Search strategy.
- * 
+ *
  * The pending nodes are stored in a FIFO queue in order to implement a BFS
  * strategy.
  */
-class NcspSpaceBFS : public NcspSpace {
+class CSPSpaceBFS : public CSPSpace {
 public:
    /// Constructor
-   NcspSpaceBFS();
+   CSPSpaceBFS();
 
    /// Default destructor
-   ~NcspSpaceBFS() = default;
+   ~CSPSpaceBFS() = default;
 
    /// No assignment
-   NcspSpaceBFS& operator=(const NcspSpaceBFS&) = delete;
+   CSPSpaceBFS& operator=(const CSPSpaceBFS&) = delete;
 
    /// Default copy constructor
-   NcspSpaceBFS(const NcspSpaceBFS&) = default;
+   CSPSpaceBFS(const CSPSpaceBFS&) = default;
 
    size_t nbSolNodes() const override;
    void pushSolNode(const SharedNcspNode& node) override;

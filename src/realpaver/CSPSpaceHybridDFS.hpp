@@ -12,18 +12,18 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceHybridDFS.hpp
+ * @file   CSPSpaceHybridDFS.hpp
  * @brief  Hybrid strategies
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_SPACE_HYBRID_DFS_HPP
-#define REALPAVER_NCSP_SPACE_HYBRID_DFS_HPP
+#ifndef REALPAVER_CSP_SPACE_HYBRID_DFS_HPP
+#define REALPAVER_CSP_SPACE_HYBRID_DFS_HPP
 
 #include <set>
 #include <vector>
-#include "realpaver/NcspSpace.hpp"
+#include "realpaver/CSPSpace.hpp"
 
 namespace realpaver {
 
@@ -194,26 +194,26 @@ private:
 
 /**
  * @brief Hybrid Best-First Depth-First search strategies.
- * 
+ *
  * A DFS strategy is used to find the next solution. When a solution is found,
  * the best pending node is selected according to a given ordering, e.g. the
  * highest node in the search tree or the one having the largest perimeter.
- * 
+ *
  * @see HybridDFSStyle
  */
-class NcspSpaceHybridDFS : public NcspSpace {
+class CSPSpaceHybridDFS : public CSPSpace {
 public:
    /// Constructor
-   NcspSpaceHybridDFS(HybridDFSStyle style);
+   CSPSpaceHybridDFS(HybridDFSStyle style);
 
    /// Destructor
-   ~NcspSpaceHybridDFS();
+   ~CSPSpaceHybridDFS();
 
    /// No copy
-   NcspSpaceHybridDFS(const NcspSpaceHybridDFS&) = delete;
+   CSPSpaceHybridDFS(const CSPSpaceHybridDFS&) = delete;
 
    /// No assignment
-   NcspSpaceHybridDFS& operator=(const NcspSpaceHybridDFS&) = delete;
+   CSPSpaceHybridDFS& operator=(const CSPSpaceHybridDFS&) = delete;
 
    size_t nbSolNodes() const override;
    void pushSolNode(const SharedNcspNode& node) override;

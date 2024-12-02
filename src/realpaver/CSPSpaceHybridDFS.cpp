@@ -12,7 +12,7 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceHybridDFS.cpp
+ * @file   CSPSpaceHybridDFS.cpp
  * @brief  Hybrid strategies
  * @author Laurent Granvilliers
  * @date   2024-4-11
@@ -22,7 +22,7 @@
 #include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/NcspSpaceHybridDFS.hpp"
+#include "realpaver/CSPSpaceHybridDFS.hpp"
 
 namespace realpaver {
 
@@ -162,7 +162,7 @@ SharedNcspNode GridPerimeterNcspNodeSet::getNode(size_t i) const
 
 /*----------------------------------------------------------------------------*/
 
-NcspSpaceHybridDFS::NcspSpaceHybridDFS(HybridDFSStyle style)
+CSPSpaceHybridDFS::CSPSpaceHybridDFS(HybridDFSStyle style)
    : sta_(),
      set_(nullptr),
      vsol_(),
@@ -178,20 +178,20 @@ NcspSpaceHybridDFS::NcspSpaceHybridDFS(HybridDFSStyle style)
       set_ = new GridPerimeterNcspNodeSet();
 
    else
-      THROW("NcspSpaceHybridDFS, style not yet supported");
+      THROW("CSPSpaceHybridDFS, style not yet supported");
 }
 
-NcspSpaceHybridDFS::~NcspSpaceHybridDFS()
+CSPSpaceHybridDFS::~CSPSpaceHybridDFS()
 {
    if (set_ != nullptr) delete set_;
 }
 
-size_t NcspSpaceHybridDFS::nbSolNodes() const
+size_t CSPSpaceHybridDFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void NcspSpaceHybridDFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceHybridDFS::pushSolNode(const SharedNcspNode& node)
 {
    vsol_.push_back(node);
 
@@ -205,21 +205,21 @@ void NcspSpaceHybridDFS::pushSolNode(const SharedNcspNode& node)
    sta_.clear();
 }
 
-SharedNcspNode NcspSpaceHybridDFS::popSolNode()
+SharedNcspNode CSPSpaceHybridDFS::popSolNode()
 {
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode NcspSpaceHybridDFS::getSolNode(size_t i) const
+SharedNcspNode CSPSpaceHybridDFS::getSolNode(size_t i) const
 {
    ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
    return vsol_[i];
 }
 
-bool NcspSpaceHybridDFS::hasFeasibleSolNode() const
+bool CSPSpaceHybridDFS::hasFeasibleSolNode() const
 {
    for (auto node : vsol_)
    {
@@ -230,12 +230,12 @@ bool NcspSpaceHybridDFS::hasFeasibleSolNode() const
    return false;
 }
 
-size_t NcspSpaceHybridDFS::nbPendingNodes() const
+size_t CSPSpaceHybridDFS::nbPendingNodes() const
 {
    return sta_.size() + set_->size();
 }
 
-SharedNcspNode NcspSpaceHybridDFS::nextPendingNode()
+SharedNcspNode CSPSpaceHybridDFS::nextPendingNode()
 {
    // gets the top of the stack if it is not empty
    if (sta_.empty())
@@ -252,13 +252,13 @@ SharedNcspNode NcspSpaceHybridDFS::nextPendingNode()
    }
 }
 
-void NcspSpaceHybridDFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceHybridDFS::insertPendingNode(const SharedNcspNode& node)
 {
    // inserts a node in the stack during a DFS stage
    sta_.push_back(node);
 }
 
-SharedNcspNode NcspSpaceHybridDFS::getPendingNode(size_t i) const
+SharedNcspNode CSPSpaceHybridDFS::getPendingNode(size_t i) const
 {
    ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a CSP space");
 
@@ -275,7 +275,7 @@ SharedNcspNode NcspSpaceHybridDFS::getPendingNode(size_t i) const
    }
 }
 
-void NcspSpaceHybridDFS::insertPendingNodes(NcspSplit::iterator first,
+void CSPSpaceHybridDFS::insertPendingNodes(NcspSplit::iterator first,
                                             NcspSplit::iterator last)
 {
    // the nodes between first and last are ordered from left to right
@@ -289,7 +289,7 @@ void NcspSpaceHybridDFS::insertPendingNodes(NcspSplit::iterator first,
          aux.push_front(*it);
 
       for (auto it = aux.begin(); it != aux.end(); ++it)
-         insertPendingNode(*it);         
+         insertPendingNode(*it);
    }
    else
    {
@@ -297,5 +297,5 @@ void NcspSpaceHybridDFS::insertPendingNodes(NcspSplit::iterator first,
          insertPendingNode(*it);
    }
 }
-                                       
+
 } // namespace

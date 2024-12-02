@@ -12,46 +12,46 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceBFS.cpp
+ * @file   CSPSpaceBFS.cpp
  * @brief  Breadth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspSpaceBFS.hpp"
+#include "realpaver/CSPSpaceBFS.hpp"
 
 namespace realpaver {
 
-NcspSpaceBFS::NcspSpaceBFS()
+CSPSpaceBFS::CSPSpaceBFS()
       : vsol_(), lnode_()
 {}
 
-size_t NcspSpaceBFS::nbSolNodes() const
+size_t CSPSpaceBFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void NcspSpaceBFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceBFS::pushSolNode(const SharedNcspNode& node)
 {
    vsol_.push_back(node);
 }
 
-SharedNcspNode NcspSpaceBFS::popSolNode()
+SharedNcspNode CSPSpaceBFS::popSolNode()
 {
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode NcspSpaceBFS::getSolNode(size_t i) const
+SharedNcspNode CSPSpaceBFS::getSolNode(size_t i) const
 {
    ASSERT(i < vsol_.size(), "Bad access to a solution node in a NCSP space");
 
    return vsol_[i];
 }
 
-bool NcspSpaceBFS::hasFeasibleSolNode() const
+bool CSPSpaceBFS::hasFeasibleSolNode() const
 {
    for (auto node : vsol_)
    {
@@ -62,24 +62,24 @@ bool NcspSpaceBFS::hasFeasibleSolNode() const
    return false;
 }
 
-size_t NcspSpaceBFS::nbPendingNodes() const
+size_t CSPSpaceBFS::nbPendingNodes() const
 {
    return lnode_.size();
 }
 
-SharedNcspNode NcspSpaceBFS::nextPendingNode()
+SharedNcspNode CSPSpaceBFS::nextPendingNode()
 {
    SharedNcspNode node = lnode_.back();
    lnode_.pop_back();
    return node;
 }
 
-void NcspSpaceBFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceBFS::insertPendingNode(const SharedNcspNode& node)
 {
    lnode_.push_front(node);
 }
 
-SharedNcspNode NcspSpaceBFS::getPendingNode(size_t i) const
+SharedNcspNode CSPSpaceBFS::getPendingNode(size_t i) const
 {
    ASSERT(i < lnode_.size(), "Bad access to a pending node in a NCSP space");
 

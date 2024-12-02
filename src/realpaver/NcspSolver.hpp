@@ -24,7 +24,7 @@
 #include <memory>
 #include "realpaver/NcspEnv.hpp"
 #include "realpaver/NcspPropagator.hpp"
-#include "realpaver/NcspSpace.hpp"
+#include "realpaver/CSPSpace.hpp"
 #include "realpaver/NcspSplit.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
@@ -87,7 +87,7 @@ public:
    std::shared_ptr<NcspEnv> getEnv() const;
 
    /// Returns the space of this
-   NcspSpace* getSpace() const;
+   CSPSpace* getSpace() const;
 
    /// Returns the preprocessor used by this
    Preprocessor* getPreprocessor() const;
@@ -122,7 +122,7 @@ private:
    NcspContext* context_;           // solving context for the BP algorithm
 
    std::shared_ptr<NcspEnv> env_;   // environment
-   NcspSpace* space_;               // search tree
+   CSPSpace* space_;                // search tree
    SharedDag dag_;                  // dag
    NcspPropagator* propagator_;     // contraction method
    NcspSplit* split_;               // splitting strategy

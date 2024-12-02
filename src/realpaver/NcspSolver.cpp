@@ -22,10 +22,10 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NcspSolver.hpp"
-#include "realpaver/NcspSpaceBFS.hpp"
-#include "realpaver/NcspSpaceDFS.hpp"
-#include "realpaver/NcspSpaceDMDFS.hpp"
-#include "realpaver/NcspSpaceHybridDFS.hpp"
+#include "realpaver/CSPSpaceBFS.hpp"
+#include "realpaver/CSPSpaceDFS.hpp"
+#include "realpaver/CSPSpaceDMDFS.hpp"
+#include "realpaver/CSPSpaceHybridDFS.hpp"
 
 namespace realpaver {
 
@@ -112,22 +112,22 @@ void NcspSolver::makeSpace()
    // gets the strategy from the parameters
    std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS")
-      space_ = new NcspSpaceDFS();
+      space_ = new CSPSpaceDFS();
 
    else if (s == "BFS")
-      space_ = new NcspSpaceBFS();
+      space_ = new CSPSpaceBFS();
 
    else if (s == "DMDFS")
-      space_ = new NcspSpaceDMDFS();
+      space_ = new CSPSpaceDMDFS();
 
    else if (s == "IDFS")
-      space_ = new NcspSpaceHybridDFS(HybridDFSStyle::Depth);
+      space_ = new CSPSpaceHybridDFS(HybridDFSStyle::Depth);
 
    else if (s == "PDFS")
-      space_ = new NcspSpaceHybridDFS(HybridDFSStyle::Perimeter);
+      space_ = new CSPSpaceHybridDFS(HybridDFSStyle::Perimeter);
 
    else if (s == "GPDFS")
-      space_ = new NcspSpaceHybridDFS(HybridDFSStyle::GridPerimeter);
+      space_ = new CSPSpaceHybridDFS(HybridDFSStyle::GridPerimeter);
 
    THROW_IF(space_ == nullptr,
             "Unable to make the space object in a Ncsp solver");
@@ -560,7 +560,7 @@ std::shared_ptr<NcspEnv> NcspSolver::getEnv() const
    return env_;
 }
 
-NcspSpace* NcspSolver::getSpace() const
+CSPSpace* NcspSolver::getSpace() const
 {
    return space_;
 }

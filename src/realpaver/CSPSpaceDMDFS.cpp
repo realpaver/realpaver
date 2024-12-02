@@ -12,7 +12,7 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceDMDFS.cpp
+ * @file   CSPSpaceDMDFS.cpp
  * @brief  Distant-Most Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspSpaceDMDFS.hpp"
+#include "realpaver/CSPSpaceDMDFS.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -52,31 +52,31 @@ double HausdorffDistCalculator::distance(const DomainBox& db1,
 
 /*----------------------------------------------------------------------------*/
 
-NcspSpaceDMDFS::NcspSpaceDMDFS()
+CSPSpaceDMDFS::CSPSpaceDMDFS()
       : vnode_(), vsol_(), dcalc_(nullptr)
 {
    dcalc_ = new HausdorffDistCalculator();
 }
 
-NcspSpaceDMDFS::~NcspSpaceDMDFS()
+CSPSpaceDMDFS::~CSPSpaceDMDFS()
 {
    if (dcalc_ != nullptr) delete dcalc_;
 }
 
 void
-NcspSpaceDMDFS::setDistCalculator(std::unique_ptr<DistCalculator> dcalc)
+CSPSpaceDMDFS::setDistCalculator(std::unique_ptr<DistCalculator> dcalc)
 {
    if (dcalc_ != nullptr) delete dcalc_;
 
    dcalc_ = dcalc.release();
 }
 
-size_t NcspSpaceDMDFS::nbSolNodes() const
+size_t CSPSpaceDMDFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void NcspSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
 {
    vsol_.push_back(node);
 
@@ -93,21 +93,21 @@ void NcspSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
    std::sort(vnode_.begin(), vnode_.end(), comparator);
 }
 
-SharedNcspNode NcspSpaceDMDFS::popSolNode()
+SharedNcspNode CSPSpaceDMDFS::popSolNode()
 {
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode NcspSpaceDMDFS::getSolNode(size_t i) const
+SharedNcspNode CSPSpaceDMDFS::getSolNode(size_t i) const
 {
    ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
    return vsol_[i];
 }
 
-bool NcspSpaceDMDFS::hasFeasibleSolNode() const
+bool CSPSpaceDMDFS::hasFeasibleSolNode() const
 {
    for (auto node : vsol_)
    {
@@ -118,13 +118,13 @@ bool NcspSpaceDMDFS::hasFeasibleSolNode() const
    return false;
 }
 
-void NcspSpaceDMDFS::makeSolClusters(double gap)
+void CSPSpaceDMDFS::makeSolClusters(double gap)
 {
    // no clustering if the gap is negative
    if (gap < 0.0) return;
 
    // clustering from the super class
-   NcspSpace::makeSolClusters(gap);
+   CSPSpace::makeSolClusters(gap);
 
    // it is necessary to update the distance between each pending node and its
    // closest solution.
@@ -142,24 +142,24 @@ void NcspSpaceDMDFS::makeSolClusters(double gap)
             elem.mindist = d;
       }
    }
-   
+
    // ascending ordering of the node distances
    std::sort(vnode_.begin(), vnode_.end(), comparator);
 }
 
-size_t NcspSpaceDMDFS::nbPendingNodes() const
+size_t CSPSpaceDMDFS::nbPendingNodes() const
 {
    return vnode_.size();
 }
 
-SharedNcspNode NcspSpaceDMDFS::nextPendingNode()
+SharedNcspNode CSPSpaceDMDFS::nextPendingNode()
 {
    SharedNcspNode node = vnode_.back().node;
    vnode_.pop_back();
    return node;
 }
 
-void NcspSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
 {
    // Finds the distance to the closest solution
    double d = Double::inf();
@@ -179,7 +179,7 @@ void NcspSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
    vnode_.push_back(elem);
 }
 
-SharedNcspNode NcspSpaceDMDFS::getPendingNode(size_t i) const
+SharedNcspNode CSPSpaceDMDFS::getPendingNode(size_t i) const
 {
    ASSERT(i < vnode_.size(), "Bad access to a pending node in a CSP space");
 

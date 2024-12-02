@@ -71,6 +71,7 @@ solve_2r_v1 = executable(
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,
 )
+
 solve_2r_v2 = executable(
   'solve_2r_v2',
   sources: 'solve_2r_v2.cpp',
@@ -79,5 +80,6 @@ solve_2r_v2 = executable(
   dependencies: deps_lib,
 )
 
+# TODO
 # Sub-directories
-subdir('ncsp')
+# subdir('ncsp')

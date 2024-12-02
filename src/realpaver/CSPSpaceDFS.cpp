@@ -12,7 +12,7 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSpaceDFS.cpp
+ * @file   CSPSpaceDFS.cpp
  * @brief  Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
@@ -20,32 +20,32 @@
 
 #include <list>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspSpaceDFS.hpp"
+#include "realpaver/CSPSpaceDFS.hpp"
 
 namespace realpaver {
 
-NcspSpaceDFS::NcspSpaceDFS()
+CSPSpaceDFS::CSPSpaceDFS()
       : vsol_(), vnode_()
 {}
 
-size_t NcspSpaceDFS::nbSolNodes() const
+size_t CSPSpaceDFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void NcspSpaceDFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceDFS::pushSolNode(const SharedNcspNode& node)
 {
    vsol_.push_back(node);
 }
 
-SharedNcspNode NcspSpaceDFS::popSolNode()
+SharedNcspNode CSPSpaceDFS::popSolNode()
 {
    SharedNcspNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode NcspSpaceDFS::getSolNode(size_t i) const
+SharedNcspNode CSPSpaceDFS::getSolNode(size_t i) const
 {
    ASSERT(i < vsol_.size(),
           "Bad access to a solution node in a NCSP space @ " << i);
@@ -53,7 +53,7 @@ SharedNcspNode NcspSpaceDFS::getSolNode(size_t i) const
    return vsol_[i];
 }
 
-bool NcspSpaceDFS::hasFeasibleSolNode() const
+bool CSPSpaceDFS::hasFeasibleSolNode() const
 {
    for (auto node : vsol_)
    {
@@ -64,24 +64,24 @@ bool NcspSpaceDFS::hasFeasibleSolNode() const
    return false;
 }
 
-size_t NcspSpaceDFS::nbPendingNodes() const
+size_t CSPSpaceDFS::nbPendingNodes() const
 {
    return vnode_.size();
 }
 
-SharedNcspNode NcspSpaceDFS::nextPendingNode()
+SharedNcspNode CSPSpaceDFS::nextPendingNode()
 {
    SharedNcspNode node = vnode_.back();
    vnode_.pop_back();
    return node;
 }
 
-void NcspSpaceDFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceDFS::insertPendingNode(const SharedNcspNode& node)
 {
    vnode_.push_back(node);
 }
 
-SharedNcspNode NcspSpaceDFS::getPendingNode(size_t i) const
+SharedNcspNode CSPSpaceDFS::getPendingNode(size_t i) const
 {
    ASSERT(i < vnode_.size(),
           "Bad access to a pending node in a NCSP space @ " << i);
