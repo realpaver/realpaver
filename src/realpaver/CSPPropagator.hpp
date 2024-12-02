@@ -12,44 +12,42 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspPropagator.hpp
- * @brief  Propagators of NCSP solver
+ * @file   CSPPropagator.hpp
+ * @brief  Propagators of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_PROPAGATOR_HPP
-#define REALPAVER_NCSP_PROPAGATOR_HPP
+#ifndef REALPAVER_CSP_PROPAGATOR_HPP
+#define REALPAVER_CSP_PROPAGATOR_HPP
 
-#include <vector>
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/ContractorVar3BCID.hpp"
-#include "realpaver/NcspContext.hpp"
-#include "realpaver/NcspNode.hpp"
+#include "realpaver/CSPContext.hpp"
+#include "realpaver/CSPNode.hpp"
 
 namespace realpaver {
 
 /**
- * @brief Base class of propagators of NCSP solver.
+ * @brief Base class of propagators of CSP solver.
  *
  * A propagator is an algorithm / operator that contracts the domains of
- * variables occurring in a NCSP search node.
+ * variables occurring in a CSP search node.
  *
  * Concrete propagators are built in contractor factories.
  */
-class NcspPropagator {
+class CSPPropagator {
 public:
    /// Constructor
-   NcspPropagator();
+   CSPPropagator();
 
    /// Default copy constructor
-   NcspPropagator(const NcspPropagator&) = default;
+   CSPPropagator(const CSPPropagator&) = default;
 
    /// No assignment
-   NcspPropagator& operator=(const NcspPropagator&) = delete;
+   CSPPropagator& operator=(const CSPPropagator&) = delete;
 
    /// Virtual destructor
-   virtual ~NcspPropagator();
+   virtual ~CSPPropagator();
 
    /**
     * @brief Contraction method.
@@ -59,7 +57,7 @@ public:
     *
     * Returns a certificate of proof
     */
-   Proof contract(NcspNode& node, NcspContext& ctx);
+   Proof contract(CSPNode& node, CSPContext& ctx);
 
    /// Reduces box by intersecting it with B
    static Proof contractBox(const IntervalBox& B, DomainBox& box);
@@ -68,18 +66,18 @@ protected:
    IntervalBox* B_;
 
    /// Contraction method to be overriden in sub-classes
-   virtual Proof contractImpl(NcspNode& node, NcspContext& ctx) = 0;
+   virtual Proof contractImpl(CSPNode& node, CSPContext& ctx) = 0;
 };
 
 /*----------------------------------------------------------------------------*/
 
 /// HC4 constraint propagation algorithm
-class NcspHC4 : public NcspPropagator {
+class CSPPropagatorHC4 : public CSPPropagator {
 public:
    /// Constructor
-   NcspHC4(ContractorFactory& facto);
+   CSPPropagatorHC4(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
    SharedContractor op_;
@@ -88,12 +86,12 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// BC4 constraint propagation algorithm
-class NcspBC4 : public NcspPropagator {
+class CSPPropagatorBC4 : public CSPPropagator {
 public:
    /// Constructor
-   NcspBC4(ContractorFactory& facto);
+   CSPPropagatorBC4(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
    SharedContractor op_;
@@ -102,12 +100,12 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Interval Newton operator
-class NcspNewton : public NcspPropagator {
+class CSPPropagatorNewton : public CSPPropagator {
 public:
    /// Constructor
-   NcspNewton(ContractorFactory& facto);
+   CSPPropagatorNewton(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
    SharedContractor op_;
@@ -116,12 +114,12 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// ACID algorithm based on HC4 contractors
-class NcspACID : public NcspPropagator {
+class CSPPropagatorACID : public CSPPropagator {
 public:
    /// Constructor
-   NcspACID(ContractorFactory& facto);
+   CSPPropagatorACID(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
    SharedContractor hc4_;
@@ -131,58 +129,58 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Applies in sequence NcspHC4 and NcspNewton.
+ * @brief Applies in sequence CSPPropagatorHC4 and CSPPropagatorNewton.
  *
  * The Newton operator is used only for square systems of equations.
  */
-class NcspHC4Newton : public NcspPropagator {
+class CSPPropagatorHC4Newton : public CSPPropagator {
 public:
    /// Constructor
-   NcspHC4Newton(ContractorFactory& facto);
+   CSPPropagatorHC4Newton(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
-   NcspHC4 hc4_;
-   NcspNewton newton_;
+   CSPPropagatorHC4 hc4_;
+   CSPPropagatorNewton newton_;
 };
 
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Applies in sequence NcspBC4 and NcspNewton.
+ * @brief Applies in sequence CSPPropagatorBC4 and CSPPropagatorNewton.
  *
  * The Newton operator is used only for square systems of equations.
  */
-class NcspBC4Newton : public NcspPropagator {
+class CSPPropagatorBC4Newton : public CSPPropagator {
 public:
    /// Constructor
-   NcspBC4Newton(ContractorFactory& facto);
+   CSPPropagatorBC4Newton(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
-   NcspBC4 bc4_;
-   NcspNewton newton_;
+   CSPPropagatorBC4 bc4_;
+   CSPPropagatorNewton newton_;
 };
 
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Applies in sequence NcspACID and NcspNewton.
+ * @brief Applies in sequence CSPPropagatorACID and CSPPropagatorNewton.
  *
  * The Newton operator is used only for square systems of equations.
  */
-class NcspACIDNewton : public NcspPropagator {
+class CSPPropagatorACIDNewton : public CSPPropagator {
 public:
    /// Constructor
-   NcspACIDNewton(ContractorFactory& facto);
+   CSPPropagatorACIDNewton(ContractorFactory& facto);
 
-   Proof contractImpl(NcspNode& node, NcspContext& ctx) override;
+   Proof contractImpl(CSPNode& node, CSPContext& ctx) override;
 
 private:
-   NcspACID acid_;
-   NcspNewton newton_;
+   CSPPropagatorACID acid_;
+   CSPPropagatorNewton newton_;
 };
 
 } // namespace

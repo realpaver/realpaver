@@ -12,18 +12,18 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspNode.cpp
- * @brief  NCSP search node
+ * @file   CSPNode.cpp
+ * @brief  CSP search node
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspNode.hpp"
+#include "realpaver/CSPNode.hpp"
 
 namespace realpaver {
 
-NcspNode::NcspNode(Scope scop, int depth)
+CSPNode::CSPNode(Scope scop, int depth)
       : scop_(scop),
         box_(nullptr),
         depth_(depth),
@@ -31,13 +31,13 @@ NcspNode::NcspNode(Scope scop, int depth)
         parent_(-1),
         proof_(Proof::Maybe)
 {
-   ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
-   ASSERT(!scop.isEmpty(), "Empty scope used to create a NCSP node");
+   ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
+   ASSERT(!scop.isEmpty(), "Empty scope used to create a CSP node");
 
    box_ = new DomainBox(scop);
 }
 
-NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
+CSPNode::CSPNode(std::unique_ptr<DomainBox> box, int depth)
       : scop_(box->scope()),
         box_(box.release()),
         depth_(depth),
@@ -45,10 +45,10 @@ NcspNode::NcspNode(std::unique_ptr<DomainBox> box, int depth)
         parent_(-1),
         proof_(Proof::Maybe)
 {
-   ASSERT(depth >= 0, "Bad depth of a NCSP node " << depth);
+   ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
 }
 
-NcspNode::NcspNode(const NcspNode& node)
+CSPNode::CSPNode(const CSPNode& node)
       : scop_(node.scop_),
         box_(nullptr),
         depth_(node.depth_),
@@ -59,69 +59,69 @@ NcspNode::NcspNode(const NcspNode& node)
    box_ = node.box_->clone();
 }
 
-NcspNode::~NcspNode()
+CSPNode::~CSPNode()
 {
    delete box_;
 }
 
-int NcspNode::depth() const
+int CSPNode::depth() const
 {
    return depth_;
 }
 
-void NcspNode::setDepth(int depth)
+void CSPNode::setDepth(int depth)
 {
    ASSERT(depth >= 0, "Bad node depth " << depth);
 
    depth_ = depth;
 }
 
-int NcspNode::index() const
+int CSPNode::index() const
 {
    return index_;
 }
 
-void NcspNode::setIndex(int id)
+void CSPNode::setIndex(int id)
 {
    index_ = id;
 }
 
-int NcspNode::parent() const
+int CSPNode::parent() const
 {
    return parent_;
 }
 
-void NcspNode::setParent(int p)
+void CSPNode::setParent(int p)
 {
    parent_ = p;
 }
 
-void NcspNode::incrementDepth()
+void CSPNode::incrementDepth()
 {
    ++depth_;
 }
 
-DomainBox* NcspNode::box() const
+DomainBox* CSPNode::box() const
 {
    return box_;
 }
 
-Scope NcspNode::scope() const
+Scope CSPNode::scope() const
 {
    return scop_;
 }
 
-Proof NcspNode::getProof() const
+Proof CSPNode::getProof() const
 {
    return proof_;
 }
 
-void NcspNode::setProof(Proof p)
+void CSPNode::setProof(Proof p)
 {
    proof_ = p;
 }
 
-std::ostream& operator<<(std::ostream& os, const NcspNode& node)
+std::ostream& operator<<(std::ostream& os, const CSPNode& node)
 {
    os << *node.box()
       << " proof: " << node.getProof();

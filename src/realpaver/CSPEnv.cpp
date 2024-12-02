@@ -12,41 +12,40 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspEnv.cpp
- * @brief  Environment for NCSP solver
+ * @file   CSPEnv.cpp
+ * @brief  Environment for CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspEnv.hpp"
+#include "realpaver/CSPEnv.hpp"
 
 namespace realpaver {
 
-NcspEnv::NcspEnv() : Env(), slim_(false), dlim_(false)
+CSPEnv::CSPEnv() : Env(), slim_(false), dlim_(false)
 {}
 
-void NcspEnv::setSolutionLimit(bool b)
+void CSPEnv::setSolutionLimit(bool b)
 {
    slim_ = b;
 }
 
-bool NcspEnv::usedSolutionLimit() const
+bool CSPEnv::usedSolutionLimit() const
 {
    return slim_;
 }
 
-void NcspEnv::setDepthLimit(bool b)
+void CSPEnv::setDepthLimit(bool b)
 {
    dlim_ = true;
 }
 
-bool NcspEnv::usedDepthLimit() const
+bool CSPEnv::usedDepthLimit() const
 {
    return dlim_;
 }
 
-bool NcspEnv::usedNoLimit() const
+bool CSPEnv::usedNoLimit() const
 {
    return !(usedTimeLimit() || usedNodeLimit() || usedSolutionLimit() ||
             usedDepthLimit());

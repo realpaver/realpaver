@@ -12,8 +12,8 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSolver.cpp
- * @brief  NCSP solver
+ * @file   CSPSolver.cpp
+ * @brief  CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
@@ -21,7 +21,7 @@
 #include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/NcspSolver.hpp"
+#include "realpaver/CSPSolver.hpp"
 #include "realpaver/CSPSpaceBFS.hpp"
 #include "realpaver/CSPSpaceDFS.hpp"
 #include "realpaver/CSPSpaceDMDFS.hpp"
@@ -29,7 +29,7 @@
 
 namespace realpaver {
 
-NcspSolver::NcspSolver(const Problem& problem)
+CSPSolver::CSPSolver(const Problem& problem)
       : problem_(nullptr),
         preprob_(nullptr),
         preproc_(nullptr),
@@ -44,15 +44,15 @@ NcspSolver::NcspSolver(const Problem& problem)
         nbnodes_(0),
         withPreprocessing_(true)
 {
-   THROW_IF(!problem.isCSP(), "Ncsp solver applied to a problem that is " <<
+   THROW_IF(!problem.isCSP(), "CSP solver applied to a problem that is " <<
                               "not a constraint satisfaction problem");
 
-   env_ = std::make_shared<NcspEnv>();
+   env_ = std::make_shared<CSPEnv>();
    preproc_ = new Preprocessor();
    problem_ = new Problem(problem);
 }
 
-NcspSolver::~NcspSolver()
+CSPSolver::~CSPSolver()
 {
    if (context_ != nullptr) delete context_;
    if (preproc_ != nullptr) delete preproc_;
@@ -65,17 +65,17 @@ NcspSolver::~NcspSolver()
    if (problem_ != nullptr) delete problem_;
 }
 
-double NcspSolver::getSolvingTime() const
+double CSPSolver::getSolvingTime() const
 {
    return stimer_.elapsedTime();
 }
 
-int NcspSolver::getTotalNodes() const
+int CSPSolver::getTotalNodes() const
 {
    return nbnodes_;
 }
 
-void NcspSolver::solve()
+void CSPSolver::solve()
 {
    LOG_MAIN("Input problem\n" << (*problem_));
 
@@ -105,9 +105,9 @@ void NcspSolver::solve()
    }
 }
 
-void NcspSolver::makeSpace()
+void CSPSolver::makeSpace()
 {
-   LOG_LOW("Makes the space in the NCSP solver");
+   LOG_LOW("Makes the space in the CSP solver");
 
    // gets the strategy from the parameters
    std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
@@ -130,19 +130,19 @@ void NcspSolver::makeSpace()
       space_ = new CSPSpaceHybridDFS(HybridDFSStyle::GridPerimeter);
 
    THROW_IF(space_ == nullptr,
-            "Unable to make the space object in a Ncsp solver");
+            "Unable to make the space object in a CSP solver");
 
    // creates and inserts the root node
-   SharedNcspNode node = std::make_shared<NcspNode>(preprob_->scope());
+   SharedCSPNode node = std::make_shared<CSPNode>(preprob_->scope());
    node->setIndex(0);
 
    space_->insertPendingNode(node);
    ++nbnodes_;
 }
 
-void NcspSolver::makePropagator()
+void CSPSolver::makePropagator()
 {
-   LOG_LOW("Makes the propagator in the NCSP solver");
+   LOG_LOW("Makes the propagator in the CSP solver");
 
    // Propagation: HC4 or BC4 or ACID
    std::string propag = env_->getParam()->getStrParam("PROPAGATION_BASE");
@@ -161,30 +161,30 @@ void NcspSolver::makePropagator()
    if (newton == false)
    {
       if (hc4)
-         propagator_ = new NcspHC4(*factory_);
+         propagator_ = new CSPPropagatorHC4(*factory_);
 
       else if (bc4)
-         propagator_ = new NcspBC4(*factory_);
+         propagator_ = new CSPPropagatorBC4(*factory_);
 
       else
-         propagator_ = new NcspACID(*factory_);
+         propagator_ = new CSPPropagatorACID(*factory_);
    }
    else
    {
       if (hc4)
-         propagator_ = new NcspHC4Newton(*factory_);
+         propagator_ = new CSPPropagatorHC4Newton(*factory_);
 
       else if (bc4)
-         propagator_ = new NcspBC4Newton(*factory_);
+         propagator_ = new CSPPropagatorBC4Newton(*factory_);
 
       else
-         propagator_ = new NcspACIDNewton(*factory_);
+         propagator_ = new CSPPropagatorACIDNewton(*factory_);
    }
 }
 
-void NcspSolver::makeSplit()
+void CSPSolver::makeSplit()
 {
-   LOG_LOW("Makes the split object in the NCSP solver");
+   LOG_LOW("Makes the split object in the CSP solver");
 
    Scope scop = preprob_->scope();
 
@@ -199,22 +199,22 @@ void NcspSolver::makeSplit()
    }
 
    THROW_IF(smap == nullptr,
-            "Unable to make the split object in a Ncsp solver");
+            "Unable to make the split object in a CSP solver");
 
    // makes the spliting object acording the variable selection strategy
    std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
-      split_ = new NcspSplitRR(scop, std::move(smap));
+      split_ = new CSPSplitRR(scop, std::move(smap));
 
    else if (sel == "LF")
-      split_ = new NcspSplitLF(scop, std::move(smap));
+      split_ = new CSPSplitLF(scop, std::move(smap));
 
    else if (sel == "SF")
-      split_ = new NcspSplitSF(scop, std::move(smap));
+      split_ = new CSPSplitSF(scop, std::move(smap));
 
    else if (sel == "SLF")
-      split_ = new NcspSplitSLF(scop, std::move(smap));
+      split_ = new CSPSplitSLF(scop, std::move(smap));
 
    else if (sel == "SSR")
    {
@@ -222,21 +222,21 @@ void NcspSolver::makeSplit()
 
       if ((ssr != nullptr) && (preprob_->nbVars() == ssr->nbVars()))
       {
-         split_ = new NcspSplitSSR(ssr, std::move(smap));
+         split_ = new CSPSplitSSR(ssr, std::move(smap));
       }
       else
       {
-         split_ = new NcspSplitRR(scop, std::move(smap));
+         split_ = new CSPSplitRR(scop, std::move(smap));
          LOG_INTER("Unable to create a SmearSumRel variable selection " <<
                    "strategy -> use a round-robin strategy instead");
       }
    }
 
    THROW_IF(split_ == nullptr,
-            "Unable to make the split object in a Ncsp solver");
+            "Unable to make the split object in a CSP solver");
 }
 
-bool NcspSolver::isInner(DomainBox* box) const
+bool CSPSolver::isInner(DomainBox* box) const
 {
    IntervalBox B(*box);
    for (size_t i=0; i<preprob_->nbCtrs(); ++i)
@@ -249,7 +249,7 @@ bool NcspSolver::isInner(DomainBox* box) const
    return true;
 }
 
-void NcspSolver::bpStep(int depthlimit)
+void CSPSolver::bpStep(int depthlimit)
 {
 #if LOG_ON
    static Timer timerStep;
@@ -257,7 +257,7 @@ void NcspSolver::bpStep(int depthlimit)
 #endif
 
    // extracts a node from the space
-    SharedNcspNode node = space_->nextPendingNode();
+    SharedCSPNode node = space_->nextPendingNode();
 
    // processes it
     bpStepAux(node, depthlimit);
@@ -271,7 +271,7 @@ void NcspSolver::bpStep(int depthlimit)
 #endif
 }
 
-void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
+void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
 {
 #if LOG_ON
    static Timer timerPropag, timerSplit;
@@ -353,7 +353,7 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 #if LOG_ON
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
-         SharedNcspNode subnode = *it;
+         SharedCSPNode subnode = *it;
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
          LOG_LOW(*subnode->box());
       }
@@ -369,17 +369,17 @@ void NcspSolver::bpStepAux(SharedNcspNode node, int depthlimit)
 #endif
 }
 
-void NcspSolver::branchAndPrune()
+void CSPSolver::branchAndPrune()
 {
    LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
    LOG_INTER("Parameters\n" << *env_->getParam());
 
    stimer_.start();
 
-   context_ = new NcspContext();
+   context_ = new CSPContext();
 
    LOG_NL_LOW();
-   LOG_LOW("Makes the factory in the NCSP solver");
+   LOG_LOW("Makes the factory in the CSP solver");
    factory_ = new ContractorFactory(*preprob_, env_);
 
    makeSpace();
@@ -513,12 +513,12 @@ void NcspSolver::branchAndPrune()
    stimer_.stop();
 }
 
-void NcspSolver::certifySolutions()
+void CSPSolver::certifySolutions()
 {
-   std::list<SharedNcspNode> lsol;
+   std::list<SharedCSPNode> lsol;
    while (space_->nbSolNodes() > 0)
    {
-      SharedNcspNode node = space_->popSolNode();
+      SharedCSPNode node = space_->popSolNode();
       Proof proof = node->getProof();
 
       DomainBox* dbox = node->box();
@@ -555,22 +555,22 @@ void NcspSolver::certifySolutions()
    }
 }
 
-std::shared_ptr<NcspEnv> NcspSolver::getEnv() const
+std::shared_ptr<CSPEnv> CSPSolver::getEnv() const
 {
    return env_;
 }
 
-CSPSpace* NcspSolver::getSpace() const
+CSPSpace* CSPSolver::getSpace() const
 {
    return space_;
 }
 
-Preprocessor* NcspSolver::getPreprocessor() const
+Preprocessor* CSPSolver::getPreprocessor() const
 {
    return preproc_;
 }
 
-size_t NcspSolver::nbSolutions() const
+size_t CSPSolver::nbSolutions() const
 {
    if (withPreprocessing_ && preproc_->isSolved())
       return preproc_->isUnfeasible() ? 0 : 1;
@@ -579,10 +579,10 @@ size_t NcspSolver::nbSolutions() const
       return space_->nbSolNodes();
 }
 
-std::pair<DomainBox, Proof> NcspSolver::getSolution(size_t i) const
+std::pair<DomainBox, Proof> CSPSolver::getSolution(size_t i) const
 {
    ASSERT(i < nbSolutions(),
-          "Bad access to a solution in a Ncsp solver @ " << i);
+          "Bad access to a solution in a CSP solver @ " << i);
 
    if (withPreprocessing_)
    {
@@ -601,7 +601,7 @@ std::pair<DomainBox, Proof> NcspSolver::getSolution(size_t i) const
       // assigns the values of the unfixed variables
       if (!preproc_->allVarsFixed())
       {
-         SharedNcspNode node = space_->getSolNode(i);
+         SharedCSPNode node = space_->getSolNode(i);
          proof = node->getProof();
 
          DomainBox* aux = node->box();
@@ -619,14 +619,14 @@ std::pair<DomainBox, Proof> NcspSolver::getSolution(size_t i) const
    }
    else
    {
-      SharedNcspNode node = space_->getSolNode(i);
+      SharedCSPNode node = space_->getSolNode(i);
       Proof proof = node->getProof();
       DomainBox aux(*node->box());
       return std::make_pair(aux, proof);
    }
 }
 
-size_t NcspSolver::nbPendingNodes() const
+size_t CSPSolver::nbPendingNodes() const
 {
    if (preproc_->isSolved())
       return 0;
@@ -635,9 +635,9 @@ size_t NcspSolver::nbPendingNodes() const
       return space_->nbPendingNodes();
 }
 
-DomainBox NcspSolver::getPendingBox(size_t i) const
+DomainBox CSPSolver::getPendingBox(size_t i) const
 {
-   ASSERT(i < nbPendingNodes(), "Bad access to a pending box in a Ncsp solver");
+   ASSERT(i < nbPendingNodes(), "Bad access to a pending box in a CSP solver");
 
    if (withPreprocessing_)
    {
@@ -655,7 +655,7 @@ DomainBox NcspSolver::getPendingBox(size_t i) const
       // assigns the values of the unfixed variables
       if (!preproc_->allVarsFixed())
       {
-         SharedNcspNode node = space_->getPendingNode(i);
+         SharedCSPNode node = space_->getPendingNode(i);
          DomainBox* aux = node->box();
 
          for (size_t i=0; i<preproc_->nbUnfixedVars(); ++i)
@@ -671,7 +671,7 @@ DomainBox NcspSolver::getPendingBox(size_t i) const
    }
    else
    {
-      SharedNcspNode node = space_->getPendingNode(i);
+      SharedCSPNode node = space_->getPendingNode(i);
       DomainBox aux(*node->box());
       return aux;
    }

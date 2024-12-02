@@ -12,14 +12,14 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspNode.hpp
- * @brief  NCSP search node
+ * @file   CSPNode.hpp
+ * @brief  CSP search node
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_NODE_HPP
-#define REALPAVER_NCSP_NODE_HPP
+#ifndef REALPAVER_CSP_NODE_HPP
+#define REALPAVER_CSP_NODE_HPP
 
 #include <memory>
 #include "realpaver/DomainBox.hpp"
@@ -27,7 +27,7 @@
 namespace realpaver {
 
 /**
- * @brief Search node for the NCSP solver.
+ * @brief Search node for the CSP solver.
  *
  * A node has a scope, a domain box, an index, a tree depth, a proof
  * certificate, and it is possible to register a variable, e.g. the selected
@@ -39,26 +39,26 @@ namespace realpaver {
  * The domain box is owned by this. Its scope is assumed to contain
  * the scope of this.
  */
-class NcspNode {
+class CSPNode {
 public:
    /**
     * @brief Constructor from a scope.
-    * 
+    *
     * The domains are extracted from the variables of the given scope.
     */
-   NcspNode(Scope scop, int depth = 0);
+   CSPNode(Scope scop, int depth = 0);
 
    /// Constructor from a box
-   NcspNode(std::unique_ptr<DomainBox> box,  int depth = 0);
+   CSPNode(std::unique_ptr<DomainBox> box,  int depth = 0);
 
    /// Virtual destructor
-   virtual ~NcspNode();
+   virtual ~CSPNode();
 
    /// Copy constructor
-   NcspNode(const NcspNode& node);
+   CSPNode(const CSPNode& node);
 
    /// No assignment
-   NcspNode& operator=(const NcspNode&) = delete;
+   CSPNode& operator=(const CSPNode&) = delete;
 
    /// Returns the depth of this in the search tree
    int depth() const;
@@ -101,10 +101,10 @@ private:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const NcspNode& node);
+std::ostream& operator<<(std::ostream& os, const CSPNode& node);
 
 /// Type of shared pointers on CSP nodes
-using SharedNcspNode = std::shared_ptr<NcspNode>;
+using SharedCSPNode = std::shared_ptr<CSPNode>;
 
 } // namespace
 

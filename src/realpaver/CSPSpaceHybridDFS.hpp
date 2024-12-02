@@ -39,20 +39,20 @@ std::ostream& operator<<(std::ostream& os, const HybridDFSStyle& style);
 
 /*----------------------------------------------------------------------------*/
 
-/// Abstract class representing a set of shared NCSP nodes
-class HybridNcspNodeSet {
+/// Abstract class representing a set of shared CSP nodes
+class HybridCSPNodeSet {
 public:
    /// Constructor
-   HybridNcspNodeSet() = default;
+   HybridCSPNodeSet() = default;
 
    /// Virtual destructor
-   virtual ~HybridNcspNodeSet();
+   virtual ~HybridCSPNodeSet();
 
    /// Default copy constructor
-   HybridNcspNodeSet(const HybridNcspNodeSet&) = default;
+   HybridCSPNodeSet(const HybridCSPNodeSet&) = default;
 
    /// No assignment
-   HybridNcspNodeSet& operator=(const HybridNcspNodeSet&) = delete;
+   HybridCSPNodeSet& operator=(const HybridCSPNodeSet&) = delete;
 
    /// Returns true if this is empty
    virtual bool isEmpty() const = 0;
@@ -61,41 +61,41 @@ public:
    virtual size_t size() const = 0;
 
    /// Inserts a node in this
-   virtual void insert(const SharedNcspNode& node) = 0;
+   virtual void insert(const SharedCSPNode& node) = 0;
 
    /// Extracts the first node of this
-   virtual SharedNcspNode extract() = 0;
+   virtual SharedCSPNode extract() = 0;
 
    /// Returns the i-th node of this
-   virtual SharedNcspNode getNode(size_t i) const = 0;
+   virtual SharedCSPNode getNode(size_t i) const = 0;
 };
 
 /*----------------------------------------------------------------------------*/
 
-/// Set of shared NCSP nodes ordered by depth (ascending)
-class DepthNcspNodeSet : public HybridNcspNodeSet {
+/// Set of shared CSP nodes ordered by depth (ascending)
+class DepthCSPNodeSet : public HybridCSPNodeSet {
 public:
    /// Constructor of an empty set
-   DepthNcspNodeSet() = default;
+   DepthCSPNodeSet() = default;
 
    /// Default destructor
-   ~DepthNcspNodeSet() = default;
+   ~DepthCSPNodeSet() = default;
 
    /// Default copy constructor
-   DepthNcspNodeSet(const DepthNcspNodeSet&) = default;
+   DepthCSPNodeSet(const DepthCSPNodeSet&) = default;
 
    /// No assignment
-   DepthNcspNodeSet& operator=(const DepthNcspNodeSet&) = delete;
+   DepthCSPNodeSet& operator=(const DepthCSPNodeSet&) = delete;
 
    bool isEmpty() const override;
    size_t size() const override;
-   void insert(const SharedNcspNode& node) override;
-   SharedNcspNode extract() override;
-   SharedNcspNode getNode(size_t i) const override;
+   void insert(const SharedCSPNode& node) override;
+   SharedCSPNode extract() override;
+   SharedCSPNode getNode(size_t i) const override;
 
 private:
    struct Elem {
-      SharedNcspNode node;
+      SharedCSPNode node;
       int depth;
    };
 
@@ -112,30 +112,30 @@ private:
 
 /*----------------------------------------------------------------------------*/
 
-/// Set of shared NCSP nodes ordered by perimeter (descending)
-class PerimeterNcspNodeSet : public HybridNcspNodeSet {
+/// Set of shared CSP nodes ordered by perimeter (descending)
+class PerimeterCSPNodeSet : public HybridCSPNodeSet {
 public:
    /// Constructor of an empty set
-   PerimeterNcspNodeSet() = default;
+   PerimeterCSPNodeSet() = default;
 
    /// Default destructor
-   ~PerimeterNcspNodeSet() = default;
+   ~PerimeterCSPNodeSet() = default;
 
    /// Default copy constructor
-   PerimeterNcspNodeSet(const PerimeterNcspNodeSet&) = default;
+   PerimeterCSPNodeSet(const PerimeterCSPNodeSet&) = default;
 
    /// No assignment
-   PerimeterNcspNodeSet& operator=(const PerimeterNcspNodeSet&) = delete;
+   PerimeterCSPNodeSet& operator=(const PerimeterCSPNodeSet&) = delete;
 
    bool isEmpty() const override;
    size_t size() const override;
-   void insert(const SharedNcspNode& node) override;
-   SharedNcspNode extract() override;
-   SharedNcspNode getNode(size_t i) const override;
+   void insert(const SharedCSPNode& node) override;
+   SharedCSPNode extract() override;
+   SharedCSPNode getNode(size_t i) const override;
 
 private:
    struct Elem {
-      SharedNcspNode node;
+      SharedCSPNode node;
       double peri;
    };
 
@@ -152,30 +152,30 @@ private:
 
 /*----------------------------------------------------------------------------*/
 
-/// Set of shared NCSP nodes ordered by grid perimeter (descending)
-class GridPerimeterNcspNodeSet : public HybridNcspNodeSet {
+/// Set of shared CSP nodes ordered by grid perimeter (descending)
+class GridPerimeterCSPNodeSet : public HybridCSPNodeSet {
 public:
    /// Constructor of an empty set
-   GridPerimeterNcspNodeSet() = default;
+   GridPerimeterCSPNodeSet() = default;
 
    /// Default destructor
-   ~GridPerimeterNcspNodeSet() = default;
+   ~GridPerimeterCSPNodeSet() = default;
 
    /// Default copy constructor
-   GridPerimeterNcspNodeSet(const GridPerimeterNcspNodeSet&) = default;
+   GridPerimeterCSPNodeSet(const GridPerimeterCSPNodeSet&) = default;
 
    /// No assignment
-   GridPerimeterNcspNodeSet& operator=(const GridPerimeterNcspNodeSet&) = delete;
+   GridPerimeterCSPNodeSet& operator=(const GridPerimeterCSPNodeSet&) = delete;
 
    bool isEmpty() const override;
    size_t size() const override;
-   void insert(const SharedNcspNode& node) override;
-   SharedNcspNode extract() override;
-   SharedNcspNode getNode(size_t i) const override;
+   void insert(const SharedCSPNode& node) override;
+   SharedCSPNode extract() override;
+   SharedCSPNode getNode(size_t i) const override;
 
 private:
    struct Elem {
-      SharedNcspNode node;
+      SharedCSPNode node;
       double peri;
    };
 
@@ -216,21 +216,21 @@ public:
    CSPSpaceHybridDFS& operator=(const CSPSpaceHybridDFS&) = delete;
 
    size_t nbSolNodes() const override;
-   void pushSolNode(const SharedNcspNode& node) override;
-   SharedNcspNode popSolNode() override;
-   SharedNcspNode getSolNode(size_t i) const override;
+   void pushSolNode(const SharedCSPNode& node) override;
+   SharedCSPNode popSolNode() override;
+   SharedCSPNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
-   SharedNcspNode nextPendingNode() override;
-   void insertPendingNode(const SharedNcspNode& node) override;
-   SharedNcspNode getPendingNode(size_t i) const override;
-   void insertPendingNodes(NcspSplit::iterator first,
-                           NcspSplit::iterator last) override;
+   SharedCSPNode nextPendingNode() override;
+   void insertPendingNode(const SharedCSPNode& node) override;
+   SharedCSPNode getPendingNode(size_t i) const override;
+   void insertPendingNodes(CSPSplit::iterator first,
+                           CSPSplit::iterator last) override;
 
 private:
-   std::vector<SharedNcspNode> sta_;   // stack of pending nodes (for DFS)
-   HybridNcspNodeSet* set_;            // set of pending nodes (for BestFS)
-   std::vector<SharedNcspNode> vsol_;  // vector of solution nodes
+   std::vector<SharedCSPNode> sta_;   // stack of pending nodes (for DFS)
+   HybridCSPNodeSet* set_;            // set of pending nodes (for BestFS)
+   std::vector<SharedCSPNode> vsol_;  // vector of solution nodes
    bool leftRight_;                    // true if the current DFS stage is
                                        // left-to-right, false for right-to-left
 };

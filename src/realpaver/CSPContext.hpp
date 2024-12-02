@@ -12,73 +12,71 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspContext.hpp
- * @brief  NCSP search context
+ * @file   CSPContext.hpp
+ * @brief  CSP search context
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_CONTEXT_HPP
-#define REALPAVER_NCSP_CONTEXT_HPP
+#ifndef REALPAVER_CSP_CONTEXT_HPP
+#define REALPAVER_CSP_CONTEXT_HPP
 
 #include <list>
 #include <memory>
 #include <unordered_map>
-#include <vector>
-#include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/Variable.hpp"
 
 namespace realpaver {
 
-///  Type of informations that can be associated with NCSP search nodes
-enum class NcspNodeInfoType {
+///  Type of informations that can be associated with CSP search nodes
+enum class CSPNodeInfoType {
    SplitVar,      ///< selected variable in a splitting step
    NbCID          ///< number of CID contractors
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ);
+std::ostream& operator<<(std::ostream& os, CSPNodeInfoType typ);
 
 /*----------------------------------------------------------------------------*/
 
-/// Base class of informations that can be associated with NCSP search nodes
-class NcspNodeInfo {
+/// Base class of informations that can be associated with CSP search nodes
+class CSPNodeInfo {
 public:
    /// Constructor
-   NcspNodeInfo(NcspNodeInfoType typ);
+   CSPNodeInfo(CSPNodeInfoType typ);
 
    /// Virtual destructor
-   virtual ~NcspNodeInfo();
+   virtual ~CSPNodeInfo();
 
    /// Default copy constructor
-   NcspNodeInfo(const NcspNodeInfo&) = default;
+   CSPNodeInfo(const CSPNodeInfo&) = default;
 
    /// Default assignment operator
-   NcspNodeInfo& operator=(const NcspNodeInfo&) = default;
+   CSPNodeInfo& operator=(const CSPNodeInfo&) = default;
 
    /// Returns the type of this
-   NcspNodeInfoType getType() const;
+   CSPNodeInfoType getType() const;
 
 private:
-   NcspNodeInfoType typ_;  // type
+   CSPNodeInfoType typ_;  // type
 };
 
 /*----------------------------------------------------------------------------*/
 
 /// Information that contains a variable
-class NcspNodeInfoVar : public NcspNodeInfo {
+class CSPNodeInfoVar : public CSPNodeInfo {
 public:
    /// Constructor
-   NcspNodeInfoVar(Variable v);
+   CSPNodeInfoVar(Variable v);
 
    /// Default destructor
-   ~NcspNodeInfoVar() = default;
+   ~CSPNodeInfoVar() = default;
 
    /// Default copy constructor
-   NcspNodeInfoVar(const NcspNodeInfoVar&) = default;
+   CSPNodeInfoVar(const CSPNodeInfoVar&) = default;
 
    /// No assignment
-   NcspNodeInfoVar& operator=(const NcspNodeInfoVar&) = delete;
+   CSPNodeInfoVar& operator=(const CSPNodeInfoVar&) = delete;
 
    /// Returns the variable enclosed in this
    Variable getVar() const;
@@ -90,19 +88,19 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Information that contains a number of CID contractors
-class NcspNodeInfoCID : public NcspNodeInfo {
+class CSPNodeInfoCID : public CSPNodeInfo {
 public:
    /// Constructor
-   NcspNodeInfoCID(int nbcid = 0);
+   CSPNodeInfoCID(int nbcid = 0);
 
    /// Default destructor
-   ~NcspNodeInfoCID() = default;
+   ~CSPNodeInfoCID() = default;
 
    /// Default copy constructor
-   NcspNodeInfoCID(const NcspNodeInfoCID&) = default;
+   CSPNodeInfoCID(const CSPNodeInfoCID&) = default;
 
    /// No assignment
-   NcspNodeInfoCID& operator=(const NcspNodeInfoCID&) = delete;
+   CSPNodeInfoCID& operator=(const CSPNodeInfoCID&) = delete;
 
    /// Returns the number of CID contractors
    size_t getNbCID() const;
@@ -117,48 +115,48 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Map that stores the informations associated with NCSP search nodes.
+ * @brief Map that stores the informations associated with CSP search nodes.
  *
  * An entry is a couple (node index, list of infos).
  */
-class NcspContext {
+class CSPContext {
 public:
    /// Default constructor
-   NcspContext() = default;
+   CSPContext() = default;
 
    /// Default destructor
-   ~NcspContext() = default;
+   ~CSPContext() = default;
 
    /// No copy
-   NcspContext(const NcspContext&) = delete;
+   CSPContext(const CSPContext&) = delete;
 
    /// No assignment
-   NcspContext& operator=(const NcspContext&) = delete;
+   CSPContext& operator=(const CSPContext&) = delete;
 
    /// Inserts a new entry in this
-   void insert(int index, std::shared_ptr<NcspNodeInfo> info);
+   void insert(int index, std::shared_ptr<CSPNodeInfo> info);
 
    /// Removes all the informations associated with a node
    void remove(int index);
 
    /**
     * @brief Gets an information associated with a node.
-    * 
+    *
     * Returns the information associated with the node index and the given type
     * if it exists, a null pointer otherwise
     */
-   std::shared_ptr<NcspNodeInfo> getInfo(int index, NcspNodeInfoType typ) const;
+   std::shared_ptr<CSPNodeInfo> getInfo(int index, CSPNodeInfoType typ) const;
 
    /// Returns the number of entries in this
    size_t size() const;
 
 private:
    // map node index -> list of infos
-   typedef std::list< std::shared_ptr<NcspNodeInfo> > ListType;
+   typedef std::list< std::shared_ptr<CSPNodeInfo> > ListType;
    std::unordered_map<int, ListType> map_;
 
    // test used in assertions
-   bool hasInfo(int index,  NcspNodeInfoType typ) const;
+   bool hasInfo(int index,  CSPNodeInfoType typ) const;
 };
 
 } // namespace

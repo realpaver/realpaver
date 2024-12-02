@@ -45,18 +45,18 @@ public:
    CSPSpaceDFS(const CSPSpaceDFS&) = default;
 
    size_t nbSolNodes() const override;
-   void pushSolNode(const SharedNcspNode& node) override;
-   SharedNcspNode popSolNode() override;
-   SharedNcspNode getSolNode(size_t i) const override;
+   void pushSolNode(const SharedCSPNode& node) override;
+   SharedCSPNode popSolNode() override;
+   SharedCSPNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
-   SharedNcspNode nextPendingNode() override;
-   void insertPendingNode(const SharedNcspNode& node) override;
-   SharedNcspNode getPendingNode(size_t i) const override;
+   SharedCSPNode nextPendingNode() override;
+   void insertPendingNode(const SharedCSPNode& node) override;
+   SharedCSPNode getPendingNode(size_t i) const override;
 
 private:
-   std::vector<SharedNcspNode> vsol_;    // vector of solution nodes
-   std::vector<SharedNcspNode> vnode_;   // vector of pending nodes
+   std::vector<SharedCSPNode> vsol_;    // vector of solution nodes
+   std::vector<SharedCSPNode> vnode_;   // vector of pending nodes
 };
 
 } // namespace

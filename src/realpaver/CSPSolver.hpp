@@ -12,20 +12,20 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSolver.hpp
- * @brief  NCSP solver
+ * @file   CSPSolver.hpp
+ * @brief  CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_SOLVER_HPP
-#define REALPAVER_NCSP_SOLVER_HPP
+#ifndef REALPAVER_CSP_SOLVER_HPP
+#define REALPAVER_CSP_SOLVER_HPP
 
 #include <memory>
-#include "realpaver/NcspEnv.hpp"
-#include "realpaver/NcspPropagator.hpp"
+#include "realpaver/CSPEnv.hpp"
+#include "realpaver/CSPPropagator.hpp"
 #include "realpaver/CSPSpace.hpp"
-#include "realpaver/NcspSplit.hpp"
+#include "realpaver/CSPSplit.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Prover.hpp"
@@ -42,7 +42,7 @@ namespace realpaver {
  * or unfeasible constraints. The second phase is an interval-based
  * branch-and-prune algorithm parameterized by several components.
  *
- * The solver takes as input a problem that must be a NCSP. Its components
+ * The solver takes as input a problem that must be a CSP. Its components
  * are generated according to a Param object prm that can be assigned as
  * follows:
  *
@@ -60,19 +60,19 @@ namespace realpaver {
  *
  * The scope of each solution is the one of the input problem.
  */
-class NcspSolver {
+class CSPSolver {
 public:
    /// Constructor
-   NcspSolver(const Problem& problem);
+   CSPSolver(const Problem& problem);
 
    /// Destructor
-   ~NcspSolver();
+   ~CSPSolver();
 
    /// No copy constructor
-   NcspSolver(const NcspSolver&) = delete;
+   CSPSolver(const CSPSolver&) = delete;
 
    /// No assignment
-   NcspSolver& operator=(const NcspSolver&) = delete;
+   CSPSolver& operator=(const CSPSolver&) = delete;
 
    /// Solving method
    void solve();
@@ -84,7 +84,7 @@ public:
    int getTotalNodes() const;
 
    /// Returns the environment of this
-   std::shared_ptr<NcspEnv> getEnv() const;
+   std::shared_ptr<CSPEnv> getEnv() const;
 
    /// Returns the space of this
    CSPSpace* getSpace() const;
@@ -119,13 +119,13 @@ private:
    Problem* preprob_;               // problem resulting from preprocessing
    Preprocessor* preproc_;          // preprocessor
 
-   NcspContext* context_;           // solving context for the BP algorithm
+   CSPContext* context_;            // solving context for the BP algorithm
 
-   std::shared_ptr<NcspEnv> env_;   // environment
+   std::shared_ptr<CSPEnv> env_;    // environment
    CSPSpace* space_;                // search tree
    SharedDag dag_;                  // dag
-   NcspPropagator* propagator_;     // contraction method
-   NcspSplit* split_;               // splitting strategy
+   CSPPropagator* propagator_;      // contraction method
+   CSPSplit* split_;                // splitting strategy
    ContractorFactory* factory_;     // contractor factory
 
    Prover* prover_;                 // solution prover
@@ -139,7 +139,7 @@ private:
    void makePropagator();
    void makeSplit();
    void bpStep(int depthlimit);
-   void bpStepAux(SharedNcspNode node, int depthlimit);
+   void bpStepAux(SharedCSPNode node, int depthlimit);
    bool isInner(DomainBox* box) const;
    void certifySolutions();
 };

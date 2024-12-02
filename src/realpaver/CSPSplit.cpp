@@ -12,18 +12,18 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspSplit.cpp
- * @brief  Splitting strategies of NCSP solver
+ * @file   CSPSplit.cpp
+ * @brief  Splitting strategies of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/NcspSplit.hpp"
+#include "realpaver/CSPSplit.hpp"
 
 namespace realpaver {
 
-NcspSplit::NcspSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+CSPSplit::CSPSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
       : scop_(scop),
         slicerMap_(smap.release()),
         cont_(),
@@ -34,17 +34,17 @@ NcspSplit::NcspSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
    ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
 }
 
-NcspSplit::~NcspSplit()
+CSPSplit::~CSPSplit()
 {
    delete slicerMap_;
 }
 
-Scope NcspSplit::scope() const
+Scope CSPSplit::scope() const
 {
    return scop_;
 }
 
-void NcspSplit::apply(SharedNcspNode& node, NcspContext& context)
+void CSPSplit::apply(SharedCSPNode& node, CSPContext& context)
 {
    LOG_INTER("Split node " << node->index() << ": " << (*node->box()));
 
@@ -56,27 +56,27 @@ void NcspSplit::apply(SharedNcspNode& node, NcspContext& context)
    LOG_INTER("  -> " << getNbNodes() << " sub-node(s)");
 }
 
-size_t NcspSplit::getNbNodes() const
+size_t CSPSplit::getNbNodes() const
 {
    return cont_.size();
 }
 
-size_t NcspSplit::getNbSplits() const
+size_t CSPSplit::getNbSplits() const
 {
    return nbs_;
 }
 
-SharedNcspNode NcspSplit::cloneNode(const SharedNcspNode& node)
+SharedCSPNode CSPSplit::cloneNode(const SharedCSPNode& node)
 {
-   SharedNcspNode aux = std::make_shared<NcspNode>(*node);
+   SharedCSPNode aux = std::make_shared<CSPNode>(*node);
    aux->setIndex(++idx_);
    aux->setDepth(1+node->depth());
    aux->setParent(node->index());
    return aux;
 }
 
-void NcspSplit::splitOne(SharedNcspNode& node, Variable v)
-{   
+void CSPSplit::splitOne(SharedCSPNode& node, Variable v)
+{
    Domain* dom = node->box()->get(v);
    DomainSlicer* slicer = slicerMap_->getSlicer(dom->type());
 
@@ -87,39 +87,39 @@ void NcspSplit::splitOne(SharedNcspNode& node, Variable v)
    while (it != slicer->end())
    {
       std::unique_ptr<Domain> slice = slicer->next(it);
-      SharedNcspNode aux = cloneNode(node);
+      SharedCSPNode aux = cloneNode(node);
       aux->box()->set(v, std::move(slice));
       cont_.push_back(aux);
    }
 }
 
-void NcspSplit::reset()
+void CSPSplit::reset()
 {
    nbs_ = idx_ = 0;
 }
 
-NcspSplit::iterator NcspSplit::begin()
+CSPSplit::iterator CSPSplit::begin()
 {
    return cont_.begin();
 }
 
-NcspSplit::iterator NcspSplit::end()
+CSPSplit::iterator CSPSplit::end()
 {
    return cont_.end();
 }
 
-DomainSlicerMap* NcspSplit::getSlicerMap() const
+DomainSlicerMap* CSPSplit::getSlicerMap() const
 {
    return slicerMap_;
 }
 
 /*----------------------------------------------------------------------------*/
 
-NcspSplitRR::NcspSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : NcspSplit(scop, std::move(smap))
+CSPSplitRR::CSPSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : CSPSplit(scop, std::move(smap))
 {}
 
-void NcspSplitRR::applyImpl(SharedNcspNode& node, NcspContext& context)
+void CSPSplitRR::applyImpl(SharedCSPNode& node, CSPContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node, context);
@@ -135,19 +135,19 @@ void NcspSplitRR::applyImpl(SharedNcspNode& node, NcspContext& context)
    if (getNbNodes() < 2) return;
 
    // assigns the split variable in the sub-nodes
-   std::shared_ptr<NcspNodeInfoVar> info = std::make_shared<NcspNodeInfoVar>(v);
+   std::shared_ptr<CSPNodeInfoVar> info = std::make_shared<CSPNodeInfoVar>(v);
 
-   for (SharedNcspNode& aux : cont_)
+   for (SharedCSPNode& aux : cont_)
       context.insert(aux->index(), info);
 }
 
-std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node,
-                                                 NcspContext& context)
+std::pair<bool, Variable> CSPSplitRR::selectVar(SharedCSPNode& node,
+                                                 CSPContext& context)
 {
    DomainBox* box = node->box();
 
-   std::shared_ptr<NcspNodeInfo>
-      info = context.getInfo(node->index(), NcspNodeInfoType::SplitVar);
+   std::shared_ptr<CSPNodeInfo>
+      info = context.getInfo(node->index(), CSPNodeInfoType::SplitVar);
 
    // assigns an iterator pointing to the next variable
    Scope::const_iterator it;
@@ -157,7 +157,7 @@ std::pair<bool, Variable> NcspSplitRR::selectVar(SharedNcspNode& node,
    }
    else
    {
-      NcspNodeInfoVar* infovar = static_cast<NcspNodeInfoVar*>(info.get());
+      CSPNodeInfoVar* infovar = static_cast<CSPNodeInfoVar*>(info.get());
       it = scop_.find(infovar->getVar());
       ++it;
       if (it == scop_.end()) it = scop_.begin();
@@ -197,14 +197,14 @@ double domainSize(const Variable& v, Domain* dom)
    else
       d = dom->size();
 
-   return d; 
+   return d;
 }
 
-NcspSplitLF::NcspSplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : NcspSplit(scop, std::move(smap))
+CSPSplitLF::CSPSplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : CSPSplit(scop, std::move(smap))
 {}
 
-void NcspSplitLF::applyImpl(SharedNcspNode& node, NcspContext& context)
+void CSPSplitLF::applyImpl(SharedCSPNode& node, CSPContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -218,12 +218,12 @@ void NcspSplitLF::applyImpl(SharedNcspNode& node, NcspContext& context)
                                       << " in node " << node->index());
 }
 
-std::pair<bool, Variable> NcspSplitLF::selectVar(SharedNcspNode& node)
+std::pair<bool, Variable> CSPSplitLF::selectVar(SharedCSPNode& node)
 {
    return selectVar(scop_, *node->box());
 }
 
-std::pair<bool, Variable> NcspSplitLF::selectVar(const Scope& scop,
+std::pair<bool, Variable> CSPSplitLF::selectVar(const Scope& scop,
                                                  const DomainBox& box)
 {
    Variable vres;
@@ -250,11 +250,11 @@ std::pair<bool, Variable> NcspSplitLF::selectVar(const Scope& scop,
 
 /*----------------------------------------------------------------------------*/
 
-NcspSplitSF::NcspSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : NcspSplit(scop, std::move(smap))
+CSPSplitSF::CSPSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : CSPSplit(scop, std::move(smap))
 {}
 
-void NcspSplitSF::applyImpl(SharedNcspNode& node, NcspContext& context)
+void CSPSplitSF::applyImpl(SharedCSPNode& node, CSPContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -268,7 +268,7 @@ void NcspSplitSF::applyImpl(SharedNcspNode& node, NcspContext& context)
                                        << " in node " << node->index());
 }
 
-std::pair<bool, Variable> NcspSplitSF::selectVar(SharedNcspNode& node)
+std::pair<bool, Variable> CSPSplitSF::selectVar(SharedCSPNode& node)
 {
    DomainBox* box = node->box();
    Variable vres;
@@ -295,11 +295,11 @@ std::pair<bool, Variable> NcspSplitSF::selectVar(SharedNcspNode& node)
 
 /*----------------------------------------------------------------------------*/
 
-NcspSplitSLF::NcspSplitSLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : NcspSplit(scop, std::move(smap))
+CSPSplitSLF::CSPSplitSLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
+      : CSPSplit(scop, std::move(smap))
 {}
 
-void NcspSplitSLF::applyImpl(SharedNcspNode& node, NcspContext& context)
+void CSPSplitSLF::applyImpl(SharedCSPNode& node, CSPContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -313,7 +313,7 @@ void NcspSplitSLF::applyImpl(SharedNcspNode& node, NcspContext& context)
                                                << " in node " << node->index());
 }
 
-std::pair<bool, Variable> NcspSplitSLF::selectVar(SharedNcspNode& node)
+std::pair<bool, Variable> CSPSplitSLF::selectVar(SharedCSPNode& node)
 {
    DomainBox* box = node->box();
    Variable ivmin, rvmax;
@@ -335,7 +335,7 @@ std::pair<bool, Variable> NcspSplitSLF::selectVar(SharedNcspNode& node)
                rvmax = v;
                rdmax = d;
                rfound = true;
-               
+
             }
          }
          else
@@ -356,16 +356,16 @@ std::pair<bool, Variable> NcspSplitSLF::selectVar(SharedNcspNode& node)
 
 /*----------------------------------------------------------------------------*/
 
-NcspSplitSSR::NcspSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
+CSPSplitSSR::CSPSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
                            std::unique_ptr<DomainSlicerMap> smap)
-      : NcspSplit(ssr->scope(), std::move(smap)),
+      : CSPSplit(ssr->scope(), std::move(smap)),
         ssr_(ssr)
 {
    ASSERT(ssr != nullptr,
           "No interval smear sum rel object in a splitting object");
 }
 
-void NcspSplitSSR::applyImpl(SharedNcspNode& node, NcspContext& context)
+void CSPSplitSSR::applyImpl(SharedCSPNode& node, CSPContext& context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
@@ -379,7 +379,7 @@ void NcspSplitSSR::applyImpl(SharedNcspNode& node, NcspContext& context)
                                       << " in node " << node->index());
 }
 
-std::pair<bool, Variable> NcspSplitSSR::selectVar(SharedNcspNode& node)
+std::pair<bool, Variable> CSPSplitSSR::selectVar(SharedCSPNode& node)
 {
    IntervalBox B(*node->box());
    ssr_->calculate(B);

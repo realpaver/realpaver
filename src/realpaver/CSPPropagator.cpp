@@ -12,27 +12,26 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspPropagator.cpp
- * @brief  Propagators of NCSP solver
+ * @file   CSPPropagator.cpp
+ * @brief  Propagators of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
-#include <algorithm>
-#include "realpaver/Logger.hpp"
-#include "realpaver/NcspPropagator.hpp"
+
+#include "realpaver/CSPPropagator.hpp"
 
 namespace realpaver {
 
-NcspPropagator::NcspPropagator()
+CSPPropagator::CSPPropagator()
       : B_(nullptr)
 {}
 
-NcspPropagator::~NcspPropagator()
+CSPPropagator::~CSPPropagator()
 {
    if (B_ != nullptr) delete B_;
 }
 
-Proof NcspPropagator::contractBox(const IntervalBox& B, DomainBox& box)
+Proof CSPPropagator::contractBox(const IntervalBox& B, DomainBox& box)
 {
    for (const auto& v : box.scope())
    {
@@ -44,7 +43,7 @@ Proof NcspPropagator::contractBox(const IntervalBox& B, DomainBox& box)
    return Proof::Maybe;
 }
 
-Proof NcspPropagator::contract(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagator::contract(CSPNode& node, CSPContext& ctx)
 {
    if (B_ != nullptr)
    {
@@ -81,13 +80,13 @@ Proof NcspPropagator::contract(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspHC4::NcspHC4(ContractorFactory& facto)
-      : NcspPropagator()
+CSPPropagatorHC4::CSPPropagatorHC4(ContractorFactory& facto)
+      : CSPPropagator()
 {
    op_ = facto.makeHC4();
 }
 
-Proof NcspHC4::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorHC4::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    B_ = new IntervalBox(*node.box());
    return op_->contract(*B_);
@@ -95,13 +94,13 @@ Proof NcspHC4::contractImpl(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspBC4::NcspBC4(ContractorFactory& facto)
-      : NcspPropagator()
+CSPPropagatorBC4::CSPPropagatorBC4(ContractorFactory& facto)
+      : CSPPropagator()
 {
    op_ = facto.makeBC4();
 }
 
-Proof NcspBC4::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorBC4::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    B_ = new IntervalBox(*node.box());
    return op_->contract(*B_);
@@ -109,13 +108,13 @@ Proof NcspBC4::contractImpl(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspNewton::NcspNewton(ContractorFactory& facto)
-      : NcspPropagator()
+CSPPropagatorNewton::CSPPropagatorNewton(ContractorFactory& facto)
+      : CSPPropagator()
 {
    op_ = facto.makeNewton();
 }
 
-Proof NcspNewton::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorNewton::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    Proof proof = Proof::Maybe;
 
@@ -130,14 +129,14 @@ Proof NcspNewton::contractImpl(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspACID::NcspACID(ContractorFactory& facto)
-      : NcspPropagator()
+CSPPropagatorACID::CSPPropagatorACID(ContractorFactory& facto)
+      : CSPPropagator()
 {
    hc4_ = facto.makeHC4();
    op_ = facto.makeACID();
 }
 
-Proof NcspACID::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorACID::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    B_ = new IntervalBox(*node.box());
 
@@ -152,13 +151,13 @@ Proof NcspACID::contractImpl(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspHC4Newton::NcspHC4Newton(ContractorFactory& facto)
-      : NcspPropagator(),
+CSPPropagatorHC4Newton::CSPPropagatorHC4Newton(ContractorFactory& facto)
+      : CSPPropagator(),
         hc4_(facto),
         newton_(facto)
 {}
 
-Proof NcspHC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorHC4Newton::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    Proof proof = hc4_.contract(node, ctx);
 
@@ -172,13 +171,13 @@ Proof NcspHC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspBC4Newton::NcspBC4Newton(ContractorFactory& facto)
-      : NcspPropagator(),
+CSPPropagatorBC4Newton::CSPPropagatorBC4Newton(ContractorFactory& facto)
+      : CSPPropagator(),
         bc4_(facto),
         newton_(facto)
 {}
 
-Proof NcspBC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorBC4Newton::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    Proof proof = bc4_.contract(node, ctx);
 
@@ -192,13 +191,13 @@ Proof NcspBC4Newton::contractImpl(NcspNode& node, NcspContext& ctx)
 
 /*----------------------------------------------------------------------------*/
 
-NcspACIDNewton::NcspACIDNewton(ContractorFactory& facto)
-      : NcspPropagator(),
+CSPPropagatorACIDNewton::CSPPropagatorACIDNewton(ContractorFactory& facto)
+      : CSPPropagator(),
         acid_(facto),
         newton_(facto)
 {}
 
-Proof NcspACIDNewton::contractImpl(NcspNode& node, NcspContext& ctx)
+Proof CSPPropagatorACIDNewton::contractImpl(CSPNode& node, CSPContext& ctx)
 {
    Proof proof = acid_.contract(node, ctx);
 

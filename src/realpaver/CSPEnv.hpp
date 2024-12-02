@@ -12,33 +12,33 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspEnv.hpp
- * @brief  Environment for NCSP solver
+ * @file   CSPEnv.hpp
+ * @brief  Environment for CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#ifndef REALPAVER_NCSP_ENV_HPP
-#define REALPAVER_NCSP_ENV_HPP
+#ifndef REALPAVER_CSP_ENV_HPP
+#define REALPAVER_CSP_ENV_HPP
 
 #include "realpaver/Env.hpp"
 
 namespace realpaver {
 
-/// Environment for NCSP solver
-class NcspEnv : public Env {
+/// Environment for CSP solver
+class CSPEnv : public Env {
 public:
    /// Constructor
-   NcspEnv();
+   CSPEnv();
 
    /// Default destructor
-   ~NcspEnv() = default;
+   ~CSPEnv() = default;
 
    /// Default copy constructor
-   NcspEnv(const NcspEnv&) = default;
+   CSPEnv(const CSPEnv&) = default;
 
    /// No assignment
-   NcspEnv& operator=(const NcspEnv&) = delete;
+   CSPEnv& operator=(const CSPEnv&) = delete;
 
    /// Determines if the solving process is aborted due a solution limit
    void setSolutionLimit(bool b = true);

@@ -13,21 +13,20 @@
 
 /**
  * @file   CSPSpace.cpp
- * @brief  Spaces of NCSP solver
+ * @brief  Spaces of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
 #include <list>
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSpace.hpp"
 
 namespace realpaver {
 
 CSPSpace::~CSPSpace() {}
 
-void CSPSpace::insertPendingNodes(NcspSplit::iterator first,
-                                   NcspSplit::iterator last)
+void CSPSpace::insertPendingNodes(CSPSplit::iterator first,
+                                   CSPSplit::iterator last)
 {
    for (auto it = first; it != last; ++it)
       insertPendingNode(*it);
@@ -39,17 +38,17 @@ void CSPSpace::makeSolClusters(double gap)
    if (gap < 0.0) return;
 
    // moves the solution nodes in a list
-   std::list<SharedNcspNode> lnode;
+   std::list<SharedCSPNode> lnode;
    while (nbSolNodes() > 0)
       lnode.push_back(popSolNode());
 
    // resulting list of nodes
-   std::list<SharedNcspNode> res;
+   std::list<SharedCSPNode> res;
 
    while (!lnode.empty())
    {
       // extracts the first node
-      SharedNcspNode node = lnode.front();
+      SharedCSPNode node = lnode.front();
       DomainBox* box = node->box();
       lnode.pop_front();
 
@@ -58,7 +57,7 @@ void CSPSpace::makeSolClusters(double gap)
       auto it = lnode.begin();
       while (!found && it != lnode.end())
       {
-         SharedNcspNode bis = *it;
+         SharedCSPNode bis = *it;
          DomainBox* boxbis = bis->box();
 
          if (box->gap(*boxbis) < gap)

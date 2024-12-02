@@ -32,21 +32,21 @@ size_t CSPSpaceBFS::nbSolNodes() const
    return vsol_.size();
 }
 
-void CSPSpaceBFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceBFS::pushSolNode(const SharedCSPNode& node)
 {
    vsol_.push_back(node);
 }
 
-SharedNcspNode CSPSpaceBFS::popSolNode()
+SharedCSPNode CSPSpaceBFS::popSolNode()
 {
-   SharedNcspNode node = vsol_.back();
+   SharedCSPNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode CSPSpaceBFS::getSolNode(size_t i) const
+SharedCSPNode CSPSpaceBFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a NCSP space");
+   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
    return vsol_[i];
 }
@@ -67,21 +67,21 @@ size_t CSPSpaceBFS::nbPendingNodes() const
    return lnode_.size();
 }
 
-SharedNcspNode CSPSpaceBFS::nextPendingNode()
+SharedCSPNode CSPSpaceBFS::nextPendingNode()
 {
-   SharedNcspNode node = lnode_.back();
+   SharedCSPNode node = lnode_.back();
    lnode_.pop_back();
    return node;
 }
 
-void CSPSpaceBFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceBFS::insertPendingNode(const SharedCSPNode& node)
 {
    lnode_.push_front(node);
 }
 
-SharedNcspNode CSPSpaceBFS::getPendingNode(size_t i) const
+SharedCSPNode CSPSpaceBFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < lnode_.size(), "Bad access to a pending node in a NCSP space");
+   ASSERT(i < lnode_.size(), "Bad access to a pending node in a CSP space");
 
    auto it = lnode_.begin();
    if (i != 0)

@@ -19,7 +19,6 @@
 */
 
 #include <algorithm>
-#include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSpaceDMDFS.hpp"
 #include "realpaver/Logger.hpp"
@@ -76,7 +75,7 @@ size_t CSPSpaceDMDFS::nbSolNodes() const
    return vsol_.size();
 }
 
-void CSPSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceDMDFS::pushSolNode(const SharedCSPNode& node)
 {
    vsol_.push_back(node);
 
@@ -93,14 +92,14 @@ void CSPSpaceDMDFS::pushSolNode(const SharedNcspNode& node)
    std::sort(vnode_.begin(), vnode_.end(), comparator);
 }
 
-SharedNcspNode CSPSpaceDMDFS::popSolNode()
+SharedCSPNode CSPSpaceDMDFS::popSolNode()
 {
-   SharedNcspNode node = vsol_.back();
+   SharedCSPNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode CSPSpaceDMDFS::getSolNode(size_t i) const
+SharedCSPNode CSPSpaceDMDFS::getSolNode(size_t i) const
 {
    ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
@@ -152,14 +151,14 @@ size_t CSPSpaceDMDFS::nbPendingNodes() const
    return vnode_.size();
 }
 
-SharedNcspNode CSPSpaceDMDFS::nextPendingNode()
+SharedCSPNode CSPSpaceDMDFS::nextPendingNode()
 {
-   SharedNcspNode node = vnode_.back().node;
+   SharedCSPNode node = vnode_.back().node;
    vnode_.pop_back();
    return node;
 }
 
-void CSPSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceDMDFS::insertPendingNode(const SharedCSPNode& node)
 {
    // Finds the distance to the closest solution
    double d = Double::inf();
@@ -179,7 +178,7 @@ void CSPSpaceDMDFS::insertPendingNode(const SharedNcspNode& node)
    vnode_.push_back(elem);
 }
 
-SharedNcspNode CSPSpaceDMDFS::getPendingNode(size_t i) const
+SharedCSPNode CSPSpaceDMDFS::getPendingNode(size_t i) const
 {
    ASSERT(i < vnode_.size(), "Bad access to a pending node in a CSP space");
 

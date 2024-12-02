@@ -26,7 +26,7 @@ int main()
                          x == 5.75,
                          y == 4.25});
 
-        NcspSolver solver(problem);
+        CSPSolver solver(problem);
         solver.getEnv()->setParam(prm);
         solver.solve();
         for (size_t i=0; i<solver.nbSolutions(); ++i)

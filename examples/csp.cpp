@@ -19,7 +19,7 @@ int main(void)
                        y == sqr(x) + 1.0 });
 
       // Solves the NCSP
-      NcspSolver solver(problem);
+      CSPSolver solver(problem);
 
       Timer tim;
       tim.start();

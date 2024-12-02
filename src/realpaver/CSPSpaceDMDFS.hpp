@@ -73,22 +73,22 @@ public:
    CSPSpaceDMDFS(const CSPSpaceDMDFS&) = default;
 
    size_t nbSolNodes() const override;
-   void pushSolNode(const SharedNcspNode& node) override;
-   SharedNcspNode popSolNode() override;
-   SharedNcspNode getSolNode(size_t i) const override;
+   void pushSolNode(const SharedCSPNode& node) override;
+   SharedCSPNode popSolNode() override;
+   SharedCSPNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    void makeSolClusters(double gap) override;
    size_t nbPendingNodes() const override;
-   SharedNcspNode nextPendingNode() override;
-   void insertPendingNode(const SharedNcspNode& node) override;
-   SharedNcspNode getPendingNode(size_t i) const override;
+   SharedCSPNode nextPendingNode() override;
+   void insertPendingNode(const SharedCSPNode& node) override;
+   SharedCSPNode getPendingNode(size_t i) const override;
 
    /// Assigns the distance calculator in this
    void setDistCalculator(std::unique_ptr<DistCalculator> dcalc);
 
 private:
    struct Elem {
-      SharedNcspNode node;    // node
+      SharedCSPNode node;    // node
       double mindist;         // distance to the closest solution
    };
 
@@ -101,7 +101,7 @@ private:
    } comparator;
 
    std::vector<Elem> vnode_;           // vector of pending nodes
-   std::vector<SharedNcspNode> vsol_;  // vector of solution nodes
+   std::vector<SharedCSPNode> vsol_;  // vector of solution nodes
 
    DistCalculator* dcalc_;             // object used to calculate the distance
                                        // between boxes

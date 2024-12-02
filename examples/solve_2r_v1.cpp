@@ -18,7 +18,7 @@ int main()
 
         if (ok)
         {
-            NcspSolver solver(problem);
+            CSPSolver solver(problem);
             solver.getEnv()->setParam(prm);
             solver.solve();
             for (size_t i=0; i<solver.nbSolutions(); ++i)

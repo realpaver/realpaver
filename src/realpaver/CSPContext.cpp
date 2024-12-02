@@ -12,24 +12,23 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   NcspContext.cpp
- * @brief  Search context for NCSPs
+ * @file   CSPContext.cpp
+ * @brief  Search context for CSPs
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#include <algorithm>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/NcspContext.hpp"
+#include "realpaver/CSPContext.hpp"
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ)
+std::ostream& operator<<(std::ostream& os, CSPNodeInfoType typ)
 {
    switch(typ)
    {
-      case NcspNodeInfoType::SplitVar: return os << "split variable";
-      case NcspNodeInfoType::NbCID:    return os << "nb CID";
+      case CSPNodeInfoType::SplitVar: return os << "split variable";
+      case CSPNodeInfoType::NbCID:    return os << "nb CID";
       default: os.setstate(std::ios::failbit);
    }
    return os;
@@ -37,55 +36,55 @@ std::ostream& operator<<(std::ostream& os, NcspNodeInfoType typ)
 
 /*----------------------------------------------------------------------------*/
 
-NcspNodeInfo::NcspNodeInfo(NcspNodeInfoType typ)
+CSPNodeInfo::CSPNodeInfo(CSPNodeInfoType typ)
       : typ_(typ)
 {}
 
-NcspNodeInfo::~NcspNodeInfo()
+CSPNodeInfo::~CSPNodeInfo()
 {}
 
-NcspNodeInfoType NcspNodeInfo::getType() const
+CSPNodeInfoType CSPNodeInfo::getType() const
 {
    return typ_;
 }
 
 /*----------------------------------------------------------------------------*/
 
-NcspNodeInfoVar::NcspNodeInfoVar(Variable v)
-      : NcspNodeInfo(NcspNodeInfoType::SplitVar),
+CSPNodeInfoVar::CSPNodeInfoVar(Variable v)
+      : CSPNodeInfo(CSPNodeInfoType::SplitVar),
         v_(v)
 {}
 
-Variable NcspNodeInfoVar::getVar() const
+Variable CSPNodeInfoVar::getVar() const
 {
    return v_;
 }
 
 /*----------------------------------------------------------------------------*/
 
-NcspNodeInfoCID::NcspNodeInfoCID(int nbcid)
-      : NcspNodeInfo(NcspNodeInfoType::NbCID),
+CSPNodeInfoCID::CSPNodeInfoCID(int nbcid)
+      : CSPNodeInfo(CSPNodeInfoType::NbCID),
         nbcid_(nbcid)
 {}
 
-size_t NcspNodeInfoCID::getNbCID() const
+size_t CSPNodeInfoCID::getNbCID() const
 {
    return nbcid_;
 }
 
-void NcspNodeInfoCID::setNbCID(size_t nbcid)
+void CSPNodeInfoCID::setNbCID(size_t nbcid)
 {
    nbcid_ = nbcid;
 }
 
 /*----------------------------------------------------------------------------*/
 
-void NcspContext::insert(int index, std::shared_ptr<NcspNodeInfo> info)
+void CSPContext::insert(int index, std::shared_ptr<CSPNodeInfo> info)
 {
    ASSERT(!hasInfo(index, info->getType()),
           "Info '" << info->getType()
                    << "' already present in the map for node " << index);
-   
+
    auto it = map_.find(index);
    if (it == map_.end())
    {
@@ -99,18 +98,18 @@ void NcspContext::insert(int index, std::shared_ptr<NcspNodeInfo> info)
    }
 }
 
-size_t NcspContext::size() const
+size_t CSPContext::size() const
 {
    return map_.size();
 }
 
-void NcspContext::remove(int index)
+void CSPContext::remove(int index)
 {
    map_.erase(index);
 }
 
-std::shared_ptr<NcspNodeInfo>
-NcspContext::getInfo(int index, NcspNodeInfoType typ) const
+std::shared_ptr<CSPNodeInfo>
+CSPContext::getInfo(int index, CSPNodeInfoType typ) const
 {
    auto it = map_.find(index);
    if (it == map_.end())
@@ -126,7 +125,7 @@ NcspContext::getInfo(int index, NcspNodeInfoType typ) const
    }
 }
 
-bool NcspContext::hasInfo(int index, NcspNodeInfoType typ) const
+bool CSPContext::hasInfo(int index, CSPNodeInfoType typ) const
 {
    auto it = map_.find(index);
    if (it == map_.end())

@@ -18,7 +18,6 @@
  * @date   2024-4-11
 */
 
-#include <list>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSpaceDFS.hpp"
 
@@ -33,22 +32,22 @@ size_t CSPSpaceDFS::nbSolNodes() const
    return vsol_.size();
 }
 
-void CSPSpaceDFS::pushSolNode(const SharedNcspNode& node)
+void CSPSpaceDFS::pushSolNode(const SharedCSPNode& node)
 {
    vsol_.push_back(node);
 }
 
-SharedNcspNode CSPSpaceDFS::popSolNode()
+SharedCSPNode CSPSpaceDFS::popSolNode()
 {
-   SharedNcspNode node = vsol_.back();
+   SharedCSPNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedNcspNode CSPSpaceDFS::getSolNode(size_t i) const
+SharedCSPNode CSPSpaceDFS::getSolNode(size_t i) const
 {
    ASSERT(i < vsol_.size(),
-          "Bad access to a solution node in a NCSP space @ " << i);
+          "Bad access to a solution node in a CSP space @ " << i);
 
    return vsol_[i];
 }
@@ -69,22 +68,22 @@ size_t CSPSpaceDFS::nbPendingNodes() const
    return vnode_.size();
 }
 
-SharedNcspNode CSPSpaceDFS::nextPendingNode()
+SharedCSPNode CSPSpaceDFS::nextPendingNode()
 {
-   SharedNcspNode node = vnode_.back();
+   SharedCSPNode node = vnode_.back();
    vnode_.pop_back();
    return node;
 }
 
-void CSPSpaceDFS::insertPendingNode(const SharedNcspNode& node)
+void CSPSpaceDFS::insertPendingNode(const SharedCSPNode& node)
 {
    vnode_.push_back(node);
 }
 
-SharedNcspNode CSPSpaceDFS::getPendingNode(size_t i) const
+SharedCSPNode CSPSpaceDFS::getPendingNode(size_t i) const
 {
    ASSERT(i < vnode_.size(),
-          "Bad access to a pending node in a NCSP space @ " << i);
+          "Bad access to a pending node in a CSP space @ " << i);
 
    return vnode_[i];
 }
