@@ -1,8 +1,8 @@
 # The Docker image that will be used to build your app
-image: node:lts
+image: python:latest
 # Functions that should be executed before the build script is run
-before_script:
-  - npm ci
+#before_script:
+#  - npm ci
 
 pages:
   stage: deploy
