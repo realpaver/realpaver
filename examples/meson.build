@@ -32,6 +32,14 @@ if local_solver_dep.found()
   )
 endif
 
+csp = executable(
+  'csp',
+  sources: 'csp.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
 parsing = executable(
   'parsing',
   sources: 'parsing.cpp',
@@ -55,3 +63,23 @@ uni_newton = executable(
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,
 )
+
+solve_2r_v1 = executable(
+  'solve_2r_v1',
+  sources: 'solve_2r_v1.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
+solve_2r_v2 = executable(
+  'solve_2r_v2',
+  sources: 'solve_2r_v2.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
+# TODO
+# Sub-directories
+# subdir('ncsp')

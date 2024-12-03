@@ -1,7 +1,6 @@
 #include <iostream>
-#include "realpaver/Logger.hpp"
+#include "realpaver_api.hpp"
 #include "realpaver/NLPSolver.hpp"
-#include "realpaver/Param.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -27,10 +26,10 @@ int main(void)
 
       IntervalBox box(problem.scope());
       RealPoint src = box.midpoint();
-   
+
       OptimizationStatus status = optimizer.minimize(box, src);
       cout << "Status.......... " << status << endl;
-   
+
       if (status == OptimizationStatus::Optimal)
       {
          cout << "Optimum value... " << optimizer.bestVal() << endl

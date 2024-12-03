@@ -12,20 +12,43 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   realpaver_api.hpp
- * @brief  Imports the main classes for solving nonlinear problems.
+ * @file   CSPEnv.cpp
+ * @brief  Environment for CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
 */
 
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/Logger.hpp"
-#include "realpaver/Timer.hpp"
+#include "realpaver/CSPEnv.hpp"
 
-#include "realpaver/Param.hpp"
-#include "realpaver/Parser.hpp"
-#include "realpaver/Problem.hpp"
+namespace realpaver {
 
-#include "realpaver/CSPSolver.hpp"
-#include "realpaver/ContractorFactory.hpp"
-#include "realpaver/LPSolver.hpp"
+CSPEnv::CSPEnv() : Env(), slim_(false), dlim_(false)
+{}
+
+void CSPEnv::setSolutionLimit(bool b)
+{
+   slim_ = b;
+}
+
+bool CSPEnv::usedSolutionLimit() const
+{
+   return slim_;
+}
+
+void CSPEnv::setDepthLimit(bool b)
+{
+   dlim_ = true;
+}
+
+bool CSPEnv::usedDepthLimit() const
+{
+   return dlim_;
+}
+
+bool CSPEnv::usedNoLimit() const
+{
+   return !(usedTimeLimit() || usedNodeLimit() || usedSolutionLimit() ||
+            usedDepthLimit());
+}
+
+} // namespace

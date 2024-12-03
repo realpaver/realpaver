@@ -18,7 +18,6 @@
  * @date   2024-7-1
 */
 
-
 #include <queue>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
@@ -27,7 +26,6 @@
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
-
 
 IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
       : Contractor(),
@@ -80,75 +78,6 @@ Scope IntervalPropagator::scope() const
 {
    return pool_->scope();
 }
-
-//~ Proof IntervalPropagator::contractBis(IntervalBox& B)
-//~ {
-   //~ // initialization: activates all contractors
-   //~ size_t N = pool_->poolSize();
-
-   //~ // propagation queue
-   //~ std::queue<size_t> queue;
-   //~ for (size_t i=0; i<N; ++i) queue.push(i);
-
-   //~ // vector of proof certificates
-   //~ certif_.resize(N);
-
-   //~ Bitset active(N);
-   //~ active.setAllOne();
-
-   //~ Proof proof = Proof::Maybe;
-   //~ IntervalBox copy(B);
-
-   //~ while ((proof != Proof::Empty) && (queue.size() > 0))
-   //~ {
-      //~ size_t j = queue.front();
-      //~ queue.pop();
-      //~ SharedContractor op = pool_->contractorAt(j);
-
-      //~ copy.setOnScope(B, op->scope());
-
-      //~ proof = op->contract(B);
-      //~ certif_[j] = proof;
-      //~ active.setZero(j);
-
-      //~ if (proof != Proof::Empty)
-      //~ {
-         //~ for (const auto& v : op->scope())
-         //~ {
-            //~ const Interval& prev = copy.get(v);
-            //~ const Interval& curr = B.get(v);
-
-            //~ LOG_LOW("Propagation test on " << v.getName() << " ("
-                                           //~ << tol_ << ")");
-
-            //~ if (tol_.isImproved(prev, curr))
-            //~ {
-               //~ LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
-                            //~ << " -> propagation");
-
-               //~ for (size_t i=0; i<N; ++i)
-               //~ {
-                  //~ if (!active.get(i))
-                  //~ {
-                     //~ SharedContractor ctc = pool_->contractorAt(i);
-                     //~ if (ctc->dependsOn(v))
-                     //~ {
-                        //~ queue.push(i);
-                        //~ active.setOne(i);
-                     //~ }
-                  //~ }
-               //~ }
-            //~ }
-            //~ else
-            //~ {
-               //~ LOG_LOW("  " << prev << " -> " << curr
-                            //~ << " not reduced enough");
-            //~ }
-         //~ }
-      //~ }
-   //~ }
-   //~ return proof;
-//~ }
 
 Proof IntervalPropagator::contract(IntervalBox& B)
 {

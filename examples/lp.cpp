@@ -1,6 +1,6 @@
 #include <iomanip>
 #include <iostream>
-#include "realpaver/LPSolver.hpp"
+#include "realpaver_api.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -24,7 +24,7 @@ int main(void)
    // x1 - x2 <= 2
    LinExpr e3 = { {1.0, -1.0}, {x1, x2} };
    solver.addCtr(e3, 2.0);
-  
+
    /////////////////////////////////////////////////////////////////////////////
    // maximize 3x1 + 4x2
    LinExpr eo = { {3.0, 4.0}, {x1, x2} };
