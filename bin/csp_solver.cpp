@@ -6,7 +6,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/NcspSolver.hpp"
+#include "realpaver/CSPSolver.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Stat.hpp"
@@ -42,11 +42,11 @@ int main(int argc, char** argv)
       // processes the arguments
       bool ok = processArgs(argc, argv, filename, pfilename);
       if (!ok) THROW("Bad arguments on the command line");
-   
+
       // parses the problem file name
       string baseFilename, pathFilename, extFilename;
       parseFilename(filename, pathFilename, baseFilename, extFilename);
-   
+
       // tries to open the problem file
       ifstream infile(filename);
       if (!infile.is_open()) THROW("Bad problem filename: " << filename);
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
       }
 #endif
 
-      LOG_MAIN("NCSP solving");
+      LOG_MAIN("CSP solving");
       LOG_MAIN("Input file: " << filename);
 
       // parsing
@@ -76,11 +76,11 @@ int main(int argc, char** argv)
 
       ok = parser.parseFile(filename, problem);
       if (!ok) THROW("Parse error: " << parser.getParseError());
-      
-      if (!problem.isCSP()) THROW("Not a NCSP");
+
+      if (!problem.isCSP()) THROW("Not a CSP");
 
       // solving
-      NcspSolver solver(problem);
+      CSPSolver solver(problem);
       solver.getEnv()->setParam(prm);
 
       std::string sep = "########################################";
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
       int wpl = 36;
 
       cout << GRAY(sep) << endl;
-      cout << BLUE(REALPAVER_STRING) << BLUE(" NCSP solver") << endl;
+      cout << BLUE(REALPAVER_STRING) << BLUE(" CSP solver") << endl;
 
       ////////////////////
       solver.solve();
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 
       Preprocessor* preproc = solver.getPreprocessor();
 
-      fsol << WP("NCSP solver", wpl) << REALPAVER_STRING << endl;
+      fsol << WP("CSP solver", wpl) << REALPAVER_STRING << endl;
 
       auto now = chrono::system_clock::now();
       std::time_t end_time = chrono::system_clock::to_time_t(now);
@@ -203,12 +203,12 @@ int main(int argc, char** argv)
          cout << BLUE("No preprocessing") << endl;
       }
 
-      std::shared_ptr<NcspEnv> env = solver.getEnv();
+      std::shared_ptr<CSPEnv> env = solver.getEnv();
 
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
       {
-         NcspSpace* space = solver.getSpace();
+         CSPSpace* space = solver.getSpace();
 
          fsol << "--- SOLVING ---" << endl << endl;
          cout << GRAY(sep) << endl;
@@ -356,7 +356,7 @@ int main(int argc, char** argv)
             }
 
             fsol << std::setprecision(prec) << endl;
-               
+
             if (sd == "STD")
                sol.first.listPrint(fsol);
             else
@@ -418,7 +418,7 @@ bool processArgs(int argc, char** argv, string& filename, string& pfilename)
 {
    bool hasfile = false;
    int i = 1;
-   
+
    while (i<argc)
    {
       std::string text(argv[i]);
@@ -476,7 +476,7 @@ void parseFilename(const std::string& filename, std::string& path,
    {
       path = "";
    }
-   
+
    size_t k = filename.find('.', pos);
    if (k == std::string::npos)
    {
