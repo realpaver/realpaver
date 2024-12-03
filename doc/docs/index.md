@@ -1,3 +1,9 @@
+---
+hide:
+  - navigation
+---
+
+
 # Welcome to RealPaver documentation
 
 RealPaver allows modeling and solving nonlinear constraint satisfaction and optimization problems involving continuous or discrete variables associated with domains. Functions and constraints are defined by analytical expressions.
