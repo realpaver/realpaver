@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Range.hpp
+ * @brief  Finite integer interval bounded by safe integers
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_RANGE_HPP
 #define REALPAVER_RANGE_HPP
@@ -16,39 +27,36 @@ namespace realpaver {
 
 class Interval;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a finite integer interval bounded by safe integers.
-///
-/// The range called universe is equal to [min, max] where min is the smallest
-/// Integer value and max is the greatest Integer value.
-///
-/// The arithmetic operations on ranges throw an exception in case of underflow
-/// or overflow.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Finite integer interval bounded by safe integers.
+ *
+ * The range called universe is equal to [min, max] where min is the smallest
+ * Integer value and max is the greatest Integer value.
+ *
+ * The arithmetic operations on ranges throw an exception in case of underflow
+ * or overflow.
+ */
 class Range {
 public:
    /// Type of bounds
-   typedef Integer BoundType;
+   using BoundType = Integer;
+
+   /// @name Constructors
+   ///@{
 
    /// Creates the universe
    Range();
 
-   /// Creates a range reduced to one point
-   /// @param a value of this
+   /// Creates the range [a, a]
    Range(const int& a);
 
-   /// Creates a range
-   /// @param a left bound
-   /// @param b right bound
+   /// Creates the range [a, b]
    Range(const int& a, const int& b);
 
-   /// Creates a range reduced to one point
-   /// @param a value of this
+   /// Creates the range [a, a]
    Range(const Integer& a);
 
-   /// Creates a range
-   /// @param a left bound
-   /// @param b right bound
+   /// Creates the range [a, b]
    Range(const Integer& a, const Integer& b);
 
    /// Default copy constructor
@@ -60,90 +68,97 @@ public:
    /// Default destructor
    ~Range() = default;
 
-   ///@{
-   /// Construction methods
+   /// Returns the range [MIN(), a]
    static Range lessThan(const Integer& a);
+
+   /// Returns the range [MIN(), a-1]
    static Range strictlyLessThan(const Integer& a);
+
+   /// Returns the range [a, MAX()]
    static Range moreThan(const Integer& a);
+
+   /// Returns the range [a+1, MAX()]
    static Range strictlyGreaterThan(const Integer& a);
    ///@}
 
-   /// @return the smallest inite bound
+   /// Returns the smallest finite bound
    static Integer MIN();
 
-   /// @return the greatest inite bound
+   /// Returns the greatest finite bound
    static Integer MAX();
 
-   /// @return the interval [-inf, +inf]
+   /// Returns the interval [MIN(), MAX()]
    static Range universe();
 
-   /// @return the interval [0, +inf]
+   /// Returns the interval [0, MAX()]
    static Range positive();
 
-   /// @return the interval [-inf, 0]
+   /// Returns the interval [MIN(), 0]
    static Range negative();
 
-   /// @reeturn the empty set
+   /// Returns the empty set
    static Range emptyset();
 
-   /// Outward rounding of an interval
-   /// @param x an interval
-   /// @return the smallest range that contains 'x'
-   /// throws an exception if 'x' is not representable
+   /**
+    * @brief Outward rounding of an interval.
+    * 
+    * Returns the smallest range that contains x; throws an exception if x is
+    * not representable
+    */
    static Range roundOutward(const Interval& x);
 
-   /// Inward rounding of an interval
-   /// @param x an interval
-   /// @return the largest range that is contained in 'x'
-   /// throws an exception if 'x' is not representable
+   /**
+    * @brief Inward rounding of an interval.
+    * 
+    * Returns the largest range that is contained in x; throws an exception if
+    * x is not representable
+    */
    static Range roundInward(const Interval& x);
 
-   /// @returns an interval representation of this
+   /// Returns an interval representation of this
    Interval toInterval() const;
 
-   /// assigns the left bound of this
-   /// @param a new value
+   /// Assigns the left bound of this
    void setLeft(const Integer& a);
 
-   /// assigns the right bound of this
-   /// @param a new value
+   /// Assigns the right bound of this
    void setRight(const Integer& a);
 
-   /// assigns this to the empty set
+   /// Assigns this to the empty set
    void setEmpty();
 
-   /// assigns this to the universe
+   /// Assigns this to the universe
    void setUniverse();
 
-   /// @return the left bound of this
+   /// Returns the left bound of this
    Integer left() const;
 
    /// @return the right bound of this
    Integer right() const;
 
-   /// @return the number of elements in this
-   Integer nbElems() const;
+   /// Returns the number of elements in this
+   unsigned long nbElems() const;
 
-   /// @return the midpoint of this
+   /// Returns the midpoint of this
    Integer midpoint() const;
 
-   /// @return the mignitude of this
+   /// Returns the mignitude of this
    Integer mig() const;
 
-   /// @return the magnitude of this
+   /// Returns the magnitude of this
    Integer mag() const;
 
-   /// @return true if this is empty
+   /// Returns true if this is empty
    bool isEmpty() const;
 
-   /// @return true if this is reduced to one integer
+   /// Returns true if this is reduced to one integer
    bool isSingleton() const;
 
-   /// @return true if this is equal to 0
+   /// Returns true if this is equal to 0
    bool isZero() const;
 
+   /// @name Set operations
    ///@{
-   /// Set operations
    bool contains(const Integer& a) const;
    bool strictlyContains(const Integer& a) const;
    bool containsZero() const;
@@ -169,6 +184,7 @@ public:
 
    bool isDisjoint(const Range& other) const;
    bool overlaps(const Range& other) const;
+   bool isJoinable(const Range& other) const;
 
    bool isCertainlyLeZero() const;
    bool isCertainlyLtZero() const;
@@ -176,20 +192,20 @@ public:
    bool isCertainlyGtZero() const;
    ///@}
 
+   /// @name Intersection
    ///@{
-   /// Intersection
    Range& operator&=(const Range& other);
    friend Range operator&(const Range& x, const Range& y);
    ///@}
 
+   /// @name Hull
    ///@{
-   /// Hull
    Range& operator|=(const Range& other);
    friend Range operator|(const Range& x, const Range& y);
    ///@}
 
+   /// @name Addition
    ///@{
-   /// Addition
    Range& operator+=(const Range& other);
    friend Range operator+(const Range& x, const Range& y);
    friend Range addPX(const Range& x, const Range& y, const Range& z);
@@ -197,8 +213,8 @@ public:
    friend Range addPZ(const Range& x, const Range& y, const Range& z);
    ///@}
 
+   /// @name Subtraction
    ///@{
-   /// Subtraction
    Range& operator-=(const Range& other);
    friend Range operator-(const Range& x, const Range& y);
    friend Range subPX(const Range& x, const Range& y, const Range& z);
@@ -206,15 +222,15 @@ public:
    friend Range subPZ(const Range& x, const Range& y, const Range& z);
    ///@}
 
+   /// @name Unary subtraction
    ///@{
-   /// Unary subtraction
    friend Range operator-(const Range& x);
    friend Range usubPX(const Range& x, const Range& y);
    friend Range usubPY(const Range& x, const Range& y);
    ///@}
 
+   /// @name Multiplication
    ///@{
-   /// Multiplication
    Range& operator*=(const Range& other);
    friend Range operator*(const Range& x, const Range& y);
    friend Range mulPX(const Range& x, const Range& y, const Range& z);
@@ -222,8 +238,8 @@ public:
    friend Range mulPZ(const Range& x, const Range& y, const Range& z);
    ///@}
 
+   /// @name Division
    ///@{
-   /// Division
    Range& operator/=(const Range& other);
    friend Range operator/(const Range& x, const Range& y);
    friend Range divPX(const Range& x, const Range& y, const Range& z);
@@ -231,52 +247,52 @@ public:
    friend Range divPZ(const Range& x, const Range& y, const Range& z);
    ///@}
 
+   /// @name Modulo
    ///@{
-   /// Modulo
    friend Range operator%(const Range& x, int n);
    friend std::pair<Range,Range> extMod(const Range& x, int n);
    friend Range modPX(const Range& x, int n, const Range& y);
    friend Range modPY(const Range& x, int n, const Range& y);
    ///@}
 
+   /// @name Square
    ///@{
-   /// Square
    friend Range sqr(const Range& x);
    friend Range sqrPX(const Range& x, const Range& y);
    friend Range sqrPY(const Range& x, const Range& y);   
 
+   /// @name Minimum
    ///@{
-   /// Minimum
    friend Range min(const Range& x, const Range& y);
    friend Range minPX(const Range& x, const Range& y, const Range& z);
    friend Range minPY(const Range& x, const Range& y, const Range& z);
    friend Range minPZ(const Range& x, const Range& y, const Range& z);
    ///@}
 
+   /// @name Maximum
    ///@{
-   /// Maximum
    friend Range max(const Range& x, const Range& y);
    friend Range maxPX(const Range& x, const Range& y, const Range& z);
    friend Range maxPY(const Range& x, const Range& y, const Range& z);
    friend Range maxPZ(const Range& x, const Range& y, const Range& z);
    ///@}
 
+   /// @name Absolute value
    ///@{
-   /// Absolute value
    friend Range abs(const Range& x);
    friend Range absPX(const Range& x, const Range& y);
    friend Range absPY(const Range& x, const Range& y);
    ///@}
 
+   /// @name Sign
    ///@{
-   /// Sign
    friend Range sgn(const Range& x);
    friend Range sgnPX(const Range& x, const Range& y);
    friend Range sgnPY(const Range& x, const Range& y);
    ///@}
 
 private:
-   Integer l_, r_;
+   Integer l_, r_;   // bounds
 };
 
 /// Output on a stream

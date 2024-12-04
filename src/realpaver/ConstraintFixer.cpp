@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ConstraintFixer.cpp
+ * @brief  Rewriting of constraints
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
@@ -13,10 +24,10 @@
 namespace realpaver {
 
 ConstraintFixer::ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
-                                 const IntervalRegion& reg)
+                                 const DomainBox& box)
       : vvm_(vvm),
         vim_(vim),
-        reg_(reg),
+        box_(box),
         c_()
 {}
 
@@ -104,7 +115,7 @@ void ConstraintFixer::apply(const TableCtr* c)
          if (it != vvm_->end())
          {
             Variable v = it->first;
-            if (c->getVal(i, j).isDisjoint(reg_.get(v)))
+            if (c->getVal(i, j).isDisjoint(box_.get(v)->intervalHull()))
                cons = false;
          }
          ++j;
@@ -131,6 +142,20 @@ void ConstraintFixer::apply(const TableCtr* c)
       }
    }
    c_ = Constraint(srep);
+}
+
+void ConstraintFixer::apply(const CondCtr* c)
+{
+   ConstraintFixer fg(vvm_, vim_, box_);
+   c->guard().acceptVisitor(fg);
+
+   ConstraintFixer bg(vvm_, vim_, box_);
+   c->body().acceptVisitor(bg);
+
+   Constraint guard = fg.getConstraint(),
+              body = bg.getConstraint();
+
+   c_ = cond(guard, body);
 }
 
 } // namespace

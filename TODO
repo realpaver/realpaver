@@ -1,19 +1,4 @@
--------------------------------------------------------------------------------
-- Constraints
-  * piecewise constraints
-  * conditional constraints
-
--------------------------------------------------------------------------------
-- Contractors
-  * ACID
-
--------------------------------------------------------------------------------
-- DAG
-  * new nodes
-  * create a DAG from a .nl file
-  * Hansen's derivative
-  * affine forms
-
--------------------------------------------------------------------------------
-- Newton
-  * Parametric operator
+* Piecewise constraints
+* Create a DAG from a .nl file
+* Affine forms
+* Parametric Newton operator

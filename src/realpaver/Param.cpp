@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Param.cpp
+ * @brief  Parameters of solvers
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include <fstream>
 #include <limits>
@@ -23,51 +34,32 @@ Param Param::instance_;
 Param::Param()
       : path_(""),
         lineno_(0),
-        tolmap_(),
         intmap_(),
         dblmap_(),
         strmap_()
 {
-   Tolerance rtol3 = Tolerance::makeRel(1.0e-3),
-             rtol4 = Tolerance::makeRel(1.0e-4),
-             rtol6 = Tolerance::makeRel(1.0e-6),
-             rtol8 = Tolerance::makeRel(1.0e-8),
-             atol9 = Tolerance::makeAbs(1.0e-9);
-
-   // tolerance
-   tolmap_.insert(std::make_pair("XTOL",                      rtol8));
-   tolmap_.insert(std::make_pair("DTOL",                      rtol6));
-   tolmap_.insert(std::make_pair("OBJ_TOL",                   rtol6));
-   tolmap_.insert(std::make_pair("PROPAGATION_DTOL",          rtol3));
-   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_XTOL",         rtol8));
-   tolmap_.insert(std::make_pair("GAUSS_SEIDEL_DTOL",         rtol6));
-   tolmap_.insert(std::make_pair("NEWTON_XTOL",               rtol8));
-   tolmap_.insert(std::make_pair("NEWTON_DTOL",               rtol6));
-   tolmap_.insert(std::make_pair("NEWTON_CERTIFY_DTOL",       rtol3));
-   tolmap_.insert(std::make_pair("NLP_SOLVER_ATOL",           atol9));
-   tolmap_.insert(std::make_pair("NLP_SOLVER_RTOL",           rtol4));
-
    // integer
    intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
    intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
    intmap_.insert(std::make_pair("SOLUTION_LIMIT",            100));
-   intmap_.insert(std::make_pair("PROPAGATION_ITER_LIMIT",    50));
    intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
    intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT",     20));
-   intmap_.insert(std::make_pair("SPLIT_NB_SLICES",           5));
    intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
    intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
    intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
    intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   50));
    intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
    intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
-   intmap_.insert(std::make_pair("SPLIT_DOM_ROBIN",           2));
    intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT",     100));
+   intmap_.insert(std::make_pair("NB_SLICE_3B",               7));
+   intmap_.insert(std::make_pair("NB_SLICE_CID",              3));
+   intmap_.insert(std::make_pair("ACID_LEARN_LENGTH",         50));
+   intmap_.insert(std::make_pair("ACID_CYCLE_LENGTH",         1000));
+   intmap_.insert(std::make_pair("TRACE_FREQUENCY",           1000));
 
    // double
    dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
    dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",           2.0));
-   dblmap_.insert(std::make_pair("SPLIT_PEEL_FACTOR",         10.0));
    dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
    dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
    dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
@@ -75,23 +67,47 @@ Param::Param()
    dblmap_.insert(std::make_pair("INFLATION_DELTA",           1.125));
    dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
    dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT",     10.0));
+   dblmap_.insert(std::make_pair("ACID_CT_RATIO",             0.002));
+   dblmap_.insert(std::make_pair("NEWTON_WIDTH_LIMIT",        0.5));
+
+   dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
+   dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
+   dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-3));
+   dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-3));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-3));
+
+   dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
+   dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
+   dblmap_.insert(std::make_pair("PROPAGATION_ABS_TOL",       0.0));
+   dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-9));
+   dblmap_.insert(std::make_pair("NEWTON_ABS_TOL",            0.0));
+   dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-9));
+   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_ABS_TOL",    0.0));
+   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_REL_TOL",    1.0e-3));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-9));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_ABS_TOL",      0.0));
+   dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
+   dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT",      0.45));
+   dblmap_.insert(std::make_pair("ACID_HC4_REL_TOL",          1.0e-1));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
    strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",           "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTOR",            "MAX_DOM"));
-   strmap_.insert(std::make_pair("SPLIT_SLICER",              "BISECTION"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTION",           "RR"));
+   strmap_.insert(std::make_pair("SPLIT_SLICING",             "BI"));
    strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_MAX_CID",  "YES"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE", "NO"));   
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
    strmap_.insert(std::make_pair("TRACE",                     "NO"));
-   strmap_.insert(std::make_pair("SPLIT_INNER",               "NO"));
+   strmap_.insert(std::make_pair("SPLIT_INNER_BOX",            "NO"));
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
    strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
-
+   strmap_.insert(std::make_pair("CERTIFICATION",             "YES"));
 }
 
 int Param::getIntParam(const std::string& name) const
@@ -131,7 +147,7 @@ double Param::getDblParam(const std::string& name) const
    if (it == dblmap_.end())
       THROW("Symbol '" << name << "' is not a real parameter");
 
-   return it->second;   
+   return it->second;
 }
 
 double Param::GetDblParam(const std::string& name)
@@ -161,7 +177,7 @@ std::string Param::getStrParam(const std::string& name) const
    if (it == strmap_.end())
       THROW("Symbol '" << name << "' is not a string parameter");
 
-   return it->second;      
+   return it->second;
 }
 
 std::string Param::GetStrParam(const std::string& name)
@@ -176,42 +192,12 @@ void Param::setStrParam(const std::string& name, const std::string& val)
    if (it == strmap_.end())
       THROW("Symbol '" << name << "' is not a string parameter");
 
-   strmap_[name] = val;   
+   strmap_[name] = val;
 }
 
 void Param::SetStrParam(const std::string& name, const std::string& val)
 {
    instance_.setStrParam(name, val);
-}
-
-Tolerance Param::getTolParam(const std::string& name) const
-{
-   auto it = tolmap_.find(name);
-
-   if (it == tolmap_.end())
-      THROW("Symbol '" << name << "' is not a tolerance parameter");
-
-   return it->second;
-}
-
-Tolerance Param::GetTolParam(const std::string& name)
-{
-   return instance_.getTolParam(name);
-}
-
-void Param::setTolParam(const std::string& name, const Tolerance& val)
-{
-   auto it = tolmap_.find(name);
-
-   if (it == tolmap_.end())
-      THROW("Symbol '" << name << "' is not a tolerance parameter");
-
-   tolmap_[name] = val;
-}
-
-void Param::SetTolParam(const std::string& name, const Tolerance& val)
-{
-   instance_.setTolParam(name, val);
 }
 
 void Param::throwEx()
@@ -298,15 +284,7 @@ void Param::processParam(const std::string& name, const std::string& val)
    auto its = strmap_.find(name);
    if (its != strmap_.end())
    {
-      strmap_[name] = val;      
-      return;
-   }
-
-   // Tolerance   
-   auto itt = tolmap_.find(name);
-   if (itt != tolmap_.end())
-   {
-      tolmap_[name] = Tolerance(val);
+      strmap_[name] = val;
       return;
    }
 
@@ -330,7 +308,7 @@ void Param::readParam(const std::string& line, size_t first)
 
    if (line[j] != '=') throwEx();
 
-   // eats = 
+   // eats =
    ++j;
 
    size_t k = eatSpaces(line, j);
@@ -353,7 +331,7 @@ void Param::processLine(const std::string& line)
 {
    size_t i = eatSpaces(line, 0);
 
-   // line with spaces 
+   // line with spaces
    if (i == line.size()) return;
 
    // comment line
@@ -376,9 +354,9 @@ void Param::loadParam(const std::string& filename)
    {
       std::string line;
       lineno_ = 0;
-      
+
       while (getline(f, line))
-      {         
+      {
          ++ lineno_;
          processLine(line);
       }
@@ -401,7 +379,7 @@ void Param::print(std::ostream& os) const
       size_t l = it->first.length();
       if (l > lmax) lmax = l;
    }
-   
+
    // doubles
    for (auto it = dblmap_.begin(); it != dblmap_.end(); ++it)
    {
@@ -416,18 +394,6 @@ void Param::print(std::ostream& os) const
    for (auto it = strmap_.begin(); it != strmap_.end(); ++it)
    {
       smap.insert(std::make_pair(it->first, it->second));
-      size_t l = it->first.length();
-      if (l > lmax) lmax = l;
-   }
-
-   // tolerances
-   for (auto it = tolmap_.begin(); it != tolmap_.end(); ++it)
-   {
-      Tolerance tol = it->second;
-      std::ostringstream ostr;
-      ostr << tol;
-
-      smap.insert(std::make_pair(it->first, ostr.str()));
       size_t l = it->first.length();
       if (l > lmax) lmax = l;
    }

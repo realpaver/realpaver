@@ -1,14 +1,25 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Logger.cpp
+ * @brief  Logger
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include <ctime>
-#include <iomanip>
+#include <limits>
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -20,7 +31,8 @@ Logger::Logger() :
       level_(LogLevel::none),
       ofs_(),
       path_(""),
-      maxsize_(1048576)
+      maxsize_(std::numeric_limits<unsigned long>::max()),
+      fprec_(8)
 {}
 
 Logger::~Logger()
@@ -44,19 +56,19 @@ void Logger::setLogLevel(LogLevel level)
    level_ = level;
 }
 
-size_t Logger::getSize() const
+unsigned long Logger::getSize() const
 {
    std::ifstream f(path_, std::ios::in | std::ios::binary);
    f.seekg(0, std::ios::end);
    return f.tellg();
 }
 
-size_t Logger::getMaxSize() const
+unsigned long Logger::getMaxSize() const
 {
    return maxsize_;
 }
 
-void Logger::setMaxSize(size_t nbytes)
+void Logger::setMaxSize(unsigned long nbytes)
 {
    maxsize_ = nbytes;
 }
@@ -93,9 +105,26 @@ void Logger::log(LogLevel level, const std::string& msg)
    if (getSize() < getMaxSize())
    {
       std::string s = LogLevelToString(level) + ".";
-      instance_.ofs_ << std::setw(7) << std::left << s;
-      instance_.ofs_ << msg << std::endl;
+      instance_.ofs_ << std::setw(7) << std::left << s
+                     << msg << std::endl;
    }
+}
+
+std::streamsize Logger::floatPrecision() const
+{
+   return fprec_;
+}
+
+std::streamsize Logger::setFloatPrecision(std::streamsize n)
+{
+   std::streamsize old = fprec_;
+   fprec_ = n;   
+   return old;
+}
+
+void Logger::newline()
+{
+   ofs_ << std::endl;
 }
 
 std::string LogLevelToString(LogLevel level)

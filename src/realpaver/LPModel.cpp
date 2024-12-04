@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   LPModel.cpp
+ * @brief  Classes for representing linear programs
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include <iostream>
 #include <sstream>
@@ -130,7 +141,7 @@ bool LinVarRep::isPrimalSolutionFeasible() const
    return lb_ <= objval_ && objval_ <= ub_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 LinVar::LinVar() : rep_(nullptr)
 {}
@@ -232,7 +243,7 @@ bool LinVar::isPrimalSolutionFeasible() const
    return rep_->isPrimalSolutionFeasible();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 void LinExprRep::addTerm(double a, LinVar v)
 {
@@ -277,7 +288,7 @@ void LinExprRep::print(std::ostream& os) const
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 LinExpr::LinExpr() :
    rep_(nullptr)
@@ -334,7 +345,7 @@ std::ostream& operator<<(std::ostream& os, const LinExpr& e)
    return os;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 LinCtrRep::LinCtrRep(double lb, LinExpr e, double ub) :
    expr_(e),
@@ -410,7 +421,7 @@ bool LinCtrRep::isRange() const
    return lb_ != Double::neginf() && ub_ != Double::inf() && lb_ < ub_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 LinCtr::LinCtr(double lb, LinExpr e, double ub) :
    rep_(nullptr)
@@ -485,7 +496,7 @@ bool LinCtr::isRange() const
    return rep_->isRange();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 LPModel::LPModel() :
    vars_(),

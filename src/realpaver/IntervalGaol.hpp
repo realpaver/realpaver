@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalGaol.hpp
+ * @brief  Interface of the Gaol library
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_INTERVAL_GAOL_HPP
 #define REALPAVER_INTERVAL_GAOL_HPP
@@ -35,6 +46,10 @@
 #   undef PACKAGE_VERSION
 #endif
 
+#if defined(PACKAGE_URL)
+#   undef PACKAGE_URL
+#endif
+
 #if defined(VERSION)
 #   undef VERSION
 #endif
@@ -42,14 +57,16 @@
 namespace realpaver {
 
 /// Raw interval type
-typedef gaol::interval RawInterval;
+using RawInterval = gaol::interval;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a specialization of the interval traits for Gaol.
-///
-/// The operations are either delegated to gaol if they are available in this
-/// library or implemented otherwise.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Specialization of the interval traits for Gaol.
+ * 
+ * @see IntervalTraits
+ * 
+ *  The operations are either delegated to gaol if they are available in this
+ *  library or implemented otherwise.
+ */
 template <>
 struct IntervalTraits<RawInterval> {
    typedef RawInterval interval;
@@ -231,24 +248,6 @@ struct IntervalTraits<RawInterval> {
          return x.width() / 2.0;
    }
 
-   static inline double relWidth(const interval& x)
-   {
-      if (!x.is_finite())
-         return 1.0;
-
-      else if (x.is_zero())
-         return 0.0;
-
-      else
-      {
-         interval y(x.width()),
-                  a(std::fabs(x.left())),
-                  b(std::fabs(x.right())),
-                  z(y / (a+b));
-         return z.right();
-      }
-   }
-
    static inline double midpoint(const interval& x)
    {
       return x.midpoint();
@@ -297,6 +296,11 @@ struct IntervalTraits<RawInterval> {
    static inline bool isZero(const interval& x)
    {
       return x.is_zero();
+   }
+
+   static inline bool isOne(const interval& x)
+   {
+      return (x.left() == 1.0) && (x.right() == 1.0);
    }
 
    static inline bool isAnInt(const interval& x)
@@ -733,6 +737,51 @@ struct IntervalTraits<RawInterval> {
       return y & gaol::tan(x);
    }
 
+   static inline interval cosh(const interval& x)
+   {
+      return gaol::cosh(x);
+   }
+
+   static inline interval coshPX(const interval& x, const interval& y)
+   {
+      return x & gaol::acosh_rel(y, x);
+   }
+
+   static inline interval coshPY(const interval& x, const interval& y)
+   {
+      return y & gaol::cosh(x);
+   }
+
+   static inline interval sinh(const interval& x)
+   {
+      return gaol::sinh(x);
+   }
+
+   static inline interval sinhPX(const interval& x, const interval& y)
+   {
+      return x & gaol::asinh_rel(y, x);
+   }
+
+   static inline interval sinhPY(const interval& x, const interval& y)
+   {
+      return y & gaol::sinh(x);
+   }
+
+   static inline interval tanh(const interval& x)
+   {
+      return gaol::tanh(x);
+   }
+
+   static inline interval tanhPX(const interval& x, const interval& y)
+   {
+      return x & gaol::atanh_rel(y, x);
+   }
+
+   static inline interval tanhPY(const interval& x, const interval& y)
+   {
+      return y & gaol::tanh(x);
+   }
+
    static inline interval abs(const interval& x)
    {
       return gaol::abs(x);
@@ -939,7 +988,7 @@ struct IntervalTraits<RawInterval> {
       return y & sgn(x);
    }
 
-   // TODO: the role of this function is just to remove a warning due to
+   // the role of this function is just to remove a warning due to
    // the constant NaN_val that is defined but not used.
    static inline gaol::uintdouble useless_remove_warnings()
    {

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Bitset.hpp
+ * @brief  The Bitset class
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_BITSET_HPP
 #define REALPAVER_BITSET_HPP
@@ -14,33 +25,24 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a sequence of bits.
-///
-/// The number of bits is fixed when an object is created.
-/// * Given the size n, the bits are indexed from 0 to n-1.
-/// * Given a couple (first, last) with last >= first, the bits are indexed
-///   from first to last.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief A bitset is a sequence of bits.
+ *
+ * The number of bits is fixed at runtime when an object is created. The bit
+ * indexes are positive integers and the first index may be different from 0.
+ */
 class Bitset {
 public:
    /// Creates an empty bitset
    Bitset();
 
-   /// Creates a bitset (b{0}, b{1}, ..., b{n-1}) initialized to (0, 0, ... 0)
-   /// @param n number of bits
-   /// @param val each bit is initialized to 0 is val = 0, 1 otherwise
+   /// Creates a bitset initialized to (0,0,...,0) with indexes 0..n-1
    Bitset(size_t n);
 
-   /// Creates a bitset (b{first}, b{first+1}, ..., b{last}) initialized
-   /// to (0, 0, ... 0)
-   /// @param first index of first bit
-   /// @param last index of last bit
-   /// @param val each bit is initialized to 0 is val = 0, 1 otherwise
+   /// Creates a bitset initialized to (0,0,...,0) with indexes first..last
    Bitset(int first, int last);
 
-   /// Creates a bitset in extension given a list of bits, e.g. {0, 1, 1, 0, 0}
-   /// @param l list of bits
+   /// Creates a bitset in extension given a list of bits
    Bitset(const std::initializer_list<int>& l);
 
    /// Copy constructor
@@ -58,74 +60,64 @@ public:
    /// Move assignment
    Bitset& operator=(Bitset&& other);
 
-   /// @return the number of bits
+   /// Rreturns the number of bits
    size_t size() const;
 
-   /// &@return the index of the first bit of this
+   /// Rreturns the index of the first bit
    int first() const;
 
-   /// &@return the index of the last bit of this
+   /// Returns the index of the last bit
    int last() const;
 
-   /// @return the number of words used to store the bits
+   /// Returns the number of words used to store the bits
    size_t wordCount() const;
 
-   /// @return 0 if the i-th bit is equal to 0, another value otherwise
+   /// Returns 0 if the i-th bit is equal to 0, another value otherwise
    size_t get(int i) const;
 
-   /// Sets a bit to 0
-   /// @param i index of the bit assigned
+   /// Sets the i-th bit to 0
    Bitset& setZero(int i);
 
    /// Sets all bits to 0
    Bitset& setAllZero();
 
-   /// Sets a bit to 1
-   /// @param i index of the bit assigned
+   /// Sets the i-th bit to 1
    Bitset& setOne(int i);
 
    /// Sets all bits to 1
    Bitset& setAllOne();
 
-   /// Flips the value of one bit
-   /// @param i index of the bit modified
+   /// Flips the value of the i-th bit
    void flip(int i);
 
    /// Flips all bits
    void flipAll();
 
-   /// @return the number of 0 in this
+   /// Returns the number of 0 in this
    size_t nbZeros() const;
 
-   /// @return the number of 1 in this
+   /// Returns the number of 1 in this
    size_t nbOnes() const;
 
-   /// @return true if all the bits are equal to 1
+   /// Returns true if all the bits are equal to 1
    bool areAllOnes() const;
 
-   /// @return true if all the bits are equal to 0
+   /// Returns true if all the bits are equal to 0
    bool areAllZeros() const;
 
    /// Output on a stream
-   /// @param os output stream
    void print(std::ostream& os) const;
 
-   /// @return hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   /// Overlapping test
-   /// @param other a bitset
-   /// @return true if this and other share at least one bit equal to 1
+   /// Returns true if this and other share at least one bit equal to 1
    bool overlaps(const Bitset& other) const;
 
    /// Bitwise AND with assignment
-   /// @param other a bitset
-   /// @return a reference to this
    Bitset& operator&=(const Bitset& other);
 
    /// Bitwise OR with assignment
-   /// @param other a bitset
-   /// @return a reference to this
    Bitset& operator|=(const Bitset& other);
 
    friend Bitset operator&(const Bitset& b1, const Bitset& b2);
@@ -162,29 +154,18 @@ private:
 
    // used by keepShadowBits
    word_t shadow_word_;
-
-   // used for debugging
-//   static void printWord(word_t w);
 };
 
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, const Bitset& b);
 
-/// Bitwise AND
-/// @param b1 a bitset
-/// @param b2 a bitset
-/// @return b1 AND b2
+/// Bitwise AND of b1 and b2
 Bitset operator&(const Bitset& b1, const Bitset& b2);
 
-/// Bitwise OR
-/// @param b1 a bitset
-/// @param b2 a bitset
-/// @return b1 OR b2
+/// Bitwise OR of b1 and b2
 Bitset operator|(const Bitset& b1, const Bitset& b2);
 
-/// Bitwise NOT
-/// @param b a bitset
-/// @return NOT b
+/// Bitwise NOT of b
 Bitset operator~(const Bitset& b);
 
 } // namespace

@@ -1,15 +1,26 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NLPModel.cpp
+ * @brief  Interface for local optimization solvers
+ * @author Raphaël Chenouard
+ * @date   2024-4-11
+*/
 
 #include "realpaver/NLPModel.hpp"
 #include "realpaver/Param.hpp"
-
+#include "realpaver/ScopeBank.hpp"
 #include "realpaver/Term.hpp"
 #include "realpaver/TermDeriver.hpp"
 
@@ -18,13 +29,13 @@ namespace realpaver {
 NLPModel::NLPModel(const Problem& pb)
     : obj_(nullptr),
       ctrs_(nullptr),
-      scope_(pb.scope()),
+      scop_(pb.scope()),
       n_(pb.nbVars()),
       m_(pb.nbCtrs()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
-      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
-      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
     bool ismin = pb.getObjective().isMinimization();
@@ -55,16 +66,15 @@ NLPModel::NLPModel(const Problem& pb)
 NLPModel::NLPModel(const RealFunction& obj)
     : obj_(nullptr),
       ctrs_(nullptr),
-      scope_(),
+      scop_(obj.scope()),
       n_(obj.nbVars()),
       m_(0), 
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
-      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
-      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
-    scope_.insert(obj.scope());
     obj_ = new RealFunction(obj);
     best_ = nullptr;
     best_val_ = Interval::universe().right();
@@ -73,17 +83,18 @@ NLPModel::NLPModel(const RealFunction& obj)
 NLPModel::NLPModel(const RealFunction& obj, const RealFunctionVector& ctrs)
     : obj_(nullptr),
       ctrs_(nullptr),
-      scope_(),
+      scop_(),
       n_(obj.nbVars()),
       m_(ctrs.nbFuns()),
       time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT")),
       iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT")),
-      atol_(Param::GetTolParam("NLP_SOLVER_ATOL")),
-      rtol_(Param::GetTolParam("NLP_SOLVER_RTOL")),
+      tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL")),
       alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
-    scope_.insert(obj.scope());
-    scope_.insert(ctrs.scope());
+    scop_.insert(obj.scope());
+    scop_.insert(ctrs.scope());
+    scop_ = ScopeBank::getInstance()->insertScope(scop_);
     obj_ = new RealFunction(obj);
     ctrs_ = new RealFunctionVector(ctrs);
     best_ = nullptr;
@@ -173,31 +184,19 @@ std::string NLPModel::getAlgorithm() const
    return alg_;
 }
 
-Tolerance NLPModel::atol() const
+Tolerance NLPModel::tol() const
 {
-   return atol_;
+   return tol_;
 }
 
-void NLPModel::setAtol(Tolerance tol)
+void NLPModel::setTol(Tolerance tol)
 {
-   ASSERT(tol.isAbsolute(), "This tolerance must be absolute");
-   atol_ = tol;
-}
-
-Tolerance NLPModel::rtol() const
-{
-   return rtol_;
-}
-
-void NLPModel::setRtol(Tolerance tol)
-{
-   ASSERT(tol.isRelative(), "This tolerance must be relative");
-   rtol_ = tol;
+   tol_ = tol;
 }
 
 Scope NLPModel::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 } // namespace

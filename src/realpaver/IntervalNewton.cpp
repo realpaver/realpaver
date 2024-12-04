@@ -1,14 +1,26 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalNewton.cpp
+ * @brief  Interval Newton method
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalNewton.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
@@ -23,12 +35,11 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
         c_(F.scope()),
         gs_(nullptr),
         maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
-        xtol_(Param::GetTolParam("NEWTON_XTOL")),
-        dtol_(Param::GetTolParam("NEWTON_DTOL")),
+        tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
+        wlim_(Param::GetDblParam("NEWTON_WIDTH_LIMIT")),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
-        cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT")),
-        cdtol_(Param::GetTolParam("NEWTON_CERTIFY_DTOL"))
+        cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
    ASSERT(F.nbVars() == F.nbFuns(),
           "Interval Newton defined with a non-square system");
@@ -46,8 +57,10 @@ IntervalNewton::IntervalNewton(const IntervalNewton& N)
         c_(N.c_),
         gs_(nullptr),
         maxiter_(N.maxiter_),
-        xtol_(N.xtol_),
-        dtol_(N.dtol_)
+        tol_(N.tol_),
+        delta_(N.delta_),
+        chi_(N.chi_),
+        cmaxiter_(N.cmaxiter_)
 {
    gs_ = new IntervalGaussSeidel(*N.gs_);
 }
@@ -72,24 +85,26 @@ size_t IntervalNewton::getMaxIter() const
    return maxiter_;
 }
 
-Tolerance IntervalNewton::getXTol() const
+Tolerance IntervalNewton::getTol() const
 {
-   return xtol_;
+   return tol_;
 }
 
-void IntervalNewton::setXTol(const Tolerance& tol)
+void IntervalNewton::setTol(const Tolerance& tol)
 {
-   xtol_ = tol;
+   tol_ = tol;
 }
 
-Tolerance IntervalNewton::getDTol() const
+void IntervalNewton::setWidthLimit(double val)
 {
-   return dtol_;
+   ASSERT(val > 0.0, "Bad threshold on the width of a box: " << val);
+
+   wlim_ = val;
 }
 
-void IntervalNewton::setDTol(const Tolerance& tol)
+double IntervalNewton::getWidthLimit() const
 {
-   dtol_ = tol;
+   return wlim_;
 }
 
 IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
@@ -97,36 +112,51 @@ IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
    return gs_;
 }
 
-Proof IntervalNewton::contract(IntervalRegion& X)
+Proof IntervalNewton::contract(IntervalBox& X)
 {
+   if (X.width() >= wlim_) return Proof::Maybe;
+   
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
+
+   LOG_INTER("Interval Newton contractor on " << X);
+
+// analysis of the degree of contraction
+#if LOG_ON
+   IntervalBox saveX(X);
+#endif
 
    do
    {
       ++ nb_steps;
 
-      F_.evalDiff(X, val_, jac_);
+      // evaluates the function on X
+      F_.eval(X, val_);
 
       if (!val_.containsZero())
       {
          proof = Proof::Empty;
          iter = false;
+         LOG_INTER("Stops on the evaluation test -> 0 not in F(X)");
          continue;
       }
 
-      X.midpointOnScope(scope(), c_);
-      F_.pointEval(c_, val_);
+      makeC(X);          // c := midpoint of X
+      F_.eval(c_, val_);
 
       if (val_.isEmpty())
       {
          iter = false;
+         LOG_INTER("Stops on the midpoint evaluation -> empty");
          continue;
       }
 
       makeY(X);      // y := X - c
       b_ = -val_;    // b := -F(c)
+
+      // calculates the Hansen's matrix
+      F_.diffHansen(X, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
             
@@ -134,17 +164,19 @@ Proof IntervalNewton::contract(IntervalRegion& X)
       {
          proof = Proof::Empty;
          iter = false;
+         LOG_INTER("Stops on Gauss-Seidel -> empty");
          continue;
       }
 
       // X := X inter (y + c)
-      bool hasxtol, hasdtol;
-      certif = reduceX(X, hasxtol, hasdtol);
+      bool improved;
+      certif = reduceX(X, improved);
 
       if (certif == Proof::Empty)
       {
          proof = Proof::Empty;
          iter = false;
+         LOG_INTER("Stops on the intersection with the previous box -> empty");
          continue;
       }
 
@@ -152,15 +184,41 @@ Proof IntervalNewton::contract(IntervalRegion& X)
          proof = Proof::Feasible;
 
       // checks the stopping criteria
-      if (nb_steps > maxiter_ || hasxtol || hasdtol)
+      if (nb_steps > maxiter_)
+      {
          iter = false;
+         LOG_INTER("Stops on a maximum number of iterations: " << maxiter_);
+      }
+
+      else if (!improved)
+      {
+         iter = false;
+         LOG_INTER("Stops on the tolerance " << tol_);
+      }
+      
+      LOG_LOW("Inner step of interval Newton  -> " << X);
    }
    while (iter);
+
+   LOG_INTER("End of interval Newton -> " << proof);
+   LOG_INTER("Reduced box -> " << X);
+
+// analysis of the degree of contraction
+#if LOG_ON
+   if (proof != Proof::Empty)
+   {
+      LOG_INTER("Newton reduction: " << saveX.width() << ", " << X.width());
+   }
+   else
+   {
+      LOG_INTER("Newton reduction: " << saveX.width() << ", empty");
+   }
+#endif
 
    return proof;
 }
 
-void IntervalNewton::makeY(IntervalRegion& X)
+void IntervalNewton::makeY(IntervalBox& X)
 {
    // y := X - c
    int i = 0;
@@ -171,13 +229,19 @@ void IntervalNewton::makeY(IntervalRegion& X)
    }
 }
 
-Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
+void IntervalNewton::makeC(IntervalBox& X)
+{
+   for (const auto& v : scope())
+      c_.set(v, X.get(v).midpoint());
+}
+
+
+Proof IntervalNewton::reduceX(IntervalBox& X, bool& improved)
 {
    int i = 0;
    Proof proof = Proof::Feasible;
 
-   hasxtol = true;
-   hasdtol = true;
+   improved = false;
 
    for (const auto& v : scope())
    {
@@ -192,11 +256,8 @@ Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
 
       Interval reduced = dom & z;
 
-      if (!dtol_.haveDistTolerance(reduced, dom))
-         hasdtol = false;
-
-      if (!xtol_.hasTolerance(reduced))
-         hasxtol = false;
+      if (tol_.isImproved(dom, reduced))
+         improved = true;
 
       X.set(v, reduced);
       i = i+1;
@@ -204,42 +265,60 @@ Proof IntervalNewton::reduceX(IntervalRegion& X, bool& hasxtol, bool& hasdtol)
    return proof;
 }
 
-Proof IntervalNewton::certify(IntervalRegion& reg)
+Proof IntervalNewton::certify(IntervalBox& box)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
 
-   IntervalRegion X(scope());
-   X.setOnScope(reg, scope());
+   IntervalBox X(scope());
+   X.setOnScope(box, scope());
+
+   // given X(k-2), X(k-1), Xk three boxes from the sequence calculated
+   // by this method, dprev is the distance between X(k-2) and X(k-1), dcurr
+   // is the distance between X(k-1) and Xk ; the method diverges if we have
+   // dcurr > dprev
+   double dprev = Double::inf(), dcurr;
+
+   LOG_INTER("Interval Newton certification on " << X);
 
    do
    {
       ++ nb_steps;
 
+      IntervalBox prev(X);
+
       // inflation
       X.inflate(delta_, chi_);
 
-      F_.evalDiff(X, val_, jac_);
+      LOG_LOW("Inflated box -> " << X);
+
+      // evaluates the function on X
+      F_.eval(X, val_);
 
       if (!val_.containsZero())
       {
          proof = Proof::Empty;
          iter = false;
+         LOG_INTER("Stops on the evaluation test -> 0 not in F(X)");
          continue;
       }
 
-      X.midpointOnScope(scope(), c_);
-      F_.pointEval(c_, val_);
+      makeC(X);            // c := midpoint of X
+      F_.eval(c_, val_);
 
       if (val_.isEmpty())
       {
          iter = false;
+         LOG_INTER("Stops on the midpoint evaluation -> empty");
          continue;
       }
 
       makeY(X);      // y := X - c
       b_ = -val_;    // b := -F(c)
+
+      // calculates the Hansen's matrix
+      F_.diffHansen(X, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
             
@@ -247,39 +326,49 @@ Proof IntervalNewton::certify(IntervalRegion& reg)
       {
          proof = Proof::Empty;
          iter = false;
+         LOG_INTER("Stops on Gauss-Seidel -> empty");
          continue;
       }
 
       // X := y + c
-      bool hasdtol;
-      certif = certifyX(X, hasdtol);
+      certif = certifyX(X);
+      dcurr = X.distance(prev);
 
       if (certif == Proof::Feasible)
       {
          proof = Proof::Feasible;
          iter = false;
-         continue;
+         LOG_INTER("Feasibility proved");
+      }
+      else if (dcurr > dprev)
+      {
+         iter = false;
+         LOG_INTER("Stops since the method diverges");
+      }
+      else if (nb_steps > cmaxiter_)
+      {
+         iter = false;
+         LOG_INTER("Stops on a maximum number of iterations: " << maxiter_);
       }
 
-      // checks the stopping criteria
-      if (nb_steps > cmaxiter_ || (!hasdtol))
-         iter = false;
-
+      LOG_LOW("Inner step of interval Newton certification  -> " << X);
    }
    while (iter);
 
    if (proof == Proof::Feasible)
-      reg.setOnScope(X, scope());
+      box.setOnScope(X, scope());
+
+   LOG_INTER("End of interval Newton cerfification -> " << proof);
+   LOG_INTER("New box -> " << box);
 
    return proof;
 }
 
-Proof IntervalNewton::certifyX(IntervalRegion& X, bool& hasdtol)
+Proof IntervalNewton::certifyX(IntervalBox& X)
 {
    // X := y + c
    int i = 0;
    Proof proof = Proof::Feasible;
-   hasdtol = true;
 
    for (const auto& v : scope())
    {
@@ -288,9 +377,6 @@ Proof IntervalNewton::certifyX(IntervalRegion& X, bool& hasdtol)
 
       if (!dom.strictlyContains(z))
          proof = Proof::Maybe;
-
-      if (!dtol_.haveDistTolerance(z, dom))
-         hasdtol = false;
 
       X.set(v, z);
       i = i+1;
@@ -328,16 +414,6 @@ void IntervalNewton::setCertifyMaxIter(size_t n)
 size_t IntervalNewton::getCertifyMaxIter() const
 {
    return cmaxiter_;
-}
-
-Tolerance IntervalNewton::getCertifyDTol() const
-{
-   return cdtol_;
-}
-
-void IntervalNewton::setCertifyDTol(const Tolerance& tol)
-{
-   cdtol_ = tol;
 }
 
 void IntervalNewton::print(std::ostream& os) const

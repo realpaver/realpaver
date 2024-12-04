@@ -1,4 +1,15 @@
-/* src/realpaver/configure.hpp.in.  Generated from configure.ac by autoheader.  */
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
 
 /* Define to 1 if you are compiling for ix86. */
 #mesondefine ARCH_X86
@@ -60,12 +71,11 @@
 /* Define to 1 to use GAOL. */
 #mesondefine INTERVAL_LIB_GAOL
 
-
-
-/* Define to 1 to use GAOL. */
+/* Define to 1 to use IPOPT. */
 #mesondefine LOCAL_OPTIMIZER_IPOPT
-#mesondefine LOCAL_OPTIMIZER_NLOPT
 
+/* Define to 1 to use NLOPT. */
+#mesondefine LOCAL_OPTIMIZER_NLOPT
 
 /* Name of package */
 #define PACKAGE "@project_name@"

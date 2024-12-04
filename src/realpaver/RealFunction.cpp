@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealFunction.hpp
+ * @brief  Real functions
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/RealFunction.hpp"
@@ -25,7 +36,7 @@ Interval RealFunctionRep::getImage() const
    return img_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunction::RealFunction(SharedDag dag, size_t i)
       : rep_(std::make_shared<RealFunctionDag>(dag, i))
@@ -72,28 +83,12 @@ double RealFunction::eval(const RealPoint& pt)
    return rep_->eval(pt);
 }
 
-void RealFunction::diff(const RealPoint& pt, RealVector& grad)
+void RealFunction::diff(const RealPoint& pt, RealVector& G)
 {
-   return rep_->diff(pt, grad);
+   return rep_->diff(pt, G);
 }
 
-void RealFunction::evalDiff(const RealPoint& pt, double& val, RealVector& grad)
-{
-   return rep_->evalDiff(pt, val, grad);
-}
-
-void RealFunction::violation(const RealPoint& pt, double& val, double& viol)
-{
-   rep_->violation(pt, val, viol);
-}
-
-void RealFunction::violation(const RealPoint& pt, double lo, double up, double& val,
-                             double& viol)
-{
-   rep_->violation(pt, lo, up, val, viol);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunctionDag::RealFunctionDag(SharedDag dag, size_t i)
       : RealFunctionRep(),
@@ -137,46 +132,13 @@ size_t RealFunctionDag::nbVars() const
 
 double RealFunctionDag::eval(const RealPoint& pt)
 {
-   return dag_->fun(index_)->realEval(pt);
+   return dag_->fun(index_)->rEval(pt);
 }
 
-void RealFunctionDag::diff(const RealPoint& pt, RealVector& grad)
-{
-   double val;
-   evalDiff(pt, val, grad);
-}
-
-void RealFunctionDag::evalDiff(const RealPoint& pt, double& val,
-                               RealVector& grad)
-{
-   ASSERT(nbVars() == grad.size(), "Bad size of gradient");
-
-   DagFun* f = dag_->fun(index_);
-   val = f->realEval(pt);
-   f->realDiff(grad);
-}
-
-void RealFunctionDag::violation(const RealPoint& pt, double& val, double& viol)
+void RealFunctionDag::diff(const RealPoint& pt, RealVector& G)
 {
    DagFun* f = dag_->fun(index_);
-   val = f->realEval(pt);
-   viol = f->realViolation();   
-}
-
-void RealFunctionDag::violation(const RealPoint& pt, double lo, double up,
-                                double& val, double& viol)
-{
-   Interval img(lo, up);
-   ASSERT(!img.isEmpty(), "Empty image for a real function");
-
-   DagFun* f = dag_->fun(index_);
-   Interval tmp = f->getImage();
-   f->setImage(img);
-
-   val = f->realEval(pt);
-   viol = f->realViolation();
-
-   f->setImage(tmp);
+   return f->rDiff(pt, G);
 }
 
 } // namespace

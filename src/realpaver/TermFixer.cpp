@@ -1,19 +1,32 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   TermFixer.cpp
+ * @brief  Rewriting of terms
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/TermFixer.hpp"
 
 namespace realpaver {
 
-TermFixer::TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim) :
-   vvm_(vvm), vim_(vim), t_()
+TermFixer::TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim)
+      : vvm_(vvm),
+        vim_(vim),
+        t_()
 {}
 
 Term TermFixer::getTerm() const
@@ -21,7 +34,7 @@ Term TermFixer::getTerm() const
    return t_;
 }
 
-void TermFixer::apply(const TermConst* t)
+void TermFixer::apply(const TermCst* t)
 {
    t_ = Term(t->getVal());
 }
@@ -198,45 +211,28 @@ void TermFixer::apply(const TermTan* t)
    t_ = tan(vis.t_);
 }
 
-void TermFixer::apply(const TermLin* t)
+void TermFixer::apply(const TermCosh* t)
 {
-   std::shared_ptr<TermLin> tlin = std::make_shared<TermLin>();
+   TermFixer vis(vvm_, vim_);
+   t->child()->acceptVisitor(vis);
 
-   // keeps the constant value
-   tlin->addConstant(t->getConstantValue());
+   t_ = cosh(vis.t_);
+}
 
-   // examines each sub-term
-   for (auto it=t->begin(); it!=t->end(); ++it)
-   {
-      Variable v = t->getVarSub(it);
-      Interval x = t->getCoefSub(it);
+void TermFixer::apply(const TermSinh* t)
+{
+   TermFixer vis(vvm_, vim_);
+   t->child()->acceptVisitor(vis);
 
-      auto it1 = vvm_->find(v);
-      auto it2 = vim_->find(v);
+   t_ = sinh(vis.t_);
+}
 
-      if (it1 != vvm_->end())
-      {
-         Variable w = it1->second;
-         tlin->addTerm(x, w);
-      }
-      else if (it2 != vim_->end())
-      {
-         Interval y = it2->second;
-         tlin->addConstant(x * y);
-      }
-      else
-         THROW("Term fixer error");
-   }
+void TermFixer::apply(const TermTanh* t)
+{
+   TermFixer vis(vvm_, vim_);
+   t->child()->acceptVisitor(vis);
 
-   // assigns the result
-   if (tlin->isConstant())
-      t_ = Term(tlin->evalConst());
-
-   else if (tlin->isVariable())
-      t_ = Term(tlin->getVarSub(0));
-
-   else
-      t_ = Term(tlin);
+   t_ = tanh(vis.t_);
 }
 
 } // namespace

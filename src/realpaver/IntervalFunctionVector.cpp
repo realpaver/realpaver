@@ -1,21 +1,33 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalFunctionVector.cpp
+ * @brief  Vector of interval functions
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalFunctionVector.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 IntervalFunctionVectorRep::~IntervalFunctionVectorRep()
 {}
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionVector::IntervalFunctionVector()
       : rep_(nullptr)
@@ -116,46 +128,28 @@ void IntervalFunctionVector::addFun(IntervalFunction f)
    }
 }
 
-void IntervalFunctionVector::eval(const IntervalRegion& reg,
-                                  IntervalVector& val)
+void IntervalFunctionVector::eval(const IntervalBox& B, IntervalVector& val)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   return rep_->eval(reg, val);
+   return rep_->eval(B, val);
 }
 
-void IntervalFunctionVector::pointEval(const RealPoint& pt, IntervalVector& val)
+void IntervalFunctionVector::diff(const IntervalBox& B, IntervalMatrix& J)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->pointEval(pt, val);
+   rep_->diff(B, J);
 }
 
-void IntervalFunctionVector::diff(const IntervalRegion& reg, IntervalMatrix& J)
+void IntervalFunctionVector::diffHansen(const IntervalBox& B, IntervalMatrix& H) 
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->diff(reg, J);
+   rep_->diffHansen(B, H);
 }
 
-void IntervalFunctionVector::evalDiff(const IntervalRegion& reg,
-                                      IntervalVector& val, IntervalMatrix& J)
-{
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
-
-   rep_->evalDiff(reg, val, J);
-}
-
-void IntervalFunctionVector::violation(const IntervalRegion& reg,
-                                       IntervalVector& val,
-                                       RealVector& viol)
-{
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
-
-   rep_->violation(reg, val, viol);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorDag::IntervalFunctionVectorDag(SharedDag dag)
       : dag_(dag)
@@ -220,69 +214,33 @@ IntervalFunction IntervalFunctionVectorDag::fun(size_t i) const
    return IntervalFunction(dag_, i);
 }
 
-void IntervalFunctionVectorDag::eval(const IntervalRegion& reg,
-                                     IntervalVector& val)
+void IntervalFunctionVectorDag::eval(const IntervalBox& B, IntervalVector& val)
 {
-   dag_->intervalEval(reg, val);
+   dag_->iEval(B, val);
 }
 
-void IntervalFunctionVectorDag::pointEval(const RealPoint& pt,
-                                          IntervalVector& val)
+void IntervalFunctionVectorDag::diff(const IntervalBox& B, IntervalMatrix& J)
 {
-   dag_->intervalPointEval(pt, val);
+   dag_->iDiff(B, J);   
 }
 
-void IntervalFunctionVectorDag::diff(const IntervalRegion& reg,
-                                     IntervalMatrix& J)
+void IntervalFunctionVectorDag::diffHansen(const IntervalBox& B,
+                                           IntervalMatrix& H)
 {
-   IntervalVector val(nbFuns());
-
-   if (nbVars() == nbFuns())
-   {
-      dag_->hansenDiff(reg, J);
-   }
-   else
-   {
-      dag_->intervalEval(reg, val);
-      dag_->intervalDiff(J);
-   }
+   dag_->iDiffHansen(B, H);
 }
 
-void IntervalFunctionVectorDag::evalDiff(const IntervalRegion& reg,
-                                         IntervalVector& val,
-                                         IntervalMatrix& J) 
-{
-   if (nbVars() == nbFuns())
-   {
-      dag_->intervalEval(reg, val);
-      dag_->hansenDiff(reg, J);
-   }
-   else
-   {
-      dag_->intervalEval(reg, val);
-      dag_->intervalDiff(J);
-   }
-}
-
-void IntervalFunctionVectorDag::violation(const IntervalRegion& reg,
-                                          IntervalVector& val,
-                                          RealVector& viol)
-{
-   dag_->intervalEval(reg, val);
-   dag_->intervalViolation(viol);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorList::IntervalFunctionVectorList()
       : vf_(),
-        scope_()
+        scop_()
 {}
 
 IntervalFunctionVectorList::IntervalFunctionVectorList(
    const std::initializer_list<IntervalFunction>& lf)
       : vf_(),
-        scope_()
+        scop_()
 {
    for (const auto& f : lf)
       addFun(f);
@@ -291,17 +249,18 @@ IntervalFunctionVectorList::IntervalFunctionVectorList(
 void IntervalFunctionVectorList::addFun(IntervalFunction f)
 {
    vf_.push_back(f);
-   scope_.insert(f.scope());
+   scop_.insert(f.scope());
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 Scope IntervalFunctionVectorList::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 size_t IntervalFunctionVectorList::nbVars() const
 {
-   return scope_.size();
+   return scop_.size();
 }
 
 size_t IntervalFunctionVectorList::nbFuns() const
@@ -315,28 +274,16 @@ IntervalFunction IntervalFunctionVectorList::fun(size_t i) const
    return vf_[i];
 }
 
-void IntervalFunctionVectorList::eval(const IntervalRegion& reg,
-                                      IntervalVector& val)
+void IntervalFunctionVectorList::eval(const IntervalBox& B, IntervalVector& val)
 {
    ASSERT(val.size() == nbFuns(),
           "Bad size of vector given for the evaluation of a function vector");
 
    for (size_t i=0; i<nbFuns(); ++i)
-      val[i] = vf_[i].eval(reg);
+      val[i] = vf_[i].eval(B);
 }
 
-void IntervalFunctionVectorList::pointEval(const RealPoint& pt,
-                                           IntervalVector& val)
-{
-   ASSERT(val.size() == nbFuns(),
-          "Bad size of vector given for the evaluation of a function vector");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-      val[i] = vf_[i].pointEval(pt);
-}
-
-void IntervalFunctionVectorList::diff(const IntervalRegion& reg,
-                                      IntervalMatrix& J)
+void IntervalFunctionVectorList::diff(const IntervalBox& B, IntervalMatrix& J)
 {
    ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
           "Bad dimensions of a Jacobian matrix used in a function vector");
@@ -346,7 +293,7 @@ void IntervalFunctionVectorList::diff(const IntervalRegion& reg,
       auto& f = vf_[i];
 
       IntervalVector G(f.nbVars());
-      f.diff(reg, G);
+      f.diff(B, G);
 
       // fills the i-th row of the matrix
       size_t j = 0;
@@ -363,14 +310,10 @@ void IntervalFunctionVectorList::diff(const IntervalRegion& reg,
    }
 }
 
-void IntervalFunctionVectorList::evalDiff(const IntervalRegion& reg,
-                                          IntervalVector& val,
-                                          IntervalMatrix& J)
+void IntervalFunctionVectorList::diffHansen(const IntervalBox& B,
+                                            IntervalMatrix& H)
 {
-   ASSERT(val.size() == nbFuns(),
-          "Bad size of vector given for the evaluation of a function vector");
-
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+   ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
           "Bad dimensions of a Jacobian matrix used in a function vector");
 
    for (size_t i=0; i<nbFuns(); ++i)
@@ -378,29 +321,21 @@ void IntervalFunctionVectorList::evalDiff(const IntervalRegion& reg,
       auto& f = vf_[i];
 
       IntervalVector G(f.nbVars());
-      f.evalDiff(reg, val[i], G);
+      f.diffHansen(B, G);
 
       // fills the i-th row of the matrix
       size_t j = 0;
       for (auto v : scope())
       {
          if (f.scope().contains(v))
-            J.set(i, j, G.get(f.scope().index(v)));
+            H.set(i, j, G.get(f.scope().index(v)));
  
          else
-            J.set(i, j, Interval::zero());
+            H.set(i, j, Interval::zero());
 
          ++j;
       }
    }
-}
-
-void IntervalFunctionVectorList::violation(const IntervalRegion& reg,
-                                           IntervalVector& val,
-                                           RealVector& viol)
-{
-   for (size_t i=0; i<nbFuns(); ++i)
-      vf_[i].violation(reg, val[i], viol[i]);
 }
 
 } // namespace

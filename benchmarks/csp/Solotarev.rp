@@ -1,0 +1,14 @@
+# The system of Solotarev from the PoSSo test suite
+
+
+Variables
+   a integer in [-10, 10],
+   b in [-10, 10],
+   x in [-10, 10],
+   y in [-10, 10];
+
+Constraints
+   3*x^2-2*x-a == 0,
+   x^3-x^2-x*a+a-2*b-2 == 0,
+   3*y^2-2*y-a == 0,
+   y^3-y^2-y*a-a+2 == 0;

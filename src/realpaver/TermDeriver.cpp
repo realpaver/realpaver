@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   TermDeriver.cpp
+ * @brief  Symbolic differentiation
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/TermDeriver.hpp"
@@ -22,7 +33,7 @@ Term TermDeriver::getDerivative() const
    return dt_;
 }
 
-void TermDeriver::apply(const TermConst* t)
+void TermDeriver::apply(const TermCst* t)
 {
    dt_ = Term(0);
 }
@@ -164,17 +175,28 @@ void TermDeriver::apply(const TermTan* t)
 {
    TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
-   dt_ = (1 + sqr(tan(t->child())))*vis.dt_;
+   dt_ = (1.0 + sqr(tan(t->child())))*vis.dt_;
 }
 
-void TermDeriver::apply(const TermLin* t)
+void TermDeriver::apply(const TermCosh* t)
 {
-   auto it = t->find(v_);
-   if (it == t->end())
-      dt_ = Term(0);
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*sinh(t->child());
+}
 
-   else
-      dt_ = Term(t->getCoefSub(it));
+void TermDeriver::apply(const TermSinh* t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*cosh(t->child());
+}
+
+void TermDeriver::apply(const TermTanh* t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_*(1.0 - sqr(tanh(t->child())));
 }
 
 } // namespace

@@ -1,3 +1,20 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *------------------------------------------------------------------------------
+ * Lexical analyzer used by the parser of nonlinear problems.
+ * Author: Laurent Granvilliers
+ * Date: 2024-4-11
+ -----------------------------------------------------------------------------*/
+
 %{
 #include <stdio.h>
 #include "realpaver/parser_bison.hpp"
@@ -17,12 +34,10 @@ DIG         [0-9]
 INT         {DIG}+
 E           [eE][+-]?{DIG}+
 REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
-TOL         {REAL}[AR]
 
 %%
 {INT}           return TK_INT;
 {REAL}          return TK_REAL;
-{TOL}           return TK_TOL;
 
 "Variables"     return TK_STR_VAR;
 "Constants"     return TK_STR_CONST;
@@ -33,6 +48,7 @@ TOL         {REAL}[AR]
 
 "integer"       return TK_STR_INT;
 "binary"        return TK_STR_BIN;
+"real"          return TK_STR_REAL;
 "tol"           return TK_STR_TOL;
 "table"         return TK_TABLE;
 
@@ -50,6 +66,9 @@ TOL         {REAL}[AR]
 "sgn"    return TK_SGN;
 "abs"    return TK_ABS;
 "pow"		return TK_POW;
+"cosh"   return TK_COSH;
+"sinh"   return TK_SINH;
+"tanh"   return TK_TANH;
 
 "in"     return TK_IN;
 "-inf"   return TK_MINUS_INF;
@@ -76,6 +95,7 @@ TOL         {REAL}[AR]
 ">="     return TK_GE;
 "<="     return TK_LE;
 "|"		return TK_PIPE;
+"->"     return TK_IMPLY;
 
 {IDENT}     	return TK_IDENT;
 
@@ -95,6 +115,13 @@ realpaver::FunctionSymbol* realpaver_fun_symbol;
 std::vector<realpaver::Variable>* realpaver_var_vector;
 std::vector<realpaver::Interval>* realpaver_itv_vector;
 
+// unions used to parse the variable domains
+realpaver::IntervalUnion* realpaver_itv_union;
+realpaver::RangeUnion* realpaver_range_union;
+
+// constraint representation used to parse (conditional) constraints
+realpaver::ConstraintRep* realpaver_ctr_rep;
+
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;
 
@@ -110,6 +137,8 @@ void realpaver_flex_init(realpaver::Problem* prob,
   realpaver_fun_symbol = nullptr;
   realpaver_var_vector = nullptr;
   realpaver_itv_vector = nullptr;
+  realpaver_itv_union = nullptr;
+  realpaver_range_union = nullptr;
 }
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
@@ -151,6 +180,8 @@ void realpaver_flex_cleanup_str()
 
   if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
   if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
+  if (realpaver_itv_union != nullptr) delete realpaver_itv_union;
+  if (realpaver_range_union != nullptr) delete realpaver_range_union;
 
   realpaver_bison__delete_buffer(realpaver_bison_buffer);
 }
@@ -163,6 +194,8 @@ void realpaver_flex_cleanup_file()
 
   if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
   if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
+  if (realpaver_itv_union != nullptr) delete realpaver_itv_union;
+  if (realpaver_range_union != nullptr) delete realpaver_range_union;
 
   if (realpaver_bison_in)
   {

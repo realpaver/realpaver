@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   SymbolTable.cpp
+ * @brief  Symbol table for parsing
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
@@ -28,7 +39,7 @@ std::string ParsingSymbol::getName() const
    return name_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 ConstantSymbol::ConstantSymbol(const std::string& name, const Interval& x)
       : ParsingSymbol(name),
@@ -42,7 +53,7 @@ Interval ConstantSymbol::getValue() const
    return x_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 VariableSymbol::VariableSymbol(Variable v)
       : ParsingSymbol(v.getName()),
@@ -55,7 +66,7 @@ Variable VariableSymbol::getVar() const
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 AliasSymbol::AliasSymbol(const std::string& name, const Term& t)
       : ParsingSymbol(name),
@@ -67,13 +78,13 @@ Term AliasSymbol::getTerm() const
    return t_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 FunctionSymbol::FunctionSymbol(const std::string& name)
       : ParsingSymbol(name),
         args_(),
         t_(0),
-        scope_()
+        scop_()
 {}
 
 void FunctionSymbol::addArgument(const std::string& name)
@@ -83,7 +94,7 @@ void FunctionSymbol::addArgument(const std::string& name)
    Variable v(name);
    v.setId(1000000 + args_.size());
    args_.push_back(v);
-   scope_.insert(v);
+   scop_.insert(v);
 }
 
 Variable FunctionSymbol::getArgument(size_t i) const
@@ -110,11 +121,11 @@ size_t FunctionSymbol::arity() const
 
 bool FunctionSymbol::setTerm(const Term& t)
 {
-   Scope s;
-   t.makeScope(s);
+   Scope scop;
+   t.makeScope(scop);
 
-   if (scope_.size() != s.size()) return false;
-   if (!scope_.contains(s)) return false;
+   if (scop_.size() != scop.size()) return false;
+   if (!scop_.contains(scop)) return false;
 
    t_ = t;
    return true;
@@ -152,7 +163,7 @@ size_t FunctionSymbol::getIndexVar(const Variable& v) const
    return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 FunctionCall::FunctionCall(FunctionSymbol* f)
       : f_(f),
@@ -179,7 +190,7 @@ Term FunctionCall::getTerm(size_t i) const
    return lt_[i];
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 SymbolTable::~SymbolTable()
 {
@@ -314,7 +325,7 @@ std::pair<bool, Term> SymbolTable::processFunCall()
    return std::make_pair(true, vis.getTerm());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 FunctionCallProcessor::FunctionCallProcessor(FunctionCall* fc)
       : TermVisitor(),
@@ -322,7 +333,7 @@ FunctionCallProcessor::FunctionCallProcessor(FunctionCall* fc)
         t_(Term::SharedRep(nullptr))
 {}
 
-void FunctionCallProcessor::apply(const TermConst* t)
+void FunctionCallProcessor::apply(const TermCst* t)
 {
    t_ = Term(t->getVal());
 }
@@ -488,17 +499,28 @@ void FunctionCallProcessor::apply(const TermTan* t)
    t_ = tan(vis.getTerm());
 }
 
-void FunctionCallProcessor::apply(const TermLin* t)
+void FunctionCallProcessor::apply(const TermCosh* t)
 {
-   t_ = t->getConstantValue();
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
 
-   for (auto it=t->begin(); it!=t->end(); ++it)
-   {
-      Interval coef = t->getCoefSub(it);
-      Variable v = t->getVarSub(it);
-      size_t i = fc_->getFunctionSymbol()->getIndexVar(v);
-      t_ += coef*fc_->getTerm(i);
-   }
+   t_ = cosh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermSinh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = sinh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermTanh* t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = tanh(vis.getTerm());
 }
 
 Term FunctionCallProcessor::getTerm() const

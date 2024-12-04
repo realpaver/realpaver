@@ -1,32 +1,78 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Dag.cpp
+ * @brief  DAG of constraints
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/FlatFunction.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
-DagNode::DagNode(Dag* dag, size_t index)
+std::ostream& operator<<(std::ostream& os, DagSymbol op)
+{
+   switch(op)
+   {
+      case DagSymbol::Cst:  return os << "cst";
+      case DagSymbol::Var:  return os << "var";
+      case DagSymbol::Add:  return os << "+";
+      case DagSymbol::Sub:  return os << "-";
+      case DagSymbol::Mul:  return os << "*";
+      case DagSymbol::Div:  return os << "/";
+      case DagSymbol::Min:  return os << "min";
+      case DagSymbol::Max:  return os << "max";
+      case DagSymbol::Usb:  return os << "-";
+      case DagSymbol::Abs:  return os << "abs";
+      case DagSymbol::Sgn:  return os << "sgn";
+      case DagSymbol::Sqr:  return os << "sqr";
+      case DagSymbol::Sqrt: return os << "sqrt";
+      case DagSymbol::Pow:  return os << "pow";
+      case DagSymbol::Exp:  return os << "exp";
+      case DagSymbol::Log:  return os << "log";
+      case DagSymbol::Cos:  return os << "cos";
+      case DagSymbol::Sin:  return os << "sin";
+      case DagSymbol::Tan:  return os << "tan";
+      case DagSymbol::Cosh: return os << "cosh";
+      case DagSymbol::Sinh: return os << "sinh";
+      case DagSymbol::Tanh: return os << "tanh";
+      case DagSymbol::Lin: return os << "lin";
+
+      default: os.setstate(std::ios::failbit);
+   }
+   return os;
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagNode::DagNode(Dag* dag, DagSymbol symb, size_t index)
       : bitset_(),
         dag_(dag),
+        symb_(symb),
         index_(index),
         vpar_(),
         vsub_(),
-        val_(),
-        dv_(),
-        rval_(0.0),
-        rdv_(0.0)
+        ival_()
 {}
 
 DagNode::~DagNode()
@@ -50,21 +96,6 @@ DagNode* DagNode::child() const
 DagNode* DagNode::subNode(size_t i) const
 {
    return dag_->node(vsub_[i]);
-}
-
-Interval DagNode::dom() const
-{
-   return dag_->dom(index_);
-}
-
-void DagNode::setDom(const Interval& x)
-{
-   dag_->setDom(index_, x);
-}
-
-void DagNode::reduceDom(const Interval& x)
-{
-   dag_->reduceDom(index_, x);
 }
 
 size_t DagNode::index() const
@@ -107,6 +138,11 @@ void DagNode::addSubNode(size_t i)
    vsub_.push_back(i);
 }
 
+DagSymbol DagNode::symbol() const
+{
+   return symb_;
+}
+
 Dag* DagNode::dag() const
 {
    return dag_;
@@ -127,54 +163,19 @@ bool DagNode::dependsOn(const Variable& v) const
    return bitset_.get(v.id());
 }
 
-Interval DagNode::val() const
+bool DagNode::isShared() const
 {
-   return val_;
+   return parArity() > 1;
 }
 
-void DagNode::setVal(const Interval& x)
+Interval DagNode::ival() const
 {
-   val_ = x;
+   return ival_;
 }
 
-Interval DagNode::dv() const
+void DagNode::setIval(const Interval& x)
 {
-   return dv_;
-}
-
-void DagNode::setDv(const Interval& x)
-{
-   dv_ = x;
-}
-
-void DagNode::addDv(const Interval& x)
-{
-   dv_ += x;
-}
-
-double DagNode::rval() const
-{
-   return rval_;
-}
-
-void DagNode::setRval(double x)
-{
-   rval_ = x;
-}
-
-double DagNode::rdv() const
-{
-   return rdv_;
-}
-
-void DagNode::setRdv(double x)
-{
-   rdv_ = x;
-}
-
-void DagNode::addRdv(double x)
-{
-   rdv_ = Double::add(rdv_, x);
+   ival_ = x;
 }
 
 size_t DagNode::nbOccurrences(const Variable& v) const
@@ -182,10 +183,10 @@ size_t DagNode::nbOccurrences(const Variable& v) const
    return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagConst::DagConst(Dag* dag, size_t index, const Interval& x)
-      : DagNode(dag, index),
+      : DagNode(dag, DagSymbol::Cst, index),
         x_(x)
 {}
 
@@ -202,44 +203,14 @@ void DagConst::print(std::ostream& os) const
       os << x_;
 }
 
-void DagConst::eval(const IntervalRegion& reg)
+void DagConst::iEvalNode(const IntervalBox& B)
 {
-   setVal(x_);
+   setIval(x_);
 }
 
-void DagConst::eval(const RealPoint& pt)
+void DagConst::iEvalTree(const IntervalBox& B)
 {
-   setVal(x_);
-}
-
-void DagConst::evalOnly(const Variable& v, const Interval& x)
-{
-   setVal(x_);
-}
-
-void DagConst::proj(IntervalRegion& reg)
-{
-   // nothing to do
-}
-
-bool DagConst::diff()
-{
-   return true;
-}
-
-bool DagConst::diffOnly(const Variable& v)
-{
-   return true;
-}
-
-void DagConst::reval(const RealPoint& pt)
-{
-   setRval(x_.midpoint());
-}
-
-bool DagConst::rdiff()
-{
-   return true;
+   setIval(x_);
 }
 
 Interval DagConst::getConst() const
@@ -247,10 +218,10 @@ Interval DagConst::getConst() const
    return x_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagVar::DagVar(Dag* dag, size_t index, Variable v)
-      : DagNode(dag, index),
+      : DagNode(dag, DagSymbol::Var, index),
         v_(v)
 {
    bitset_ = Bitset(v.id(), v.id());
@@ -272,45 +243,14 @@ void DagVar::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagVar::eval(const IntervalRegion& reg)
+void DagVar::iEvalNode(const IntervalBox& B)
 {
-   setVal(reg.get(v_));
+   setIval(B.get(v_));
 }
 
-void DagVar::eval(const RealPoint& pt)
+void DagVar::iEvalTree(const IntervalBox& B)
 {
-   setVal(pt.get(v_));
-}
-
-void DagVar::evalOnly(const Variable& v, const Interval& x)
-{
-   if (v_.id() == v.id())
-      setVal(x);
-}
-
-void DagVar::proj(IntervalRegion& reg)
-{
-   reg.set(v_, reg.get(v_) & dom());
-}
-
-bool DagVar::diff()
-{
-   return true;
-}
-
-bool DagVar::diffOnly(const Variable& v)
-{
-   return true;
-}
-
-void DagVar::reval(const RealPoint& pt)
-{
-   setRval(pt.get(v_));
-}
-
-bool DagVar::rdiff()
-{
-   return true;
+   setIval(B.get(v_));
 }
 
 Variable DagVar::getVar() const
@@ -318,11 +258,10 @@ Variable DagVar::getVar() const
    return v_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
-DagOp::DagOp(Dag* dag, OpSymbol symb, const IndexList& lsub)
-      : DagNode(dag),
-        symb_(symb)
+DagOp::DagOp(Dag* dag, DagSymbol symb, const IndexList& lsub)
+      : DagNode(dag, symb)
 {
    for (size_t i : lsub)
    {
@@ -344,7 +283,7 @@ void DagOp::setIndex(size_t index)
 
 bool DagOp::eqSymbol(const DagOp* other) const
 {
-   return symb_ == other->symb_;
+   return symbol() == other->symbol();
 }
 
 bool DagOp::eq(const DagOp* other) const
@@ -374,59 +313,26 @@ size_t DagOp::nbOccurrences(const Variable& v) const
 
 void DagOp::print(std::ostream& os) const
 {
-   os << symb_;
+   os << symbol();
 }
 
-void DagOp::evalOnly(const Variable& v, const Interval& x)
+void DagOp::iEvalNode(const IntervalBox& B)
 {
-   if (dependsOn(v))
-   {
-      for (size_t i=0; i<subArity(); ++i)
-         subNode(i)->evalOnly(v, x);
-
-      eval();
-   }
+   iEvalNode();
 }
 
-bool DagOp::diffOnly(const Variable& v)
+void DagOp::iEvalTree(const IntervalBox& B)
 {
-   bool res = true;
+   for (size_t i=0; i<subArity(); ++i)
+      subNode(i)->iEvalTree(B);
 
-   if (dependsOn(v))
-   {
-      res = diff();
-
-      for (size_t i=0; i<subArity(); ++i)
-         res = res && subNode(i)->diffOnly(v);
-   }
-
-   return res;
+   iEvalNode();
 }
 
-OpSymbol DagOp::getSymbol() const
-{
-   return symb_;
-}
-
-void DagOp::eval(const IntervalRegion& reg)
-{
-   eval();
-}
-
-void DagOp::eval(const RealPoint& pt)
-{
-   eval();
-}
-
-void DagOp::reval(const RealPoint& pt)
-{
-   reval();
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagAdd::DagAdd(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Add, lsub)
+      : DagOp(dag, DagSymbol::Add, lsub)
 {}
 
 void DagAdd::acceptVisitor(DagVisitor& vis) const
@@ -434,44 +340,15 @@ void DagAdd::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagAdd::eval()
+void DagAdd::iEvalNode()
 {
-   setVal(left()->val()+right()->val());
+   setIval(left()->ival()+right()->ival());
 }
 
-void DagAdd::proj(IntervalRegion& reg)
-{
-   left()->reduceDom(addPX(left()->val(), right()->val(), dom()));
-   right()->reduceDom(addPY(left()->val(), right()->val(), dom()));
-}
-
-bool DagAdd::diff()
-{
-   // d(l+r)/dl = 1, d(l+r)/dr = 1
-   left()->addDv(dv());
-   right()->addDv(dv());
-
-   return true;
-}
-
-void DagAdd::reval()
-{
-   setRval(Double::add(left()->rval(), right()->rval()));
-}
-
-bool DagAdd::rdiff()
-{
-   // d(l+r)/dl = 1, d(l+r)/dr = 1
-   left()->addRdv(rdv());
-   right()->addRdv(rdv());
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSub::DagSub(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Sub, lsub)
+      : DagOp(dag, DagSymbol::Sub, lsub)
 {}
 
 void DagSub::acceptVisitor(DagVisitor& vis) const
@@ -479,44 +356,15 @@ void DagSub::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagSub::eval()
+void DagSub::iEvalNode()
 {
-   setVal(left()->val()-right()->val());
+   setIval(left()->ival()-right()->ival());
 }
 
-void DagSub::proj(IntervalRegion& reg)
-{
-   left()->reduceDom(subPX(left()->val(), right()->val(), dom()));
-   right()->reduceDom(subPY(left()->val(), right()->val(), dom()));
-}
-
-bool DagSub::diff()
-{
-   // d(l+r)/dl = 1, d(l+r)/dr = -1
-   left()->addDv(dv());
-   right()->addDv(-dv());
-
-   return true;
-}
-
-void DagSub::reval()
-{
-   setRval(Double::sub(left()->rval(), right()->rval()));
-}
-
-bool DagSub::rdiff()
-{
-   // d(l+r)/dl = 1, d(l+r)/dr = -1
-   left()->addRdv(rdv());
-   right()->addRdv(-rdv());
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagMul::DagMul(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Mul, lsub)
+      : DagOp(dag, DagSymbol::Mul, lsub)
 {}
 
 void DagMul::acceptVisitor(DagVisitor& vis) const
@@ -524,44 +372,15 @@ void DagMul::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagMul::eval()
+void DagMul::iEvalNode()
 {
-   setVal(left()->val()*right()->val());
+   setIval(left()->ival()*right()->ival());
 }
 
-void DagMul::proj(IntervalRegion& reg)
-{
-   left()->reduceDom(mulPX(left()->val(), right()->val(), dom()));
-   right()->reduceDom(mulPY(left()->val(), right()->val(), dom()));
-}
-
-bool DagMul::diff()
-{
-   // d(l*r)/dl = r, d(l*r)/dr = l
-   left()->addDv(dv()*right()->val());
-   right()->addDv(dv()*left()->val());
-
-   return true;
-}
-
-void DagMul::reval()
-{
-   setRval(Double::mul(left()->rval(), right()->rval()));
-}
-
-bool DagMul::rdiff()
-{
-   // d(l*r)/dl = r, d(l*r)/dr = l
-   left()->addRdv(Double::mul(rdv(), right()->rval()));
-   right()->addRdv(Double::mul(rdv(), left()->rval()));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagDiv::DagDiv(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Div, lsub)
+      : DagOp(dag, DagSymbol::Div, lsub)
 {}
 
 void DagDiv::acceptVisitor(DagVisitor& vis) const
@@ -569,45 +388,15 @@ void DagDiv::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagDiv::eval()
+void DagDiv::iEvalNode()
 {
-   setVal(left()->val()/right()->val());
+   setIval(left()->ival()/right()->ival());
 }
 
-void DagDiv::proj(IntervalRegion& reg)
-{
-   left()->reduceDom(divPX(left()->val(), right()->val(), dom()));
-   right()->reduceDom(divPY(left()->val(), right()->val(), dom()));
-}
-
-bool DagDiv::diff()
-{
-   // d(l/r)/dl = 1/r, d(l/r)/dr = -l/r^2
-   left()->addDv(dv()/right()->val());
-   right()->addDv((-dv()*left()->val()) / sqr(right()->val()));
-
-   return !right()->val().containsZero();
-}
-
-void DagDiv::reval()
-{
-   setRval(Double::div(left()->rval(), right()->rval()));
-}
-
-bool DagDiv::rdiff()
-{
-   // d(l/r)/dl = 1/r, d(l/r)/dr = -l/r^2
-   left()->addRdv(Double::div(rdv(), right()->rval()));
-   right()->addRdv(Double::div(Double::mul(Double::usb(rdv()), left()->rval()),
-                   Double::sqr(right()->rval())));
-
-   return right()->rval() != 0.0;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagMin::DagMin(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Min, lsub)
+      : DagOp(dag, DagSymbol::Min, lsub)
 {}
 
 void DagMin::acceptVisitor(DagVisitor& vis) const
@@ -615,69 +404,15 @@ void DagMin::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagMin::eval()
+void DagMin::iEvalNode()
 {
-   setVal(min(left()->val(), right()->val()));
+   setIval(min(left()->ival(), right()->ival()));
 }
 
-void DagMin::proj(IntervalRegion& reg)
-{
-   left()->reduceDom(minPX(left()->val(), right()->val(), dom()));
-   right()->reduceDom(minPY(left()->val(), right()->val(), dom()));
-}
-
-bool DagMin::diff()
-{
-   if (left()->val().isCertainlyLt(right()->val()))
-   {
-      // d(min(l,r))/dl = 1, d(min(l,r))/dr = 0 if l < r
-      left()->addDv(dv());
-   }
-   else if (right()->val().isCertainlyLt(left()->val()))
-   {
-      // d(min(l,r))/dl = 0, d(min(l,r))/dr = 1 if r < l
-      right()->addDv(dv());
-   }
-   else
-   {
-      // d(min(l,r))/dl = d(min(l,r))/dr = [0,1] otherwise
-      Interval x(Interval(0,1)*dv());
-      left()->addDv(x);
-      right()->addDv(x);
-   }
-   return true;
-}
-
-void DagMin::reval()
-{
-   setRval(Double::min(left()->rval(), right()->rval()));
-}
-
-bool DagMin::rdiff()
-{
-   if (left()->rval() < right()->rval())
-   {
-      // d(min(l,r))/dl = 1, d(min(l,r))/dr = 0 if l < r
-      left()->addRdv(rdv());
-      return true;
-   }
-   else if (right()->rval() < left()->rval())
-   {
-      // d(min(l,r))/dl = 0, d(min(l,r))/dr = 1 if r < l
-      right()->addRdv(rdv());
-      return true;
-   }
-   else
-   {
-      // d(min(l,r))/dl = d(min(l,r))/dr = [0,1] otherwise
-      return false;
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagMax::DagMax(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Max, lsub)
+      : DagOp(dag, DagSymbol::Max, lsub)
 {}
 
 void DagMax::acceptVisitor(DagVisitor& vis) const
@@ -685,69 +420,15 @@ void DagMax::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagMax::eval()
+void DagMax::iEvalNode()
 {
-   setVal(max(left()->val(), right()->val()));
+   setIval(max(left()->ival(), right()->ival()));
 }
 
-void DagMax::proj(IntervalRegion& reg)
-{
-   left()->reduceDom(maxPX(left()->val(), right()->val(), dom()));
-   right()->reduceDom(maxPY(left()->val(), right()->val(), dom()));
-}
-
-bool DagMax::diff()
-{
-   if (left()->val().isCertainlyGt(right()->val()))
-   {
-      // d(max(l,r))/dl = 1 and d(max(l,r))/dr = 0 if l > r
-      left()->addDv(dv());
-   }
-   else if (right()->val().isCertainlyGt(left()->val()))
-   {
-      // d(max(l,r))/dl = 0 and d(max(l,r))/dr = 1 if r > l
-      right()->addDv(dv());
-   }
-   else
-   {
-      // d(max(l,r))/dl = d(max(l,r))/dr = [0,1] otherwise
-      Interval x(Interval(0,1)*dv());
-      left()->addDv(x);
-      right()->addDv(x);
-   }
-   return true;
-}
-
-void DagMax::reval()
-{
-   setVal(Double::max(left()->rval(), right()->rval()));
-}
-
-bool DagMax::rdiff()
-{
-   if (left()->rval() > right()->rval())
-   {
-      // d(max(l,r))/dl = 1 and d(max(l,r))/dr = 0 if l > r
-      left()->addRdv(rdv());
-      return true;
-   }
-   else if (right()->rval() > left()->rval())
-   {
-      // d(max(l,r))/dl = 0 and d(max(l,r))/dr = 1 if r > l
-      right()->addRdv(rdv());
-      return true;
-   }
-   else
-   {
-      // d(max(l,r))/dl = d(max(l,r))/dr = [0,1] otherwise
-      return false;
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagUsb::DagUsb(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Usb, lsub)
+      : DagOp(dag, DagSymbol::Usb, lsub)
 {}
 
 void DagUsb::acceptVisitor(DagVisitor& vis) const
@@ -755,41 +436,15 @@ void DagUsb::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagUsb::eval()
+void DagUsb::iEvalNode()
 {
-   setVal(-child()->val());
+   setIval(-child()->ival());
 }
 
-void DagUsb::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(usubPX(child()->val(), dom()));
-}
-
-bool DagUsb::diff()
-{
-   // d(-u)/du = -1
-   child()->addDv(-dv());
-
-   return true;
-}
-
-void DagUsb::reval()
-{
-   setRval(Double::usb(child()->rval()));
-}
-
-bool DagUsb::rdiff()
-{
-   // d(-u)/du = -1
-   child()->addRdv(Double::usb(rdv()));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagAbs::DagAbs(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Abs, lsub)
+      : DagOp(dag, DagSymbol::Abs, lsub)
 {}
 
 void DagAbs::acceptVisitor(DagVisitor& vis) const
@@ -797,59 +452,15 @@ void DagAbs::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagAbs::eval()
+void DagAbs::iEvalNode()
 {
-   setVal(abs(child()->val()));
+   setIval(abs(child()->ival()));
 }
 
-void DagAbs::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(absPX(child()->val(), dom()));
-}
-
-bool DagAbs::diff()
-{
-   // d(abs(u))/du = 1 if u>0, -1 if u<0, [-1,1] otherwise
-   if (child()->val().isCertainlyGtZero())
-      child()->addDv(dv());
-
-   else if (child()->val().isCertainlyLtZero())
-      child()->addDv(-dv());
-
-   else
-      child()->addDv(dv() | (-dv()));
-
-   return true;
-}
-
-void DagAbs::reval()
-{
-   setRval(Double::abs(child()->rval()));
-}
-
-bool DagAbs::rdiff()
-{
-   // d(abs(u))/du = 1 if u>0, -1 if u<0, [-1,1] otherwise
-   if (child()->rval() > 0.0)
-   {
-      child()->addRdv(rdv());
-      return true;
-   }
-   else if (child()->rval() < 0.0)
-   {
-      child()->addRdv(-rdv());
-      return true;
-   }
-   else
-   {
-      return false;
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSgn::DagSgn(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Sgn, lsub)
+      : DagOp(dag, DagSymbol::Sgn, lsub)
 {}
 
 void DagSgn::acceptVisitor(DagVisitor& vis) const
@@ -857,37 +468,15 @@ void DagSgn::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagSgn::eval()
+void DagSgn::iEvalNode()
 {
-   setVal(sgn(child()->val()));
+   setIval(sgn(child()->ival()));
 }
 
-void DagSgn::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(sgnPX(child()->val(), dom()));
-}
-
-bool DagSgn::diff()
-{
-   // d(sgn(u))/du = 0 except at 0
-   return true;
-}
-
-void DagSgn::reval()
-{
-   setRval(Double::sgn(child()->rval()));
-}
-
-bool DagSgn::rdiff()
-{
-   // d(sgn(u))/du = 0 except at 0
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSqr::DagSqr(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Sqr, lsub)
+      : DagOp(dag, DagSymbol::Sqr, lsub)
 {}
 
 void DagSqr::acceptVisitor(DagVisitor& vis) const
@@ -895,41 +484,15 @@ void DagSqr::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagSqr::eval()
+void DagSqr::iEvalNode()
 {
-   setVal(sqr(child()->val()));
+   setIval(sqr(child()->ival()));
 }
 
-void DagSqr::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(sqrPX(child()->val(), dom()));
-}
-
-bool DagSqr::diff()
-{
-   // d(u^2)/du = 2u
-   child()->addDv(2.0*child()->val()*dv());
-
-   return true;
-}
-
-void DagSqr::reval()
-{
-   setRval(Double::sqr(child()->rval()));
-}
-
-bool DagSqr::rdiff()
-{
-   // d(u^2)/du = 2u
-   child()->addRdv(Double::mul(2.0, Double::mul(child()->rval(), rdv())));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSqrt::DagSqrt(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Sqrt, lsub)
+      : DagOp(dag, DagSymbol::Sqrt, lsub)
 {}
 
 void DagSqrt::acceptVisitor(DagVisitor& vis) const
@@ -937,41 +500,15 @@ void DagSqrt::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagSqrt::eval()
+void DagSqrt::iEvalNode()
 {
-   setVal(sqrt(child()->val()));
+   setIval(sqrt(child()->ival()));
 }
 
-void DagSqrt::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(sqrtPX(child()->val(), dom()));
-}
-
-bool DagSqrt::diff()
-{
-   // d(sqrt(u))/du = 0.5/sqrt(u)
-   child()->addDv((0.5*dv())/val());
-
-   return true;
-}
-
-void DagSqrt::reval()
-{
-   setRval(Double::sqrt(child()->rval()));
-}
-
-bool DagSqrt::rdiff()
-{
-   // d(sqrt(u))/du = 0.5/sqrt(u)
-   child()->addRdv(Double::div(Double::mul(0.5, rdv()), rval()));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagPow::DagPow(Dag* dag, int n, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Pow, lsub),
+      : DagOp(dag, DagSymbol::Pow, lsub),
         n_(n)
 {}
 
@@ -1001,43 +538,15 @@ void DagPow::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagPow::eval()
+void DagPow::iEvalNode()
 {
-   setVal(pow(child()->val(), n_));
+   setIval(pow(child()->ival(), n_));
 }
 
-void DagPow::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(powPX(child()->val(), n_, dom()));
-}
-
-bool DagPow::diff()
-{
-   // d(u^n)/du = n * u^(n-1)
-   child()->addDv(n_*dv()*pow(child()->val(), n_-1));
-
-   return true;
-}
-
-void DagPow::reval()
-{
-   setRval(Double::pow(child()->rval(), n_));
-}
-
-bool DagPow::rdiff()
-{
-   // d(u^n)/du = n * u^(n-1)
-   child()->addRdv(Double::mul(n_,
-                               Double::mul(rdv(),
-                                       Double::pow(child()->rval(), n_-1))));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagExp::DagExp(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Exp, lsub)
+      : DagOp(dag, DagSymbol::Exp, lsub)
 {}
 
 void DagExp::acceptVisitor(DagVisitor& vis) const
@@ -1045,41 +554,15 @@ void DagExp::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagExp::eval()
+void DagExp::iEvalNode()
 {
-   setVal(exp(child()->val()));
+   setIval(exp(child()->ival()));
 }
 
-void DagExp::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(expPX(child()->val(), dom()));
-}
-
-bool DagExp::diff()
-{
-   // d(exp(u))/du = exp(u)
-   child()->addDv(dv()*val());
-
-   return true;
-}
-
-void DagExp::reval()
-{
-   setRval(Double::exp(child()->rval()));
-}
-
-bool DagExp::rdiff()
-{
-   // d(exp(u))/du = exp(u)
-   child()->addRdv(Double::mul(rdv(), rval()));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagLog::DagLog(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Log, lsub)
+      : DagOp(dag, DagSymbol::Log, lsub)
 {}
 
 void DagLog::acceptVisitor(DagVisitor& vis) const
@@ -1087,41 +570,15 @@ void DagLog::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagLog::eval()
+void DagLog::iEvalNode()
 {
-   setVal(log(child()->val()));
+   setIval(log(child()->ival()));
 }
 
-void DagLog::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(logPX(child()->val(), dom()));
-}
-
-bool DagLog::diff()
-{
-   // d(log(u))/du = 1/u
-   child()->addDv(dv()/child()->val());
-
-   return child()->val().isCertainlyGtZero();
-}
-
-void DagLog::reval()
-{
-   setRval(Double::log(child()->rval()));
-}
-
-bool DagLog::rdiff()
-{
-   // d(log(u))/du = 1/u
-   child()->addRdv(Double::div(rdv(), child()->rval()));
-
-   return child()->val().isCertainlyGtZero();
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagCos::DagCos(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Cos, lsub)
+      : DagOp(dag, DagSymbol::Cos, lsub)
 {}
 
 void DagCos::acceptVisitor(DagVisitor& vis) const
@@ -1129,42 +586,15 @@ void DagCos::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagCos::eval()
+void DagCos::iEvalNode()
 {
-   setVal(cos(child()->val()));
+   setIval(cos(child()->ival()));
 }
 
-void DagCos::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(cosPX(child()->val(), dom()));
-}
-
-bool DagCos::diff()
-{
-   // d(cos(u))/du = -sin(u)
-   child()->addDv(-dv()*sin(child()->val()));
-
-   return true;
-}
-
-void DagCos::reval()
-{
-   setRval(Double::cos(child()->rval()));
-}
-
-bool DagCos::rdiff()
-{
-   // d(cos(u))/du = -sin(u)
-   child()->addRdv(Double::mul(Double::usb(rdv()),
-                               Double::sin(child()->rval())));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagSin::DagSin(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Sin, lsub)
+      : DagOp(dag, DagSymbol::Sin, lsub)
 {}
 
 void DagSin::acceptVisitor(DagVisitor& vis) const
@@ -1172,41 +602,15 @@ void DagSin::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagSin::eval()
+void DagSin::iEvalNode()
 {
-   setVal(sin(child()->val()));
+   setIval(sin(child()->ival()));
 }
 
-void DagSin::proj(IntervalRegion& reg)
-{
-   child()->reduceDom(sinPX(child()->val(), dom()));
-}
-
-bool DagSin::diff()
-{
-   // d(sin(u))/du = cos(u)
-   child()->addDv(dv()*cos(child()->val()));
-
-   return true;
-}
-
-void DagSin::reval()
-{
-   setRval(Double::sin(child()->rval()));
-}
-
-bool DagSin::rdiff()
-{
-   // d(sin(u))/du = cos(u)
-   child()->addRdv(Double::mul(rdv(), Double::cos(child()->rval())));
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagTan::DagTan(Dag* dag, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Tan, lsub)
+      : DagOp(dag, DagSymbol::Tan, lsub)
 {}
 
 void DagTan::acceptVisitor(DagVisitor& vis) const
@@ -1214,65 +618,91 @@ void DagTan::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagTan::eval()
+void DagTan::iEvalNode()
 {
-   setVal(tan(child()->val()));
+   setIval(tan(child()->ival()));
 }
 
-void DagTan::proj(IntervalRegion& reg)
+/*----------------------------------------------------------------------------*/
+
+DagCosh::DagCosh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, DagSymbol::Cosh, lsub)
+{}
+
+void DagCosh::acceptVisitor(DagVisitor& vis) const
 {
-   child()->reduceDom(tanPX(child()->val(), dom()));
+   vis.apply(this);
 }
 
-bool DagTan::diff()
+void DagCosh::iEvalNode()
 {
-   // d(tan(u))/du = 1+tan^2(u)
-   child()->addDv(dv()*(1.0+sqr(val())));
-
-   return val().isFinite();
+   setIval(cosh(child()->ival()));
 }
 
-void DagTan::reval()
+/*----------------------------------------------------------------------------*/
+
+DagSinh::DagSinh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, DagSymbol::Sinh, lsub)
+{}
+
+void DagSinh::acceptVisitor(DagVisitor& vis) const
 {
-   setRval(Double::tan(child()->rval()));
+   vis.apply(this);
 }
 
-bool DagTan::rdiff()
+void DagSinh::iEvalNode()
 {
-   // d(tan(u))/du = 1+tan^2(u)
-   child()->addRdv(Double::mul(rdv(), Double::add(1.0, Double::sqr(rval()))));
-
-   return val().isFinite();
+   setIval(sinh(child()->ival()));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
-DagLin::DagLin(Dag* dag, const TermLin* t, const IndexList& lsub)
-      : DagOp(dag, OpSymbol::Lin, lsub),
-        cst_(t->getConstantValue()),
+DagTanh::DagTanh(Dag* dag, const IndexList& lsub)
+      : DagOp(dag, DagSymbol::Tanh, lsub)
+{}
+
+void DagTanh::acceptVisitor(DagVisitor& vis) const
+{
+   vis.apply(this);
+}
+
+void DagTanh::iEvalNode()
+{
+   setIval(tanh(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagLin::DagLin(Dag* dag, const TermLin& tl, const IndexList& lsub)
+      : DagOp(dag, DagSymbol::Lin, lsub),
+        cst_(),
         terms_()
 {   
-   for (auto it=t->begin(); it!=t->end(); ++it)
+   cst_ = tl.getCst();
+
+   for (size_t i=0; i<tl.nbTerms(); ++i)
    {
-      Interval x = t->getCoefSub(it);
-      Variable v = t->getVarSub(it);
-      DagVar* node = dag->findVarNode(v.id());
-      Item itm = {x, node, Interval::zero()};
-      terms_.insert(itm);
+      DagVar* node = dag->findVarNode(tl.var(i).id());
+      Item it = { tl.coef(i), node, Interval::universe() };
+      terms_.insert(it);      
    }
 }
 
 bool DagLin::eqSymbol(const DagOp* other) const
 {
-   if (getSymbol() != other->getSymbol())
+   if (symbol() != other->symbol())
       return false;
 
    if (subArity() != other->subArity())
       return false;
 
-   // compares here the constants
-   // the variables are compared in the eq() method
    const DagLin* dl = static_cast<const DagLin*>(other);
+
+   // compares the constant terms
+   if (!cst_.isSetEq(dl->cst_))
+      return false;
+
+   // compares the factors of the linear terms
    auto it = terms_.begin();
    auto jt = dl->terms_.begin();
 
@@ -1284,6 +714,10 @@ bool DagLin::eqSymbol(const DagOp* other) const
       ++it;
       ++jt;
    }
+
+   // no need to compare the variables / sub-nodes since this is done
+   // in the eq() method
+   
    return true;
 }
 
@@ -1294,7 +728,7 @@ size_t DagLin::nbOccurrences(const Variable& v) const
 
 void DagLin::print(std::ostream& os) const
 {
-   os << getSymbol() << "(" << cst_ << ")";
+   os << symbol() << "(" << cst_ << ")";
    for (const auto& t : terms_)
    {
       os << "(" << t.coef << ", " << t.node->index() << ")";
@@ -1306,82 +740,24 @@ void DagLin::acceptVisitor(DagVisitor& vis) const
    vis.apply(this);
 }
 
-void DagLin::eval()
+void DagLin::iEvalNode()
 {
-   setVal(cst_);
+   setIval(cst_);
 
    for (const Item& citm : terms_)
    {
       Item& itm = const_cast<Item&>(citm);
-      itm.ival = itm.coef * itm.node->val();
-      setVal(val() + itm.ival);
+      itm.ival = (itm.coef.isOne()) ? itm.node->ival() :
+                                      itm.coef * itm.node->ival();
+      setIval(ival() + itm.ival);
    }
-}
-
-void DagLin::proj(IntervalRegion& reg)
-{
-   for (auto it=terms_.begin(); it!=terms_.end(); ++it)
-   {
-      // contracts the domain of the variable node
-      Interval x = dom() - cst_;
-      DagVar* node = (*it).node;
-
-      auto jt = terms_.begin();
-      while (jt != it)
-      {
-         x -= jt->ival;
-         ++jt;
-      }
-      ++jt;
-      while (jt != terms_.end())
-      {
-         x -= jt->ival;
-         ++jt;
-      }
-
-      node->reduceDom(mulPY(it->coef, node->dom(), x));
-   }
-}
-
-bool DagLin::diff()
-{
-   for (const Item& itm : terms_)
-   {
-      // d(a * v) / dv = a
-      DagVar* node = itm.node;
-      node->addDv(dv() * itm.coef);
-   }
-   return true;
-}
-
-void DagLin::reval()
-{
-   setRval(cst_.midpoint());
-
-   for (const Item& citm : terms_)
-   {
-      Item& itm = const_cast<Item&>(citm);
-      itm.ival = itm.coef * itm.node->rval();
-      setRval(rval() + itm.ival.midpoint());
-   }
-}
-
-bool DagLin::rdiff()
-{
-   for (const Item& itm : terms_)
-   {
-      // d(a * v) / dv = a
-      DagVar* node = itm.node;
-      node->addRdv(rdv() * itm.coef.midpoint());
-   }   
-   return true;
 }
 
 DagLin::const_iterator DagLin::begin() const
 {
    return terms_.begin();
 }
-   
+
 DagLin::const_iterator DagLin::end() const
 {
    return terms_.end();
@@ -1397,25 +773,55 @@ DagVar* DagLin::getNodeSub(const_iterator it) const
    return (*it).node;
 }
 
-Interval DagLin::getConstantValue() const
+Interval DagLin::getCst() const
 {
    return cst_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+size_t DagLin::nbTerms() const
+{
+   return terms_.size();
+}
 
-DagFun::DagFun(Dag* dag, size_t root, const Interval& image)
+DagVar* DagLin::varNode(size_t i) const
+{
+   ASSERT(i<nbTerms(), "Bad access in a DagLin node @ " << i);
+
+   auto it = terms_.begin();
+   std::advance(it, i);
+   return it->node;
+}
+
+Interval DagLin::coef(size_t i) const
+{
+   ASSERT(i<nbTerms(), "Bad access in a DagLin node @ " << i);
+
+   auto it = terms_.begin();
+   std::advance(it, i);
+   return it->coef;   
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagFun::DagFun(Dag* dag, size_t root, Scope scop, const Interval& image)
       : dag_(dag),
         node_(),
         vnode_(),
-        scope_(),
+        scop_(),
         image_(image),
         idx_(0),
         inode_()
 {
+   scop_ = ScopeBank::getInstance()->insertScope(scop);
    DagFunCreator vis(this);
    DagNode* node = dag->node(root);
    node->acceptVisitor(vis);
+   flat_ = new FlatFunction(this);
+}
+
+DagFun::~DagFun()
+{
+   delete flat_;
 }
 
 Interval DagFun::getImage() const
@@ -1468,11 +874,6 @@ size_t DagFun::nbOccurrences(const Variable& v) const
    return rootNode()->nbOccurrences(v);
 }
 
-Interval DagFun::intervalDeriv(size_t i) const
-{
-   return varNode(i)->dv();
-}
-
 void DagFun::setIndex(size_t i)
 {
    idx_ = i;
@@ -1485,27 +886,7 @@ size_t DagFun::index() const
 
 Scope DagFun::scope() const
 {
-   return scope_;
-}
-
-void DagFun::setScope(Scope s)
-{
-   scope_ = s;
-}
-
-double DagFun::realDeriv(size_t i) const
-{
-   return varNode(i)->rdv();
-}
-
-double DagFun::realValue() const
-{
-   return rootNode()->rval();
-}
-
-Interval DagFun::intervalValue() const
-{
-   return rootNode()->val();
+   return scop_;
 }
 
 bool DagFun::hasNode(DagNode* node) const
@@ -1551,309 +932,52 @@ void DagFun::insertOpNode(DagOp* node)
    }
 }
 
-Interval DagFun::intervalEval(const IntervalRegion& reg)
+Proof DagFun::hc4ReviseNeg(IntervalBox& B)
 {
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(reg);
-
-   return rootNode()->val();
+   return flat_->hc4ReviseNeg(B);
 }
 
-Interval DagFun::intervalEval(const RealPoint& pt)
+Proof DagFun::hc4Revise(IntervalBox& B)
 {
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(pt);
-
-   return rootNode()->val();
+   return flat_->hc4Revise(B);
 }
 
-Interval DagFun::intervalEvalOnly(const Variable& v, const Interval& x)
+Interval DagFun::iEval(const IntervalBox& B)
 {
-   ASSERT(dependsOn(v),
-          "Node " << rootNode()->index()
-                  << " does not depend on variable " << v.getName());
-
-   rootNode()->evalOnly(v, x);
-   return rootNode()->val();
+   return flat_->iEval(B);
 }
 
-Proof DagFun::hc4Revise(IntervalRegion& reg)
+void DagFun::iDiff(const IntervalBox& B, IntervalVector& G)
 {
-   // assigns the projections to the universe
-   for (size_t i=0; i<nbNodes(); ++i)
-         node_[i]->setDom(Interval::universe());
-
-   return sharedHc4Revise(reg);
+   flat_->iDiff(B, G);
 }
 
-Proof DagFun::hc4ReviseNeg(IntervalRegion& reg)
+void DagFun::iDiffHansen(const IntervalBox& B, IntervalVector& G)
 {
-   Interval e = intervalEval(reg);
+   IntervalBox X = B.midpoint();
+   IntervalVector V(G.size());
 
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (image_.contains(e))
-      return Proof::Empty;
-
-   else if (!image_.overlaps(e))
-      return Proof::Inner;
-
-   else
+   size_t i = 0;
+   for (const auto& v : scop_)
    {
-      if (image_.isSingleton() || image_.isUniverse())
-         return Proof::Maybe;
-
-      else if (image_.isInfLeft())
-      {
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes()-1; ++i)
-            node_[i]->setDom(Interval::universe());
-
-         // projection over the root node
-         rootNode()->setDom(e & Interval::moreThan(image_.right()));
-
-         return hc4ReviseBack(reg);
-      }
-
-      else if (image_.isInfRight())
-      {
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes()-1; ++i)
-            node_[i]->setDom(Interval::universe());
-
-         // projection over the root node
-         rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         return hc4ReviseBack(reg);                  
-      }
-
-      else
-      {
-         // given the image [a, b] calculates the projections for each
-         // part [-oo, a] and [b, +oo] and makes the interval disjunction
-
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes()-1; ++i)
-            node_[i]->setDom(Interval::universe());
-
-         IntervalRegion Xl(reg);
-         rootNode()->setDom(e & Interval::lessThan(image_.left()));
-         Proof pl = hc4ReviseBack(Xl);
-
-         // assigns the projections to the universe
-         for (size_t i=0; i<nbNodes(); ++i)
-            node_[i]->setDom(Interval::universe());
-
-         IntervalRegion Xr(reg);
-         rootNode()->setDom(e & Interval::moreThan(image_.right()));
-         Proof pr = hc4ReviseBack(Xr);
-
-         Proof proof;
-
-         if (pl == Proof::Empty)
-            proof = pr;
-
-         else if (pr == Proof::Empty)
-            proof = pl;
-
-         else
-            proof = std::min(pl, pr);
-
-         if (proof != Proof::Empty)
-         {
-            for (size_t i=0; i<nbVars(); ++i)
-            {
-               Variable v = varNode(i)->getVar();
-
-               if (pl == Proof::Empty)
-                  reg.set(v, Xr.get(v));
-
-               else if (pr == Proof::Empty)
-                  reg.set(v, Xl.get(v));
-
-               else
-                  reg.set(v, Xl.get(v) | Xr.get(v));
-            }
-         }
-
-         return proof;
-      }
+      X.set(v, B.get(v));
+      flat_->iDiff(B, V);
+      G[i] = V[i];
+      ++i;
    }
 }
 
-Proof DagFun::sharedHc4Revise(IntervalRegion& reg)
+double DagFun::rEval(const RealPoint& pt)
 {
-   Interval e = intervalEval(reg);
-
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (image_.contains(e))
-      return Proof::Inner;
-
-   else if (!image_.overlaps(e))
-      return Proof::Empty;
-
-   else
-   {
-      rootNode()->setDom(e & image_);
-      return hc4ReviseBack(reg);
-   }
+   return flat_->rEval(pt);
 }
 
-Proof DagFun::hc4ReviseBack(IntervalRegion& reg)
+void DagFun::rDiff(const RealPoint& pt, RealVector& G)
 {
-   for (int i=nbNodes()-1; i>=0; --i)
-   {
-      size_t j = (size_t)i;
-      node_[j]->proj(reg);
-   }
-
-   for (size_t i=0; i<nbVars(); ++i)
-   {
-      Variable v = varNode(i)->getVar();
-
-      if (reg.get(v).isEmpty())
-         return Proof::Empty;
-   }
-
-   return Proof::Maybe;
+   flat_->rDiff(pt, G);
 }
 
-double DagFun::intervalViolation()
-{
-   Interval e = rootNode()->val();
-
-   if (e.isEmpty()) return Double::inf();
-   if (e.overlaps(image_)) return 0.0;
-   
-   Double::rndNear();
-   return e.isCertainlyLt(image_) ? image_.left() - e.right() :
-                                    e.left() - image_.right();
-}
-
-double DagFun::realViolation()
-{
-   double e = rootNode()->rval();
-
-   if (Double::isNan(e)) return Double::inf();
-   if (image_.contains(e)) return 0.0;
-
-   Double::rndNear();
-   return (e < image_.left()) ? image_.left() - e : e - image_.right();
-}
-
-void DagFun::intervalDiff()
-{
-   // initializes the derivatives
-   rootNode()->setDv(Interval::one());
-
-   for (size_t i=0; i<nbNodes()-1; ++i)
-      node_[i]->setDv(Interval::zero());
-
-   // differentiation
-   for (int i=nbNodes()-1; i>=0; --i)
-   {
-      size_t j = (size_t)i;
-      node_[j]->diff();
-   }
-}
-
-void DagFun::intervalDiff(IntervalVector& grad)
-{
-   intervalDiff();
-   for (size_t i=0; i<nbVars(); ++i)
-      grad.set(i, intervalDeriv(i));
-}
-
-Interval DagFun::intervalDeriv(const Variable& v) const
-{
-   return dag_->findVarNode(v.id())->dv();
-}
-
-bool DagFun::intervalDiffOnly(const Variable& v)
-{
-   ASSERT(dependsOn(v), "Node " << rootNode()->index()
-                           << " does not depend on variable " << v.getName());
-
-   Interval e = rootNode()->val();
-
-   if (e.isEmpty() || e.isInf()) return false;
-
-   // initializes the derivatives
-   rootNode()->setDv(Interval::one());
-
-   for (size_t i=0; i<nbNodes()-1; ++i)
-      node_[i]->setDv(Interval::zero());
-   
-   // differentiation
-   return rootNode()->diffOnly(v);
-}
-
-bool DagFun::intervalDiffOnly(const Variable& v, const Interval& x)
-{
-   intervalEvalOnly(v, x);
-   return intervalDiffOnly(v);
-}
-
-double DagFun::realEval(const RealPoint& pt)
-{
-   Double::rndNear();
-
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->reval(pt);
-
-   return rootNode()->rval();
-}
-
-void DagFun::realDiff()
-{
-   // initializes the derivatives
-   rootNode()->setRdv(1.0);
-
-   for (size_t i=0; i<nbNodes()-1; ++i)
-      node_[i]->setRdv(0.0);
-
-   // differentiation
-   for (int i=nbNodes()-1; i>=0; --i)
-   {
-      size_t j = (size_t)i;
-      node_[j]->rdiff();
-   }
-}
-
-void DagFun::realDiff(RealVector& grad)
-{
-   realDiff();
-   for (size_t i=0; i<nbVars(); ++i)
-      grad.set(i, realDeriv(i));
-}
-
-double DagFun::realDeriv(const Variable& v) const
-{
-   return dag_->findVarNode(v.id())->rdv();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-DagContext::DagContext() : dom()
-{}
-
-DagContext::DagContext(size_t n) : dom(n)
-{}
-
-void DagContext::extend(size_t n)
-{
-   for (size_t i=0; i<n; ++i)
-      dom.push(Interval::universe());
-}
-
-DagContext* DagContext::clone() const
-{
-   return new DagContext(*this);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 Dag::Dag()
       : node_(),
@@ -1863,11 +987,8 @@ Dag::Dag()
         fun_(),
         vmap_(),
         omap_(),
-        scope_()
-{
-   defaultContext_ = new DagContext();
-   context_ = defaultContext_;
-}
+        scop_()
+{}
 
 Dag::~Dag()
 {
@@ -1876,8 +997,6 @@ Dag::~Dag()
 
    for (DagFun* fun: fun_)
       delete fun;
-
-   delete defaultContext_;
 }
 
 bool Dag::isEmpty() const
@@ -1903,28 +1022,6 @@ size_t Dag::nbFuns() const
 void Dag::pushNode(DagNode* node)
 {
    node_.push_back(node);
-   defaultContext_->extend(1);
-}
-
-Interval Dag::dom(size_t i) const
-{
-   return context_->dom[i];
-}
-
-void Dag::setDom(size_t i, const Interval& x)
-{
-   context_->dom.set(i, x);
-}
-
-void Dag::reduceDom(size_t i, const Interval& x)
-{
-   Interval aux( x & context_->dom[i]);
-   context_->dom.set(i, aux);
-}
-
-DagContext* Dag::cloneDefaultContext() const
-{
-   return defaultContext_->clone();
 }
 
 size_t Dag::nbVars() const
@@ -2010,7 +1107,7 @@ size_t Dag::insertVarNode(const Variable& v)
       index = it->second;
 
    // insertion in the scope
-   scope_.insert(v);
+   scop_.insert(v);
 
    return index;
 }
@@ -2095,199 +1192,21 @@ DagVar* Dag::findVarNode(size_t id) const
 
 Scope Dag::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
-bool Dag::intervalPointEval(const RealPoint& pt, IntervalVector& val)
-{
-   ASSERT(val.size() == nbFuns(), "Size of interval vector different from " <<
-                                  "the number of functions in a dag");
-
-   bool res = true;
-
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(pt);
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      DagFun* f = fun_[i];
-      val.set(i, f->intervalValue());
-      if (f->intervalValue().isEmpty()) res = false;
-   }
-   return res;
-}
-
-bool Dag::intervalEval(const IntervalRegion& reg)
+bool Dag::iEvalNodes(const IntervalBox& B)
 {
    bool res = true;
 
    for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(reg);
+      node_[i]->iEvalNode(B);
 
    for (size_t i=0; i<nbFuns(); ++i)
-      if (fun_[i]->intervalValue().isEmpty()) res = false;
+      if (fun_[i]->rootNode()->ival().isEmpty())
+         res = false;
 
    return res;
-}
-
-bool Dag::intervalEval(const IntervalRegion& reg, IntervalVector& val)
-{
-   ASSERT(val.size() == nbFuns(), "Size of interval vector different from " <<
-                                  "the number of functions in a dag");
-
-   bool res = true;
-
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->eval(reg);
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      DagFun* f = fun_[i];
-      val.set(i, f->intervalValue());
-      if (f->intervalValue().isEmpty()) res = false;
-   }
-   return res;
-}
-
-void Dag::intervalViolation(RealVector& viol)
-{
-   ASSERT(nbFuns() == viol.size(), "Bad vector size used in a DAG");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-      viol.set(i, fun_[i]->intervalViolation());
-}
-
-void Dag::intervalDiff(IntervalMatrix& jac)
-{
-   ASSERT(nbVars() == jac.ncols() && nbFuns() == jac.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a DAG");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      // differentiates the i-th function
-      DagFun* f = fun_[i];
-      f->intervalDiff();
-
-      // fills the i-th row of the matrix
-      size_t j = 0;
-      for (auto v : scope())
-      {
-         if (f->dependsOn(v))
-            jac.set(i, j, f->intervalDeriv(v));
-         else
-            jac.set(i, j, Interval::zero());
-
-         ++j;
-      }
-   }
-}
-
-void Dag::hansenDiff(const IntervalRegion& reg, IntervalMatrix& jac)
-{
-   ASSERT(nbVars() == jac.ncols() && nbFuns() == jac.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a DAG");
-
-   ASSERT(nbVars() == nbFuns(),
-          "Hansen's derivatives can be computed only for square systems");
-
-   IntervalRegion X = reg.midpoint();
-
-   size_t j = 0;
-   for (auto v : scope())
-   {
-      // assigns the domain of v
-      X.set(v, reg.get(v));
-
-      // evaluates the DAG
-      intervalEval(X);
-
-      // calculates every dfi/dv and assigns it in the Jacobian matrix
-      for (size_t i=0; i<nbFuns(); ++i)
-      {
-         DagFun* f = fun_[i];
-
-         if (f->dependsOn(v))
-         {
-            f->intervalDiff();
-            jac.set(i, j, f->intervalDeriv(v));
-         }
-         else
-         {
-            jac.set(i, j, Interval::zero());
-         }
-      }
-
-      ++j;
-   }
-}
-
-bool Dag::realEval(const RealPoint& pt)
-{
-   Double::rndNear();
-
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->reval(pt);
-
-   for (size_t i=0; i<nbFuns(); ++i)
-      if (Double::isNan(fun_[i]->realValue()))
-         return false;
-
-   return true;
-}
-
-bool Dag::realEval(const RealPoint& pt, RealVector& v)
-{
-   ASSERT(v.size() == nbFuns(), "Bad vector size");
-
-   Double::rndNear();
-   bool res = true;
-
-   for (size_t i=0; i<nbNodes(); ++i)
-      node_[i]->reval(pt);
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      DagFun* f = fun_[i];
-      double x = f->realValue();
-
-      if (Double::isNan(x)) res = false;
-      v.set(i, x);
-   }
-
-   return res;
-}
-
-void Dag::realViolation(RealVector& viol)
-{
-   ASSERT(viol.size() == nbFuns(), "Bad vector size");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-      viol.set(i, fun_[i]->realViolation());
-}
-
-void Dag::realDiff(RealMatrix& jac)
-{
-   ASSERT(nbVars() == jac.ncols() && nbFuns() == jac.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a DAG");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      // differentiates the i-th function
-      DagFun* f = fun_[i];
-      f->realDiff();
-
-      // fills the i-th row of the matrix
-      size_t j = 0;
-      for (auto v : scope())
-      {
-         if (f->dependsOn(v))
-            jac.set(i, j, f->realDeriv(v));
-         else
-            jac.set(i, j, 0.0);
-
-         ++j;
-      }
-   }
 }
 
 void Dag::print(std::ostream& os) const
@@ -2341,21 +1260,112 @@ std::ostream& operator<<(std::ostream& os, const Dag& dag)
    return os;
 }
 
-void Dag::bindContext(DagContext* context)
+void Dag::iEval(const IntervalBox& B, IntervalVector& V)
 {
-   context_ = context;
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      V.set(i, fun(i)->iEval(B));
+   }
 }
 
-DagContext* Dag::unbindContext()
+void Dag::iDiff(const IntervalBox& B, IntervalMatrix& J)
 {
-   ASSERT(context_ != defaultContext_, "");
+   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+          "Bad dimensions of a Jacobian matrix used in a DAG");
 
-   DagContext* aux = context_;
-   context_ = defaultContext_;
-   return aux;
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      // differentiates the i-th function
+      DagFun* f = fun_[i];
+      IntervalVector G(f->nbVars());
+      f->iDiff(B, G);
+
+      // fills the i-th row of the matrix
+      size_t j = 0;
+      for (const auto& v : scope())
+      {
+         if (f->dependsOn(v))
+            J.set(i, j, G[f->scope().index(v)]);
+         else
+            J.set(i, j, Interval::zero());
+
+         ++j;
+      }
+   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+void Dag::iDiffHansen(const IntervalBox& B, IntervalMatrix& H)
+{
+   ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
+          "Bad dimensions of a Hansen matrix used in a DAG");
+
+   ASSERT(nbVars() == nbFuns(),
+          "Hansen's derivatives can be computed only for square systems");
+
+   IntervalBox X =  B.midpoint();
+
+   size_t j = 0;
+   for (const auto& v : scope())
+   {
+      // assigns the domain of v
+      X.set(v, B.get(v));
+
+      // calculates every dfi/dv and assigns it in the Jacobian matrix
+      for (size_t i=0; i<nbFuns(); ++i)
+      {
+         DagFun* f = fun_[i];
+
+         if (f->dependsOn(v))
+         {
+            IntervalVector G(f->nbVars());
+            f->iDiff(X, G);
+            H.set(i, j, G[f->scope().index(v)]);
+         }
+         else
+         {
+            H.set(i, j, Interval::zero());
+         }
+      }
+
+      ++j;
+   }   
+}
+
+void Dag::rEval(const RealPoint& pt, RealVector& V)
+{
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      V.set(i, fun(i)->rEval(pt));
+   }
+}
+
+void Dag::rDiff(const RealPoint& pt, RealMatrix& J)
+{
+   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+          "Bad dimensions of a Jacobian matrix used in a DAG");
+
+   for (size_t i=0; i<nbFuns(); ++i)
+   {
+      // differentiates the i-th function
+      DagFun* f = fun_[i];
+      RealVector G(f->nbVars());
+      f->rDiff(pt, G);
+
+      // fills the i-th row of the matrix
+      size_t j = 0;
+      for (const auto& v : scope())
+      {
+         if (f->dependsOn(v))
+            J.set(i, j, G[f->scope().index(v)]);
+         else
+            J.set(i, j, 0.0);
+
+         ++j;
+      }
+   }
+}
+
+/*----------------------------------------------------------------------------*/
 
 DagVisitor::~DagVisitor()
 {}
@@ -2455,12 +1465,27 @@ void DagVisitor::apply(const DagTan* d)
    THROW("visit method not implemented");
 }
 
+void DagVisitor::apply(const DagCosh* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagSinh* d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagTanh* d)
+{
+   THROW("visit method not implemented");
+}
+
 void DagVisitor::apply(const DagLin* d)
 {
    THROW("visit method not implemented");
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagFunCreator::DagFunCreator(DagFun* f): f_(f)
 {}
@@ -2605,6 +1630,27 @@ void DagFunCreator::apply(const DagTan* d)
    f_->insertOpNode(aux);
 }
 
+void DagFunCreator::apply(const DagCosh* d)
+{
+   visitSubNodes(d);
+   DagCosh* aux = const_cast<DagCosh*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagSinh* d)
+{
+   visitSubNodes(d);
+   DagSinh* aux = const_cast<DagSinh*>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagTanh* d)
+{
+   visitSubNodes(d);
+   DagTanh* aux = const_cast<DagTanh*>(d);
+   f_->insertOpNode(aux);
+}
+
 void DagFunCreator::apply(const DagLin* d)
 {
    visitSubNodes(d);
@@ -2612,7 +1658,7 @@ void DagFunCreator::apply(const DagLin* d)
    f_->insertOpNode(aux);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagCreator::DagCreator(Dag* dag, Constraint c)
       : dag_(dag),
@@ -2627,82 +1673,75 @@ size_t DagCreator::index()
 
 void DagCreator::apply(const ArithCtrEq* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t(c->left() - c->right());  
-   t.acceptVisitor(vis);
-
-   // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::zero());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::zero());
 }
 
 void DagCreator::apply(const ArithCtrLe* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::negative());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::negative());
 }
 
 void DagCreator::apply(const ArithCtrLt* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::negative());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::negative());
 }
 
 void DagCreator::apply(const ArithCtrGe* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creation of the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::positive());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::positive());
 }
 
 void DagCreator::apply(const ArithCtrGt* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
    Term t( c->left() - c->right());
-   t.acceptVisitor(vis);
-
-   // creation of the function
-   DagFun* f = new DagFun(dag_, vis.index(), Interval::positive());
-   f->setScope(c->scope());
-   index_ = dag_->insertFun(f);
+   make(t, c->scope(), Interval::positive());
 }
 
 void DagCreator::apply(const ArithCtrIn* c)
 {
-   // visits the constraint
-   DagTermCreator vis(dag_);
-   c->term().acceptVisitor(vis);
+   make(c->term(), c->scope(), c->image());
+}
+
+void DagCreator::make(const Term& t, Scope scop, const Interval& img)
+{
+   size_t root = 0;  // index of root node
+
+   try
+   {
+      // tries to make a linear term
+      TermLin tl(t);
+
+      // lsub is the list of indexes of variable nodes
+      IndexList lsub;
+      for (size_t i=0; i<tl.nbTerms(); ++i)
+      {
+         size_t index = dag_->insertVarNode(tl.var(i));
+         lsub.push_back(index);
+      }
+
+      // creates and inserts the node
+      DagLin* node = new DagLin(dag_, tl, lsub);
+      root = dag_->insertOpNode(tl.hashCode(), node);
+      scop = tl.makeScope();
+   }
+   catch(Exception e)
+   {
+      // handles a non-linear term
+      DagTermCreator vis(dag_);
+      t.acceptVisitor(vis);
+      root = vis.index();
+   }
 
    // creates the function
-   DagFun* f = new DagFun(dag_, vis.index(), c->image());
-   f->setScope(c->scope());
+   DagFun* f = new DagFun(dag_, root, scop, img);
    index_ = dag_->insertFun(f);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 DagTermCreator::DagTermCreator(Dag* dag)
       : dag_(dag),
@@ -2725,7 +1764,7 @@ void DagTermCreator::visitSubnodes(const TermOp* t)
    }
 }
 
-void DagTermCreator::apply(const TermConst* t)
+void DagTermCreator::apply(const TermCst* t)
 {
    index_ = dag_->insertConstNode(Interval(t->getVal()));
 }
@@ -2854,17 +1893,24 @@ void DagTermCreator::apply(const TermTan* t)
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 
-void DagTermCreator::apply(const TermLin* t)
+void DagTermCreator::apply(const TermCosh* t)
 {
-   // creates the variable nodes
-   for (auto it=t->begin(); it !=t->end(); ++it)
-   {
-      Variable v = t->getVarSub(it);
-      size_t idx = dag_->insertVarNode(v);
-      lsub_.push_back(idx);
-   }
+   visitSubnodes(t);
+   DagCosh* node = new DagCosh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
 
-   DagLin* node = new DagLin(dag_, t, lsub_);
+void DagTermCreator::apply(const TermSinh* t)
+{
+   visitSubnodes(t);
+   DagSinh* node = new DagSinh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermTanh* t)
+{
+   visitSubnodes(t);
+   DagTanh* node = new DagTanh(dag_, lsub_);
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 

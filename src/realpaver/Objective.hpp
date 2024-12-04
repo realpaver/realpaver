@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Objective.hpp
+ * @brief  Objective function
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_OBJECTIVE_HPP
 #define REALPAVER_OBJECTIVE_HPP
@@ -14,16 +25,16 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the shared representation of an objective function
-///////////////////////////////////////////////////////////////////////////////
+/// Shared representation of an objective function
 class ObjectiveRep {
 public:
-   /// Creates the representation of an objective function
-   /// @param f expression of the function
-   /// @param minimization sense
-   ///        - true for minimization
-   ///        - false for maximization
+   /**
+    * @brief Constructor.
+    * @param f expression of the function
+    * @param minimization sense
+    *        - true for minimization
+    *        - false for maximization
+    */
    ObjectiveRep(Term f, bool minimization);
 
    /// No copy
@@ -35,24 +46,22 @@ public:
    /// Default destructor
    ~ObjectiveRep() = default;
 
-   /// @return the expression of this
+   /// Returns the expression of this
    Term getTerm() const;
 
-   /// @return true if this is constant (variable free)
+   /// Returns true if this is constant (variable free)
    bool isConstant() const;
 
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if this depends on v
+   /// Returns true if v occurs in this
    bool dependsOn(const Variable& v) const;
 
-   /// @return true if this is linear
+   /// Returns true if this is linear
    bool isLinear() const;
 
-   /// @return true if this has to be minimized
+   /// Returns true if this has to be minimized
    bool isMinimization() const;
 
-   /// @return true if this has to be maximized
+   /// Returns true if this has to be maximized
    bool isMaximization() const;
 
 private:
@@ -60,12 +69,14 @@ private:
    bool minimization_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an objective function.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Objective function.
+ *
+ * This encloses a shared pointer to its representation. It is a lightweight
+ * object that can be copied and assigned.
+ */
 class Objective {
 public:
    /// Default copy constructor
@@ -77,24 +88,22 @@ public:
    /// Default destructor
    ~Objective() = default;
 
-   /// @return the expression of this
+   /// Returns the expression of this
    Term getTerm() const;
 
-   /// @return true if this is constant (variable free)
+   /// Returns true if this is constant (variable free)
    bool isConstant() const;
 
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if this depends on v
+   /// Returns true if v occurs in this
    bool dependsOn(const Variable& v) const;
 
-   /// @return true if this is linear
+   /// Returns true if this is linear
    bool isLinear() const;
 
-   /// @return true if this has to be minimized
+   /// Returns true if this has to be minimized
    bool isMinimization() const;
 
-   /// @return true if this has to be maximized
+   /// Returns true if this has to be maximized
    bool isMaximization() const;
 
    friend Objective MIN(Term f);
@@ -109,14 +118,10 @@ private:
 /// Output on a stream
 std::ostream& operator<<(std::ostream& os, Objective obj);
 
-/// Creates an objective function
-/// @param f expression
-/// @return minimize f
+/// Returns the objective: minimize f
 Objective MIN(Term f);
 
-/// Creates an objective function
-/// @param f expression
-/// @return maximize f
+/// Returns the objective: maximize f
 Objective MAX(Term f);
 
 } // namespace

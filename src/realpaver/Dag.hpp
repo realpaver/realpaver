@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Dag.hpp
+ * @brief  DAG of constraints
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_DAG_HPP
 #define REALPAVER_DAG_HPP
@@ -18,710 +29,601 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include "realpaver/TermLin.hpp"
 
 namespace realpaver {
 
-// forward declarations
 class Dag;
 class DagVisitor;
+class FlatFunction;
 
-// list of indexes
-typedef std::vector<size_t> IndexList;
+/// Type of lists of indexes
+using IndexList = std::vector<size_t>;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of DAG nodes.
-///
-/// A node has an index in the DAG, a list a sub-nodes and a list of parent
-/// nodes. It encloses real and interval numbers resulting from evaluation and
-/// differentiation operations.
-///////////////////////////////////////////////////////////////////////////////
+/// Enumeration of dag node symbols
+enum class DagSymbol {
+   Cst,     ///< constant
+   Var,     ///< variable
+   Add,     ///< addition
+   Sub,     ///< subtraction
+   Mul,     ///< multiplication
+   Div,     ///< division
+   Min,     ///< minimum
+   Max,     ///< maximum
+   Usb,     ///< unary subtraction
+   Abs,     ///< absolute value
+   Sgn,     ///< sign
+   Sqr,     ///< square
+   Sqrt,    ///< square root
+   Pow,     ///< power
+   Exp,     ///< exponential
+   Log,     ///< logarithm
+   Cos,     ///< cosine
+   Sin,     ///< sine
+   Tan,     ///< tangent
+   Cosh,    ///< hyperbolic cosine
+   Sinh,    ///< hyperbolic sine
+   Tanh,    ///< hyperbolic tangent
+   Lin      ///< linear expression
+};
+
+/// Output on a stream
+std::ostream& operator<<(std::ostream& os, DagSymbol op);
+
+/**
+ * @brief Base class of DAG nodes.
+ *
+ * A node has an index in the DAG, a list a sub-nodes and a list of parent
+ * nodes. It encloses real and interval numbers resulting from evaluation and
+ * differentiation operations.
+*/
 class DagNode {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param index DAG index of this
-   DagNode(Dag* dag, size_t index = 0);
+   /// Constructor given the symbol and node index
+   DagNode(Dag* dag, DagSymbol symb, size_t index = 0);
 
    /// Virtual destructor
    virtual ~DagNode();
 
-   /// @return the DAG index of this
+   /// Returns the DAG index of this
    size_t index() const;
 
    /// Assigns the DAG index
-   /// @param i DAG index of this node
    void setIndex(size_t i);
 
-   /// @return the number of parent nodes
+   /// Returns the number of parent nodes
    size_t parArity() const;
 
-   /// Gets a parent node
-   /// @param i index of a parent node in the list of parent nodes
-   ///          with 0 <= i < parArity()
-   /// @return DAG index of the i-th parent node
+   /// Returns the i-th parent node of this with 0 <= i < parArity()
    size_t parNode(size_t i) const;
 
-   /// Inserts a parent node
-   /// @param i DAG index of a parent node
+   /// Inserts a parent node of index i
    void addParNode(size_t i);
    
-   /// @return the number of sub-nodes
+   /// Returns the number of sub-nodes
    size_t subArity() const;
 
-   /// Gets a sub-node
-   /// @param i index of a sub-node in the list of sub-nodes
-   ///        with 0 <= i < subArity()
-   /// @return the DAG index of the i-th sub-node
+   /// Returns the i-th sub-node of this with 0 <= i < subArity()
    size_t subIndex(size_t i) const;
 
-   /// Gets a sub-node
-   /// @param i index of a sub-node in the list of sub-nodes
-   ///        with 0 <= i < subArity()
-   /// @return the i-th sub-node of this
+   /// Returns the i-th sub-node of this with 0 <= i < subArity()
    DagNode* subNode(size_t i) const;
 
-   /// Inserts a sub-node
-   /// @param i DAG index of a sub-node
+   /// Inserts a sub-node of index i
    void addSubNode(size_t i);
 
-   /// @return left child for a binary operation
+   /// Returns the left child of a binary operation
    DagNode* left() const;
 
-   /// @return right child for a binary operation
+   /// Returns the right child of a binary operation
    DagNode* right() const;
 
-   /// @return child for a unary operation
+   /// Returns the child of a unary operation
    DagNode* child() const;
 
-   /// @return the DAG
+   /// Returns the DAG
    Dag* dag() const;
 
-   /// @return the bitset this depends on
+   /// Returns the symbol
+   DagSymbol symbol() const;
+
+   /// Returns the bitset this depends on
    const Bitset& bitset() const;
 
-   /// Dependency test
-   /// @param bs a bitset representing a set of variables
-   /// @return true if this depends on bs
+   /// Returns true if this depends on bs
    bool dependsOn(const Bitset& bs) const;
 
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if v occurs in the tree rooted by this
+   /// Returns true if this has more than one parent node
+   bool isShared() const;
+
+   /// Returns true if v belongs to the tree rooted by this
    bool dependsOn(const Variable& v) const;
 
-   /// @return the interval value
-   Interval val() const;
-
-   /// Assigns the interval value
-   /// @param x new interval value
-   void setVal(const Interval& x);
-
-   /// @return the domain (projection)
-   Interval dom() const;
-
-   /// Assigns the domain (projection)
-   /// @param x new interval value
-   void setDom(const Interval& x);
-
-   /// Reduces the domain (projection)
-   /// @param x interval value intersected with the domain of this
-   void reduceDom(const Interval& x);
-
-   /// @return the interval derivative
-   Interval dv() const;
-
-   /// Assigns the interval derivative
-   /// @param x new interval value
-   void setDv(const Interval& x);
-
-   /// Adds an interval derivative
-   /// @param x interval value added in the interval derivative
-   void addDv(const Interval& x);
-
-   /// @return the real value
-   double rval() const;
-
-   /// Assigns the real value
-   /// @param x new real value
-   void setRval(double x);
-
-   /// @return the real derivative
-   double rdv() const;
-
-   /// Assigns the real derivative
-   /// @param x new real value
-   void setRdv(double x);
-
-   /// Adds a real derivative
-   /// @param x real value added in the real derivative
-   void addRdv(double x);
-
-   /// Counts the number of occurrences of a variable
-   /// @param v a variable
-   /// @return the number of occurrences of v in the tree rooted by this
+   /// Counts the number of occurrences of a variable in the sub-tree
    virtual size_t nbOccurrences(const Variable& v) const;
 
    /// Visitor pattern
-   /// @param vis a visitor
    virtual void acceptVisitor(DagVisitor& vis) const = 0;
 
    /// Output on a stream
-   /// @param os an output stream
    virtual void print(std::ostream& os) const = 0;
 
-   /// Interval evaluation of this
-   /// @param reg the variable domains
-   /// The result is assigned in the interval value enclosed in this.
-   virtual void eval(const IntervalRegion& reg) = 0;
+   /// @name Interval evaluation
+   ///@{
 
-   /// Interval evaluation of this
-   /// @param pt the variable values
-   /// The result is assigned in the interval value enclosed in this.
-   virtual void eval(const RealPoint& pt) = 0;
+   /// Returns the interval value
+   Interval ival() const;
 
-   /// Restricted interval evaluation
-   /// @param v a variable
-   /// @param x domain of v
-   ///
-   /// This is evaluated only if it depends on v and the result is assigned
-   /// in the interval value enclosed in this.
-   virtual void evalOnly(const Variable& v, const Interval& x) = 0;
+   /// Assigns the interval value
+   void setIval(const Interval& x);
 
-   /// Interval projection
-   /// @param reg the variable domains
-   ///
-   /// It assumes that an interval evaluation has been done.
-   /// The new projections are assigned in reg.
-   virtual void proj(IntervalRegion& reg) = 0;
+   /// Interval evaluation of this node on B
+   virtual void iEvalNode(const IntervalBox& B) = 0;
 
-   /// Interval differentiation in reverse mode
-   /// @return false if some operation at this node is not continuous
-   ///
-   /// It assumes that an interval evaluation has been done.
-   virtual bool diff() = 0;
-
-   /// Restricted interval differentiation in reverse mode
-   /// @param v a variable
-   ///
-   /// This is differentiated only if it depends on v.
-   /// It assumes that an interval evaluation has been done.
-   virtual bool diffOnly(const Variable& v) = 0;
-
-   /// Real (point) evaluation
-   /// @param pt variable values
-   ///
-   /// The result is assigned in the real value enclosed.
-   virtual void reval(const RealPoint& pt) = 0;
-
-   /// Real (point) differentiation in reverse mode
-   /// @return false if some operation at this node is not continuous.
-   ///
-   /// It assumes that a point evaluation has been done.
-   virtual bool rdiff() = 0;
+   /// Interval evaluation of the tree rooted by this on B
+   virtual void iEvalTree(const IntervalBox& B) = 0;
+   ///@}
 
 protected:
    Bitset bitset_;   // set of variables occurring in this
 
 private:
    Dag* dag_;        // the DAG
+   DagSymbol symb_;  // symbol
    size_t index_;    // index of this node in the DAG
    IndexList vpar_;  // list of indexes of parent nodes in the DAG
    IndexList vsub_;  // list of indexes of sub-nodes in the DAG
-   Interval val_;    // result of an interval evaluation
-   Interval dv_;     // interval derivative
-   double rval_;     // result of a point evaluation
-   double rdv_;      // point derivative
+   Interval ival_;   // result of an interval evaluation
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing an interval constant.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing an interval constant.
 class DagConst : public DagNode {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param DAG index
-   /// @param x value enclosed
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param index node index in the DAG
+    * @param x value enclosed
+    */
    DagConst(Dag* dag, size_t index, const Interval& x);
 
-   ///@{
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval(const IntervalRegion& reg) override;
-   void eval(const RealPoint& pt) override;
-   void evalOnly(const Variable& v, const Interval& x) override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   bool diffOnly(const Variable& v) override;
-   void reval(const RealPoint& pt) override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode(const IntervalBox& B) override;
+   void iEvalTree(const IntervalBox& B) override;
 
-   /// @return the constant interval value
+   /// Returns the constant interval value
    Interval getConst() const;
 
 private:
    Interval x_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a variable.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a variable
 class DagVar : public DagNode {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param DAG index
-   /// @param v variable enclosed
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param index node index in the DAG
+    * @param v variable enclosed
+    */
    DagVar(Dag* dag, size_t index, Variable v);
 
-   /// @return the variable enclosed
+   /// Returns the variable enclosed
    Variable getVar() const;
 
-   ///@{
    size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval(const IntervalRegion& reg) override;
-   void eval(const RealPoint& pt) override;
-   void evalOnly(const Variable& v, const Interval& x) override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   bool diffOnly(const Variable& v) override;
-   void reval(const RealPoint& pt) override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode(const IntervalBox& B) override;
+   void iEvalTree(const IntervalBox& B) override;
 
 private:
    Variable v_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of operation DAG nodes.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Base class of operation DAG nodes
 class DagOp : public DagNode {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param symb operation symbol
-   /// @param lsub list of DAG indexes of the sub-nodes of this
-   DagOp(Dag* dag, OpSymbol symb, const IndexList& lsub);
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param symb operation symbol
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagOp(Dag* dag, DagSymbol symb, const IndexList& lsub);
 
    /// Virtual destructor
    virtual ~DagOp();
 
-   /// Assigns the DAG index of this
-   /// @param index DAG index of this
-   ///
-   /// It makes the links between this node and its sub-nodes.
+   /**
+    * @brief Assigns the DAG index of this.
+    *
+    * It makes the links between this node and its sub-nodes.
+    */
    void setIndex(size_t index);
 
-   /// @return the symbol enclosed
-   OpSymbol getSymbol() const;
-
    /// Equality test
-   /// @param other another operation DAG node
-   /// @return true if this and other are equal
    bool eq(const DagOp* other) const;
 
    /// Equality test of relation symbols
-   /// @param other another operation DAG node
-   /// @return true if this and other have the same operation symbol
    virtual bool eqSymbol(const DagOp* other) const;
 
-   /// Interval evaluation of this node using the interval values of the
-   /// children nodes
-   virtual void eval() = 0;
+   /// Interval evaluation using the interval values of the children nodes
+   virtual void iEvalNode() = 0;
 
-   /// Real evaluation of this node using the real values of the
-   /// children nodes
-   virtual void reval() = 0;
-
-   ///@{
    virtual size_t nbOccurrences(const Variable& v) const override;
    virtual void print(std::ostream& os) const override;
-   void eval(const IntervalRegion& reg) override;
-   void eval(const RealPoint& pt) override;
-   void evalOnly(const Variable& v, const Interval& x) override;
-   bool diffOnly(const Variable& v) override;
-   void reval(const RealPoint& pt) override;
-   ///@}
-
-private:
-   OpSymbol symb_;
+   void iEvalNode(const IntervalBox& B) override;
+   void iEvalTree(const IntervalBox& B) override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a binary addition.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a binary addition
 class DagAdd : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagAdd(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
- 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a binary subtraction.
-///////////////////////////////////////////////////////////////////////////////
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a binary subtraction
 class DagSub : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagSub(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a binary multiplication.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a binary multiplication
 class DagMul : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagMul(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a division.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a division
 class DagDiv : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagDiv(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a binary minimum.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a binary minimum
 class DagMin : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagMin(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a binary maximum.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a binary maximum
 class DagMax : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagMax(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a unary subtraction.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a unary subtraction
 class DagUsb : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagUsb(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing an absolute value.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing an absolute value
 class DagAbs : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagAbs(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a sign function.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a sign function
 class DagSgn : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagSgn(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a square.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a square
 class DagSqr : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagSqr(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a square root.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a square root
 class DagSqrt : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagSqrt(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing the power operation.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the power operation
 class DagPow : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param n exponent
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param n exponent
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagPow(Dag* dag, int n, const IndexList& lsub);
 
-   /// @return the exponent
+   /// Returns the exponent
    int exponent() const;
 
-   ///@{
    bool eqSymbol(const DagOp* other) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 
 private:
-   int n_;
+   int n_;  // exponent
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing the exponential function.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the exponential function
 class DagExp : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagExp(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing the logarithm function.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the logarithm function
 class DagLog : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagLog(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing the cosine function.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the cosine function
 class DagCos : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagCos(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing the sine function.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the sine function
 class DagSin : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagSin(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing the tangent function.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the tangent function
 class DagTan : public DagOp {
 public:
-   /// Creates a node
-   /// @param dag owner of this
-   /// @param lsub list of DAG indexes of the sub-nodes of this
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
    DagTan(Dag* dag, const IndexList& lsub);
 
-   ///@{
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG node representing a (non-constant) linear expression.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic cosine function
+class DagCosh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagCosh(Dag* dag, const IndexList& lsub);
+
+   void acceptVisitor(DagVisitor& vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic sine function
+class DagSinh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagSinh(Dag* dag, const IndexList& lsub);
+
+   void acceptVisitor(DagVisitor& vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic tangent function
+class DagTanh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagTanh(Dag* dag, const IndexList& lsub);
+
+   void acceptVisitor(DagVisitor& vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing a (non-constant) linear expression
 class DagLin : public DagOp {
 public:
-   /// Creates an empty linear expression
-   DagLin(Dag* dag, const TermLin* t, const IndexList& lsub);
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param t linear term
+    * @param lsub list of DAG indexes of the sub-nodes (variables) of this
+    */
+   DagLin(Dag* dag, const TermLin& tl, const IndexList& lsub);
 
-   ///@{
    bool eqSymbol(const DagOp* other) const override;
    size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
    void acceptVisitor(DagVisitor& vis) const override;
-   void eval() override;
-   void proj(IntervalRegion& reg) override;
-   bool diff() override;
-   void reval() override;
-   bool rdiff() override;
-   ///@}
+   void iEvalNode() override;
 
-   /// @return the constant value of this linear expression
-   Interval getConstantValue() const;
+   /// Returns the constant value of this linear expression
+   Interval getCst() const;
+
+   /// Returns the number of linear terms
+   size_t nbTerms() const;
+
+   /// Returns the variable node of the i-th linear term
+   DagVar* varNode(size_t i) const;
+
+   /// Returns the factor of the i-th linear term
+   Interval coef(size_t i) const;
 
 private:
    struct Item {
@@ -741,218 +643,136 @@ private:
    std::set<Item, CompItem> terms_;    // set of linear terms
 
 public:
+   /// Type of iterators on the list of linear terms
    typedef std::set<Item, CompItem>::const_iterator const_iterator;
+
+   /// Returns an iterator on the beginning of the list of linear terms
    const_iterator begin() const;
+
+   /// Returns an iterator on the end of the list of linear terms
    const_iterator end() const;
 
+   /// Returns the coefficient of a linear term pointed by an iterator
    Interval getCoefSub(const_iterator it) const;
+
+   /// Returns the variable of a linear term pointed by an iterator
    DagVar* getNodeSub(const_iterator it) const;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a function in a DAG.
-///
-/// To every function is associated an image, i.e. we have L <= f(x) <= U.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Function in a DAG.
+ *
+ * To every function is associated an image, i.e. we have L <= f(x) <= U.
+*/
 class DagFun {
 public:
-   /// Creates a function
-   /// @param dag owner of this
-   /// @param root DAG index of the root node
-   /// @param image image of this
-   DagFun(Dag* dag, size_t root, const Interval& image);
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param root DAG index of the root node
+    * @param scop set of variables
+    * @param image image of this
+    */
+   DagFun(Dag* dag, size_t root, Scope scop, const Interval& image);
 
-   /// @return the image of this
+   /// Destructor
+   ~DagFun();
+
+   /// Returns the image of this
    Interval getImage() const;
 
    /// Assigns the image of this
-   /// @param x new value
    void setImage(const Interval& x);
 
-   /// @return the dag
+   /// Returns the dag
    Dag* dag() const;
 
    /// Inserts a constant node
-   /// @param node a node
    void insertConstNode(DagConst* node);
 
    /// Inserts a variable node
-   /// @param node a node
    void insertVarNode(DagVar* node);
 
    /// Inserts an operation node
-   /// @param node a node
    void insertOpNode(DagOp* node);
 
-   /// @return the number of nodes of this
+   /// Returns the number of nodes of this
    size_t nbNodes() const;
 
-   /// Gets a node of this
-   /// @param i index of a node with 0 <= i < nbNodes()
-   /// @return the i-th node of this
+   /// Gets the i-th node of this with 0 <= i < nbNodes()
    DagNode* node(size_t i) const;
 
-   /// @return the root node of this
+   /// Returns the root node of this
    DagNode* rootNode() const;
 
-   /// @return the number of variables occurring in this
+   /// Returns the number of variables occurring in this
    size_t nbVars() const;
 
-   /// Gets a variable
-   /// @param i index of a variable with 0 <= i < nbVars()
-   /// @return the i-th variable of this
+   /// Gets the i-th variable of this with 0 <= i < nbVars()
    DagVar* varNode(size_t i) const;
 
-   /// Dependency test
-   /// @param v a variable
-   /// @return true if v occurs in this
+   /// Returns true if v occurs in this
    bool dependsOn(const Variable& v) const;
 
-   /// Counts the number of occurrences of a variable
-   /// @param v a variable
-   /// @return the number of occurrences of v in this
+   /// Counts the number of occurrences of v in this
    size_t nbOccurrences(const Variable& v) const;
 
    /// Assigns the index of this in the dag
-   /// @param i new value
    void setIndex(size_t i);
 
-   /// @return the index of this in the dag
+   /// Returns the index of this in the dag
    size_t index() const;
 
-   /// @return the scope of this (set of variables)
+   /// Returns the scope of this (set of variables)
    Scope scope() const;
 
-   /// Assigns the scope of this
-   /// @param s scope assigned
-   void setScope(Scope s);
+   /**
+    * @brief HC4Revise contractor.
+    * 
+    * Applies the contractor on B and returns a certificate of proof.
+    * The projections of this onto its variables are assigned in B.
+    */
+   Proof hc4Revise(IntervalBox& B);
 
-   /// Interval evaluation of this
-   /// @param reg the variable domains
-   /// @return the evaluation of this at reg
-   Interval intervalEval(const IntervalRegion& reg);
+   /**
+    * @brief HC4Revise contractor on the constraint negation.
+    * 
+    * Applies the contractor on B and returns a certificate of proof.
+    * The projections of this onto its variables are assigned in B.
+    */
+   Proof hc4ReviseNeg(IntervalBox& B);
 
-  /// Interval evaluation
-   /// @param pt variable values
-   /// @return the evaluation of this at pt
-   Interval intervalEval(const RealPoint& pt);
+   /// Returns the interval evaluation of this on B
+   Interval iEval(const IntervalBox& B);
 
-   /// @return the result of an interval evaluation
-   Interval intervalValue() const;
+   /**
+    * @brief Interval differentiation method.
+    * 
+    * Calculates the gradient of this on B (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    */
+   void iDiff(const IntervalBox& B, IntervalVector& G);
 
-   /// Restricted interval evaluation
-   /// @param v a variable
-   /// @param x domain of v
-   /// @return the interval evaluation such that only the nodes depending
-   ///         on v are evaluated.
-   Interval intervalEvalOnly(const Variable& v, const Interval& x);
+   /**
+    * @brief Interval differentiation method using Hansen's strategy.
+    * 
+    * Calculates the gradient of this on B (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    */
+   void iDiffHansen(const IntervalBox& B, IntervalVector& G);
 
-   /// HC4Revise contractor
-   /// @param reg the variable domains
-   /// @return a certificate of proof
-   ///
-   /// The projections of this onto its variables are assigned in
-   /// the given region.
-   Proof hc4Revise(IntervalRegion& reg);
+   /// Returns the real evaluation of this at pt
+   double rEval(const RealPoint& pt);
 
-   /// HC4Revise contractor on the constraint negation
-   /// @param reg the variable domains
-   /// @return a certificate of proof
-   ///
-   /// The projections of this onto its variables are assigned in
-   /// the given region.
-   Proof hc4ReviseNeg(IntervalRegion& reg);
-
-   /// HC4Revise contractor with node sharing
-   /// @param reg the variable domains
-   /// @return a certificate of proof
-   ///
-   /// The projections of this onto its variables are assigned in
-   /// the given region.
-   ///
-   /// It assumes that a DagContext has been initialized.
-   Proof sharedHc4Revise(IntervalRegion& reg);
-
-   /// Calculates the violation of the underlying constraint
-   /// @return 0.0 if the constraint is satisfied, a positive real number
-   ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation
-   ///
-   /// It assumes that this function has been evaluated using intervalEval(.).
-   double intervalViolation();
-
-   /// Calculates the violation of the underlying constraint
-   /// @return 0.0 if the constraint is satisfied, a positive real number
-   ///         otherwise equal to the width of the gap between the image of the
-   ///         function and the result of its evaluation
-   ///
-   /// It assumes that this function has been evaluated using realEval(.).
-   double realViolation();
-
-   /// Interval differentiation in reverse mode
-   ///
-   /// It assumes that this function has been evaluated.
-   void intervalDiff();
-
-   /// Interval differentiation in reverse mode
-   /// @param grad output gradient
-   ///
-   /// It assumes that this function has been evaluated.
-   void intervalDiff(IntervalVector& grad);
-
-   /// Restricted interval differentiation in forward mode
-   /// @param v a variable
-   ///
-   /// It assumes that this function has been evaluated.
-   /// Only the nodes depending on the considered variable are differentiated.
-   bool intervalDiffOnly(const Variable& v);
-
-   /// Restricted interval differentiation in forward mode
-   /// @param v a variable
-   /// @param x domain of v
-   ///
-   /// This function is first evaluated.
-   /// Only the nodes depending on the considered variable are differentiated.   
-   bool intervalDiffOnly(const Variable& v, const Interval& x);
-
-   /// Gets an interval derivative after a differentiation
-   /// @param i index of a variable in this with 0 <= i < nbVars()
-   /// @return the partial derivative with respect to the i-th variable
-   Interval intervalDeriv(size_t i) const;
-
-   /// Gets an interval derivative after a differentiation
-   /// @param v a variable occurring in this
-   /// @return the partial derivative of this with respect to v
-   Interval intervalDeriv(const Variable& v) const;
-
-   /// Real (point) evaluation
-   /// @param pt variable values
-   /// @return the evaluation of this at pt
-   double realEval(const RealPoint& pt);
-
-   /// @return the result of the point evaluation
-   double realValue() const;
-
-   /// Point differentiation in reverse mode
-   ///
-   /// It assumes that this function has been evaluated.
-   void realDiff();
-
-   /// Point differentiation in reverse mode
-   /// @param grad_ output gradient vector
-   ///
-   /// It assumes that this function has been evaluated.
-   void realDiff(RealVector& grad);
-
-   /// Gets a real derivative after a differentiation
-   /// @param i index of a variable in this with 0 <= i < nbVars()
-   /// @return the partial derivative with respect to the i-th variable
-   double realDeriv(size_t i) const;
-
-   /// Gets a real derivative after a differentiation
-   /// @param v a variable occurring in this
-   /// @return the partial derivative of this with respect to v
-   double realDeriv(const Variable& v) const;
+   /**
+    * @brief Real differentiation method.
+    * 
+    * Calculates the gradient of this at pt (reverse mode). G[i] is the partial
+    * derivative of this with respect to the i-th variable of its scope.
+    */
+   void rDiff(const RealPoint& pt, RealVector& G);
 
 private:
    Dag* dag_;                    // the DAG
@@ -962,53 +782,26 @@ private:
    std::vector<DagVar*> vnode_;  // vector of variable nodes of the function
                                  // sorted by an ascending ordering of the
                                  // identifiers of the variables
-   Scope scope_;                 // the set of variables
+   Scope scop_;                  // the set of variables
    Interval image_;              // bounds of the function, i.e. the co-domain
    size_t idx_;                  // index in the dag
+   FlatFunction* flat_;          // implements hc4Revise
 
    // tests if a node is already present in this function
    bool hasNode(DagNode* node) const;
 
    // set of node indexes used to implement hasNode in O(1)
    std::unordered_set<size_t> inode_;
-
-   // backward phase of the Hc4Revise contractor
-   // to be called after the assignment of the projection over the root node 
-   Proof hc4ReviseBack(IntervalRegion& reg);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a context such that every dag node is associated with an interval
-/// domain.
-///////////////////////////////////////////////////////////////////////////////
-struct DagContext
-{
-   IntervalVector dom;
+/*----------------------------------------------------------------------------*/
 
-   /// Creates an empty context
-   DagContext();
-
-   /// Creates a context
-   /// @param n number of domains
-   DagContext(size_t n);
-
-   /// Default copy constructor
-   DagContext(const DagContext&) = default;
-
-   /// Extends a context
-   /// @param n number of new domains inserted in this
-   void extend(size_t n = 1);
-
-   /// @return a clone
-   DagContext* clone() const;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// This is a DAG representing an expression graph.
-///
-/// An expression graph represents a constraint system L <= f(x) <= U with
-/// a function vector f : Rn -> Rm and bounds U and L in Rm.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief DAG representing an expression graph.
+ *
+ * An expression graph represents a constraint system L <= f(x) <= U with
+ * a function vector f : Rn -> Rm and bounds U and L in Rm.
+ */
 class Dag {
 public:
    /// Creates an empty DAG
@@ -1023,164 +816,129 @@ public:
    /// No assignment
    Dag& operator=(const Dag&) =delete;
 
-   /// @return true if this dag is empty
+   /// Returns true if this dag is empty
    bool isEmpty() const;
 
-   /// @return the number of nodes
+   /// Returns the number of nodes
    size_t nbNodes() const;
 
-   /// Gets a node
-   /// @param i a node index with 0 <= i < nbNodes()
-   /// @return the i-th node
+   /// Gets the i-th node with 0 <= i < nbNodes()
    DagNode* node(size_t i) const;
 
-   /// @return the number of functions
+   /// Returns the number of functions
    size_t nbFuns() const;
 
-   /// Gets a function
-   /// @param i a function index with 0 <= i < nbFuns()
-   /// @return the i-th function
+   /// Gets the i-th function with 0 <= i < nbFuns()
    DagFun* fun(size_t i) const;
 
-   /// @return the number of variables
+   /// Returns the number of variables
    size_t nbVars() const;
 
-   /// Gets a variable
-   /// @param i a variable index with 0 <= i < nbVars()
-   /// @return the i-th variable node
+   /// Gets the i-th variable with 0 <= i < nbVars()
    DagVar* varNode(size_t i) const;
 
-   /// Gets a variable node
-   /// @param id identifier of a variable
-   /// @returns the node representing the variable id if it exists,
-   ///          nullptr otherwise
+   /**
+    * @brief Gets a variable node given the identifier of a variable.
+    * 
+    * Returns the node representing the variable id if it exists,
+    * nullptr otherwise.
+    */
    DagVar* findVarNode(size_t id) const;
 
-   /// Inserts a constraint
-   /// @param c a constraint
-   /// @return the index of c in the DAG
-   ///
-   /// Throws an exception if the constraint cannot be handled.
+   /**
+    * @brief Inserts a constraint in this and returns its index.
+    *
+    * Throws an exception if the constraint cannot be handled.
+    */
    size_t insert(Constraint c);
 
-   /// Inserts a constraint given a term and an image
-   /// @param t expression of a function
-   /// @param image image of the function
-   /// @return the index of the constraint in the DAG
-   ///
-   /// Throws an exception if the constraint cannot be handled.
+   /**
+    * @brief Inserts a constraint in this and returns its index.
+    * 
+    * The constraint is given by a term and its image.
+    * Throws an exception if the constraint cannot be handled.
+    */
    size_t insert(Term t, const Interval& img = Interval::universe());
 
-   /// Inserts a node representing an interval
-   /// @param x an interval
-   /// @return the index of the node in the DAG
-   ///
-   /// A new node is created only if it does not already exists in the DAG.
+   /**
+    * @brief Inserts a node representing an interval.
+    * 
+    * Returns the node index. A new node is created only if it does not already
+    * exists in the DAG.
+    */
    size_t insertConstNode(const Interval& x);
 
-   /// Inserts a node representing a variable
-   /// @param v a variable
-   /// @return the index of the node in the DAG
-   ///
-   /// A new node is created only if it does not already exists in the DAG.
+   /**
+    * @brief Inserts a node representing a variable.
+    * 
+    * Returns the node index. A new node is created only if it does not already
+    * exists in the DAG.
+    */
    size_t insertVarNode(const Variable& v);
 
-   /// Inserts a node representing an operation
-   /// @param hcode hash code of tje input node
-   /// @param node an operation node
-   /// @returns the index of node in the DAG
-   ///
-   /// A new node is created only if it does not already exists in the DAG.
-   /// Otherwise, node is deleted.
+   /**
+    * @brief Inserts a node representing an operation.
+    * 
+    * Returns the node index. A new node is created only if it does not already
+    * exists in the DAG, otherwise the input node is deleted.
+    */
    size_t insertOpNode(size_t hcode, DagOp* node);
 
-   /// Inserts a function
-   /// @param f a function
-   /// @return the function index in the DAG
+   /// Inserts a function and returns its index
    size_t insertFun(DagFun* f);
 
-   /// @return the scope of this
+   /// Returns the scope of this
    Scope scope() const;
 
    /// Output on a stream
-   /// @param os an output stream
    void print(std::ostream& os) const;
 
-   // management of context
-   void bindContext(DagContext* context);
-   DagContext* unbindContext();
-   DagContext* cloneDefaultContext() const;
+   /**
+    * @brief Interval evaluation of the DAG nodes on B.
+    *
+    * Returns false if an empty interval occurs in the computation.
+    * The method ival() can be used to get the interval value at each node.
+    */
+   bool iEvalNodes(const IntervalBox& B);
 
-   /// Gets the domain of a node
-   /// @param i a node index
-   /// @return the domain of the i-th node
-   Interval dom(size_t i) const;
+   /**
+    * @brief Interval evaluation of the functions on B.
+    * 
+    * V[i] is the value of the i-th function.
+    * The method ival() CANNOT be used to get the interval value at each node.
+    */
+   void iEval(const IntervalBox& B, IntervalVector& V);
 
-   /// Assigns the domain of a node
-   /// @param i a node index
-   /// @patam x new domain for the i-th node
-   void setDom(size_t i, const Interval& x);
+   /**
+    * @brief Interval diferentiation of this on B.
+    * 
+    * J[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the scope of this.
+    */
+   void iDiff(const IntervalBox& B, IntervalMatrix& J);
 
-   /// Reduces the domain of a node
-   /// @param i a node index
-   /// @patam x an interval intersected with the domain of the i-th node
-   void reduceDom(size_t i, const Interval& x);
+   /**
+    * @brief Calculates the Hansen matrix of this on B.
+    * 
+    * H[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the scope of this.
+    */
+   void iDiffHansen(const IntervalBox& B, IntervalMatrix& H);
 
-   /// Interval evaluation
-   /// @param reg domains of variables
-   /// @return false if an empty interval occurs in the computation
-   bool intervalEval(const IntervalRegion& reg);
+   /**
+    * @brief Real evaluation of the functions at pt.
+    * 
+    * V[i] is the value of the i-th function.
+    */
+   void rEval(const RealPoint& pt, RealVector& V);
 
-   /// Interval evaluation
-   /// @param reg domains of variables
-   /// @param val output vector such that v[i] is the value of the i-th function
-   /// @return false if the output vector is empty
-   bool intervalEval(const IntervalRegion& reg, IntervalVector& val);
-
-   /// Interval evaluation
-   /// @param reg domains of variables
-   /// @param val output vector such that v[i] is the value of the i-th function
-   /// @return false if the output vector is empty
-   bool intervalPointEval(const RealPoint& pt, IntervalVector& val);
-
-   /// Interval differentiation in reverse mode to be called after an evaluation
-   /// @param jac resulting matrix of partial derivatives of this
-   void intervalDiff(IntervalMatrix& jac);
-
-   /// Interval differentiation for square systems using Hansen's method
-   /// @param reg domains of variables
-   /// @param jac resulting matrix of partial derivatives of this
-   void hansenDiff(const IntervalRegion& reg, IntervalMatrix& jac);
-
-   /// Calculates the violation of the constraints
-   /// @param viol output vector such that viol[i] is the violation of the i-th
-   ///        constraint
-   ///
-   /// It asumes that this dag has been evaluated using intervalEval or
-   /// intervalPointEval.
-   void intervalViolation(RealVector& viol);
-
-   /// Real (point) evaluation
-   /// @param pt values of variables
-   /// @return false if a NaN occurs in the computation, true othewise
-   bool realEval(const RealPoint& pt);
-
-   /// Real (point) evaluation
-   /// @param pt values of variables
-   /// @param val output vector such that v[i] is the value of the i-th function
-   /// @return false if a NaN occurs, true othewise
-   bool realEval(const RealPoint& pt, RealVector& val);
-
-   /// Point differentiation in reverse mode to be called after an evaluation
-   /// @param jac resulting matrix of partial derivatives of this
-   void realDiff(RealMatrix& jac);
-
-   /// Calculates the violation of the constraints
-   /// @param viol output vector such that viol[i] is the violation of the i-th
-   ///        constraint
-   ///
-   /// It assumes that this dag has been evaluated using realEval.
-   void realViolation(RealVector& viol);
+   /**
+    * @brief Real diferentiation of this at pt.
+    * 
+    * J[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the scope of this.
+    */
+   void rDiff(const RealPoint& pt, RealMatrix& J);
 
 private:
    // vector of nodes sorted by a topological ordering from the leaves
@@ -1208,40 +966,31 @@ private:
    std::unordered_map<size_t, IndexList> omap_;
 
    // scope
-   Scope scope_;
-
-   // current context that stores an interval domain for each node of this dag
-   DagContext* context_;
-
-   // default context
-   DagContext* defaultContext_;
+   Scope scop_;
 
    // find methods
    DagConst* findConstNode(const Interval& x) const;
    DagOp* findOpNode(size_t hcode, DagOp* node) const;
 
    // pushes a new node in the vector of nodes
-   // extends the size of the default context
    void pushNode(DagNode* node);
 };
 
 /// Type of shared pointers to dags
-typedef std::shared_ptr<Dag> SharedDag;
+using SharedDag = std::shared_ptr<Dag>;
 
 /// Output on a stream
-/// @param os an output stream
-/// @param a dag
-/// @return a reference to os
 std::ostream& operator<<(std::ostream& os, const Dag& dag);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of visitors of DAG nodes.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Base class of visitors of DAG nodes
 class DagVisitor {
 public:
    /// Virtual destructor
    virtual ~DagVisitor();
 
+   /// @name Visit methods
    ///@{
    virtual void apply(const DagConst* d);
    virtual void apply(const DagVar* d);
@@ -1262,40 +1011,46 @@ public:
    virtual void apply(const DagCos* d);
    virtual void apply(const DagSin* d);
    virtual void apply(const DagTan* d);
+   virtual void apply(const DagCosh* d);
+   virtual void apply(const DagSinh* d);
+   virtual void apply(const DagTanh* d);
    virtual void apply(const DagLin* d);
    ///@}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to create a function in a DAG.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Visitor used to create a function in a DAG
 class DagFunCreator : public DagVisitor {
 public:
-   /// Creates a visitor
-   /// @param f function built by the visit
+   /// Constructor given f the function built by the visit
    DagFunCreator(DagFun* f);
 
+   /// @name Visit methods
    ///@{
-   virtual void apply(const DagConst* d) override;
-   virtual void apply(const DagVar* d) override;
-   virtual void apply(const DagAdd* d) override;
-   virtual void apply(const DagSub* d) override;
-   virtual void apply(const DagMul* d) override;
-   virtual void apply(const DagDiv* d) override;
-   virtual void apply(const DagMin* d) override;
-   virtual void apply(const DagMax* d) override;
-   virtual void apply(const DagUsb* d) override;
-   virtual void apply(const DagAbs* d) override;
-   virtual void apply(const DagSgn* d) override;
-   virtual void apply(const DagSqr* d) override;
-   virtual void apply(const DagSqrt* d) override;
-   virtual void apply(const DagPow* d) override;
-   virtual void apply(const DagExp* d) override;
-   virtual void apply(const DagLog* d) override;
-   virtual void apply(const DagCos* d) override;
-   virtual void apply(const DagSin* d) override;
-   virtual void apply(const DagTan* d) override;
-   virtual void apply(const DagLin* d) override;
+   void apply(const DagConst* d) override;
+   void apply(const DagVar* d) override;
+   void apply(const DagAdd* d) override;
+   void apply(const DagSub* d) override;
+   void apply(const DagMul* d) override;
+   void apply(const DagDiv* d) override;
+   void apply(const DagMin* d) override;
+   void apply(const DagMax* d) override;
+   void apply(const DagUsb* d) override;
+   void apply(const DagAbs* d) override;
+   void apply(const DagSgn* d) override;
+   void apply(const DagSqr* d) override;
+   void apply(const DagSqrt* d) override;
+   void apply(const DagPow* d) override;
+   void apply(const DagExp* d) override;
+   void apply(const DagLog* d) override;
+   void apply(const DagCos* d) override;
+   void apply(const DagSin* d) override;
+   void apply(const DagTan* d) override;
+   void apply(const DagCosh* d) override;
+   void apply(const DagSinh* d) override;
+   void apply(const DagTanh* d) override;
+   void apply(const DagLin* d) override;
    ///@}
 
 private:
@@ -1304,48 +1059,49 @@ private:
    void visitSubNodes(const DagOp* d);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to insert an arithmetic constraint in a DAG.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Visitor used to insert an arithmetic constraint in a DAG
 class DagCreator : public ConstraintVisitor {
 public:
-   /// Creates a visitor
-   /// @param dag DAG modified by a visit
-   /// @param c constraint visited
+   /**
+    * @brief Constructor.
+    * 
+    * @param dag DAG modified by a visit
+    * @param c constraint visited
+    */
    DagCreator(Dag* dag, Constraint c);
 
-   /// @return the constraint index in the DAG
+   /// Returns the constraint index in the DAG
    size_t index();
 
-   ///@{
    void apply(const ArithCtrEq* c) override;
    void apply(const ArithCtrLe* c) override;
    void apply(const ArithCtrLt* c) override;
    void apply(const ArithCtrGe* c) override;
    void apply(const ArithCtrGt* c) override;
    void apply(const ArithCtrIn* c) override;
-   ///@}
 
 private:
-   Dag* dag_;
-   Constraint c_;
-   size_t index_;
+   Dag* dag_;        // DAG
+   Constraint c_;    // constraint visited
+   size_t index_;    // resulting constraint index in the DAG
+
+   void make(const Term& t, Scope scop, const Interval& img);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to insert a term in a DAG.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Visitor used to insert a term in a DAG
 class DagTermCreator : public TermVisitor {
 public:
-   /// Creates a visitor
-   /// @param dag DAG modified by a visit
+   /// Constructor
    DagTermCreator(Dag* dag);
 
-   /// @returns the DAG index of the root node of the visited term
+   /// Returns the DAG index of the root node of the visited term
    size_t index();
 
-   ///@{
-   void apply(const TermConst* t) override;
+   void apply(const TermCst* t) override;
    void apply(const TermVar* t) override;
    void apply(const TermAdd* t) override;
    void apply(const TermSub* t) override;
@@ -1364,11 +1120,12 @@ public:
    void apply(const TermCos* t) override;
    void apply(const TermSin* t) override;
    void apply(const TermTan* t) override;
-   void apply(const TermLin* t) override;
-   ///@}
+   void apply(const TermCosh* t) override;
+   void apply(const TermSinh* t) override;
+   void apply(const TermTanh* t) override;
 
 private:
-   Dag* dag_;
+   Dag* dag_;           // DAG
    IndexList lsub_;     // list of DAG indexes of sub-nodes
    size_t index_;       // DAG index of the root node
 

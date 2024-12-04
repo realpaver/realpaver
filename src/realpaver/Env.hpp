@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Env.hpp
+ * @brief  Base class of environments for solvers
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_ENV_HPP
 #define REALPAVER_ENV_HPP
@@ -14,9 +25,12 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a base class of environments for solvers.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Base class of environments for solvers.
+ * 
+ * An environment manages a set of parameters, limits used to stop the solving,
+ * and data from the solving process.
+ */
 class Env {
 public:
    /// Constructor
@@ -26,45 +40,39 @@ public:
    virtual ~Env();
 
    /// Copy constructor
-   /// @param e environment copied in this
    Env(const Env& e);
 
    /// No assignment
    Env& operator=(const Env&) = delete;
 
    /// Sets the object that manages the parameter settings
-   /// @param prm new object
    void setParam(const Param& prm);
 
-   /// @return the object that manages the parameter settings
+   /// Returns the object that manages the parameter settings
    Param* getParam() const;
 
    /// Sets a flag that informs on the termination of a solving process
-   /// @param b true if the solving process is aborted due a time limit
    void setTimeLimit(bool b = true);
 
-   /// @return true if a solving process is aborted due a time limit
+   /// Returns true if a solving process is aborted due a time limit
    bool usedTimeLimit() const;
 
    /// Sets a flag that informs on the termination of a solving process
-   /// @param b true if the solving process is aborted due a node limit
    void setNodeLimit(bool b = true);
 
-   /// @return true if a solving process is aborted due a node limit
+   /// Returns true if a solving process is aborted due a node limit
    bool usedNodeLimit() const;
 
    /// Sets a flag related to the preprocessing
-   /// @param b true if a problem is solved at preprocessing
    void setPresolved(bool b = false);
 
-   /// @return true if a problem is solved at preprocessing
+   /// Returns true if a problem is solved at preprocessing
    bool isPresolved() const;
 
    /// Sets a flag related to the preprocessing
-   /// @param b true if a constraint is violated at preprocessing
    void setConstraintViolated(bool b = false);
 
-   /// @return true if a constraint is violated at preprocessing
+   /// Returns true if a constraint is violated at preprocessing
    bool hasConstraintViolated() const;
 
 private:

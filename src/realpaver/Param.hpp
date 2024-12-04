@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Param.hpp
+ * @brief  Parameters of solvers
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_PARAM_HPP
 #define REALPAVER_PARAM_HPP
@@ -17,15 +28,15 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This registers the parameters of an application.
-///
-/// This class has a static instance storing the default values of the
-/// parameters used to initialize the components of the library.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Registers the set of parameters of an application.
+ *
+ * This class has a static instance storing the default values of the
+ * parameters used to initialize the components of the library.
+ */
 class Param {
 public:
-   /// Creates an instance
+   /// Constructor of an empty set
    Param();
 
    /// Default destructor
@@ -38,99 +49,57 @@ public:
    Param& operator=(const Param&) = default;
 
    /// Loads settings from a file
-   /// @param name of the file
    void loadParam(const std::string& filename);
 
-   /// Gets the value of an integral parameter
-   /// @param name name of parameter
-   /// @return value of parameter
+   /// Gets the value of an integral parameter name
    int getIntParam(const std::string& name) const;
 
-   /// Sets the value of an integral parameter
-   /// @param name name of parameter
-   /// @param val value assigned
+   /// Sets the value of an integral parameter name to val
    void setIntParam(const std::string& name, int val);
 
-   /// Gets the value of a real parameter
-   /// @param name name of parameter
-   /// @return value of parameter
+   /// Gets the value of a real parameter name
    double getDblParam(const std::string& name) const;
 
-   /// Sets the value of a real parameter
-   /// @param name name of parameter
-   /// @param val value assigned
+   /// Sets the value of a real parameter name to val
    void setDblParam(const std::string& name, double val);
 
-   /// Gets the value of a tolerance parameter
-   /// @param name name of parameter
-   /// @return value of parameter
-   Tolerance getTolParam(const std::string& name) const;
-
-   /// Sets the value of a tolerance parameter
-   /// @param name name of parameter
-   /// @param val value assigned
-   void setTolParam(const std::string& name, const Tolerance& val);
-
-   /// Gets the value of a string parameter
-   /// @param name name of parameter
-   /// @return value of parameter
+   /// Gets the value of a string parameter name
    std::string getStrParam(const std::string& name) const;
 
-   /// Sets the value of a string parameter
-   /// @param name name of parameter
-   /// @param val value assigned
+   /// Sets the value of a string parameter name to val
    void setStrParam(const std::string& name, const std::string& val);
 
    /// Writes the parameters on a stream
-   /// @param os output stream
    void print(std::ostream& os) const;
 
    /// Loads settings from a file in the static instance
-   /// @param name of the file
    static void LoadParam(const std::string& filename);
 
    /// Gets the value of an integral parameter in the static instance
-   /// @param name name of parameter
-   /// @return value of parameter
    static int GetIntParam(const std::string& name);
 
    /// Sets the value of an integral parameter in the static instance
-   /// @param name name of parameter
-   /// @param val value assigned
    static void SetIntParam(const std::string& name, int val);
 
    /// Gets the value of a real parameter in the static instance
-   /// @param name name of parameter
-   /// @return value of parameter
    static double GetDblParam(const std::string& name);
 
    /// Sets the value of a real parameter in the static instance
-   /// @param name name of parameter
-   /// @param val value assigned
    static void SetDblParam(const std::string& name, double val);
 
    /// Gets the value of a tolerance parameter in the static instance
-   /// @param name name of parameter
-   /// @return value of parameter
    static Tolerance GetTolParam(const std::string& name);
 
    /// Sets the value of a tolerance parameter in the static instance
-   /// @param name name of parameter
-   /// @param val value assigned
    static void SetTolParam(const std::string& name, const Tolerance& val);
 
    /// Gets the value of a string parameter in the static instance
-   /// @param name name of parameter
-   /// @return value of parameter
    static std::string GetStrParam(const std::string& name);
 
    /// Sets the value of a string parameter in the static instance
-   /// @param name name of parameter
-   /// @param val value assigned
    static void SetStrParam(const std::string& name, const std::string& val);
 
    /// Writes the parameters of the static instance on a stream
-   /// @param os output stream
    static void PrintParam(std::ostream& os);
 
 private:
@@ -138,7 +107,8 @@ private:
 
    std::string path_;
    int lineno_;
-   std::unordered_map<std::string, Tolerance> tolmap_;
+
+   // maps of parameters
    std::unordered_map<std::string, int> intmap_;
    std::unordered_map<std::string, double> dblmap_;
    std::unordered_map<std::string, std::string> strmap_;

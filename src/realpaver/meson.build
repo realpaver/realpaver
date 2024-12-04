@@ -1,30 +1,55 @@
-configure_file(input: 'configure_meson.hpp.in',
-                output: 'configure.hpp',
-                configuration: conf_data,
-                install: true,
-                install_dir: 'include/realpaver')
+#-------------------------------------------------------------------------------
+# Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+#              interval computations.
+#-------------------------------------------------------------------------------
+# Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+#                         France
+# Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+#                         France
+#-------------------------------------------------------------------------------
+# Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+# file for information.
+#-------------------------------------------------------------------------------
+# Configuration file processed by the Meson Build system.
+# Author: Raphaël Chenouard
+#-------------------------------------------------------------------------------
 
-incdir = include_directories(['.','..'])
+configure_file(
+  input: 'configure_meson.hpp.in',
+  output: 'configure.hpp',
+  configuration: conf_data,
+  install: true,
+  install_dir: 'include/realpaver',
+)
+
+incdir = include_directories(['.', '..'])
 
 rp_sources = []
 rp_headers = []
 
 # Interval library
 if interval_lib_name.to_upper() == 'GAOL'
-  gaol_header = custom_target('gen-interval-header',
+  interval_header = custom_target(
+    'gen-interval-header',
     input: 'IntervalGaol.hpp',
     output: 'IntervalImpl.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
     install: true,
-    install_dir: 'include/realpaver')
+    install_dir: 'include/realpaver',
+  )
 elif interval_lib_name.to_upper() == 'INUM64'
-  inum64_header = custom_target('gen-interval-header',
+  interval_header = custom_target(
+    'gen-interval-header',
     input: 'IntervalInum64.hpp',
     output: 'IntervalImpl.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
     install: true,
-    install_dir: 'include/realpaver')
+    install_dir: 'include/realpaver',
+  )
+else
+  error('Invalid interval library: ' + interval_lib_name)
 endif
+rp_sources += [interval_header]
 
 # LP library
 lp_header_hpp = ''
@@ -32,7 +57,7 @@ if lp_lib_name.to_upper() == 'CLP'
   lp_header_hpp += 'LPSolverClp.hpp'
   rp_sources += ['LPSolverClp.cpp']
 elif lp_lib_name.to_upper() == 'GUROBI'
-#### NOT WORKING FOR NOW 
+  #### NOT WORKING FOR NOW
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
 elif lp_lib_name.to_upper() == 'SOPLEX'
@@ -41,99 +66,128 @@ elif lp_lib_name.to_upper() == 'SOPLEX'
 elif lp_lib_name.to_upper() == 'HIGHS'
   lp_header_hpp += 'LPSolverHighs.hpp'
   rp_sources += ['LPSolverHighs.cpp']
+else
+  error('Invalid linear solver library: ' + lp_lib_name)
 endif
 
-lp_header = custom_target('gen-lp-header',
-    input: lp_header_hpp,
-    output: 'LPSolver.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
-    install: true,
-    install_dir : 'include/realpaver')
+lp_header = custom_target(
+  'gen-lp-header',
+  input: lp_header_hpp,
+  output: 'LPSolver.hpp',
+  command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
+  install: true,
+  install_dir: 'include/realpaver',
+)
+rp_sources += [lp_header]
 
 # Local NLP solver
 if local_solver_dep.found()
   local_solver_header_hpp = ''
-  if local_solver_name.to_upper() == 'IPOPT'
-    local_solver_header_hpp = ['NLPSolverIpopt.hpp']
-    rp_sources += ['NLPSolverIpopt.cpp']
-  elif local_solver_name.to_upper() == 'NLOPT'
+  # if local_solver_name.to_upper() == 'IPOPT'
+  #   local_solver_header_hpp = ['NLPSolverIpopt.hpp']
+  #   rp_sources += ['NLPSolverIpopt.cpp']
+  # el
+  if local_solver_name.to_upper() == 'NLOPT'
     local_solver_header_hpp = ['NLPSolverNlopt.hpp']
     rp_sources += ['NLPSolverNlopt.cpp']
   endif
 
-  nlp_header = custom_target('gen-local-solver-header',
+  nlp_header = custom_target(
+    'gen-local-solver-header',
     input: local_solver_header_hpp,
     output: 'NLPSolver.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
     install: true,
-    install_dir: 'include/realpaver')
-rp_sources += [nlp_header]
+    install_dir: 'include/realpaver',
+  )
+  rp_sources += [nlp_header]
 endif
 
 # flex, bison
 if flex.found() and bison.found()
-   flex_analyzer = custom_target('flex-parser-gen',
-      input: 'parser_flex.lpp',
-      output: 'parser_flex.cpp',
-      command: [flex, '-o', '@OUTPUT@', '@INPUT@'])
-   rp_sources += [flex_analyzer]
+  flex_analyzer = custom_target(
+    'flex-parser-gen',
+    input: 'parser_flex.lpp',
+    output: 'parser_flex.cpp',
+    command: [flex, '-o', '@OUTPUT@', '@INPUT@'],
+  )
+  rp_sources += [flex_analyzer]
 
-   bison_analyzer = custom_target('bison-parser-gen',
-      input: 'parser_bison.ypp',
-      output: ['parser_bison.hpp', 'parser_bison.cpp'],
-      command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'])
-   rp_sources += [bison_analyzer]
+  bison_analyzer = custom_target(
+    'bison-parser-gen',
+    input: 'parser_bison.ypp',
+    output: ['parser_bison.hpp', 'parser_bison.cpp'],
+    command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'],
+  )
+  rp_sources += [bison_analyzer]
 else
-   rp_sources += ['parser_flex.cpp',
-                  'parser_bison.cpp']
+  rp_sources += ['parser_flex.cpp', 'parser_bison.cpp']
 endif
 
 rp_headers += [
   'AssertDebug.hpp',
   'Bitset.hpp',
-  'BC3Contractor.hpp',
-  'BC4Contractor.hpp',
-  'CIDContractor.hpp',
   'Common.hpp',
   'config.hpp',
   'Constraint.hpp',
-  'ConstraintContractor.hpp',
   'ConstraintFixer.hpp',
   'ConstraintRelaxor.hpp',
   'Contractor.hpp',
+  'ContractorACID.hpp',
+  'ContractorBC3Revise.hpp',
+  'ContractorBC4Revise.hpp',
+  'ContractorBC4.hpp',
+  'ContractorConstraint.hpp',
+  'ContractorDomain.hpp',
+  'ContractorFactory.hpp',
+  'ContractorHC4.hpp',
+  'ContractorHC4Revise.hpp',
+  'ContractorList.hpp',
   'ContractorPool.hpp',
+  'ContractorVar3B.hpp',
+  'ContractorVar3BCID.hpp',
+  'ContractorVarCID.hpp',
+  'CSPContext.hpp',
+  'CSPEnv.hpp',
+  'CSPNode.hpp',
+  'CSPPropagator.hpp',
+  'CSPSpace.hpp',
+  'CSPSpaceBFS.hpp',
+  'CSPSpaceDFS.hpp',
+  'CSPSpaceDMDFS.hpp',
+  'CSPSpaceHybridDFS.hpp',
+  'CSPSolver.hpp',
+  'CSPSplit.hpp',
   'Dag.hpp',
+  'Domain.hpp',
+  'DomainBox.hpp',
+  'DomainSlicer.hpp',
+  'DomainSlicerFactory.hpp',
+  'DomainSlicerMap.hpp',
   'Double.hpp',
   'Env.hpp',
   'Exception.hpp',
-  'HC4Contractor.hpp',
+  'FlatFunction.hpp',
   'Inflator.hpp',
-  'IntContractor.hpp',
   'Integer.hpp',
   'Interval.hpp',
+  'IntervalBox.hpp',
   'IntervalFunction.hpp',
+  'IntervalFunctionUni.hpp',
   'IntervalFunctionVector.hpp',
   'IntervalGaussSeidel.hpp',
   'IntervalMatrix.hpp',
   'IntervalNewton.hpp',
-  'IntervalRegion.hpp',
+  'IntervalNewtonUni.hpp',
+  'IntervalPropagator.hpp',
   'IntervalSlicer.hpp',
+  'IntervalSmearSumRel.hpp',
+  'IntervalThickFunction.hpp',
   'IntervalTraits.hpp',
   'IntervalVector.hpp',
   'IntervalUnion.hpp',
-  'ListContractor.hpp',
   'Logger.hpp',
   'LPModel.hpp',
-  'MaxCIDContractor.hpp',
-  'NcspEnv.hpp',
-  'NcspNode.hpp',
-  'NcspSpace.hpp',
-  'NcspSpaceBFS.hpp',
-  'NcspSpaceDFS.hpp',
-  'NcspSpaceDMDFS.hpp',
-  'NcspSpaceHybridDFS.hpp',
-  'NcspSolver.hpp',
-  'NcspSplit.hpp',
   'NLPModel.hpp',
   'NumericDoubleTraits.hpp',
   'NumericIntervalTraits.hpp',
@@ -143,133 +197,154 @@ rp_headers += [
   'Objective.hpp',
   'Param.hpp',
   'Parser.hpp',
-  'PolytopeHullContractor.hpp',
   'Preprocessor.hpp',
   'Problem.hpp',
-  'Propagator.hpp',
   'Prover.hpp',
-  'QuadraticTerm.hpp',
   'Range.hpp',
   'RangeSlicer.hpp',
+  'RangeUnion.hpp',
   'RealFunction.hpp',
   'RealFunctionVector.hpp',
   'RealMatrix.hpp',
   'RealPoint.hpp',
   'RealVector.hpp',
-  'RLTRelaxation.hpp',
   'Scope.hpp',
+  'ScopeBank.hpp',
   'ScopeMap.hpp',
-  'SearchNode.hpp',
-  'SplitStrategy.hpp',
   'Stat.hpp',
   'SymbolTable.hpp',
   'Term.hpp',
   'TermDeriver.hpp',
   'TermFixer.hpp',
-  'ThickFunction.hpp',
+  'TermLin.hpp',
+  'TermQuadratic.hpp',
   'Timer.hpp',
   'Tolerance.hpp',
-  'UniIntervalNewton.hpp',
   'Variable.hpp',
-  'VariableSelector.hpp',
   'VariableVector.hpp',
+  'ZeroOne.hpp',
   'IntervalGaol.hpp',
   'LPSolverClp.hpp',
-  'LPSolverGurobi.hpp'
+  'LPSolverGurobi.hpp',
 ]
 
 rp_sources += [
   'AssertDebug.hpp',
   'Bitset.cpp',
-  'BC3Contractor.cpp',
-  'BC4Contractor.cpp',
-  'CIDContractor.cpp',
   'Common.cpp',
   'Constraint.cpp',
-  'ConstraintContractor.cpp',
   'ConstraintFixer.cpp',
   'ConstraintRelaxor.cpp',
   'Contractor.cpp',
+  'ContractorACID.cpp',
+  'ContractorBC3Revise.cpp',
+  'ContractorBC4Revise.cpp',
+  'ContractorBC4.cpp',
+  'ContractorConstraint.cpp',
+  'ContractorDomain.cpp',
+  'ContractorFactory.cpp',
+  'ContractorHC4.cpp',
+  'ContractorHC4Revise.cpp',
+  'ContractorList.cpp',
   'ContractorPool.cpp',
+  'ContractorVar3B.cpp',
+  'ContractorVar3BCID.cpp',
+  'ContractorVarCID.cpp',
+  'CSPContext.cpp',
+  'CSPEnv.cpp',
+  'CSPNode.cpp',
+  'CSPPropagator.cpp',
+  'CSPSpace.cpp',
+  'CSPSpaceBFS.cpp',
+  'CSPSpaceDFS.cpp',
+  'CSPSpaceDMDFS.cpp',
+  'CSPSpaceHybridDFS.cpp',
+  'CSPSolver.cpp',
+  'CSPSplit.cpp',
   'Dag.cpp',
+  'Domain.cpp',
+  'DomainBox.cpp',
+  'DomainSlicer.cpp',
+  'DomainSlicerFactory.cpp',
+  'DomainSlicerMap.cpp',
   'Env.cpp',
   'Exception.cpp',
-  'HC4Contractor.cpp',
+  'FlatFunction.cpp',
   'Inflator.cpp',
-  'IntContractor.cpp',
   'Integer.cpp',
   'Interval.cpp',
+  'IntervalBox.cpp',
   'IntervalFunction.cpp',
+  'IntervalFunctionUni.cpp',
   'IntervalFunctionVector.cpp',
   'IntervalGaussSeidel.cpp',
   'IntervalMatrix.cpp',
   'IntervalNewton.cpp',
-  'IntervalRegion.cpp',
+  'IntervalNewtonUni.cpp',
+  'IntervalPropagator.cpp',
   'IntervalSlicer.cpp',
+  'IntervalSmearSumRel.cpp',
+  'IntervalThickFunction.cpp',
   'IntervalVector.cpp',
   'IntervalUnion.cpp',
-  'ListContractor.cpp',
   'Logger.cpp',
   'LPModel.cpp',
-  'MaxCIDContractor.cpp',
-  'NcspEnv.cpp',
-  'NcspNode.cpp',
-  'NcspSpace.cpp',
-  'NcspSpaceDFS.cpp',
-  'NcspSpaceBFS.cpp',
-  'NcspSpaceDMDFS.cpp',
-  'NcspSpaceHybridDFS.cpp',
-  'NcspSolver.cpp',
-  'NcspSplit.cpp',
   'NLPModel.cpp',
   'Objective.cpp',
   'Param.cpp',
   'Parser.cpp',
-  'PolytopeHullContractor.cpp',
   'Preprocessor.cpp',
   'Problem.cpp',
-  'Propagator.cpp',
   'Prover.cpp',
-  'QuadraticTerm.cpp',
   'Range.cpp',
   'RangeSlicer.cpp',
+  'RangeUnion.cpp',
   'RealFunction.cpp',
   'RealFunctionVector.cpp',
   'RealMatrix.cpp',
   'RealPoint.cpp',
   'RealVector.cpp',
-  'RLTRelaxation.cpp',
   'Scope.cpp',
+  'ScopeBank.cpp',
   'ScopeMap.cpp',
-  'SearchNode.cpp',
   'Stat.cpp',
   'SymbolTable.cpp',
   'Term.cpp',
   'TermDeriver.cpp',
   'TermFixer.cpp',
-  'ThickFunction.cpp',
+  'TermLin.cpp',
+  'TermQuadratic.cpp',
   'Timer.cpp',
   'Tolerance.cpp',
-  'UniIntervalNewton.cpp',
+  'ZeroOne.cpp',
   'Variable.cpp',
-  'VariableSelector.cpp',
-  'VariableVector.cpp'
+  'VariableVector.cpp',
 ]
 
-extra_dist = ['parser_flex.lpp','parser_bison.ypp',
-  'LPSolverClp.cpp','LPSolverClp.hpp',
-  'LPSolverGurobi.cpp','LPSolverGurobi.hpp',
-  'LPSolverHighs.cpp','LPSolverHighs.hpp',
-  'LPSolverSoplex.cpp','LPSolverSoplex.hpp',
-  'NLPSolverIpopt.cpp','NLPSolverIpopt.hpp',
-  'NLPSolverNlopt.cpp','NLPSolverNlopt.hpp']
+extra_dist = [
+  'parser_flex.lpp',
+  'parser_bison.ypp',
+  'LPSolverClp.cpp',
+  'LPSolverClp.hpp',
+  'LPSolverGurobi.cpp',
+  'LPSolverGurobi.hpp',
+  'LPSolverHighs.cpp',
+  'LPSolverHighs.hpp',
+  'LPSolverSoplex.cpp',
+  'LPSolverSoplex.hpp',
+  #  'NLPSolverIpopt.cpp',
+  #  'NLPSolverIpopt.hpp',
+  'NLPSolverNlopt.cpp',
+  'NLPSolverNlopt.hpp',
+]
 
-realpaver_lib = both_libraries('realpaver',
-    sources: rp_sources,
-    dependencies: deps_lib,
-    install: true,
-    extra_files: extra_dist,
-    include_directories: incdir
+realpaver_lib = both_libraries(
+  'realpaver',
+  sources: rp_sources,
+  dependencies: deps_lib,
+  install: true,
+  extra_files: extra_dist,
+  include_directories: incdir,
 )
 
 install_headers(rp_headers, subdir: 'realpaver')

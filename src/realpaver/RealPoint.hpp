@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealPoint.hpp
+ * @brief  Classes of real points
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_REAL_POINT_HPP
 #define REALPAVER_REAL_POINT_HPP
@@ -15,32 +26,28 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a scoped real vector.
-///////////////////////////////////////////////////////////////////////////////
+/// Scoped real vector
 class RealPoint : public RealVector {
 public:
-   /// Creates a real pooint
-   /// s scope of this
-   /// a value assigned to each element of this
-   RealPoint(Scope s, double a = 0.0);
+   /**
+    * @brief Constructor.
+    * 
+    * Each variable from scop is assigned to a.
+    */
+   RealPoint(Scope scop, double a = 0.0);
 
-   /// Creates a real point
-   /// s scope of this
-   /// X real vector having the same size than s
-   ///
-   /// The i-th variable in s is assigned to X[i] for each i.
-   RealPoint(Scope s, const RealVector& X);
+   /**
+    * @brief Constructor.
+    * 
+    * The i-th variable of scop is assigned to X[i] for each i.
+    */
+   RealPoint(Scope scop, const RealVector& X);
 
    /// Default copy constructor
    RealPoint(const RealPoint&) = default;
 
    /// Creates a point from another point projected on a scope
-   /// @param pt a point
-   /// @param sco a scope that is included in the scope of pt
-   ///
-   /// this is equal to pt restricted to s
-   RealPoint(const RealPoint& pt, Scope s);
+   RealPoint(const RealPoint& pt, Scope scop);
 
    /// Default assignment operator
    RealPoint& operator=(const RealPoint&) = default;
@@ -48,41 +55,39 @@ public:
    /// Default destructor
    ~RealPoint() = default;
 
-   /// @return the scope of this (sorted set of variables)
+   /// Returns the scope of this (sorted set of variables)
    Scope scope() const;
 
-   /// Gets an element in this
-   /// @param v a variable that belongs to the scope of this
-   /// @return the value of v in this
-   ///
-   /// This masks the access by index.
-   double get(Variable v) const;
+   /// Gets the value of v in this
+   double get(const Variable& v) const;
 
-   /// Sets an element of this
-   /// @param v a variable that belongs to the scope of this
-   /// @param a value assigned to v ion this
-   ///
-   /// This masks the access by index.
-   void set(Variable v, double a);
+   /// Sets v to a
+   void set(const Variable& v, double a);
 
-   /// Assignment on a scope
-   /// @param pt a real point
-   /// @param s a scope included in the scope of this and pt
-   ///
-   /// this[s] is assigned to pt[s]
-   void setOnScope(const RealPoint& pt, Scope s);
+   /**
+    * @brief Assignment on a scope.
+    * 
+    * this[scop] is assigned to pt[scop]
+    */
+   void setOnScope(const RealPoint& pt, const Scope& scop);
 
-   /// Gets a sub-point
-   /// @param s a scope included in the scope of this
-   /// @return this restricted to s
-   RealPoint subPoint(Scope s) const;
+   /// Gets a sub-point corresponding to this restricted to scop
+   RealPoint subPoint(const Scope& scop) const;
 
-   ///@{
    RealPoint* clone() const override;
-   ///@}
+
+   /**
+    * @brief Tests if this behaves like a vector.
+    * 
+    * Returns true if the scope of this contains the variables whose
+    * identifiers are 0, 1, 2, ..., which permits to consider this as a vector.
+    * In other words, it is possible to cast this to a RealVector and to access
+    * the domains using the variable ids.
+    */
+   bool isVectorizable() const;
 
 private:
-   Scope scope_;
+   Scope scop_;
 };
 
 } // namespace

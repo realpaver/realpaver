@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealFunctionVector.hpp
+ * @brief  Vector of real functions
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_REAL_FUNCTION_VECTOR_HPP
 #define REALPAVER_REAL_FUNCTION_VECTOR_HPP
@@ -16,10 +27,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the base class of the hierarchy of representations of real
-/// function vectors.
-///////////////////////////////////////////////////////////////////////////////
+/// Base class of the hierarchy of representations of real function vectors
 class RealFunctionVectorRep {
 public:
    /// Default constructor
@@ -35,83 +43,66 @@ public:
    RealFunctionVectorRep&
    operator=(const RealFunctionVectorRep&) = delete;
 
-   /// @return the scope of this, i.e. the set of variables
+   /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
 
-   /// @return the number of variables in this
+   /// Returns the number of variables in this
    virtual size_t nbVars() const = 0;
 
-   /// @return the number of functions in this
+   /// Returns the number of functions in this
    virtual size_t nbFuns() const = 0;
 
-   /// @return the i-th function of this
+   /// Returns the i-th function of this
    virtual RealFunction fun(size_t i) const = 0;
 
-   /// Evaluates this
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
-   ///
-   /// val must have nbFuns() components.
+   /**
+    * @brief Evaluates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this at pt
+    * and val must have nbFuns() components
+    */
    virtual void eval(const RealPoint& pt, RealVector& val) = 0;
 
-   /// Differentiates this (calculates an interval Jacobian matrix)
-   /// @param pt values of variables
-   /// @param J Jacobian matrix of this at pt such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns.
+   /**
+    * @brief Differentiates this (calculates an interval Jacobian matrix).
+    * 
+    * J is the Jacobian matrix of this at pt such that we have the partial
+    * derivative dfi / dxj in the i-th row and j-th column of J.
+    * 
+    * J must have nbFuns() rows and nbVars() columns.
+    */
    virtual void diff(const RealPoint& pt, RealMatrix& J) = 0;
-
-   /// Evaluates and differentiates this
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
-   /// @param J Jacobian matrix of this at pt such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns; val must have
-   /// nbFuns() components.
-   virtual void evalDiff(const RealPoint& pt, RealVector& val,
-                         RealMatrix& J) = 0;
-
-   /// Evaluates this and calculates the violation of the constraints
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the evaluation of
-   ///        the i-th function at pt
-   /// @param viol output vector such that viol[i] is the violation of the
-   ///        i-th function / constraint at pt
-   virtual void violation(const RealPoint& pt, RealVector& val,
-                          RealVector& viol) = 0;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the main of real function vectors.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Main class of real function vectors.
+ * 
+ *  This encloses a shared pointer to its representation. It is a lightweight
+ *  object that can be copied and assigned.
+ */
 class RealFunctionVector {
 public:
    /// Creates an empty vector
    RealFunctionVector();
 
-   /// Constructor
-   /// @param dag a dag whose functions are added in this in the same order
+   /// Creates a vector corresponding to a DAG
    RealFunctionVector(SharedDag dag);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
+   /// Creates  a vector corresponding to a DAG built from a list of terms
    RealFunctionVector(const std::initializer_list<Term>& lt);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
-   /// @param li list of images (bounds) of those terms
+   /**
+    * @brief Constructor.
+    * 
+    * Creates  a vector corresponding to a DAG built from a list of terms and
+    * a list of bounds. For each i, we have lt[i] IN li[i].
+    */
    RealFunctionVector(const std::initializer_list<Term>& lt,
                       const std::initializer_list<Interval>& li);
 
-   /// Constructor
-   /// @param lf list of functions
+   /// Creates a vector from a list of fonctions
    RealFunctionVector(const std::initializer_list<RealFunction>& lf);
 
    /// Default copy constructor
@@ -123,91 +114,74 @@ public:
    /// Default destructor
    ~RealFunctionVector() = default;
 
-   /// @return the scope of this, i.e. the set of variables
+   /// Returns the scope of this, i.e. the set of variables
    Scope scope() const;
 
-   /// @return the number of variables in this
+   /// Returns the number of variables in this
    size_t nbVars() const;
 
-   /// @return the number of functions in this
+   /// Returns the number of functions in this
    size_t nbFuns() const;
 
-   /// @return the i-th function of this
+   /// Returns the i-th function of this
    RealFunction fun(size_t i) const;
 
-   /// Inserts a function at the end
-   /// @param f function inserted
-   ///
-   /// It may be necessary to switch to another representation if the current
-   /// one is not a list.
+   /**
+    * @brief Inserts a function at the end.
+    * 
+    * It may be necessary to switch to another representation if the current
+    * one is not a list.
+    */
    void addFun(RealFunction f);
 
-   /// Evaluates this
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
-   ///
-   /// val must have nbFuns() components.
+   /**
+    * @brief Evaluates this.
+    * 
+    * val[i] is the result of the evaluation of the i-th function of this at pt
+    * and val must have nbFuns() components
+    */
    void eval(const RealPoint& pt, RealVector& val);
 
-   /// Differentiates this (calculates an interval Jacobian matrix)
-   /// @param pt values of variables
-   /// @param J Jacobian matrix of this at pt such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns.
+   /**
+    * @brief Differentiates this (calculates an interval Jacobian matrix).
+    * 
+    * J is the Jacobian matrix of this at pt such that we have the partial
+    * derivative dfi / dxj in the i-th row and j-th column of J.
+    * 
+    * J must have nbFuns() rows and nbVars() columns.
+    */
    void diff(const RealPoint& pt, RealMatrix& J);
 
-   /// Evaluates and differentiates this
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the result of the evaluation
-   ///        of the i-th function of this at pt
-   /// @param J Jacobian matrix of this at pt such that we have the partial
-   ///        derivative dfi / dxj in the i-th row and j-th column of J
-   ///
-   /// J must have nbFuns() rows and nbVars() columns; val must have
-   /// nbFuns() components.
-   void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J);
+   /// Type of the representation of interval functions vectors
+   using SharedRep = std::shared_ptr<RealFunctionVectorRep>;
 
-   /// Evaluates this and calculates the violation of the constraints
-   /// @param pt values of variables
-   /// @param val output vector such that val[i] is the evaluation of
-   ///        the i-th function at pt
-   /// @param viol output vector such that viol[i] is the violation of the
-   ///        i-th function / constraint at pt
-   void violation(const RealPoint& pt, RealVector& val, RealVector& viol);
-
-   /// type of the representation of interval functions vectors
-   typedef std::shared_ptr<RealFunctionVectorRep> SharedRep;
-
-   /// @return the representation of this
+   /// Returns the representation of this
    SharedRep rep() const;
 
    /// Constructor
-   /// @param rep representation of this
    RealFunctionVector(SharedRep rep);
 
 private:
    SharedRep rep_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a vector of real-valued functions based on a DAG such that
-/// all the functions of the DAG are considered.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Vector of real functions reflecting a DAG
 class RealFunctionVectorDag : public RealFunctionVectorRep {
 public:
-   /// Constructor
-   /// @param dag a dag whose functions are added in this in the same order
+   /// Creates a vector corresponding to a DAG
    RealFunctionVectorDag(SharedDag dag);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
+   /// Creates  a vector corresponding to a DAG built from a list of terms
    RealFunctionVectorDag(const std::initializer_list<Term>& lt);
 
-   /// Constructor that creates a dag
-   /// @param lt list of terms inserted in the dag
-   /// @param li list of images (bounds) of those terms
+   /**
+    * @brief Constructor.
+    * 
+    * Creates  a vector corresponding to a DAG built from a list of terms and
+    * a list of bounds. For each i, we have lt[i] IN li[i].
+    */
    RealFunctionVectorDag(const std::initializer_list<Term>& lt,
                          const std::initializer_list<Interval>& li);
 
@@ -221,35 +195,29 @@ public:
    /// Default destructor
    ~RealFunctionVectorDag() = default;
 
-   /// @return the dag enclosed in this
+   /// Returns the dag enclosed in this
    SharedDag dag() const;
 
-   ///@{
    Scope scope() const override;
    size_t nbVars() const override;
    size_t nbFuns() const override;
    RealFunction fun(size_t i) const override;
    void eval(const RealPoint& pt, RealVector& val) override;
    void diff(const RealPoint& pt, RealMatrix& J) override;
-   void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J) override;
-   void violation(const RealPoint& pt, RealVector& val,
-                  RealVector& viol) override;
-   ///@}
 
 private:
    SharedDag dag_;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a vector of interval-valued functions based on a a list.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Vector of real-valued functions based on a list
 class RealFunctionVectorList : public RealFunctionVectorRep {
 public:
    /// Constructor of an empty function vector
    RealFunctionVectorList();
 
    /// Constructor
-   /// @param lf list of functions
    RealFunctionVectorList(const std::initializer_list<RealFunction>& lf);
 
    /// Default copy constructor
@@ -263,24 +231,18 @@ public:
    ~RealFunctionVectorList() = default;
 
    /// Inserts a function at the end
-   /// @param f function inserted
     void addFun(RealFunction f);
 
-   ///@{
    Scope scope() const override;
    size_t nbVars() const override;
    size_t nbFuns() const override;
    RealFunction fun(size_t i) const override;
    void eval(const RealPoint& pt, RealVector& val) override;
    void diff(const RealPoint& pt, RealMatrix& J) override;
-   void evalDiff(const RealPoint& pt, RealVector& val, RealMatrix& J) override;
-   void violation(const RealPoint& pt, RealVector& val,
-                  RealVector& viol) override;
-   ///@}
 
 private:
    std::vector<RealFunction> vf_;
-   Scope scope_;
+   Scope scop_;
 };
 
 } // namespace

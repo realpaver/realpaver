@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Interval.cpp
+ * @brief  Class of intervals
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
@@ -28,8 +39,16 @@ Interval::Interval(const std::string& s)
    : Interval(Interval::Traits::create(s.c_str()))
 {}
 
+Interval::Interval(const char* s)
+   : Interval(Interval::Traits::create(s))
+{}
+
 Interval::Interval(const std::string& sl, const std::string& sr)
       : Interval(Interval::Traits::create(sl.c_str(), sr.c_str()))
+{}
+
+Interval::Interval(const char* sl, const char* sr)
+      : Interval(Interval::Traits::create(sl, sr))
 {}
 
 Interval Interval::lessThan(double a)
@@ -305,7 +324,22 @@ size_t Interval::hashCode() const
 
 double Interval::relWidth() const
 {
-   return Interval::Traits::relWidth(impl_);
+   if (isInf())
+      return 1.0;
+
+   else if (isSingleton())
+      return 0.0;
+
+   else
+   {
+      double w = width(),
+             a = Double::abs(left()),
+             b = Double::abs(right()),
+             m = Double::max(a, b);
+
+      Interval x = Interval(w) / Interval(m);
+      return x.right();
+   }   
 }
 
 double Interval::midpoint() const
@@ -371,6 +405,11 @@ bool Interval::isSingleton() const
 bool Interval::isZero() const
 {
    return Interval::Traits::isZero(impl_);
+}
+
+bool Interval::isOne() const
+{
+   return Interval::Traits::isOne(impl_);
 }
 
 bool Interval::isAnInt() const
@@ -617,8 +656,14 @@ Interval& Interval::operator+=(const Interval& other)
 }
 
 Interval operator+(const Interval& x, const Interval& y)
-{
-   return Interval(Interval::Traits::add(x.impl_, y.impl_));      
+{   
+   Interval res = Interval(Interval::Traits::add(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("add on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval addPX(const Interval& x, const Interval& y,
@@ -665,7 +710,13 @@ Interval& Interval::operator-=(const Interval& other)
 
 Interval operator-(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::sub(x.impl_, y.impl_));      
+   Interval res = Interval(Interval::Traits::sub(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sub on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval subPX(const Interval& x, const Interval& y,
@@ -739,7 +790,13 @@ Interval& Interval::operator*=(const Interval& other)
 
 Interval operator*(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::mul(x.impl_, y.impl_));      
+   Interval res = Interval(Interval::Traits::mul(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("mul on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval mulPX(const Interval& x, const Interval& y,
@@ -826,7 +883,13 @@ Interval divPZ(const Interval& x, const Interval& y,
 
 Interval sqr(const Interval& x)
 {
-   return Interval(Interval::Traits::sqr(x.impl_));
+   Interval res = Interval(Interval::Traits::sqr(x.impl_));
+
+#if LOG_ON
+   LOG_FULL("sqr on " << x << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval sqrPX(const Interval& x, const Interval& y)
@@ -1035,6 +1098,87 @@ Interval tanPY(const Interval& x, const Interval& y)
 
 #if LOG_ON
    LOG_FULL("tanPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval cosh(const Interval& x)
+{
+   return Interval(Interval::Traits::cosh(x.impl_));
+}
+
+Interval coshPX(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::coshPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("coshPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval coshPY(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::coshPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("coshPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval sinh(const Interval& x)
+{
+   return Interval(Interval::Traits::sinh(x.impl_));
+}
+
+Interval sinhPX(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::sinhPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sinhPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval sinhPY(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::sinhPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("sinhPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval tanh(const Interval& x)
+{
+   return Interval(Interval::Traits::tanh(x.impl_));
+}
+
+Interval tanhPX(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::tanhPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("tanhPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval tanhPY(const Interval& x, const Interval& y)
+{
+   Interval res = Interval(Interval::Traits::tanhPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("tanhPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
    return res;

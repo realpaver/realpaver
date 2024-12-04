@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NumericMatrix.hpp
+ * @brief  Dense numeric matrix
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_NUMERIC_MATRIX_HPP
 #define REALPAVER_NUMERIC_MATRIX_HPP
@@ -18,34 +29,36 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a numeric matrix of elements of type T.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Dense numeric matrix of elements of type T.
+ * 
+ * A matrix is represented by a vector following a row orientation.
+ */
 template <typename T>
 class NumericMatrix {
 protected:
    /// Traits class
-  typedef NumericTraits<T> TraitsType;
+  using TraitsType = NumericTraits<T>;
       
 public:
    /// Value type
-   typedef T ValueType;
+   using ValueType = T;
 
    /// Reference type
-   typedef T& RefType;
+   using RefType = T&;
 
    /// Const reference type
-   typedef const T& ConstRefType;
+   using ConstRefType = const T&;
 
-   /// Creates a matrix of a given size
-   /// @param nrows number of rows
-   /// @param ncols number of columns
+   /// Constructor
    NumericMatrix(size_t nrows, size_t ncols);
 
-   /// Creates a matrix and initializes its elements
-   /// @param nrows number of rows
-   /// @param ncols number of columns
-   /// @param init value of all the elements
+   /**
+    * @brief Constructor.
+    * @param nrows number of rows
+    * @param ncols number of columns
+    * @param init value of all the elements
+    */
    NumericMatrix(size_t nrows, size_t ncols, ConstRefType init);
 
    /// Default copy constructor
@@ -57,103 +70,78 @@ public:
    /// Virtual destructor
    virtual ~NumericMatrix();
 
-   /// @return the number of rows of this
+   /// Returns the number of rows of this
    size_t nrows() const;
 
-   /// @return the number of columns of this
+   /// Returns the number of columns of this
    size_t ncols() const;
 
-   /// @return true if this is a square matrix
+   /// Returns true if this is a square matrix
    bool isSquare() const;
 
-   /// Constant access in this
-   /// @param i a row index between 0 and nrows()-1
-   /// @param j a column index between 0 and ncols()-1
-   /// @return the coefficient at (i, j) of this
+   /// Returns this(i, j) (constant access)
    ValueType operator()(size_t i, size_t j) const;
 
-   /// Non constant access in this
-   /// @param i a row index between 0 and nrows()-1
-   /// @param j a column index between 0 and ncols()-1
-   /// @return the coefficient at (i, j) of this
+   /// Returns this(i, j) (non constant access)
    RefType operator()(size_t i, size_t j);
 
-   /// Modification of all the elements of this
-   /// @param x a number
-   ///
-   /// Assigns x to all the element of this
+   /// Assigns all the element of this to x
    void setAll(ConstRefType x);
 
-   /// Swaps two rows
-   /// @param i a row index
-   /// @param j a row index
+   /// Swaps the i-th row and the j-th row
    void swapRows(size_t i, size_t j);
 
-   /// Swaps two columns
-   /// @param i a column index
-   /// @param j a column index
+   /// Swaps the i-th column and the j-th column
    void swapCols(size_t i, size_t j);
 
    /// Output on a stream
-   /// @param os an output stream
    virtual void print(std::ostream& os) const;
 
-   /// @return true if one element of this in infinite
+   /// Returns true if one element of this in infinite
    bool isInf() const;
 
-   /// @return true if all the elements of this are finite
+   /// Returns true if all the elements of this are finite
    bool isFinite() const;
 
-   /// Addition
-   /// @param A a matrix
-   /// @param B a matrix
-   /// @param res result assigned to A + B
+   /// Assigns res to A + B
    static void add(const NumericMatrix& A, const NumericMatrix& B,
                    NumericMatrix& res);
 
-   /// Subtraction
-   /// @param A a matrix
-   /// @param B a matrix
-   /// @param res result assigned to A - B
+   /// Assigns res to A - B
    static void sub(const NumericMatrix& A, const NumericMatrix& B,
                    NumericMatrix& res);
 
-   /// Unary subtraction
-   /// @param A a matrix
-   /// @param res result assigned to - A
+   /// Assigns res to -A
    static void usb(const NumericMatrix& A, NumericMatrix& res);
 
-   /// Multiplication
-   /// @param a a scalar
-   /// @param B a matrix
-   /// @param res result assigned to a * B
+   /// Assigns res to a * B
    static void mulScalar(ConstRefType a, const NumericMatrix& B,
                          NumericMatrix& res);
 
-   /// Division
-   /// @param B a matrix
-   /// @param a a scalar
-   /// @param res result assigned to B / a
+   /// Assigns res to B / a
    static void divScalar(const NumericMatrix& B, ConstRefType a,
                          NumericMatrix& res);
 
-   /// Multiplication
-   /// @param A a matrix
-   /// @param B a matrix
-   /// @param res result assigned to A * B
+   /// Assigns res to A * B
    static void mul(const NumericMatrix& A, const NumericMatrix& B,
                    NumericMatrix& res);
 
+   /// Assigns the number of rows
    void setNrows(size_t nrows);
+
+   /// Assigns the number of columns
    void setNcols(size_t ncols);
+
+   /// Inserts x at the end of the vector representing this
    void push(ConstRefType x);
 
 private:
    typedef std::vector<ValueType> MatrixType;
-   MatrixType elems_;
-   size_t nrows_;
-   size_t ncols_;
+   MatrixType elems_;   // vector of coefficients
+   size_t nrows_;       // number of rows
+   size_t ncols_;       // number of columns
 
+   // Constructor from a vector
    NumericMatrix(const MatrixType& m);
 };
 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalInum64.hpp
+ * @brief  Interface of the inum64 library
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_INTERVAL_INUM64_HPP
 #define REALPAVER_INTERVAL_INUM64_HPP
@@ -23,15 +34,17 @@ namespace realpaver {
 /// Raw interval type
 using RawInterval = inum64::interval;
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a specialization of the interval traits for inum64.
-///
-/// The operations are either delegated to inum64 if they are available in this
-/// library or implemented otherwise.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Specialization of the interval traits for inum64.
+ *
+ * @see IntervalTraits
+ *
+ *  The operations are either delegated to gaol if they are available in this
+ *  library or implemented otherwise.
+ */
 template <>
 struct IntervalTraits<RawInterval> {
-   typedef RawInterval interval;
+   using interval = RawInterval;
 
    static inline interval create()
    {
@@ -190,11 +203,6 @@ struct IntervalTraits<RawInterval> {
       return x.rad();
    }
 
-   static inline double relWidth(const interval& x)
-   {
-      return x.rel_wid();
-   }
-
    static inline double midpoint(const interval& x)
    {
       return x.mid();
@@ -245,6 +253,11 @@ struct IntervalTraits<RawInterval> {
       return x.is_zero();
    }
 
+   static inline bool isOne(const interval& x)
+   {
+      return (x.left() == 1.0) && (x.right() == 1.0);
+   }
+
    static inline bool isAnInt(const interval& x)
    {
       return x.is_an_int();
@@ -252,7 +265,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool contains(const interval& x, double a)
    {
-      return x.contains(a);      
+      return x.contains(a);
    }
 
    static inline bool strictlyContains(const interval& x, double a)
@@ -288,7 +301,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isSetNeq(const interval& x, const interval& y)
    {
-      return x != y;      
+      return x != y;
    }
 
    static inline bool isNegative(const interval& x)
@@ -318,7 +331,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isPossiblyNeq(const interval& x, const interval& y)
    {
-      return x.is_possibly_neq(y);      
+      return x.is_possibly_neq(y);
    }
 
    static inline bool isPossiblyLe(const interval& x, const interval& y)
@@ -328,7 +341,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isPossiblyLt(const interval& x, const interval& y)
    {
-      return x.is_possibly_lt(y);      
+      return x.is_possibly_lt(y);
    }
 
    static inline bool isPossiblyGe(const interval& x, const interval& y)
@@ -414,7 +427,7 @@ struct IntervalTraits<RawInterval> {
    static inline void print(std::ostream& os, const interval& x)
    {
       os << x;
-   } 
+   }
 
    static inline void addAssign(interval& x, const interval& y)
    {
@@ -540,7 +553,7 @@ struct IntervalTraits<RawInterval> {
    static inline interval divPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return inum64::div_pz(x, y, z);     
+      return inum64::div_pz(x, y, z);
    }
 
    static inline interval sqr(const interval& x)
@@ -665,13 +678,58 @@ struct IntervalTraits<RawInterval> {
       return inum64::tan_py(x, y);
    }
 
+   static inline interval cosh(const interval& x)
+   {
+      return inum64::cosh(x);
+   }
+
+   static inline interval coshPX(const interval& x, const interval& y)
+   {
+      return inum64::cosh_px(x, y);
+   }
+
+   static inline interval coshPY(const interval& x, const interval& y)
+   {
+      return inum64::cosh_py(x, y);
+   }
+
+   static inline interval sinh(const interval& x)
+   {
+      return inum64::sinh(x);
+   }
+
+   static inline interval sinhPX(const interval& x, const interval& y)
+   {
+      return inum64::sinh_px(x, y);
+   }
+
+   static inline interval sinhPY(const interval& x, const interval& y)
+   {
+      return inum64::sinh_py(x, y);
+   }
+
+   static inline interval tanh(const interval& x)
+   {
+      return inum64::tanh(x);
+   }
+
+   static inline interval tanhPX(const interval& x, const interval& y)
+   {
+      return inum64::tanh_px(x, y);
+   }
+
+   static inline interval tanhPY(const interval& x, const interval& y)
+   {
+      return inum64::tanh_py(x, y);
+   }
+
    static inline interval abs(const interval& x)
    {
       return inum64::abs(x);
    }
 
    static inline interval absPX(const interval& x, const interval& y)
-   {      
+   {
       return inum64::abs_px(x, y);
    }
 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Scope.cpp
+ * @brief  Scope of variables
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
@@ -17,6 +28,7 @@ namespace realpaver {
 ScopeRep::ScopeRep()
       : m_(),
         scopeMap_(nullptr),
+        hcode_(0),
         minid_(0),
         maxid_(0)
 {}
@@ -24,6 +36,7 @@ ScopeRep::ScopeRep()
 ScopeRep::ScopeRep(const ScopeRep& other)
       : m_(other.m_),
         scopeMap_(nullptr),
+        hcode_(other.hcode_),
         minid_(other.minid_),
         maxid_(other.maxid_)
 {
@@ -57,9 +70,13 @@ void ScopeRep::makeMap()
    else
    {
       ScopeHashMap* aux = new ScopeHashMap();
-      for (auto it : m_) aux->insert(it.first.id());
+      for (auto it : m_)
+         aux->insert(it.first.id());
+
       scopeMap_ = aux;
    }
+
+   hcode_ = scopeMap_->hashCode();
 }
 
 size_t ScopeRep::size() const
@@ -106,8 +123,14 @@ void ScopeRep::insert(Variable v, size_t n)
    auto it = m_.find(v);
 
    if (it != m_.end())
-      it->second += n;
+   {
+      if (it->first != v)
+         THROW("Bad insertion in a scope: two different variables " <<
+               "have the same index : " << v.id());
 
+      else
+         it->second += n;
+   }
    else
    {
       m_.insert(std::make_pair(v,n));
@@ -171,6 +194,11 @@ void ScopeRep::remove(const Variable& v, size_t n)
    }
 }
 
+size_t ScopeRep::hashCode() const
+{
+   return hcode_;
+}
+
 void ScopeRep::print(std::ostream& os) const
 {
    os << "{";
@@ -185,9 +213,15 @@ void ScopeRep::print(std::ostream& os) const
    os << "}";
 }
 
-///////////////////////////////////////////////////////////////////////////////
+bool ScopeRep::isIdentity() const
+{
+   return scopeMap_->isIdentity();
+}
 
-Scope::Scope() : rep_(std::make_shared< ScopeRep >())
+/*----------------------------------------------------------------------------*/
+
+Scope::Scope()
+      : rep_(std::make_shared< ScopeRep >())
 {}
 
 Scope::Scope(const std::initializer_list<Variable>& l)
@@ -205,6 +239,13 @@ void Scope::insert(Variable v)
    insert(v, 1);
 }
 
+size_t Scope::hashCode() const
+{
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
+   return rep_->hashCode();
+}
+
 void Scope::insert(Variable v, size_t n)
 {
    if (isShared())
@@ -212,6 +253,7 @@ void Scope::insert(Variable v, size_t n)
       // copy-on-write (cow) pointer
       rep_ = std::make_shared<ScopeRep>(*rep_.get());
    }
+
    rep_->insert(v, n);
 }
 
@@ -222,6 +264,8 @@ void Scope::remove(const Variable& v)
 
 void Scope::remove(const Variable& v, size_t n)
 {
+   ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
+   
    if (isShared())
    {
       // copy-on-write (cow) pointer
@@ -233,6 +277,8 @@ void Scope::remove(const Variable& v, size_t n)
 
 size_t Scope::size() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->size();
 }
 
@@ -243,47 +289,81 @@ bool Scope::isEmpty() const
 
 bool Scope::contains(const Variable& v) const
 {
-   return find(v) != end();
+   auto it = rep_->find(v);
+
+   // no variable having the same index
+   if (it == end()) return false;
+
+   // checks if the two variables correspond
+   return (*it) == v;
 }
 
 size_t Scope::minVarId() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->minVarId();
 }
 
 size_t Scope::maxVarId() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->maxVarId();
 }
 
 void Scope::print(std::ostream& os) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    rep_->print(os);
 }
 
 typename Scope::const_iterator Scope::begin() const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
    return rep_->begin();
 }
 
 typename Scope::const_iterator Scope::end() const
 {
-   return rep_->end();   
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
+   return rep_->end();
 }
 
 typename Scope::const_iterator Scope::find(const Variable& v) const
 {
-   return rep_->find(v);
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+
+   auto it = rep_->find(v);
+
+   // no variable having the same index
+   if (it == rep_->end())
+      return it;
+
+   // one variable havibg the same index but different from v
+   if (*it != v)
+      return rep_->end();
+
+   // variable found
+   return it;
 }
 
 size_t Scope::index(const Variable& v) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
+
    return rep_->index(v);
 }
 
 Variable Scope::var(size_t i) const
 {
+   ASSERT(rep_ != nullptr, "Scope with null pointer");
    ASSERT(i < size(), "Bad access to a variable in a scope @ " << i);
+
    return rep_->var(i);
 }
 
@@ -359,6 +439,22 @@ bool Scope::overlaps(const Scope& other) const
    return !disjoint(other);
 }
 
+bool Scope::operator==(const Scope& other) const
+{
+   if (rep_.get() == other.rep_.get())
+      return true;
+
+   if (size() != other.size())
+      return false;
+
+   return contains(other);
+}
+
+bool Scope::operator!=(const Scope& other) const
+{
+   return !operator==(other);
+}
+
 Scope operator&(Scope s, Scope t)
 {
    Scope res;
@@ -395,6 +491,11 @@ size_t Scope::nameMaxLength() const
       if (n > l) l = n;
    }
    return l;
+}
+
+bool Scope::isIdentity() const
+{
+   return rep_->isIdentity();
 }
 
 } // namespace

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NumericVector.hpp
+ * @brief  Numeric vector
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_NUMERIC_VECTOR_HPP
 #define REALPAVER_NUMERIC_VECTOR_HPP
@@ -18,36 +29,33 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a numeric vector of elements of type T.
-///////////////////////////////////////////////////////////////////////////////
+/// Numeric vector of elements of type T
 template <typename T>
 class NumericVector {
 protected:
    /// Traits class
-  typedef NumericTraits<T> TraitsType;
+  using TraitsType = NumericTraits<T>;
       
 public:
    /// Value type
-   typedef T ValueType;
+   using ValueType = T;
 
    /// Pointer type
-   typedef T* PointerType;
+   using PointerType = T*;
 
    /// Constant pointer type
-   typedef const T* ConstPointerType;
+   using ConstPointerType = const T*;
 
    /// Reference type
-   typedef T& RefType;
+   using RefType = T&;
 
    /// Const reference type
-   typedef const T& ConstRefType;
+   using ConstRefType = const T&;
 
-   /// Creates a vector of a given size
-   /// @param size number of elements of this
+   /// Constructor
    NumericVector(size_t size = 0);
 
-   /// Creates a vector and initializes its elements
+   /// Constructor that initializes all the elements to init
    NumericVector(size_t size, ConstRefType init);
 
    /// Default copy constructor
@@ -59,84 +67,58 @@ public:
    /// Virtual destructor
    virtual ~NumericVector();
 
-   /// @return the size of this
+   /// Returns the size of this
    size_t size() const;
 
-   /// Resizes the vector
-   /// @param n new size of this
+   /// Resizes the vector given the new size n
    void resize(size_t n);
 
-   /// Constant access in this
-   /// @param i an index between 0 and size()-1
-   /// @return the i-th element of this
+   /// Returns the i-th element of this
    ValueType operator[](size_t i) const;
 
-   /// Non constant access in this
-   /// @param i an index between 0 and size()-1
-   /// @return a reference to the i-th element of this
+   /// Returns a reference to the i-th element of this
    RefType operator[](size_t i);
 
-   /// Modification of all the elements of this
-   /// @param x a number
-   ///
-   /// Assigns x to all the element of this
+   /// Assigns all the element of this to x
    void setAll(ConstRefType x);
 
-   /// Assigns another vector to this
-   /// @param V a vector having the same size than this
+   /// Assigns this to V
    void setAll(const NumericVector& V);
 
-   /// Asigns this from an array
-   /// @param array array of values to be assigned to this
+   /// Assigns this from an array
    void setArray(ConstPointerType array);
 
-   /// Insertion of one element at the end of this
-   /// @param x a number inserted at the end
+   /// Inserts x at the end of this
    void push(const T& x);
 
    /// Output on a stream
-   /// @param os an output stream
    virtual void print(std::ostream& os) const;
 
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   /// @return true if one element of this in infinite
+   /// Returns true if one element of this in infinite
    bool isInf() const;
 
-   /// @return true if all the elements of this are finite
+   /// Returns true if all the elements of this are finite
    bool isFinite() const;
 
-   /// Addition
-   /// @param V a vector
-   /// @param W a vector
-   /// @param res result assigned to V + W
+   /// Assigns res to V + W
    static void add(const NumericVector& V, const NumericVector& W,
                    NumericVector& res);
 
-   /// Subtraction
-   /// @param V a vector
-   /// @param W a vector
-   /// @param res result assigned to V - W
+   /// Assigns res to V - W
    static void sub(const NumericVector& V, const NumericVector& W,
                    NumericVector& res);
 
-   /// Unary subtraction
-   /// @param V a vector
-   /// @param res result assigned to - V
+   /// Assigns res to -V
    static void usb(const NumericVector& V, NumericVector& res);
 
-   /// Multiplication
-   /// @param a a scalar
-   /// @param V a vector
-   /// @param res result assigned to a * V
+   /// Assigns res to a * V
    static void mulScalar(ConstRefType a, const NumericVector& V,
                          NumericVector& res);
 
-   /// Division
-   /// @param V a vector
-   /// @param a a scalar
-   /// @param res result assigned to V / a
+   /// Assigns res to V / a
    static void divScalar(const NumericVector& V, ConstRefType a,
                          NumericVector& res);
 

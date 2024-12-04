@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Tolerance.cpp
+ * @brief  Tolerances for numerical computations
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
@@ -13,169 +24,145 @@
 
 namespace realpaver {
 
-Tolerance::Tolerance(double val, bool absolute) :
-   val_(val), abs_(absolute)
+Tolerance::Tolerance(double rtol, double atol)
+      : rtol_(rtol),
+        atol_(atol)
 {
-   ASSERT(val >= 0.0 && (val <= 1.0 || absolute), "bad tolerance: " << val);
+   ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
+   ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
 }
 
-Tolerance::Tolerance(const std::string& str)
+double Tolerance::getRelTol() const
 {
-   if (str.size() < 2) THROW("Bad tolerance format");
-
-   size_t k = str.size()-1;
-   char c = str[k];
-
-   if (c != 'A' && c != 'R') THROW("Bad tolerance format");
-
-   Interval x(str.substr(0, k));
-   if (x.isEmpty() || x.right() < 0.0) THROW("Bad tolerance format");
-
-   abs_ = (c == 'A');
-   val_ = x.right();
+   return rtol_;
 }
 
-double Tolerance::getVal() const
+double Tolerance::getAbsTol() const
 {
-   return val_;
+   return atol_;
 }
 
-void Tolerance::setVal(double m)
+void Tolerance::setRelTol(double val)
 {
-   val_ = m;
+   ASSERT(val >= 0.0, "A relative tolerance must be positive");
+
+   rtol_ = val;
 }
 
-bool Tolerance::isAbsolute() const
+void Tolerance::setAbsTol(double val)
 {
-   return abs_;
+   ASSERT(val >= 0.0, "An absolute tolerance must be positive");
+
+   atol_ = val;
 }
 
-bool Tolerance::isRelative() const
-{
-   return !abs_;
-}
-
-Tolerance Tolerance::makeAbs(double val)
-{
-   return Tolerance(val, true);
-}
-
-Tolerance Tolerance::makeRel(double val)
-{
-   return Tolerance(val, false);
-}
-
-double Tolerance::toleranceOf(const Interval& x)
+bool Tolerance::isTight(const Interval& x) const
 {
    if (x.isEmpty())
-      return -1.0;
-
-   else if (x.isCanonical())
-      return 0.0;
- 
-   else if (abs_ || Interval::minusOnePlusOne().contains(x))
-      return x.width();
-
-   else
-      return x.relWidth();
-}
-
-bool Tolerance::hasTolerance(const Interval& x) const
-{
-   if (x.isEmpty() || x.isInf())
       return false;
 
    else if (x.isCanonical())
       return true;
 
    else
-   {
-      double px = (isAbsolute() || Interval::minusOnePlusOne().contains(x)) ?
-                     x.width() : x.relWidth();
-
-      return px <= val_;
-   }
+      return Double::isClose(x.left(), x.right(), rtol_, atol_);
 }
 
-bool Tolerance::hasTolerance(const IntervalVector& X) const
+bool Tolerance::isTight(const IntervalVector& X) const
 {
    for (size_t i=0; i<X.size(); ++i)
-      if (!hasTolerance(X.get(i)))
+      if (!isTight(X.get(i)))
          return false;
 
    return true;
 }
 
-bool Tolerance::hasTolerance(double x, double y) const
+bool Tolerance::isImproved(const Interval& old, const Interval& x) const
 {
-   if (x == y) return true;
-
-   return (x < y) ? hasTolerance(Interval(x, y)) :
-                    hasTolerance(Interval(y, x));
-}
-
-bool Tolerance::haveDistTolerance(const Interval& x, const Interval& y) const
-{
-   if (x.isEmpty() || y.isEmpty() || x.isInf() || y.isInf())
+   if (old.isEmpty() || x.isEmpty())
       return false;
 
-   double u = Double::abs(x.left() - y.left()),
-          v = Double::abs(x.right() - y.right());
-
-   return (u > v) ? hasTolerance(x.left(), y.left()) :
-                    hasTolerance(x.right(), y.right());
+   return (1.0 - x.width() / old.width()) > rtol_;
 }
 
-Interval Tolerance::maxIntervalDn(double ub) const
+double maxIntervalDnAbs(double ub, double atol)
 {
-   if (Double::isInf(ub)) return Interval::universe();
+   Double::rndUp();
+   return ub - atol;
+}
 
-   if (val_ == 0.0) return Interval(Double::prevDouble(ub), ub);
-
-   if (isAbsolute())
+double maxIntervalDnRel(double ub, double rtol)
+{
+   if (ub > 1.0)
    {
-      Double::rndUp();
-      return Interval(ub - val_, ub);
-   }
-   else if (ub > 1.0)
-   {
-      Interval v(val_), lb(ub*(1.0-v)/(1.0+v));
-      return Interval(lb.right(), ub);
+      Interval v(rtol), lb(ub*(1.0-v)/(1.0+v));
+      return lb.right();
    }
    else if (ub <= -1.0)
    {
-      if (val_ == 1.0)
+      if (rtol == 1.0)
       {
-         return Interval(Double::lowest(), ub);
+         return Double::lowest();
       }
       else
       {
-         Interval v(val_), lb(ub*(1.0+v)/(1.0-v));
-         return Interval(lb.right(), ub);
+         Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+         return lb.right();
       }
    }
    else
    {
       Double::rndUp();
-      double lb = ub - val_;
+      double lb = ub - rtol;
 
       if (lb >= -1.0)
       {
-         return Interval(lb, ub);
+         return lb;
       }
       else
       {
-         // we have ub < 0.0 since val_ <= 1.0
-         if (val_ == 1.0)
+         // we have ub < 0.0 since rtol <= 1.0
+         if (rtol == 1.0)
          {
-            return Interval(Double::lowest(), ub);
+            return Double::lowest();
          }
          else
          {
-            Interval v(val_), lb(ub*(1.0+v)/(1.0-v));
-            return Interval(lb.right(), ub);
+            Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+            return lb.right();
          }
       }
+   }
+}
+
+Interval Tolerance::maxIntervalDn(double ub) const
+{
+   if (Double::isNan(ub))
+      return Interval::emptyset();
+
+   if (Double::isInf(ub))
+      return Interval::universe();
+
+   else if (atol_ == 0.0 && rtol_ == 0.0)
+      return Interval(Double::prevDouble(ub), ub);
+
+   else if (rtol_ == 0.0)
+   {
+      double lb = maxIntervalDnAbs(ub, atol_);
+      return Interval(lb, ub);
+   }
+
+   else if (atol_ == 0.0)
+   {
+      double lb = maxIntervalDnRel(ub, rtol_);
+      return Interval(lb, ub);
+   }
+
+   else
+   {
+      double lb1 = maxIntervalDnAbs(ub, atol_),
+             lb2 = maxIntervalDnRel(ub, rtol_);
+      return Interval(Double::min(lb1, lb2), ub);
    }
 }
 
@@ -184,10 +171,31 @@ Interval Tolerance::maxIntervalUp(double lb) const
    return -maxIntervalDn(-lb); 
 }
 
+double Tolerance::discreteSize(const Interval& x) const
+{
+   if (x.isEmpty())
+      return 0.0;
+   
+   else if (x.isCanonical())
+      return 1.0;
+  
+   else if (x.isInf())
+      return Double::floor(Double::greatest());
+
+   else
+   {
+      // absolute
+      double a = x.width() / atol_,
+             b = Double::floor(a);
+
+      return (a == b) ? b : b+1.0;
+   }
+}
+
 std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
 {
-   os << tol.getVal()
-      << (tol.isAbsolute() ? "A" : "R");
+   os << "tol(" << tol.getRelTol() << ", "
+      << tol.getAbsTol() << ")";
    return os;
 }
 

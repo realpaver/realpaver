@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalFunction.cpp
+ * @brief  Interval functions
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalFunction.hpp"
@@ -25,7 +36,7 @@ Interval IntervalFunctionRep::getImage() const
    return img_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunction::IntervalFunction(SharedDag dag, size_t i)
       : rep_(std::make_shared<IntervalFunctionDag>(dag, i))
@@ -67,40 +78,22 @@ size_t IntervalFunction::nbVars() const
    return rep_->nbVars();
 }
 
-Interval IntervalFunction::eval(const IntervalRegion& reg)
+Interval IntervalFunction::eval(const IntervalBox& B)
 {
-   return rep_->eval(reg);
+   return rep_->eval(B);
 }
 
-Interval IntervalFunction::pointEval(const RealPoint& pt)
+void IntervalFunction::diff(const IntervalBox& B, IntervalVector& G)
 {
-   return rep_->pointEval(pt);
+   return rep_->diff(B, G);
 }
 
-void IntervalFunction::diff(const IntervalRegion& reg, IntervalVector& grad)
+void IntervalFunction::diffHansen(const IntervalBox& B, IntervalVector& G)
 {
-   return rep_->diff(reg, grad);
+   rep_->diffHansen(B, G);
 }
 
-void IntervalFunction::evalDiff(const IntervalRegion& reg, Interval& val,
-                                IntervalVector& grad)
-{
-   return rep_->evalDiff(reg, val, grad);   
-}
-
-void IntervalFunction::violation(const IntervalRegion& reg, Interval& val,
-                                 double& viol)
-{
-   rep_->violation(reg, val, viol);
-}
-
-void IntervalFunction::violation(const IntervalRegion& reg, double lo,
-                                 double up, Interval& val, double& viol)
-{
-   rep_->violation(reg, lo, up, val, viol);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 IntervalFunctionDag::IntervalFunctionDag(SharedDag dag, size_t i)
       : IntervalFunctionRep(),
@@ -139,58 +132,21 @@ size_t IntervalFunctionDag::nbVars() const
    return dag_->fun(index_)->nbVars();   
 }
 
-Interval IntervalFunctionDag::eval(const IntervalRegion& reg)
+Interval IntervalFunctionDag::eval(const IntervalBox& B)
 {
-   return dag_->fun(index_)->intervalEval(reg);
+   return dag_->fun(index_)->iEval(B);
 }
 
-Interval IntervalFunctionDag::pointEval(const RealPoint& pt)
-{
-   return dag_->fun(index_)->intervalEval(pt);
-}
-
-void IntervalFunctionDag::violation(const IntervalRegion& reg, Interval& val,
-                                    double& viol)
+void IntervalFunctionDag::diff(const IntervalBox& B, IntervalVector& G)
 {
    DagFun* f = dag_->fun(index_);
-   val = f->intervalEval(reg);
-   viol = f->intervalViolation();
+   return f->iDiff(B, G);
 }
 
-void IntervalFunctionDag::violation(const IntervalRegion& reg, double lo,
-                                    double up, Interval& val, double& viol)
+void IntervalFunctionDag::diffHansen(const IntervalBox& B, IntervalVector& G)
 {
-   Interval img(lo, up);
-   ASSERT(!img.isEmpty(), "Empty image for an interval function");
-
    DagFun* f = dag_->fun(index_);
-   Interval tmp = f->getImage();
-   f->setImage(img);
-
-   val = f->intervalEval(reg);
-   viol = f->intervalViolation();
-
-   f->setImage(tmp);
-}
-
-void IntervalFunctionDag::diff(const IntervalRegion& reg, IntervalVector& grad)
-{
-   Interval val;
-   evalDiff(reg, val, grad);
-}
-
-void IntervalFunctionDag::evalDiff(const IntervalRegion& reg, Interval& val,
-                                   IntervalVector& grad)
-{
-   ASSERT(nbVars() == grad.size(), "Bad size of gradient");
-
-   DagFun* f = dag_->fun(index_);
-   val = f->intervalEval(reg);
-   if (val.isEmpty())
-      grad.setEmpty();
-
-   else
-      f->intervalDiff(grad);
+   return f->iDiffHansen(B, G);
 }
 
 } // namespace

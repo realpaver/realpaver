@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ConstraintFixer.hpp
+ * @brief  Rewriting of constraints
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_CONSTRAINT_FIXER_HPP
 #define REALPAVER_CONSTRAINT_FIXER_HPP
@@ -15,30 +26,32 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor of terms that replaces variables.
-///
-/// Let c be a constraint, let vvm be a map Variable -> Variable, and let vim
-/// be a map Variable -> Interval.
-/// - for every entry (v, x) in vvm, every occurrence of v in c is replaced
-///   by x;
-/// - for every entry (v, d) in vim, every occurrence of v in c is replaced
-/// - by d.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Visitor that rewrites constraints.
+ * 
+ * Let c be a constraint, let vvm be a map Variable -> Variable, and let vim
+ * be a map Variable -> Interval.
+ * - for every entry (v, x) in vvm, every occurrence of v in c is replaced
+ *   by x.
+ * - for every entry (v, d) in vim, every occurrence of v in c is replaced
+ *   by d.
+ */
 class ConstraintFixer : public ConstraintVisitor {
 public:
-   /// map type Variable -> Variable
-   typedef TermFixer::VarVarMapType VarVarMapType;
+   /// Map type Variable -> Variable
+   using VarVarMapType = TermFixer::VarVarMapType;
 
-   /// map type Variable -> Interval
-   typedef TermFixer::VarIntervalMapType VarIntervalMapType;
+   /// Map type Variable -> Interval
+   using VarIntervalMapType = TermFixer::VarIntervalMapType;
 
-   /// Creates a fixer given two maps
-   /// @param vvm map Variable -> Variable
-   /// @param vim map Variable -> Interval
-   /// @param reg domains of the variables in vvm
+   /**
+    * @brief Constructor.
+    * @param vvm map Variable -> Variable
+    * @param vim map Variable -> Interval
+    * @param B domains of the variables in vvm
+    */
    ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
-                   const IntervalRegion& reg);
+                   const DomainBox& box);
 
    /// No copy
    ConstraintFixer(const ConstraintFixer&) = delete;
@@ -49,10 +62,9 @@ public:
    /// Default destructor
    ~ConstraintFixer() = default;
 
-   /// @return the new constraint after a visit
+   /// Returns the new constraint after a visit
    Constraint getConstraint() const;
 
-   ///@{
    void apply(const ArithCtrEq* c) override;
    void apply(const ArithCtrLe* c) override;
    void apply(const ArithCtrLt* c) override;
@@ -60,13 +72,13 @@ public:
    void apply(const ArithCtrGt* c) override;
    void apply(const ArithCtrIn* c) override;
    void apply(const TableCtr* c) override;
-   ///@}
+   void apply(const CondCtr* c) override;
 
 private:
-   VarVarMapType* vvm_;
-   VarIntervalMapType* vim_;
-   IntervalRegion reg_;
-   Constraint c_;
+   VarVarMapType* vvm_;       // map Variable -> Variable
+   VarIntervalMapType* vim_;  // map Variable -> Interval
+   DomainBox box_;            // domains of variables
+   Constraint c_;             // new constraint
 };
 
 } // namespace

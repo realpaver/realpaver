@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Common.hpp
+ * @brief  Common types and functions
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_COMMON_HPP
 #define REALPAVER_COMMON_HPP
@@ -15,11 +26,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-// Hash coding functions
-///////////////////////////////////////////////////////////////////////////////
-
-/// Calculates the hash code of a value using std::hash
+/// Returns the hash code of a value using std::hash
 template <typename T>
 std::size_t hash1(const T& x)
 {
@@ -37,24 +44,24 @@ std::size_t hash3(std::size_t h1, std::size_t h2, std::size_t h3);
 std::size_t hash4(std::size_t h1, std::size_t h2,
                   std::size_t h3, std::size_t h4);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a certificate returned by solvers of optimization problems.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/// Certificate returned by solvers of optimization problems
 enum class OptimizationStatus {
-   Optimal,
-   Infeasible,
-   StopOnIterLimit,
-   StopOnNodeLimit,
-   StopOnTimeLimit,
-   Other
+   Optimal,            ///< optimum found
+   Infeasible,         ///< proved infeasible
+   StopOnIterLimit,    ///< iteration limit exceeded
+   StopOnNodeLimit,    ///< node limit exceeded
+   StopOnTimeLimit,    ///< time limit exceeded
+   Other               ///< other status
 };
 
-/// Output on a stream of an optimization status
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, OptimizationStatus status);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a certificate returned by interval solvers.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/** @brief Certificate returned by interval solvers */
 enum class Proof {
    Empty,      ///< proof of infeasible region
    Maybe,      ///< no proof
@@ -62,7 +69,7 @@ enum class Proof {
    Inner       ///< proof of inner region
 };
 
-/// Output on a stream of a certificate of proof
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, Proof proof);
 
 } // namespace

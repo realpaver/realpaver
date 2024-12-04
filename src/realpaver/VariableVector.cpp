@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   VariableVector.cpp
+ * @brief  Vector of variables
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include <sstream>
 #include "realpaver/AssertDebug.hpp"
@@ -52,24 +63,6 @@ Variable VariableVectorRep::get(int i) const
    return vars_[i-first_];
 }
 
-void VariableVectorRep::setDomain(const Interval& x)
-{
-   for (auto& v : vars_)
-      v.setDomain(x);
-}
-
-void VariableVectorRep::setInteger()
-{
-   for (auto& v : vars_)
-      v.setInteger();
-}
-
-void VariableVectorRep::setBinary()
-{
-   for (auto& v : vars_)
-      v.setBinary();
-}
-
 void VariableVectorRep::setTolerance(const Tolerance& tol)
 {
    for (auto& v : vars_)
@@ -99,7 +92,7 @@ int VariableVectorRep::lastIndex() const
    return last_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 VariableVector::VariableVector(const std::string& name, int first, int last)
    : rep_(std::make_shared<VariableVectorRep>(name, first, last))
@@ -118,24 +111,6 @@ Variable VariableVector::get(int i) const
 Variable VariableVector::operator[](int i) const
 {
    return rep_->get(i);
-}
-
-VariableVector& VariableVector::setDomain(const Interval& x)
-{
-   rep_->setDomain(x);
-   return *this;
-}
-
-VariableVector& VariableVector::setInteger()
-{
-   rep_->setInteger();
-   return *this;
-}
-
-VariableVector& VariableVector::setBinary()
-{
-   rep_->setBinary();
-   return *this;
 }
 
 VariableVector& VariableVector::setTolerance(const Tolerance& tol)

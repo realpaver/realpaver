@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   IntervalUnion.hpp
+ * @brief  Ordered set of disjoint intervals
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_INTERVAL_UNION_HPP
 #define REALPAVER_INTERVAL_UNION_HPP
@@ -16,9 +27,7 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an ordered set of disjoint intervals.
-///////////////////////////////////////////////////////////////////////////////
+/// Ordered set of disjoint intervals
 class IntervalUnion {
 public:
    /// Creates an empty interval union
@@ -27,8 +36,7 @@ public:
    /// Creates an interval union reduced to one interval
    IntervalUnion(const Interval& x);
 
-   /// Creates an interval union
-   /// @para l list of intervals inserted in this
+   /// Creates an interval union from a list
    IntervalUnion(const std::initializer_list<Interval>& l);
 
    /// Default copy constructor
@@ -40,37 +48,72 @@ public:
    /// Default destructor
    ~IntervalUnion() = default;
 
-   /// @return the number of disjoint intervals in this
+   /// Returns the number of disjoint intervals in this
    size_t size() const;
 
-   /// Gets an interval of this
-   /// @param i index of an interval between 0 and size()-1
-   /// @return the i-th interval of this
-   Interval operator[](size_t i) const;
+   /// Gets the i-th interval of this
+   const Interval& operator[](size_t i) const;
 
-   /// @return true if this is empty
+   /// Gets a part of this
+   IntervalUnion subUnion(size_t i, size_t j) const;
+
+   /// Returns true if this is empty
    bool isEmpty() const;
 
    /// Assigns this to the empty set
    void setEmpty();
 
-   /// Inserts an element in this
-   /// @param x interval inserted in this
-   /// @return a reference to this
+   /// Inserts x in this
    IntervalUnion& insert(const Interval& x);
 
-   /// @return the interval hull of this
+   /// Returns the interval hull of this
    Interval hull() const;
 
-   /// Contracts an interval
-   /// @param x an interval
-   ///
-   /// x is assigned tohull(x inter this)
-   void contract(Interval& x) const;
+   /// Contracts x as hull(x inter this)
+   void contractInterval(Interval& x) const;
+
+   /// Contracts this as (this inter x)
+   void contract(const Interval& x);
 
    /// Output on a stream
-   /// @param os output stream
    void print(std::ostream& os) const;
+
+   /// Clears this, which becomes empty
+   void clear();
+
+   /// Returns the sum of the widths of the components of this
+   double width() const;
+
+   /// Equality test
+   bool equals(const IntervalUnion& other) const;
+
+   /// @name Addition
+   ///@{
+   friend IntervalUnion addPX(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   friend IntervalUnion addPY(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   ///@}
+
+   /// @name Subtraction
+   ///@{
+   friend IntervalUnion subPX(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   friend IntervalUnion subPY(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   ///@}
+
+   /// @name Multiplication
+   ///@{
+   friend IntervalUnion mulPX(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   friend IntervalUnion mulPY(const Interval& x, const Interval& y,
+                              const IntervalUnion& Z);
+   ///@}
+
+
+   /// Square
+   friend IntervalUnion sqrPX(const Interval& x, const IntervalUnion& Y);
 
 private:
    typedef std::vector<Interval> VectorType;
@@ -83,12 +126,12 @@ private:
 
 public:
    /// Type of iterators in an interval union
-   typedef VectorType::iterator iterator;
+   using iterator = VectorType::iterator;
 
-   /// @return an iterator to the beginning of this
+   /// Returns an iterator to the beginning of this
    iterator begin();
 
-   /// @return an iterator to the end of this
+   /// Returns an iterator to the end of this
    iterator end();
 };
 

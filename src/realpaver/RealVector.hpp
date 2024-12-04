@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealVector.hpp
+ * @brief  Real vector
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_REAL_VECTOR_HPP
 #define REALPAVER_REAL_VECTOR_HPP
@@ -17,23 +28,20 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a vector of real numbers.
-///
-/// The elements of a vector of size n are indexed from 0 to n-1.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Vector of real numbers.
+ *
+ * The elements of a vector of size n are indexed from 0 to n-1.
+ */
 class RealVector : public NumericVector<double> {
 public:
    /// Base class
-   typedef NumericVector<double> BaseType;
+   using BaseType = NumericVector<double>;
 
-   /// Creates a vector
-   /// @param n number of elements
-   /// @param x initialization value
+   /// Creates a vector with n elements assigned to x
    RealVector(size_t n = 0, double x = 0.0);
    
    /// Creates a vector from a list
-   /// @param l list of elements inserted in this
    RealVector(const std::initializer_list<double>& l);
 
    /// Default copy constructor
@@ -45,83 +53,75 @@ public:
    /// Default destructor
    ~RealVector() = default;
 
-   /// @param i an index between 0 and size()-1
-   /// @return the i-th element of this
+   /// Returns the i-th element of this
    double get(size_t i) const;
 
-   /// Sets an element of this
-   /// @param i an index between 0 and size()-1
-   /// @param x a real number
+   /// Sets the i-th element to x
    void set(size_t i, double x);
 
-   /// @return true if at least one component is a NaN
+   /// Returns true if at least one component is a NaN
    bool isNan() const;
 
-   /// @return true if every component is not a NaN and is finite
+   /// Sets this to NaN
+   void setNan();
+
+   /// Returns true if every component is not a NaN and is finite
    bool isFinite() const;
 
-   /// Scalar product
-   /// @param V a vector having the same size than this
-   /// @return the scalar product of this and V
+   /// Returns the scalar product of this and V
    double scalarProduct(const RealVector& V) const;
 
-   /// @return the L1-norm of this
+   /// Returns the L1-norm of this
    double l1Norm() const;
 
-   /// @return the L2-norm (Euclidean-norm) of this
+   /// Returns the L2-norm (Euclidean-norm) of this
    double l2Norm() const;
 
-   /// @return the infinite-norm of this
+   /// Returns the infinite-norm of this
    double linfNorm() const;
 
    /// Addition with assignment
-   /// @param V a vector
-   /// @return a reference to this
-   ///
-   /// this is assigned to this + V
    RealVector& operator+=(const RealVector& V);
 
    /// Subtraction with assignment
-   /// @param V a vector
-   /// @return a reference to this
-   ///
-   /// this is assigned to this - V
    RealVector& operator-=(const RealVector& V);
 
    /// Multiplication with assignment
-   /// @param a a scalar
-   /// @return a reference to this
-   ///
-   /// this is assigned to this * a
    RealVector& operator*=(double a);
 
    /// Division with assignment
-   /// @param a a scalar
-   /// @return a reference to this
-   ///
-   /// this is assigned to this / a
    RealVector& operator/=(double a);
 
-   /// @return a clone of this
+   /// Returns a clone of this
    virtual RealVector* clone() const;
 };
 
-/// output on a stream
+/// Output on a stream
 std::ostream& operator<<(std::ostream& os, const RealVector& V);
 
-///@{
-/// Operators on real vectors
+/// Returns V+W
 RealVector operator+(const RealVector& V, const RealVector& W);
+
+/// Returns V+w
 RealVector operator+(const RealVector& V, double w);
+
+/// Returns V-W
 RealVector operator-(const RealVector& V, const RealVector& W);
+
+/// Returns -V
 RealVector operator-(const RealVector& V);
 
+/// Returns a*V
 RealVector operator*(double a, const RealVector& V);
+
+/// Returns V*a
 RealVector operator*(const RealVector& V, double a);
+
+/// Returns A*X
 RealVector operator*(const RealMatrix& A, const RealVector& X);
 
+/// Returns V/a
 RealVector operator/(const RealVector& V, double a);
-///@}
 
 } // namespace
 

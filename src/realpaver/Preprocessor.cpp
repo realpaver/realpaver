@@ -1,27 +1,45 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Preprocessor.cpp
+ * @brief  Preprocessor of problems
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 Preprocessor::Preprocessor()
       : vvm_(),
         vim_(),
+        box_(nullptr),
         inactive_(),
         active_(),
         unfeasible_(false),
         timer_()
 {}
+
+Preprocessor::~Preprocessor()
+{
+   if (box_!=nullptr) delete box_;
+}
 
 bool Preprocessor::allVarsFixed() const
 {
@@ -49,29 +67,32 @@ Variable Preprocessor::srcToDestVar(Variable v) const
    auto it = vvm_.find(v);
    return it->second;
 }
-   
+
+Scope Preprocessor::destScope() const
+{
+   Scope scop;
+   for (auto p : vvm_)
+      scop.insert(p.second);
+
+   return scop;
+}
+
+DomainBox Preprocessor::destRegion() const
+{
+   DomainBox box(destScope());
+   for (auto p : vvm_)
+   {
+      std::unique_ptr<Domain> domain(box_->get(p.first)->clone());
+      box.set(p.second, std::move(domain));
+   }
+
+   return box;
+}
+
 void Preprocessor::apply(const Problem& src, Problem& dest)
-{
-   IntervalRegion reg = src.getDomains();
-   apply(src, reg, dest);
-}
-
-void Preprocessor::apply(const Problem& src, IntervalRegion& reg, Problem& dest)
-{
-   timer_.reset();
-   timer_.start();
-   applyImpl(src, reg, dest);
-   timer_.stop();
-}
-
-void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
-                             Problem& dest)
-{
-   ASSERT(src.nbVars() == reg.size(), "Preprocessing error");
+{   
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
-
-   Objective obj = src.getObjective();
 
    // resets this
    vvm_.clear();
@@ -80,16 +101,30 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    active_.clear();
    unfeasible_ = false;
 
+   // makes the interval box used for propagation
+   if (box_!=nullptr) delete box_;
+   box_ = new DomainBox(src.scope());
+
    LOG_MAIN("Preprocessing");
-   LOG_INTER("Region: " << reg);
+   LOG_INTER("Box: " << (*box_));
+
+   timer_.reset();
+   timer_.start();
+   applyImpl(src, dest);
+   timer_.stop();
+}
+
+void Preprocessor::applyImpl(const Problem& src, Problem& dest)
+{
+   Objective obj = src.getObjective();
 
    // test empty domains
    for (size_t i=0; i<src.nbVars(); ++i)
    {
-      Variable v        = src.varAt(i);
-      Interval domain   = reg.get(v);
+      Variable v = src.varAt(i);
+      Domain* domain = box_->get(v);
 
-      if (domain.isEmpty())
+      if (domain->isEmpty())
       {
          LOG_MAIN("Empty domain of variable: " << v.getName());
          unfeasible_ = true;
@@ -98,20 +133,20 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    }
 
    // propagation
-   bool ok = propagate(src, reg);
+   bool ok = propagate(src, *box_);
    if (!ok)
    {
       unfeasible_ = true;
       return;
    }
 
-   LOG_INTER("Contracted region: " << reg);
+   LOG_INTER("Contracted box: " << (*box_));
 
    // satisfaction tests
    for (size_t i=0; i<src.nbCtrs(); ++i)
    {
       Constraint c = src.ctrAt(i);
-      Proof proof = c.isSatisfied(reg);
+      Proof proof = c.isSatisfied(*box_);
 
       if (proof == Proof::Empty)
       {
@@ -137,33 +172,30 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    // rewrites the variables
    for (size_t i=0; i<src.nbVars(); ++i)
    {
-      Variable v        = src.varAt(i);
-      Interval domain   = reg.get(v);
-      bool isContinuous = v.isContinuous();
-      Tolerance tol     = v.getTolerance();
+      Variable v = src.varAt(i);
+      Domain* domain = box_->get(v);
 
-      bool isFixed = isContinuous ? domain.isCanonical() :
-                                    domain.isSingleton();
-
+      bool isFixed = domain->isCanonical();
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
    
       if (isFake)
       {
-         LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
-         vim_.insert(std::make_pair(v, domain));
+         LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
+         vim_.insert(std::make_pair(v, domain->intervalHull()));
       }
       else if (isFixed)
       {
-         LOG_INTER("Fixes and removes " << v.getName() << " := " << domain);
-         vim_.insert(std::make_pair(v, domain));
+         LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
+         vim_.insert(std::make_pair(v, domain->intervalHull()));
       }
       else
       {
          // creates a clone of the variable in the other problem
-         Variable w = isContinuous ?
-                           dest.addRealVar(domain, v.getName()) :
-                           dest.addIntVar(domain, v.getName());
-         w.setTolerance(tol);
+         Variable w = dest.addClonedVar(v);
+
+         // assigns the reduced domain to it
+         std::unique_ptr<Domain> wdom(domain->clone());
+         w.setDomain(std::move(wdom));
 
          // new map entry
          vvm_.insert(std::make_pair(v, w));
@@ -175,7 +207,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    // rewrites the constraints
    for (Constraint input : active_)
    {
-      ConstraintFixer fixer(&vvm_, &vim_, reg);
+      ConstraintFixer fixer(&vvm_, &vim_, *box_);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
 
@@ -189,7 +221,7 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(src.getDomains());
+   Interval dobj = obj.getTerm().eval(*box_)->intervalHull();
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");
@@ -215,22 +247,20 @@ void Preprocessor::applyImpl(const Problem& src, IntervalRegion& reg,
    }
 }
 
-bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
+bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
 {
    // AC1 propagation algorithm
    bool modified;
-   int nbsteps = Param::GetIntParam("PROPAGATION_ITER_LIMIT");
 
    do
    {
       modified = false;
-      --nbsteps;
-      IntervalRegion save(reg);
+      DomainBox save(box);
 
       for (size_t i=0; i<problem.nbCtrs(); ++i)
       {
          Constraint c = problem.ctrAt(i);
-         Proof proof = c.contract(reg);
+         Proof proof = c.contract(box);
          if (proof == Proof::Empty)
          {
             LOG_INTER("Constraint violated: " << c);
@@ -238,23 +268,10 @@ bool Preprocessor::propagate(const Problem& problem, IntervalRegion& reg)
          }
       }
 
-      if (!save.equals(reg)) modified = true;
+      if (!save.equals(box)) modified = true;
    }
-   while (modified && nbsteps>0);
-   
-   // integer variables
-   Scope sco = reg.scope();
-   for (auto v : sco)
-   {
-      if (v.isInteger())
-      {
-         Interval rnd = round(reg.get(v));
-         reg.set(v, rnd);
+   while (modified);
 
-         if (rnd.isEmpty()) return false;
-      }
-   }
-   
    return true;
 }
 
@@ -268,16 +285,16 @@ bool Preprocessor::occursInActiveConstraint(const Variable& v) const
 
 Scope Preprocessor::fixedScope() const
 {
-   Scope sco;
-   for (auto p : vim_) sco.insert(p.first);
-   return sco;
+   Scope scop;
+   for (auto p : vim_) scop.insert(p.first);
+   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 Scope Preprocessor::unfixedScope() const
 {
-   Scope sco;
-   for (auto p : vvm_) sco.insert(p.first);
-   return sco;
+   Scope scop;
+   for (auto p : vvm_) scop.insert(p.first);
+   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 size_t Preprocessor::nbInactiveCtrs() const
@@ -321,15 +338,15 @@ Variable Preprocessor::getUnfixedVar(size_t i) const
    return (*it).first;
 }
 
-IntervalRegion Preprocessor::fixedRegion() const
+DomainBox Preprocessor::fixedRegion() const
 {
    ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
 
-   IntervalRegion reg(fixedScope());
+   IntervalBox B(fixedScope());
    for (auto p : vim_)
-      reg.set(p.first, p.second);
+      B.set(p.first, p.second);
 
-   return reg;
+   return DomainBox(B);
 }
 
 bool Preprocessor::isUnfeasible() const

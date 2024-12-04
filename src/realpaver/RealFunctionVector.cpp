@@ -1,21 +1,33 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealFunctionVector.hpp
+ * @brief  Vector of real functions
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/RealFunctionVector.hpp"
+#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 RealFunctionVectorRep::~RealFunctionVectorRep()
 {}
 
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunctionVector::RealFunctionVector()
       : rep_(nullptr)
@@ -121,23 +133,7 @@ void RealFunctionVector::diff(const RealPoint& pt, RealMatrix& J)
    rep_->diff(pt, J);
 }
 
-void RealFunctionVector::evalDiff(const RealPoint& pt, RealVector& val,
-                                  RealMatrix& J)
-{
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
-
-   rep_->evalDiff(pt, val, J);
-}
-
-void RealFunctionVector::violation(const RealPoint& pt, RealVector& val,
-                                   RealVector& viol)
-{
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
-
-   rep_->violation(pt, val, viol);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunctionVectorDag::RealFunctionVectorDag(SharedDag dag)
       : dag_(dag)
@@ -206,42 +202,25 @@ RealFunction RealFunctionVectorDag::fun(size_t i) const
 
 void RealFunctionVectorDag::eval(const RealPoint& pt, RealVector& val)
 {
-   dag_->realEval(pt, val);
+   dag_->rEval(pt, val);
 }
 
 void RealFunctionVectorDag::diff(const RealPoint& pt, RealMatrix& J)
 {
-   RealVector val(nbFuns());
-
-   dag_->realEval(pt, val);
-   dag_->realDiff(J);
+   dag_->rDiff(pt, J);  
 }
 
-void RealFunctionVectorDag::evalDiff(const RealPoint& pt, RealVector& val,
-                                     RealMatrix& J) 
-{
-   dag_->realEval(pt, val);
-   dag_->realDiff(J);
-}
-
-void RealFunctionVectorDag::violation(const RealPoint& pt, RealVector& val,
-                                      RealVector& viol)
-{
-   dag_->realEval(pt, val);
-   dag_->realViolation(viol);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
 
 RealFunctionVectorList::RealFunctionVectorList()
       : vf_(),
-        scope_()
+        scop_()
 {}
 
 RealFunctionVectorList::RealFunctionVectorList(
    const std::initializer_list<RealFunction>& lf)
       : vf_(),
-        scope_()
+        scop_()
 {
    for (const auto& f : lf)
       addFun(f);
@@ -250,17 +229,18 @@ RealFunctionVectorList::RealFunctionVectorList(
 void RealFunctionVectorList::addFun(RealFunction f)
 {
    vf_.push_back(f);
-   scope_.insert(f.scope());
+   scop_.insert(f.scope());
+   scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
 Scope RealFunctionVectorList::scope() const
 {
-   return scope_;
+   return scop_;
 }
 
 size_t RealFunctionVectorList::nbVars() const
 {
-   return scope_.size();
+   return scop_.size();
 }
 
 size_t RealFunctionVectorList::nbFuns() const
@@ -308,44 +288,6 @@ void RealFunctionVectorList::diff(const RealPoint& pt, RealMatrix& J)
          ++j;
       }
    }
-}
-
-void RealFunctionVectorList::evalDiff(const RealPoint& pt, RealVector& val,
-                                      RealMatrix& J)
-{
-   ASSERT(val.size() == nbFuns(),
-          "Bad size of vector given for the evaluation of a function vector");
-
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a function vector");
-
-   for (size_t i=0; i<nbFuns(); ++i)
-   {
-      auto& f = vf_[i];
-
-      RealVector G(f.nbVars());
-      f.evalDiff(pt, val[i], G);
-
-      // fills the i-th row of the matrix
-      size_t j = 0;
-      for (auto v : scope())
-      {
-         if (f.scope().contains(v))
-            J.set(i, j, G.get(f.scope().index(v)));
- 
-         else
-            J.set(i, j, 0.0);
-
-         ++j;
-      }
-   }
-}
-
-void RealFunctionVectorList::violation(const RealPoint& pt, RealVector& val,
-                                       RealVector& viol)
-{
-   for (size_t i=0; i<nbFuns(); ++i)
-      vf_[i].violation(pt, val[i], viol[i]);
 }
 
 } // namespace

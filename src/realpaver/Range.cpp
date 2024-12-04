@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Range.cpp
+ * @brief  Finite integer interval bounded by safe integers
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #include <cmath>
 #include "realpaver/AssertDebug.hpp"
@@ -59,9 +70,9 @@ Integer Range::right() const
    return r_;
 }
 
-Integer Range::nbElems() const
+unsigned long  Range::nbElems() const
 {
-   return r_ - l_ + 1;
+   return isEmpty() ? 0 : (unsigned long)r_.toInt() - l_.toInt() + 1;
 }
 
 bool Range::isEmpty() const
@@ -207,6 +218,20 @@ bool Range::isCertainlyGeZero() const
 bool Range::isCertainlyGtZero() const
 {
    return r_ > 0;
+}
+
+bool Range::isJoinable(const Range& other) const
+{
+   if (isEmpty() || other.isEmpty())
+      return false;
+
+   if (overlaps(other))
+      return true;
+
+   if (isCertainlyLt(other))
+      return r_ + 1 == other.l_;
+
+   return other.r_ + 1 == l_;
 }
 
 Range Range::roundOutward(const Interval& x)
@@ -968,7 +993,7 @@ Range operator%(const Range& x, int n)
    else if (n==1)
       return Range(0);
 
-   else if (xx.nbElems() >= n)
+   else if (xx.nbElems() >= (unsigned long)n)
       return Range(0, n-1);
 
    else
@@ -997,7 +1022,7 @@ std::pair<Range,Range> extMod(const Range& x, int n)
    else if (n==1)
       return std::make_pair(Range(0), Range::emptyset());
 
-   else if (xx.nbElems() >= n)
+   else if (xx.nbElems() >= (unsigned long)n)
       return std::make_pair(Range(0, n-1), Range::emptyset());
 
    else

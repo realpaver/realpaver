@@ -1,11 +1,23 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   RealMatrix.hpp
+ * @brief  Dense real matrix
+ * @author Laurent Granvilliers
+ * @author Raphaël Chenouard (LU decomposition)
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_REAL_MATRIX_HPP
 #define REALPAVER_REAL_MATRIX_HPP
@@ -16,25 +28,21 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// @brief This is a matrix of real numbers.
-///
-/// The elements of a matrix of size (n, m) are indexed from 0 to n-1 and
-/// 0 to m-1.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ *  @brief Dense real matrix.
+ * 
+ *  The elements of a matrix of size (n, m) are indexed from 0 to n-1 and
+ *  0 to m-1.
+ */
 class RealMatrix : public NumericMatrix<double> {
 public:
    /// Base class
-   typedef NumericMatrix<double> BaseType;
+   using BaseType = NumericMatrix<double>;
 
-   /// Creates a matrix
-   /// @param nrows number of rows
-   /// @param ncols number of columns
-   /// @param x initialization value
+   /// Creates a matrix with nrows rows and ncols columns
    RealMatrix(size_t nrows, size_t ncols, double x = 0.0);
    
-   /// Creates a matrix from a list
-   /// @param l list of elements inserted in this
+   /// Creates a matrix from a list of rows
    RealMatrix(const std::initializer_list<std::initializer_list<double>>& l);
 
    /// Default copy constructor
@@ -46,92 +54,69 @@ public:
    /// Default destructor
    ~RealMatrix() = default;
 
-   /// Constant access
-   /// @param i a row index between 0 and nrows()-1
-   /// @param j a column index between 0 and ncols()-1
-   /// @return the element at position (i, j) of this
+   /// Gets the coefficient (i, j)
    double get(size_t i, size_t j) const;
 
-   /// Sets an element of this
-   /// @param i a row index between 0 and nrows()-1
-   /// @param j a column index between 0 and ncols()-1
-   /// @param x a real number
+   /// Sets the coefficient (i, j) to x
    void set(size_t i, size_t j, double x);
 
-   /// @return true if at least one component is a NaN
+   /// Returns true if at least one component is a NaN
    bool isNan() const;
 
-   /// Maximum absolute column sum norm
-   /// @return the L1-norm of this
+   /// Return the L1-norm of this
    double l1Norm() const;
 
-   /// Maximum absolute row sum norm
-   /// @return the infinite-norm of this
+   /// Return the infinite-norm of this
    double linfNorm() const;
 
    /// Assigns this to the identity matrix
    void setIdentity();
 
-   /// Equality test
-   /// @param A a matrix
-   /// return true if this is equal to A
+   /// Returns true if this is equal to A
    bool operator==(const RealMatrix& A) const;
 
-   /// Disequality test
-   /// @param A a matrix
-   /// return true if this is not equal to A
+   /// Returns true if this is not equal to A
    bool operator!=(const RealMatrix& A) const;
 
    /// Addition with assignment
-   /// @param A a matrix
-   /// @return a reference to this
-   ///
-   /// this is assigned to this + A
    RealMatrix& operator+=(const RealMatrix& A);
 
    /// Subtraction with assignment
-   /// @param A a matrix
-   /// @return a reference to this
-   ///
-   /// this is assigned to this - A
    RealMatrix& operator-=(const RealMatrix& A);
 
    /// Multiplication with assignment
-   /// @param a a scalar
-   /// @return a reference to this
-   ///
-   /// this is assigned to this * a
    RealMatrix& operator*=(double a);
 
    /// Division with assignment
-   /// @param a a scalar
-   /// @return a reference to this
-   ///
-   /// this is assigned to this / a
    RealMatrix& operator/=(double a);
 
-   /// @return the transpose of this
+   /// Returns the transpose of this
    RealMatrix transpose() const;
 
-   /// Calculates the inverse of a square matrix
-   /// @param P the result in case of success
-   /// @return true if this is invertible
-   ///
-   /// This is modified.
+   /**
+    * @brief Calculates the inverse of a square matrix.
+    * 
+    * Returns true if this is invertible, in this case P is the inverse; returns
+    * false otherwise.
+    * 
+    * this is modified.
+    */
    bool inverse(RealMatrix& P);
 
-   /// @return the threshold on the values of pivots
+   /// Returns the threshold on the values of pivots
    bool getMinPivot() const;
 
    /// Assigns the threshold on the values of pivots
-   /// @param val any pivot must be strictly greater than this value
    void setMinPivot(double val);
 
-   /// Computes the LU decomposition of *this
-   /// @param L and U initialized matrices filled by the algorithm
-   void LU(RealMatrix* L, RealMatrix* U) const;
+   /**
+    * @brief Computes the LU decomposition of this.
+    * 
+    * this, L, and U must have the same dimension.
+    */
+   void LU(RealMatrix& L, RealMatrix& U) const;
 
-   /// Checks if *this is positive definite
+   /// Checks if this is positive definite
    bool isPositiveDefinite() const;
 
 private:
@@ -155,18 +140,26 @@ private:
 /// Output on s stream
 std::ostream& operator<<(std::ostream& os, const RealMatrix& A);
 
-///@{
-/// Operators on real matrices
+/// Returns A+B
 RealMatrix operator+(const RealMatrix& A, const RealMatrix& B);
+
+/// Returns A-B
 RealMatrix operator-(const RealMatrix& A, const RealMatrix& B);
+
+/// Returns -A
 RealMatrix operator-(const RealMatrix& A);
 
+/// Returns a*B
 RealMatrix operator*(double a, const RealMatrix& B);
+
+/// Returns B*a
 RealMatrix operator*(const RealMatrix& B, double a);
+
+/// Returns A*B
 RealMatrix operator*(const RealMatrix& A, const RealMatrix& B);
 
+/// Returns B/a
 RealMatrix operator/(const RealMatrix& B, double a);
-///@}
 
 } // namespace
 

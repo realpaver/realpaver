@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Double.hpp
+ * @brief  Management of floating-point numbers
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_DOUBLE_HPP
 #define REALPAVER_DOUBLE_HPP
@@ -17,72 +28,83 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This describes values and operations on floating-point numbers.
-///////////////////////////////////////////////////////////////////////////////
+/// Management of floating-point numbers in double precision
 struct Double {
    /// Value type
-   typedef double ValueType;
+   using ValueType = double;
 
    /// Reference type
-   typedef double& RefType;
+   using RefType = double&;
 
    /// Constant reference type
-   typedef const double& ConstRefType;
+   using ConstRefType = const double&;
 
-   /// @return +Infinity
+   /// Returns +Infinity
    static inline ValueType inf()
    {
       return std::numeric_limits<ValueType>::infinity();
    }
 
-   /// @return -Infinity
+   /// Returns -Infinity
    static inline ValueType neginf()
    {
       return -std::numeric_limits<ValueType>::infinity();
    }
 
-   /// @return Not a Number
+   /// Returns Not a Number
    static inline ValueType nan()
    {
       return std::numeric_limits<ValueType>::quiet_NaN();
    }
 
-   /// @return the lowest representable value
+   /// Returns the lowest representable value
    static inline ValueType lowest()
    {
       return -std::numeric_limits<ValueType>::max();
    }
 
-   /// @return the greatest representable value
+   /// Returns the greatest representable value
    static inline ValueType greatest()
    {
       return std::numeric_limits<ValueType>::max();
    }
 
-   /// @param x a number
-   /// @return true if x is equal to -Infinity or +Infinity
+   /// Returns true if x is equal to -Infinity or +Infinity
    static inline bool isInf(ValueType x)
    {
       return (x==inf()) || (x==neginf());
    }
 
-   /// @param x a number
-   /// @return true if x is not a number
+   /// Returns true if x is not a number
    static inline bool isNan(ValueType x)
    {
       return x != x;
    }
 
-   /// @param x a number
-   /// @return the double before x
+   /**
+    * @brief Test of closeness of two numbers.
+    * 
+    * Given an absolute tolerance abs_tol and a relative tolerance rel_tol, x is
+    * close to y if |x - y| <= max( rtol*max(|x|, |y|), atol).
+    * 
+    * Returns false if x or y is a NaN or +/-inf.
+    */
+   static inline bool isClose(ValueType x, ValueType y, ValueType rel_tol,
+                              ValueType abs_tol)
+   {
+      if (isNan(x) || isNan(y) || isInf(x) || isInf(y))
+         return false;
+
+      return abs(y-x) <= max(rel_tol*max(abs(x), abs(y)), abs_tol);
+   }
+
+   /// Returns the double before x
    static inline ValueType prevDouble(ValueType x)
    {
       return std::nextafter(x, neginf());
    }
 
-   /// @param x a number
-   /// @return the double after x
+   /// Returns the double after x
    static inline ValueType nextDouble(ValueType x)
    {
       return std::nextafter(x, inf());
@@ -104,6 +126,18 @@ struct Double {
    static inline void rndUp()
    {
       std::fesetround(FE_UPWARD);
+   }
+
+   /// Returns the greatest integral number not greater than x
+   static inline ValueType floor(ValueType x)
+   {
+      return std::floor(x);
+   }
+
+   /// Returns the smallest integral number not smaller than x
+   static inline ValueType ceil(ValueType x)
+   {
+      return std::ceil(x);
    }
 
    /// Addition
@@ -224,6 +258,24 @@ struct Double {
    static inline ValueType tan(ValueType x)
    {
       return std::tan(x);
+   }
+
+   /// Hyperbolic cosine
+   static inline ValueType cosh(ValueType x)
+   {
+      return std::cosh(x);
+   }
+
+   /// Hyperbolic sine
+   static inline ValueType sinh(ValueType x)
+   {
+      return std::sinh(x);
+   }
+
+   /// Hyperbolic tangent
+   static inline ValueType tanh(ValueType x)
+   {
+      return std::tanh(x);
    }
 
    /// Sign function

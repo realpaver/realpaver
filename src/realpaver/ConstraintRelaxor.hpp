@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ConstraintRelaxor.hpp
+ * @brief  Relaxation of equations
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_CONSTRAINT_RELAXOR_HPP
 #define REALPAVER_CONSTRAINT_RELAXOR_HPP
@@ -14,17 +25,16 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a visitor used to relax a constraint.
-///
-/// Given a real number nu>0, every equation f(x) = 0 is relaxed as
-/// f(x) in [-nu, +nu]. Every other constraint is not handled and the apply
-/// method must raise an exception.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Visitor used to relax a constraint.
+ * 
+ * Given a real number nu>0, every equation f(x) = 0 is relaxed as
+ * f(x) in [-nu, +nu]. Every other constraint is not handled and the apply
+ * method must raise an exception.
+ */
 class ConstraintRelaxor : public ConstraintVisitor {
 public:
-   /// Creates a visitor
-   /// @param nu relaxation value
+   /// Constructor given the relaxation value
    ConstraintRelaxor(double nu);
 
    /// Default copy constructor
@@ -36,16 +46,14 @@ public:
    /// Default destructor
    ~ConstraintRelaxor() = default;
 
-   ///@{
-   void apply(const ArithCtrEq* c) override;
-   ///@}
-
-   /// @return the relaxed constraint after a visit
+   /// Returns the relaxed constraint after a visit
    Constraint getRelaxedCtr() const;
 
+   void apply(const ArithCtrEq* c) override;
+
 private:
-   double nu_;
-   Constraint relaxed_;
+   double nu_;             // relaxation value
+   Constraint relaxed_;    // new constraint after a visit
 };
 
 } // namespace

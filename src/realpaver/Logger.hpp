@@ -1,16 +1,28 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Logger.hpp
+ * @brief  Management of log files
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_LOGGER_HPP
 #define REALPAVER_LOGGER_HPP
 
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -30,49 +42,57 @@ enum class LogLevel {
    full         ///< verbose mode
 };
 
+/// Conversion function
 std::string LogLevelToString(LogLevel level);
+
+/// Conversion function
 LogLevel StringToLogLevel(const std::string& s);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a logger.
-///
-/// A logger can write log messages to a log file.
-/// The design of this class follows the singleton design pattern.
-///
-/// LOG(msg) writes a log.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Management of log files.
+ * 
+ * A logger can write log messages to a log file.
+ * The design of this class follows the singleton design pattern.
+ * 
+ * LOG(msg) writes a log.
+ */
 class Logger {
 public:
-   /// Connects the logger to a log file
-   /// @param level log level
-   /// @param filename name of the log file
+   /// Connects the logger to a log file given a log level and a filename
    static void init(LogLevel level, const std::string& path);
 
-   /// @return the instance
+   /// Returns the instance
    static Logger* getInstance();
 
-   /// @return the path of the log file
+   /// Returns the path of the log file
    std::string getPath() const;
 
-   /// @return the current log level of this
+   /// Returns the current log level of this
    LogLevel getLogLevel() const;
 
    /// Sets the log level of this
-   /// @param new log level
    void setLogLevel(LogLevel level);
 
-   /// @return the maximum size of a log file in bytes
-   size_t getMaxSize() const;
+   /// Returns the maximum size of a log file in bytes
+   unsigned long getMaxSize() const;
 
-   /// @return the current size of the log file in bytes
-   size_t getSize() const;
+   /// Returns the current size of the log file in bytes
+   unsigned long getSize() const;
 
-   /// Sets the maximum size of a log file
-   /// @param nbytes maximum size of a log file in bytes
-   void setMaxSize(size_t nbytes);
+   /// Sets the maximum size of a log in bytes
+   void setMaxSize(unsigned long nbytes);
 
    /// Writes a message
    void log(LogLevel level, const std::string& msg);
+
+   /// Returns the number of digits of floats when printed on a stream
+   std::streamsize floatPrecision() const;
+
+   /// Assigns the number of digits of floats when printed on a stream
+   std::streamsize setFloatPrecision(std::streamsize n);
+
+   /// Inserts a new line in the log file
+   void newline();
 
 private:
    static Logger instance_;   // the instance
@@ -80,7 +100,8 @@ private:
    LogLevel level_;           // current log level
    std::ofstream ofs_;        // log file
    std::string path_;         // path of the log file
-   size_t maxsize_;           // maximum size of a log file in bytes
+   unsigned long maxsize_;    // maximum size of a log file in bytes
+   std::streamsize fprec_;    // float precision (number of digits)
 
    Logger();
    ~Logger();
@@ -89,16 +110,17 @@ private:
 };
 
 #if LOG_ON
-#  define LOG(level, msg)                                   \
-   if (level <= Logger::getInstance()->getLogLevel())       \
-   {                                                        \
-      do                                                    \
-      {                                                     \
-         std::ostringstream __os;                           \
-         __os << msg;                                       \
-         Logger::getInstance()->log(level, __os.str());     \
-      }                                                     \
-      while(0);                                             \
+#  define LOG(level, msg)                                         \
+   if (level <= Logger::getInstance()->getLogLevel())             \
+   {                                                              \
+      do                                                          \
+      {                                                           \
+         std::ostringstream __os;                                 \
+         __os.precision(Logger::getInstance()->floatPrecision()); \
+         __os << msg;                                             \
+         Logger::getInstance()->log(level, __os.str());           \
+      }                                                           \
+      while(0);                                                   \
    }
 #else
 #  define LOG(level, msg)
@@ -108,6 +130,25 @@ private:
 #define LOG_INTER(msg) LOG(LogLevel::inter, msg)
 #define LOG_LOW(msg)   LOG(LogLevel::low, msg)
 #define LOG_FULL(msg)  LOG(LogLevel::full, msg)
+
+#if LOG_ON
+#  define LOG_NL(level)                                           \
+   if (level <= Logger::getInstance()->getLogLevel())             \
+   {                                                              \
+      do                                                          \
+      {                                                           \
+         Logger::getInstance()->newline();                        \
+      }                                                           \
+      while(0);                                                   \
+   }
+#else
+#  define LOG_NL(level)
+#endif
+
+#define LOG_NL_MAIN()  LOG_NL(LogLevel::main)
+#define LOG_NL_INTER() LOG_NL(LogLevel::inter)
+#define LOG_NL_LOW()   LOG_NL(LogLevel::low)
+#define LOG_NL_FULL()  LOG_NL(LogLevel::full)
 
 } // namespace
 

@@ -1,11 +1,22 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   NLPSolverNlopt.hpp
+ * @brief  Implementation of NLP solver for Nlopt
+ * @author Raphaël Chenouard
+ * @date   2024-4-11
+*/
 
 #ifndef REALPAVER_NLP_SOLVER_NLOPT_HPP
 #define REALPAVER_NLP_SOLVER_NLOPT_HPP
@@ -15,24 +26,21 @@
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an implementation of NLP solver for Nlopt.
-///////////////////////////////////////////////////////////////////////////////
+/// Implementation of NLP solver for Nlopt
 class NLPSolver : public NLPModel {
 public:
-   /// Creates a solver for an optimization problem
-   /// @param pb an optimization problem
+   /// @name Constructors
+   ///@{
+
+   /// Constructor from a problem
    NLPSolver(const Problem& pb);
 
-   /// Creates a solver for an unconstrained optimization problem
-   /// @param obj an objective function to be minimized
+   /// Constructor given an objective function to be minimized
    NLPSolver(const RealFunction& obj);
 
-   /// Creates a solver for a onstrained optimization problem
-   /// @param obj an objective function to be minimized
-   /// @param ctrs a vector of constraint functions
+   /// Constructor given an objective function and a set of constraints
    NLPSolver(const RealFunction& obj, const RealFunctionVector& ctrs);
-
+   ///@}
    /// Destructor
    ~NLPSolver();
 
@@ -42,17 +50,10 @@ public:
    /// No assignment
    NLPSolver& operator=(const NLPSolver&) = delete;
 
-   /// Minimization of a problem
-   /// @param reg interval region in the search space
-   /// @param src starting point that belongs to the region
-   /// @return an optimization status
-   ///
-   /// Both scopes of reg and src must contain the scope of this.
-   /// They do not necessarily correspond.
-   OptimizationStatus minimize(const IntervalRegion& reg,
-                               const RealPoint& src);
+   OptimizationStatus minimize(const IntervalBox& box,
+                               const RealPoint& src) override;
 
-   // Structure used to process a constraint
+   /// Structure used to process a constraint
    struct Ctr {
       NLPSolver* ls;    // the solver vector
       size_t idx;       // constraint index

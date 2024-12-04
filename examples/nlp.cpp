@@ -1,7 +1,6 @@
 #include <iostream>
-#include "realpaver/Logger.hpp"
+#include "realpaver_api.hpp"
 #include "realpaver/NLPSolver.hpp"
-#include "realpaver/Param.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -25,12 +24,12 @@ int main(void)
       NLPSolver optimizer(f, G);
       optimizer.setAlgorithm("NLOPT_SLSQP");
 
-      IntervalRegion reg = problem.getDomains();
-      RealPoint src = reg.midpoint();
-   
-      OptimizationStatus status = optimizer.minimize(reg, src);
+      IntervalBox box(problem.scope());
+      RealPoint src = box.midpoint();
+
+      OptimizationStatus status = optimizer.minimize(box, src);
       cout << "Status.......... " << status << endl;
-   
+
       if (status == OptimizationStatus::Optimal)
       {
          cout << "Optimum value... " << optimizer.bestVal() << endl

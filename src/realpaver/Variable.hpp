@@ -1,28 +1,36 @@
-///////////////////////////////////////////////////////////////////////////////
-// This file is part of Realpaver, an interval constraint and NLP solver.    //
-//                                                                           //
-// Copyright (c) 2017-2023 LS2N, Nantes                                      //
-//                                                                           //
-// Realpaver is a software distributed WITHOUT ANY WARRANTY; read the file   //
-// COPYING for information.                                                  //
-///////////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Variables.hpp
+ * @brief  Variable in a problem
+ * @author Laurent Granvilliers
+ * @date   2024-4-11
+ */
 
 #ifndef REALPAVER_VARIABLE_HPP
 #define REALPAVER_VARIABLE_HPP
 
 #include <memory>
-#include "realpaver/Interval.hpp"
+#include "realpaver/Domain.hpp"
 #include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is the shared representation of a variable in a problem.
-///////////////////////////////////////////////////////////////////////////////
+/// Shared representation of a variable in a problem.
 class VariableRep {
 public:
-   /// Creates a variable representation
-   /// @param name of the variable
+   /// Constructor
    VariableRep(const std::string& name);
 
    /// No copy
@@ -31,86 +39,70 @@ public:
    /// No assignment
    VariableRep& operator=(const VariableRep&) = delete;
 
-   /// Default destructor
-   ~VariableRep() = default;
+   /// Destructor
+   ~VariableRep();
 
-   /// @return the unique identifier of this
+   /// Returns the unique identifier of this
    size_t id() const;
 
    /// Sets the unique identifier of this
-   /// @param id new identifier of this
    void setId(size_t id);
 
-   /// @return the name of this
+   /// Returns the name of this
    std::string getName() const;
 
    /// Sets the name of this
-   /// @param name new name of this
    void setName(const std::string& name);
 
-   /// @return the domain of this
-   Interval getDomain() const;
+   /// Returns the domain of this
+   Domain* getDomain() const;
 
    /// Sets the domain of this
-   /// @param x new domain of this
-   void setDomain(const Interval& x);
+   void setDomain(Domain* dom);
 
-   /// @return true if this is an integer variable, false otherwise
+   /// Returns true if this is a binary variable, false otherwise
+   bool isBinary() const;
+
+   /// Returns true if this is an integer variable, false otherwise
    bool isInteger() const;
 
-   /// Sets this as an integer variable
-   void setInteger();
+   /// Returns true if this is a real variable, false otherwise
+   bool isReal() const;
 
-   /// @return true if this is continuous, false otherwise
-   bool isContinuous() const;
-
-   /// Sets this as a continuous variable
-   void setContinuous();
-
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   /// @return the tolerance of this (output precision of interval solutions)
+   /// Returns the tolerance of this (output precision of interval solutions)
    Tolerance getTolerance() const;
 
    /// Sets the tolerance of this
-   /// @param tol new tolerance of this
    void setTolerance(const Tolerance& tol);
 
 private:
-   std::string name_;
-   size_t id_;
-   Interval domain_;
-   bool continuous_;
-   Tolerance tol_;
+   std::string name_;   // name
+   size_t id_;          // identifier
+   Domain* dom_;        // domain
+   Tolerance tol_;      // tolerance
 
-   static int NEXT_ID;
+   static int NEXT_ID;  // management of ids
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a variable in a problem.
-///
-/// This encloses a shared pointer to its representation. It is a lightweight
-/// object that can be copied and assigned.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Variable in a problem.
+ *
+ * This encloses a shared pointer to its representation. It is a lightweight
+ * object that can be copied and assigned.
+ */
 class Variable {
 public:
-   /// Creates a variable
-   /// @param name of the variable
+   /**
+    * @brief Constructor.
+    *
+    * The default domain is the interval universe.
+    */
    Variable(const std::string& name);
-
-   /// Creates a variable
-   /// @param x variable domain
-   /// @param name of the variable
-   /// @param x variable domain
-   Variable(const Interval& x, const std::string& name);
-
-   /// Creates a variable
-   /// @param x variable domain
-   /// @param name of the variable
-   /// @param lo lower bound of the variable domain
-   /// @param up upper bound of the variable domain
-   Variable(double lo, double up, const std::string& name);
 
    /// Creates a variable having no representation
    Variable();
@@ -124,112 +116,91 @@ public:
    /// Default destructor
    ~Variable() = default;
 
-   /// @return the unique identifier of this
+   /// Returns the unique identifier of this
    size_t id() const;
 
    /// Sets the unique identifier of this
-   /// @param id new identifier of this
    Variable& setId(size_t id);
 
-   /// @return the name of this
+   /// Returns the name of this
    std::string getName() const;
 
    /// Sets the name of this
-   /// @param name new name of this
    Variable& setName(const std::string& name);
 
-   /// @return the domain of this
-   Interval getDomain() const;
+   /// Returns the domain of this
+   Domain* getDomain() const;
 
-   /// Sets the domain of this
-   /// @param x new domain of this
-   Variable& setDomain(const Interval& x);
+   /**
+    * @brief Sets the domain of this.
+    *
+    * throws an exception if dom is null
+    */
+   Variable& setDomain(std::unique_ptr<Domain> dom);
 
-   /// Sets the domain of this
-   /// @param lo lower bound
-   /// @param up upper bound
-   Variable& setDomain(double lo, double up);
-
-   /// @return true if this is an integer variable, false otherwise
-   bool isInteger() const;
-
-   /// Sets this as an integer variable
-   /// @return a reference to this
-   Variable& setInteger();
-
-   /// @return true if this is an integer variable in [0, 1]
+   /// Returns true if this is an integer variable in [0, 1]
    bool isBinary() const;
 
-   /// Sets this as an integer variable  in [0, 1]
-   /// @return a reference to this
-   Variable& setBinary();
+   /// Returns true if this is an integer variable, false otherwise
+   bool isInteger() const;
 
-   /// @return true if this is continuous, false otherwise
-   bool isContinuous() const;
+   /// Returns true if this is a real variable, false otherwise
+   bool isReal() const;
 
-   /// Sets this as a continuous variable
-   /// @return a reference to this
-   Variable& setContinuous();
-
-   /// @return the hash code of this
+   /// Returns the hash code of this
    size_t hashCode() const;
 
-   /// @return the tolerance of this (output precision of interval solutions)
+   /// Returns the tolerance of this (output precision of interval solutions)
    Tolerance getTolerance() const;
 
    /// Sets the tolerance of this
-   /// @param tol new tolerance of this
-   /// @return a reference to this
    Variable& setTolerance(const Tolerance& tol);
 
-   /// @return a clone of this with a new representation
+   /// Returns a clone of this with a new representation
    Variable clone() const;
 
    /// Tests the equality of two variables
-   /// @param other a variable
-   /// @return true if this and other have the same identifier, false otherwise
    bool operator==(const Variable& other) const;
 
-   /// @return true if it has been created with the default constructor, false
-   ///         if this has a representation (i.e. it is a true variable)
+   /// Tests the difference of two variables
+   bool operator!=(const Variable& other) const;
+
+   /// Returns true if this has no representation (nullptr)
    bool hasNullPointer() const;
 
 private:
-   std::shared_ptr<VariableRep> rep_;
+   std::shared_ptr<VariableRep> rep_;  // representation
 };
 
 /// Output on a stream
-/// @param os a stream
-/// @param v a variable written on os
-/// @return os
 std::ostream& operator<<(std::ostream& os, const Variable& v);
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is a variable hasher.
-///
-/// This implements a function call operator that simply returns the hash code
-/// of a variable.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Variable hasher.
+ *
+ * This implements a function call operator that simply returns the hash code
+ * of a variable.
+ */
 struct VariableHasher {
-   /// Hash function
-   /// @param v a variable
-   /// @return the hash code of 'v'
+   /// Hash function of v
    std::size_t operator()(const Variable& v) const
    {
       return v.hashCode();
    }
 };
 
-///////////////////////////////////////////////////////////////////////////////
-/// This is an equality comparator of variables.
-///
-/// This implements a function call operator that returns true if two
-/// variables have the same id.
-///////////////////////////////////////////////////////////////////////////////
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Equality comparator of variables.
+ *
+ * This implements a function call operator that returns true if two
+ * variables have the same id.
+ */
 struct VariableEqual {
-   /// @param v a variable
-   /// @param w a variable
-   /// @return true if v and w represent the same variable
+   /// Returns true if v and w represent the same variable
    bool operator()(const Variable& v, const Variable& w) const
    {
       return v.id() == w.id();

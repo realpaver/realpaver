@@ -1,8 +1,27 @@
 # realpaver
 
+## Pre-requisite
+
+### Mandatory dependencies
+
+- meson build system (https://mesonbuild.com/)
+- a supported interval library (eg: GAOL https://github.com/goualard-f/GAOL)
+- a supported linear solver library:
+  - CLP: https://github.com/coin-or/Clp
+  - HiGHS: https://highs.dev/
+  - SoPlex: https://soplex.zib.de/
+  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/
+
+### Optional dependencies
+
+- lex, yacc (or flex, bison)
+- doxygen
+
+Be careful that your system uses recent versions of these libraries or tools!
+
 ## How to build
 
-Realpaver is using meson build system (https://github.com/mesonbuild/meson).
+Realpaver is using meson build system for compilation, test and installation.
 
 In Realpaver root folder run:
 
@@ -14,7 +33,7 @@ The folder build will be generated (you can change this name to a preferred one)
 
 ```bash
 cd build
-ninja
+meson compile
 ```
 
 ## How to change building options
@@ -35,7 +54,6 @@ In realpaver root folder, run `meson configure` command, while specifying one of
 - `-DINTERVAL_LIB=LIBNAME`: specify the interval library to use (default: Gaol)
 - `-DLOCAL_SOLVER=LIBNAME`: specify the local optimization solver to use (default: none, can be replaced by NLOPT, IPOPT)
 - `-DASSERT=BOOLVAL`: activate assertions (default: true)
-- `-DDEBUG=BOOLVAL`: activate debug messages (default: false)
 - `-DLOG=BOOLVAL`: activate logging (default: false)
 
 Example of meson setup command:
@@ -61,7 +79,7 @@ meson setup build -DLP_LIB=Gurobi
 In the build folder run:
 
 ```bash
-ninja test
+meson test
 ```
 
 ## How to install
@@ -69,7 +87,7 @@ ninja test
 In the build folder run:
 
 ```bash
-ninja install
+meson install
 ```
 
 ## More documentation on meson:
