@@ -1,23 +1,8 @@
 # The Docker image that will be used to build your app
-image: docker:stable-git
+image: python:latest
 # Functions that should be executed before the build script is run
-#before_script:
-#  - npm ci
-
-
-build:
-  stage: build
-  script:
-    - docker pull $CI_REGISTRY_IMAGE || true
-    - docker build --build-arg HTTP_PROXY="http://proxy-upgrade.univ-nantes.prive:3128" 
-      --build-arg HTTPS_PROXY="http://proxy-upgrade.univ-nantes.prive:3128" 
-      --build-arg FTP_PROXY="http://proxy-upgrade.univ-nantes.prive:3128" 
-      --build-arg http_proxy="http://proxy-upgrade.univ-nantes.prive:3128" 
-      --build-arg https_proxy="http://proxy-upgrade.univ-nantes.prive:3128" 
-      --build-arg ftp_proxy="http://proxy-upgrade.univ-nantes.prive:3128" 
-      -t $CI_REGISTRY_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE
-
+before_script:
+  - apt update
 
 pages:
   stage: deploy
