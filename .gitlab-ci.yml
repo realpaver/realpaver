@@ -1,5 +1,5 @@
 # The Docker image that will be used to build your app
-image: python:latest
+image: docker:stable-git
 # Functions that should be executed before the build script is run
 #before_script:
 #  - npm ci
