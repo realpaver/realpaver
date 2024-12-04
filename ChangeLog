@@ -7,8 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2023-04-13
+
+## [1.0.0] - 2024-12-04
+
+First release, with following features:
+
+* CSP problem definition in C++ or using the RealPaver DSL:
+    - Continuous (interval domain) or discrete variables (integer domain or ennuerated set of values)
+    - Arithmetic constraints (==,<=,>==)
+    - Set contraints (in)
+    - Table constraints
+    - Conditional constraints (->)
+* Solving algorithms:
+    - Branch-and-Prune algorithm (CSPSolver)
+    - Interval contractors/propagators (ACID, BC4, HC4, Interval Newton)
+    - Search strategies: branching (DFS, IDFS, DMDFS, PDFS, GPDFS), splitting (RR, LF, SSR, SLF)
+    - Preprocessing:  basic simplification
+    - Postprocessing: prover (interval Newton), box clustering
+    - Linear solver interface (supported solvers: Clp, Soplex, Highs)
+    - Local solver interface (supported libraries: Nlopt)
+* Documentation:
+    - Based on mkdocs
+    - Basic user-documentation
+* Tests:
+    - A few tests implemented
+* Benchmark problems and C++ examples relating to the documentation
 
 ### Changed
 
-- Interface for inum64.
+- First release
