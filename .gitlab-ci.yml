@@ -8,6 +8,7 @@ pages:
   stage: deploy
   image: python:latest
   script:
+    - apt install doxygen
     - pip install mkdocs-material mkdoxy
     - cd doc
     - mkdocs build --site-dir public
