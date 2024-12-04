@@ -14,32 +14,38 @@
 # Author: Raphaël Chenouard
 #-------------------------------------------------------------------------------
 
-configure_file(input: 'configure_meson.hpp.in',
-                output: 'configure.hpp',
-                configuration: conf_data,
-                install: true,
-                install_dir: 'include/realpaver')
+configure_file(
+  input: 'configure_meson.hpp.in',
+  output: 'configure.hpp',
+  configuration: conf_data,
+  install: true,
+  install_dir: 'include/realpaver',
+)
 
-incdir = include_directories(['.','..'])
+incdir = include_directories(['.', '..'])
 
 rp_sources = []
 rp_headers = []
 
 # Interval library
 if interval_lib_name.to_upper() == 'GAOL'
-  interval_header = custom_target('gen-interval-header',
+  interval_header = custom_target(
+    'gen-interval-header',
     input: 'IntervalGaol.hpp',
     output: 'IntervalImpl.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
     install: true,
-    install_dir: 'include/realpaver')
+    install_dir: 'include/realpaver',
+  )
 elif interval_lib_name.to_upper() == 'INUM64'
-  interval_header = custom_target('gen-interval-header',
+  interval_header = custom_target(
+    'gen-interval-header',
     input: 'IntervalInum64.hpp',
     output: 'IntervalImpl.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
     install: true,
-    install_dir: 'include/realpaver')
+    install_dir: 'include/realpaver',
+  )
 else
   error('Invalid interval library: ' + interval_lib_name)
 endif
@@ -51,7 +57,7 @@ if lp_lib_name.to_upper() == 'CLP'
   lp_header_hpp += 'LPSolverClp.hpp'
   rp_sources += ['LPSolverClp.cpp']
 elif lp_lib_name.to_upper() == 'GUROBI'
-#### NOT WORKING FOR NOW
+  #### NOT WORKING FOR NOW
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
 elif lp_lib_name.to_upper() == 'SOPLEX'
@@ -64,50 +70,58 @@ else
   error('Invalid linear solver library: ' + lp_lib_name)
 endif
 
-lp_header = custom_target('gen-lp-header',
-    input: lp_header_hpp,
-    output: 'LPSolver.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
-    install: true,
-    install_dir : 'include/realpaver')
+lp_header = custom_target(
+  'gen-lp-header',
+  input: lp_header_hpp,
+  output: 'LPSolver.hpp',
+  command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
+  install: true,
+  install_dir: 'include/realpaver',
+)
 rp_sources += [lp_header]
 
 # Local NLP solver
 if local_solver_dep.found()
   local_solver_header_hpp = ''
-  if local_solver_name.to_upper() == 'IPOPT'
-    local_solver_header_hpp = ['NLPSolverIpopt.hpp']
-    rp_sources += ['NLPSolverIpopt.cpp']
-  elif local_solver_name.to_upper() == 'NLOPT'
+  # if local_solver_name.to_upper() == 'IPOPT'
+  #   local_solver_header_hpp = ['NLPSolverIpopt.hpp']
+  #   rp_sources += ['NLPSolverIpopt.cpp']
+  # el
+  if local_solver_name.to_upper() == 'NLOPT'
     local_solver_header_hpp = ['NLPSolverNlopt.hpp']
     rp_sources += ['NLPSolverNlopt.cpp']
   endif
 
-  nlp_header = custom_target('gen-local-solver-header',
+  nlp_header = custom_target(
+    'gen-local-solver-header',
     input: local_solver_header_hpp,
     output: 'NLPSolver.hpp',
-    command: ['ln','-f', '@INPUT@', '@OUTPUT@'],
+    command: ['ln', '-f', '@INPUT@', '@OUTPUT@'],
     install: true,
-    install_dir: 'include/realpaver')
+    install_dir: 'include/realpaver',
+  )
   rp_sources += [nlp_header]
 endif
 
 # flex, bison
 if flex.found() and bison.found()
-   flex_analyzer = custom_target('flex-parser-gen',
-      input: 'parser_flex.lpp',
-      output: 'parser_flex.cpp',
-      command: [flex, '-o', '@OUTPUT@', '@INPUT@'])
-   rp_sources += [flex_analyzer]
+  flex_analyzer = custom_target(
+    'flex-parser-gen',
+    input: 'parser_flex.lpp',
+    output: 'parser_flex.cpp',
+    command: [flex, '-o', '@OUTPUT@', '@INPUT@'],
+  )
+  rp_sources += [flex_analyzer]
 
-   bison_analyzer = custom_target('bison-parser-gen',
-      input: 'parser_bison.ypp',
-      output: ['parser_bison.hpp', 'parser_bison.cpp'],
-      command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'])
-   rp_sources += [bison_analyzer]
+  bison_analyzer = custom_target(
+    'bison-parser-gen',
+    input: 'parser_bison.ypp',
+    output: ['parser_bison.hpp', 'parser_bison.cpp'],
+    command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'],
+  )
+  rp_sources += [bison_analyzer]
 else
-   rp_sources += ['parser_flex.cpp',
-                  'parser_bison.cpp']
+  rp_sources += ['parser_flex.cpp', 'parser_bison.cpp']
 endif
 
 rp_headers += [
@@ -211,7 +225,7 @@ rp_headers += [
   'ZeroOne.hpp',
   'IntervalGaol.hpp',
   'LPSolverClp.hpp',
-  'LPSolverGurobi.hpp'
+  'LPSolverGurobi.hpp',
 ]
 
 rp_sources += [
@@ -304,23 +318,33 @@ rp_sources += [
   'Tolerance.cpp',
   'ZeroOne.cpp',
   'Variable.cpp',
-  'VariableVector.cpp'
+  'VariableVector.cpp',
 ]
 
-extra_dist = ['parser_flex.lpp','parser_bison.ypp',
-  'LPSolverClp.cpp','LPSolverClp.hpp',
-  'LPSolverGurobi.cpp','LPSolverGurobi.hpp',
-  'LPSolverHighs.cpp','LPSolverHighs.hpp',
-  'LPSolverSoplex.cpp','LPSolverSoplex.hpp',
-  'NLPSolverIpopt.cpp','NLPSolverIpopt.hpp',
-  'NLPSolverNlopt.cpp','NLPSolverNlopt.hpp']
+extra_dist = [
+  'parser_flex.lpp',
+  'parser_bison.ypp',
+  'LPSolverClp.cpp',
+  'LPSolverClp.hpp',
+  'LPSolverGurobi.cpp',
+  'LPSolverGurobi.hpp',
+  'LPSolverHighs.cpp',
+  'LPSolverHighs.hpp',
+  'LPSolverSoplex.cpp',
+  'LPSolverSoplex.hpp',
+  #  'NLPSolverIpopt.cpp',
+  #  'NLPSolverIpopt.hpp',
+  'NLPSolverNlopt.cpp',
+  'NLPSolverNlopt.hpp',
+]
 
-realpaver_lib = both_libraries('realpaver',
-    sources: rp_sources,
-    dependencies: deps_lib,
-    install: true,
-    extra_files: extra_dist,
-    include_directories: incdir
+realpaver_lib = both_libraries(
+  'realpaver',
+  sources: rp_sources,
+  dependencies: deps_lib,
+  install: true,
+  extra_files: extra_dist,
+  include_directories: incdir,
 )
 
 install_headers(rp_headers, subdir: 'realpaver')

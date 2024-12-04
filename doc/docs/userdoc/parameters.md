@@ -13,7 +13,7 @@ Several categories of parameters can be defined:
 
 ## General parameters
 
-- CERTIFICATION: postprocessing of solution nodes in order to handle clusters and to provide certificate of proofs (default: NO)
+- CERTIFICATION: postprocessing of solution nodes in order to handle clusters and to provide certificate of proofs (default: YES)
 - DISPLAY_REGION: display of regions (default: STD), possible values:
     - STD: standard display with one variable and its domain per line
     - VEC: display as a vector of domains

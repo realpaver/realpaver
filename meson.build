@@ -128,9 +128,10 @@ if interval_lib_name.to_lower() == 'gaol'
   #   conf_data.set('INTERVAL_LIB_CRLIBM',1)
 endif
 
-if local_solver_name.to_lower() == 'ipopt'
-  conf_data.set('LOCAL_OPTIMIZER_IPOPT', 1)
-elif local_solver_name.to_lower() == 'nlopt'
+#if local_solver_name.to_lower() == 'ipopt'
+#  conf_data.set('LOCAL_OPTIMIZER_IPOPT', 1)
+#el
+if local_solver_name.to_lower() == 'nlopt'
   conf_data.set('LOCAL_OPTIMIZER_NLOPT', 1)
 endif
 

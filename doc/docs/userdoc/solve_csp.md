@@ -4,7 +4,7 @@
 
 When building the RealPaver library, a default CSP solver is also generated, namely `csp_solver`. It is able to solve CSPs written using the [RealPaver dedicated language](language.md).
 
-From the command line, the solver requires the file path to the problem desciption written inthe RealPaver language. Thus, solving a CSP relating to a 2R planar robot, described in the file '2r-robot.rp', can be solved as follows:
+From the command line, the solver requires the file path to the problem desciption written in the RealPaver language. Thus, solving a CSP relating to a 2R planar robot, described in the file '2r-robot.rp', can be solved as follows:
 
 ``` bash
 # Run with default parameters
@@ -47,7 +47,7 @@ The following parameter file overloads the default values for the corresponding 
 # in seconds
 TIME_LIMIT=1000
 
-# No postprocessing
+# Postprocessing
 CERTIFICATION=YES
 
 # Display traces in terminal
@@ -131,7 +131,9 @@ for (size_t i=0; i<solver.nbSolutions(); ++i)
 Additional information on the solving process can also be printed:
 
 ``` c++
-cout<<solver.nbSolutions()<<" solutions found in "<<solver.getSolvingTime()<<" s, using "<<solver.getTotalNodes()<<" nodes."<<endl;
+cout << solver.nbSolutions() <<" solutions found in "
+     << solver.getSolvingTime() <<" s, using "
+     << solver.getTotalNodes() << " nodes." << endl;
 ```
 
 ### Describing the problem in C++
@@ -191,10 +193,11 @@ int main()
         {
             pair<DomainBox, Proof> sol = solver.getSolution(i);
             cout << "SOL " << i << ": " << sol.first
-                << " (" << sol.second << ")" << endl;
+                 << " (" << sol.second << ")" << endl;
         }
-        cout<<solver.nbSolutions()<<" solutions found in "<<solver.getSolvingTime()<<" s,"
-            <<" using "<<solver.getTotalNodes()<<" nodes."<<endl;
+        cout << solver.nbSolutions() <<" solutions found in "
+             << solver.getSolvingTime() <<" s, using "
+             << solver.getTotalNodes() << " nodes." << endl;
     }
     catch(Exception e) {
        cout << e.what() << endl;

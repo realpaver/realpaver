@@ -74,7 +74,7 @@ Constants
 ## Variables
 
 The definition of a variable is a bit more complex, since a domain should be defined, as well as the width of
-interval values considered as solutions during a solving process. This width is defined as a tolerance with
+interval values considered as solutions during a solving process (for continuous variables). This width is defined as a tolerance with
 a relative and absolute value.
 
 Additionally to a domain, a variable can be typed using keywords: `binary`, `integer`, `real`.
@@ -84,7 +84,13 @@ When defining a binary variable, the domain $[0,1]$ must not be specified.
 The generic syntax to define a variable is:
 
 ```
-var_name type in a_domain tol(rel_tol,abs_tol)
+var_name type in a_domain
+```
+
+For continuous variables the main syntax is:
+
+```
+var_name in a_domain tol(rel_tol,abs_tol)
 ```
 
 To define domains, interval values are defined by 2 values between square brackets: `[-1,1]`,

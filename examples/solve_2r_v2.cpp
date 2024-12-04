@@ -35,8 +35,9 @@ int main()
             cout << "SOL " << i << ": " << sol.first
                 << " (" << sol.second << ")" << endl;
         }
-        cout<<solver.nbSolutions()<<" solutions found in "<<solver.getSolvingTime()<<" s,"
-            <<" using "<<solver.getTotalNodes()<<" nodes."<<endl;
+        cout << solver.nbSolutions() <<" solutions found in "
+             << solver.getSolvingTime() <<" s, using "
+             << solver.getTotalNodes() << " nodes." << endl;
     }
     catch(Exception e) {
        cout << e.what() << endl;

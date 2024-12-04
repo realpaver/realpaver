@@ -107,7 +107,7 @@ Param::Param()
    strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
    strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
    strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
-   strmap_.insert(std::make_pair("CERTIFICATION",             "NO"));
+   strmap_.insert(std::make_pair("CERTIFICATION",             "YES"));
 }
 
 int Param::getIntParam(const std::string& name) const

@@ -10,7 +10,7 @@ Required software or libraries:
 
 - mesonbuild, then a minimal python environment
 - a C/C++ compiler: gcc, clang or msvc
-- an interval library: [Gaol](https://github.com/goualard-f/GAOL) or inum64
+- an interval library: [Gaol](https://github.com/goualard-f/GAOL)
 - a linear programming library: [Clp](https://github.com/coin-or/Clp), [Highs](https://highs.dev/), [Soplex](https://soplex.zib.de/) or [Gurobi](https://www.gurobi.com/downloads/gurobi-software/)
 
 Optional software or libraries:
@@ -81,7 +81,7 @@ More on the official mesonbuild documentation: [https://mesonbuild.com/Builtin-o
 For macos, if using [Homebrew](https://brew.sh/), here is an example where the prefix target the homebrew cellar:
 
 ```bash
-meson setup build --prefix=/opt/homebrew/Cellar/realpaver/1.0.0 -DLP_LIB=clp -DINTERVAL_LIB=gaol
+meson setup build --prefix=/opt/homebrew/Cellar/realpaver/1.0.0 -DLP_LIB=Clp -DINTERVAL_LIB=Gaol
 ```
 
 

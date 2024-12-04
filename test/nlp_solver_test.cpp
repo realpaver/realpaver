@@ -19,9 +19,10 @@ bool init_pointers(std::string filepath)
     {
         pb = std::make_shared<Problem>(Problem(filepath));
         Parser parser;
-        if (!parser.parseFile(filepath,*pb))
+        string fullpath = std::filesystem::current_path().string()+"/"+filepath;
+        if (!parser.parseFile(fullpath,*pb))
         {
-            std::cerr<<"Unable to parse file "<<std::filesystem::current_path()<<filepath<<std::endl;
+            std::cerr<<"Unable to parse file "<<fullpath<<std::endl;
             std::cerr<<parser.getParseError()<<std::endl;
             return false;
         }
@@ -32,17 +33,17 @@ bool init_pointers(std::string filepath)
     return true;
 }
 
-void test_ipopt(std::string filepath)
+void test_localopt(std::string filepath)
 {
     std::cerr<<"\n*** Solving "<<filepath<<std::endl;
-    
+
     if (!init_pointers(filepath))
     {
         TEST_TRUE(false);
     }
 
-    NLPSolver rp_ipopt(*pb);
-    
+    NLPSolver rp_localopt(*pb);
+
     RealPoint sol(pb->scope());
     OptimizationStatus status = OptimizationStatus::Other;
     IntervalBox box(pb->scope());
@@ -50,10 +51,10 @@ void test_ipopt(std::string filepath)
 
     std::cerr<<"Search space: "<<box<<std::endl;
     std::cerr<<"Starting point: "<<start<<std::endl;
-    
-    status = rp_ipopt.minimize(box,start);
+
+    status = rp_localopt.minimize(box,start);
     std::cerr<<"\n*** Solving status with NLPSolver:"<<status<<std::endl;
-    std::cerr<<"Best point: "<<rp_ipopt.bestPoint()<<" with obj: "<<rp_ipopt.bestVal()<<std::endl;
+    std::cerr<<"Best point: "<<rp_localopt.bestPoint()<<" with obj: "<<rp_localopt.bestVal()<<std::endl;
 
     TEST_TRUE(status != OptimizationStatus::Other);
     std::cerr<<"\nDone!"<<std::endl;
@@ -66,14 +67,14 @@ int main()
     pb = nullptr;
     obj = nullptr;
 
-    test_ipopt("../examples/bop/Beale.bop");
+    test_localopt("../benchmarks/cop/Beale.rp");
 
     std::cout<<"Solved!!!!!!!!!!!!"<<std::endl;
 
     pb = nullptr;
     obj = nullptr;
 
-    test_ipopt("../examples/bop/Rapha.bop");
+    test_localopt("../benchmarks/cop/OLS.rp");
 
     END_TEST
 }

@@ -55,7 +55,7 @@ PREPROCESSING = YES
 
 # Postprocessing of solution nodes in order to handle clusters and to
 # provide certificate of proofs
-CERTIFICATION = NO
+CERTIFICATION = YES
 
 #-------------------------------------------------------------------------------
 # BRANCH-AND-CONTRACT ALGORITHMS
