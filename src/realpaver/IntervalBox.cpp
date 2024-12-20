@@ -29,7 +29,7 @@ IntervalBox::IntervalBox(Scope scop)
       : IntervalVector(scop.size()),
         scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");   
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
 
    for (const auto& v : scop)
       set(v, v.getDomain()->intervalHull());
@@ -39,15 +39,15 @@ IntervalBox::IntervalBox(Scope scop, const Interval& x)
       : IntervalVector(scop.size(), x),
         scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");   
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
 }
 
 IntervalBox::IntervalBox(Scope scop, const IntervalVector& X)
       : IntervalVector(X),
         scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");      
-   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");      
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
+   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
 }
 
 IntervalBox::IntervalBox(const RealPoint& pt)
@@ -59,8 +59,8 @@ IntervalBox::IntervalBox(Scope scop, const RealVector& X)
       : IntervalVector(X),
         scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");      
-   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");      
+   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
+   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
 }
 
 IntervalBox::IntervalBox(const IntervalBox& B, Scope scop)
@@ -106,12 +106,12 @@ RealPoint IntervalBox::midpoint() const
 
 RealPoint IntervalBox::lCorner() const
 {
-   return RealPoint(scop_, IntervalVector::lCorner());   
+   return RealPoint(scop_, IntervalVector::lCorner());
 }
 
 RealPoint IntervalBox::rCorner() const
 {
-   return RealPoint(scop_, IntervalVector::rCorner());   
+   return RealPoint(scop_, IntervalVector::rCorner());
 }
 
 RealPoint IntervalBox::corner(const Bitset& bs) const
@@ -296,12 +296,12 @@ double IntervalBox::gridPerimeterOnScope(const Scope& scop) const
       {
          double w = x.width();
          double z = w / tol.getAbsTol();
-         
+
          LOG_FULL("   > " << v.getName() << " : " << w << " / "
                           << tol.getAbsTol() << " = " << z);
-         
+
          p += z;
-      }      
+      }
    }
 
    LOG_FULL("   > " << p);
@@ -316,24 +316,6 @@ IntervalBox* IntervalBox::clone() const
 
 void IntervalBox::print(std::ostream& os) const
 {
-   vecPrint(os);
-}
-
-void IntervalBox::listPrint(std::ostream& os) const
-{
-   size_t lmax = scop_.nameMaxLength();
-
-   for (const auto& v : scop_)
-   {
-      os << v.getName();
-      size_t n = v.getName().length();
-      for (size_t i=0; i<lmax-n; ++i) os << ' ';
-      os << " = " << get(v) << std::endl;
-   }
-}
-
-void IntervalBox::vecPrint(std::ostream& os) const
-{
    os << '(';
    for (size_t i=0; i<size(); ++i)
    {
@@ -342,7 +324,7 @@ void IntervalBox::vecPrint(std::ostream& os) const
       Variable v = scop_.var(i);
       os << v.getName() << " = " << get(v);
    }
-   os << ')'; 
+   os << ')';
 }
 
 bool IntervalBox::isSplitable(const Variable& v) const
@@ -378,7 +360,7 @@ bool IntervalBox::equals(const IntervalBox& B, const Variable& v) const
       if (i != j && operator[](i).isSetNeq(B.operator[](i)))
          return false;
    }
-   return true;   
+   return true;
 }
 
 } // namespace
