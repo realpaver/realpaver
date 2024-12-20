@@ -125,8 +125,10 @@ else
 endif
 
 rp_headers += [
+  'Alias.hpp',
   'AssertDebug.hpp',
   'Bitset.hpp',
+  'BoxReporter.hpp',
   'Common.hpp',
   'config.hpp',
   'Constraint.hpp',
@@ -229,8 +231,10 @@ rp_headers += [
 ]
 
 rp_sources += [
+  'Alias.cpp',
   'AssertDebug.hpp',
   'Bitset.cpp',
+  'BoxReporter.cpp',
   'Common.cpp',
   'Constraint.cpp',
   'ConstraintFixer.cpp',

@@ -3,13 +3,12 @@
 #include <iomanip>
 #include <iostream>
 #include "realpaver/config.hpp"
-#include "realpaver/AssertDebug.hpp"
+#include "realpaver/BoxReporter.hpp"
+#include "realpaver/CSPSolver.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/CSPSolver.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
-#include "realpaver/Stat.hpp"
 
 using namespace realpaver;
 using namespace std;
@@ -162,7 +161,7 @@ int main(int argc, char** argv)
                fsol << endl << "SOLUTION " << std::scientific
                     << "[" << B.width() << "]"
                     << endl;
-               B.listPrint(fsol);
+               B.print(fsol);
             }
          }
          else
@@ -182,7 +181,7 @@ int main(int argc, char** argv)
             {
                IntervalBox B(preproc->fixedRegion());
                Scope sco = preproc->fixedScope();
-               B.listPrint(fsol);
+               B.print(fsol);
             }
 
             fsol << WP("Number of inactive constraints", wpl)
@@ -333,13 +332,25 @@ int main(int argc, char** argv)
          // writes the solutions
          Scope sco = preproc->unfixedScope();
 
+         std::string dr = prm.getStrParam("DISPLAY_REGION");
+
+         StreamReporter reporter(problem, fsol);
+         for (const auto& v : sco)
+            if (!problem.isVarReported(v))
+               reporter.remove(v.getName());
+
+         if (dr == "STD") reporter.setVertical(true);
+         if (dr == "VEC") reporter.setVertical(false);
+
+         std::string sd = prm.getStrParam("DISPLAY_REGION");
+
          int prec = prm.getIntParam("FLOAT_PRECISION");
          fsol << std::defaultfloat;
 
-         string sd =solver.getEnv()->getParam()->getStrParam("DISPLAY_REGION");
-
          for (size_t i=0; i<solver.nbSolutions(); ++i)
          {
+            if (i>0) fsol << std::endl;
+
             std::pair<DomainBox, Proof> sol = solver.getSolution(i);
             IntervalBox hull(sol.first);
 
@@ -356,11 +367,7 @@ int main(int argc, char** argv)
             }
 
             fsol << std::setprecision(prec) << endl;
-
-            if (sd == "STD")
-               sol.first.listPrint(fsol);
-            else
-               sol.first.vecPrint(fsol);
+            reporter.report(sol.first);
          }
 
          // writes the hull of the pending nodes
@@ -376,11 +383,7 @@ int main(int argc, char** argv)
             fsol << std::defaultfloat << std::setprecision(4);
             fsol << endl << "HULL OF PENDING NODES" << " ["
                  << hp.width() << "]" << endl;
-            if (sd == "STD")
-               hp.listPrint(fsol);
-
-            else
-               hp.vecPrint(fsol);
+            hp.print(fsol);
          }
       }
 
@@ -388,7 +391,7 @@ int main(int argc, char** argv)
       fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
       DomainBox box(problem.scope());
       fsol << "BOX" << endl;
-      box.listPrint(fsol);
+      box.print(fsol);
       fsol << endl;
 
       // writes the constraints

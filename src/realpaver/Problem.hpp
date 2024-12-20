@@ -21,10 +21,10 @@
 #ifndef REALPAVER_PROBLEM_HPP
 #define REALPAVER_PROBLEM_HPP
 
-#include <memory>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include "realpaver/Alias.hpp"
+#include "realpaver/BoxReporter.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Objective.hpp"
 #include "realpaver/VariableVector.hpp"
@@ -34,8 +34,8 @@ namespace realpaver {
 /**
  * @brief Constraint satisfaction and optimization problem.
  *
- * A problem in general has a set of variables, a set of constraints and an
- * objective function.
+ * A problem in general has a set of variables, a set of constraints, an
+ * objective function and a set of aliases.
  *
  * The variables are indexed by consecutive natural numbers 0, 1, ... that are
  * automatically generated.
@@ -43,9 +43,16 @@ namespace realpaver {
  * The Cartesian product of variable domains can be simply obtained by creating
  * a domain box from the scope of this.
  *
+ * Variables and aliases can be reported or not when a solution is displayed
+ * or not after a solving process. To this end, a problem manages a vector
+ * of reported entities. The defaulkt strategy is to consider every alias or
+ * variable as reported. The methods reportAlias and reportVariable can be
+ * used to change this behaviour.
+ *
  * There are several classes of problems:
  * - Constraint Satisfaction Problems (CSPs);
- * - ...
+ * - Bound-constrained Optimization Problems (BOPs);
+ * - Constrained Optimization Problems (COPs).
  */
 class Problem {
 public:
@@ -69,7 +76,7 @@ public:
 
    /**
     * @brief Creates a vector of binary variables.
-    * 
+    *
     * Indexes in the vector: first, first+1, ..., last.
     */
    VariableVector addBinaryVarVector(const std::string& name, int first, int last);
@@ -85,7 +92,7 @@ public:
 
    /**
     * @brief Creates a vector of integer variables with domain r.
-    * 
+    *
     * Indexes in the vector: first, first+1, ..., last.
     */
    VariableVector addIntVarVector(const std::string& name, int first, int last,
@@ -102,7 +109,7 @@ public:
 
    /**
     * @brief Creates a vector of real variables with domains x.
-    * 
+    *
     * Indexes in the vector: first, first+1, ..., last.
     */
    VariableVector addRealVarVector(const std::string& name, int first, int last,
@@ -192,11 +199,32 @@ public:
    /// Returns true if this has a non constant objective function
    bool hasObjective() const;
 
-   /// Returns true if this has a non constant and linear objective function   
+   /// Returns true if this has a non constant and linear objective function
    bool isLinObjective() const;
 
    /// Returns true if this has no variable, no constraint, no objective
    bool isEmpty() const;
+
+   /// Adds an alias in this
+   void addAlias(const Alias& a);
+
+   /// Returns the number of aliases
+   size_t nbAliases() const;
+
+   /// Access to an alias given its position between 0 and nbAliases()-1
+   Alias aliasAt(size_t i) const;
+
+   /// Makes a variable a reported entity if b is true
+   void reportVariable(Variable v, bool b = true);
+
+   /// Makes an alias a reported entity if b is true
+   void reportAlias(Alias a, bool b = true);
+
+   /// Returns true if v is reported, false otherwise
+   bool isVarReported(const Variable& v) const;
+
+   /// Returns true if a is reported, false otherwise
+   bool isAliasReported(const Alias& a) const;
 
 private:
    std::string name_;               // name
@@ -204,9 +232,13 @@ private:
    std::vector<Constraint> ctrs_;   // vector of constraints
    Objective obj_;                  // objective function
    Scope scop_;                     // set of variables
+   std::vector<Alias> als_;         // vector of aliases
 
    // set of symbols used in this problem
    std::unordered_set<std::string> vname_;
+
+   // reported entities (aliases and variables)
+   std::shared_ptr<EntityReportedVector> erv_;
 
    // throws an exception if a name is already used as the name of a symbol
    void checkSymbol(const std::string& name);
@@ -215,6 +247,9 @@ private:
    int id_;          // problem id
 
    size_t nextVarId() const;
+
+   // Adds v in the vector of variables and the scope of this
+   void pushVar(Variable v);
 };
 
 /// Output on a stream

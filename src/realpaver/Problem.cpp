@@ -35,7 +35,9 @@ Problem::Problem(const std::string& name)
         ctrs_(),
         obj_(MIN(Term(0))),
         scop_(),
+        als_(),
         vname_(),
+        erv_(std::make_shared<EntityReportedVector>()),
         id_(NP++)
 {}
 
@@ -54,8 +56,7 @@ Variable Problem::addVar(const std::string& name)
    v.setId(id)
     .setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
@@ -77,8 +78,7 @@ Variable Problem::addBinaryVar(const std::string& name)
     .setDomain(std::move(dom))
     .setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
@@ -98,7 +98,7 @@ VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
        .setDomain(std::move(dom))
        .setTolerance(Tolerance(0.0, 0.0));
 
-      vars_.push_back(v);
+      pushVar(v);
    }
 
    return vec;
@@ -112,7 +112,7 @@ Variable Problem::addIntVar(int lo, int up, const std::string& name)
 Variable Problem::addIntVar(const Range& r, const std::string& name)
 {
    THROW_IF(r.isEmpty(), "Integer variable with an empty domain");
-   
+
    size_t id = nextVarId();
 
    std::ostringstream os;
@@ -129,15 +129,14 @@ Variable Problem::addIntVar(const Range& r, const std::string& name)
     .setDomain(std::move(dom))
     .setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
 Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
 {
    THROW_IF(u.isEmpty(), "Integer variable with an empty domain");
-   
+
    size_t id = nextVarId();
 
    std::ostringstream os;
@@ -154,8 +153,7 @@ Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
     .setDomain(std::move(dom))
     .setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
@@ -175,7 +173,7 @@ VariableVector Problem::addIntVarVector(const std::string& name, int first, int 
        .setDomain(std::move(dom))
        .setTolerance(Tolerance(0.0, 0.0));
 
-      vars_.push_back(v);
+      pushVar(v);
    }
 
    return vec;
@@ -196,7 +194,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
 
    if (name == "") os << "_x" << id;
    else            os << name;
-   
+
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new IntervalDomain(x));
@@ -209,8 +207,7 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
     .setDomain(std::move(dom))
     .setTolerance(Tolerance(rtol, atol));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
@@ -224,7 +221,7 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
 
    if (name == "") os << "_x" << id;
    else            os << name;
-   
+
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new IntervalUnionDomain(u));
@@ -237,8 +234,7 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
     .setDomain(std::move(dom))
     .setTolerance(Tolerance(rtol, atol));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
@@ -261,7 +257,7 @@ VariableVector Problem::addRealVarVector(const std::string& name, int first,
        .setDomain(std::move(dom))
        .setTolerance(Tolerance(rtol, atol));
 
-      vars_.push_back(v);
+      pushVar(v);
    }
 
    return vec;
@@ -274,9 +270,15 @@ Variable Problem::addClonedVar(Variable v)
    size_t id = nextVarId();
    res.setId(id);
 
-   vars_.push_back(res);
-
+   pushVar(res);
    return res;
+}
+
+void Problem::pushVar(Variable v)
+{
+   vars_.push_back(v);
+   scop_.insert(v);
+   erv_->addVariable(v);
 }
 
 void Problem::addCtr(Constraint c)
@@ -297,12 +299,13 @@ void Problem::addObjective(Objective obj)
 std::ostream& operator<<(std::ostream& os, const Problem& p)
 {
    if (p.isEmpty()) return os << "Nothing in this problem";
-   
+
    std::string indent = "",
                s_var  = "Variables",
                s_ctr  = "Constraints",
                s_int  = "Integer",
-               s_obj  = "Objectives";
+               s_obj  = "Objectives",
+               s_als  = "Aliases";
 
    // variables
    bool first = true;
@@ -338,6 +341,21 @@ std::ostream& operator<<(std::ostream& os, const Problem& p)
       os << indent << p.getObjective() << std::endl << ";";
    }
 
+   // aliases
+   if (p.nbAliases() > 0)
+   {
+      os << std::endl << s_als << std::endl;
+      first = true;
+      for (size_t i=0; i<p.nbAliases(); ++i)
+      {
+         if (!first) os << "," << std::endl;
+         else first = false;
+
+         os << indent << p.aliasAt(i);
+      }
+      os << std::endl << ";";
+   }
+
    return os;
 }
 
@@ -345,7 +363,7 @@ bool Problem::isFakeVar(Variable v) const
 {
    if (obj_.getTerm().dependsOn(v))
       return false;
-   
+
    for (size_t i=0; i<nbCtrs(); ++i)
       if (ctrAt(i).dependsOn(v))
          return false;
@@ -513,17 +531,17 @@ bool Problem::isCSP() const
 
 bool Problem::isBOP() const
 {
-   return (nbVars() > 0) && (nbCtrs() == 0) && hasObjective();   
+   return (nbVars() > 0) && (nbCtrs() == 0) && hasObjective();
 }
 
 bool Problem::isCOP() const
 {
-   return (nbVars() > 0) && (nbCtrs() > 0) && hasObjective();      
+   return (nbVars() > 0) && (nbCtrs() > 0) && hasObjective();
 }
 
 bool Problem::isEmpty() const
 {
-   return (nbVars() == 0) && (nbCtrs() == 0) && (!hasObjective()); 
+   return (nbVars() == 0) && (nbCtrs() == 0) && (!hasObjective());
 }
 
 void Problem::checkSymbol(const std::string& name)
@@ -538,6 +556,62 @@ void Problem::checkSymbol(const std::string& name)
 size_t Problem::nextVarId() const
 {
    return vars_.size();
+}
+
+void Problem::addAlias(const Alias& a)
+{
+   checkSymbol(a.name());
+
+   THROW_IF(!scop_.contains(a.scope()),
+      "Alias " << a.name() << " not on the problem's scope");
+
+   als_.push_back(a);
+   erv_->addAlias(a);
+}
+
+size_t Problem::nbAliases() const
+{
+   return als_.size();
+}
+
+Alias Problem::aliasAt(size_t i) const
+{
+   ASSERT(i < als_.size(), "Bad access to aa alias in a problem");
+   return als_[i];
+}
+
+void Problem::reportVariable(Variable v, bool b)
+{
+   if (erv_->contains(v.getName()))
+   {
+      if (!b) erv_->remove(v.getName());
+   }
+   else
+   {
+      if (b) erv_->addVariable(v);
+   }
+}
+
+void Problem::reportAlias(Alias a, bool b)
+{
+   if (erv_->contains(a.name()))
+   {
+      if (!b) erv_->remove(a.name());
+   }
+   else
+   {
+      if (b) erv_->addAlias(a);
+   }
+}
+
+bool Problem::isVarReported(const Variable& v) const
+{
+   return erv_->contains(v.getName());
+}
+
+bool Problem::isAliasReported(const Alias& a) const
+{
+   return erv_->contains(a.name());
 }
 
 } // namespace
