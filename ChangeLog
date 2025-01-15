@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-01-15
+
+* Add an API to improve the reporting of solutions and handle aliases ([issue #21](https://gitlab.univ-nantes.fr/realpavergroup/realpaver/-/issues/21))
+* Remove of useless files (README,NEWS,TODO)
+* Change default value for assertion option to false
+* Update of README.md to add a link to documentation
 
 ## [1.0.0] - 2024-12-04
 
