@@ -31,20 +31,20 @@ class IntervalBox;
 
 /**
  * @brief Box of domains.
- * 
+ *
  * A box associates a scope and a vector of variable domains indexed by the
  * local indexes of the variables from the scope.
- * 
+ *
  * The perimeter of a box is defined from its hull as the sum of the widths
  * of its components.
- * 
+ *
  * The grid perimeter of a box is defined from its hull as the sum of the
  * following quantities for each xi in Di with tolerance Ei:
  * - 0.0 if Di has tolerance Ei
  * - width(Di) / Ei (where Ei is the absolute tolerance of xi) otherwise
- * 
+ *
  * The gap between two boxes is defined as the gap between their interval hulls.
- * 
+ *
  * The glue method considers this and another box. For each variable v in some
  * scope, the domain of v in this is assigned to an interval domain defined as
  * the hull of this(v) and box(v).
@@ -86,7 +86,7 @@ public:
 
    /**
     * @brief Domain assignment.
-    * 
+    *
     * Assigns the domain of v in this. The ownership of the domain pointer is
     * moved from p to this.
     */
@@ -98,11 +98,8 @@ public:
    /// Tests if the domain of a variable is splitable
    bool isSplitable(const Variable& v) const;
 
-   /// Output on a stream with one couple (variable, domain) per line
-   void listPrint(std::ostream& os) const;
-
    /// Output on a stream using a vector notation
-   void vecPrint(std::ostream& os) const;
+   void print(std::ostream& os) const;
 
    /// Returns the width of the interval box corresponding to the hull of this
    double width() const;

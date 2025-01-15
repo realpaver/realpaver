@@ -233,24 +233,16 @@ std::unique_ptr<Domain> Term::hc4ReviseForward(const DomainBox& box) const
 
 Proof Term::hc4ReviseBackward(IntervalBox& B, const Interval& img)
 {
-   if (rep_->ival_.isEmpty())       return Proof::Empty;
-   if (img.isDisjoint(rep_->ival_)) return Proof::Empty;
-   if (img.contains(rep_->ival_))   return Proof::Inner;
-
    rep_->ival_ &= img;
-
-   return rep_->contract(B);   
+   if (rep_->ival_.isEmpty()) return Proof::Empty;
+   return rep_->contract(B);
 }
 
 Proof Term::hc4ReviseBackward(DomainBox& box, const Interval& img)
 {
-   if (rep_->ival_.isEmpty())       return Proof::Empty;
-   if (img.isDisjoint(rep_->ival_)) return Proof::Empty;
-   if (img.contains(rep_->ival_))   return Proof::Inner;
-
    rep_->ival_ &= img;
-
-   return rep_->contract(box);   
+   if (rep_->ival_.isEmpty()) return Proof::Empty;
+   return rep_->contract(box);
 }
 
 void Term::acceptVisitor(TermVisitor& vis) const
@@ -1317,7 +1309,7 @@ void TermSub::print(std::ostream& os) const
 
    left()->print(os);
    os << " " << symbol() << " ";
-   
+
    if (rp <= p && (!right()->isVar()) && (!right()->isNumber()))
    {
       os << "(";
@@ -1390,7 +1382,7 @@ void TermMul::print(std::ostream& os) const
       os << ")";
    }
    else
-      left()->print(os);      
+      left()->print(os);
 
    os << symbol();
 
@@ -1468,7 +1460,7 @@ void TermDiv::print(std::ostream& os) const
       left()->print(os);
 
    os << symbol();
-   
+
    if (rp == NodePriority::AddSub || rp == NodePriority::MulDiv)
    {
       os << "(";
@@ -1631,7 +1623,7 @@ void TermUsb::print(std::ostream& os) const
               rp = child()->priority();
 
    os << symbol();
-   
+
    if (rp <= p && (!child()->isVar()))
    {
       os << "(";
@@ -2349,7 +2341,7 @@ void SumOfSquaresCreator::apply(const TermAdd* t)
    if (vl.sos_ && vr.sos_)
    {
       sos_ = true;
-      
+
       for (auto t : vl.v_) v_.push_back(t);
       for (auto t : vr.v_) v_.push_back(t);
    }

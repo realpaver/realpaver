@@ -38,28 +38,28 @@ public:
 
    /**
     * @brief Constructor from a scope.
-    * 
+    *
     * Each variable from scop is assigned to the hull of its domain.
     */
    IntervalBox(Scope scop);
 
    /**
     * @brief Constructor from a scope and an interval.
-    * 
+    *
     * Each variable from scop is assigned to x.
     */
    IntervalBox(Scope scop, const Interval& x);
 
    /**
     * @brief Constructor from a scope and an interval vector.
-    * 
+    *
     * For each i, the i-th variable from scop is assigned to X[i].
     */
    IntervalBox(Scope scop, const IntervalVector& X);
 
    /**
     * @brief Constructor from a scope and a real vector.
-    * 
+    *
     * For each i, the i-th variable from scop is assigned to X[i].
     */
    IntervalBox(Scope scop, const RealVector& X);
@@ -75,7 +75,7 @@ public:
 
    /**
     * @brief Constructor of a sub-box.
-    * 
+    *
     * Assigns this to B restricted to scop
     */
    IntervalBox(const IntervalBox& B, Scope scop);
@@ -107,7 +107,7 @@ public:
 
    /**
     * @brief Gets a corner of this.
-    * 
+    *
     * The bitset bs defines the corner as follows. For each i, the i-th variable
     * is assigned to the left bound in the resulting point if bs[i] is true, to
     * the right bound otherwise.
@@ -116,7 +116,7 @@ public:
 
    /**
     * @brief Gets a corner of this.
-    * 
+    *
     * The bitset bs defines the corner as follows. For each i, the i-th variable
     * is assigned to the left bound in the resulting point if bs[i] is false, to
     * the right bound otherwise.
@@ -144,7 +144,7 @@ public:
 
    /**
     * @brief Glues a box in this.
-    * 
+    *
     * For each variable v in the scope of this, its domain in this is assigned
     * to the hull of its domain in this and its domain in B.
     */
@@ -152,7 +152,7 @@ public:
 
    /**
     * @brief Glues a box in this.
-    * 
+    *
     * For each variable v in scop, its domain in this is assigned to the hull
     * of its domain in this and its domain in B.
     */
@@ -160,14 +160,14 @@ public:
 
    /**
     * @brief Assignment on a scope.
-    * 
+    *
     * For each v in scope, this[v] is assigned to B[v].
     */
    void setOnScope(const IntervalBox& B, const Scope& scop);
 
    /**
     * @brief Midpoint on a scope.
-    * 
+    *
     * For each v in scop, the value of v in the resulting point is assigned
     * to the midpoint of the domain of v in this.
     */
@@ -175,7 +175,7 @@ public:
 
    /**
     * @brief Midpoint on a scope.
-    * 
+    *
     * For each v in scop, the value of v in pt is assigned to the midpoint of
     * the domain of v in this.
     */
@@ -207,7 +207,7 @@ public:
 
    /**
     * @brief Returns the grid perimeter of this.
-    * 
+    *
     *
     * Given xi in Di with tolerance Ei for each i, the grid perimeter is the
     * sum for each i of the following quantity:
@@ -222,18 +222,12 @@ public:
    IntervalBox* clone() const override;
    void print(std::ostream& os) const override;
 
-   /// Outout on a stream with one variable per line
-   void listPrint(std::ostream& os) const;
-
-   /// Output on a stream using a vector notation
-   void vecPrint(std::ostream& os) const;
-
    /// Tests if the domain of a variable is splitable
    bool isSplitable(const Variable& v) const;
 
    /**
     * @brief Tests if this behaves like a vector.
-    * 
+    *
     * Returns true if the scope of this contains the variables whose
     * identifiers are 0, 1, 2, ..., which permits to consider this as a vector.
     * In other words, it is possible to cast this to an IntervalVector and

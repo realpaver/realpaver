@@ -1,4 +1,10 @@
-# realpaver
+# RealPaver
+
+The RealPaver library provides a C++ API to deal with interval analysis, constraint programming and global optimization techniques.
+
+## Documentation
+
+[https://realpavergroup.univ-nantes.io/realpaver/](https://realpavergroup.univ-nantes.io/realpaver/)
 
 ## Pre-requisite
 

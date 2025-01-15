@@ -126,23 +126,7 @@ bool DomainBox::isSplitable(const Variable& v) const
       return !dom->isCanonical();
 }
 
-void DomainBox::listPrint(std::ostream& os) const
-{
-   size_t lmax = scop_.nameMaxLength();
-
-   for (size_t i=0; i<size(); ++i)
-   {
-      Variable v = scop_.var(i);
-      os << v.getName();
-
-      size_t n = v.getName().length();
-      for (size_t i=0; i<lmax-n; ++i) os << ' ';
-
-      os << " = " << (*doms_[i]) << std::endl;
-   }
-}
-
-void DomainBox::vecPrint(std::ostream& os) const
+void DomainBox::print(std::ostream& os) const
 {
    os << '(';
    for (size_t i=0; i<size(); ++i)
@@ -152,12 +136,12 @@ void DomainBox::vecPrint(std::ostream& os) const
       Variable v = scop_.var(i);
       os << v.getName() << " = " << (*doms_[i]);
    }
-   os << ')'; 
+   os << ')';
 }
 
 std::ostream& operator<<(std::ostream& os, const DomainBox& box)
 {
-   box.vecPrint(os);
+   box.print(os);
    return os;
 }
 
@@ -243,10 +227,10 @@ double DomainBox::gridPerimeterOnScope(const Scope& scop) const
       {
          double w = x.width();
          double z = w / tol.getAbsTol();
-         
+
          LOG_FULL("   > " << v.getName() << " : " << w << " / "
                           << tol.getAbsTol() << " = " << z);
-         
+
          p += z;
       }
    }
@@ -259,7 +243,7 @@ double DomainBox::gridPerimeterOnScope(const Scope& scop) const
 bool DomainBox::equals(const DomainBox& box) const
 {
    if (scop_ != box.scop_) return false;
-   
+
    for (size_t i=0; i<doms_.size(); ++i)
       if (!doms_[i]->equals(*box.doms_[i]))
          return false;
