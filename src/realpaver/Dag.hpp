@@ -99,7 +99,7 @@ public:
 
    /// Inserts a parent node of index i
    void addParNode(size_t i);
-   
+
    /// Returns the number of sub-nodes
    size_t subArity() const;
 
@@ -728,9 +728,15 @@ public:
    /// Returns the scope of this (set of variables)
    Scope scope() const;
 
+   /// Returns the flat function enclosed in this
+   std::shared_ptr<FlatFunction> flatFunction() const;
+
+   /// Assigns the flat function enclosed in this to fun
+   void setFlatFunction(std::shared_ptr<FlatFunction> fun);
+
    /**
     * @brief HC4Revise contractor.
-    * 
+    *
     * Applies the contractor on B and returns a certificate of proof.
     * The projections of this onto its variables are assigned in B.
     */
@@ -738,7 +744,7 @@ public:
 
    /**
     * @brief HC4Revise contractor on the constraint negation.
-    * 
+    *
     * Applies the contractor on B and returns a certificate of proof.
     * The projections of this onto its variables are assigned in B.
     */
@@ -749,7 +755,7 @@ public:
 
    /**
     * @brief Interval differentiation method.
-    * 
+    *
     * Calculates the gradient of this on B (reverse mode). G[i] is the partial
     * derivative of this with respect to the i-th variable of its scope.
     */
@@ -757,7 +763,7 @@ public:
 
    /**
     * @brief Interval differentiation method using Hansen's strategy.
-    * 
+    *
     * Calculates the gradient of this on B (reverse mode). G[i] is the partial
     * derivative of this with respect to the i-th variable of its scope.
     */
@@ -768,7 +774,7 @@ public:
 
    /**
     * @brief Real differentiation method.
-    * 
+    *
     * Calculates the gradient of this at pt (reverse mode). G[i] is the partial
     * derivative of this with respect to the i-th variable of its scope.
     */
@@ -785,7 +791,7 @@ private:
    Scope scop_;                  // the set of variables
    Interval image_;              // bounds of the function, i.e. the co-domain
    size_t idx_;                  // index in the dag
-   FlatFunction* flat_;          // implements hc4Revise
+   std::shared_ptr<FlatFunction> flat_;   // implements hc4Revise
 
    // tests if a node is already present in this function
    bool hasNode(DagNode* node) const;
@@ -839,7 +845,7 @@ public:
 
    /**
     * @brief Gets a variable node given the identifier of a variable.
-    * 
+    *
     * Returns the node representing the variable id if it exists,
     * nullptr otherwise.
     */
@@ -854,7 +860,7 @@ public:
 
    /**
     * @brief Inserts a constraint in this and returns its index.
-    * 
+    *
     * The constraint is given by a term and its image.
     * Throws an exception if the constraint cannot be handled.
     */
@@ -862,7 +868,7 @@ public:
 
    /**
     * @brief Inserts a node representing an interval.
-    * 
+    *
     * Returns the node index. A new node is created only if it does not already
     * exists in the DAG.
     */
@@ -870,7 +876,7 @@ public:
 
    /**
     * @brief Inserts a node representing a variable.
-    * 
+    *
     * Returns the node index. A new node is created only if it does not already
     * exists in the DAG.
     */
@@ -878,7 +884,7 @@ public:
 
    /**
     * @brief Inserts a node representing an operation.
-    * 
+    *
     * Returns the node index. A new node is created only if it does not already
     * exists in the DAG, otherwise the input node is deleted.
     */
@@ -903,7 +909,7 @@ public:
 
    /**
     * @brief Interval evaluation of the functions on B.
-    * 
+    *
     * V[i] is the value of the i-th function.
     * The method ival() CANNOT be used to get the interval value at each node.
     */
@@ -911,7 +917,7 @@ public:
 
    /**
     * @brief Interval diferentiation of this on B.
-    * 
+    *
     * J[i,k] is the partial derivative of the i-th function with respect to the
     * k-th variable of the scope of this.
     */
@@ -919,7 +925,7 @@ public:
 
    /**
     * @brief Calculates the Hansen matrix of this on B.
-    * 
+    *
     * H[i,k] is the partial derivative of the i-th function with respect to the
     * k-th variable of the scope of this.
     */
@@ -927,14 +933,14 @@ public:
 
    /**
     * @brief Real evaluation of the functions at pt.
-    * 
+    *
     * V[i] is the value of the i-th function.
     */
    void rEval(const RealPoint& pt, RealVector& V);
 
    /**
     * @brief Real diferentiation of this at pt.
-    * 
+    *
     * J[i,k] is the partial derivative of the i-th function with respect to the
     * k-th variable of the scope of this.
     */
@@ -1066,7 +1072,7 @@ class DagCreator : public ConstraintVisitor {
 public:
    /**
     * @brief Constructor.
-    * 
+    *
     * @param dag DAG modified by a visit
     * @param c constraint visited
     */
@@ -1087,7 +1093,8 @@ private:
    Constraint c_;    // constraint visited
    size_t index_;    // resulting constraint index in the DAG
 
-   void make(const Term& t, Scope scop, const Interval& img);
+   void make(const Term& t, Scope scop, const Interval& img,
+             std::shared_ptr<FlatFunction> fun);
 };
 
 /*----------------------------------------------------------------------------*/

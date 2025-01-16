@@ -93,7 +93,7 @@ public:
 
    /**
     * @brief Returns the number of nodes in this considered as a tree.
-    * 
+    *
     * For instance the number of nodes in (1 + x) - (1 + x) is 7.
     */
    virtual size_t nbNodes() const = 0;
@@ -106,31 +106,17 @@ public:
 
    /**
     * @brief Interval evaluation on B.
-    * 
+    *
     * The result is assigned in the interval value enclosed.
     */
    virtual void eval(const IntervalBox& B) = 0;
 
    /**
     * @brief Interval evaluation on box.
-    * 
+    *
     * The result is assigned in the interval value enclosed.
     */
    virtual void eval(const DomainBox& box) = 0;
-
-   /**
-    * @brief Contraction method.
-    * 
-    * Contracts B and returns a certificate of proof
-    */
-   virtual Proof contract(IntervalBox& B) = 0;
-
-   /**
-    * @brief Contraction method.
-    * 
-    * Contracts box and returns a certificate of proof
-    */
-   virtual Proof contract(DomainBox& box) = 0;
 
    /// Visitor pattern
    virtual void acceptVisitor(TermVisitor& vis) const = 0;
@@ -182,7 +168,7 @@ public:
 
    /**
     * @brief Cloning.
-    * 
+    *
     * Returns a new representation such that the root of this is cloned and
     * its sub-terms are shared
     */
@@ -244,7 +230,7 @@ public:
 
    /**
     * @brief Returns the number of nodes in this considered as a tree.
-    * 
+    *
     * For instance the number of nodes in (1 + x) - (1 + x) is 7.
     */
    size_t nbNodes() const;
@@ -261,72 +247,8 @@ public:
    /// Returns the interval evaluation of this on box
    std::unique_ptr<Domain> eval(const DomainBox& box) const;
 
-   /**
-    * @brief Reduction of domains using the HC4 Revise contractor.
-    * 
-    * @param B domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * This algorithm first evaluates the nodes from the leaves to the root
-    * (forward phase) and then calculates the projections from the root to
-    * the leaves (backward phase).
-    */
-   Proof contract(IntervalBox& B, const Interval& img);
-
-   /**
-    * @brief Reduction of domains using the HC4 Revise contractor.
-    * 
-    * @param box domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * This algorithm first evaluates the nodes from the leaves to the root
-    * (forward phase) and then calculates the projections from the root to
-    * the leaves (backward phase).
-    */
-   Proof contract(DomainBox& box, const Interval& img);
-
-   /**
-    * @brief Forward phase of the HC4 Revise contractor.
-    * 
-    * @param B domains of variables
-    * @return the interval evaluation of this on B
-    */
-   Interval hc4ReviseForward(const IntervalBox& B) const;
-
-   /**
-    * @brief Forward phase of the HC4 Revise contractor.
-    * 
-    * @param box domains of variables
-    * @return the evaluation of this on B
-    */
-   std::unique_ptr<Domain> hc4ReviseForward(const DomainBox& box) const;
-
-   /**
-    * @brief Backward phase of the HC4 Revise contractor.
-    * 
-    * @param B domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * Assumes that the forward phase has been executed using hc4ReviseForward.
-    */
-   Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
-
-   /**
-    * @brief Backward phase of the HC4 Revise contractor.
-    * 
-    * @param box domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * Assumes that the forward phase has been executed using hc4ReviseForward.
-    */
-   Proof hc4ReviseBackward(DomainBox& box, const Interval& img);
-
    /// Visitor pattern
-   void acceptVisitor(TermVisitor& vis) const;   
+   void acceptVisitor(TermVisitor& vis) const;
 
    /// Returns true if the root node of this has type TermCst (a number)
    bool isNumber() const;
@@ -395,13 +317,13 @@ public:
 
    /// Division with assignment
    Term& operator/=(Term other);
- 
+
    /// Returns the representation of this
    SharedRep rep() const;
 
    /**
     * @brief Cloning.
-    * 
+    *
     * Returns a new representation such that the root of this is cloned and
     * its sub-terms are shared
     */
@@ -412,7 +334,7 @@ public:
 
    /**
     * @brief Returns the simplification status.
-    * 
+    *
     * Returns true if terms are automatically simplified when they are created
     * and false otherwise
     */
@@ -420,7 +342,7 @@ public:
 
    /**
     * @brief Assigns the simplification status.
-    * 
+    *
     * @param simplify true in order to simplify terms when they are created,
     *        false otherwise
     * @return the previous status before its assignment
@@ -429,7 +351,7 @@ public:
 
    /**
     * @brief Gets the display status of constants.
-    * 
+    *
     * Returns true if the constants are displayed as intervals, false
     * if the midpoints are displayed
     */
@@ -533,9 +455,7 @@ public:
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isNumber() const override;
    bool isZero() const override;
@@ -568,9 +488,7 @@ public:
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool dependsOn(const Variable& v) const override;
    bool isLinear() const override;
@@ -628,9 +546,7 @@ public:
    bool isInteger() const override;
    virtual bool isLinear() const override;
    void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    virtual void print(std::ostream& os) const override;
    bool dependsOn(const Variable& v) const override;
    void makeScope(Scope& scop) const override;
@@ -638,9 +554,6 @@ public:
 protected:
    /// Interval evaluation of the root node
    virtual void evalRoot() = 0;
-
-   /// Contraction with respect to the root node
-   virtual void contractRoot() = 0;
 
    /// Returns true if the term rooted by this is an integer term
    virtual bool isIntegerRoot() const;
@@ -659,7 +572,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
@@ -678,7 +590,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
@@ -697,7 +608,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
@@ -716,7 +626,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
@@ -734,7 +643,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
@@ -751,7 +659,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
@@ -769,7 +676,6 @@ public:
    void print(std::ostream& os) const override;
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isLinear() const override;
    bool isIntegerRoot() const override;
@@ -787,7 +693,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
@@ -804,7 +709,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
@@ -821,7 +725,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
@@ -839,7 +742,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
    TermRep* cloneRoot() const override;
@@ -859,7 +761,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void print(std::ostream& os) const override;
    void acceptVisitor(TermVisitor& vis) const override;
    bool isIntegerRoot() const override;
@@ -880,7 +781,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -896,7 +796,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -912,7 +811,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -928,7 +826,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -944,7 +841,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -960,7 +856,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -976,7 +871,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;
@@ -992,7 +886,6 @@ public:
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
    void acceptVisitor(TermVisitor& vis) const override;
    TermRep* cloneRoot() const override;
    TermRep* clone() const override;

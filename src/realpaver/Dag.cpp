@@ -125,7 +125,7 @@ void DagNode::addParNode(size_t i)
 
 size_t DagNode::subArity() const
 {
-   return vsub_.size();   
+   return vsub_.size();
 }
 
 size_t DagNode::subIndex(size_t i) const
@@ -677,14 +677,14 @@ DagLin::DagLin(Dag* dag, const TermLin& tl, const IndexList& lsub)
       : DagOp(dag, DagSymbol::Lin, lsub),
         cst_(),
         terms_()
-{   
+{
    cst_ = tl.getCst();
 
    for (size_t i=0; i<tl.nbTerms(); ++i)
    {
       DagVar* node = dag->findVarNode(tl.var(i).id());
       Item it = { tl.coef(i), node, Interval::universe() };
-      terms_.insert(it);      
+      terms_.insert(it);
    }
 }
 
@@ -717,7 +717,7 @@ bool DagLin::eqSymbol(const DagOp* other) const
 
    // no need to compare the variables / sub-nodes since this is done
    // in the eq() method
-   
+
    return true;
 }
 
@@ -798,7 +798,7 @@ Interval DagLin::coef(size_t i) const
 
    auto it = terms_.begin();
    std::advance(it, i);
-   return it->coef;   
+   return it->coef;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -816,13 +816,10 @@ DagFun::DagFun(Dag* dag, size_t root, Scope scop, const Interval& image)
    DagFunCreator vis(this);
    DagNode* node = dag->node(root);
    node->acceptVisitor(vis);
-   flat_ = new FlatFunction(this);
 }
 
 DagFun::~DagFun()
-{
-   delete flat_;
-}
+{}
 
 Interval DagFun::getImage() const
 {
@@ -887,6 +884,16 @@ size_t DagFun::index() const
 Scope DagFun::scope() const
 {
    return scop_;
+}
+
+std::shared_ptr<FlatFunction> DagFun::flatFunction() const
+{
+   return flat_;
+}
+
+void DagFun::setFlatFunction(std::shared_ptr<FlatFunction> fun)
+{
+   flat_ = fun;
 }
 
 bool DagFun::hasNode(DagNode* node) const
@@ -1249,7 +1256,7 @@ void Dag::print(std::ostream& os) const
       }
       os << "]";
       os << " depends on " << node->bitset();
-      
+
       os << std::endl;
    }
 }
@@ -1328,7 +1335,7 @@ void Dag::iDiffHansen(const IntervalBox& B, IntervalMatrix& H)
       }
 
       ++j;
-   }   
+   }
 }
 
 void Dag::rEval(const RealPoint& pt, RealVector& V)
@@ -1673,40 +1680,41 @@ size_t DagCreator::index()
 
 void DagCreator::apply(const ArithCtrEq* c)
 {
-   Term t(c->left() - c->right());  
-   make(t, c->scope(), Interval::zero());
+   Term t(c->left() - c->right());
+   make(t, c->scope(), Interval::zero(), c->flatFunction());
 }
 
 void DagCreator::apply(const ArithCtrLe* c)
 {
    Term t( c->left() - c->right());
-   make(t, c->scope(), Interval::negative());
+   make(t, c->scope(), Interval::negative(), c->flatFunction());
 }
 
 void DagCreator::apply(const ArithCtrLt* c)
 {
    Term t( c->left() - c->right());
-   make(t, c->scope(), Interval::negative());
+   make(t, c->scope(), Interval::negative(), c->flatFunction());
 }
 
 void DagCreator::apply(const ArithCtrGe* c)
 {
    Term t( c->left() - c->right());
-   make(t, c->scope(), Interval::positive());
+   make(t, c->scope(), Interval::positive(), c->flatFunction());
 }
 
 void DagCreator::apply(const ArithCtrGt* c)
 {
    Term t( c->left() - c->right());
-   make(t, c->scope(), Interval::positive());
+   make(t, c->scope(), Interval::positive(), c->flatFunction());
 }
 
 void DagCreator::apply(const ArithCtrIn* c)
 {
-   make(c->term(), c->scope(), c->image());
+   make(c->term(), c->scope(), c->image(), c->flatFunction());
 }
 
-void DagCreator::make(const Term& t, Scope scop, const Interval& img)
+void DagCreator::make(const Term& t, Scope scop, const Interval& img,
+                      std::shared_ptr<FlatFunction> fun)
 {
    size_t root = 0;  // index of root node
 
@@ -1738,6 +1746,7 @@ void DagCreator::make(const Term& t, Scope scop, const Interval& img)
 
    // creates the function
    DagFun* f = new DagFun(dag_, root, scop, img);
+   f->setFlatFunction(fun);
    index_ = dag_->insertFun(f);
 }
 

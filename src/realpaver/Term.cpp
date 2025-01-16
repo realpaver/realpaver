@@ -221,30 +221,6 @@ std::unique_ptr<Domain> Term::eval(const DomainBox& box) const
    return std::make_unique<IntervalDomain>(rep_->ival_);
 }
 
-Interval Term::hc4ReviseForward(const IntervalBox& B) const
-{
-   return eval(B);
-}
-
-std::unique_ptr<Domain> Term::hc4ReviseForward(const DomainBox& box) const
-{
-   return eval(box);
-}
-
-Proof Term::hc4ReviseBackward(IntervalBox& B, const Interval& img)
-{
-   rep_->ival_ &= img;
-   if (rep_->ival_.isEmpty()) return Proof::Empty;
-   return rep_->contract(B);
-}
-
-Proof Term::hc4ReviseBackward(DomainBox& box, const Interval& img)
-{
-   rep_->ival_ &= img;
-   if (rep_->ival_.isEmpty()) return Proof::Empty;
-   return rep_->contract(box);
-}
-
 void Term::acceptVisitor(TermVisitor& vis) const
 {
    rep_->acceptVisitor(vis);
@@ -353,18 +329,6 @@ Scope Term::scope() const
    Scope scop;
    makeScope(scop);
    return ScopeBank::getInstance()->insertScope(scop);
-}
-
-Proof Term::contract(IntervalBox& B, const Interval& img)
-{
-   hc4ReviseForward(B);
-   return hc4ReviseBackward(B, img);
-}
-
-Proof Term::contract(DomainBox& box, const Interval& img)
-{
-   hc4ReviseForward(box);
-   return hc4ReviseBackward(box, img);
 }
 
 std::ostream& operator<<(std::ostream& os, const Term& t)
@@ -858,16 +822,6 @@ void TermCst::eval(const DomainBox& box)
    ival_ = x_;
 }
 
-Proof TermCst::contract(IntervalBox& B)
-{
-   return Proof::Maybe;
-}
-
-Proof TermCst::contract(DomainBox& box)
-{
-   return Proof::Maybe;
-}
-
 void TermCst::print(std::ostream& os) const
 {
    if (Term::idisplay())
@@ -963,33 +917,6 @@ void TermVar::eval(const IntervalBox& B)
 void TermVar::eval(const DomainBox& box)
 {
    ival_ = box.get(v_)->intervalHull();
-}
-
-Proof TermVar::contract(IntervalBox& B)
-{
-   ival_ &= B.get(v_);
-
-#if LOG_ON
-   LOG_FULL("term contract variable " << v_.getName() << " -> " << ival_);
-#endif
-
-   B.set(v_, ival_);
-   return ival_.isEmpty() ? Proof::Empty : Proof::Maybe;
-}
-
-Proof TermVar::contract(DomainBox& box)
-{
-   // contracts ival_
-   box.get(v_)->contractInterval(ival_);
-
-   // contracts the domain of v_ in the box
-   box.get(v_)->contract(ival_);
-
-#if LOG_ON
-   LOG_FULL("term contract variable " << v_.getName() << " -> " << ival_);
-#endif
-
-   return ival_.isEmpty() ? Proof::Empty : Proof::Maybe;
 }
 
 void TermVar::print(std::ostream& os) const
@@ -1152,30 +1079,6 @@ void TermOp::eval(const DomainBox& box)
    evalRoot();
 }
 
-Proof TermOp::contract(IntervalBox& B)
-{
-   if (ival_.isEmpty()) return Proof::Empty;
-
-   contractRoot();
-
-   for (auto sub : v_)
-      if (sub->contract(B) == Proof::Empty) return Proof::Empty;
-
-   return Proof::Maybe;
-}
-
-Proof TermOp::contract(DomainBox& box)
-{
-   if (ival_.isEmpty()) return Proof::Empty;
-
-   contractRoot();
-
-   for (auto sub : v_)
-      if (sub->contract(box) == Proof::Empty) return Proof::Empty;
-
-   return Proof::Maybe;
-}
-
 bool TermOp::dependsOn(const Variable& v) const
 {
    for (auto sub : v_)
@@ -1240,12 +1143,6 @@ void TermAdd::evalRoot()
    ival_ = left()->ival() + right()->ival();
 }
 
-void TermAdd::contractRoot()
-{
-   left()->setIval(addPX(left()->ival(), right()->ival(), ival_));
-   right()->setIval(addPY(left()->ival(), right()->ival(), ival_));
-}
-
 bool TermAdd::isIntegerRoot() const
 {
    return true;
@@ -1294,12 +1191,6 @@ Interval TermSub::evalConst() const
 void TermSub::evalRoot()
 {
    ival_ = left()->ival() - right()->ival();
-}
-
-void TermSub::contractRoot()
-{
-   left()->setIval(subPX(left()->ival(), right()->ival(), ival_));
-   right()->setIval(subPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermSub::print(std::ostream& os) const
@@ -1361,12 +1252,6 @@ Interval TermMul::evalConst() const
 void TermMul::evalRoot()
 {
    ival_ = left()->ival() * right()->ival();
-}
-
-void TermMul::contractRoot()
-{
-   left()->setIval(mulPX(left()->ival(), right()->ival(), ival_));
-   right()->setIval(mulPY(left()->ival(), right()->ival(), ival_));
 }
 
 void TermMul::print(std::ostream& os) const
@@ -1439,12 +1324,6 @@ void TermDiv::evalRoot()
    ival_ = left()->ival() / right()->ival();
 }
 
-void TermDiv::contractRoot()
-{
-   left()->setIval(divPX(left()->ival(), right()->ival(), ival_));
-   right()->setIval(divPY(left()->ival(), right()->ival(), ival_));
-}
-
 void TermDiv::print(std::ostream& os) const
 {
    NodePriority lp = left()->priority(),
@@ -1509,12 +1388,6 @@ void TermMin::evalRoot()
    ival_ = min(left()->ival(), right()->ival());
 }
 
-void TermMin::contractRoot()
-{
-   left()->setIval(minPX(left()->ival(), right()->ival(), ival_));
-   right()->setIval(minPY(left()->ival(), right()->ival(), ival_));
-}
-
 void TermMin::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -1553,12 +1426,6 @@ void TermMax::evalRoot()
    ival_ = max(left()->ival(), right()->ival());
 }
 
-void TermMax::contractRoot()
-{
-   left()->setIval(maxPX(left()->ival(), right()->ival(), ival_));
-   right()->setIval(maxPY(left()->ival(), right()->ival(), ival_));
-}
-
 void TermMax::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -1595,11 +1462,6 @@ Interval TermUsb::evalConst() const
 void TermUsb::evalRoot()
 {
    ival_ = -child()->ival();
-}
-
-void TermUsb::contractRoot()
-{
-   child()->setIval(usubPX(child()->ival(), ival_));
 }
 
 void TermUsb::acceptVisitor(TermVisitor& vis) const
@@ -1661,11 +1523,6 @@ void TermAbs::evalRoot()
    ival_ = abs(child()->ival());
 }
 
-void TermAbs::contractRoot()
-{
-   child()->setIval(absPX(child()->ival(), ival_));
-}
-
 void TermAbs::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -1701,11 +1558,6 @@ Interval TermSgn::evalConst() const
 void TermSgn::evalRoot()
 {
    ival_ = sgn(child()->ival());
-}
-
-void TermSgn::contractRoot()
-{
-   child()->setIval(sgnPX(child()->ival(), ival_));
 }
 
 void TermSgn::acceptVisitor(TermVisitor& vis) const
@@ -1763,11 +1615,6 @@ void TermSqr::print(std::ostream& os) const
    }
 }
 
-void TermSqr::contractRoot()
-{
-   child()->setIval(sqrPX(child()->ival(), ival_));
-}
-
 void TermSqr::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -1803,11 +1650,6 @@ Interval TermSqrt::evalConst() const
 void TermSqrt::evalRoot()
 {
    ival_ = sqrt(child()->ival());
-}
-
-void TermSqrt::contractRoot()
-{
-   child()->setIval(sqrtPX(child()->ival(), ival_));
 }
 
 void TermSqrt::acceptVisitor(TermVisitor& vis) const
@@ -1858,11 +1700,6 @@ void TermPow::evalRoot()
    ival_ = pow(child()->ival(), n_);
 }
 
-void TermPow::contractRoot()
-{
-   child()->setIval(powPX(child()->ival(), n_, ival_));
-}
-
 void TermPow::print(std::ostream& os) const
 {
    os << symbol() << "(";
@@ -1907,11 +1744,6 @@ void TermExp::evalRoot()
    ival_ = exp(child()->ival());
 }
 
-void TermExp::contractRoot()
-{
-   child()->setIval(expPX(child()->ival(), ival_));
-}
-
 void TermExp::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -1942,11 +1774,6 @@ Interval TermLog::evalConst() const
 void TermLog::evalRoot()
 {
    ival_ = log(child()->ival());
-}
-
-void TermLog::contractRoot()
-{
-   child()->setIval(logPX(child()->ival(), ival_));
 }
 
 void TermLog::acceptVisitor(TermVisitor& vis) const
@@ -1981,11 +1808,6 @@ void TermCos::evalRoot()
    ival_ = cos(child()->ival());
 }
 
-void TermCos::contractRoot()
-{
-   child()->setIval(cosPX(child()->ival(), ival_));
-}
-
 void TermCos::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -2016,11 +1838,6 @@ Interval TermSin::evalConst() const
 void TermSin::evalRoot()
 {
    ival_ = sin(child()->ival());
-}
-
-void TermSin::contractRoot()
-{
-   child()->setIval(sinPX(child()->ival(), ival_));
 }
 
 void TermSin::acceptVisitor(TermVisitor& vis) const
@@ -2055,11 +1872,6 @@ void TermTan::evalRoot()
    ival_ = tan(child()->ival());
 }
 
-void TermTan::contractRoot()
-{
-   child()->setIval(tanPX(child()->ival(), ival_));
-}
-
 void TermTan::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -2090,11 +1902,6 @@ Interval TermCosh::evalConst() const
 void TermCosh::evalRoot()
 {
    ival_ = cosh(child()->ival());
-}
-
-void TermCosh::contractRoot()
-{
-   child()->setIval(coshPX(child()->ival(), ival_));
 }
 
 void TermCosh::acceptVisitor(TermVisitor& vis) const
@@ -2129,11 +1936,6 @@ void TermSinh::evalRoot()
    ival_ = sinh(child()->ival());
 }
 
-void TermSinh::contractRoot()
-{
-   child()->setIval(sinhPX(child()->ival(), ival_));
-}
-
 void TermSinh::acceptVisitor(TermVisitor& vis) const
 {
    vis.apply(this);
@@ -2164,11 +1966,6 @@ Interval TermTanh::evalConst() const
 void TermTanh::evalRoot()
 {
    ival_ = tanh(child()->ival());
-}
-
-void TermTanh::contractRoot()
-{
-   child()->setIval(tanhPX(child()->ival(), ival_));
 }
 
 void TermTanh::acceptVisitor(TermVisitor& vis) const
