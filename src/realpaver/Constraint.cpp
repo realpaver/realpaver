@@ -19,6 +19,7 @@
 */
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/FlatFunction.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/ScopeBank.hpp"
 
@@ -211,6 +212,7 @@ ConstraintRep* Constraint::cloneRoot() const
 
 ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
       : ConstraintRep(rel),
+        fun_(nullptr),
         l_(l),
         r_(r)
 {
@@ -235,6 +237,11 @@ Term ArithCtrBinary::left() const
 Term ArithCtrBinary::right() const
 {
    return r_;
+}
+
+std::shared_ptr<FlatFunction> ArithCtrBinary::flatFunction() const
+{
+   return fun_;
 }
 
 bool ArithCtrBinary::isConstant() const
@@ -273,16 +280,34 @@ bool ArithCtrBinary::isBoundConstraint() const
    return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
 }
 
-bool ArithCtrBinary::isInteger() const 
+bool ArithCtrBinary::isInteger() const
 {
    return l_.isInteger() && r_.isInteger();
+}
+
+Proof ArithCtrBinary::contract(IntervalBox& B)
+{
+   return fun_->hc4Revise(B);
+}
+
+Proof ArithCtrBinary::contract(DomainBox& box)
+{
+   IntervalBox B(box);
+   Proof proof = contract(B);
+
+   for (const auto& v : scope())
+      box.get(v)->contract(B.get(v));
+
+   return proof;
 }
 
 /*----------------------------------------------------------------------------*/
 
 ArithCtrEq::ArithCtrEq(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Eq)
-{}
+{
+   fun_ = std::make_shared<FlatFunction>(l-r, Interval::zero());
+}
 
 void ArithCtrEq::acceptVisitor(ConstraintVisitor& vis) const
 {
@@ -314,34 +339,9 @@ double ArithCtrEq::violation(const IntervalBox& B)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyEq(r)) return 0.0;
- 
+
    Double::rndNear();
    return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
-}
-
-Proof ArithCtrEq::contract(IntervalBox& B)
-{
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyEq(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyEq(r))
-   {
-      Interval img = l & r;
-
-      Proof pl = left().hc4ReviseBackward(B, img),
-            pr = right().hc4ReviseBackward(B, img);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Proof ArithCtrEq::isSatisfied(const DomainBox& box)
@@ -369,34 +369,9 @@ double ArithCtrEq::violation(const DomainBox& box)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyEq(r)) return 0.0;
- 
+
    Double::rndNear();
    return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
-}
-
-Proof ArithCtrEq::contract(DomainBox& box)
-{
-   Interval l = left().hc4ReviseForward(box)->intervalHull(),
-            r = right().hc4ReviseForward(box)->intervalHull();
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyEq(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyEq(r))
-   {
-      Interval img = l & r;
-
-      Proof pl = left().hc4ReviseBackward(box, img),
-            pr = right().hc4ReviseBackward(box, img);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint operator==(Term l, Term r)
@@ -413,7 +388,9 @@ ConstraintRep* ArithCtrEq::cloneRoot() const
 
 ArithCtrLe::ArithCtrLe(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Le)
-{}
+{
+   fun_ = std::make_shared<FlatFunction>(l-r, Interval::negative());
+}
 
 void ArithCtrLe::acceptVisitor(ConstraintVisitor& vis) const
 {
@@ -445,35 +422,9 @@ double ArithCtrLe::violation(const IntervalBox& B)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLe(r)) return 0.0;
- 
+
    Double::rndNear();
    return l.left() - r.right();
-}
-
-Proof ArithCtrLe::contract(IntervalBox& B)
-{
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyLe(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyLe(r))
-   {
-      Interval imgl = Interval::lessThan(r.right()),
-               imgr = Interval::moreThan(l.left());
-
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Proof ArithCtrLe::isSatisfied(const DomainBox& box)
@@ -501,35 +452,9 @@ double ArithCtrLe::violation(const DomainBox& box)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLe(r)) return 0.0;
- 
+
    Double::rndNear();
    return l.left() - r.right();
-}
-
-Proof ArithCtrLe::contract(DomainBox& box)
-{
-   Interval l = left().hc4ReviseForward(box)->intervalHull(),
-            r = right().hc4ReviseForward(box)->intervalHull();
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyLe(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyLe(r))
-   {
-      Interval imgl = Interval::lessThan(r.right()),
-               imgr = Interval::moreThan(l.left());
-
-      Proof pl = left().hc4ReviseBackward(box, imgl),
-            pr = right().hc4ReviseBackward(box, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint operator<=(Term l, Term r)
@@ -546,7 +471,9 @@ ConstraintRep* ArithCtrLe::cloneRoot() const
 
 ArithCtrLt::ArithCtrLt(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Lt)
-{}
+{
+   fun_ = std::make_shared<FlatFunction>(l-r, Interval::negative());
+}
 
 void ArithCtrLt::acceptVisitor(ConstraintVisitor& vis) const
 {
@@ -578,35 +505,9 @@ double ArithCtrLt::violation(const IntervalBox& B)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLt(r)) return 0.0;
- 
+
    Double::rndNear();
    return l.left() - r.right();
-}
-
-Proof ArithCtrLt::contract(IntervalBox& B)
-{
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyLt(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyLt(r))
-   {
-      Interval imgl = Interval::lessThan(r.right()),
-               imgr = Interval::moreThan(l.left());
-
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Proof ArithCtrLt::isSatisfied(const DomainBox& box)
@@ -634,35 +535,9 @@ double ArithCtrLt::violation(const DomainBox& box)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyLt(r)) return 0.0;
- 
+
    Double::rndNear();
    return l.left() - r.right();
-}
-
-Proof ArithCtrLt::contract(DomainBox& box)
-{
-   Interval l = left().hc4ReviseForward(box)->intervalHull(),
-            r = right().hc4ReviseForward(box)->intervalHull();
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyLt(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyLt(r))
-   {
-      Interval imgl = Interval::lessThan(r.right()),
-               imgr = Interval::moreThan(l.left());
-
-      Proof pl = left().hc4ReviseBackward(box, imgl),
-            pr = right().hc4ReviseBackward(box, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint operator<(Term l, Term r)
@@ -679,7 +554,9 @@ ConstraintRep* ArithCtrLt::cloneRoot() const
 
 ArithCtrGe::ArithCtrGe(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Ge)
-{}
+{
+   fun_ = std::make_shared<FlatFunction>(l-r, Interval::positive());
+}
 
 void ArithCtrGe::acceptVisitor(ConstraintVisitor& vis) const
 {
@@ -711,35 +588,9 @@ double ArithCtrGe::violation(const IntervalBox& B)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGe(r)) return 0.0;
- 
+
    Double::rndNear();
    return r.left() - l.right();
-}
-
-Proof ArithCtrGe::contract(IntervalBox& B)
-{
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyGe(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyGe(r))
-   {
-      Interval imgl = Interval::moreThan(r.left()),
-               imgr = Interval::lessThan(l.right());
-
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Proof ArithCtrGe::isSatisfied(const DomainBox& box)
@@ -767,35 +618,9 @@ double ArithCtrGe::violation(const DomainBox& box)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGe(r)) return 0.0;
- 
+
    Double::rndNear();
    return r.left() - l.right();
-}
-
-Proof ArithCtrGe::contract(DomainBox& box)
-{
-   Interval l = left().hc4ReviseForward(box)->intervalHull(),
-            r = right().hc4ReviseForward(box)->intervalHull();
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyGe(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyGe(r))
-   {
-      Interval imgl = Interval::moreThan(r.left()),
-               imgr = Interval::lessThan(l.right());
-
-      Proof pl = left().hc4ReviseBackward(box, imgl),
-            pr = right().hc4ReviseBackward(box, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint operator>=(Term l, Term r)
@@ -812,7 +637,9 @@ ConstraintRep* ArithCtrGe::cloneRoot() const
 
 ArithCtrGt::ArithCtrGt(Term l, Term r)
       : ArithCtrBinary(l, r, RelSymbol::Gt)
-{}
+{
+   fun_ = std::make_shared<FlatFunction>(l-r, Interval::positive());
+}
 
 void ArithCtrGt::acceptVisitor(ConstraintVisitor& vis) const
 {
@@ -844,35 +671,9 @@ double ArithCtrGt::violation(const IntervalBox& B)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGt(r)) return 0.0;
- 
+
    Double::rndNear();
    return r.left() - l.right();
-}
-
-Proof ArithCtrGt::contract(IntervalBox& B)
-{
-   Interval l = left().hc4ReviseForward(B),
-            r = right().hc4ReviseForward(B);
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyGt(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyGt(r))
-   {
-      Interval imgl = Interval::moreThan(r.left()),
-               imgr = Interval::lessThan(l.right());
-
-      Proof pl = left().hc4ReviseBackward(B, imgl),
-            pr = right().hc4ReviseBackward(B, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Proof ArithCtrGt::isSatisfied(const DomainBox& box)
@@ -899,35 +700,9 @@ double ArithCtrGt::violation(const DomainBox& box)
 
    if (l.isEmpty() || r.isEmpty()) return Double::inf();
    if (l.isPossiblyGt(r)) return 0.0;
- 
+
    Double::rndNear();
    return r.left() - l.right();
-}
-
-Proof ArithCtrGt::contract(DomainBox& box)
-{
-   Interval l = left().hc4ReviseForward(box)->intervalHull(),
-            r = right().hc4ReviseForward(box)->intervalHull();
-
-   if (l.isEmpty() || r.isEmpty())
-      return Proof::Empty;
-
-   else if (l.isCertainlyGt(r))
-      return Proof::Inner;
-
-   else if (l.isPossiblyGt(r))
-   {
-      Interval imgl = Interval::moreThan(r.left()),
-               imgr = Interval::lessThan(l.right());
-
-      Proof pl = left().hc4ReviseBackward(box, imgl),
-            pr = right().hc4ReviseBackward(box, imgr);
-
-      return std::min(pl, pr);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint operator>(Term l, Term r)
@@ -947,6 +722,9 @@ ArithCtrIn::ArithCtrIn(Term t, const Interval& x)
 {
    ASSERT(!(x.isEmpty() || x.isUniverse()),
           "Bad interval target in a IN constraint");
+
+   fun_ = std::make_shared<FlatFunction>(t, x);
+
 }
 
 Interval ArithCtrIn::image() const
@@ -987,30 +765,9 @@ double ArithCtrIn::violation(const IntervalBox& B)
 
    if (e.isEmpty()) return Double::inf();
    if (x_.overlaps(e)) return 0.0;
- 
+
    Double::rndNear();
    return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
-}
-
-Proof ArithCtrIn::contract(IntervalBox& B)
-{
-   Interval e = term().hc4ReviseForward(B);
-
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (x_.contains(e))
-      return Proof::Inner;
-
-   else if (x_.overlaps(e))
-   {
-      Interval img = e & x_;
-
-      return term().hc4ReviseBackward(B, img);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint in(Term t, const Interval& x)
@@ -1051,30 +808,9 @@ double ArithCtrIn::violation(const DomainBox& box)
 
    if (e.isEmpty()) return Double::inf();
    if (x_.overlaps(e)) return 0.0;
- 
+
    Double::rndNear();
    return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
-}
-
-Proof ArithCtrIn::contract(DomainBox& box)
-{
-   Interval e = term().hc4ReviseForward(box)->intervalHull();
-
-   if (e.isEmpty())
-      return Proof::Empty;
-
-   else if (x_.contains(e))
-      return Proof::Inner;
-
-   else if (x_.overlaps(e))
-   {
-      Interval img = e & x_;
-
-      return term().hc4ReviseBackward(box, img);
-   }
-
-   else
-      return Proof::Empty;
 }
 
 Constraint in(Term t, double a, double b)
@@ -1226,7 +962,7 @@ Interval TableCtr::getVal(size_t i, size_t j) const
 {
    ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
    ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
-   return vcol_[j].getVal(i);   
+   return vcol_[j].getVal(i);
 }
 
 
@@ -1259,7 +995,7 @@ bool TableCtr::isConstant() const
 bool TableCtr::isRowConsistent(size_t i, const IntervalBox& B) const
 {
    for (size_t j=0; j<nbCols(); ++j)
-   {      
+   {
       Variable v = vcol_[j].getVar();
       if (B.get(v).isDisjoint(vcol_[j].getVal(i)))
          return false;
@@ -1270,7 +1006,7 @@ bool TableCtr::isRowConsistent(size_t i, const IntervalBox& B) const
 bool TableCtr::isRowConsistent(size_t i, const DomainBox& box) const
 {
    for (size_t j=0; j<nbCols(); ++j)
-   {      
+   {
       Variable v = vcol_[j].getVar();
       if (box.get(v)->intervalHull().isDisjoint(vcol_[j].getVal(i)))
          return false;
@@ -1490,7 +1226,7 @@ Constraint table(const Variable* vars, size_t nvars,
       THROW("Bad initialization of a table constraint");
 
    size_t nrows = nvalues / nvars;
-   
+
    Constraint::SharedRep srep = std::make_shared<TableCtr>();
    TableCtr* rep = static_cast<TableCtr*>(srep.get());
 
@@ -1530,7 +1266,7 @@ CondCtr::CondCtr(Constraint guard, Constraint body)
    scop.insert(body.scope());
    setScope(scop);
 }
-   
+
 Constraint CondCtr::guard() const
 {
    return guard_;
