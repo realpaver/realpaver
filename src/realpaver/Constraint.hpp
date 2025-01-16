@@ -26,6 +26,7 @@
 namespace realpaver {
 
 class ConstraintVisitor;
+class FlatFunction;
 
 /// Enumeration of relation symbols
 enum class RelSymbol {
@@ -46,7 +47,7 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel);
 
 /**
  * @brief Base class of the hierarchy of constraint representations.
- * 
+ *
  * The common attributes are a scope, a relation symbol, and an hash code.
  */
 class ConstraintRep {
@@ -86,7 +87,7 @@ public:
 
    /**
     * @brief Returns the violation of this on a box.
-    * 
+    *
     * Returns 0 if the constraint is satisfied, otherwise a positive real
     * number that indicates how much the constraint is violated.
     */
@@ -94,7 +95,7 @@ public:
 
    /**
     * @brief Returns the violation of this on a box.
-    * 
+    *
     * Returns 0 if the constraint is satisfied, otherwise a positive real
     * number that indicates how much the constraint is violated.
     */
@@ -151,7 +152,7 @@ protected:
 
 /**
  * @brief The main Constraint class.
- * 
+ *
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
  */
@@ -177,7 +178,7 @@ public:
 
    /**
     * @brief Returns the violation of this on a box.
-    * 
+    *
     * Returns 0 if the constraint is satisfied, otherwise a positive real
     * number that indicates how much the constraint is violated.
     */
@@ -185,7 +186,7 @@ public:
 
    /**
     * @brief Returns the violation of this on a box.
-    * 
+    *
     * Returns 0 if the constraint is satisfied, otherwise a positive real
     * number that indicates how much the constraint is violated.
     */
@@ -243,7 +244,7 @@ std::ostream& operator<<(std::ostream& os, Constraint c);
 
 /*----------------------------------------------------------------------------*/
 
-/// Base class of arithmetic constraints between two terms 
+/// Base class of arithmetic constraints between two terms
 class ArithCtrBinary : public ConstraintRep {
 public:
    /// Creates a constraint rel(l, r)
@@ -258,6 +259,9 @@ public:
    /// Returns the right-hand term
    Term right() const;
 
+   /// Returns the flat function
+   std::shared_ptr<FlatFunction> flatFunction() const;
+
    void print(std::ostream& os) const override;
    bool isConstant() const override;
    bool isEquation() const override;
@@ -265,9 +269,14 @@ public:
    bool isLinear() const override;
    bool isBoundConstraint() const override;
    bool isInteger() const override;
+   Proof contract(IntervalBox& B) override;
+   Proof contract(DomainBox& box) override;
+
+protected:
+   std::shared_ptr<FlatFunction> fun_;   // flat function
 
 private:
-   Term l_, r_;   // left-hand term, right-hand term
+   Term l_, r_;               // left-hand term, right-hand term
 };
 
 /*----------------------------------------------------------------------------*/
@@ -281,10 +290,8 @@ public:
    void acceptVisitor(ConstraintVisitor& vis) const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    Proof isSatisfied(const DomainBox& box) override;
    double violation(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -302,10 +309,8 @@ public:
    void acceptVisitor(ConstraintVisitor& vis) const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    Proof isSatisfied(const DomainBox& box) override;
    double violation(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -319,14 +324,12 @@ class ArithCtrLt : public ArithCtrBinary {
 public:
    /// Creates l < r
    ArithCtrLt(Term l, Term r);
-   
+
    void acceptVisitor(ConstraintVisitor& vis) const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    Proof isSatisfied(const DomainBox& box) override;
    double violation(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -340,14 +343,12 @@ class ArithCtrGe : public ArithCtrBinary {
 public:
    /// Creates l >= r
    ArithCtrGe(Term l, Term r);
-   
+
    void acceptVisitor(ConstraintVisitor& vis) const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    Proof isSatisfied(const DomainBox& box) override;
    double violation(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -365,10 +366,8 @@ public:
    void acceptVisitor(ConstraintVisitor& vis) const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    Proof isSatisfied(const DomainBox& box) override;
    double violation(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 };
 
@@ -379,7 +378,7 @@ Constraint operator>(Term l, Term r);
 
 /**
  * @brief Representation of an inequality constraint f in I.
- * 
+ *
  * It is equivalent to min(I) <= f <= max(I).
  */
 class ArithCtrIn : public ArithCtrBinary {
@@ -396,10 +395,8 @@ public:
    void acceptVisitor(ConstraintVisitor& vis) const override;
    Proof isSatisfied(const IntervalBox& B) override;
    double violation(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
    Proof isSatisfied(const DomainBox& box) override;
    double violation(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
    ConstraintRep* cloneRoot() const override;
 
 private:
@@ -416,7 +413,7 @@ Constraint in(Term t, double a, double b);
 
 /**
  * @brief Column of a table constraint.
- * 
+ *
  * A column is a variable with a list of values (assignments).
  */
 class TableCtrCol {
@@ -451,7 +448,7 @@ private:
 
 /**
  * @brief Representation of a table constraint.
- * 
+ *
  * Example: x  y  z
  *          0  1  2
  *          3  4  5
@@ -466,12 +463,12 @@ public:
 
    /**
     * @brief Constructor.
-    * 
+    *
     * Input: a list of variables vars and a list of values representing a
     * row-oriented matrix.
     */
    TableCtr(const std::initializer_list<Variable>& vars,
-            const std::initializer_list<Interval>& values);   
+            const std::initializer_list<Interval>& values);
 
    /// Returns the number of columns (variables)
    size_t nbCols() const;
@@ -515,7 +512,7 @@ private:
 
 /**
  * @brief Generates a table constraint.
- * 
+ *
  * @param vars a list of variables
  * @param values a list of values representing the list of tuples assigned
  *        to the variables, i.e. we have the first tuple in the list,
@@ -543,7 +540,7 @@ Constraint table(const Variable* vars, size_t nvars,
 
 /**
  * @brief Representation of a conditional constraint guard -> body.
- * 
+ *
  * The guard must be an integer constraint or an inequality constraint, i.e.
  * a constraint that can be certainly satisfied in a box. The body is any
  * constraint.

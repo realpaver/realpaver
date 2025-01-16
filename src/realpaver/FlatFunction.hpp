@@ -68,15 +68,15 @@ std::ostream& operator<<(std::ostream& os, FlatSymbol op);
 
 /**
  * @brief Function used to implement a fast version of HC4Revise.
- * 
+ *
  * The nodes of the tree-representation of a function are stored in arrays
  * sorted by a topological ordering from the leaves to the root.
- * 
+ *
  * Example : (x - sqr(y)) + 1 = 0
  * Topological ordering: x y sqr - 1 +
- * 
+ *
  * Suppose that the identifiers of x and y are respectively 28 and 43.
- * 
+ *
  * Attributes:
  * - Image img_ : [0, 0]
  * - Scope scop_ : {x, y}
@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, FlatSymbol op);
  * - arg_[3] : 3 0 2 (node - between nodes at positions 0 and 2)
  * - arg_[4] : 2 0 (constant node, 0 is the index of the constant in cst_)
  * - arg_[5] : 3 3 4 (node + between nodes at positions 3 and 4)
- * 
+ *
  * The symbol AddR means that we have an addition between a left-hand non
  * constant expression and a right-hand constant expression (value 1). The
  * advantage is to save projection operations on constant nodes.
@@ -105,10 +105,10 @@ public:
 
    /// Creates a flat function representing a function f from a DAG
    FlatFunction(const DagFun* f);
-   
+
    /**
     * @brief Creates a univariate flat function.
-    * 
+    *
     * It represents f where all the variables but v are replaced with their
     * domains in B.
     */
@@ -137,10 +137,10 @@ public:
 
    /**
     * @brief Interval differentiation method.
-    * 
+    *
     * Calculates the gradient of this on B (reverse mode). G[i] is the partial
     * derivative of this with respect to the i-th variable of its scope.
-    * 
+    *
     * This function is also evaluated using interval arithmetic. The result
     * can be obtained by a call to ival().
     */
@@ -148,7 +148,7 @@ public:
 
    /**
     * @brief Real evaluation of this on pt.
-    * 
+    *
     * The left bounds of the interval constants are used.
     */
    double rEval(const RealPoint& pt);
@@ -158,10 +158,10 @@ public:
 
    /**
     * @brief Real differentiation method.
-    * 
+    *
     * Calculates the gradient of this at pt (reverse mode). G[i] is the partial
     * derivative of this with respect to the i-th variable of its scope.
-    * 
+    *
     * This function is also evaluated using real arithmetic. The result
     * can be obtained by a call to rval().
     */
@@ -318,14 +318,14 @@ public:
 
 private:
    FlatFunction* f_;    // target function
-   size_t idx_;         // index of node in f_ resulting from a visit   
+   size_t idx_;         // index of node in f_ resulting from a visit
 };
 
 /*----------------------------------------------------------------------------*/
 
 /**
  * @brief Visitor of dag functions that creates a thick flat function.
- * 
+ *
  * Given a dag function f, an interval box B, and a variable v, it creates a
  * flat function corresponding to f where all the variables but v are replaced
  * with their domains in B.
@@ -366,7 +366,7 @@ private:
    FlatFunction* f_;       // target function
    const IntervalBox& B_;  // box used to fix all the variables but one
    Variable v_;            // the variable of the target function
-   size_t idx_;            // index of node in f_ resulting from a visit   
+   size_t idx_;            // index of node in f_ resulting from a visit
 };
 
 } // namespace
