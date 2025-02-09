@@ -32,7 +32,7 @@ namespace realpaver {
 
 /**
  * @brief Vector of intervals.
- * 
+ *
  * The elements of a vector of size n are indexed from 0 to n-1.
  */
 class IntervalVector : public NumericVector<Interval> {
@@ -90,7 +90,7 @@ public:
 
    /**
     * @brief Gets a corner of this.
-    * 
+    *
     * Let res be the result. For each i, res[i] is equal to the left bound of
     * the i-th component of this if bs[i] is true, the right bound otherwise.
     */
@@ -98,7 +98,7 @@ public:
 
    /**
     * @brief Gets a corner of this.
-    * 
+    *
     * Let res be the result. For each i, res[i] is equal to the right bound of
     * the i-th component of this if bs[i] is true, the left bound otherwise.
     */
@@ -142,16 +142,22 @@ public:
 
    /**
     * @brief Inflation method.
-    * 
+    *
     * Let delta > 1.0 and let chi > 0.0. Let x be an element of this and let
     * m(x) be its midpoint. Then x is replaced by
     * m(x) + delta*(x - m(x)) + chi*[-1,1].
     */
    void inflate(double delta, double chi);
-
-   /// Returns the product of this and X
-   Interval scalarProduct(const IntervalVector& X) const;
 };
+
+// Returns X*Y
+Interval operator*(const IntervalVector& X, const IntervalVector& Y);
+
+// Returns X*Y
+Interval operator*(const RealVector& X, const IntervalVector& Y);
+
+// Returns X*Y
+Interval operator*(const IntervalVector& X, const RealVector& Y);
 
 /// Returns A*X
 IntervalVector operator*(const RealMatrix& A, const IntervalVector& X);

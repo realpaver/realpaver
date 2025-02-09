@@ -93,6 +93,7 @@ Param::Param()
    dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
    dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT",      0.45));
    dblmap_.insert(std::make_pair("ACID_HC4_REL_TOL",          1.0e-1));
+   dblmap_.insert(std::make_pair("LP_FEAS_TOL",               1.0e-8));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));

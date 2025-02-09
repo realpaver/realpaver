@@ -46,18 +46,28 @@ public:
    /// No assignment
    LPSolver& operator=(const LPSolver&) = delete;
 
-   bool optimize() override;
-   bool reoptimize() override;
+   LPStatus optimize() override;
+   LPStatus reoptimize() override;
+   double costSolution() const override;
+   RealVector primalSolution() const override;
+   RealVector dualSolution() const override;
+   bool infeasibleRay(RealVector& ray) const override;
 
 private:
    ClpSimplex* simplex_;
-  
+
+   // makes a Clp problem from a LPModel
    void makeVars();
    void makeCtrs();
-   void makeObj();
-   void makeClpSimplex();
+   void makeCost();
+   void makeSimplex();
+   void setOptions();
 
-   bool run();
+   // optimization
+   LPStatus run();
+
+   // gets the status from Clp
+   LPStatus ClpToLPStatus();
 };
 
 } // namespace

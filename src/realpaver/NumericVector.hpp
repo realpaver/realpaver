@@ -21,6 +21,7 @@
 #ifndef REALPAVER_NUMERIC_VECTOR_HPP
 #define REALPAVER_NUMERIC_VECTOR_HPP
 
+#include <cwchar>
 #include <iostream>
 #include <vector>
 #include "realpaver/AssertDebug.hpp"
@@ -35,7 +36,7 @@ class NumericVector {
 protected:
    /// Traits class
   using TraitsType = NumericTraits<T>;
-      
+
 public:
    /// Value type
    using ValueType = T;
@@ -103,6 +104,9 @@ public:
    /// Returns true if all the elements of this are finite
    bool isFinite() const;
 
+   /// Returns a pointer to the data array
+   ValueType* data();
+
    /// Assigns res to V + W
    static void add(const NumericVector& V, const NumericVector& W,
                    NumericVector& res);
@@ -139,7 +143,7 @@ NumericVector<T>::NumericVector(size_t size, ConstRefType init) : elems_(size)
    for (size_t i=0; i<size; ++i)
       elems_[i] = init;
 }
-   
+
 template <typename T>
 NumericVector<T>::~NumericVector()
 {}
@@ -205,7 +209,7 @@ void NumericVector<T>::push(const T& x)
 {
    elems_.push_back(x);
 }
-   
+
 template <typename T>
 NumericVector<T>::NumericVector(const VectorType& v) : elems_(v)
 {}
@@ -219,7 +223,7 @@ void NumericVector<T>::print(std::ostream& os) const
       if (i!=0) os << ", ";
       os << operator[](i);
    }
-   os << ')'; 
+   os << ')';
 }
 
 template <typename T>
@@ -237,7 +241,7 @@ size_t NumericVector<T>::hashCode() const
 
    return h;
 }
-   
+
 template <typename T>
 bool NumericVector<T>::isInf() const
 {
@@ -256,6 +260,12 @@ bool NumericVector<T>::isFinite() const
          return false;
 
    return true;
+}
+
+template <typename T>
+typename NumericVector<T>::ValueType* NumericVector<T>::data()
+{
+   return elems_.data();
 }
 
 template <typename T>

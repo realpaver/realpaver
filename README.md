@@ -72,8 +72,8 @@ meson setup build --prefix /opt/homebrew/Cellar/realpaver/1.0.0 -DLP_LIB=Highs -
 
 **Requirements:** pkg-config
 
-1. Modify the gurobi100.pc file in the realpaver folder with your own configuration for gurobi
-2. Copy this file to a folder where meson will look at when searching for dependencies (e.g /opt/homebrew/share/pkgconfig in macOS with homebrew)
+1. Modify the gurobi.pc file in the realpaver folder with your own configuration for gurobi
+2. Copy this file to a folder where meson will look at when searching for dependencies (e.g /opt/homebrew/share/pkgconfig in macOS with homebrew) or add its path to the environment variable PKG_CONFIG_PATH
 3. Configure your build folder with gurobi as LP solver:
 
 ```bash

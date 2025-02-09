@@ -47,21 +47,32 @@ public:
    /// No assignment
    LPSolver& operator=(const LPSolver&) = delete;
 
-   bool optimize() override;
-   bool reoptimize() override;
+   LPStatus optimize() override;
+   LPStatus reoptimize() override;
+   double costSolution() const override;
+   RealVector primalSolution() const override;
+   RealVector dualSolution() const override;
+   bool infeasibleRay(RealVector& ray) const override;
 
 private:
-  GRBEnv* env_;
-  GRBModel* simplex_;
-  std::vector<GRBVar> vars_;
+  GRBEnv* env_;                  // environment
+  GRBModel* simplex_;            // problem
+  std::vector<GRBVar> gvars_;    // primal variables
+  std::vector<GRBConstr> gctrs_; // constraints
 
+  // makes a Clp problem from a LPModel
   void makeVars();
   GRBLinExpr makeGrbLinExpr(LinExpr e);
   void makeCtrs();
-  void makeObj();
-  void makeGurobiSimplex();
+  void makeCost();
+  void makeSimplex();
+  void createEnv();
 
-   bool run();
+  // optimization
+  LPStatus run();
+
+  // extracts the status
+  LPStatus toLPStatus();
 };
 
 } // namespace
