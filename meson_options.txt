@@ -14,7 +14,7 @@
 # Author: Raphaël Chenouard
 #-------------------------------------------------------------------------------
 
-option('LP_LIB', type : 'string', value : 'Highs', description : 'Linear Programming library (Highs, Clp, Gurobi, Soplex)')
+option('LP_LIB', type : 'string', value : 'Highs', description : 'Linear Programming library (Highs, Clp, Gurobi)')
 option('INTERVAL_LIB', type : 'string', value : 'Gaol', description : 'Interval arithmetic library (Gaol)')
 option('ASSERT', type : 'boolean', value : false, description : 'Activate assertions')
 option('LOG', type : 'boolean', value : false, description : 'Activate file logging')

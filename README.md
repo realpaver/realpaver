@@ -14,9 +14,8 @@ The RealPaver library provides a C++ API to deal with interval analysis, constra
 - a supported interval library (eg: GAOL https://github.com/goualard-f/GAOL)
 - a supported linear solver library:
   - CLP: https://github.com/coin-or/Clp
-  - HiGHS: https://highs.dev/
-  - SoPlex: https://soplex.zib.de/
   - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/
+  - HiGHS: https://highs.dev/
 
 ### Optional dependencies
 
@@ -56,7 +55,7 @@ In realpaver root folder, run `meson configure` command, while specifying one of
 
 ### Realpaver specific options:
 
-- `-DLP_LIB=LIBNAME`: specify the linear programing library/solver to use (default: Clp, can be replaced by Highs, Soplex)
+- `-DLP_LIB=LIBNAME`: specify the linear programing library/solver to use (default: Highs, can be replaced by Clp, Gurobi)
 - `-DINTERVAL_LIB=LIBNAME`: specify the interval library to use (default: Gaol)
 - `-DLOCAL_SOLVER=LIBNAME`: specify the local optimization solver to use (default: none, can be replaced by NLOPT, IPOPT)
 - `-DASSERT=BOOLVAL`: activate assertions (default: true)

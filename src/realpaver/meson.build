@@ -57,12 +57,11 @@ if lp_lib_name.to_upper() == 'CLP'
   lp_header_hpp += 'LPSolverClp.hpp'
   rp_sources += ['LPSolverClp.cpp']
 elif lp_lib_name.to_upper() == 'GUROBI'
-  #### NOT WORKING FOR NOW
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
-elif lp_lib_name.to_upper() == 'SOPLEX'
-  lp_header_hpp += 'LPSolverSoplex.hpp'
-  rp_sources += ['LPSolverSoplex.cpp']
+#elif lp_lib_name.to_upper() == 'SOPLEX'
+#  lp_header_hpp += 'LPSolverSoplex.hpp'
+#  rp_sources += ['LPSolverSoplex.cpp']
 elif lp_lib_name.to_upper() == 'HIGHS'
   lp_header_hpp += 'LPSolverHighs.hpp'
   rp_sources += ['LPSolverHighs.cpp']
@@ -334,8 +333,8 @@ extra_dist = [
   'LPSolverGurobi.hpp',
   'LPSolverHighs.cpp',
   'LPSolverHighs.hpp',
-  'LPSolverSoplex.cpp',
-  'LPSolverSoplex.hpp',
+  #  'LPSolverSoplex.cpp',
+  #  'LPSolverSoplex.hpp',
   #  'NLPSolverIpopt.cpp',
   #  'NLPSolverIpopt.hpp',
   'NLPSolverNlopt.cpp',
