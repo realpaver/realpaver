@@ -18,6 +18,7 @@
  * @date   2024-4-11
 */
 
+#include "realpaver/Logger.hpp"
 #include "realpaver/LPSolverSoplex.hpp"
 
 namespace realpaver {
@@ -34,35 +35,38 @@ LPSolver::~LPSolver()
 void LPSolver::makeVars()
 {
    int n = getNbLinVars();
-
    soplex::DSVectorReal dscol(0);
-   for(int i = 0; i < n; ++i) {
-     simplex_->addColReal(soplex::LPColReal(0, dscol, soplex::infinity, -soplex::infinity));
-   }
+   for(int i=0; i<n; ++i)
+     simplex_->addColReal(soplex::LPColReal(0, dscol, soplex::infinity,
+                                            -soplex::infinity));
+
    soplex::DSVectorReal dsrow(n);
    int nb_int = 0;
    std::vector<int> vint;
-   for(int i = 0; i < n; ++i) {
-     LinVar v = getLinVar(i);
-     int j = v.getIndex();
-     dsrow.add(j, 1);
-     simplex_->addRowReal(soplex::LPRowReal(-soplex::infinity, dsrow, soplex::infinity));
-   //   simplex_->changeBoundsReal(j, v.getLB(), v.getUB());
-   //   simplex_->changeRangeReal(j, v.getLB(), v.getUB());
-     if (!v.isContinuous()){
-       nb_int++;
-       vint.push_back(j);
-     }
-     dsrow.clear();
+   for(int i=0; i<n; ++i)
+   {
+      LinVar v = getLinVar(i);
+      int j = v.getIndex();
+      dsrow.add(j, 1);
+      simplex_->addRowReal(soplex::LPRowReal(-soplex::infinity, dsrow,
+                                             soplex::infinity));
+      if (!v.isContinuous())
+      {
+         nb_int++;
+         vint.push_back(j);
+      }
+      dsrow.clear();
    }
    if (nb_int>0)
-     simplex_->setIntegralityInformation(nb_int, vint.data());
+      simplex_->setIntegralityInformation(nb_int, vint.data());
 }
 
 void LPSolver::makeCtrs()
 {
    int m = getNbLinCtrs();
    int n = getNbLinVars();
+
+   // constraints
    for (int i=0; i<m; ++i)
    {
       LinCtr c = getLinCtr(i);
@@ -74,16 +78,15 @@ void LPSolver::makeCtrs()
       simplex_->addRowReal(soplex::LPRowReal(c.getLB(), dsrow, c.getUB()));
    }
 
-   // RAPHAEL
    // bound constraints
    for (int i=0; i<n; ++i)
    {
       LinVar v = getLinVar(i);
       LinExpr e = {{1.0}, {v}};
       soplex::DSVectorReal dsrow(n);
-      for (int j=0;j<e.getNbTerms();j++){
+      for (int j=0;j<e.getNbTerms();j++)
         dsrow.add(e.getIndexVar(j), e.getCoef(j));
-      }
+
       simplex_->addRowReal(soplex::LPRowReal(v.getLB(), dsrow, v.getUB()));
    }
 }
@@ -97,15 +100,16 @@ void LPSolver::makeObj()
    for (int i=0; i<n; ++i){
       LinVar v = getLinVar(i);
       int j = v.getIndex();
-      //simplex_->changeObjReal(j,obj.getCoef(i));
       dcost[j] = obj.getCoef(i);
    }
    simplex_->changeObjReal(dcost);
 
    if (isMinimization())
-     simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MINIMIZE);
+     simplex_->setIntParam(soplex::SoPlex::OBJSENSE,
+                           soplex::SoPlex::OBJSENSE_MINIMIZE);
    else
-     simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MAXIMIZE);
+     simplex_->setIntParam(soplex::SoPlex::OBJSENSE,
+                           soplex::SoPlex::OBJSENSE_MAXIMIZE);
 }
 
 void LPSolver::makeSoplexSimplex()
@@ -120,69 +124,91 @@ void LPSolver::makeSoplexSimplex()
 
 bool LPSolver::run()
 {
-   simplex_->setIntParam(soplex::SoPlex::SOLVEMODE, soplex::SoPlex::SOLVEMODE_REAL);
+   simplex_->setIntParam(soplex::SoPlex::SOLVEMODE,
+                         soplex::SoPlex::SOLVEMODE_REAL);
+
    simplex_->setBoolParam(soplex::SoPlex::ENSURERAY, true);
+
    simplex_->setRealParam(soplex::SoPlex::TIMELIMIT, getMaxSeconds());
+
    const int max_iter = getMaxIter();
-   simplex_->setIntParam(soplex::SoPlex::ITERLIMIT,max_iter);
-   simplex_->setIntParam(soplex::SoPlex::VERBOSITY, soplex::SoPlex::VERBOSITY_ERROR);
-//    simplex_->setRealParam(SoPlex::FEASTOL, tolerance);
-//    simplex_->setRealParam(SoPlex::OPTTOL, tolerance);
+   simplex_->setIntParam(soplex::SoPlex::ITERLIMIT, max_iter);
+
+   simplex_->setIntParam(soplex::SoPlex::VERBOSITY,
+                         soplex::SoPlex::VERBOSITY_ERROR);
 
    simplex_->solve();
    simplex_->ignoreUnscaledViolations();
 
-   soplex::SPxSolver::Status soplex_status = simplex_->status();
-   
-   if (soplex_status==soplex::SPxSolver::OPTIMAL)
+   // assigns the status
+   soplex::SPxSolver::Status status = simplex_->status();
+   switch(status)
    {
-      setObjVal(simplex_->objValueReal());
+      case soplex::SPxSolver::OPTIMAL:
+         setStatus(LPStatus::Optimal); break;
+      case soplex::SPxSolver::INFEASIBLE:
+         setStatus(LPStatus::Infeasible); break;
+      case soplex::SPxSolver::INForUNBD:
+         setStatus(LPStatus::InfeasibleOrUnbounded); break;
+      case soplex::SPxSolver::UNBOUNDED:
+         setStatus(LPStatus::Unbounded); break;
+      case soplex::SPxSolver::ABORT_ITER:
+         setStatus(LPStatus::StopOnIterLimit); break;
+      case soplex::SPxSolver::ABORT_TIME:
+         setStatus(LPStatus::StopOnTimeLimit); break;
+      default:
+         setStatus(LPStatus::Other);
+   }
+
+   LOG_INTER("Status: " << getStatus());
+
+   // assigns the solution
+   if (status==soplex::SPxSolver::OPTIMAL)
+   {
+      // assigns the value of the optimum
+      double objval = simplex_->objValueReal();
+      setObjVal(objval);
+      LOG_INTER("Optimum found: " << objval);
 
       int m = getNbLinCtrs();
       int n = getNbLinVars();
 
       soplex::DVectorReal solution(n);
-      simplex_->getPrimalReal(solution);
+      simplex_->getPrimal(solution);
       for (int i=0; i<n; ++i)
       {
+         double val = solution[i];
          LinVar v = getLinVar(i);
-         v.setObjVal(solution[i]);
+         v.setObjVal(val);
+         LOG_LOW(v.getName() << " = " << val);
       }
 
-      // RAPHAEL
       // assigns the values of the dual variables (multipliers)
       soplex::DVectorReal dual(m+n);
-      simplex_->getDualReal(dual);
+      simplex_->getDual(dual);
+
       // first for the primal constraints
       for (int i=0; i<m; ++i)
       {
          LinCtr c = getLinCtr(i);
-         c.setMultiplier(dual[i]);
+         double mult = dual[i];
+         c.setMultiplier(mult);
+         LOG_LOW("multiplier c" << i << " = " << mult);
       }
+
       // second for the primal bound constraints
       for (int i=0; i<n; ++i)
       {
          LinVar v = getLinVar(i);
-         v.setMultiplier(dual[m+i]);
+         double mult = dual[m+i];
+         v.setMultiplier(mult);
+         LOG_LOW("multiplier " << v.getName() << " = " << mult);
       }
 
-      setStatus(OptimizationStatus::Optimal);
       return true;
    }
    else
    {
-      setStatus(OptimizationStatus::Other);
-
-      if (soplex_status==soplex::SPxSolver::INFEASIBLE ||
-            soplex_status==soplex::SPxSolver::UNBOUNDED)
-         setStatus(OptimizationStatus::Infeasible);
-
-      if (soplex_status==soplex::SPxSolver::ABORT_TIME)
-         setStatus(OptimizationStatus::StopOnIterLimit);
-
-      if (soplex_status==soplex::SPxSolver::ABORT_ITER)
-         setStatus(OptimizationStatus::StopOnTimeLimit);
-
       return false;
    }
 }
@@ -190,12 +216,6 @@ bool LPSolver::run()
 bool LPSolver::optimize()
 {
    makeSoplexSimplex();
-   return run();
-}
-
-bool LPSolver::reoptimize()
-{
-   makeObj();
    return run();
 }
 

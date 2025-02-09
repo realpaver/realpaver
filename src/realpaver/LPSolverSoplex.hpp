@@ -47,11 +47,10 @@ public:
    LPSolver& operator=(const LPSolver&) = delete;
 
    bool optimize() override;
-   bool reoptimize() override;
 
 private:
    soplex::SoPlex* simplex_;
-  
+
    void makeVars();
    void makeCtrs();
    void makeObj();

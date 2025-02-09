@@ -20,16 +20,12 @@ project('Realpaver', 'cpp', version: '1.0.1', default_options: ['cpp_std=c++17']
 ## Main compiler and linker configs
 cpp_comp = meson.get_compiler('cpp')
 
-## dependencies
-gurobi_dir = get_option('GUROBI_DIR')
-
 lp_lib_name = get_option('LP_LIB')
 lp_dep = dependency('', required: false)
 if lp_lib_name.to_upper() == 'CLP'
   lp_dep = dependency('clp', required: true)
 elif lp_lib_name.to_upper() == 'GUROBI'
-  lp_dep = dependency('gurobi100', required: true, method: 'auto')
-  #lp_dep = cpp_comp.find_library('gurobi100', required: true, dirs: gurobi_dir+'/lib')
+  lp_dep = dependency('gurobi', required: true)
 elif lp_lib_name.to_upper() == 'SOPLEX'
   lp_dep = cpp_comp.find_library('soplex', required: true)
 elif lp_lib_name.to_upper() == 'HIGHS'
@@ -113,17 +109,21 @@ endif
 conf_data.set('ARCH_X86', x86)
 conf_data.set('ARCH_X86_64', x86_64)
 conf_data.set('ARCH_ARM64', arm64)
+
 # Configuring LP lib
-if lp_lib_name == 'Clp'
+if lp_lib_name.to_upper() == 'CLP'
   conf_data.set('LP_LIB_CLP', 1)
-elif lp_lib_name == 'Clp'
+elif lp_lib_name.to_upper() == 'GUROBI'
   conf_data.set('LP_LIB_GUROBI', 1)
+elif lp_lib_name.to_upper() == 'HIGHS'
+  conf_data.set('LP_LIB_HIGHS', 1)
+elif lp_lib_name.to_upper() == 'SOPLEX'
+  conf_data.set('LP_LIB_SOPLEX', 1)
 endif
+
 # Configuring interval lib
 if interval_lib_name.to_lower() == 'gaol'
   conf_data.set('INTERVAL_LIB_GAOL', 1)
-  # elif interval_lib_name == 'Crlibm'
-  #   conf_data.set('INTERVAL_LIB_CRLIBM',1)
 endif
 
 #if local_solver_name.to_lower() == 'ipopt'

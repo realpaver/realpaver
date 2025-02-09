@@ -102,7 +102,7 @@ double IntervalVector::width() const
 RealVector IntervalVector::midpoint() const
 {
    RealVector mid(size());
-   
+
    for (size_t i=0; i<size(); ++i)
       mid.set(i, get(i).midpoint());
 
@@ -296,14 +296,38 @@ void IntervalVector::inflate(double delta, double chi)
       set(i, get(i).inflate(delta, chi));
 }
 
-Interval IntervalVector::scalarProduct(const IntervalVector& X) const
+Interval operator*(const IntervalVector& X, const IntervalVector& Y)
 {
-   ASSERT(size() == X.size(),
+   ASSERT(X.size() == Y.size(),
           "Scalar product of vectors having different sizes");
 
-   Interval prod = get(0)*X.get(0);
-   for (size_t i=1; i<size(); ++i)
-      prod += get(i)*X.get(i);
+   Interval prod = X.get(0)*Y.get(0);
+   for (size_t i=1; i<X.size(); ++i)
+      prod += X.get(i)*Y.get(i);
+
+   return prod;
+}
+
+Interval operator*(const RealVector& X, const IntervalVector& Y)
+{
+   ASSERT(X.size() == Y.size(),
+          "Scalar product of vectors having different sizes");
+
+   Interval prod = X.get(0)*Y.get(0);
+   for (size_t i=1; i<X.size(); ++i)
+      prod += X.get(i)*Y.get(i);
+
+   return prod;
+}
+
+Interval operator*(const IntervalVector& X, const RealVector& Y)
+{
+   ASSERT(X.size() == Y.size(),
+          "Scalar product of vectors having different sizes");
+
+   Interval prod = X.get(0)*Y.get(0);
+   for (size_t i=1; i<X.size(); ++i)
+      prod += X.get(i)*Y.get(i);
 
    return prod;
 }

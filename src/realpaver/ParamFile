@@ -229,10 +229,13 @@ NLP_SOLVER_OBJ_ABS_TOL = 0.0
 #-------------------------------------------------------------------------------
 
 # Time limit in seconds
-LP_TIME_LIMIT = 10.0
+LP_TIME_LIMIT = 100.0
 
 # Iteration limit
-LP_ITER_LIMIT = 50
+LP_ITER_LIMIT = 100
+
+# Feasibility tolerance
+LP_FEAS_TOL = 1.0e-8
 
 # Threshold on the values of pivots in Gaussian elimination
 # A pivot must be strictly greater than this (positive) value.

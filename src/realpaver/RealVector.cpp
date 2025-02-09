@@ -64,19 +64,6 @@ bool RealVector::isFinite() const
    return true;
 }
 
-double RealVector::scalarProduct(const RealVector& V) const
-{
-   ASSERT(size() == V.size(),
-          "Scalar product of vectors having different sizes");
-
-   double res = Double::mul(get(0), V[0]);
-
-   for (size_t i=1; i<size(); ++i)
-      Double::addAssign(res, Double::mul(get(i), V[i]));
-
-   return res;
-}
-
 double RealVector::l2Norm() const
 {
    double sq = 0.0;
@@ -162,6 +149,19 @@ RealVector operator-(const RealVector& V)
 {
    RealVector res(V.size());
    RealVector::BaseType::usb(V, res);
+   return res;
+}
+
+double operator*(const RealVector& V, const RealVector& W)
+{
+   ASSERT(V.size() == W.size(),
+          "Scalar product of vectors having different sizes");
+
+   double res = Double::mul(V[0], W[0]);
+
+   for (size_t i=1; i<V.size(); ++i)
+      Double::addAssign(res, Double::mul(V[i], W[i]));
+
    return res;
 }
 

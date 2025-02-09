@@ -68,6 +68,12 @@ preprocessor_test = executable( 'preprocessor_test',
                                 include_directories: ['../src'] )
 test('Test of preprocessor', preprocessor_test)
 
+lp_solver_test = executable( 'lp_solver_test',
+                             sources: 'lp_solver_test.cpp',
+                             link_with: realpaver_lib,
+                             include_directories: ['../src'] )
+  test('Test of LP solver', lp_solver_test)
+
 range_test = executable( 'range_test',
                          sources: 'range_test.cpp',
                          link_with: realpaver_lib,
@@ -86,7 +92,6 @@ scope_test = executable( 'scope_test',
                          include_directories: ['../src'] )
 test('Test of scope', scope_test)
 
-
 real_function_vector_test = executable( 'real_function_vector_test',
                                         sources: 'real_function_vector_test.cpp',
                                         link_with: realpaver_lib,
@@ -94,10 +99,10 @@ real_function_vector_test = executable( 'real_function_vector_test',
 test('Test of real function vector', real_function_vector_test)
 
 if local_solver_dep.found()
-  nlpsolver_test = executable( 'nlpsolver_test',
-                               sources: 'nlp_solver_test.cpp',
-                               link_with: realpaver_lib,
-                               dependencies: local_solver_dep,
-                               include_directories: ['../src'] )
-  test('Test of NLPSolver API', nlpsolver_test)
+  nlp_solver_test = executable( 'nlp_solver_test',
+                                sources: 'nlp_solver_test.cpp',
+                                link_with: realpaver_lib,
+                                dependencies: local_solver_dep,
+                                include_directories: ['../src'] )
+  test('Test of NLP solver API', nlp_solver_test)
 endif

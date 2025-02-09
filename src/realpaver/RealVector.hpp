@@ -40,7 +40,7 @@ public:
 
    /// Creates a vector with n elements assigned to x
    RealVector(size_t n = 0, double x = 0.0);
-   
+
    /// Creates a vector from a list
    RealVector(const std::initializer_list<double>& l);
 
@@ -67,9 +67,6 @@ public:
 
    /// Returns true if every component is not a NaN and is finite
    bool isFinite() const;
-
-   /// Returns the scalar product of this and V
-   double scalarProduct(const RealVector& V) const;
 
    /// Returns the L1-norm of this
    double l1Norm() const;
@@ -110,6 +107,9 @@ RealVector operator-(const RealVector& V, const RealVector& W);
 
 /// Returns -V
 RealVector operator-(const RealVector& V);
+
+/// Returns V*W
+double operator*(const RealVector& V, const RealVector& W);
 
 /// Returns a*V
 RealVector operator*(double a, const RealVector& V);

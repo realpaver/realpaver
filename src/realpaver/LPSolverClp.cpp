@@ -18,6 +18,9 @@
  * @date   2024-4-11
 */
 
+#include <CoinFinite.hpp>
+#include "realpaver/LPModel.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/LPSolverClp.hpp"
 
 namespace realpaver {
@@ -33,149 +36,181 @@ LPSolver::~LPSolver()
 
 void LPSolver::makeVars()
 {
-   int n = getNbLinVars();
-   simplex_->resize(0, n);
+   int m = getNbLinVars();
+   simplex_->resize(0, m);
 
-   for (int i=0; i<n; ++i)
+   for (int i=0; i<m; ++i)
    {
       LinVar v = getLinVar(i);
       int j = v.getIndex();
-
-      // RAPHAEL
-      //simplex_->setColumnLower(j, v.getLB());
-      //simplex_->setColumnUpper(j, v.getUB());
-
-      if (v.isContinuous())
-         simplex_->setContinuous(j);
-      else
-         simplex_->setInteger(j);
+      simplex_->setColumnLower(j, v.getLB());
+      simplex_->setColumnUpper(j, v.getUB());
    }
 }
 
 void LPSolver::makeCtrs()
 {
-   // linear constraints
-   int m = getNbLinCtrs();
+   // bound constraints (necessary for certification methods)
+   int m = getNbLinVars();
    for (int i=0; i<m; ++i)
-   {
-      LinCtr c = getLinCtr(i);
-      LinExpr e = c.getExpr();
-
-      simplex_->addRow(e.getNbTerms(), e.getIndexVars(), e.getCoefs(),
-                       c.getLB(), c.getUB());
-   }
-
-   // RAPHAEL
-   // bound constraints
-   int n = getNbLinVars();
-   for (int i=0; i<n; ++i)
    {
       LinVar v = getLinVar(i);
       LinExpr e = {{1.0}, {v}};
-      simplex_->addRow(e.getNbTerms(), e.getIndexVars(), e.getCoefs(),
-                       v.getLB(), v.getUB());
+      double lb = v.getLB();
+      double ub = v.getUB();
+      simplex_->addRow(e.getNbTerms(), e.getIndexVars(), e.getCoefs(), lb, ub);
+      }
+
+   // constraints
+   int n = getNbLinCtrs();
+   for (int i=0; i<n; ++i)
+   {
+      LinCtr c = getLinCtr(i);
+      LinExpr e = c.getExpr();
+      double lb = c.getLB();
+      double ub = c.getUB();
+      simplex_->addRow(e.getNbTerms(), e.getIndexVars(), e.getCoefs(), lb, ub);
    }
 }
 
-void LPSolver::makeObj()
+void LPSolver::makeCost()
 {
-   LinExpr obj = getObjExpr();
+   LinExpr obj = getCost();
    int n = obj.getNbTerms();
 
    for (int i=0; i<n; ++i)
       simplex_->setObjectiveCoefficient(obj.getIndexVar(i), obj.getCoef(i));
 
-   int sense = isMinimization() ? 1.0: -1.0;
+   int sense = (getSense() == LPSense::Min) ? 1.0: -1.0;
    simplex_->setOptimizationDirection(sense);
 }
 
-void LPSolver::makeClpSimplex()
+void LPSolver::makeSimplex()
 {
    if (simplex_ != nullptr) delete simplex_;
    simplex_ = new ClpSimplex();
 
+   // assigns the options
+   setOptions();
+
+   // creates the model
    makeVars();
    makeCtrs();
-   makeObj();
+   makeCost();
 }
 
-bool LPSolver::run()
+void LPSolver::setOptions()
 {
-   simplex_->setMaximumSeconds(getMaxSeconds());
-   simplex_->setMaximumIterations(getMaxIter());
+   int maxsec = getMaxSeconds();
+   int maxiter = getMaxIter();
+   double tol = getFeasilityTol();
+
+   simplex_->setMaximumSeconds(maxsec);
+   simplex_->setMaximumIterations(maxiter);
    simplex_->setLogLevel(0);
+   simplex_->setPrimalTolerance(tol);
+}
+
+LPStatus LPSolver::run()
+{
+   LOG_INTER("Runs LP Solver Clp on \n---\n" << (*this) << "---");
 
    simplex_->initialSolve();
 
-   if (simplex_->isProvenOptimal())
+   LPStatus status = ClpToLPStatus();
+
+#if LOG_ON
+   if (status==LPStatus::Optimal)
    {
-      int n = getNbLinVars();
-      int m = getNbLinCtrs();
-
-      // assigns the values of the primal variables
-      double* colPrimal = simplex_->primalColumnSolution();
-      for (int i=0; i<n; ++i)
-      {
-         LinVar v = getLinVar(i);
-         v.setObjVal(colPrimal[i]);
-      }
-
-      // assigns the optimum
-      setObjVal(simplex_->getObjValue());
-
-      // RAPHAEL
-      // assigns the values of the dual variables (multipliers)
-      double* rowDual = simplex_->dualRowSolution();
-      // first for the primal constraints
-      for (int i=0; i<m; ++i)
-      {
-         LinCtr c = getLinCtr(i);
-         c.setMultiplier(rowDual[i]);
-      }
-      // second for the primal bound constraints
-      for (int i=0; i<n; ++i)
-      {
-         LinVar v = getLinVar(i);
-         v.setMultiplier(rowDual[m+i]);
-      }
-   
-      // assigns the status
-      setStatus(OptimizationStatus::Optimal);
-      return true;
+      LOG_INTER("Status: " << status << std::endl <<
+                "Cost:   " << costSolution() << std::endl <<
+                "Primal: " << primalSolution() << std::endl <<
+                "Dual:   " << dualSolution() << std::endl);
    }
    else
-   {
-      setStatus(OptimizationStatus::Other);
+      LOG_INTER("Status: " << status << std::endl);
+#endif
 
-      if (simplex_->isProvenPrimalInfeasible() ||
-            simplex_->isProvenDualInfeasible())
-         setStatus(OptimizationStatus::Infeasible);
-
-      if (simplex_->isIterationLimitReached())
-         setStatus(OptimizationStatus::StopOnIterLimit);
-
-      if (simplex_->hitMaximumIterations())
-         setStatus(OptimizationStatus::StopOnTimeLimit);
-
-      return false;
-   }
+   return status;
 }
 
-bool LPSolver::optimize()
+LPStatus LPSolver::ClpToLPStatus()
 {
-   makeClpSimplex();
+   if (simplex_->isProvenOptimal())
+      return LPStatus::Optimal;
+
+   else if (simplex_->isProvenPrimalInfeasible())
+      return LPStatus::Infeasible;
+
+   else if (simplex_->isProvenDualInfeasible())
+      return LPStatus::InfeasibleOrUnbounded;
+
+   else if (simplex_->isIterationLimitReached())
+      return LPStatus::StopOnIterLimit;
+
+   else if (simplex_->hitMaximumIterations())
+      return LPStatus::StopOnTimeLimit;
+
+   else
+      return LPStatus::Other;
+}
+
+LPStatus LPSolver::optimize()
+{
+   makeSimplex();
    return run();
 }
 
-bool LPSolver::reoptimize()
+LPStatus LPSolver::reoptimize()
 {
-   int n = getNbLinVars();
-
-   for (int i=0; i<n; ++i)
+   for (int i=0; i<getNbLinVars(); ++i)
       simplex_->setObjectiveCoefficient(i, 0.0);
 
-   makeObj();
+   makeCost();
    return run();
+}
+
+double LPSolver::costSolution() const
+{
+   return simplex_->getObjValue();
+}
+
+RealVector LPSolver::primalSolution() const
+{
+   double* colPrimal = simplex_->primalColumnSolution();
+   int m = getNbLinVars();
+   RealVector primal(m);
+   for (int i=0; i<m; ++i)
+      primal[i] = colPrimal[i];
+
+   return primal;
+}
+
+RealVector LPSolver::dualSolution() const
+{
+   int p = getNbLinVars() + getNbLinCtrs();
+   RealVector dual(p);
+
+   double* rowDual = simplex_->dualRowSolution();
+   for (int i=0; i<p; ++i)
+      dual[i] = rowDual[i];
+
+   return dual;
+}
+
+bool LPSolver::infeasibleRay(RealVector& ray) const
+{
+   if (!(simplex_->isProvenPrimalInfeasible() ||
+         simplex_->isProvenDualInfeasible())) return false;
+
+   double* clpRay = simplex_->infeasibilityRay();
+   if (clpRay == nullptr) return false;
+
+   int p = getNbLinVars() + getNbLinCtrs();
+   if (ray.size() != p) ray.resize(p);
+   for (int i=0; i<p; ++i) ray[i] = clpRay[i];
+   delete[] clpRay;
+   return true;
 }
 
 } // namespace
