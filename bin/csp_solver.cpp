@@ -68,6 +68,7 @@ int main(int argc, char** argv)
 
       LOG_MAIN("CSP solving");
       LOG_MAIN("Input file: " << filename);
+      LOG_MAIN("Parsing...");
 
       // parsing
       Parser parser(prm);
@@ -76,6 +77,7 @@ int main(int argc, char** argv)
       ok = parser.parseFile(filename, problem);
       if (!ok) THROW("Parse error: " << parser.getParseError());
 
+      LOG_MAIN("End of parsing");
       if (!problem.isCSP()) THROW("Not a CSP");
 
       // solving

@@ -648,12 +648,12 @@ size_t LPModel::getMaxIter() const
    return maxiter_;
 }
 
-double LPModel::getFeasilityTol() const
+double LPModel::getFeasTol() const
 {
    return tol_;
 }
 
-void LPModel::setFeasilityTol(double tol)
+void LPModel::setFeasTol(double tol)
 {
    tol_ = tol;
 }
@@ -670,6 +670,17 @@ double LPModel::certifiedCostSolution() const
    ASSERT(X.isFinite(), "Certification impossible due to an infinite bound");
 
    Interval val = dual*B - R*X;
+
+   LOG_LOW("Certification of cost");
+   LOG_LOW("  dual: " << dual);
+   LOG_LOW("  M: " << M);
+   LOG_LOW("  B: " << B);
+   LOG_LOW("  C: " << C);
+   LOG_LOW("  R: " << R);
+   LOG_LOW("  X: " << X);
+   LOG_LOW("  val: " << val);
+
+
    return (getSense() == LPSense::Min) ? val.left() : val.right();
 }
 

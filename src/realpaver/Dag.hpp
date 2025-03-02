@@ -780,6 +780,17 @@ public:
     */
    void rDiff(const RealPoint& pt, RealVector& G);
 
+   /// Returns true if this is linear, false otherwise
+   bool isLinear() const;
+
+   /**
+    * @brief Acess to a linear expression.
+    *
+    * It returns a pointer to the root node if this function is linear,
+    * a null pointer otherwise.
+    */
+   DagLin* getLinearExpr() const;
+
 private:
    Dag* dag_;                    // the DAG
    std::vector<DagNode*> node_;  // vector of nodes of the function sorted by

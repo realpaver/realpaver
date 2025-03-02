@@ -129,7 +129,7 @@ void LPSolver::setOptions()
 {
    int maxsec = getMaxSeconds();
    int maxiter = getMaxIter();
-   double tol = getFeasilityTol();
+   double tol = getFeasTol();
    HighsStatus hs, ok = HighsStatus::kOk;
 
    hs = simplex_->setOptionValue("time_limit", maxsec);
@@ -152,7 +152,6 @@ LPStatus LPSolver::run()
 {
    LOG_INTER("Runs LP Solver Highs on \n---\n" << (*this) << "---");
 
-   simplex_->presolve();
    simplex_->run();
 
    LPStatus status = toLPStatus();
@@ -175,6 +174,7 @@ LPStatus LPSolver::run()
 LPStatus LPSolver::optimize()
 {
    makeSimplex();
+   simplex_->setOptionValue("presolve", "choose");
    return run();
 }
 
@@ -184,6 +184,7 @@ LPStatus LPSolver::reoptimize()
       simplex_->changeColCost(i, 0.0);
 
    makeCost();
+   simplex_->setOptionValue("presolve", "off");
    return run();
 }
 

@@ -1,0 +1,43 @@
+# In: Moré JJ, Garbow BS, Hillstrom KE.
+#     Testing unconstrained optimization software.
+#     ACM Trans Math Software 1981, 7(1):17–41.
+
+Constants
+x0 = 0,
+x11 = 0,
+h = 1/11,
+u = h^2/2,
+t1 = 1*h,
+t2 = 2*h,
+t3 = 3*h,
+t4 = 4*h,
+t5 = 5*h,
+t6 = 6*h,
+t7 = 7*h,
+t8 = 8*h,
+t9 = 9*h,
+t10 = 10*h;
+
+Variables
+x1 in [-1e2, 1e2],
+x2 in [-1e2, 1e2],
+x3 in [-1e2, 1e2],
+x4 in [-1e2, 1e2],
+x5 in [-1e2, 1e2],
+x6 in [-1e2, 1e2],
+x7 in [-1e2, 1e2],
+x8 in [-1e2, 1e2],
+x9 in [-1e2, 1e2],
+x10 in [-1e2, 1e2];
+
+Constraints
+2*x1-x0-x2+u*(x1+t1+1) == 0,
+2*x2-x1-x3+u*(x2+t2+1) == 0,
+2*x3-x2-x4+u*(x3+t3+1) == 0,
+2*x4-x3-x5+u*(x4+t4+1) == 0,
+2*x5-x4-x6+u*(x5+t5+1) == 0,
+2*x6-x5-x7+u*(x6+t6+1) == 0,
+2*x7-x6-x8+u*(x7+t7+1) == 0,
+2*x8-x7-x9+u*(x8+t8+1) == 0,
+2*x9-x8-x10+u*(x9+t9+1) == 0,
+2*x10-x9-x11+u*(x10+t10+1) == 0;

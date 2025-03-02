@@ -103,7 +103,7 @@ void LPSolver::setOptions()
 {
    int maxsec = getMaxSeconds();
    int maxiter = getMaxIter();
-   double tol = getFeasilityTol();
+   double tol = getFeasTol();
 
    simplex_->setMaximumSeconds(maxsec);
    simplex_->setMaximumIterations(maxiter);
@@ -117,7 +117,7 @@ LPStatus LPSolver::run()
 
    simplex_->initialSolve();
 
-   LPStatus status = ClpToLPStatus();
+   LPStatus status = toLPStatus();
 
 #if LOG_ON
    if (status==LPStatus::Optimal)
@@ -134,7 +134,7 @@ LPStatus LPSolver::run()
    return status;
 }
 
-LPStatus LPSolver::ClpToLPStatus()
+LPStatus LPSolver::toLPStatus()
 {
    if (simplex_->isProvenOptimal())
       return LPStatus::Optimal;

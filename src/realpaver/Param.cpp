@@ -96,19 +96,23 @@ Param::Param()
    dblmap_.insert(std::make_pair("LP_FEAS_TOL",               1.0e-8));
 
    // string
-   strmap_.insert(std::make_pair("BP_NODE_SELECTION",         "DFS"));
-   strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",           "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTION",           "RR"));
-   strmap_.insert(std::make_pair("SPLIT_SLICING",             "BI"));
-   strmap_.insert(std::make_pair("PROPAGATION_BASE",          "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",   "NO"));
-   strmap_.insert(std::make_pair("LOG_LEVEL",                 "NONE"));
-   strmap_.insert(std::make_pair("TRACE",                     "NO"));
-   strmap_.insert(std::make_pair("SPLIT_INNER_BOX",            "NO"));
-   strmap_.insert(std::make_pair("DISPLAY_REGION",            "STD"));
-   strmap_.insert(std::make_pair("PREPROCESSING",             "YES"));
-   strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",      "DEFAULT"));
-   strmap_.insert(std::make_pair("CERTIFICATION",             "YES"));
+   strmap_.insert(std::make_pair("BP_NODE_SELECTION",              "DFS"));
+   strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",                "NO"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTION",                "RR"));
+   strmap_.insert(std::make_pair("SPLIT_SLICING",                  "BI"));
+   strmap_.insert(std::make_pair("PROPAGATION_BASE",               "HC4"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",        "NO"));
+   strmap_.insert(std::make_pair("LOG_LEVEL",                      "NONE"));
+   strmap_.insert(std::make_pair("TRACE",                          "NO"));
+   strmap_.insert(std::make_pair("SPLIT_INNER_BOX",                 "NO"));
+   strmap_.insert(std::make_pair("DISPLAY_REGION",                 "STD"));
+   strmap_.insert(std::make_pair("PREPROCESSING",                  "YES"));
+   strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",           "DEFAULT"));
+   strmap_.insert(std::make_pair("CERTIFICATION",                  "YES"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE_HULL", "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_RELAXATION",       "TAYLOR"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_HANSEN",    "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_RANDOM",    "NO"));
 }
 
 int Param::getIntParam(const std::string& name) const
