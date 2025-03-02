@@ -144,42 +144,38 @@ void CSPSolver::makePropagator()
 {
    LOG_LOW("Makes the propagator in the CSP solver");
 
-   // Propagation: HC4 or BC4 or ACID
-   std::string propag = env_->getParam()->getStrParam("PROPAGATION_BASE");
-   bool hc4 = (propag == "HC4"),
-        bc4 = (propag == "BC4"),
-        acid = (propag == "ACID");
+   CSPPropagatorList* aux = new CSPPropagatorList();
 
-   THROW_IF(!(hc4 || bc4 || acid),
-             "Bad parameter value for the propagation algorithm");
+   // Constraint propagation algorithm: HC4, BC4, or ACID
+   std::string with_cp = env_->getParam()->getStrParam("PROPAGATION_BASE");
+
+   if (with_cp == "HC4")
+      aux->pushBack(CSPPropagAlgo::HC4, *factory_);
+   else if (with_cp == "BC4")
+      aux->pushBack(CSPPropagAlgo::BC4, *factory_);
+   else if (with_cp == "ACID")
+      aux->pushBack(CSPPropagAlgo::ACID, *factory_);
+   else
+      THROW("Bad parameter value for the propagation algorithm");
+
+   // Polytope hull contractor: YES or NO
+   std::string with_polytope =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
+
+   if (with_polytope == "YES")
+      aux->pushBack(CSPPropagAlgo::Polytope, *factory_);
 
    // Newton: YES or NO
    std::string with_newton =
       env_->getParam()->getStrParam("PROPAGATION_WITH_NEWTON");
-   bool newton = (with_newton == "YES");
 
-   if (newton == false)
-   {
-      if (hc4)
-         propagator_ = new CSPPropagatorHC4(*factory_);
+   if (with_newton == "YES")
+      aux->pushBack(CSPPropagAlgo::Newton, *factory_);
 
-      else if (bc4)
-         propagator_ = new CSPPropagatorBC4(*factory_);
+   if (aux->size() == 0)
+      THROW("Unable to create the propagator in the CSP solver");
 
-      else
-         propagator_ = new CSPPropagatorACID(*factory_);
-   }
-   else
-   {
-      if (hc4)
-         propagator_ = new CSPPropagatorHC4Newton(*factory_);
-
-      else if (bc4)
-         propagator_ = new CSPPropagatorBC4Newton(*factory_);
-
-      else
-         propagator_ = new CSPPropagatorACIDNewton(*factory_);
-   }
+   propagator_ = aux;
 }
 
 void CSPSolver::makeSplit()

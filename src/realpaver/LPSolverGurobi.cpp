@@ -48,7 +48,7 @@ void LPSolver::makeVars()
       LinVar v = getLinVar(i);
       char type = v.isContinuous() ? GRB_CONTINUOUS : GRB_INTEGER;
       double objCoef = 0.0;
-      GRBVar gv = simplex_->addVar(-GRB_INFINITY, GRB_INFINITY, objCoef,
+      GRBVar gv = simplex_->addVar(v.getLB(), v.getUB(), objCoef,
                                    type, v.getName());
       gvars_.push_back(gv);
    }
@@ -154,7 +154,7 @@ void LPSolver::createEnv()
 
    int maxsec = getMaxSeconds();
    int maxiter = getMaxIter();
-   double tol = getFeasilityTol();
+   double tol = getFeasTol();
 
    // limits
    env_->set(GRB_DoubleParam_TimeLimit, maxsec);

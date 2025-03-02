@@ -135,7 +135,7 @@ private:
 };
 
 /** @brief Type of shared pointers on contractors */
-typedef std::shared_ptr<ContractorACID> SharedContractorACID;
+using SharedContractorACID = std::shared_ptr<ContractorACID>;
 
 } // namespace
 

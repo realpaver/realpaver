@@ -99,15 +99,6 @@ public:
    /// Returns the name of this
    std::string getName() const;
 
-   /**
-    * @brief Fessibility test.
-    *
-    * Returns true if the solution of the primal problem is feasible after an
-    * an optimization, false otherwise. Interval arithmetic is used to provide
-    * a proof certificate.
-    */
-   bool isPrimalSolutionFeasible() const;
-
 private:
    int index_;
    double lb_, ub_;
@@ -455,6 +446,8 @@ std::ostream& operator<<(std::ostream& os, const LPSense& sense);
  * > min  cT x,<br>
  * > s.t. lhs <= Ax <= rhs, lb <= x <= ub.
  *
+ * Each variable has an index. The i-th variable has index i.
+ *
  * Any LP solver must be defined as a sub-class using a third-party software,
  * e.g. Clp, Highs. The are two optimization methods:
  * - optimize() calls the Simplex algorithm;
@@ -473,8 +466,8 @@ std::ostream& operator<<(std::ostream& os, const LPSense& sense);
  *
  * The method certifiedCostSolution() must be called only when the
  * optimization method returned the status Optimal. It provides a certified
- * value of the cost function, i.e. a valid lower / upper bound for a
- * min / max problem.
+ * value of the cost function, i.e. a valid lower (resp. upper) bound for a
+ * min (resp. max) problem.
  *
  * The method isCertifiedInfeasible() must be called only when the
  * optimization method returned the status Infeasible. It returns true
@@ -555,10 +548,10 @@ public:
    size_t getMaxIter() const;
 
    /// Returns the feasibility tolerance
-   double getFeasilityTol() const;
+   double getFeasTol() const;
 
    /// Assigns the feasibility tolerance to tol
-   void setFeasilityTol(double tol);
+   void setFeasTol(double tol);
 
    /**
     * @brief Certification method.

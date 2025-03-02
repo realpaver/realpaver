@@ -28,7 +28,7 @@
 namespace realpaver {
 
 
-/// Quadratic expression
+/// Linear expression
 class TermLin {
 public:
    /// Creates 0
@@ -36,7 +36,7 @@ public:
 
    /**
     * @brief Creates a linear term representing t
-    * 
+    *
     * Throws an exception if t is not linear
     */
    TermLin(const Term& t);

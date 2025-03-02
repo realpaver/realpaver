@@ -984,6 +984,16 @@ void DagFun::rDiff(const RealPoint& pt, RealVector& G)
    flat_->rDiff(pt, G);
 }
 
+bool DagFun::isLinear() const
+{
+   return rootNode()->symbol() == DagSymbol::Lin;
+}
+
+DagLin* DagFun::getLinearExpr() const
+{
+   return isLinear() ? static_cast<DagLin*>(rootNode()) : nullptr;
+}
+
 /*----------------------------------------------------------------------------*/
 
 Dag::Dag()

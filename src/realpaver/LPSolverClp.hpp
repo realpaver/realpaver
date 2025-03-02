@@ -67,7 +67,7 @@ private:
    LPStatus run();
 
    // gets the status from Clp
-   LPStatus ClpToLPStatus();
+   LPStatus toLPStatus();
 };
 
 } // namespace

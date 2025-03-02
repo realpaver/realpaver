@@ -23,13 +23,10 @@
 namespace realpaver {
 
 CSPPropagator::CSPPropagator()
-      : B_(nullptr)
 {}
 
 CSPPropagator::~CSPPropagator()
-{
-   if (B_ != nullptr) delete B_;
-}
+{}
 
 Proof CSPPropagator::contractBox(const IntervalBox& B, DomainBox& box)
 {
@@ -45,18 +42,15 @@ Proof CSPPropagator::contractBox(const IntervalBox& B, DomainBox& box)
 
 Proof CSPPropagator::contract(CSPNode& node, CSPContext& ctx)
 {
-   if (B_ != nullptr)
-   {
-      delete B_;
-      B_ = nullptr;
-   }
+   // creates an interval box from the domain box in the given node
+   IntervalBox B(*node.box());
 
    // contractor of sub-class
-   Proof proof = contractImpl(node, ctx);
+   Proof proof = contractImpl(B);
 
    // contracts the domains using a reduced interval box from contractImpl
    // if any
-   if ((proof != Proof::Empty) && (B_ != nullptr))
+   if (proof != Proof::Empty)
    {
       DomainBox* box = node.box();
       auto it = box->scope().begin();
@@ -65,7 +59,7 @@ Proof CSPPropagator::contract(CSPNode& node, CSPContext& ctx)
       {
          Variable v = *it;
          Domain* dom = box->get(v);
-         dom->contract(B_->get(v));
+         dom->contract(B.get(v));
 
          if (dom->isEmpty())
             proof = Proof::Empty;
@@ -83,13 +77,12 @@ Proof CSPPropagator::contract(CSPNode& node, CSPContext& ctx)
 CSPPropagatorHC4::CSPPropagatorHC4(ContractorFactory& facto)
       : CSPPropagator()
 {
-   op_ = facto.makeHC4();
+   hc4_ = facto.makeHC4();
 }
 
-Proof CSPPropagatorHC4::contractImpl(CSPNode& node, CSPContext& ctx)
+Proof CSPPropagatorHC4::contractImpl(IntervalBox& B)
 {
-   B_ = new IntervalBox(*node.box());
-   return op_->contract(*B_);
+   return hc4_->contract(B);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -97,13 +90,12 @@ Proof CSPPropagatorHC4::contractImpl(CSPNode& node, CSPContext& ctx)
 CSPPropagatorBC4::CSPPropagatorBC4(ContractorFactory& facto)
       : CSPPropagator()
 {
-   op_ = facto.makeBC4();
+   bc4_ = facto.makeBC4();
 }
 
-Proof CSPPropagatorBC4::contractImpl(CSPNode& node, CSPContext& ctx)
+Proof CSPPropagatorBC4::contractImpl(IntervalBox& B)
 {
-   B_ = new IntervalBox(*node.box());
-   return op_->contract(*B_);
+   return bc4_->contract(B);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -111,19 +103,28 @@ Proof CSPPropagatorBC4::contractImpl(CSPNode& node, CSPContext& ctx)
 CSPPropagatorNewton::CSPPropagatorNewton(ContractorFactory& facto)
       : CSPPropagator()
 {
-   op_ = facto.makeNewton();
+   nwt_ = facto.makeNewton();
 }
 
-Proof CSPPropagatorNewton::contractImpl(CSPNode& node, CSPContext& ctx)
+Proof CSPPropagatorNewton::contractImpl(IntervalBox& B)
 {
    Proof proof = Proof::Maybe;
+   if (nwt_ != nullptr) proof = nwt_->contract(B);
+   return proof;
+}
 
-   if (op_ != nullptr)
-   {
-      B_ = new IntervalBox(*node.box());
-      proof = op_->contract(*B_);
-   }
+/*----------------------------------------------------------------------------*/
 
+CSPPropagatorPolytope::CSPPropagatorPolytope(ContractorFactory& facto)
+      : CSPPropagator()
+{
+   poly_ = facto.makePolytope();
+}
+
+Proof CSPPropagatorPolytope::contractImpl(IntervalBox& B)
+{
+   Proof proof = Proof::Maybe;
+   if (poly_ != nullptr) proof = poly_->contract(B);
    return proof;
 }
 
@@ -133,79 +134,74 @@ CSPPropagatorACID::CSPPropagatorACID(ContractorFactory& facto)
       : CSPPropagator()
 {
    hc4_ = facto.makeHC4();
-   op_ = facto.makeACID();
+   acid_ = facto.makeACID();
 }
 
-Proof CSPPropagatorACID::contractImpl(CSPNode& node, CSPContext& ctx)
+Proof CSPPropagatorACID::contractImpl(IntervalBox& B)
 {
-   B_ = new IntervalBox(*node.box());
-
    // applies HC4
-   Proof proof = hc4_->contract(*B_);
-   if (proof == Proof::Empty)
-      return proof;
+   Proof proof = hc4_->contract(B);
+   if (proof == Proof::Empty) return proof;
 
    // applies ACID
-   return op_->contract(*B_);
-}
-
-/*----------------------------------------------------------------------------*/
-
-CSPPropagatorHC4Newton::CSPPropagatorHC4Newton(ContractorFactory& facto)
-      : CSPPropagator(),
-        hc4_(facto),
-        newton_(facto)
-{}
-
-Proof CSPPropagatorHC4Newton::contractImpl(CSPNode& node, CSPContext& ctx)
-{
-   Proof proof = hc4_.contract(node, ctx);
-
-   if (proof != Proof::Empty)
-   {
-      proof = newton_.contract(node, ctx);
-   }
+   if (acid_ != nullptr) proof = acid_->contract(B);
 
    return proof;
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorBC4Newton::CSPPropagatorBC4Newton(ContractorFactory& facto)
+CSPPropagatorList::CSPPropagatorList()
       : CSPPropagator(),
-        bc4_(facto),
-        newton_(facto)
+        v_()
 {}
 
-Proof CSPPropagatorBC4Newton::contractImpl(CSPNode& node, CSPContext& ctx)
+void CSPPropagatorList::pushBack(CSPPropagAlgo alg,
+                                 ContractorFactory& facto)
 {
-   Proof proof = bc4_.contract(node, ctx);
-
-   if (proof != Proof::Empty)
+   SharedCSPPropagator op;
+   switch(alg)
    {
-      proof = newton_.contract(node, ctx);
-   }
+      case CSPPropagAlgo::HC4:
+         op = std::make_shared<CSPPropagatorHC4>(facto);
+         if (op != nullptr) v_.push_back(op);
+         break;
 
-   return proof;
+      case CSPPropagAlgo::BC4:
+         op = std::make_shared<CSPPropagatorBC4>(facto);
+         if (op != nullptr) v_.push_back(op);
+         break;
+
+      case CSPPropagAlgo::ACID:
+         op = std::make_shared<CSPPropagatorACID>(facto);
+         if (op != nullptr) v_.push_back(op);
+         break;
+
+       case CSPPropagAlgo::Polytope:
+         op = std::make_shared<CSPPropagatorPolytope>(facto);
+         if (op != nullptr) v_.push_back(op);
+         break;
+
+      case CSPPropagAlgo::Newton:
+         op = std::make_shared<CSPPropagatorNewton>(facto);
+         if (op != nullptr) v_.push_back(op);
+         break;
+   }
 }
 
-/*----------------------------------------------------------------------------*/
-
-CSPPropagatorACIDNewton::CSPPropagatorACIDNewton(ContractorFactory& facto)
-      : CSPPropagator(),
-        acid_(facto),
-        newton_(facto)
-{}
-
-Proof CSPPropagatorACIDNewton::contractImpl(CSPNode& node, CSPContext& ctx)
+size_t CSPPropagatorList::size() const
 {
-   Proof proof = acid_.contract(node, ctx);
+   return v_.size();
+}
 
-   if (proof != Proof::Empty)
+Proof CSPPropagatorList::contractImpl(IntervalBox& B)
+{
+   Proof proof = Proof::Maybe;
+   for (int i=0; i<v_.size(); ++i)
    {
-      proof = newton_.contract(node, ctx);
+      proof = v_[i]->contractImpl(B);
+      if (proof == Proof::Empty) return proof;
    }
-
    return proof;
 }
 

@@ -20,6 +20,18 @@ bitset_test = executable( 'bitset_test',
                           include_directories: ['../src'] )
 test('Test of bitset', bitset_test)
 
+ctc_hc4_test = executable( 'ctc_hc4_test',
+                           sources: 'ctc_hc4_test.cpp',
+                           link_with: realpaver_lib,
+                           include_directories: ['../src'] )
+test('Test of HC4 contractor', ctc_hc4_test)
+
+ctc_polytope_test = executable( 'ctc_polytope_test',
+                           sources: 'ctc_polytope_test.cpp',
+                           link_with: realpaver_lib,
+                           include_directories: ['../src'] )
+test('Test of polytope hull contractor', ctc_polytope_test)
+
 ctc_var_3b_test = executable( 'ctc_var_3b_test',
                               sources: 'ctc_var_3b_test.cpp',
                               link_with: realpaver_lib,
@@ -31,12 +43,6 @@ ctc_var_cid_test = executable( 'ctc_var_cid_test',
                               link_with: realpaver_lib,
                               include_directories: ['../src'] )
 test('Test of varCID contractor', ctc_var_cid_test)
-
-ctc_hc4_test = executable( 'ctc_hc4_test',
-                           sources: 'ctc_hc4_test.cpp',
-                           link_with: realpaver_lib,
-                           include_directories: ['../src'] )
-test('Test of HC4 contractor', ctc_hc4_test)
 
 dag_test = executable( 'dag_test',
                        sources: 'dag_test.cpp',
@@ -62,17 +68,23 @@ flat_function_test = executable( 'flat_function_test',
                                  include_directories: ['../src'] )
 test('Test of flat function', flat_function_test)
 
-preprocessor_test = executable( 'preprocessor_test',
-                                sources: 'preprocessor_test.cpp',
-                                link_with: realpaver_lib,
-                                include_directories: ['../src'] )
-test('Test of preprocessor', preprocessor_test)
+linearizer_test = executable( 'linearizer_test',
+                             sources: 'linearizer_test.cpp',
+                             link_with: realpaver_lib,
+                             include_directories: ['../src'] )
+  test('Test of linearization methods', linearizer_test)
 
 lp_solver_test = executable( 'lp_solver_test',
                              sources: 'lp_solver_test.cpp',
                              link_with: realpaver_lib,
                              include_directories: ['../src'] )
   test('Test of LP solver', lp_solver_test)
+
+preprocessor_test = executable( 'preprocessor_test',
+                                sources: 'preprocessor_test.cpp',
+                                link_with: realpaver_lib,
+                                include_directories: ['../src'] )
+test('Test of preprocessor', preprocessor_test)
 
 range_test = executable( 'range_test',
                          sources: 'range_test.cpp',
