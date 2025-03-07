@@ -143,7 +143,7 @@ SPLIT_INNER_BOX = NO
 # width of a box driving propagation steps. Given two consecutive domains
 # prev and next of some variable and tol the tolerance, a propagation on this
 # variable occurs if (1 - width(next) / width(prev)) > tol.
-PROPAGATION_REL_TOL = 1.0e-2
+PROPAGATION_TOL = 1.0e-3
 
 # Peel factor for the BC3 contractor >= 0.0 and <= 100.0
 # Given an interval [a, b] and the peel factor f let w = (b - a) * (p / 100)
@@ -159,8 +159,10 @@ BC3_ITER_LIMIT = 30
 # that uses one contractor per constraint
 # HC4:   HC4 contractor
 # BC4:   BC4 contractor
-# ACID : ACID contractor
 PROPAGATION_BASE = HC4
+
+# Propagation with a ACID contractor (YES or NO)
+PROPAGATION_WITH_ACID = NO
 
 # Propagation with a polytope hull contractor (YES or NO)
 PROPAGATION_WITH_POLYTOPE_HULL = NO
@@ -174,6 +176,10 @@ PROPAGATION_WITH_NEWTON = YES
 # The value 0.0 implies that a linear equation is generated.
 RELAXATION_EQ_TOL = 1.0e-10
 
+# Tolerance in [0,1] that corresponds to a percentage of reduction of the
+# width of a box driving the loop contractor.
+LOOP_CONTRACTOR_TOL = 1.0e-2
+
 #--------------------------------------------------
 # Polytope hull contractor
 
@@ -186,6 +192,15 @@ POLYTOPE_HULL_TAYLOR_HANSEN = NO
 
 # Choice of corners in the Taylor-based relaxation (YES or NO)
 POLYTOPE_HULL_TAYLOR_RANDOM = NO
+
+# Control of the application of the polytope hull contractor (YES oor NO)
+# NO:  it is applied only once
+# YES: it is applied in a fixed-point loop while the box can be reduced enough
+POLYTOPE_HULL_LOOP = NO
+
+# Tolerance in [0,1] that corresponds to a percentage of reduction of the
+# width of a box
+POLYTOPE_HULL_LOOP_TOL = 1.0e-1
 
 #--------------------------------------------------
 # Adaptive Constructive Interval Disjunction (ACID)
@@ -216,7 +231,7 @@ VAR3BCID_MIN_WIDTH = 1.0e-11
 # Given two consecutive domains prev and next of some variable and tol the
 # tolerance, a propagation on this variable occurs if we have
 # (1 - width(next) / width(prev)) > tol.
-ACID_HC4_REL_TOL = 1.0e-1
+ACID_HC4_TOL = 1.0e-1
 
 #-------------------------------------------------------------------------------
 # LOCAL OPTIMIZATION
@@ -271,7 +286,7 @@ GAUSS_SEIDEL_ITER_LIMIT = 50
 # width of an interval vector. Given two consecutive domains prev and next of
 # some variable and tol the tolerance, the method is iterated if we have
 #(1 - width(next) / width(prev)) > tol.
-GAUSS_SEIDEL_REL_TOL = 1.0e-3
+GAUSS_SEIDEL_TOL = 1.0e-3
 
 # Iteration limit on the number of (outer) steps in the contraction technique
 # of interval Newton method
@@ -285,7 +300,7 @@ NEWTON_CERTIFY_ITER_LIMIT = 20
 # width of a box. Given two consecutive domains prev and next of some
 # variable and tol the tolerance, the method is iterated if we have
 #(1 - width(next) / width(prev)) > tol.
-NEWTON_REL_TOL = 1.0e-3
+NEWTON_TOL = 1.0e-3
 
 # Threshold on the width of an input box of the contraction method, whih is not
 # applied if the width of the box is greater than this value

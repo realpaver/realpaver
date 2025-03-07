@@ -94,10 +94,6 @@ Proof ContractorACID::contract(IntervalBox& B)
    LOG_INTER("ACID call " << nbCalls_ << " on " << B);
    Proof proof = Proof::Maybe;
 
-
-//~ std::cout << "\n\nACID call " << nbCalls_ << " on " << B << std::endl;
-
-
    int nbvarmax = 5*scop_.size();
    double* ctcGains = new double[nbvarmax];
 
@@ -106,15 +102,9 @@ Proof ContractorACID::contract(IntervalBox& B)
 
    int mcall = nbCalls_ % cycleLength_;
 
-//~ std::cout << "mcall " << mcall << std::endl;
-
-
    // learning phase ?
    if (mcall < learnLength_)
    {
-//~ std::cout << "*** LEARNING" << std::endl;
-
-
       // first learning phase: one var3BCID per variable
       // next phases: two times the number of the previous number of var3BCID
       vhandled = (nbCalls_ < learnLength_) ? n_ : 2*numVarCID_;
@@ -123,27 +113,15 @@ Proof ContractorACID::contract(IntervalBox& B)
 
       for (int i =0; i<nbvarmax; i++)
          ctcGains[i] = 0;
-
-
-//~ std::cout << "learning : vhandled = " << vhandled << std::endl;
-
    }
    else
    {
-//~ std::cout << "*** EXPLOITATION" << std::endl;
-
       // exploitation phase
       vhandled = numVarCID_;
-
-//~ std::cout << "exploitation : vhandled = " << vhandled << std::endl;
-
    }
 
    if (vhandled > nbvarmax)
       vhandled = nbvarmax;
-
-//~ std::cout << "vhandled = " << vhandled << std::endl;
-
 
    if (vhandled > 0)
    {
@@ -164,9 +142,6 @@ Proof ContractorACID::contract(IntervalBox& B)
 
       proof = var3BCID_[k]->contract(B);
 
-//~ std::cout << k << "-th var3BCID on " << v.getName() << " -> " << proof << ", " << B << std::endl;
-
-
       LOG_LOW(k << "-th var3BCID on " << v.getName());
       LOG_LOW(" -> " << proof << ", " << B);
 
@@ -180,8 +155,6 @@ Proof ContractorACID::contract(IntervalBox& B)
       if (mcall < learnLength_)
       {
          ctcGains[i] = gainRatio(save, B, scop_);
-
-//~ std::cout << "ctcGains[" << i << "] = " << ctcGains[i] << std::endl;
       }
 
       save = B;
@@ -193,26 +166,14 @@ Proof ContractorACID::contract(IntervalBox& B)
       sumGood_ += (proof == Proof::Empty) ?
                      (stop+1) :
                      lastSignificantGain(ctcGains, ctRatio_, vhandled-1);
-
-//~ std::cout << "sumGood_      = " << sumGood_ << std::endl;
-
    }
 
    // end of learning phase
    if (mcall == learnLength_-1)
    {
-   //~ std::cout << "----- END LEARNING ------" << std::endl;
-
-
       // fixes the number of var cided for the next exploitation phases
       numVarCID_ = (int)(std::ceil((double)sumGood_ / learnLength_));
-
-//~ std::cout << "numVarCID_ = " << numVarCID_ << std::endl;
-
-
-
       sumGood_ = 0;
-
 
       LOG_LOW("end of learning, nummVarCID <- " << numVarCID_);
    }

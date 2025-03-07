@@ -19,12 +19,10 @@
  */
 
 #include <fstream>
-#include <limits>
 #include <map>
 #include <sstream>
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/Double.hpp"
 #include "realpaver/Exception.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
@@ -70,30 +68,20 @@ Param::Param()
    dblmap_.insert(std::make_pair("ACID_CT_RATIO",             0.002));
    dblmap_.insert(std::make_pair("NEWTON_WIDTH_LIMIT",        0.5));
 
-   dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
-   dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
-   dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-3));
-   dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-3));
-   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-3));
 
    dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
    dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
-   dblmap_.insert(std::make_pair("PROPAGATION_ABS_TOL",       0.0));
-   dblmap_.insert(std::make_pair("PROPAGATION_REL_TOL",       1.0e-9));
-   dblmap_.insert(std::make_pair("NEWTON_ABS_TOL",            0.0));
-   dblmap_.insert(std::make_pair("NEWTON_REL_TOL",            1.0e-9));
-   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_ABS_TOL",    0.0));
-   dblmap_.insert(std::make_pair("NEWTON_CERTIFY_REL_TOL",    1.0e-3));
-   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_REL_TOL",      1.0e-9));
-   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_ABS_TOL",      0.0));
+   dblmap_.insert(std::make_pair("PROPAGATION_TOL",           1.0e-3));
+   dblmap_.insert(std::make_pair("NEWTON_TOL",                1.0e-3));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_TOL",          1.0e-3));
    dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
    dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT",      0.45));
-   dblmap_.insert(std::make_pair("ACID_HC4_REL_TOL",          1.0e-1));
+   dblmap_.insert(std::make_pair("ACID_HC4_TOL",              1.0e-1));
    dblmap_.insert(std::make_pair("LP_FEAS_TOL",               1.0e-8));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
+   dblmap_.insert(std::make_pair("LOOP_CONTRACTOR_TOL",       1.0e-2));
+   dblmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP_TOL",    1.0e-1));
 
    // string
    strmap_.insert(std::make_pair("BP_NODE_SELECTION",              "DFS"));
@@ -113,6 +101,8 @@ Param::Param()
    strmap_.insert(std::make_pair("POLYTOPE_HULL_RELAXATION",       "TAYLOR"));
    strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_HANSEN",    "NO"));
    strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_RANDOM",    "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP",             "NO"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_ACID",          "NO"));
 }
 
 int Param::getIntParam(const std::string& name) const

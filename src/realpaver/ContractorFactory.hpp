@@ -77,7 +77,7 @@ public:
     *
     * tol is the tolerance driving propagation steps.
     */
-   SharedContractorHC4 makeHC4(Tolerance tol);
+   SharedContractorHC4 makeHC4(double tol);
 
    /// Same as SharedContractorHC4(tol) with tol extracted from the environment
    SharedContractorHC4 makeHC4();

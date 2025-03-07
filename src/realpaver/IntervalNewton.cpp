@@ -35,7 +35,7 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
         c_(F.scope()),
         gs_(nullptr),
         maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
+        tol_(Param::GetDblParam("NEWTON_TOL")),
         wlim_(Param::GetDblParam("NEWTON_WIDTH_LIMIT")),
         delta_(Param::GetDblParam("INFLATION_DELTA")),
         chi_(Param::GetDblParam("INFLATION_CHI")),
@@ -85,13 +85,15 @@ size_t IntervalNewton::getMaxIter() const
    return maxiter_;
 }
 
-Tolerance IntervalNewton::getTol() const
+double IntervalNewton::getTol() const
 {
    return tol_;
 }
 
-void IntervalNewton::setTol(const Tolerance& tol)
+void IntervalNewton::setTol(const double& tol)
 {
+   ASSERT(tol >= 0.0 && tol <= 1.0,
+          "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -115,7 +117,7 @@ IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
 Proof IntervalNewton::contract(IntervalBox& X)
 {
    if (X.width() >= wlim_) return Proof::Maybe;
-   
+
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
@@ -159,7 +161,7 @@ Proof IntervalNewton::contract(IntervalBox& X)
       F_.diffHansen(X, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
-            
+
       if (certif == Proof::Empty)
       {
          proof = Proof::Empty;
@@ -195,7 +197,7 @@ Proof IntervalNewton::contract(IntervalBox& X)
          iter = false;
          LOG_INTER("Stops on the tolerance " << tol_);
       }
-      
+
       LOG_LOW("Inner step of interval Newton  -> " << X);
    }
    while (iter);
@@ -256,7 +258,7 @@ Proof IntervalNewton::reduceX(IntervalBox& X, bool& improved)
 
       Interval reduced = dom & z;
 
-      if (tol_.isImproved(dom, reduced))
+      if (reduced.improves(dom, tol_))
          improved = true;
 
       X.set(v, reduced);
@@ -321,7 +323,7 @@ Proof IntervalNewton::certify(IntervalBox& box)
       F_.diffHansen(X, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
-            
+
       if (certif == Proof::Empty)
       {
          proof = Proof::Empty;

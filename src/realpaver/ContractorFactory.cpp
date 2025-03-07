@@ -114,7 +114,7 @@ std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
    return ssr;
 }
 
-SharedContractorHC4 ContractorFactory::makeHC4(Tolerance tol)
+SharedContractorHC4 ContractorFactory::makeHC4(double tol)
 {
    // constraints from the dag
    SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(dag_);
@@ -141,8 +141,8 @@ SharedContractorHC4 ContractorFactory::makeHC4(Tolerance tol)
 
 SharedContractorHC4 ContractorFactory::makeHC4()
 {
-   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   return makeHC4(Tolerance(rtol, 0.0));
+   double tol = env_->getParam()->getDblParam("PROPAGATION_TOL");
+   return makeHC4(tol);
 }
 
 SharedContractorBC4 ContractorFactory::makeBC4()
@@ -165,12 +165,12 @@ SharedContractorBC4 ContractorFactory::makeBC4()
       bc4->push(dop);
 
    // tuning of propagation
-   double val = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   bc4->setTol(Tolerance(val, 0.0));
+   double tol = env_->getParam()->getDblParam("PROPAGATION_TOL");
+   bc4->setTol(tol);
 
    // tuning of BC4Revise operators
-   val = env_->getParam()->getDblParam("BC3_PEEL_FACTOR");
-   bc4->setBC4RevisePeelFactor(val);
+   double f = env_->getParam()->getDblParam("BC3_PEEL_FACTOR");
+   bc4->setBC4RevisePeelFactor(f);
 
    int niter = env_->getParam()->getIntParam("BC3_ITER_LIMIT");
    bc4->setBC4ReviseMaxIter(niter);
@@ -207,8 +207,8 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
    {
       LOG_LOW("Newton operator built by the factory");
 
-      double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL");
-      newton->setTol(Tolerance(rtol, 0.0));
+      double tol = env_->getParam()->getDblParam("NEWTON_TOL");
+      newton->setTol(tol);
 
       double wl = env_->getParam()->getDblParam("NEWTON_WIDTH_LIMIT");
       newton->setWidthLimit(wl);
@@ -222,8 +222,8 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
       double chi = env_->getParam()->getDblParam("INFLATION_CHI");
       newton->setInflationChi(chi);
 
-      rtol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_REL_TOL");
-      newton->getGaussSeidel()->setTol(Tolerance(rtol, 0.0));
+      tol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_TOL");
+      newton->getGaussSeidel()->setTol(tol);
 
       niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
       newton->getGaussSeidel()->setMaxIter(niter);
@@ -265,8 +265,8 @@ SharedContractorACID ContractorFactory::makeACID()
 
    std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
-   double rtol = env_->getParam()->getDblParam("ACID_HC4_REL_TOL");
-   SharedContractorHC4 hc4 = makeHC4(Tolerance(rtol, 0.0));
+   double tol = env_->getParam()->getDblParam("ACID_HC4_TOL");
+   SharedContractorHC4 hc4 = makeHC4(tol);
 
    int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
    int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");
@@ -323,6 +323,10 @@ SharedContractorPolytope ContractorFactory::makePolytope()
 
       double max_time = env_->getParam()->getDblParam("LP_TIME_LIMIT");
       op->setMaxSeconds(max_time);
+
+      bool loop = (env_->getParam()->getStrParam("POLYTOPE_HULL_LOOP") == "YES");
+      double looptol = env_->getParam()->getDblParam("POLYTOPE_HULL_LOOP_TOL");
+      op->enforceLoop(loop, looptol);
    }
 
    return op;

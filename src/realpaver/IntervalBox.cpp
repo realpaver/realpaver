@@ -363,4 +363,21 @@ bool IntervalBox::equals(const IntervalBox& B, const Variable& v) const
    return true;
 }
 
+bool IntervalBox::improves(const IntervalBox& old, double tol)
+{
+   return improvesOnScope(old, tol, scop_);
+}
+
+bool IntervalBox::improvesOnScope(const IntervalBox& old, double tol,
+                                  const Scope& scop)
+{
+   ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
+          "Bad scopes used to test an improvement between interval boxes");
+
+   for (const auto& v : scop)
+      if (get(v).improves(old.get(v), tol))
+         return true;
+   return false;
+}
+
 } // namespace

@@ -241,7 +241,7 @@ public:
 
    /**
     * @brief Rounds an interval to integral bounds.
-    * 
+    *
     * Returns the largest interval of integers included in x
     */
    friend Interval round(const Interval& x);
@@ -253,6 +253,17 @@ public:
     * m(this) + delta*(this - m(this)) + chi*[-1,1]
     */
    Interval inflate(double delta, double chi) const;
+
+   /**
+    * @brief Test of improvement.
+    *
+    * Assume that this is included in old. We want to know is this improves
+    * old enough with respect to the tolerance tol. Returns true if both
+    * intervals are non empty and (1.0 - x.width() / old.width()) > tol.
+    *
+    * The (relative) tolerance must be a real number in [0,1].
+    */
+   bool improves(const Interval& old, double tol) const;
 
    /// Output on a stream
    friend std::ostream& operator<<(std::ostream& os, const Interval& x);
@@ -425,7 +436,7 @@ public:
    ///@{
    friend Interval sgn(const Interval& x);
    friend Interval sgnPX(const Interval& x, const Interval& y);
-   friend Interval sgnPY(const Interval& x, const Interval& y);   
+   friend Interval sgnPY(const Interval& x, const Interval& y);
    ///@}
 
 private:

@@ -34,7 +34,7 @@ int main(void)
       pool->push(std::make_shared<ContractorHC4Revise>(dag, j));
 
       IntervalPropagator tor(pool);
-      tor.setTol(Tolerance(1.0e-4, 0.0));
+      tor.setTol(1.0e-4);
 
       Proof proof = tor.contract(B);
 

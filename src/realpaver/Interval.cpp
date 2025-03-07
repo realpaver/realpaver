@@ -58,7 +58,7 @@ Interval Interval::lessThan(double a)
 
 Interval Interval::moreThan(double a)
 {
-   return Interval(a, Interval::universe().right());   
+   return Interval(a, Interval::universe().right());
 }
 
 Interval::Interval(const Interval::Traits::interval& x):
@@ -180,6 +180,15 @@ Interval Interval::inflate(double delta, double chi) const
    return m + delta*(*this - m) + chi*minusOnePlusOne();
 }
 
+bool Interval::improves(const Interval& old, double tol) const
+{
+   ASSERT(tol>=0.0 && tol<= 1.0, "Bad tolerance");
+   ASSERT(old.contains(*this), "Bad test of improvement between intervals");
+
+   if (isEmpty() || old.isEmpty()) return false;
+   else return (1.0 - width() / old.width()) > tol;
+}
+
 std::pair<Interval,Interval> complement(const Interval& x)
 {
    Interval E(Interval::emptyset());
@@ -232,7 +241,7 @@ std::pair<Interval,Interval> setminus(const Interval& x, const Interval& y)
       else if (x.right() == y.right())
       {
          Interval z(x.left(), y.left());
-         return std::make_pair(z, E);         
+         return std::make_pair(z, E);
       }
       else
       {
@@ -277,7 +286,7 @@ std::pair<Interval,Interval> extDiv(const Interval& x, const Interval& y)
    }
    else
    {
-      return std::make_pair(x/y,Interval::emptyset()); 
+      return std::make_pair(x/y,Interval::emptyset());
    }
 }
 
@@ -304,7 +313,7 @@ void Interval::setLeft(double a)
 
 void Interval::setRight(double a)
 {
-   impl_ = Interval::Traits::create(left(), a);   
+   impl_ = Interval::Traits::create(left(), a);
 }
 
 double Interval::width() const
@@ -339,7 +348,7 @@ double Interval::relWidth() const
 
       Interval x = Interval(w) / Interval(m);
       return x.right();
-   }   
+   }
 }
 
 double Interval::midpoint() const
@@ -414,7 +423,7 @@ bool Interval::isOne() const
 
 bool Interval::isAnInt() const
 {
-  return Interval::Traits::isAnInt(impl_);   
+  return Interval::Traits::isAnInt(impl_);
 }
 
 bool Interval::contains(double a) const
@@ -624,7 +633,7 @@ double Interval::gap(const Interval& other) const
 
 Interval& Interval::operator&=(const Interval& other)
 {
-   Interval::Traits::inter_assign(impl_, other.impl_);  
+   Interval::Traits::inter_assign(impl_, other.impl_);
    return *this;
 }
 
@@ -635,28 +644,28 @@ Interval operator&(const Interval& x, const Interval& y)
 
 Interval& Interval::operator|=(const Interval& other)
 {
-   Interval::Traits::hull_assign(impl_, other.impl_);     
+   Interval::Traits::hull_assign(impl_, other.impl_);
    return *this;
 }
 
 Interval operator|(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::hull(x.impl_, y.impl_));   
+   return Interval(Interval::Traits::hull(x.impl_, y.impl_));
 }
 
 Interval round(const Interval& x)
 {
-   return Interval(Interval::Traits::round(x.impl_));      
+   return Interval(Interval::Traits::round(x.impl_));
 }
 
 Interval& Interval::operator+=(const Interval& other)
 {
-   Interval::Traits::addAssign(impl_, other.impl_);     
+   Interval::Traits::addAssign(impl_, other.impl_);
    return *this;
 }
 
 Interval operator+(const Interval& x, const Interval& y)
-{   
+{
    Interval res = Interval(Interval::Traits::add(x.impl_, y.impl_));
 
 #if LOG_ON
@@ -693,7 +702,7 @@ Interval addPY(const Interval& x, const Interval& y,
 Interval addPZ(const Interval& x, const Interval& y,
                       const Interval& z)
 {
-   Interval res = Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));   
+   Interval res = Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));
 
 #if LOG_ON
    LOG_FULL("addPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
@@ -704,8 +713,8 @@ Interval addPZ(const Interval& x, const Interval& y,
 
 Interval& Interval::operator-=(const Interval& other)
 {
-   Interval::Traits::subAssign(impl_, other.impl_);     
-   return *this;   
+   Interval::Traits::subAssign(impl_, other.impl_);
+   return *this;
 }
 
 Interval operator-(const Interval& x, const Interval& y)
@@ -779,13 +788,13 @@ Interval usubPY(const Interval& x, const Interval& y)
    LOG_FULL("usubPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
-   return res; 
+   return res;
 }
 
 Interval& Interval::operator*=(const Interval& other)
 {
-   Interval::Traits::mulAssign(impl_, other.impl_);  
-   return *this;   
+   Interval::Traits::mulAssign(impl_, other.impl_);
+   return *this;
 }
 
 Interval operator*(const Interval& x, const Interval& y)
@@ -838,12 +847,12 @@ Interval mulPZ(const Interval& x, const Interval& y,
 Interval& Interval::operator/=(const Interval& other)
 {
    Interval::Traits::divAssign(impl_, other.impl_);
-   return *this;   
+   return *this;
 }
 
 Interval operator/(const Interval& x, const Interval& y)
 {
-   return Interval(Interval::Traits::div(x.impl_, y.impl_));      
+   return Interval(Interval::Traits::div(x.impl_, y.impl_));
 }
 
 Interval divPX(const Interval& x, const Interval& y, const Interval& z)

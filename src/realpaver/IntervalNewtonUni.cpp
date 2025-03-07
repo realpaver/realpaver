@@ -18,19 +18,19 @@
  * @date   2024-4-11
 */
 
-#include <limits>
 #include <stack>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
 IntervalNewtonUni::IntervalNewtonUni()
       : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
+        tol_(Param::GetDblParam("NEWTON_TOL")),
         inflator_()
 {}
 
@@ -46,13 +46,15 @@ void IntervalNewtonUni::setMaxIter(size_t n)
    maxiter_ = n;
 }
 
-Tolerance IntervalNewtonUni::getTol() const
+double IntervalNewtonUni::getTol() const
 {
    return tol_;
 }
 
-void IntervalNewtonUni::setTol(const Tolerance& tol)
+void IntervalNewtonUni::setTol(const double& tol)
 {
+   ASSERT(tol >= 0.0 && tol <= 1.0,
+          "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -97,7 +99,7 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
          if (++nbiter >= maxiter_)
             iter = false;
 
-         if (!tol_.isImproved(prev, y))
+         if (!y.improves(prev, tol_))
             iter = false;
       }
    }
@@ -191,7 +193,7 @@ Proof IntervalNewtonUni::shrinkLeft(IntervalFunctionUni& f, Interval& x)
       Interval y = stak.top();
       stak.pop();
       proof = contract(f, y);
-      
+
       if (proof == Proof::Empty) continue;
 
       if (proof == Proof::Feasible)
@@ -245,7 +247,7 @@ Proof IntervalNewtonUni::shrinkRight(IntervalFunctionUni& f, Interval& x)
       stak.push(Interval(c, y.right()));
    }
 
-   return Proof::Empty;   
+   return Proof::Empty;
 }
 
 Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)

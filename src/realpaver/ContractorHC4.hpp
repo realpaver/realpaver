@@ -28,7 +28,7 @@ namespace realpaver {
 
 /**
  * @brief HC4 contractor.
- * 
+ *
  * Constraint propagation algorithm applying HC4Revise contractors on a DAG
  * such that the projections are intersected at the shared nodes.
  */
@@ -54,10 +54,10 @@ public:
    void push(SharedContractor op);
 
    /// Returns the tolerance used as stopping criterion
-   Tolerance getTol() const;
+   double getTol() const;
 
    /// Sets the tolerance used as stopping criterion
-   void setTol(Tolerance tol);
+   void setTol(double tol);
 
 private:
    SharedDag dag_;               // DAG

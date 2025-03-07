@@ -1,3 +1,7 @@
+# Origin: COPRIN
+# Determine the geometrical parameters of a parallel robot so that its "hand"
+# may reach 3 given poses
+
 Variables
 xc in [-12.9614813968157204619319348722, 12.9614813968157204619319348722],
 yc in [-12.9614813968157204619319348722, 12.9614813968157204619319348722],
