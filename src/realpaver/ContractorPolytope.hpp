@@ -88,6 +88,15 @@ public:
    /// Assigns the feasibility tolerance to tol
    void setFeasTol(double tol);
 
+   /**
+    * @brief Controls the contraction method.
+    *
+    * If loop = false then it is applied only once. Otherwise, it is applied
+    * in a fixed-point loop given tol as improvement factor, which is a relative
+    * tolerance in [0, 1].
+    */
+   void enforceLoop(bool loop, double tol = 0.0);
+
    Scope scope() const override;
    Proof contract(IntervalBox& B) override;
    void print(std::ostream& os) const override;
@@ -96,9 +105,11 @@ private:
    std::unique_ptr<Linearizer> lzr_;   // relaxation method
 
    // parameters of the LP solver
-   double maxseconds_;           // time limit
-   size_t maxiter_;              // iteration limit
-   double feastol_;              // feasibility tolerance
+   double maxseconds_;     // time limit
+   size_t maxiter_;        // iteration limit
+   double feastol_;        // feasibility tolerance
+   bool loop_;             // true when applied in a fixed-point loop
+   double looptol_;        // improvement factor of the fixed-point loop
 
    // tunes the LP solver
    void tuneLPSolver(LPSolver& solver);
@@ -113,10 +124,6 @@ private:
                          int *rb, int& nrb, int& iv, LPSense& sense);
    void selectNext(int *lb, int& nlb, int *rb, int& nrb, int& iv,
                    LPSense& sense);
-
-   // used for debugging
-   static void printState(int *lb, int& nlb, int *rb, int& nrb, int& iv,
-                          LPSense& sense);
 };
 
 /// type of shared contractors

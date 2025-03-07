@@ -32,7 +32,9 @@ ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
         lzr_(std::move(lzr)),
         maxseconds_(Param::GetDblParam("LP_TIME_LIMIT")),
         maxiter_(Param::GetIntParam("LP_ITER_LIMIT")),
-        feastol_(Param::GetDblParam("LP_FEAS_TOL"))
+        feastol_(Param::GetDblParam("LP_FEAS_TOL")),
+        loop_(Param::GetStrParam("POLYTOPE_HULL_LOOP") == "YES"),
+        looptol_(Param::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
 {
    ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
 }
@@ -87,10 +89,29 @@ void ContractorPolytope::setFeasTol(double tol)
    feastol_ = tol;
 }
 
+void ContractorPolytope::enforceLoop(bool loop, double tol)
+{
+   ASSERT(tol >= 0.0 && tol <= 1.0,
+          "A relative tolerance must belong to [0, 1]");
+   loop_ = loop;
+   looptol_ = tol;
+}
+
 Proof ContractorPolytope::contract(IntervalBox& B)
 {
-   Proof proof = contractImpl(B);
-   return proof;
+   if (!loop_) return contractImpl(B);
+
+   bool iter = true;
+   IntervalBox prev(B);
+   while (iter)
+   {
+      if (contractImpl(B) == Proof::Empty) return Proof::Empty;
+      if (!B.improves(prev, looptol_))
+         iter = false;
+      else
+         prev.setOnScope(B, scope());
+   }
+   return Proof::Maybe;
 }
 
 Proof ContractorPolytope::contractImpl(IntervalBox& B)
@@ -128,21 +149,6 @@ Proof ContractorPolytope::contractImpl(IntervalBox& B)
    delete[] rb;
 
    return proof;
-}
-
-void ContractorPolytope::printState(int *lb, int& nlb, int *rb,
-                                    int& nrb, int& iv, LPSense& sense)
-{
-   std::cout << "nlb : " << nlb << std::endl;
-   std::cout << "nrb : " << nrb << std::endl;
-   std::cout << "iv  : " << iv << std::endl;
-   std::cout << "lb : ";
-   for (int i=0; i<nlb; ++i) std::cout << lb[i] << " ";
-   std::cout << std::endl;
-   std::cout << "rb : ";
-   for (int i=0; i<nrb; ++i) std::cout << rb[i] << " ";
-   std::cout << std::endl;
-   std::cout << "sense : " << sense << std::endl;
 }
 
 Proof ContractorPolytope::run(LPSolver& solver, IntervalBox& B, int *lb,

@@ -26,6 +26,12 @@ ctc_hc4_test = executable( 'ctc_hc4_test',
                            include_directories: ['../src'] )
 test('Test of HC4 contractor', ctc_hc4_test)
 
+ctc_loop_test = executable( 'ctc_loop_test',
+                           sources: 'ctc_loop_test.cpp',
+                           link_with: realpaver_lib,
+                           include_directories: ['../src'] )
+test('Test of loop contractor', ctc_loop_test)
+
 ctc_polytope_test = executable( 'ctc_polytope_test',
                            sources: 'ctc_polytope_test.cpp',
                            link_with: realpaver_lib,

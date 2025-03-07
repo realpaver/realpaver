@@ -22,12 +22,13 @@
 #include "realpaver/IntervalGaussSeidel.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
 IntervalGaussSeidel::IntervalGaussSeidel()
       : maxiter_(Param::GetIntParam("GAUSS_SEIDEL_ITER_LIMIT")),
-        tol_(Param::GetDblParam("GAUSS_SEIDEL_REL_TOL"), 0.0)
+        tol_(Param::GetDblParam("GAUSS_SEIDEL_TOL"))
 {}
 
 size_t IntervalGaussSeidel::getMaxIter() const
@@ -42,13 +43,15 @@ void IntervalGaussSeidel::setMaxIter(size_t n)
    maxiter_ = n;
 }
 
-Tolerance IntervalGaussSeidel::getTol() const
+double IntervalGaussSeidel::getTol() const
 {
    return tol_;
 }
 
-void IntervalGaussSeidel::setTol(const Tolerance& tol)
+void IntervalGaussSeidel::setTol(const double& tol)
 {
+   ASSERT(tol >= 0.0 && tol <= 1.0,
+          "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -102,7 +105,7 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix& A, IntervalVector& x,
          proof = Proof::Empty;
          iter = false;
       }
-   
+
       else if (res == 1)
          iter = false;
 
@@ -134,14 +137,14 @@ int IntervalGaussSeidel::innerStep(const IntervalMatrix& A, IntervalVector& x,
 
       for (size_t j=i+1; j<x.size(); ++j)
          I -= A.get(i, j)*x.get(j);
-     
+
       // projection of I = x{i}*A{i,i} onto x{i}
       Interval z = mulPX(x.get(i), A.get(i, i), I);
 
       if (z.isEmpty()) return 0;
       else
       {
-         if (tol_.isImproved(x.get(i), z))
+         if (z.improves(x.get(i), tol_))
             res = 2;    // contraction large enough to iterate
 
          x.set(i, z);

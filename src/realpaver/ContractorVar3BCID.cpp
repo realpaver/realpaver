@@ -85,8 +85,6 @@ Proof ContractorVar3BCID::contract(IntervalBox& B)
       if (n3B < 2) n3B = 2;
    }
 
-//~ std::cout << "n3B : " << n3B << std::endl;
-
    // 3B
    IntervalBox save(B);
    IntervalPartitionMaker slicer(n3B);
@@ -103,32 +101,21 @@ Proof ContractorVar3BCID::contract(IntervalBox& B)
       if (i>0) B = save;
       leftSlice = slicer.slice(i);
 
-//~ std::cout << "left " << i << " : " << leftSlice << std::endl;      
-      
       B.set(v_, leftSlice);
       Proof certif = op_->contract(B);
 
       if (certif == Proof::Empty)
       {
-
-//~ std::cout << "    EMPTY" << std::endl;
-
          ++i;
       }
       else
       {
-
-//~ std::cout << "    LEFT " << B << std::endl;
-
          leftFound = true;
       }
    }
 
    if (!leftFound)
    {
-
-//~ std::cout << "RESULT : EMPTY" << std::endl;
-
       return Proof::Empty;
    }
 
@@ -139,9 +126,6 @@ Proof ContractorVar3BCID::contract(IntervalBox& B)
    // B corresponds to this reduced slice
    if (i == j)
    {
-
-//~ std::cout << "RESULT : ONLY LEFT SLICE " << B << std::endl;
-
       return Proof::Maybe;
    }
 
@@ -155,38 +139,23 @@ Proof ContractorVar3BCID::contract(IntervalBox& B)
    {
       B = save;
       rightSlice = slicer.slice(j);
-
-//~ std::cout << "right " << j << " : " << rightSlice << std::endl;
-
       B.set(v_, rightSlice);
       Proof certif = op_->contract(B);
 
       if (certif == Proof::Empty)
       {
-
-//~ std::cout << "    EMPTY" << std::endl;
-
          --j;
       }
       else
       {
-
-//~ std::cout << "    RIGHT " << B << std::endl;
-
          rightFound = true;
       }
    }
 
    if (!rightFound)
    {
-
-//~ std::cout << "NO RIGHT FOUND " << std::endl;
-
       // only one consistent facet (the one found from left to right)
       B = newbox;
-
-//~ std::cout << "RESULT " << B << std::endl;
-
       return Proof::Maybe;
    }
 
@@ -194,9 +163,6 @@ Proof ContractorVar3BCID::contract(IntervalBox& B)
    {
       // only two consistent facets
       B.glue(newbox);
-
-//~ std::cout << "TWO FOUND " << B << std::endl;
-
       return Proof::Maybe;
    }
 
@@ -225,9 +191,6 @@ bool ContractorVar3BCID::contractCID(IntervalBox& Bcid, IntervalBox& B3bCid)
    if (nsCID_ == 0 || Bcid.equals(B3bCid, v_))
       return false;
 
-//~ std::cout << "contract CID on Bcid " << Bcid << std::endl;
-//~ std::cout << "with B3bCid " << B3bCid << std::endl;
-
    IntervalBox B(Bcid);
    Interval dom(Bcid.get(v_));
 
@@ -239,20 +202,11 @@ bool ContractorVar3BCID::contractCID(IntervalBox& Bcid, IntervalBox& B3bCid)
    {
       if (i>0) B = Bcid;
       B.set(v_, slicer.slice(i));
-
-//~ std::cout << "to be cided " << B << std::endl;
-
       Proof certif = op_->contract(B);
-      
+
       if (certif != Proof::Empty)
       {
-
-//~ std::cout << "    result " << B << std::endl;
-
          B3bCid.glue(B);
-
-//~ std::cout << "    glue " << B3bCid << std::endl;
-         
          if (Bcid.equals(B3bCid, v_))
             return false;
       }
@@ -264,5 +218,5 @@ void ContractorVar3BCID::print(std::ostream& os) const
 {
    os << "var3BCID contractor on " << v_.getName();
 }
-   
+
 } // namespace

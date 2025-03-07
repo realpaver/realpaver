@@ -18,7 +18,6 @@
  * @date   2024-4-11
 */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Logger.hpp"
@@ -51,6 +50,7 @@ Scope ContractorHC4::scope() const
 
 Proof ContractorHC4::contract(IntervalBox& B)
 {
+   LOG_INTER("HC4");
    return propag_->contract(B);
 }
 
@@ -59,12 +59,12 @@ void ContractorHC4::print(std::ostream& os) const
    os << "HC4";
 }
 
-Tolerance ContractorHC4::getTol() const
+double ContractorHC4::getTol() const
 {
    return propag_->getTol();
 }
 
-void ContractorHC4::setTol(Tolerance tol)
+void ContractorHC4::setTol(double tol)
 {
    propag_->setTol(tol);
 }

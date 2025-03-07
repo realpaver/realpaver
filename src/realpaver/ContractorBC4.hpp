@@ -29,7 +29,7 @@ namespace realpaver {
 
 /**
  * @brief Propagation algorithm implementing the BC4 strategy.
- * 
+ *
  * A BC4Revise contractor is associated with each constraint from a DAG. The
  * contraction method implements an AC3-like propagation algorithm on the set
  * of contractors.
@@ -52,14 +52,14 @@ public:
    void push(SharedContractor op);
 
    /// Returns the tolerance used as stopping criterion
-   Tolerance getTol() const;
+   double getTol() const;
 
    /// Sets the tolerance used as stopping criterion
-   void setTol(Tolerance tol);
+   void setTol(double tol);
 
    /**
     * @brief Sets the peel factor of the BC4Revise operators.
-    * 
+    *
     * Condition: 0.0 <= f <= 100.0
     */
    void setBC4RevisePeelFactor(double f);

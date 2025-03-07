@@ -18,7 +18,6 @@
  * @date   2024-4-11
 */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorBC4.hpp"
 #include "realpaver/Logger.hpp"
 
@@ -53,6 +52,7 @@ Scope ContractorBC4::scope() const
 
 Proof ContractorBC4::contract(IntervalBox& B)
 {
+   LOG_INTER("BC4");
    return propag_->contract(B);
 }
 
@@ -73,12 +73,12 @@ void ContractorBC4::setBC4ReviseMaxIter(size_t val)
       op->setMaxIter(val);
 }
 
-Tolerance ContractorBC4::getTol() const
+double ContractorBC4::getTol() const
 {
    return propag_->getTol();
 }
 
-void ContractorBC4::setTol(Tolerance tol)
+void ContractorBC4::setTol(double tol)
 {
    propag_->setTol(tol);
 }

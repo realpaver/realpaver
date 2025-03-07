@@ -30,7 +30,7 @@ namespace realpaver {
 IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
       : Contractor(),
         pool_(pool),
-        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
+        tol_(Param::GetDblParam("PROPAGATION_TOL")),
         certif_()
 {
    if (pool == nullptr)
@@ -39,13 +39,15 @@ IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
    }
 }
 
-Tolerance IntervalPropagator::getTol() const
+double IntervalPropagator::getTol() const
 {
    return tol_;
 }
 
-void IntervalPropagator::setTol(Tolerance tol)
+void IntervalPropagator::setTol(double tol)
 {
+   ASSERT(tol >= 0.0 && tol <= 1.0,
+          "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -121,7 +123,7 @@ Proof IntervalPropagator::contract(IntervalBox& B)
             LOG_LOW("Propagation test on " << v.getName() << " ("
                                            << tol_ << ")");
 
-            if (tol_.isImproved(prev, curr))
+            if (curr.improves(prev, tol_))
             {
                LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
                             << " -> propagation");

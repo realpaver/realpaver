@@ -77,14 +77,6 @@ bool Tolerance::isTight(const IntervalVector& X) const
    return true;
 }
 
-bool Tolerance::isImproved(const Interval& old, const Interval& x) const
-{
-   if (old.isEmpty() || x.isEmpty())
-      return false;
-
-   return (1.0 - x.width() / old.width()) > rtol_;
-}
-
 double maxIntervalDnAbs(double ub, double atol)
 {
    Double::rndUp();
@@ -168,17 +160,17 @@ Interval Tolerance::maxIntervalDn(double ub) const
 
 Interval Tolerance::maxIntervalUp(double lb) const
 {
-   return -maxIntervalDn(-lb); 
+   return -maxIntervalDn(-lb);
 }
 
 double Tolerance::discreteSize(const Interval& x) const
 {
    if (x.isEmpty())
       return 0.0;
-   
+
    else if (x.isCanonical())
       return 1.0;
-  
+
    else if (x.isInf())
       return Double::floor(Double::greatest());
 

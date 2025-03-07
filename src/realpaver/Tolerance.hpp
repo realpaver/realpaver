@@ -21,7 +21,6 @@
 #ifndef REALPAVER_TOLERANCE_HPP
 #define REALPAVER_TOLERANCE_HPP
 
-#include "realpaver/Interval.hpp"
 #include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
@@ -31,7 +30,7 @@ class Tolerance {
 public:
    /**
     * @brief Constructor.
-    * 
+    *
     * @param rtol relative tolerance
     * @param atol absolute tolerance
     */
@@ -60,7 +59,7 @@ public:
 
    /**
     * @brief Tests if an interval is tight enough with respect to this.
-    * 
+    *
     * Returns false if x is empty; true if x is canonical ; otherwise it tests
     * if abs(b-a) <= max(rtol*max(abs(b), abs(a)), atol) where x=[a,b], atol
     * and rtol are respectively absolute and relative tolerances
@@ -71,20 +70,8 @@ public:
    bool isTight(const IntervalVector& X) const;
 
    /**
-    * @brief Test of improvement.
-    * 
-    * Tests if two consecutive intervals of a nested sequence are such that
-    * the width of the second one has been reduced enough with respect to the
-    * width of the first one according to the relative tolerance
-    * 
-    * Returns true if (1 - wid(x)/wid(old)) > rtol where rtol is the
-    * relative tolerance, false otherwise
-    */
-   bool isImproved(const Interval& old, const Interval& x) const;
-
-   /**
     * @brief Gets the largest interval having this tolerance.
-    * 
+    *
     * Returns the largest interval [lb, ub] having the absolute or the
     * relative tolerance
     */
@@ -92,7 +79,7 @@ public:
 
    /**
     *  Gets the largest interval having this tolerance
-    * 
+    *
     * Returns the largest interval [lb, ub] having the absolute or the
     * relative tolerance
     */
@@ -100,7 +87,7 @@ public:
 
    /**
     * @brief Calculates the size of a partition of an interval.
-    * 
+    *
     * Returns 0 if x is empty, 1 if x is canonical, the width of x divided
     * by the absolute tolerance of this rounded upward otherwise
     */

@@ -29,7 +29,7 @@ namespace realpaver {
 
 /**
  * @brief Multivariate interval Newton method.
- * 
+ *
  * Given a square system of equations F = 0 and a box, the contraction method
  * is a fixed-point loop applying an inner step until a stopping criterion is
  * verified. The inner step linearizes the system and applies the interval
@@ -41,7 +41,7 @@ namespace realpaver {
  * - a maximum number of iterations is reached.
  * The contraction method is not applied if the width of the box is smaller than
  * a threshold.
- * 
+ *
  * The certification method tries to prove the existence of a solution in a box
  * using an inflation-based algorithm.
  */
@@ -73,10 +73,10 @@ public:
    size_t getMaxIter() const;
 
    /// Returns the improvement factor
-   Tolerance getTol() const;
+   double getTol() const;
 
    /// Sets the improvement factor
-   void setTol(const Tolerance& tol);
+   void setTol(const double& tol);
 
    /// Assigns the threshold on the width of a box of the contraction method
    void setWidthLimit(double val);
@@ -86,7 +86,7 @@ public:
 
    /**
     * @brief Certification method.
-    * 
+    *
     * Tries to derive a proof certificate for the existence of a solution in
     * a box using an inflation-based algorithm. The box can be modified.
     */
@@ -118,7 +118,7 @@ private:
    IntervalGaussSeidel* gs_;        // Gauss-Seidel operator
 
    size_t maxiter_;     // maximum number of iterations (contraction)
-   Tolerance tol_;      // tolerance on the distance between two intervals
+   double tol_;        // tolerance on the distance between two intervals
    double wlim_;        // threshold on the width of a box: no application
                         // of the contraction method if the width of the
                         // input box is greater than this value

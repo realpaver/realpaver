@@ -57,10 +57,10 @@ public:
    void print(std::ostream& os) const override;
 
    /// Returns the tolerance used as stopping criterion
-   Tolerance getTol() const;
+   double getTol() const;
 
    /// Sets the tolerance used as stopping criterion
-   void setTol(Tolerance tol);
+   void setTol(double tol);
 
    /// Returns the maximum number of propagation steps
    size_t getMaxIter() const;
@@ -73,7 +73,7 @@ public:
 
 private:
    SharedContractorPool pool_;   // pool of contractors
-   Tolerance tol_;               // tolerance used for propagation
+   double tol_;                  // tolerance used for propagation
    std::vector<Proof> certif_;   // proof certificates of contractors
 };
 

@@ -241,6 +241,26 @@ public:
    /// Equality test on all dimensions but one variable
    bool equals(const IntervalBox& B, const Variable& v) const;
 
+   /**
+    * @brief Test of improvement.
+    *
+    * It returns true if there exists a variable v in the scope of this
+    * such that its domain in this improves enough its domain in the other
+    * box old with respect to the tolerance tol. Each test uses the improves
+    * method of the Interval class.
+    *
+    * The (relative) tolerance must be a real number in [0,1].
+    */
+   bool improves(const IntervalBox& old, double tol);
+
+   /**
+    * @brief Test of improvement.
+    *
+    * It corresponds to a call of  improves(old, tol) restricted to
+    * the set of variables scop.
+    */
+   bool improvesOnScope(const IntervalBox& old, double tol, const Scope& scop);
+
 private:
    Scope scop_;
 };

@@ -23,8 +23,6 @@
 
 #include <string>
 #include <unordered_map>
-#include "realpaver/Interval.hpp"
-#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
@@ -86,12 +84,6 @@ public:
 
    /// Sets the value of a real parameter in the static instance
    static void SetDblParam(const std::string& name, double val);
-
-   /// Gets the value of a tolerance parameter in the static instance
-   static Tolerance GetTolParam(const std::string& name);
-
-   /// Sets the value of a tolerance parameter in the static instance
-   static void SetTolParam(const std::string& name, const Tolerance& val);
 
    /// Gets the value of a string parameter in the static instance
    static std::string GetStrParam(const std::string& name);

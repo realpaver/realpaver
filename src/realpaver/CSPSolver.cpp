@@ -147,16 +147,21 @@ void CSPSolver::makePropagator()
    CSPPropagatorList* aux = new CSPPropagatorList();
 
    // Constraint propagation algorithm: HC4, BC4, or ACID
-   std::string with_cp = env_->getParam()->getStrParam("PROPAGATION_BASE");
+   std::string base = env_->getParam()->getStrParam("PROPAGATION_BASE");
 
-   if (with_cp == "HC4")
+   if (base == "HC4")
       aux->pushBack(CSPPropagAlgo::HC4, *factory_);
-   else if (with_cp == "BC4")
+   else if (base == "BC4")
       aux->pushBack(CSPPropagAlgo::BC4, *factory_);
-   else if (with_cp == "ACID")
-      aux->pushBack(CSPPropagAlgo::ACID, *factory_);
    else
       THROW("Bad parameter value for the propagation algorithm");
+
+   // ACID contractor: YES or NO
+   std::string with_acid =
+      env_->getParam()->getStrParam("PROPAGATION_WITH_ACID");
+
+   if (with_acid == "YES")
+      aux->pushBack(CSPPropagAlgo::ACID, *factory_);
 
    // Polytope hull contractor: YES or NO
    std::string with_polytope =
