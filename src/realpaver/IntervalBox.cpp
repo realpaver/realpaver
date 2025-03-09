@@ -371,7 +371,7 @@ bool IntervalBox::improves(const IntervalBox& old, double tol)
 bool IntervalBox::improvesOnScope(const IntervalBox& old, double tol,
                                   const Scope& scop)
 {
-   ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
+   ASSERT(scop_.contains(scop) && scop_.contains(scop),
           "Bad scopes used to test an improvement between interval boxes");
 
    for (const auto& v : scop)
