@@ -98,7 +98,9 @@ public:
    static Interval pi();
    static Interval halfPi();
    static Interval twoPi();
+   static Interval minusPiZero();
    static Interval minusPiPlusPi();
+   static Interval minusHalfPiPlusHalfPi();
    static Interval zeroPi();
    static Interval zeroTwoPi();
    /** @} */
@@ -193,6 +195,8 @@ public:
    bool isStrictlyNegative() const;
    bool isPositive() const;
    bool isStrictlyPositive() const;
+   bool containskPi() const;
+   bool containsHalfPiPluskPi() const;
    ///@}
 
    /// Returns true if this and other do not overlap
@@ -219,6 +223,15 @@ public:
     * - a-d if a>d
     */
    double gap(const Interval& other) const;
+
+   /**
+    * @brief Returns the couple (midpoint, radius) of this.
+    *
+    * Returns (m, r) where m is the midpoint of this and r is its radius
+    * such that [m-r, m+r] contains this, if this is non empty; (NaN, NaN)
+    * otherwise.
+    */
+   std::pair<double, double> midrad() const;
 
    /// Intersection with assignment
    Interval& operator&=(const Interval& other);
@@ -394,6 +407,36 @@ public:
    friend Interval sinh(const Interval& x);
    friend Interval sinhPX(const Interval& x, const Interval& y);
    friend Interval sinhPY(const Interval& x, const Interval& y);
+   ///@}
+
+   /// @name Arccosine
+   ///@{
+   friend Interval acos(const Interval& x);
+   ///@}
+
+   /// @name Arcsine
+   ///@{
+   friend Interval asin(const Interval& x);
+   ///@}
+
+   /// @name Arctangent
+   ///@{
+   friend Interval atan(const Interval& x);
+   ///@}
+
+   /// @name Hyperbolic arccosine
+   ///@{
+   friend Interval acosh(const Interval& x);
+   ///@}
+
+   /// @name Hyperbolic arcsine
+   ///@{
+   friend Interval asinh(const Interval& x);
+   ///@}
+
+   /// @name Hyperbolic arctangent
+   ///@{
+   friend Interval atanh(const Interval& x);
    ///@}
 
    ///@{

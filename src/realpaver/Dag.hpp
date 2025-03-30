@@ -195,7 +195,7 @@ public:
    void iEvalTree(const IntervalBox& B) override;
 
    /// Returns the constant interval value
-   Interval getConst() const;
+   const Interval& getConst() const;
 
 private:
    Interval x_;
@@ -215,7 +215,7 @@ public:
    DagVar(Dag* dag, size_t index, Variable v);
 
    /// Returns the variable enclosed
-   Variable getVar() const;
+   const Variable& getVar() const;
 
    size_t nbOccurrences(const Variable& v) const override;
    void print(std::ostream& os) const override;
@@ -596,7 +596,13 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// DAG node representing a (non-constant) linear expression
+/**
+ * @brief DAG node representing a (non-constant) linear expression.
+ *
+ * The linear expression is defined as a0 + sum_i (a_i*x_i) where
+ * the list of couples (a_i, x_i) is ordered by decreasing indexes of the
+ * variables.
+ */
 class DagLin : public DagOp {
 public:
    /**

@@ -124,6 +124,8 @@ else
 endif
 
 rp_headers += [
+  'AffineCreator.hpp',
+  'AffineForm.hpp',
   'Alias.hpp',
   'AssertDebug.hpp',
   'Bitset.hpp',
@@ -233,6 +235,8 @@ rp_headers += [
 ]
 
 rp_sources += [
+  'AffineCreator.cpp',
+  'AffineForm.cpp',
   'Alias.cpp',
   'AssertDebug.hpp',
   'Bitset.cpp',
@@ -296,7 +300,8 @@ rp_sources += [
   'IntervalVector.cpp',
   'IntervalUnion.cpp',
   'IntRandom.cpp',
-  'Linearizer.cpp',  'Logger.cpp',
+  'Linearizer.cpp',
+  'Logger.cpp',
   'LPModel.cpp',
   'NLPModel.cpp',
   'Objective.cpp',
