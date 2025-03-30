@@ -16,17 +16,16 @@
  * @brief  Classes for representing linear programs
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_LPMODEL_HPP
 #define REALPAVER_LPMODEL_HPP
 
+#include "realpaver/IntervalMatrix.hpp"
+#include "realpaver/IntervalVector.hpp"
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "realpaver/Common.hpp"
-#include "realpaver/IntervalMatrix.hpp"
-#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 
@@ -48,17 +47,16 @@ public:
     *  @param continuous true for a contibuous variable, false otherwise
     *  @param name       the name of this variable
     */
-   LinVarRep(int index, double lb, double ub, bool continuous,
-             const std::string& name);
+   LinVarRep(int index, double lb, double ub, bool continuous, const std::string &name);
 
    /// Destructor
    ~LinVarRep();
 
    /// No copy
-   LinVarRep(const LinVarRep&) = delete;
+   LinVarRep(const LinVarRep &) = delete;
 
    /// No assignment
-   LinVarRep& operator=(const LinVarRep&) = delete;
+   LinVarRep &operator=(const LinVarRep &) = delete;
 
    /// Defines this as a continuous variable
    void setContinuous();
@@ -73,10 +71,10 @@ public:
    void setUB(double ub);
 
    /// Sets the domain of this
-   void setDomain(const Interval& x);
+   void setDomain(const Interval &x);
 
    /// Sets the name of this
-   void setName(const std::string& name);
+   void setName(const std::string &name);
 
    /// @return true if this is a continuous variable
    bool isContinuous() const;
@@ -120,10 +118,10 @@ public:
    LinVar();
 
    /// Default copy constructor
-   LinVar(const LinVar&) = default;
+   LinVar(const LinVar &) = default;
 
    /// Default assignment operator
-   LinVar& operator=(const LinVar&) = default;
+   LinVar &operator=(const LinVar &) = default;
 
    /// Default destructor
    ~LinVar() = default;
@@ -141,10 +139,10 @@ public:
    void setUB(double ub);
 
    /// Sets the domain of this
-   void setDomain(const Interval& x);
+   void setDomain(const Interval &x);
 
    /// Sets the name of this
-   void setName(const std::string& name);
+   void setName(const std::string &name);
 
    /// Returns true if this is a continuous variable
    bool isContinuous() const;
@@ -173,8 +171,7 @@ private:
    std::shared_ptr<LinVarRep> rep_;
 
    // Only the friend class can build a variable
-   LinVar(int index, double lb, double ub, bool continuous,
-          const std::string& name);
+   LinVar(int index, double lb, double ub, bool continuous, const std::string &name);
 };
 
 /*----------------------------------------------------------------------------*/
@@ -194,10 +191,10 @@ public:
    ~LinExprRep() = default;
 
    /// No copy
-   LinExprRep(const LinExprRep&) = delete;
+   LinExprRep(const LinExprRep &) = delete;
 
    /// No assignment
-   LinExprRep& operator=(const LinExprRep&) = delete;
+   LinExprRep &operator=(const LinExprRep &) = delete;
 
    /**
     * @brief Adds a new term a*v in this.
@@ -219,13 +216,13 @@ public:
    int getIndexVar(int i) const;
 
    /// Returns a pointer to the array of coefficients of the terms of this
-   double* getCoefs() const;
+   double *getCoefs() const;
 
    /// Returns a pointer to the array of variable indexes of the terms of this
-   int* getIndexVars() const;
+   int *getIndexVars() const;
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
 private:
    std::vector<double> coefs_;
@@ -246,14 +243,13 @@ public:
    LinExpr();
 
    /// Creates an expression given a sum of terms
-   LinExpr(const std::initializer_list<double>& lc,
-           const std::initializer_list<LinVar>& lv);
+   LinExpr(const std::initializer_list<double> &lc, const std::initializer_list<LinVar> &lv);
 
    /// Default copy constructor
-   LinExpr(const LinExpr&) = default;
+   LinExpr(const LinExpr &) = default;
 
    /// Default assignment operator
-   LinExpr& operator=(const LinExpr&) = default;
+   LinExpr &operator=(const LinExpr &) = default;
 
    /// Default destructor
    ~LinExpr() = default;
@@ -266,7 +262,7 @@ public:
     *  previously inserted.
     *  Assumes that the variable v is not already present in this.
     */
-   LinExpr& addTerm(double a, LinVar v);
+   LinExpr &addTerm(double a, LinVar v);
 
    /// Returns the number of terms in this
    int getNbTerms() const;
@@ -278,20 +274,20 @@ public:
    int getIndexVar(int i) const;
 
    /// Returns a pointer to the array of coefficients of the terms of this
-   double* getCoefs() const;
+   double *getCoefs() const;
 
    /// Returns a pointer to the array of variable indexes of the terms of this
-   int* getIndexVars() const;
+   int *getIndexVars() const;
 
    /// Output on a stream
-   friend std::ostream& operator<<(std::ostream& os, const LinExpr& e);
+   friend std::ostream &operator<<(std::ostream &os, const LinExpr &e);
 
 private:
    std::shared_ptr<LinExprRep> rep_;
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const LinExpr& e);
+std::ostream &operator<<(std::ostream &os, const LinExpr &e);
 
 /*----------------------------------------------------------------------------*/
 
@@ -314,10 +310,10 @@ public:
    LinCtrRep(LinExpr e, double ub);
 
    /// No copy
-   LinCtrRep(const LinCtrRep&) = delete;
+   LinCtrRep(const LinCtrRep &) = delete;
 
    /// No assignment
-   LinCtrRep& operator=(const LinCtrRep&) = delete;
+   LinCtrRep &operator=(const LinCtrRep &) = delete;
 
    /// Default destructor
    ~LinCtrRep() = default;
@@ -372,10 +368,10 @@ public:
    LinCtr(LinExpr e, double ub);
 
    /// Default copy constructor
-   LinCtr(const LinCtr&) = default;
+   LinCtr(const LinCtr &) = default;
 
    /// Default assignment operator
-   LinCtr& operator=(const LinCtr&) = default;
+   LinCtr &operator=(const LinCtr &) = default;
 
    /// Default destructor
    ~LinCtr() = default;
@@ -415,27 +411,27 @@ private:
 
 /// Certificate returned by solvers of optimization problems
 enum class LPStatus {
-   Optimal,                   ///< optimum found by the solver
-   Infeasible,                ///< infeasible
-   Unbounded,                 ///< unbounded
-   InfeasibleOrUnbounded,     ///< infeasible or unbounded
-   StopOnIterLimit,           ///< iteration limit exceeded
-   StopOnTimeLimit,           ///< time limit exceeded
-   Other                      ///< other status
+   Optimal,               ///< optimum found by the solver
+   Infeasible,            ///< infeasible
+   Unbounded,             ///< unbounded
+   InfeasibleOrUnbounded, ///< infeasible or unbounded
+   StopOnIterLimit,       ///< iteration limit exceeded
+   StopOnTimeLimit,       ///< time limit exceeded
+   Other                  ///< other status
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const LPStatus& status);
+std::ostream &operator<<(std::ostream &os, const LPStatus &status);
 
 /*----------------------------------------------------------------------------*/
 
 enum class LPSense {
-   Min,  ///< minimize
-   Max   ///< maximize
+   Min, ///< minimize
+   Max  ///< maximize
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const LPSense& sense);
+std::ostream &operator<<(std::ostream &os, const LPSense &sense);
 
 /*----------------------------------------------------------------------------*/
 
@@ -487,13 +483,13 @@ public:
    virtual ~LPModel();
 
    /// No copy
-   LPModel(const LPModel&) = delete;
+   LPModel(const LPModel &) = delete;
 
    /// No assignment
-   LPModel& operator=(const LPModel&) = delete;
+   LPModel &operator=(const LPModel &) = delete;
 
    /// Creates a new linear variable in this given two bounds and a name
-   LinVar makeVar(double lb, double ub, const std::string& name="");
+   LinVar makeVar(double lb, double ub, const std::string &name = "");
 
    /// Inserts a new constraint in this and returns its index
    size_t addCtr(LinCtr c);
@@ -517,7 +513,7 @@ public:
    LPSense getSense() const;
 
    /// Output on a stream
-   friend std::ostream& operator<<(std::ostream& os, const LPModel& model);
+   friend std::ostream &operator<<(std::ostream &os, const LPModel &model);
 
    /// Returns the number of linear variables in this
    int getNbLinVars() const;
@@ -617,7 +613,7 @@ public:
     *
     * The vector ray is resized if it is necessary.
     */
-   virtual bool infeasibleRay(RealVector& ray) const = 0;
+   virtual bool infeasibleRay(RealVector &ray) const = 0;
 
    /**
     * @brief Returns the matrix of constraint coefficients.
@@ -647,21 +643,21 @@ public:
    IntervalVector bounds() const;
 
 private:
-   std::vector<LinVar> vars_;    // vector of variables
-   std::vector<LinCtr> ctrs_;    // vector of constraints
-   LinExpr cost_;                // cost function
-   LPSense sense_;               // optimization sense (min or max)
-   double maxseconds_;           // time limit
-   size_t maxiter_;              // iteration limit
-   double tol_;                  // feasibility tolerance
+   std::vector<LinVar> vars_; // vector of variables
+   std::vector<LinCtr> ctrs_; // vector of constraints
+   LinExpr cost_;             // cost function
+   LPSense sense_;            // optimization sense (min or max)
+   double maxseconds_;        // time limit
+   size_t maxiter_;           // iteration limit
+   double tol_;               // feasibility tolerance
 
    // display
-   void printLinExpr(std::ostream& os, LinExpr e) const;
-   void printVars(std::ostream& os) const;
-   void printCtrs(std::ostream& os) const;
-   void printCost(std::ostream& os) const;
+   void printLinExpr(std::ostream &os, LinExpr e) const;
+   void printVars(std::ostream &os) const;
+   void printCtrs(std::ostream &os) const;
+   void printCost(std::ostream &os) const;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

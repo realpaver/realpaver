@@ -308,6 +308,47 @@ SharedContractorPolytope ContractorFactory::makePolytope()
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
+      else if (relaxation == "AFFINE")
+      {
+         bool minrange =
+            env_->getParam()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX")
+               == "MINRANGE";
+
+         std::unique_ptr<Linearizer> lzr
+            = std::make_unique<LinearizerAffine>(dag_, minrange);
+
+         op = std::make_shared<ContractorPolytope>(std::move(lzr));
+      }
+      else if (relaxation == "AFFINE_TAYLOR")
+      {
+         bool hansen =
+            env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
+
+         bool rand =
+            env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
+
+         CornerStyle style = (rand ? CornerStyle::Random : CornerStyle::RandomSeed);
+
+         std::unique_ptr<LinearizerTaylor> taylor
+            = std::make_unique<LinearizerTaylor>(dag_, hansen, style);
+
+         ASSERT(taylor != nullptr, "taylor null");
+
+         bool minrange =
+            env_->getParam()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX")
+               == "MINRANGE";
+
+         std::unique_ptr<LinearizerAffine> affine
+            = std::make_unique<LinearizerAffine>(dag_, minrange);
+
+            ASSERT(affine != nullptr, "affine null");
+
+            std::unique_ptr<Linearizer> lzr
+            = std::make_unique<LinearizerAffineTaylor>(dag_, std::move(affine),
+                                                       std::move(taylor));
+
+         op = std::make_shared<ContractorPolytope>(std::move(lzr));
+      }
    }
 
    if (op != nullptr)

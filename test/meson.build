@@ -14,6 +14,18 @@
 # Author: Raphaël Chenouard
 # ------------------------------------------------------------------------------
 
+affine_test = executable( 'affine_test',
+                          sources: 'affine_test.cpp',
+                          link_with: realpaver_lib,
+                          include_directories: ['../src'] )
+test('Test of affine form', affine_test)
+
+affine_creator_test = executable( 'affine_creator_test',
+                          sources: 'affine_creator_test.cpp',
+                          link_with: realpaver_lib,
+                          include_directories: ['../src'] )
+test('Test of creator of affine forms', affine_creator_test)
+
 bitset_test = executable( 'bitset_test',
                           sources: 'bitset_test.cpp',
                           link_with: realpaver_lib,

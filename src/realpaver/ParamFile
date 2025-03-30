@@ -184,7 +184,9 @@ LOOP_CONTRACTOR_TOL = 1.0e-2
 # Polytope hull contractor
 
 # Relaxation method
+# - AFFINE: use of affine forms
 # - TAYLOR: use of Taylor (mean value) forms
+# - AFFINE_TAYLOR: use of both affine forms and Taylor forms
 POLYTOPE_HULL_RELAXATION = TAYLOR
 
 # Use of Hansen's derivatives in the Taylor-based relaxation (YES or NO)
@@ -201,6 +203,11 @@ POLYTOPE_HULL_LOOP = NO
 # Tolerance in [0,1] that corresponds to a percentage of reduction of the
 # width of a box
 POLYTOPE_HULL_LOOP_TOL = 1.0e-1
+
+# Approximation method that generates affine forms for the elementary functions
+# - MINRANGE : MinRange approximation
+# - CHEBYSHEV : Chebyshev approximation
+POLYTOPE_HULL_AFFINE_APPROX = MINRANGE
 
 #--------------------------------------------------
 # Adaptive Constructive Interval Disjunction (ACID)

@@ -61,9 +61,9 @@ using RawInterval = gaol::interval;
 
 /**
  * @brief Specialization of the interval traits for Gaol.
- * 
+ *
  * @see IntervalTraits
- * 
+ *
  *  The operations are either delegated to gaol if they are available in this
  *  library or implemented otherwise.
  */
@@ -125,7 +125,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline size_t hashCode(const interval& x)
    {
-      std::hash<double> f;      
+      std::hash<double> f;
       return f(x.left()) ^ (f(x.right()) << 1);
    }
 
@@ -310,7 +310,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool contains(const interval& x, double a)
    {
-      return x.set_contains(a);      
+      return x.set_contains(a);
    }
 
    static inline bool strictlyContains(const interval& x, double a)
@@ -346,7 +346,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isSetNeq(const interval& x, const interval& y)
    {
-      return x.set_neq(y);      
+      return x.set_neq(y);
    }
 
    static inline bool isNegative(const interval& x)
@@ -376,7 +376,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isPossiblyNeq(const interval& x, const interval& y)
    {
-      return x.possibly_neq(y);      
+      return x.possibly_neq(y);
    }
 
    static inline bool isPossiblyLe(const interval& x, const interval& y)
@@ -386,7 +386,7 @@ struct IntervalTraits<RawInterval> {
 
    static inline bool isPossiblyLt(const interval& x, const interval& y)
    {
-      return x.possibly_le(y);      
+      return x.possibly_le(y);
    }
 
    static inline bool isPossiblyGe(const interval& x, const interval& y)
@@ -486,7 +486,7 @@ struct IntervalTraits<RawInterval> {
          os << x;
          interval::precision(size);
       }
-   } 
+   }
 
    static inline void addAssign(interval& x, const interval& y)
    {
@@ -612,7 +612,7 @@ struct IntervalTraits<RawInterval> {
    static inline interval divPZ(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return mulPY(y, z, x);     
+      return mulPY(y, z, x);
    }
 
    static inline interval sqr(const interval& x)
@@ -782,13 +782,43 @@ struct IntervalTraits<RawInterval> {
       return y & gaol::tanh(x);
    }
 
+   static inline interval acos(const interval& x)
+   {
+      return gaol::acos(x);
+   }
+
+   static inline interval asin(const interval& x)
+   {
+      return gaol::asin(x);
+   }
+
+   static inline interval atan(const interval& x)
+   {
+      return gaol::atan(x);
+   }
+
+   static inline interval acosh(const interval& x)
+   {
+      return gaol::acosh(x);
+   }
+
+   static inline interval asinh(const interval& x)
+   {
+      return gaol::asinh(x);
+   }
+
+   static inline interval atanh(const interval& x)
+   {
+      return gaol::atanh(x);
+   }
+
    static inline interval abs(const interval& x)
    {
       return gaol::abs(x);
    }
 
    static inline interval absPX(const interval& x, const interval& y)
-   {      
+   {
       return x & gaol::invabs_rel(y, x);
    }
 
@@ -809,7 +839,7 @@ struct IntervalTraits<RawInterval> {
       {
          return interval::emptyset();
       }
-   
+
       interval pz = minPZ(x, y, z);
       if (pz.is_empty())
       {
@@ -856,7 +886,7 @@ struct IntervalTraits<RawInterval> {
       {
          return interval::emptyset();
       }
-   
+
       interval pz = maxPZ(x, y, z);
       if (pz.is_empty())
       {
@@ -882,7 +912,7 @@ struct IntervalTraits<RawInterval> {
    static inline interval maxPY(const interval& x, const interval& y,
                                 const interval& z)
    {
-      return maxPX(y, x, z);      
+      return maxPX(y, x, z);
    }
 
    static inline interval maxPZ(const interval& x, const interval& y,
@@ -895,7 +925,7 @@ struct IntervalTraits<RawInterval> {
    {
       if (x.is_empty())
          return interval::emptyset();
-      
+
       int neg = (x.left() < 0.0) ? (1 << 0) : 0;
       int pos = (x.right() > 0.0) ? (1 << 1) : 0;
       int zro = x.set_contains(0.0) ? (1 << 2) : 0;

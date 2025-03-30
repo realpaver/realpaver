@@ -103,6 +103,7 @@ Param::Param()
    strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_RANDOM",    "NO"));
    strmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP",             "NO"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_ACID",          "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_AFFINE_APPROX",    "MINRANGE"));
 }
 
 int Param::getIntParam(const std::string& name) const

@@ -723,6 +723,36 @@ struct IntervalTraits<RawInterval> {
       return inum64::tanh_py(x, y);
    }
 
+   static inline interval acos(const interval& x)
+   {
+      return inum64::acos(x);
+   }
+
+   static inline interval asin(const interval& x)
+   {
+      return inum64::asin(x);
+   }
+
+   static inline interval atan(const interval& x)
+   {
+      return inum64::atan(x);
+   }
+
+   static inline interval acosh(const interval& x)
+   {
+      return inum64::acosh(x);
+   }
+
+   static inline interval asinh(const interval& x)
+   {
+      return inum64::asinh(x);
+   }
+
+   static inline interval atanh(const interval& x)
+   {
+      return inum64::atanh(x);
+   }
+
    static inline interval abs(const interval& x)
    {
       return inum64::abs(x);
