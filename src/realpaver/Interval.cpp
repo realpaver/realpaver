@@ -22,6 +22,7 @@
 #include "realpaver/Double.hpp"
 #include "realpaver/Interval.hpp"
 #include "realpaver/Logger.hpp"
+#include <utility>
 
 namespace realpaver {
 
@@ -149,6 +150,18 @@ Interval Interval::minusPiPlusPi()
    return x;
 }
 
+Interval Interval::minusHalfPiPlusHalfPi()
+{
+   static Interval x(Interval::Traits::minusPiPlusPi()/2.0);
+   return x;
+}
+
+Interval Interval::minusPiZero()
+{
+   static Interval x(-zeroPi());
+   return x;
+}
+
 Interval Interval::zeroPi()
 {
    static Interval x(Interval::Traits::zeroPi());
@@ -187,6 +200,17 @@ bool Interval::improves(const Interval& old, double tol) const
 
    if (isEmpty() || old.isEmpty()) return false;
    else return (1.0 - width() / old.width()) > tol;
+}
+
+std::pair<double, double> Interval::midrad() const
+{
+   if (isEmpty())
+      return std::make_pair(Double::nan(), Double::nan());
+
+   double m = midpoint();
+   Double::rndUp();
+   double r = std::max(m-left(), right()-m);
+   return std::make_pair(m, r);
 }
 
 std::pair<Interval,Interval> complement(const Interval& x)
@@ -484,6 +508,18 @@ bool Interval::isPositive() const
 bool Interval::isStrictlyPositive() const
 {
    return Interval::Traits::isStrictlyPositive(impl_);
+}
+
+bool Interval::containskPi() const
+{
+   Interval x = round((*this) / pi());
+   return !x.isEmpty();
+}
+
+bool Interval::containsHalfPiPluskPi() const
+{
+   Interval x = round((*this - Interval::halfPi()) / pi());
+   return !x.isEmpty();
 }
 
 bool Interval::isPossiblyEq(const Interval& other) const
@@ -1191,6 +1227,36 @@ Interval tanhPY(const Interval& x, const Interval& y)
 #endif
 
    return res;
+}
+
+Interval acos(const Interval& x)
+{
+   return Interval(Interval::Traits::acos(x.impl_));
+}
+
+Interval asin(const Interval& x)
+{
+   return Interval(Interval::Traits::asin(x.impl_));
+}
+
+Interval atan(const Interval& x)
+{
+   return Interval(Interval::Traits::atan(x.impl_));
+}
+
+Interval acosh(const Interval& x)
+{
+   return Interval(Interval::Traits::acosh(x.impl_));
+}
+
+Interval asinh(const Interval& x)
+{
+   return Interval(Interval::Traits::asinh(x.impl_));
+}
+
+Interval atanh(const Interval& x)
+{
+   return Interval(Interval::Traits::atanh(x.impl_));
 }
 
 Interval abs(const Interval& x)

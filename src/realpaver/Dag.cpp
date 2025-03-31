@@ -213,7 +213,7 @@ void DagConst::iEvalTree(const IntervalBox& B)
    setIval(x_);
 }
 
-Interval DagConst::getConst() const
+const Interval& DagConst::getConst() const
 {
    return x_;
 }
@@ -253,7 +253,7 @@ void DagVar::iEvalTree(const IntervalBox& B)
    setIval(B.get(v_));
 }
 
-Variable DagVar::getVar() const
+const Variable& DagVar::getVar() const
 {
    return v_;
 }

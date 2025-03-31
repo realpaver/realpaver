@@ -159,7 +159,7 @@ Proof ContractorPolytope::run(LPSolver& solver, IntervalBox& B, int *lb,
    LPStatus status = LPStatus::Other;
    while (iv>=0)
    {
-      // changes the cost
+   // changes the cost
       Variable v = scope().var(iv);
       LinVar lv = solver.getLinVar(lzr_->linVarIndex(v));
       LinExpr e({1.0}, {lv});
