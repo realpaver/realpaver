@@ -19,6 +19,7 @@ csp_solver = executable(
   sources: 'csp_solver.cpp',
   link_with: realpaver_lib,
   include_directories: incdir,
+  install: true,
   dependencies: deps_lib,
 )
 
