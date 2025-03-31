@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "DiscreteBoundary-";
 
@@ -28,33 +28,36 @@ int main(int argc, char ** argv)
    //////////
    of << "Constants" << endl;
    of << "x0 = 0," << endl;
-   of << "x" << n+1 << " = 0," << endl;
-   of << "h = 1/" << n+1 << "," << endl;
+   of << "x" << n + 1 << " = 0," << endl;
+   of << "h = 1/" << n + 1 << "," << endl;
    of << "u = h^2/2," << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "t" << i << " = " << i << "*h";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e2, 1e2]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    string c = "1.1";
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
-      of << "2*x" << i << "-x" << i-1 << "-x" << i+1;
+      of << "2*x" << i << "-x" << i - 1 << "-x" << i + 1;
       of << "+u*(x" << i << "+t" << i << "+1) == 0";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl;
 

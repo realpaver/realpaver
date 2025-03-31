@@ -21,13 +21,13 @@
 #ifndef REALPAVER_PROBLEM_HPP
 #define REALPAVER_PROBLEM_HPP
 
-#include <unordered_set>
-#include <vector>
 #include "realpaver/Alias.hpp"
 #include "realpaver/BoxReporter.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Objective.hpp"
 #include "realpaver/VariableVector.hpp"
+#include <unordered_set>
+#include <vector>
 
 namespace realpaver {
 
@@ -57,63 +57,63 @@ namespace realpaver {
 class Problem {
 public:
    /// Constructor
-   Problem(const std::string& name = "");
+   Problem(const std::string &name = "");
 
    /// Default copy constructor
-   Problem(const Problem&) = default;
+   Problem(const Problem &) = default;
 
    /// No assignment
-   Problem& operator=(const Problem&) = delete;
+   Problem &operator=(const Problem &) = delete;
 
    /// Default destructor
    ~Problem() = default;
 
    /// Creates a new variable with no domain yet
-   Variable addVar(const std::string& name = "");
+   Variable addVar(const std::string &name = "");
 
    /// Creates a new variable with domain {0, 1}
-   Variable addBinaryVar(const std::string& name = "");
+   Variable addBinaryVar(const std::string &name = "");
 
    /**
     * @brief Creates a vector of binary variables.
     *
     * Indexes in the vector: first, first+1, ..., last.
     */
-   VariableVector addBinaryVarVector(const std::string& name, int first, int last);
+   VariableVector addBinaryVarVector(const std::string &name, int first, int last);
 
    /// Creates a new integer variable with domain [lo, up]
-   Variable addIntVar(int lo, int up, const std::string& name = "");
+   Variable addIntVar(int lo, int up, const std::string &name = "");
 
    /// Creates a new integer variable with domain r
-   Variable addIntVar(const Range& r, const std::string& name = "");
+   Variable addIntVar(const Range &r, const std::string &name = "");
 
    /// Creates a new integer variable with domain u
-   Variable addIntVar(const RangeUnion& u, const std::string& name = "");
+   Variable addIntVar(const RangeUnion &u, const std::string &name = "");
 
    /**
     * @brief Creates a vector of integer variables with domain r.
     *
     * Indexes in the vector: first, first+1, ..., last.
     */
-   VariableVector addIntVarVector(const std::string& name, int first, int last,
-                                  const Range& r = Range::universe());
+   VariableVector addIntVarVector(const std::string &name, int first, int last,
+                                  const Range &r = Range::universe());
 
    /// Creates a new real variable with domain [lo,up]
-   Variable addRealVar(double lo, double up, const std::string& name = "");
+   Variable addRealVar(double lo, double up, const std::string &name = "");
 
    /// Creates a new real variable with domain x
-   Variable addRealVar(const Interval& x, const std::string& name = "");
+   Variable addRealVar(const Interval &x, const std::string &name = "");
 
    /// Creates a new real variable with domain u
-   Variable addRealVar(const IntervalUnion& u, const std::string& name = "");
+   Variable addRealVar(const IntervalUnion &u, const std::string &name = "");
 
    /**
     * @brief Creates a vector of real variables with domains x.
     *
     * Indexes in the vector: first, first+1, ..., last.
     */
-   VariableVector addRealVarVector(const std::string& name, int first, int last,
-                                   const Interval& x = Interval::universe());
+   VariableVector addRealVarVector(const std::string &name, int first, int last,
+                                   const Interval &x = Interval::universe());
 
    /// Creates a new real variable by cloning
    Variable addClonedVar(Variable v);
@@ -137,7 +137,7 @@ public:
    void addCtr(Constraint c);
 
    /// Inserts a list of constraints
-   void addCtr(const std::initializer_list<Constraint>& l);
+   void addCtr(const std::initializer_list<Constraint> &l);
 
    /// Adds an objective function
    void addObjective(Objective obj);
@@ -206,7 +206,7 @@ public:
    bool isEmpty() const;
 
    /// Adds an alias in this
-   void addAlias(const Alias& a);
+   void addAlias(const Alias &a);
 
    /// Returns the number of aliases
    size_t nbAliases() const;
@@ -221,18 +221,18 @@ public:
    void reportAlias(Alias a, bool b = true);
 
    /// Returns true if v is reported, false otherwise
-   bool isVarReported(const Variable& v) const;
+   bool isVarReported(const Variable &v) const;
 
    /// Returns true if a is reported, false otherwise
-   bool isAliasReported(const Alias& a) const;
+   bool isAliasReported(const Alias &a) const;
 
 private:
-   std::string name_;               // name
-   std::vector<Variable> vars_;     // vector of variables
-   std::vector<Constraint> ctrs_;   // vector of constraints
-   Objective obj_;                  // objective function
-   Scope scop_;                     // set of variables
-   std::vector<Alias> als_;         // vector of aliases
+   std::string name_;             // name
+   std::vector<Variable> vars_;   // vector of variables
+   std::vector<Constraint> ctrs_; // vector of constraints
+   Objective obj_;                // objective function
+   Scope scop_;                   // set of variables
+   std::vector<Alias> als_;       // vector of aliases
 
    // set of symbols used in this problem
    std::unordered_set<std::string> vname_;
@@ -241,10 +241,10 @@ private:
    std::shared_ptr<EntityReportedVector> erv_;
 
    // throws an exception if a name is already used as the name of a symbol
-   void checkSymbol(const std::string& name);
+   void checkSymbol(const std::string &name);
 
-   static int NP;    // problem counter
-   int id_;          // problem id
+   static int NP; // problem counter
+   int id_;       // problem id
 
    size_t nextVarId() const;
 
@@ -253,8 +253,8 @@ private:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Problem& p);
+std::ostream &operator<<(std::ostream &os, const Problem &p);
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -22,8 +22,8 @@
 #define REALPAVER_CONTRACTOR_POLYTOPE_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/Linearizer.hpp"
 #include "realpaver/LPSolver.hpp"
+#include "realpaver/Linearizer.hpp"
 
 namespace realpaver {
 
@@ -52,10 +52,10 @@ public:
    ~ContractorPolytope() = default;
 
    /// No copy
-   ContractorPolytope(const ContractorPolytope&) = delete;
+   ContractorPolytope(const ContractorPolytope &) = delete;
 
    /// No assignment
-   ContractorPolytope& operator=(const ContractorPolytope&) = delete;
+   ContractorPolytope &operator=(const ContractorPolytope &) = delete;
 
    /// Returns the tolerance on bounds / primal solutions
    double getBoundTol() const;
@@ -98,37 +98,36 @@ public:
    void enforceLoop(bool loop, double tol = 0.0);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
 private:
-   std::unique_ptr<Linearizer> lzr_;   // relaxation method
+   std::unique_ptr<Linearizer> lzr_; // relaxation method
 
    // parameters of the LP solver
-   double maxseconds_;     // time limit
-   size_t maxiter_;        // iteration limit
-   double feastol_;        // feasibility tolerance
-   bool loop_;             // true when applied in a fixed-point loop
-   double looptol_;        // improvement factor of the fixed-point loop
+   double maxseconds_; // time limit
+   size_t maxiter_;    // iteration limit
+   double feastol_;    // feasibility tolerance
+   bool loop_;         // true when applied in a fixed-point loop
+   double looptol_;    // improvement factor of the fixed-point loop
 
    // tunes the LP solver
-   void tuneLPSolver(LPSolver& solver);
+   void tuneLPSolver(LPSolver &solver);
 
    // contraction methods
-   Proof contractImpl(IntervalBox& B);
-   Proof run(LPSolver& solver, IntervalBox& B, int *lb, int& nlb, int *rb,
-             int& nrb, int& iv, LPSense& sense);
+   Proof contractImpl(IntervalBox &B);
+   Proof run(LPSolver &solver, IntervalBox &B, int *lb, int &nlb, int *rb, int &nrb,
+             int &iv, LPSense &sense);
 
    // selects the next variable and the optimization sense
-   void selectAchterberg(LPSolver& solver, IntervalBox& B, int *lb, int& nlb,
-                         int *rb, int& nrb, int& iv, LPSense& sense);
-   void selectNext(int *lb, int& nlb, int *rb, int& nrb, int& iv,
-                   LPSense& sense);
+   void selectAchterberg(LPSolver &solver, IntervalBox &B, int *lb, int &nlb, int *rb,
+                         int &nrb, int &iv, LPSense &sense);
+   void selectNext(int *lb, int &nlb, int *rb, int &nrb, int &iv, LPSense &sense);
 };
 
 /// type of shared contractors
 using SharedContractorPolytope = std::shared_ptr<ContractorPolytope>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

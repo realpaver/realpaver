@@ -16,7 +16,7 @@
  * @brief  Univariate interval Newton operator
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_NEWTON_UNI_HPP
 #define REALPAVER_INTERVAL_NEWTON_UNI_HPP
@@ -73,7 +73,7 @@ public:
     * Contracts x with respect to f = 0 using the interval Newton method and
     * returns a certificate of proof
     */
-   Proof contract(IntervalFunctionUni& f, Interval& x);
+   Proof contract(IntervalFunctionUni &f, Interval &x);
 
    /**
     * @brief Contraction method.
@@ -81,7 +81,7 @@ public:
     * Contracts x with respect to f = 0 by combining the interval Newton method
     * with search and returns a certificate of proof
     */
-   Proof contractWithSearch(IntervalFunctionUni& f, Interval& x);
+   Proof contractWithSearch(IntervalFunctionUni &f, Interval &x);
 
    /**
     * @brief Step of the contraction method.
@@ -89,7 +89,7 @@ public:
     * The interval x is contracted as the intersection of x and the set
     * hull( c - f(c) / f'(x) ) where c is the midpoint of x.
     */
-   Proof step(IntervalFunctionUni& f, Interval& x);
+   Proof step(IntervalFunctionUni &f, Interval &x);
 
    /**
     * @brief Local search and certification method.
@@ -97,10 +97,10 @@ public:
     * Applies an inflation-based algorithm to f = 0 and x and returns a
     * certificate of proof.
     */
-   Proof localSearch(IntervalFunctionUni& f, Interval& x);
+   Proof localSearch(IntervalFunctionUni &f, Interval &x);
 
    /// Step of the local search method
-   Proof localStep(IntervalFunctionUni& f, Interval& x);
+   Proof localStep(IntervalFunctionUni &f, Interval &x);
 
    /// Sets a limit of iterations of the iterative methods
    void setMaxIter(size_t n);
@@ -112,23 +112,23 @@ public:
    double getTol() const;
 
    /// Sets the improvement factor of the contraction method
-   void setTol(const double& tol);
+   void setTol(const double &tol);
 
    /// Returns the inflator used by the local search method
-   Inflator& getInflator();
+   Inflator &getInflator();
 
    /// Sets the inflator used by the local search method
-   void setInflator(const Inflator& inflator);
+   void setInflator(const Inflator &inflator);
 
 private:
-   size_t maxiter_;     // maxmum number of iterations
-   double tol_;         // improvement factor
-   Inflator inflator_;  // inflator
+   size_t maxiter_;    // maxmum number of iterations
+   double tol_;        // improvement factor
+   Inflator inflator_; // inflator
 
-   Proof shrinkLeft(IntervalFunctionUni& f, Interval& x);
-   Proof shrinkRight(IntervalFunctionUni& f, Interval& x);
+   Proof shrinkLeft(IntervalFunctionUni &f, Interval &x);
+   Proof shrinkRight(IntervalFunctionUni &f, Interval &x);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -21,9 +21,9 @@
 #ifndef REALPAVER_ALIAS_HPP
 #define REALPAVER_ALIAS_HPP
 
+#include "realpaver/Term.hpp"
 #include <memory>
 #include <string>
-#include "realpaver/Term.hpp"
 
 namespace realpaver {
 
@@ -35,13 +35,13 @@ public:
     *
     * throws an exception if t has no variable.
     */
-   AliasRep(const std::string& name, Term t);
+   AliasRep(const std::string &name, Term t);
 
    /// No copy
-   AliasRep(const AliasRep&) = delete;
+   AliasRep(const AliasRep &) = delete;
 
    /// No assignment
-   AliasRep& operator=(const AliasRep&) = delete;
+   AliasRep &operator=(const AliasRep &) = delete;
 
    /// Default destructor
    ~AliasRep() = default;
@@ -56,9 +56,9 @@ public:
    Scope scope() const;
 
 private:
-   std::string name_;   // name
-   Term t_;             // term or expression
-   Scope scop_;         // scope of term
+   std::string name_; // name
+   Term t_;           // term or expression
+   Scope scop_;       // scope of term
 };
 
 /*----------------------------------------------------------------------------*/
@@ -76,13 +76,13 @@ public:
     *
     * throws an exception if t has no variable.
     */
-   Alias(const std::string& name, Term t);
+   Alias(const std::string &name, Term t);
 
    /// Default copy constructor
-   Alias(const Alias&) = default;
+   Alias(const Alias &) = default;
 
    /// Default assignment operator
-   Alias& operator=(const Alias&) = default;
+   Alias &operator=(const Alias &) = default;
 
    /// Default destructor
    ~Alias() = default;
@@ -97,12 +97,12 @@ public:
    Scope scope() const;
 
 private:
-   std::shared_ptr<AliasRep> rep_;  // representation
+   std::shared_ptr<AliasRep> rep_; // representation
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Alias& a);
+std::ostream &operator<<(std::ostream &os, const Alias &a);
 
-} // namespace
+} // namespace realpaver
 
 #endif

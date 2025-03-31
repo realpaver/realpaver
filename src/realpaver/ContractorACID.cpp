@@ -16,22 +16,21 @@
  * @brief  ACID contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
+#include "realpaver/ContractorACID.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorVarCID.hpp"
-#include "realpaver/ContractorACID.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
 ContractorACID::ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
-                               SharedContractor op, int ns3B, int nsCID,
-                               int learnLength, int cycleLength, double ctRatio,
-                               double varMinWidth)
-      : Contractor(),
-        ssr_(ssr),
-        op_(op)
+                               SharedContractor op, int ns3B, int nsCID, int learnLength,
+                               int cycleLength, double ctRatio, double varMinWidth)
+    : Contractor()
+    , ssr_(ssr)
+    , op_(op)
 {
    ASSERT(ssr_ != nullptr, "No smear sum rel object in ACID");
    ASSERT(op_ != nullptr, "No operator in ACID");
@@ -49,10 +48,10 @@ ContractorACID::ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
 
    ASSERT(n_ > 0, "No variable in ACID");
 
-   for (size_t i=0; i<n_; ++i)
+   for (size_t i = 0; i < n_; ++i)
    {
       Variable v = scop_.var(i);
-      ContractorVar3BCID* c3bc = new ContractorVar3BCID(op_, v, ns3B, nsCID);
+      ContractorVar3BCID *c3bc = new ContractorVar3BCID(op_, v, ns3B, nsCID);
       c3bc->setVarMinWidth(varMinWidth);
       var3BCID_.push_back(c3bc);
    }
@@ -89,13 +88,13 @@ SharedContractor ContractorACID::sliceContractor() const
    return op_;
 }
 
-Proof ContractorACID::contract(IntervalBox& B)
+Proof ContractorACID::contract(IntervalBox &B)
 {
    LOG_INTER("ACID call " << nbCalls_ << " on " << B);
    Proof proof = Proof::Maybe;
 
-   int nbvarmax = 5*scop_.size();
-   double* ctcGains = new double[nbvarmax];
+   int nbvarmax = 5 * scop_.size();
+   double *ctcGains = new double[nbvarmax];
 
    IntervalBox initbox(B);
    int vhandled;
@@ -107,11 +106,12 @@ Proof ContractorACID::contract(IntervalBox& B)
    {
       // first learning phase: one var3BCID per variable
       // next phases: two times the number of the previous number of var3BCID
-      vhandled = (nbCalls_ < learnLength_) ? n_ : 2*numVarCID_;
+      vhandled = (nbCalls_ < learnLength_) ? n_ : 2 * numVarCID_;
 
-      if (vhandled < 2) vhandled = 2;
+      if (vhandled < 2)
+         vhandled = 2;
 
-      for (int i =0; i<nbvarmax; i++)
+      for (int i = 0; i < nbvarmax; i++)
          ctcGains[i] = 0;
    }
    else
@@ -134,7 +134,7 @@ Proof ContractorACID::contract(IntervalBox& B)
 
    int stop = 0;
 
-   for (int i=0; i<vhandled; ++i)
+   for (int i = 0; i < vhandled; ++i)
    {
       size_t j = i % n_;
       Variable v = ssr_->getVar(j);
@@ -163,13 +163,13 @@ Proof ContractorACID::contract(IntervalBox& B)
    // learning phase: calculates the number of interesting variables
    if (mcall < learnLength_)
    {
-      sumGood_ += (proof == Proof::Empty) ?
-                     (stop+1) :
-                     lastSignificantGain(ctcGains, ctRatio_, vhandled-1);
+      sumGood_ += (proof == Proof::Empty)
+                      ? (stop + 1)
+                      : lastSignificantGain(ctcGains, ctRatio_, vhandled - 1);
    }
 
    // end of learning phase
-   if (mcall == learnLength_-1)
+   if (mcall == learnLength_ - 1)
    {
       // fixes the number of var cided for the next exploitation phases
       numVarCID_ = (int)(std::ceil((double)sumGood_ / learnLength_));
@@ -187,33 +187,29 @@ Proof ContractorACID::contract(IntervalBox& B)
    return proof;
 }
 
-void ContractorACID::print(std::ostream& os) const
+void ContractorACID::print(std::ostream &os) const
 {
    os << "ACID contractor";
 }
 
-int ContractorACID::lastSignificantGain(double* ctcGains,
-                                        double ctRatio,
-                                        int imax)
+int ContractorACID::lastSignificantGain(double *ctcGains, double ctRatio, int imax)
 {
    int i = imax;
 
-   while ((i>=0) && (ctcGains[i]<=ctRatio))
+   while ((i >= 0) && (ctcGains[i] <= ctRatio))
       --i;
 
-   return i+1;
+   return i + 1;
 }
 
-double ContractorACID::gainRatio(const IntervalBox& prev,
-                                 const IntervalBox& next,
-                                 const Scope& scop)
+double ContractorACID::gainRatio(const IntervalBox &prev, const IntervalBox &next,
+                                 const Scope &scop)
 {
    double s = 0.0;
 
-   for (const auto& v : scop)
+   for (const auto &v : scop)
    {
-      Interval x = next.get(v),
-               y = prev.get(v);
+      Interval x = next.get(v), y = prev.get(v);
 
       if (!x.isInf() && !y.isSingleton())
          s += (1.0 - x.width() / y.width());
@@ -222,4 +218,4 @@ double ContractorACID::gainRatio(const IntervalBox& prev,
    return s / scop.size();
 }
 
-} // namespace
+} // namespace realpaver

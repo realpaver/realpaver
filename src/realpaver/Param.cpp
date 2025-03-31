@@ -18,95 +18,94 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/Param.hpp"
+#include "realpaver/Exception.hpp"
+#include "realpaver/Interval.hpp"
 #include <fstream>
 #include <map>
 #include <sstream>
-#include "realpaver/Exception.hpp"
-#include "realpaver/Interval.hpp"
-#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
 Param Param::instance_;
 
 Param::Param()
-      : path_(""),
-        lineno_(0),
-        intmap_(),
-        dblmap_(),
-        strmap_()
+    : path_("")
+    , lineno_(0)
+    , intmap_()
+    , dblmap_()
+    , strmap_()
 {
    // integer
-   intmap_.insert(std::make_pair("NODE_LIMIT",                100000));
-   intmap_.insert(std::make_pair("DEPTH_LIMIT",               100));
-   intmap_.insert(std::make_pair("SOLUTION_LIMIT",            100));
-   intmap_.insert(std::make_pair("BC3_ITER_LIMIT",            30));
-   intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT",     20));
-   intmap_.insert(std::make_pair("LP_ITER_LIMIT",             50));
-   intmap_.insert(std::make_pair("FLOAT_PRECISION",           8));
-   intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY",        1));
-   intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT",   50));
-   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT",         30));
+   intmap_.insert(std::make_pair("NODE_LIMIT", 100000));
+   intmap_.insert(std::make_pair("DEPTH_LIMIT", 100));
+   intmap_.insert(std::make_pair("SOLUTION_LIMIT", 100));
+   intmap_.insert(std::make_pair("BC3_ITER_LIMIT", 30));
+   intmap_.insert(std::make_pair("UNI_NEWTON_ITER_LIMIT", 20));
+   intmap_.insert(std::make_pair("LP_ITER_LIMIT", 50));
+   intmap_.insert(std::make_pair("FLOAT_PRECISION", 8));
+   intmap_.insert(std::make_pair("BB_SPACE_FREQUENCY", 1));
+   intmap_.insert(std::make_pair("GAUSS_SEIDEL_ITER_LIMIT", 50));
+   intmap_.insert(std::make_pair("NEWTON_ITER_LIMIT", 30));
    intmap_.insert(std::make_pair("NEWTON_CERTIFY_ITER_LIMIT", 20));
-   intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT",     100));
-   intmap_.insert(std::make_pair("NB_SLICE_3B",               7));
-   intmap_.insert(std::make_pair("NB_SLICE_CID",              3));
-   intmap_.insert(std::make_pair("ACID_LEARN_LENGTH",         50));
-   intmap_.insert(std::make_pair("ACID_CYCLE_LENGTH",         1000));
-   intmap_.insert(std::make_pair("TRACE_FREQUENCY",           1000));
+   intmap_.insert(std::make_pair("NLP_SOLVER_ITER_LIMIT", 100));
+   intmap_.insert(std::make_pair("NB_SLICE_3B", 7));
+   intmap_.insert(std::make_pair("NB_SLICE_CID", 3));
+   intmap_.insert(std::make_pair("ACID_LEARN_LENGTH", 50));
+   intmap_.insert(std::make_pair("ACID_CYCLE_LENGTH", 1000));
+   intmap_.insert(std::make_pair("TRACE_FREQUENCY", 1000));
 
    // double
-   dblmap_.insert(std::make_pair("TIME_LIMIT",                100.0));
-   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR",           2.0));
-   dblmap_.insert(std::make_pair("LP_TIME_LIMIT",             10.0));
-   dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL",         1.0e-10));
-   dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP",      0.0));
-   dblmap_.insert(std::make_pair("GAUSSIAN_MIN_PIVOT",        1.0e-8));
-   dblmap_.insert(std::make_pair("INFLATION_DELTA",           1.125));
-   dblmap_.insert(std::make_pair("INFLATION_CHI",             1.0e-12));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT",     10.0));
-   dblmap_.insert(std::make_pair("ACID_CT_RATIO",             0.002));
-   dblmap_.insert(std::make_pair("NEWTON_WIDTH_LIMIT",        0.5));
+   dblmap_.insert(std::make_pair("TIME_LIMIT", 100.0));
+   dblmap_.insert(std::make_pair("BC3_PEEL_FACTOR", 2.0));
+   dblmap_.insert(std::make_pair("LP_TIME_LIMIT", 10.0));
+   dblmap_.insert(std::make_pair("RELAXATION_EQ_TOL", 1.0e-10));
+   dblmap_.insert(std::make_pair("SOLUTION_CLUSTER_GAP", 0.0));
+   dblmap_.insert(std::make_pair("GAUSSIAN_MIN_PIVOT", 1.0e-8));
+   dblmap_.insert(std::make_pair("INFLATION_DELTA", 1.125));
+   dblmap_.insert(std::make_pair("INFLATION_CHI", 1.0e-12));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_TIME_LIMIT", 10.0));
+   dblmap_.insert(std::make_pair("ACID_CT_RATIO", 0.002));
+   dblmap_.insert(std::make_pair("NEWTON_WIDTH_LIMIT", 0.5));
 
-
-   dblmap_.insert(std::make_pair("VAR_ABS_TOL",               1.0e-8));
-   dblmap_.insert(std::make_pair("VAR_REL_TOL",               0.0));
-   dblmap_.insert(std::make_pair("PROPAGATION_TOL",           1.0e-3));
-   dblmap_.insert(std::make_pair("NEWTON_TOL",                1.0e-3));
-   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_TOL",          1.0e-3));
-   dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH",        1.0e-11));
-   dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT",      0.45));
-   dblmap_.insert(std::make_pair("ACID_HC4_TOL",              1.0e-1));
-   dblmap_.insert(std::make_pair("LP_FEAS_TOL",               1.0e-8));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL",    0.0));
-   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL",    1.0e-4));
-   dblmap_.insert(std::make_pair("LOOP_CONTRACTOR_TOL",       1.0e-2));
-   dblmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP_TOL",    1.0e-1));
+   dblmap_.insert(std::make_pair("VAR_ABS_TOL", 1.0e-8));
+   dblmap_.insert(std::make_pair("VAR_REL_TOL", 0.0));
+   dblmap_.insert(std::make_pair("PROPAGATION_TOL", 1.0e-3));
+   dblmap_.insert(std::make_pair("NEWTON_TOL", 1.0e-3));
+   dblmap_.insert(std::make_pair("GAUSS_SEIDEL_TOL", 1.0e-3));
+   dblmap_.insert(std::make_pair("VAR3BCID_MIN_WIDTH", 1.0e-11));
+   dblmap_.insert(std::make_pair("SPLIT_INTERVAL_POINT", 0.45));
+   dblmap_.insert(std::make_pair("ACID_HC4_TOL", 1.0e-1));
+   dblmap_.insert(std::make_pair("LP_FEAS_TOL", 1.0e-8));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_ABS_TOL", 0.0));
+   dblmap_.insert(std::make_pair("NLP_SOLVER_OBJ_REL_TOL", 1.0e-4));
+   dblmap_.insert(std::make_pair("LOOP_CONTRACTOR_TOL", 1.0e-2));
+   dblmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP_TOL", 1.0e-1));
 
    // string
-   strmap_.insert(std::make_pair("BP_NODE_SELECTION",              "DFS"));
-   strmap_.insert(std::make_pair("SPLIT_OBJECTIVE",                "NO"));
-   strmap_.insert(std::make_pair("SPLIT_SELECTION",                "RR"));
-   strmap_.insert(std::make_pair("SPLIT_SLICING",                  "BI"));
-   strmap_.insert(std::make_pair("PROPAGATION_BASE",               "HC4"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON",        "NO"));
-   strmap_.insert(std::make_pair("LOG_LEVEL",                      "NONE"));
-   strmap_.insert(std::make_pair("TRACE",                          "NO"));
-   strmap_.insert(std::make_pair("SPLIT_INNER_BOX",                 "NO"));
-   strmap_.insert(std::make_pair("DISPLAY_REGION",                 "STD"));
-   strmap_.insert(std::make_pair("PREPROCESSING",                  "YES"));
-   strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM",           "DEFAULT"));
-   strmap_.insert(std::make_pair("CERTIFICATION",                  "YES"));
+   strmap_.insert(std::make_pair("BP_NODE_SELECTION", "DFS"));
+   strmap_.insert(std::make_pair("SPLIT_OBJECTIVE", "NO"));
+   strmap_.insert(std::make_pair("SPLIT_SELECTION", "RR"));
+   strmap_.insert(std::make_pair("SPLIT_SLICING", "BI"));
+   strmap_.insert(std::make_pair("PROPAGATION_BASE", "HC4"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_NEWTON", "NO"));
+   strmap_.insert(std::make_pair("LOG_LEVEL", "NONE"));
+   strmap_.insert(std::make_pair("TRACE", "NO"));
+   strmap_.insert(std::make_pair("SPLIT_INNER_BOX", "NO"));
+   strmap_.insert(std::make_pair("DISPLAY_REGION", "STD"));
+   strmap_.insert(std::make_pair("PREPROCESSING", "YES"));
+   strmap_.insert(std::make_pair("NLP_SOLVER_ALGORITHM", "DEFAULT"));
+   strmap_.insert(std::make_pair("CERTIFICATION", "YES"));
    strmap_.insert(std::make_pair("PROPAGATION_WITH_POLYTOPE_HULL", "NO"));
-   strmap_.insert(std::make_pair("POLYTOPE_HULL_RELAXATION",       "TAYLOR"));
-   strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_HANSEN",    "NO"));
-   strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_RANDOM",    "NO"));
-   strmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP",             "NO"));
-   strmap_.insert(std::make_pair("PROPAGATION_WITH_ACID",          "NO"));
-   strmap_.insert(std::make_pair("POLYTOPE_HULL_AFFINE_APPROX",    "MINRANGE"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_RELAXATION", "TAYLOR"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_HANSEN", "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_TAYLOR_RANDOM", "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_LOOP", "NO"));
+   strmap_.insert(std::make_pair("PROPAGATION_WITH_ACID", "NO"));
+   strmap_.insert(std::make_pair("POLYTOPE_HULL_AFFINE_APPROX", "MINRANGE"));
 }
 
-int Param::getIntParam(const std::string& name) const
+int Param::getIntParam(const std::string &name) const
 {
    auto it = intmap_.find(name);
 
@@ -116,12 +115,12 @@ int Param::getIntParam(const std::string& name) const
    return it->second;
 }
 
-int Param::GetIntParam(const std::string& name)
+int Param::GetIntParam(const std::string &name)
 {
    return instance_.getIntParam(name);
 }
 
-void Param::setIntParam(const std::string& name, int val)
+void Param::setIntParam(const std::string &name, int val)
 {
    auto it = intmap_.find(name);
 
@@ -131,12 +130,12 @@ void Param::setIntParam(const std::string& name, int val)
    intmap_[name] = val;
 }
 
-void Param::SetIntParam(const std::string& name, int val)
+void Param::SetIntParam(const std::string &name, int val)
 {
    instance_.setIntParam(name, val);
 }
 
-double Param::getDblParam(const std::string& name) const
+double Param::getDblParam(const std::string &name) const
 {
    auto it = dblmap_.find(name);
 
@@ -146,12 +145,12 @@ double Param::getDblParam(const std::string& name) const
    return it->second;
 }
 
-double Param::GetDblParam(const std::string& name)
+double Param::GetDblParam(const std::string &name)
 {
    return instance_.getDblParam(name);
 }
 
-void Param::setDblParam(const std::string& name, double val)
+void Param::setDblParam(const std::string &name, double val)
 {
    auto it = dblmap_.find(name);
 
@@ -161,12 +160,12 @@ void Param::setDblParam(const std::string& name, double val)
    dblmap_[name] = val;
 }
 
-void Param::SetDblParam(const std::string& name, double val)
+void Param::SetDblParam(const std::string &name, double val)
 {
    instance_.setDblParam(name, val);
 }
 
-std::string Param::getStrParam(const std::string& name) const
+std::string Param::getStrParam(const std::string &name) const
 {
    auto it = strmap_.find(name);
 
@@ -176,12 +175,12 @@ std::string Param::getStrParam(const std::string& name) const
    return it->second;
 }
 
-std::string Param::GetStrParam(const std::string& name)
+std::string Param::GetStrParam(const std::string &name)
 {
    return instance_.getStrParam(name);
 }
 
-void Param::setStrParam(const std::string& name, const std::string& val)
+void Param::setStrParam(const std::string &name, const std::string &val)
 {
    auto it = strmap_.find(name);
 
@@ -191,7 +190,7 @@ void Param::setStrParam(const std::string& name, const std::string& val)
    strmap_[name] = val;
 }
 
-void Param::SetStrParam(const std::string& name, const std::string& val)
+void Param::SetStrParam(const std::string &name, const std::string &val)
 {
    instance_.setStrParam(name, val);
 }
@@ -201,16 +200,19 @@ void Param::throwEx()
    THROW("Settings error in file '" << path_ << "' at line " << lineno_);
 }
 
-bool Param::isInt(const std::string& s)
+bool Param::isInt(const std::string &s)
 {
-   if (s.size() == 0) return false;
+   if (s.size() == 0)
+      return false;
 
    size_t i = 0;
-   if ((s[0] == '+') || (s[0] == '-')) ++i;
+   if ((s[0] == '+') || (s[0] == '-'))
+      ++i;
 
-   if (i == s.size()) return false;
+   if (i == s.size())
+      return false;
 
-   for (size_t j=i; j<s.size(); ++j)
+   for (size_t j = i; j < s.size(); ++j)
       if (!isDigit(s[j]))
          return false;
 
@@ -237,7 +239,7 @@ bool Param::isCharName(char c)
    return isLetter(c) || isDigit(c) || c == '_';
 }
 
-size_t Param::eatSpaces(const std::string& line, size_t first)
+size_t Param::eatSpaces(const std::string &line, size_t first)
 {
    size_t i = first;
 
@@ -247,14 +249,15 @@ size_t Param::eatSpaces(const std::string& line, size_t first)
    return i;
 }
 
-void Param::processParam(const std::string& name, const std::string& val)
+void Param::processParam(const std::string &name, const std::string &val)
 {
    // Double
    auto itd = dblmap_.find(name);
    if (itd != dblmap_.end())
    {
       Interval x(val);
-      if (x.isEmpty()) throwEx();
+      if (x.isEmpty())
+         throwEx();
 
       dblmap_[name] = x.right();
       return;
@@ -264,13 +267,15 @@ void Param::processParam(const std::string& name, const std::string& val)
    auto iti = intmap_.find(name);
    if (iti != intmap_.end())
    {
-      if (!isInt(val)) throwEx();
+      if (!isInt(val))
+         throwEx();
 
-      try {
+      try
+      {
          intmap_[name] = std::stoi(val);
          return;
       }
-      catch(std::exception& e)
+      catch (std::exception &e)
       {
          throwEx();
       }
@@ -288,50 +293,59 @@ void Param::processParam(const std::string& name, const std::string& val)
    throwEx();
 }
 
-void Param::readParam(const std::string& line, size_t first)
+void Param::readParam(const std::string &line, size_t first)
 {
    size_t i = first;
 
-   while (i < line.size() && isCharName(line[i])) ++i;
+   while (i < line.size() && isCharName(line[i]))
+      ++i;
 
-   if (i == line.size()) throwEx();
+   if (i == line.size())
+      throwEx();
 
    std::string name = line.substr(first, i - first);
 
    size_t j = eatSpaces(line, i);
 
-   if (j == line.size()) throwEx();
+   if (j == line.size())
+      throwEx();
 
-   if (line[j] != '=') throwEx();
+   if (line[j] != '=')
+      throwEx();
 
    // eats =
    ++j;
 
    size_t k = eatSpaces(line, j);
 
-   if (k == line.size()) throwEx();
+   if (k == line.size())
+      throwEx();
 
    size_t l = k;
 
-   while (l < line.size() && (!isSpace(line[l]))) ++l;
+   while (l < line.size() && (!isSpace(line[l])))
+      ++l;
 
    std::string val = line.substr(k, l - k);
 
    size_t p = eatSpaces(line, l);
-   if (p != line.size()) throwEx();
+   if (p != line.size())
+      throwEx();
 
    processParam(name, val);
 }
 
-void Param::processLine(const std::string& line)
+void Param::processLine(const std::string &line)
 {
    size_t i = eatSpaces(line, 0);
 
    // line with spaces
-   if (i == line.size()) return;
+   if (i == line.size())
+      return;
 
    // comment line
-   if (line[i] == '#') return;
+   if (line[i] == '#')
+      return;
 
    // line with a parameter
    if (isLetter(line[i]))
@@ -341,7 +355,7 @@ void Param::processLine(const std::string& line)
       throwEx();
 }
 
-void Param::loadParam(const std::string& filename)
+void Param::loadParam(const std::string &filename)
 {
    path_ = filename;
    std::ifstream f(filename);
@@ -353,7 +367,7 @@ void Param::loadParam(const std::string& filename)
 
       while (getline(f, line))
       {
-         ++ lineno_;
+         ++lineno_;
          processLine(line);
       }
    }
@@ -361,7 +375,7 @@ void Param::loadParam(const std::string& filename)
       THROW("file open error '" << filename << "'");
 }
 
-void Param::print(std::ostream& os) const
+void Param::print(std::ostream &os) const
 {
    std::map<std::string, std::string> smap;
    size_t lmax = 0;
@@ -373,7 +387,8 @@ void Param::print(std::ostream& os) const
       ostr << it->second;
       smap.insert(std::make_pair(it->first, ostr.str()));
       size_t l = it->first.length();
-      if (l > lmax) lmax = l;
+      if (l > lmax)
+         lmax = l;
    }
 
    // doubles
@@ -383,7 +398,8 @@ void Param::print(std::ostream& os) const
       ostr << it->second;
       smap.insert(std::make_pair(it->first, ostr.str()));
       size_t l = it->first.length();
-      if (l > lmax) lmax = l;
+      if (l > lmax)
+         lmax = l;
    }
 
    // strings
@@ -391,34 +407,37 @@ void Param::print(std::ostream& os) const
    {
       smap.insert(std::make_pair(it->first, it->second));
       size_t l = it->first.length();
-      if (l > lmax) lmax = l;
+      if (l > lmax)
+         lmax = l;
    }
 
    // prints the parameters
    for (auto it = smap.begin(); it != smap.end(); ++it)
    {
-      if (it != smap.begin()) os << "\n";
+      if (it != smap.begin())
+         os << "\n";
       os << it->first;
       size_t l = it->first.length();
-      for (size_t i=0; i<lmax-l; ++i) os << " ";
+      for (size_t i = 0; i < lmax - l; ++i)
+         os << " ";
       os << " = " << it->second;
    }
 }
 
-void Param::PrintParam(std::ostream& os)
+void Param::PrintParam(std::ostream &os)
 {
    instance_.print(os);
 }
 
-void Param::LoadParam(const std::string& filename)
+void Param::LoadParam(const std::string &filename)
 {
    instance_.loadParam(filename);
 }
 
-std::ostream& operator<<(std::ostream& os, const Param& prm)
+std::ostream &operator<<(std::ostream &os, const Param &prm)
 {
    prm.print(os);
    return os;
 }
 
-} // namespace
+} // namespace realpaver

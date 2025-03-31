@@ -16,30 +16,31 @@
  * @brief  Rewriting of terms
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/TermFixer.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-TermFixer::TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim)
-      : vvm_(vvm),
-        vim_(vim),
-        t_()
-{}
+TermFixer::TermFixer(VarVarMapType *vvm, VarIntervalMapType *vim)
+    : vvm_(vvm)
+    , vim_(vim)
+    , t_()
+{
+}
 
 Term TermFixer::getTerm() const
 {
    return t_;
 }
 
-void TermFixer::apply(const TermCst* t)
+void TermFixer::apply(const TermCst *t)
 {
    t_ = Term(t->getVal());
 }
 
-void TermFixer::apply(const TermVar* t)
+void TermFixer::apply(const TermVar *t)
 {
    auto it1 = vvm_->find(t->var());
    auto it2 = vim_->find(t->var());
@@ -57,7 +58,7 @@ void TermFixer::apply(const TermVar* t)
       t_ = Term(t->var());
 }
 
-void TermFixer::apply(const TermAdd* t)
+void TermFixer::apply(const TermAdd *t)
 {
    TermFixer vl(vvm_, vim_);
    t->left()->acceptVisitor(vl);
@@ -68,7 +69,7 @@ void TermFixer::apply(const TermAdd* t)
    t_ = vl.t_ + vr.t_;
 }
 
-void TermFixer::apply(const TermSub* t)
+void TermFixer::apply(const TermSub *t)
 {
    TermFixer vl(vvm_, vim_);
    t->left()->acceptVisitor(vl);
@@ -76,10 +77,10 @@ void TermFixer::apply(const TermSub* t)
    TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
 
-   t_ = vl.t_ - vr.t_;   
+   t_ = vl.t_ - vr.t_;
 }
 
-void TermFixer::apply(const TermMul* t)
+void TermFixer::apply(const TermMul *t)
 {
    TermFixer vl(vvm_, vim_);
    t->left()->acceptVisitor(vl);
@@ -90,7 +91,7 @@ void TermFixer::apply(const TermMul* t)
    t_ = vl.t_ * vr.t_;
 }
 
-void TermFixer::apply(const TermDiv* t)
+void TermFixer::apply(const TermDiv *t)
 {
    TermFixer vl(vvm_, vim_);
    t->left()->acceptVisitor(vl);
@@ -101,7 +102,7 @@ void TermFixer::apply(const TermDiv* t)
    t_ = vl.t_ / vr.t_;
 }
 
-void TermFixer::apply(const TermMin* t)
+void TermFixer::apply(const TermMin *t)
 {
    TermFixer vl(vvm_, vim_);
    t->left()->acceptVisitor(vl);
@@ -112,7 +113,7 @@ void TermFixer::apply(const TermMin* t)
    t_ = MIN(vl.t_, vr.t_);
 }
 
-void TermFixer::apply(const TermMax* t)
+void TermFixer::apply(const TermMax *t)
 {
    TermFixer vl(vvm_, vim_);
    t->left()->acceptVisitor(vl);
@@ -123,7 +124,7 @@ void TermFixer::apply(const TermMax* t)
    t_ = MAX(vl.t_, vr.t_);
 }
 
-void TermFixer::apply(const TermUsb* t)
+void TermFixer::apply(const TermUsb *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -131,7 +132,7 @@ void TermFixer::apply(const TermUsb* t)
    t_ = -vis.t_;
 }
 
-void TermFixer::apply(const TermAbs* t)
+void TermFixer::apply(const TermAbs *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -139,7 +140,7 @@ void TermFixer::apply(const TermAbs* t)
    t_ = abs(vis.t_);
 }
 
-void TermFixer::apply(const TermSgn* t)
+void TermFixer::apply(const TermSgn *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -147,7 +148,7 @@ void TermFixer::apply(const TermSgn* t)
    t_ = sgn(vis.t_);
 }
 
-void TermFixer::apply(const TermSqr* t)
+void TermFixer::apply(const TermSqr *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -155,7 +156,7 @@ void TermFixer::apply(const TermSqr* t)
    t_ = sqr(vis.t_);
 }
 
-void TermFixer::apply(const TermSqrt* t)
+void TermFixer::apply(const TermSqrt *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -163,7 +164,7 @@ void TermFixer::apply(const TermSqrt* t)
    t_ = sqrt(vis.t_);
 }
 
-void TermFixer::apply(const TermPow* t)
+void TermFixer::apply(const TermPow *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -171,7 +172,7 @@ void TermFixer::apply(const TermPow* t)
    t_ = pow(vis.t_, t->exponent());
 }
 
-void TermFixer::apply(const TermExp* t)
+void TermFixer::apply(const TermExp *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -179,7 +180,7 @@ void TermFixer::apply(const TermExp* t)
    t_ = exp(vis.t_);
 }
 
-void TermFixer::apply(const TermLog* t)
+void TermFixer::apply(const TermLog *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -187,7 +188,7 @@ void TermFixer::apply(const TermLog* t)
    t_ = log(vis.t_);
 }
 
-void TermFixer::apply(const TermCos* t)
+void TermFixer::apply(const TermCos *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -195,7 +196,7 @@ void TermFixer::apply(const TermCos* t)
    t_ = cos(vis.t_);
 }
 
-void TermFixer::apply(const TermSin* t)
+void TermFixer::apply(const TermSin *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -203,7 +204,7 @@ void TermFixer::apply(const TermSin* t)
    t_ = sin(vis.t_);
 }
 
-void TermFixer::apply(const TermTan* t)
+void TermFixer::apply(const TermTan *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -211,7 +212,7 @@ void TermFixer::apply(const TermTan* t)
    t_ = tan(vis.t_);
 }
 
-void TermFixer::apply(const TermCosh* t)
+void TermFixer::apply(const TermCosh *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -219,7 +220,7 @@ void TermFixer::apply(const TermCosh* t)
    t_ = cosh(vis.t_);
 }
 
-void TermFixer::apply(const TermSinh* t)
+void TermFixer::apply(const TermSinh *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -227,7 +228,7 @@ void TermFixer::apply(const TermSinh* t)
    t_ = sinh(vis.t_);
 }
 
-void TermFixer::apply(const TermTanh* t)
+void TermFixer::apply(const TermTanh *t)
 {
    TermFixer vis(vvm_, vim_);
    t->child()->acceptVisitor(vis);
@@ -235,4 +236,4 @@ void TermFixer::apply(const TermTanh* t)
    t_ = tanh(vis.t_);
 }
 
-} // namespace
+} // namespace realpaver

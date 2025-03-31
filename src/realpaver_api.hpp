@@ -16,7 +16,7 @@
  * @brief  Imports the main classes for solving nonlinear problems.
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"

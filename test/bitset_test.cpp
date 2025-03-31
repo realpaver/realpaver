@@ -1,5 +1,5 @@
-#include "test_config.hpp"
 #include "realpaver/Bitset.hpp"
+#include "test_config.hpp"
 
 void test_init_1()
 {
@@ -45,18 +45,21 @@ void test_flip_2()
    b.setOne(i);
    b.flipAll();
    TEST_TRUE(b.get(i) == 0);
-   TEST_TRUE(b.nbOnes() == n-1);
+   TEST_TRUE(b.nbOnes() == n - 1);
 }
 
 void test_and()
 {
    size_t n = 45, i = 7, j = 12, k = 22, l = 36;
    Bitset b1(n), b2(n);
-   b1.setOne(i); b1.setOne(j);
-   b2.setOne(i); b2.setOne(k); b2.setOne(l);
+   b1.setOne(i);
+   b1.setOne(j);
+   b2.setOne(i);
+   b2.setOne(k);
+   b2.setOne(l);
 
    Bitset b3(b1 & b2);
-      
+
    TEST_TRUE(b3.get(i) != 0);
    TEST_TRUE(b3.get(j) == 0);
    TEST_TRUE(b3.get(k) == 0);
@@ -68,11 +71,13 @@ void test_or()
 {
    size_t n = 500, i = 0, j = 229, k = 341, l = 499;
    Bitset b1(n), b2(n);
-   b1.setOne(i); b1.setOne(j);
-   b2.setOne(i); b2.setOne(l);
+   b1.setOne(i);
+   b1.setOne(j);
+   b2.setOne(i);
+   b2.setOne(l);
 
    Bitset b3(b1 | b2);
-      
+
    TEST_TRUE(b3.get(i) != 0);
    TEST_TRUE(b3.get(j) != 0);
    TEST_TRUE(b3.get(k) == 0);
@@ -84,9 +89,12 @@ void test_overlap()
 {
    size_t n = 220, i = 70, j = 102, k = 103, l = 199;
    Bitset b1(n), b2(n), b3(n);
-   b1.setOne(i); b1.setOne(j);
-   b2.setOne(j); b2.setOne(k);
-   b3.setOne(k); b3.setOne(l);
+   b1.setOne(i);
+   b1.setOne(j);
+   b2.setOne(j);
+   b2.setOne(k);
+   b3.setOne(k);
+   b3.setOne(l);
 
    TEST_TRUE(b1.overlaps(b2));
    TEST_TRUE(b2.overlaps(b3));
@@ -97,13 +105,14 @@ void test_not()
 {
    size_t n = 28, i = 3, j = 20;
    Bitset b1(n);
-   b1.setOne(i); b1.setOne(j);
+   b1.setOne(i);
+   b1.setOne(j);
    Bitset b2(~b1);
 
    TEST_TRUE(b2.get(i) == 0);
    TEST_TRUE(b2.get(j) == 0);
    TEST_TRUE(b2.nbZeros() == 2);
-   TEST_TRUE(b2.nbOnes() == n-2);
+   TEST_TRUE(b2.nbOnes() == n - 2);
 }
 
 int main()

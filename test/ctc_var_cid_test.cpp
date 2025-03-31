@@ -1,16 +1,16 @@
-#include "test_config.hpp"
-#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/ContractorConstraint.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 
 #include <memory>
 
 using namespace std;
 
-Problem* P;
+Problem *P;
 Variable x, y;
-ContractorVarCID* cid;
-IntervalBox* B;
+ContractorVarCID *cid;
+IntervalBox *B;
 
 void init()
 {
@@ -19,7 +19,7 @@ void init()
    y = P->addRealVar(0, 1, "y");
 
    B = new IntervalBox(P->scope());
-   Constraint c( x - y == 0 );
+   Constraint c(x - y == 0);
 
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
    cid = new ContractorVarCID(ctc, x, 3);

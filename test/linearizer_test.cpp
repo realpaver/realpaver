@@ -1,8 +1,8 @@
-#include "test_config.hpp"
 #include "realpaver/FlatFunction.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 
-Problem* P;
+Problem *P;
 Variable x, y, z;
 
 void init()
@@ -11,7 +11,6 @@ void init()
    x = P->addRealVar(-10, 10, "x");
    y = P->addRealVar(-10, 10, "y");
    z = P->addRealVar(-10, 10, "z");
-
 }
 
 void clean()
@@ -21,7 +20,6 @@ void clean()
 
 void test_1()
 {
-
 }
 
 int main()

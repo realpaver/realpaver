@@ -16,13 +16,14 @@
  * @brief  Base class of univariate interval functions
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/IntervalFunctionUni.hpp"
 
 namespace realpaver {
 
 IntervalFunctionUni::~IntervalFunctionUni()
-{}
+{
+}
 
-} // namespace
+} // namespace realpaver

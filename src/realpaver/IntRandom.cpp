@@ -18,21 +18,23 @@
  * @date   2024-26-11
  */
 
+#include "realpaver/IntRandom.hpp"
 #include <chrono>
 #include <limits>
-#include "realpaver/IntRandom.hpp"
 
 namespace realpaver {
 
 IntRandom::IntRandom()
-      : gen_(std::chrono::steady_clock::now().time_since_epoch().count()),
-        dis_(0, std::numeric_limits<int>::max())
-{}
+    : gen_(std::chrono::steady_clock::now().time_since_epoch().count())
+    , dis_(0, std::numeric_limits<int>::max())
+{
+}
 
 IntRandom::IntRandom(unsigned seed)
-      : gen_(seed),
-        dis_(0, std::numeric_limits<int>::max())
-{}
+    : gen_(seed)
+    , dis_(0, std::numeric_limits<int>::max())
+{
+}
 
 int IntRandom::next()
 {
@@ -41,7 +43,7 @@ int IntRandom::next()
 
 int IntRandom::next(int a, int b)
 {
-   return next() % (b-a+1);
+   return next() % (b - a + 1);
 }
 
 bool IntRandom::nextBool()
@@ -54,4 +56,4 @@ void IntRandom::reset()
    dis_.reset();
 }
 
-} // namespace
+} // namespace realpaver

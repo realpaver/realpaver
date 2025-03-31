@@ -16,22 +16,22 @@
  * @brief  Smear sum relative strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include <algorithm>
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include <algorithm>
 
 namespace realpaver {
 
 IntervalSmearSumRel::IntervalSmearSumRel(IntervalFunctionVector F)
-      : F_(F),
-        scop_(F.scope()),
-        ssr_()
+    : F_(F)
+    , scop_(F.scope())
+    , ssr_()
 {
-   for (size_t i=0; i<F_.nbVars(); ++i)
+   for (size_t i = 0; i < F_.nbVars(); ++i)
    {
-      Item itm = { scop_.var(i), 0.0 };
+      Item itm = {scop_.var(i), 0.0};
       ssr_.push_back(itm);
    }
 }
@@ -51,7 +51,7 @@ Variable IntervalSmearSumRel::getMaxVar() const
    size_t imax = 0;
    double smax = ssr_[0].val;
 
-   for (size_t i=0; i<F_.nbVars(); ++i)
+   for (size_t i = 0; i < F_.nbVars(); ++i)
    {
       double d = ssr_[i].val;
       if (d > smax)
@@ -63,7 +63,7 @@ Variable IntervalSmearSumRel::getMaxVar() const
    return ssr_[imax].var;
 }
 
-void IntervalSmearSumRel::calculate(const IntervalBox& B)
+void IntervalSmearSumRel::calculate(const IntervalBox &B)
 {
    IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
    RealMatrix S(F_.nbFuns(), F_.nbVars(), 0.0);
@@ -72,30 +72,30 @@ void IntervalSmearSumRel::calculate(const IntervalBox& B)
    F_.diff(B, jac);
 
    // calculates the relative smear values
-   for (size_t i=0; i<F_.nbFuns(); ++i)
+   for (size_t i = 0; i < F_.nbFuns(); ++i)
    {
       double sum = 0.0;
-      for (size_t j=0; j<F_.nbVars(); ++j)
+      for (size_t j = 0; j < F_.nbVars(); ++j)
       {
-         const auto& v = scop_.var(j);
+         const auto &v = scop_.var(j);
          double smear = jac.get(i, j).mag() * B.get(v).width();
          S.set(i, j, smear);
          sum += smear;
       }
       if (sum != 0.0)
       {
-         for (size_t j=0; j<F_.nbVars(); ++j)
+         for (size_t j = 0; j < F_.nbVars(); ++j)
             S.set(i, j, S.get(i, j) / sum);
       }
    }
 
    // calculates the smearRelSum values
-   for (size_t j=0; j<F_.nbVars(); ++j)
+   for (size_t j = 0; j < F_.nbVars(); ++j)
    {
       ssr_[j].var = scop_.var(j);
       ssr_[j].val = 0.0;
 
-      for (size_t i=0; i<F_.nbFuns(); ++i)
+      for (size_t i = 0; i < F_.nbFuns(); ++i)
          ssr_[j].val += S.get(i, j);
    }
 }
@@ -120,18 +120,18 @@ size_t IntervalSmearSumRel::nbVars() const
    return ssr_.size();
 }
 
-void IntervalSmearSumRel::print(std::ostream& os) const
+void IntervalSmearSumRel::print(std::ostream &os) const
 {
-   for (size_t i=0; i<ssr_.size(); ++i)
+   for (size_t i = 0; i < ssr_.size(); ++i)
    {
       os << "(" << ssr_[i].var.getName() << "," << ssr_[i].val << ") ";
    }
 }
 
-std::ostream& operator<<(std::ostream& os, const IntervalSmearSumRel& ssr)
+std::ostream &operator<<(std::ostream &os, const IntervalSmearSumRel &ssr)
 {
    ssr.print(os);
    return os;
 }
 
-} // namespace
+} // namespace realpaver

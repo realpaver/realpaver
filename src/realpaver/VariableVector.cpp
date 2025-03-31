@@ -18,22 +18,21 @@
  * @date   2024-4-11
  */
 
-#include <sstream>
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/VariableVector.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include <sstream>
 
 namespace realpaver {
 
-VariableVectorRep::VariableVectorRep(const std::string& name, int first,
-                                     int last)
-   : name_(name),
-     first_(first),
-     last_(last),
-     vars_()
+VariableVectorRep::VariableVectorRep(const std::string &name, int first, int last)
+    : name_(name)
+    , first_(first)
+    , last_(last)
+    , vars_()
 {
    ASSERT(first <= last, "Bad indexes for the creation of a variable vector");
 
-   for (int i=first; i<=last; ++i)
+   for (int i = first; i <= last; ++i)
    {
       std::ostringstream os;
       os << i;
@@ -44,35 +43,36 @@ VariableVectorRep::VariableVectorRep(const std::string& name, int first,
    }
 }
 
-void VariableVectorRep::print(std::ostream& os) const
+void VariableVectorRep::print(std::ostream &os) const
 {
    size_t p = vars_.size() - 1;
 
    os << "(";
-   for (size_t i=0; i<=p; ++i)
+   for (size_t i = 0; i <= p; ++i)
    {
       os << vars_[i].getName();
-      if (i<p) os << ", ";
+      if (i < p)
+         os << ", ";
    }
    os << ")";
 }
 
 Variable VariableVectorRep::get(int i) const
 {
-   ASSERT(i>= first_ && i<=last_, "Bad access in a variable vector @ " << i);
-   return vars_[i-first_];
+   ASSERT(i >= first_ && i <= last_, "Bad access in a variable vector @ " << i);
+   return vars_[i - first_];
 }
 
-void VariableVectorRep::setTolerance(const Tolerance& tol)
+void VariableVectorRep::setTolerance(const Tolerance &tol)
 {
-   for (auto& v : vars_)
+   for (auto &v : vars_)
       v.setTolerance(tol);
 }
 
 size_t VariableVectorRep::hashCode() const
 {
    size_t h = 0;
-   for (auto& v : vars_)
+   for (auto &v : vars_)
       h = hash2(h, v.hashCode());
    return h;
 }
@@ -94,11 +94,12 @@ int VariableVectorRep::lastIndex() const
 
 /*----------------------------------------------------------------------------*/
 
-VariableVector::VariableVector(const std::string& name, int first, int last)
-   : rep_(std::make_shared<VariableVectorRep>(name, first, last))
-{}
+VariableVector::VariableVector(const std::string &name, int first, int last)
+    : rep_(std::make_shared<VariableVectorRep>(name, first, last))
+{
+}
 
-void VariableVector::print(std::ostream& os) const
+void VariableVector::print(std::ostream &os) const
 {
    rep_->print(os);
 }
@@ -113,7 +114,7 @@ Variable VariableVector::operator[](int i) const
    return rep_->get(i);
 }
 
-VariableVector& VariableVector::setTolerance(const Tolerance& tol)
+VariableVector &VariableVector::setTolerance(const Tolerance &tol)
 {
    rep_->setTolerance(tol);
    return *this;
@@ -139,10 +140,10 @@ int VariableVector::lastIndex() const
    return rep_->lastIndex();
 }
 
-std::ostream& operator<<(std::ostream& os, const VariableVector& v)
+std::ostream &operator<<(std::ostream &os, const VariableVector &v)
 {
    v.print(os);
    return os;
 }
 
-} // namespace
+} // namespace realpaver

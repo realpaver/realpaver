@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "BroydenBanded-";
 
@@ -27,33 +27,35 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e2, 1e2]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << "*(2+5*x" << i << "^2)+1-(";
 
-      int p = std::max(1, i-5),
-          q = std::min(n, i+1);
+      int p = std::max(1, i - 5), q = std::min(n, i + 1);
       bool plus = false;
-      for (int j=p; j<=q; ++j)
+      for (int j = p; j <= q; ++j)
       {
          if (i != j)
          {
-            if (plus) of << "+";
+            if (plus)
+               of << "+";
             of << "x" << j << "*(1+x" << j << ")";
             plus = true;
          }
       }
       of << ") == 0";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl;
 

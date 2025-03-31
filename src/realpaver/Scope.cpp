@@ -18,27 +18,28 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/Scope.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
 ScopeRep::ScopeRep()
-      : m_(),
-        scopeMap_(nullptr),
-        hcode_(0),
-        minid_(0),
-        maxid_(0)
-{}
+    : m_()
+    , scopeMap_(nullptr)
+    , hcode_(0)
+    , minid_(0)
+    , maxid_(0)
+{
+}
 
-ScopeRep::ScopeRep(const ScopeRep& other)
-      : m_(other.m_),
-        scopeMap_(nullptr),
-        hcode_(other.hcode_),
-        minid_(other.minid_),
-        maxid_(other.maxid_)
+ScopeRep::ScopeRep(const ScopeRep &other)
+    : m_(other.m_)
+    , scopeMap_(nullptr)
+    , hcode_(other.hcode_)
+    , minid_(other.minid_)
+    , maxid_(other.maxid_)
 {
    if (other.scopeMap_ != nullptr)
       scopeMap_ = other.scopeMap_->clone();
@@ -50,8 +51,7 @@ ScopeRep::~ScopeRep()
       delete scopeMap_;
 }
 
-typename ScopeRep::const_iterator
-ScopeRep::find(const Variable& v)
+typename ScopeRep::const_iterator ScopeRep::find(const Variable &v)
 {
    auto it = m_.find(v);
    return const_iterator(it);
@@ -59,7 +59,7 @@ ScopeRep::find(const Variable& v)
 
 void ScopeRep::makeMap()
 {
-   if ((minid_ == 0) && (maxid_ == size()-1))
+   if ((minid_ == 0) && (maxid_ == size() - 1))
    {
       scopeMap_ = new ScopeIdMap(maxid_);
    }
@@ -69,7 +69,7 @@ void ScopeRep::makeMap()
    }
    else
    {
-      ScopeHashMap* aux = new ScopeHashMap();
+      ScopeHashMap *aux = new ScopeHashMap();
       for (auto it : m_)
          aux->insert(it.first.id());
 
@@ -84,7 +84,7 @@ size_t ScopeRep::size() const
    return m_.size();
 }
 
-size_t ScopeRep::index(const Variable& v) const
+size_t ScopeRep::index(const Variable &v) const
 {
    return scopeMap_->index(v.id());
 }
@@ -106,16 +106,14 @@ size_t ScopeRep::maxVarId() const
    return maxid_;
 }
 
-typename ScopeRep::const_iterator
-ScopeRep::begin() const
+typename ScopeRep::const_iterator ScopeRep::begin() const
 {
    return const_iterator(m_.cbegin());
 }
 
-typename ScopeRep::const_iterator
-ScopeRep::end() const
+typename ScopeRep::const_iterator ScopeRep::end() const
 {
-   return const_iterator(m_.cend());   
+   return const_iterator(m_.cend());
 }
 
 void ScopeRep::insert(Variable v, size_t n)
@@ -125,15 +123,15 @@ void ScopeRep::insert(Variable v, size_t n)
    if (it != m_.end())
    {
       if (it->first != v)
-         THROW("Bad insertion in a scope: two different variables " <<
-               "have the same index : " << v.id());
+         THROW("Bad insertion in a scope: two different variables "
+               << "have the same index : " << v.id());
 
       else
          it->second += n;
    }
    else
    {
-      m_.insert(std::make_pair(v,n));
+      m_.insert(std::make_pair(v, n));
       size_t id = v.id();
 
       if (size() == 1)
@@ -142,8 +140,10 @@ void ScopeRep::insert(Variable v, size_t n)
       }
       else
       {
-         if (id < minid_) minid_ = id;
-         if (id > maxid_) maxid_ = id;
+         if (id < minid_)
+            minid_ = id;
+         if (id > maxid_)
+            maxid_ = id;
       }
 
       if (scopeMap_ != nullptr)
@@ -153,7 +153,7 @@ void ScopeRep::insert(Variable v, size_t n)
    }
 }
 
-void ScopeRep::remove(const Variable& v)
+void ScopeRep::remove(const Variable &v)
 {
    auto it = m_.find(v);
    if (it != m_.cend())
@@ -169,11 +169,13 @@ void ScopeRep::remove(const Variable& v)
       {
          auto jt = m_.cbegin();
          minid_ = maxid_ = jt->first.id();
-         for (++jt; jt!=m_.cend(); ++jt)
+         for (++jt; jt != m_.cend(); ++jt)
          {
             size_t id = jt->first.id();
-            if (minid_ > id) minid_ = id;
-            if (maxid_ < id) maxid_ = id;
+            if (minid_ > id)
+               minid_ = id;
+            if (maxid_ < id)
+               maxid_ = id;
          }
 
          makeMap();
@@ -181,7 +183,7 @@ void ScopeRep::remove(const Variable& v)
    }
 }
 
-void ScopeRep::remove(const Variable& v, size_t n)
+void ScopeRep::remove(const Variable &v, size_t n)
 {
    auto it = m_.find(v);
    if (it != m_.end())
@@ -199,14 +201,16 @@ size_t ScopeRep::hashCode() const
    return hcode_;
 }
 
-void ScopeRep::print(std::ostream& os) const
+void ScopeRep::print(std::ostream &os) const
 {
    os << "{";
    bool first = true;
    for (auto it : m_)
    {
-      if (first) first = false;
-      else os << ", ";
+      if (first)
+         first = false;
+      else
+         os << ", ";
 
       os << it.first.getName();
    }
@@ -221,18 +225,21 @@ bool ScopeRep::isIdentity() const
 /*----------------------------------------------------------------------------*/
 
 Scope::Scope()
-      : rep_(std::make_shared< ScopeRep >())
-{}
+    : rep_(std::make_shared<ScopeRep>())
+{
+}
 
-Scope::Scope(const std::initializer_list<Variable>& l)
-      : rep_(std::make_shared<ScopeRep>())
+Scope::Scope(const std::initializer_list<Variable> &l)
+    : rep_(std::make_shared<ScopeRep>())
 {
    for (Variable v : l)
       insert(v);
 }
 
-Scope::Scope(std::shared_ptr<ScopeRep> rep) : rep_(rep)
-{}
+Scope::Scope(std::shared_ptr<ScopeRep> rep)
+    : rep_(rep)
+{
+}
 
 void Scope::insert(Variable v)
 {
@@ -257,15 +264,15 @@ void Scope::insert(Variable v, size_t n)
    rep_->insert(v, n);
 }
 
-void Scope::remove(const Variable& v)
+void Scope::remove(const Variable &v)
 {
    remove(v, 1);
 }
 
-void Scope::remove(const Variable& v, size_t n)
+void Scope::remove(const Variable &v, size_t n)
 {
    ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
-   
+
    if (isShared())
    {
       // copy-on-write (cow) pointer
@@ -287,12 +294,13 @@ bool Scope::isEmpty() const
    return size() == 0;
 }
 
-bool Scope::contains(const Variable& v) const
+bool Scope::contains(const Variable &v) const
 {
    auto it = rep_->find(v);
 
    // no variable having the same index
-   if (it == end()) return false;
+   if (it == end())
+      return false;
 
    // checks if the two variables correspond
    return (*it) == v;
@@ -312,7 +320,7 @@ size_t Scope::maxVarId() const
    return rep_->maxVarId();
 }
 
-void Scope::print(std::ostream& os) const
+void Scope::print(std::ostream &os) const
 {
    ASSERT(rep_ != nullptr, "Scope with null pointer");
 
@@ -333,7 +341,7 @@ typename Scope::const_iterator Scope::end() const
    return rep_->end();
 }
 
-typename Scope::const_iterator Scope::find(const Variable& v) const
+typename Scope::const_iterator Scope::find(const Variable &v) const
 {
    ASSERT(rep_ != nullptr, "Scope with null pointer");
 
@@ -351,7 +359,7 @@ typename Scope::const_iterator Scope::find(const Variable& v) const
    return it;
 }
 
-size_t Scope::index(const Variable& v) const
+size_t Scope::index(const Variable &v) const
 {
    ASSERT(rep_ != nullptr, "Scope with null pointer");
    ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
@@ -367,25 +375,25 @@ Variable Scope::var(size_t i) const
    return rep_->var(i);
 }
 
-void Scope::insert(const std::initializer_list<Variable>& l)
+void Scope::insert(const std::initializer_list<Variable> &l)
 {
    for (Variable v : l)
       insert(v);
 }
 
-void Scope::insert(const Scope& other)
+void Scope::insert(const Scope &other)
 {
    for (Variable v : other)
       insert(v, other.count(v));
 }
 
-void Scope::remove(const Scope& other)
+void Scope::remove(const Scope &other)
 {
    for (Variable v : other)
       remove(v, other.count(v));
 }
 
-size_t Scope::count(const Variable& v) const
+size_t Scope::count(const Variable &v) const
 {
    auto it = find(v);
    return (it == end()) ? 0 : it.count();
@@ -405,13 +413,13 @@ bool Scope::isShared() const
    return rep_ != nullptr && rep_.use_count() > 1;
 }
 
-std::ostream& operator<<(std::ostream& os, const Scope& s)
+std::ostream &operator<<(std::ostream &os, const Scope &s)
 {
    s.print(os);
    return os;
 }
 
-bool Scope::contains(const Scope& other) const
+bool Scope::contains(const Scope &other) const
 {
    for (auto it = other.begin(); it != other.end(); ++it)
    {
@@ -421,11 +429,13 @@ bool Scope::contains(const Scope& other) const
    return true;
 }
 
-bool Scope::disjoint(const Scope& other) const
+bool Scope::disjoint(const Scope &other) const
 {
-   if (minVarId() > other.maxVarId()) return true;
-   if (maxVarId() < other.minVarId()) return true;
-   
+   if (minVarId() > other.maxVarId())
+      return true;
+   if (maxVarId() < other.minVarId())
+      return true;
+
    for (auto v : *this)
    {
       if (other.contains(v))
@@ -434,12 +444,12 @@ bool Scope::disjoint(const Scope& other) const
    return true;
 }
 
-bool Scope::overlaps(const Scope& other) const
+bool Scope::overlaps(const Scope &other) const
 {
    return !disjoint(other);
 }
 
-bool Scope::operator==(const Scope& other) const
+bool Scope::operator==(const Scope &other) const
 {
    if (rep_.get() == other.rep_.get())
       return true;
@@ -450,7 +460,7 @@ bool Scope::operator==(const Scope& other) const
    return contains(other);
 }
 
-bool Scope::operator!=(const Scope& other) const
+bool Scope::operator!=(const Scope &other) const
 {
    return !operator==(other);
 }
@@ -463,7 +473,7 @@ Scope operator&(Scope s, Scope t)
    {
       auto jt = t.find(v);
       if (jt != t.end())
-         res.insert(v);         
+         res.insert(v);
    }
 
    return res;
@@ -474,10 +484,10 @@ Scope operator|(Scope s, Scope t)
    Scope res;
 
    for (auto it = s.begin(); it != s.end(); ++it)
-      res.insert(*it,it.count());
+      res.insert(*it, it.count());
 
    for (auto it = t.begin(); it != t.end(); ++it)
-      res.insert(*it,it.count());
+      res.insert(*it, it.count());
 
    return res;
 }
@@ -488,7 +498,8 @@ size_t Scope::nameMaxLength() const
    for (auto v : *this)
    {
       size_t n = v.getName().length();
-      if (n > l) l = n;
+      if (n > l)
+         l = n;
    }
    return l;
 }
@@ -498,4 +509,4 @@ bool Scope::isIdentity() const
    return rep_->isIdentity();
 }
 
-} // namespace
+} // namespace realpaver

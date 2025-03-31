@@ -16,35 +16,40 @@
  * @brief  Base class of environments for solvers
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Env.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-Env::Env() : param_(nullptr), tlim_(false), nlim_(false)
+Env::Env()
+    : param_(nullptr)
+    , tlim_(false)
+    , nlim_(false)
 {
    param_ = new Param();
 }
 
 Env::~Env()
 {
-   if (param_ != nullptr) delete param_;   
+   if (param_ != nullptr)
+      delete param_;
 }
 
-Env::Env(const Env& e)
+Env::Env(const Env &e)
 {
    param_ = new Param(*e.param_);
 }
 
-void Env::setParam(const Param& prm)
+void Env::setParam(const Param &prm)
 {
-   if (param_ != nullptr) delete param_;
+   if (param_ != nullptr)
+      delete param_;
    param_ = new Param(prm);
 }
 
-Param* Env::getParam() const
+Param *Env::getParam() const
 {
    return param_;
 }
@@ -89,4 +94,4 @@ bool Env::hasConstraintViolated() const
    return cviol_;
 }
 
-} // namespace
+} // namespace realpaver

@@ -16,19 +16,19 @@
  * @brief  Splitting strategies of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
+#include "realpaver/CSPSplit.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/CSPSplit.hpp"
 
 namespace realpaver {
 
 CSPSplit::CSPSplit(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : scop_(scop),
-        slicerMap_(smap.release()),
-        cont_(),
-        nbs_(0),
-        idx_(0)
+    : scop_(scop)
+    , slicerMap_(smap.release())
+    , cont_()
+    , nbs_(0)
+    , idx_(0)
 {
    ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
    ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
@@ -44,7 +44,7 @@ Scope CSPSplit::scope() const
    return scop_;
 }
 
-void CSPSplit::apply(SharedCSPNode& node, CSPContext& context)
+void CSPSplit::apply(SharedCSPNode &node, CSPContext &context)
 {
    LOG_INTER("Split node " << node->index() << ": " << (*node->box()));
 
@@ -66,22 +66,23 @@ size_t CSPSplit::getNbSplits() const
    return nbs_;
 }
 
-SharedCSPNode CSPSplit::cloneNode(const SharedCSPNode& node)
+SharedCSPNode CSPSplit::cloneNode(const SharedCSPNode &node)
 {
    SharedCSPNode aux = std::make_shared<CSPNode>(*node);
    aux->setIndex(++idx_);
-   aux->setDepth(1+node->depth());
+   aux->setDepth(1 + node->depth());
    aux->setParent(node->index());
    return aux;
 }
 
-void CSPSplit::splitOne(SharedCSPNode& node, Variable v)
+void CSPSplit::splitOne(SharedCSPNode &node, Variable v)
 {
-   Domain* dom = node->box()->get(v);
-   DomainSlicer* slicer = slicerMap_->getSlicer(dom->type());
+   Domain *dom = node->box()->get(v);
+   DomainSlicer *slicer = slicerMap_->getSlicer(dom->type());
 
    size_t n = slicer->apply(dom);
-   if (n < 2) return;
+   if (n < 2)
+      return;
 
    auto it = slicer->begin();
    while (it != slicer->end())
@@ -108,7 +109,7 @@ CSPSplit::iterator CSPSplit::end()
    return cont_.end();
 }
 
-DomainSlicerMap* CSPSplit::getSlicerMap() const
+DomainSlicerMap *CSPSplit::getSlicerMap() const
 {
    return slicerMap_;
 }
@@ -116,38 +117,39 @@ DomainSlicerMap* CSPSplit::getSlicerMap() const
 /*----------------------------------------------------------------------------*/
 
 CSPSplitRR::CSPSplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : CSPSplit(scop, std::move(smap))
-{}
+    : CSPSplit(scop, std::move(smap))
+{
+}
 
-void CSPSplitRR::applyImpl(SharedCSPNode& node, CSPContext& context)
+void CSPSplitRR::applyImpl(SharedCSPNode &node, CSPContext &context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node, context);
-   if (!res.first) return;
+   if (!res.first)
+      return;
    Variable v = res.second;
 
    // splits the variable domain
    splitOne(node, v);
 
-   LOG_INTER("Round-Robin selects " << v.getName()
-                                    << " in node " << node->index());
+   LOG_INTER("Round-Robin selects " << v.getName() << " in node " << node->index());
 
-   if (getNbNodes() < 2) return;
+   if (getNbNodes() < 2)
+      return;
 
    // assigns the split variable in the sub-nodes
    std::shared_ptr<CSPNodeInfoVar> info = std::make_shared<CSPNodeInfoVar>(v);
 
-   for (SharedCSPNode& aux : cont_)
+   for (SharedCSPNode &aux : cont_)
       context.insert(aux->index(), info);
 }
 
-std::pair<bool, Variable> CSPSplitRR::selectVar(SharedCSPNode& node,
-                                                 CSPContext& context)
+std::pair<bool, Variable> CSPSplitRR::selectVar(SharedCSPNode &node, CSPContext &context)
 {
-   DomainBox* box = node->box();
+   DomainBox *box = node->box();
 
-   std::shared_ptr<CSPNodeInfo>
-      info = context.getInfo(node->index(), CSPNodeInfoType::SplitVar);
+   std::shared_ptr<CSPNodeInfo> info =
+       context.getInfo(node->index(), CSPNodeInfoType::SplitVar);
 
    // assigns an iterator pointing to the next variable
    Scope::const_iterator it;
@@ -157,16 +159,17 @@ std::pair<bool, Variable> CSPSplitRR::selectVar(SharedCSPNode& node,
    }
    else
    {
-      CSPNodeInfoVar* infovar = static_cast<CSPNodeInfoVar*>(info.get());
+      CSPNodeInfoVar *infovar = static_cast<CSPNodeInfoVar *>(info.get());
       it = scop_.find(infovar->getVar());
       ++it;
-      if (it == scop_.end()) it = scop_.begin();
+      if (it == scop_.end())
+         it = scop_.begin();
    }
 
    bool found = false;
    size_t nb = 0;
 
-   while (!found && nb<scop_.size())
+   while (!found && nb < scop_.size())
    {
       if (box->isSplitable(*it))
       {
@@ -176,7 +179,8 @@ std::pair<bool, Variable> CSPSplitRR::selectVar(SharedCSPNode& node,
       {
          ++nb;
          ++it;
-         if (it == scop_.end()) it = scop_.begin();
+         if (it == scop_.end())
+            it = scop_.begin();
       }
    }
 
@@ -185,7 +189,7 @@ std::pair<bool, Variable> CSPSplitRR::selectVar(SharedCSPNode& node,
 
 /*----------------------------------------------------------------------------*/
 
-double domainSize(const Variable& v, Domain* dom)
+double domainSize(const Variable &v, Domain *dom)
 {
    double d;
 
@@ -201,36 +205,36 @@ double domainSize(const Variable& v, Domain* dom)
 }
 
 CSPSplitLF::CSPSplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : CSPSplit(scop, std::move(smap))
-{}
+    : CSPSplit(scop, std::move(smap))
+{
+}
 
-void CSPSplitLF::applyImpl(SharedCSPNode& node, CSPContext& context)
+void CSPSplitLF::applyImpl(SharedCSPNode &node, CSPContext &context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
-   if (!res.first) return;
+   if (!res.first)
+      return;
    Variable v = res.second;
 
    // splits the variable domain
    splitOne(node, v);
 
-   LOG_INTER("Largest-First selects " << v.getName()
-                                      << " in node " << node->index());
+   LOG_INTER("Largest-First selects " << v.getName() << " in node " << node->index());
 }
 
-std::pair<bool, Variable> CSPSplitLF::selectVar(SharedCSPNode& node)
+std::pair<bool, Variable> CSPSplitLF::selectVar(SharedCSPNode &node)
 {
    return selectVar(scop_, *node->box());
 }
 
-std::pair<bool, Variable> CSPSplitLF::selectVar(const Scope& scop,
-                                                 const DomainBox& box)
+std::pair<bool, Variable> CSPSplitLF::selectVar(const Scope &scop, const DomainBox &box)
 {
    Variable vres;
    double dres;
    bool found = false;
 
-   for (const auto& v : scop)
+   for (const auto &v : scop)
    {
       if (box.isSplitable(v))
       {
@@ -251,31 +255,32 @@ std::pair<bool, Variable> CSPSplitLF::selectVar(const Scope& scop,
 /*----------------------------------------------------------------------------*/
 
 CSPSplitSF::CSPSplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : CSPSplit(scop, std::move(smap))
-{}
+    : CSPSplit(scop, std::move(smap))
+{
+}
 
-void CSPSplitSF::applyImpl(SharedCSPNode& node, CSPContext& context)
+void CSPSplitSF::applyImpl(SharedCSPNode &node, CSPContext &context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
-   if (!res.first) return;
+   if (!res.first)
+      return;
    Variable v = res.second;
 
    // splits the variable domain
    splitOne(node, v);
 
-   LOG_INTER("Smallest-First selects " << v.getName()
-                                       << " in node " << node->index());
+   LOG_INTER("Smallest-First selects " << v.getName() << " in node " << node->index());
 }
 
-std::pair<bool, Variable> CSPSplitSF::selectVar(SharedCSPNode& node)
+std::pair<bool, Variable> CSPSplitSF::selectVar(SharedCSPNode &node)
 {
-   DomainBox* box = node->box();
+   DomainBox *box = node->box();
    Variable vres;
    double dres;
    bool found = false;
 
-   for (const auto& v : scop_)
+   for (const auto &v : scop_)
    {
       if (box->isSplitable(v))
       {
@@ -296,33 +301,35 @@ std::pair<bool, Variable> CSPSplitSF::selectVar(SharedCSPNode& node)
 /*----------------------------------------------------------------------------*/
 
 CSPSplitSLF::CSPSplitSLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-      : CSPSplit(scop, std::move(smap))
-{}
+    : CSPSplit(scop, std::move(smap))
+{
+}
 
-void CSPSplitSLF::applyImpl(SharedCSPNode& node, CSPContext& context)
+void CSPSplitSLF::applyImpl(SharedCSPNode &node, CSPContext &context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
-   if (!res.first) return;
+   if (!res.first)
+      return;
    Variable v = res.second;
 
    // splits the variable domain
    splitOne(node, v);
 
-   LOG_INTER("Smallest-Largest-First selects " << v.getName()
-                                               << " in node " << node->index());
+   LOG_INTER("Smallest-Largest-First selects " << v.getName() << " in node "
+                                               << node->index());
 }
 
-std::pair<bool, Variable> CSPSplitSLF::selectVar(SharedCSPNode& node)
+std::pair<bool, Variable> CSPSplitSLF::selectVar(SharedCSPNode &node)
 {
-   DomainBox* box = node->box();
+   DomainBox *box = node->box();
    Variable ivmin, rvmax;
    double idmin, rdmax;
    bool ifound, rfound;
 
    ifound = rfound = false;
 
-   for (const auto& v : scop_)
+   for (const auto &v : scop_)
    {
       if (box->isSplitable(v))
       {
@@ -335,7 +342,6 @@ std::pair<bool, Variable> CSPSplitSLF::selectVar(SharedCSPNode& node)
                rvmax = v;
                rdmax = d;
                rfound = true;
-
             }
          }
          else
@@ -350,36 +356,34 @@ std::pair<bool, Variable> CSPSplitSLF::selectVar(SharedCSPNode& node)
       }
    }
 
-   return (ifound) ? std::make_pair(ifound, ivmin) :
-                     std::make_pair(rfound, rvmax);
+   return (ifound) ? std::make_pair(ifound, ivmin) : std::make_pair(rfound, rvmax);
 }
 
 /*----------------------------------------------------------------------------*/
 
 CSPSplitSSR::CSPSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
-                           std::unique_ptr<DomainSlicerMap> smap)
-      : CSPSplit(ssr->scope(), std::move(smap)),
-        ssr_(ssr)
+                         std::unique_ptr<DomainSlicerMap> smap)
+    : CSPSplit(ssr->scope(), std::move(smap))
+    , ssr_(ssr)
 {
-   ASSERT(ssr != nullptr,
-          "No interval smear sum rel object in a splitting object");
+   ASSERT(ssr != nullptr, "No interval smear sum rel object in a splitting object");
 }
 
-void CSPSplitSSR::applyImpl(SharedCSPNode& node, CSPContext& context)
+void CSPSplitSSR::applyImpl(SharedCSPNode &node, CSPContext &context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node);
-   if (!res.first) return;
+   if (!res.first)
+      return;
    Variable v = res.second;
 
    // splits the variable domain
    splitOne(node, v);
 
-   LOG_INTER("Smear-Sum-Rel selects " << v.getName()
-                                      << " in node " << node->index());
+   LOG_INTER("Smear-Sum-Rel selects " << v.getName() << " in node " << node->index());
 }
 
-std::pair<bool, Variable> CSPSplitSSR::selectVar(SharedCSPNode& node)
+std::pair<bool, Variable> CSPSplitSSR::selectVar(SharedCSPNode &node)
 {
    IntervalBox B(*node->box());
    ssr_->calculate(B);
@@ -388,7 +392,7 @@ std::pair<bool, Variable> CSPSplitSSR::selectVar(SharedCSPNode& node)
    if (node->box()->isSplitable(v))
       return std::make_pair(true, v);
 
-   for (size_t i=0; i<ssr_->nbVars(); ++i)
+   for (size_t i = 0; i < ssr_->nbVars(); ++i)
    {
       v = ssr_->getVar(i);
       if (node->box()->isSplitable(v))
@@ -398,4 +402,4 @@ std::pair<bool, Variable> CSPSplitSSR::selectVar(SharedCSPNode& node)
    return std::make_pair(false, v);
 }
 
-} // namespace
+} // namespace realpaver

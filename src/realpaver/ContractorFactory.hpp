@@ -16,12 +16,11 @@
  * @brief  Factory of interval contractors
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_FACTORY_HPP
 #define REALPAVER_CONTRACTOR_FACTORY_HPP
 
-#include <vector>
 #include "realpaver/ContractorACID.hpp"
 #include "realpaver/ContractorBC4.hpp"
 #include "realpaver/ContractorDomain.hpp"
@@ -31,6 +30,7 @@
 #include "realpaver/Env.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
+#include <vector>
 
 namespace realpaver {
 
@@ -44,16 +44,16 @@ namespace realpaver {
 class ContractorFactory {
 public:
    /// Creates a factory given a problem and an environment for the parameters
-   ContractorFactory(const Problem& pbm, std::shared_ptr<Env> env);
+   ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env);
 
    /// Default destructor
    ~ContractorFactory() = default;
 
    /// No copy
-   ContractorFactory(const ContractorFactory&) = delete;
+   ContractorFactory(const ContractorFactory &) = delete;
 
    /// No assignment
-   ContractorFactory& operator=(const ContractorFactory&) = delete;
+   ContractorFactory &operator=(const ContractorFactory &) = delete;
 
    /// Returns the environment of this
    std::shared_ptr<Env> getEnv() const;
@@ -131,17 +131,17 @@ public:
    SharedContractorPolytope makePolytope();
 
 private:
-   std::shared_ptr<Env> env_;    // environment for parameters
-   SharedDag dag_;               // DAG of numerical constraints
-   std::vector<size_t> ve_;      // indexes of equations in the DAG
-   std::vector<size_t> vi_;      // indexes of inequalities in the DAG
-   std::vector<Constraint> vc_;  // other constraints
+   std::shared_ptr<Env> env_;   // environment for parameters
+   SharedDag dag_;              // DAG of numerical constraints
+   std::vector<size_t> ve_;     // indexes of equations in the DAG
+   std::vector<size_t> vi_;     // indexes of inequalities in the DAG
+   std::vector<Constraint> vc_; // other constraints
 
-   Scope se_;                    // scope of equations
-   Scope si_;                    // scope of inequalities
-   Scope sc_;                    // scope of the other constraints
+   Scope se_; // scope of equations
+   Scope si_; // scope of inequalities
+   Scope sc_; // scope of the other constraints
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

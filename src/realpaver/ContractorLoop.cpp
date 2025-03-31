@@ -16,15 +16,15 @@
  * @brief. Loop on a contractor
  * @author Laurent Granvilliers
  * @date   4-3-2025
-*/
+ */
 #include "realpaver/ContractorLoop.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
 
 ContractorLoop::ContractorLoop(SharedContractor op)
-      : op_(op),
-        tol_(Param::GetDblParam("LOOP_CONTRACTOR_TOL"))
+    : op_(op)
+    , tol_(Param::GetDblParam("LOOP_CONTRACTOR_TOL"))
 {
    ASSERT(op != nullptr, "Bad operator in the loop contractor");
 }
@@ -45,16 +45,16 @@ Scope ContractorLoop::scope() const
    return op_->scope();
 }
 
-Proof ContractorLoop::contract(IntervalBox& B)
+Proof ContractorLoop::contract(IntervalBox &B)
 {
-   ASSERT(B.scope().contains(op_->scope()),
-          "Bad scopes in the loop contractor");
+   ASSERT(B.scope().contains(op_->scope()), "Bad scopes in the loop contractor");
 
    bool iter = true;
    IntervalBox prev(B);
    while (iter)
    {
-      if (op_->contract(B) == Proof::Empty) return Proof::Empty;
+      if (op_->contract(B) == Proof::Empty)
+         return Proof::Empty;
       if (!B.improves(prev, tol_))
          iter = false;
       else
@@ -63,10 +63,10 @@ Proof ContractorLoop::contract(IntervalBox& B)
    return Proof::Maybe;
 }
 
-void ContractorLoop::print(std::ostream& os) const
+void ContractorLoop::print(std::ostream &os) const
 {
    os << "Loop contractor on ";
    op_->print(os);
 }
 
-} // namespace
+} // namespace realpaver

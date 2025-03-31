@@ -16,12 +16,11 @@
  * @brief  CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CSP_SOLVER_HPP
 #define REALPAVER_CSP_SOLVER_HPP
 
-#include <memory>
 #include "realpaver/CSPEnv.hpp"
 #include "realpaver/CSPPropagator.hpp"
 #include "realpaver/CSPSpace.hpp"
@@ -30,6 +29,7 @@
 #include "realpaver/Problem.hpp"
 #include "realpaver/Prover.hpp"
 #include "realpaver/Timer.hpp"
+#include <memory>
 
 namespace realpaver {
 
@@ -63,16 +63,16 @@ namespace realpaver {
 class CSPSolver {
 public:
    /// Constructor
-   CSPSolver(const Problem& problem);
+   CSPSolver(const Problem &problem);
 
    /// Destructor
    ~CSPSolver();
 
    /// No copy constructor
-   CSPSolver(const CSPSolver&) = delete;
+   CSPSolver(const CSPSolver &) = delete;
 
    /// No assignment
-   CSPSolver& operator=(const CSPSolver&) = delete;
+   CSPSolver &operator=(const CSPSolver &) = delete;
 
    /// Solving method
    void solve();
@@ -87,10 +87,10 @@ public:
    std::shared_ptr<CSPEnv> getEnv() const;
 
    /// Returns the space of this
-   CSPSpace* getSpace() const;
+   CSPSpace *getSpace() const;
 
    /// Returns the preprocessor used by this
-   Preprocessor* getPreprocessor() const;
+   Preprocessor *getPreprocessor() const;
 
    /// Returns the number of solutions after the preprocessing / solving phase
    size_t nbSolutions() const;
@@ -115,24 +115,24 @@ public:
    DomainBox getPendingBox(size_t i) const;
 
 private:
-   Problem* problem_;               // initial problem
-   Problem* preprob_;               // problem resulting from preprocessing
-   Preprocessor* preproc_;          // preprocessor
+   Problem *problem_;      // initial problem
+   Problem *preprob_;      // problem resulting from preprocessing
+   Preprocessor *preproc_; // preprocessor
 
-   CSPContext* context_;            // solving context for the BP algorithm
+   CSPContext *context_; // solving context for the BP algorithm
 
-   std::shared_ptr<CSPEnv> env_;    // environment
-   CSPSpace* space_;                // search tree
-   SharedDag dag_;                  // dag
-   CSPPropagator* propagator_;      // contraction method
-   CSPSplit* split_;                // splitting strategy
-   ContractorFactory* factory_;     // contractor factory
+   std::shared_ptr<CSPEnv> env_; // environment
+   CSPSpace *space_;             // search tree
+   SharedDag dag_;               // dag
+   CSPPropagator *propagator_;   // contraction method
+   CSPSplit *split_;             // splitting strategy
+   ContractorFactory *factory_;  // contractor factory
 
-   Prover* prover_;                 // solution prover
+   Prover *prover_; // solution prover
 
-   Timer stimer_;                   // timer for the solving phase
-   int nbnodes_;                    // number of nodes processed
-   bool withPreprocessing_;         // true if preprocessing enabled
+   Timer stimer_;           // timer for the solving phase
+   int nbnodes_;            // number of nodes processed
+   bool withPreprocessing_; // true if preprocessing enabled
 
    void branchAndPrune();
    void makeSpace();
@@ -140,10 +140,10 @@ private:
    void makeSplit();
    void bpStep(int depthlimit);
    void bpStepAux(SharedCSPNode node, int depthlimit);
-   bool isInner(DomainBox* box) const;
+   bool isInner(DomainBox *box) const;
    void certifySolutions();
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

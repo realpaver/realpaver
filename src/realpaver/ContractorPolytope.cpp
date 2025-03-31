@@ -18,23 +18,23 @@
  * @date   2025-fev-11
  */
 
+#include "realpaver/ContractorPolytope.hpp"
 #include "LPModel.hpp"
 #include "Scope.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
 
 ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
-      : Contractor(),
-        lzr_(std::move(lzr)),
-        maxseconds_(Param::GetDblParam("LP_TIME_LIMIT")),
-        maxiter_(Param::GetIntParam("LP_ITER_LIMIT")),
-        feastol_(Param::GetDblParam("LP_FEAS_TOL")),
-        loop_(Param::GetStrParam("POLYTOPE_HULL_LOOP") == "YES"),
-        looptol_(Param::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
+    : Contractor()
+    , lzr_(std::move(lzr))
+    , maxseconds_(Param::GetDblParam("LP_TIME_LIMIT"))
+    , maxiter_(Param::GetIntParam("LP_ITER_LIMIT"))
+    , feastol_(Param::GetDblParam("LP_FEAS_TOL"))
+    , loop_(Param::GetStrParam("POLYTOPE_HULL_LOOP") == "YES")
+    , looptol_(Param::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
 {
    ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
 }
@@ -46,8 +46,7 @@ double ContractorPolytope::getRelaxTol() const
 
 void ContractorPolytope::setRelaxTol(double tol)
 {
-   ASSERT(tol >= 0.0,
-          "The relaxation tolerance must be positive: " << tol);
+   ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
 
    lzr_->setRelaxTol(tol);
 }
@@ -84,28 +83,29 @@ double ContractorPolytope::getFeasTol() const
 
 void ContractorPolytope::setFeasTol(double tol)
 {
-   ASSERT(tol>0.0, "Bad tolerance in the polytope hull contractor");
+   ASSERT(tol > 0.0, "Bad tolerance in the polytope hull contractor");
 
    feastol_ = tol;
 }
 
 void ContractorPolytope::enforceLoop(bool loop, double tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0,
-          "A relative tolerance must belong to [0, 1]");
+   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
    loop_ = loop;
    looptol_ = tol;
 }
 
-Proof ContractorPolytope::contract(IntervalBox& B)
+Proof ContractorPolytope::contract(IntervalBox &B)
 {
-   if (!loop_) return contractImpl(B);
+   if (!loop_)
+      return contractImpl(B);
 
    bool iter = true;
    IntervalBox prev(B);
    while (iter)
    {
-      if (contractImpl(B) == Proof::Empty) return Proof::Empty;
+      if (contractImpl(B) == Proof::Empty)
+         return Proof::Empty;
       if (!B.improves(prev, looptol_))
          iter = false;
       else
@@ -114,7 +114,7 @@ Proof ContractorPolytope::contract(IntervalBox& B)
    return Proof::Maybe;
 }
 
-Proof ContractorPolytope::contractImpl(IntervalBox& B)
+Proof ContractorPolytope::contractImpl(IntervalBox &B)
 {
    LOG_INTER("Polytope hull contractor " << B);
 
@@ -124,24 +124,27 @@ Proof ContractorPolytope::contractImpl(IntervalBox& B)
 
    // linearizes the constraints
    bool ok = lzr_->make(solver, B);
-   if (!ok) return Proof::Maybe;
+   if (!ok)
+      return Proof::Maybe;
 
    LOG_LOW("Relaxation " << solver);
 
    // creates additional structures
-   int nv  = scope().size(),
-       nlb = nv-1,            // number of left bounds
-       nrb = nv,              // number of right bounds
-       *lb = new int[nlb],    // array of indexes of variables (left bounds)
-       *rb = new int[nrb],    // array of indexes of variables (right bounds)
-       iv  = 0;               // current variable t be handled
-   LPSense sense = LPSense::Min; // current optimization sense
+   int nv = scope().size(),
+       nlb = nv - 1,               // number of left bounds
+       nrb = nv,                   // number of right bounds
+           *lb = new int[nlb],     // array of indexes of variables (left bounds)
+               *rb = new int[nrb], // array of indexes of variables (right bounds)
+       iv = 0;                     // current variable t be handled
+   LPSense sense = LPSense::Min;   // current optimization sense
 
    // lb: 1, 2,, ..., n-1 (no need to record the left bound of the first var)
-   for (int i=0; i<nlb; ++i) lb[i] = i+1;
+   for (int i = 0; i < nlb; ++i)
+      lb[i] = i + 1;
 
    // rb: 0, 1, 2, ..., n-1 (right bounds of all the variables)
-   for (int i=0; i<nrb; ++i) rb[i] = i;
+   for (int i = 0; i < nrb; ++i)
+      rb[i] = i;
 
    Proof proof = run(solver, B, lb, nlb, rb, nrb, iv, sense);
 
@@ -151,15 +154,14 @@ Proof ContractorPolytope::contractImpl(IntervalBox& B)
    return proof;
 }
 
-Proof ContractorPolytope::run(LPSolver& solver, IntervalBox& B, int *lb,
-                              int& nlb, int *rb, int& nrb, int& iv,
-                              LPSense& sense)
+Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nlb,
+                              int *rb, int &nrb, int &iv, LPSense &sense)
 {
    Proof proof = Proof::Maybe;
    LPStatus status = LPStatus::Other;
-   while (iv>=0)
+   while (iv >= 0)
    {
-   // changes the cost
+      // changes the cost
       Variable v = scope().var(iv);
       LinVar lv = solver.getLinVar(lzr_->linVarIndex(v));
       LinExpr e({1.0}, {lv});
@@ -169,78 +171,73 @@ Proof ContractorPolytope::run(LPSolver& solver, IntervalBox& B, int *lb,
       LOG_LOW("LP solved: " << sense << " " << v.getName());
 
       // optimization
-      status = (status!=LPStatus::Optimal) ? solver.optimize() :
-                                             solver.reoptimize();
+      status = (status != LPStatus::Optimal) ? solver.optimize() : solver.reoptimize();
 
       LOG_LOW("Status : " << status);
 
-      switch(status)
+      switch (status)
       {
-         case LPStatus::Optimal:
-         {
-            double bnd = solver.certifiedCostSolution();
-            LOG_LOW("Certified cost: " << bnd);
-            LOG_LOW("Primal: " << solver.primalSolution());
+      case LPStatus::Optimal: {
+         double bnd = solver.certifiedCostSolution();
+         LOG_LOW("Certified cost: " << bnd);
+         LOG_LOW("Primal: " << solver.primalSolution());
 
-            Interval x = B.get(v);
-            if (sense == LPSense::Min)
-            {
-               if (bnd > x.right())
-               {
-                  iv = -1;
-                  proof = Proof::Empty;
-                  LOG_LOW("Empty box");
-               }
-               else if (bnd > x.left())
-               {
-                  Interval dom(bnd, x.right());
-                  B.set(v, dom);
-                  lv.setLB(bnd);
-                  LOG_LOW("New domain: " << dom);
-               }
-            }
-            else
-            {
-               if (bnd < x.left())
-               {
-                  iv = -1;
-                  proof = Proof::Empty;
-                  LOG_LOW("Empty box => stop");
-               }
-               else if (bnd < x.right())
-               {
-                  Interval dom(x.left(), bnd);
-                  B.set(v, dom);
-                  lv.setUB(bnd);
-                  LOG_LOW("New domain: " << dom);
-               }
-            }
-            break;
-         }
-         case LPStatus::Infeasible:
+         Interval x = B.get(v);
+         if (sense == LPSense::Min)
          {
-            iv = -1;    // infeasible (proved or not) => stop
-            if (solver.isCertifiedInfeasible())
+            if (bnd > x.right())
             {
+               iv = -1;
                proof = Proof::Empty;
-               LOG_LOW("Proved infeasible")
+               LOG_LOW("Empty box");
             }
-            break;
+            else if (bnd > x.left())
+            {
+               Interval dom(bnd, x.right());
+               B.set(v, dom);
+               lv.setLB(bnd);
+               LOG_LOW("New domain: " << dom);
+            }
          }
-         case LPStatus::StopOnIterLimit:
-         case LPStatus::StopOnTimeLimit:
+         else
          {
-            iv = -1;    // too expensive => stop
-            break;
+            if (bnd < x.left())
+            {
+               iv = -1;
+               proof = Proof::Empty;
+               LOG_LOW("Empty box => stop");
+            }
+            else if (bnd < x.right())
+            {
+               Interval dom(x.left(), bnd);
+               B.set(v, dom);
+               lv.setUB(bnd);
+               LOG_LOW("New domain: " << dom);
+            }
          }
-         default:
+         break;
+      }
+      case LPStatus::Infeasible: {
+         iv = -1; // infeasible (proved or not) => stop
+         if (solver.isCertifiedInfeasible())
          {
-            // other status => select the next variable
-            break;
+            proof = Proof::Empty;
+            LOG_LOW("Proved infeasible")
          }
+         break;
+      }
+      case LPStatus::StopOnIterLimit:
+      case LPStatus::StopOnTimeLimit: {
+         iv = -1; // too expensive => stop
+         break;
+      }
+      default: {
+         // other status => select the next variable
+         break;
+      }
       }
 
-      if (iv>=0)
+      if (iv >= 0)
       {
          if (status == LPStatus::Optimal)
             selectAchterberg(solver, B, lb, nlb, rb, nrb, iv, sense);
@@ -252,19 +249,20 @@ Proof ContractorPolytope::run(LPSolver& solver, IntervalBox& B, int *lb,
 
 #if LOG_ON
    LOG_INTER("Proof: " << proof);
-   if (proof != Proof::Empty) LOG_INTER("New box: " << B);
+   if (proof != Proof::Empty)
+      LOG_INTER("New box: " << B);
 #endif
 
    return proof;
 }
 
-void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
-                                          int *lb, int& nlb, int *rb, int& nrb,
-                                          int& iv, LPSense& sense)
+void ContractorPolytope::selectAchterberg(LPSolver &solver, IntervalBox &B, int *lb,
+                                          int &nlb, int *rb, int &nrb, int &iv,
+                                          LPSense &sense)
 {
    LOG_LOW("Achterberg's heuristics");
 
-   if (nlb+nrb==0)
+   if (nlb + nrb == 0)
    {
       iv = -1;
       return;
@@ -284,18 +282,17 @@ void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
    int j = 0;
    while (j < nlb)
    {
-      int jv = lb[j];   // index of variable in the scope
+      int jv = lb[j]; // index of variable in the scope
       Variable aux = scope().var(jv);
       LinVar lin = solver.getLinVar(lzr_->linVarIndex(aux));
-      double bnd = B.get(aux).left(),
-             sol = primal[lin.getIndex()],
+      double bnd = B.get(aux).left(), sol = primal[lin.getIndex()],
              delta = Double::abs(sol - bnd);
 
-      LOG_LOW("Var: " << aux.getName() << ", left: " << bnd
-                      << ", sol: " << sol << ", delta: " << delta);
+      LOG_LOW("Var: " << aux.getName() << ", left: " << bnd << ", sol: " << sol
+                      << ", delta: " << delta);
 
-      if ((Double::abs(bnd)<1.0 && delta<feastol_) ||
-          (Double::abs(bnd)>=1.0 && Double::abs(delta/bnd)<feastol_))
+      if ((Double::abs(bnd) < 1.0 && delta < feastol_) ||
+          (Double::abs(bnd) >= 1.0 && Double::abs(delta / bnd) < feastol_))
       {
          // the primal solution is close enough to the left bound
          // this bound can be discarded
@@ -304,7 +301,7 @@ void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
       }
       else
       {
-         if (delta<dist)
+         if (delta < dist)
          {
             // this bound minimizes the distance with its primal solution
             // (but it is not close enough acording to the tolerance)
@@ -320,18 +317,17 @@ void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
    j = 0;
    while (j < nrb)
    {
-      int jv = rb[j];   // index of variable in the scope
+      int jv = rb[j]; // index of variable in the scope
       Variable aux = scope().var(jv);
       LinVar lin = solver.getLinVar(lzr_->linVarIndex(aux));
-      double bnd = B.get(aux).right(),
-             sol = primal[lin.getIndex()],
+      double bnd = B.get(aux).right(), sol = primal[lin.getIndex()],
              delta = Double::abs(sol - bnd);
 
-      LOG_LOW("Var: " << aux.getName() << ", right: " << bnd
-                      << ", sol: " << sol << ", delta: " << delta);
+      LOG_LOW("Var: " << aux.getName() << ", right: " << bnd << ", sol: " << sol
+                      << ", delta: " << delta);
 
-      if ((Double::abs(bnd)<1.0 && delta<feastol_) ||
-         (Double::abs(bnd)>=1.0 && Double::abs(delta/bnd)<feastol_))
+      if ((Double::abs(bnd) < 1.0 && delta < feastol_) ||
+          (Double::abs(bnd) >= 1.0 && Double::abs(delta / bnd) < feastol_))
       {
          // the primal solution is close enough to the right bound
          // this bound can be discarded
@@ -340,7 +336,7 @@ void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
       }
       else
       {
-         if (delta<dist)
+         if (delta < dist)
          {
             // this bound minimizes the distance to the primal solution
             // (but it is not close enough acording to the tolerance)
@@ -352,7 +348,8 @@ void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
       }
    }
 
-   if (idx == -1) iv = -1;
+   if (idx == -1)
+      iv = -1;
    else
    {
       sense = sns;
@@ -369,16 +366,16 @@ void ContractorPolytope::selectAchterberg(LPSolver& solver, IntervalBox& B,
    }
 }
 
-void ContractorPolytope::selectNext(int *lb, int& nlb, int *rb, int& nrb,
-                                    int& iv, LPSense& sense)
+void ContractorPolytope::selectNext(int *lb, int &nlb, int *rb, int &nrb, int &iv,
+                                    LPSense &sense)
 {
-   if (nlb+nrb==0)
+   if (nlb + nrb == 0)
    {
       iv = -1;
       return;
    }
 
-   if ((nrb==0) || (nlb>0 && sense==LPSense::Max))
+   if ((nrb == 0) || (nlb > 0 && sense == LPSense::Max))
    {
       iv = lb[0];
       sense = LPSense::Min;
@@ -393,16 +390,16 @@ void ContractorPolytope::selectNext(int *lb, int& nlb, int *rb, int& nrb,
    LOG_LOW("Select next var: " << iv);
 }
 
-void ContractorPolytope::print(std::ostream& os) const
+void ContractorPolytope::print(std::ostream &os) const
 {
    os << "Polytope hull contractor";
 }
 
-void ContractorPolytope::tuneLPSolver(LPSolver& solver)
+void ContractorPolytope::tuneLPSolver(LPSolver &solver)
 {
    solver.setMaxIter(maxiter_);
    solver.setMaxSeconds(maxseconds_);
    solver.setFeasTol(feastol_);
 }
 
-} // namespace
+} // namespace realpaver

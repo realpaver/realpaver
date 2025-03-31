@@ -16,27 +16,28 @@
  * @brief  Rewriting of constraints
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-ConstraintFixer::ConstraintFixer(VarVarMapType* vvm, VarIntervalMapType* vim,
-                                 const DomainBox& box)
-      : vvm_(vvm),
-        vim_(vim),
-        box_(box),
-        c_()
-{}
+ConstraintFixer::ConstraintFixer(VarVarMapType *vvm, VarIntervalMapType *vim,
+                                 const DomainBox &box)
+    : vvm_(vvm)
+    , vim_(vim)
+    , box_(box)
+    , c_()
+{
+}
 
 Constraint ConstraintFixer::getConstraint() const
 {
    return c_;
 }
 
-void ConstraintFixer::apply(const ArithCtrEq* c)
+void ConstraintFixer::apply(const ArithCtrEq *c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -47,7 +48,7 @@ void ConstraintFixer::apply(const ArithCtrEq* c)
    c_ = (vl.getTerm() == vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ArithCtrLe* c)
+void ConstraintFixer::apply(const ArithCtrLe *c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -58,7 +59,7 @@ void ConstraintFixer::apply(const ArithCtrLe* c)
    c_ = (vl.getTerm() <= vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ArithCtrLt* c)
+void ConstraintFixer::apply(const ArithCtrLt *c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -69,7 +70,7 @@ void ConstraintFixer::apply(const ArithCtrLt* c)
    c_ = (vl.getTerm() < vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ArithCtrGe* c)
+void ConstraintFixer::apply(const ArithCtrGe *c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -80,7 +81,7 @@ void ConstraintFixer::apply(const ArithCtrGe* c)
    c_ = (vl.getTerm() >= vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ArithCtrGt* c)
+void ConstraintFixer::apply(const ArithCtrGt *c)
 {
    TermFixer vl(vvm_, vim_);
    c->left().acceptVisitor(vl);
@@ -91,7 +92,7 @@ void ConstraintFixer::apply(const ArithCtrGt* c)
    c_ = (vl.getTerm() > vr.getTerm());
 }
 
-void ConstraintFixer::apply(const ArithCtrIn* c)
+void ConstraintFixer::apply(const ArithCtrIn *c)
 {
    TermFixer vis(vvm_, vim_);
    c->term().acceptVisitor(vis);
@@ -99,13 +100,13 @@ void ConstraintFixer::apply(const ArithCtrIn* c)
    c_ = in(vis.getTerm(), c->image());
 }
 
-void ConstraintFixer::apply(const TableCtr* c)
+void ConstraintFixer::apply(const TableCtr *c)
 {
    // checks the consistent assignments with respect to the variable domains
    Bitset consistent(c->nbRows());
    consistent.setAllZero();
 
-   for (size_t i=0; i<c->nbRows(); ++i)
+   for (size_t i = 0; i < c->nbRows(); ++i)
    {
       size_t j = 0;
       bool cons = true;
@@ -120,21 +121,22 @@ void ConstraintFixer::apply(const TableCtr* c)
          }
          ++j;
       }
-      if (cons) consistent.setOne(i);
+      if (cons)
+         consistent.setOne(i);
    }
 
    // rewrites the constraint
    Constraint::SharedRep srep = std::make_shared<TableCtr>();
-   TableCtr* rep = static_cast<TableCtr*>(srep.get());
+   TableCtr *rep = static_cast<TableCtr *>(srep.get());
 
-   for (size_t j=0; j<c->nbCols(); ++j)
+   for (size_t j = 0; j < c->nbCols(); ++j)
    {
       auto it = vvm_->find(c->getVar(j));
       if (it != vvm_->end())
       {
          TableCtrCol col(it->second);
 
-         for (size_t i=0; i<c->nbRows(); ++i)
+         for (size_t i = 0; i < c->nbRows(); ++i)
             if (consistent.get(i))
                col.addValue(c->getVal(i, j));
 
@@ -144,7 +146,7 @@ void ConstraintFixer::apply(const TableCtr* c)
    c_ = Constraint(srep);
 }
 
-void ConstraintFixer::apply(const CondCtr* c)
+void ConstraintFixer::apply(const CondCtr *c)
 {
    ConstraintFixer fg(vvm_, vim_, box_);
    c->guard().acceptVisitor(fg);
@@ -152,10 +154,9 @@ void ConstraintFixer::apply(const CondCtr* c)
    ConstraintFixer bg(vvm_, vim_, box_);
    c->body().acceptVisitor(bg);
 
-   Constraint guard = fg.getConstraint(),
-              body = bg.getConstraint();
+   Constraint guard = fg.getConstraint(), body = bg.getConstraint();
 
    c_ = cond(guard, body);
 }
 
-} // namespace
+} // namespace realpaver

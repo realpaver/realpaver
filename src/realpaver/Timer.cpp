@@ -22,8 +22,12 @@
 
 namespace realpaver {
 
-Timer::Timer() : on_(false), start_(), total_()
-{}
+Timer::Timer()
+    : on_(false)
+    , start_()
+    , total_()
+{
+}
 
 void Timer::start()
 {
@@ -61,4 +65,4 @@ double Timer::elapsedTime() const
    return std::chrono::duration_cast<UnitType>(d).count() / 1000.0;
 }
 
-} // namespace
+} // namespace realpaver

@@ -18,10 +18,10 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/LPModel.hpp"
 #include "RealVector.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
-#include "realpaver/LPModel.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include <iostream>

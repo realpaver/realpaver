@@ -1,8 +1,8 @@
-#include "test_config.hpp"
 #include "realpaver/Preprocessor.hpp"
+#include "test_config.hpp"
 
-Problem* src;
-DomainBox* box;
+Problem *src;
+DomainBox *box;
 Variable x, y, z;
 
 void init()
@@ -14,7 +14,7 @@ void init()
 
    src->addCtr(x + 1 == 0);
    src->addCtr(x + y == 0);
-   src->addCtr(2*x - y + sqr(z) - z == 1);
+   src->addCtr(2 * x - y + sqr(z) - z == 1);
 
    box = new DomainBox(src->scope());
 }
@@ -31,7 +31,7 @@ void test_1()
    Problem dest;
 
    proc.apply(*src, dest);
-   
+
    TEST_TRUE(proc.hasFixedDomain(x));
    TEST_TRUE(proc.hasFixedDomain(y));
    TEST_FALSE(proc.hasFixedDomain(z));

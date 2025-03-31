@@ -92,8 +92,7 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Choice of corner in a LinearizerTaylor object
-enum class CornerStyle
-{
+enum class CornerStyle {
    Random,     ///< random with the current system time as seed
    RandomSeed, ///< random with a fixed seed
    User        ///< fixed by the user (useful for testing)
@@ -114,7 +113,8 @@ public:
     * used, false otherwise. The style specifies how the first corner is
     * selected.
     */
-   LinearizerTaylor(SharedDag dag, bool hansen = false, CornerStyle style = CornerStyle::RandomSeed);
+   LinearizerTaylor(SharedDag dag, bool hansen = false,
+                    CornerStyle style = CornerStyle::RandomSeed);
 
    /**
     * @brief Creates a creator for a subset of a DAG.

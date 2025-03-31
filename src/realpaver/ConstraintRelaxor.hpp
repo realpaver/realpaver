@@ -16,7 +16,7 @@
  * @brief  Relaxation of equations
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONSTRAINT_RELAXOR_HPP
 #define REALPAVER_CONSTRAINT_RELAXOR_HPP
@@ -27,7 +27,7 @@ namespace realpaver {
 
 /**
  * @brief Visitor used to relax a constraint.
- * 
+ *
  * Given a real number nu>0, every equation f(x) = 0 is relaxed as
  * f(x) in [-nu, +nu]. Every other constraint is not handled and the apply
  * method must raise an exception.
@@ -38,10 +38,10 @@ public:
    ConstraintRelaxor(double nu);
 
    /// Default copy constructor
-   ConstraintRelaxor(const ConstraintRelaxor&) = default;
+   ConstraintRelaxor(const ConstraintRelaxor &) = default;
 
    /// No assignment
-   ConstraintRelaxor& operator=(const ConstraintRelaxor&) = delete;
+   ConstraintRelaxor &operator=(const ConstraintRelaxor &) = delete;
 
    /// Default destructor
    ~ConstraintRelaxor() = default;
@@ -49,13 +49,13 @@ public:
    /// Returns the relaxed constraint after a visit
    Constraint getRelaxedCtr() const;
 
-   void apply(const ArithCtrEq* c) override;
+   void apply(const ArithCtrEq *c) override;
 
 private:
-   double nu_;             // relaxation value
-   Constraint relaxed_;    // new constraint after a visit
+   double nu_;          // relaxation value
+   Constraint relaxed_; // new constraint after a visit
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

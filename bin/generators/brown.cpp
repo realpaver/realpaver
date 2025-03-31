@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "Brown-";
 
@@ -27,30 +27,31 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e8, 1e8]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    string c = "1.1";
    of << "Constraints" << endl;
-   for (int i=1; i<n; ++i)
+   for (int i = 1; i < n; ++i)
    {
       of << "2*x" << i;
-      for (int j=1; j<=n; ++j)
+      for (int j = 1; j <= n; ++j)
       {
          if (i != j)
          {
-           of << "+" << "x" << j;
+            of << "+" << "x" << j;
          }
       }
-      of << " == " << n+1 << "," << endl;
+      of << " == " << n + 1 << "," << endl;
    }
 
-   for (int i=1; i<n; ++i)
+   for (int i = 1; i < n; ++i)
    {
       of << "x" << i << "*";
    }

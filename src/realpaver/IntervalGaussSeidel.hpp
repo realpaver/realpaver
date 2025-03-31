@@ -16,7 +16,7 @@
  * @brief  Interval Gauss Seidel method
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_GAUSS_SEIDEL_HPP
 #define REALPAVER_INTERVAL_GAUSS_SEIDEL_HPP
@@ -51,17 +51,16 @@ public:
    IntervalGaussSeidel();
 
    /// Default copy constructor
-   IntervalGaussSeidel(const IntervalGaussSeidel&) = default;
+   IntervalGaussSeidel(const IntervalGaussSeidel &) = default;
 
    /// No assignment
-   IntervalGaussSeidel& operator=(const IntervalGaussSeidel&) = delete;
+   IntervalGaussSeidel &operator=(const IntervalGaussSeidel &) = delete;
 
    /// Default destructor
    ~IntervalGaussSeidel() = default;
 
    /// Contracts x with respect to Ax = b and returns a certificate of proof
-   Proof contract(const IntervalMatrix& A, IntervalVector& x,
-                  const IntervalVector& b);
+   Proof contract(const IntervalMatrix &A, IntervalVector &x, const IntervalVector &b);
 
    /**
     * @brief Contraction method with preconditionning.
@@ -69,8 +68,8 @@ public:
     * Contracts x with respect to PAx = Pb and where P is the inverse of the
     * midpoint of A returns a certificate of proof
     */
-   Proof contractPrecond(const IntervalMatrix& A, IntervalVector& x,
-                         const IntervalVector& b);
+   Proof contractPrecond(const IntervalMatrix &A, IntervalVector &x,
+                         const IntervalVector &b);
 
    /// Sets a limit of iterations of the iterative method
    void setMaxIter(size_t n);
@@ -82,19 +81,18 @@ public:
    double getTol() const;
 
    /// Sets the improvement factor
-   void setTol(const double& tol);
+   void setTol(const double &tol);
 
 private:
-   size_t maxiter_;  // maximum number of iterations
-   double tol_;      // improvement factor
+   size_t maxiter_; // maximum number of iterations
+   double tol_;     // improvement factor
 
    // inner step
    // returns 0 if the system is not satisfiable; 1 if the system is satisfiable
    // but x is not improved enough, 2 otherwise
-   int innerStep(const IntervalMatrix& A, IntervalVector& x,
-                 const IntervalVector& b);
+   int innerStep(const IntervalMatrix &A, IntervalVector &x, const IntervalVector &b);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

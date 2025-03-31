@@ -16,20 +16,23 @@
  * @brief  Search context for CSPs
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPContext.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, CSPNodeInfoType typ)
+std::ostream &operator<<(std::ostream &os, CSPNodeInfoType typ)
 {
-   switch(typ)
+   switch (typ)
    {
-      case CSPNodeInfoType::SplitVar: return os << "split variable";
-      case CSPNodeInfoType::NbCID:    return os << "nb CID";
-      default: os.setstate(std::ios::failbit);
+   case CSPNodeInfoType::SplitVar:
+      return os << "split variable";
+   case CSPNodeInfoType::NbCID:
+      return os << "nb CID";
+   default:
+      os.setstate(std::ios::failbit);
    }
    return os;
 }
@@ -37,11 +40,13 @@ std::ostream& operator<<(std::ostream& os, CSPNodeInfoType typ)
 /*----------------------------------------------------------------------------*/
 
 CSPNodeInfo::CSPNodeInfo(CSPNodeInfoType typ)
-      : typ_(typ)
-{}
+    : typ_(typ)
+{
+}
 
 CSPNodeInfo::~CSPNodeInfo()
-{}
+{
+}
 
 CSPNodeInfoType CSPNodeInfo::getType() const
 {
@@ -51,9 +56,10 @@ CSPNodeInfoType CSPNodeInfo::getType() const
 /*----------------------------------------------------------------------------*/
 
 CSPNodeInfoVar::CSPNodeInfoVar(Variable v)
-      : CSPNodeInfo(CSPNodeInfoType::SplitVar),
-        v_(v)
-{}
+    : CSPNodeInfo(CSPNodeInfoType::SplitVar)
+    , v_(v)
+{
+}
 
 Variable CSPNodeInfoVar::getVar() const
 {
@@ -63,9 +69,10 @@ Variable CSPNodeInfoVar::getVar() const
 /*----------------------------------------------------------------------------*/
 
 CSPNodeInfoCID::CSPNodeInfoCID(int nbcid)
-      : CSPNodeInfo(CSPNodeInfoType::NbCID),
-        nbcid_(nbcid)
-{}
+    : CSPNodeInfo(CSPNodeInfoType::NbCID)
+    , nbcid_(nbcid)
+{
+}
 
 size_t CSPNodeInfoCID::getNbCID() const
 {
@@ -82,8 +89,8 @@ void CSPNodeInfoCID::setNbCID(size_t nbcid)
 void CSPContext::insert(int index, std::shared_ptr<CSPNodeInfo> info)
 {
    ASSERT(!hasInfo(index, info->getType()),
-          "Info '" << info->getType()
-                   << "' already present in the map for node " << index);
+          "Info '" << info->getType() << "' already present in the map for node "
+                   << index);
 
    auto it = map_.find(index);
    if (it == map_.end())
@@ -108,8 +115,7 @@ void CSPContext::remove(int index)
    map_.erase(index);
 }
 
-std::shared_ptr<CSPNodeInfo>
-CSPContext::getInfo(int index, CSPNodeInfoType typ) const
+std::shared_ptr<CSPNodeInfo> CSPContext::getInfo(int index, CSPNodeInfoType typ) const
 {
    auto it = map_.find(index);
    if (it == map_.end())
@@ -117,7 +123,7 @@ CSPContext::getInfo(int index, CSPNodeInfoType typ) const
 
    else
    {
-      for (const auto& info : it->second)
+      for (const auto &info : it->second)
          if (info->getType() == typ)
             return info;
 
@@ -133,7 +139,7 @@ bool CSPContext::hasInfo(int index, CSPNodeInfoType typ) const
 
    else
    {
-      for (const auto& info : it->second)
+      for (const auto &info : it->second)
          if (info->getType() == typ)
             return true;
 
@@ -141,4 +147,4 @@ bool CSPContext::hasInfo(int index, CSPNodeInfoType typ) const
    }
 }
 
-} // namespace
+} // namespace realpaver

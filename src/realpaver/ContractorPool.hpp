@@ -16,13 +16,13 @@
  * @brief  Classes of pools of contractoirs
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_POOL_HPP
 #define REALPAVER_CONTRACTOR_POOL_HPP
 
-#include <memory>
 #include "realpaver/Contractor.hpp"
+#include <memory>
 
 namespace realpaver {
 
@@ -39,10 +39,10 @@ public:
    ContractorPool();
 
    /// Default copy constructor
-   ContractorPool(const ContractorPool&) = default;
+   ContractorPool(const ContractorPool &) = default;
 
    /// No assignment
-   ContractorPool& operator=(const ContractorPool&) = delete;
+   ContractorPool &operator=(const ContractorPool &) = delete;
 
    /// Default destructor
    ~ContractorPool() = default;
@@ -60,13 +60,13 @@ public:
    SharedContractor contractorAt(size_t i) const;
 
    /// Returns the number of contractors depending on v
-   size_t depSize(const Variable& v) const;
+   size_t depSize(const Variable &v) const;
 
    /// Returns the index in this pool of the i-th contractor depending on v
-   size_t depAt(const Variable& v, size_t i) const;
+   size_t depAt(const Variable &v, size_t i) const;
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
 private:
    std::vector<SharedContractor> v_;
@@ -85,6 +85,6 @@ private:
 /// Type of shared contractor pools
 using SharedContractorPool = std::shared_ptr<ContractorPool>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

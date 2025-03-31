@@ -48,15 +48,15 @@ public:
    double elapsedTime() const;
 
 private:
-   using PointType    = std::chrono::time_point<std::chrono::system_clock>;
+   using PointType = std::chrono::time_point<std::chrono::system_clock>;
    using DurationType = std::chrono::duration<double>;
-   using UnitType     = std::chrono::milliseconds;
+   using UnitType = std::chrono::milliseconds;
 
-   bool on_;                  // true if this is started
-   PointType start_;          // last starting time point
-   DurationType total_;       // accumulated elapsed time
+   bool on_;            // true if this is started
+   PointType start_;    // last starting time point
+   DurationType total_; // accumulated elapsed time
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

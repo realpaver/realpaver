@@ -37,10 +37,10 @@ public:
    Tolerance(double rtol = 0.0, double atol = 0.0);
 
    /// Default copy constructor
-   Tolerance(const Tolerance&) = default;
+   Tolerance(const Tolerance &) = default;
 
    /// Default assignment operator
-   Tolerance& operator=(const Tolerance&) = default;
+   Tolerance &operator=(const Tolerance &) = default;
 
    /// Default destructor
    ~Tolerance() = default;
@@ -64,10 +64,10 @@ public:
     * if abs(b-a) <= max(rtol*max(abs(b), abs(a)), atol) where x=[a,b], atol
     * and rtol are respectively absolute and relative tolerances
     */
-   bool isTight(const Interval& x) const;
+   bool isTight(const Interval &x) const;
 
    /// Return true if every component of X is tight enough, false otherwise
-   bool isTight(const IntervalVector& X) const;
+   bool isTight(const IntervalVector &X) const;
 
    /**
     * @brief Gets the largest interval having this tolerance.
@@ -91,16 +91,16 @@ public:
     * Returns 0 if x is empty, 1 if x is canonical, the width of x divided
     * by the absolute tolerance of this rounded upward otherwise
     */
-   double discreteSize(const Interval& x) const;
+   double discreteSize(const Interval &x) const;
 
 private:
-   double rtol_;   // relative tolerance
-   double atol_;   // absolute tolerance
+   double rtol_; // relative tolerance
+   double atol_; // absolute tolerance
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Tolerance& tol);
+std::ostream &operator<<(std::ostream &os, const Tolerance &tol);
 
-} // namespace
+} // namespace realpaver
 
 #endif

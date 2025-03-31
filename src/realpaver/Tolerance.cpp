@@ -18,15 +18,15 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/Tolerance.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
-#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
 Tolerance::Tolerance(double rtol, double atol)
-      : rtol_(rtol),
-        atol_(atol)
+    : rtol_(rtol)
+    , atol_(atol)
 {
    ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
    ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
@@ -56,7 +56,7 @@ void Tolerance::setAbsTol(double val)
    atol_ = val;
 }
 
-bool Tolerance::isTight(const Interval& x) const
+bool Tolerance::isTight(const Interval &x) const
 {
    if (x.isEmpty())
       return false;
@@ -68,9 +68,9 @@ bool Tolerance::isTight(const Interval& x) const
       return Double::isClose(x.left(), x.right(), rtol_, atol_);
 }
 
-bool Tolerance::isTight(const IntervalVector& X) const
+bool Tolerance::isTight(const IntervalVector &X) const
 {
-   for (size_t i=0; i<X.size(); ++i)
+   for (size_t i = 0; i < X.size(); ++i)
       if (!isTight(X.get(i)))
          return false;
 
@@ -87,7 +87,7 @@ double maxIntervalDnRel(double ub, double rtol)
 {
    if (ub > 1.0)
    {
-      Interval v(rtol), lb(ub*(1.0-v)/(1.0+v));
+      Interval v(rtol), lb(ub * (1.0 - v) / (1.0 + v));
       return lb.right();
    }
    else if (ub <= -1.0)
@@ -98,7 +98,7 @@ double maxIntervalDnRel(double ub, double rtol)
       }
       else
       {
-         Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+         Interval v(rtol), lb(ub * (1.0 + v) / (1.0 - v));
          return lb.right();
       }
    }
@@ -120,7 +120,7 @@ double maxIntervalDnRel(double ub, double rtol)
          }
          else
          {
-            Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+            Interval v(rtol), lb(ub * (1.0 + v) / (1.0 - v));
             return lb.right();
          }
       }
@@ -152,8 +152,7 @@ Interval Tolerance::maxIntervalDn(double ub) const
 
    else
    {
-      double lb1 = maxIntervalDnAbs(ub, atol_),
-             lb2 = maxIntervalDnRel(ub, rtol_);
+      double lb1 = maxIntervalDnAbs(ub, atol_), lb2 = maxIntervalDnRel(ub, rtol_);
       return Interval(Double::min(lb1, lb2), ub);
    }
 }
@@ -163,7 +162,7 @@ Interval Tolerance::maxIntervalUp(double lb) const
    return -maxIntervalDn(-lb);
 }
 
-double Tolerance::discreteSize(const Interval& x) const
+double Tolerance::discreteSize(const Interval &x) const
 {
    if (x.isEmpty())
       return 0.0;
@@ -177,18 +176,16 @@ double Tolerance::discreteSize(const Interval& x) const
    else
    {
       // absolute
-      double a = x.width() / atol_,
-             b = Double::floor(a);
+      double a = x.width() / atol_, b = Double::floor(a);
 
-      return (a == b) ? b : b+1.0;
+      return (a == b) ? b : b + 1.0;
    }
 }
 
-std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
+std::ostream &operator<<(std::ostream &os, const Tolerance &tol)
 {
-   os << "tol(" << tol.getRelTol() << ", "
-      << tol.getAbsTol() << ")";
+   os << "tol(" << tol.getRelTol() << ", " << tol.getAbsTol() << ")";
    return os;
 }
 
-} // namespace
+} // namespace realpaver

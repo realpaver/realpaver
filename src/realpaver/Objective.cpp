@@ -18,15 +18,16 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Objective.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 ObjectiveRep::ObjectiveRep(Term f, bool minimization)
-      : f_(f),
-        minimization_(minimization)
-{}
+    : f_(f)
+    , minimization_(minimization)
+{
+}
 
 Term ObjectiveRep::getTerm() const
 {
@@ -38,7 +39,7 @@ bool ObjectiveRep::isConstant() const
    return f_.isConstant();
 }
 
-bool ObjectiveRep::dependsOn(const Variable& v) const
+bool ObjectiveRep::dependsOn(const Variable &v) const
 {
    return f_.dependsOn(v);
 }
@@ -55,14 +56,15 @@ bool ObjectiveRep::isMinimization() const
 
 bool ObjectiveRep::isMaximization() const
 {
-   return !minimization_; 
+   return !minimization_;
 }
 
 /*----------------------------------------------------------------------------*/
 
 Objective::Objective(Term f, bool minimization)
-      : rep_(std::make_shared<ObjectiveRep>(f, minimization))
-{}
+    : rep_(std::make_shared<ObjectiveRep>(f, minimization))
+{
+}
 
 Term Objective::getTerm() const
 {
@@ -74,7 +76,7 @@ bool Objective::isConstant() const
    return rep_->isConstant();
 }
 
-bool Objective::dependsOn(const Variable& v) const
+bool Objective::dependsOn(const Variable &v) const
 {
    return rep_->dependsOn(v);
 }
@@ -91,7 +93,7 @@ bool Objective::isMinimization() const
 
 bool Objective::isMaximization() const
 {
-   return rep_->isMaximization(); 
+   return rep_->isMaximization();
 }
 
 Objective MIN(Term f)
@@ -104,7 +106,7 @@ Objective MAX(Term f)
    return Objective(f, false);
 }
 
-std::ostream& operator<<(std::ostream& os, Objective obj)
+std::ostream &operator<<(std::ostream &os, Objective obj)
 {
    if (obj.isMaximization())
       os << "MAX ";
@@ -114,4 +116,4 @@ std::ostream& operator<<(std::ostream& os, Objective obj)
    return os << obj.getTerm();
 }
 
-} // namespace
+} // namespace realpaver

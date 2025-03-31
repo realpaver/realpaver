@@ -16,7 +16,7 @@
  * @brief  Vector of intervals
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_VECTOR_HPP
 #define REALPAVER_INTERVAL_VECTOR_HPP
@@ -41,31 +41,31 @@ public:
    using BaseType = NumericVector<Interval>;
 
    /// Creates a vector with n elements assigned to x
-   IntervalVector(size_t n = 0, const Interval& x = Interval::universe());
+   IntervalVector(size_t n = 0, const Interval &x = Interval::universe());
 
    /// Creates a vector from a list
-   IntervalVector(const std::initializer_list<Interval>& l);
+   IntervalVector(const std::initializer_list<Interval> &l);
 
    /// Copy constructor
-   IntervalVector(const RealVector& pt);
+   IntervalVector(const RealVector &pt);
 
    /// Default copy constructor
-   IntervalVector(const IntervalVector&) = default;
+   IntervalVector(const IntervalVector &) = default;
 
    /// Default assignment operator
-   IntervalVector& operator=(const IntervalVector&) = default;
+   IntervalVector &operator=(const IntervalVector &) = default;
 
    /// Virtual destructor
    virtual ~IntervalVector();
 
    /// Returns true if this == X
-   bool equals(const IntervalVector& X) const;
+   bool equals(const IntervalVector &X) const;
 
    /// Returns the i-th element of this
    Interval get(size_t i) const;
 
    /// Sets the i-th element of this to x
-   void set(size_t i, const Interval& x);
+   void set(size_t i, const Interval &x);
 
    /// Assigns this to the empty vector (assigns the first component to empty)
    void setEmpty();
@@ -94,7 +94,7 @@ public:
     * Let res be the result. For each i, res[i] is equal to the left bound of
     * the i-th component of this if bs[i] is true, the right bound otherwise.
     */
-   RealVector corner(const Bitset& bs) const;
+   RealVector corner(const Bitset &bs) const;
 
    /**
     * @brief Gets a corner of this.
@@ -102,19 +102,19 @@ public:
     * Let res be the result. For each i, res[i] is equal to the right bound of
     * the i-th component of this if bs[i] is true, the left bound otherwise.
     */
-   RealVector oppositeCorner(const Bitset& bs) const;
+   RealVector oppositeCorner(const Bitset &bs) const;
 
    /// Returns true if each X[i] is included in this[i]
-   bool contains(const IntervalVector& X) const;
+   bool contains(const IntervalVector &X) const;
 
    /// Returns true if each X[i] is strictly included in this[i]
-   bool strictlyContains(const IntervalVector& X) const;
+   bool strictlyContains(const IntervalVector &X) const;
 
    /// Return true if each X[i] belongs to this[i]
-   bool contains(const RealVector& X) const;
+   bool contains(const RealVector &X) const;
 
    /// Returns true if each X[i] strictly belongs to this[i]
-   bool strictlyContains(const RealVector& X) const;
+   bool strictlyContains(const RealVector &X) const;
 
    /// Returns true if this contains 0.0
    bool containsZero() const;
@@ -123,7 +123,7 @@ public:
    bool strictlyContainsZero() const;
 
    /// Returns true if this and X overlap
-   bool overlaps(const IntervalVector& X) const;
+   bool overlaps(const IntervalVector &X) const;
 
    /// Returns the one-norm of this
    double l1Norm() const;
@@ -132,13 +132,13 @@ public:
    double linfNorm() const;
 
    /// Returns a clone of this
-   virtual IntervalVector* clone() const;
+   virtual IntervalVector *clone() const;
 
    /// Returns the Hausdorff distance between this and X
-   double distance(const IntervalVector& X) const;
+   double distance(const IntervalVector &X) const;
 
    /// Returns the maximum gap componentwise between this and X
-   double gap(const IntervalVector& X) const;
+   double gap(const IntervalVector &X) const;
 
    /**
     * @brief Inflation method.
@@ -151,26 +151,26 @@ public:
 };
 
 // Returns X*Y
-Interval operator*(const IntervalVector& X, const IntervalVector& Y);
+Interval operator*(const IntervalVector &X, const IntervalVector &Y);
 
 // Returns X*Y
-Interval operator*(const RealVector& X, const IntervalVector& Y);
+Interval operator*(const RealVector &X, const IntervalVector &Y);
 
 // Returns X*Y
-Interval operator*(const IntervalVector& X, const RealVector& Y);
+Interval operator*(const IntervalVector &X, const RealVector &Y);
 
 /// Returns A*X
-IntervalVector operator*(const RealMatrix& A, const IntervalVector& X);
+IntervalVector operator*(const RealMatrix &A, const IntervalVector &X);
 
 /// Returns -X
-IntervalVector operator-(const IntervalVector& X);
+IntervalVector operator-(const IntervalVector &X);
 
 /// Returns X-Y
-IntervalVector operator-(const IntervalVector& X, const IntervalVector& Y);
+IntervalVector operator-(const IntervalVector &X, const IntervalVector &Y);
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const IntervalVector& X);
+std::ostream &operator<<(std::ostream &os, const IntervalVector &X);
 
-} // namespace
+} // namespace realpaver
 
 #endif

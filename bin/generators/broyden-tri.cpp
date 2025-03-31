@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "BroydenTri-";
 
@@ -28,23 +28,25 @@ int main(int argc, char ** argv)
    //////////
    of << "Constants" << endl;
    of << "x0 = 0," << endl;
-   of << "x" << n+1 << " = 0;" << endl << endl;
+   of << "x" << n + 1 << " = 0;" << endl << endl;
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e2, 1e2]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
-      of << "(3-2*x" << i << ")*x" << i << "-x" << i-1 << "-2*x" << i+1 << "+1 == 0";
-      if (i<n) of << "," << endl;
+      of << "(3-2*x" << i << ")*x" << i << "-x" << i - 1 << "-2*x" << i + 1 << "+1 == 0";
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl;
 

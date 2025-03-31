@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "Trigo1-";
 
@@ -27,23 +27,25 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [1e-8, 2*PI-1e-8]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
-      for (int j=1; j<=n; ++j)
+      for (int j = 1; j <= n; ++j)
       {
          of << "cos(x" << j << ")+";
       }
       of << i << "*(1-cos(x" << i << "))-sin(x" << i << ") == " << n;
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl;
 

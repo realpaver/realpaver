@@ -16,7 +16,7 @@
  * @brief  Loop on a contractor
  * @author Laurent Granvilliers
  * @date   4-3-2025
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_LOOP_HPP
 #define REALPAVER_CONTRACTOR_LOOP_HPP
@@ -38,10 +38,10 @@ public:
    ~ContractorLoop() = default;
 
    /// No copy
-   ContractorLoop(const ContractorLoop&) = delete;
+   ContractorLoop(const ContractorLoop &) = delete;
 
    /// No assignment
-   ContractorLoop& operator=(const ContractorLoop&) = delete;
+   ContractorLoop &operator=(const ContractorLoop &) = delete;
 
    /// Returns the relative tolerance
    double getTol() const;
@@ -50,14 +50,14 @@ public:
    void setTol(double tol);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
 private:
-   SharedContractor op_;   // operator
-   double tol_;            // relative tolerance
+   SharedContractor op_; // operator
+   double tol_;          // relative tolerance
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

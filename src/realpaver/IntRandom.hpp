@@ -46,10 +46,10 @@ public:
    IntRandom(unsigned seed);
 
    /// Default copy constructor
-   IntRandom(const IntRandom&) = default;
+   IntRandom(const IntRandom &) = default;
 
    /// Default assignment
-   IntRandom& operator=(const IntRandom&) = default;
+   IntRandom &operator=(const IntRandom &) = default;
 
    /// Default destructor
    ~IntRandom() = default;
@@ -67,10 +67,10 @@ public:
    void reset();
 
 private:
-   std::default_random_engine gen_;          // generator
-   std::uniform_int_distribution<int> dis_;  // distribution
+   std::default_random_engine gen_;         // generator
+   std::uniform_int_distribution<int> dis_; // distribution
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

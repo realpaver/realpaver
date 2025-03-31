@@ -16,27 +16,35 @@
  * @brief  Classes of constraints
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
+#include "realpaver/Constraint.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/FlatFunction.hpp"
-#include "realpaver/Constraint.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, RelSymbol rel)
+std::ostream &operator<<(std::ostream &os, RelSymbol rel)
 {
-   switch(rel)
+   switch (rel)
    {
-      case RelSymbol::Eq:     return os << "==";
-      case RelSymbol::Le:     return os << "<=";
-      case RelSymbol::Lt:     return os << "<";
-      case RelSymbol::Ge:     return os << ">=";
-      case RelSymbol::Gt:     return os << ">";
-      case RelSymbol::In:     return os << "in";
-      case RelSymbol::Table:  return os << "table";
-      default: os.setstate(std::ios::failbit);
+   case RelSymbol::Eq:
+      return os << "==";
+   case RelSymbol::Le:
+      return os << "<=";
+   case RelSymbol::Lt:
+      return os << "<";
+   case RelSymbol::Ge:
+      return os << ">=";
+   case RelSymbol::Gt:
+      return os << ">";
+   case RelSymbol::In:
+      return os << "in";
+   case RelSymbol::Table:
+      return os << "table";
+   default:
+      os.setstate(std::ios::failbit);
    }
    return os;
 }
@@ -44,13 +52,15 @@ std::ostream& operator<<(std::ostream& os, RelSymbol rel)
 /*----------------------------------------------------------------------------*/
 
 ConstraintRep::ConstraintRep(RelSymbol rel)
-      : scop_(),
-        rel_(rel),
-        hcode_(0)
-{}
+    : scop_()
+    , rel_(rel)
+    , hcode_(0)
+{
+}
 
 ConstraintRep::~ConstraintRep()
-{}
+{
+}
 
 size_t ConstraintRep::hashCode() const
 {
@@ -99,8 +109,10 @@ bool ConstraintRep::isBoundConstraint() const
 
 /*----------------------------------------------------------------------------*/
 
-Constraint::Constraint(const SharedRep& rep) : rep_(rep)
-{}
+Constraint::Constraint(const SharedRep &rep)
+    : rep_(rep)
+{
+}
 
 Constraint::SharedRep Constraint::rep() const
 {
@@ -127,42 +139,42 @@ bool Constraint::isConstant() const
    return rep_->isConstant();
 }
 
-void Constraint::print(std::ostream& os) const
+void Constraint::print(std::ostream &os) const
 {
    rep_->print(os);
 }
 
-void Constraint::acceptVisitor(ConstraintVisitor& vis) const
+void Constraint::acceptVisitor(ConstraintVisitor &vis) const
 {
    rep_->acceptVisitor(vis);
 }
 
-Proof Constraint::isSatisfied(const IntervalBox& B)
+Proof Constraint::isSatisfied(const IntervalBox &B)
 {
    return rep_->isSatisfied(B);
 }
 
-double Constraint::violation(const IntervalBox& B)
+double Constraint::violation(const IntervalBox &B)
 {
    return rep_->violation(B);
 }
 
-Proof Constraint::contract(IntervalBox& B)
+Proof Constraint::contract(IntervalBox &B)
 {
    return rep_->contract(B);
 }
 
-Proof Constraint::isSatisfied(const DomainBox& box)
+Proof Constraint::isSatisfied(const DomainBox &box)
 {
    return rep_->isSatisfied(box);
 }
 
-double Constraint::violation(const DomainBox& box)
+double Constraint::violation(const DomainBox &box)
 {
    return rep_->violation(box);
 }
 
-Proof Constraint::contract(DomainBox& box)
+Proof Constraint::contract(DomainBox &box)
 {
    return rep_->contract(box);
 }
@@ -197,13 +209,13 @@ bool Constraint::isInteger() const
    return rep_->isInteger();
 }
 
-std::ostream& operator<<(std::ostream& os, Constraint c)
+std::ostream &operator<<(std::ostream &os, Constraint c)
 {
    c.print(os);
    return os;
 }
 
-ConstraintRep* Constraint::cloneRoot() const
+ConstraintRep *Constraint::cloneRoot() const
 {
    return rep_->cloneRoot();
 }
@@ -211,10 +223,10 @@ ConstraintRep* Constraint::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
-      : ConstraintRep(rel),
-        fun_(nullptr),
-        l_(l),
-        r_(r)
+    : ConstraintRep(rel)
+    , fun_(nullptr)
+    , l_(l)
+    , r_(r)
 {
    hcode_ = static_cast<size_t>(rel);
    hcode_ = hash2(l.hashCode(), hcode_);
@@ -227,7 +239,8 @@ ArithCtrBinary::ArithCtrBinary(Term l, Term r, RelSymbol rel)
 }
 
 ArithCtrBinary::~ArithCtrBinary()
-{}
+{
+}
 
 Term ArithCtrBinary::left() const
 {
@@ -249,7 +262,7 @@ bool ArithCtrBinary::isConstant() const
    return l_.isConstant() && r_.isConstant();
 }
 
-void ArithCtrBinary::print(std::ostream& os) const
+void ArithCtrBinary::print(std::ostream &os) const
 {
    l_.print(os);
    os << " " << relSymbol() << " ";
@@ -265,9 +278,8 @@ bool ArithCtrBinary::isInequality() const
 {
    RelSymbol rel = relSymbol();
 
-   return rel == RelSymbol::Ge || rel == RelSymbol::Gt ||
-          rel == RelSymbol::Le || rel == RelSymbol::Lt ||
-          rel == RelSymbol::In;
+   return rel == RelSymbol::Ge || rel == RelSymbol::Gt || rel == RelSymbol::Le ||
+          rel == RelSymbol::Lt || rel == RelSymbol::In;
 }
 
 bool ArithCtrBinary::isLinear() const
@@ -285,17 +297,17 @@ bool ArithCtrBinary::isInteger() const
    return l_.isInteger() && r_.isInteger();
 }
 
-Proof ArithCtrBinary::contract(IntervalBox& B)
+Proof ArithCtrBinary::contract(IntervalBox &B)
 {
    return fun_->hc4Revise(B);
 }
 
-Proof ArithCtrBinary::contract(DomainBox& box)
+Proof ArithCtrBinary::contract(DomainBox &box)
 {
    IntervalBox B(box);
    Proof proof = contract(B);
 
-   for (const auto& v : scope())
+   for (const auto &v : scope())
       box.get(v)->contract(B.get(v));
 
    return proof;
@@ -304,20 +316,19 @@ Proof ArithCtrBinary::contract(DomainBox& box)
 /*----------------------------------------------------------------------------*/
 
 ArithCtrEq::ArithCtrEq(Term l, Term r)
-      : ArithCtrBinary(l, r, RelSymbol::Eq)
+    : ArithCtrBinary(l, r, RelSymbol::Eq)
 {
-   fun_ = std::make_shared<FlatFunction>(l-r, Interval::zero());
+   fun_ = std::make_shared<FlatFunction>(l - r, Interval::zero());
 }
 
-void ArithCtrEq::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrEq::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Proof ArithCtrEq::isSatisfied(const IntervalBox& B)
+Proof ArithCtrEq::isSatisfied(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -332,22 +343,22 @@ Proof ArithCtrEq::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrEq::violation(const IntervalBox& B)
+double ArithCtrEq::violation(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyEq(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyEq(r))
+      return 0.0;
 
    Double::rndNear();
    return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
 }
 
-Proof ArithCtrEq::isSatisfied(const DomainBox& box)
+Proof ArithCtrEq::isSatisfied(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -362,13 +373,14 @@ Proof ArithCtrEq::isSatisfied(const DomainBox& box)
       return Proof::Empty;
 }
 
-double ArithCtrEq::violation(const DomainBox& box)
+double ArithCtrEq::violation(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyEq(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyEq(r))
+      return 0.0;
 
    Double::rndNear();
    return (l.isCertainlyLt(r)) ? r.left() - l.right() : l.left() - r.right();
@@ -379,7 +391,7 @@ Constraint operator==(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrEq>(l.rep(), r.rep()));
 }
 
-ConstraintRep* ArithCtrEq::cloneRoot() const
+ConstraintRep *ArithCtrEq::cloneRoot() const
 {
    return new ArithCtrEq(left(), right());
 }
@@ -387,20 +399,19 @@ ConstraintRep* ArithCtrEq::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 ArithCtrLe::ArithCtrLe(Term l, Term r)
-      : ArithCtrBinary(l, r, RelSymbol::Le)
+    : ArithCtrBinary(l, r, RelSymbol::Le)
 {
-   fun_ = std::make_shared<FlatFunction>(l-r, Interval::negative());
+   fun_ = std::make_shared<FlatFunction>(l - r, Interval::negative());
 }
 
-void ArithCtrLe::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrLe::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Proof ArithCtrLe::isSatisfied(const IntervalBox& B)
+Proof ArithCtrLe::isSatisfied(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -415,22 +426,22 @@ Proof ArithCtrLe::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrLe::violation(const IntervalBox& B)
+double ArithCtrLe::violation(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyLe(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyLe(r))
+      return 0.0;
 
    Double::rndNear();
    return l.left() - r.right();
 }
 
-Proof ArithCtrLe::isSatisfied(const DomainBox& box)
+Proof ArithCtrLe::isSatisfied(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -445,13 +456,14 @@ Proof ArithCtrLe::isSatisfied(const DomainBox& box)
       return Proof::Empty;
 }
 
-double ArithCtrLe::violation(const DomainBox& box)
+double ArithCtrLe::violation(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyLe(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyLe(r))
+      return 0.0;
 
    Double::rndNear();
    return l.left() - r.right();
@@ -462,7 +474,7 @@ Constraint operator<=(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrLe>(l.rep(), r.rep()));
 }
 
-ConstraintRep* ArithCtrLe::cloneRoot() const
+ConstraintRep *ArithCtrLe::cloneRoot() const
 {
    return new ArithCtrLe(left(), right());
 }
@@ -470,20 +482,19 @@ ConstraintRep* ArithCtrLe::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 ArithCtrLt::ArithCtrLt(Term l, Term r)
-      : ArithCtrBinary(l, r, RelSymbol::Lt)
+    : ArithCtrBinary(l, r, RelSymbol::Lt)
 {
-   fun_ = std::make_shared<FlatFunction>(l-r, Interval::negative());
+   fun_ = std::make_shared<FlatFunction>(l - r, Interval::negative());
 }
 
-void ArithCtrLt::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrLt::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Proof ArithCtrLt::isSatisfied(const IntervalBox& B)
+Proof ArithCtrLt::isSatisfied(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -498,22 +509,22 @@ Proof ArithCtrLt::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrLt::violation(const IntervalBox& B)
+double ArithCtrLt::violation(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyLt(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyLt(r))
+      return 0.0;
 
    Double::rndNear();
    return l.left() - r.right();
 }
 
-Proof ArithCtrLt::isSatisfied(const DomainBox& box)
+Proof ArithCtrLt::isSatisfied(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -528,13 +539,14 @@ Proof ArithCtrLt::isSatisfied(const DomainBox& box)
       return Proof::Empty;
 }
 
-double ArithCtrLt::violation(const DomainBox& box)
+double ArithCtrLt::violation(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyLt(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyLt(r))
+      return 0.0;
 
    Double::rndNear();
    return l.left() - r.right();
@@ -545,7 +557,7 @@ Constraint operator<(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrLt>(l.rep(), r.rep()));
 }
 
-ConstraintRep* ArithCtrLt::cloneRoot() const
+ConstraintRep *ArithCtrLt::cloneRoot() const
 {
    return new ArithCtrLt(left(), right());
 }
@@ -553,20 +565,19 @@ ConstraintRep* ArithCtrLt::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 ArithCtrGe::ArithCtrGe(Term l, Term r)
-      : ArithCtrBinary(l, r, RelSymbol::Ge)
+    : ArithCtrBinary(l, r, RelSymbol::Ge)
 {
-   fun_ = std::make_shared<FlatFunction>(l-r, Interval::positive());
+   fun_ = std::make_shared<FlatFunction>(l - r, Interval::positive());
 }
 
-void ArithCtrGe::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrGe::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Proof ArithCtrGe::isSatisfied(const IntervalBox& B)
+Proof ArithCtrGe::isSatisfied(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -581,22 +592,22 @@ Proof ArithCtrGe::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrGe::violation(const IntervalBox& B)
+double ArithCtrGe::violation(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyGe(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyGe(r))
+      return 0.0;
 
    Double::rndNear();
    return r.left() - l.right();
 }
 
-Proof ArithCtrGe::isSatisfied(const DomainBox& box)
+Proof ArithCtrGe::isSatisfied(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -611,13 +622,14 @@ Proof ArithCtrGe::isSatisfied(const DomainBox& box)
       return Proof::Empty;
 }
 
-double ArithCtrGe::violation(const DomainBox& box)
+double ArithCtrGe::violation(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyGe(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyGe(r))
+      return 0.0;
 
    Double::rndNear();
    return r.left() - l.right();
@@ -628,7 +640,7 @@ Constraint operator>=(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrGe>(l.rep(), r.rep()));
 }
 
-ConstraintRep* ArithCtrGe::cloneRoot() const
+ConstraintRep *ArithCtrGe::cloneRoot() const
 {
    return new ArithCtrGe(left(), right());
 }
@@ -636,20 +648,19 @@ ConstraintRep* ArithCtrGe::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 ArithCtrGt::ArithCtrGt(Term l, Term r)
-      : ArithCtrBinary(l, r, RelSymbol::Gt)
+    : ArithCtrBinary(l, r, RelSymbol::Gt)
 {
-   fun_ = std::make_shared<FlatFunction>(l-r, Interval::positive());
+   fun_ = std::make_shared<FlatFunction>(l - r, Interval::positive());
 }
 
-void ArithCtrGt::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrGt::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Proof ArithCtrGt::isSatisfied(const IntervalBox& B)
+Proof ArithCtrGt::isSatisfied(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -664,22 +675,22 @@ Proof ArithCtrGt::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrGt::violation(const IntervalBox& B)
+double ArithCtrGt::violation(const IntervalBox &B)
 {
-   Interval l = left().eval(B),
-            r = right().eval(B);
+   Interval l = left().eval(B), r = right().eval(B);
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyGt(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyGt(r))
+      return 0.0;
 
    Double::rndNear();
    return r.left() - l.right();
 }
 
-Proof ArithCtrGt::isSatisfied(const DomainBox& box)
+Proof ArithCtrGt::isSatisfied(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
    if (l.isEmpty() || r.isEmpty())
       return Proof::Empty;
@@ -691,15 +702,17 @@ Proof ArithCtrGt::isSatisfied(const DomainBox& box)
       return Proof::Maybe;
 
    else
-      return Proof::Empty;}
+      return Proof::Empty;
+}
 
-double ArithCtrGt::violation(const DomainBox& box)
+double ArithCtrGt::violation(const DomainBox &box)
 {
-   Interval l = left().eval(box)->intervalHull(),
-            r = right().eval(box)->intervalHull();
+   Interval l = left().eval(box)->intervalHull(), r = right().eval(box)->intervalHull();
 
-   if (l.isEmpty() || r.isEmpty()) return Double::inf();
-   if (l.isPossiblyGt(r)) return 0.0;
+   if (l.isEmpty() || r.isEmpty())
+      return Double::inf();
+   if (l.isPossiblyGt(r))
+      return 0.0;
 
    Double::rndNear();
    return r.left() - l.right();
@@ -710,21 +723,20 @@ Constraint operator>(Term l, Term r)
    return Constraint(std::make_shared<ArithCtrGt>(l.rep(), r.rep()));
 }
 
-ConstraintRep* ArithCtrGt::cloneRoot() const
+ConstraintRep *ArithCtrGt::cloneRoot() const
 {
    return new ArithCtrGt(left(), right());
 }
 
 /*----------------------------------------------------------------------------*/
 
-ArithCtrIn::ArithCtrIn(Term t, const Interval& x)
-      : ArithCtrBinary(t, x, RelSymbol::In), x_(x)
+ArithCtrIn::ArithCtrIn(Term t, const Interval &x)
+    : ArithCtrBinary(t, x, RelSymbol::In)
+    , x_(x)
 {
-   ASSERT(!(x.isEmpty() || x.isUniverse()),
-          "Bad interval target in a IN constraint");
+   ASSERT(!(x.isEmpty() || x.isUniverse()), "Bad interval target in a IN constraint");
 
    fun_ = std::make_shared<FlatFunction>(t, x);
-
 }
 
 Interval ArithCtrIn::image() const
@@ -737,12 +749,12 @@ Term ArithCtrIn::term() const
    return left();
 }
 
-void ArithCtrIn::acceptVisitor(ConstraintVisitor& vis) const
+void ArithCtrIn::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Proof ArithCtrIn::isSatisfied(const IntervalBox& B)
+Proof ArithCtrIn::isSatisfied(const IntervalBox &B)
 {
    Interval e = term().eval(B);
 
@@ -759,18 +771,20 @@ Proof ArithCtrIn::isSatisfied(const IntervalBox& B)
       return Proof::Empty;
 }
 
-double ArithCtrIn::violation(const IntervalBox& B)
+double ArithCtrIn::violation(const IntervalBox &B)
 {
    Interval e = term().eval(B);
 
-   if (e.isEmpty()) return Double::inf();
-   if (x_.overlaps(e)) return 0.0;
+   if (e.isEmpty())
+      return Double::inf();
+   if (x_.overlaps(e))
+      return 0.0;
 
    Double::rndNear();
    return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
 }
 
-Constraint in(Term t, const Interval& x)
+Constraint in(Term t, const Interval &x)
 {
    if (x.isSingleton())
       return t == x;
@@ -785,7 +799,7 @@ Constraint in(Term t, const Interval& x)
       return Constraint(std::make_shared<ArithCtrIn>(t.rep(), x));
 }
 
-Proof ArithCtrIn::isSatisfied(const DomainBox& box)
+Proof ArithCtrIn::isSatisfied(const DomainBox &box)
 {
    Interval e = term().eval(box)->intervalHull();
 
@@ -802,12 +816,14 @@ Proof ArithCtrIn::isSatisfied(const DomainBox& box)
       return Proof::Empty;
 }
 
-double ArithCtrIn::violation(const DomainBox& box)
+double ArithCtrIn::violation(const DomainBox &box)
 {
    Interval e = term().eval(box)->intervalHull();
 
-   if (e.isEmpty()) return Double::inf();
-   if (x_.overlaps(e)) return 0.0;
+   if (e.isEmpty())
+      return Double::inf();
+   if (x_.overlaps(e))
+      return 0.0;
 
    Double::rndNear();
    return (x_.isCertainlyGt(e)) ? x_.left() - e.right() : e.left() - x_.right();
@@ -815,10 +831,10 @@ double ArithCtrIn::violation(const DomainBox& box)
 
 Constraint in(Term t, double a, double b)
 {
-   return in(t, Interval(a,b));
+   return in(t, Interval(a, b));
 }
 
-ConstraintRep* ArithCtrIn::cloneRoot() const
+ConstraintRep *ArithCtrIn::cloneRoot() const
 {
    return new ArithCtrIn(term(), image());
 }
@@ -826,14 +842,16 @@ ConstraintRep* ArithCtrIn::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 TableCtrCol::TableCtrCol(Variable v)
-      : v_(v),
-        vval_()
-{}
+    : v_(v)
+    , vval_()
+{
+}
 
-TableCtrCol::TableCtrCol(Variable v, const std::initializer_list<Interval>& l)
-      : v_(v),
-        vval_(l)
-{}
+TableCtrCol::TableCtrCol(Variable v, const std::initializer_list<Interval> &l)
+    : v_(v)
+    , vval_(l)
+{
+}
 
 size_t TableCtrCol::size() const
 {
@@ -845,7 +863,7 @@ Variable TableCtrCol::getVar() const
    return v_;
 }
 
-void TableCtrCol::addValue(const Interval& x)
+void TableCtrCol::addValue(const Interval &x)
 {
    vval_.push_back(x);
 }
@@ -864,14 +882,14 @@ bool TableCtrCol::isInteger() const
 /*----------------------------------------------------------------------------*/
 
 TableCtr::TableCtr()
-      : ConstraintRep(RelSymbol::Table),
-        vcol_()
-{}
+    : ConstraintRep(RelSymbol::Table)
+    , vcol_()
+{
+}
 
-TableCtr::TableCtr(
-   const std::initializer_list<TableCtrCol>& l)
-      : ConstraintRep(RelSymbol::Table),
-        vcol_(l)
+TableCtr::TableCtr(const std::initializer_list<TableCtrCol> &l)
+    : ConstraintRep(RelSymbol::Table)
+    , vcol_(l)
 {
    ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
    ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
@@ -880,11 +898,10 @@ TableCtr::TableCtr(
    makeScopeAndHashCode();
 }
 
-TableCtr::TableCtr(
-   const std::initializer_list<Variable>& vars,
-   const std::initializer_list<Interval>& values)
-      : ConstraintRep(RelSymbol::Table),
-        vcol_()
+TableCtr::TableCtr(const std::initializer_list<Variable> &vars,
+                   const std::initializer_list<Interval> &values)
+    : ConstraintRep(RelSymbol::Table)
+    , vcol_()
 {
    size_t nbvar = vars.size();
    size_t nbitv = values.size();
@@ -893,7 +910,7 @@ TableCtr::TableCtr(
           "Bad initialization of a constraint table");
 
    // creates the columns
-   for (auto itv=vars.begin(); itv != vars.end(); ++itv)
+   for (auto itv = vars.begin(); itv != vars.end(); ++itv)
    {
       TableCtrCol col(*itv);
       vcol_.push_back(col);
@@ -902,9 +919,9 @@ TableCtr::TableCtr(
    auto itv = values.begin();
    size_t nrows = nbitv / nbvar;
 
-   for (size_t i=0; i<nrows; ++i)
+   for (size_t i = 0; i < nrows; ++i)
    {
-      for (size_t j=0; j<nbvar; ++j, ++itv)
+      for (size_t j = 0; j < nbvar; ++j, ++itv)
       {
          Interval x = *itv;
          if (x.isEmpty())
@@ -923,7 +940,7 @@ void TableCtr::makeScopeAndHashCode()
    Scope s;
    hcode_ = static_cast<size_t>(RelSymbol::Table);
 
-   for (auto& col : vcol_)
+   for (auto &col : vcol_)
    {
       Variable v = col.getVar();
       s.insert(v);
@@ -935,7 +952,7 @@ void TableCtr::makeScopeAndHashCode()
 
 bool TableCtr::isInteger() const
 {
-   for (auto& col : vcol_)
+   for (auto &col : vcol_)
       if (!col.isInteger())
          return false;
 
@@ -965,21 +982,19 @@ Interval TableCtr::getVal(size_t i, size_t j) const
    return vcol_[j].getVal(i);
 }
 
-
 TableCtrCol TableCtr::getCol(size_t j) const
 {
    ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j];
 }
 
-void TableCtr::addCol(const TableCtrCol& col)
+void TableCtr::addCol(const TableCtrCol &col)
 {
    ASSERT(vcol_.empty() || col.size() == nbRows(),
           "Bad insertion of a new column in a table constraint");
 
    ASSERT(!dependsOn(col.getVar()),
-          "Variable already present in a table constraint: " <<
-          col.getVar().getName());
+          "Variable already present in a table constraint: " << col.getVar().getName());
 
    vcol_.push_back(col);
 
@@ -992,9 +1007,9 @@ bool TableCtr::isConstant() const
    return vcol_.empty();
 }
 
-bool TableCtr::isRowConsistent(size_t i, const IntervalBox& B) const
+bool TableCtr::isRowConsistent(size_t i, const IntervalBox &B) const
 {
-   for (size_t j=0; j<nbCols(); ++j)
+   for (size_t j = 0; j < nbCols(); ++j)
    {
       Variable v = vcol_[j].getVar();
       if (B.get(v).isDisjoint(vcol_[j].getVal(i)))
@@ -1003,9 +1018,9 @@ bool TableCtr::isRowConsistent(size_t i, const IntervalBox& B) const
    return true;
 }
 
-bool TableCtr::isRowConsistent(size_t i, const DomainBox& box) const
+bool TableCtr::isRowConsistent(size_t i, const DomainBox &box) const
 {
-   for (size_t j=0; j<nbCols(); ++j)
+   for (size_t j = 0; j < nbCols(); ++j)
    {
       Variable v = vcol_[j].getVar();
       if (box.get(v)->intervalHull().isDisjoint(vcol_[j].getVal(i)))
@@ -1014,36 +1029,37 @@ bool TableCtr::isRowConsistent(size_t i, const DomainBox& box) const
    return true;
 }
 
-Proof TableCtr::isSatisfied(const IntervalBox& B)
+Proof TableCtr::isSatisfied(const IntervalBox &B)
 {
    size_t nbc = 0;
 
-   for (size_t i=0; i<nbRows(); ++i)
+   for (size_t i = 0; i < nbRows(); ++i)
       if (isRowConsistent(i, B))
       {
          ++nbc;
-         if (nbc > 1) return Proof::Maybe;
+         if (nbc > 1)
+            return Proof::Maybe;
       }
 
    return (nbc == 1) ? Proof::Inner : Proof::Empty;
 }
 
-double TableCtr::violation(const IntervalBox& B)
+double TableCtr::violation(const IntervalBox &B)
 {
    double res = Double::inf();
 
-   for (size_t i=0; i<nbRows(); ++i)
+   for (size_t i = 0; i < nbRows(); ++i)
       res = Double::min(res, rowViolation(B, i));
 
    return res;
 }
 
-double TableCtr::rowViolation(const IntervalBox& B, size_t i)
+double TableCtr::rowViolation(const IntervalBox &B, size_t i)
 {
    double res = 0.0;
    Double::rndNear();
 
-   for (size_t j=0; j<nbCols(); ++j)
+   for (size_t j = 0; j < nbCols(); ++j)
    {
       Variable v = vcol_[j].getVar();
       Interval val = vcol_[j].getVal(i);
@@ -1057,18 +1073,19 @@ double TableCtr::rowViolation(const IntervalBox& B, size_t i)
       else if (dom.isCertainlyGt(val))
          viol = dom.left() - val.right();
 
-      if (viol > res) res = viol;
+      if (viol > res)
+         res = viol;
    }
 
    return res;
 }
 
-double TableCtr::rowViolation(const DomainBox& box, size_t i)
+double TableCtr::rowViolation(const DomainBox &box, size_t i)
 {
    double res = 0.0;
    Double::rndNear();
 
-   for (size_t j=0; j<nbCols(); ++j)
+   for (size_t j = 0; j < nbCols(); ++j)
    {
       Variable v = vcol_[j].getVar();
       Interval val = vcol_[j].getVal(i);
@@ -1082,145 +1099,154 @@ double TableCtr::rowViolation(const DomainBox& box, size_t i)
       else if (dom.isCertainlyGt(val))
          viol = dom.left() - val.right();
 
-      if (viol > res) res = viol;
+      if (viol > res)
+         res = viol;
    }
 
    return res;
 }
 
-Proof TableCtr::contract(IntervalBox& B)
+Proof TableCtr::contract(IntervalBox &B)
 {
    Bitset consistent(nbRows());
    consistent.setAllOne();
-   size_t nbc = nbRows();     // number of consistent rows
+   size_t nbc = nbRows(); // number of consistent rows
 
    // checks consistency
-   for (size_t i=0; i<nbRows(); ++i)
+   for (size_t i = 0; i < nbRows(); ++i)
       if (!isRowConsistent(i, B))
       {
          consistent.setZero(i);
          --nbc;
       }
 
-   if (nbc == 0) return Proof::Empty;
+   if (nbc == 0)
+      return Proof::Empty;
 
    // contracts the domains
-   for (size_t j=0; j<nbCols(); ++j)
+   for (size_t j = 0; j < nbCols(); ++j)
    {
       Variable v = vcol_[j].getVar();
 
       // hull of values of this variable occurring in the consistent rows
       Interval h = Interval::emptyset();
-      for (size_t i=0; i<nbRows(); ++i)
+      for (size_t i = 0; i < nbRows(); ++i)
          if (consistent.get(i))
             h |= vcol_[j].getVal(i);
 
       Interval x = h & B.get(v);
-      if (x.isEmpty()) return Proof::Empty;
+      if (x.isEmpty())
+         return Proof::Empty;
       B.set(v, x);
    }
 
    return (nbc == 1) ? Proof::Inner : Proof::Maybe;
 }
 
-
-Proof TableCtr::isSatisfied(const DomainBox& box)
+Proof TableCtr::isSatisfied(const DomainBox &box)
 {
    size_t nbc = 0;
 
-   for (size_t i=0; i<nbRows(); ++i)
+   for (size_t i = 0; i < nbRows(); ++i)
       if (isRowConsistent(i, box))
       {
          ++nbc;
-         if (nbc > 1) return Proof::Maybe;
+         if (nbc > 1)
+            return Proof::Maybe;
       }
 
    return (nbc == 1) ? Proof::Inner : Proof::Empty;
 }
 
-double TableCtr::violation(const DomainBox& box)
+double TableCtr::violation(const DomainBox &box)
 {
    double res = Double::inf();
 
-   for (size_t i=0; i<nbRows(); ++i)
+   for (size_t i = 0; i < nbRows(); ++i)
       res = Double::min(res, rowViolation(box, i));
 
-   return res;}
+   return res;
+}
 
-Proof TableCtr::contract(DomainBox& box)
+Proof TableCtr::contract(DomainBox &box)
 {
    Bitset consistent(nbRows());
    consistent.setAllOne();
-   size_t nbc = nbRows();     // number of consistent rows
+   size_t nbc = nbRows(); // number of consistent rows
 
    // checks consistency
-   for (size_t i=0; i<nbRows(); ++i)
+   for (size_t i = 0; i < nbRows(); ++i)
       if (!isRowConsistent(i, box))
       {
          consistent.setZero(i);
          --nbc;
       }
 
-   if (nbc == 0) return Proof::Empty;
+   if (nbc == 0)
+      return Proof::Empty;
 
    // contracts the domains
-   for (size_t j=0; j<nbCols(); ++j)
+   for (size_t j = 0; j < nbCols(); ++j)
    {
       Variable v = vcol_[j].getVar();
 
       // hull of values of this variable occurring in the consistent rows
       Interval x = Interval::emptyset();
-      for (size_t i=0; i<nbRows(); ++i)
+      for (size_t i = 0; i < nbRows(); ++i)
          if (consistent.get(i))
             x |= vcol_[j].getVal(i);
 
-      Domain* domain = box.get(v);
+      Domain *domain = box.get(v);
       domain->contract(x);
-      if (domain->isEmpty()) return Proof::Empty;
+      if (domain->isEmpty())
+         return Proof::Empty;
    }
 
    return (nbc == 1) ? Proof::Inner : Proof::Maybe;
 }
 
-void TableCtr::print(std::ostream& os) const
+void TableCtr::print(std::ostream &os) const
 {
    os << "table(";
    // prints the variables
    os << "{";
-   for (size_t i=0; i<nbCols(); ++i)
+   for (size_t i = 0; i < nbCols(); ++i)
    {
-      if (i > 0) os << ", ";
+      if (i > 0)
+         os << ", ";
       os << vcol_[i].getVar().getName();
    }
    os << "}, ";
 
    // prints the rows
    os << "{";
-   for (size_t j=0; j<nbRows(); ++j)
+   for (size_t j = 0; j < nbRows(); ++j)
    {
-      if (j > 0) os << ", ";
-      for (size_t i=0; i<nbCols(); ++i)
+      if (j > 0)
+         os << ", ";
+      for (size_t i = 0; i < nbCols(); ++i)
       {
-         if (i> 0) os << ", ";
+         if (i > 0)
+            os << ", ";
          os << vcol_[i].getVal(j);
       }
    }
    os << "})";
 }
 
-void TableCtr::acceptVisitor(ConstraintVisitor& vis) const
+void TableCtr::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-Constraint table(const std::initializer_list<Variable>& vars,
-                 const std::initializer_list<Interval>& values)
+Constraint table(const std::initializer_list<Variable> &vars,
+                 const std::initializer_list<Interval> &values)
 {
    return Constraint(std::make_shared<TableCtr>(vars, values));
 }
 
-Constraint table(const Variable* vars, size_t nvars,
-                 const Interval* values, size_t nvalues)
+Constraint table(const Variable *vars, size_t nvars, const Interval *values,
+                 size_t nvalues)
 {
    if (nvars == 0 || nvalues % nvars != 0)
       THROW("Bad initialization of a table constraint");
@@ -1228,14 +1254,14 @@ Constraint table(const Variable* vars, size_t nvars,
    size_t nrows = nvalues / nvars;
 
    Constraint::SharedRep srep = std::make_shared<TableCtr>();
-   TableCtr* rep = static_cast<TableCtr*>(srep.get());
+   TableCtr *rep = static_cast<TableCtr *>(srep.get());
 
-   for (size_t j=0; j<nvars; ++j)
+   for (size_t j = 0; j < nvars; ++j)
    {
       TableCtrCol col(vars[j]);
-      for (size_t i=0; i<nrows; ++i)
+      for (size_t i = 0; i < nrows; ++i)
       {
-         Interval x = values[i*nvars + j];
+         Interval x = values[i * nvars + j];
          col.addValue(x);
       }
       rep->addCol(col);
@@ -1243,7 +1269,7 @@ Constraint table(const Variable* vars, size_t nvars,
    return Constraint(srep);
 }
 
-ConstraintRep* TableCtr::cloneRoot() const
+ConstraintRep *TableCtr::cloneRoot() const
 {
    return new TableCtr(*this);
 }
@@ -1251,9 +1277,9 @@ ConstraintRep* TableCtr::cloneRoot() const
 /*----------------------------------------------------------------------------*/
 
 CondCtr::CondCtr(Constraint guard, Constraint body)
-      : ConstraintRep(RelSymbol::Cond),
-        guard_(guard),
-        body_(body)
+    : ConstraintRep(RelSymbol::Cond)
+    , guard_(guard)
+    , body_(body)
 {
    THROW_IF(!(guard.isInteger() || guard.isInequality()),
             "Bad guard of conditional constraint: " << guard);
@@ -1282,7 +1308,7 @@ bool CondCtr::isConstant() const
    return guard_.isConstant() && body_.isConstant();
 }
 
-Proof CondCtr::isSatisfied(const IntervalBox& B)
+Proof CondCtr::isSatisfied(const IntervalBox &B)
 {
    Proof p = guard_.isSatisfied(B);
 
@@ -1295,13 +1321,13 @@ Proof CondCtr::isSatisfied(const IntervalBox& B)
    return p;
 }
 
-double CondCtr::violation(const IntervalBox& B)
+double CondCtr::violation(const IntervalBox &B)
 {
    Proof p = guard_.isSatisfied(B);
-   return (p == Proof::Inner) ?  body_.violation(B) : 0.0;
+   return (p == Proof::Inner) ? body_.violation(B) : 0.0;
 }
 
-Proof CondCtr::contract(IntervalBox& B)
+Proof CondCtr::contract(IntervalBox &B)
 {
    Proof p = guard_.isSatisfied(B);
 
@@ -1314,7 +1340,7 @@ Proof CondCtr::contract(IntervalBox& B)
    return p;
 }
 
-Proof CondCtr::isSatisfied(const DomainBox& box)
+Proof CondCtr::isSatisfied(const DomainBox &box)
 {
    Proof p = guard_.isSatisfied(box);
 
@@ -1327,13 +1353,13 @@ Proof CondCtr::isSatisfied(const DomainBox& box)
    return p;
 }
 
-double CondCtr::violation(const DomainBox& box)
+double CondCtr::violation(const DomainBox &box)
 {
    Proof p = guard_.isSatisfied(box);
-   return (p == Proof::Inner) ?  body_.violation(box) : 0.0;
+   return (p == Proof::Inner) ? body_.violation(box) : 0.0;
 }
 
-Proof CondCtr::contract(DomainBox& box)
+Proof CondCtr::contract(DomainBox &box)
 {
    Proof p = guard_.isSatisfied(box);
 
@@ -1346,17 +1372,17 @@ Proof CondCtr::contract(DomainBox& box)
    return p;
 }
 
-void CondCtr::print(std::ostream& os) const
+void CondCtr::print(std::ostream &os) const
 {
    os << guard_ << " -> " << body_;
 }
 
-void CondCtr::acceptVisitor(ConstraintVisitor& vis) const
+void CondCtr::acceptVisitor(ConstraintVisitor &vis) const
 {
    vis.apply(this);
 }
 
-ConstraintRep* CondCtr::cloneRoot() const
+ConstraintRep *CondCtr::cloneRoot() const
 {
    return new CondCtr(guard_, body_);
 }
@@ -1374,46 +1400,47 @@ Constraint cond(Constraint guard, Constraint body)
 /*----------------------------------------------------------------------------*/
 
 ConstraintVisitor::~ConstraintVisitor()
-{}
+{
+}
 
-void ConstraintVisitor::apply(const ArithCtrEq* c)
+void ConstraintVisitor::apply(const ArithCtrEq *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ArithCtrLe* c)
+void ConstraintVisitor::apply(const ArithCtrLe *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ArithCtrLt* c)
+void ConstraintVisitor::apply(const ArithCtrLt *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ArithCtrGe* c)
+void ConstraintVisitor::apply(const ArithCtrGe *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ArithCtrGt* c)
+void ConstraintVisitor::apply(const ArithCtrGt *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const ArithCtrIn* c)
+void ConstraintVisitor::apply(const ArithCtrIn *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const TableCtr* c)
+void ConstraintVisitor::apply(const TableCtr *c)
 {
    THROW("Visit method not implemented");
 }
 
-void ConstraintVisitor::apply(const CondCtr* c)
+void ConstraintVisitor::apply(const CondCtr *c)
 {
    THROW("Visit method not implemented");
 }
 
-} // namespace
+} // namespace realpaver

@@ -16,40 +16,42 @@
  * @brief  Wrapper class for the LP solver Gurobi.
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
+#include "realpaver/LPSolverGurobi.hpp"
 #include "gurobi_c++.h"
 #include "gurobi_c.h"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/LPSolverGurobi.hpp"
 
 namespace realpaver {
 
-LPSolver::LPSolver() :
-   env_(nullptr),
-   simplex_(nullptr),
-   gvars_(),
-   gctrs_()
-{}
+LPSolver::LPSolver()
+    : env_(nullptr)
+    , simplex_(nullptr)
+    , gvars_()
+    , gctrs_()
+{
+}
 
 LPSolver::~LPSolver()
 {
-   if (simplex_ != nullptr) delete simplex_;
-   if (env_ != nullptr) delete env_;
+   if (simplex_ != nullptr)
+      delete simplex_;
+   if (env_ != nullptr)
+      delete env_;
 }
 
 void LPSolver::makeVars()
 {
    int n = getNbLinVars();
 
-   for (int i=0; i<n; ++i)
+   for (int i = 0; i < n; ++i)
    {
       LinVar v = getLinVar(i);
       char type = v.isContinuous() ? GRB_CONTINUOUS : GRB_INTEGER;
       double objCoef = 0.0;
-      GRBVar gv = simplex_->addVar(v.getLB(), v.getUB(), objCoef,
-                                   type, v.getName());
+      GRBVar gv = simplex_->addVar(v.getLB(), v.getUB(), objCoef, type, v.getName());
       gvars_.push_back(gv);
    }
 }
@@ -59,12 +61,12 @@ GRBLinExpr LPSolver::makeGrbLinExpr(LinExpr e)
    GRBLinExpr ge;
 
    int n = e.getNbTerms();
-   for (int i=0; i<n; ++i)
+   for (int i = 0; i < n; ++i)
    {
       int j = e.getIndexVar(i);
       double coef = e.getCoef(i);
       GRBVar gv = gvars_[j];
-      ge += coef*gv;
+      ge += coef * gv;
    }
 
    return ge;
@@ -76,7 +78,7 @@ void LPSolver::makeCtrs()
 
    // bound constraints (necessary for certification methods)
    int n = getNbLinVars();
-   for (int i=0; i<n; ++i)
+   for (int i = 0; i < n; ++i)
    {
       LinVar v = getLinVar(i);
       LinExpr e = {{1.0}, {v}};
@@ -87,7 +89,7 @@ void LPSolver::makeCtrs()
 
    // primal constraints
    int m = getNbLinCtrs();
-   for (int i=0; i<m; ++i)
+   for (int i = 0; i < m; ++i)
    {
       LinCtr c = getLinCtr(i);
       LinExpr e = c.getExpr();
@@ -123,7 +125,8 @@ void LPSolver::makeSimplex()
    createEnv();
 
    // creates the simplex with this environment
-   if (simplex_ != nullptr) delete simplex_;
+   if (simplex_ != nullptr)
+      delete simplex_;
    simplex_ = new GRBModel(env_);
 
    // makes the model
@@ -135,21 +138,28 @@ void LPSolver::makeSimplex()
 LPStatus LPSolver::toLPStatus()
 {
    int status = simplex_->get(GRB_IntAttr_Status);
-   switch(status)
+   switch (status)
    {
-      case GRB_OPTIMAL:         return LPStatus::Optimal;
-      case GRB_INFEASIBLE:      return LPStatus::Infeasible;
-      case GRB_INF_OR_UNBD:     return LPStatus::InfeasibleOrUnbounded;
-      case GRB_UNBOUNDED:       return LPStatus::Unbounded;
-      case GRB_ITERATION_LIMIT: return LPStatus::StopOnIterLimit;
-      case GRB_TIME_LIMIT:      return LPStatus::StopOnTimeLimit;
+   case GRB_OPTIMAL:
+      return LPStatus::Optimal;
+   case GRB_INFEASIBLE:
+      return LPStatus::Infeasible;
+   case GRB_INF_OR_UNBD:
+      return LPStatus::InfeasibleOrUnbounded;
+   case GRB_UNBOUNDED:
+      return LPStatus::Unbounded;
+   case GRB_ITERATION_LIMIT:
+      return LPStatus::StopOnIterLimit;
+   case GRB_TIME_LIMIT:
+      return LPStatus::StopOnTimeLimit;
    }
    return LPStatus::Other;
 }
 
 void LPSolver::createEnv()
 {
-   if (env_ != nullptr) delete env_;
+   if (env_ != nullptr)
+      delete env_;
    env_ = new GRBEnv(true);
 
    int maxsec = getMaxSeconds();
@@ -182,7 +192,7 @@ LPStatus LPSolver::run()
 
    LPStatus status = toLPStatus();
 
-   if (status==LPStatus::InfeasibleOrUnbounded)
+   if (status == LPStatus::InfeasibleOrUnbounded)
    {
       // decide between Infeasible or Unbounded
       simplex_->set(GRB_IntParam_DualReductions, 0);
@@ -192,12 +202,12 @@ LPStatus LPSolver::run()
    }
 
 #if LOG_ON
-   if (status==LPStatus::Optimal)
+   if (status == LPStatus::Optimal)
    {
-      LOG_INTER("Status: " << status << std::endl <<
-                "Cost:   " << costSolution() << std::endl <<
-                "Primal: " << primalSolution() << std::endl <<
-                "Dual:   " << dualSolution() << std::endl);
+      LOG_INTER("Status: " << status << std::endl
+                           << "Cost:   " << costSolution() << std::endl
+                           << "Primal: " << primalSolution() << std::endl
+                           << "Dual:   " << dualSolution() << std::endl);
    }
    else
       LOG_INTER("Status: " << status << std::endl);
@@ -249,7 +259,7 @@ RealVector LPSolver::primalSolution() const
 
    int m = getNbLinVars();
    RealVector primal(m);
-   for (int i=0; i<m; ++i)
+   for (int i = 0; i < m; ++i)
       primal[i] = gvars_[i].get(GRB_DoubleAttr_X);
 
    return primal;
@@ -265,24 +275,25 @@ RealVector LPSolver::dualSolution() const
 
    // the first m values are the reduced costs of the variables
    // and the next n values are the shadow prices of the constraints
-   for (int i=0; i<p; ++i)
+   for (int i = 0; i < p; ++i)
       dual[i] = gctrs_[i].get(GRB_DoubleAttr_Pi);
 
    return dual;
 }
 
-bool LPSolver::infeasibleRay(RealVector& ray) const
+bool LPSolver::infeasibleRay(RealVector &ray) const
 {
    if (simplex_->get(GRB_IntAttr_Status) != GRB_INFEASIBLE)
       return false;
 
    int p = getNbLinVars() + getNbLinCtrs();
-   if (ray.size() != p) ray.resize(p);
+   if (ray.size() != p)
+      ray.resize(p);
 
-   for (int i=0; i<p; ++i)
+   for (int i = 0; i < p; ++i)
       ray[i] = gctrs_[i].get(GRB_DoubleAttr_FarkasDual);
 
    return true;
 }
 
-} // namespace
+} // namespace realpaver

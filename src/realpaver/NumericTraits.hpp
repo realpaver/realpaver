@@ -24,17 +24,15 @@
 namespace realpaver {
 
 /// Traits class for numbers used in linear algebra.
-template <typename T>
-struct NumericTraits
-{
+template <typename T> struct NumericTraits {
    /// Value type
    using ValueType = T;
 
    /// Reference type
-   using RefType = T&;
+   using RefType = T &;
 
    /// Const reference type
-   using ConstRefType = const T&;
+   using ConstRefType = const T &;
 
    /// Returns the number zero
    static ValueType zero();
@@ -67,13 +65,13 @@ struct NumericTraits
    static void addAssign(RefType x, ConstRefType y);
 
    /// x -= y
-   static void subAssign(ValueType& x, ConstRefType y);
+   static void subAssign(ValueType &x, ConstRefType y);
 
    /// x *= y
    static void mulAssign(RefType x, ConstRefType y);
 
    /// x /= y
-   static void divAssign(ValueType& x, ConstRefType y);
+   static void divAssign(ValueType &x, ConstRefType y);
 
    /// Returns true if x is infinite
    static bool isInf(ConstRefType x);
@@ -82,9 +80,9 @@ struct NumericTraits
    static bool isEqual(ConstRefType x, ConstRefType y);
 
    /// Returns the hash code of x
-   static size_t hashCode(ConstRefType  x);
+   static size_t hashCode(ConstRefType x);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

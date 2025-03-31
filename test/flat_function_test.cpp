@@ -1,8 +1,8 @@
-#include "test_config.hpp"
 #include "realpaver/FlatFunction.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 
-Problem* P;
+Problem *P;
 Variable x, y, z;
 
 void init()
@@ -11,7 +11,6 @@ void init()
    x = P->addRealVar(-10, 10, "x");
    y = P->addRealVar(-10, 10, "y");
    z = P->addRealVar(-10, 10, "z");
-
 }
 
 void clean()
@@ -25,10 +24,9 @@ void test_1()
    B.set(x, Interval(-1.5, 4));
    B.set(y, Interval(-1, 10.5));
    B.set(z, Interval(0, 2.5));
-   Term t(sqr(x) - 2*y + log(z));
+   Term t(sqr(x) - 2 * y + log(z));
    FlatFunction f(t, Interval::zero());
-   Interval I = t.eval(B),
-            J = f.iEval(B);
+   Interval I = t.eval(B), J = f.iEval(B);
    TEST_TRUE(I.isSetEq(J));
 }
 
@@ -38,10 +36,9 @@ void test_2()
    B.set(x, Interval(-0.5, 27.25));
    B.set(y, Interval(-1, 10.5));
    B.set(z, Interval(0, 2.5));
-   Term t(x*y - pow(z, 3));
+   Term t(x * y - pow(z, 3));
    FlatFunction f(t, Interval::zero());
-   Interval I = t.eval(B),
-            J = f.iEval(B);
+   Interval I = t.eval(B), J = f.iEval(B);
    TEST_TRUE(I.isSetEq(J));
 }
 
@@ -53,8 +50,7 @@ void test_3()
    B.set(z, Interval(-100, 2.5));
    Term t(sqr(cos(x - z)) + sqr(cos(y)) - MIN(x, z));
    FlatFunction f(t, Interval::zero());
-   Interval I = t.eval(B),
-            J = f.iEval(B);
+   Interval I = t.eval(B), J = f.iEval(B);
    TEST_TRUE(I.isSetEq(J));
 }
 

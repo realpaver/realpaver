@@ -41,61 +41,61 @@ public:
    ~Param() = default;
 
    /// Default copy constructor
-   Param(const Param&) = default;
+   Param(const Param &) = default;
 
    /// Default assignment operator
-   Param& operator=(const Param&) = default;
+   Param &operator=(const Param &) = default;
 
    /// Loads settings from a file
-   void loadParam(const std::string& filename);
+   void loadParam(const std::string &filename);
 
    /// Gets the value of an integral parameter name
-   int getIntParam(const std::string& name) const;
+   int getIntParam(const std::string &name) const;
 
    /// Sets the value of an integral parameter name to val
-   void setIntParam(const std::string& name, int val);
+   void setIntParam(const std::string &name, int val);
 
    /// Gets the value of a real parameter name
-   double getDblParam(const std::string& name) const;
+   double getDblParam(const std::string &name) const;
 
    /// Sets the value of a real parameter name to val
-   void setDblParam(const std::string& name, double val);
+   void setDblParam(const std::string &name, double val);
 
    /// Gets the value of a string parameter name
-   std::string getStrParam(const std::string& name) const;
+   std::string getStrParam(const std::string &name) const;
 
    /// Sets the value of a string parameter name to val
-   void setStrParam(const std::string& name, const std::string& val);
+   void setStrParam(const std::string &name, const std::string &val);
 
    /// Writes the parameters on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Loads settings from a file in the static instance
-   static void LoadParam(const std::string& filename);
+   static void LoadParam(const std::string &filename);
 
    /// Gets the value of an integral parameter in the static instance
-   static int GetIntParam(const std::string& name);
+   static int GetIntParam(const std::string &name);
 
    /// Sets the value of an integral parameter in the static instance
-   static void SetIntParam(const std::string& name, int val);
+   static void SetIntParam(const std::string &name, int val);
 
    /// Gets the value of a real parameter in the static instance
-   static double GetDblParam(const std::string& name);
+   static double GetDblParam(const std::string &name);
 
    /// Sets the value of a real parameter in the static instance
-   static void SetDblParam(const std::string& name, double val);
+   static void SetDblParam(const std::string &name, double val);
 
    /// Gets the value of a string parameter in the static instance
-   static std::string GetStrParam(const std::string& name);
+   static std::string GetStrParam(const std::string &name);
 
    /// Sets the value of a string parameter in the static instance
-   static void SetStrParam(const std::string& name, const std::string& val);
+   static void SetStrParam(const std::string &name, const std::string &val);
 
    /// Writes the parameters of the static instance on a stream
-   static void PrintParam(std::ostream& os);
+   static void PrintParam(std::ostream &os);
 
 private:
-   static Param instance_;  // default instance
+   static Param instance_; // default instance
 
    std::string path_;
    int lineno_;
@@ -106,23 +106,23 @@ private:
    std::unordered_map<std::string, std::string> strmap_;
 
    // processing of lines in a settings file
-   void processParam(const std::string& name, const std::string& val);
-   void readParam(const std::string& line, size_t first);
-   void processLine(const std::string& line);
+   void processParam(const std::string &name, const std::string &val);
+   void readParam(const std::string &line, size_t first);
+   void processLine(const std::string &line);
    void throwEx();
 
    // utility functions
-   static size_t eatSpaces(const std::string& line, size_t first);
+   static size_t eatSpaces(const std::string &line, size_t first);
    static bool isDigit(char c);
    static bool isSpace(char c);
    static bool isLetter(char c);
    static bool isCharName(char c);
-   static bool isInt(const std::string& s);
+   static bool isInt(const std::string &s);
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Param& prm);
+std::ostream &operator<<(std::ostream &os, const Param &prm);
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -16,13 +16,13 @@
  * @brief  Constraint propagation over interval contractors
  * @author Laurent Granvilliers
  * @date   2024-7-1
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_PROPAGATOR_HPP
 #define REALPAVER_INTERVAL_PROPAGATOR_HPP
 
-#include <vector>
 #include "realpaver/ContractorPool.hpp"
+#include <vector>
 
 namespace realpaver {
 
@@ -32,10 +32,10 @@ public:
    IntervalPropagator(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
-   IntervalPropagator(const IntervalPropagator&) = default;
+   IntervalPropagator(const IntervalPropagator &) = default;
 
    /// No assignment
-   IntervalPropagator& operator=(const IntervalPropagator&) = delete;
+   IntervalPropagator &operator=(const IntervalPropagator &) = delete;
 
    /// Default destructor
    ~IntervalPropagator() = default;
@@ -53,8 +53,8 @@ public:
    void push(SharedContractor op);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
    /// Returns the tolerance used as stopping criterion
    double getTol() const;
@@ -72,11 +72,11 @@ public:
    Proof proofAt(size_t i) const;
 
 private:
-   SharedContractorPool pool_;   // pool of contractors
-   double tol_;                  // tolerance used for propagation
-   std::vector<Proof> certif_;   // proof certificates of contractors
+   SharedContractorPool pool_; // pool of contractors
+   double tol_;                // tolerance used for propagation
+   std::vector<Proof> certif_; // proof certificates of contractors
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "Trigexp1-";
 
@@ -29,23 +29,25 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e2, 1e2]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    of << "Constraints" << endl;
    of << "3*x1^3+2*x2-5+sin(x1-x2-2)*sin(x1+x2) == 0," << endl;
-   for (int i=2; i<n; ++i)
+   for (int i = 2; i < n; ++i)
    {
-      of << "3*x" << i << "^3+2*x" << i+1 << "-5+sin(x" << i << "-x" << i+1;
-      of << ")*sin(x" << i << "+x" << i+1 << ")-4*x" << i;
-      of << "-x" << i-1 << "*exp(x" << i-1 << "-x" << i << ")-3 == 0," << endl;
+      of << "3*x" << i << "^3+2*x" << i + 1 << "-5+sin(x" << i << "-x" << i + 1;
+      of << ")*sin(x" << i << "+x" << i + 1 << ")-4*x" << i;
+      of << "-x" << i - 1 << "*exp(x" << i - 1 << "-x" << i << ")-3 == 0," << endl;
    }
-   of << "4*x" << n << "-x" << n-1 << "*exp(x" << n-1 << "-x" << n << ")-3 == 0;" << endl;
+   of << "4*x" << n << "-x" << n - 1 << "*exp(x" << n - 1 << "-x" << n << ")-3 == 0;"
+      << endl;
 
    of.close();
 

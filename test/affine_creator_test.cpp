@@ -1,9 +1,9 @@
-#include "test_config.hpp"
 #include "realpaver/AffineCreator.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 
-Problem* P;
-IntervalBox* B;
+Problem *P;
+IntervalBox *B;
 Variable x, y, z;
 
 void init()
@@ -33,8 +33,7 @@ void test_single_occ()
    AffineCreator creator(dag);
    creator.create(*B);
 
-   AffineForm f(3.0, {4.0}, {0}, 4.0),
-              g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
+   AffineForm f(3.0, {4.0}, {0}, 4.0), g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
 
    TEST_TRUE(f.equals(creator.fun(0)));
    TEST_TRUE(g.equals(creator.fun(1)));
@@ -49,7 +48,7 @@ void test_lin()
    B->set(y, Interval(1, 6));
 
    SharedDag dag = std::make_shared<Dag>();
-   dag->insert(1.5*x - 2.5*y - 2.0 == 0);
+   dag->insert(1.5 * x - 2.5 * y - 2.0 == 0);
 
    AffineCreator creator(dag);
    creator.create(*B);
@@ -66,15 +65,14 @@ void test_subset()
 
    SharedDag dag = std::make_shared<Dag>();
    dag->insert(sqr(x) + sqr(y) == 2.0);
-   dag->insert(1.5*x - 2.5*y - 2.0 == 0);
+   dag->insert(1.5 * x - 2.5 * y - 2.0 == 0);
    dag->insert(y - sqr(x) == 0.0);
 
    std::vector<size_t> lfun = {0, 2};
    AffineCreator creator(dag, lfun);
    creator.create(*B);
 
-   AffineForm f(3.0, {4.0}, {0}, 4.0),
-              g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
+   AffineForm f(3.0, {4.0}, {0}, 4.0), g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
 
    TEST_TRUE(f.equals(creator.fun(0)));
    TEST_TRUE(g.equals(creator.fun(1)));

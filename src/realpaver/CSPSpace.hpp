@@ -16,7 +16,7 @@
  * @brief  Spaces of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CSP_SPACE_HPP
 #define REALPAVER_CSP_SPACE_HPP
@@ -44,10 +44,10 @@ public:
    virtual ~CSPSpace();
 
    /// No assignment
-   CSPSpace& operator=(const CSPSpace&) = delete;
+   CSPSpace &operator=(const CSPSpace &) = delete;
 
    /// Default copy constructor
-   CSPSpace(const CSPSpace&) = default;
+   CSPSpace(const CSPSpace &) = default;
 
    /// @name Management of solution nodes
    ///@{
@@ -56,7 +56,7 @@ public:
    virtual size_t nbSolNodes() const = 0;
 
    /// Inserts a solution node in this
-   virtual void pushSolNode(const SharedCSPNode& node) = 0;
+   virtual void pushSolNode(const SharedCSPNode &node) = 0;
 
    /// Removes a solution node from this
    virtual SharedCSPNode popSolNode() = 0;
@@ -87,7 +87,7 @@ public:
    virtual SharedCSPNode nextPendingNode() = 0;
 
    /// Inserts a pending node in this
-   virtual void insertPendingNode(const SharedCSPNode& node) = 0;
+   virtual void insertPendingNode(const SharedCSPNode &node) = 0;
 
    /**
     * @brief Inserts a collection of pending nodes in this.
@@ -95,14 +95,13 @@ public:
     * The default behavior calls insertPendingNode for each node in
     * the range of iterators.
     */
-   virtual void insertPendingNodes(CSPSplit::iterator first,
-                                   CSPSplit::iterator last);
+   virtual void insertPendingNodes(CSPSplit::iterator first, CSPSplit::iterator last);
 
    /// Returns the i-th pending node
    virtual SharedCSPNode getPendingNode(size_t i) const = 0;
    ///@}
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

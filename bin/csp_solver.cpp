@@ -1,46 +1,48 @@
-#include <chrono>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include "realpaver/config.hpp"
 #include "realpaver/BoxReporter.hpp"
 #include "realpaver/CSPSolver.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
+#include "realpaver/config.hpp"
+#include <chrono>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
 
 using namespace realpaver;
 using namespace std;
 
-#define BLACK(s)   "\033[30m" << s << "\033[39m"
-#define RED(s)     "\033[31m" << s << "\033[39m"
-#define GREEN(s)   "\033[32m" << s << "\033[39m"
-#define ORANGE(s)  "\033[33m" << s << "\033[39m"
-#define BLUE(s)    "\033[34m" << s << "\033[39m"
+#define BLACK(s) "\033[30m" << s << "\033[39m"
+#define RED(s) "\033[31m" << s << "\033[39m"
+#define GREEN(s) "\033[32m" << s << "\033[39m"
+#define ORANGE(s) "\033[33m" << s << "\033[39m"
+#define BLUE(s) "\033[34m" << s << "\033[39m"
 #define MAGENTA(s) "\033[35m" << s << "\033[39m"
-#define CYAN(s)    "\033[36m" << s << "\033[39m"
-#define GRAY(s)    "\033[37m" << s << "\033[39m"
+#define CYAN(s) "\033[36m" << s << "\033[39m"
+#define GRAY(s) "\033[37m" << s << "\033[39m"
 
 // parses the filename
-void parseFilename(const std::string& filename, std::string& path,
-                   std::string& base, std::string& ext);
+void parseFilename(const std::string &filename, std::string &path, std::string &base,
+                   std::string &ext);
 
 // processes the argulments on the command line
-bool processArgs(int argc, char** argv, string& filename, string& pfilename);
+bool processArgs(int argc, char **argv, string &filename, string &pfilename);
 
 // inserts points at the end of a string
-string WP(const string& s, int n);
+string WP(const string &s, int n);
 
 // main function
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-   try {
+   try
+   {
       string filename = "", pfilename = "", sfilename = "";
 
       // processes the arguments
       bool ok = processArgs(argc, argv, filename, pfilename);
-      if (!ok) THROW("Bad arguments on the command line");
+      if (!ok)
+         THROW("Bad arguments on the command line");
 
       // parses the problem file name
       string baseFilename, pathFilename, extFilename;
@@ -48,12 +50,15 @@ int main(int argc, char** argv)
 
       // tries to open the problem file
       ifstream infile(filename);
-      if (!infile.is_open()) THROW("Bad problem filename: " << filename);
-      else infile.close();
+      if (!infile.is_open())
+         THROW("Bad problem filename: " << filename);
+      else
+         infile.close();
 
       // reads the parameters
       Param prm;
-      if (pfilename != "") prm.loadParam(pfilename);
+      if (pfilename != "")
+         prm.loadParam(pfilename);
 
       // logger
 #if LOG_ON
@@ -75,10 +80,12 @@ int main(int argc, char** argv)
       Problem problem;
 
       ok = parser.parseFile(filename, problem);
-      if (!ok) THROW("Parse error: " << parser.getParseError());
+      if (!ok)
+         THROW("Parse error: " << parser.getParseError());
 
       LOG_MAIN("End of parsing");
-      if (!problem.isCSP()) THROW("Not a CSP");
+      if (!problem.isCSP())
+         THROW("Not a CSP");
 
       // solving
       CSPSolver solver(problem);
@@ -99,7 +106,8 @@ int main(int argc, char** argv)
       string solfilename = baseFilename + ".sol";
       ofstream fsol;
       fsol.open(solfilename, std::ofstream::out);
-      if (fsol.bad()) THROW("Open error of solution file");
+      if (fsol.bad())
+         THROW("Open error of solution file");
 
       // preliminaries
       cout << GRAY(sep) << endl;
@@ -119,7 +127,7 @@ int main(int argc, char** argv)
       cout << GRAY(sep) << endl;
       string prepro = solver.getEnv()->getParam()->getStrParam("PREPROCESSING");
 
-      Preprocessor* preproc = solver.getPreprocessor();
+      Preprocessor *preproc = solver.getPreprocessor();
 
       fsol << WP("CSP solver", wpl) << REALPAVER_STRING << endl;
 
@@ -131,21 +139,16 @@ int main(int argc, char** argv)
 
       if (prepro == "YES")
       {
-         fsol << "--- PREPROCESSING ---" << endl << endl
-              << std::fixed << std::setprecision(3)
-              << WP("Elapsed time", wpl)
-              << preproc->elapsedTime() << " (seconds)"
+         fsol << "--- PREPROCESSING ---" << endl
               << endl
-              << std::fixed << std::setprecision(2)
-              << WP("Status", wpl);
+              << std::fixed << std::setprecision(3) << WP("Elapsed time", wpl)
+              << preproc->elapsedTime() << " (seconds)" << endl
+              << std::fixed << std::setprecision(2) << WP("Status", wpl);
 
          cout << BLUE("Preprocessing") << endl;
-         cout << std::fixed << std::setprecision(3)
-              << indent << WP("Time", wpl)
-              << GREEN(preproc->elapsedTime() << " (seconds)")
-              << endl
-              << std::fixed << std::setprecision(2)
-              << indent << WP("Status", wpl);
+         cout << std::fixed << std::setprecision(3) << indent << WP("Time", wpl)
+              << GREEN(preproc->elapsedTime() << " (seconds)") << endl
+              << std::fixed << std::setprecision(2) << indent << WP("Status", wpl);
 
          if (preproc->isSolved())
          {
@@ -160,9 +163,8 @@ int main(int argc, char** argv)
                cout << GREEN("solved feasible") << endl;
 
                IntervalBox B(preproc->fixedRegion());
-               fsol << endl << "SOLUTION " << std::scientific
-                    << "[" << B.width() << "]"
-                    << endl;
+               fsol << endl
+                    << "SOLUTION " << std::scientific << "[" << B.width() << "]" << endl;
                B.print(fsol);
             }
          }
@@ -171,8 +173,8 @@ int main(int argc, char** argv)
             fsol << "checked" << endl;
             cout << GREEN("checked") << endl;
 
-            fsol << WP("Number of variables fixed", wpl)
-                 << preproc->nbFixedVars() << endl;
+            fsol << WP("Number of variables fixed", wpl) << preproc->nbFixedVars()
+                 << endl;
 
             cout << indent << WP("Number of variables fixed", wpl)
                  << GREEN(preproc->nbFixedVars()) << endl
@@ -186,12 +188,12 @@ int main(int argc, char** argv)
                B.print(fsol);
             }
 
-            fsol << WP("Number of inactive constraints", wpl)
-                 << preproc->nbInactiveCtrs() << endl;
+            fsol << WP("Number of inactive constraints", wpl) << preproc->nbInactiveCtrs()
+                 << endl;
 
             if (preproc->nbInactiveCtrs() > 0)
             {
-               for (size_t i=0; i<preproc->nbInactiveCtrs(); ++i)
+               for (size_t i = 0; i < preproc->nbInactiveCtrs(); ++i)
                {
                   fsol << preproc->getInactiveCtr(i) << endl;
                }
@@ -209,28 +211,22 @@ int main(int argc, char** argv)
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
       {
-         CSPSpace* space = solver.getSpace();
+         CSPSpace *space = solver.getSpace();
 
          fsol << "--- SOLVING ---" << endl << endl;
          cout << GRAY(sep) << endl;
          cout << BLUE("Solving") << endl;
 
-         fsol << WP("Elapsed time", wpl)
-              << std::fixed << std::setprecision(3)
-              << solver.getSolvingTime() << " (seconds)"
-              << endl
-              << WP("Number of nodes", wpl)
-              << solver.getTotalNodes() << endl;
+         fsol << WP("Elapsed time", wpl) << std::fixed << std::setprecision(3)
+              << solver.getSolvingTime() << " (seconds)" << endl
+              << WP("Number of nodes", wpl) << solver.getTotalNodes() << endl;
 
-         cout << indent << WP("Time", wpl)
-              << std::fixed << std::setprecision(3)
-              << GREEN(solver.getSolvingTime() << " (seconds)")
-              << endl
-              << indent << WP("Number of nodes", wpl)
-              << GREEN(solver.getTotalNodes()) << endl;
+         cout << indent << WP("Time", wpl) << std::fixed << std::setprecision(3)
+              << GREEN(solver.getSolvingTime() << " (seconds)") << endl
+              << indent << WP("Number of nodes", wpl) << GREEN(solver.getTotalNodes())
+              << endl;
 
-         bool complete = env->usedNoLimit() &&
-                         space->nbPendingNodes() == 0;
+         bool complete = env->usedNoLimit() && space->nbPendingNodes() == 0;
 
          fsol << WP("Search status", wpl);
          cout << indent << WP("Search status", wpl);
@@ -274,8 +270,7 @@ int main(int argc, char** argv)
             }
          }
 
-         fsol << WP("Number of solutions", wpl)
-              << solver.nbSolutions() << endl;
+         fsol << WP("Number of solutions", wpl) << solver.nbSolutions() << endl;
 
          if (solver.nbSolutions() > 0)
          {
@@ -284,8 +279,8 @@ int main(int argc, char** argv)
          }
          else
          {
-            cout << indent << WP("Number of solutions", wpl)
-                 << RED(solver.nbSolutions()) << endl;
+            cout << indent << WP("Number of solutions", wpl) << RED(solver.nbSolutions())
+                 << endl;
          }
 
          // limits
@@ -294,39 +289,35 @@ int main(int argc, char** argv)
             double tl = env->getParam()->getDblParam("TIME_LIMIT");
             cout << std::fixed << std::setprecision(3);
             fsol << std::fixed << std::setprecision(3);
-            cout << indent << WP("Time limit enabled", wpl)
-                 << RED(tl << " (seconds)") << endl;
+            cout << indent << WP("Time limit enabled", wpl) << RED(tl << " (seconds)")
+                 << endl;
             fsol << WP("Time limit enabled", wpl) << tl << " (seconds)" << endl;
          }
 
          if (env->usedSolutionLimit())
          {
             int nb = env->getParam()->getIntParam("SOLUTION_LIMIT");
-            cout << indent << WP("Solution limit enabled", wpl)
-                 << RED(nb) << endl;
+            cout << indent << WP("Solution limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Solution limit enabled", wpl) << nb << endl;
          }
 
          if (env->usedNodeLimit())
          {
             int nb = env->getParam()->getIntParam("NODE_LIMIT");
-            cout << indent << WP("Node limit enabled", wpl)
-                 << RED(nb) << endl;
+            cout << indent << WP("Node limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Node limit enabled", wpl) << nb << endl;
          }
 
          if (env->usedDepthLimit())
          {
             int nb = env->getParam()->getIntParam("DEPTH_LIMIT");
-            cout << indent << WP("Depth limit enabled", wpl)
-                 << RED(nb) << endl;
+            cout << indent << WP("Depth limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Depth limit enabled", wpl) << endl;
          }
 
          if (space->nbPendingNodes() > 0)
          {
-            fsol << WP("Number of pending nodes", wpl)
-                 << space->nbPendingNodes() << endl;
+            fsol << WP("Number of pending nodes", wpl) << space->nbPendingNodes() << endl;
             cout << indent << WP("Number of pending nodes", wpl)
                  << RED(space->nbPendingNodes()) << endl;
          }
@@ -337,35 +328,45 @@ int main(int argc, char** argv)
          std::string dr = prm.getStrParam("DISPLAY_REGION");
 
          StreamReporter reporter(problem, fsol);
-         for (const auto& v : sco)
+         for (const auto &v : sco)
             if (!problem.isVarReported(v))
                reporter.remove(v.getName());
 
-         if (dr == "STD") reporter.setVertical(true);
-         if (dr == "VEC") reporter.setVertical(false);
+         if (dr == "STD")
+            reporter.setVertical(true);
+         if (dr == "VEC")
+            reporter.setVertical(false);
 
          std::string sd = prm.getStrParam("DISPLAY_REGION");
 
          int prec = prm.getIntParam("FLOAT_PRECISION");
          fsol << std::defaultfloat;
 
-         for (size_t i=0; i<solver.nbSolutions(); ++i)
+         for (size_t i = 0; i < solver.nbSolutions(); ++i)
          {
-            if (i>0) fsol << std::endl;
+            if (i > 0)
+               fsol << std::endl;
 
             std::pair<DomainBox, Proof> sol = solver.getSolution(i);
             IntervalBox hull(sol.first);
 
             fsol << std::setprecision(4);
-            fsol << std::endl << "SOLUTION " << (i+1)
-                 << " [" << hull.width() << "]";
+            fsol << std::endl << "SOLUTION " << (i + 1) << " [" << hull.width() << "]";
 
             switch (sol.second)
             {
-               case Proof::Inner:    fsol << " [exact]"; break;
-               case Proof::Feasible: fsol << " [feasible]"; break;
-               case Proof::Maybe:    fsol << " [unvalidated]"; break;
-               default:              fsol << " (bug!!!)"; break;
+            case Proof::Inner:
+               fsol << " [exact]";
+               break;
+            case Proof::Feasible:
+               fsol << " [feasible]";
+               break;
+            case Proof::Maybe:
+               fsol << " [unvalidated]";
+               break;
+            default:
+               fsol << " (bug!!!)";
+               break;
             }
 
             fsol << std::setprecision(prec) << endl;
@@ -376,15 +377,14 @@ int main(int argc, char** argv)
          if (solver.nbPendingNodes() > 0)
          {
             IntervalBox hp(solver.getPendingBox(0));
-            for (size_t i=1; i<solver.nbPendingNodes(); ++i)
+            for (size_t i = 1; i < solver.nbPendingNodes(); ++i)
             {
                IntervalBox aux(solver.getPendingBox(i));
                hp.glue(aux);
             }
 
             fsol << std::defaultfloat << std::setprecision(4);
-            fsol << endl << "HULL OF PENDING NODES" << " ["
-                 << hp.width() << "]" << endl;
+            fsol << endl << "HULL OF PENDING NODES" << " [" << hp.width() << "]" << endl;
             hp.print(fsol);
          }
       }
@@ -398,7 +398,7 @@ int main(int argc, char** argv)
 
       // writes the constraints
       fsol << "CONSTRAINTS" << endl;
-      for (size_t i=0; i<problem.nbCtrs(); ++i)
+      for (size_t i = 0; i < problem.nbCtrs(); ++i)
       {
          fsol << problem.ctrAt(i) << endl;
       }
@@ -412,45 +412,48 @@ int main(int argc, char** argv)
       // closes the solution file
       fsol.close();
    }
-   catch(Exception e) {
+   catch (Exception e)
+   {
       cout << e.what() << endl;
    }
 
    return 0;
 }
 
-bool processArgs(int argc, char** argv, string& filename, string& pfilename)
+bool processArgs(int argc, char **argv, string &filename, string &pfilename)
 {
    bool hasfile = false;
    int i = 1;
 
-   while (i<argc)
+   while (i < argc)
    {
       std::string text(argv[i]);
       if (text[0] != '-' && !hasfile)
       {
          filename = text;
          hasfile = true;
-         i = i+1;
+         i = i + 1;
       }
       else if (text == "-p")
       {
-         i = i+1;
-         if (i == argc) return false;
+         i = i + 1;
+         if (i == argc)
+            return false;
          else
          {
             pfilename = std::string(argv[i]);
-            i = i+1;
+            i = i + 1;
          }
       }
-      else return false;
+      else
+         return false;
    }
 
    return hasfile;
 }
 
-void parseFilename(const std::string& filename, std::string& path,
-                   std::string& base, std::string& ext)
+void parseFilename(const std::string &filename, std::string &path, std::string &base,
+                   std::string &ext)
 {
    bool iter = true, found = false;
    size_t pos = 0;
@@ -467,11 +470,10 @@ void parseFilename(const std::string& filename, std::string& path,
       }
       else
       {
-         pos = k+1;
+         pos = k + 1;
          found = true;
       }
-   }
-   while (iter);
+   } while (iter);
 
    if (found)
    {
@@ -495,11 +497,12 @@ void parseFilename(const std::string& filename, std::string& path,
    }
 }
 
-string WP(const string& s, int n)
+string WP(const string &s, int n)
 {
    string str = s;
    int m = n - s.length();
-   while (--m >= 0) str += ".";
+   while (--m >= 0)
+      str += ".";
    str += " ";
    return str;
 }

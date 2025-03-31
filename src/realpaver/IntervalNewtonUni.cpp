@@ -16,23 +16,24 @@
  * @brief  Univariate interval Newton operator
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include <stack>
+#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
-#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Tolerance.hpp"
+#include <stack>
 
 namespace realpaver {
 
 IntervalNewtonUni::IntervalNewtonUni()
-      : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_TOL")),
-        inflator_()
-{}
+    : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT"))
+    , tol_(Param::GetDblParam("NEWTON_TOL"))
+    , inflator_()
+{
+}
 
 size_t IntervalNewtonUni::getMaxIter() const
 {
@@ -51,25 +52,23 @@ double IntervalNewtonUni::getTol() const
    return tol_;
 }
 
-void IntervalNewtonUni::setTol(const double& tol)
+void IntervalNewtonUni::setTol(const double &tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0,
-          "A relative tolerance must belong to [0, 1]");
+   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
-Inflator& IntervalNewtonUni::getInflator()
+Inflator &IntervalNewtonUni::getInflator()
 {
    return inflator_;
 }
 
-void IntervalNewtonUni::setInflator(const Inflator& inflator)
+void IntervalNewtonUni::setInflator(const Inflator &inflator)
 {
    inflator_ = inflator;
 }
 
-Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
-                                  Interval& x)
+Proof IntervalNewtonUni::contract(IntervalFunctionUni &f, Interval &x)
 {
    LOG_LOW("Interval Newton: contract " << x << " (" << tol_ << ")");
 
@@ -102,8 +101,7 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
          if (!y.improves(prev, tol_))
             iter = false;
       }
-   }
-   while (iter);
+   } while (iter);
 
    LOG_LOW("> " << proof << " " << y);
 
@@ -111,7 +109,7 @@ Proof IntervalNewtonUni::contract(IntervalFunctionUni& f,
    return proof;
 }
 
-Proof IntervalNewtonUni::step(IntervalFunctionUni& f, Interval& x)
+Proof IntervalNewtonUni::step(IntervalFunctionUni &f, Interval &x)
 {
    Interval fx = f.eval(x);
    Interval dx = f.diff(x);
@@ -132,11 +130,9 @@ Proof IntervalNewtonUni::step(IntervalFunctionUni& f, Interval& x)
 
    if (dx.strictlyContainsZero())
    {
-      std::pair<Interval,Interval> q = extDiv(fc, dx);
+      std::pair<Interval, Interval> q = extDiv(fc, dx);
 
-      Interval xx1 = c - q.second,
-               xx2 = c - q.first,
-               nx = (x & xx1) | (x & xx2);
+      Interval xx1 = c - q.second, xx2 = c - q.first, nx = (x & xx1) | (x & xx2);
 
       if (nx.isEmpty())
          proof = Proof::Empty;
@@ -148,8 +144,7 @@ Proof IntervalNewtonUni::step(IntervalFunctionUni& f, Interval& x)
    }
    else
    {
-      Interval xx = c - fc / dx,
-               nx = x & xx;
+      Interval xx = c - fc / dx, nx = x & xx;
 
       if (nx.isEmpty())
          proof = Proof::Empty;
@@ -166,23 +161,28 @@ Proof IntervalNewtonUni::step(IntervalFunctionUni& f, Interval& x)
    return proof;
 }
 
-Proof IntervalNewtonUni::contractWithSearch(IntervalFunctionUni& f, Interval& x)
+Proof IntervalNewtonUni::contractWithSearch(IntervalFunctionUni &f, Interval &x)
 {
    Proof proof = contract(f, x);
-   if (proof != Proof::Maybe) return proof;
-   if (x.isCanonical()) return proof;
+   if (proof != Proof::Maybe)
+      return proof;
+   if (x.isCanonical())
+      return proof;
 
    Proof pl = shrinkLeft(f, x);
-   if (pl == Proof::Empty) return proof;
+   if (pl == Proof::Empty)
+      return proof;
 
    Proof pr = shrinkRight(f, x);
 
-   if (pl == Proof::Feasible) proof = pl;
-   if (pr == Proof::Feasible) proof = pr;
+   if (pl == Proof::Feasible)
+      proof = pl;
+   if (pr == Proof::Feasible)
+      proof = pr;
    return proof;
 }
 
-Proof IntervalNewtonUni::shrinkLeft(IntervalFunctionUni& f, Interval& x)
+Proof IntervalNewtonUni::shrinkLeft(IntervalFunctionUni &f, Interval &x)
 {
    std::stack<Interval> stak;
    stak.push(x);
@@ -194,7 +194,8 @@ Proof IntervalNewtonUni::shrinkLeft(IntervalFunctionUni& f, Interval& x)
       stak.pop();
       proof = contract(f, y);
 
-      if (proof == Proof::Empty) continue;
+      if (proof == Proof::Empty)
+         continue;
 
       if (proof == Proof::Feasible)
       {
@@ -216,7 +217,7 @@ Proof IntervalNewtonUni::shrinkLeft(IntervalFunctionUni& f, Interval& x)
    return Proof::Empty;
 }
 
-Proof IntervalNewtonUni::shrinkRight(IntervalFunctionUni& f, Interval& x)
+Proof IntervalNewtonUni::shrinkRight(IntervalFunctionUni &f, Interval &x)
 {
    std::stack<Interval> stak;
    stak.push(x);
@@ -228,7 +229,8 @@ Proof IntervalNewtonUni::shrinkRight(IntervalFunctionUni& f, Interval& x)
       stak.pop();
       proof = contract(f, y);
 
-      if (proof == Proof::Empty) continue;
+      if (proof == Proof::Empty)
+         continue;
 
       if (proof == Proof::Feasible)
       {
@@ -250,7 +252,7 @@ Proof IntervalNewtonUni::shrinkRight(IntervalFunctionUni& f, Interval& x)
    return Proof::Empty;
 }
 
-Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)
+Proof IntervalNewtonUni::localSearch(IntervalFunctionUni &f, Interval &x)
 {
    Proof proof = Proof::Maybe;
    Interval y = x.midpoint();
@@ -304,17 +306,15 @@ Proof IntervalNewtonUni::localSearch(IntervalFunctionUni& f, Interval& x)
       }
 
       dprev = dcurr;
-   }
-   while (iter);
+   } while (iter);
 
    x = y;
-
 
    LOG_INTER(" -> " << proof);
    return proof;
 }
 
-Proof IntervalNewtonUni::localStep(IntervalFunctionUni& f, Interval& x)
+Proof IntervalNewtonUni::localStep(IntervalFunctionUni &f, Interval &x)
 {
    Interval ix = inflator_.inflate(x);
    Interval fix = f.eval(ix);
@@ -347,4 +347,4 @@ Proof IntervalNewtonUni::localStep(IntervalFunctionUni& f, Interval& x)
    return proof;
 }
 
-} // namespace
+} // namespace realpaver

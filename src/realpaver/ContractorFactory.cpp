@@ -16,12 +16,12 @@
  * @brief  Factory of interval contractors
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
+#include "realpaver/ContractorFactory.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
-#include "realpaver/ContractorFactory.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/Linearizer.hpp"
 #include "realpaver/Logger.hpp"
@@ -29,16 +29,15 @@
 
 namespace realpaver {
 
-ContractorFactory::ContractorFactory(const Problem& pbm,
-                                     std::shared_ptr<Env> env)
-      : env_(env),
-        dag_(nullptr),
-        ve_(),
-        vi_(),
-        vc_(),
-        se_(),
-        si_(),
-        sc_()
+ContractorFactory::ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env)
+    : env_(env)
+    , dag_(nullptr)
+    , ve_()
+    , vi_()
+    , vc_()
+    , se_()
+    , si_()
+    , sc_()
 {
    // environment
    if (env == nullptr)
@@ -48,7 +47,7 @@ ContractorFactory::ContractorFactory(const Problem& pbm,
    dag_ = std::make_shared<Dag>();
 
    // separates the constraints in three parts
-   for (size_t i=0; i<pbm.nbCtrs(); ++i)
+   for (size_t i = 0; i < pbm.nbCtrs(); ++i)
    {
       Constraint c = pbm.ctrAt(i);
       try
@@ -65,7 +64,7 @@ ContractorFactory::ContractorFactory(const Problem& pbm,
             si_.insert(c.scope());
          }
       }
-      catch(Exception& e)
+      catch (Exception &e)
       {
          vc_.push_back(c);
          sc_.insert(c.scope());
@@ -90,7 +89,8 @@ SharedDag ContractorFactory::ContractorFactory::getDag() const
 
 std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
 {
-   if (dag_->isEmpty()) return nullptr;
+   if (dag_->isEmpty())
+      return nullptr;
 
    std::shared_ptr<IntervalSmearSumRel> ssr;
 
@@ -120,10 +120,10 @@ SharedContractorHC4 ContractorFactory::makeHC4(double tol)
    SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(dag_);
 
    // other constraints
-   for (const Constraint& c : vc_)
+   for (const Constraint &c : vc_)
    {
-      std::shared_ptr<ContractorConstraint>
-         op = std::make_shared<ContractorConstraint>(c);
+      std::shared_ptr<ContractorConstraint> op =
+          std::make_shared<ContractorConstraint>(c);
       hc4->push(op);
    }
 
@@ -151,10 +151,10 @@ SharedContractorBC4 ContractorFactory::makeBC4()
    SharedContractorBC4 bc4 = std::make_shared<ContractorBC4>(dag_);
 
    // other constraints
-   for (const Constraint& c : vc_)
+   for (const Constraint &c : vc_)
    {
-      std::shared_ptr<ContractorConstraint>
-         op = std::make_shared<ContractorConstraint>(c);
+      std::shared_ptr<ContractorConstraint> op =
+          std::make_shared<ContractorConstraint>(c);
       bc4->push(op);
    }
 
@@ -180,10 +180,10 @@ SharedContractorBC4 ContractorFactory::makeBC4()
 
 std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
 {
-   size_t ne = ve_.size(),
-          nv = se_.size();
+   size_t ne = ve_.size(), nv = se_.size();
 
-   if ((ne < 2) || (ne != nv)) return nullptr;
+   if ((ne < 2) || (ne != nv))
+      return nullptr;
 
    std::shared_ptr<IntervalNewton> newton;
 
@@ -222,7 +222,7 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
       double chi = env_->getParam()->getDblParam("INFLATION_CHI");
       newton->setInflationChi(chi);
 
-      tol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_TOL");
+      tol = env_->getParam()->getDblParam("GAUSS_SEIDEL_TOL");
       newton->getGaussSeidel()->setTol(tol);
 
       niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
@@ -281,71 +281,67 @@ SharedContractorACID ContractorFactory::makeACID()
 
 SharedContractorPolytope ContractorFactory::makePolytope()
 {
-   if (dag_->isEmpty()) return nullptr;
+   if (dag_->isEmpty())
+      return nullptr;
 
    SharedContractorPolytope op = nullptr;
 
-   bool ok =
-      env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL") == "YES";
+   bool ok = env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL") == "YES";
 
    if (ok)
    {
-      std::string relaxation
-         = env_->getParam()->getStrParam("POLYTOPE_HULL_RELAXATION");
+      std::string relaxation = env_->getParam()->getStrParam("POLYTOPE_HULL_RELAXATION");
 
       if (relaxation == "TAYLOR")
       {
          bool hansen =
-            env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
+             env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
 
          bool rand =
-            env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
+             env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
 
          CornerStyle style = (rand ? CornerStyle::Random : CornerStyle::RandomSeed);
 
-         std::unique_ptr<Linearizer> lzr
-            = std::make_unique<LinearizerTaylor>(dag_, hansen, style);
+         std::unique_ptr<Linearizer> lzr =
+             std::make_unique<LinearizerTaylor>(dag_, hansen, style);
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
       else if (relaxation == "AFFINE")
       {
          bool minrange =
-            env_->getParam()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX")
-               == "MINRANGE";
+             env_->getParam()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
 
-         std::unique_ptr<Linearizer> lzr
-            = std::make_unique<LinearizerAffine>(dag_, minrange);
+         std::unique_ptr<Linearizer> lzr =
+             std::make_unique<LinearizerAffine>(dag_, minrange);
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
       else if (relaxation == "AFFINE_TAYLOR")
       {
          bool hansen =
-            env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
+             env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
 
          bool rand =
-            env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
+             env_->getParam()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
 
          CornerStyle style = (rand ? CornerStyle::Random : CornerStyle::RandomSeed);
 
-         std::unique_ptr<LinearizerTaylor> taylor
-            = std::make_unique<LinearizerTaylor>(dag_, hansen, style);
+         std::unique_ptr<LinearizerTaylor> taylor =
+             std::make_unique<LinearizerTaylor>(dag_, hansen, style);
 
          ASSERT(taylor != nullptr, "taylor null");
 
          bool minrange =
-            env_->getParam()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX")
-               == "MINRANGE";
+             env_->getParam()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
 
-         std::unique_ptr<LinearizerAffine> affine
-            = std::make_unique<LinearizerAffine>(dag_, minrange);
+         std::unique_ptr<LinearizerAffine> affine =
+             std::make_unique<LinearizerAffine>(dag_, minrange);
 
-            ASSERT(affine != nullptr, "affine null");
+         ASSERT(affine != nullptr, "affine null");
 
-            std::unique_ptr<Linearizer> lzr
-            = std::make_unique<LinearizerAffineTaylor>(dag_, std::move(affine),
-                                                       std::move(taylor));
+         std::unique_ptr<Linearizer> lzr = std::make_unique<LinearizerAffineTaylor>(
+             dag_, std::move(affine), std::move(taylor));
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
@@ -373,4 +369,4 @@ SharedContractorPolytope ContractorFactory::makePolytope()
    return op;
 }
 
-} // namespace
+} // namespace realpaver

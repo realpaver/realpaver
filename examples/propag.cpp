@@ -1,5 +1,5 @@
-#include <iostream>
 #include "realpaver_api.hpp"
+#include <iostream>
 
 using namespace realpaver;
 using namespace std;
@@ -8,11 +8,11 @@ int main(void)
 {
    Logger::init(LogLevel::full, "propag.log");
 
-   try {
+   try
+   {
       Problem problem;
 
-      Variable x = problem.addRealVar(-7, 3, "x"),
-               y = problem.addRealVar(-3, 6, "y");
+      Variable x = problem.addRealVar(-7, 3, "x"), y = problem.addRealVar(-3, 6, "y");
 
       DomainBox dbox(problem.scope());
       cout << "Box:    " << dbox << endl;
@@ -24,8 +24,8 @@ int main(void)
       //~ size_t i = dag->insert( y == 0.5*x );
       //~ size_t j = dag->insert( y == 2*x );
 
-      size_t i = dag->insert( y - sqr(x) == 0 );
-      size_t j = dag->insert( sqr(x) + sqr(y) - 2.0 == 0 );
+      size_t i = dag->insert(y - sqr(x) == 0);
+      size_t j = dag->insert(sqr(x) + sqr(y) - 2.0 == 0);
 
       cout << (*dag) << endl;
 
@@ -43,7 +43,8 @@ int main(void)
       if (proof != Proof::Empty)
          cout << "New box: " << B << endl;
    }
-   catch(Exception e) {
+   catch (Exception e)
+   {
       cout << e.what() << endl;
    }
 

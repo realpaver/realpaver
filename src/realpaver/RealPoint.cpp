@@ -18,34 +18,33 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/RealPoint.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 RealPoint::RealPoint(Scope scop, double a)
-      : RealVector(scop.size(), a),
-        scop_(scop)
+    : RealVector(scop.size(), a)
+    , scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create a real point");   
+   ASSERT(!scop.isEmpty(), "Empty scope used to create a real point");
 }
 
-RealPoint::RealPoint(Scope scop, const RealVector& X)
-      : RealVector(X),
-        scop_(scop)
+RealPoint::RealPoint(Scope scop, const RealVector &X)
+    : RealVector(X)
+    , scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create a real point");      
-   ASSERT(scop.size() == X.size(), "Bad initialization of a real point");  
+   ASSERT(!scop.isEmpty(), "Empty scope used to create a real point");
+   ASSERT(scop.size() == X.size(), "Bad initialization of a real point");
 }
 
-RealPoint::RealPoint(const RealPoint& pt, Scope scop)
-      : RealVector(scop.size()),
-        scop_(scop)
+RealPoint::RealPoint(const RealPoint &pt, Scope scop)
+    : RealVector(scop.size())
+    , scop_(scop)
 {
-   ASSERT(pt.scope().contains(scop),
-          "Bad scope used to project a point in a sub-space");
+   ASSERT(pt.scope().contains(scop), "Bad scope used to project a point in a sub-space");
 
-   for (const auto& v : scop)
+   for (const auto &v : scop)
       set(v, pt.get(v));
 }
 
@@ -54,37 +53,37 @@ Scope RealPoint::scope() const
    return scop_;
 }
 
-double RealPoint::get(const Variable& v) const
+double RealPoint::get(const Variable &v) const
 {
    ASSERT(scop_.contains(v), "Bad access in a real point @ " << v.getName());
 
    return operator[](scop_.index(v));
 }
 
-void RealPoint::set(const Variable& v, double a)
+void RealPoint::set(const Variable &v, double a)
 {
    ASSERT(scop_.contains(v), "Bad access in a real point @ " << v.getName());
 
    operator[](scop_.index(v)) = a;
 }
 
-void RealPoint::setOnScope(const RealPoint& pt, const Scope& scop)
+void RealPoint::setOnScope(const RealPoint &pt, const Scope &scop)
 {
-   for (const auto& v : scop)
+   for (const auto &v : scop)
       set(v, pt.get(v));
 }
 
-RealPoint RealPoint::subPoint(const Scope& scop) const
+RealPoint RealPoint::subPoint(const Scope &scop) const
 {
-   ASSERT(scop_.contains(scop),
-          "Bad scope used to create a sub-point " << scop);
+   ASSERT(scop_.contains(scop), "Bad scope used to create a sub-point " << scop);
 
    RealPoint pt(scop);
-   for (const auto& v : scop) pt.set(v, get(v));
+   for (const auto &v : scop)
+      pt.set(v, get(v));
    return pt;
 }
 
-RealPoint* RealPoint::clone() const
+RealPoint *RealPoint::clone() const
 {
    return new RealPoint(*this);
 }
@@ -94,4 +93,4 @@ bool RealPoint::isVectorizable() const
    return scop_.isIdentity();
 }
 
-} // namespace
+} // namespace realpaver

@@ -35,7 +35,7 @@ public:
 
    /**
     * @brief Constructor.
-    * 
+    *
     * 4 cases given the parameters:
     * - (true, true) -> {0, 1}
     * - (true, false) -> {0}
@@ -45,10 +45,10 @@ public:
    ZeroOne(bool zro, bool one);
 
    /// Default copy constructor
-   ZeroOne(const ZeroOne&) = default;
+   ZeroOne(const ZeroOne &) = default;
 
    /// Default assignment operator
-   ZeroOne& operator=(const ZeroOne&) = default;
+   ZeroOne &operator=(const ZeroOne &) = default;
 
    /// Default destructor
    ~ZeroOne() = default;
@@ -85,33 +85,33 @@ public:
 
    /**
     * @brief Assignment method.
-    * 
+    *
     * Inserts 0 in this if b = true, removes it otherwise.
     * Returns a reference to this.
     */
-   ZeroOne& setZero(bool b);
+   ZeroOne &setZero(bool b);
 
    /**
     * @brief Assignment method.
-    * 
+    *
     * Inserts 1 in this if b = true, removes it otherwise.
     * Returns a reference to this.
     */
-   ZeroOne& setOne(bool b);
+   ZeroOne &setOne(bool b);
 
    /// Returns a range that corresponds to this
    Range toRange() const;
 
    /// Equality test
-   bool equals(const ZeroOne& other) const;
+   bool equals(const ZeroOne &other) const;
 
 private:
    bool zro_, one_;
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const ZeroOne& zo);
+std::ostream &operator<<(std::ostream &os, const ZeroOne &zo);
 
-} // namespace
+} // namespace realpaver
 
 #endif

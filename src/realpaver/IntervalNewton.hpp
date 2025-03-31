@@ -16,7 +16,7 @@
  * @brief  Interval Newton method
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_NEWTON_HPP
 #define REALPAVER_INTERVAL_NEWTON_HPP
@@ -54,17 +54,17 @@ public:
    ~IntervalNewton();
 
    /// Copy constructor
-   IntervalNewton(const IntervalNewton&);
+   IntervalNewton(const IntervalNewton &);
 
    /// No assignment
-   IntervalNewton& operator=(const IntervalNewton&) = delete;
+   IntervalNewton &operator=(const IntervalNewton &) = delete;
 
    Scope scope() const override;
-   Proof contract(IntervalBox& X) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &X) override;
+   void print(std::ostream &os) const override;
 
    /// Returns the interval GFauss Seidel operator of this
-   IntervalGaussSeidel* getGaussSeidel() const;
+   IntervalGaussSeidel *getGaussSeidel() const;
 
    /// Sets a limit of iterations of the contraction method
    void setMaxIter(size_t n);
@@ -76,7 +76,7 @@ public:
    double getTol() const;
 
    /// Sets the improvement factor
-   void setTol(const double& tol);
+   void setTol(const double &tol);
 
    /// Assigns the threshold on the width of a box of the contraction method
    void setWidthLimit(double val);
@@ -90,19 +90,19 @@ public:
     * Tries to derive a proof certificate for the existence of a solution in
     * a box using an inflation-based algorithm. The box can be modified.
     */
-   Proof certify(IntervalBox& box);
+   Proof certify(IntervalBox &box);
 
    /// Returns the parameter delta of the inflation algorithm
    double getInflationDelta() const;
 
    /// Assigns the parameter delta of the inflation algorithm
-   void setInflationDelta(const double& val);
+   void setInflationDelta(const double &val);
 
    /// Returns the parameter chi of the inflation algorithm
    double getInflationChi() const;
 
    /// Assigns the parameter chi of the inflation algorithm
-   void setInflationChi(const double& val);
+   void setInflationChi(const double &val);
 
    /// Sets a limit of iterations of the certification method
    void setCertifyMaxIter(size_t n);
@@ -111,28 +111,28 @@ public:
    size_t getCertifyMaxIter() const;
 
 private:
-   IntervalFunctionVector F_;       // vector of interval functions
-   IntervalMatrix jac_;             // Jacobian matrix
-   IntervalVector val_, y_, b_;     // working vectors
-   IntervalBox c_;                  // point of expansion
-   IntervalGaussSeidel* gs_;        // Gauss-Seidel operator
+   IntervalFunctionVector F_;   // vector of interval functions
+   IntervalMatrix jac_;         // Jacobian matrix
+   IntervalVector val_, y_, b_; // working vectors
+   IntervalBox c_;              // point of expansion
+   IntervalGaussSeidel *gs_;    // Gauss-Seidel operator
 
-   size_t maxiter_;     // maximum number of iterations (contraction)
-   double tol_;        // tolerance on the distance between two intervals
-   double wlim_;        // threshold on the width of a box: no application
-                        // of the contraction method if the width of the
-                        // input box is greater than this value
+   size_t maxiter_; // maximum number of iterations (contraction)
+   double tol_;     // tolerance on the distance between two intervals
+   double wlim_;    // threshold on the width of a box: no application
+                    // of the contraction method if the width of the
+                    // input box is greater than this value
 
-   double delta_;       // parameter delta of inflation
-   double chi_;         // parameter chi of inflation
-   size_t cmaxiter_;    // maximum number of iterations
+   double delta_;    // parameter delta of inflation
+   double chi_;      // parameter chi of inflation
+   size_t cmaxiter_; // maximum number of iterations
 
-   void makeY(IntervalBox& X);
-   void makeC(IntervalBox& X);
-   Proof reduceX(IntervalBox& X, bool& improved);
-   Proof certifyX(IntervalBox& X);
+   void makeY(IntervalBox &X);
+   void makeC(IntervalBox &X);
+   Proof reduceX(IntervalBox &X, bool &improved);
+   Proof certifyX(IntervalBox &X);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

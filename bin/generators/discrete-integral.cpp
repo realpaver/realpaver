@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "DiscreteIntegral-";
 
@@ -27,38 +27,41 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Constants" << endl;
-   of << "h = 1/" << n+1 << "," << endl;
-   for (int i=1; i<=n; ++i)
+   of << "h = 1/" << n + 1 << "," << endl;
+   for (int i = 1; i <= n; ++i)
    {
       of << "t" << i << " = " << i << "*h," << endl;
       of << "u" << i << " = 1-t" << i;
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e2, 1e2]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    string c = "1.1";
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << "+h*(";
-      for (int j=1; j<=i; ++j)
+      for (int j = 1; j <= i; ++j)
       {
-         if (j > 1) of << "+";
+         if (j > 1)
+            of << "+";
          of << "t" << j << "*(";
          of << "x" << j << "+t" << j << "+1";
          of << ")^3";
       }
-      for (int j=i+1; j<=n; ++j)
+      for (int j = i + 1; j <= n; ++j)
       {
          of << "+";
          of << "u" << j << "*(";
@@ -66,7 +69,8 @@ int main(int argc, char ** argv)
          of << ")^3";
       }
       of << ") == 0";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl;
 

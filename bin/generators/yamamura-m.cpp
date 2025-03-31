@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "Yamamura-M-";
 
@@ -22,12 +22,13 @@ int main(int argc, char ** argv)
    of.open(filename);
 
    of << "# In: Yamamura K., Kawata H., and Tokue A." << endl;
-   of << "#     Interval solution of nonlinear equations using linear programming." << endl;
+   of << "#     Interval solution of nonlinear equations using linear programming."
+      << endl;
    of << "#     BIT, 38(1):186-199, 1998." << endl << endl;
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e8, 1e8]";
       of << "," << endl;
@@ -36,18 +37,19 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "2.5*x" << i << "^3-10.5*x" << i << "^2+11.8*x" << i;
       of << "+v == " << i;
-     of << "," << endl;
+      of << "," << endl;
    }
 
    of << "v == ";
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i;
-      if (i<n) of << "+";
+      if (i < n)
+         of << "+";
    }
    of << ";" << endl;
 

@@ -16,7 +16,7 @@
  * @brief  HC4 contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_HC4_HPP
 #define REALPAVER_CONTRACTOR_HC4_HPP
@@ -41,14 +41,14 @@ public:
    ~ContractorHC4();
 
    /// No copy
-   ContractorHC4(const ContractorHC4&) = delete;
+   ContractorHC4(const ContractorHC4 &) = delete;
 
    /// No asignment
-   ContractorHC4& operator=(const ContractorHC4&) = delete;
+   ContractorHC4 &operator=(const ContractorHC4 &) = delete;
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
    /// Inserts a contractor in this
    void push(SharedContractor op);
@@ -60,13 +60,13 @@ public:
    void setTol(double tol);
 
 private:
-   SharedDag dag_;               // DAG
-   IntervalPropagator* propag_;  // propagation algorithm
+   SharedDag dag_;              // DAG
+   IntervalPropagator *propag_; // propagation algorithm
 };
 
 /// Type of shared pointers of HC4 contractors
 using SharedContractorHC4 = std::shared_ptr<ContractorHC4>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

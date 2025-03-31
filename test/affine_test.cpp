@@ -1,384 +1,343 @@
-#include "test_config.hpp"
 #include "realpaver/AffineForm.hpp"
+#include "test_config.hpp"
 
 void test_var()
 {
-   AffineForm f(1, Interval(-1, 2)),
-              res(0.5, {1.5}, {1});
+   AffineForm f(1, Interval(-1, 2)), res(0.5, {1.5}, {1});
    TEST_TRUE(f.equals(res));
 }
 
 void test_eval()
 {
-   AffineForm f(-1.0, {2.0, -3.0}, {0, 1});  // -1.0 + 2v0 - 3v1
+   AffineForm f(-1.0, {2.0, -3.0}, {0, 1}); // -1.0 + 2v0 - 3v1
    Interval res(-6.0, 4.0);
    TEST_TRUE(res.isSetEq(f.eval()));
 }
 
 void test_push_1()
 {
-   AffineForm f(-1.0),
-              res(-1.0, {2.0}, {1});
+   AffineForm f(-1.0), res(-1.0, {2.0}, {1});
    f.push(2.0, 1);
    TEST_TRUE(res.equals(f));
 }
 
 void test_push_2()
 {
-   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}),  // -1.0 + 2v1 - 3v2 - v4
-              res(-1.0, {-1.0, 2.0, -3.0, -1.0}, {0, 1, 2, 4});
+   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}), // -1.0 + 2v1 - 3v2 - v4
+       res(-1.0, {-1.0, 2.0, -3.0, -1.0}, {0, 1, 2, 4});
    f.push(-1.0, 0);
    TEST_TRUE(res.equals(f));
 }
 
 void test_push_3()
 {
-   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}),  // -1.0 + 2v1 - 3v2 - v4
-              res(-1.0, {2.0, -3.0, -4.0, -1.0}, {1, 2, 3, 4});
+   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}), // -1.0 + 2v1 - 3v2 - v4
+       res(-1.0, {2.0, -3.0, -4.0, -1.0}, {1, 2, 3, 4});
    f.push(-4.0, 3);
    TEST_TRUE(res.equals(f));
 }
 
 void test_push_4()
 {
-   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}),  // -1.0 + 2v1 - 3v2 - v4
-              res(-1.0, {2.0, -3.0, -1.0, -4.0}, {1, 2, 4, 5});
+   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}), // -1.0 + 2v1 - 3v2 - v4
+       res(-1.0, {2.0, -3.0, -1.0, -4.0}, {1, 2, 4, 5});
    f.push(-4.0, 5);
    TEST_TRUE(res.equals(f));
 }
 
 void test_push_5()
 {
-   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}),  // -1.0 + 2v1 - 3v2 - v4
-              res(-1.0, {2.0, -7.0, -1.0}, {1, 2, 4});
+   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}), // -1.0 + 2v1 - 3v2 - v4
+       res(-1.0, {2.0, -7.0, -1.0}, {1, 2, 4});
    f.push(-4.0, 2);
    TEST_TRUE(res.equals(f));
 }
 
 void test_push_6()
 {
-   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}),  // -1.0 + 2v1 - 3v2 - v4
-              res(-1.0, {2.0, -1.0}, {1, 4});
+   AffineForm f(-1.0, {2.0, -3.0, -1.0}, {1, 2, 4}), // -1.0 + 2v1 - 3v2 - v4
+       res(-1.0, {2.0, -1.0}, {1, 4});
    f.push(3.0, 2);
    TEST_TRUE(res.equals(f));
 }
 
 void test_add_1()
 {
-   AffineForm f(1.0, {-2.0}, {0}),  // 1 - 2v0
-              g(1.5, {3.0},  {1}),  // 1.5 + 3v1
-              h = f + g,
-              res(2.5, {-2.0, 3.0}, {0, 1});
+   AffineForm f(1.0, {-2.0}, {0}), // 1 - 2v0
+       g(1.5, {3.0}, {1}),         // 1.5 + 3v1
+       h = f + g, res(2.5, {-2.0, 3.0}, {0, 1});
    TEST_TRUE(h.equals(res));
 }
 
 void test_add_2()
 {
-   AffineForm f(1.0, {-2.0}, {0}, 1.0),  // 1   - 2v0 + ve
-              g(1.5, {3.0},  {0}, 0.5),  // 1.5 + 3v0 + 0.5ve
-              h = f + g,
-              res(2.5, {1.0}, {0}, 1.5);
+   AffineForm f(1.0, {-2.0}, {0}, 1.0), // 1   - 2v0 + ve
+       g(1.5, {3.0}, {0}, 0.5),         // 1.5 + 3v0 + 0.5ve
+       h = f + g, res(2.5, {1.0}, {0}, 1.5);
    TEST_TRUE(h.equals(res));
 }
 
 void test_add_3()
 {
-   AffineForm f(1.0, {-2.0, 2.0}, {0, 1}),   // 1   - 2v0 + 2v1
-              g(1.5, {2.0, -2.0},  {0, 1}),  // 1.5 + 2v0 - 2v1
-              h = f + g,
-              res(2.5, {}, {});
+   AffineForm f(1.0, {-2.0, 2.0}, {0, 1}), // 1   - 2v0 + 2v1
+       g(1.5, {2.0, -2.0}, {0, 1}),        // 1.5 + 2v0 - 2v1
+       h = f + g, res(2.5, {}, {});
    TEST_TRUE(h.equals(res));
 }
 
 void test_add_4()
 {
-   AffineForm f(1.0, {-2.0}, {1}),  // 1 - 2v1
-              g(1.5, {3.0},  {0}),  // 1.5 + 3v0
-              h = f + g,
-              res(2.5, {3.0, -2.0}, {0, 1});
+   AffineForm f(1.0, {-2.0}, {1}), // 1 - 2v1
+       g(1.5, {3.0}, {0}),         // 1.5 + 3v0
+       h = f + g, res(2.5, {3.0, -2.0}, {0, 1});
    TEST_TRUE(h.equals(res));
 }
 
 void test_sub_1()
 {
-   AffineForm f(1.0, {-2.0}, {0}, 1.0),  // 1 - 2v0 + ve
-              g(1.5, {3.0},  {1}, 0.5),  // 1.5 + 3v1 + 0.5ve
-              h = f - g,
-              res(-0.5, {-2.0, -3.0}, {0, 1}, 1.5);
+   AffineForm f(1.0, {-2.0}, {0}, 1.0), // 1 - 2v0 + ve
+       g(1.5, {3.0}, {1}, 0.5),         // 1.5 + 3v1 + 0.5ve
+       h = f - g, res(-0.5, {-2.0, -3.0}, {0, 1}, 1.5);
    TEST_TRUE(h.equals(res));
 }
 
 void test_sub_2()
 {
-   AffineForm f(1.0, {-2.0}, {0}),  // 1   - 2v0
-              g(1.5, {3.0},  {0}),  // 1.5 + 3v0
-              h = f - g,
-              res(-0.5, {-5.0}, {0});
+   AffineForm f(1.0, {-2.0}, {0}), // 1   - 2v0
+       g(1.5, {3.0}, {0}),         // 1.5 + 3v0
+       h = f - g, res(-0.5, {-5.0}, {0});
    TEST_TRUE(h.equals(res));
 }
 
 void test_sub_3()
 {
-   AffineForm f(1.0, {-2.0, 2.0}, {0, 1}),   // 1   - 2v0 + 2v1
-              g(1.5, {-2.0, 2.0},  {0, 1}),  // 1.5 - 2v0 + 2v1
-              h = f - g,
-              res(-0.5, {}, {});
+   AffineForm f(1.0, {-2.0, 2.0}, {0, 1}), // 1   - 2v0 + 2v1
+       g(1.5, {-2.0, 2.0}, {0, 1}),        // 1.5 - 2v0 + 2v1
+       h = f - g, res(-0.5, {}, {});
    TEST_TRUE(h.equals(res));
 }
 
 void test_sub_4()
 {
-   AffineForm f(1.0, {-2.0}, {1}),  // 1 - 2v1
-              g(1.5, {3.0},  {0}),  // 1.5 + 3v0
-              h = f - g,
-              res(-0.5, {-3.0, -2.0}, {0, 1});
+   AffineForm f(1.0, {-2.0}, {1}), // 1 - 2v1
+       g(1.5, {3.0}, {0}),         // 1.5 + 3v0
+       h = f - g, res(-0.5, {-3.0, -2.0}, {0, 1});
    TEST_TRUE(h.equals(res));
 }
 
 void test_usub()
 {
-   AffineForm f(1.0, {3.0, -2.0}, {0, 1}, 2.0),  // 1 + 3v0 - 2v1 + 2ve
-              h = -f,
-              res(-1.0, {-3.0, 2.0}, {0, 1}, 2.0);
+   AffineForm f(1.0, {3.0, -2.0}, {0, 1}, 2.0), // 1 + 3v0 - 2v1 + 2ve
+       h = -f, res(-1.0, {-3.0, 2.0}, {0, 1}, 2.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_mul_1()
 {
-   AffineForm f(1.5, {3.0}, {0}),  // 1.5 + 3v0
-              g(2.0, {-2.0}, {1}), // 2 - 2v1
-              h = f*g,
-              res(3.0, {6.0, -3.0}, {0, 1}, 6.0);
+   AffineForm f(1.5, {3.0}, {0}), // 1.5 + 3v0
+       g(2.0, {-2.0}, {1}),       // 2 - 2v1
+       h = f * g, res(3.0, {6.0, -3.0}, {0, 1}, 6.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_mul_2()
 {
-   AffineForm f(1.5, {3.0}, {0}),  // 1.5 + 3v0
-              g(2.0, {-2.0}, {0}), // 2 - 2v0
-              h = f*g,
-              res(3.0, {3.0}, {0}, 6.0);
+   AffineForm f(1.5, {3.0}, {0}), // 1.5 + 3v0
+       g(2.0, {-2.0}, {0}),       // 2 - 2v0
+       h = f * g, res(3.0, {3.0}, {0}, 6.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_mul_3()
 {
-   AffineForm f(1.5, {3.0}, {0}),         // 1.5 + 3v0
-              g(2.0, {-2.0, 4}, {0, 1}),  // 2 - 2v0 + 4v1
-              h = f*g,
-              res(3.0, {3.0, 6.0}, {0, 1}, 18.0);
+   AffineForm f(1.5, {3.0}, {0}), // 1.5 + 3v0
+       g(2.0, {-2.0, 4}, {0, 1}), // 2 - 2v0 + 4v1
+       h = f * g, res(3.0, {3.0, 6.0}, {0, 1}, 18.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_mul_4()
 {
-   AffineForm f(1.5, {3.0, -1.0}, {0, 1}),  // 1.5 + 3v0 - v1
-              g(2.0, {-2.0, 4}, {0, 1}),    // 2 - 2v0 + 4v1
-              h = f*g,
-              res(3.0, {3.0, 4.0}, {0, 1}, 24.0);
+   AffineForm f(1.5, {3.0, -1.0}, {0, 1}), // 1.5 + 3v0 - v1
+       g(2.0, {-2.0, 4}, {0, 1}),          // 2 - 2v0 + 4v1
+       h = f * g, res(3.0, {3.0, 4.0}, {0, 1}, 24.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_mul_5()
 {
-   AffineForm f(1.5, {3.0, -1.0}, {0, 1}, 2.0),  // 1.5 + 3v0 - v1 + 2v2
-              g(2.0, {-2.0, 4}, {0, 1},   0.5),  // 2 - 2v0 + 4v1 + 0.5v2
-              h = f*g,
-              res(3.0, {3.0, 4.0}, {0, 1}, 43.75);
+   AffineForm f(1.5, {3.0, -1.0}, {0, 1}, 2.0), // 1.5 + 3v0 - v1 + 2v2
+       g(2.0, {-2.0, 4}, {0, 1}, 0.5),          // 2 - 2v0 + 4v1 + 0.5v2
+       h = f * g, res(3.0, {3.0, 4.0}, {0, 1}, 43.75);
    TEST_TRUE(h.equals(res));
 }
 
 void test_sqr_1()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0
-              h = sqr(f),
-              res(4.25, {-6.0}, {0}, 2.0);
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0
+       h = sqr(f), res(4.25, {-6.0}, {0}, 2.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_sqr_2()
 {
-   AffineForm f(1.5, {-2.0, 0.5}, {0, 1}),  // 1.5 - 2v0 + 0.5v1
-              h = sqr(f),
-              res(5.375, {-6.0, 1.5}, {0, 1}, 3.125);
+   AffineForm f(1.5, {-2.0, 0.5}, {0, 1}), // 1.5 - 2v0 + 0.5v1
+       h = sqr(f), res(5.375, {-6.0, 1.5}, {0, 1}, 3.125);
    TEST_TRUE(h.equals(res));
 }
 
 void test_sqr_3()
 {
-   AffineForm f(1.5, {-2.0, 0.5}, {0, 1}, 10.0),  // 1.5 - 2v0 + 0.5v1 + 10ve
-              h = sqr(f),
-              res(80.375, {-6.0, 1.5}, {0, 1}, 108.125);
+   AffineForm f(1.5, {-2.0, 0.5}, {0, 1}, 10.0), // 1.5 - 2v0 + 0.5v1 + 10ve
+       h = sqr(f), res(80.375, {-6.0, 1.5}, {0, 1}, 108.125);
    TEST_TRUE(h.equals(res));
 }
 
 void test_udiv_1()
 {
-   AffineForm f(0, Interval(1, 2)),
-              h = udiv(f),
-              res(0.75, {-0.125}, {0}, 0.125);
+   AffineForm f(0, Interval(1, 2)), h = udiv(f), res(0.75, {-0.125}, {0}, 0.125);
    TEST_TRUE(h.equals(res));
 }
 
 void test_udiv_2()
 {
-   AffineForm f(0, Interval(-2, -1)),
-              h = udiv(f),
-              res(-0.75, {-0.125}, {0}, 0.125);
+   AffineForm f(0, Interval(-2, -1)), h = udiv(f), res(-0.75, {-0.125}, {0}, 0.125);
    TEST_TRUE(h.equals(res));
 }
 
 void test_udiv_3()
 {
-   AffineForm f(1.5, {0.25}, {0}, 0.25),
-              h = udiv(f),
-              res(0.75, {-0.0625}, {0}, 0.1875);
+   AffineForm f(1.5, {0.25}, {0}, 0.25), h = udiv(f), res(0.75, {-0.0625}, {0}, 0.1875);
    TEST_TRUE(h.equals(res));
 }
 
 void test_udiv_4()
 {
-   AffineForm f(1.0, {2.0}, {0}),
-              h = udiv(f);
+   AffineForm f(1.0, {2.0}, {0}), h = udiv(f);
    TEST_TRUE(h.errorTerm().isInf());
 }
 
 void test_udiv_5()
 {
-   AffineForm f(0.0, {}, {}),
-              h = udiv(f);
+   AffineForm f(0.0, {}, {}), h = udiv(f);
    TEST_TRUE(h.isEmpty());
 }
 
 void test_pow()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0
-              h = pow(f, 3),
-              res(6.375, {-17.5}, {0}, 19.0);
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0
+       h = pow(f, 3), res(6.375, {-17.5}, {0}, 19.0);
    TEST_TRUE(h.equals(res));
 }
 
 void test_min_1()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              g(1.0, {1.0}, {1}),   // 1 + v1 in [0, 2]
-              h = min(f, g),
-              res(-0.5, {}, {}, Interval(0, 2.5));
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       g(1.0, {1.0}, {1}),         // 1 + v1 in [0, 2]
+       h = min(f, g), res(-0.5, {}, {}, Interval(0, 2.5));
    TEST_TRUE(h.equals(res));
 }
 
 void test_min_2()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              g(5.0, {1.0}, {1}),   // 5 + v1 in [4, 6]
-              h = min(f, g),
-              res(f);
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       g(5.0, {1.0}, {1}),         // 5 + v1 in [4, 6]
+       h = min(f, g), res(f);
    TEST_TRUE(h.equals(res));
 }
 
 void test_min_3()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              g(-3.0, {1.0}, {1}),  // -3 + v1 in [-4, -2]
-              h = min(f, g),
-              res(g);
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       g(-3.0, {1.0}, {1}),        // -3 + v1 in [-4, -2]
+       h = min(f, g), res(g);
    TEST_TRUE(h.equals(res));
 }
 
 void test_max_1()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              g(1.0, {1.0}, {1}),   // 1 + v1 in [0, 2]
-              h = max(f, g),
-              res(0.0, {}, {}, Interval(0, 3.5));
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       g(1.0, {1.0}, {1}),         // 1 + v1 in [0, 2]
+       h = max(f, g), res(0.0, {}, {}, Interval(0, 3.5));
    TEST_TRUE(h.equals(res));
 }
 
 void test_max_2()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              g(5.0, {1.0}, {1}),   // 5 + v1 in [4, 6]
-              h = max(f, g),
-              res(g);
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       g(5.0, {1.0}, {1}),         // 5 + v1 in [4, 6]
+       h = max(f, g), res(g);
    TEST_TRUE(h.equals(res));
 }
 
 void test_max_3()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              g(-3.0, {1.0}, {1}),  // -3 + v1 in [-4, -2]
-              h = max(f, g),
-              res(f);
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       g(-3.0, {1.0}, {1}),        // -3 + v1 in [-4, -2]
+       h = max(f, g), res(f);
    TEST_TRUE(h.equals(res));
 }
 
 void test_abs_1()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              h = abs(f),
-              res(0.0, {}, {}, Interval(0, 3.5));
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       h = abs(f), res(0.0, {}, {}, Interval(0, 3.5));
    TEST_TRUE(h.equals(res));
 }
 
 void test_abs_2()
 {
-   AffineForm f(2.5, {-2.0}, {0}),  // 1.5 - 2v0 in [0.5, 4.5]
-              h = abs(f),
-              res(f);
+   AffineForm f(2.5, {-2.0}, {0}), // 1.5 - 2v0 in [0.5, 4.5]
+       h = abs(f), res(f);
    TEST_TRUE(h.equals(res));
 }
 
 void test_abs_3()
 {
-   AffineForm f(-2.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-4.5, -0.5]
-              h = abs(f),
-              res(-f);
+   AffineForm f(-2.5, {-2.0}, {0}), // 1.5 - 2v0 in [-4.5, -0.5]
+       h = abs(f), res(-f);
    TEST_TRUE(h.equals(res));
 }
 
 void test_sgn_1()
 {
-   AffineForm f(1.5, {-2.0}, {0}),  // 1.5 - 2v0 in [-0.5, 3.5]
-              h = sgn(f),
-              res(-1.0, {}, {}, Interval(0, 2.0));
+   AffineForm f(1.5, {-2.0}, {0}), // 1.5 - 2v0 in [-0.5, 3.5]
+       h = sgn(f), res(-1.0, {}, {}, Interval(0, 2.0));
    TEST_TRUE(h.equals(res));
 }
 
 void test_sgn_2()
 {
-   AffineForm f(2.5, {-2.0}, {0}),  // 2.5 - 2v0 in [0.5, 4.5]
-              h = sgn(f),
-              res(1.0, {}, {});
+   AffineForm f(2.5, {-2.0}, {0}), // 2.5 - 2v0 in [0.5, 4.5]
+       h = sgn(f), res(1.0, {}, {});
    TEST_TRUE(h.equals(res));
 }
 
 void test_sgn_3()
 {
-   AffineForm f(-2.5, {-2.0}, {0}),  // -2.5 - 2v0 in [-4.5, -0.5]
-              h = sgn(f),
-              res(-1.0, {}, {});
+   AffineForm f(-2.5, {-2.0}, {0}), // -2.5 - 2v0 in [-4.5, -0.5]
+       h = sgn(f), res(-1.0, {}, {});
    TEST_TRUE(h.equals(res));
 }
 
 void test_sqrt_1()
 {
-   AffineForm f(-2.5, {-2.0}, {0}),  // -2.5 - 2v0 in [-4.5, -0.5]
-              h = sqrt(f);
+   AffineForm f(-2.5, {-2.0}, {0}), // -2.5 - 2v0 in [-4.5, -0.5]
+       h = sqrt(f);
    TEST_TRUE(h.isEmpty());
 }
 
 void test_sqrt_2()
 {
-   AffineForm f(2.5, {1.5}, {0}),  // 2.5 + 1.5v0 in [1, 4]
-              h = sqrt(f),
-              res(1.5, {0.375}, {0}, 0.125);
+   AffineForm f(2.5, {1.5}, {0}), // 2.5 + 1.5v0 in [1, 4]
+       h = sqrt(f), res(1.5, {0.375}, {0}, 0.125);
    TEST_TRUE(h.equals(res));
 }
 
 void test_exp()
 {
-   AffineForm f(1.0, {-1.0}, {0}),  // 1.0 - v0 in [0, 2]
-              h = exp(f);
+   AffineForm f(1.0, {-1.0}, {0}), // 1.0 - v0 in [0, 2]
+       h = exp(f);
 
    Interval x = Interval::minusOne() + Interval(-1.0e-12, 1.0e-12);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -392,8 +351,8 @@ void test_exp()
 
 void test_log()
 {
-   AffineForm f(1.5, {-0.5}, {0}),  // 1.5 - 0.5v0 in [1, 2]
-              h = log(f);
+   AffineForm f(1.5, {-0.5}, {0}), // 1.5 - 0.5v0 in [1, 2]
+       h = log(f);
 
    Interval x = -0.25 + Interval(-1.0e-12, 1.0e-12);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -407,8 +366,8 @@ void test_log()
 
 void test_cos_1()
 {
-   AffineForm f(2.0, {1.0}, {0}),  // 2.0 + v0 in [1, 3]
-              h = cos(f);
+   AffineForm f(2.0, {1.0}, {0}), // 2.0 + v0 in [1, 3]
+       h = cos(f);
 
    Interval x = -0.141120008 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -422,8 +381,8 @@ void test_cos_1()
 
 void test_cos_2()
 {
-   AffineForm f(-2.0, {1.0}, {0}),  // -2.0 + v0 in [-3, -1]
-              h = cos(f);
+   AffineForm f(-2.0, {1.0}, {0}), // -2.0 + v0 in [-3, -1]
+       h = cos(f);
 
    Interval x = 0.141120008 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -437,16 +396,15 @@ void test_cos_2()
 
 void test_cos_3()
 {
-   AffineForm f(0.0, {4.0}, {0}),  // 4v0
-              h = cos(f),
-              res(-1.0, {}, {}, Interval(0, 2));
+   AffineForm f(0.0, {4.0}, {0}), // 4v0
+       h = cos(f), res(-1.0, {}, {}, Interval(0, 2));
    TEST_TRUE(h.equals(res));
 }
 
 void test_sin_1()
 {
-   AffineForm f(3.0, {-1.0}, {0}),  // 3.0 - v0 in [2, 4]
-              h = sin(f);
+   AffineForm f(3.0, {-1.0}, {0}), // 3.0 - v0 in [2, 4]
+       h = sin(f);
 
    Interval x = 0.416146836 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -460,8 +418,8 @@ void test_sin_1()
 
 void test_sin_2()
 {
-   AffineForm f(-3.0, {-1.0}, {0}),  // 3.0 - v0 in [-4, -2]
-              h = sin(f);
+   AffineForm f(-3.0, {-1.0}, {0}), // 3.0 - v0 in [-4, -2]
+       h = sin(f);
 
    Interval x = 0.416146836 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -475,16 +433,15 @@ void test_sin_2()
 
 void test_sin_3()
 {
-   AffineForm f(1.57, {4.0}, {0}),  // 4v0
-              h = sin(f),
-              res(-1.0, {}, {}, Interval(0, 2));
+   AffineForm f(1.57, {4.0}, {0}), // 4v0
+       h = sin(f), res(-1.0, {}, {}, Interval(0, 2));
    TEST_TRUE(h.equals(res));
 }
 
 void test_tan_1()
 {
-   AffineForm f(-0.25, {0.5}, {0}),  // -0.25 + 0.5v0 in [-0.75, 0.25]
-              h = tan(f);
+   AffineForm f(-0.25, {0.5}, {0}), // -0.25 + 0.5v0 in [-0.75, 0.25]
+       h = tan(f);
 
    Interval x = 0.5 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -498,23 +455,22 @@ void test_tan_1()
 
 void test_tan_2()
 {
-   AffineForm f(1.0, {1.0}, {0}),  // 1 + v0 in [0, 2]
-              h = tan(f),
-              res(0.0, {}, {}, Interval::positive());
+   AffineForm f(1.0, {1.0}, {0}), // 1 + v0 in [0, 2]
+       h = tan(f), res(0.0, {}, {}, Interval::positive());
    TEST_TRUE(h.equals(res));
 }
 
 void test_tan_3()
 {
-   AffineForm f(1.25, {0.5}, {0}),  // 1.25 + 0.5v0 in [0.75, 1.75]
-              g = tan(f);
+   AffineForm f(1.25, {0.5}, {0}), // 1.25 + 0.5v0 in [0.75, 1.75]
+       g = tan(f);
    TEST_TRUE(g.isInf());
 }
 
 void test_cosh()
 {
-   AffineForm f(3.5, {2.0}, {0}),  // 3.5 + 2v0 in [1.5, 5.5]
-              h = cosh(f);
+   AffineForm f(3.5, {2.0}, {0}), // 3.5 + 2v0 in [1.5, 5.5]
+       h = cosh(f);
 
    Interval x = 4.25855891 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -528,8 +484,8 @@ void test_cosh()
 
 void test_sinh()
 {
-   AffineForm f(-1.0, {2.5}, {0}),  // -1 + 2.5v0 in [-3.5, 1.5]
-              h = sinh(f);
+   AffineForm f(-1.0, {2.5}, {0}), // -1 + 2.5v0 in [-3.5, 1.5]
+       h = sinh(f);
 
    Interval x = 2.5 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));
@@ -543,8 +499,8 @@ void test_sinh()
 
 void test_tanh()
 {
-   AffineForm f(-1.0, {2.5}, {0}),  // -1 + 2.5v0 in [-3.5, 1.5]
-              h = tanh(f);
+   AffineForm f(-1.0, {2.5}, {0}), // -1 + 2.5v0 in [-3.5, 1.5]
+       h = tanh(f);
 
    Interval x = 0.0091022118 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(h.cbegin()->itv));

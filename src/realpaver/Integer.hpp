@@ -16,7 +16,7 @@
  * @brief  Class of safe integers
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTEGER_HPP
 #define REALPAVER_INTEGER_HPP
@@ -25,10 +25,10 @@
 #include <limits>
 
 namespace realpaver {
-   
+
 /**
  * @brief Signed integer with checked underflows and overflows.
- * 
+ *
  * Exceptions are thrown when underflows and overflows are detected.
  */
 class Integer {
@@ -37,19 +37,19 @@ public:
    using ValueType = long;
 
    /// Constructor
-   Integer(const int& n = 0);
+   Integer(const int &n = 0);
 
    /// Constructor
-   Integer(const size_t& n);
+   Integer(const size_t &n);
 
    /// Constructor
-   Integer(const ValueType& n);
+   Integer(const ValueType &n);
 
    /// Default copy constructor
-   Integer(const Integer&) = default;
+   Integer(const Integer &) = default;
 
    /// Default assignment
-   Integer& operator=(const Integer&) = default;
+   Integer &operator=(const Integer &) = default;
 
    /// Default destructor
    ~Integer() = default;
@@ -69,19 +69,19 @@ public:
 
    /**
     * @brief Floor function.
-    * 
+    *
     * Returns the largest integer smaller than a if 'a' is representable,
     * throws an exception otherwise
     */
-   static Integer floor(const double& a);
+   static Integer floor(const double &a);
 
    /**
     * @brief Ceil function.
-    * 
+    *
     * Return thes smallest integer greater than a if 'a' is representable,
     * throws an exception otherwise
     */
-   static Integer ceil(const double& a);
+   static Integer ceil(const double &a);
 
    /// REeturns the value of this
    ValueType get() const;
@@ -93,126 +93,126 @@ public:
    bool isOdd() const;
 
    /// Addition with assignment
-   Integer& operator+=(const Integer& other);
+   Integer &operator+=(const Integer &other);
 
    /// Subtraction with assignment
-   Integer& operator-=(const Integer& other);
+   Integer &operator-=(const Integer &other);
 
    /// Multiplication with assignment
-   Integer& operator*=(const Integer& other);
+   Integer &operator*=(const Integer &other);
 
    /// Division with assignment
-   Integer& operator/=(const Integer& other);
+   Integer &operator/=(const Integer &other);
 
    /// Incrementation (prefix)
-   Integer& operator++();
+   Integer &operator++();
 
    /// Decrementation (prefix)
-   Integer& operator--();
+   Integer &operator--();
 
-   friend Integer operator+(const Integer& a, const Integer& b);
-   friend Integer operator-(const Integer& a, const Integer& b);
-   friend Integer operator-(const Integer& a);
-   friend Integer operator*(const Integer& a, const Integer& b);
-   friend Integer operator/(const Integer& a, const Integer& b);
-   friend Integer operator%(const Integer& a, int n);
+   friend Integer operator+(const Integer &a, const Integer &b);
+   friend Integer operator-(const Integer &a, const Integer &b);
+   friend Integer operator-(const Integer &a);
+   friend Integer operator*(const Integer &a, const Integer &b);
+   friend Integer operator/(const Integer &a, const Integer &b);
+   friend Integer operator%(const Integer &a, int n);
 
-   friend Integer abs(const Integer& a);
-   friend Integer sqr(const Integer& a);
-   friend Integer divFloor(const Integer& a, const Integer& b);
-   friend Integer divCeil(const Integer& a, const Integer& b);
-   friend Integer sqrtFloor(const Integer& a);
-   friend Integer sqrtCeil(const Integer& a);
+   friend Integer abs(const Integer &a);
+   friend Integer sqr(const Integer &a);
+   friend Integer divFloor(const Integer &a, const Integer &b);
+   friend Integer divCeil(const Integer &a, const Integer &b);
+   friend Integer sqrtFloor(const Integer &a);
+   friend Integer sqrtCeil(const Integer &a);
 
-   friend Integer min(const Integer& a, const Integer& b);
-   friend Integer max(const Integer& a, const Integer& b);
+   friend Integer min(const Integer &a, const Integer &b);
+   friend Integer max(const Integer &a, const Integer &b);
 
-   friend bool operator==(const Integer& a, const Integer& b);
-   friend bool operator!=(const Integer& a, const Integer& b);
-   friend bool operator>=(const Integer& a, const Integer& b);
-   friend bool operator>(const Integer& a, const Integer& b);
-   friend bool operator<=(const Integer& a, const Integer& b);
-   friend bool operator<(const Integer& a, const Integer& b);
+   friend bool operator==(const Integer &a, const Integer &b);
+   friend bool operator!=(const Integer &a, const Integer &b);
+   friend bool operator>=(const Integer &a, const Integer &b);
+   friend bool operator>(const Integer &a, const Integer &b);
+   friend bool operator<=(const Integer &a, const Integer &b);
+   friend bool operator<(const Integer &a, const Integer &b);
 
    /// Output on a stream
-   friend std::ostream& operator<<(std::ostream& os, const Integer& a);
+   friend std::ostream &operator<<(std::ostream &os, const Integer &a);
 
 private:
    ValueType val_;
 
    // checking of overflows and underflows
-   static bool OutOfRangeAdd(const ValueType& a, const ValueType& b);
-   static bool OutOfRangeSub(const ValueType& a, const ValueType& b);
-   static bool OutOfRangeMul(const ValueType& a, const ValueType& b);
-   static bool OutOfRangeDiv(const ValueType& a, const ValueType& b);
+   static bool OutOfRangeAdd(const ValueType &a, const ValueType &b);
+   static bool OutOfRangeSub(const ValueType &a, const ValueType &b);
+   static bool OutOfRangeMul(const ValueType &a, const ValueType &b);
+   static bool OutOfRangeDiv(const ValueType &a, const ValueType &b);
 
    // absolute value
-   static ValueType Abs(const ValueType& a);
+   static ValueType Abs(const ValueType &a);
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Integer& a);
+std::ostream &operator<<(std::ostream &os, const Integer &a);
 
 /// Addition
-Integer operator+(const Integer& a, const Integer& b);
+Integer operator+(const Integer &a, const Integer &b);
 
 /// Subtraction
-Integer operator-(const Integer& a, const Integer& b);
+Integer operator-(const Integer &a, const Integer &b);
 
 /// Unaru subtraction
-Integer operator-(const Integer& a);
+Integer operator-(const Integer &a);
 
 /// Multiplication
-Integer operator*(const Integer& a, const Integer& b);
+Integer operator*(const Integer &a, const Integer &b);
 
 /// Division
-Integer operator/(const Integer& a, const Integer& b);
+Integer operator/(const Integer &a, const Integer &b);
 
 /// Modulo
-Integer operator%(const Integer& a, int n);
+Integer operator%(const Integer &a, int n);
 
 /// Absolute value
-Integer abs(const Integer& a);
+Integer abs(const Integer &a);
 
 /// Square
-Integer sqr(const Integer& a);
+Integer sqr(const Integer &a);
 
 /// Division rounded downward
-Integer divFloor(const Integer& a, const Integer& b);
+Integer divFloor(const Integer &a, const Integer &b);
 
 /// Division rounded upward
-Integer divCeil(const Integer& a, const Integer& b);
+Integer divCeil(const Integer &a, const Integer &b);
 
 /// Square root rounded downward
-Integer sqrtFloor(const Integer& a);
+Integer sqrtFloor(const Integer &a);
 
 /// Square root rounded upward
-Integer sqrtCeil(const Integer& a);
+Integer sqrtCeil(const Integer &a);
 
 /// Minimum
-Integer min(const Integer& a, const Integer& b);
+Integer min(const Integer &a, const Integer &b);
 
 /// Maximum
-Integer max(const Integer& a, const Integer& b);
+Integer max(const Integer &a, const Integer &b);
 
 /// Comparison
-bool operator==(const Integer& a, const Integer& b);
+bool operator==(const Integer &a, const Integer &b);
 
 /// Comparison
-bool operator!=(const Integer& a, const Integer& b);
+bool operator!=(const Integer &a, const Integer &b);
 
 /// Comparison
-bool operator>=(const Integer& a, const Integer& b);
+bool operator>=(const Integer &a, const Integer &b);
 
 /// Comparison
-bool operator>(const Integer& a, const Integer& b);
+bool operator>(const Integer &a, const Integer &b);
 
 /// Comparison
-bool operator<=(const Integer& a, const Integer& b);
+bool operator<=(const Integer &a, const Integer &b);
 
 /// Comparison
-bool operator<(const Integer& a, const Integer& b);
+bool operator<(const Integer &a, const Integer &b);
 
-} // namespace
+} // namespace realpaver
 
 #endif

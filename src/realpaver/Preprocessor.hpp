@@ -21,11 +21,11 @@
 #ifndef REALPAVER_PREPROCESSOR_HPP
 #define REALPAVER_PREPROCESSOR_HPP
 
-#include <unordered_set>
-#include <vector>
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Timer.hpp"
+#include <unordered_set>
+#include <vector>
 
 namespace realpaver {
 
@@ -51,17 +51,17 @@ public:
    Preprocessor();
 
    /// No copy
-   Preprocessor(const Preprocessor&) = delete;
+   Preprocessor(const Preprocessor &) = delete;
 
    /// No assignment
-   Preprocessor& operator=(const Preprocessor&) = delete;
+   Preprocessor &operator=(const Preprocessor &) = delete;
 
    /// Destructor
    ~Preprocessor();
 
    /**
     * @brief Creates a simplified problem from a source problem.
-    * 
+    *
     * @param src source problem
     * @param dest simplified problem
     *
@@ -71,7 +71,7 @@ public:
     * After a call to apply, it is possible to check if the input problem is
     * not feasible with the method isProblemUnfeasible().
     */
-   void apply(const Problem& src, Problem& dest);
+   void apply(const Problem &src, Problem &dest);
 
    /// Returns true if the domain of v is fixed
    bool hasFixedDomain(Variable v) const;
@@ -142,22 +142,22 @@ public:
    double elapsedTime() const;
 
 private:
-   VarVarMapType vvm_;                 // map for non fixed variables
-   VarIntervalMapType vim_;            // map for fixed variables
+   VarVarMapType vvm_;      // map for non fixed variables
+   VarIntervalMapType vim_; // map for fixed variables
 
-   DomainBox* box_;                    // box used for propagation
+   DomainBox *box_; // box used for propagation
 
-   std::vector<Constraint> inactive_;  // constraints inactive
-   std::vector<Constraint> active_;    // constraints not inactive
-   bool unfeasible_;                   // true if problem unfeasible
+   std::vector<Constraint> inactive_; // constraints inactive
+   std::vector<Constraint> active_;   // constraints not inactive
+   bool unfeasible_;                  // true if problem unfeasible
 
    Timer timer_;
 
-   bool occursInActiveConstraint(const Variable& v) const;
-   bool propagate(const Problem& problem, DomainBox& box);
-   void applyImpl(const Problem& src, Problem& dest);
+   bool occursInActiveConstraint(const Variable &v) const;
+   bool propagate(const Problem &problem, DomainBox &box);
+   void applyImpl(const Problem &src, Problem &dest);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -1,7 +1,7 @@
-#include "test_config.hpp"
-#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/ContractorConstraint.hpp"
+#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 
 #include <memory>
 
@@ -9,16 +9,16 @@ using namespace std;
 
 using Result = std::pair<Proof, Interval>;
 
-Result my_test(const Interval& I)
+Result my_test(const Interval &I)
 {
    Problem P;
    Variable x = P.addRealVar(0, 10, "x");
-   Constraint c( in(x, I) );
+   Constraint c(in(x, I));
 
    // the domain of x is sliced in 10 parts: [0, 1] [1, 2] ... [9, 10]
    // the constraint is: x in I
 
-   Scope scop( {x} );
+   Scope scop({x});
    IntervalBox B(scop);
 
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);

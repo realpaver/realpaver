@@ -1,28 +1,28 @@
-#include "realpaver/Linearizer.hpp"
-#include "test_config.hpp"
 #include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/Dag.hpp"
+#include "realpaver/Linearizer.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 #include <memory>
 
 void init()
-{}
+{
+}
 
 void clean()
-{}
+{
+}
 
 void test_1()
 {
    Problem prob;
-   Variable x = prob.addRealVar(0, 0, "x"),
-            y = prob.addRealVar(0, 0, "y");
+   Variable x = prob.addRealVar(0, 0, "x"), y = prob.addRealVar(0, 0, "y");
 
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
    dag->insert(y - sqr(x) >= 0);
    dag->insert(y + sqr(x) - 2 <= 0);
 
-   std::unique_ptr<LinearizerTaylor> lzr
-      = std::make_unique<LinearizerTaylor>(dag);
+   std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({0, 1});
    lzr->fixFirstCorner(corner);
@@ -35,8 +35,7 @@ void test_1()
    Proof proof = ctc.contract(B);
    TEST_TRUE(proof != Proof::Empty);
 
-   Interval resx(-1.25, 1),
-            resy(-1, 2);
+   Interval resx(-1.25, 1), resy(-1, 2);
 
    TEST_TRUE(B.get(x).contains(resx));
    TEST_TRUE(resx.distance(B.get(x)) < 1.0e-8);
@@ -54,15 +53,13 @@ void test_1()
 void test_2()
 {
    Problem prob;
-   Variable x = prob.addRealVar(0, 0, "x"),
-            y = prob.addRealVar(0, 0, "y");
+   Variable x = prob.addRealVar(0, 0, "x"), y = prob.addRealVar(0, 0, "y");
 
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
    dag->insert(y - sqr(x) >= 0);
    dag->insert(y + sqr(x) - 2 <= 0);
 
-   std::unique_ptr<LinearizerTaylor> lzr
-      = std::make_unique<LinearizerTaylor>(dag);
+   std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({1, 0});
    lzr->fixFirstCorner(corner);
@@ -75,11 +72,7 @@ void test_2()
    Proof proof = ctc.contract(B);
    TEST_TRUE(proof != Proof::Empty);
 
-   Interval I(5),
-            J(3),
-            K(I / J),
-            resx(-1.25, K.right()),
-            resy(-3, 2);
+   Interval I(5), J(3), K(I / J), resx(-1.25, K.right()), resy(-3, 2);
 
    TEST_TRUE(B.get(x).contains(resx));
    TEST_TRUE(resx.distance(B.get(x)) < 1.0e-8);
@@ -97,21 +90,18 @@ void test_2()
 void brown_5_feasible()
 {
    Problem prob;
-   Variable x1 = prob.addRealVar(0, 0, "x1"),
-            x2 = prob.addRealVar(0, 0, "x2"),
-            x3 = prob.addRealVar(0, 0, "x3"),
-            x4 = prob.addRealVar(0, 0, "x4"),
+   Variable x1 = prob.addRealVar(0, 0, "x1"), x2 = prob.addRealVar(0, 0, "x2"),
+            x3 = prob.addRealVar(0, 0, "x3"), x4 = prob.addRealVar(0, 0, "x4"),
             x5 = prob.addRealVar(0, 0, "x5");
 
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(2*x1 + x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + 2*x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + 2*x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + x3 + 2*x4 + x5 - 6 == 0);
+   dag->insert(2 * x1 + x2 + x3 + x4 + x5 - 6 == 0);
+   dag->insert(x1 + 2 * x2 + x3 + x4 + x5 - 6 == 0);
+   dag->insert(x1 + x2 + 2 * x3 + x4 + x5 - 6 == 0);
+   dag->insert(x1 + x2 + x3 + 2 * x4 + x5 - 6 == 0);
    dag->insert(x1 * x2 * x3 * x4 * x5 - 1 == 0);
 
-   std::unique_ptr<LinearizerTaylor> lzr
-      = std::make_unique<LinearizerTaylor>(dag);
+   std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({0, 1, 0, 1, 0});
    lzr->fixFirstCorner(corner);
@@ -142,21 +132,18 @@ void brown_5_feasible()
 void brown_5_infeasible()
 {
    Problem prob;
-   Variable x1 = prob.addRealVar(0, 0, "x1"),
-            x2 = prob.addRealVar(0, 0, "x2"),
-            x3 = prob.addRealVar(0, 0, "x3"),
-            x4 = prob.addRealVar(0, 0, "x4"),
+   Variable x1 = prob.addRealVar(0, 0, "x1"), x2 = prob.addRealVar(0, 0, "x2"),
+            x3 = prob.addRealVar(0, 0, "x3"), x4 = prob.addRealVar(0, 0, "x4"),
             x5 = prob.addRealVar(0, 0, "x5");
 
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(2*x1 + x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + 2*x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + 2*x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + x3 + 2*x4 + x5 - 6 == 0);
+   dag->insert(2 * x1 + x2 + x3 + x4 + x5 - 6 == 0);
+   dag->insert(x1 + 2 * x2 + x3 + x4 + x5 - 6 == 0);
+   dag->insert(x1 + x2 + 2 * x3 + x4 + x5 - 6 == 0);
+   dag->insert(x1 + x2 + x3 + 2 * x4 + x5 - 6 == 0);
    dag->insert(x1 * x2 * x3 * x4 * x5 - 1 == 0);
 
-   std::unique_ptr<LinearizerTaylor> lzr
-      = std::make_unique<LinearizerTaylor>(dag);
+   std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({0, 1, 0, 1, 0});
    lzr->fixFirstCorner(corner);

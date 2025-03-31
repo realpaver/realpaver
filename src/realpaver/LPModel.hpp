@@ -243,7 +243,8 @@ public:
    LinExpr();
 
    /// Creates an expression given a sum of terms
-   LinExpr(const std::initializer_list<double> &lc, const std::initializer_list<LinVar> &lv);
+   LinExpr(const std::initializer_list<double> &lc,
+           const std::initializer_list<LinVar> &lv);
 
    /// Default copy constructor
    LinExpr(const LinExpr &) = default;

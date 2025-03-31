@@ -32,16 +32,16 @@ public:
    RealFunctionRep() = default;
 
    /// Default copy constructor
-   RealFunctionRep(const RealFunctionRep&) = default;
+   RealFunctionRep(const RealFunctionRep &) = default;
 
    /// No assignment
-   RealFunctionRep& operator=(const RealFunctionRep&) = delete;
+   RealFunctionRep &operator=(const RealFunctionRep &) = delete;
 
    /// Virtual destructor
    virtual ~RealFunctionRep();
 
    /// Assigns the image of this
-   void setImage(const Interval& img);
+   void setImage(const Interval &img);
 
    /// Returns the image of this
    Interval getImage() const;
@@ -53,15 +53,15 @@ public:
    virtual size_t nbVars() const = 0;
 
    /// Returns the evaluation of this on pt
-   virtual double eval(const RealPoint& pt) = 0;
+   virtual double eval(const RealPoint &pt) = 0;
 
    /**
     * @brief Differentiates this.
-    * 
+    *
     * G is the output vector such that G[i] if the derivative of this
     * at pt with respect to the i-th variable of its scope
     */
-   virtual void diff(const RealPoint& pt, RealVector& G) = 0;
+   virtual void diff(const RealPoint &pt, RealVector &G) = 0;
 
 protected:
    Interval img_;
@@ -71,13 +71,13 @@ protected:
 
 /**
  * @brief Main class of real functions.
- * 
+ *
  * A real function is supposed to be differentiable.
- * 
+ *
  * A real function is supposed to be associated with an image which makes
  * it an inequality constraint of the form L <= F(x) <= U. Fix L = -oo and
  * U = +oo to eliminate the constraint.
- * 
+ *
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
  */
@@ -87,19 +87,19 @@ public:
    RealFunction(SharedDag dag, size_t i);
 
    /// Constructor that creates a DAG from a term and assigns its image
-   RealFunction(Term t, const Interval& img = Interval::universe());
+   RealFunction(Term t, const Interval &img = Interval::universe());
 
    /// Default destructor
    ~RealFunction() = default;
 
    /// Default copy constructor
-   RealFunction(const RealFunction&) = default;
+   RealFunction(const RealFunction &) = default;
 
    /// No assignment
-   RealFunction& operator=(const RealFunction&) = delete;
+   RealFunction &operator=(const RealFunction &) = delete;
 
    /// Assigns the image of this
-   void setImage(const Interval& img);
+   void setImage(const Interval &img);
 
    /// Returns the image of this
    Interval getImage() const;
@@ -111,15 +111,15 @@ public:
    size_t nbVars() const;
 
    /// Evaluates this at pt
-   double eval(const RealPoint& pt);
+   double eval(const RealPoint &pt);
 
    /**
     * @brief Differentiates this.
-    * 
+    *
     * G is the output vector such that G[i] if the derivative of this
     * at pt with respect to the i-th variable of its scope
     */
-   void diff(const RealPoint& pt, RealVector& G);
+   void diff(const RealPoint &pt, RealVector &G);
 
    /// Type of shared pointer to a representation
    using SharedRep = std::shared_ptr<RealFunctionRep>;
@@ -147,16 +147,16 @@ public:
    RealFunctionDag(SharedDag dag, size_t i);
 
    /// Constructor that creates a DAG from a term and assigns its image
-   RealFunctionDag(Term t, const Interval& img = Interval::universe());
+   RealFunctionDag(Term t, const Interval &img = Interval::universe());
 
    /// Default destructor
    ~RealFunctionDag() = default;
 
    /// Copy constructor
-   RealFunctionDag(const RealFunctionDag&) = default;
+   RealFunctionDag(const RealFunctionDag &) = default;
 
    /// No asssignment
-   RealFunctionDag& operator=(const RealFunctionDag&) = delete;
+   RealFunctionDag &operator=(const RealFunctionDag &) = delete;
 
    /// Returns the dag
    SharedDag dag() const;
@@ -166,14 +166,14 @@ public:
 
    Scope scope() const override;
    size_t nbVars() const override;
-   double eval(const RealPoint& pt) override;
-   void diff(const RealPoint& pt, RealVector& G) override;
+   double eval(const RealPoint &pt) override;
+   void diff(const RealPoint &pt, RealVector &G) override;
 
 private:
-   SharedDag dag_;         // DAG
-   size_t index_;          // index of function
+   SharedDag dag_; // DAG
+   size_t index_;  // index of function
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

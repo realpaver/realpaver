@@ -18,9 +18,9 @@
  * @date   2025-fev-11
  */
 
+#include "realpaver/Linearizer.hpp"
 #include "realpaver/AffineCreator.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Linearizer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ScopeBank.hpp"
 
@@ -122,7 +122,8 @@ LinearizerTaylor::LinearizerTaylor(SharedDag dag, bool hansen, CornerStyle style
       gen_ = IntRandom();
 }
 
-LinearizerTaylor::LinearizerTaylor(SharedDag dag, const IndexList &lfun, bool hansen, CornerStyle style)
+LinearizerTaylor::LinearizerTaylor(SharedDag dag, const IndexList &lfun, bool hansen,
+                                   CornerStyle style)
     : Linearizer(dag, lfun)
     , hansen_(hansen)
     , style_(style)
@@ -457,7 +458,8 @@ bool LinearizerAffine::make(LPModel &lpm, const IntervalBox &B)
 
 /*----------------------------------------------------------------------------*/
 
-LinearizerAffineTaylor::LinearizerAffineTaylor(SharedDag dag, std::unique_ptr<LinearizerAffine> affine,
+LinearizerAffineTaylor::LinearizerAffineTaylor(SharedDag dag,
+                                               std::unique_ptr<LinearizerAffine> affine,
                                                std::unique_ptr<LinearizerTaylor> taylor)
     : Linearizer(dag)
     , affine_(std::move(affine))

@@ -16,7 +16,7 @@
  * @brief  3B contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_VAR_3B_HPP
 #define REALPAVER_CONTRACTOR_VAR_3B_HPP
@@ -57,10 +57,10 @@ public:
    ~ContractorVar3B() = default;
 
    /// No copy
-   ContractorVar3B(const ContractorVar3B&) = delete;
+   ContractorVar3B(const ContractorVar3B &) = delete;
 
    /// No assignment
-   ContractorVar3B& operator=(const ContractorVar3B&) = delete;
+   ContractorVar3B &operator=(const ContractorVar3B &) = delete;
 
    /// Returns the variable whose domain is sliced
    Variable getVar() const;
@@ -75,16 +75,16 @@ public:
    void setVarMinWidth(double val);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
 private:
-   SharedContractor op_;                     // contractors for slices
-   Variable v_;                              // variable whose domain is sliced
-   std::unique_ptr<IntervalSlicer> slicer_;  // slicer
-   double var_min_width_;                    // threshold
+   SharedContractor op_;                    // contractors for slices
+   Variable v_;                             // variable whose domain is sliced
+   std::unique_ptr<IntervalSlicer> slicer_; // slicer
+   double var_min_width_;                   // threshold
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

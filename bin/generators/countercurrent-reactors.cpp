@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
    string filename = "CountercurrentReactors-";
 
@@ -35,46 +35,48 @@ int main(int argc, char ** argv)
 
    //////////
    of << "Variables" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
       of << "x" << i << " in [-1e8, 1e8]";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl << endl;
 
    //////////
    string c = "1.1";
    of << "Constraints" << endl;
-   for (int i=1; i<=n; ++i)
+   for (int i = 1; i <= n; ++i)
    {
-      if (i==1)
+      if (i == 1)
       {
-         of << "a-b*x" << i+2 << "-x" << i << "*(1+4*x" << i+1 << ")";
+         of << "a-b*x" << i + 2 << "-x" << i << "*(1+4*x" << i + 1 << ")";
       }
-      else if (i==2)
+      else if (i == 2)
       {
-         of << "-c*x" << i+2 << "-x" << i << "*(1+4*x" << i-1 << ")";
+         of << "-c*x" << i + 2 << "-x" << i << "*(1+4*x" << i - 1 << ")";
       }
-      else if (i==n)
+      else if (i == n)
       {
-         of << "a*x" << i-2 << "-c-x" << i << "*(1+4*x" << i-1 << ")";
+         of << "a*x" << i - 2 << "-c-x" << i << "*(1+4*x" << i - 1 << ")";
       }
-      else if (i==n-1)
+      else if (i == n - 1)
       {
-         of << "a*x" << i-2 << "-x" << i << "*(1+4*x" << i+1 << ")";
+         of << "a*x" << i - 2 << "-x" << i << "*(1+4*x" << i + 1 << ")";
       }
       else if (i % 2 == 0)
       {
-         of << "a*x" << i-2 << "-c*x" << i+2 << "-x" << i
-            << "*(1+4*x" << i-1 << ")";
+         of << "a*x" << i - 2 << "-c*x" << i + 2 << "-x" << i << "*(1+4*x" << i - 1
+            << ")";
       }
       else
       {
-         of << "a*x" << i-2 << "-b*x" << i+2 << "-x" << i
-            << "*(1+4*x" << i+1 << ")";
+         of << "a*x" << i - 2 << "-b*x" << i + 2 << "-x" << i << "*(1+4*x" << i + 1
+            << ")";
       }
       of << " == 0";
-      if (i<n) of << "," << endl;
+      if (i < n)
+         of << "," << endl;
    }
    of << ";" << endl;
 
