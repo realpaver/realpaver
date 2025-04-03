@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/Param.hpp"
 
 namespace realpaver {
@@ -29,7 +29,7 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v,
     : op_(op)
     , v_(v)
     , slicer_(std::move(slicer))
-    , var_min_width_(Param::GetDblParam("VAR3BCID_MIN_WIDTH"))
+    , var_min_width_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
    ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
    ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");

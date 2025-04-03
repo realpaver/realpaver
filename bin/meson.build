@@ -23,4 +23,13 @@ csp_solver = executable(
   dependencies: deps_lib,
 )
 
+make_param = executable(
+  'make_param',
+  sources: 'make_param.cpp',
+  link_with: realpaver_lib,
+  include_directories: incdir,
+  install: true,
+  dependencies: deps_lib,
+)
+
 subdir('generators')

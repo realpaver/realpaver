@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSolver.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/CSPSolver.hpp"
 #include "realpaver/CSPSpaceBFS.hpp"
 #include "realpaver/CSPSpaceDFS.hpp"
 #include "realpaver/CSPSpaceDMDFS.hpp"
@@ -88,10 +88,10 @@ void CSPSolver::solve()
 {
    LOG_MAIN("Input problem\n" << (*problem_));
 
-   int fp = env_->getParam()->getIntParam("FLOAT_PRECISION");
+   int fp = env_->getParams()->getIntParam("FLOAT_PRECISION");
    Logger::getInstance()->setFloatPrecision(fp);
 
-   std::string pre = env_->getParam()->getStrParam("PREPROCESSING");
+   std::string pre = env_->getParams()->getStrParam("PREPROCESSING");
    if (pre == "YES")
    {
       // preprocessing + branch-and-prune
@@ -119,7 +119,7 @@ void CSPSolver::makeSpace()
    LOG_LOW("Makes the space in the CSP solver");
 
    // gets the strategy from the parameters
-   std::string s = env_->getParam()->getStrParam("BP_NODE_SELECTION");
+   std::string s = env_->getParams()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS")
       space_ = new CSPSpaceDFS();
 
@@ -155,7 +155,7 @@ void CSPSolver::makePropagator()
    CSPPropagatorList *aux = new CSPPropagatorList();
 
    // Constraint propagation algorithm: HC4, BC4, or ACID
-   std::string base = env_->getParam()->getStrParam("PROPAGATION_BASE");
+   std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
       aux->pushBack(CSPPropagAlgo::HC4, *factory_);
@@ -165,20 +165,20 @@ void CSPSolver::makePropagator()
       THROW("Bad parameter value for the propagation algorithm");
 
    // ACID contractor: YES or NO
-   std::string with_acid = env_->getParam()->getStrParam("PROPAGATION_WITH_ACID");
+   std::string with_acid = env_->getParams()->getStrParam("PROPAGATION_WITH_ACID");
 
    if (with_acid == "YES")
       aux->pushBack(CSPPropagAlgo::ACID, *factory_);
 
    // Polytope hull contractor: YES or NO
    std::string with_polytope =
-       env_->getParam()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
+       env_->getParams()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
 
    if (with_polytope == "YES")
       aux->pushBack(CSPPropagAlgo::Polytope, *factory_);
 
    // Newton: YES or NO
-   std::string with_newton = env_->getParam()->getStrParam("PROPAGATION_WITH_NEWTON");
+   std::string with_newton = env_->getParams()->getStrParam("PROPAGATION_WITH_NEWTON");
 
    if (with_newton == "YES")
       aux->pushBack(CSPPropagAlgo::Newton, *factory_);
@@ -196,19 +196,19 @@ void CSPSolver::makeSplit()
    Scope scop = preprob_->scope();
 
    // makes the slicer
-   std::string sli = env_->getParam()->getStrParam("SPLIT_SLICING");
+   std::string sli = env_->getParams()->getStrParam("SPLIT_SLICING");
    std::unique_ptr<DomainSlicerMap> smap = nullptr;
 
    if (sli == "BI")
    {
-      double sip = env_->getParam()->getDblParam("SPLIT_INTERVAL_POINT");
+      double sip = env_->getParams()->getDblParam("SPLIT_INTERVAL_POINT");
       smap = DomainSlicerFactory::makeBiStrategy(sip);
    }
 
    THROW_IF(smap == nullptr, "Unable to make the split object in a CSP solver");
 
    // makes the spliting object acording the variable selection strategy
-   std::string sel = env_->getParam()->getStrParam("SPLIT_SELECTION");
+   std::string sel = env_->getParams()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
       split_ = new CSPSplitRR(scop, std::move(smap));
@@ -318,7 +318,7 @@ void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
 
       node->setProof(Proof::Inner);
 
-      std::string str = env_->getParam()->getStrParam("SPLIT_INNER_BOX");
+      std::string str = env_->getParams()->getStrParam("SPLIT_INNER_BOX");
       if (str == "NO")
       {
          space_->pushSolNode(node);
@@ -376,7 +376,7 @@ void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
 void CSPSolver::branchAndPrune()
 {
    LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
-   LOG_INTER("Parameters\n" << *env_->getParam());
+   LOG_INTER("Parameters\n" << *env_->getParams());
 
    stimer_.start();
 
@@ -393,29 +393,29 @@ void CSPSolver::branchAndPrune()
    // prover that derives proof certificates of the solutions
    prover_ = new Prover(*preprob_);
 
-   int niter = env_->getParam()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
+   int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
    prover_->setMaxIter(niter);
 
-   double delta = env_->getParam()->getDblParam("INFLATION_DELTA");
+   double delta = env_->getParams()->getDblParam("INFLATION_DELTA");
    prover_->setInflationDelta(delta);
 
-   double chi = env_->getParam()->getDblParam("INFLATION_CHI");
+   double chi = env_->getParams()->getDblParam("INFLATION_CHI");
    prover_->setInflationChi(chi);
 
    // parameters
-   double timelimit = env_->getParam()->getDblParam("TIME_LIMIT");
+   double timelimit = env_->getParams()->getDblParam("TIME_LIMIT");
    env_->setTimeLimit(false);
 
-   int nodelimit = env_->getParam()->getIntParam("NODE_LIMIT");
+   int nodelimit = env_->getParams()->getIntParam("NODE_LIMIT");
    env_->setNodeLimit(false);
 
-   int sollimit = env_->getParam()->getIntParam("SOLUTION_LIMIT");
+   int sollimit = env_->getParams()->getIntParam("SOLUTION_LIMIT");
    env_->setSolutionLimit(false);
 
-   int depthlimit = env_->getParam()->getIntParam("DEPTH_LIMIT");
+   int depthlimit = env_->getParams()->getIntParam("DEPTH_LIMIT");
 
-   bool trace = env_->getParam()->getStrParam("TRACE") == "YES";
-   int tracefreq = env_->getParam()->getIntParam("TRACE_FREQUENCY");
+   bool trace = env_->getParams()->getStrParam("TRACE") == "YES";
+   int tracefreq = env_->getParams()->getIntParam("TRACE_FREQUENCY");
 
    bool iter = true;
 
@@ -490,7 +490,7 @@ void CSPSolver::branchAndPrune()
 #endif
    } while (iter);
 
-   double gap = env_->getParam()->getDblParam("SOLUTION_CLUSTER_GAP");
+   double gap = env_->getParams()->getDblParam("SOLUTION_CLUSTER_GAP");
    space_->makeSolClusters(gap);
 
 #if LOG_ON
@@ -500,7 +500,7 @@ void CSPSolver::branchAndPrune()
 
    LOG_NL_MAIN();
 
-   std::string sc = env_->getParam()->getStrParam("CERTIFICATION");
+   std::string sc = env_->getParams()->getStrParam("CERTIFICATION");
    if (sc == "YES")
    {
       LOG_INTER("Certification a posteriori");

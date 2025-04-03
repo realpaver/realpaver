@@ -18,17 +18,16 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalGaussSeidel.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalGaussSeidel.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
 IntervalGaussSeidel::IntervalGaussSeidel()
-    : maxiter_(Param::GetIntParam("GAUSS_SEIDEL_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("GAUSS_SEIDEL_TOL"))
+    : maxiter_(Params::GetIntParam("GAUSS_SEIDEL_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("GAUSS_SEIDEL_TOL"))
 {
 }
 

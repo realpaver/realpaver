@@ -56,13 +56,13 @@ int main(int argc, char **argv)
          infile.close();
 
       // reads the parameters
-      Param prm;
+      Params params;
       if (pfilename != "")
-         prm.loadParam(pfilename);
+         params.loadParam(pfilename);
 
       // logger
 #if LOG_ON
-      LogLevel loglevel = StringToLogLevel(prm.getStrParam("LOG_LEVEL"));
+      LogLevel loglevel = StringToLogLevel(params.getStrParam("LOG_LEVEL"));
       string flog = "";
       if (loglevel != LogLevel::none)
       {
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
       LOG_MAIN("Parsing...");
 
       // parsing
-      Parser parser(prm);
+      Parser parser(params);
       Problem problem;
 
       ok = parser.parseFile(filename, problem);
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
       // solving
       CSPSolver solver(problem);
-      solver.getEnv()->setParam(prm);
+      solver.getEnv()->setParams(params);
 
       std::string sep = "########################################";
       sep += sep;
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 
       // preprocessing
       cout << GRAY(sep) << endl;
-      string prepro = solver.getEnv()->getParam()->getStrParam("PREPROCESSING");
+      string prepro = solver.getEnv()->getParams()->getStrParam("PREPROCESSING");
 
       Preprocessor *preproc = solver.getPreprocessor();
 
@@ -286,7 +286,7 @@ int main(int argc, char **argv)
          // limits
          if (env->usedTimeLimit())
          {
-            double tl = env->getParam()->getDblParam("TIME_LIMIT");
+            double tl = env->getParams()->getDblParam("TIME_LIMIT");
             cout << std::fixed << std::setprecision(3);
             fsol << std::fixed << std::setprecision(3);
             cout << indent << WP("Time limit enabled", wpl) << RED(tl << " (seconds)")
@@ -296,21 +296,21 @@ int main(int argc, char **argv)
 
          if (env->usedSolutionLimit())
          {
-            int nb = env->getParam()->getIntParam("SOLUTION_LIMIT");
+            int nb = env->getParams()->getIntParam("SOLUTION_LIMIT");
             cout << indent << WP("Solution limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Solution limit enabled", wpl) << nb << endl;
          }
 
          if (env->usedNodeLimit())
          {
-            int nb = env->getParam()->getIntParam("NODE_LIMIT");
+            int nb = env->getParams()->getIntParam("NODE_LIMIT");
             cout << indent << WP("Node limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Node limit enabled", wpl) << nb << endl;
          }
 
          if (env->usedDepthLimit())
          {
-            int nb = env->getParam()->getIntParam("DEPTH_LIMIT");
+            int nb = env->getParams()->getIntParam("DEPTH_LIMIT");
             cout << indent << WP("Depth limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Depth limit enabled", wpl) << endl;
          }
@@ -325,7 +325,7 @@ int main(int argc, char **argv)
          // writes the solutions
          Scope sco = preproc->unfixedScope();
 
-         std::string dr = prm.getStrParam("DISPLAY_REGION");
+         std::string dr = params.getStrParam("DISPLAY_REGION");
 
          StreamReporter reporter(problem, fsol);
          for (const auto &v : sco)
@@ -337,9 +337,9 @@ int main(int argc, char **argv)
          if (dr == "VEC")
             reporter.setVertical(false);
 
-         std::string sd = prm.getStrParam("DISPLAY_REGION");
+         std::string sd = params.getStrParam("DISPLAY_REGION");
 
-         int prec = prm.getIntParam("FLOAT_PRECISION");
+         int prec = params.getIntParam("FLOAT_PRECISION");
          fsol << std::defaultfloat;
 
          for (size_t i = 0; i < solver.nbSolutions(); ++i)
@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 
       // writes the parameters in the solution file
       fsol << endl << "--- PARAMETERS ---" << endl << endl;
-      env->getParam()->print(fsol);
+      env->getParams()->printValues(fsol);
 
       cout << GRAY(sep) << endl;
 

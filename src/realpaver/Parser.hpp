@@ -34,7 +34,7 @@ public:
    Parser();
 
    /// Constructor
-   Parser(const Param &prm);
+   Parser(const Params &params);
 
    /**
     * @brief Parses a model from a file.
@@ -50,7 +50,7 @@ public:
 
 private:
    SymbolTable symtab_; // table of symbols
-   Param param_;        // parameters
+   Params params_;      // parameters
 
    void initSymbolTable();
 };

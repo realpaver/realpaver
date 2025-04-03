@@ -8,8 +8,8 @@ int main()
 {
    try
    {
-      Param prm;
-      prm.loadParam("../../examples/param.txt");
+      Params params;
+      params.loadParam("../../examples/param.txt");
 
       Problem problem;
 
@@ -24,7 +24,7 @@ int main()
                       y == l1 * sin(q1) + l2 * sin(q1 + q2), x == 5.75, y == 4.25});
 
       CSPSolver solver(problem);
-      solver.getEnv()->setParam(prm);
+      solver.getEnv()->setParams(params);
       solver.solve();
       for (size_t i = 0; i < solver.nbSolutions(); ++i)
       {

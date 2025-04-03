@@ -19,7 +19,6 @@
  */
 
 #include "realpaver/ContractorBC3Revise.hpp"
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Param.hpp"
 #include <stack>
 
@@ -27,8 +26,8 @@ namespace realpaver {
 
 ContractorBC3Revise::ContractorBC3Revise(SharedDag dag, size_t i, Variable v)
     : f_(dag, i, v)
-    , peeler_(Param::GetDblParam("BC3_PEEL_FACTOR"))
-    , maxiter_(Param::GetIntParam("BC3_ITER_LIMIT"))
+    , peeler_(Params::GetDblParam("BC3_PEEL_FACTOR"))
+    , maxiter_(Params::GetIntParam("BC3_ITER_LIMIT"))
 {
    newton_ = new IntervalNewtonUni();
 }

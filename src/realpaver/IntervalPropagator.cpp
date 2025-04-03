@@ -18,9 +18,9 @@
  * @date   2024-7-1
  */
 
-#include "realpaver/IntervalPropagator.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
+#include "realpaver/IntervalPropagator.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include <queue>
@@ -30,7 +30,7 @@ namespace realpaver {
 IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
     : Contractor()
     , pool_(pool)
-    , tol_(Param::GetDblParam("PROPAGATION_TOL"))
+    , tol_(Params::GetDblParam("PROPAGATION_TOL"))
     , certif_()
 {
    if (pool == nullptr)

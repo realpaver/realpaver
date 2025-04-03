@@ -2264,7 +2264,7 @@ void yyfree(void *ptr)
 
 realpaver::Problem *realpaver_bison_problem;
 realpaver::SymbolTable *realpaver_bison_symtab;
-realpaver::Param *realpaver_bison_param;
+realpaver::Params *realpaver_bison_param;
 realpaver::FunctionSymbol *realpaver_fun_symbol;
 
 // vectors used to parse the table constraints

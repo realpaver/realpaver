@@ -20,8 +20,8 @@ int main(int argc, char **argv)
       else
          infile.close();
 
-      Param prm;
-      Parser parser(prm);
+      Params params;
+      Parser parser(params);
       Problem problem;
 
       bool ok = parser.parseFile(filename, problem);

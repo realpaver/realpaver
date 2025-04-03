@@ -8,18 +8,18 @@ int main()
 {
    try
    {
-      Param prm;
-      prm.loadParam("../../examples/param.txt");
+      Params params;
+      params.loadParam("../../examples/param.txt");
 
       Problem problem;
 
-      Parser parser(prm);
+      Parser parser(params);
       bool ok = parser.parseFile("../../examples/2r-robot.rp", problem);
 
       if (ok)
       {
          CSPSolver solver(problem);
-         solver.getEnv()->setParam(prm);
+         solver.getEnv()->setParams(params);
          solver.solve();
          for (size_t i = 0; i < solver.nbSolutions(); ++i)
          {
