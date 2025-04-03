@@ -22,7 +22,6 @@
 #include "realpaver/Param.hpp"
 #include "realpaver/ScopeBank.hpp"
 #include "realpaver/Term.hpp"
-#include "realpaver/TermDeriver.hpp"
 
 namespace realpaver {
 
@@ -32,11 +31,11 @@ NLPModel::NLPModel(const Problem &pb)
     , scop_(pb.scope())
     , n_(pb.nbVars())
     , m_(pb.nbCtrs())
-    , time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
-    , iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
-           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL"))
-    , alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
+    , time_limit_(Params::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
+    , iter_limit_(Params::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Params::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL"))
+    , alg_(Params::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
    bool ismin = pb.getObjective().isMinimization();
 
@@ -69,11 +68,11 @@ NLPModel::NLPModel(const RealFunction &obj)
     , scop_(obj.scope())
     , n_(obj.nbVars())
     , m_(0)
-    , time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
-    , iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
-           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL"))
-    , alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
+    , time_limit_(Params::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
+    , iter_limit_(Params::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Params::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL"))
+    , alg_(Params::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
    obj_ = new RealFunction(obj);
    best_ = nullptr;
@@ -86,11 +85,11 @@ NLPModel::NLPModel(const RealFunction &obj, const RealFunctionVector &ctrs)
     , scop_()
     , n_(obj.nbVars())
     , m_(ctrs.nbFuns())
-    , time_limit_(Param::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
-    , iter_limit_(Param::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
-           Param::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL"))
-    , alg_(Param::GetStrParam("NLP_SOLVER_ALGORITHM"))
+    , time_limit_(Params::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
+    , iter_limit_(Params::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+           Params::GetDblParam("NLP_SOLVER_OBJ_ABS_TOL"))
+    , alg_(Params::GetStrParam("NLP_SOLVER_ALGORITHM"))
 {
    scop_.insert(obj.scope());
    scop_.insert(ctrs.scope());

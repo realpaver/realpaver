@@ -24,7 +24,7 @@ namespace realpaver {
 
 ContractorLoop::ContractorLoop(SharedContractor op)
     : op_(op)
-    , tol_(Param::GetDblParam("LOOP_CONTRACTOR_TOL"))
+    , tol_(Params::GetDblParam("LOOP_CONTRACTOR_TOL"))
 {
    ASSERT(op != nullptr, "Bad operator in the loop contractor");
 }

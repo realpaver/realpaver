@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorVar3BCID.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorVar3BCID.hpp"
 #include "realpaver/IntervalSlicer.hpp"
 
 namespace realpaver {
@@ -30,7 +30,7 @@ ContractorVar3BCID::ContractorVar3BCID(SharedContractor op, Variable v, size_t n
     , v_(v)
     , ns3B_(ns3B)
     , nsCID_(nsCID)
-    , varMnWidth_(Param::GetDblParam("VAR3BCID_MIN_WIDTH"))
+    , varMnWidth_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
    ASSERT(ns3B >= 2, "Bas number of slices in a var3BCID contractor");
    ASSERT(nsCID >= 2, "Bas number of slices in a var3BCID contractor");

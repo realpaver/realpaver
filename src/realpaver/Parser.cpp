@@ -18,13 +18,13 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Parser.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Parser.hpp"
 #include <vector>
 
 extern int realpaver_flex_init_file(realpaver::Problem *prob,
-                                    realpaver::SymbolTable *symtab, realpaver::Param *prm,
-                                    const char *filename);
+                                    realpaver::SymbolTable *symtab,
+                                    realpaver::Params *params, const char *filename);
 extern void realpaver_flex_cleanup_file(void);
 extern int realpaver_bison_parse(void);
 extern std::string realpaver_parse_error;
@@ -43,12 +43,12 @@ static std::vector<std::string> keywords = {
 
 Parser::Parser()
     : symtab_()
-    , param_()
+    , params_()
 {
 }
 
-Parser::Parser(const Param &prm)
-    : param_(prm)
+Parser::Parser(const Params &params)
+    : params_(params)
 {
 }
 
@@ -72,7 +72,7 @@ bool Parser::parseFile(const std::string &filename, Problem &problem)
    initSymbolTable();
 
    // initializes the lexical analyzer
-   int res = realpaver_flex_init_file(&problem, &symtab_, &param_, filename.c_str());
+   int res = realpaver_flex_init_file(&problem, &symtab_, &params_, filename.c_str());
 
    // parses the input file
    if (res == 0)

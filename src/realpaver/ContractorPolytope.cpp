@@ -18,23 +18,23 @@
  * @date   2025-fev-11
  */
 
-#include "realpaver/ContractorPolytope.hpp"
-#include "LPModel.hpp"
-#include "Scope.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorPolytope.hpp"
+#include "realpaver/LPModel.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
 ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
     : Contractor()
     , lzr_(std::move(lzr))
-    , maxseconds_(Param::GetDblParam("LP_TIME_LIMIT"))
-    , maxiter_(Param::GetIntParam("LP_ITER_LIMIT"))
-    , feastol_(Param::GetDblParam("LP_FEAS_TOL"))
-    , loop_(Param::GetStrParam("POLYTOPE_HULL_LOOP") == "YES")
-    , looptol_(Param::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
+    , maxseconds_(Params::GetDblParam("LP_TIME_LIMIT"))
+    , maxiter_(Params::GetIntParam("LP_ITER_LIMIT"))
+    , feastol_(Params::GetDblParam("LP_FEAS_TOL"))
+    , loop_(Params::GetStrParam("POLYTOPE_HULL_LOOP") == "YES")
+    , looptol_(Params::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
 {
    ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
 }

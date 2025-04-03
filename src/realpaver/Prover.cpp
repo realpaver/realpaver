@@ -18,11 +18,11 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Prover.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalThickFunction.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Prover.hpp"
 
 namespace realpaver {
 
@@ -31,9 +31,9 @@ Prover::Prover(const Problem &p)
     , dag_(nullptr)
     , mnewton_(nullptr)
     , unewton_(nullptr)
-    , delta_(Param::GetDblParam("INFLATION_DELTA"))
-    , chi_(Param::GetDblParam("INFLATION_CHI"))
-    , maxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
+    , delta_(Params::GetDblParam("INFLATION_DELTA"))
+    , chi_(Params::GetDblParam("INFLATION_CHI"))
+    , maxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
    dag_ = std::make_shared<Dag>();
 

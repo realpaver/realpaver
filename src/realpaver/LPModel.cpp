@@ -18,12 +18,12 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/LPModel.hpp"
-#include "RealVector.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/LPModel.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/RealVector.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -481,9 +481,9 @@ LPModel::LPModel()
     , ctrs_()
     , cost_()
     , sense_(LPSense::Min)
-    , maxseconds_(Param::GetDblParam("LP_TIME_LIMIT"))
-    , maxiter_(Param::GetIntParam("LP_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("LP_FEAS_TOL"))
+    , maxseconds_(Params::GetDblParam("LP_TIME_LIMIT"))
+    , maxiter_(Params::GetIntParam("LP_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("LP_FEAS_TOL"))
 {
 }
 

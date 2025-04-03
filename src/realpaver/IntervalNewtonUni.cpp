@@ -18,19 +18,18 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/Tolerance.hpp"
 #include <stack>
 
 namespace realpaver {
 
 IntervalNewtonUni::IntervalNewtonUni()
-    : maxiter_(Param::GetIntParam("UNI_NEWTON_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("NEWTON_TOL"))
+    : maxiter_(Params::GetIntParam("UNI_NEWTON_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("NEWTON_TOL"))
     , inflator_()
 {
 }

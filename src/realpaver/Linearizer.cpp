@@ -18,9 +18,9 @@
  * @date   2025-fev-11
  */
 
-#include "realpaver/Linearizer.hpp"
 #include "realpaver/AffineCreator.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Linearizer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ScopeBank.hpp"
 
@@ -30,7 +30,7 @@ Linearizer::Linearizer(SharedDag dag)
     : dag_(dag)
     , scop_(dag->scope())
     , lfun_()
-    , tol_(Param::GetDblParam("RELAXATION_EQ_TOL"))
+    , tol_(Params::GetDblParam("RELAXATION_EQ_TOL"))
     , mvv_()
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");
@@ -45,7 +45,7 @@ Linearizer::Linearizer(SharedDag dag, const IndexList &lfun)
     : dag_(dag)
     , scop_()
     , lfun_()
-    , tol_(Param::GetDblParam("RELAXATION_TOL"))
+    , tol_(Params::GetDblParam("RELAXATION_TOL"))
     , mvv_()
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");

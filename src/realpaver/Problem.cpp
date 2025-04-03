@@ -18,10 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Problem.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
 #include <sstream>
 
@@ -198,8 +197,8 @@ Variable Problem::addRealVar(const Interval &x, const std::string &name)
 
    std::unique_ptr<Domain> dom(new IntervalDomain(x));
 
-   double rtol = Param::GetDblParam("VAR_REL_TOL"),
-          atol = Param::GetDblParam("VAR_ABS_TOL");
+   double rtol = Params::GetDblParam("VAR_REL_TOL"),
+          atol = Params::GetDblParam("VAR_ABS_TOL");
 
    Variable v(os.str());
    v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(rtol, atol));
@@ -225,8 +224,8 @@ Variable Problem::addRealVar(const IntervalUnion &u, const std::string &name)
 
    std::unique_ptr<Domain> dom(new IntervalUnionDomain(u));
 
-   double rtol = Param::GetDblParam("VAR_REL_TOL"),
-          atol = Param::GetDblParam("VAR_ABS_TOL");
+   double rtol = Params::GetDblParam("VAR_REL_TOL"),
+          atol = Params::GetDblParam("VAR_ABS_TOL");
 
    Variable v(os.str());
    v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(rtol, atol));
@@ -240,8 +239,8 @@ VariableVector Problem::addRealVarVector(const std::string &name, int first, int
 {
    VariableVector vec(name, first, last);
 
-   double rtol = Param::GetDblParam("VAR_REL_TOL"),
-          atol = Param::GetDblParam("VAR_ABS_TOL");
+   double rtol = Params::GetDblParam("VAR_REL_TOL"),
+          atol = Params::GetDblParam("VAR_ABS_TOL");
 
    for (int i = first; i <= last; ++i)
    {

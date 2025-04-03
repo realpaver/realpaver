@@ -32,7 +32,7 @@ extern char* realpaver_bison_text;
 extern int realpaver_bison_lineno;
 extern std::string realpaver_parse_error;
 extern realpaver::Problem* realpaver_bison_problem;
-extern realpaver::Param* realpaver_bison_param;
+extern realpaver::Params* realpaver_bison_params;
 extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern std::vector<realpaver::Variable>* realpaver_var_vector;
@@ -177,8 +177,8 @@ var_def
 
       realpaver::Variable v = realpaver_bison_problem->addVar($1);
 
-      double rtol = realpaver_bison_param->getDblParam("VAR_REL_TOL"),
-             atol = realpaver_bison_param->getDblParam("VAR_ABS_TOL");
+      double rtol = realpaver_bison_params->getDblParam("VAR_REL_TOL"),
+             atol = realpaver_bison_params->getDblParam("VAR_ABS_TOL");
       v.setTolerance(realpaver::Tolerance(rtol, atol));
 
       realpaver_bison_symtab->insertVariable($1, v);

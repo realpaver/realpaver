@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Dag.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/FlatFunction.hpp"
 #include "realpaver/IntervalSlicer.hpp"

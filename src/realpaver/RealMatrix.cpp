@@ -19,21 +19,21 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/RealMatrix.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/RealMatrix.hpp"
 
 namespace realpaver {
 
 RealMatrix::RealMatrix(size_t nrows, size_t ncols, double x)
     : NumericMatrix<double>(nrows, ncols, x)
-    , minpiv_(Param::GetDblParam("GAUSSIAN_MIN_PIVOT"))
+    , minpiv_(Params::GetDblParam("GAUSSIAN_MIN_PIVOT"))
 {
 }
 
 RealMatrix::RealMatrix(const std::initializer_list<std::initializer_list<double>> &l)
     : NumericMatrix<double>(0, 0)
-    , minpiv_(Param::GetDblParam("GAUSSIAN_MIN_PIVOT"))
+    , minpiv_(Params::GetDblParam("GAUSSIAN_MIN_PIVOT"))
 {
    size_t nrows = l.size();
 

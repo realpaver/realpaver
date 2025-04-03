@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 
@@ -34,12 +34,12 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
     , b_(F.nbFuns())
     , c_(F.scope())
     , gs_(nullptr)
-    , maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT"))
-    , tol_(Param::GetDblParam("NEWTON_TOL"))
-    , wlim_(Param::GetDblParam("NEWTON_WIDTH_LIMIT"))
-    , delta_(Param::GetDblParam("INFLATION_DELTA"))
-    , chi_(Param::GetDblParam("INFLATION_CHI"))
-    , cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
+    , maxiter_(Params::GetIntParam("NEWTON_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("NEWTON_TOL"))
+    , wlim_(Params::GetDblParam("NEWTON_WIDTH_LIMIT"))
+    , delta_(Params::GetDblParam("INFLATION_DELTA"))
+    , chi_(Params::GetDblParam("INFLATION_CHI"))
+    , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
    ASSERT(F.nbVars() == F.nbFuns(), "Interval Newton defined with a non-square system");
 

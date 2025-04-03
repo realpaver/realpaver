@@ -20,6 +20,7 @@
 
 #include "realpaver/AffineForm.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Double.hpp"
 
 namespace realpaver {
 

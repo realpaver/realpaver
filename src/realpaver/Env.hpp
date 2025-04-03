@@ -46,10 +46,10 @@ public:
    Env &operator=(const Env &) = delete;
 
    /// Sets the object that manages the parameter settings
-   void setParam(const Param &prm);
+   void setParams(const Params &params);
 
    /// Returns the object that manages the parameter settings
-   Param *getParam() const;
+   Params *getParams() const;
 
    /// Sets a flag that informs on the termination of a solving process
    void setTimeLimit(bool b = true);
@@ -76,7 +76,7 @@ public:
    bool hasConstraintViolated() const;
 
 private:
-   Param *param_;   // management of parameters
+   Params *params_; // management of parameters
    bool tlim_;      // time limit reached
    bool nlim_;      // node limit reached
    bool presolved_; // true if a problem is solved at preprocessing
