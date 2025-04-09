@@ -297,13 +297,24 @@ SharedContractorPolytope ContractorFactory::makePolytope()
          bool hansen =
              env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
 
-         bool rand =
-             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
+         std::string corner =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_CORNER");
 
-         CornerStyle style = (rand ? CornerStyle::Random : CornerStyle::RandomSeed);
+         CornerStyle style;
+         if (corner == "RANDOM_OPPOSITE")
+            style = CornerStyle::RandomOpposite;
+         else if (corner == "RANDOM")
+            style = CornerStyle::Random;
+         else if (corner == "LEFT")
+            style = CornerStyle::Left;
+         else if (corner == "RIGHT")
+            style = CornerStyle::Right;
+
+         unsigned seed =
+             (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
 
          std::unique_ptr<Linearizer> lzr =
-             std::make_unique<LinearizerTaylor>(dag_, hansen, style);
+             std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
@@ -322,13 +333,24 @@ SharedContractorPolytope ContractorFactory::makePolytope()
          bool hansen =
              env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
 
-         bool rand =
-             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_RANDOM") == "YES";
+         std::string corner =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_CORNER");
 
-         CornerStyle style = (rand ? CornerStyle::Random : CornerStyle::RandomSeed);
+         CornerStyle style;
+         if (corner == "RANDOM_OPPOSITE")
+            style = CornerStyle::RandomOpposite;
+         else if (corner == "RANDOM")
+            style = CornerStyle::Random;
+         else if (corner == "LEFT")
+            style = CornerStyle::Left;
+         else if (corner == "RIGHT")
+            style = CornerStyle::Right;
+
+         unsigned seed =
+             (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
 
          std::unique_ptr<LinearizerTaylor> taylor =
-             std::make_unique<LinearizerTaylor>(dag_, hansen, style);
+             std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
 
          ASSERT(taylor != nullptr, "taylor null");
 

@@ -198,6 +198,9 @@ public:
    /// Output on a stream
    void print(std::ostream &os) const;
 
+   /// Used for debugging
+   void debug(std::ostream &os) const;
+
 private:
    Scope scop_;   // set of variables occurring in this
    Interval img_; // image

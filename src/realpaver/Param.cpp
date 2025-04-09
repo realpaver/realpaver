@@ -18,6 +18,7 @@
  * @date   2025-4-2
  */
 
+#include "gurobi_c++.h"
 #include "realpaver/Double.hpp"
 #include "realpaver/Exception.hpp"
 #include "realpaver/Interval.hpp"
@@ -1310,14 +1311,27 @@ void Params::makePolytope()
    add(hansen);
 
    ////////////////////
-   ParamStr random;
-   random.setName("POLYTOPE_HULL_TAYLOR_RANDOM")
+   ParamStr tayl_corn;
+   tayl_corn.setName("POLYTOPE_HULL_TAYLOR_CORNER")
        .setCat(cat)
        .setWhat("Choice of corners in the Taylor-based relaxation")
-       .addChoice("YES", "random choice")
-       .addChoice("NO", "default choice")
-       .setValue("YES");
-   add(random);
+       .addChoice("RANDOM", "one corner selected randomly")
+       .addChoice("RANDOM_OPPOSITE", "two opposite corners, one selected randomly")
+       .addChoice("LEFT", "corner of left bounds")
+       .addChoice("RIGHT", "corner of right bounds")
+       .setValue("RANDOM_OPPOSITE");
+   add(tayl_corn);
+
+   ////////////////////
+   ParamInt tayl_seed;
+   str = std::string("Seed used to initialize the generator of pseudo-random numbers. ") +
+         "The system is used if it is equal to 0.";
+   tayl_seed.setName("POLYTOPE_HULL_TAYLOR_SEED")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(0)
+       .setMinValue(0);
+   add(tayl_seed);
 
    ////////////////////
    ParamStr loop;

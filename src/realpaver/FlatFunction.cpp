@@ -18,8 +18,8 @@
  * @date   2024-6-11
  */
 
-#include "realpaver/FlatFunction.hpp"
 #include "realpaver/Dag.hpp"
+#include "realpaver/FlatFunction.hpp"
 
 namespace realpaver {
 
@@ -1712,6 +1712,14 @@ void FlatFunction::print(std::ostream &os) const
 
       os << std::endl;
    }
+}
+
+void FlatFunction::debug(std::ostream &os) const
+{
+   print(os);
+   os << "-- ival, idv --";
+   for (size_t i = 0; i < nb_; ++i)
+      os << i << ": " << ival_[i] << "\t\t" << idv_[i] << std::endl;
 }
 
 std::ostream &operator<<(std::ostream &os, const FlatFunction &f)

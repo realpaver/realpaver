@@ -111,27 +111,32 @@ void Linearizer::setRelaxTol(double tol)
 
 /*----------------------------------------------------------------------------*/
 
-LinearizerTaylor::LinearizerTaylor(SharedDag dag, bool hansen, CornerStyle style)
+LinearizerTaylor::LinearizerTaylor(SharedDag dag, bool hansen, CornerStyle style,
+                                   unsigned seed)
     : Linearizer(dag)
     , hansen_(hansen)
     , style_(style)
     , corner_(scope().size())
-    , gen_(SEED)
+    , gen_()
 {
-   if (style == CornerStyle::Random)
+   if (seed == 0)
       gen_ = IntRandom();
+   else
+      gen_ = IntRandom(seed);
 }
 
 LinearizerTaylor::LinearizerTaylor(SharedDag dag, const IndexList &lfun, bool hansen,
-                                   CornerStyle style)
+                                   CornerStyle style, unsigned seed)
     : Linearizer(dag, lfun)
     , hansen_(hansen)
     , style_(style)
     , corner_(scope().size())
-    , gen_(SEED)
+    , gen_()
 {
-   if (style == CornerStyle::Random)
+   if (seed == 0)
       gen_ = IntRandom();
+   else
+      gen_ = IntRandom(seed);
 }
 
 void LinearizerTaylor::useHansenDerivatives(bool b)
@@ -139,39 +144,38 @@ void LinearizerTaylor::useHansenDerivatives(bool b)
    hansen_ = b;
 }
 
-void LinearizerTaylor::useRandomCorners(unsigned seed)
-{
-   if (seed == 0)
-   {
-      style_ = CornerStyle::Random;
-      gen_ = IntRandom();
-   }
-   else
-   {
-      style_ = CornerStyle::RandomSeed;
-      gen_ = IntRandom(seed);
-   }
-}
-
-void LinearizerTaylor::fixFirstCorner(const Bitset &corner)
+void LinearizerTaylor::fixCorner(const Bitset &corner, bool opposite)
 {
    ASSERT(corner_.size() == corner.size(), "Bad corner");
 
-   style_ = CornerStyle::User;
+   style_ = opposite ? CornerStyle::UserOpposite : CornerStyle::User;
    corner_ = corner;
 }
 
 void LinearizerTaylor::selectCorner(const IntervalBox &B)
 {
-   if (style_ == CornerStyle::User)
-      return;
-
-   for (size_t i = 0; i < corner_.size(); ++i)
+   switch (style_)
    {
-      if (gen_.nextBool())
-         corner_.setOne(i);
-      else
-         corner_.setZero(i);
+   case CornerStyle::Random:
+   case CornerStyle::RandomOpposite:
+      for (size_t i = 0; i < corner_.size(); ++i)
+      {
+         if (gen_.nextBool())
+            corner_.setOne(i);
+         else
+            corner_.setZero(i);
+      }
+      break;
+   case CornerStyle::Left:
+      corner_.setAllZero();
+      break;
+   case CornerStyle::Right:
+      corner_.setAllOne();
+      break;
+   case CornerStyle::User:
+   case CornerStyle::UserOpposite:
+      // nothing
+      break;
    }
 }
 
@@ -186,40 +190,28 @@ void LinearizerTaylor::makeVars(LPModel &lpm, const IntervalBox &B)
    }
 }
 
-bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
+bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner)
 {
-   // selects the first corner
-   selectCorner(B);
-
-   // makes the two opposite corners
-   RealPoint c1(scop_), c2(scop_);
+   // makes the corner of the box
+   RealPoint c(scop_);
    for (const auto &v : scop_)
    {
       Interval dom = B.get(v);
-      if (corner_.get(scop_.index(v)))
-      {
-         c1.set(v, dom.right());
-         c2.set(v, dom.left());
-      }
+      if (corner.get(scop_.index(v)))
+         c.set(v, dom.right());
       else
-      {
-         c1.set(v, dom.left());
-         c2.set(v, dom.right());
-      }
+         c.set(v, dom.left());
    }
 
-   // evaluates the functions at both corners
-   IntervalVector fc1(lfun_.size()), fc2(lfun_.size());
+   // evaluates the functions at c
+   IntervalVector fc(lfun_.size());
    for (size_t i : lfun_)
    {
       DagFun *f = dag_->fun(i);
-      Interval x1 = f->iEval(c1), x2 = f->iEval(c2);
-
-      if (x1.isEmpty() || x2.isEmpty())
+      Interval x = f->iEval(c);
+      if (x.isEmpty())
          return false;
-
-      fc1.set(i, x1);
-      fc2.set(i, x2);
+      fc.set(i, x);
    }
 
    // generates the constraints
@@ -235,22 +227,22 @@ bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
       // differentiates the function
       IntervalVector G(f->nbVars());
       if (hansen_)
-         f->iDiffHansen(B, G);
+         f->iDiffHansen(B, c, G);
       else
          f->iDiff(B, G);
 
-      // lower bounding constraints
-      // assumes that the right bound of the image of the function is finite
-      // we generate two linear constraints, one per corner
-      // the first one has the form lo1 <= u1 where lo1 is the non constant
-      // part of the constraint and u1 is the constant part
-      // the second one lo2 <= u2 is built similarly
+      if (G.isEmpty())
+         return false;
+
+      if (G.isInf())
+         continue;
+
+      // lower bounding constraint of the form lo <= u generated if the right
+      // bound of the image of the function is finite
       if (!Double::isInf(img.right()))
       {
-         Interval u1 = img.right() - fc1.get(i), // U - f(c1)
-             u2 = img.right() - fc2.get(i);      // U - f(c2)
-
-         LinExpr lo1, lo2;
+         Interval u = img.right() - fc.get(i);
+         LinExpr lo;
 
          for (const auto &v : f->scope())
          {
@@ -258,47 +250,32 @@ bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
 
             // derivative of f wrt. v
             Interval z = G[f->scope().index(v)];
-            if (z.isEmpty() || z.isInf())
-               return false;
 
-            if (corner_.get(scop_.index(v)))
+            if (corner.get(scop_.index(v)))
             {
                // right bound used for this variable (bit = 1)
-               // first corner => right bound of the derivative
-               lo1.addTerm(z.right(), lv);
-               u1 += z.right() * Interval(c1.get(v));
-
-               // second (opposite) corner => left bound of the derivative
-               lo2.addTerm(z.left(), lv);
-               u2 += z.left() * Interval(c2.get(v));
+               // => right bound of the derivative
+               lo.addTerm(z.right(), lv);
+               u += z.right() * Interval(c.get(v));
             }
             else
             {
                // left bound used for this variable (bit = 0)
-               // first corner => left bound of the derivative
-               lo1.addTerm(z.left(), lv);
-               u1 += z.left() * Interval(c1.get(v));
-
-               // second (opposite) corner => right bound of the derivative
-               lo2.addTerm(z.right(), lv);
-               u2 += z.right() * Interval(c2.get(v));
+               // => left bound of the derivative
+               lo.addTerm(z.left(), lv);
+               u += z.left() * Interval(c.get(v));
             }
          }
-         lpm.addCtr(lo1, u1.right());
-         lpm.addCtr(lo2, u2.right());
+         lpm.addCtr(lo, u.right());
       }
 
-      // upper bounding constraints
-      // assumes that the left bound of the image of the function is finite
-      // we generate two linear constraints, one per corner
-      // the first one has the form up1 >= l1 where up1 is the non constant
-      // part of the constraint and l1 is the constant part
-      // the second one up2 >= l2 is built similarly
+      // upper bounding constraint of the form up >= l generated if the left
+      // bound of the image of the function is finite
       if (!Double::isInf(img.left()))
       {
-         Interval l1 = img.left() - fc1.get(i), l2 = img.left() - fc2.get(i);
+         Interval l = img.left() - fc.get(i);
 
-         LinExpr up1, up2;
+         LinExpr up;
 
          for (const auto &v : f->scope())
          {
@@ -307,54 +284,51 @@ bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
             // derivative of f wrt. v
             Interval z = G[f->scope().index(v)];
 
-            if (corner_.get(scop_.index(v)))
+            if (corner.get(scop_.index(v)))
             {
                // right bound used for this variable (bit = 1)
-               // first corner => left bound of the derivative
-               up1.addTerm(z.left(), lv);
-               l1 += z.left() * Interval(c1.get(v));
-
-               // second (opposite) corner => right bound of the derivative
-               up2.addTerm(z.right(), lv);
-               l2 += z.right() * Interval(c2.get(v));
+               // => left bound of the derivative
+               up.addTerm(z.left(), lv);
+               l += z.left() * Interval(c.get(v));
             }
             else
             {
                // left bound used for this variable (bit = 1)
-               // first corner => right bound of the derivative
-               up1.addTerm(z.right(), lv);
-               l1 += z.right() * Interval(c1.get(v));
-
-               // second (opposite) corner => left bound of the derivative
-               up2.addTerm(z.left(), lv);
-               l2 += z.left() * Interval(c2.get(v));
+               // => right bound of the derivative
+               up.addTerm(z.right(), lv);
+               l += z.right() * Interval(c.get(v));
             }
          }
-         lpm.addCtr(l1.left(), up1);
-         lpm.addCtr(l2.left(), up2);
+         lpm.addCtr(l.left(), up);
       }
    }
    return true;
+}
+
+bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
+{
+   // selects the first corner
+   selectCorner(B);
+
+   // generates the constraints for this corner
+   bool b = makeOne(lpm, B, corner_);
+   if (!b)
+      return false;
+
+   // manages the opposite corner if necessary
+   if (style_ == CornerStyle::RandomOpposite || style_ == CornerStyle::UserOpposite)
+   {
+      corner_.flipAll();
+      return makeOne(lpm, B, corner_);
+   }
+   else
+      return true;
 }
 
 bool LinearizerTaylor::make(LPModel &lpm, const IntervalBox &B)
 {
    makeVars(lpm, B);
    return makeCtrs(lpm, B);
-}
-
-bool LinearizerTaylor::areEquals(const LinExpr &e1, const LinExpr &e2)
-{
-   if (e1.getNbTerms() != e2.getNbTerms())
-      return false;
-   for (int i = 0; i < e1.getNbTerms(); ++i)
-   {
-      if (e1.getIndexVar(i) != e2.getIndexVar(i))
-         return false;
-      if (e1.getCoef(i) != e2.getCoef(i))
-         return false;
-   }
-   return true;
 }
 
 /*----------------------------------------------------------------------------*/

@@ -2,6 +2,11 @@
 #     An application of the Runge-Kutta space.
 #     BIT, 24, pages 425--440, 1984.
 
+# Analysis from the Coprin project: Ranges: for all unknowns [-50,50].
+# If a = -1, b =-1, b1 =-2, b2 = b3 = 0, then all equations are verified whatever
+# are c2,c3,a32. Hence we check all solutions for a in [-50,-1.1] and [-0.9,50].
+# 3 solutions for a in [-50,-1.1] and 3 for a in [-0.9,50].
+
 Constants
 f1 = 0,
 f2 = 0,
@@ -13,15 +18,14 @@ f7 = 0,
 f8 = 0;
 
 Variables
-a in [-1, 1],
-b in [-1, 1],
-b1 in [-1, 1],
-b2 in [-1, 1],
-b3 in [-1, 1],
-c2 in [-1, 1],
-c3 in [-1, 1],
-a32 in [-1, 1];
-# [-50, 50]
+a in [-50, -1.1],
+b in [-50, 50],
+b1 in [-50, 50],
+b2 in [-50, 50],
+b3 in [-50, 50],
+c2 in [-50, 50],
+c3 in [-50, 50],
+a32 in [-50, 50];
 
 Constraints
 b1 + b2 + b3 - (a+b) == f1,

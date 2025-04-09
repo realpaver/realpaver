@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
@@ -144,11 +144,12 @@ void IntervalFunctionVector::diff(const IntervalBox &B, IntervalMatrix &J)
    rep_->diff(B, J);
 }
 
-void IntervalFunctionVector::diffHansen(const IntervalBox &B, IntervalMatrix &H)
+void IntervalFunctionVector::diffHansen(const IntervalBox &B, const RealPoint &c,
+                                        IntervalMatrix &H)
 {
    ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->diffHansen(B, H);
+   rep_->diffHansen(B, c, H);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -221,9 +222,10 @@ void IntervalFunctionVectorDag::diff(const IntervalBox &B, IntervalMatrix &J)
    dag_->iDiff(B, J);
 }
 
-void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, IntervalMatrix &H)
+void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, const RealPoint &c,
+                                           IntervalMatrix &H)
 {
-   dag_->iDiffHansen(B, H);
+   dag_->iDiffHansen(B, c, H);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -307,7 +309,8 @@ void IntervalFunctionVectorList::diff(const IntervalBox &B, IntervalMatrix &J)
    }
 }
 
-void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, IntervalMatrix &H)
+void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoint &c,
+                                            IntervalMatrix &H)
 {
    ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
           "Bad dimensions of a Jacobian matrix used in a function vector");
@@ -317,7 +320,7 @@ void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, IntervalMatrix
       auto &f = vf_[i];
 
       IntervalVector G(f.nbVars());
-      f.diffHansen(B, G);
+      f.diffHansen(B, c, G);
 
       // fills the i-th row of the matrix
       size_t j = 0;

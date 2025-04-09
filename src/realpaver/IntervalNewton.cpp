@@ -157,7 +157,7 @@ Proof IntervalNewton::contract(IntervalBox &X)
       b_ = -val_; // b := -F(c)
 
       // calculates the Hansen's matrix
-      F_.diffHansen(X, jac_);
+      F_.diffHansen(X, c_, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
 
@@ -316,7 +316,7 @@ Proof IntervalNewton::certify(IntervalBox &box)
       b_ = -val_; // b := -F(c)
 
       // calculates the Hansen's matrix
-      F_.diffHansen(X, jac_);
+      F_.diffHansen(X, c_, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
 
