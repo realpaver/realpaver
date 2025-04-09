@@ -1024,6 +1024,22 @@ void Params::makeBranch()
    std::string str;
 
    ////////////////////
+   ParamStr search_stat;
+   str = std::string("The search is complete when the whole search space is ") +
+         "explorated until reaching the tolerances on the variables " +
+         "(and the tolerance on the cost function for optimization " +
+         "problems. On the contrary, the search can be stopped when " +
+         "the following limits are reached: TIME_LIMIT, SOLUTION_LIMIT " +
+         "NODE_LIMIT, and DEPTH_LIMIT.";
+   search_stat.setName("SEARCH_STATUS")
+       .setCat(cat)
+       .setWhat(str)
+       .addChoice("COMPLETE", "the whole search space is explorated")
+       .addChoice("LIMITED", "the search is possibly stopped due to the limits")
+       .setValue("LIMITED");
+   add(search_stat);
+
+   ////////////////////
    ParamInt node_lim;
    node_lim.setName("NODE_LIMIT")
        .setCat(cat)

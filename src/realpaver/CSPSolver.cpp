@@ -25,7 +25,9 @@
 #include "realpaver/CSPSpaceDMDFS.hpp"
 #include "realpaver/CSPSpaceHybridDFS.hpp"
 #include "realpaver/Logger.hpp"
+#include <limits>
 #include <list>
+#include <string>
 
 namespace realpaver {
 
@@ -403,22 +405,34 @@ void CSPSolver::branchAndPrune()
    prover_->setInflationChi(chi);
 
    // parameters
-   double timelimit = env_->getParams()->getDblParam("TIME_LIMIT");
-   env_->setTimeLimit(false);
-
-   int nodelimit = env_->getParams()->getIntParam("NODE_LIMIT");
-   env_->setNodeLimit(false);
-
-   int sollimit = env_->getParams()->getIntParam("SOLUTION_LIMIT");
-   env_->setSolutionLimit(false);
-
-   int depthlimit = env_->getParams()->getIntParam("DEPTH_LIMIT");
-
    bool trace = env_->getParams()->getStrParam("TRACE") == "YES";
    int tracefreq = env_->getParams()->getIntParam("TRACE_FREQUENCY");
+   bool complete = (env_->getParams()->getStrParam("SEARCH_STATUS") == "COMPLETE");
+
+   double time_limit;
+   int node_limit, sol_limit, depth_limit;
+
+   if (complete)
+   {
+      time_limit = Double::inf();
+      node_limit = std::numeric_limits<int>::max();
+      sol_limit = std::numeric_limits<int>::max();
+      depth_limit = std::numeric_limits<int>::max();
+   }
+   else
+   {
+      time_limit = env_->getParams()->getDblParam("TIME_LIMIT");
+      node_limit = env_->getParams()->getIntParam("NODE_LIMIT");
+      sol_limit = env_->getParams()->getIntParam("SOLUTION_LIMIT");
+      depth_limit = env_->getParams()->getIntParam("DEPTH_LIMIT");
+   }
+
+   env_->setTimeLimit(false);
+   env_->setNodeLimit(false);
+   env_->setSolutionLimit(false);
+   env_->setDepthLimit(false);
 
    bool iter = true;
-
    size_t last_nb_sol = 0;
    size_t nb_nodes_processed = 0;
 
@@ -430,7 +444,7 @@ void CSPSolver::branchAndPrune()
    do
    {
       ++nb_nodes_processed;
-      bpStep(depthlimit);
+      bpStep(depth_limit);
 
       // trace every new solution
       size_t nb_sol = space_->nbSolNodes();
@@ -464,23 +478,23 @@ void CSPSolver::branchAndPrune()
          iter = false;
       }
 
-      if (iter && preproc_->elapsedTime() + stimer_.elapsedTime() > timelimit)
+      if (iter && preproc_->elapsedTime() + stimer_.elapsedTime() > time_limit)
       {
-         LOG_MAIN("Stops on time limit (" << timelimit << "s)");
+         LOG_MAIN("Stops on time limit (" << time_limit << "s)");
          env_->setTimeLimit(true);
          iter = false;
       }
 
-      if (iter && nbnodes_ > nodelimit)
+      if (iter && nbnodes_ > node_limit)
       {
-         LOG_MAIN("Stops on node limit (" << nodelimit << ")");
+         LOG_MAIN("Stops on node limit (" << node_limit << ")");
          env_->setNodeLimit(true);
          iter = false;
       }
 
-      if (iter && (int)space_->nbSolNodes() >= sollimit)
+      if (iter && (int)space_->nbSolNodes() >= sol_limit)
       {
-         LOG_MAIN("Stops on solution limit (" << sollimit << ")");
+         LOG_MAIN("Stops on solution limit (" << sol_limit << ")");
          env_->setSolutionLimit(true);
          iter = false;
       }
