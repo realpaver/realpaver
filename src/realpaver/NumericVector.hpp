@@ -209,7 +209,7 @@ template <typename T> void NumericVector<T>::print(std::ostream &os) const
    for (size_t i = 0; i < size(); ++i)
    {
       if (i != 0)
-         os << ", ";
+         os << " ; ";
       os << operator[](i);
    }
    os << ')';

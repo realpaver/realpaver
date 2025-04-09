@@ -25,7 +25,7 @@ void test_1()
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({0, 1});
-   lzr->fixFirstCorner(corner);
+   lzr->fixCorner(corner, true);
    ContractorPolytope ctc(std::move(lzr));
 
    IntervalBox B(prob.scope());
@@ -62,7 +62,7 @@ void test_2()
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({1, 0});
-   lzr->fixFirstCorner(corner);
+   lzr->fixCorner(corner, true);
    ContractorPolytope ctc(std::move(lzr));
 
    IntervalBox B(prob.scope());
@@ -104,7 +104,7 @@ void brown_5_feasible()
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({0, 1, 0, 1, 0});
-   lzr->fixFirstCorner(corner);
+   lzr->fixCorner(corner, true);
    ContractorPolytope ctc(std::move(lzr));
 
    IntervalBox B(prob.scope());
@@ -146,7 +146,7 @@ void brown_5_infeasible()
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
    Bitset corner({0, 1, 0, 1, 0});
-   lzr->fixFirstCorner(corner);
+   lzr->fixCorner(corner, true);
    ContractorPolytope ctc(std::move(lzr));
 
    IntervalBox B(prob.scope());

@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalBox.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainBox.hpp"
+#include "realpaver/IntervalBox.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -48,6 +48,16 @@ IntervalBox::IntervalBox(Scope scop, const IntervalVector &X)
 {
    ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
    ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
+}
+
+IntervalBox::IntervalBox(Scope scop, const RealPoint &pt)
+    : IntervalVector(scop.size())
+    , scop_(scop)
+{
+   ASSERT(pt.scope().contains(scop), "Bad initialization of an interval box");
+
+   for (const auto &v : scop)
+      set(v, pt.get(v));
 }
 
 IntervalBox::IntervalBox(const RealPoint &pt)

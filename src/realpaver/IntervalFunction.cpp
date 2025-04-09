@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalFunction.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -90,9 +90,10 @@ void IntervalFunction::diff(const IntervalBox &B, IntervalVector &G)
    return rep_->diff(B, G);
 }
 
-void IntervalFunction::diffHansen(const IntervalBox &B, IntervalVector &G)
+void IntervalFunction::diffHansen(const IntervalBox &B, const RealPoint &c,
+                                  IntervalVector &G)
 {
-   rep_->diffHansen(B, G);
+   rep_->diffHansen(B, c, G);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -145,10 +146,11 @@ void IntervalFunctionDag::diff(const IntervalBox &B, IntervalVector &G)
    return f->iDiff(B, G);
 }
 
-void IntervalFunctionDag::diffHansen(const IntervalBox &B, IntervalVector &G)
+void IntervalFunctionDag::diffHansen(const IntervalBox &B, const RealPoint &c,
+                                     IntervalVector &G)
 {
    DagFun *f = dag_->fun(index_);
-   return f->iDiffHansen(B, G);
+   return f->iDiffHansen(B, c, G);
 }
 
 } // namespace realpaver

@@ -513,9 +513,6 @@ public:
    /// Returns the optimization sense (min or max)
    LPSense getSense() const;
 
-   /// Output on a stream
-   friend std::ostream &operator<<(std::ostream &os, const LPModel &model);
-
    /// Returns the number of linear variables in this
    int getNbLinVars() const;
 
@@ -643,6 +640,12 @@ public:
     */
    IntervalVector bounds() const;
 
+   /// Display on a stream
+   void print(std::ostream &os) const;
+
+   /// Display on a stream
+   void printSystem(std::ostream &os) const;
+
 private:
    std::vector<LinVar> vars_; // vector of variables
    std::vector<LinCtr> ctrs_; // vector of constraints
@@ -657,7 +660,11 @@ private:
    void printVars(std::ostream &os) const;
    void printCtrs(std::ostream &os) const;
    void printCost(std::ostream &os) const;
+   friend std::ostream &operator<<(std::ostream &os, const LPModel &model);
 };
+
+/// Output on a stream
+std::ostream &operator<<(std::ostream &os, const LPModel &model);
 
 } // namespace realpaver
 

@@ -25,6 +25,7 @@
 #include "realpaver/Param.hpp"
 #include "realpaver/RealVector.hpp"
 #include <iostream>
+#include <ostream>
 #include <sstream>
 
 namespace realpaver {
@@ -609,11 +610,59 @@ void LPModel::printCost(std::ostream &os) const
    os << std::endl;
 }
 
+void LPModel::print(std::ostream &os) const
+{
+   printCost(os);
+   printCtrs(os);
+   printVars(os);
+}
+
+void LPModel::printSystem(std::ostream &os) const
+{
+   size_t n = ctrs_.size(), m = vars_.size();
+
+   RealVector lhs(m + n), rhs(m + n);
+   for (int i = 0; i < m; ++i)
+   {
+      lhs[i] = vars_[i].getLB();
+      rhs[i] = vars_[i].getUB();
+   }
+   for (int i = 0; i < n; ++i)
+   {
+      lhs[m + i] = ctrs_[i].getLB();
+      rhs[m + i] = ctrs_[i].getUB();
+   }
+
+   RealMatrix A(m + n, m, 0.0);
+   for (int i = 0; i < m; ++i)
+   {
+      A.set(i, i, 1.0);
+   }
+   for (int i = 0; i < n; ++i)
+   {
+      LinExpr e = ctrs_[i].getExpr();
+      for (int j = 0; j < e.getNbTerms(); ++j)
+      {
+         A.set(m + i, e.getIndexVar(j), e.getCoef(j));
+      }
+   }
+
+   RealVector cost(m, 0.0);
+   LinExpr e = getCost();
+   for (int j = 0; j < e.getNbTerms(); ++j)
+   {
+      cost[e.getIndexVar(j)] = e.getCoef(j);
+   }
+
+   os << "cost: " << getSense() << ' ' << cost << std::endl
+      << "lhs: " << lhs << std::endl
+      << "matrix: " << A << std::endl
+      << "rhs: " << rhs << std::endl;
+}
+
 std::ostream &operator<<(std::ostream &os, const LPModel &model)
 {
-   model.printCost(os);
-   model.printCtrs(os);
-   model.printVars(os);
+   model.printSystem(os);
    return os;
 }
 

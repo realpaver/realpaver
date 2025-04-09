@@ -21,6 +21,7 @@
 #ifndef REALPAVER_DAG_HPP
 #define REALPAVER_DAG_HPP
 
+#include "RealPoint.hpp"
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/IntervalMatrix.hpp"
@@ -772,8 +773,10 @@ public:
     *
     * Calculates the gradient of this on B (reverse mode). G[i] is the partial
     * derivative of this with respect to the i-th variable of its scope.
+    *
+    * The point c must belong to B on the scope of this.
     */
-   void iDiffHansen(const IntervalBox &B, IntervalVector &G);
+   void iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G);
 
    /// Returns the real evaluation of this at pt
    double rEval(const RealPoint &pt);
@@ -945,8 +948,10 @@ public:
     *
     * H[i,k] is the partial derivative of the i-th function with respect to the
     * k-th variable of the scope of this.
+    *
+    * The point c must belong to B.
     */
-   void iDiffHansen(const IntervalBox &B, IntervalMatrix &H);
+   void iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H);
 
    /**
     * @brief Real evaluation of the functions at pt.

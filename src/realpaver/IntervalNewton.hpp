@@ -114,7 +114,7 @@ private:
    IntervalFunctionVector F_;   // vector of interval functions
    IntervalMatrix jac_;         // Jacobian matrix
    IntervalVector val_, y_, b_; // working vectors
-   IntervalBox c_;              // point of expansion
+   RealPoint c_;                // point of expansion
    IntervalGaussSeidel *gs_;    // Gauss-Seidel operator
 
    size_t maxiter_; // maximum number of iterations (contraction)

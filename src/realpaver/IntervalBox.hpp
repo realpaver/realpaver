@@ -58,7 +58,7 @@ public:
    IntervalBox(Scope scop, const IntervalVector &X);
 
    /**
-    * @brief Constructor from a scope and a real vector.
+    * @brief Constructor from a scope and a real vector
     *
     * For each i, the i-th variable from scop is assigned to X[i].
     */
@@ -66,6 +66,9 @@ public:
 
    /// Constructor from a point
    IntervalBox(const RealPoint &pt);
+
+   /// Constructor from a scope and a point
+   IntervalBox(Scope scop, const RealPoint &pt);
 
    /// Constructor of the hull of a domain box
    IntervalBox(const DomainBox &box);

@@ -18,7 +18,7 @@ void clean()
    delete P;
 }
 
-void test_1()
+void test_eval_1()
 {
    IntervalBox B(P->scope());
    B.set(x, Interval(-1.5, 4));
@@ -30,7 +30,7 @@ void test_1()
    TEST_TRUE(I.isSetEq(J));
 }
 
-void test_2()
+void test_eval_2()
 {
    IntervalBox B(P->scope());
    B.set(x, Interval(-0.5, 27.25));
@@ -42,7 +42,7 @@ void test_2()
    TEST_TRUE(I.isSetEq(J));
 }
 
-void test_3()
+void test_eval_3()
 {
    IntervalBox B(P->scope());
    B.set(x, Interval(-1.5, 4));
@@ -54,13 +54,48 @@ void test_3()
    TEST_TRUE(I.isSetEq(J));
 }
 
+void test_diff_1()
+{
+   IntervalBox B(P->scope());
+   B.set(x, Interval(-1.5, 4));
+   B.set(y, Interval(-1, 2.5));
+
+   Term t = x * sqr(y) - y * pow(x, 3) - 2 * x + y - 2;
+
+   FlatFunction f(t, Interval::zero());
+   IntervalVector G(2);
+   f.iDiff(B, G);
+
+   TEST_TRUE(G[0].isSetEq(Interval(-122, 52.25)));
+   TEST_TRUE(G[1].isSetEq(Interval(-71, 24.375)));
+}
+
+void test_diff_2()
+{
+   IntervalBox B(P->scope());
+   B.set(x, Interval(1, 4));
+   B.set(y, Interval(1, 2));
+
+   Term t = x / y;
+
+   FlatFunction f(t, Interval::zero());
+   IntervalVector G(2);
+   f.iDiff(B, G);
+
+   TEST_TRUE(G[0].isSetEq(Interval(0.5, 1)));
+   TEST_TRUE(G[1].isSetEq(Interval(-4, -0.25)));
+}
+
 int main()
 {
    INIT_TEST
 
-   TEST(test_1)
-   TEST(test_2)
-   TEST(test_3)
+   TEST(test_eval_1)
+   TEST(test_eval_2)
+   TEST(test_eval_3)
+
+   TEST(test_diff_1)
+   TEST(test_diff_2)
 
    CLEAN_TEST
    END_TEST

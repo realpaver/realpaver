@@ -1007,16 +1007,16 @@ void DagFun::iDiff(const IntervalBox &B, IntervalVector &G)
    flat_->iDiff(B, G);
 }
 
-void DagFun::iDiffHansen(const IntervalBox &B, IntervalVector &G)
+void DagFun::iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G)
 {
-   IntervalBox X = B.midpoint();
+   IntervalBox X(scop_, c);
    IntervalVector V(G.size());
 
    size_t i = 0;
    for (const auto &v : scop_)
    {
       X.set(v, B.get(v));
-      flat_->iDiff(B, V);
+      flat_->iDiff(X, V);
       G[i] = V[i];
       ++i;
    }
@@ -1363,7 +1363,7 @@ void Dag::iDiff(const IntervalBox &B, IntervalMatrix &J)
    }
 }
 
-void Dag::iDiffHansen(const IntervalBox &B, IntervalMatrix &H)
+void Dag::iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H)
 {
    ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
           "Bad dimensions of a Hansen matrix used in a DAG");
@@ -1371,7 +1371,7 @@ void Dag::iDiffHansen(const IntervalBox &B, IntervalMatrix &H)
    ASSERT(nbVars() == nbFuns(),
           "Hansen's derivatives can be computed only for square systems");
 
-   IntervalBox X = B.midpoint();
+   IntervalBox X(scop_, c);
 
    size_t j = 0;
    for (const auto &v : scope())
