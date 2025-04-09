@@ -41,7 +41,7 @@ bool CSPEnv::usedSolutionLimit() const
 
 void CSPEnv::setDepthLimit(bool b)
 {
-   dlim_ = true;
+   dlim_ = b;
 }
 
 bool CSPEnv::usedDepthLimit() const
