@@ -1,0 +1,14 @@
+# In Rump S.M.
+# Verification methods for dense and sparse systems of equations.
+# In Topics in Validated Computations-Studies in Computational Mathematics,
+# pages 63-136. Elsevier, 1994.
+
+Variables
+   x1 in [-1.0e8, 1.0e8],
+   x2 in [-1.0e8, 1.0e8],
+   x3 in [-1.0e8, 1.0e8];
+
+Constraints
+   2*sin(0.2*PI*x1)*sin(0.2*PI*x3) - x2 == 0,
+   2.5 - x3 + 0.1*x2*sin(2*PI*x3) - x1 == 0,
+   1 + 0.1*x2*sin(2*PI*x1)-x3 == 0;
