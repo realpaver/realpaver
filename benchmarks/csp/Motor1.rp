@@ -1,0 +1,25 @@
+# In: Qishuo Pang, Xianyan Mi, Jixuan Sun and Huayong Qin.
+#     Solving nonlinear equation systems via clustering-based adaptive
+#     speciation diﬀerential evolution.
+#     Mathematical Biosciences and Engineering, 18(5):6034:6065, 2021.
+
+Variables
+x1 in [-3, 1],
+x2 in [-1, 1],
+x3 in [-2, 2],
+x4 in [-1, 1],
+x5 in [-1, 1],
+x6 in [-0.5, 0.5],
+x7 in [-1.5, 1.5],
+x8 in [-1.5, 1.5];
+
+
+Constraints
+0.8*(sqr(x1)+x1-1)*x3+0.12*sqr(x1)+2.16*x1-0.12 == 0,
+(1+sqr(x1))*x4+0.4*sqr(x1)-1.6*x1-0.4 == 0,
+(1+sqr(x1))*x5+sqr(x1)-1 == 0,
+(1+sqr(x1))*x6+0.8*(sqr(x1)+x1-1) == 0,
+x3*x7-0.02*x6-x5-x3*x4-0.16*x4 == 0,
+sqr(x7)-2*x4*x7+sqr(x6)+sqr(x4)-sqr(x2) == 0,
+x8-x2*x3 == 0,
+0.0476*x3*pow(x8,12)+x3-2.104 == 0;

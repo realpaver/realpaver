@@ -60,6 +60,8 @@ void Parser::initSymbolTable()
 
    // constants
    symtab_.insertConstant("PI", Interval::pi());
+   symtab_.insertConstant("Pi", Interval::pi());
+   symtab_.insertConstant("pi", Interval::pi());
 }
 
 std::string Parser::getParseError() const
