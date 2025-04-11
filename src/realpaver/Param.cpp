@@ -18,7 +18,6 @@
  * @date   2025-4-2
  */
 
-#include "gurobi_c++.h"
 #include "realpaver/Double.hpp"
 #include "realpaver/Exception.hpp"
 #include "realpaver/Interval.hpp"
