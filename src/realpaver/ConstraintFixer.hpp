@@ -72,6 +72,7 @@ public:
    void apply(const ArithCtrIn *c) override;
    void apply(const TableCtr *c) override;
    void apply(const CondCtr *c) override;
+   void apply(const PiecewiseCtr *c) override;
 
 private:
    VarVarMapType *vvm_;      // map Variable -> Variable

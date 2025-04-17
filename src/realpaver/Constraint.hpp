@@ -30,14 +30,15 @@ class FlatFunction;
 
 /// Enumeration of relation symbols
 enum class RelSymbol {
-   Eq,    ///< equation
-   Le,    ///< less than
-   Lt,    ///< strictly less than
-   Ge,    ///< greater than
-   Gt,    ///< stricly greater than
-   In,    ///< doubly bounded inequality constraint
-   Table, ///< table constraint
-   Cond   ///< conditional constraint
+   Eq,       ///< equation
+   Le,       ///< less than
+   Lt,       ///< strictly less than
+   Ge,       ///< greater than
+   Gt,       ///< stricly greater than
+   In,       ///< doubly bounded inequality constraint
+   Table,    ///< table constraint
+   Cond,     ///< conditional constraint
+   Piecewise ///< piecewise constraint
 };
 
 /// Output on a stream
@@ -587,6 +588,164 @@ Constraint cond(Constraint guard, Constraint body);
 
 /*----------------------------------------------------------------------------*/
 
+/**
+ * @brief Representation of a piecewise constraint
+ * {(v in [a1,b1] <=> z1) -> body1,..., (v in [an,bn] <=> zn) -> bodyn}.
+ *
+ * A reference variable v must be in an interval to activate the body constraint.
+ * The body is any constraint.
+ * An intermediary binary variable zi is used to assess the right case.
+ *
+ * A single case can and must be activated at the same time.
+ */
+class PiecewiseCtr : public ConstraintRep {
+public:
+   /// Constructor
+   PiecewiseCtr(Variable v, const std::initializer_list<Variable> &binaries,
+                const std::initializer_list<Interval> &intervals,
+                const std::initializer_list<Constraint> &constraints);
+
+   /// Constructor
+   PiecewiseCtr(Variable v, const std::vector<Variable> &binaries,
+                const std::vector<Interval> &intervals,
+                const std::vector<Constraint> &constraints);
+
+   /// Default copy constructor
+   PiecewiseCtr(PiecewiseCtr &) = default;
+
+   /// No assignment
+   PiecewiseCtr &operator=(PiecewiseCtr &) = delete;
+
+   /// Defaut destructor
+   ~PiecewiseCtr() = default;
+
+   /// Returns the main variable used as guard
+   const Variable &variable() const;
+
+   /// Returns the binary variables used as guard
+   const std::vector<Variable> &binaries() const;
+
+   /// Returns the ith binary variable used as a guard
+   const Variable &binary(size_t i) const;
+
+   /// Returns the intervals used as guard
+   const std::vector<Interval> &intervals() const;
+
+   /// Returns the ith interval used as a guard
+   const Interval &interval(size_t i) const;
+
+   /// Returns the constraints to be activated by guards
+   const std::vector<Constraint> &constraints() const;
+
+   /// Returns the ith constraint
+   const Constraint &constraint(size_t i) const;
+
+   /// Returns the number of pieces
+   size_t nb_pieces() const;
+
+   bool isConstant() const override;
+   bool isInteger() const override;
+   Proof isSatisfied(const IntervalBox &B) override;
+   double violation(const IntervalBox &B) override;
+   Proof contract(IntervalBox &B) override;
+   Proof isSatisfied(const DomainBox &box) override;
+   double violation(const DomainBox &box) override;
+   Proof contract(DomainBox &box) override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(ConstraintVisitor &vis) const override;
+   ConstraintRep *cloneRoot() const override;
+
+   /// Static function to handle automatic naming of binary variables
+   static string getNextBinaryName();
+
+private:
+   Variable v_; // Main variable for which intervals are compared to its domain
+   std::vector<Variable> binaries_;  // binary variables relating intervals activation
+   std::vector<Interval> intervals_; // intervals used to activate constraints
+   std::vector<Constraint>
+       constraints_;     // constraints to apply when the relating interval is satisfied
+   Interval guard_hull_; // Hull of intervals used as guard
+
+   void checkActive(const DomainBox &B, size_t &nb_active, size_t &nb_possibly_active,
+                    size_t &nb_inactive, size_t &num_active) const;
+   void checkActive(const IntervalBox &B, size_t &nb_active, size_t &nb_possibly_active,
+                    size_t &nb_inactive, size_t &num_active) const;
+
+   static size_t
+       nb_binaries_; // Static counter of the number of generated binary variables
+   static const string binary_prefix_; // prefix used to name generated binary variables
+};
+
+/**
+ * Argsort(currently support ascending sort)
+ * @param array input array
+ * @return indices w.r.t sorted array
+ */
+std::vector<size_t> argsort(const std::vector<Interval> &array);
+
+/**
+ * checkNonOverlappingIntervals(except on their bounds)
+ * @param intervals a list of intervals
+ * @return boolean value stating if some intervals overlaps
+ */
+bool checkNonOverlappingIntervals(const std::vector<Interval> &intervals);
+
+class Problem;
+
+/**
+ * @brief Generates a piecewise constraint.
+ *
+ * @param v the variable used as guard
+ * @param ivs a list of intervals used as guards
+ * @param ctrs a list of constraints applied if the corresponding
+ *        guard is satisfied
+ * @param pb a pointer to the problem to add binary intermediary variables
+ * @return the constraint
+ */
+Constraint piecewise(Variable v, const std::initializer_list<Interval> &ivs,
+                     const std::initializer_list<Constraint> &ctrs, Problem *pb);
+/**
+ * @brief Generates a piecewise constraint.
+ *
+ * @param v the variable used as guard
+ * @param bins a list of binary variables used as guards
+ * @param ivs a list of intervals used as guards
+ * @param ctrs a list of constraints applied if the corresponding
+ *        guard is satisfied
+ * @return the constraint
+ */
+Constraint piecewise(Variable v, const std::initializer_list<Variable> &bins,
+                     const std::initializer_list<Interval> &ivs,
+                     const std::initializer_list<Constraint> &ctrs);
+
+/**
+ * @brief Generates a piecewise constraint.
+ *
+ * @param v the variable used as guard
+ * @param ivs a list of intervals used as guards
+ * @param ctrs a list of constraints applied if the corresponding
+ *        guard is satisfied
+ * @param pb a pointer to the problem to add binary intermediary variables
+ * @return the constraint
+ */
+Constraint piecewise(Variable v, const std::vector<Interval> &ivs,
+                     const std::vector<Constraint> &ctrs, Problem *pb);
+/**
+ * @brief Generates a piecewise constraint.
+ *
+ * @param v the variable used as guard
+ * @param bins a list of binary variables used as guards
+ * @param ivs a list of intervals used as guards
+ * @param ctrs a list of constraints applied if the corresponding
+ *        guard is satisfied
+ * @return the constraint
+ */
+Constraint piecewise(Variable v, const std::vector<Variable> &bins,
+                     const std::vector<Interval> &ivs,
+                     const std::vector<Constraint> &ctrs);
+
+/*----------------------------------------------------------------------------*/
+
 /// Base class of visitors of constraint representations
 class ConstraintVisitor {
 public:
@@ -603,6 +762,7 @@ public:
    virtual void apply(const ArithCtrIn *c);
    virtual void apply(const TableCtr *c);
    virtual void apply(const CondCtr *c);
+   virtual void apply(const PiecewiseCtr *c);
    ///@}
 };
 

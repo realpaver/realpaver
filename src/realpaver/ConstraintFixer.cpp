@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ConstraintFixer.hpp"
 
 namespace realpaver {
 
@@ -157,6 +157,18 @@ void ConstraintFixer::apply(const CondCtr *c)
    Constraint guard = fg.getConstraint(), body = bg.getConstraint();
 
    c_ = cond(guard, body);
+}
+
+void ConstraintFixer::apply(const PiecewiseCtr *c)
+{
+   std::vector<Constraint> ctrs;
+   for (size_t i = 0; i < c->nb_pieces(); i++)
+   {
+      ConstraintFixer bg(vvm_, vim_, box_);
+      c->constraint(i).acceptVisitor(bg);
+      ctrs.push_back((bg.getConstraint()));
+   }
+   c_ = piecewise(vvm_->find(c->variable())->second, c->binaries(), c->intervals(), ctrs);
 }
 
 } // namespace realpaver
