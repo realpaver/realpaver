@@ -59,9 +59,9 @@ if lp_lib_name.to_upper() == 'CLP'
 elif lp_lib_name.to_upper() == 'GUROBI'
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
-#elif lp_lib_name.to_upper() == 'SOPLEX'
-#  lp_header_hpp += 'LPSolverSoplex.hpp'
-#  rp_sources += ['LPSolverSoplex.cpp']
+  #elif lp_lib_name.to_upper() == 'SOPLEX'
+  #  lp_header_hpp += 'LPSolverSoplex.hpp'
+  #  rp_sources += ['LPSolverSoplex.cpp']
 elif lp_lib_name.to_upper() == 'HIGHS'
   lp_header_hpp += 'LPSolverHighs.hpp'
   rp_sources += ['LPSolverHighs.cpp']
@@ -109,6 +109,7 @@ if flex.found() and bison.found()
     input: 'parser_flex.lpp',
     output: 'parser_flex.cpp',
     command: [flex, '-o', '@OUTPUT@', '@INPUT@'],
+    build_by_default: true,
   )
   rp_sources += [flex_analyzer]
 
@@ -117,6 +118,7 @@ if flex.found() and bison.found()
     input: 'parser_bison.ypp',
     output: ['parser_bison.hpp', 'parser_bison.cpp'],
     command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'],
+    build_by_default: true,
   )
   rp_sources += [bison_analyzer]
 else
@@ -192,7 +194,8 @@ rp_headers += [
   'IntervalVector.hpp',
   'IntervalUnion.hpp',
   'IntRandom.hpp',
-  'Linearizer.hpp',  'Logger.hpp',
+  'Linearizer.hpp',
+  'Logger.hpp',
   'LPModel.hpp',
   'NLPModel.hpp',
   'NumericDoubleTraits.hpp',

@@ -51,6 +51,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "real"          return TK_STR_REAL;
 "tol"           return TK_STR_TOL;
 "table"         return TK_TABLE;
+"piecewise"     return TK_PW;
 
 "min"    return TK_MIN;
 "max"    return TK_MAX;
@@ -114,6 +115,10 @@ realpaver::FunctionSymbol* realpaver_fun_symbol;
 // vectors used to parse the table constraints
 std::vector<realpaver::Variable>* realpaver_var_vector;
 std::vector<realpaver::Interval>* realpaver_itv_vector;
+
+// vectors used to parse the piecewise constraints
+std::vector<realpaver::Variable>* realpaver_ctr_pieces;
+std::vector<realpaver::Interval>* realpaver_itv_pieces;
 
 // unions used to parse the variable domains
 realpaver::IntervalUnion* realpaver_itv_union;

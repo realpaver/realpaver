@@ -194,3 +194,11 @@ if local_solver_dep.found()
   )
   test('Test of NLP solver API', nlp_solver_test)
 endif
+
+piecewise_test = executable(
+  'piecewise_test',
+  sources: 'piecewise_test.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'],
+)
+test('Test of piecewise', piecewise_test)

@@ -25,7 +25,11 @@
 extern int realpaver_flex_init_file(realpaver::Problem *prob,
                                     realpaver::SymbolTable *symtab,
                                     realpaver::Params *params, const char *filename);
+extern int realpaver_flex_init_str(realpaver::Problem *prob,
+                                   realpaver::SymbolTable *symtab, realpaver::Params *prm,
+                                   const char *realpaver_str);
 extern void realpaver_flex_cleanup_file(void);
+extern void realpaver_flex_cleanup_str(void);
 extern int realpaver_bison_parse(void);
 extern std::string realpaver_parse_error;
 
@@ -81,6 +85,22 @@ bool Parser::parseFile(const std::string &filename, Problem &problem)
       res = realpaver_bison_parse();
 
    realpaver_flex_cleanup_file();
+   symtab_.clear();
+
+   return res == 0;
+}
+
+bool Parser::parseStr(const std::string &realpaver_str, Problem &problem)
+{
+   initSymbolTable();
+
+   // initializes the lexical analyzer
+   realpaver_flex_init_str(&problem, &symtab_, &params_, realpaver_str.c_str());
+
+   // parses the input file
+   int res = realpaver_bison_parse();
+
+   realpaver_flex_cleanup_str();
    symtab_.clear();
 
    return res == 0;

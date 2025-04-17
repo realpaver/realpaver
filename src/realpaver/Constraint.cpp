@@ -18,10 +18,13 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Constraint.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Constraint.hpp"
 #include "realpaver/FlatFunction.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
+
+#include <numeric>
 
 namespace realpaver {
 
@@ -1399,6 +1402,580 @@ Constraint cond(Constraint guard, Constraint body)
 
 /*----------------------------------------------------------------------------*/
 
+PiecewiseCtr::PiecewiseCtr(Variable v, const std::initializer_list<Variable> &binaries,
+                           const std::initializer_list<Interval> &intervals,
+                           const std::initializer_list<Constraint> &constraints)
+    : ConstraintRep(RelSymbol::Piecewise)
+    , v_(v)
+    , binaries_(binaries)
+    , intervals_(intervals)
+    , constraints_()
+    , guard_hull_(Interval::emptyset())
+{
+   ASSERT(binaries_.size() == intervals_.size() == constraints_.size(),
+          "Error: inconsistent number of pieces");
+   hcode_ = 0;
+   Scope scop;
+   scop.insert(v_);
+   for (auto b : binaries_)
+   {
+      ASSERT(b.isBinary(), "Error a variable is not binary");
+      scop.insert(b);
+   }
+   for (auto iv : intervals_)
+   {
+      guard_hull_ |= iv;
+   }
+   // creates the guards and bodies
+   for (auto it = constraints.begin(); it != constraints.end(); ++it)
+   {
+      Constraint ctr(*it);
+      constraints_.push_back(ctr);
+      hcode_ = hash2(ctr.hashCode(), hcode_);
+      scop.insert(ctr.scope());
+   }
+   setScope(scop);
+}
+
+PiecewiseCtr::PiecewiseCtr(Variable v, const std::vector<Variable> &binaries,
+                           const std::vector<Interval> &intervals,
+                           const std::vector<Constraint> &constraints)
+    : ConstraintRep(RelSymbol::Piecewise)
+    , v_(v)
+    , binaries_(binaries)
+    , intervals_(intervals)
+    , constraints_()
+    , guard_hull_(Interval::emptyset())
+{
+   ASSERT(binaries_.size() == intervals_.size() == constraints_.size(),
+          "Error: inconsistent number of pieces");
+   hcode_ = 0;
+   Scope scop;
+   scop.insert(v_);
+   for (auto b : binaries_)
+   {
+      ASSERT(b.isBinary(), "Error a variable is not binary");
+      scop.insert(b);
+   }
+   for (auto iv : intervals_)
+   {
+      guard_hull_ |= iv;
+   }
+   // creates the guards and bodies
+   for (auto it = constraints.begin(); it != constraints.end(); ++it)
+   {
+      Constraint ctr(*it);
+      constraints_.push_back(ctr);
+      hcode_ = hash2(ctr.hashCode(), hcode_);
+      scop.insert(ctr.scope());
+   }
+   setScope(scop);
+}
+
+const Variable &PiecewiseCtr::variable() const
+{
+   return v_;
+}
+
+const std::vector<Variable> &PiecewiseCtr::binaries() const
+{
+   return binaries_;
+}
+
+const Variable &PiecewiseCtr::binary(size_t i) const
+{
+   return binaries_[i];
+}
+
+const std::vector<Interval> &PiecewiseCtr::intervals() const
+{
+   return intervals_;
+}
+
+const Interval &PiecewiseCtr::interval(size_t i) const
+{
+   return intervals_[i];
+}
+
+const std::vector<Constraint> &PiecewiseCtr::constraints() const
+{
+   return constraints_;
+}
+
+const Constraint &PiecewiseCtr::constraint(size_t i) const
+{
+   return constraints_[i];
+}
+
+size_t PiecewiseCtr::nb_pieces() const
+{
+   return intervals_.size();
+}
+
+bool PiecewiseCtr::isConstant() const
+{
+   bool is_constant = true;
+   size_t i = 0;
+   while (is_constant && i < constraints_.size())
+   {
+      is_constant &= constraints_[i].isConstant();
+      i++;
+   }
+   return is_constant;
+}
+
+Proof PiecewiseCtr::isSatisfied(const IntervalBox &B)
+{
+   Interval iv = B.get(v_);
+   Proof p_c = Proof::Maybe;
+   if (!guard_hull_.contains(iv))
+      p_c = Proof::Empty;
+
+   // Check cases status:
+   size_t nb_active; // count the number of active intervals and binary variables (should
+                     // be <=1)
+   size_t nb_possibly_active;
+   size_t num_active;  // store the index of the active interval and binary variable
+   size_t nb_inactive; // count the number of inactive intervals and binary variables
+   checkActive(B, nb_active, nb_possibly_active, nb_inactive, num_active);
+
+   if (nb_active > 1)
+   {
+      return Proof::Empty;
+   }
+   if (nb_inactive == nb_pieces())
+   {
+      return Proof::Empty;
+   }
+   if (num_active != nb_pieces())
+      p_c = constraints_[num_active].isSatisfied(B);
+
+   return p_c;
+}
+
+double PiecewiseCtr::violation(const IntervalBox &B)
+{
+   double violation = 0.0;
+   Interval iv = B.get(v_);
+   bool active = false;
+   for (size_t i = 0; i < intervals_.size(); i++)
+   {
+      const Interval b_val = binaries_[i].getDomain()->intervalHull();
+      Interval iv2 = intervals_[i] & iv;
+      if (!iv2.isEmpty() && b_val.isOne())
+      {
+         active = true;
+         IntervalBox Bi(B);
+         violation += constraints_[i].violation(Bi);
+      }
+      else if (iv.isEmpty() && b_val.isOne())
+      {
+         active = true;
+         violation += intervals_[i].width();
+      }
+   }
+   if (!active)
+   {
+      violation = guard_hull_.width();
+   }
+   return violation;
+}
+
+void PiecewiseCtr::checkActive(const IntervalBox &B, size_t &nb_active,
+                               size_t &nb_possibly_active, size_t &nb_inactive,
+                               size_t &num_active) const
+{
+   Interval iv = B.get(v_);
+   // Search for active guards, i.e. intervals and binary variables
+   nb_active =
+       0; // count the number of active intervals and binary variables (should be <=1)
+   nb_possibly_active = 0;
+   num_active = nb_pieces(); // store the index of the active interval and binary variable
+   nb_inactive = 0; // count the number of inactive intervals and binary variables
+   for (size_t i = 0; i < nb_pieces(); i++)
+   {
+      // intersect ith interval with current box interval for v_
+      Interval iv2 = intervals_[i] & iv;
+      Interval b_dom = B.get(binaries_[i]);
+      if (b_dom.left() == 1 && b_dom.right() == 1 && !iv2.isEmpty()) // Active case
+      {
+         if (nb_active > 0) // Inconsistency: more than 1 active binary variable
+         {
+            nb_active = nb_pieces();
+            nb_possibly_active = nb_pieces();
+            nb_inactive = nb_pieces();
+            num_active = nb_pieces();
+            return;
+         }
+         nb_active++;
+         num_active = i;
+      }
+      else if (b_dom.left() == 0 && b_dom.right() == 1 && !iv2.isEmpty()) // Unknown case
+      {
+         nb_possibly_active++;
+         if (nb_active == 0) // store in num_active the last possible activable piece
+            num_active = i;
+      }
+      else if (b_dom.left() == 1 && b_dom.right() == 1 &&
+               iv2.isEmpty()) // Inconsistency: interval empty but binary active
+      {
+         nb_active = nb_pieces();
+         nb_possibly_active = nb_pieces();
+         nb_inactive = nb_pieces();
+         num_active = nb_pieces();
+         return;
+      }
+      else if ((b_dom.left() == 0 && b_dom.right() == 0) ||
+               iv2.isEmpty()) // Inactive case
+         nb_inactive++;
+   }
+}
+
+Proof PiecewiseCtr::contract(IntervalBox &B)
+{
+   Interval iv = B.get(v_);
+   if (guard_hull_.isDisjoint(iv))
+      return Proof::Empty; /// Inconsistent case: no contraint can be applied
+   // Force the domain of v to be included in guards hull
+   if (iv.strictlyContains(guard_hull_))
+   {
+      iv &= guard_hull_;
+   }
+
+   // Check cases status:
+   size_t nb_active; // count the number of active intervals and binary variables (should
+                     // be <=1)
+   size_t nb_possibly_active;
+   size_t num_active;  // store the index of the active interval and binary variable
+   size_t nb_inactive; // count the number of inactive intervals and binary variables
+   checkActive(B, nb_active, nb_possibly_active, nb_inactive, num_active);
+
+   if (nb_active > 1 || num_active == nb_pieces())
+      return Proof::Empty; /// Inconsistent case!
+   else if ((nb_active == 0 && nb_possibly_active == 0) || nb_inactive == nb_pieces())
+      return Proof::Empty;
+
+   // Only a single case active
+   if (nb_active == 1)
+   {
+      if (nb_possibly_active > 0) // Prune undetermined binaries to 0
+      {
+         for (size_t i = 0; i < nb_pieces(); i++)
+         {
+            if (i != num_active)
+               B.set(binaries_[i], Interval::zero());
+         }
+      }
+      iv &= intervals_[num_active];
+      B.set(v_, iv); // Prune v_ domain to be sure, useless?
+      return constraints_[num_active].contract(B);
+   }
+   else // nb_active==0 && nb_possibly_active>0
+   {
+      if (nb_possibly_active == 1) // domain of v_ intersect a single piece where binary
+                                   // variable is undetermined
+      {
+         iv &= intervals_[num_active];
+         B.set(v_, iv);
+         B.set(binaries_[num_active], Interval::one());
+         return constraints_[num_active].contract(B);
+      }
+   }
+
+   return Proof::Maybe;
+}
+
+Proof PiecewiseCtr::isSatisfied(const DomainBox &box)
+{
+   Interval iv = box.get(v_)->intervalHull();
+   Proof p_c = Proof::Maybe;
+   if (!guard_hull_.contains(iv))
+      p_c = Proof::Empty;
+
+   // Check cases status:
+   size_t nb_active; // count the number of active intervals and binary variables (should
+                     // be <=1)
+   size_t nb_possibly_active;
+   size_t num_active;  // store the index of the active interval and binary variable
+   size_t nb_inactive; // count the number of inactive intervals and binary variables
+   checkActive(box, nb_active, nb_possibly_active, nb_inactive, num_active);
+
+   if (nb_active > 1)
+   {
+      return Proof::Empty;
+   }
+   if (nb_inactive == nb_pieces())
+   {
+      return Proof::Empty;
+   }
+   if (num_active != nb_pieces())
+      p_c = constraints_[num_active].isSatisfied(box);
+
+   return p_c;
+}
+
+double PiecewiseCtr::violation(const DomainBox &box)
+{
+   double violation = 0.0;
+   Interval iv = box.get(v_)->intervalHull();
+   bool active = false;
+   for (size_t i = 0; i < intervals_.size(); i++)
+   {
+      const Interval b_val = binaries_[i].getDomain()->intervalHull();
+      Interval iv2 = intervals_[i] & iv;
+      if (!iv2.isEmpty() && b_val.isOne())
+      {
+         active = true;
+         IntervalBox Bi(box); // Bi.set(v_,iv2);
+         violation += constraints_[i].violation(Bi);
+      }
+      else if (iv.isEmpty() && b_val.isOne())
+      {
+         active = true;
+         violation += intervals_[i].width();
+      }
+      if (!active)
+      {
+         violation = guard_hull_.width();
+      }
+   }
+   return violation;
+}
+
+void PiecewiseCtr::checkActive(const DomainBox &B, size_t &nb_active,
+                               size_t &nb_possibly_active, size_t &nb_inactive,
+                               size_t &num_active) const
+{
+   Interval iv = B.get(v_)->intervalHull();
+   // Search for active guards, i.e. intervals and binary variables
+   nb_active =
+       0; // count the number of active intervals and binary variables (should be <=1)
+   nb_possibly_active = 0;
+   num_active = nb_pieces(); // store the index of the active interval and binary variable
+   nb_inactive = 0; // count the number of inactive intervals and binary variables
+   for (size_t i = 0; i < nb_pieces(); i++)
+   {
+      // intersect ith interval with current box interval for v_
+      Interval iv2 = intervals_[i] & iv;
+      const Interval b_val = B.get(binaries_[i])->intervalHull();
+      if (b_val.isOne() && !iv2.isEmpty())
+      {
+         if (nb_active > 0) // Inconsistency: more than 1 active binary variable
+         {
+            nb_active = nb_pieces();
+            nb_possibly_active = nb_pieces();
+            nb_inactive = nb_pieces();
+            num_active = nb_pieces();
+            return;
+         }
+         nb_active++;
+         num_active = i;
+      }
+      else if (!b_val.isSingleton() && !iv2.isEmpty())
+      {
+         nb_possibly_active++;
+         if (nb_active == 0) // store in num_active the last possible activable piece
+            num_active = i;
+      }
+      else if (b_val.isOne() && iv2.isEmpty())
+      { /// Inconsistent case!
+         nb_active = nb_pieces();
+         nb_possibly_active = nb_pieces();
+         nb_inactive = nb_pieces();
+         num_active = nb_pieces();
+         return;
+      }
+      else if (b_val.isZero() || iv2.isEmpty())
+         nb_inactive++;
+   }
+}
+
+Proof PiecewiseCtr::contract(DomainBox &box)
+{
+   Interval iv = box.get(v_)->intervalHull();
+   if (guard_hull_.isDisjoint(iv))
+   {
+      return Proof::Empty; /// Inconsistent case: no contraint can be applieds
+   }
+   // Force the domain of v to be included in guards hull
+   if (iv.strictlyContains(guard_hull_))
+   {
+      iv &= guard_hull_;
+      box.get(v_)->contractInterval(iv);
+   }
+
+   // Check cases status:
+   size_t nb_active; // count the number of active intervals and binary variables (should
+                     // be <=1)
+   size_t nb_possibly_active;
+   size_t num_active;  // store the index of the active interval and binary variable
+   size_t nb_inactive; // count the number of inactive intervals and binary variables
+   checkActive(box, nb_active, nb_possibly_active, nb_inactive, num_active);
+
+   if (nb_active > 1 || num_active == nb_pieces())
+   {
+      return Proof::Empty; /// Inconsistent case!
+   }
+   else if ((nb_active == 0 && nb_possibly_active == 0) || nb_inactive == nb_pieces())
+   {
+      return Proof::Empty;
+   }
+
+   // Only a single case active
+   if (nb_active == 1)
+   {
+      if (nb_possibly_active > 0) // Prune undetermined binaries to 0
+      {
+         for (size_t i = 0; i < nb_pieces(); i++)
+         {
+            if (i != num_active)
+            {
+               BinaryDomain *b_dom = dynamic_cast<BinaryDomain *>(box.get(binaries_[i]));
+               b_dom->setVal(ZeroOne::zero());
+            }
+         }
+      }
+
+      iv &= intervals_[num_active];
+      box.get(v_)->contractInterval(iv); // Prune v_ domain to be sure, useless?
+      return constraints_[num_active].contract(box);
+   }
+   else // nb_active==0 && nb_possibly_active>0
+   {
+      if (nb_possibly_active == 1) // domain of v_ intersect a single piece where binary
+                                   // variable is undetermined
+      {
+         iv &= intervals_[num_active];
+         box.get(v_)->contractInterval(iv);
+         BinaryDomain *b_dom =
+             dynamic_cast<BinaryDomain *>(box.get(binaries_[num_active]));
+         b_dom->setVal(ZeroOne::one());
+         return constraints_[num_active].contract(box);
+      }
+   }
+   return Proof::Maybe;
+}
+
+void PiecewiseCtr::print(std::ostream &os) const
+{
+   os << "{ ";
+   if (intervals_.size() > 0)
+      os << v_.getName() << " in " << intervals_[0] << " -> " << constraints_[0];
+   for (size_t i = 1; i < intervals_.size(); i++)
+      os << ", " << v_.getName() << " in " << intervals_[i] << " -> " << constraints_[i];
+   os << " }";
+}
+
+void PiecewiseCtr::acceptVisitor(ConstraintVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+ConstraintRep *PiecewiseCtr::cloneRoot() const
+{
+   return new PiecewiseCtr(v_, binaries_, intervals_, constraints_);
+}
+
+bool PiecewiseCtr::isInteger() const
+{
+   bool is_integer = true;
+   size_t i = 0;
+   while (i < constraints_.size() && is_integer)
+   {
+      is_integer &= constraints_[i].isInteger();
+      i++;
+   }
+   return is_integer;
+}
+
+/**
+ * Argsort(currently support ascending sort)
+ * @param array input array
+ * @return indices w.r.t sorted array
+ */
+std::vector<size_t> argsort(const std::vector<Interval> &array)
+{
+   std::vector<size_t> indices(array.size());
+   std::iota(indices.begin(), indices.end(), 0);
+   std::sort(indices.begin(), indices.end(), [&array](int left, int right) -> bool {
+      // sort indices according to corresponding array element
+      return array[left].left() < array[right].left();
+   });
+
+   return indices;
+}
+
+bool checkNonOverlappingIntervals(const std::vector<Interval> &intervals)
+{
+   // bool complementarity = true;
+   if (intervals.size() > 0)
+   {
+      // check consecutive images do not overlap
+      std::vector<size_t> idx = argsort(intervals);
+      for (size_t i = 0; i < idx.size() - 1; i++)
+      {
+         // only check if ith right bound is lower equal i+1th left bound
+         if (Double::prevDouble(intervals[idx[i]].right()) >
+             Double::nextDouble(intervals[idx[i + 1]].left()))
+         {
+            return false;
+         }
+      }
+   }
+   return true;
+}
+
+size_t PiecewiseCtr::nb_binaries_ = 0;
+const string PiecewiseCtr::binary_prefix_ = "__z";
+
+string PiecewiseCtr::getNextBinaryName()
+{
+   std::stringstream ss;
+   ss << PiecewiseCtr::nb_binaries_;
+   PiecewiseCtr::nb_binaries_++;
+   return PiecewiseCtr::binary_prefix_ + ss.str();
+}
+
+Constraint piecewise(Variable v, const std::initializer_list<Variable> &bins,
+                     const std::initializer_list<Interval> &ivs,
+                     const std::initializer_list<Constraint> &ctrs)
+{
+   return Constraint(std::make_shared<PiecewiseCtr>(v, bins, ivs, ctrs));
+}
+
+Constraint piecewise(Variable v, const std::initializer_list<Interval> &ivs,
+                     const std::initializer_list<Constraint> &ctrs, Problem *pb)
+{
+   std::vector<Variable> bins;
+   for (size_t i = 0; i < ivs.size(); i++)
+   {
+      bins.push_back(pb->addBinaryVar(PiecewiseCtr::getNextBinaryName()));
+   }
+
+   return Constraint(std::make_shared<PiecewiseCtr>(v, bins, ivs, ctrs));
+}
+
+Constraint piecewise(Variable v, const std::vector<Variable> &bins,
+                     const std::vector<Interval> &ivs,
+                     const std::vector<Constraint> &ctrs)
+{
+   return Constraint(std::make_shared<PiecewiseCtr>(v, bins, ivs, ctrs));
+}
+
+Constraint piecewise(Variable v, const std::vector<Interval> &ivs,
+                     const std::vector<Constraint> &ctrs, Problem *pb)
+{
+   std::vector<Variable> bins;
+   for (size_t i = 0; i < ivs.size(); i++)
+   {
+      bins.push_back(pb->addBinaryVar(PiecewiseCtr::getNextBinaryName()));
+   }
+
+   return Constraint(std::make_shared<PiecewiseCtr>(v, bins, ivs, ctrs));
+}
+
+/*----------------------------------------------------------------------------*/
+
 ConstraintVisitor::~ConstraintVisitor()
 {
 }
@@ -1439,6 +2016,11 @@ void ConstraintVisitor::apply(const TableCtr *c)
 }
 
 void ConstraintVisitor::apply(const CondCtr *c)
+{
+   THROW("Visit method not implemented");
+}
+
+void ConstraintVisitor::apply(const PiecewiseCtr *c)
 {
    THROW("Visit method not implemented");
 }
