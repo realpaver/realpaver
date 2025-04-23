@@ -59,9 +59,9 @@ if lp_lib_name.to_upper() == 'CLP'
 elif lp_lib_name.to_upper() == 'GUROBI'
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
-  #elif lp_lib_name.to_upper() == 'SOPLEX'
-  #  lp_header_hpp += 'LPSolverSoplex.hpp'
-  #  rp_sources += ['LPSolverSoplex.cpp']
+elif lp_lib_name.to_upper() == 'SOPLEX'
+  lp_header_hpp += 'LPSolverSoplex.hpp'
+  rp_sources += ['LPSolverSoplex.cpp']
 elif lp_lib_name.to_upper() == 'HIGHS'
   lp_header_hpp += 'LPSolverHighs.hpp'
   rp_sources += ['LPSolverHighs.cpp']

@@ -20,6 +20,8 @@ project('Realpaver', 'cpp', version: '1.0.1', default_options: ['cpp_std=c++17']
 ## Main compiler and linker configs
 cpp_comp = meson.get_compiler('cpp')
 
+gmp_dep = dependency('', required: false)
+z_dep = dependency('', required: false)
 lp_lib_name = get_option('LP_LIB')
 lp_dep = dependency('', required: false)
 if lp_lib_name.to_upper() == 'CLP'
@@ -28,6 +30,9 @@ elif lp_lib_name.to_upper() == 'GUROBI'
   lp_dep = dependency('gurobi', required: true)
 elif lp_lib_name.to_upper() == 'SOPLEX'
   lp_dep = cpp_comp.find_library('soplex', required: true)
+  gmp_dep = dependency('gmp', required: true)
+  z_dep = dependency('zlib', required: true)
+  # lp_dep = dependency('soplex', required: true)
 elif lp_lib_name.to_upper() == 'HIGHS'
   lp_dep = dependency('highs', required: true)
 endif
@@ -62,7 +67,7 @@ elif local_solver_name.to_upper() == 'NLOPT'
   local_solver_dep = dependency('nlopt', required: true)
 endif
 
-deps_lib = [lp_dep, mathlib_dep, interval_dep, m_dep, local_solver_dep]
+deps_lib = [lp_dep, mathlib_dep, interval_dep, m_dep, local_solver_dep, z_dep, gmp_dep]
 
 ## Config
 os_unix = false
