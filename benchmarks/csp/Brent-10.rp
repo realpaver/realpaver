@@ -1,0 +1,29 @@
+# In: Luksan L. and Vleck J.
+#     Sparse and partially separable test problems for unconstrained
+#     and equality constrained optimization.
+#     Research Report 767, Institute of Computer Science, Academy of 
+#     Sciences of the Czeck Republic, Janvier 1999
+
+Variables
+x1 in [-1.0e8, 1.0e8],
+x2 in [-1.0e8, 1.0e8],
+x3 in [-1.0e8, 1.0e8],
+x4 in [-1.0e8, 1.0e8],
+x5 in [-1.0e8, 1.0e8],
+x6 in [-1.0e8, 1.0e8],
+x7 in [-1.0e8, 1.0e8],
+x8 in [-1.0e8, 1.0e8],
+x9 in [-1.0e8, 1.0e8],
+x10 in [-1.0e8, 1.0e8];
+
+Constraints
+3*x1*(x2-2*x1)+0.25*x2^2 == 0,
+3*x2*(x3-2*x2+x1)+0.25*(x3-x1)^2 == 0,
+3*x3*(x4-2*x3+x2)+0.25*(x4-x2)^2 == 0,
+3*x4*(x5-2*x4+x3)+0.25*(x5-x3)^2 == 0,
+3*x5*(x6-2*x5+x4)+0.25*(x6-x4)^2 == 0,
+3*x6*(x7-2*x6+x5)+0.25*(x7-x5)^2 == 0,
+3*x7*(x8-2*x7+x6)+0.25*(x8-x6)^2 == 0,
+3*x8*(x9-2*x8+x7)+0.25*(x9-x7)^2 == 0,
+3*x9*(x10-2*x9+x8)+0.25*(x10-x8)^2 == 0,
+3*x10*(20-2*x10+x9)+0.25*(20-x9)^2 == 0;

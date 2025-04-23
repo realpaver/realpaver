@@ -3,21 +3,21 @@
 #     ACM Trans Math Software 1981, 7(1):17–41.
 
 Variables
-x1 in [-1e8, 1e8],
-x2 in [-1e8, 1e8],
-x3 in [-1e8, 1e8],
-x4 in [-1e8, 1e8],
-x5 in [-1e8, 1e8],
-x6 in [-1e8, 1e8],
-x7 in [-1e8, 1e8],
-x8 in [-1e8, 1e8],
-x9 in [-1e8, 1e8],
-x10 in [-1e8, 1e8],
-x11 in [-1e8, 1e8],
-x12 in [-1e8, 1e8],
-x13 in [-1e8, 1e8],
-x14 in [-1e8, 1e8],
-x15 in [-1e8, 1e8];
+x1 in [-1e3, 1e3],
+x2 in [-1e3, 1e3],
+x3 in [-1e3, 1e3],
+x4 in [-1e3, 1e3],
+x5 in [-1e3, 1e3],
+x6 in [-1e3, 1e3],
+x7 in [-1e3, 1e3],
+x8 in [-1e3, 1e3],
+x9 in [-1e3, 1e3],
+x10 in [-1e3, 1e3],
+x11 in [-1e3, 1e3],
+x12 in [-1e3, 1e3],
+x13 in [-1e3, 1e3],
+x14 in [-1e3, 1e3],
+x15 in [-1e3, 1e3];
 
 Constraints
 2*x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11+x12+x13+x14+x15 == 16,

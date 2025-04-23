@@ -109,6 +109,7 @@ if flex.found() and bison.found()
     input: 'parser_flex.lpp',
     output: 'parser_flex.cpp',
     command: [flex, '-o', '@OUTPUT@', '@INPUT@'],
+    build_by_default: true,
   )
   rp_sources += [flex_analyzer]
 
@@ -117,6 +118,7 @@ if flex.found() and bison.found()
     input: 'parser_bison.ypp',
     output: ['parser_bison.hpp', 'parser_bison.cpp'],
     command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'],
+    build_by_default: true,
   )
   rp_sources += [bison_analyzer]
 else
