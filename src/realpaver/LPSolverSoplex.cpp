@@ -18,6 +18,7 @@
  * @date   2024-4-11
  */
 
+#include "LPModel.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/LPSolverSoplex.hpp"
 #include "realpaver/Logger.hpp"
@@ -39,82 +40,50 @@ LPSolver::~LPSolver()
 
 void LPSolver::makeVars()
 {
-   int n = getNbLinVars();
-
-   soplex::DSVector dscol(0);
-   for (int i = 0; i < n; ++i)
-   {
-      simplex_->addColReal(soplex::LPCol(0, dscol, soplex::infinity, -soplex::infinity));
-   }
-   // soplex::DSVectorReal dsrow(n);
-   int nb_int = 0;
+   size_t n = getNbLinVars();
+   size_t nb_int = 0;
    std::vector<int> vint;
+   soplex::DSVectorReal dscol(0);
    for (int i = 0; i < n; ++i)
    {
-      LinVar v = getLinVar(i);
-      int j = v.getIndex();
-      // dsrow.add(j, 1);
-      // simplex_->addRowReal(soplex::LPRowReal(v.getLB(), dsrow, v.getUB()));
-      //    simplex_->addRowReal(soplex::LPRowReal(-soplex::infinity, dsrow,
-      //    soplex::infinity));
-      //    //   simplex_->changeBoundsReal(j, v.getLB(), v.getUB());
-      //    //   simplex_->changeRangeReal(j, v.getLB(), v.getUB());
-      if (!v.isContinuous())
+      simplex_->addColReal(
+          soplex::LPColReal(0, dscol, soplex::infinity, -soplex::infinity));
+      if (!getLinVar(i).isContinuous())
       {
          nb_int++;
-         vint.push_back(j);
+         vint.push_back(getLinVar(i).getIndex());
       }
-      // dsrow.clear();
    }
    if (nb_int > 0)
       simplex_->setIntegralityInformation(nb_int, vint.data());
 }
 
 void LPSolver::makeCtrs()
-{ // bound constraints
-   int n = getNbLinVars();
-   for (int i = 0; i < n; i++)
+{
+   size_t n = getNbLinVars();
+   soplex::DSVector row(n);
+   for (size_t i = 0; i < n; i++)
    {
-      LinVar v = getLinVar(i);
-      LinExpr e = {{1.0}, {v}};
-      soplex::DSVector row_v(n);
-      for (int j = 0; j < e.getNbTerms(); j++)
-      {
-         row_v.add(e.getIndexVar(j), e.getCoef(j));
-      }
-      simplex_->addRowReal(soplex::LPRow(v.getLB(), row_v, v.getUB()));
+      const LinVar &v = getLinVar(i);
+      row.add(v.getIndex(), 1);
+      simplex_->addRowReal(soplex::LPRow(v.getLB(), row, v.getUB()));
+      row.clear();
    }
-   int m = getNbLinCtrs();
-   for (int i = 0; i < m; i++)
+
+   size_t m = getNbLinCtrs();
+   for (size_t j = 0; j < m; j++)
    {
-      LinCtr c = getLinCtr(i);
-      LinExpr e = c.getExpr();
-      soplex::DSVector row_c(n);
-      for (int j = 0; j < e.getNbTerms(); j++)
-      {
-         row_c.add(e.getIndexVar(j), e.getCoef(j));
-      }
-      simplex_->addRowReal(soplex::LPRow(c.getLB(), row_c, c.getUB()));
+      soplex::DSVectorReal row(n);
+      const LinCtr &c_j = getLinCtr(j);
+      const LinExpr &l_e = c_j.getExpr();
+      for (size_t k = 0; k < l_e.getNbTerms(); k++)
+         row.add(l_e.getIndexVar(k), l_e.getCoef(k));
+      simplex_->addRowReal(soplex::LPRowReal(c_j.getLB(), row, c_j.getUB()));
    }
 }
 
 void LPSolver::makeCost()
 {
-   LinExpr obj = getCost();
-   int n = obj.getNbTerms();
-
-   soplex::DVector cost(getNbLinVars());
-   // for (int i = 0; i < getNbLinVars(); i++)
-   //    cost[i] = 0;
-   for (int i = 0; i < n; ++i)
-   {
-      LinVar v = getLinVar(i);
-      int j = v.getIndex();
-      // simplex_->changeObjReal(j, obj.getCoef(i));
-      cost[j] = obj.getCoef(i);
-   }
-   simplex_->changeObjReal(cost);
-
    if (getSense() == LPSense::Min)
    {
       simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MINIMIZE);
@@ -123,6 +92,14 @@ void LPSolver::makeCost()
    {
       simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MAXIMIZE);
    }
+
+   soplex::DVectorReal obj(getNbLinVars());
+   const LinExpr &l_e = getCost();
+   for (size_t k = 0; k < l_e.getNbTerms(); k++)
+   {
+      obj[l_e.getIndexVar(k)] = l_e.getCoef(k);
+   }
+   simplex_->changeObjReal(obj);
 }
 
 void LPSolver::makeSoplexSimplex()
@@ -169,8 +146,8 @@ LPStatus LPSolver::toLPStatus() const
 
 void LPSolver::setOptions()
 {
-   int maxsec = getMaxSeconds();
-   int maxiter = getMaxIter();
+   size_t maxsec = getMaxSeconds();
+   size_t maxiter = getMaxIter();
    double tol = getFeasTol();
 
    simplex_->setIntParam(soplex::SoPlex::SOLVEMODE, soplex::SoPlex::SOLVEMODE_REAL);
@@ -179,7 +156,7 @@ void LPSolver::setOptions()
    simplex_->setIntParam(soplex::SoPlex::ITERLIMIT, maxiter);
    simplex_->setIntParam(soplex::SoPlex::VERBOSITY, soplex::SoPlex::VERBOSITY_ERROR);
    simplex_->setRealParam(soplex::SoPlex::FEASTOL, tol);
-   // simplex_->setRealParam(soplex::SoPlex::OPTTOL, tol);
+   simplex_->setRealParam(soplex::SoPlex::OPTTOL, tol);
 }
 
 LPStatus LPSolver::run()
@@ -225,7 +202,7 @@ double LPSolver::costSolution() const
 
 RealVector LPSolver::primalSolution() const
 {
-   int n = getNbLinVars();
+   size_t n = getNbLinVars();
    RealVector primal(n);
    soplex::DVectorReal solution(n);
    simplex_->getPrimal(solution);
@@ -236,25 +213,12 @@ RealVector LPSolver::primalSolution() const
 
 RealVector LPSolver::dualSolution() const
 {
-   // int m = getNbLinCtrs();
-   // int n = getNbLinVars();
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    RealVector dual(p);
    soplex::DVectorReal dual_sol(p);
    simplex_->getDual(dual_sol);
    for (size_t i = 0; i < p; i++)
       dual[i] = dual_sol[i];
-   // first for the primal constraints
-   // for (int i = 0; i < m; i++)
-   // {
-   //    LinCtr c = getLinCtr(i);
-   //    dual[i] = dual_sol[i];
-   // }
-   // // second for the primal bound constraints
-   // for (int i = 0; i < n; i++)
-   // {
-   //    dual[m + i] = dual_sol[m + i];
-   // }
    return dual;
 }
 
@@ -265,13 +229,12 @@ bool LPSolver::infeasibleRay(RealVector &ray) const
    if ((status != LPStatus::Infeasible) && (status != LPStatus::InfeasibleOrUnbounded))
       return false;
 
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    if (ray.size() != p)
       ray.resize(p);
 
    // gets the ray
    bool hasRay = simplex_->hasDualFarkas();
-   // soplex::DVectorReal dual_farkas(p);
    if (hasRay)
    {
       soplex::DVector dual_farkas(p);
