@@ -1081,14 +1081,14 @@ AffineForm tanh(const AffineForm &f)
 
 Interval AffineForm::eval() const
 {
-   Interval res = c_ + e_ * Interval::minusOnePlusOne();
-   auto it = l_.cbegin();
-   while (it != l_.cend())
-   {
-      res += it->itv * Interval::minusOnePlusOne();
-      ++it;
-   }
-   return res;
+   // sum_i a_I*[-1, 1] is calculated as follows: s is the sum of absolute values
+   // sum_i |a_i| rounded upward and the result is equal to the interval [-s, s]
+   Double::rndUp();
+   double s = 0.0;
+   for (auto it = l_.cbegin(); it != l_.cend(); ++it)
+      s += Double::max(Double::abs(it->itv.left()), Double::abs(it->itv.right()));
+
+   return c_ + Interval(-s, s) + Interval(-e_.right(), e_.right());
 }
 
 void AffineForm::approxDzetaDelta(const Interval &alpha, const Interval &a,

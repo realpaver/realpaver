@@ -37,6 +37,10 @@ namespace realpaver {
  *
  * It is possible to select the approximation method of the elementary
  * functions, namely Minrange or Chebyshev.
+ *
+ * The variables in affine forms are represented by integers. Variable i corresponds
+ * to the i-th variable of the scope of the DAG. Given this scope S, the original
+ * variable is S.var(i).
  */
 class AffineCreator {
 public:
@@ -60,6 +64,17 @@ public:
     * approximation.
     */
    AffineCreator(SharedDag dag, const IndexList &lfun, bool minrange = true);
+
+   /**
+    * @brief Creates a creator on one function of a DAG.
+    *
+    * The function considered has index i.
+    *
+    * The boolean minrage is true if the linearization of the elementary
+    * functions must use the Minrange approximation, false for the Chebyshev
+    * approximation.
+    */
+   AffineCreator(SharedDag dag, size_t i, bool minrange = true);
 
    /// No copy
    AffineCreator(const AffineCreator &) = delete;

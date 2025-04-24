@@ -22,6 +22,7 @@
 #define REALPAVER_CONTRACTOR_FACTORY_HPP
 
 #include "realpaver/ContractorACID.hpp"
+#include "realpaver/ContractorAffine.hpp"
 #include "realpaver/ContractorBC4.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorHC4.hpp"
@@ -79,7 +80,7 @@ public:
     */
    SharedContractorHC4 makeHC4(double tol);
 
-   /// Same as SharedContractorHC4(tol) with tol extracted from the environment
+   /// Same as makeHC4(tol) with tol extracted from the environment
    SharedContractorHC4 makeHC4();
 
    /**
@@ -93,6 +94,24 @@ public:
     *   is not connected.
     */
    SharedContractorBC4 makeBC4();
+
+   /**
+    * @brief Returns an affine contractor.
+    *
+    * Creates a contractor that implements a constraint propagation algorithm
+    * based on affine contractors.
+    * - An affine contractor is created for each equation and inequality
+    *   constraint.
+    * - A constraint contractor is created for each other constraint.
+    * - A domain contractor is created for each variable whose initial domain
+    *   is not connected.
+    *
+    * tol is the tolerance driving propagation steps.
+    */
+   SharedContractorAffine makeAffine(double tol);
+
+   /// Same as makeAffine(tol) with tol extracted from the environment
+   SharedContractorAffine makeAffine();
 
    /**
     * @brief Returns an ACID contractor.

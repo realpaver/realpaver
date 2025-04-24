@@ -178,6 +178,37 @@ SharedContractorBC4 ContractorFactory::makeBC4()
    return bc4;
 }
 
+SharedContractorAffine ContractorFactory::makeAffine(double tol)
+{
+   // constraints from the dag
+   SharedContractorAffine ctc = std::make_shared<ContractorAffine>(dag_);
+
+   // other constraints
+   for (const Constraint &c : vc_)
+   {
+      std::shared_ptr<ContractorConstraint> op =
+          std::make_shared<ContractorConstraint>(c);
+      ctc->push(op);
+   }
+
+   // variables with disconnected domains
+   std::shared_ptr<ContractorDomain> dop = makeContractorDomain();
+
+   if (dop->nbVars() > 0)
+      ctc->push(dop);
+
+   // tuning of propagation
+   ctc->setTol(tol);
+
+   return ctc;
+}
+
+SharedContractorAffine ContractorFactory::makeAffine()
+{
+   double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
+   return makeAffine(tol);
+}
+
 std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
 {
    size_t ne = ve_.size(), nv = se_.size();

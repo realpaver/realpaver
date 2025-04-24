@@ -41,6 +41,15 @@ bitset_test = executable(
 )
 test('Test of bitset', bitset_test)
 
+ctc_affine_test = executable(
+  'ctc_affine_test',
+  sources: 'ctc_affine_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of affine contractor', ctc_affine_test)
+
 ctc_hc4_test = executable(
   'ctc_hc4_test',
   sources: 'ctc_hc4_test.cpp',
