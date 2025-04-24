@@ -25,6 +25,7 @@ rp_gen_params = executable(
 
 rp_default_params = custom_target(
   command: [rp_gen_params, '@OUTPUT@'],
+  depend_files: files(['../src/realpaver/Param.hpp','../src/realpaver/Param.cpp']),
   install: true,
   install_dir: 'share/realpaver',
   output: 'rp_params.txt',
