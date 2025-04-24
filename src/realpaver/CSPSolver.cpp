@@ -156,13 +156,15 @@ void CSPSolver::makePropagator()
 
    CSPPropagatorList *aux = new CSPPropagatorList();
 
-   // Constraint propagation algorithm: HC4, BC4, or ACID
+   // Constraint propagation algorithm: HC4, BC4, or AFFIBE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
       aux->pushBack(CSPPropagAlgo::HC4, *factory_);
    else if (base == "BC4")
       aux->pushBack(CSPPropagAlgo::BC4, *factory_);
+   else if (base == "AFFINE")
+      aux->pushBack(CSPPropagAlgo::AFFINE, *factory_);
    else
       THROW("Bad parameter value for the propagation algorithm");
 

@@ -103,6 +103,19 @@ Proof CSPPropagatorBC4::contractImpl(IntervalBox &B)
 
 /*----------------------------------------------------------------------------*/
 
+CSPPropagatorAffine::CSPPropagatorAffine(ContractorFactory &facto)
+    : CSPPropagator()
+{
+   ctc_ = facto.makeAffine();
+}
+
+Proof CSPPropagatorAffine::contractImpl(IntervalBox &B)
+{
+   return ctc_->contract(B);
+}
+
+/*----------------------------------------------------------------------------*/
+
 CSPPropagatorNewton::CSPPropagatorNewton(ContractorFactory &facto)
     : CSPPropagator()
 {
@@ -177,6 +190,12 @@ void CSPPropagatorList::pushBack(CSPPropagAlgo alg, ContractorFactory &facto)
 
    case CSPPropagAlgo::BC4:
       op = std::make_shared<CSPPropagatorBC4>(facto);
+      if (op != nullptr)
+         v_.push_back(op);
+      break;
+
+   case CSPPropagAlgo::AFFINE:
+      op = std::make_shared<CSPPropagatorAffine>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;

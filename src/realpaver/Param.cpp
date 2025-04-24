@@ -1241,6 +1241,7 @@ void Params::makeContract()
        .setWhat(str)
        .addChoice("HC4", "HC4 contractor")
        .addChoice("BC4", "BC4 contractor")
+       .addChoice("AFFINE", "contractor based on affine forms")
        .setValue("HC4");
    add(propag_base);
 

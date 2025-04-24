@@ -32,6 +32,7 @@ namespace realpaver {
 enum class CSPPropagAlgo {
    HC4,      ///< propagation algorithm based on HC4 contractors
    BC4,      ///< propagation algorithm based on BC4 contractors
+   AFFINE,   ///< propagation algorithm based on affine contractors
    ACID,     ///< adaptive CID
    Polytope, ///< polytope hull contractor
    Newton    ///< interval Newton operator
@@ -123,6 +124,29 @@ public:
 
 private:
    SharedContractor bc4_;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Constraint propagation algorithm based on affine contractors
+class CSPPropagatorAffine : public CSPPropagator {
+public:
+   /// Constructor
+   CSPPropagatorAffine(ContractorFactory &facto);
+
+   /// Default copy constructor
+   CSPPropagatorAffine(const CSPPropagatorAffine &) = default;
+
+   /// No assignment
+   CSPPropagatorAffine &operator=(const CSPPropagatorAffine &) = delete;
+
+   /// Default destructor
+   ~CSPPropagatorAffine() = default;
+
+   Proof contractImpl(IntervalBox &B) override;
+
+private:
+   SharedContractor ctc_;
 };
 
 /*----------------------------------------------------------------------------*/

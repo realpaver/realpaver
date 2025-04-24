@@ -45,6 +45,18 @@ AffineCreator::AffineCreator(SharedDag dag, const IndexList &lfun, bool minrange
    ASSERT(!lfun.empty(), "Empty list of indexes");
 }
 
+AffineCreator::AffineCreator(SharedDag dag, size_t i, bool minrange)
+    : dag_(dag)
+    , minrange_(minrange)
+    , v_(dag_->nbNodes())
+    , lfun_(1)
+{
+   ASSERT(dag != nullptr, "Null pointer");
+   ASSERT(i < dag->nbFuns(), "Bad function index in a DAG @ " << i);
+
+   lfun_[0] = i;
+}
+
 size_t AffineCreator::nbFuns() const
 {
    return lfun_.size();
@@ -109,6 +121,7 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       break;
    }
    case DagSymbol::Var: {
+
       const Variable &v = static_cast<DagVar *>(node)->getVar();
       f = std::make_unique<AffineForm>(dag_->scope().index(v), B.get(v));
       break;
