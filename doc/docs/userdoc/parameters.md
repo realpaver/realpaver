@@ -1,7 +1,7 @@
 
 # Parameters description
 
-RealPaver behavior can be controlled using some parameters. These parameters are defined by the class [`Params`](../api/classrealpaver_1_1_params.md) implemented by the file [`src/realpaver/Params.hpp`](../api/_params_8hpp.md) and [`src/realpaver/Params.cpp`](../api/_params_8cpp.md). Parameters can be handled more globally with environments using the class [`Env`](../api/classrealpaver_1_1_env.md) like for the CSP solver.
+RealPaver behavior can be controlled using some parameters. These parameters are defined by the class [`Params`](../api/classrealpaver_1_1_params.md) implemented by the file [`src/realpaver/Param.hpp`](../api/_param_8hpp.md) and [`src/realpaver/Param.cpp`](../api/_param_8cpp.md). Parameters can be handled more globally with environments using the class [`Env`](../api/classrealpaver_1_1_env.md) like for the CSP solver.
 
 Parameters can also be defined in a text file and a default one is provided in `src/realpaver/ParamFile`.
 

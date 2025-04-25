@@ -200,12 +200,21 @@ expression in [a,b]
 `
 constraint -> constraint
 `
-4. Table constraints, enumerating all consistent tuples for a set of varaibles:
+4. Table constraints, enumerating all consistent tuples for a set of variables:
 `
 table(var_set,tuple_set)
 `
 
-**NB:** Only conditions as set constraints are supported by the solver
+5. Piecewise constraints, conditioned by a variable domain to activate the single constraint to apply:
+`
+piecewise(x,{[a_1,b_1]:constraint_1, ..., [a_n,b_n]:constraint_n})
+`
+
+
+**NB:**
+
+- Only conditions as set constraints are supported by the solver
+- Intervals in a piecewise constraint must not overlap (except on their bounds)
 
 Here are some example constraints:
 
