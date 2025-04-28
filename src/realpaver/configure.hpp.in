@@ -1,0 +1,43 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/* Define this to 1 to check assertions. */
+#mesondefine ASSERT_ON
+
+/* Define this to 1 to turn on debugging. */
+#mesondefine DEBUG_ON
+
+/* Define this to 1 to generate log files. */
+#mesondefine LOG_ON
+
+/* Name of package */
+#define PACKAGE "@project_name@"
+
+/* Define to the address where bug reports for this package should be sent. */
+#define PACKAGE_BUGREPORT "@bug_report@"
+
+/* Define to the full name of this package. */
+#define PACKAGE_NAME "@project_full_name@"
+
+/* Define to the full name and version of this package. */
+#define PACKAGE_STRING "@project_full_name@ @version@"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL "@project_url@"
+
+/* Define to the version of this package. */
+#define PACKAGE_VERSION  "@version@"
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER

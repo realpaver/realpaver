@@ -15,7 +15,7 @@
 #-------------------------------------------------------------------------------
 
 configure_file(
-  input: 'configure_meson.hpp.in',
+  input: 'configure.hpp.in',
   output: 'configure.hpp',
   configuration: conf_data,
   install: true,
