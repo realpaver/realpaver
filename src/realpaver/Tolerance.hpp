@@ -85,14 +85,6 @@ public:
     */
    Interval maxIntervalUp(double lb) const;
 
-   /**
-    * @brief Calculates the size of a partition of an interval.
-    *
-    * Returns 0 if x is empty, 1 if x is canonical, the width of x divided
-    * by the absolute tolerance of this rounded upward otherwise
-    */
-   double discreteSize(const Interval &x) const;
-
 private:
    double rtol_; // relative tolerance
    double atol_; // absolute tolerance

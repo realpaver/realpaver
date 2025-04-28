@@ -1150,8 +1150,9 @@ void Params::makeSplit()
        .addChoice("RR", "round-robin strategy")
        .addChoice("LF", "largest domain")
        .addChoice("SF", "smallest domain")
-       .addChoice("SSR", "smear sum relative (using derivatives)")
+       .addChoice("SSR", "smear sum relative values (using derivatives)")
        .addChoice("SLF", "integer variable with smallest first and then real variable")
+       .addChoice("ASR", "affine sum relative values")
        .setValue("SSR");
    add(var_sel);
 

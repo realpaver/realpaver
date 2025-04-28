@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Tolerance.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/Tolerance.hpp"
 
 namespace realpaver {
 
@@ -160,26 +160,6 @@ Interval Tolerance::maxIntervalDn(double ub) const
 Interval Tolerance::maxIntervalUp(double lb) const
 {
    return -maxIntervalDn(-lb);
-}
-
-double Tolerance::discreteSize(const Interval &x) const
-{
-   if (x.isEmpty())
-      return 0.0;
-
-   else if (x.isCanonical())
-      return 1.0;
-
-   else if (x.isInf())
-      return Double::floor(Double::greatest());
-
-   else
-   {
-      // absolute
-      double a = x.width() / atol_, b = Double::floor(a);
-
-      return (a == b) ? b : b + 1.0;
-   }
 }
 
 std::ostream &operator<<(std::ostream &os, const Tolerance &tol)
