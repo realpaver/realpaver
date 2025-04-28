@@ -1412,7 +1412,7 @@ PiecewiseCtr::PiecewiseCtr(Variable v, const std::initializer_list<Variable> &bi
     , constraints_()
     , guard_hull_(Interval::emptyset())
 {
-   ASSERT(binaries_.size() == intervals_.size() == constraints_.size(),
+   ASSERT(binaries.size() == intervals.size() && intervals.size() == constraints.size(),
           "Error: inconsistent number of pieces");
    hcode_ = 0;
    Scope scop;
@@ -1447,7 +1447,7 @@ PiecewiseCtr::PiecewiseCtr(Variable v, const std::vector<Variable> &binaries,
     , constraints_()
     , guard_hull_(Interval::emptyset())
 {
-   ASSERT(binaries_.size() == intervals_.size() == constraints_.size(),
+   ASSERT(binaries.size() == intervals.size() && intervals.size() == constraints.size(),
           "Error: inconsistent number of pieces");
    hcode_ = 0;
    Scope scop;
