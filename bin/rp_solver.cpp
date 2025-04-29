@@ -4,7 +4,7 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
-#include "realpaver/config.hpp"
+#include "realpaver/configure.hpp"
 #include <chrono>
 #include <fstream>
 #include <iomanip>

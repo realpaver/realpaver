@@ -22,7 +22,7 @@
 #define REALPAVER_LOGGER_HPP
 
 #include "realpaver/Exception.hpp"
-#include "realpaver/config.hpp"
+#include "realpaver/configure.hpp"
 #include <fstream>
 #include <iomanip>
 #include <iostream>

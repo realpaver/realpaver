@@ -105,8 +105,7 @@ conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
 conf_data.set('project_name', meson.project_name())
 conf_data.set('project_full_name', meson.project_name())
-conf_data.set('bug_report', 'laurent.granvilliers@univ-nantes.fr')
-conf_data.set('project_url', 'https://gitlab.univ-nantes.fr/granvilliers-l/realpaver')
+conf_data.set('project_url', 'https://github.com/realpaver/realpaver')
 
 if os_darwin
   conf_data.set('PLATFORM_OSX', 1)

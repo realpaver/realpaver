@@ -133,7 +133,6 @@ rp_headers += [
   'Bitset.hpp',
   'BoxReporter.hpp',
   'Common.hpp',
-  'config.hpp',
   'Constraint.hpp',
   'ConstraintFixer.hpp',
   'ConstraintRelaxor.hpp',

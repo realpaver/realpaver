@@ -1,5 +1,5 @@
 #include "realpaver/Param.hpp"
-#include "realpaver/config.hpp"
+#include "realpaver/configure.hpp"
 #include <fstream>
 #include <iostream>
 

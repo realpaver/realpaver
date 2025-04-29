@@ -20,23 +20,17 @@
 /* Define this to 1 to generate log files. */
 #mesondefine LOG_ON
 
-/* Name of package */
-#define PACKAGE "@project_name@"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "@bug_report@"
-
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "@project_full_name@"
+#define REALPAVER_NAME "@project_full_name@"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "@project_full_name@ @version@"
+#define REALPAVER_STRING "@project_full_name@ @version@"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "@project_url@"
+#define REAPAVER_PACKAGE_URL "@project_url@"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION  "@version@"
+#define REALPAVER_VERSION  "@version@"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
