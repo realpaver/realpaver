@@ -21,7 +21,7 @@
 #ifndef REALPAVER_EXCEPTION_HPP
 #define REALPAVER_EXCEPTION_HPP
 
-#include "realpaver/config.hpp"
+#include "realpaver/configure.hpp"
 #include <sstream>
 #include <string>
 

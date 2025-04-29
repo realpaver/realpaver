@@ -15,7 +15,7 @@
 #-------------------------------------------------------------------------------
 
 configure_file(
-  input: 'configure_meson.hpp.in',
+  input: 'configure.hpp.in',
   output: 'configure.hpp',
   configuration: conf_data,
   install: true,
@@ -133,7 +133,6 @@ rp_headers += [
   'Bitset.hpp',
   'BoxReporter.hpp',
   'Common.hpp',
-  'config.hpp',
   'Constraint.hpp',
   'ConstraintFixer.hpp',
   'ConstraintRelaxor.hpp',
