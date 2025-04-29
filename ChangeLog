@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-04-25
+
+* Add Taylor linearization
+* Add Affine linearization
+* Add Polytope hull contractor using linearizations
+* Add Piecewise constraints
+* Add Fixed-point contractor
+* Add Interface to report solutions
+# Reorganize definition of RealPaver parameters
+* Add SEARCH_STATUS parameter
+* Update of documentation
+
 ## [1.0.1] - 2025-01-15
 
 * Add an API to improve the reporting of solutions and handle aliases ([issue #21](https://gitlab.univ-nantes.fr/realpavergroup/realpaver/-/issues/21))
