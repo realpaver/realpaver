@@ -15,7 +15,7 @@
 #-------------------------------------------------------------------------------
 
 configure_file(
-  input: 'configure_meson.hpp.in',
+  input: 'configure.hpp.in',
   output: 'configure.hpp',
   configuration: conf_data,
   install: true,
@@ -57,7 +57,6 @@ if lp_lib_name.to_upper() == 'CLP'
   lp_header_hpp += 'LPSolverClp.hpp'
   rp_sources += ['LPSolverClp.cpp']
 elif lp_lib_name.to_upper() == 'GUROBI'
-  #### NOT WORKING FOR NOW
   lp_header_hpp += 'LPSolverGurobi.hpp'
   rp_sources += ['LPSolverGurobi.cpp']
 elif lp_lib_name.to_upper() == 'SOPLEX'
@@ -110,6 +109,7 @@ if flex.found() and bison.found()
     input: 'parser_flex.lpp',
     output: 'parser_flex.cpp',
     command: [flex, '-o', '@OUTPUT@', '@INPUT@'],
+    build_by_default: true,
   )
   rp_sources += [flex_analyzer]
 
@@ -118,6 +118,7 @@ if flex.found() and bison.found()
     input: 'parser_bison.ypp',
     output: ['parser_bison.hpp', 'parser_bison.cpp'],
     command: [bison, '-d', '-o', '@OUTPUT1@', '@INPUT@'],
+    build_by_default: true,
   )
   rp_sources += [bison_analyzer]
 else
@@ -125,17 +126,20 @@ else
 endif
 
 rp_headers += [
+  'AffineCreator.hpp',
+  'AffineForm.hpp',
   'Alias.hpp',
   'AssertDebug.hpp',
   'Bitset.hpp',
   'BoxReporter.hpp',
   'Common.hpp',
-  'config.hpp',
   'Constraint.hpp',
   'ConstraintFixer.hpp',
   'ConstraintRelaxor.hpp',
   'Contractor.hpp',
   'ContractorACID.hpp',
+  'ContractorAffine.hpp',
+  'ContractorAffineRevise.hpp',
   'ContractorBC3Revise.hpp',
   'ContractorBC4Revise.hpp',
   'ContractorBC4.hpp',
@@ -145,7 +149,9 @@ rp_headers += [
   'ContractorHC4.hpp',
   'ContractorHC4Revise.hpp',
   'ContractorList.hpp',
+  'ContractorLoop.hpp',
   'ContractorPool.hpp',
+  'ContractorPolytope.hpp',
   'ContractorVar3B.hpp',
   'ContractorVar3BCID.hpp',
   'ContractorVarCID.hpp',
@@ -188,6 +194,8 @@ rp_headers += [
   'IntervalTraits.hpp',
   'IntervalVector.hpp',
   'IntervalUnion.hpp',
+  'IntRandom.hpp',
+  'Linearizer.hpp',
   'Logger.hpp',
   'LPModel.hpp',
   'NLPModel.hpp',
@@ -231,6 +239,8 @@ rp_headers += [
 ]
 
 rp_sources += [
+  'AffineCreator.cpp',
+  'AffineForm.cpp',
   'Alias.cpp',
   'AssertDebug.hpp',
   'Bitset.cpp',
@@ -241,6 +251,8 @@ rp_sources += [
   'ConstraintRelaxor.cpp',
   'Contractor.cpp',
   'ContractorACID.cpp',
+  'ContractorAffine.cpp',
+  'ContractorAffineRevise.cpp',
   'ContractorBC3Revise.cpp',
   'ContractorBC4Revise.cpp',
   'ContractorBC4.cpp',
@@ -250,6 +262,8 @@ rp_sources += [
   'ContractorHC4.cpp',
   'ContractorHC4Revise.cpp',
   'ContractorList.cpp',
+  'ContractorLoop.cpp',
+  'ContractorPolytope.cpp',
   'ContractorPool.cpp',
   'ContractorVar3B.cpp',
   'ContractorVar3BCID.cpp',
@@ -291,6 +305,8 @@ rp_sources += [
   'IntervalThickFunction.cpp',
   'IntervalVector.cpp',
   'IntervalUnion.cpp',
+  'IntRandom.cpp',
+  'Linearizer.cpp',
   'Logger.cpp',
   'LPModel.cpp',
   'NLPModel.cpp',
@@ -334,8 +350,8 @@ extra_dist = [
   'LPSolverGurobi.hpp',
   'LPSolverHighs.cpp',
   'LPSolverHighs.hpp',
-  'LPSolverSoplex.cpp',
-  'LPSolverSoplex.hpp',
+  #  'LPSolverSoplex.cpp',
+  #  'LPSolverSoplex.hpp',
   #  'NLPSolverIpopt.cpp',
   #  'NLPSolverIpopt.hpp',
   'NLPSolverNlopt.cpp',

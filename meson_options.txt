@@ -14,10 +14,9 @@
 # Author: Raphaël Chenouard
 #-------------------------------------------------------------------------------
 
-option('LP_LIB', type : 'string', value : 'Clp', description : 'Linear Programming library (Clp, Gurobi, Highs, Soplex)')
+option('LP_LIB', type : 'string', value : 'Highs', description : 'Linear Programming library (Highs, Clp, Gurobi)')
 option('INTERVAL_LIB', type : 'string', value : 'Gaol', description : 'Interval arithmetic library (Gaol)')
 option('ASSERT', type : 'boolean', value : false, description : 'Activate assertions')
 option('LOG', type : 'boolean', value : false, description : 'Activate file logging')
-option('GUROBI_DIR', type : 'string', value : '/Library/gurobi1000/macos_universal2', description : 'Path to LP solver Gurobi')
 option('GENERATE_DOC', type : 'boolean', value: false, description : 'Activate the generation of the documentation (Doxygen)')
 option('LOCAL_SOLVER', type : 'string', value : 'none', description : 'Local solver library (e.g. NLOPT)')

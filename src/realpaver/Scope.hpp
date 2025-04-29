@@ -21,10 +21,10 @@
 #ifndef REALPAVER_SCOPE_HPP
 #define REALPAVER_SCOPE_HPP
 
-#include <map>
-#include <memory>
 #include "realpaver/ScopeMap.hpp"
 #include "realpaver/Variable.hpp"
+#include <map>
+#include <memory>
 
 namespace realpaver {
 
@@ -40,10 +40,10 @@ public:
    ScopeRep();
 
    /// Copy constructor
-   ScopeRep(const ScopeRep& other);
+   ScopeRep(const ScopeRep &other);
 
    /// No assignment
-   ScopeRep& operator=(const ScopeRep& other) = delete;
+   ScopeRep &operator=(const ScopeRep &other) = delete;
 
    /// Destructor
    ~ScopeRep();
@@ -52,7 +52,7 @@ public:
    size_t size() const;
 
    /// Gets the index of v
-   size_t index(const Variable& v) const;
+   size_t index(const Variable &v) const;
 
    /// Returns the i-th variable in this
    Variable var(size_t i) const;
@@ -61,13 +61,13 @@ public:
    void insert(Variable v, size_t n);
 
    /// Removes v from this
-   void remove(const Variable& v);
+   void remove(const Variable &v);
 
    /// Removes n occurrences ofv from this
-   void remove(const Variable& v, size_t n);
+   void remove(const Variable &v, size_t n);
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Returns the smallest variable identifier in this
    size_t minVarId() const;
@@ -94,10 +94,10 @@ private:
 
    MapType m_;
 
-   AbstractScopeMap* scopeMap_;   // map v.id() -> 0..size()-1
-   size_t hcode_;                 // hash code
-   size_t minid_;                 // min {v.id() : v in this}
-   size_t maxid_;                 // max {v.id() : v in this}
+   AbstractScopeMap *scopeMap_; // map v.id() -> 0..size()-1
+   size_t hcode_;               // hash code
+   size_t minid_;               // min {v.id() : v in this}
+   size_t maxid_;               // max {v.id() : v in this}
 
    // recreates the map of indexes
    void makeMap();
@@ -107,16 +107,29 @@ public:
    class const_iterator {
    public:
       /// Default constructor
-      const_iterator() : it_() {}
+      const_iterator()
+          : it_()
+      {
+      }
 
       /// Constructor
-      const_iterator(MapIteratorType it) : it_(it) {}
+      const_iterator(MapIteratorType it)
+          : it_(it)
+      {
+      }
 
       /// Dereference operator
-      Variable operator*() { return it_->first; }
+      Variable operator*()
+      {
+         return it_->first;
+      }
 
       /// Increment operator prefix
-      const_iterator& operator++() { ++it_; return *this; }
+      const_iterator &operator++()
+      {
+         ++it_;
+         return *this;
+      }
 
       /// Increment operator postfix
       const_iterator operator++(int)
@@ -127,28 +140,37 @@ public:
       }
 
       /// Equality test
-      bool operator==(const const_iterator& other) const
+      bool operator==(const const_iterator &other) const
       {
          return it_ == other.it_;
       }
 
       /// Disequality test
-      bool operator!=(const const_iterator& other) const
+      bool operator!=(const const_iterator &other) const
       {
          return it_ != other.it_;
       }
 
       /// @return the variable pointed by this iterator
-      Variable var() { return it_->first; }
+      Variable var()
+      {
+         return it_->first;
+      }
 
       /// Returns the occurrence counter of var()
-      size_t count() { return it_->second; }
+      size_t count()
+      {
+         return it_->second;
+      }
 
       /// Returns the map iterator enclosed
-      MapIteratorType get() { return it_; }
+      MapIteratorType get()
+      {
+         return it_;
+      }
 
    private:
-      MapIteratorType it_;    // map iterator
+      MapIteratorType it_; // map iterator
    };
 
    /// Returns an iterator to the beginning of this
@@ -158,14 +180,14 @@ public:
    const_iterator end() const;
 
    /// Finds a variable having the same index as v in this
-   const_iterator find(const Variable& v);
+   const_iterator find(const Variable &v);
 };
 
 /*----------------------------------------------------------------------------*/
 
 /**
  * @brief Ordered set of variables.
- * 
+ *
  * The variables are indexed from 0 to size()-1.
  *
  * This encloses a shared pointer to its representation. It is a lightweight
@@ -182,13 +204,13 @@ public:
    Scope();
 
    /// Creates a scope from a list of variables
-   Scope(const std::initializer_list<Variable>& l);
+   Scope(const std::initializer_list<Variable> &l);
 
    /// Default copy constructor
-   Scope(const Scope& other) = default;
+   Scope(const Scope &other) = default;
 
    /// Default assignment operator
-   Scope& operator=(const Scope&) = default;
+   Scope &operator=(const Scope &) = default;
 
    /// Default destructor
    ~Scope() = default;
@@ -203,16 +225,16 @@ public:
    bool isEmpty() const;
 
    /// Gets the index of v in this (index between 0 and size() -1)
-   size_t index(const Variable& v) const;
+   size_t index(const Variable &v) const;
 
    /// Returns the i-th variable in this (i between 0 and size() -1)
    Variable var(size_t i) const;
 
    /// Returns the number of occurrences of v in this
-   size_t count(const Variable& v) const;
+   size_t count(const Variable &v) const;
 
    /// Membership test
-   bool contains(const Variable& v) const;
+   bool contains(const Variable &v) const;
 
    /// Returns the smallest variable identifier in this
    size_t minVarId() const;
@@ -227,37 +249,37 @@ public:
    void insert(Variable v, size_t n);
 
    /// Inserts a list of variables in this
-   void insert(const std::initializer_list<Variable>& l);
+   void insert(const std::initializer_list<Variable> &l);
 
    /// Inserts a scope in this
-   void insert(const Scope& other);
+   void insert(const Scope &other);
 
    /// Removes a variable from this
-   void remove(const Variable& v);
+   void remove(const Variable &v);
 
    /// Removes n  occurrences of v
-   void remove(const Variable& v, size_t n);
+   void remove(const Variable &v, size_t n);
 
    /// Removes a scope from this
-   void remove(const Scope& other);
+   void remove(const Scope &other);
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Inclusion test
-   bool contains(const Scope& other) const;
+   bool contains(const Scope &other) const;
 
    /// Disjunction test
-   bool disjoint(const Scope& other) const;
+   bool disjoint(const Scope &other) const;
 
    /// Intersection test
-   bool overlaps(const Scope& other) const;
+   bool overlaps(const Scope &other) const;
 
    /// Equality test
-   bool operator==(const Scope& other) const;
+   bool operator==(const Scope &other) const;
 
    /// Disequality test
-   bool operator!=(const Scope& other) const;
+   bool operator!=(const Scope &other) const;
 
    /// Type of constant iterators
    using const_iterator = ScopeRep::const_iterator;
@@ -269,7 +291,7 @@ public:
    const_iterator end() const;
 
    /// Finds a variable in this
-   const_iterator find(const Variable& v) const;
+   const_iterator find(const Variable &v) const;
 
    /**
     * @brief Returns a clone of this.
@@ -287,7 +309,7 @@ public:
 
    /**
     * @brief Returns true if this has an identity map.
-    * 
+    *
     * It means that the indexes of the variables in this scope are the
     * consecutive integers 0, 1, 2, etc. and the method index(v) is equivalent
     * to v.id().
@@ -295,14 +317,14 @@ public:
    bool isIdentity() const;
 
 private:
-   std::shared_ptr<ScopeRep> rep_;  // shared representation
+   std::shared_ptr<ScopeRep> rep_; // shared representation
 
    // constructor
    Scope(std::shared_ptr<ScopeRep> rep);
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Scope& s);
+std::ostream &operator<<(std::ostream &os, const Scope &s);
 
 /// Returns a new scope corresponding to the intersection of s and t
 Scope operator&(Scope s, Scope t);
@@ -310,6 +332,6 @@ Scope operator&(Scope s, Scope t);
 /// Returns a new scope corresponding to the union of s and t
 Scope operator|(Scope s, Scope t);
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -16,44 +16,46 @@
  * @brief  Thick interval function
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalThickFunction.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-IntervalThickFunction::IntervalThickFunction(SharedDag dag, size_t i,
-                                             Variable v)
-      : IntervalFunctionUni(),
-        f_(dag->fun(i)),
-        v_(v),
-        flat_(nullptr),
-        B_({v}),
-        G_(1)
-{}
+IntervalThickFunction::IntervalThickFunction(SharedDag dag, size_t i, Variable v)
+    : IntervalFunctionUni()
+    , f_(dag->fun(i))
+    , v_(v)
+    , flat_(nullptr)
+    , B_({v})
+    , G_(1)
+{
+}
 
 IntervalThickFunction::~IntervalThickFunction()
 {
-   if (flat_ != nullptr) delete flat_;
+   if (flat_ != nullptr)
+      delete flat_;
 }
 
-Interval IntervalThickFunction::eval(const Interval& x)
+Interval IntervalThickFunction::eval(const Interval &x)
 {
    B_.set(v_, x);
    return flat_->iEval(B_);
 }
 
-Interval IntervalThickFunction::diff(const Interval& x)
+Interval IntervalThickFunction::diff(const Interval &x)
 {
    B_.set(v_, x);
    flat_->iDiff(B_, G_);
    return G_[0];
 }
 
-void IntervalThickFunction::update(const IntervalBox& B)
+void IntervalThickFunction::update(const IntervalBox &B)
 {
-   if (flat_ != nullptr) delete flat_;
+   if (flat_ != nullptr)
+      delete flat_;
    flat_ = new FlatFunction(f_, B, v_);
 }
 
@@ -62,9 +64,9 @@ Variable IntervalThickFunction::getVar() const
    return v_;
 }
 
-DagFun* IntervalThickFunction::getFun() const
+DagFun *IntervalThickFunction::getFun() const
 {
    return f_;
 }
 
-} // namespace
+} // namespace realpaver

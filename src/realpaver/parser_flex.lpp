@@ -51,6 +51,7 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "real"          return TK_STR_REAL;
 "tol"           return TK_STR_TOL;
 "table"         return TK_TABLE;
+"piecewise"     return TK_PW;
 
 "min"    return TK_MIN;
 "max"    return TK_MAX;
@@ -108,12 +109,16 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 
 realpaver::Problem* realpaver_bison_problem;
 realpaver::SymbolTable* realpaver_bison_symtab;
-realpaver::Param* realpaver_bison_param;
+realpaver::Params* realpaver_bison_params;
 realpaver::FunctionSymbol* realpaver_fun_symbol;
 
 // vectors used to parse the table constraints
 std::vector<realpaver::Variable>* realpaver_var_vector;
 std::vector<realpaver::Interval>* realpaver_itv_vector;
+
+// vectors used to parse the piecewise constraints
+std::vector<realpaver::Variable>* realpaver_ctr_pieces;
+std::vector<realpaver::Interval>* realpaver_itv_pieces;
 
 // unions used to parse the variable domains
 realpaver::IntervalUnion* realpaver_itv_union;
@@ -127,12 +132,12 @@ std::string realpaver_parse_error;
 
 void realpaver_flex_init(realpaver::Problem* prob,
 							    realpaver::SymbolTable* symtab,
-                         realpaver::Param* prm)
+                         realpaver::Params* params)
 {
   realpaver_bison_lineno = 1;
   realpaver_bison_problem = prob;
   realpaver_bison_symtab = symtab;
-  realpaver_bison_param = prm;
+  realpaver_bison_params = params;
   realpaver_parse_error = "";
   realpaver_fun_symbol = nullptr;
   realpaver_var_vector = nullptr;
@@ -143,16 +148,16 @@ void realpaver_flex_init(realpaver::Problem* prob,
 
 void realpaver_flex_init_str(realpaver::Problem* prob,
 								     realpaver::SymbolTable* symtab,
-                             realpaver::Param* prm,
+                             realpaver::Params* params,
                              const char* str)
 {
-  realpaver_flex_init(prob, symtab, prm);
+  realpaver_flex_init(prob, symtab, params);
   realpaver_bison_buffer = realpaver_bison__scan_string(str);
 }
 
 int realpaver_flex_init_file(realpaver::Problem* prob,
 								     realpaver::SymbolTable* symtab,
-                             realpaver::Param* prm,
+                             realpaver::Params* params,
 								     const char* filename)
 {
   int res = 0;
@@ -164,7 +169,7 @@ int realpaver_flex_init_file(realpaver::Problem* prob,
   }
   else
   {
-    realpaver_flex_init(prob, symtab, prm);
+    realpaver_flex_init(prob, symtab, params);
     realpaver_bison_buffer =
       realpaver_bison__create_buffer(realpaver_bison_in, YY_BUF_SIZE);
     realpaver_bison__switch_to_buffer(realpaver_bison_buffer);
@@ -176,7 +181,7 @@ void realpaver_flex_cleanup_str()
 {
   realpaver_bison_problem = NULL;
   realpaver_bison_symtab = NULL;
-  realpaver_bison_param = NULL;
+  realpaver_bison_params = NULL;
 
   if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
   if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;
@@ -190,7 +195,7 @@ void realpaver_flex_cleanup_file()
 {
   realpaver_bison_problem = nullptr;
   realpaver_bison_symtab = nullptr;
-  realpaver_bison_param = nullptr;
+  realpaver_bison_params = nullptr;
 
   if (realpaver_var_vector != nullptr) delete realpaver_var_vector;
   if (realpaver_itv_vector != nullptr) delete realpaver_itv_vector;

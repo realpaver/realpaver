@@ -25,32 +25,29 @@
 #include "NumericTraits.hpp"
 
 namespace realpaver {
-   
-static inline Interval itv_sqr(const Interval& x)
+
+static inline Interval itv_sqr(const Interval &x)
 {
    return sqr(x);
 }
 
-static inline Interval itv_sqrt(const Interval& x)
+static inline Interval itv_sqrt(const Interval &x)
 {
    return sqrt(x);
 }
 
-
 /**
  * @brief Specialization of template NumericTraits for intervals.
- * 
+ *
  * This traits is used to parameterize matrices, vectors, and algorithms
  * from linear algebra.
- * 
+ *
  * @see NumericTraits
  */
-template <>
-struct NumericTraits<Interval>
-{
+template <> struct NumericTraits<Interval> {
    using ValueType = Interval;
-   using RefType = Interval&;
-   using ConstRefType = const Interval&;
+   using RefType = Interval &;
+   using ConstRefType = const Interval &;
 
    static inline ValueType zero()
    {
@@ -102,7 +99,7 @@ struct NumericTraits<Interval>
       x += y;
    }
 
-   static inline void subAssign(ValueType& x, ConstRefType y)
+   static inline void subAssign(ValueType &x, ConstRefType y)
    {
       x -= y;
    }
@@ -112,7 +109,7 @@ struct NumericTraits<Interval>
       x *= y;
    }
 
-   static inline void divAssign(ValueType& x, ConstRefType y)
+   static inline void divAssign(ValueType &x, ConstRefType y)
    {
       x /= y;
    }
@@ -127,12 +124,12 @@ struct NumericTraits<Interval>
       return x.isSetEq(y);
    }
 
-   static inline size_t hashCode(ConstRefType  x)
+   static inline size_t hashCode(ConstRefType x)
    {
       return x.hashCode();
    }
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

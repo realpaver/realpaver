@@ -34,34 +34,34 @@ public:
    /// Returns the partial derivative after a visit
    Term getDerivative() const;
 
-   void apply(const TermCst* t) override;
-   void apply(const TermVar* t) override;
-   void apply(const TermAdd* t) override;
-   void apply(const TermSub* t) override;
-   void apply(const TermMul* t) override;
-   void apply(const TermDiv* t) override;
-   void apply(const TermMin* t) override;
-   void apply(const TermMax* t) override;
-   void apply(const TermUsb* t) override;
-   void apply(const TermAbs* t) override;
-   void apply(const TermSgn* t) override;
-   void apply(const TermSqr* t) override;
-   void apply(const TermSqrt* t) override;
-   void apply(const TermPow* t) override;
-   void apply(const TermExp* t) override;
-   void apply(const TermLog* t) override;
-   void apply(const TermCos* t) override;
-   void apply(const TermSin* t) override;
-   void apply(const TermTan* t) override;
-   void apply(const TermCosh* t) override;
-   void apply(const TermSinh* t) override;
-   void apply(const TermTanh* t) override;
+   void apply(const TermCst *t) override;
+   void apply(const TermVar *t) override;
+   void apply(const TermAdd *t) override;
+   void apply(const TermSub *t) override;
+   void apply(const TermMul *t) override;
+   void apply(const TermDiv *t) override;
+   void apply(const TermMin *t) override;
+   void apply(const TermMax *t) override;
+   void apply(const TermUsb *t) override;
+   void apply(const TermAbs *t) override;
+   void apply(const TermSgn *t) override;
+   void apply(const TermSqr *t) override;
+   void apply(const TermSqrt *t) override;
+   void apply(const TermPow *t) override;
+   void apply(const TermExp *t) override;
+   void apply(const TermLog *t) override;
+   void apply(const TermCos *t) override;
+   void apply(const TermSin *t) override;
+   void apply(const TermTan *t) override;
+   void apply(const TermCosh *t) override;
+   void apply(const TermSinh *t) override;
+   void apply(const TermTanh *t) override;
 
 private:
-   Variable v_;   // variable
-   Term dt_;      // partial derivative wrt. this variable
+   Variable v_; // variable
+   Term dt_;    // partial derivative wrt. this variable
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

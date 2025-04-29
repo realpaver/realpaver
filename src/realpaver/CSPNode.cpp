@@ -16,20 +16,20 @@
  * @brief  CSP search node
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPNode.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 CSPNode::CSPNode(Scope scop, int depth)
-      : scop_(scop),
-        box_(nullptr),
-        depth_(depth),
-        index_(-1),
-        parent_(-1),
-        proof_(Proof::Maybe)
+    : scop_(scop)
+    , box_(nullptr)
+    , depth_(depth)
+    , index_(-1)
+    , parent_(-1)
+    , proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
    ASSERT(!scop.isEmpty(), "Empty scope used to create a CSP node");
@@ -38,23 +38,23 @@ CSPNode::CSPNode(Scope scop, int depth)
 }
 
 CSPNode::CSPNode(std::unique_ptr<DomainBox> box, int depth)
-      : scop_(box->scope()),
-        box_(box.release()),
-        depth_(depth),
-        index_(-1),
-        parent_(-1),
-        proof_(Proof::Maybe)
+    : scop_(box->scope())
+    , box_(box.release())
+    , depth_(depth)
+    , index_(-1)
+    , parent_(-1)
+    , proof_(Proof::Maybe)
 {
    ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
 }
 
-CSPNode::CSPNode(const CSPNode& node)
-      : scop_(node.scop_),
-        box_(nullptr),
-        depth_(node.depth_),
-        index_(-1),
-        parent_(-1),
-        proof_(Proof::Maybe)
+CSPNode::CSPNode(const CSPNode &node)
+    : scop_(node.scop_)
+    , box_(nullptr)
+    , depth_(node.depth_)
+    , index_(-1)
+    , parent_(-1)
+    , proof_(Proof::Maybe)
 {
    box_ = node.box_->clone();
 }
@@ -101,7 +101,7 @@ void CSPNode::incrementDepth()
    ++depth_;
 }
 
-DomainBox* CSPNode::box() const
+DomainBox *CSPNode::box() const
 {
    return box_;
 }
@@ -121,12 +121,11 @@ void CSPNode::setProof(Proof p)
    proof_ = p;
 }
 
-std::ostream& operator<<(std::ostream& os, const CSPNode& node)
+std::ostream &operator<<(std::ostream &os, const CSPNode &node)
 {
-   os << *node.box()
-      << " proof: " << node.getProof();
+   os << *node.box() << " proof: " << node.getProof();
 
    return os;
 }
 
-} // namespace
+} // namespace realpaver

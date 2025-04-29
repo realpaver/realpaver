@@ -21,9 +21,9 @@
 #ifndef REALPAVER_VARIABLE_HPP
 #define REALPAVER_VARIABLE_HPP
 
-#include <memory>
 #include "realpaver/Domain.hpp"
 #include "realpaver/Tolerance.hpp"
+#include <memory>
 
 namespace realpaver {
 
@@ -31,13 +31,13 @@ namespace realpaver {
 class VariableRep {
 public:
    /// Constructor
-   VariableRep(const std::string& name);
+   VariableRep(const std::string &name);
 
    /// No copy
-   VariableRep(const VariableRep&) = delete;
+   VariableRep(const VariableRep &) = delete;
 
    /// No assignment
-   VariableRep& operator=(const VariableRep&) = delete;
+   VariableRep &operator=(const VariableRep &) = delete;
 
    /// Destructor
    ~VariableRep();
@@ -52,13 +52,13 @@ public:
    std::string getName() const;
 
    /// Sets the name of this
-   void setName(const std::string& name);
+   void setName(const std::string &name);
 
    /// Returns the domain of this
-   Domain* getDomain() const;
+   Domain *getDomain() const;
 
    /// Sets the domain of this
-   void setDomain(Domain* dom);
+   void setDomain(Domain *dom);
 
    /// Returns true if this is a binary variable, false otherwise
    bool isBinary() const;
@@ -76,15 +76,15 @@ public:
    Tolerance getTolerance() const;
 
    /// Sets the tolerance of this
-   void setTolerance(const Tolerance& tol);
+   void setTolerance(const Tolerance &tol);
 
 private:
-   std::string name_;   // name
-   size_t id_;          // identifier
-   Domain* dom_;        // domain
-   Tolerance tol_;      // tolerance
+   std::string name_; // name
+   size_t id_;        // identifier
+   Domain *dom_;      // domain
+   Tolerance tol_;    // tolerance
 
-   static int NEXT_ID;  // management of ids
+   static int NEXT_ID; // management of ids
 };
 
 /*----------------------------------------------------------------------------*/
@@ -102,16 +102,16 @@ public:
     *
     * The default domain is the interval universe.
     */
-   Variable(const std::string& name);
+   Variable(const std::string &name);
 
    /// Creates a variable having no representation
    Variable();
 
    /// Default copy constructor
-   Variable(const Variable&) = default;
+   Variable(const Variable &) = default;
 
    /// Default assignment operator
-   Variable& operator=(const Variable&) = default;
+   Variable &operator=(const Variable &) = default;
 
    /// Default destructor
    ~Variable() = default;
@@ -120,23 +120,23 @@ public:
    size_t id() const;
 
    /// Sets the unique identifier of this
-   Variable& setId(size_t id);
+   Variable &setId(size_t id);
 
    /// Returns the name of this
    std::string getName() const;
 
    /// Sets the name of this
-   Variable& setName(const std::string& name);
+   Variable &setName(const std::string &name);
 
    /// Returns the domain of this
-   Domain* getDomain() const;
+   Domain *getDomain() const;
 
    /**
     * @brief Sets the domain of this.
     *
     * throws an exception if dom is null
     */
-   Variable& setDomain(std::unique_ptr<Domain> dom);
+   Variable &setDomain(std::unique_ptr<Domain> dom);
 
    /// Returns true if this is an integer variable in [0, 1]
    bool isBinary() const;
@@ -154,26 +154,26 @@ public:
    Tolerance getTolerance() const;
 
    /// Sets the tolerance of this
-   Variable& setTolerance(const Tolerance& tol);
+   Variable &setTolerance(const Tolerance &tol);
 
    /// Returns a clone of this with a new representation
    Variable clone() const;
 
    /// Tests the equality of two variables
-   bool operator==(const Variable& other) const;
+   bool operator==(const Variable &other) const;
 
    /// Tests the difference of two variables
-   bool operator!=(const Variable& other) const;
+   bool operator!=(const Variable &other) const;
 
    /// Returns true if this has no representation (nullptr)
    bool hasNullPointer() const;
 
 private:
-   std::shared_ptr<VariableRep> rep_;  // representation
+   std::shared_ptr<VariableRep> rep_; // representation
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Variable& v);
+std::ostream &operator<<(std::ostream &os, const Variable &v);
 
 /*----------------------------------------------------------------------------*/
 
@@ -185,7 +185,7 @@ std::ostream& operator<<(std::ostream& os, const Variable& v);
  */
 struct VariableHasher {
    /// Hash function of v
-   std::size_t operator()(const Variable& v) const
+   std::size_t operator()(const Variable &v) const
    {
       return v.hashCode();
    }
@@ -201,12 +201,12 @@ struct VariableHasher {
  */
 struct VariableEqual {
    /// Returns true if v and w represent the same variable
-   bool operator()(const Variable& v, const Variable& w) const
+   bool operator()(const Variable &v, const Variable &w) const
    {
       return v.id() == w.id();
    }
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

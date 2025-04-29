@@ -16,16 +16,16 @@
  * @brief  Relaxation of equations
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintRelaxor.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 ConstraintRelaxor::ConstraintRelaxor(double nu)
-      : nu_(nu),
-        relaxed_(nullptr)
+    : nu_(nu)
+    , relaxed_(nullptr)
 {
    ASSERT(nu_ > 0.0, "Bad relaxation value " << nu);
 }
@@ -35,9 +35,9 @@ Constraint ConstraintRelaxor::getRelaxedCtr() const
    return relaxed_;
 }
 
-void ConstraintRelaxor::apply(const ArithCtrEq* c)
+void ConstraintRelaxor::apply(const ArithCtrEq *c)
 {
    relaxed_ = in(c->left() - c->right(), Interval(-nu_, nu_));
 }
 
-} // namespace
+} // namespace realpaver

@@ -16,187 +16,253 @@
  * @brief  Wrapper class for the LP solver Soplex.
  * @author Raphaël Chenouard
  * @date   2024-4-11
-*/
+ */
 
+#include "LPModel.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/LPSolverSoplex.hpp"
+#include "realpaver/Logger.hpp"
+#include <cstddef>
+#include <ostream>
 
 namespace realpaver {
 
-LPSolver::LPSolver() :
-   simplex_(nullptr)
-{}
+LPSolver::LPSolver()
+    : simplex_(nullptr)
+{
+}
 
 LPSolver::~LPSolver()
 {
-   if (simplex_!= nullptr) delete simplex_;
+   if (simplex_ != nullptr)
+      delete simplex_;
 }
 
 void LPSolver::makeVars()
 {
-   int n = getNbLinVars();
-
-   soplex::DSVectorReal dscol(0);
-   for(int i = 0; i < n; ++i) {
-     simplex_->addColReal(soplex::LPColReal(0, dscol, soplex::infinity, -soplex::infinity));
-   }
-   soplex::DSVectorReal dsrow(n);
-   int nb_int = 0;
+   size_t n = getNbLinVars();
+   size_t nb_int = 0;
    std::vector<int> vint;
-   for(int i = 0; i < n; ++i) {
-     LinVar v = getLinVar(i);
-     int j = v.getIndex();
-     dsrow.add(j, 1);
-     simplex_->addRowReal(soplex::LPRowReal(-soplex::infinity, dsrow, soplex::infinity));
-   //   simplex_->changeBoundsReal(j, v.getLB(), v.getUB());
-   //   simplex_->changeRangeReal(j, v.getLB(), v.getUB());
-     if (!v.isContinuous()){
-       nb_int++;
-       vint.push_back(j);
-     }
-     dsrow.clear();
+   soplex::DSVectorReal dscol(0);
+   for (int i = 0; i < n; ++i)
+   {
+      simplex_->addColReal(
+          soplex::LPColReal(0, dscol, soplex::infinity, -soplex::infinity));
+      if (!getLinVar(i).isContinuous())
+      {
+         nb_int++;
+         vint.push_back(getLinVar(i).getIndex());
+      }
    }
-   if (nb_int>0)
-     simplex_->setIntegralityInformation(nb_int, vint.data());
+   if (nb_int > 0)
+      simplex_->setIntegralityInformation(nb_int, vint.data());
 }
 
 void LPSolver::makeCtrs()
 {
-   int m = getNbLinCtrs();
-   int n = getNbLinVars();
-   for (int i=0; i<m; ++i)
+   size_t n = getNbLinVars();
+   soplex::DSVector row(n);
+   for (size_t i = 0; i < n; i++)
    {
-      LinCtr c = getLinCtr(i);
-      LinExpr e = c.getExpr();
-      soplex::DSVectorReal dsrow(n);
-      for (int j=0;j<e.getNbTerms();j++){
-        dsrow.add(e.getIndexVar(j), e.getCoef(j));
-      }
-      simplex_->addRowReal(soplex::LPRowReal(c.getLB(), dsrow, c.getUB()));
+      const LinVar &v = getLinVar(i);
+      row.add(v.getIndex(), 1);
+      simplex_->addRowReal(soplex::LPRow(v.getLB(), row, v.getUB()));
+      row.clear();
    }
 
-   // RAPHAEL
-   // bound constraints
-   for (int i=0; i<n; ++i)
+   size_t m = getNbLinCtrs();
+   for (size_t j = 0; j < m; j++)
    {
-      LinVar v = getLinVar(i);
-      LinExpr e = {{1.0}, {v}};
-      soplex::DSVectorReal dsrow(n);
-      for (int j=0;j<e.getNbTerms();j++){
-        dsrow.add(e.getIndexVar(j), e.getCoef(j));
-      }
-      simplex_->addRowReal(soplex::LPRowReal(v.getLB(), dsrow, v.getUB()));
+      soplex::DSVectorReal row(n);
+      const LinCtr &c_j = getLinCtr(j);
+      const LinExpr &l_e = c_j.getExpr();
+      for (size_t k = 0; k < l_e.getNbTerms(); k++)
+         row.add(l_e.getIndexVar(k), l_e.getCoef(k));
+      simplex_->addRowReal(soplex::LPRowReal(c_j.getLB(), row, c_j.getUB()));
    }
 }
 
-void LPSolver::makeObj()
+void LPSolver::makeCost()
 {
-   LinExpr obj = getObjExpr();
-   int n = obj.getNbTerms();
-
-   soplex::DVectorReal dcost(n);
-   for (int i=0; i<n; ++i){
-      LinVar v = getLinVar(i);
-      int j = v.getIndex();
-      //simplex_->changeObjReal(j,obj.getCoef(i));
-      dcost[j] = obj.getCoef(i);
+   if (getSense() == LPSense::Min)
+   {
+      simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MINIMIZE);
    }
-   simplex_->changeObjReal(dcost);
-
-   if (isMinimization())
-     simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MINIMIZE);
    else
-     simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MAXIMIZE);
+   {
+      simplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MAXIMIZE);
+   }
+
+   soplex::DVectorReal obj(getNbLinVars());
+   const LinExpr &l_e = getCost();
+   for (size_t k = 0; k < l_e.getNbTerms(); k++)
+   {
+      obj[l_e.getIndexVar(k)] = l_e.getCoef(k);
+   }
+   simplex_->changeObjReal(obj);
 }
 
 void LPSolver::makeSoplexSimplex()
 {
-   if (simplex_ != nullptr) delete simplex_;
+   if (simplex_ != nullptr)
+      delete simplex_;
    simplex_ = new soplex::SoPlex();
+
+   // assigns the options
+   setOptions();
 
    makeVars();
    makeCtrs();
-   makeObj();
+   makeCost();
 }
 
-bool LPSolver::run()
+LPStatus LPSolver::toLPStatus() const
 {
+   soplex::SPxSolver::Status status = simplex_->status();
+   switch (status)
+   {
+   case soplex::SPxSolver::OPTIMAL:
+      return LPStatus::Optimal;
+
+   case soplex::SPxSolver::INFEASIBLE:
+      return LPStatus::Infeasible;
+
+   case soplex::SPxSolver::INForUNBD:
+      return LPStatus::InfeasibleOrUnbounded;
+
+   case soplex::SPxSolver::UNBOUNDED:
+      return LPStatus::Unbounded;
+
+   case soplex::SPxSolver::ABORT_ITER:
+      return LPStatus::StopOnIterLimit;
+
+   case soplex::SPxSolver::ABORT_TIME:
+      return LPStatus::StopOnTimeLimit;
+
+   default:
+      return LPStatus::Other;
+   }
+}
+
+void LPSolver::setOptions()
+{
+   size_t maxsec = getMaxSeconds();
+   size_t maxiter = getMaxIter();
+   double tol = getFeasTol();
+
    simplex_->setIntParam(soplex::SoPlex::SOLVEMODE, soplex::SoPlex::SOLVEMODE_REAL);
    simplex_->setBoolParam(soplex::SoPlex::ENSURERAY, true);
-   simplex_->setRealParam(soplex::SoPlex::TIMELIMIT, getMaxSeconds());
-   const int max_iter = getMaxIter();
-   simplex_->setIntParam(soplex::SoPlex::ITERLIMIT,max_iter);
+   simplex_->setRealParam(soplex::SoPlex::TIMELIMIT, maxsec);
+   simplex_->setIntParam(soplex::SoPlex::ITERLIMIT, maxiter);
    simplex_->setIntParam(soplex::SoPlex::VERBOSITY, soplex::SoPlex::VERBOSITY_ERROR);
-//    simplex_->setRealParam(SoPlex::FEASTOL, tolerance);
-//    simplex_->setRealParam(SoPlex::OPTTOL, tolerance);
-
-   simplex_->solve();
-   simplex_->ignoreUnscaledViolations();
-
-   soplex::SPxSolver::Status soplex_status = simplex_->status();
-   
-   if (soplex_status==soplex::SPxSolver::OPTIMAL)
-   {
-      setObjVal(simplex_->objValueReal());
-
-      int m = getNbLinCtrs();
-      int n = getNbLinVars();
-
-      soplex::DVectorReal solution(n);
-      simplex_->getPrimalReal(solution);
-      for (int i=0; i<n; ++i)
-      {
-         LinVar v = getLinVar(i);
-         v.setObjVal(solution[i]);
-      }
-
-      // RAPHAEL
-      // assigns the values of the dual variables (multipliers)
-      soplex::DVectorReal dual(m+n);
-      simplex_->getDualReal(dual);
-      // first for the primal constraints
-      for (int i=0; i<m; ++i)
-      {
-         LinCtr c = getLinCtr(i);
-         c.setMultiplier(dual[i]);
-      }
-      // second for the primal bound constraints
-      for (int i=0; i<n; ++i)
-      {
-         LinVar v = getLinVar(i);
-         v.setMultiplier(dual[m+i]);
-      }
-
-      setStatus(OptimizationStatus::Optimal);
-      return true;
-   }
-   else
-   {
-      setStatus(OptimizationStatus::Other);
-
-      if (soplex_status==soplex::SPxSolver::INFEASIBLE ||
-            soplex_status==soplex::SPxSolver::UNBOUNDED)
-         setStatus(OptimizationStatus::Infeasible);
-
-      if (soplex_status==soplex::SPxSolver::ABORT_TIME)
-         setStatus(OptimizationStatus::StopOnIterLimit);
-
-      if (soplex_status==soplex::SPxSolver::ABORT_ITER)
-         setStatus(OptimizationStatus::StopOnTimeLimit);
-
-      return false;
-   }
+   simplex_->setRealParam(soplex::SoPlex::FEASTOL, tol);
+   simplex_->setRealParam(soplex::SoPlex::OPTTOL, tol);
 }
 
-bool LPSolver::optimize()
+LPStatus LPSolver::run()
+{
+   LOG_INTER("Runs LP Solver SoPlex on \n---\n" << (*this) << "---");
+
+   simplex_->optimize();
+   simplex_->ignoreUnscaledViolations();
+
+   LPStatus status = toLPStatus();
+
+#if LOG_ON
+   if (status == LPStatus::Optimal)
+   {
+      LOG_INTER("Status: " << status << std::endl
+                           << "Cost:   " << costSolution() << std::endl
+                           << "Primal: " << primalSolution() << std::endl
+                           << "Dual:   " << dualSolution() << std::endl);
+   }
+   else
+      LOG_INTER("Status: " << status << std::endl);
+#endif
+
+   return status;
+}
+
+LPStatus LPSolver::optimize()
 {
    makeSoplexSimplex();
    return run();
 }
 
-bool LPSolver::reoptimize()
+LPStatus LPSolver::reoptimize()
 {
-   makeObj();
+   makeCost();
    return run();
 }
 
-} // namespace
+double LPSolver::costSolution() const
+{
+   return simplex_->objValueReal();
+}
+
+RealVector LPSolver::primalSolution() const
+{
+   size_t n = getNbLinVars();
+   RealVector primal(n);
+   soplex::DVectorReal solution(n);
+   simplex_->getPrimal(solution);
+   for (int i = 0; i < n; ++i)
+      primal[i] = solution[i];
+   return primal;
+}
+
+RealVector LPSolver::dualSolution() const
+{
+   size_t p = getNbLinVars() + getNbLinCtrs();
+   RealVector dual(p);
+   soplex::DVectorReal dual_sol(p);
+   simplex_->getDual(dual_sol);
+   for (size_t i = 0; i < p; i++)
+      dual[i] = dual_sol[i];
+   return dual;
+}
+
+bool LPSolver::infeasibleRay(RealVector &ray) const
+{
+   LPStatus status = toLPStatus();
+
+   if ((status != LPStatus::Infeasible) && (status != LPStatus::InfeasibleOrUnbounded))
+      return false;
+
+   size_t p = getNbLinVars() + getNbLinCtrs();
+   if (ray.size() != p)
+      ray.resize(p);
+
+   // gets the ray
+   bool hasRay = simplex_->hasDualFarkas();
+   if (hasRay)
+   {
+      soplex::DVector dual_farkas(p);
+      hasRay = simplex_->getDualFarkas(dual_farkas);
+      if (hasRay)
+         for (size_t i = 0; i < p; i++)
+            ray[i] = dual_farkas[i];
+   }
+
+   if (!hasRay)
+   {
+      // Technique implemented in SCIP
+      int dualdir = (getSense() == LPSense::Min) ? 1.0 : -1.0;
+
+      soplex::DVector lhs(p), rhs(p);
+      simplex_->getLhsReal(lhs);
+      simplex_->getRhsReal(rhs);
+      for (int i = 0; i < getNbLinCtrs(); ++i)
+      {
+         if (lhs[i] > 0.0)
+            ray[i] = dualdir;
+         else if (rhs[i] < 0.0)
+            ray[i] = -dualdir;
+         else
+            ray[i] = 0.0;
+      }
+   }
+   return hasRay;
+}
+
+} // namespace realpaver

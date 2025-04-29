@@ -1,0 +1,19 @@
+# In: Luksan L. and Vleck J.
+#     Sparse and partially separable test problems for unconstrained
+#     and equality constrained optimization.
+#     Research Report 767, Institute of Computer Science, Academy of 
+#     Sciences of the Czeck Republic, Janvier 1999
+
+Variables
+x1 in [0, 2*PI-0.001],
+x2 in [0, 2*PI-0.001],
+x3 in [0, 2*PI-0.001],
+x4 in [0, 2*PI-0.001],
+x5 in [0, 2*PI-0.001];
+
+Constraints
+5+1*(1-cos(x1))-sin(x1)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5) == 0,
+5+2*(1-cos(x2))-sin(x2)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5) == 0,
+5+3*(1-cos(x3))-sin(x3)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5) == 0,
+5+4*(1-cos(x4))-sin(x4)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5) == 0,
+5+5*(1-cos(x5))-sin(x5)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5) == 0;

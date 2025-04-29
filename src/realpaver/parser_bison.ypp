@@ -32,11 +32,14 @@ extern char* realpaver_bison_text;
 extern int realpaver_bison_lineno;
 extern std::string realpaver_parse_error;
 extern realpaver::Problem* realpaver_bison_problem;
-extern realpaver::Param* realpaver_bison_param;
+extern realpaver::Params* realpaver_bison_params;
 extern realpaver::SymbolTable* realpaver_bison_symtab;
 
 extern std::vector<realpaver::Variable>* realpaver_var_vector;
 extern std::vector<realpaver::Interval>* realpaver_itv_vector;
+
+extern std::vector<realpaver::Constraint>* realpaver_ctr_pieces;
+extern std::vector<realpaver::Interval>* realpaver_itv_pieces;
 
 extern realpaver::IntervalUnion* realpaver_itv_union;
 extern realpaver::RangeUnion* realpaver_range_union;
@@ -80,7 +83,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_IDENT TK_INT TK_REAL
 %token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT TK_STR_TOL TK_STR_BIN TK_STR_REAL
-%token TK_TABLE
+%token TK_TABLE TK_PW
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT TK_IMPLY
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
@@ -92,15 +95,14 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 
 %left TK_PLUS TK_MINUS
 %left TK_MUL TK_DIV
-%right TK_UMINUS
-%right TK_UPLUS
+%right TK_UMINUS TK_UPLUS
 %right TK_CARET
 
 %start model
 
 %%
 model
-  : 
+  :
   | statement TK_SCOLON model
   ;
 
@@ -145,7 +147,7 @@ const_def
         std::ostringstream os;
         os << "Symbol [" << $1 << "] already used";
         realpaver_bison_error(os.str().c_str());
-        YYABORT;         
+        YYABORT;
       }
 
       realpaver_bison_symtab->insertConstant($1, x);
@@ -173,13 +175,13 @@ var_def
         std::ostringstream os;
         os << "Symbol [" << $1 << "] already used";
         realpaver_bison_error(os.str().c_str());
-        YYABORT;         
+        YYABORT;
       }
 
       realpaver::Variable v = realpaver_bison_problem->addVar($1);
 
-      double rtol = realpaver_bison_param->getDblParam("VAR_REL_TOL"),
-             atol = realpaver_bison_param->getDblParam("VAR_ABS_TOL");
+      double rtol = realpaver_bison_params->getDblParam("VAR_REL_TOL"),
+             atol = realpaver_bison_params->getDblParam("VAR_ABS_TOL");
       v.setTolerance(realpaver::Tolerance(rtol, atol));
 
       realpaver_bison_symtab->insertVariable($1, v);
@@ -218,7 +220,7 @@ var_real_dom
     {
        realpaver::Term::SharedRep e($1);
        realpaver::Interval x = e->evalConst();
-       
+
        if (x.isEmpty())
        {
          realpaver_bison_error("Real variable with empty domain");
@@ -297,10 +299,10 @@ var_tol
         realpaver::Term::SharedRep ea($5);
         realpaver::Interval xa = ea->evalConst();
         double atol = xa.right();
-         
+
         if ((rtol<0.0) || (atol<0.0))
         {
-          YYABORT;         
+          YYABORT;
         }
         else
         {
@@ -326,7 +328,7 @@ var_int_dom
     {
       realpaver::Term::SharedRep e($1);
       realpaver::Range x = realpaver::Range::roundInward(e->evalConst());
-       
+
       if (x.isEmpty())
       {
         realpaver_bison_error("Integer variable with empty domain");
@@ -412,7 +414,7 @@ alias_def
         std::ostringstream os;
         os << "Symbol [" << $1 << "] already used";
         realpaver_bison_error(os.str().c_str());
-        YYABORT;         
+        YYABORT;
       }
 
       realpaver_bison_symtab->insertAlias($1, t);
@@ -518,7 +520,7 @@ ctr_atom
       else
         realpaver_itv_vector = new std::vector<realpaver::Interval>();
     }
-    TK_LPAR TK_LCBR table_list_var TK_RCBR TK_COMMA    
+    TK_LPAR TK_LCBR table_list_var TK_RCBR TK_COMMA
                      TK_LCBR table_list_val TK_RCBR TK_RPAR
     {
       if (realpaver_var_vector->size() == 0 ||
@@ -532,6 +534,42 @@ ctr_atom
                                      realpaver_var_vector->size(),
                                      realpaver_itv_vector->data(),
                                      realpaver_itv_vector->size()) );
+      $$ = c.cloneRoot();
+    }
+    | TK_PW
+    {
+      if (realpaver_itv_pieces != nullptr)
+         realpaver_itv_pieces->clear();
+      else
+        realpaver_itv_pieces = new std::vector<realpaver::Interval>();
+
+      if (realpaver_ctr_pieces != nullptr)
+         realpaver_ctr_pieces->clear();
+      else
+        realpaver_ctr_pieces = new std::vector<realpaver::Constraint>();
+    }
+    TK_LPAR ident TK_COMMA TK_LCBR piece_list TK_RCBR TK_RPAR
+    {
+      realpaver::VariableSymbol* vs =
+         realpaver_bison_symtab->findVariable($4);
+
+      if (vs == nullptr)
+      {
+         std::ostringstream os;
+         os << "Identifier [" << $4 << "] not found";
+         realpaver_bison_error(os.str().c_str());
+         YYABORT;
+      }
+      if (realpaver_itv_pieces->size()==0 ||
+          realpaver_ctr_pieces->size()==0)
+      {
+         realpaver_bison_error("Bad initialization of a piecewise constraint");
+         YYABORT;
+      }
+      realpaver::Constraint c( piecewise(vs->getVar(),
+                                         *realpaver_itv_pieces,
+                                         *realpaver_ctr_pieces,
+                                         realpaver_bison_problem) );
       $$ = c.cloneRoot();
     }
   ;
@@ -570,7 +608,7 @@ obj_def
         YYABORT;
       }
 
-      realpaver_bison_problem->addObjective(MAX(f));       
+      realpaver_bison_problem->addObjective(MAX(f));
     }
   ;
 
@@ -589,13 +627,13 @@ fun_tail
 
 fun_def
   : ident TK_LPAR
-    {       
+    {
       if (realpaver_bison_symtab->hasSymbol($1))
       {
         std::ostringstream os;
         os << "Symbol [" << $1 << "] already used";
         realpaver_bison_error(os.str().c_str());
-        YYABORT;         
+        YYABORT;
       }
 
       realpaver_fun_symbol = realpaver_bison_symtab->insertFunction($1);
@@ -603,13 +641,13 @@ fun_def
     arg_list TK_RPAR TK_EQ expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($7));
-      bool ok = realpaver_fun_symbol->setTerm(t);      
+      bool ok = realpaver_fun_symbol->setTerm(t);
       realpaver_fun_symbol = nullptr;
 
       if (!ok)
       {
         realpaver_bison_error("Bad variable in a function expression");
-        YYABORT;                  
+        YYABORT;
       }
     }
   ;
@@ -673,7 +711,7 @@ table_list_val
       realpaver::TermCst* cst = static_cast<realpaver::TermCst*>($1);
       realpaver::Interval x(cst->evalConst());
       delete cst;
-      
+
       if (x.isEmpty())
       {
         realpaver_bison_error("Empty interval in a table constraint");
@@ -696,6 +734,45 @@ table_list_val_def
   : const_expr
     {
        $$ = $1;
+    }
+  ;
+
+piece_list
+  : piece_def piece_tail
+  ;
+
+piece_tail
+  :
+  | TK_COMMA piece_list
+  ;
+
+piece_def
+  : itv TK_COLON ctr_atom
+    {
+      realpaver::TermCst* cst = static_cast<realpaver::TermCst*>($1);
+      realpaver::Interval x(cst->evalConst());
+      delete cst;
+
+      if (x.isEmpty())
+      {
+        realpaver_bison_error("Empty interval in a piecewise constraint");
+        YYABORT;
+      }
+      else
+      {
+        realpaver_itv_pieces->push_back(x);
+      }
+
+      try {
+        realpaver::Constraint::SharedRep brep($3);
+        realpaver::Constraint body(brep);
+        realpaver_ctr_pieces->push_back(body);
+      }
+      catch (realpaver::Exception& e)
+      {
+        realpaver_bison_error("Bad definition of a piecewise constraint");
+        YYABORT;
+      }
     }
   ;
 
@@ -748,6 +825,7 @@ expr
       realpaver::Term t(realpaver::Term::SharedRep($1)),
                       e(realpaver::Term::SharedRep($3)),
                       res(pow(t, e));
+
       $$ = res.cloneRoot();
     }
   | TK_POW TK_LPAR expr TK_COMMA expr TK_RPAR
@@ -969,7 +1047,7 @@ fun_call
        else
        {
          realpaver_bison_error("Function call invalid");
-         YYABORT;          
+         YYABORT;
        }
     }
   ;
@@ -1012,7 +1090,7 @@ integer
       {
         realpaver_bison_error("Bad integer value");
         YYABORT;
-      }       
+      }
     }
   ;
 
@@ -1029,7 +1107,7 @@ real
       {
         realpaver_bison_error("Bad real number");
         YYABORT;
-      }       
+      }
     }
   ;
 
@@ -1087,7 +1165,7 @@ ident
 
 int realpaver_bison_error(const char* str)
 {
-  std::ostringstream os;   
+  std::ostringstream os;
   os << "l" << realpaver_bison_lineno << ": " << str;
 
   realpaver_parse_error = os.str();

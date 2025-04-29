@@ -2,19 +2,19 @@
 #     Noncongruence Subgroups, Covers and Drawings.
 #     In The Grothendieck Theory of Dessins d'Enfants, editor: Schneps, L.
 #     London Mathematical Society Lecture Series 200,
-#     Cambridge University Press, pages 25-46, 1994. 
+#     Cambridge University Press, pages 25-46, 1994.
 
 Variables
-   x1 in [-1.0e1, 1.0e1],
-   x2 in [-1.0e1, 1.0e1],
-   x3 in [-1.0e1, 1.0e1],
-   x4 in [-1.0e1, 1.0e1],
-   x5 in [-1.0e1, 1.0e1],
-   x6 in [-1.0e1, 1.0e1],
-   x7 in [-1.0e1, 1.0e1],
-   x8 in [-1.0e1, 1.0e1],
-   x9 in [-1.0e1, 1.0e1],
-   x10 in [-1.0e1, 1.0e1];
+   x1 in [-1.0e8, 1.0e8],
+   x2 in [-1.0e8, 1.0e8],
+   x3 in [-1.0e8, 1.0e8],
+   x4 in [-1.0e8, 1.0e8],
+   x5 in [-1.0e8, 1.0e8],
+   x6 in [-1.0e8, 1.0e8],
+   x7 in [-1.0e8, 1.0e8],
+   x8 in [-1.0e8, 1.0e8],
+   x9 in [-1.0e8, 1.0e8],
+   x10 in [-1.0e8, 1.0e8];
 
 Constraints
    16*x1*x6 + 18*x2*x5 + 20*x3*x8 == 0,

@@ -1,0 +1,23 @@
+# In: Harmandeep Singh and Janak Raj Sharma.
+#     Simple and Efficient Fifth Order Solvers for Systems 
+#     of Nonlinear Problems.
+#     Mathematical Modelling and Analysis. Volume 28, Issue 1,
+#     1–22, 2023.
+
+Variables
+x1 in [-1.0e2, 1.0e2],
+x2 in [-1.0e2, 1.0e2],
+x3 in [-1.0e2, 1.0e2],
+x4 in [-1.0e2, 1.0e2],
+x5 in [-1.0e2, 1.0e2];
+
+Constraints
+exp(-x1)-x2-x3-x4-x5 == 0,
+exp(-x2)-x1-x3-x4-x5 == 0,
+exp(-x3)-x1-x2-x4-x5 == 0,
+exp(-x4)-x1-x2-x3-x5 == 0,
+exp(-x5)-x1-x2-x3-x4 == 0,
+x1 <= x2,
+x1 <= x3,
+x1 <= x4,
+x1 <= x5;

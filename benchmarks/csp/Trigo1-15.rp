@@ -1,0 +1,37 @@
+# In: Moré JJ, Garbow BS, Hillstrom KE.
+#     Testing unconstrained optimization software.
+#     ACM Trans Math Software 1981, 7(1):17–41.
+
+Variables
+x1 in [1e-8, 2*PI-1e-8],
+x2 in [1e-8, 2*PI-1e-8],
+x3 in [1e-8, 2*PI-1e-8],
+x4 in [1e-8, 2*PI-1e-8],
+x5 in [1e-8, 2*PI-1e-8],
+x6 in [1e-8, 2*PI-1e-8],
+x7 in [1e-8, 2*PI-1e-8],
+x8 in [1e-8, 2*PI-1e-8],
+x9 in [1e-8, 2*PI-1e-8],
+x10 in [1e-8, 2*PI-1e-8],
+x11 in [1e-8, 2*PI-1e-8],
+x12 in [1e-8, 2*PI-1e-8],
+x13 in [1e-8, 2*PI-1e-8],
+x14 in [1e-8, 2*PI-1e-8],
+x15 in [1e-8, 2*PI-1e-8];
+
+Constraints
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+1*(1-cos(x1))-sin(x1) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+2*(1-cos(x2))-sin(x2) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+3*(1-cos(x3))-sin(x3) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+4*(1-cos(x4))-sin(x4) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+5*(1-cos(x5))-sin(x5) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+6*(1-cos(x6))-sin(x6) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+7*(1-cos(x7))-sin(x7) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+8*(1-cos(x8))-sin(x8) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+9*(1-cos(x9))-sin(x9) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+10*(1-cos(x10))-sin(x10) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+11*(1-cos(x11))-sin(x11) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+12*(1-cos(x12))-sin(x12) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+13*(1-cos(x13))-sin(x13) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+14*(1-cos(x14))-sin(x14) == 15,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+15*(1-cos(x15))-sin(x15) == 15;

@@ -16,31 +16,29 @@
  * @brief  Distant-Most Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include <algorithm>
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSpaceDMDFS.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
+#include <algorithm>
 
 namespace realpaver {
 
 DistCalculator::~DistCalculator()
-{}
+{
+}
 
 /*----------------------------------------------------------------------------*/
 
-double HausdorffDistCalculator::distance(const DomainBox& db1,
-                                         const DomainBox& db2)
+double HausdorffDistCalculator::distance(const DomainBox &db1, const DomainBox &db2)
 {
-   ASSERT(db1.scope() == db2.scope(),
-          "The scopes of the two boxes must be equal");
+   ASSERT(db1.scope() == db2.scope(), "The scopes of the two boxes must be equal");
 
    double d = 0.0;
-   for (const auto& v : db1.scope())
+   for (const auto &v : db1.scope())
    {
-      Interval x = db1.get(v)->intervalHull(),
-               y = db2.get(v)->intervalHull();
+      Interval x = db1.get(v)->intervalHull(), y = db2.get(v)->intervalHull();
       double e = x.distance(y);
 
       if (e > d)
@@ -52,20 +50,23 @@ double HausdorffDistCalculator::distance(const DomainBox& db1,
 /*----------------------------------------------------------------------------*/
 
 CSPSpaceDMDFS::CSPSpaceDMDFS()
-      : vnode_(), vsol_(), dcalc_(nullptr)
+    : vnode_()
+    , vsol_()
+    , dcalc_(nullptr)
 {
    dcalc_ = new HausdorffDistCalculator();
 }
 
 CSPSpaceDMDFS::~CSPSpaceDMDFS()
 {
-   if (dcalc_ != nullptr) delete dcalc_;
+   if (dcalc_ != nullptr)
+      delete dcalc_;
 }
 
-void
-CSPSpaceDMDFS::setDistCalculator(std::unique_ptr<DistCalculator> dcalc)
+void CSPSpaceDMDFS::setDistCalculator(std::unique_ptr<DistCalculator> dcalc)
 {
-   if (dcalc_ != nullptr) delete dcalc_;
+   if (dcalc_ != nullptr)
+      delete dcalc_;
 
    dcalc_ = dcalc.release();
 }
@@ -75,12 +76,12 @@ size_t CSPSpaceDMDFS::nbSolNodes() const
    return vsol_.size();
 }
 
-void CSPSpaceDMDFS::pushSolNode(const SharedCSPNode& node)
+void CSPSpaceDMDFS::pushSolNode(const SharedCSPNode &node)
 {
    vsol_.push_back(node);
 
    // update the distances
-   for (auto& elem : vnode_)
+   for (auto &elem : vnode_)
    {
       double d = dcalc_->distance(*node->box(), *elem.node->box());
 
@@ -120,21 +121,22 @@ bool CSPSpaceDMDFS::hasFeasibleSolNode() const
 void CSPSpaceDMDFS::makeSolClusters(double gap)
 {
    // no clustering if the gap is negative
-   if (gap < 0.0) return;
+   if (gap < 0.0)
+      return;
 
    // clustering from the super class
    CSPSpace::makeSolClusters(gap);
 
    // it is necessary to update the distance between each pending node and its
    // closest solution.
-   for (auto& elem : vnode_)
+   for (auto &elem : vnode_)
    {
-      DomainBox* reg = elem.node->box();
+      DomainBox *reg = elem.node->box();
       elem.mindist = Double::inf();
 
-      for (auto& sol : vsol_)
+      for (auto &sol : vsol_)
       {
-         DomainBox* regsol = sol->box();
+         DomainBox *regsol = sol->box();
          double d = dcalc_->distance(*reg, *regsol);
 
          if (d < elem.mindist)
@@ -158,13 +160,13 @@ SharedCSPNode CSPSpaceDMDFS::nextPendingNode()
    return node;
 }
 
-void CSPSpaceDMDFS::insertPendingNode(const SharedCSPNode& node)
+void CSPSpaceDMDFS::insertPendingNode(const SharedCSPNode &node)
 {
    // Finds the distance to the closest solution
    double d = Double::inf();
-   for (auto& sol : vsol_)
+   for (auto &sol : vsol_)
    {
-      DomainBox* reg = sol->box();
+      DomainBox *reg = sol->box();
       double e = dcalc_->distance(*reg, *node->box());
 
       if (e < d)
@@ -174,7 +176,7 @@ void CSPSpaceDMDFS::insertPendingNode(const SharedCSPNode& node)
    LOG_INTER("Insert node " << node->index()
                             << " / distance to the closest solution : " << d);
 
-   Elem elem = { node, d };
+   Elem elem = {node, d};
    vnode_.push_back(elem);
 }
 
@@ -185,4 +187,4 @@ SharedCSPNode CSPSpaceDMDFS::getPendingNode(size_t i) const
    return vnode_[i].node;
 }
 
-} // namespace
+} // namespace realpaver

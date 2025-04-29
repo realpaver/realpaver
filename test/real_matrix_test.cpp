@@ -1,5 +1,5 @@
-#include "test_config.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include "test_config.hpp"
 
 void test_inv_1()
 {
@@ -47,38 +47,38 @@ void test_inv_4()
 
 void test_LU_1()
 {
-   RealMatrix M({{4,3}, {6, 3}});
-   RealMatrix L(2,2), U(2,2);
+   RealMatrix M({{4, 3}, {6, 3}});
+   RealMatrix L(2, 2), U(2, 2);
 
-   M.LU(L,U);
-   TEST_TRUE(M==L*U);
+   M.LU(L, U);
+   TEST_TRUE(M == L * U);
 }
 
 void test_LU_2()
 {
    RealMatrix M({{2, -1, 2}, {-4, 6, 3}, {-4, -2, 8}});
-   RealMatrix L(3,3), U(3,3);
+   RealMatrix L(3, 3), U(3, 3);
 
    M.LU(L, U);
-   TEST_TRUE(M==L*U);
+   TEST_TRUE(M == L * U);
 }
 
 void test_LU_3()
 {
-   RealMatrix M({ { 2, -1, -2 }, { -4, 6, 3 }, { -4, -2, 8 } });
-   RealMatrix L(3,3), U(3,3);
-   
-   M.LU(L,U);
-   TEST_TRUE(M==L*U);
+   RealMatrix M({{2, -1, -2}, {-4, 6, 3}, {-4, -2, 8}});
+   RealMatrix L(3, 3), U(3, 3);
+
+   M.LU(L, U);
+   TEST_TRUE(M == L * U);
 }
 
 void test_LU_4()
 {
    RealMatrix M({{25, 5, 4}, {10, 8, 16}, {8, 12, 22}});
-   RealMatrix L(3,3), U(3,3);
+   RealMatrix L(3, 3), U(3, 3);
 
-   M.LU(L,U);
-   TEST_TRUE(M==L*U);
+   M.LU(L, U);
+   TEST_TRUE(M == L * U);
 }
 
 int main()

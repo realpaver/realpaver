@@ -18,26 +18,27 @@
  * @date   2024-4-11
  */
 
-#include <memory>
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Variable.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include <memory>
 
 namespace realpaver {
 
 int VariableRep::NEXT_ID = 0;
 
-VariableRep::VariableRep(const std::string& name)
-      : name_(name),
-        id_(NEXT_ID++),
-        dom_(nullptr),
-        tol_(0.0, 0.0)
+VariableRep::VariableRep(const std::string &name)
+    : name_(name)
+    , id_(NEXT_ID++)
+    , dom_(nullptr)
+    , tol_(0.0, 0.0)
 {
    dom_ = new IntervalDomain(Interval::universe());
 }
 
 VariableRep::~VariableRep()
 {
-   if (dom_ != nullptr) delete dom_;
+   if (dom_ != nullptr)
+      delete dom_;
 }
 
 size_t VariableRep::id() const
@@ -55,21 +56,22 @@ std::string VariableRep::getName() const
    return name_;
 }
 
-void VariableRep::setName(const std::string& name)
+void VariableRep::setName(const std::string &name)
 {
    name_ = name;
 }
 
-Domain* VariableRep::getDomain() const
+Domain *VariableRep::getDomain() const
 {
    return dom_;
 }
 
-void VariableRep::setDomain(Domain* dom)
+void VariableRep::setDomain(Domain *dom)
 {
    THROW_IF(dom == nullptr, "The domain of " + getName() + " is null");
 
-   if (dom_ != nullptr) delete dom_;
+   if (dom_ != nullptr)
+      delete dom_;
    dom_ = dom;
 }
 
@@ -98,26 +100,29 @@ Tolerance VariableRep::getTolerance() const
    return tol_;
 }
 
-void VariableRep::setTolerance(const Tolerance& tol)
+void VariableRep::setTolerance(const Tolerance &tol)
 {
    tol_ = tol;
 }
 
 /*----------------------------------------------------------------------------*/
 
-Variable::Variable(const std::string& name)
-      : rep_(std::make_shared<VariableRep>(name))
-{}
+Variable::Variable(const std::string &name)
+    : rep_(std::make_shared<VariableRep>(name))
+{
+}
 
-Variable::Variable() : rep_(nullptr)
-{}
+Variable::Variable()
+    : rep_(nullptr)
+{
+}
 
 size_t Variable::id() const
 {
    return rep_->id();
 }
 
-Variable& Variable::setId(size_t id)
+Variable &Variable::setId(size_t id)
 {
    rep_->setId(id);
    return *this;
@@ -128,18 +133,18 @@ std::string Variable::getName() const
    return rep_->getName();
 }
 
-Variable& Variable::setName(const std::string& name)
+Variable &Variable::setName(const std::string &name)
 {
    rep_->setName(name);
    return *this;
 }
 
-Domain* Variable::getDomain() const
+Domain *Variable::getDomain() const
 {
    return rep_->getDomain();
 }
 
-Variable& Variable::setDomain(std::unique_ptr<Domain> dom)
+Variable &Variable::setDomain(std::unique_ptr<Domain> dom)
 {
    rep_->setDomain(dom.release());
    return *this;
@@ -170,26 +175,25 @@ Tolerance Variable::getTolerance() const
    return rep_->getTolerance();
 }
 
-Variable& Variable::setTolerance(const Tolerance& tol)
+Variable &Variable::setTolerance(const Tolerance &tol)
 {
    rep_->setTolerance(tol);
    return *this;
 }
 
-bool Variable::operator==(const Variable& other) const
+bool Variable::operator==(const Variable &other) const
 {
    return rep_.get() == other.rep_.get();
 }
 
-bool Variable::operator!=(const Variable& other) const
+bool Variable::operator!=(const Variable &other) const
 {
    return rep_.get() != other.rep_.get();
 }
 
-std::ostream& operator<<(std::ostream& os, const Variable& v)
+std::ostream &operator<<(std::ostream &os, const Variable &v)
 {
-   os << v.getName()
-      << " in " << (*v.getDomain());
+   os << v.getName() << " in " << (*v.getDomain());
 
    if (v.isReal())
       os << " " << v.getTolerance();
@@ -203,9 +207,7 @@ Variable Variable::clone() const
 
    std::unique_ptr<Domain> dom(getDomain()->clone());
 
-   v.setId(id())
-    .setDomain(std::move(dom))
-    .setTolerance(getTolerance());
+   v.setId(id()).setDomain(std::move(dom)).setTolerance(getTolerance());
 
    return v;
 }
@@ -215,4 +217,4 @@ bool Variable::hasNullPointer() const
    return rep_ == nullptr;
 }
 
-} // namespace
+} // namespace realpaver

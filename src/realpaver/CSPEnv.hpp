@@ -16,7 +16,7 @@
  * @brief  Environment for CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CSP_ENV_HPP
 #define REALPAVER_CSP_ENV_HPP
@@ -35,10 +35,10 @@ public:
    ~CSPEnv() = default;
 
    /// Default copy constructor
-   CSPEnv(const CSPEnv&) = default;
+   CSPEnv(const CSPEnv &) = default;
 
    /// No assignment
-   CSPEnv& operator=(const CSPEnv&) = delete;
+   CSPEnv &operator=(const CSPEnv &) = delete;
 
    /// Determines if the solving process is aborted due a solution limit
    void setSolutionLimit(bool b = true);
@@ -56,10 +56,10 @@ public:
    bool usedNoLimit() const;
 
 private:
-   bool slim_;    // solution limit reached
-   bool dlim_;    // depth limit reached in a search tree
+   bool slim_; // solution limit reached
+   bool dlim_; // depth limit reached in a search tree
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

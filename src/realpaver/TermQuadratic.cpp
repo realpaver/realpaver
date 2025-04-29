@@ -18,24 +18,25 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/TermQuadratic.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
-#include "realpaver/TermQuadratic.hpp"
 
 namespace realpaver {
 
 TermQuadratic::TermQuadratic()
-   : cst_(Interval::zero()),
-     sq_(),
-     sb_(),
-     sl_()
-{}
+    : cst_(Interval::zero())
+    , sq_()
+    , sb_()
+    , sl_()
+{
+}
 
-TermQuadratic::TermQuadratic(const Term& t)
-   : cst_(Interval::zero()),
-     sq_(),
-     sb_(),
-     sl_()
+TermQuadratic::TermQuadratic(const Term &t)
+    : cst_(Interval::zero())
+    , sq_()
+    , sb_()
+    , sl_()
 {
    TermQuadraticCreator creator(this);
    t.acceptVisitor(creator);
@@ -44,14 +45,15 @@ TermQuadratic::TermQuadratic(const Term& t)
       THROW("Creation of quadratic term failed");
 }
 
-void TermQuadratic::addConstant(const Interval& a)
+void TermQuadratic::addConstant(const Interval &a)
 {
    cst_ += a;
 }
 
-void TermQuadratic::addSquare(const Interval& a, const Variable& v)
+void TermQuadratic::addSquare(const Interval &a, const Variable &v)
 {
-   if (a.isZero()) return;
+   if (a.isZero())
+      return;
 
    Square s = {a, v};
    auto it = sq_.find(s);
@@ -73,11 +75,11 @@ void TermQuadratic::addSquare(const Interval& a, const Variable& v)
    }
 }
 
-void TermQuadratic::addBilin(const Interval& a, const Variable& v1,
-                             const Variable& v2)
+void TermQuadratic::addBilin(const Interval &a, const Variable &v1, const Variable &v2)
 {
-   if (a.isZero()) return;
-   
+   if (a.isZero())
+      return;
+
    if (v1.id() == v2.id())
    {
       addSquare(a, v1);
@@ -85,7 +87,8 @@ void TermQuadratic::addBilin(const Interval& a, const Variable& v1,
    }
 
    Bilin b = {a, v1, v2};
-   if (v1.id()>v2.id()) b = {a, v2, v1};
+   if (v1.id() > v2.id())
+      b = {a, v2, v1};
 
    auto it = sb_.find(b);
 
@@ -106,9 +109,10 @@ void TermQuadratic::addBilin(const Interval& a, const Variable& v1,
    }
 }
 
-void TermQuadratic::addLin(const Interval& a, const Variable& v)
+void TermQuadratic::addLin(const Interval &a, const Variable &v)
 {
-   if (a.isZero()) return;
+   if (a.isZero())
+      return;
 
    Lin l = {a, v};
    auto it = sl_.find(l);
@@ -133,48 +137,46 @@ void TermQuadratic::addLin(const Interval& a, const Variable& v)
 Term TermQuadratic::toTerm() const
 {
    Term t(cst_);
-   
-   for (const auto& s : sq_)
+
+   for (const auto &s : sq_)
    {
       if (s.coef.isCertainlyLeZero())
-         t -= (-s.coef)*sqr(s.v);
+         t -= (-s.coef) * sqr(s.v);
 
       else
-         t += s.coef*sqr(s.v);
-   }
-   
-   for (const auto& s : sb_)
-   {
-      if (s.coef.isCertainlyLeZero())
-         t -= (-s.coef)*s.v1*s.v2;
-
-      else
-         t += s.coef*s.v1*s.v2;
+         t += s.coef * sqr(s.v);
    }
 
-   for (const auto& s : sl_)
+   for (const auto &s : sb_)
    {
       if (s.coef.isCertainlyLeZero())
-         t -= (-s.coef)*s.v;
+         t -= (-s.coef) * s.v1 * s.v2;
 
       else
-         t += s.coef*s.v;
+         t += s.coef * s.v1 * s.v2;
+   }
+
+   for (const auto &s : sl_)
+   {
+      if (s.coef.isCertainlyLeZero())
+         t -= (-s.coef) * s.v;
+
+      else
+         t += s.coef * s.v;
    }
 
    return t;
 }
 
-
-std::ostream& operator<<(std::ostream& os, const TermQuadratic& t)
+std::ostream &operator<<(std::ostream &os, const TermQuadratic &t)
 {
-   for (const auto& s : t.sq_)
+   for (const auto &s : t.sq_)
       os << "(" << s.coef << " " << s.v.getName() << "^2)";
 
-   for (const auto& s : t.sb_)
-      os << "(" << s.coef << " "
-         << s.v1.getName() << " " << s.v2.getName() << ")";
+   for (const auto &s : t.sb_)
+      os << "(" << s.coef << " " << s.v1.getName() << " " << s.v2.getName() << ")";
 
-   for (const auto& s : t.sl_)
+   for (const auto &s : t.sl_)
       os << "(" << s.coef << " " << s.v.getName() << ")";
 
    if (!t.cst_.isZero())
@@ -187,16 +189,16 @@ Scope TermQuadratic::makeScope() const
 {
    Scope scop;
 
-   for (const auto& s : sq_)
+   for (const auto &s : sq_)
       scop.insert(s.v);
 
-   for (const auto& s : sb_)
+   for (const auto &s : sb_)
    {
       scop.insert(s.v1);
       scop.insert(s.v2);
    }
 
-   for (const auto& s : sl_)
+   for (const auto &s : sl_)
       scop.insert(s.v);
 
    return ScopeBank::getInstance()->insertScope(scop);
@@ -212,7 +214,7 @@ Term TermQuadratic::factorize() const
    // copy of the set of bilinear terms
    std::set<Bilin, CompBilin> bi(sb_);
 
-   for (const Variable& v : lv)
+   for (const Variable &v : lv)
    {
       Term vfactor(0.0);
 
@@ -250,9 +252,10 @@ Term TermQuadratic::factorize() const
             else
                vfactor += (*kt).coef * (*kt).v1;
 
-            kt = bi.erase(kt);            
+            kt = bi.erase(kt);
          }
-         else ++kt;
+         else
+            ++kt;
       }
 
       // linear term
@@ -274,11 +277,11 @@ Term TermQuadratic::factorize() const
    return t;
 }
 
-void TermQuadratic::sortByOcc(std::list<Variable>& lv) const
+void TermQuadratic::sortByOcc(std::list<Variable> &lv) const
 {
    Scope sco = makeScope();
 
-   for (const Variable& v : sco)
+   for (const Variable &v : sco)
    {
       int n = sco.count(v);
       auto it = lv.begin();
@@ -294,7 +297,8 @@ void TermQuadratic::sortByOcc(std::list<Variable>& lv) const
             if (n >= m)
                iter = false;
 
-            else ++it;
+            else
+               ++it;
          }
       }
 
@@ -304,10 +308,10 @@ void TermQuadratic::sortByOcc(std::list<Variable>& lv) const
 
 /*----------------------------------------------------------------------------*/
 
-TermQuadraticCreator::TermQuadraticCreator(TermQuadratic* qt)
-   : qt_(qt),
-     plus_(true),
-     success_(false)
+TermQuadraticCreator::TermQuadraticCreator(TermQuadratic *qt)
+    : qt_(qt)
+    , plus_(true)
+    , success_(false)
 {
    ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
 }
@@ -317,24 +321,24 @@ bool TermQuadraticCreator::visitSuccessfull() const
    return success_;
 }
 
-TermQuadratic* TermQuadraticCreator::getTermQuadratic() const
+TermQuadratic *TermQuadraticCreator::getTermQuadratic() const
 {
    return qt_;
 }
 
-void TermQuadraticCreator::apply(const TermCst* t)
+void TermQuadraticCreator::apply(const TermCst *t)
 {
    qt_->addConstant(plus_ ? t->getVal() : -t->getVal());
    success_ = true;
 }
 
-void TermQuadraticCreator::apply(const TermVar* t)
+void TermQuadraticCreator::apply(const TermVar *t)
 {
    qt_->addLin(plus_ ? 1.0 : -1.0, t->var());
    success_ = true;
 }
 
-void TermQuadraticCreator::apply(const TermAdd* t)
+void TermQuadraticCreator::apply(const TermAdd *t)
 {
    TermQuadraticCreator vl(qt_);
    vl.plus_ = plus_;
@@ -347,7 +351,7 @@ void TermQuadraticCreator::apply(const TermAdd* t)
    success_ = vl.success_ & vr.success_;
 }
 
-void TermQuadraticCreator::apply(const TermSub* t)
+void TermQuadraticCreator::apply(const TermSub *t)
 {
    TermQuadraticCreator vl(qt_);
    vl.plus_ = plus_;
@@ -360,19 +364,19 @@ void TermQuadraticCreator::apply(const TermSub* t)
    success_ = vl.success_ & vr.success_;
 }
 
-void TermQuadraticCreator::apply(const TermMul* t)
+void TermQuadraticCreator::apply(const TermMul *t)
 {
-   const TermCst* lcst = dynamic_cast<const TermCst*>(t->left().get());
-   const TermCst* rcst = dynamic_cast<const TermCst*>(t->right().get());
+   const TermCst *lcst = dynamic_cast<const TermCst *>(t->left().get());
+   const TermCst *rcst = dynamic_cast<const TermCst *>(t->right().get());
 
-   const TermVar* lvar = dynamic_cast<const TermVar*>(t->left().get());
-   const TermVar* rvar = dynamic_cast<const TermVar*>(t->right().get());
+   const TermVar *lvar = dynamic_cast<const TermVar *>(t->left().get());
+   const TermVar *rvar = dynamic_cast<const TermVar *>(t->right().get());
 
-   const TermMul* lmul = dynamic_cast<const TermMul*>(t->left().get());
-   const TermMul* rmul = dynamic_cast<const TermMul*>(t->right().get());
+   const TermMul *lmul = dynamic_cast<const TermMul *>(t->left().get());
+   const TermMul *rmul = dynamic_cast<const TermMul *>(t->right().get());
 
-   const TermSqr* lsqr = dynamic_cast<const TermSqr*>(t->left().get());
-   const TermSqr* rsqr = dynamic_cast<const TermSqr*>(t->right().get());
+   const TermSqr *lsqr = dynamic_cast<const TermSqr *>(t->left().get());
+   const TermSqr *rsqr = dynamic_cast<const TermSqr *>(t->right().get());
 
    if (lcst != nullptr && rcst != nullptr)
    {
@@ -383,7 +387,7 @@ void TermQuadraticCreator::apply(const TermMul* t)
    else if (lcst != nullptr && rvar != nullptr)
    {
       qt_->addLin(plus_ ? lcst->getVal() : -lcst->getVal(), rvar->var());
-      success_ = true;      
+      success_ = true;
    }
    else if (lcst != nullptr && rmul != nullptr)
    {
@@ -395,7 +399,7 @@ void TermQuadraticCreator::apply(const TermMul* t)
    }
    else if (lvar != nullptr && rcst != nullptr)
    {
-      qt_->addLin(plus_ ? rcst->getVal() : -rcst->getVal() , lvar->var());
+      qt_->addLin(plus_ ? rcst->getVal() : -rcst->getVal(), lvar->var());
       success_ = true;
    }
    else if (lvar != nullptr && rvar != nullptr)
@@ -405,15 +409,15 @@ void TermQuadraticCreator::apply(const TermMul* t)
    }
    else if (lvar != nullptr && rmul != nullptr)
    {
-      success_ =  makeProd(lvar, rmul);
+      success_ = makeProd(lvar, rmul);
    }
    else if (lmul != nullptr && rcst != nullptr)
    {
-      success_ =  makeProd(rcst, rmul);
+      success_ = makeProd(rcst, rmul);
    }
    else if (lmul != nullptr && rvar != nullptr)
    {
-      success_ =  makeProd(rvar, lmul);
+      success_ = makeProd(rvar, lmul);
    }
    else if (lsqr != nullptr && rcst != nullptr)
    {
@@ -421,25 +425,24 @@ void TermQuadraticCreator::apply(const TermMul* t)
    }
 }
 
-bool TermQuadraticCreator::makeProd(const TermCst* tc, const TermMul* tm)
+bool TermQuadraticCreator::makeProd(const TermCst *tc, const TermMul *tm)
 {
-   const TermVar* tvl = dynamic_cast<const TermVar*>(tm->left().get());
-   const TermVar* tvr = dynamic_cast<const TermVar*>(tm->right().get());
+   const TermVar *tvl = dynamic_cast<const TermVar *>(tm->left().get());
+   const TermVar *tvr = dynamic_cast<const TermVar *>(tm->right().get());
 
    if (tvl == nullptr || tvr == nullptr)
       return false;
 
    else
    {
-      qt_->addBilin(plus_ ? tc->getVal() : -tc->getVal(), tvl->var(),
-                    tvr->var());
+      qt_->addBilin(plus_ ? tc->getVal() : -tc->getVal(), tvl->var(), tvr->var());
       return true;
    }
 }
 
-bool TermQuadraticCreator::makeProd(const TermCst* tc, const TermSqr* ts)
+bool TermQuadraticCreator::makeProd(const TermCst *tc, const TermSqr *ts)
 {
-   const TermVar* tv = dynamic_cast<const TermVar* >(ts->child().get());
+   const TermVar *tv = dynamic_cast<const TermVar *>(ts->child().get());
    if (tv == nullptr)
       return false;
 
@@ -450,58 +453,62 @@ bool TermQuadraticCreator::makeProd(const TermCst* tc, const TermSqr* ts)
    }
 }
 
-bool TermQuadraticCreator::makeProd(const TermVar* tv, const TermMul* tm)
+bool TermQuadraticCreator::makeProd(const TermVar *tv, const TermMul *tm)
 {
-   const TermCst* tcl = dynamic_cast<const TermCst*>(tm->left().get());
-   const TermCst* tcr = dynamic_cast<const TermCst*>(tm->right().get());
+   const TermCst *tcl = dynamic_cast<const TermCst *>(tm->left().get());
+   const TermCst *tcr = dynamic_cast<const TermCst *>(tm->right().get());
 
-   const TermVar* tvl = dynamic_cast<const TermVar*>(tm->left().get());
-   const TermVar* tvr = dynamic_cast<const TermVar*>(tm->right().get());
+   const TermVar *tvl = dynamic_cast<const TermVar *>(tm->left().get());
+   const TermVar *tvr = dynamic_cast<const TermVar *>(tm->right().get());
 
    if (tcl != nullptr && tcr != nullptr)
    {
       Interval x = tcl->getVal() * tcr->getVal();
       qt_->addLin(plus_ ? x : -x, tv->var());
-      
+
       return true;
    }
    else if (tcl != nullptr && tvr != nullptr)
    {
-      qt_->addBilin(plus_ ? tcl->getVal() : -tcl->getVal(), tv->var(),
-                    tvr->var());
+      qt_->addBilin(plus_ ? tcl->getVal() : -tcl->getVal(), tv->var(), tvr->var());
       return true;
    }
    else if (tvl != nullptr && tcr != nullptr)
    {
-      qt_->addBilin(plus_ ? tcr->getVal() : -tcr->getVal(), tv->var(),
-                    tvl->var());      
+      qt_->addBilin(plus_ ? tcr->getVal() : -tcr->getVal(), tv->var(), tvl->var());
       return true;
    }
 
    return false;
 }
 
-void TermQuadraticCreator::apply(const TermDiv* t)
-{}
-
-void TermQuadraticCreator::apply(const TermMin* t)
-{}
-
-void TermQuadraticCreator::apply(const TermMax* t)
-{}
-
-void TermQuadraticCreator::apply(const TermUsb* t)
-{}
-
-void TermQuadraticCreator::apply(const TermAbs* t)
-{}
-
-void TermQuadraticCreator::apply(const TermSgn* t)
-{}
-
-void TermQuadraticCreator::apply(const TermSqr* t)
+void TermQuadraticCreator::apply(const TermDiv *t)
 {
-   const TermVar* tv = dynamic_cast<const TermVar*>(t->child().get());
+}
+
+void TermQuadraticCreator::apply(const TermMin *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermMax *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermUsb *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAbs *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermSgn *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermSqr *t)
+{
+   const TermVar *tv = dynamic_cast<const TermVar *>(t->child().get());
    if (tv == nullptr)
    {
       success_ = false;
@@ -513,34 +520,44 @@ void TermQuadraticCreator::apply(const TermSqr* t)
    }
 }
 
-void TermQuadraticCreator::apply(const TermSqrt* t)
-{}
+void TermQuadraticCreator::apply(const TermSqrt *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermPow* t)
-{}
+void TermQuadraticCreator::apply(const TermPow *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermExp* t)
-{}
+void TermQuadraticCreator::apply(const TermExp *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermLog* t)
-{}
+void TermQuadraticCreator::apply(const TermLog *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermCos* t)
-{}
+void TermQuadraticCreator::apply(const TermCos *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermSin* t)
-{}
+void TermQuadraticCreator::apply(const TermSin *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermTan* t)
-{}
+void TermQuadraticCreator::apply(const TermTan *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermCosh* t)
-{}
+void TermQuadraticCreator::apply(const TermCosh *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermSinh* t)
-{}
+void TermQuadraticCreator::apply(const TermSinh *t)
+{
+}
 
-void TermQuadraticCreator::apply(const TermTanh* t)
-{}
+void TermQuadraticCreator::apply(const TermTanh *t)
+{
+}
 
-} // namespace
+} // namespace realpaver

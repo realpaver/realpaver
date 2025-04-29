@@ -16,7 +16,7 @@
  * @brief  HC4Revise contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_HC4_REVISE_HPP
 #define REALPAVER_CONTRACTOR_HC4_REVISE_HPP
@@ -44,17 +44,17 @@ public:
    ContractorHC4Revise(SharedDag dag, size_t i);
 
    /// Default copy constructor
-   ContractorHC4Revise(const ContractorHC4Revise&) = default;
+   ContractorHC4Revise(const ContractorHC4Revise &) = default;
 
    /// Default assignment operator
-   ContractorHC4Revise& operator=(const ContractorHC4Revise&) = delete;
+   ContractorHC4Revise &operator=(const ContractorHC4Revise &) = delete;
 
    /// Default destructor
    ~ContractorHC4Revise() = default;
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
    /// Returns the dag
    SharedDag getDag() const;
@@ -63,10 +63,10 @@ public:
    size_t getFunIndex() const;
 
 private:
-   SharedDag dag_;   // dag
-   size_t idx_;      // function index in the dag
+   SharedDag dag_; // dag
+   size_t idx_;    // function index in the dag
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

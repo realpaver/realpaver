@@ -1,0 +1,28 @@
+Constants
+h = 1/(11)^2,
+x0 = 0,
+x11= 0;
+
+Variables
+x1 in [-1e8, 20],
+x2 in [-1e8, 20],
+x3 in [-1e8, 20],
+x4 in [-1e8, 20],
+x5 in [-1e8, 20],
+x6 in [-1e8, 20],
+x7 in [-1e8, 20],
+x8 in [-1e8, 20],
+x9 in [-1e8, 20],
+x10 in [-1e8, 20];
+
+Constraints
+x0-2*x1+x2+h*exp(x1) == 0,
+x1-2*x2+x3+h*exp(x2) == 0,
+x2-2*x3+x4+h*exp(x3) == 0,
+x3-2*x4+x5+h*exp(x4) == 0,
+x4-2*x5+x6+h*exp(x5) == 0,
+x5-2*x6+x7+h*exp(x6) == 0,
+x6-2*x7+x8+h*exp(x7) == 0,
+x7-2*x8+x9+h*exp(x8) == 0,
+x8-2*x9+x10+h*exp(x9) == 0,
+x9-2*x10+x11+h*exp(x10) == 0;

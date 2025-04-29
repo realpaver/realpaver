@@ -16,15 +16,15 @@
  * @brief  Management of floating-point numbers
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_DOUBLE_HPP
 #define REALPAVER_DOUBLE_HPP
 
+#include "realpaver/Common.hpp"
 #include <cfenv>
 #include <cmath>
 #include <limits>
-#include "realpaver/Common.hpp"
 
 namespace realpaver {
 
@@ -34,10 +34,10 @@ struct Double {
    using ValueType = double;
 
    /// Reference type
-   using RefType = double&;
+   using RefType = double &;
 
    /// Constant reference type
-   using ConstRefType = const double&;
+   using ConstRefType = const double &;
 
    /// Returns +Infinity
    static inline ValueType inf()
@@ -72,7 +72,7 @@ struct Double {
    /// Returns true if x is equal to -Infinity or +Infinity
    static inline bool isInf(ValueType x)
    {
-      return (x==inf()) || (x==neginf());
+      return (x == inf()) || (x == neginf());
    }
 
    /// Returns true if x is not a number
@@ -83,10 +83,10 @@ struct Double {
 
    /**
     * @brief Test of closeness of two numbers.
-    * 
+    *
     * Given an absolute tolerance abs_tol and a relative tolerance rel_tol, x is
     * close to y if |x - y| <= max( rtol*max(|x|, |y|), atol).
-    * 
+    *
     * Returns false if x or y is a NaN or +/-inf.
     */
    static inline bool isClose(ValueType x, ValueType y, ValueType rel_tol,
@@ -95,7 +95,7 @@ struct Double {
       if (isNan(x) || isNan(y) || isInf(x) || isInf(y))
          return false;
 
-      return abs(y-x) <= max(rel_tol*max(abs(x), abs(y)), abs_tol);
+      return abs(y - x) <= max(rel_tol * max(abs(x), abs(y)), abs_tol);
    }
 
    /// Returns the double before x
@@ -143,25 +143,25 @@ struct Double {
    /// Addition
    static inline ValueType add(ValueType x, ValueType y)
    {
-      return x+y;
+      return x + y;
    }
 
    /// Subtraction
    static inline ValueType sub(ValueType x, ValueType y)
    {
-      return x-y;
+      return x - y;
    }
 
    /// Multiplication
    static inline ValueType mul(ValueType x, ValueType y)
    {
-      return x*y;
+      return x * y;
    }
 
    /// Division
    static inline ValueType div(ValueType x, ValueType y)
    {
-      return x/y;
+      return x / y;
    }
 
    /// Addition with assignment
@@ -191,13 +191,13 @@ struct Double {
    /// Minimum of two numbers
    static inline ValueType min(ValueType x, ValueType y)
    {
-      return (x<y) ? x : y;
+      return (x < y) ? x : y;
    }
 
    /// Maximum of two numbers
    static inline ValueType max(ValueType x, ValueType y)
    {
-      return (x>y) ? x : y;
+      return (x > y) ? x : y;
    }
 
    /// Power function
@@ -209,7 +209,7 @@ struct Double {
    /// Absolute value
    static inline ValueType abs(ValueType x)
    {
-      return (x<0.0) ? (-x) : x;
+      return (x < 0.0) ? (-x) : x;
    }
 
    /// Unary subtraction
@@ -221,7 +221,7 @@ struct Double {
    /// Square
    static inline ValueType sqr(ValueType x)
    {
-      return x*x;
+      return x * x;
    }
 
    /// Square root
@@ -297,6 +297,6 @@ struct Double {
    }
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

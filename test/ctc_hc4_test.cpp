@@ -1,10 +1,10 @@
-#include "test_config.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/Problem.hpp"
+#include "test_config.hpp"
 
-Problem* prob;
-Dag* dag;
-IntervalBox* B;
+Problem *prob;
+Dag *dag;
+IntervalBox *B;
 Variable x, y, z;
 
 void init()
@@ -15,9 +15,9 @@ void init()
    z = prob->addRealVar(0, 0, "z");
 
    dag = new Dag();
-   dag->insert(sqr(x + y) - 2*z + 2 == 0);
-   dag->insert(sqr(x + y) - 2*z + 2 >= 0);
-   dag->insert(2*x - y + z == 1);
+   dag->insert(sqr(x + y) - 2 * z + 2 == 0);
+   dag->insert(sqr(x + y) - 2 * z + 2 >= 0);
+   dag->insert(2 * x - y + z == 1);
 
    B = new IntervalBox(prob->scope());
 }

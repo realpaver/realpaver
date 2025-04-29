@@ -43,7 +43,7 @@ public:
    virtual size_t index(size_t id) const = 0;
 
    /// Returns a clone of this
-   virtual AbstractScopeMap* clone() const = 0;
+   virtual AbstractScopeMap *clone() const = 0;
 
    /// Calculates an hash code
    virtual size_t hashCode() const = 0;
@@ -65,10 +65,10 @@ public:
    ScopeIdMap(size_t last);
 
    /// Copy constructor
-   ScopeIdMap(const ScopeIdMap& other);
+   ScopeIdMap(const ScopeIdMap &other);
 
    size_t index(size_t id) const override;
-   ScopeIdMap* clone() const override;
+   ScopeIdMap *clone() const override;
    size_t hashCode() const override;
    bool isIdentity() const override;
 
@@ -80,7 +80,7 @@ private:
 
 /**
  * @brief Mapping from a sequence of integers.
- * 
+ *
  * A sequence first, first+1, ..., last is mapped to 0, 1, ..., last-first.
  */
 class ScopeSeqMap : public AbstractScopeMap {
@@ -89,10 +89,10 @@ public:
    ScopeSeqMap(size_t first, size_t last);
 
    /// Copy constructor
-   ScopeSeqMap(const ScopeSeqMap& other);
+   ScopeSeqMap(const ScopeSeqMap &other);
 
    size_t index(size_t id) const override;
-   ScopeSeqMap* clone() const override;
+   ScopeSeqMap *clone() const override;
    size_t hashCode() const override;
 
 private:
@@ -103,7 +103,7 @@ private:
 
 /**
  * @brief General mapping.
- * 
+ *
  * A set of indexes i(k), i(k+1), ... is mapped to 0, 1, ...
  */
 class ScopeHashMap : public AbstractScopeMap {
@@ -112,20 +112,20 @@ public:
    ScopeHashMap();
 
    /// Copy constructor
-   ScopeHashMap(const ScopeHashMap& other);
+   ScopeHashMap(const ScopeHashMap &other);
 
    /// Inserts id in the domain of this
    void insert(size_t id);
 
    size_t index(size_t id) const override;
-   ScopeHashMap* clone() const override;
+   ScopeHashMap *clone() const override;
    size_t hashCode() const override;
 
 private:
-   std::unordered_map<size_t,size_t> m_;  // hash map
+   std::unordered_map<size_t, size_t> m_; // hash map
    size_t next_;                          // index of the next element
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

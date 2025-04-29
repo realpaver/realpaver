@@ -16,30 +16,28 @@
  * @brief  Factory of interval contractors
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/ContractorList.hpp"
 #include "realpaver/IntervalSmearSumRel.hpp"
+#include "realpaver/Linearizer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
-ContractorFactory::ContractorFactory(const Problem& pbm,
-                                     std::shared_ptr<Env> env)
-      : env_(env),
-        dag_(nullptr),
-        ve_(),
-        vi_(),
-        vc_(),
-        se_(),
-        si_(),
-        sc_()
+ContractorFactory::ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env)
+    : env_(env)
+    , dag_(nullptr)
+    , ve_()
+    , vi_()
+    , vc_()
+    , se_()
+    , si_()
+    , sc_()
 {
    // environment
    if (env == nullptr)
@@ -49,7 +47,7 @@ ContractorFactory::ContractorFactory(const Problem& pbm,
    dag_ = std::make_shared<Dag>();
 
    // separates the constraints in three parts
-   for (size_t i=0; i<pbm.nbCtrs(); ++i)
+   for (size_t i = 0; i < pbm.nbCtrs(); ++i)
    {
       Constraint c = pbm.ctrAt(i);
       try
@@ -66,7 +64,7 @@ ContractorFactory::ContractorFactory(const Problem& pbm,
             si_.insert(c.scope());
          }
       }
-      catch(Exception& e)
+      catch (Exception &e)
       {
          vc_.push_back(c);
          sc_.insert(c.scope());
@@ -91,7 +89,8 @@ SharedDag ContractorFactory::ContractorFactory::getDag() const
 
 std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
 {
-   if (dag_->isEmpty()) return nullptr;
+   if (dag_->isEmpty())
+      return nullptr;
 
    std::shared_ptr<IntervalSmearSumRel> ssr;
 
@@ -115,16 +114,16 @@ std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
    return ssr;
 }
 
-SharedContractorHC4 ContractorFactory::makeHC4(Tolerance tol)
+SharedContractorHC4 ContractorFactory::makeHC4(double tol)
 {
    // constraints from the dag
    SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(dag_);
 
    // other constraints
-   for (const Constraint& c : vc_)
+   for (const Constraint &c : vc_)
    {
-      std::shared_ptr<ContractorConstraint>
-         op = std::make_shared<ContractorConstraint>(c);
+      std::shared_ptr<ContractorConstraint> op =
+          std::make_shared<ContractorConstraint>(c);
       hc4->push(op);
    }
 
@@ -142,8 +141,8 @@ SharedContractorHC4 ContractorFactory::makeHC4(Tolerance tol)
 
 SharedContractorHC4 ContractorFactory::makeHC4()
 {
-   double rtol = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   return makeHC4(Tolerance(rtol, 0.0));
+   double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
+   return makeHC4(tol);
 }
 
 SharedContractorBC4 ContractorFactory::makeBC4()
@@ -152,10 +151,10 @@ SharedContractorBC4 ContractorFactory::makeBC4()
    SharedContractorBC4 bc4 = std::make_shared<ContractorBC4>(dag_);
 
    // other constraints
-   for (const Constraint& c : vc_)
+   for (const Constraint &c : vc_)
    {
-      std::shared_ptr<ContractorConstraint>
-         op = std::make_shared<ContractorConstraint>(c);
+      std::shared_ptr<ContractorConstraint> op =
+          std::make_shared<ContractorConstraint>(c);
       bc4->push(op);
    }
 
@@ -166,25 +165,56 @@ SharedContractorBC4 ContractorFactory::makeBC4()
       bc4->push(dop);
 
    // tuning of propagation
-   double val = env_->getParam()->getDblParam("PROPAGATION_REL_TOL");
-   bc4->setTol(Tolerance(val, 0.0));
+   double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
+   bc4->setTol(tol);
 
    // tuning of BC4Revise operators
-   val = env_->getParam()->getDblParam("BC3_PEEL_FACTOR");
-   bc4->setBC4RevisePeelFactor(val);
+   double f = env_->getParams()->getDblParam("BC3_PEEL_FACTOR");
+   bc4->setBC4RevisePeelFactor(f);
 
-   int niter = env_->getParam()->getIntParam("BC3_ITER_LIMIT");
+   int niter = env_->getParams()->getIntParam("BC3_ITER_LIMIT");
    bc4->setBC4ReviseMaxIter(niter);
 
    return bc4;
 }
 
+SharedContractorAffine ContractorFactory::makeAffine(double tol)
+{
+   // constraints from the dag
+   SharedContractorAffine ctc = std::make_shared<ContractorAffine>(dag_);
+
+   // other constraints
+   for (const Constraint &c : vc_)
+   {
+      std::shared_ptr<ContractorConstraint> op =
+          std::make_shared<ContractorConstraint>(c);
+      ctc->push(op);
+   }
+
+   // variables with disconnected domains
+   std::shared_ptr<ContractorDomain> dop = makeContractorDomain();
+
+   if (dop->nbVars() > 0)
+      ctc->push(dop);
+
+   // tuning of propagation
+   ctc->setTol(tol);
+
+   return ctc;
+}
+
+SharedContractorAffine ContractorFactory::makeAffine()
+{
+   double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
+   return makeAffine(tol);
+}
+
 std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
 {
-   size_t ne = ve_.size(),
-          nv = se_.size();
+   size_t ne = ve_.size(), nv = se_.size();
 
-   if ((ne < 2) || (ne != nv)) return nullptr;
+   if ((ne < 2) || (ne != nv))
+      return nullptr;
 
    std::shared_ptr<IntervalNewton> newton;
 
@@ -208,25 +238,25 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
    {
       LOG_LOW("Newton operator built by the factory");
 
-      double rtol = env_->getParam()->getDblParam("NEWTON_REL_TOL");
-      newton->setTol(Tolerance(rtol, 0.0));
+      double tol = env_->getParams()->getDblParam("NEWTON_TOL");
+      newton->setTol(tol);
 
-      double wl = env_->getParam()->getDblParam("NEWTON_WIDTH_LIMIT");
+      double wl = env_->getParams()->getDblParam("NEWTON_WIDTH_LIMIT");
       newton->setWidthLimit(wl);
 
-      int niter = env_->getParam()->getIntParam("NEWTON_ITER_LIMIT");
+      int niter = env_->getParams()->getIntParam("NEWTON_ITER_LIMIT");
       newton->setMaxIter(niter);
 
-      double delta = env_->getParam()->getDblParam("INFLATION_DELTA");
+      double delta = env_->getParams()->getDblParam("INFLATION_DELTA");
       newton->setInflationDelta(delta);
 
-      double chi = env_->getParam()->getDblParam("INFLATION_CHI");
+      double chi = env_->getParams()->getDblParam("INFLATION_CHI");
       newton->setInflationChi(chi);
 
-      rtol  = env_->getParam()->getDblParam("GAUSS_SEIDEL_REL_TOL");
-      newton->getGaussSeidel()->setTol(Tolerance(rtol, 0.0));
+      tol = env_->getParams()->getDblParam("GAUSS_SEIDEL_TOL");
+      newton->getGaussSeidel()->setTol(tol);
 
-      niter = env_->getParam()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
+      niter = env_->getParams()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
       newton->getGaussSeidel()->setMaxIter(niter);
    }
    else
@@ -256,46 +286,140 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
    return op;
 }
 
-SharedContractor ContractorFactory::makeHC4Newton()
-{
-   SharedContractorHC4 hc4 = makeHC4();
-   std::shared_ptr<IntervalNewton> newton = makeNewton();
-
-   if (newton != nullptr)
-   {
-      SharedContractorPool pool = std::make_shared<ContractorPool>();
-      pool->push(hc4);
-      pool->push(newton);
-      return std::make_shared<ContractorList>(pool);
-   }
-   else
-   {
-      return hc4;
-   }
-}
-
-SharedContractor ContractorFactory::makeACID()
+SharedContractorACID ContractorFactory::makeACID()
 {
    if (dag_->isEmpty() || (!dag_->scope().contains(sc_)))
    {
-      LOG_LOW("Unable to create an ACID contractor -> HC4 instead");
-      return makeHC4();
+      LOG_LOW("Unable to create an ACID contractor");
+      return nullptr;
    }
 
    std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
 
-   double rtol = env_->getParam()->getDblParam("ACID_HC4_REL_TOL");
-   SharedContractorHC4 hc4 = makeHC4(Tolerance(rtol, 0.0));
+   double tol = env_->getParams()->getDblParam("ACID_HC4_TOL");
+   SharedContractorHC4 hc4 = makeHC4(tol);
 
-   int ns3B = env_->getParam()->getIntParam("NB_SLICE_3B");
-   int nsCID = env_->getParam()->getIntParam("NB_SLICE_CID");
-   int learnLength = env_->getParam()->getIntParam("ACID_LEARN_LENGTH");
-   int cycleLength = env_->getParam()->getIntParam("ACID_CYCLE_LENGTH");
-   double ctRatio = env_->getParam()->getDblParam("ACID_CT_RATIO");
-   double varMinWidth = env_->getParam()->getDblParam("VAR3BCID_MIN_WIDTH");
+   int ns3B = env_->getParams()->getIntParam("NB_SLICE_3B");
+   int nsCID = env_->getParams()->getIntParam("NB_SLICE_CID");
+   int learnLength = env_->getParams()->getIntParam("ACID_LEARN_LENGTH");
+   int cycleLength = env_->getParams()->getIntParam("ACID_CYCLE_LENGTH");
+   double ctRatio = env_->getParams()->getDblParam("ACID_CT_RATIO");
+   double varMinWidth = env_->getParams()->getDblParam("VAR3BCID_MIN_WIDTH");
 
    return std::make_shared<ContractorACID>(ssr, hc4, ns3B, nsCID, learnLength,
                                            cycleLength, ctRatio, varMinWidth);
 }
 
-} // namespace
+SharedContractorPolytope ContractorFactory::makePolytope()
+{
+   if (dag_->isEmpty())
+      return nullptr;
+
+   SharedContractorPolytope op = nullptr;
+
+   bool ok = env_->getParams()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL") == "YES";
+
+   if (ok)
+   {
+      std::string relaxation = env_->getParams()->getStrParam("POLYTOPE_HULL_RELAXATION");
+
+      if (relaxation == "TAYLOR")
+      {
+         bool hansen =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
+
+         std::string corner =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_CORNER");
+
+         CornerStyle style;
+         if (corner == "RANDOM_OPPOSITE")
+            style = CornerStyle::RandomOpposite;
+         else if (corner == "RANDOM")
+            style = CornerStyle::Random;
+         else if (corner == "LEFT")
+            style = CornerStyle::Left;
+         else if (corner == "RIGHT")
+            style = CornerStyle::Right;
+
+         unsigned seed =
+             (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
+
+         std::unique_ptr<Linearizer> lzr =
+             std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
+
+         op = std::make_shared<ContractorPolytope>(std::move(lzr));
+      }
+      else if (relaxation == "AFFINE")
+      {
+         bool minrange =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
+
+         std::unique_ptr<Linearizer> lzr =
+             std::make_unique<LinearizerAffine>(dag_, minrange);
+
+         op = std::make_shared<ContractorPolytope>(std::move(lzr));
+      }
+      else if (relaxation == "AFFINE_TAYLOR")
+      {
+         bool hansen =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_HANSEN") == "YES";
+
+         std::string corner =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_TAYLOR_CORNER");
+
+         CornerStyle style;
+         if (corner == "RANDOM_OPPOSITE")
+            style = CornerStyle::RandomOpposite;
+         else if (corner == "RANDOM")
+            style = CornerStyle::Random;
+         else if (corner == "LEFT")
+            style = CornerStyle::Left;
+         else if (corner == "RIGHT")
+            style = CornerStyle::Right;
+
+         unsigned seed =
+             (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
+
+         std::unique_ptr<LinearizerTaylor> taylor =
+             std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
+
+         ASSERT(taylor != nullptr, "taylor null");
+
+         bool minrange =
+             env_->getParams()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
+
+         std::unique_ptr<LinearizerAffine> affine =
+             std::make_unique<LinearizerAffine>(dag_, minrange);
+
+         ASSERT(affine != nullptr, "affine null");
+
+         std::unique_ptr<Linearizer> lzr = std::make_unique<LinearizerAffineTaylor>(
+             dag_, std::move(affine), std::move(taylor));
+
+         op = std::make_shared<ContractorPolytope>(std::move(lzr));
+      }
+   }
+
+   if (op != nullptr)
+   {
+      double feas_tol = env_->getParams()->getDblParam("LP_FEAS_TOL");
+      op->setFeasTol(feas_tol);
+
+      double relax_tol = env_->getParams()->getDblParam("RELAXATION_EQ_TOL");
+      op->setRelaxTol(relax_tol);
+
+      int max_iter = env_->getParams()->getIntParam("LP_ITER_LIMIT");
+      op->setMaxIter(max_iter);
+
+      double max_time = env_->getParams()->getDblParam("LP_TIME_LIMIT");
+      op->setMaxSeconds(max_time);
+
+      bool loop = (env_->getParams()->getStrParam("POLYTOPE_HULL_LOOP") == "YES");
+      double looptol = env_->getParams()->getDblParam("POLYTOPE_HULL_LOOP_TOL");
+      op->enforceLoop(loop, looptol);
+   }
+
+   return op;
+}
+
+} // namespace realpaver

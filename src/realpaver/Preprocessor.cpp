@@ -18,27 +18,29 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/Preprocessor.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
-#include "realpaver/Preprocessor.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 Preprocessor::Preprocessor()
-      : vvm_(),
-        vim_(),
-        box_(nullptr),
-        inactive_(),
-        active_(),
-        unfeasible_(false),
-        timer_()
-{}
+    : vvm_()
+    , vim_()
+    , box_(nullptr)
+    , inactive_()
+    , active_()
+    , unfeasible_(false)
+    , timer_()
+{
+}
 
 Preprocessor::~Preprocessor()
 {
-   if (box_!=nullptr) delete box_;
+   if (box_ != nullptr)
+      delete box_;
 }
 
 bool Preprocessor::allVarsFixed() const
@@ -89,8 +91,8 @@ DomainBox Preprocessor::destRegion() const
    return box;
 }
 
-void Preprocessor::apply(const Problem& src, Problem& dest)
-{   
+void Preprocessor::apply(const Problem &src, Problem &dest)
+{
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
 
@@ -102,7 +104,8 @@ void Preprocessor::apply(const Problem& src, Problem& dest)
    unfeasible_ = false;
 
    // makes the interval box used for propagation
-   if (box_!=nullptr) delete box_;
+   if (box_ != nullptr)
+      delete box_;
    box_ = new DomainBox(src.scope());
 
    LOG_MAIN("Preprocessing");
@@ -114,15 +117,15 @@ void Preprocessor::apply(const Problem& src, Problem& dest)
    timer_.stop();
 }
 
-void Preprocessor::applyImpl(const Problem& src, Problem& dest)
+void Preprocessor::applyImpl(const Problem &src, Problem &dest)
 {
    Objective obj = src.getObjective();
 
    // test empty domains
-   for (size_t i=0; i<src.nbVars(); ++i)
+   for (size_t i = 0; i < src.nbVars(); ++i)
    {
       Variable v = src.varAt(i);
-      Domain* domain = box_->get(v);
+      Domain *domain = box_->get(v);
 
       if (domain->isEmpty())
       {
@@ -143,7 +146,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    LOG_INTER("Contracted box: " << (*box_));
 
    // satisfaction tests
-   for (size_t i=0; i<src.nbCtrs(); ++i)
+   for (size_t i = 0; i < src.nbCtrs(); ++i)
    {
       Constraint c = src.ctrAt(i);
       Proof proof = c.isSatisfied(*box_);
@@ -160,7 +163,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
          LOG_INTER("Inactive constraint: " << c);
          inactive_.push_back(c);
       }
-      
+
       else
       {
          active_.push_back(c);
@@ -170,14 +173,14 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    LOG_MAIN("Number of inactive constraints: " << inactive_.size());
 
    // rewrites the variables
-   for (size_t i=0; i<src.nbVars(); ++i)
+   for (size_t i = 0; i < src.nbVars(); ++i)
    {
       Variable v = src.varAt(i);
-      Domain* domain = box_->get(v);
+      Domain *domain = box_->get(v);
 
       bool isFixed = domain->isCanonical();
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
-   
+
       if (isFake)
       {
          LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
@@ -217,7 +220,8 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
          inactive_.push_back(input);
       }
 
-      else dest.addCtr(c);
+      else
+         dest.addCtr(c);
    }
 
    // checks the range of the objective function
@@ -247,7 +251,7 @@ void Preprocessor::applyImpl(const Problem& src, Problem& dest)
    }
 }
 
-bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
+bool Preprocessor::propagate(const Problem &problem, DomainBox &box)
 {
    // AC1 propagation algorithm
    bool modified;
@@ -257,7 +261,7 @@ bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
       modified = false;
       DomainBox save(box);
 
-      for (size_t i=0; i<problem.nbCtrs(); ++i)
+      for (size_t i = 0; i < problem.nbCtrs(); ++i)
       {
          Constraint c = problem.ctrAt(i);
          Proof proof = c.contract(box);
@@ -268,17 +272,18 @@ bool Preprocessor::propagate(const Problem& problem, DomainBox& box)
          }
       }
 
-      if (!save.equals(box)) modified = true;
-   }
-   while (modified);
+      if (!save.equals(box))
+         modified = true;
+   } while (modified);
 
    return true;
 }
 
-bool Preprocessor::occursInActiveConstraint(const Variable& v) const
+bool Preprocessor::occursInActiveConstraint(const Variable &v) const
 {
    for (Constraint c : active_)
-      if (c.dependsOn(v)) return true;
+      if (c.dependsOn(v))
+         return true;
 
    return false;
 }
@@ -286,14 +291,16 @@ bool Preprocessor::occursInActiveConstraint(const Variable& v) const
 Scope Preprocessor::fixedScope() const
 {
    Scope scop;
-   for (auto p : vim_) scop.insert(p.first);
+   for (auto p : vim_)
+      scop.insert(p.first);
    return ScopeBank::getInstance()->insertScope(scop);
 }
 
 Scope Preprocessor::unfixedScope() const
 {
    Scope scop;
-   for (auto p : vvm_) scop.insert(p.first);
+   for (auto p : vvm_)
+      scop.insert(p.first);
    return ScopeBank::getInstance()->insertScope(scop);
 }
 
@@ -320,8 +327,7 @@ size_t Preprocessor::nbUnfixedVars() const
 
 Variable Preprocessor::getFixedVar(size_t i) const
 {
-   ASSERT(i < nbFixedVars(),
-          "Bad access to a fixed variable in a preprocessor");
+   ASSERT(i < nbFixedVars(), "Bad access to a fixed variable in a preprocessor");
 
    auto it = vim_.begin();
    std::advance(it, i);
@@ -330,9 +336,8 @@ Variable Preprocessor::getFixedVar(size_t i) const
 
 Variable Preprocessor::getUnfixedVar(size_t i) const
 {
-   ASSERT(i < nbUnfixedVars(),
-          "Bad access to a-n unfixed variable in a preprocessor");
-   
+   ASSERT(i < nbUnfixedVars(), "Bad access to a-n unfixed variable in a preprocessor");
+
    auto it = vvm_.begin();
    std::advance(it, i);
    return (*it).first;
@@ -364,4 +369,4 @@ double Preprocessor::elapsedTime() const
    return timer_.elapsedTime();
 }
 
-} // namespace
+} // namespace realpaver

@@ -16,13 +16,13 @@
  * @brief  Wrapper class for the LP solver Soplex
  * @author Raphaël Chenouard
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_LPSOLVER_SOPLEX_HPP
 #define REALPAVER_LPSOLVER_SOPLEX_HPP
 
-#include <soplex.h>
 #include "realpaver/LPModel.hpp"
+#include <soplex.h>
 
 namespace realpaver {
 
@@ -41,25 +41,34 @@ public:
    ~LPSolver();
 
    /// No copy
-   LPSolver(const LPSolver&) = delete;
+   LPSolver(const LPSolver &) = delete;
 
    /// No assignment
-   LPSolver& operator=(const LPSolver&) = delete;
+   LPSolver &operator=(const LPSolver &) = delete;
 
-   bool optimize() override;
-   bool reoptimize() override;
+   LPStatus optimize() override;
+   LPStatus reoptimize() override;
+   double costSolution() const override;
+   RealVector primalSolution() const override;
+   RealVector dualSolution() const override;
+   bool infeasibleRay(RealVector &ray) const override;
 
 private:
-   soplex::SoPlex* simplex_;
-  
+   soplex::SoPlex *simplex_;
+
    void makeVars();
    void makeCtrs();
-   void makeObj();
+   void makeCost();
    void makeSoplexSimplex();
+   void setOptions();
 
-   bool run();
+   // optimization
+   LPStatus run();
+
+   // gets the status from Highs
+   LPStatus toLPStatus() const;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -16,7 +16,7 @@
  * @brief  3B contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorVar3B.hpp"
@@ -26,25 +26,23 @@ namespace realpaver {
 
 ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v,
                                  std::unique_ptr<IntervalSlicer> slicer)
-         : op_(op),
-           v_(v),
-           slicer_(std::move(slicer)),
-           var_min_width_(Param::GetDblParam("VAR3BCID_MIN_WIDTH"))
+    : op_(op)
+    , v_(v)
+    , slicer_(std::move(slicer))
+    , var_min_width_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
    ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v <<
-                                   " in a var3B contractor");
+   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");
    ASSERT(slicer_ != nullptr, "No slicer in a var3B contractor");
 }
 
 ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
-         : op_(op),
-           v_(v),
-           slicer_(nullptr)
+    : op_(op)
+    , v_(v)
+    , slicer_(nullptr)
 {
    ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v <<
-                                   " in a var3B contractor");
+   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");
    ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
 
    slicer_ = std::make_unique<IntervalPartitionMaker>(n);
@@ -62,8 +60,7 @@ Variable ContractorVar3B::getVar() const
 
 void ContractorVar3B::setVar(Variable v)
 {
-   ASSERT(scope().contains(v),
-          "Bad variable " << v << " in a var3B contractor");
+   ASSERT(scope().contains(v), "Bad variable " << v << " in a var3B contractor");
 
    v_ = v;
 }
@@ -78,7 +75,7 @@ void ContractorVar3B::setVarMinWidth(double val)
    var_min_width_ = val;
 }
 
-Proof ContractorVar3B::contract(IntervalBox& B)
+Proof ContractorVar3B::contract(IntervalBox &B)
 {
    Interval dom = B.get(v_);
 
@@ -98,14 +95,14 @@ Proof ContractorVar3B::contract(IntervalBox& B)
       return op_->contract(B);
 
    // left to right
-   size_t nbl = 0;               // number of left inconsistent facets
-   auto it = slicer_->begin();   // iterator on the first slice
+   size_t nbl = 0;             // number of left inconsistent facets
+   auto it = slicer_->begin(); // iterator on the first slice
    bool iter = true;
    Interval lslice;
 
    while (iter)
    {
-      IntervalBox* facet = B.clone();
+      IntervalBox *facet = B.clone();
       lslice = *it;
       facet->set(v_, lslice);
 
@@ -115,7 +112,8 @@ Proof ContractorVar3B::contract(IntervalBox& B)
       {
          ++nbl;
          ++it;
-         if (nbl == nbs) iter = false;
+         if (nbl == nbs)
+            iter = false;
       }
       else
       {
@@ -126,17 +124,18 @@ Proof ContractorVar3B::contract(IntervalBox& B)
       delete facet;
    }
 
-   if (nbl == nbs) return Proof::Empty;
+   if (nbl == nbs)
+      return Proof::Empty;
 
    // right to left
-   size_t nbr = 0;               // number of right inconsistent facets
+   size_t nbr = 0; // number of right inconsistent facets
    auto jt = slicer_->rbegin();
    iter = true;
    Interval rslice;
 
    while (iter)
    {
-      IntervalBox* facet = B.clone();
+      IntervalBox *facet = B.clone();
       rslice = *jt;
       facet->set(v_, rslice);
 
@@ -167,9 +166,9 @@ Proof ContractorVar3B::contract(IntervalBox& B)
    return Proof::Maybe;
 }
 
-void ContractorVar3B::print(std::ostream& os) const
+void ContractorVar3B::print(std::ostream &os) const
 {
    os << "var3B contractor on " << v_.getName();
 }
 
-} // namespace
+} // namespace realpaver

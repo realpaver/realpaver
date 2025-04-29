@@ -16,22 +16,22 @@
  * @brief  Constraint propagation over interval contractors
  * @author Laurent Granvilliers
  * @date   2024-7-1
-*/
+ */
 
-#include <queue>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
 #include "realpaver/IntervalPropagator.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include <queue>
 
 namespace realpaver {
 
 IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
-      : Contractor(),
-        pool_(pool),
-        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
-        certif_()
+    : Contractor()
+    , pool_(pool)
+    , tol_(Params::GetDblParam("PROPAGATION_TOL"))
+    , certif_()
 {
    if (pool == nullptr)
    {
@@ -39,13 +39,14 @@ IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
    }
 }
 
-Tolerance IntervalPropagator::getTol() const
+double IntervalPropagator::getTol() const
 {
    return tol_;
 }
 
-void IntervalPropagator::setTol(Tolerance tol)
+void IntervalPropagator::setTol(double tol)
 {
+   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -79,7 +80,7 @@ Scope IntervalPropagator::scope() const
    return pool_->scope();
 }
 
-Proof IntervalPropagator::contract(IntervalBox& B)
+Proof IntervalPropagator::contract(IntervalBox &B)
 {
    ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
@@ -88,7 +89,8 @@ Proof IntervalPropagator::contract(IntervalBox& B)
 
    // propagation queue
    std::queue<size_t> queue;
-   for (size_t i=0; i<N; ++i) queue.push(i);
+   for (size_t i = 0; i < N; ++i)
+      queue.push(i);
 
    // vector of proof certificates
    certif_.resize(N);
@@ -113,21 +115,20 @@ Proof IntervalPropagator::contract(IntervalBox& B)
 
       if (proof != Proof::Empty)
       {
-         for (const auto& v : op->scope())
+         for (const auto &v : op->scope())
          {
-            const Interval& prev = copy.get(v);
-            const Interval& curr = B.get(v);
+            const Interval &prev = copy.get(v);
+            const Interval &curr = B.get(v);
 
-            LOG_LOW("Propagation test on " << v.getName() << " ("
-                                           << tol_ << ")");
+            LOG_LOW("Propagation test on " << v.getName() << " (" << tol_ << ")");
 
-            if (tol_.isImproved(prev, curr))
+            if (curr.improves(prev, tol_))
             {
                LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
                             << " -> propagation");
 
                // considers the dependency relation of v
-               for (size_t k=0; k<pool_->depSize(v); ++k)
+               for (size_t k = 0; k < pool_->depSize(v); ++k)
                {
                   size_t l = pool_->depAt(v, k);
                   if (!active.get(l) && (l != j))
@@ -143,9 +144,9 @@ Proof IntervalPropagator::contract(IntervalBox& B)
    return proof;
 }
 
-void IntervalPropagator::print(std::ostream& os) const
+void IntervalPropagator::print(std::ostream &os) const
 {
    os << "IntervalPropagator on " << pool_->poolSize() << " contractors";
 }
 
-} // namespace
+} // namespace realpaver

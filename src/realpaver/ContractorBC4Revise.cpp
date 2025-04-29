@@ -16,23 +16,23 @@
  * @brief  BC4Revise contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorBC4Revise.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
 ContractorBC4Revise::ContractorBC4Revise(SharedDag dag, size_t i)
-      : dag_(dag),
-        if_(i),
-        hc4_(nullptr),
-        bc3_()
+    : dag_(dag)
+    , if_(i)
+    , hc4_(nullptr)
+    , bc3_()
 {
    hc4_ = new ContractorHC4Revise(dag, i);
 
-   DagFun* f = dag->fun(i);
+   DagFun *f = dag->fun(i);
    Scope s = f->scope();
    for (auto v : s)
    {
@@ -45,7 +45,8 @@ ContractorBC4Revise::~ContractorBC4Revise()
 {
    delete hc4_;
 
-   for (auto it : bc3_) delete it;
+   for (auto it : bc3_)
+      delete it;
 }
 
 Scope ContractorBC4Revise::scope() const
@@ -53,10 +54,10 @@ Scope ContractorBC4Revise::scope() const
    return dag_->fun(if_)->scope();
 }
 
-Proof ContractorBC4Revise::contract(IntervalBox& B)
+Proof ContractorBC4Revise::contract(IntervalBox &B)
 {
    LOG_LOW("BC4Revise contractor @ " << if_ << " on " << B);
-   
+
    // HC4
    Proof proof = hc4_->contract(B);
 
@@ -67,7 +68,7 @@ Proof ContractorBC4Revise::contract(IntervalBox& B)
    }
 
    // BC3
-   for (size_t i=0; i<bc3_.size(); ++i)
+   for (size_t i = 0; i < bc3_.size(); ++i)
    {
       Proof certif = bc3_[i]->contract(B);
 
@@ -86,19 +87,19 @@ Proof ContractorBC4Revise::contract(IntervalBox& B)
 
 void ContractorBC4Revise::setPeelFactor(double f)
 {
-   for (size_t i=0; i<bc3_.size(); ++i)
+   for (size_t i = 0; i < bc3_.size(); ++i)
       bc3_[i]->setPeelFactor(f);
 }
 
 void ContractorBC4Revise::setMaxIter(size_t val)
 {
-   for (size_t i=0; i<bc3_.size(); ++i)
+   for (size_t i = 0; i < bc3_.size(); ++i)
       bc3_[i]->setMaxIter(val);
 }
 
-void ContractorBC4Revise::print(std::ostream& os) const
+void ContractorBC4Revise::print(std::ostream &os) const
 {
    os << "BC4Revise contractor #" << if_;
 }
 
-} // namespace
+} // namespace realpaver

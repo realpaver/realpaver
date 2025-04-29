@@ -40,15 +40,15 @@ public:
 
    /// Creates a vector with n elements assigned to x
    RealVector(size_t n = 0, double x = 0.0);
-   
+
    /// Creates a vector from a list
-   RealVector(const std::initializer_list<double>& l);
+   RealVector(const std::initializer_list<double> &l);
 
    /// Default copy constructor
-   RealVector(const RealVector&) = default;
+   RealVector(const RealVector &) = default;
 
    /// Default assignment operator
-   RealVector& operator=(const RealVector& V) = default;
+   RealVector &operator=(const RealVector &V) = default;
 
    /// Default destructor
    ~RealVector() = default;
@@ -68,9 +68,6 @@ public:
    /// Returns true if every component is not a NaN and is finite
    bool isFinite() const;
 
-   /// Returns the scalar product of this and V
-   double scalarProduct(const RealVector& V) const;
-
    /// Returns the L1-norm of this
    double l1Norm() const;
 
@@ -81,48 +78,51 @@ public:
    double linfNorm() const;
 
    /// Addition with assignment
-   RealVector& operator+=(const RealVector& V);
+   RealVector &operator+=(const RealVector &V);
 
    /// Subtraction with assignment
-   RealVector& operator-=(const RealVector& V);
+   RealVector &operator-=(const RealVector &V);
 
    /// Multiplication with assignment
-   RealVector& operator*=(double a);
+   RealVector &operator*=(double a);
 
    /// Division with assignment
-   RealVector& operator/=(double a);
+   RealVector &operator/=(double a);
 
    /// Returns a clone of this
-   virtual RealVector* clone() const;
+   virtual RealVector *clone() const;
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const RealVector& V);
+std::ostream &operator<<(std::ostream &os, const RealVector &V);
 
 /// Returns V+W
-RealVector operator+(const RealVector& V, const RealVector& W);
+RealVector operator+(const RealVector &V, const RealVector &W);
 
 /// Returns V+w
-RealVector operator+(const RealVector& V, double w);
+RealVector operator+(const RealVector &V, double w);
 
 /// Returns V-W
-RealVector operator-(const RealVector& V, const RealVector& W);
+RealVector operator-(const RealVector &V, const RealVector &W);
 
 /// Returns -V
-RealVector operator-(const RealVector& V);
+RealVector operator-(const RealVector &V);
+
+/// Returns V*W
+double operator*(const RealVector &V, const RealVector &W);
 
 /// Returns a*V
-RealVector operator*(double a, const RealVector& V);
+RealVector operator*(double a, const RealVector &V);
 
 /// Returns V*a
-RealVector operator*(const RealVector& V, double a);
+RealVector operator*(const RealVector &V, double a);
 
 /// Returns A*X
-RealVector operator*(const RealMatrix& A, const RealVector& X);
+RealVector operator*(const RealMatrix &A, const RealVector &X);
 
 /// Returns V/a
-RealVector operator/(const RealVector& V, double a);
+RealVector operator/(const RealVector &V, double a);
 
-} // namespace
+} // namespace realpaver
 
 #endif
