@@ -120,6 +120,7 @@ bool SelectorSSR::apply(const DomainBox &box)
 
    // Selects the variable with the maximum smear value
    Variable v = getMaxVar();
+
    if (box.isSplitable(v))
    {
       setSelectedVar(v);

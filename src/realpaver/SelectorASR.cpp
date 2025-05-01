@@ -50,9 +50,13 @@ void SelectorASR::calculate(const IntervalBox &B)
    const Scope &scop = dag_->scope();
    RealMatrix M(dag_->nbFuns(), dag_->nbVars() + 1, 0.0);
 
+   DEBUG("");
+
    for (size_t i = 0; i < creator.nbFuns(); ++i)
    {
       const AffineForm &f = creator.fun(i);
+
+      DEBUG("f_" << i << ": " << f);
 
       // sum of coefficients
       double s = 0.0;
@@ -64,6 +68,8 @@ void SelectorASR::calculate(const IntervalBox &B)
       double e = f.errorTerm().right();
       s += e;
 
+      DEBUG("   sum: " << s);
+
       // assignment of the matrix of relative coefficients
       for (auto it = f.cbegin(); it != f.cend(); ++it)
       {
@@ -74,6 +80,8 @@ void SelectorASR::calculate(const IntervalBox &B)
       }
       M.set(i, scop.size(), e / s);
    }
+
+   DEBUG("M : " << M);
 
    // calculates the affineSumRel values
    for (size_t j = 0; j < dag_->nbVars(); ++j)

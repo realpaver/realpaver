@@ -17,6 +17,8 @@
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
+#include "AssertDebug.hpp"
+#include "IntervalFunctionVector.hpp"
 #include "realpaver/AffineCreator.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSplit.hpp"
@@ -308,6 +310,35 @@ void CSPSplitASR::applyImpl(SharedCSPNode &node, CSPContext &context)
          splitOne(node, v);
          LOG_INTER("LF selects " << v.getName() << " in node " << node->index());
       }
+   }
+}
+
+/*----------------------------------------------------------------------------*/
+
+CSPSplitHybridSSR::CSPSplitHybridSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
+                                     IntervalFunctionVector F)
+    : CSPSplit(scop, std::move(smap))
+    , sel_(scop, F)
+{
+}
+
+double CSPSplitHybridSSR::getFrequency() const
+{
+   return sel_.getFrequency();
+}
+
+void CSPSplitHybridSSR::setFrequency(double f)
+{
+   sel_.setFrequency(f);
+}
+
+void CSPSplitHybridSSR::applyImpl(SharedCSPNode &node, CSPContext &context)
+{
+   if (sel_.apply(*node->box()))
+   {
+      Variable v = sel_.getSelectedVar();
+      splitOne(node, v);
+      LOG_INTER("HybridSSR selects " << v.getName() << " in node " << node->index());
    }
 }
 
