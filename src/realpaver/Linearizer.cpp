@@ -79,12 +79,14 @@ Scope Linearizer::scope() const
 size_t Linearizer::linVarIndex(Variable v) const
 {
    auto it = mvv_.find(v.id());
+   ASSERT(it != mvv_.end(), "Iterator null");
    return it->second;
 }
 
 size_t Linearizer::linVarIndex(size_t id) const
 {
    auto it = mvv_.find(id);
+   ASSERT(it != mvv_.end(), "Iterator null");
    return it->second;
 }
 
@@ -409,8 +411,7 @@ bool LinearizerAffine::make(LPModel &lpm, const IntervalBox &B)
       while (it != f.cend())
       {
          std::pair<double, double> p = AffineForm::itv(it).midrad();
-         LinVar ev = lpm.getLinVar(linVarIndex(AffineForm::var(it)) + scop_.size());
-
+         LinVar ev = lpm.getLinVar(AffineForm::var(it) + scop_.size());
          expr.addTerm(p.first, ev);
          ac += Interval(p.second);
          ++it;
