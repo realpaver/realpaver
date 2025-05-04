@@ -231,12 +231,12 @@ void CSPSolver::makeSplit()
       split_ =
           new CSPSplitSSR(scop, std::move(smap), factory_->makeIntervalFunctionVector());
 
-   else if (sel == "HYBRID_SSR")
+   else if (sel == "SSR_LF")
    {
-      CSPSplitHybridSSR *hybrid = new CSPSplitHybridSSR(
-          scop, std::move(smap), factory_->makeIntervalFunctionVector());
+      CSPSplitSSRLF *hybrid = new CSPSplitSSRLF(scop, std::move(smap),
+                                                factory_->makeIntervalFunctionVector());
 
-      double f = env_->getParams()->getDblParam("SPLIT_HYBRID_SSR_FREQUENCY");
+      double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
       hybrid->setFrequency(f);
 
       split_ = hybrid;

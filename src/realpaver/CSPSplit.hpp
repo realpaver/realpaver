@@ -27,11 +27,11 @@
 #include "realpaver/DomainSlicerMap.hpp"
 #include "realpaver/Scope.hpp"
 #include "realpaver/SelectorASR.hpp"
-#include "realpaver/SelectorHybridSSR.hpp"
 #include "realpaver/SelectorLF.hpp"
 #include "realpaver/SelectorSF.hpp"
 #include "realpaver/SelectorSLF.hpp"
 #include "realpaver/SelectorSSR.hpp"
+#include "realpaver/SelectorSSRLF.hpp"
 #include <list>
 
 namespace realpaver {
@@ -271,20 +271,20 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Splitting strategy hybridizing SSR and LF
-class CSPSplitHybridSSR : public CSPSplit {
+class CSPSplitSSRLF : public CSPSplit {
 public:
    /// Constructor
-   CSPSplitHybridSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
-                     IntervalFunctionVector F);
+   CSPSplitSSRLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
+                 IntervalFunctionVector F);
 
    /// Default destructor
-   ~CSPSplitHybridSSR() = default;
+   ~CSPSplitSSRLF() = default;
 
    /// No copy
-   CSPSplitHybridSSR(const CSPSplitHybridSSR &) = delete;
+   CSPSplitSSRLF(const CSPSplitSSRLF &) = delete;
 
    /// No assignment
-   CSPSplitHybridSSR &operator=(const CSPSplitHybridSSR &) = delete;
+   CSPSplitSSRLF &operator=(const CSPSplitSSRLF &) = delete;
 
    /// Returns the frequency of application of the SSR strategy
    double getFrequency() const;
@@ -295,7 +295,7 @@ public:
    void applyImpl(SharedCSPNode &node, CSPContext &context) override;
 
 private:
-   SelectorHybridSSR sel_; // hybrid selector
+   SelectorSSRLF sel_; // hybrid selector
 };
 
 } // namespace realpaver

@@ -315,24 +315,24 @@ void CSPSplitASR::applyImpl(SharedCSPNode &node, CSPContext &context)
 
 /*----------------------------------------------------------------------------*/
 
-CSPSplitHybridSSR::CSPSplitHybridSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
-                                     IntervalFunctionVector F)
+CSPSplitSSRLF::CSPSplitSSRLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
+                             IntervalFunctionVector F)
     : CSPSplit(scop, std::move(smap))
     , sel_(scop, F)
 {
 }
 
-double CSPSplitHybridSSR::getFrequency() const
+double CSPSplitSSRLF::getFrequency() const
 {
    return sel_.getFrequency();
 }
 
-void CSPSplitHybridSSR::setFrequency(double f)
+void CSPSplitSSRLF::setFrequency(double f)
 {
    sel_.setFrequency(f);
 }
 
-void CSPSplitHybridSSR::applyImpl(SharedCSPNode &node, CSPContext &context)
+void CSPSplitSSRLF::applyImpl(SharedCSPNode &node, CSPContext &context)
 {
    if (sel_.apply(*node->box()))
    {
