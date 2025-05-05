@@ -12,21 +12,19 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   IntervalSmearSumRel.cpp
- * @brief  Smear sum relative strategy
+ * @file   SelectorSSR.cpp
+ * @brief  Variable selection strategy Smear Sum Relative
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   25 Apr 2025
  */
 
-#include "realpaver/IntervalSmearSumRel.hpp"
-#include "realpaver/AssertDebug.hpp"
-#include <algorithm>
+#include "realpaver/SelectorSSR.hpp"
 
 namespace realpaver {
 
-IntervalSmearSumRel::IntervalSmearSumRel(IntervalFunctionVector F)
-    : F_(F)
-    , scop_(F.scope())
+SelectorSSR::SelectorSSR(IntervalFunctionVector F)
+    : Selector(F.scope())
+    , F_(F)
     , ssr_()
 {
    for (size_t i = 0; i < F_.nbVars(); ++i)
@@ -36,17 +34,12 @@ IntervalSmearSumRel::IntervalSmearSumRel(IntervalFunctionVector F)
    }
 }
 
-Scope IntervalSmearSumRel::scope() const
-{
-   return scop_;
-}
-
-IntervalFunctionVector IntervalSmearSumRel::getFun() const
+IntervalFunctionVector SelectorSSR::getFun() const
 {
    return F_;
 }
 
-Variable IntervalSmearSumRel::getMaxVar() const
+Variable SelectorSSR::getMaxVar() const
 {
    size_t imax = 0;
    double smax = ssr_[0].val;
@@ -63,7 +56,7 @@ Variable IntervalSmearSumRel::getMaxVar() const
    return ssr_[imax].var;
 }
 
-void IntervalSmearSumRel::calculate(const IntervalBox &B)
+void SelectorSSR::calculate(const IntervalBox &B)
 {
    IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
    RealMatrix S(F_.nbFuns(), F_.nbVars(), 0.0);
@@ -77,7 +70,7 @@ void IntervalSmearSumRel::calculate(const IntervalBox &B)
       double sum = 0.0;
       for (size_t j = 0; j < F_.nbVars(); ++j)
       {
-         const auto &v = scop_.var(j);
+         const auto &v = scope().var(j);
          double smear = jac.get(i, j).mag() * B.get(v).width();
          S.set(i, j, smear);
          sum += smear;
@@ -89,10 +82,10 @@ void IntervalSmearSumRel::calculate(const IntervalBox &B)
       }
    }
 
-   // calculates the smearRelSum values
+   // calculates the smearSumRel values
    for (size_t j = 0; j < F_.nbVars(); ++j)
    {
-      ssr_[j].var = scop_.var(j);
+      ssr_[j].var = scope().var(j);
       ssr_[j].val = 0.0;
 
       for (size_t i = 0; i < F_.nbFuns(); ++i)
@@ -100,27 +93,55 @@ void IntervalSmearSumRel::calculate(const IntervalBox &B)
    }
 }
 
-void IntervalSmearSumRel::sort()
+void SelectorSSR::sort()
 {
    std::sort(ssr_.begin(), ssr_.end(), CompItem());
 }
 
-Variable IntervalSmearSumRel::getVar(size_t i) const
+Variable SelectorSSR::getVar(size_t i) const
 {
    return ssr_[i].var;
 }
 
-double IntervalSmearSumRel::getSmearSumRel(size_t i) const
+double SelectorSSR::getSmearSumRel(size_t i) const
 {
    return ssr_[i].val;
 }
 
-size_t IntervalSmearSumRel::nbVars() const
+size_t SelectorSSR::nbVars() const
 {
    return ssr_.size();
 }
 
-void IntervalSmearSumRel::print(std::ostream &os) const
+bool SelectorSSR::apply(const DomainBox &box)
+{
+   IntervalBox B(box);
+   calculate(B);
+
+   // Selects the variable with the maximum smear value
+   Variable v = getMaxVar();
+
+   if (box.isSplitable(v))
+   {
+      setSelectedVar(v);
+      return true;
+   }
+
+   // Case when the domain of the maximum variable cannot be split
+   for (size_t i = 0; i < nbVars(); ++i)
+   {
+      v = getVar(i);
+      if (box.isSplitable(v))
+      {
+         setSelectedVar(v);
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void SelectorSSR::print(std::ostream &os) const
 {
    for (size_t i = 0; i < ssr_.size(); ++i)
    {
@@ -128,7 +149,7 @@ void IntervalSmearSumRel::print(std::ostream &os) const
    }
 }
 
-std::ostream &operator<<(std::ostream &os, const IntervalSmearSumRel &ssr)
+std::ostream &operator<<(std::ostream &os, const SelectorSSR &ssr)
 {
    ssr.print(os);
    return os;

@@ -1,0 +1,40 @@
+# In: P. Van Hentenryck, D. Mac Allester and D. Kapur.
+#     Solving Polynomial Systems using a Branch and Prune approach.
+#     SIAM J. Numer. Anal., 34(2):797-827, 1997.
+
+Constants
+s = 1/22,
+t1 = 1/11,
+t2 = 2/11,
+t3 = 3/11,
+t4 = 4/11,
+t5 = 5/11,
+t6 = 6/11,
+t7 = 7/11,
+t8 = 8/11,
+t9 = 9/11,
+t10 = 10/11;
+
+Variables
+x1 in [-4, 5],
+x2 in [-4, 5],
+x3 in [-4, 5],
+x4 in [-4, 5],
+x5 in [-4, 5],
+x6 in [-4, 5],
+x7 in [-4, 5],
+x8 in [-4, 5],
+x9 in [-4, 5],
+x10 in [-4, 5];
+
+Constraints
+x1+s*((1-t1)*(t1*pow(x1+t1+1,3))+t1*(+(1-t2)*pow(x2+t2+1,3)+(1-t3)*pow(x3+t3+1,3)+(1-t4)*pow(x4+t4+1,3)+(1-t5)*pow(x5+t5+1,3)+(1-t6)*pow(x6+t6+1,3)+(1-t7)*pow(x7+t7+1,3)+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x2+s*((1-t2)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3))+t2*(+(1-t3)*pow(x3+t3+1,3)+(1-t4)*pow(x4+t4+1,3)+(1-t5)*pow(x5+t5+1,3)+(1-t6)*pow(x6+t6+1,3)+(1-t7)*pow(x7+t7+1,3)+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x3+s*((1-t3)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3))+t3*(+(1-t4)*pow(x4+t4+1,3)+(1-t5)*pow(x5+t5+1,3)+(1-t6)*pow(x6+t6+1,3)+(1-t7)*pow(x7+t7+1,3)+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x4+s*((1-t4)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3))+t4*(+(1-t5)*pow(x5+t5+1,3)+(1-t6)*pow(x6+t6+1,3)+(1-t7)*pow(x7+t7+1,3)+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x5+s*((1-t5)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3)+t5*pow(x5+t5+1,3))+t5*(+(1-t6)*pow(x6+t6+1,3)+(1-t7)*pow(x7+t7+1,3)+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x6+s*((1-t6)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3)+t5*pow(x5+t5+1,3)+t6*pow(x6+t6+1,3))+t6*(+(1-t7)*pow(x7+t7+1,3)+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x7+s*((1-t7)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3)+t5*pow(x5+t5+1,3)+t6*pow(x6+t6+1,3)+t7*pow(x7+t7+1,3))+t7*(+(1-t8)*pow(x8+t8+1,3)+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x8+s*((1-t8)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3)+t5*pow(x5+t5+1,3)+t6*pow(x6+t6+1,3)+t7*pow(x7+t7+1,3)+t8*pow(x8+t8+1,3))+t8*(+(1-t9)*pow(x9+t9+1,3)+(1-t10)*pow(x10+t10+1,3))) == 0,
+x9+s*((1-t9)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3)+t5*pow(x5+t5+1,3)+t6*pow(x6+t6+1,3)+t7*pow(x7+t7+1,3)+t8*pow(x8+t8+1,3)+t9*pow(x9+t9+1,3))+t9*(+(1-t10)*pow(x10+t10+1,3))) == 0,
+x10+s*((1-t10)*(t1*pow(x1+t1+1,3)+t2*pow(x2+t2+1,3)+t3*pow(x3+t3+1,3)+t4*pow(x4+t4+1,3)+t5*pow(x5+t5+1,3)+t6*pow(x6+t6+1,3)+t7*pow(x7+t7+1,3)+t8*pow(x8+t8+1,3)+t9*pow(x9+t9+1,3)+t10*pow(x10+t10+1,3))) == 0;

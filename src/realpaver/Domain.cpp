@@ -18,8 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Domain.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Domain.hpp"
+#include "realpaver/Double.hpp"
 
 namespace realpaver {
 
@@ -55,6 +56,32 @@ bool Domain::isInteger() const
 bool Domain::isReal() const
 {
    return false;
+}
+
+double Domain::discreteSize(double tol) const
+{
+   if (isReal())
+   {
+      Interval x = intervalHull();
+      if (x.isEmpty())
+         return 0.0;
+
+      else if (x.isCanonical())
+         return 1.0;
+
+      else if (x.isInf())
+         return Double::floor(Double::greatest());
+
+      else
+      {
+         double a = x.width() / tol, b = Double::floor(a);
+         return (a == b) ? b : b + 1.0;
+      }
+   }
+   else
+   {
+      return size();
+   }
 }
 
 std::ostream &operator<<(std::ostream &os, const Domain &dom)

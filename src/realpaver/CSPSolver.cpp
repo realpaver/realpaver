@@ -24,6 +24,7 @@
 #include "realpaver/CSPSpaceDFS.hpp"
 #include "realpaver/CSPSpaceDMDFS.hpp"
 #include "realpaver/CSPSpaceHybridDFS.hpp"
+#include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
 #include <limits>
 #include <list>
@@ -227,20 +228,22 @@ void CSPSolver::makeSplit()
       split_ = new CSPSplitSLF(scop, std::move(smap));
 
    else if (sel == "SSR")
-   {
-      std::shared_ptr<IntervalSmearSumRel> ssr = factory_->makeSSR();
+      split_ =
+          new CSPSplitSSR(scop, std::move(smap), factory_->makeIntervalFunctionVector());
 
-      if ((ssr != nullptr) && (preprob_->nbVars() == ssr->nbVars()))
-      {
-         split_ = new CSPSplitSSR(ssr, std::move(smap));
-      }
-      else
-      {
-         split_ = new CSPSplitRR(scop, std::move(smap));
-         LOG_INTER("Unable to create a SmearSumRel variable selection "
-                   << "strategy -> use a round-robin strategy instead");
-      }
+   else if (sel == "SSR_LF")
+   {
+      CSPSplitSSRLF *hybrid = new CSPSplitSSRLF(scop, std::move(smap),
+                                                factory_->makeIntervalFunctionVector());
+
+      double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
+      hybrid->setFrequency(f);
+
+      split_ = hybrid;
    }
+
+   else if (sel == "ASR")
+      split_ = new CSPSplitASR(scop, std::move(smap), factory_->getDag());
 
    THROW_IF(split_ == nullptr, "Unable to make the split object in a CSP solver");
 }
