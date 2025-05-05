@@ -19,7 +19,6 @@
  */
 #include "AssertDebug.hpp"
 #include "IntervalFunctionVector.hpp"
-#include "realpaver/AffineCreator.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSplit.hpp"
 #include "realpaver/Logger.hpp"
@@ -264,40 +263,6 @@ void CSPSplitSSR::applyImpl(SharedCSPNode &node, CSPContext &context)
       Variable v = ssr_.getSelectedVar();
       splitOne(node, v);
       LOG_INTER("SSR selects " << v.getName() << " in node " << node->index());
-      return;
-   }
-
-   if (!sbis_.isEmpty())
-   {
-      SelectorLF sel(sbis_);
-      if (sel.apply(box))
-      {
-         Variable v = sel.getSelectedVar();
-         splitOne(node, v);
-         LOG_INTER("LF selects " << v.getName() << " in node " << node->index());
-      }
-   }
-}
-
-/*----------------------------------------------------------------------------*/
-
-CSPSplitASR::CSPSplitASR(Scope scop, std::unique_ptr<DomainSlicerMap> smap, SharedDag dag)
-    : CSPSplit(scop, std::move(smap))
-    , asr_(dag)
-    , sbis_(scop.setminus(dag->scope()))
-{
-   ASSERT(dag != nullptr, "Null pointer");
-}
-
-void CSPSplitASR::applyImpl(SharedCSPNode &node, CSPContext &context)
-{
-   const DomainBox &box = *node->box();
-
-   if (asr_.apply(box))
-   {
-      Variable v = asr_.getSelectedVar();
-      splitOne(node, v);
-      LOG_INTER("ASR selects " << v.getName() << " in node " << node->index());
       return;
    }
 

@@ -242,9 +242,6 @@ void CSPSolver::makeSplit()
       split_ = hybrid;
    }
 
-   else if (sel == "ASR")
-      split_ = new CSPSplitASR(scop, std::move(smap), factory_->getDag());
-
    THROW_IF(split_ == nullptr, "Unable to make the split object in a CSP solver");
 }
 

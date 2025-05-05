@@ -1152,7 +1152,6 @@ void Params::makeSplit()
        .addChoice("SF", "smallest domain")
        .addChoice("SSR", "smear sum relative values (using derivatives)")
        .addChoice("SLF", "integer variable with smallest first and then real variable")
-       .addChoice("ASR", "affine sum relative values")
        .addChoice("SSR_LF", "SSR and LF alternating with a given frequency")
        .setValue("SSR");
    add(var_sel);
