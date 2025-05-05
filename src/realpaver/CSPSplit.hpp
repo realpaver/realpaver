@@ -21,11 +21,17 @@
 #ifndef REALPAVER_CSP_SPLIT_HPP
 #define REALPAVER_CSP_SPLIT_HPP
 
+#include "IntervalFunctionVector.hpp"
 #include "realpaver/CSPContext.hpp"
 #include "realpaver/CSPNode.hpp"
-#include "realpaver/DomainSlicerFactory.hpp"
-#include "realpaver/IntervalSmearSumRel.hpp"
+#include "realpaver/DomainSlicerMap.hpp"
 #include "realpaver/Scope.hpp"
+#include "realpaver/SelectorASR.hpp"
+#include "realpaver/SelectorLF.hpp"
+#include "realpaver/SelectorSF.hpp"
+#include "realpaver/SelectorSLF.hpp"
+#include "realpaver/SelectorSSR.hpp"
+#include "realpaver/SelectorSSRLF.hpp"
 #include <list>
 
 namespace realpaver {
@@ -157,21 +163,8 @@ public:
 
    void applyImpl(SharedCSPNode &node, CSPContext &context) override;
 
-   /**
-    * @brief Variable selection.
-    *
-    * Returns a couple (b, v) such that b is false if no variable has been
-    * selected, b is true if v has ben selected
-    */
-   std::pair<bool, Variable> selectVar(SharedCSPNode &node);
-
-   /**
-    * @brief Variable selection.
-    *
-    * Returns a couple (b, v) such that b is false if no variable has been
-    * selected, b is true if v has ben selected
-    */
-   static std::pair<bool, Variable> selectVar(const Scope &scop, const DomainBox &box);
+private:
+   SelectorLF sel_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -194,8 +187,7 @@ public:
    void applyImpl(SharedCSPNode &node, CSPContext &context) override;
 
 private:
-   // variable selection method
-   std::pair<bool, Variable> selectVar(SharedCSPNode &node);
+   SelectorSF sel_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -224,8 +216,7 @@ public:
    void applyImpl(SharedCSPNode &node, CSPContext &context) override;
 
 private:
-   // variable selection method
-   std::pair<bool, Variable> selectVar(SharedCSPNode &node);
+   SelectorSLF sel_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -234,8 +225,8 @@ private:
 class CSPSplitSSR : public CSPSplit {
 public:
    /// Constructor
-   CSPSplitSSR(std::shared_ptr<IntervalSmearSumRel> ssr,
-               std::unique_ptr<DomainSlicerMap> smap);
+   CSPSplitSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
+               IntervalFunctionVector F);
 
    /// Default destructor
    ~CSPSplitSSR() = default;
@@ -249,10 +240,62 @@ public:
    void applyImpl(SharedCSPNode &node, CSPContext &context) override;
 
 private:
-   std::shared_ptr<IntervalSmearSumRel> ssr_;
+   SelectorSSR ssr_; // main selector based on SSR values
+   Scope sbis_;      // selector for the variables not handled by the SSR selector
+};
 
-   // variable selection method
-   std::pair<bool, Variable> selectVar(SharedCSPNode &node);
+/*----------------------------------------------------------------------------*/
+
+/// Splitting strategy based on affine forms
+class CSPSplitASR : public CSPSplit {
+public:
+   /// Constructor
+   CSPSplitASR(Scope scop, std::unique_ptr<DomainSlicerMap> smap, SharedDag dag);
+
+   /// Default destructor
+   ~CSPSplitASR() = default;
+
+   /// No copy
+   CSPSplitASR(const CSPSplitASR &) = delete;
+
+   /// No assignment
+   CSPSplitASR &operator=(const CSPSplitASR &) = delete;
+
+   void applyImpl(SharedCSPNode &node, CSPContext &context) override;
+
+private:
+   SelectorASR asr_; // main selector based on ASR values
+   Scope sbis_;      // selector for the variables not handled by the SSR selector
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Splitting strategy hybridizing SSR and LF
+class CSPSplitSSRLF : public CSPSplit {
+public:
+   /// Constructor
+   CSPSplitSSRLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
+                 IntervalFunctionVector F);
+
+   /// Default destructor
+   ~CSPSplitSSRLF() = default;
+
+   /// No copy
+   CSPSplitSSRLF(const CSPSplitSSRLF &) = delete;
+
+   /// No assignment
+   CSPSplitSSRLF &operator=(const CSPSplitSSRLF &) = delete;
+
+   /// Returns the frequency of application of the SSR strategy
+   double getFrequency() const;
+
+   /// Assigns the frequency of application of the SSR strategy
+   void setFrequency(double f);
+
+   void applyImpl(SharedCSPNode &node, CSPContext &context) override;
+
+private:
+   SelectorSSRLF sel_; // hybrid selector
 };
 
 } // namespace realpaver

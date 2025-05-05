@@ -316,6 +316,9 @@ public:
     */
    bool isIdentity() const;
 
+   /// Returns this set minus scop
+   Scope setminus(const Scope &scop) const;
+
 private:
    std::shared_ptr<ScopeRep> rep_; // shared representation
 
@@ -327,10 +330,10 @@ private:
 std::ostream &operator<<(std::ostream &os, const Scope &s);
 
 /// Returns a new scope corresponding to the intersection of s and t
-Scope operator&(Scope s, Scope t);
+Scope operator&(const Scope &s, const Scope &t);
 
 /// Returns a new scope corresponding to the union of s and t
-Scope operator|(Scope s, Scope t);
+Scope operator|(const Scope &s, const Scope &t);
 
 } // namespace realpaver
 

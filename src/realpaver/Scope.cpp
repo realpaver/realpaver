@@ -18,10 +18,10 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Scope.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 
@@ -465,7 +465,16 @@ bool Scope::operator!=(const Scope &other) const
    return !operator==(other);
 }
 
-Scope operator&(Scope s, Scope t)
+Scope Scope::setminus(const Scope &scop) const
+{
+   Scope res;
+   for (auto v : (*this))
+      if (!scop.contains(v))
+         res.insert(v);
+   return res;
+}
+
+Scope operator&(const Scope &s, const Scope &t)
 {
    Scope res;
 
@@ -479,7 +488,7 @@ Scope operator&(Scope s, Scope t)
    return res;
 }
 
-Scope operator|(Scope s, Scope t)
+Scope operator|(const Scope &s, const Scope &t)
 {
    Scope res;
 

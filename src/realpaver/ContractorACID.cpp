@@ -18,23 +18,23 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorACID.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorACID.hpp"
 #include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorACID::ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
-                               SharedContractor op, int ns3B, int nsCID, int learnLength,
-                               int cycleLength, double ctRatio, double varMinWidth)
+ContractorACID::ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContractor op,
+                               int ns3B, int nsCID, int learnLength, int cycleLength,
+                               double ctRatio, double varMinWidth)
     : Contractor()
-    , ssr_(ssr)
+    , ssr_(std::move(ssr))
     , op_(op)
 {
    ASSERT(ssr_ != nullptr, "No smear sum rel object in ACID");
    ASSERT(op_ != nullptr, "No operator in ACID");
-   ASSERT(op->scope().contains(ssr->scope()), "Bad scopes in ACID");
+   ASSERT(op->scope().contains(ssr_->scope()), "Bad scopes in ACID");
 
    ASSERT(ns3B >= 2, "Bad number of slices for 3B contractors");
    ASSERT(nsCID >= 2, "Bad number of slices for CID contractors");
