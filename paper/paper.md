@@ -26,13 +26,23 @@ bibliography: paper.bib
 
 # Summary
 
-Constraint Programming (CP) is a paradigm for solving constraint satisfaction and optimization problems [@rossi2006]. Although CP mainly addresses combinatorial problems, it can also handle continuous problems by approximating real numbers with intervals [@benhamou2006]. This technology has been applied with success in many fields of engineering like automatic control [@jaulin2001], preliminary design [@yvars2021] and robotics [@merlet2004].
+Constraint Programming (CP) is a paradigm for solving constraint satisfaction and optimization problems [@rossi2006]. Although CP mainly addresses combinatorial problems, it can also handle continuous problems by approximating real numbers with intervals [@benhamou2006]. 
 
 RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API. It achieves performances equivalent to the competing library Ibex [@chabert2009] for pure continuous problems.
 
-# CP over integer and numeric domains
+# Statement of need
 
-CP associates a rich modeling language with powerful search techniques. The main algorithm of RealPaver is a branch-and-prune's (B&P) that implements a complete search to find all the solutions of a given problem [@pvh1997; @chabert2009]. The branching component separates a problem into sub-problems easier to solve. The pruning or contracting component aims at reducing the region delimited by a sub-problem.
+CP associates a rich modeling language with powerful solving techniques. The main algorithm behind the RealPaver solver is a branch-and-prune (B&P) that implements a complete search to find all the solutions of a given problem [@pvh1997; @chabert2009]. The branching component separates a problem into sub-problems easier to solve. The pruning or contracting component aims at reducing the region delimited by a sub-problem. RealPaver relies on the GAOL interval library [@GAOL] to ensure rigorous computations.
+
+This technology has been applied with success in many fields of engineering like automatic control [@jaulin2001], preliminary design [@yvars2021] and robotics [@merlet2004].
+
+This library can be used by anyone wanting to compute sets of solutions for numerical or mixed discrete-continuous CSPs. It can also be used to prove infeasibility or existence of solutions thanks to the B\&P algorithm and interval analysis [@moore2009].
+Since the library contains most of the state-of-the art algorithms relating to CP over intervals, it can also be used by researchers in this field to define new algorithms.
+
+
+# Overview
+
+The RealPaver libray provides a CSP solver relying on a modern C++ API. Problems can be defined through the object-oriented API or using a domain specific language.
 
 ## Modeling language
 
@@ -65,7 +75,63 @@ The pruning component of the B&P algorithm combines several techniques.
 * Linear methods applied to affine or Taylor relaxations of nonlinear problems [@trombettoni2011];
 * Specific algorithms for the non-arithmetic or global constraints.
 
-# Design and implementation
+
+## Parameters and RealPaver customization
+
+RealPaver integrates classes to handle three types of parameters : double-valued, integer-valued or string-valued parameters.
+
+All existing parameters, with their default value, are defined in the class `Params`.
+This class organizes them using 10 categories: `General`, `Branch`, `Split`, `Contract`, `Polytope`, `Acid`, `LocaOptim`, `LinearSolver`, `Interval` and `NoCat`.
+
+Each parameter is defined by a name, a category, a description as a string, a domain (interval for doubles, range for integers and enumerated list of strings), and a value. All these elements are summarized in the default parameter file that is generated with the B\&P solver executable. For each parameter in this file, a comment before the parameter gives its description and possible values.
+Below is an extract of the general category:
+
+
+```bash
+# Time limit in seconds
+# Range of possible real values: [0, inf]
+TIME_LIMIT = 3600
+
+# Display of regions
+# List of possible values: 
+# - STD: standard display with one variable and its domain per line
+# - VEC: display as a vector of domains
+DISPLAY_REGION = STD
+
+# Number of digits used to print floating-point numbers and intervals
+# Range of possible int values: [1..16]
+FLOAT_PRECISION = 12
+
+# Absolute tolerance on the width of an interval domain of a constrained
+# variable
+# Range of possible real values: [0, inf]
+VAR_ABS_TOL = 1e-08
+```
+
+The B\&P behavior can be controlled by changing various parameters, like:
+
+- `SEARCH_STATUS` (`LIMITED` or `COMPLETE`): in the case of limited search, additional parameters act to stop the solving process (`TIME_LIMIT`, `SOLUTION_LIMIT`, `NODE_LIMIT`, `DEPTH_LIMIT`), otherwise they are ignored to compute the whole set of solutions that reaches the tolerances on all the variables.
+- `BP_NODE_SELECTION` (`DFS`, `BFS`, `DMDFS`): defines the global exploration strategy
+
+
+Additionally, more specific behaviors can be configured:
+
+- branching (variable and domain splitting) strategies (`SPLIT_SELECTION`,`SPLIT_INTERVAL_POINT`);
+- propagation and contraction algorithms (`PROPAGATION_BASE`: `HC4` or `BC4`, `PROPAGATION_WITH_NEWTON`, etc.);
+- parameters dedicated to the selected mechanisms, like the tolerance of the interval Newton contraction algorithm (`NEWTON_TOL`).
+
+
+Moreover, the section about the parameters in the documentation (processed by MkDocs) is generated from the default parameter file, using the python script `doc/gen_params_doc.py`.
+
+
+## Building system and requirements
+
+The meson build system is used to orchestrates the configuration, the building of the library and the generation of `rp_solver` (the CSP solver executable). The user can select one of the supported linear solving libraries (Coin-or CLP, HiGHS, SoPlex and Gurobi) and can activate assertions, logging or the generation of the documentation, directly as meson command line options.
+
+The current building system does not install dependencies or third party softwares. The user has to install, by its own, the GAOL interval library [@GAOL] and one of the supported linear solving library, as well as MkDocs if the building of the documentation is activated.
+Meson build system supports unit tests and ease their definition and execution. 22 executable tests cover internal mechanisms at various levels from interval arithmetic to piecewise constraints and polytope contractors.
+
+<!--# Design and implementation
 
 ## Building system and requirements
 
@@ -106,21 +172,21 @@ The B\&P behavior can be controlled by defining various parameters, like:
 - `BP_NODE_SELECTION` (`DFS`, `BFS`, `DMDFS`): defines the global exploration strategy
 
 
-Additionally, more specialized behavior can be configured:
+Additionally, more specific behaviors can be configured:
 
-- branching (variable and domain splitting) strategies
-- propagation and contraction algorithms (`HC4`, `BC4`, `ACID`, `NEWTON`, etc.)
+- branching (variable and domain splitting) strategies (`SPLIT_SELECTION`,`SPLIT_INTERVAL_POINT`)
+- propagation and contraction algorithms (`PROPAGATION_BASE`: `HC4` or `BC4`, `PROPAGATION_WITH_ACID`, `PROPAGATION_WITH_NEWTON`, etc.)
 - parameters dedicated to the selected mechanisms, like the tolerance of the interval Newton contraction algorithm (`NEWTON_TOL`)
 
 
 ## Extension of library
 
 development of new strategies, ..., using the API
-
+-->
 
 # Running Example
 
-The following problem is a simplified sizing problem of an electric coil. Somes variables are continuous (with interval domains), and the other are discrete (an interval of integers or enumerated sets of values). The material of wires is chosen from a table describing its characteristics (density and electical conductivity):
+The following problem is a simplified sizing problem of an electric coil. Somes variables are continuous (with interval domains), and the others are discrete (an interval of integers or enumerated sets of values). The material of wires is chosen from a table describing its characteristics (density and electical conductivity):
 
 ```python
 Constants
@@ -145,53 +211,53 @@ Aliases
 Constraints
   L == N*phi_w,
   P_j <= 5,
-  M <= 1,
+  M <= 0.1,
   table({rho,gamma},{
     2700, 37.7e6,
     8800, 59.6e6
   });
 ```
 
-Solving this problem can be done writting the problem is a text file, for instance called `coil.rp`, then running `rp_solver` on this file from the commande line:
+Solving this problem can be done by writting the problem in a text file (for instance `coil.rp`), then running `rp_solver` on this file from the commande line:
 
 ```bash
 rp_solver coil.rp -p params.txt
 ```
 
-The `-p` is optional and allows to customize the parameters using the `params.txt` definition.
+The `-p` is optional and allows to customize the parameters using a text file (here `params.txt`).
 
-An example output is:
+Using a time limit of 1 second and a absolute precision for variables of 0.001, the output on the command line is:
 
 ```bash
-################################################################################
+##############################################################################
 Realpaver 1.1.0 CSP solver
-################################################################################
+##############################################################################
 Files
-   Input file.......................... ../coil.rp
+   Input file.......................... ./coil.rp
    Output file......................... coil.sol
-################################################################################
+##############################################################################
 Preprocessing
    Time................................ 0.000 (seconds)
    Status.............................. checked
-   Number of variables fixed........... 1
-   Number of inactive constraints...... 0
-################################################################################
+   Number of variables fixed........... 0
+   Number of inactive constraints...... 1
+##############################################################################
 Solving
-   Time................................ 1.371 (seconds)
-   Number of nodes..................... 6301
+   Time................................ 1.145 (seconds)
+   Number of nodes..................... 3341
    Search status....................... partial
    Solution status..................... no proof certificate
-   Number of solutions................. 3132
+   Number of solutions................. 1662
    Time limit enabled.................. 1.000 (seconds)
-   Number of pending nodes............. 19
-################################################################################
+   Number of pending nodes............. 9
+##############################################################################
 ```
 
-Since this problem is under-constrained, a huge number of boxes may be computed to pave the feasible space. In this example, a time limit of 1 second stopped `rp_solver`, leading to a partial exploration with 3,213 solutions and 19 pending boxes (not fully processed boxes).
+Since this problem is under-constrained, a huge number of boxes may be computed to pave the feasible space. In this example, the time limit  stopped `rp_solver`, thus leading to a partial exploration with 3,341 computed solutions and 9 pending boxes (not fully processed boxes).
 
-The whole set of solutions is stored in the text file coil.sol. It also contains the hull of pending boxes and the summary of the solving process and the used values for parameters.
+The set of computed solutions is stored in the text file coil.sol. It also contains the hull of pending boxes and the summary of the solving process and the used values for parameters.
 
-# Future work
+
 
 # Acknowledgements
 
