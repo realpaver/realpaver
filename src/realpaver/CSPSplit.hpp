@@ -26,7 +26,6 @@
 #include "realpaver/CSPNode.hpp"
 #include "realpaver/DomainSlicerMap.hpp"
 #include "realpaver/Scope.hpp"
-#include "realpaver/SelectorASR.hpp"
 #include "realpaver/SelectorLF.hpp"
 #include "realpaver/SelectorSF.hpp"
 #include "realpaver/SelectorSLF.hpp"
@@ -241,30 +240,6 @@ public:
 
 private:
    SelectorSSR ssr_; // main selector based on SSR values
-   Scope sbis_;      // selector for the variables not handled by the SSR selector
-};
-
-/*----------------------------------------------------------------------------*/
-
-/// Splitting strategy based on affine forms
-class CSPSplitASR : public CSPSplit {
-public:
-   /// Constructor
-   CSPSplitASR(Scope scop, std::unique_ptr<DomainSlicerMap> smap, SharedDag dag);
-
-   /// Default destructor
-   ~CSPSplitASR() = default;
-
-   /// No copy
-   CSPSplitASR(const CSPSplitASR &) = delete;
-
-   /// No assignment
-   CSPSplitASR &operator=(const CSPSplitASR &) = delete;
-
-   void applyImpl(SharedCSPNode &node, CSPContext &context) override;
-
-private:
-   SelectorASR asr_; // main selector based on ASR values
    Scope sbis_;      // selector for the variables not handled by the SSR selector
 };
 
