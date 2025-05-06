@@ -656,7 +656,7 @@ public:
    ConstraintRep *cloneRoot() const override;
 
    /// Static function to handle automatic naming of binary variables
-   static string getNextBinaryName();
+   static std::string getNextBinaryName();
 
 private:
    Variable v_; // Main variable for which intervals are compared to its domain
@@ -673,7 +673,7 @@ private:
 
    static size_t
        nb_binaries_; // Static counter of the number of generated binary variables
-   static const string binary_prefix_; // prefix used to name generated binary variables
+   static const std::string binary_prefix_; // prefix used to name generated binary variables
 };
 
 /**

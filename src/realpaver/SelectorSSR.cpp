@@ -20,6 +20,8 @@
 
 #include "realpaver/SelectorSSR.hpp"
 
+#include <algorithm>
+
 namespace realpaver {
 
 SelectorSSR::SelectorSSR(IntervalFunctionVector F)
