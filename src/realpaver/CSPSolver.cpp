@@ -692,4 +692,9 @@ DomainBox CSPSolver::getPendingBox(size_t i) const
    }
 }
 
+const Problem &CSPSolver::getProblem() const
+{
+   return *problem_;
+}
+
 } // namespace realpaver
