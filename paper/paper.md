@@ -28,7 +28,7 @@ bibliography: paper.bib
 
 Constraint Programming (CP) is a paradigm for solving constraint satisfaction and optimization problems [@rossi2006]. Although CP mainly addresses combinatorial problems, it can also handle continuous problems by approximating real numbers with intervals [@benhamou2006]. 
 
-RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API. It achieves performances equivalent to the competing library Ibex [@chabert2009] for pure continuous problems.
+RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API. It achieves performances equivalent to the competing library Ibex [@ibex] for pure continuous problems.
 
 # Statement of need
 
@@ -36,7 +36,7 @@ CP associates a rich modeling language with powerful solving techniques. The mai
 
 This technology has been applied with success in many fields of engineering like automatic control [@jaulin2001], preliminary design [@yvars2021] and robotics [@merlet2004].
 
-This library can be used by anyone wanting to compute sets of solutions for numerical or mixed discrete-continuous CSPs. It can also be used to prove infeasibility or existence of solutions thanks to the B\&P algorithm and interval analysis [@moore2009].
+This library can be used by anyone wanting to compute sets of solutions for numerical or mixed discrete-continuous constraint satisfaction problems. It can also be used to prove infeasibility or existence of solutions thanks to the B\&P algorithm and interval analysis [@moore2009].
 Since the library contains most of the state-of-the art algorithms relating to CP over intervals, it can also be used by researchers in this field to define new algorithms.
 
 
@@ -70,21 +70,20 @@ The B&P algorithm creates a search tree by recursively dividing the initial regi
 
 The pruning component of the B&P algorithm combines several techniques.
 
-* Contraint propagation based on HC4 or BC4 operators [benhamou1999] and the ACID algorithm [@neveu2015];
+* Contraint propagation based on HC4 or BC4 operators [@benhamou1999] and the ACID algorithm [@neveu2015];
 * The interval Newton operator for nonlinear systems of equations [@moore2009];
-* Linear methods applied to affine or Taylor relaxations of nonlinear problems [@trombettoni2011];
+* Linear methods applied to affine or Taylor relaxations of nonlinear problems [@trombettoni2011; @Ninin40R2015];
 * Specific algorithms for the non-arithmetic or global constraints.
 
 
 ## Parameters and RealPaver customization
 
-RealPaver integrates classes to handle three types of parameters : double-valued, integer-valued or string-valued parameters.
+RealPaver integrates classes to handle three types of parameters: double-valued, integer-valued or string-valued parameters.
 
 All existing parameters, with their default value, are defined in the class `Params`.
 This class organizes them using 10 categories: `General`, `Branch`, `Split`, `Contract`, `Polytope`, `Acid`, `LocaOptim`, `LinearSolver`, `Interval` and `NoCat`.
 
-Each parameter is defined by a name, a category, a description as a string, a domain (interval for doubles, range for integers and enumerated list of strings), and a value. All these elements are summarized in the default parameter file that is generated with the B\&P solver executable. For each parameter in this file, a comment before the parameter gives its description and possible values.
-Below is an extract of the general category:
+Each parameter is defined by a name, a category, a description as a string, a domain (interval for doubles, range for integers and enumerated list of strings), and a value. All these elements are summarized in the default parameter file that is generated with the B\&P solver executable. For each parameter in this file, a comment before the parameter gives its description and possible values. Below is an extract of the general category:
 
 
 ```bash
@@ -116,8 +115,8 @@ The B\&P behavior can be controlled by changing various parameters, like:
 
 Additionally, more specific behaviors can be configured:
 
-- branching (variable and domain splitting) strategies (`SPLIT_SELECTION`,`SPLIT_INTERVAL_POINT`);
-- propagation and contraction algorithms (`PROPAGATION_BASE`: `HC4` or `BC4`, `PROPAGATION_WITH_NEWTON`, etc.);
+- branching strategies (`SPLIT_SELECTION`, `SPLIT_INTERVAL_POINT`);
+- propagation and contraction algorithms (`PROPAGATION_BASE` selects`HC4` or `BC4`, `PROPAGATION_WITH_NEWTON`, etc.);
 - parameters dedicated to the selected mechanisms, like the tolerance of the interval Newton contraction algorithm (`NEWTON_TOL`).
 
 
@@ -126,10 +125,10 @@ Moreover, the section about the parameters in the documentation (processed by Mk
 
 ## Building system and requirements
 
-The meson build system is used to orchestrates the configuration, the building of the library and the generation of `rp_solver` (the CSP solver executable). The user can select one of the supported linear solving libraries (Coin-or CLP, HiGHS, SoPlex and Gurobi) and can activate assertions, logging or the generation of the documentation, directly as meson command line options.
+The meson build system is used to orchestrate the configuration, the building of the library and the generation of `rp_solver` (the CSP solver executable). The user can select one of the supported linear solving libraries (Coin-or CLP, HiGHS, SoPlex and Gurobi) and can activate assertions, logging or the generation of the documentation, directly as meson command line options.
 
 The current building system does not install dependencies or third party softwares. The user has to install, by its own, the GAOL interval library [@GAOL] and one of the supported linear solving library, as well as MkDocs if the building of the documentation is activated.
-Meson build system supports unit tests and ease their definition and execution. 22 executable tests cover internal mechanisms at various levels from interval arithmetic to piecewise constraints and polytope contractors.
+Meson build system supports unit tests and eases their definition and execution. Numerous executable tests cover internal mechanisms at various levels from interval arithmetic to piecewise constraints and polytope contractors.
 
 <!--# Design and implementation
 
@@ -226,7 +225,7 @@ rp_solver coil.rp -p params.txt
 
 The `-p` is optional and allows to customize the parameters using a text file (here `params.txt`).
 
-Using a time limit of 1 second and a absolute precision for variables of 0.001, the output on the command line is:
+Using a time limit of 1 second and an absolute precision for variables of 0.001, the output on the command line is:
 
 ```bash
 ##############################################################################
