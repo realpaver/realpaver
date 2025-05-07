@@ -116,7 +116,7 @@ The B\&P behavior can be controlled by changing various parameters, like:
 Additionally, more specific behaviors can be configured:
 
 - branching strategies (`SPLIT_SELECTION`, `SPLIT_INTERVAL_POINT`);
-- propagation and contraction algorithms (`PROPAGATION_BASE` selects`HC4` or `BC4`, `PROPAGATION_WITH_NEWTON`, etc.);
+- propagation and contraction algorithms (`PROPAGATION_BASE` selects `HC4` or `BC4`, `PROPAGATION_WITH_NEWTON`, etc.);
 - parameters dedicated to the selected mechanisms, like the tolerance of the interval Newton contraction algorithm (`NEWTON_TOL`).
 
 
