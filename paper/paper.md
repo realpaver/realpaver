@@ -1,5 +1,5 @@
 ---
-title: 'RealPaver 1.1: A C++ Library for Constraint Programming over Numeric Domains'
+title: 'RealPaver 1.1: A C++ Library for Constraint Programming over Numeric or Mixed Discrete-Continuous Domains'
 tags:
   - C++
   - constraint programming
@@ -28,7 +28,9 @@ bibliography: paper.bib
 
 Constraint Programming (CP) is a paradigm for solving constraint satisfaction and optimization problems [@rossi2006]. Although CP mainly addresses combinatorial problems, it can also handle continuous problems by approximating real numbers with intervals [@benhamou2006]. 
 
-RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API. It achieves performances equivalent to the competing library Ibex [@ibex] for pure continuous problems.
+RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. Constraint Satisfaction Prblems (CSPs) can be described either in C++ with the API, or in a text file using the syntax of RealPaver specific language.  Then, they can be solved using the C++ API or using the CSP solver from the command-line. The CSP solver is pre-configured, but various parameters can be modified in another text file.
+
+With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API. It achieves performances equivalent to the competing library Ibex [@ibex] for pure continuous problems.
 
 # Statement of need
 
