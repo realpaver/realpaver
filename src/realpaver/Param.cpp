@@ -1698,4 +1698,9 @@ void Params::makeInterval()
    add(inf_chi);
 }
 
+void Params::setParam(const std::string &name, const std::string &val)
+{
+   processParam(name, val);
+}
+
 } // namespace realpaver
