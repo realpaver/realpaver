@@ -17,8 +17,8 @@ theme:
     # view: material/eye
 
 ## Options dedicated to git repository
-repo_url: https://gitlab.univ-nantes.fr/realpavergroup/realpaver/
-repo_name: realpavergroup/realpaver
+repo_url: https://github.com/realpaver/realpaver
+repo_name: realpaver/realpaver
 edit_uri: edit/main/doc/docs/
 
 markdown_extensions:

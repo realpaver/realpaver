@@ -121,7 +121,6 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       break;
    }
    case DagSymbol::Var: {
-
       const Variable &v = static_cast<DagVar *>(node)->getVar();
       f = std::make_unique<AffineForm>(dag_->scope().index(v), B.get(v));
       break;

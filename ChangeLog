@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleases]
+
+## [1.1.1] - 2025-05-20
+
+* Minor update of documentation [4115f9585588b20b539bb699c75fb47f30474079, 5237dad2daa912528372a623e39a0f040664311b]
+* Minor API modifications [8e0e58a9e39be3c19fea242a8950a13406f1e903, c710bcabb5b1dbf7a0612c81df3098e4076b9e87, 4ae4ea2d7737e43030dd3fb34fc378066ded21f4]
+* Fix a bug in affine forms [7a09b33636a5fac36c0bd57fa0fd048f72eced1a]
 
 ## [1.1.0] - 2025-04-25
 

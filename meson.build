@@ -15,7 +15,7 @@
 #-------------------------------------------------------------------------------
 
 ## Configuration of Realpaver using meson build
-project('Realpaver', 'cpp', version: '1.1.0', default_options: ['cpp_std=c++17'])
+project('Realpaver', 'cpp', version: '1.1.1', default_options: ['cpp_std=c++17'])
 
 ## Main compiler and linker configs
 cpp_comp = meson.get_compiler('cpp')

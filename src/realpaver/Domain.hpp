@@ -77,6 +77,14 @@ public:
     */
    virtual double size() const = 0;
 
+   /**
+    * @brief Returns the discrete size of this.
+    *
+    * If this is a discrete domain then returns size(), floor(H / tol) otherwise
+    * where His the interval hull of this.
+    */
+   double discreteSize(double tol) const;
+
    /// Returns true if this is empty
    virtual bool isEmpty() const = 0;
 

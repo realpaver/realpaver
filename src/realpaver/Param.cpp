@@ -1150,10 +1150,25 @@ void Params::makeSplit()
        .addChoice("RR", "round-robin strategy")
        .addChoice("LF", "largest domain")
        .addChoice("SF", "smallest domain")
-       .addChoice("SSR", "smear sum relative (using derivatives)")
+       .addChoice("SSR", "smear sum relative values (using derivatives)")
        .addChoice("SLF", "integer variable with smallest first and then real variable")
+       .addChoice("SSR_LF", "SSR and LF alternating with a given frequency")
        .setValue("SSR");
    add(var_sel);
+
+   ////////////////////
+   ParamDbl freq_ssr;
+   str = std::string("Frequency 0 <= f <= 1 used by the SSR_LF strategy. ") +
+         "If f = 1 then SSR is used. If f = 0 then LF is used. Otherwise SSR " +
+         "is used with frequency f with respect to LF, e.g. f = 0.75 means " +
+         "that SSR is used 3 times out of 4.";
+   freq_ssr.setName("SPLIT_SSR_LF_FREQUENCY")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(0.75)
+       .setMinValue(0.0)
+       .setMaxValue(1.0);
+   add(freq_ssr);
 
    ////////////////////
    ParamStr split_sl;
@@ -1681,6 +1696,11 @@ void Params::makeInterval()
        .setValue(1.0e-12)
        .setMinValue(0.0);
    add(inf_chi);
+}
+
+void Params::setParam(const std::string &name, const std::string &val)
+{
+   processParam(name, val);
 }
 
 } // namespace realpaver

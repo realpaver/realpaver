@@ -26,7 +26,7 @@ void clean()
 
 void problem1()
 {
-   string pb_str = R"RP(
+   std::string pb_str = R"RP(
     Variables
         x in {1,2,3},
         y in [-10,10];
@@ -46,7 +46,7 @@ void problem1()
 
 void problem2()
 {
-   string pb_str = R"RP(
+   std::string pb_str = R"RP(
     Variables
         x in [0,2],
         y in [0,10];
