@@ -388,6 +388,9 @@ public:
    /// Prints the static instance on a stream using the format of a parameter file
    static void Print(std::ostream &os);
 
+   /// Sets the value of a parameter called 'name' to val
+   void setParam(const std::string &name, const std::string &val);
+
 private:
    static Params instance_; // default instance
 

@@ -84,6 +84,9 @@ bool Parser::parseFile(const std::string &filename, Problem &problem)
    if (res == 0)
       res = realpaver_bison_parse();
 
+   if (problem.getName() == "")
+      problem.setName(filename);
+
    realpaver_flex_cleanup_file();
    symtab_.clear();
 
@@ -99,6 +102,9 @@ bool Parser::parseStr(const std::string &realpaver_str, Problem &problem)
 
    // parses the input file
    int res = realpaver_bison_parse();
+
+   if (problem.getName() == "")
+      problem.setName("no_name");
 
    realpaver_flex_cleanup_str();
    symtab_.clear();

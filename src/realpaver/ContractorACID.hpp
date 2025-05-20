@@ -22,8 +22,7 @@
 #define REALPAVER_CONTRACTOR_ACID_HPP
 
 #include "realpaver/ContractorVar3BCID.hpp"
-#include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/IntervalSmearSumRel.hpp"
+#include "realpaver/SelectorSSR.hpp"
 #include <memory>
 
 namespace realpaver {
@@ -63,12 +62,12 @@ public:
     * @param ctRatio threshold on the quality of contractions
     * @param varMinWidth threshold on the wodth of variable domains
     */
-   ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr, SharedContractor op, int ns3B,
+   ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContractor op, int ns3B,
                   int nsCID, int learnLength, int cycleLength, double ctRatio,
                   double varMinWidth);
 
    /// Default copy constructor
-   ContractorACID(const ContractorACID &) = default;
+   ContractorACID(const ContractorACID &) = delete;
 
    /// No assignment
    ContractorACID &operator=(const ContractorACID &) = delete;
@@ -93,11 +92,10 @@ public:
    void print(std::ostream &os) const override;
 
 private:
-   std::shared_ptr<IntervalSmearSumRel> ssr_; // calculator of smear
-                                              // sum rel values
-   SharedContractor op_;                      // contractor of slices e.g. HC4
-   Scope scop_;                               // scope
-   size_t n_;                                 // scope size
+   std::unique_ptr<SelectorSSR> ssr_; // calculator of smear sum rel values
+   SharedContractor op_;              // contractor of slices e.g. HC4
+   Scope scop_;                       // scope
+   size_t n_;                         // scope size
 
    int numVarCID_; // number of var3BCID contractors that must be applied
                    // in a call to the contract method

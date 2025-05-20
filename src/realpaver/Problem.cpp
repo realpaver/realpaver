@@ -629,4 +629,14 @@ bool Problem::isAliasReported(const Alias &a) const
    return erv_->contains(a.name());
 }
 
+std::string Problem::getName() const
+{
+   return name_;
+}
+
+void Problem::setName(std::string name)
+{
+   name_ = name;
+}
+
 } // namespace realpaver

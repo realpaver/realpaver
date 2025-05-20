@@ -22,6 +22,7 @@
 #define REALPAVER_SCOPE_MAP_HPP
 
 #include <unordered_map>
+#include <cstddef>
 
 namespace realpaver {
 

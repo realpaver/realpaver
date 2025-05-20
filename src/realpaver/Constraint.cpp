@@ -25,6 +25,7 @@
 #include "realpaver/ScopeBank.hpp"
 
 #include <numeric>
+#include <algorithm>
 
 namespace realpaver {
 
@@ -1926,9 +1927,9 @@ bool checkNonOverlappingIntervals(const std::vector<Interval> &intervals)
 }
 
 size_t PiecewiseCtr::nb_binaries_ = 0;
-const string PiecewiseCtr::binary_prefix_ = "__z";
+const std::string PiecewiseCtr::binary_prefix_ = "__z";
 
-string PiecewiseCtr::getNextBinaryName()
+std::string PiecewiseCtr::getNextBinaryName()
 {
    std::stringstream ss;
    ss << PiecewiseCtr::nb_binaries_;

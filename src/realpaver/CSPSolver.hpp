@@ -114,6 +114,9 @@ public:
     */
    DomainBox getPendingBox(size_t i) const;
 
+   /// Returns the problem
+   const Problem &getProblem() const;
+
 private:
    Problem *problem_;      // initial problem
    Problem *preprob_;      // problem resulting from preprocessing

@@ -62,8 +62,8 @@ public:
    /// Returns the dag of equations and inequality constraints
    SharedDag getDag() const;
 
-   /// Returns an IntervalSmearSumRel object on the DAG
-   std::shared_ptr<IntervalSmearSumRel> makeSSR();
+   /// Returns a vector with all the functions of the DAG
+   IntervalFunctionVector makeIntervalFunctionVector();
 
    /**
     * @brief Returns an HC4 contractor.

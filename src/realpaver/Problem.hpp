@@ -226,6 +226,12 @@ public:
    /// Returns true if a is reported, false otherwise
    bool isAliasReported(const Alias &a) const;
 
+   /// Returns the name of the problem
+   std::string getName() const;
+
+   /// Assigns the problem name
+   void setName(std::string name);
+
 private:
    std::string name_;             // name
    std::vector<Variable> vars_;   // vector of variables

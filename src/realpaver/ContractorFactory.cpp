@@ -22,7 +22,6 @@
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/IntervalSmearSumRel.hpp"
 #include "realpaver/Linearizer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -87,31 +86,14 @@ SharedDag ContractorFactory::ContractorFactory::getDag() const
    return dag_;
 }
 
-std::shared_ptr<IntervalSmearSumRel> ContractorFactory::makeSSR()
+IntervalFunctionVector ContractorFactory::makeIntervalFunctionVector()
 {
-   if (dag_->isEmpty())
-      return nullptr;
-
-   std::shared_ptr<IntervalSmearSumRel> ssr;
-
-   if (vc_.empty())
-   {
-      IntervalFunctionVector F(dag_);
-      ssr = std::make_shared<IntervalSmearSumRel>(F);
-   }
-   else
-   {
-      IntervalFunctionVector F;
-      for (size_t i : ve_)
-         F.addFun(IntervalFunction(dag_, i));
-
-      for (size_t i : vi_)
-         F.addFun(IntervalFunction(dag_, i));
-
-      ssr = std::make_shared<IntervalSmearSumRel>(F);
-   }
-
-   return ssr;
+   IntervalFunctionVector F;
+   for (size_t i : ve_)
+      F.addFun(IntervalFunction(dag_, i));
+   for (size_t i : vi_)
+      F.addFun(IntervalFunction(dag_, i));
+   return F;
 }
 
 SharedContractorHC4 ContractorFactory::makeHC4(double tol)
@@ -294,7 +276,8 @@ SharedContractorACID ContractorFactory::makeACID()
       return nullptr;
    }
 
-   std::shared_ptr<IntervalSmearSumRel> ssr = makeSSR();
+   IntervalFunctionVector F = makeIntervalFunctionVector();
+   std::unique_ptr<SelectorSSR> ssr = std::make_unique<SelectorSSR>(F);
 
    double tol = env_->getParams()->getDblParam("ACID_HC4_TOL");
    SharedContractorHC4 hc4 = makeHC4(tol);
@@ -306,7 +289,7 @@ SharedContractorACID ContractorFactory::makeACID()
    double ctRatio = env_->getParams()->getDblParam("ACID_CT_RATIO");
    double varMinWidth = env_->getParams()->getDblParam("VAR3BCID_MIN_WIDTH");
 
-   return std::make_shared<ContractorACID>(ssr, hc4, ns3B, nsCID, learnLength,
+   return std::make_shared<ContractorACID>(std::move(ssr), hc4, ns3B, nsCID, learnLength,
                                            cycleLength, ctRatio, varMinWidth);
 }
 

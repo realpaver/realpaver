@@ -12,21 +12,24 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   IntervalSmearSumRel.hpp
- * @brief  Smear sum relative strategy
+ * @file   SelectorSSR.hpp
+ * @brief  Variable selection strategy Smear Sum Relative
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   25 Apr 2025
  */
 
-#ifndef REALPAVER_INTERVAL_SMEAR_SUM_REL_HPP
-#define REALPAVER_INTERVAL_SMEAR_SUM_REL_HPP
+#ifndef REALPAVER_SELECTOR_SSR_HPP
+#define REALPAVER_SELECTOR_SSR_HPP
 
 #include "realpaver/IntervalFunctionVector.hpp"
+#include "realpaver/Selector.hpp"
 
 namespace realpaver {
 
 /**
- * @brief Calculates the smear sum relative values of interval functions.
+ * @brief Variable selection strategy Smear Sum Relative.
+ *
+ * It calculates the smear sum relative values of interval functions.
  *
  * Let F(x) be a vector of functions obtained from all the numeric constraints
  * of a problem and let B be a box. We first calculate the real matrix S
@@ -55,35 +58,35 @@ namespace realpaver {
    @endverbatim
  *
  * These values are stored in this. They can be accessed using getSSR(v).
+ *
+ * The variables that are not involved in numerical constraints are handled by the
+ * Largest-First strategy.
  */
-class IntervalSmearSumRel {
+class SelectorSSR : public Selector {
 public:
-   /// Constructor
-   IntervalSmearSumRel(IntervalFunctionVector F);
+   /// Creates a selector on a function vector
+   SelectorSSR(IntervalFunctionVector F);
 
    /// Default destructor
-   ~IntervalSmearSumRel() = default;
+   ~SelectorSSR() = default;
 
    /// Default copy constructor
-   IntervalSmearSumRel(const IntervalSmearSumRel &other) = default;
+   SelectorSSR(const SelectorSSR &) = default;
 
    /// No assignment
-   IntervalSmearSumRel &operator=(const IntervalSmearSumRel &) = delete;
-
-   /// Returns the scope of this
-   Scope scope() const;
+   SelectorSSR &operator=(const SelectorSSR &) = delete;
 
    /// Returns the interval function vector of this
    IntervalFunctionVector getFun() const;
 
-   /// Calculates the smearSumRel value of the variables in a box
+   /// Calculates the smearSumRel values of the variables in a box
    void calculate(const IntervalBox &B);
 
    /**
     * @brief Sorting method.
     *
     * Sorts the variables by decreasing ordering of their smearSumRel values.
-    * It must be done after a call to calculateSSR.
+    * It must be done after a call to calculate().
     */
    void sort();
 
@@ -111,6 +114,8 @@ public:
    /// Output on a stream
    void print(std::ostream &os) const;
 
+   bool apply(const DomainBox &box) override;
+
 private:
    struct Item {
       Variable var; // variable
@@ -126,13 +131,12 @@ private:
    };
 
    IntervalFunctionVector F_; // function vector
-   Scope scop_;               // scope of function vector
    std::vector<Item> ssr_;    // vector of smearSumRel values
                               // ordered by the scope
 };
 
 /// Output on a stream
-std::ostream &operator<<(std::ostream &os, const IntervalSmearSumRel &ssr);
+std::ostream &operator<<(std::ostream &os, const SelectorSSR &sel);
 
 } // namespace realpaver
 
