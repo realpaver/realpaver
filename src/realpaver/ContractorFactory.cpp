@@ -22,7 +22,10 @@
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/Linearizer.hpp"
+#include "realpaver/LinearizerAffine.hpp"
+#include "realpaver/LinearizerAffineTaylor.hpp"
+#include "realpaver/LinearizerRLT.hpp"
+#include "realpaver/LinearizerTaylor.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
 
@@ -377,8 +380,13 @@ SharedContractorPolytope ContractorFactory::makePolytope()
          ASSERT(affine != nullptr, "affine null");
 
          std::unique_ptr<Linearizer> lzr = std::make_unique<LinearizerAffineTaylor>(
-             dag_, std::move(affine), std::move(taylor));
+             std::move(affine), std::move(taylor));
 
+         op = std::make_shared<ContractorPolytope>(std::move(lzr));
+      }
+      else if (relaxation == "RLT")
+      {
+         std::unique_ptr<Linearizer> lzr = std::make_unique<LinearizerRLT>(dag_);
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
    }
