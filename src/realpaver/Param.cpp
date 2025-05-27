@@ -1328,6 +1328,7 @@ void Params::makePolytope()
        .addChoice("AFFINE", "use of affine forms")
        .addChoice("TAYLOR", "use of Taylor (mean value) forms")
        .addChoice("AFFINE_TAYLOR", "use of affine and Taylor (mean value) forms")
+       .addChoice("RLT", "use of Relaxation-Reformulation Techniques")
        .setValue("AFFINE");
    add(relax);
 

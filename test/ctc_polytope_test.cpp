@@ -1,6 +1,8 @@
 #include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/Dag.hpp"
-#include "realpaver/Linearizer.hpp"
+#include "realpaver/LinearizerAffine.hpp"
+#include "realpaver/LinearizerAffineTaylor.hpp"
+#include "realpaver/LinearizerTaylor.hpp"
 #include "realpaver/Problem.hpp"
 #include "test_config.hpp"
 #include <memory>
