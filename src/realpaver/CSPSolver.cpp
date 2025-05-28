@@ -192,6 +192,7 @@ void CSPSolver::makePropagator()
       THROW("Unable to create the propagator in the CSP solver");
 
    propagator_ = aux;
+   dag_ = factory_->getDag();
 }
 
 void CSPSolver::makeSplit()
@@ -228,18 +229,34 @@ void CSPSolver::makeSplit()
       split_ = new CSPSplitSLF(scop, std::move(smap));
 
    else if (sel == "SSR")
-      split_ =
-          new CSPSplitSSR(scop, std::move(smap), factory_->makeIntervalFunctionVector());
+      if (!dag_->isEmpty())
+         split_ = new CSPSplitSSR(scop, std::move(smap),
+                                  factory_->makeIntervalFunctionVector());
+      else
+      {
+         std::cout << "WARNING: Empty DAG, switching to Largest First splitting strategy!"
+                   << std::endl;
+         split_ = new CSPSplitLF(scop, std::move(smap));
+      }
 
    else if (sel == "SSR_LF")
    {
-      CSPSplitSSRLF *hybrid = new CSPSplitSSRLF(scop, std::move(smap),
-                                                factory_->makeIntervalFunctionVector());
+      if (!dag_->isEmpty())
+      {
+         CSPSplitSSRLF *hybrid = new CSPSplitSSRLF(
+             scop, std::move(smap), factory_->makeIntervalFunctionVector());
 
-      double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
-      hybrid->setFrequency(f);
+         double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
+         hybrid->setFrequency(f);
 
-      split_ = hybrid;
+         split_ = hybrid;
+      }
+      else
+      {
+         std::cout << "WARNING: Empty DAG, switching to Largest First splitting strategy!"
+                   << std::endl;
+         split_ = new CSPSplitLF(scop, std::move(smap));
+      }
    }
 
    THROW_IF(split_ == nullptr, "Unable to make the split object in a CSP solver");
