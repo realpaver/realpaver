@@ -18,18 +18,18 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Preprocessor.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Preprocessor.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/TermFixer.hpp"
 
 namespace realpaver {
 
 Preprocessor::Preprocessor()
-    : vvm_()
-    , vim_()
-    , box_(nullptr)
+    : bridge_(nullptr)
     , inactive_()
     , active_()
     , unfeasible_(false)
@@ -37,79 +37,21 @@ Preprocessor::Preprocessor()
 {
 }
 
-Preprocessor::~Preprocessor()
-{
-   if (box_ != nullptr)
-      delete box_;
-}
-
-bool Preprocessor::allVarsFixed() const
-{
-   return vvm_.empty();
-}
-
-bool Preprocessor::hasFixedDomain(Variable v) const
-{
-   auto it = vim_.find(v);
-   return it != vim_.end();
-}
-
-Interval Preprocessor::getFixedDomain(Variable v) const
-{
-   ASSERT(hasFixedDomain(v), "Domain of " << v.getName() << " is not fixed");
-
-   auto it = vim_.find(v);
-   return it->second;
-}
-
-Variable Preprocessor::srcToDestVar(Variable v) const
-{
-   ASSERT(!hasFixedDomain(v), "Domain of " << v.getName() << " is fixed");
-
-   auto it = vvm_.find(v);
-   return it->second;
-}
-
-Scope Preprocessor::destScope() const
-{
-   Scope scop;
-   for (auto p : vvm_)
-      scop.insert(p.second);
-
-   return scop;
-}
-
-DomainBox Preprocessor::destRegion() const
-{
-   DomainBox box(destScope());
-   for (auto p : vvm_)
-   {
-      std::unique_ptr<Domain> domain(box_->get(p.first)->clone());
-      box.set(p.second, std::move(domain));
-   }
-
-   return box;
-}
-
-void Preprocessor::apply(const Problem &src, Problem &dest)
+void Preprocessor::apply(Problem &src, Problem &dest)
 {
    ASSERT(!src.isEmpty(), "Preprocessing error");
    ASSERT(dest.isEmpty(), "Preprocessing error");
 
    // resets this
-   vvm_.clear();
-   vim_.clear();
    inactive_.clear();
    active_.clear();
    unfeasible_ = false;
 
-   // makes the interval box used for propagation
-   if (box_ != nullptr)
-      delete box_;
-   box_ = new DomainBox(src.scope());
+   // makes the bridge
+   bridge_ = std::make_shared<ProblemBridge>(src, dest);
 
    LOG_MAIN("Preprocessing");
-   LOG_INTER("Box: " << (*box_));
+   LOG_INTER("Box: " << (bridge_->srcRegion()));
 
    timer_.reset();
    timer_.start();
@@ -117,15 +59,16 @@ void Preprocessor::apply(const Problem &src, Problem &dest)
    timer_.stop();
 }
 
-void Preprocessor::applyImpl(const Problem &src, Problem &dest)
+void Preprocessor::applyImpl(Problem &src, Problem &dest)
 {
+   DomainBox &box = bridge_->srcRegion();
    Objective obj = src.getObjective();
 
    // test empty domains
    for (size_t i = 0; i < src.nbVars(); ++i)
    {
       Variable v = src.varAt(i);
-      Domain *domain = box_->get(v);
+      Domain *domain = box.get(v);
 
       if (domain->isEmpty())
       {
@@ -136,20 +79,20 @@ void Preprocessor::applyImpl(const Problem &src, Problem &dest)
    }
 
    // propagation
-   bool ok = propagate(src, *box_);
+   bool ok = propagate(src, box);
    if (!ok)
    {
       unfeasible_ = true;
       return;
    }
 
-   LOG_INTER("Contracted box: " << (*box_));
+   LOG_INTER("Contracted box: " << (box));
 
    // satisfaction tests
    for (size_t i = 0; i < src.nbCtrs(); ++i)
    {
       Constraint c = src.ctrAt(i);
-      Proof proof = c.isSatisfied(*box_);
+      Proof proof = c.isSatisfied(box);
 
       if (proof == Proof::Empty)
       {
@@ -176,7 +119,7 @@ void Preprocessor::applyImpl(const Problem &src, Problem &dest)
    for (size_t i = 0; i < src.nbVars(); ++i)
    {
       Variable v = src.varAt(i);
-      Domain *domain = box_->get(v);
+      Domain *domain = box.get(v);
 
       bool isFixed = domain->isCanonical();
       bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
@@ -184,33 +127,25 @@ void Preprocessor::applyImpl(const Problem &src, Problem &dest)
       if (isFake)
       {
          LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
-         vim_.insert(std::make_pair(v, domain->intervalHull()));
+         bridge_->insertFixed(v, *domain);
       }
       else if (isFixed)
       {
          LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
-         vim_.insert(std::make_pair(v, domain->intervalHull()));
+         bridge_->insertFixed(v, *domain);
       }
       else
       {
-         // creates a clone of the variable in the other problem
-         Variable w = dest.addClonedVar(v);
-
-         // assigns the reduced domain to it
-         std::unique_ptr<Domain> wdom(domain->clone());
-         w.setDomain(std::move(wdom));
-
-         // new map entry
-         vvm_.insert(std::make_pair(v, w));
+         bridge_->insertVar(v, *domain);
       }
    }
 
-   LOG_MAIN("Number of removed variables: " << vim_.size());
+   LOG_MAIN("Number of removed variables: " << bridge_->nbFixedVars());
 
    // rewrites the constraints
    for (Constraint input : active_)
    {
-      ConstraintFixer fixer(&vvm_, &vim_, *box_);
+      ConstraintFixer fixer(bridge_);
       input.acceptVisitor(fixer);
       Constraint c = fixer.getConstraint();
 
@@ -225,7 +160,7 @@ void Preprocessor::applyImpl(const Problem &src, Problem &dest)
    }
 
    // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(*box_)->intervalHull();
+   Interval dobj = obj.getTerm().eval(box)->intervalHull();
    if (dobj.isEmpty())
    {
       LOG_MAIN("Empty range of the objective function");
@@ -234,7 +169,7 @@ void Preprocessor::applyImpl(const Problem &src, Problem &dest)
    }
 
    // simplifies the objective function
-   TermFixer fixer(&vvm_, &vim_);
+   TermFixer fixer(bridge_);
    obj.getTerm().acceptVisitor(fixer);
 
    if ((!obj.isConstant()) && fixer.getTerm().isConstant())
@@ -251,7 +186,7 @@ void Preprocessor::applyImpl(const Problem &src, Problem &dest)
    }
 }
 
-bool Preprocessor::propagate(const Problem &problem, DomainBox &box)
+bool Preprocessor::propagate(Problem &problem, DomainBox &box)
 {
    // AC1 propagation algorithm
    bool modified;
@@ -284,24 +219,7 @@ bool Preprocessor::occursInActiveConstraint(const Variable &v) const
    for (Constraint c : active_)
       if (c.dependsOn(v))
          return true;
-
    return false;
-}
-
-Scope Preprocessor::fixedScope() const
-{
-   Scope scop;
-   for (auto p : vim_)
-      scop.insert(p.first);
-   return ScopeBank::getInstance()->insertScope(scop);
-}
-
-Scope Preprocessor::unfixedScope() const
-{
-   Scope scop;
-   for (auto p : vvm_)
-      scop.insert(p.first);
-   return ScopeBank::getInstance()->insertScope(scop);
 }
 
 size_t Preprocessor::nbInactiveCtrs() const
@@ -315,45 +233,6 @@ Constraint Preprocessor::getInactiveCtr(size_t i) const
    return inactive_[i];
 }
 
-size_t Preprocessor::nbFixedVars() const
-{
-   return vim_.size();
-}
-
-size_t Preprocessor::nbUnfixedVars() const
-{
-   return vvm_.size();
-}
-
-Variable Preprocessor::getFixedVar(size_t i) const
-{
-   ASSERT(i < nbFixedVars(), "Bad access to a fixed variable in a preprocessor");
-
-   auto it = vim_.begin();
-   std::advance(it, i);
-   return (*it).first;
-}
-
-Variable Preprocessor::getUnfixedVar(size_t i) const
-{
-   ASSERT(i < nbUnfixedVars(), "Bad access to a-n unfixed variable in a preprocessor");
-
-   auto it = vvm_.begin();
-   std::advance(it, i);
-   return (*it).first;
-}
-
-DomainBox Preprocessor::fixedRegion() const
-{
-   ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
-
-   IntervalBox B(fixedScope());
-   for (auto p : vim_)
-      B.set(p.first, p.second);
-
-   return DomainBox(B);
-}
-
 bool Preprocessor::isUnfeasible() const
 {
    return unfeasible_;
@@ -361,12 +240,120 @@ bool Preprocessor::isUnfeasible() const
 
 bool Preprocessor::isSolved() const
 {
-   return unfeasible_ || allVarsFixed();
+   return unfeasible_ || bridge_->allVarsFixed();
 }
 
 double Preprocessor::elapsedTime() const
 {
    return timer_.elapsedTime();
+}
+
+bool Preprocessor::allVarsFixed() const
+{
+   return bridge_->allVarsFixed();
+}
+
+Variable Preprocessor::srcToDestVar(const Variable &v) const
+{
+   return bridge_->srcToDestVar(v);
+}
+
+size_t Preprocessor::nbFixedVars() const
+{
+   return bridge_->nbFixedVars();
+}
+
+size_t Preprocessor::nbUnfixedVars() const
+{
+   return bridge_->nbUnfixedVars();
+}
+
+Variable Preprocessor::getFixedVar(size_t i) const
+{
+   return bridge_->getFixedVar(i);
+}
+
+Variable Preprocessor::getUnfixedVar(size_t i) const
+{
+   return bridge_->getUnfixedVar(i);
+}
+
+Interval Preprocessor::getFixedDomain(const Variable &v) const
+{
+   return bridge_->getFixedDomain(v);
+}
+
+bool Preprocessor::isFixed(const Variable &v) const
+{
+   return bridge_->isFixed(v);
+}
+
+bool Preprocessor::isUnfixed(const Variable &v) const
+{
+   return bridge_->isUnfixed(v);
+}
+
+DomainBox Preprocessor::fixedRegion() const
+{
+   return bridge_->fixedRegion();
+}
+
+DomainBox Preprocessor::destRegion() const
+{
+   return bridge_->destRegion();
+}
+
+Scope Preprocessor::destScope() const
+{
+   return bridge_->destScope();
+}
+
+Scope Preprocessor::fixedScope() const
+{
+   return bridge_->fixedScope();
+}
+
+Scope Preprocessor::unfixedScope() const
+{
+   return bridge_->unfixedScope();
+}
+
+void Preprocessor::print(std::ostream &os) const
+{
+   os << "Status: ";
+   if (unfeasible_)
+   {
+      os << "infeasible" << std::endl;
+      return;
+   }
+   else
+      os << "possibly feasible" << std::endl;
+
+   os << "Fixed variables: ";
+   for (size_t i = 0; i < nbFixedVars(); ++i)
+   {
+      if (i > 0)
+         os << ", ";
+      os << getFixedVar(i).getName() << ":" << getFixedDomain(getFixedVar(i));
+   }
+   os << std::endl;
+
+   os << "Unfixed variables: ";
+   for (size_t i = 0; i < nbUnfixedVars(); ++i)
+   {
+      if (i > 0)
+         os << ", ";
+      os << getUnfixedVar(i).getName();
+   }
+   os << std::endl;
+
+   os << "Inactive constraints:" << std::endl;
+   for (const auto &c : inactive_)
+      os << "   " << c << std::endl;
+
+   os << "Active constraints:" << std::endl;
+   for (const auto &c : active_)
+      os << "   " << c << std::endl;
 }
 
 } // namespace realpaver

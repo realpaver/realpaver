@@ -1,3 +1,4 @@
+#include "realpaver/ConstraintArithmetic.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorVar3B.hpp"
 #include "realpaver/Problem.hpp"

@@ -12,32 +12,42 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   ConstraintRelaxor.cpp
- * @brief  Relaxation of equations
+ * @file   ConstraintRelation.cpp
+ * @brief  Constraint relations
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   28 may 2025
  */
 
-#include "realpaver/ConstraintRelaxor.hpp"
-#include "realpaver/AssertDebug.hpp"
+#include "realpaver/ConstraintRelation.hpp"
 
 namespace realpaver {
 
-ConstraintRelaxor::ConstraintRelaxor(double nu)
-    : nu_(nu)
-    , relaxed_(nullptr)
+std::ostream &operator<<(std::ostream &os, const ConstraintRelation &rel)
 {
-   ASSERT(nu_ > 0.0, "Bad relaxation value " << nu);
-}
-
-Constraint ConstraintRelaxor::getRelaxedCtr() const
-{
-   return relaxed_;
-}
-
-void ConstraintRelaxor::apply(const ArithCtrEq *c)
-{
-   relaxed_ = in(c->left() - c->right(), Interval(-nu_, nu_));
+   switch (rel)
+   {
+   case ConstraintRelation::Eq:
+      return os << "==";
+   case ConstraintRelation::Le:
+      return os << "<=";
+   case ConstraintRelation::Lt:
+      return os << "<";
+   case ConstraintRelation::Ge:
+      return os << ">=";
+   case ConstraintRelation::Gt:
+      return os << ">";
+   case ConstraintRelation::In:
+      return os << "in";
+   case ConstraintRelation::Cond:
+      return os << "cond";
+   case ConstraintRelation::Piecewise:
+      return os << "piecewise";
+   case ConstraintRelation::Table:
+      return os << "table";
+   default:
+      os.setstate(std::ios::failbit);
+   }
+   return os;
 }
 
 } // namespace realpaver

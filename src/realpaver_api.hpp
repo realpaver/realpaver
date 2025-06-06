@@ -22,6 +22,10 @@
 #include "realpaver/Logger.hpp"
 #include "realpaver/Timer.hpp"
 
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintCond.hpp"
+#include "realpaver/ConstraintPiecewise.hpp"
+#include "realpaver/ConstraintTable.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"

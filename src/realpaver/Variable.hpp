@@ -27,6 +27,17 @@
 
 namespace realpaver {
 
+enum class VariableStatus {
+   Decision,  ///< decision variable
+   Objective, ///< variable representing an objective function
+   Auxiliary  ///< auxiliary variable introduced e.g. by reformulations
+};
+
+/// Output on a stream
+std::ostream &operator<<(std::ostream &os, VariableStatus status);
+
+/*----------------------------------------------------------------------------*/
+
 /// Shared representation of a variable in a problem.
 class VariableRep {
 public:
@@ -60,6 +71,12 @@ public:
    /// Sets the domain of this
    void setDomain(Domain *dom);
 
+   /// Returns the status of this
+   VariableStatus getStatus() const;
+
+   /// Sets the status of this
+   void setStatus(VariableStatus status);
+
    /// Returns true if this is a binary variable, false otherwise
    bool isBinary() const;
 
@@ -79,10 +96,11 @@ public:
    void setTolerance(const Tolerance &tol);
 
 private:
-   std::string name_; // name
-   size_t id_;        // identifier
-   Domain *dom_;      // domain
-   Tolerance tol_;    // tolerance
+   std::string name_;      // name
+   size_t id_;             // identifier
+   Domain *dom_;           // domain
+   VariableStatus status_; // status
+   Tolerance tol_;         // tolerance
 
    static int NEXT_ID; // management of ids
 };
@@ -94,6 +112,9 @@ private:
  *
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
+ *
+ * A variable has a name, a unique identifier, a domain, a status, and a tolerance.
+ * The default status is Decision. The default tolerance is equal to 0.
  */
 class Variable {
 public:
@@ -137,6 +158,12 @@ public:
     * throws an exception if dom is null
     */
    Variable &setDomain(std::unique_ptr<Domain> dom);
+
+   /// Returns the status of this
+   VariableStatus getStatus() const;
+
+   /// Sets the status of this
+   Variable &setStatus(VariableStatus status);
 
    /// Returns true if this is an integer variable in [0, 1]
    bool isBinary() const;

@@ -1,0 +1,136 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ConstraintRep.hpp
+ * @brief  Base class of constraint representations
+ * @author Laurent Granvilliers
+ * @date   28 may 2025
+ */
+
+#ifndef REALPAVER_CONSTRAINT_REP_HPP
+#define REALPAVER_CONSTRAINT_REP_HPP
+
+#include "realpaver/ConstraintRelation.hpp"
+#include "realpaver/Term.hpp"
+
+namespace realpaver {
+
+class ConstraintVisitor;
+
+/**
+ * @brief Base class of the hierarchy of constraint representations.
+ *
+ * The common attributes are a scope, a relation symbol, and an hash code.
+ */
+class ConstraintRep {
+public:
+   /// Constructor
+   ConstraintRep(const ConstraintRelation &rel);
+
+   /// Default copy constructor
+   ConstraintRep(const ConstraintRep &) = default;
+
+   /// No assignment
+   ConstraintRep &operator=(const ConstraintRep &) = delete;
+
+   /// Virtual destructor
+   virtual ~ConstraintRep();
+
+   /// Returns the hash code of this
+   size_t hashCode() const;
+
+   /// Returns the scope of this
+   Scope scope() const;
+
+   /// Returns true if v belongs to the scope of this
+   bool dependsOn(Variable v) const;
+
+   /// Returns the relation symbol of this
+   ConstraintRelation relation() const;
+
+   /// Returns true if this constraint is variable free
+   virtual bool isConstant() const = 0;
+
+   /// Checks the satisfaction of this on a box
+   virtual Proof isSatisfied(const IntervalBox &B) = 0;
+
+   /// Checks the satisfaction of this on a box
+   virtual Proof isSatisfied(const DomainBox &box) = 0;
+
+   /**
+    * @brief Returns the violation of this on a box.
+    *
+    * Returns 0 if the constraint is satisfied, otherwise a positive real
+    * number that indicates how much the constraint is violated.
+    */
+   virtual double violation(const IntervalBox &B) = 0;
+
+   /**
+    * @brief Returns the violation of this on a box.
+    *
+    * Returns 0 if the constraint is satisfied, otherwise a positive real
+    * number that indicates how much the constraint is violated.
+    */
+   virtual double violation(const DomainBox &box) = 0;
+
+   /// Contracts a box and returns a certificate of proof
+   virtual Proof contract(IntervalBox &B) = 0;
+
+   /// Contracts a box and returns a certificate of proof
+   virtual Proof contract(DomainBox &box) = 0;
+
+   /// Output on a stream
+   virtual void print(std::ostream &os) const = 0;
+
+   /// Visitor pattern
+   virtual void acceptVisitor(ConstraintVisitor &vis) const = 0;
+
+   /// Returns true if this is an equation
+   virtual bool isEquation() const;
+
+   /// Returns true if this is an inequality constraint (default: false)
+   virtual bool isInequality() const;
+
+   /// Returns true if this is linear
+   virtual bool isLinear() const;
+
+   /// Returns true if this is an integer arithmetic constraint
+   virtual bool isInteger() const = 0;
+
+   /// Return true if this just bounds a variable
+   virtual bool isBoundConstraint() const;
+
+   /// Returns a new representation such that only the root of this is cloned
+   virtual ConstraintRep *cloneRoot() const = 0;
+
+protected:
+   /// Type of shared constraint representation
+   using SharedRep = std::shared_ptr<ConstraintRep>;
+
+   friend class Constraint;
+
+   /// Sets the scope
+   void setScope(Scope scop);
+
+private:
+   Scope scop_;             // scope
+   ConstraintRelation rel_; // relation symbol
+
+protected:
+   size_t hcode_; // hash code
+};
+
+} // namespace realpaver
+
+#endif

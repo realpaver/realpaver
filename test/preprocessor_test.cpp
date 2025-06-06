@@ -1,28 +1,25 @@
+#include "realpaver/ConstraintArithmetic.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "test_config.hpp"
 
-Problem *src;
-DomainBox *box;
-Variable x, y, z;
+Problem *pb1;
+Variable u1, v1, w1;
 
 void init()
 {
-   src = new Problem();
-   x = src->addRealVar(-10, 10, "x");
-   y = src->addRealVar(-10, 10, "y");
-   z = src->addRealVar(-10, 10, "z");
+   pb1 = new Problem();
+   u1 = pb1->addRealVar(-10, 10, "u1");
+   v1 = pb1->addRealVar(-10, 10, "v1");
+   w1 = pb1->addRealVar(-10, 10, "w1");
 
-   src->addCtr(x + 1 == 0);
-   src->addCtr(x + y == 0);
-   src->addCtr(2 * x - y + sqr(z) - z == 1);
-
-   box = new DomainBox(src->scope());
+   pb1->addCtr(u1 + 1 == 0);
+   pb1->addCtr(u1 + v1 == 0);
+   pb1->addCtr(2 * u1 - v1 + sqr(w1) - w1 == 1);
 }
 
 void clean()
 {
-   delete box;
-   delete src;
+   delete pb1;
 }
 
 void test_1()
@@ -30,11 +27,11 @@ void test_1()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
-   TEST_TRUE(proc.hasFixedDomain(x));
-   TEST_TRUE(proc.hasFixedDomain(y));
-   TEST_FALSE(proc.hasFixedDomain(z));
+   TEST_TRUE(proc.isFixed(u1));
+   TEST_TRUE(proc.isFixed(v1));
+   TEST_FALSE(proc.isFixed(w1));
 }
 
 void test_2()
@@ -42,10 +39,10 @@ void test_2()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
-   TEST_TRUE(proc.getFixedDomain(x).isSetEq(Interval(-1.0)));
-   TEST_TRUE(proc.getFixedDomain(y).isSetEq(Interval(1.0)));
+   TEST_TRUE(proc.getFixedDomain(u1).isSetEq(Interval(-1.0)));
+   TEST_TRUE(proc.getFixedDomain(v1).isSetEq(Interval(1.0)));
 }
 
 void test_3()
@@ -53,12 +50,12 @@ void test_3()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
    Scope scop(proc.fixedScope());
 
-   TEST_TRUE(scop.contains(x));
-   TEST_TRUE(scop.contains(y));
+   TEST_TRUE(scop.contains(u1));
+   TEST_TRUE(scop.contains(v1));
 }
 
 void test_4()
@@ -66,7 +63,7 @@ void test_4()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
    TEST_TRUE(!proc.allVarsFixed());
 }
@@ -76,7 +73,7 @@ void test_5()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
    TEST_TRUE(proc.nbInactiveCtrs() == 2);
 }
@@ -86,14 +83,14 @@ void test_6()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
    DomainBox box = proc.fixedRegion();
 
    TEST_TRUE(box.scope().size() == 2);
-   TEST_TRUE(box.scope().contains(x));
-   TEST_TRUE(box.scope().contains(y));
-   TEST_FALSE(box.scope().contains(z));
+   TEST_TRUE(box.scope().contains(u1));
+   TEST_TRUE(box.scope().contains(v1));
+   TEST_FALSE(box.scope().contains(w1));
 }
 
 void test_7()
@@ -101,13 +98,13 @@ void test_7()
    Preprocessor proc;
    Problem dest;
 
-   proc.apply(*src, dest);
+   proc.apply(*pb1, dest);
 
    DomainBox box = proc.destRegion();
-   Variable v = proc.srcToDestVar(z);
+   Variable w = proc.srcToDestVar(w1);
 
    TEST_TRUE(box.scope().size() == 1);
-   TEST_TRUE(box.scope().contains(v));
+   TEST_TRUE(box.scope().contains(w));
 }
 
 int main()

@@ -57,6 +57,10 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %code requires
 {
 #include "realpaver/Constraint.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintCond.hpp"
+#include "realpaver/ConstraintPiecewise.hpp"
+#include "realpaver/ConstraintTable.hpp"
 #include "realpaver/Exception.hpp"
 }
 
@@ -566,11 +570,19 @@ ctr_atom
          realpaver_bison_error("Bad initialization of a piecewise constraint");
          YYABORT;
       }
-      realpaver::Constraint c( piecewise(vs->getVar(),
-                                         *realpaver_itv_pieces,
-                                         *realpaver_ctr_pieces,
-                                         realpaver_bison_problem) );
-      $$ = c.cloneRoot();
+
+      try
+      {
+         realpaver::Constraint c( piecewise(vs->getVar(), *realpaver_itv_pieces,
+                                            *realpaver_ctr_pieces,
+                                            *realpaver_bison_problem) );
+         $$ = c.cloneRoot();
+      }
+      catch(realpaver::Exception& e)
+      {
+        realpaver_bison_error("Bad piecewise constraint");
+        YYABORT;
+      }
     }
   ;
 

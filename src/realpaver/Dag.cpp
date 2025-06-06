@@ -1744,37 +1744,37 @@ size_t DagCreator::index()
    return index_;
 }
 
-void DagCreator::apply(const ArithCtrEq *c)
+void DagCreator::apply(const ConstraintEq *c)
 {
    Term t(c->left() - c->right());
    make(t, c->scope(), Interval::zero(), c->flatFunction());
 }
 
-void DagCreator::apply(const ArithCtrLe *c)
+void DagCreator::apply(const ConstraintLe *c)
 {
    Term t(c->left() - c->right());
    make(t, c->scope(), Interval::negative(), c->flatFunction());
 }
 
-void DagCreator::apply(const ArithCtrLt *c)
+void DagCreator::apply(const ConstraintLt *c)
 {
    Term t(c->left() - c->right());
    make(t, c->scope(), Interval::negative(), c->flatFunction());
 }
 
-void DagCreator::apply(const ArithCtrGe *c)
+void DagCreator::apply(const ConstraintGe *c)
 {
    Term t(c->left() - c->right());
    make(t, c->scope(), Interval::positive(), c->flatFunction());
 }
 
-void DagCreator::apply(const ArithCtrGt *c)
+void DagCreator::apply(const ConstraintGt *c)
 {
    Term t(c->left() - c->right());
    make(t, c->scope(), Interval::positive(), c->flatFunction());
 }
 
-void DagCreator::apply(const ArithCtrIn *c)
+void DagCreator::apply(const ConstraintIn *c)
 {
    make(c->term(), c->scope(), c->image(), c->flatFunction());
 }

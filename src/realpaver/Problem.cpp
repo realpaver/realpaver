@@ -294,7 +294,7 @@ void Problem::addObjective(Objective obj)
 std::ostream &operator<<(std::ostream &os, const Problem &p)
 {
    if (p.isEmpty())
-      return os << "Nothing in this problem";
+      return os << "empty problem";
 
    std::string indent = "", s_var = "Variables", s_ctr = "Constraints", s_int = "Integer",
                s_obj = "Objectives", s_als = "Aliases";
