@@ -24,6 +24,8 @@
 #include "RealPoint.hpp"
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/RealMatrix.hpp"
 #include "realpaver/TermLin.hpp"
@@ -1103,12 +1105,12 @@ public:
    /// Returns the constraint index in the DAG
    size_t index();
 
-   void apply(const ArithCtrEq *c) override;
-   void apply(const ArithCtrLe *c) override;
-   void apply(const ArithCtrLt *c) override;
-   void apply(const ArithCtrGe *c) override;
-   void apply(const ArithCtrGt *c) override;
-   void apply(const ArithCtrIn *c) override;
+   void apply(const ConstraintEq *c) override;
+   void apply(const ConstraintLe *c) override;
+   void apply(const ConstraintLt *c) override;
+   void apply(const ConstraintGe *c) override;
+   void apply(const ConstraintGt *c) override;
+   void apply(const ConstraintIn *c) override;
 
 private:
    Dag *dag_;     // DAG

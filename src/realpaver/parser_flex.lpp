@@ -117,7 +117,7 @@ std::vector<realpaver::Variable>* realpaver_var_vector;
 std::vector<realpaver::Interval>* realpaver_itv_vector;
 
 // vectors used to parse the piecewise constraints
-std::vector<realpaver::Variable>* realpaver_ctr_pieces;
+std::vector<realpaver::Constraint>* realpaver_ctr_pieces;
 std::vector<realpaver::Interval>* realpaver_itv_pieces;
 
 // unions used to parse the variable domains

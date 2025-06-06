@@ -21,6 +21,7 @@
 #ifndef REALPAVER_TERM_FIXER_HPP
 #define REALPAVER_TERM_FIXER_HPP
 
+#include "realpaver/ProblemBridge.hpp"
 #include "realpaver/Term.hpp"
 
 namespace realpaver {
@@ -28,23 +29,14 @@ namespace realpaver {
 /**
  * @brief Visitor that rewrites terms.
  *
- * Let t be a term, let vvm be a map Variable -> Variable, and let vim
- * be a map Variable -> Interval.
- * - for every entry (v, x) in vvm, every occurrence of v in t is replaced
- *   by x.
- * - for every entry (v, d) in vim, every occurrence of v in t is replaced
- *   by d.
+ * Every variable of a source problem is replaced either by an interval domain
+ * if it is fixed, or the corresponding variable in the destination
+ * problem. Those problems are given in a bridge.
  */
 class TermFixer : public TermVisitor {
 public:
-   /// Map type Variable -> Variable
-   using VarVarMapType = std::unordered_map<Variable, Variable, VariableHasher>;
-
-   /// Map type Variable -> Interval
-   using VarIntervalMapType = std::unordered_map<Variable, Interval, VariableHasher>;
-
-   /// Constructor
-   TermFixer(VarVarMapType *vvm, VarIntervalMapType *vim);
+   /// Creates a fixer given a problem bridge
+   TermFixer(SharedProblemBridge bridge);
 
    /// No copy
    TermFixer(const TermFixer &) = delete;
@@ -82,9 +74,8 @@ public:
    void apply(const TermTanh *t) override;
 
 private:
-   VarVarMapType *vvm_;      // map Variable -> Variable
-   VarIntervalMapType *vim_; // map Variable -> Interval
-   Term t_;                  // new term after a visit
+   SharedProblemBridge bridge_; // bridge between problems
+   Term rt_;                    // new term after a visit
 };
 
 } // namespace realpaver

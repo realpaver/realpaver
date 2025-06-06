@@ -18,18 +18,37 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Variable.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Variable.hpp"
 #include <memory>
 
 namespace realpaver {
 
 int VariableRep::NEXT_ID = 0;
 
+std::ostream &operator<<(std::ostream &os, VariableStatus status)
+{
+   switch (status)
+   {
+   case VariableStatus::Decision:
+      return os << "Decision";
+   case VariableStatus::Objective:
+      return os << "Objective";
+   case VariableStatus::Auxiliary:
+      return os << "Auxiliary";
+   default:
+      os.setstate(std::ios::failbit);
+   }
+   return os;
+}
+
+/*----------------------------------------------------------------------------*/
+
 VariableRep::VariableRep(const std::string &name)
     : name_(name)
     , id_(NEXT_ID++)
     , dom_(nullptr)
+    , status_(VariableStatus::Decision)
     , tol_(0.0, 0.0)
 {
    dom_ = new IntervalDomain(Interval::universe());
@@ -73,6 +92,16 @@ void VariableRep::setDomain(Domain *dom)
    if (dom_ != nullptr)
       delete dom_;
    dom_ = dom;
+}
+
+VariableStatus VariableRep::getStatus() const
+{
+   return status_;
+}
+
+void VariableRep::setStatus(VariableStatus status)
+{
+   status_ = status;
 }
 
 bool VariableRep::isBinary() const
@@ -150,6 +179,17 @@ Variable &Variable::setDomain(std::unique_ptr<Domain> dom)
    return *this;
 }
 
+VariableStatus Variable::getStatus() const
+{
+   return rep_->getStatus();
+}
+
+Variable &Variable::setStatus(VariableStatus status)
+{
+   rep_->setStatus(status);
+   return *this;
+}
+
 bool Variable::isBinary() const
 {
    return rep_->isBinary();
@@ -207,7 +247,10 @@ Variable Variable::clone() const
 
    std::unique_ptr<Domain> dom(getDomain()->clone());
 
-   v.setId(id()).setDomain(std::move(dom)).setTolerance(getTolerance());
+   v.setId(id())
+       .setDomain(std::move(dom))
+       .setTolerance(getTolerance())
+       .setStatus(getStatus());
 
    return v;
 }
