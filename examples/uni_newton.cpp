@@ -1,12 +1,18 @@
-#include <iostream>
 #include "realpaver_api.hpp"
+#include <iostream>
 
 using namespace realpaver;
 using namespace std;
 
 class MyFun : public IntervalFunctionUni {
-   Interval eval(const Interval& x)  { return sqr(x) - 2.0; }
-   Interval diff(const Interval& x) { return 2.0*x; }
+   Interval eval(const Interval &x)
+   {
+      return sqr(x) - 2.0;
+   }
+   Interval diff(const Interval &x)
+   {
+      return 2.0 * x;
+   }
 };
 
 int main(void)

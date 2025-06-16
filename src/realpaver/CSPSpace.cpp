@@ -16,17 +16,18 @@
  * @brief  Spaces of CSP solver
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include <list>
 #include "realpaver/CSPSpace.hpp"
+#include <list>
 
 namespace realpaver {
 
-CSPSpace::~CSPSpace() {}
+CSPSpace::~CSPSpace()
+{
+}
 
-void CSPSpace::insertPendingNodes(CSPSplit::iterator first,
-                                   CSPSplit::iterator last)
+void CSPSpace::insertPendingNodes(CSPSplit::iterator first, CSPSplit::iterator last)
 {
    for (auto it = first; it != last; ++it)
       insertPendingNode(*it);
@@ -35,7 +36,8 @@ void CSPSpace::insertPendingNodes(CSPSplit::iterator first,
 void CSPSpace::makeSolClusters(double gap)
 {
    // no clustering if the gap is negative
-   if (gap < 0.0) return;
+   if (gap < 0.0)
+      return;
 
    // moves the solution nodes in a list
    std::list<SharedCSPNode> lnode;
@@ -49,7 +51,7 @@ void CSPSpace::makeSolClusters(double gap)
    {
       // extracts the first node
       SharedCSPNode node = lnode.front();
-      DomainBox* box = node->box();
+      DomainBox *box = node->box();
       lnode.pop_front();
 
       // finds another node that is close enough
@@ -58,7 +60,7 @@ void CSPSpace::makeSolClusters(double gap)
       while (!found && it != lnode.end())
       {
          SharedCSPNode bis = *it;
-         DomainBox* boxbis = bis->box();
+         DomainBox *boxbis = bis->box();
 
          if (box->gap(*boxbis) < gap)
          {
@@ -66,16 +68,18 @@ void CSPSpace::makeSolClusters(double gap)
             boxbis->glueOnScope(*box, node->scope());
             found = true;
          }
-         else ++it;
+         else
+            ++it;
       }
 
       // this is a solution node and no other solution is close enough
-      if (!found) res.push_back(node);
+      if (!found)
+         res.push_back(node);
    }
 
    // pushes the solution nodes in this
-   for (const auto& node : res)
+   for (const auto &node : res)
       pushSolNode(node);
 }
 
-} // namespace
+} // namespace realpaver

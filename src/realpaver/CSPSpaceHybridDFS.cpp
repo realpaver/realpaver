@@ -16,24 +16,28 @@
  * @brief  Hybrid strategies
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include <algorithm>
-#include <list>
+#include "realpaver/CSPSpaceHybridDFS.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/CSPSpaceHybridDFS.hpp"
+#include <algorithm>
+#include <list>
 
 namespace realpaver {
 
-std::ostream& operator<<(std::ostream& os, const HybridDFSStyle& style)
+std::ostream &operator<<(std::ostream &os, const HybridDFSStyle &style)
 {
-   switch(style)
+   switch (style)
    {
-      case HybridDFSStyle::Depth:         return os << "depth style";
-      case HybridDFSStyle::Perimeter:     return os << "perimeter style";
-      case HybridDFSStyle::GridPerimeter: return os << "grid perimeter style";
-      default:                            os.setstate(std::ios::failbit);
+   case HybridDFSStyle::Depth:
+      return os << "depth style";
+   case HybridDFSStyle::Perimeter:
+      return os << "perimeter style";
+   case HybridDFSStyle::GridPerimeter:
+      return os << "grid perimeter style";
+   default:
+      os.setstate(std::ios::failbit);
    }
    return os;
 }
@@ -41,7 +45,8 @@ std::ostream& operator<<(std::ostream& os, const HybridDFSStyle& style)
 /*----------------------------------------------------------------------------*/
 
 HybridCSPNodeSet::~HybridCSPNodeSet()
-{}
+{
+}
 
 /*----------------------------------------------------------------------------*/
 
@@ -55,9 +60,9 @@ size_t DepthCSPNodeSet::size() const
    return set_.size();
 }
 
-void DepthCSPNodeSet::insert(const SharedCSPNode& node)
+void DepthCSPNodeSet::insert(const SharedCSPNode &node)
 {
-   Elem e = { node, node->depth() };
+   Elem e = {node, node->depth()};
    set_.insert(e);
 }
 
@@ -91,13 +96,13 @@ size_t PerimeterCSPNodeSet::size() const
    return set_.size();
 }
 
-void PerimeterCSPNodeSet::insert(const SharedCSPNode& node)
+void PerimeterCSPNodeSet::insert(const SharedCSPNode &node)
 {
    double p = node->box()->perimeter();
 
    LOG_INTER("Insert node " << node->index() << " / perimeter : " << p);
 
-   Elem e = { node, p };
+   Elem e = {node, p};
    set_.insert(e);
 }
 
@@ -131,13 +136,13 @@ size_t GridPerimeterCSPNodeSet::size() const
    return set_.size();
 }
 
-void GridPerimeterCSPNodeSet::insert(const SharedCSPNode& node)
+void GridPerimeterCSPNodeSet::insert(const SharedCSPNode &node)
 {
    double p = node->box()->gridPerimeter();
 
    LOG_INTER("Insert node " << node->index() << " / grid perimeter : " << p);
 
-   Elem e = { node, p };
+   Elem e = {node, p};
    set_.insert(e);
 }
 
@@ -146,8 +151,7 @@ SharedCSPNode GridPerimeterCSPNodeSet::extract()
    auto it = set_.begin();
    SharedCSPNode node = it->node;
 
-   LOG_INTER("Extract node " << node->index() << " / grid perimeter : "
-                             << it->peri);
+   LOG_INTER("Extract node " << node->index() << " / grid perimeter : " << it->peri);
 
    set_.erase(it);
    return node;
@@ -163,10 +167,10 @@ SharedCSPNode GridPerimeterCSPNodeSet::getNode(size_t i) const
 /*----------------------------------------------------------------------------*/
 
 CSPSpaceHybridDFS::CSPSpaceHybridDFS(HybridDFSStyle style)
-   : sta_(),
-     set_(nullptr),
-     vsol_(),
-     leftRight_(true)
+    : sta_()
+    , set_(nullptr)
+    , vsol_()
+    , leftRight_(true)
 {
    if (style == HybridDFSStyle::Depth)
       set_ = new DepthCSPNodeSet();
@@ -183,7 +187,8 @@ CSPSpaceHybridDFS::CSPSpaceHybridDFS(HybridDFSStyle style)
 
 CSPSpaceHybridDFS::~CSPSpaceHybridDFS()
 {
-   if (set_ != nullptr) delete set_;
+   if (set_ != nullptr)
+      delete set_;
 }
 
 size_t CSPSpaceHybridDFS::nbSolNodes() const
@@ -191,7 +196,7 @@ size_t CSPSpaceHybridDFS::nbSolNodes() const
    return vsol_.size();
 }
 
-void CSPSpaceHybridDFS::pushSolNode(const SharedCSPNode& node)
+void CSPSpaceHybridDFS::pushSolNode(const SharedCSPNode &node)
 {
    vsol_.push_back(node);
 
@@ -252,7 +257,7 @@ SharedCSPNode CSPSpaceHybridDFS::nextPendingNode()
    }
 }
 
-void CSPSpaceHybridDFS::insertPendingNode(const SharedCSPNode& node)
+void CSPSpaceHybridDFS::insertPendingNode(const SharedCSPNode &node)
 {
    // inserts a node in the stack during a DFS stage
    sta_.push_back(node);
@@ -276,7 +281,7 @@ SharedCSPNode CSPSpaceHybridDFS::getPendingNode(size_t i) const
 }
 
 void CSPSpaceHybridDFS::insertPendingNodes(CSPSplit::iterator first,
-                                            CSPSplit::iterator last)
+                                           CSPSplit::iterator last)
 {
    // the nodes between first and last are ordered from left to right
    // if the DFS ordering is left to right then it is necessary to inverse
@@ -298,4 +303,4 @@ void CSPSpaceHybridDFS::insertPendingNodes(CSPSplit::iterator first,
    }
 }
 
-} // namespace
+} // namespace realpaver

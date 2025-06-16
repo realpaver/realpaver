@@ -16,7 +16,7 @@
  * @brief  Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CSP_SPACE_DFS_HPP
 #define REALPAVER_CSP_SPACE_DFS_HPP
@@ -39,26 +39,26 @@ public:
    ~CSPSpaceDFS() = default;
 
    /// No assignment
-   CSPSpaceDFS& operator=(const CSPSpaceDFS&) = delete;
+   CSPSpaceDFS &operator=(const CSPSpaceDFS &) = delete;
 
    /// Default copy constructor
-   CSPSpaceDFS(const CSPSpaceDFS&) = default;
+   CSPSpaceDFS(const CSPSpaceDFS &) = default;
 
    size_t nbSolNodes() const override;
-   void pushSolNode(const SharedCSPNode& node) override;
+   void pushSolNode(const SharedCSPNode &node) override;
    SharedCSPNode popSolNode() override;
    SharedCSPNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
    SharedCSPNode nextPendingNode() override;
-   void insertPendingNode(const SharedCSPNode& node) override;
+   void insertPendingNode(const SharedCSPNode &node) override;
    SharedCSPNode getPendingNode(size_t i) const override;
 
 private:
-   std::vector<SharedCSPNode> vsol_;    // vector of solution nodes
-   std::vector<SharedCSPNode> vnode_;   // vector of pending nodes
+   std::vector<SharedCSPNode> vsol_;  // vector of solution nodes
+   std::vector<SharedCSPNode> vnode_; // vector of pending nodes
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

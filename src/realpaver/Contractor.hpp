@@ -16,14 +16,14 @@
  * @brief  Base class of interval contractors
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_HPP
 #define REALPAVER_CONTRACTOR_HPP
 
-#include <memory>
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/Scope.hpp"
+#include <memory>
 
 namespace realpaver {
 
@@ -31,7 +31,7 @@ namespace realpaver {
  * @brief Base class of interval contractors.
  *
  * An interval contractor is in general associated with a constraint. Given an
- * interval box, it removes infeasible facets (it prunes interval bounds) and 
+ * interval box, it removes infeasible facets (it prunes interval bounds) and
  * returns a certificate of proof:
  * - Proof::Empty if there is no solution;
  * - Proof::Feasible if it is proved that there is a solution;
@@ -46,33 +46,33 @@ public:
    Contractor() = default;
 
    /// Default copy constructor
-   Contractor(const Contractor&) = default;
+   Contractor(const Contractor &) = default;
 
    /// No assignment
-   Contractor& operator=(const Contractor&) = delete;
+   Contractor &operator=(const Contractor &) = delete;
 
    /// Virtual destructor
    virtual ~Contractor();
 
    /// Returns true if v belongs to the scope of this
-   bool dependsOn(const Variable& v) const;
+   bool dependsOn(const Variable &v) const;
 
    /// Returns the set of variable on which this depends on
    virtual Scope scope() const = 0;
 
    /// Contracts a box B and returns a certificate of proof
-   virtual Proof contract(IntervalBox& B) = 0;
+   virtual Proof contract(IntervalBox &B) = 0;
 
    /// Output on a stream
-   virtual void print(std::ostream& os) const;
+   virtual void print(std::ostream &os) const;
 };
 
-/// Output on a stream 
-std::ostream& operator<<(std::ostream& os, const Contractor& op);
+/// Output on a stream
+std::ostream &operator<<(std::ostream &os, const Contractor &op);
 
 /// Type of shared pointers on contractors
 using SharedContractor = std::shared_ptr<Contractor>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

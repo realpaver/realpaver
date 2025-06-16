@@ -16,15 +16,15 @@
  * @brief  Class of intervals
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_HPP
 #define REALPAVER_INTERVAL_HPP
 
-#include <string>
-#include <utility>
 #include "realpaver/Common.hpp"
 #include "realpaver/IntervalImpl.hpp"
+#include <string>
+#include <utility>
 
 namespace realpaver {
 
@@ -59,19 +59,19 @@ public:
    Interval(double l, double r);
 
    /// Creates [s rounded downward, s rounded upward]
-   Interval(const std::string& s);
+   Interval(const std::string &s);
 
    /// Creates [sl rounded downward, sr rounded upward]
-   Interval(const std::string& sl, const std::string& sr);
+   Interval(const std::string &sl, const std::string &sr);
 
    /// Creates [s rounded downward, s rounded upward]
-   Interval(const char* s);
+   Interval(const char *s);
 
    /// Creates [sl rounded downward, sr rounded upward]
-   Interval(const char* sl, const char* sr);
+   Interval(const char *sl, const char *sr);
 
    /// Default copy constructor
-   Interval(const Interval&) = default;
+   Interval(const Interval &) = default;
    ///@}
 
    /// Creates [-oo, a]
@@ -98,7 +98,9 @@ public:
    static Interval pi();
    static Interval halfPi();
    static Interval twoPi();
+   static Interval minusPiZero();
    static Interval minusPiPlusPi();
+   static Interval minusHalfPiPlusHalfPi();
    static Interval zeroPi();
    static Interval zeroTwoPi();
    /** @} */
@@ -158,22 +160,22 @@ public:
    ///@{
    bool contains(double a) const;
    bool strictlyContains(double a) const;
-   bool contains(const Interval& other) const;
-   bool strictlyContains(const Interval& other) const;
-   bool isSetEq(const Interval& other) const;
-   bool isSetNeq(const Interval& other) const;
-   bool isPossiblyEq(const Interval& other) const;
-   bool isPossiblyNeq(const Interval& other) const;
-   bool isPossiblyLe(const Interval& other) const;
-   bool isPossiblyLt(const Interval& other) const;
-   bool isPossiblyGe(const Interval& other) const;
-   bool isPossiblyGt(const Interval& other) const;
-   bool isCertainlyEq(const Interval& other) const;
-   bool isCertainlyNeq(const Interval& other) const;
-   bool isCertainlyLe(const Interval& other) const;
-   bool isCertainlyLt(const Interval& other) const;
-   bool isCertainlyGe(const Interval& other) const;
-   bool isCertainlyGt(const Interval& other) const;
+   bool contains(const Interval &other) const;
+   bool strictlyContains(const Interval &other) const;
+   bool isSetEq(const Interval &other) const;
+   bool isSetNeq(const Interval &other) const;
+   bool isPossiblyEq(const Interval &other) const;
+   bool isPossiblyNeq(const Interval &other) const;
+   bool isPossiblyLe(const Interval &other) const;
+   bool isPossiblyLt(const Interval &other) const;
+   bool isPossiblyGe(const Interval &other) const;
+   bool isPossiblyGt(const Interval &other) const;
+   bool isCertainlyEq(const Interval &other) const;
+   bool isCertainlyNeq(const Interval &other) const;
+   bool isCertainlyLe(const Interval &other) const;
+   bool isCertainlyLt(const Interval &other) const;
+   bool isCertainlyGe(const Interval &other) const;
+   bool isCertainlyGt(const Interval &other) const;
 
    bool isCertainlyEqZero() const;
    bool isCertainlyLeZero() const;
@@ -193,13 +195,15 @@ public:
    bool isStrictlyNegative() const;
    bool isPositive() const;
    bool isStrictlyPositive() const;
+   bool containskPi() const;
+   bool containsHalfPiPluskPi() const;
    ///@}
 
    /// Returns true if this and other do not overlap
-   bool isDisjoint(const Interval& other) const;
+   bool isDisjoint(const Interval &other) const;
 
    /// Returns true if this and other overlap
-   bool overlaps(const Interval& other) const;
+   bool overlaps(const Interval &other) const;
 
    /**
     * @brief Returns the Hausdorff distance between this and other.
@@ -207,7 +211,7 @@ public:
     * Given this = [a, b] and other = [c, d], the distance is defined by
     * max(|a-c|, |b-d|)
     */
-   double distance(const Interval& other) const;
+   double distance(const Interval &other) const;
 
    /**
     * @brief Returns the Gap between this and other.
@@ -218,33 +222,41 @@ public:
     * - c-b if c>b
     * - a-d if a>d
     */
-   double gap(const Interval& other) const;
+   double gap(const Interval &other) const;
+
+   /**
+    * @brief Returns the couple (midpoint, radius) of this.
+    *
+    * Returns (m, r) where m is the midpoint of this and r is its radius
+    * such that [m-r, m+r] contains this, if this is non empty; (NaN, NaN)
+    * otherwise.
+    */
+   std::pair<double, double> midrad() const;
 
    /// Intersection with assignment
-   Interval& operator&=(const Interval& other);
+   Interval &operator&=(const Interval &other);
 
    /// Intersection
-   friend Interval operator&(const Interval& x, const Interval& y);
+   friend Interval operator&(const Interval &x, const Interval &y);
 
    /// Interval hull with assignment
-   Interval& operator|=(const Interval& other);
+   Interval &operator|=(const Interval &other);
 
    /// Interval hull
-   friend Interval operator|(const Interval& x, const Interval& y);
+   friend Interval operator|(const Interval &x, const Interval &y);
 
    /// Set complement
-   friend std::pair<Interval,Interval> complement(const Interval& x);
+   friend std::pair<Interval, Interval> complement(const Interval &x);
 
    /// Set difference
-   friend std::pair<Interval,Interval> setminus(const Interval& x,
-                                                const Interval& y);
+   friend std::pair<Interval, Interval> setminus(const Interval &x, const Interval &y);
 
    /**
     * @brief Rounds an interval to integral bounds.
-    * 
+    *
     * Returns the largest interval of integers included in x
     */
-   friend Interval round(const Interval& x);
+   friend Interval round(const Interval &x);
 
    /**
     * @brief Inflation method.
@@ -254,191 +266,213 @@ public:
     */
    Interval inflate(double delta, double chi) const;
 
+   /**
+    * @brief Test of improvement.
+    *
+    * Assume that this is included in old. We want to know is this improves
+    * old enough with respect to the tolerance tol. Returns true if both
+    * intervals are non empty and (1.0 - x.width() / old.width()) > tol.
+    *
+    * The (relative) tolerance must be a real number in [0,1].
+    */
+   bool improves(const Interval &old, double tol) const;
+
    /// Output on a stream
-   friend std::ostream& operator<<(std::ostream& os, const Interval& x);
+   friend std::ostream &operator<<(std::ostream &os, const Interval &x);
 
    /// @name Addition
    ///@{
-   Interval& operator+=(const Interval& other);
-   friend Interval operator+(const Interval& x, const Interval& y);
-   friend Interval addPX(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval addPY(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval addPZ(const Interval& x, const Interval& y,
-                         const Interval& z);
+   Interval &operator+=(const Interval &other);
+   friend Interval operator+(const Interval &x, const Interval &y);
+   friend Interval addPX(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval addPY(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval addPZ(const Interval &x, const Interval &y, const Interval &z);
    ///@}
 
    /// @name Subtraction
    ///@{
-   Interval& operator-=(const Interval& other);
-   friend Interval operator-(const Interval& x, const Interval& y);
-   friend Interval subPX(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval subPY(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval subPZ(const Interval& x, const Interval& y,
-                         const Interval& z);
+   Interval &operator-=(const Interval &other);
+   friend Interval operator-(const Interval &x, const Interval &y);
+   friend Interval subPX(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval subPY(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval subPZ(const Interval &x, const Interval &y, const Interval &z);
    ///@}
 
    /// @name Unary subtraction
    ///@{
-   friend Interval operator-(const Interval& x);
-   friend Interval usubPX(const Interval& x, const Interval& y);
-   friend Interval usubPY(const Interval& x, const Interval& y);
+   friend Interval operator-(const Interval &x);
+   friend Interval usubPX(const Interval &x, const Interval &y);
+   friend Interval usubPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Multiplication
    ///@{
-   Interval& operator*=(const Interval& other);
-   friend Interval operator*(const Interval& x, const Interval& y);
-   friend Interval mulPX(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval mulPY(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval mulPZ(const Interval& x, const Interval& y,
-                         const Interval& z);
+   Interval &operator*=(const Interval &other);
+   friend Interval operator*(const Interval &x, const Interval &y);
+   friend Interval mulPX(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval mulPY(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval mulPZ(const Interval &x, const Interval &y, const Interval &z);
    ///@}
 
    /// @name Division
    ///@{
-   Interval& operator/=(const Interval& other);
-   friend Interval operator/(const Interval& x, const Interval& y);
+   Interval &operator/=(const Interval &other);
+   friend Interval operator/(const Interval &x, const Interval &y);
 
-   friend std::pair<Interval,Interval> extDiv(const Interval& x,
-                                              const Interval& y);
-   friend Interval divPX(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval divPY(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval divPZ(const Interval& x, const Interval& y,
-                         const Interval& z);
+   friend std::pair<Interval, Interval> extDiv(const Interval &x, const Interval &y);
+   friend Interval divPX(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval divPY(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval divPZ(const Interval &x, const Interval &y, const Interval &z);
    ///@}
 
    /// @name Square
    ///@{
-   friend Interval sqr(const Interval& x);
-   friend Interval sqrPX(const Interval& x, const Interval& y);
-   friend Interval sqrPY(const Interval& x, const Interval& y);
+   friend Interval sqr(const Interval &x);
+   friend Interval sqrPX(const Interval &x, const Interval &y);
+   friend Interval sqrPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Square root
    ///@{
-   friend Interval sqrt(const Interval& x);
-   friend Interval sqrtPX(const Interval& x, const Interval& y);
-   friend Interval sqrtPY(const Interval& x, const Interval& y);
+   friend Interval sqrt(const Interval &x);
+   friend Interval sqrtPX(const Interval &x, const Interval &y);
+   friend Interval sqrtPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Power function
    ///@{
-   friend Interval pow(const Interval& x, int n);
-   friend Interval powPX(const Interval& x, int n, const Interval& y);
-   friend Interval powPY(const Interval& x, int n, const Interval& y);
+   friend Interval pow(const Interval &x, int n);
+   friend Interval powPX(const Interval &x, int n, const Interval &y);
+   friend Interval powPY(const Interval &x, int n, const Interval &y);
    ///@}
 
    /// @name Exponential
    ///@{
-   friend Interval exp(const Interval& x);
-   friend Interval expPX(const Interval& x, const Interval& y);
-   friend Interval expPY(const Interval& x, const Interval& y);
+   friend Interval exp(const Interval &x);
+   friend Interval expPX(const Interval &x, const Interval &y);
+   friend Interval expPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Logarithm
    ///@{
-   friend Interval log(const Interval& x);
-   friend Interval logPX(const Interval& x, const Interval& y);
-   friend Interval logPY(const Interval& x, const Interval& y);
+   friend Interval log(const Interval &x);
+   friend Interval logPX(const Interval &x, const Interval &y);
+   friend Interval logPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Sine
    ///@{
-   friend Interval sin(const Interval& x);
-   friend Interval sinPX(const Interval& x, const Interval& y);
-   friend Interval sinPY(const Interval& x, const Interval& y);
+   friend Interval sin(const Interval &x);
+   friend Interval sinPX(const Interval &x, const Interval &y);
+   friend Interval sinPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Cosine
    ///@{
-   friend Interval cos(const Interval& x);
-   friend Interval cosPX(const Interval& x, const Interval& y);
-   friend Interval cosPY(const Interval& x, const Interval& y);
+   friend Interval cos(const Interval &x);
+   friend Interval cosPX(const Interval &x, const Interval &y);
+   friend Interval cosPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Tangent
    ///@{
-   friend Interval tan(const Interval& x);
-   friend Interval tanPX(const Interval& x, const Interval& y);
-   friend Interval tanPY(const Interval& x, const Interval& y);
+   friend Interval tan(const Interval &x);
+   friend Interval tanPX(const Interval &x, const Interval &y);
+   friend Interval tanPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Hyperbolic cosine
    ///@{
-   friend Interval cosh(const Interval& x);
-   friend Interval coshPX(const Interval& x, const Interval& y);
-   friend Interval coshPY(const Interval& x, const Interval& y);
+   friend Interval cosh(const Interval &x);
+   friend Interval coshPX(const Interval &x, const Interval &y);
+   friend Interval coshPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Hyperbolic sine
    ///@{
-   friend Interval sinh(const Interval& x);
-   friend Interval sinhPX(const Interval& x, const Interval& y);
-   friend Interval sinhPY(const Interval& x, const Interval& y);
+   friend Interval sinh(const Interval &x);
+   friend Interval sinhPX(const Interval &x, const Interval &y);
+   friend Interval sinhPY(const Interval &x, const Interval &y);
+   ///@}
+
+   /// @name Arccosine
+   ///@{
+   friend Interval acos(const Interval &x);
+   ///@}
+
+   /// @name Arcsine
+   ///@{
+   friend Interval asin(const Interval &x);
+   ///@}
+
+   /// @name Arctangent
+   ///@{
+   friend Interval atan(const Interval &x);
+   ///@}
+
+   /// @name Hyperbolic arccosine
+   ///@{
+   friend Interval acosh(const Interval &x);
+   ///@}
+
+   /// @name Hyperbolic arcsine
+   ///@{
+   friend Interval asinh(const Interval &x);
+   ///@}
+
+   /// @name Hyperbolic arctangent
+   ///@{
+   friend Interval atanh(const Interval &x);
    ///@}
 
    ///@{
    /// Hyperbolic tangent
-   friend Interval tanh(const Interval& x);
-   friend Interval tanhPX(const Interval& x, const Interval& y);
-   friend Interval tanhPY(const Interval& x, const Interval& y);
+   friend Interval tanh(const Interval &x);
+   friend Interval tanhPX(const Interval &x, const Interval &y);
+   friend Interval tanhPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Absolute value
    ///@{
-   friend Interval abs(const Interval& x);
-   friend Interval absPX(const Interval& x, const Interval& y);
-   friend Interval absPY(const Interval& x, const Interval& y);
+   friend Interval abs(const Interval &x);
+   friend Interval absPX(const Interval &x, const Interval &y);
+   friend Interval absPY(const Interval &x, const Interval &y);
    ///@}
 
    /// @name Minimum function
    ///@{
-   friend Interval min(const Interval& x, const Interval& y);
-   friend Interval minPX(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval minPY(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval minPZ(const Interval& x, const Interval& y,
-                         const Interval& z);
+   friend Interval min(const Interval &x, const Interval &y);
+   friend Interval minPX(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval minPY(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval minPZ(const Interval &x, const Interval &y, const Interval &z);
    ///@}
 
    /// @name Maximum function
    ///@{
-   friend Interval max(const Interval& x, const Interval& y);
-   friend Interval maxPX(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval maxPY(const Interval& x, const Interval& y,
-                         const Interval& z);
-   friend Interval maxPZ(const Interval& x, const Interval& y,
-                         const Interval& z);
+   friend Interval max(const Interval &x, const Interval &y);
+   friend Interval maxPX(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval maxPY(const Interval &x, const Interval &y, const Interval &z);
+   friend Interval maxPZ(const Interval &x, const Interval &y, const Interval &z);
    ///@}
 
    /// @name Sign function
    ///@{
-   friend Interval sgn(const Interval& x);
-   friend Interval sgnPX(const Interval& x, const Interval& y);
-   friend Interval sgnPY(const Interval& x, const Interval& y);   
+   friend Interval sgn(const Interval &x);
+   friend Interval sgnPX(const Interval &x, const Interval &y);
+   friend Interval sgnPY(const Interval &x, const Interval &y);
    ///@}
 
 private:
    using Traits = IntervalTraits<RawInterval>;
-   RawInterval impl_;    // interval enclosed
+   RawInterval impl_; // interval enclosed
 
    /// Constructor
-   Interval(const Interval::Traits::interval& x);
+   Interval(const Interval::Traits::interval &x);
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Interval& x);
+std::ostream &operator<<(std::ostream &os, const Interval &x);
 
-} // namespace
+} // namespace realpaver
 
 #endif

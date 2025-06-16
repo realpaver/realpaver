@@ -18,16 +18,18 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/RealVector.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-RealVector::RealVector(size_t n, double x) : NumericVector<double>(n, x)
-{}
+RealVector::RealVector(size_t n, double x)
+    : NumericVector<double>(n, x)
+{
+}
 
-RealVector::RealVector(const std::initializer_list<double>& l)
-      : NumericVector<double>()
+RealVector::RealVector(const std::initializer_list<double> &l)
+    : NumericVector<double>()
 {
    for (auto x : l)
       push(x);
@@ -45,8 +47,9 @@ void RealVector::set(size_t i, double x)
 
 bool RealVector::isNan() const
 {
-   for (size_t i=0; i<size(); ++i)
-      if (Double::isNan(get(i))) return true;
+   for (size_t i = 0; i < size(); ++i)
+      if (Double::isNan(get(i)))
+         return true;
 
    return false;
 }
@@ -58,30 +61,18 @@ void RealVector::setNan()
 
 bool RealVector::isFinite() const
 {
-   for (size_t i=0; i<size(); ++i)
-      if (Double::isNan(get(i)) || Double::isInf(get(i))) return false;
+   for (size_t i = 0; i < size(); ++i)
+      if (Double::isNan(get(i)) || Double::isInf(get(i)))
+         return false;
 
    return true;
-}
-
-double RealVector::scalarProduct(const RealVector& V) const
-{
-   ASSERT(size() == V.size(),
-          "Scalar product of vectors having different sizes");
-
-   double res = Double::mul(get(0), V[0]);
-
-   for (size_t i=1; i<size(); ++i)
-      Double::addAssign(res, Double::mul(get(i), V[i]));
-
-   return res;
 }
 
 double RealVector::l2Norm() const
 {
    double sq = 0.0;
 
-   for (size_t i=0; i<size(); ++i)
+   for (size_t i = 0; i < size(); ++i)
       Double::addAssign(sq, Double::sqr(get(i)));
 
    return Double::sqrt(sq);
@@ -91,7 +82,7 @@ double RealVector::l1Norm() const
 {
    double norm = 0.0;
 
-   for (size_t i=0; i<size(); ++i)
+   for (size_t i = 0; i < size(); ++i)
       Double::addAssign(norm, Double::abs(get(i)));
 
    return norm;
@@ -101,93 +92,106 @@ double RealVector::linfNorm() const
 {
    double norm = 0.0;
 
-   for (size_t i=0; i<size(); ++i)
+   for (size_t i = 0; i < size(); ++i)
    {
       double m = Double::abs(get(i));
-      if (m > norm) norm = m;
+      if (m > norm)
+         norm = m;
    }
 
    return norm;
 }
 
-RealVector& RealVector::operator+=(const RealVector& V)
+RealVector &RealVector::operator+=(const RealVector &V)
 {
    RealVector::BaseType::add(*this, V, *this);
    return *this;
 }
 
-RealVector& RealVector::operator-=(const RealVector& V)
+RealVector &RealVector::operator-=(const RealVector &V)
 {
    RealVector::BaseType::sub(*this, V, *this);
    return *this;
 }
 
-RealVector& RealVector::operator*=(double a)
+RealVector &RealVector::operator*=(double a)
 {
    RealVector::BaseType::mulScalar(a, *this, *this);
    return *this;
 }
 
-RealVector& RealVector::operator/=(double a)
+RealVector &RealVector::operator/=(double a)
 {
    RealVector::BaseType::divScalar(*this, a, *this);
    return *this;
 }
 
-RealVector operator+(const RealVector& V, const RealVector& W)
+RealVector operator+(const RealVector &V, const RealVector &W)
 {
    RealVector res(V.size());
    RealVector::BaseType::add(V, W, res);
    return res;
 }
 
-RealVector operator+(const RealVector& V, double w)
+RealVector operator+(const RealVector &V, double w)
 {
    RealVector res(V.size());
-   for (size_t i=0; i<V.size(); ++i)
+   for (size_t i = 0; i < V.size(); ++i)
    {
-      res.set(i, V.get(i)+w);
+      res.set(i, V.get(i) + w);
    }
    return res;
 }
 
-RealVector operator-(const RealVector& V, const RealVector& W)
+RealVector operator-(const RealVector &V, const RealVector &W)
 {
    RealVector res(V.size());
    RealVector::BaseType::sub(V, W, res);
    return res;
 }
 
-RealVector operator-(const RealVector& V)
+RealVector operator-(const RealVector &V)
 {
    RealVector res(V.size());
    RealVector::BaseType::usb(V, res);
    return res;
 }
 
-RealVector operator*(double a, const RealVector& V)
+double operator*(const RealVector &V, const RealVector &W)
+{
+   ASSERT(V.size() == W.size(), "Scalar product of vectors having different sizes");
+
+   double res = Double::mul(V[0], W[0]);
+
+   for (size_t i = 1; i < V.size(); ++i)
+      Double::addAssign(res, Double::mul(V[i], W[i]));
+
+   return res;
+}
+
+RealVector operator*(double a, const RealVector &V)
 {
    RealVector res(V.size());
    RealVector::BaseType::mulScalar(a, V, res);
    return res;
 }
 
-RealVector operator*(const RealVector& V, double a)
+RealVector operator*(const RealVector &V, double a)
 {
-   return a*V;
+   return a * V;
 }
 
-RealVector operator*(const RealMatrix& A, const RealVector& X)
+RealVector operator*(const RealMatrix &A, const RealVector &X)
 {
    ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
 
    RealVector Y(A.nrows());
 
-   for (size_t i=0; i<Y.size(); ++i)
+   for (size_t i = 0; i < Y.size(); ++i)
    {
       double z = 0.0;
 
-      for (size_t j=0; j<A.ncols(); ++j)
+      for (size_t j = 0; j < A.ncols(); ++j)
          z += A.get(i, j) * X.get(j);
 
       Y.set(i, z);
@@ -196,23 +200,22 @@ RealVector operator*(const RealMatrix& A, const RealVector& X)
    return Y;
 }
 
-RealVector operator/(const RealVector& V, double a)
+RealVector operator/(const RealVector &V, double a)
 {
    RealVector res(V.size());
    RealVector::BaseType::divScalar(V, a, res);
    return res;
 }
 
-RealVector* RealVector::clone() const
+RealVector *RealVector::clone() const
 {
    return new RealVector(*this);
 }
 
-std::ostream&
-operator<<(std::ostream& os, const RealVector& V)
+std::ostream &operator<<(std::ostream &os, const RealVector &V)
 {
    V.print(os);
    return os;
 }
 
-} // namespace
+} // namespace realpaver

@@ -16,18 +16,19 @@
  * @brief  Classes of pools of contractoirs
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorPool.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 ContractorPool::ContractorPool()
-      : v_(),
-        scop_()
-{}
+    : v_()
+    , scop_()
+{
+}
 
 size_t ContractorPool::poolSize() const
 {
@@ -51,8 +52,7 @@ void ContractorPool::push(SharedContractor op)
 
 SharedContractor ContractorPool::contractorAt(size_t i) const
 {
-   ASSERT(i < v_.size(),
-          "Access out of range in a vector of contractors @ " << i);
+   ASSERT(i < v_.size(), "Access out of range in a vector of contractors @ " << i);
 
    return v_[i];
 }
@@ -62,11 +62,11 @@ void ContractorPool::makeDep()
    dep_.clear();
    dep_.resize(scop_.size());
 
-   for (size_t i=0; i<scop_.size(); ++i)
+   for (size_t i = 0; i < scop_.size(); ++i)
    {
       Variable v = scop_.var(i);
-      
-      for (size_t j=0; j<v_.size(); ++j)
+
+      for (size_t j = 0; j < v_.size(); ++j)
       {
          if (v_[j]->dependsOn(v))
          {
@@ -76,25 +76,25 @@ void ContractorPool::makeDep()
    }
 }
 
-size_t ContractorPool::depSize(const Variable& v) const
+size_t ContractorPool::depSize(const Variable &v) const
 {
    return dep_[scop_.index(v)].size();
 }
 
-size_t ContractorPool::depAt(const Variable& v, size_t i) const
+size_t ContractorPool::depAt(const Variable &v, size_t i) const
 {
    return dep_[scop_.index(v)][i];
 }
 
-void ContractorPool::print(std::ostream& os) const
+void ContractorPool::print(std::ostream &os) const
 {
    os << "Pool of " << v_.size() << " contractors" << std::endl;
-   for (size_t i=0; i<scop_.size(); ++i)
+   for (size_t i = 0; i < scop_.size(); ++i)
    {
       Variable v = scop_.var(i);
       os << v.getName() << ": ";
-      
-      for (size_t j=0; j<dep_[i].size(); ++j)
+
+      for (size_t j = 0; j < dep_[i].size(); ++j)
       {
          os << dep_[i][j] << " ";
       }
@@ -102,4 +102,4 @@ void ContractorPool::print(std::ostream& os) const
    }
 }
 
-} // namespace
+} // namespace realpaver

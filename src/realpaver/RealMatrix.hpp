@@ -30,7 +30,7 @@ namespace realpaver {
 
 /**
  *  @brief Dense real matrix.
- * 
+ *
  *  The elements of a matrix of size (n, m) are indexed from 0 to n-1 and
  *  0 to m-1.
  */
@@ -41,15 +41,15 @@ public:
 
    /// Creates a matrix with nrows rows and ncols columns
    RealMatrix(size_t nrows, size_t ncols, double x = 0.0);
-   
+
    /// Creates a matrix from a list of rows
-   RealMatrix(const std::initializer_list<std::initializer_list<double>>& l);
+   RealMatrix(const std::initializer_list<std::initializer_list<double>> &l);
 
    /// Default copy constructor
-   RealMatrix(const RealMatrix&) = default;
+   RealMatrix(const RealMatrix &) = default;
 
    /// Default assignment operator
-   RealMatrix& operator=(const RealMatrix& V) = default;
+   RealMatrix &operator=(const RealMatrix &V) = default;
 
    /// Default destructor
    ~RealMatrix() = default;
@@ -73,35 +73,35 @@ public:
    void setIdentity();
 
    /// Returns true if this is equal to A
-   bool operator==(const RealMatrix& A) const;
+   bool operator==(const RealMatrix &A) const;
 
    /// Returns true if this is not equal to A
-   bool operator!=(const RealMatrix& A) const;
+   bool operator!=(const RealMatrix &A) const;
 
    /// Addition with assignment
-   RealMatrix& operator+=(const RealMatrix& A);
+   RealMatrix &operator+=(const RealMatrix &A);
 
    /// Subtraction with assignment
-   RealMatrix& operator-=(const RealMatrix& A);
+   RealMatrix &operator-=(const RealMatrix &A);
 
    /// Multiplication with assignment
-   RealMatrix& operator*=(double a);
+   RealMatrix &operator*=(double a);
 
    /// Division with assignment
-   RealMatrix& operator/=(double a);
+   RealMatrix &operator/=(double a);
 
    /// Returns the transpose of this
    RealMatrix transpose() const;
 
    /**
     * @brief Calculates the inverse of a square matrix.
-    * 
+    *
     * Returns true if this is invertible, in this case P is the inverse; returns
     * false otherwise.
-    * 
+    *
     * this is modified.
     */
-   bool inverse(RealMatrix& P);
+   bool inverse(RealMatrix &P);
 
    /// Returns the threshold on the values of pivots
    bool getMinPivot() const;
@@ -111,56 +111,56 @@ public:
 
    /**
     * @brief Computes the LU decomposition of this.
-    * 
+    *
     * this, L, and U must have the same dimension.
     */
-   void LU(RealMatrix& L, RealMatrix& U) const;
+   void LU(RealMatrix &L, RealMatrix &U) const;
 
    /// Checks if this is positive definite
    bool isPositiveDefinite() const;
 
 private:
-   double minpiv_;   // threshold on the values of pivots
+   double minpiv_; // threshold on the values of pivots
 
    // first phase of inversion: calculates an upper triangular matrix
    // using Gauss-Jordan elimination
-   bool elimination(RealMatrix& P);
+   bool elimination(RealMatrix &P);
 
    // second phase of inversion: back substitution
-   void substitution(RealMatrix& P);
+   void substitution(RealMatrix &P);
 
    // finds a pivot in the submatrix of this such that the coefficient
    // (i, i) is the upper left corner
-   bool findPivot(size_t i, size_t& row, size_t& col);
+   bool findPivot(size_t i, size_t &row, size_t &col);
 
    // divides the i-th rows in this and P by this(i, i)
-   void dividePivot(size_t i, RealMatrix& P);
+   void dividePivot(size_t i, RealMatrix &P);
 };
 
 /// Output on s stream
-std::ostream& operator<<(std::ostream& os, const RealMatrix& A);
+std::ostream &operator<<(std::ostream &os, const RealMatrix &A);
 
 /// Returns A+B
-RealMatrix operator+(const RealMatrix& A, const RealMatrix& B);
+RealMatrix operator+(const RealMatrix &A, const RealMatrix &B);
 
 /// Returns A-B
-RealMatrix operator-(const RealMatrix& A, const RealMatrix& B);
+RealMatrix operator-(const RealMatrix &A, const RealMatrix &B);
 
 /// Returns -A
-RealMatrix operator-(const RealMatrix& A);
+RealMatrix operator-(const RealMatrix &A);
 
 /// Returns a*B
-RealMatrix operator*(double a, const RealMatrix& B);
+RealMatrix operator*(double a, const RealMatrix &B);
 
 /// Returns B*a
-RealMatrix operator*(const RealMatrix& B, double a);
+RealMatrix operator*(const RealMatrix &B, double a);
 
 /// Returns A*B
-RealMatrix operator*(const RealMatrix& A, const RealMatrix& B);
+RealMatrix operator*(const RealMatrix &A, const RealMatrix &B);
 
 /// Returns B/a
-RealMatrix operator/(const RealMatrix& B, double a);
+RealMatrix operator/(const RealMatrix &B, double a);
 
-} // namespace
+} // namespace realpaver
 
 #endif

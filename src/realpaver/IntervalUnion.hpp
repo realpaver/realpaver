@@ -16,14 +16,14 @@
  * @brief  Ordered set of disjoint intervals
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_UNION_HPP
 #define REALPAVER_INTERVAL_UNION_HPP
 
+#include "realpaver/Interval.hpp"
 #include <iostream>
 #include <vector>
-#include "realpaver/Interval.hpp"
 
 namespace realpaver {
 
@@ -34,16 +34,16 @@ public:
    IntervalUnion();
 
    /// Creates an interval union reduced to one interval
-   IntervalUnion(const Interval& x);
+   IntervalUnion(const Interval &x);
 
    /// Creates an interval union from a list
-   IntervalUnion(const std::initializer_list<Interval>& l);
+   IntervalUnion(const std::initializer_list<Interval> &l);
 
    /// Default copy constructor
-   IntervalUnion(const IntervalUnion&) = default;
+   IntervalUnion(const IntervalUnion &) = default;
 
    /// Default assignment operator
-   IntervalUnion& operator=(const IntervalUnion&) = default;
+   IntervalUnion &operator=(const IntervalUnion &) = default;
 
    /// Default destructor
    ~IntervalUnion() = default;
@@ -52,7 +52,7 @@ public:
    size_t size() const;
 
    /// Gets the i-th interval of this
-   const Interval& operator[](size_t i) const;
+   const Interval &operator[](size_t i) const;
 
    /// Gets a part of this
    IntervalUnion subUnion(size_t i, size_t j) const;
@@ -64,19 +64,19 @@ public:
    void setEmpty();
 
    /// Inserts x in this
-   IntervalUnion& insert(const Interval& x);
+   IntervalUnion &insert(const Interval &x);
 
    /// Returns the interval hull of this
    Interval hull() const;
 
    /// Contracts x as hull(x inter this)
-   void contractInterval(Interval& x) const;
+   void contractInterval(Interval &x) const;
 
    /// Contracts this as (this inter x)
-   void contract(const Interval& x);
+   void contract(const Interval &x);
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Clears this, which becomes empty
    void clear();
@@ -85,35 +85,34 @@ public:
    double width() const;
 
    /// Equality test
-   bool equals(const IntervalUnion& other) const;
+   bool equals(const IntervalUnion &other) const;
 
    /// @name Addition
    ///@{
-   friend IntervalUnion addPX(const Interval& x, const Interval& y,
-                              const IntervalUnion& Z);
-   friend IntervalUnion addPY(const Interval& x, const Interval& y,
-                              const IntervalUnion& Z);
+   friend IntervalUnion addPX(const Interval &x, const Interval &y,
+                              const IntervalUnion &Z);
+   friend IntervalUnion addPY(const Interval &x, const Interval &y,
+                              const IntervalUnion &Z);
    ///@}
 
    /// @name Subtraction
    ///@{
-   friend IntervalUnion subPX(const Interval& x, const Interval& y,
-                              const IntervalUnion& Z);
-   friend IntervalUnion subPY(const Interval& x, const Interval& y,
-                              const IntervalUnion& Z);
+   friend IntervalUnion subPX(const Interval &x, const Interval &y,
+                              const IntervalUnion &Z);
+   friend IntervalUnion subPY(const Interval &x, const Interval &y,
+                              const IntervalUnion &Z);
    ///@}
 
    /// @name Multiplication
    ///@{
-   friend IntervalUnion mulPX(const Interval& x, const Interval& y,
-                              const IntervalUnion& Z);
-   friend IntervalUnion mulPY(const Interval& x, const Interval& y,
-                              const IntervalUnion& Z);
+   friend IntervalUnion mulPX(const Interval &x, const Interval &y,
+                              const IntervalUnion &Z);
+   friend IntervalUnion mulPY(const Interval &x, const Interval &y,
+                              const IntervalUnion &Z);
    ///@}
 
-
    /// Square
-   friend IntervalUnion sqrPX(const Interval& x, const IntervalUnion& Y);
+   friend IntervalUnion sqrPX(const Interval &x, const IntervalUnion &Y);
 
 private:
    typedef std::vector<Interval> VectorType;
@@ -122,7 +121,7 @@ private:
    // first := index of the leftmost interval intersecting x
    // right := index of the rightmost interval intersecting x
    // returns true if this and x overlap
-   bool findInter(const Interval& x, int& first, int& last) const;
+   bool findInter(const Interval &x, int &first, int &last) const;
 
 public:
    /// Type of iterators in an interval union
@@ -136,8 +135,8 @@ public:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const IntervalUnion& u);
+std::ostream &operator<<(std::ostream &os, const IntervalUnion &u);
 
-} // namespace toutatis
+} // namespace realpaver
 
 #endif

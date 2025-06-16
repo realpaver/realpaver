@@ -16,23 +16,25 @@
  * @brief  Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSpaceDFS.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 CSPSpaceDFS::CSPSpaceDFS()
-      : vsol_(), vnode_()
-{}
+    : vsol_()
+    , vnode_()
+{
+}
 
 size_t CSPSpaceDFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void CSPSpaceDFS::pushSolNode(const SharedCSPNode& node)
+void CSPSpaceDFS::pushSolNode(const SharedCSPNode &node)
 {
    vsol_.push_back(node);
 }
@@ -46,8 +48,7 @@ SharedCSPNode CSPSpaceDFS::popSolNode()
 
 SharedCSPNode CSPSpaceDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(),
-          "Bad access to a solution node in a CSP space @ " << i);
+   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space @ " << i);
 
    return vsol_[i];
 }
@@ -75,17 +76,16 @@ SharedCSPNode CSPSpaceDFS::nextPendingNode()
    return node;
 }
 
-void CSPSpaceDFS::insertPendingNode(const SharedCSPNode& node)
+void CSPSpaceDFS::insertPendingNode(const SharedCSPNode &node)
 {
    vnode_.push_back(node);
 }
 
 SharedCSPNode CSPSpaceDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < vnode_.size(),
-          "Bad access to a pending node in a CSP space @ " << i);
+   ASSERT(i < vnode_.size(), "Bad access to a pending node in a CSP space @ " << i);
 
    return vnode_[i];
 }
 
-} // namespace
+} // namespace realpaver

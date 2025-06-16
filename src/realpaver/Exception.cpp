@@ -16,18 +16,18 @@
  * @brief  Class of exceptions
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/Exception.hpp"
 
 namespace realpaver {
 
-Exception::Exception(const std::string& msg, const std::string& filename,
-                     size_t lineno)
-      : msg_("Error: " + msg),
-        filename_(filename),
-        lineno_(lineno)
-{}
+Exception::Exception(const std::string &msg, const std::string &filename, size_t lineno)
+    : msg_("Error: " + msg)
+    , filename_(filename)
+    , lineno_(lineno)
+{
+}
 
 std::string Exception::what() const
 {
@@ -49,4 +49,4 @@ size_t Exception::lineno() const
    return lineno_;
 }
 
-} // namespace
+} // namespace realpaver

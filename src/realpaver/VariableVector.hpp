@@ -21,9 +21,9 @@
 #ifndef REALPAVER_VARIABLE_VECTOR_HPP
 #define REALPAVER_VARIABLE_VECTOR_HPP
 
+#include "realpaver/Variable.hpp"
 #include <memory>
 #include <vector>
-#include "realpaver/Variable.hpp"
 
 namespace realpaver {
 
@@ -32,24 +32,24 @@ class VariableVectorRep {
 public:
    /**
     * @brief Constructor.
-    * 
+    *
     * @param name base name
     * @param first index of the first variable in this
     * @param last index of the last variable in this
     */
-   VariableVectorRep(const std::string& name, int first, int last);
+   VariableVectorRep(const std::string &name, int first, int last);
 
    /// Default destructor
    ~VariableVectorRep() = default;
 
    /// No copy
-   VariableVectorRep(const VariableVectorRep&) = delete;
+   VariableVectorRep(const VariableVectorRep &) = delete;
 
    /// No assignment
-   VariableVectorRep& operator=(const VariableVectorRep&) = delete;
+   VariableVectorRep &operator=(const VariableVectorRep &) = delete;
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Returns the size of this
    int size() const;
@@ -64,15 +64,15 @@ public:
    Variable get(int i) const;
 
    /// Sets the tolerance of all the variables of this
-   void setTolerance(const Tolerance& tol);
+   void setTolerance(const Tolerance &tol);
 
    /// Returns the hash code of this
    size_t hashCode() const;
 
 private:
-   std::string name_;            // base name
-   int first_, last_;            // bounds of the variable indexes
-   std::vector<Variable> vars_;  // the variables
+   std::string name_;           // base name
+   int first_, last_;           // bounds of the variable indexes
+   std::vector<Variable> vars_; // the variables
 };
 
 /*----------------------------------------------------------------------------*/
@@ -87,24 +87,24 @@ class VariableVector {
 public:
    /**
     * @brief Constructor.
-    * 
+    *
     * @param name base name
     * @param first index of the first variable in this
     * @param last index of the last variable in this
     */
-   VariableVector(const std::string& name, int first, int last);
+   VariableVector(const std::string &name, int first, int last);
 
    /// Default copy constructor
-   VariableVector(const VariableVector&) = default;
+   VariableVector(const VariableVector &) = default;
 
    /// Default assignment
-   VariableVector& operator=(const VariableVector&) = default;
+   VariableVector &operator=(const VariableVector &) = default;
 
    /// Default destructor
    ~VariableVector() = default;
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Returns the size of this
    int size() const;
@@ -122,7 +122,7 @@ public:
    Variable operator[](int i) const;
 
    /// Sets the tolerance of all the variables of this
-   VariableVector& setTolerance(const Tolerance& tol);
+   VariableVector &setTolerance(const Tolerance &tol);
 
    /// Returns the hash code of this
    size_t hashCode() const;
@@ -132,8 +132,8 @@ private:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const VariableVector& v);
+std::ostream &operator<<(std::ostream &os, const VariableVector &v);
 
-} // namespace
+} // namespace realpaver
 
 #endif

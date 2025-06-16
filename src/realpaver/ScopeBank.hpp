@@ -21,8 +21,8 @@
 #ifndef REALPAVER_SCOPE_BANK_HPP
 #define REALPAVER_SCOPE_BANK_HPP
 
-#include <unordered_set>
 #include "realpaver/Scope.hpp"
+#include <unordered_set>
 
 namespace realpaver {
 
@@ -34,7 +34,7 @@ namespace realpaver {
 class ScopeBank {
 public:
    /// Returns the instance
-   static ScopeBank* getInstance();
+   static ScopeBank *getInstance();
 
    /// Returns the number of scopes in this
    size_t size() const;
@@ -44,7 +44,7 @@ public:
 
    /**
     * @brief Inserts a scope in this.
-    * 
+    *
     * If there is a scope S in this that is equal to scop then S is eturned,
     * scop is inserted and returned otherwise.
     */
@@ -52,24 +52,24 @@ public:
 
 private:
    struct ScopeHasher {
-      std::size_t operator()(const Scope& scop) const
+      std::size_t operator()(const Scope &scop) const
       {
          return scop.hashCode();
       }
    };
    typedef std::unordered_set<Scope, ScopeHasher> SetType;
 
-   SetType bank_;    // the set of scopes
-   size_t nb_;       // the number of scopes that have been inserted in this
+   SetType bank_; // the set of scopes
+   size_t nb_;    // the number of scopes that have been inserted in this
 
    static ScopeBank instance_;
 
    ScopeBank();
    ~ScopeBank() = default;
-   ScopeBank(ScopeBank&) = delete;
-   ScopeBank& operator=(ScopeBank&) = delete;
+   ScopeBank(ScopeBank &) = delete;
+   ScopeBank &operator=(ScopeBank &) = delete;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

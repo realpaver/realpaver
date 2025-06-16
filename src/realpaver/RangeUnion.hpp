@@ -21,9 +21,9 @@
 #ifndef REALPAVER_RANGE_UNION_HPP
 #define REALPAVER_RANGE_UNION_HPP
 
+#include "realpaver/Range.hpp"
 #include <iostream>
 #include <vector>
-#include "realpaver/Range.hpp"
 
 namespace realpaver {
 
@@ -36,19 +36,19 @@ public:
    RangeUnion();
 
    /// Creates a range union reduced to one range
-   RangeUnion(const Range& r);
+   RangeUnion(const Range &r);
 
    /// Creates a range union from a list
-   RangeUnion(const std::initializer_list<Range>& l);
+   RangeUnion(const std::initializer_list<Range> &l);
 
    /// Creates a range union from a list of int
-   RangeUnion(const std::initializer_list<int>& l);
+   RangeUnion(const std::initializer_list<int> &l);
 
    /// Default copy constructor
-   RangeUnion(const RangeUnion&) = default;
+   RangeUnion(const RangeUnion &) = default;
 
    /// Default assignment operator
-   RangeUnion& operator=(const RangeUnion&) = default;
+   RangeUnion &operator=(const RangeUnion &) = default;
 
    /// Default destructor
    ~RangeUnion() = default;
@@ -69,19 +69,19 @@ public:
    RangeUnion subUnion(size_t i, size_t j) const;
 
    /// Inserts r in this and returns a reference to this
-   RangeUnion& insert(const Range& r);
+   RangeUnion &insert(const Range &r);
 
    /// Returns the hull of this
    Range hull() const;
 
    /// Contracts x as hull(x inter this)
-   void contractInterval(Interval& x) const;
+   void contractInterval(Interval &x) const;
 
    /// Contracts this as (this inter x)
-   void contract(const Interval& x);
+   void contract(const Interval &x);
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Clears this, which becomes empty
    void clear();
@@ -90,7 +90,7 @@ public:
    unsigned long nbElems() const;
 
    /// Equality test
-   bool equals(const RangeUnion& other) const;
+   bool equals(const RangeUnion &other) const;
 
 private:
    typedef std::vector<Range> VectorType;
@@ -99,12 +99,12 @@ private:
    // first := index of the leftmost range that overlaps with r
    // right := index of the rightmost range that ioverlaps with r
    // returns true if this and r overlap
-   bool findInter(const Range& r, int& first, int& last) const;
+   bool findInter(const Range &r, int &first, int &last) const;
 
    // first := index of the leftmost range that is joinable with r
    // right := index of the rightmost range that is joinable with r
    // returns true if this and r overlap
-   bool findJoin(const Range& r, int& first, int& last) const;
+   bool findJoin(const Range &r, int &first, int &last) const;
 
 public:
    /// Type of iterators in an interval union
@@ -118,8 +118,8 @@ public:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const RangeUnion& u);
+std::ostream &operator<<(std::ostream &os, const RangeUnion &u);
 
-} // namespace toutatis
+} // namespace realpaver
 
 #endif

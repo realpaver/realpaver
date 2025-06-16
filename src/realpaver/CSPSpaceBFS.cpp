@@ -16,23 +16,25 @@
  * @brief  Breadth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/CSPSpaceBFS.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 CSPSpaceBFS::CSPSpaceBFS()
-      : vsol_(), lnode_()
-{}
+    : vsol_()
+    , lnode_()
+{
+}
 
 size_t CSPSpaceBFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void CSPSpaceBFS::pushSolNode(const SharedCSPNode& node)
+void CSPSpaceBFS::pushSolNode(const SharedCSPNode &node)
 {
    vsol_.push_back(node);
 }
@@ -74,7 +76,7 @@ SharedCSPNode CSPSpaceBFS::nextPendingNode()
    return node;
 }
 
-void CSPSpaceBFS::insertPendingNode(const SharedCSPNode& node)
+void CSPSpaceBFS::insertPendingNode(const SharedCSPNode &node)
 {
    lnode_.push_front(node);
 }
@@ -90,4 +92,4 @@ SharedCSPNode CSPSpaceBFS::getPendingNode(size_t i) const
    return *it;
 }
 
-} // namespace
+} // namespace realpaver

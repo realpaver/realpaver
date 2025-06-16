@@ -1,0 +1,29 @@
+# In: Moré JJ, Garbow BS, Hillstrom KE.
+#     Testing unconstrained optimization software.
+#     ACM Trans Math Software 1981, 7(1):17–41.
+
+Variables
+x1 in [-1e8, 1e8],
+x2 in [-1e8, 1e8],
+x3 in [-1e8, 1e8],
+x4 in [-1e8, 1e8],
+x5 in [-1e8, 1e8],
+x6 in [-1e8, 1e8],
+x7 in [-1e8, 1e8],
+x8 in [-1e8, 1e8],
+x9 in [-1e8, 1e8],
+x10 in [-1e8, 1e8],
+v in [-1e8, 1e8];
+
+Constraints
+x1+v == 11,
+x2+v == 11,
+x3+v == 11,
+x4+v == 11,
+x5+v == 11,
+x6+v == 11,
+x7+v == 11,
+x8+v == 11,
+x9+v == 11,
+x1*x2*x3*x4*x5*x6*x7*x8*x9*x10 == 1,
+v == x1+x2+x3+x4+x5+x6+x7+x8+x9+x10;

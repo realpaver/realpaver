@@ -16,27 +16,29 @@
  * @brief  Contractor associated with a constraint
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorConstraint.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-ContractorConstraint::ContractorConstraint(Constraint c) : c_(c)
-{}
+ContractorConstraint::ContractorConstraint(Constraint c)
+    : c_(c)
+{
+}
 
 Scope ContractorConstraint::scope() const
 {
    return c_.scope();
 }
 
-Proof ContractorConstraint::contract(IntervalBox& B)
+Proof ContractorConstraint::contract(IntervalBox &B)
 {
    return c_.contract(B);
 }
 
-void ContractorConstraint::print(std::ostream& os) const
+void ContractorConstraint::print(std::ostream &os) const
 {
    os << "Contractor of " << c_;
 }
@@ -46,4 +48,4 @@ Constraint ContractorConstraint::getConstraint() const
    return c_;
 }
 
-} // namespace
+} // namespace realpaver

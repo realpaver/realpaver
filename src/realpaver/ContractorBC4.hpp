@@ -16,7 +16,7 @@
  * @brief  BC4 contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_BC4_HPP
 #define REALPAVER_CONTRACTOR_BC4_HPP
@@ -29,7 +29,7 @@ namespace realpaver {
 
 /**
  * @brief Propagation algorithm implementing the BC4 strategy.
- * 
+ *
  * A BC4Revise contractor is associated with each constraint from a DAG. The
  * contraction method implements an AC3-like propagation algorithm on the set
  * of contractors.
@@ -43,23 +43,23 @@ public:
    ~ContractorBC4();
 
    /// No copy
-   ContractorBC4(const ContractorBC4&) = delete;
+   ContractorBC4(const ContractorBC4 &) = delete;
 
    /// No asignment
-   ContractorBC4& operator=(const ContractorBC4&) = delete;
+   ContractorBC4 &operator=(const ContractorBC4 &) = delete;
 
    /// Inserts a contractor in this
    void push(SharedContractor op);
 
    /// Returns the tolerance used as stopping criterion
-   Tolerance getTol() const;
+   double getTol() const;
 
    /// Sets the tolerance used as stopping criterion
-   void setTol(Tolerance tol);
+   void setTol(double tol);
 
    /**
     * @brief Sets the peel factor of the BC4Revise operators.
-    * 
+    *
     * Condition: 0.0 <= f <= 100.0
     */
    void setBC4RevisePeelFactor(double f);
@@ -68,18 +68,18 @@ public:
    void setBC4ReviseMaxIter(size_t val);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
 private:
-   SharedDag dag_;               // DAG
-   IntervalPropagator* propag_;  // propagation algorithm
-   std::vector<std::shared_ptr<ContractorBC4Revise>> vop_;  // contractors
+   SharedDag dag_;                                         // DAG
+   IntervalPropagator *propag_;                            // propagation algorithm
+   std::vector<std::shared_ptr<ContractorBC4Revise>> vop_; // contractors
 };
 
 /// Type of shared pointers to BC4 contractors
 using SharedContractorBC4 = std::shared_ptr<ContractorBC4>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

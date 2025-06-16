@@ -16,7 +16,7 @@
  * @brief  Base class of univariate interval functions
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_INTERVAL_FUNCTION_UNI_HPP
 #define REALPAVER_INTERVAL_FUNCTION_UNI_HPP
@@ -32,21 +32,21 @@ public:
    IntervalFunctionUni() = default;
 
    /// Default copy constructor
-   IntervalFunctionUni(const IntervalFunctionUni&) = default;
+   IntervalFunctionUni(const IntervalFunctionUni &) = default;
 
    /// No assignment
-   IntervalFunctionUni& operator=(const IntervalFunctionUni&) = delete;
+   IntervalFunctionUni &operator=(const IntervalFunctionUni &) = delete;
 
    /// Virtual destructor
    virtual ~IntervalFunctionUni();
 
    /// Returns the evaluation of this on x
-   virtual Interval eval(const Interval& x) = 0;
+   virtual Interval eval(const Interval &x) = 0;
 
    /// Returns the interval derivative of this on x
-   virtual Interval diff(const Interval& x) = 0;
+   virtual Interval diff(const Interval &x) = 0;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

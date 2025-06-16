@@ -1,0 +1,47 @@
+# In: Moré JJ, Garbow BS, Hillstrom KE.
+#     Testing unconstrained optimization software.
+#     ACM Trans Math Software 1981, 7(1):17–41.
+
+Variables
+x1 in [1e-8, 2*PI-1e-8],
+x2 in [1e-8, 2*PI-1e-8],
+x3 in [1e-8, 2*PI-1e-8],
+x4 in [1e-8, 2*PI-1e-8],
+x5 in [1e-8, 2*PI-1e-8],
+x6 in [1e-8, 2*PI-1e-8],
+x7 in [1e-8, 2*PI-1e-8],
+x8 in [1e-8, 2*PI-1e-8],
+x9 in [1e-8, 2*PI-1e-8],
+x10 in [1e-8, 2*PI-1e-8],
+x11 in [1e-8, 2*PI-1e-8],
+x12 in [1e-8, 2*PI-1e-8],
+x13 in [1e-8, 2*PI-1e-8],
+x14 in [1e-8, 2*PI-1e-8],
+x15 in [1e-8, 2*PI-1e-8],
+x16 in [1e-8, 2*PI-1e-8],
+x17 in [1e-8, 2*PI-1e-8],
+x18 in [1e-8, 2*PI-1e-8],
+x19 in [1e-8, 2*PI-1e-8],
+x20 in [1e-8, 2*PI-1e-8];
+
+Constraints
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+1*(1-cos(x1))-sin(x1) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+2*(1-cos(x2))-sin(x2) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+3*(1-cos(x3))-sin(x3) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+4*(1-cos(x4))-sin(x4) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+5*(1-cos(x5))-sin(x5) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+6*(1-cos(x6))-sin(x6) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+7*(1-cos(x7))-sin(x7) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+8*(1-cos(x8))-sin(x8) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+9*(1-cos(x9))-sin(x9) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+10*(1-cos(x10))-sin(x10) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+11*(1-cos(x11))-sin(x11) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+12*(1-cos(x12))-sin(x12) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+13*(1-cos(x13))-sin(x13) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+14*(1-cos(x14))-sin(x14) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+15*(1-cos(x15))-sin(x15) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+16*(1-cos(x16))-sin(x16) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+17*(1-cos(x17))-sin(x17) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+18*(1-cos(x18))-sin(x18) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+19*(1-cos(x19))-sin(x19) == 20,
+cos(x1)+cos(x2)+cos(x3)+cos(x4)+cos(x5)+cos(x6)+cos(x7)+cos(x8)+cos(x9)+cos(x10)+cos(x11)+cos(x12)+cos(x13)+cos(x14)+cos(x15)+cos(x16)+cos(x17)+cos(x18)+cos(x19)+cos(x20)+20*(1-cos(x20))-sin(x20) == 20;

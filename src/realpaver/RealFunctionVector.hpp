@@ -21,9 +21,9 @@
 #ifndef REALPAVER_REAL_FUNCTION_VECTOR_HPP
 #define REALPAVER_REAL_FUNCTION_VECTOR_HPP
 
-#include <vector>
 #include "realpaver/Dag.hpp"
 #include "realpaver/RealFunction.hpp"
+#include <vector>
 
 namespace realpaver {
 
@@ -37,11 +37,10 @@ public:
    virtual ~RealFunctionVectorRep();
 
    /// Default copy constructor
-   RealFunctionVectorRep(const RealFunctionVectorRep&) = default;
+   RealFunctionVectorRep(const RealFunctionVectorRep &) = default;
 
    /// No assignment
-   RealFunctionVectorRep&
-   operator=(const RealFunctionVectorRep&) = delete;
+   RealFunctionVectorRep &operator=(const RealFunctionVectorRep &) = delete;
 
    /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
@@ -57,28 +56,28 @@ public:
 
    /**
     * @brief Evaluates this.
-    * 
+    *
     * val[i] is the result of the evaluation of the i-th function of this at pt
     * and val must have nbFuns() components
     */
-   virtual void eval(const RealPoint& pt, RealVector& val) = 0;
+   virtual void eval(const RealPoint &pt, RealVector &val) = 0;
 
    /**
     * @brief Differentiates this (calculates an interval Jacobian matrix).
-    * 
+    *
     * J is the Jacobian matrix of this at pt such that we have the partial
     * derivative dfi / dxj in the i-th row and j-th column of J.
-    * 
+    *
     * J must have nbFuns() rows and nbVars() columns.
     */
-   virtual void diff(const RealPoint& pt, RealMatrix& J) = 0;
+   virtual void diff(const RealPoint &pt, RealMatrix &J) = 0;
 };
 
 /*----------------------------------------------------------------------------*/
 
 /**
  * @brief Main class of real function vectors.
- * 
+ *
  *  This encloses a shared pointer to its representation. It is a lightweight
  *  object that can be copied and assigned.
  */
@@ -91,25 +90,25 @@ public:
    RealFunctionVector(SharedDag dag);
 
    /// Creates  a vector corresponding to a DAG built from a list of terms
-   RealFunctionVector(const std::initializer_list<Term>& lt);
+   RealFunctionVector(const std::initializer_list<Term> &lt);
 
    /**
     * @brief Constructor.
-    * 
+    *
     * Creates  a vector corresponding to a DAG built from a list of terms and
     * a list of bounds. For each i, we have lt[i] IN li[i].
     */
-   RealFunctionVector(const std::initializer_list<Term>& lt,
-                      const std::initializer_list<Interval>& li);
+   RealFunctionVector(const std::initializer_list<Term> &lt,
+                      const std::initializer_list<Interval> &li);
 
    /// Creates a vector from a list of fonctions
-   RealFunctionVector(const std::initializer_list<RealFunction>& lf);
+   RealFunctionVector(const std::initializer_list<RealFunction> &lf);
 
    /// Default copy constructor
-   RealFunctionVector(const RealFunctionVector&) = default;
+   RealFunctionVector(const RealFunctionVector &) = default;
 
    /// No assignment
-   RealFunctionVector& operator=(const RealFunctionVector&) = delete;
+   RealFunctionVector &operator=(const RealFunctionVector &) = delete;
 
    /// Default destructor
    ~RealFunctionVector() = default;
@@ -128,7 +127,7 @@ public:
 
    /**
     * @brief Inserts a function at the end.
-    * 
+    *
     * It may be necessary to switch to another representation if the current
     * one is not a list.
     */
@@ -136,21 +135,21 @@ public:
 
    /**
     * @brief Evaluates this.
-    * 
+    *
     * val[i] is the result of the evaluation of the i-th function of this at pt
     * and val must have nbFuns() components
     */
-   void eval(const RealPoint& pt, RealVector& val);
+   void eval(const RealPoint &pt, RealVector &val);
 
    /**
     * @brief Differentiates this (calculates an interval Jacobian matrix).
-    * 
+    *
     * J is the Jacobian matrix of this at pt such that we have the partial
     * derivative dfi / dxj in the i-th row and j-th column of J.
-    * 
+    *
     * J must have nbFuns() rows and nbVars() columns.
     */
-   void diff(const RealPoint& pt, RealMatrix& J);
+   void diff(const RealPoint &pt, RealMatrix &J);
 
    /// Type of the representation of interval functions vectors
    using SharedRep = std::shared_ptr<RealFunctionVectorRep>;
@@ -174,23 +173,22 @@ public:
    RealFunctionVectorDag(SharedDag dag);
 
    /// Creates  a vector corresponding to a DAG built from a list of terms
-   RealFunctionVectorDag(const std::initializer_list<Term>& lt);
+   RealFunctionVectorDag(const std::initializer_list<Term> &lt);
 
    /**
     * @brief Constructor.
-    * 
+    *
     * Creates  a vector corresponding to a DAG built from a list of terms and
     * a list of bounds. For each i, we have lt[i] IN li[i].
     */
-   RealFunctionVectorDag(const std::initializer_list<Term>& lt,
-                         const std::initializer_list<Interval>& li);
+   RealFunctionVectorDag(const std::initializer_list<Term> &lt,
+                         const std::initializer_list<Interval> &li);
 
    /// Default copy constructor
-   RealFunctionVectorDag(const RealFunctionVectorDag&) = default;
+   RealFunctionVectorDag(const RealFunctionVectorDag &) = default;
 
    /// No assignment
-   RealFunctionVectorDag&
-   operator=(const RealFunctionVectorDag&) = delete;
+   RealFunctionVectorDag &operator=(const RealFunctionVectorDag &) = delete;
 
    /// Default destructor
    ~RealFunctionVectorDag() = default;
@@ -202,8 +200,8 @@ public:
    size_t nbVars() const override;
    size_t nbFuns() const override;
    RealFunction fun(size_t i) const override;
-   void eval(const RealPoint& pt, RealVector& val) override;
-   void diff(const RealPoint& pt, RealMatrix& J) override;
+   void eval(const RealPoint &pt, RealVector &val) override;
+   void diff(const RealPoint &pt, RealMatrix &J) override;
 
 private:
    SharedDag dag_;
@@ -218,33 +216,32 @@ public:
    RealFunctionVectorList();
 
    /// Constructor
-   RealFunctionVectorList(const std::initializer_list<RealFunction>& lf);
+   RealFunctionVectorList(const std::initializer_list<RealFunction> &lf);
 
    /// Default copy constructor
-   RealFunctionVectorList(const RealFunctionVectorList&) = default;
+   RealFunctionVectorList(const RealFunctionVectorList &) = default;
 
    /// No assignment
-   RealFunctionVectorList&
-   operator=(const RealFunctionVectorList&) = delete;
+   RealFunctionVectorList &operator=(const RealFunctionVectorList &) = delete;
 
    /// Default destructor
    ~RealFunctionVectorList() = default;
 
    /// Inserts a function at the end
-    void addFun(RealFunction f);
+   void addFun(RealFunction f);
 
    Scope scope() const override;
    size_t nbVars() const override;
    size_t nbFuns() const override;
    RealFunction fun(size_t i) const override;
-   void eval(const RealPoint& pt, RealVector& val) override;
-   void diff(const RealPoint& pt, RealMatrix& J) override;
+   void eval(const RealPoint &pt, RealVector &val) override;
+   void diff(const RealPoint &pt, RealMatrix &J) override;
 
 private:
    std::vector<RealFunction> vf_;
    Scope scop_;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

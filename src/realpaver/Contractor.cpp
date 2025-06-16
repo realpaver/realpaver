@@ -16,28 +16,30 @@
  * @brief  Base class of contractors
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Contractor.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 Contractor::~Contractor()
-{}
+{
+}
 
-void Contractor::print(std::ostream& os) const
-{}
+void Contractor::print(std::ostream &os) const
+{
+}
 
-bool Contractor::dependsOn(const Variable& v) const
+bool Contractor::dependsOn(const Variable &v) const
 {
    return scope().contains(v);
 }
 
-std::ostream& operator<<(std::ostream& os, const Contractor& op)
+std::ostream &operator<<(std::ostream &os, const Contractor &op)
 {
    op.print(os);
    return os;
 }
 
-} // namespace
+} // namespace realpaver

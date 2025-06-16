@@ -16,25 +16,24 @@
  * @brief  HC4Revise contractor
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorHC4Revise.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
 ContractorHC4Revise::ContractorHC4Revise(SharedDag dag, size_t i)
-      : dag_(dag),
-        idx_(i)
+    : dag_(dag)
+    , idx_(i)
 {
-   ASSERT(dag != nullptr,
-          "Creation of HC4Revise contractor from a null pointer");
-   ASSERT(i < dag->nbFuns(), "Creation of HC4Revise contractor given a bad " <<
-                             " function index " << i);
+   ASSERT(dag != nullptr, "Creation of HC4Revise contractor from a null pointer");
+   ASSERT(i < dag->nbFuns(),
+          "Creation of HC4Revise contractor given a bad " << " function index " << i);
 }
 
-Proof ContractorHC4Revise::contract(IntervalBox& B)
+Proof ContractorHC4Revise::contract(IntervalBox &B)
 {
    LOG_LOW("HC4Revise contractor @ " << idx_ << " on " << B);
 
@@ -45,7 +44,7 @@ Proof ContractorHC4Revise::contract(IntervalBox& B)
    return proof;
 }
 
-void ContractorHC4Revise::print(std::ostream& os) const
+void ContractorHC4Revise::print(std::ostream &os) const
 {
    os << "HC4Revise contractor / function " << " @ " << idx_;
 }
@@ -65,4 +64,4 @@ Scope ContractorHC4Revise::scope() const
    return dag_->fun(idx_)->scope();
 }
 
-} // namespace
+} // namespace realpaver

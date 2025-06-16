@@ -2,20 +2,20 @@
 
 ## Using the command-line
 
-When building the RealPaver library, a default CSP solver is also generated, namely `csp_solver`. It is able to solve CSPs written using the [RealPaver dedicated language](language.md).
+When building the RealPaver library, a default CSP solver is also generated, namely `rp_solver`. It is able to solve CSPs written using the [RealPaver dedicated language](language.md).
 
 From the command line, the solver requires the file path to the problem desciption written in the RealPaver language. Thus, solving a CSP relating to a 2R planar robot, described in the file '2r-robot.rp', can be solved as follows:
 
 ``` bash
 # Run with default parameters
-csp_solver 2r-robot.rp
+rp_solver 2r-robot.rp
 ```
 
 [RealPaver parameters](parameters.md) can be specified with prefix `-p` in a dedicated text file to adapt the behavior of the solver. For instance, the solver can be called to solve again the 2R planar robot problem with some parameters overloaded by the definitions in 'param.txt', as follows:
 
 ``` bash
 # Run with specific parameters in param.txt
-csp_solver -p param.txt 2r-robot.rp
+rp_solver -p param.txt 2r-robot.rp
 ```
 
 The following problem file describes a 2R planar robot.
@@ -92,7 +92,7 @@ catch(Exception e) {
 Parameters are loaded from the given file.
 
 ``` cpp
-Param prm;                      // Default parameters
+Params prm;                      // Default parameters
 prm.loadParam("param.txt");     // Overloading some parameters
 ```
 
@@ -112,7 +112,7 @@ bool ok = parser.parseFile("2r-robot.rp", problem);
 The solver is created for the problem. The parameters are applied to the solver inner context, i.e. its environment, and finally it is called to solve the problem:
 
 ``` cpp
-CspSolver solver(problem);
+CSPSolver solver(problem);
 solver.getEnv()->setParam(prm);
 solver.solve();
 ```
@@ -167,7 +167,7 @@ using namespace realpaver;
 int main()
 {
     try {
-        Param prm;
+        Params prm;
         prm.loadParam("../../examples/param.txt");
 
         Problem problem;
@@ -186,7 +186,7 @@ int main()
                          x == 5.75,
                          y == 4.25});
 
-        CspSolver solver(problem);
+        CSPSolver solver(problem);
         solver.getEnv()->setParam(prm);
         solver.solve();
         for (size_t i=0; i<solver.nbSolutions(); ++i)

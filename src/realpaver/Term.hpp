@@ -21,12 +21,12 @@
 #ifndef REALPAVER_TERM_HPP
 #define REALPAVER_TERM_HPP
 
-#include <set>
-#include <unordered_map>
-#include <vector>
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/Scope.hpp"
+#include <set>
+#include <unordered_map>
+#include <vector>
 
 namespace realpaver {
 
@@ -34,41 +34,41 @@ class TermVisitor;
 
 /// Enumeration of term node symbols
 enum class TermSymbol {
-   Cst,     ///< constant
-   Var,     ///< variable
-   Add,     ///< addition
-   Sub,     ///< subtraction
-   Mul,     ///< multiplication
-   Div,     ///< division
-   Min,     ///< minimum
-   Max,     ///< maximum
-   Usb,     ///< unary subtraction
-   Abs,     ///< absolute value
-   Sgn,     ///< sign
-   Sqr,     ///< square
-   Sqrt,    ///< square root
-   Pow,     ///< power
-   Exp,     ///< exponential
-   Log,     ///< logarithm
-   Cos,     ///< cosine
-   Sin,     ///< sine
-   Tan,     ///< tangent
-   Cosh,    ///< hyperbolic cosine
-   Sinh,    ///< hyperbolic sine
-   Tanh     ///< hyperbolic tangent
+   Cst,  ///< constant
+   Var,  ///< variable
+   Add,  ///< addition
+   Sub,  ///< subtraction
+   Mul,  ///< multiplication
+   Div,  ///< division
+   Min,  ///< minimum
+   Max,  ///< maximum
+   Usb,  ///< unary subtraction
+   Abs,  ///< absolute value
+   Sgn,  ///< sign
+   Sqr,  ///< square
+   Sqrt, ///< square root
+   Pow,  ///< power
+   Exp,  ///< exponential
+   Log,  ///< logarithm
+   Cos,  ///< cosine
+   Sin,  ///< sine
+   Tan,  ///< tangent
+   Cosh, ///< hyperbolic cosine
+   Sinh, ///< hyperbolic sine
+   Tanh  ///< hyperbolic tangent
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, TermSymbol op);
+std::ostream &operator<<(std::ostream &os, TermSymbol op);
 
 /*----------------------------------------------------------------------------*/
 
 /// Enumeration of priority levels of expression nodes
 enum class NodePriority {
-   Low,        ///< constants, variables
-   AddSub,     ///< add, sub
-   MulDiv,     ///< mul, div
-   High        ///< others
+   Low,    ///< constants, variables
+   AddSub, ///< add, sub
+   MulDiv, ///< mul, div
+   High    ///< others
 };
 
 /*----------------------------------------------------------------------------*/
@@ -93,47 +93,33 @@ public:
 
    /**
     * @brief Returns the number of nodes in this considered as a tree.
-    * 
+    *
     * For instance the number of nodes in (1 + x) - (1 + x) is 7.
     */
    virtual size_t nbNodes() const = 0;
 
    /// Output on a stream
-   virtual void print(std::ostream& os) const = 0;
+   virtual void print(std::ostream &os) const = 0;
 
    /// Returns the interval evaluation of a constant term
    virtual Interval evalConst() const = 0;
 
    /**
     * @brief Interval evaluation on B.
-    * 
+    *
     * The result is assigned in the interval value enclosed.
     */
-   virtual void eval(const IntervalBox& B) = 0;
+   virtual void eval(const IntervalBox &B) = 0;
 
    /**
     * @brief Interval evaluation on box.
-    * 
+    *
     * The result is assigned in the interval value enclosed.
     */
-   virtual void eval(const DomainBox& box) = 0;
-
-   /**
-    * @brief Contraction method.
-    * 
-    * Contracts B and returns a certificate of proof
-    */
-   virtual Proof contract(IntervalBox& B) = 0;
-
-   /**
-    * @brief Contraction method.
-    * 
-    * Contracts box and returns a certificate of proof
-    */
-   virtual Proof contract(DomainBox& box) = 0;
+   virtual void eval(const DomainBox &box) = 0;
 
    /// Visitor pattern
-   virtual void acceptVisitor(TermVisitor& vis) const = 0;
+   virtual void acceptVisitor(TermVisitor &vis) const = 0;
 
    /// Returns true if the root node of this has type TermCst (a number)
    virtual bool isNumber() const;
@@ -175,27 +161,27 @@ public:
    bool isConstant() const;
 
    /// Returns true if v occurs in this
-   virtual bool dependsOn(const Variable& v) const = 0;
+   virtual bool dependsOn(const Variable &v) const = 0;
 
    /// Makes the scope of this
-   virtual void makeScope(Scope& scop) const = 0;
+   virtual void makeScope(Scope &scop) const = 0;
 
    /**
     * @brief Cloning.
-    * 
+    *
     * Returns a new representation such that the root of this is cloned and
     * its sub-terms are shared
     */
-   virtual TermRep* cloneRoot() const = 0;
+   virtual TermRep *cloneRoot() const = 0;
 
    /// Returns a clone of this (deep copy)
-   virtual TermRep* clone() const = 0;
+   virtual TermRep *clone() const = 0;
 
    /// Returns the interval value enclosed
    Interval ival() const;
 
    /// Assigns the interval value enclosed
-   void setIval(const Interval& x);
+   void setIval(const Interval &x);
 
 protected:
    using SharedRep = std::shared_ptr<TermRep>;
@@ -207,7 +193,7 @@ protected:
    Interval ival_;   // used for evaluation
 
 private:
-   NodePriority priority_;   // priority
+   NodePriority priority_; // priority
 };
 
 /*----------------------------------------------------------------------------*/
@@ -230,13 +216,13 @@ public:
    Term(double a = 0.0);
 
    /// Constructor of a constant term
-   Term(const Interval& x);
+   Term(const Interval &x);
 
    /// Constructor of a variable term
    Term(Variable v);
 
    /// Constructor from a representation
-   Term(const SharedRep& rep);
+   Term(const SharedRep &rep);
    ///@}
 
    /// Returns the hash code of this
@@ -244,89 +230,25 @@ public:
 
    /**
     * @brief Returns the number of nodes in this considered as a tree.
-    * 
+    *
     * For instance the number of nodes in (1 + x) - (1 + x) is 7.
     */
    size_t nbNodes() const;
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Returns the interval evaluation of a constant term
    Interval evalConst() const;
 
    /// Returns the interval evaluation of this on B
-   Interval eval(const IntervalBox& B) const;
+   Interval eval(const IntervalBox &B) const;
 
    /// Returns the interval evaluation of this on box
-   std::unique_ptr<Domain> eval(const DomainBox& box) const;
-
-   /**
-    * @brief Reduction of domains using the HC4 Revise contractor.
-    * 
-    * @param B domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * This algorithm first evaluates the nodes from the leaves to the root
-    * (forward phase) and then calculates the projections from the root to
-    * the leaves (backward phase).
-    */
-   Proof contract(IntervalBox& B, const Interval& img);
-
-   /**
-    * @brief Reduction of domains using the HC4 Revise contractor.
-    * 
-    * @param box domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * This algorithm first evaluates the nodes from the leaves to the root
-    * (forward phase) and then calculates the projections from the root to
-    * the leaves (backward phase).
-    */
-   Proof contract(DomainBox& box, const Interval& img);
-
-   /**
-    * @brief Forward phase of the HC4 Revise contractor.
-    * 
-    * @param B domains of variables
-    * @return the interval evaluation of this on B
-    */
-   Interval hc4ReviseForward(const IntervalBox& B) const;
-
-   /**
-    * @brief Forward phase of the HC4 Revise contractor.
-    * 
-    * @param box domains of variables
-    * @return the evaluation of this on B
-    */
-   std::unique_ptr<Domain> hc4ReviseForward(const DomainBox& box) const;
-
-   /**
-    * @brief Backward phase of the HC4 Revise contractor.
-    * 
-    * @param B domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * Assumes that the forward phase has been executed using hc4ReviseForward.
-    */
-   Proof hc4ReviseBackward(IntervalBox& B, const Interval& img);
-
-   /**
-    * @brief Backward phase of the HC4 Revise contractor.
-    * 
-    * @param box domains of variables
-    * @param img image or bounds of this considered as a function
-    * @return a certificate of proof
-    *
-    * Assumes that the forward phase has been executed using hc4ReviseForward.
-    */
-   Proof hc4ReviseBackward(DomainBox& box, const Interval& img);
+   std::unique_ptr<Domain> eval(const DomainBox &box) const;
 
    /// Visitor pattern
-   void acceptVisitor(TermVisitor& vis) const;   
+   void acceptVisitor(TermVisitor &vis) const;
 
    /// Returns true if the root node of this has type TermCst (a number)
    bool isNumber() const;
@@ -376,43 +298,43 @@ public:
    bool isSumOfSquares() const;
 
    /// Returns true if v occurs in this
-   bool dependsOn(const Variable& v) const;
+   bool dependsOn(const Variable &v) const;
 
    /// Inserts the variables of this in a scope
-   void makeScope(Scope& scop) const;
+   void makeScope(Scope &scop) const;
 
    /// Returns creates and returns the scope of this
    Scope scope() const;
 
    /// Addition with assignment
-   Term& operator+=(Term other);
+   Term &operator+=(Term other);
 
    /// Subtraction with assignment
-   Term& operator-=(Term other);
+   Term &operator-=(Term other);
 
    /// Multiplication with assignment
-   Term& operator*=(Term other);
+   Term &operator*=(Term other);
 
    /// Division with assignment
-   Term& operator/=(Term other);
- 
+   Term &operator/=(Term other);
+
    /// Returns the representation of this
    SharedRep rep() const;
 
    /**
     * @brief Cloning.
-    * 
+    *
     * Returns a new representation such that the root of this is cloned and
     * its sub-terms are shared
     */
-   TermRep* cloneRoot() const;
+   TermRep *cloneRoot() const;
 
    /// Returns a clone of this (deep copy)
    Term clone() const;
 
    /**
     * @brief Returns the simplification status.
-    * 
+    *
     * Returns true if terms are automatically simplified when they are created
     * and false otherwise
     */
@@ -420,7 +342,7 @@ public:
 
    /**
     * @brief Assigns the simplification status.
-    * 
+    *
     * @param simplify true in order to simplify terms when they are created,
     *        false otherwise
     * @return the previous status before its assignment
@@ -429,7 +351,7 @@ public:
 
    /**
     * @brief Gets the display status of constants.
-    * 
+    *
     * Returns true if the constants are displayed as intervals, false
     * if the midpoints are displayed
     */
@@ -439,14 +361,14 @@ public:
    static bool idisplay(bool ok);
 
 private:
-   SharedRep rep_;         // shared representation
+   SharedRep rep_; // shared representation
 
-   static bool simplify_;  // true if terms are automatically simplified
-   static bool idisplay_;  // true if constants are displayed as intervals
+   static bool simplify_; // true if terms are automatically simplified
+   static bool idisplay_; // true if constants are displayed as intervals
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Term& t);
+std::ostream &operator<<(std::ostream &os, const Term &t);
 
 /// @name Creation of terms
 ///@{
@@ -491,7 +413,7 @@ Term pow(Term t, int n);
 Term pow(Term t, double d);
 
 /// Returns t^x
-Term pow(Term t, const Interval& x);
+Term pow(Term t, const Interval &x);
 
 /// Returns t^e
 Term pow(Term t, Term e);
@@ -527,26 +449,24 @@ Term tanh(Term t);
 class TermCst : public TermRep {
 public:
    /// Constructor
-   TermCst(const Interval& x);
+   TermCst(const Interval &x);
 
    size_t nbNodes() const override;
-   void print(std::ostream& os) const override;
+   void print(std::ostream &os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
-   void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void eval(const IntervalBox &B) override;
+   void eval(const DomainBox &box) override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isNumber() const override;
    bool isZero() const override;
    bool isOne() const override;
    bool isMinusOne() const override;
-   bool dependsOn(const Variable& v) const override;
+   bool dependsOn(const Variable &v) const override;
    bool isLinear() const override;
    bool isInteger() const override;
-   void makeScope(Scope& scop) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void makeScope(Scope &scop) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 
    /// Returns the value enclosed
    Interval getVal() const;
@@ -565,20 +485,18 @@ public:
    TermVar(Variable v);
 
    size_t nbNodes() const override;
-   void print(std::ostream& os) const override;
+   void print(std::ostream &os) const override;
    Interval evalConst() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
-   void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   bool dependsOn(const Variable& v) const override;
+   void eval(const IntervalBox &B) override;
+   void eval(const DomainBox &box) override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   bool dependsOn(const Variable &v) const override;
    bool isLinear() const override;
    bool isInteger() const override;
-   void makeScope(Scope& scop) const override;
+   void makeScope(Scope &scop) const override;
    bool isVar() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 
    /// Returns the variable enclosed
    Variable var() const;
@@ -593,10 +511,10 @@ private:
 class TermOp : public TermRep {
 public:
    /// Constructor
-   TermOp(const SharedRep& t, TermSymbol symb, NodePriority p);
+   TermOp(const SharedRep &t, TermSymbol symb, NodePriority p);
 
    /// Constructor
-   TermOp(const SharedRep& l, const SharedRep& r, TermSymbol op, NodePriority p);
+   TermOp(const SharedRep &l, const SharedRep &r, TermSymbol op, NodePriority p);
 
    /// Virtual destructor
    virtual ~TermOp();
@@ -617,7 +535,7 @@ public:
    SharedRep child() const;
 
    /// Inserts a term at the end of the list of sub-terms of this
-   void insert(const SharedRep& t);
+   void insert(const SharedRep &t);
 
    size_t nbNodes() const override;
    bool isAdd() const override;
@@ -627,26 +545,21 @@ public:
    bool isUsb() const override;
    bool isInteger() const override;
    virtual bool isLinear() const override;
-   void eval(const IntervalBox& B) override;
-   Proof contract(IntervalBox& B) override;
-   void eval(const DomainBox& box) override;
-   Proof contract(DomainBox& box) override;
-   virtual void print(std::ostream& os) const override;
-   bool dependsOn(const Variable& v) const override;
-   void makeScope(Scope& scop) const override;
+   void eval(const IntervalBox &B) override;
+   void eval(const DomainBox &box) override;
+   virtual void print(std::ostream &os) const override;
+   bool dependsOn(const Variable &v) const override;
+   void makeScope(Scope &scop) const override;
 
 protected:
    /// Interval evaluation of the root node
    virtual void evalRoot() = 0;
 
-   /// Contraction with respect to the root node
-   virtual void contractRoot() = 0;
-
    /// Returns true if the term rooted by this is an integer term
    virtual bool isIntegerRoot() const;
 
 private:
-   std::vector<SharedRep> v_;    // sub-terms
+   std::vector<SharedRep> v_; // sub-terms
 };
 
 /*----------------------------------------------------------------------------*/
@@ -655,17 +568,16 @@ private:
 class TermAdd : public TermOp {
 public:
    /// Constructor
-   TermAdd(const SharedRep& l, const SharedRep& r);
+   TermAdd(const SharedRep &l, const SharedRep &r);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -674,17 +586,16 @@ public:
 class TermSub : public TermOp {
 public:
    /// Constructor
-   TermSub(const SharedRep& l, const SharedRep& r);
+   TermSub(const SharedRep &l, const SharedRep &r);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -693,17 +604,16 @@ public:
 class TermMul : public TermOp {
 public:
    /// Constructor
-   TermMul(const SharedRep& l, const SharedRep& r);
+   TermMul(const SharedRep &l, const SharedRep &r);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -712,16 +622,15 @@ public:
 class TermDiv : public TermOp {
 public:
    /// Constructor
-   TermDiv(const SharedRep& l, const SharedRep& r);
+   TermDiv(const SharedRep &l, const SharedRep &r);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -730,15 +639,14 @@ public:
 class TermMin : public TermOp {
 public:
    /// Constructor
-   TermMin(const SharedRep& l, const SharedRep& r);
+   TermMin(const SharedRep &l, const SharedRep &r);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -747,15 +655,14 @@ public:
 class TermMax : public TermOp {
 public:
    /// Constructor
-   TermMax(const SharedRep& l, const SharedRep& r);
+   TermMax(const SharedRep &l, const SharedRep &r);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -764,17 +671,16 @@ public:
 class TermUsb : public TermOp {
 public:
    /// Constructor
-   TermUsb(const SharedRep& t);
+   TermUsb(const SharedRep &t);
 
-   void print(std::ostream& os) const override;
+   void print(std::ostream &os) const override;
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -783,15 +689,14 @@ public:
 class TermAbs : public TermOp {
 public:
    /// Constructor
-   TermAbs(const SharedRep& t);
+   TermAbs(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -800,15 +705,14 @@ public:
 class TermSgn : public TermOp {
 public:
    /// Constructor
-   TermSgn(const SharedRep& t);
+   TermSgn(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -817,16 +721,15 @@ public:
 class TermSqr : public TermOp {
 public:
    /// Constructor
-   TermSqr(const SharedRep& t);
+   TermSqr(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -835,15 +738,14 @@ public:
 class TermSqrt : public TermOp {
 public:
    /// Constructor
-   TermSqrt(const SharedRep& t);
+   TermSqrt(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -852,19 +754,18 @@ public:
 class TermPow : public TermOp {
 public:
    /// Constructor
-   TermPow(const SharedRep& t, int n);
+   TermPow(const SharedRep &t, int n);
 
    /// Returns the exponent
    int exponent() const;
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void print(std::ostream& os) const override;
-   void acceptVisitor(TermVisitor& vis) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 
 private:
    int n_;
@@ -876,14 +777,13 @@ private:
 class TermExp : public TermOp {
 public:
    /// Constructor
-   TermExp(const SharedRep& t);
+   TermExp(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -892,14 +792,13 @@ public:
 class TermLog : public TermOp {
 public:
    /// Constructor
-   TermLog(const SharedRep& t);
+   TermLog(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -908,14 +807,13 @@ public:
 class TermCos : public TermOp {
 public:
    /// Constructor
-   TermCos(const SharedRep& t);
+   TermCos(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -924,14 +822,13 @@ public:
 class TermSin : public TermOp {
 public:
    /// Constructor
-   TermSin(const SharedRep& t);
+   TermSin(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -940,14 +837,13 @@ public:
 class TermTan : public TermOp {
 public:
    /// Constructor
-   TermTan(const SharedRep& t);
+   TermTan(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -956,14 +852,13 @@ public:
 class TermCosh : public TermOp {
 public:
    /// Constructor
-   TermCosh(const SharedRep& t);
+   TermCosh(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -972,14 +867,13 @@ public:
 class TermSinh : public TermOp {
 public:
    /// Constructor
-   TermSinh(const SharedRep& t);
+   TermSinh(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -988,14 +882,13 @@ public:
 class TermTanh : public TermOp {
 public:
    /// Constructor
-   TermTanh(const SharedRep& t);
+   TermTanh(const SharedRep &t);
 
    Interval evalConst() const override;
    void evalRoot() override;
-   void contractRoot() override;
-   void acceptVisitor(TermVisitor& vis) const override;
-   TermRep* cloneRoot() const override;
-   TermRep* clone() const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1006,28 +899,28 @@ public:
    /// Virtual destructor
    virtual ~TermVisitor();
 
-   virtual void apply(const TermCst* t);
-   virtual void apply(const TermVar* t);
-   virtual void apply(const TermAdd* t);
-   virtual void apply(const TermSub* t);
-   virtual void apply(const TermMul* t);
-   virtual void apply(const TermDiv* t);
-   virtual void apply(const TermMin* t);
-   virtual void apply(const TermMax* t);
-   virtual void apply(const TermUsb* t);
-   virtual void apply(const TermAbs* t);
-   virtual void apply(const TermSgn* t);
-   virtual void apply(const TermSqr* t);
-   virtual void apply(const TermSqrt* t);
-   virtual void apply(const TermPow* t);
-   virtual void apply(const TermExp* t);
-   virtual void apply(const TermLog* t);
-   virtual void apply(const TermCos* t);
-   virtual void apply(const TermSin* t);
-   virtual void apply(const TermTan* t);
-   virtual void apply(const TermCosh* t);
-   virtual void apply(const TermSinh* t);
-   virtual void apply(const TermTanh* t);
+   virtual void apply(const TermCst *t);
+   virtual void apply(const TermVar *t);
+   virtual void apply(const TermAdd *t);
+   virtual void apply(const TermSub *t);
+   virtual void apply(const TermMul *t);
+   virtual void apply(const TermDiv *t);
+   virtual void apply(const TermMin *t);
+   virtual void apply(const TermMax *t);
+   virtual void apply(const TermUsb *t);
+   virtual void apply(const TermAbs *t);
+   virtual void apply(const TermSgn *t);
+   virtual void apply(const TermSqr *t);
+   virtual void apply(const TermSqrt *t);
+   virtual void apply(const TermPow *t);
+   virtual void apply(const TermExp *t);
+   virtual void apply(const TermLog *t);
+   virtual void apply(const TermCos *t);
+   virtual void apply(const TermSin *t);
+   virtual void apply(const TermTan *t);
+   virtual void apply(const TermCosh *t);
+   virtual void apply(const TermSinh *t);
+   virtual void apply(const TermTanh *t);
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1052,34 +945,34 @@ public:
    /// Gets the i-th square in this after a visit
    Term getSquare(size_t i) const;
 
-   void apply(const TermCst* t) override;
-   void apply(const TermVar* t) override;
-   void apply(const TermAdd* t) override;
-   void apply(const TermSub* t) override;
-   void apply(const TermMul* t) override;
-   void apply(const TermDiv* t) override;
-   void apply(const TermMin* t) override;
-   void apply(const TermMax* t) override;
-   void apply(const TermUsb* t) override;
-   void apply(const TermAbs* t) override;
-   void apply(const TermSgn* t) override;
-   void apply(const TermSqr* t) override;
-   void apply(const TermSqrt* t) override;
-   void apply(const TermPow* t) override;
-   void apply(const TermExp* t) override;
-   void apply(const TermLog* t) override;
-   void apply(const TermCos* t) override;
-   void apply(const TermSin* t) override;
-   void apply(const TermTan* t) override;
-   void apply(const TermCosh* t) override;
-   void apply(const TermSinh* t) override;
-   void apply(const TermTanh* t) override;
+   void apply(const TermCst *t) override;
+   void apply(const TermVar *t) override;
+   void apply(const TermAdd *t) override;
+   void apply(const TermSub *t) override;
+   void apply(const TermMul *t) override;
+   void apply(const TermDiv *t) override;
+   void apply(const TermMin *t) override;
+   void apply(const TermMax *t) override;
+   void apply(const TermUsb *t) override;
+   void apply(const TermAbs *t) override;
+   void apply(const TermSgn *t) override;
+   void apply(const TermSqr *t) override;
+   void apply(const TermSqrt *t) override;
+   void apply(const TermPow *t) override;
+   void apply(const TermExp *t) override;
+   void apply(const TermLog *t) override;
+   void apply(const TermCos *t) override;
+   void apply(const TermSin *t) override;
+   void apply(const TermTan *t) override;
+   void apply(const TermCosh *t) override;
+   void apply(const TermSinh *t) override;
+   void apply(const TermTanh *t) override;
 
 private:
-   bool sos_;              // true if this has visited a sum of squares
-   std::vector<Term> v_;   // vector of squares
+   bool sos_;            // true if this has visited a sum of squares
+   std::vector<Term> v_; // vector of squares
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

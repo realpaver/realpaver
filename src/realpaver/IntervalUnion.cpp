@@ -16,22 +16,26 @@
  * @brief  Ordered set of disjoint intervals
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalUnion.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-IntervalUnion::IntervalUnion() : v_()
-{}
+IntervalUnion::IntervalUnion()
+    : v_()
+{
+}
 
-IntervalUnion::IntervalUnion(const Interval& x) : v_()
+IntervalUnion::IntervalUnion(const Interval &x)
+    : v_()
 {
    insert(x);
 }
 
-IntervalUnion::IntervalUnion(const std::initializer_list<Interval>& l) : v_()
+IntervalUnion::IntervalUnion(const std::initializer_list<Interval> &l)
+    : v_()
 {
    for (Interval x : l)
       insert(x);
@@ -42,9 +46,9 @@ size_t IntervalUnion::size() const
    return v_.size();
 }
 
-const Interval& IntervalUnion::operator[](size_t i) const
+const Interval &IntervalUnion::operator[](size_t i) const
 {
-   ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
+   ASSERT(i >= 0 && i < v_.size(), "Bad access in an interval union @ " << i);
 
    return v_[i];
 }
@@ -71,19 +75,20 @@ IntervalUnion::iterator IntervalUnion::end()
 
 IntervalUnion IntervalUnion::subUnion(size_t i, size_t j) const
 {
-   ASSERT(i>=0 && i<v_.size(), "Bad access in an interval union @ " << i);
-   ASSERT(j>=0 && j<v_.size(), "Bad access in an interval union @ " << j);
-   ASSERT(i<=j, "Bad indexes used to create a sub interval union");
+   ASSERT(i >= 0 && i < v_.size(), "Bad access in an interval union @ " << i);
+   ASSERT(j >= 0 && j < v_.size(), "Bad access in an interval union @ " << j);
+   ASSERT(i <= j, "Bad indexes used to create a sub interval union");
 
    IntervalUnion u;
-   for (size_t k=i; k<=j; ++k)
+   for (size_t k = i; k <= j; ++k)
       u.v_.push_back(v_[k]);
    return u;
 }
 
-IntervalUnion& IntervalUnion::insert(const Interval& x)
+IntervalUnion &IntervalUnion::insert(const Interval &x)
 {
-   if (x.isEmpty()) return *this;
+   if (x.isEmpty())
+      return *this;
 
    if (isEmpty())
    {
@@ -93,7 +98,7 @@ IntervalUnion& IntervalUnion::insert(const Interval& x)
 
    // insertion at the beginning?            v_[0]:         |------|
    //                                            x: |---|
-   if (x.right()<v_[0].left())
+   if (x.right() < v_[0].left())
    {
       v_.insert(v_.begin(), x);
       return *this;
@@ -101,7 +106,7 @@ IntervalUnion& IntervalUnion::insert(const Interval& x)
 
    // insertion at the end?             v_[size-1]: |------|
    //                                            x:            |---|
-   if (x.left()>v_[size()-1].right())
+   if (x.left() > v_[size() - 1].right())
    {
       v_.push_back(x);
       return *this;
@@ -114,27 +119,27 @@ IntervalUnion& IntervalUnion::insert(const Interval& x)
    if (found)
    {
       // only one interval having an intersection
-      if (first==last)
+      if (first == last)
       {
          v_[first] |= x;
       }
       else
       {
          Interval y(v_[first] | v_[last] | x);
-            
+
          // removes the range first..last from the vector
          auto itfirst = v_.begin();
          std::advance(itfirst, first);
-            
+
          auto itlast = v_.begin();
          std::advance(itlast, last + 1);
 
-         v_.erase(itfirst,itlast);
-            
+         v_.erase(itfirst, itlast);
+
          // inserts the hull at the right place
          auto it = v_.begin();
          std::advance(it, first);
-         v_.insert(it,y);
+         v_.insert(it, y);
       }
    }
    else
@@ -153,14 +158,14 @@ Interval IntervalUnion::hull() const
    if (isEmpty())
       return Interval::emptyset();
 
-   else if (size()==1)
+   else if (size() == 1)
       return v_[0];
 
    else
-      return Interval(v_[0].left(), v_[size()-1].right());
+      return Interval(v_[0].left(), v_[size() - 1].right());
 }
 
-void IntervalUnion::contractInterval(Interval& x) const
+void IntervalUnion::contractInterval(Interval &x) const
 {
    if (!x.isEmpty())
    {
@@ -180,7 +185,7 @@ void IntervalUnion::contractInterval(Interval& x) const
    }
 }
 
-void IntervalUnion::contract(const Interval& x)
+void IntervalUnion::contract(const Interval &x)
 {
    if (x.isEmpty())
    {
@@ -202,10 +207,10 @@ void IntervalUnion::contract(const Interval& x)
    v_[last] &= x;
 
    // removes the intervals after last
-   if (last < (int)(v_.size()-1))
+   if (last < (int)(v_.size() - 1))
    {
       auto it = v_.begin();
-      std::advance(it, last+1);
+      std::advance(it, last + 1);
       v_.erase(it, v_.end());
    }
 
@@ -218,7 +223,7 @@ void IntervalUnion::contract(const Interval& x)
    }
 }
 
-void IntervalUnion::print(std::ostream& os) const
+void IntervalUnion::print(std::ostream &os) const
 {
    if (isEmpty())
       os << "{empty}";
@@ -228,38 +233,39 @@ void IntervalUnion::print(std::ostream& os) const
       os << "{";
       for (auto it = v_.begin(); it != v_.end(); ++it)
       {
-         if (it != v_.begin()) os << ", ";
+         if (it != v_.begin())
+            os << ", ";
          os << (*it);
       }
       os << "}";
    }
 }
 
-bool IntervalUnion::findInter(const Interval& x, int& first, int& last) const
+bool IntervalUnion::findInter(const Interval &x, int &first, int &last) const
 {
    first = 0;
-   last = size()-1;
+   last = size() - 1;
    int current;
    bool found = false;
 
    // dichotomic search of an interval intersecting x
-   while ( (!found) && last>=first )
+   while ((!found) && last >= first)
    {
       // checks the midpoint interval between first and last
-      current = (first+last)/ 2;
+      current = (first + last) / 2;
 
       // first case:           v_[current]: |------|
-      //                                 x:              |---|   
-      if (v_[current].right()<x.left())
+      //                                 x:              |---|
+      if (v_[current].right() < x.left())
          first = current + 1;
 
       // second case:          v_[current]:            |------|
-      //                                 x:   |---|   
-      else if (v_[current].left()>x.right())
+      //                                 x:   |---|
+      else if (v_[current].left() > x.right())
          last = current - 1;
 
       // last case:            v_[current]:    |------|
-      //                               x:    |---|  
+      //                               x:    |---|
       else
          found = true;
    }
@@ -268,13 +274,13 @@ bool IntervalUnion::findInter(const Interval& x, int& first, int& last) const
    {
       // finds the leftmost interval intersecting x
       first = current - 1;
-      while (first>=0 && (v_[first].overlaps(x)))
+      while (first >= 0 && (v_[first].overlaps(x)))
          --first;
       ++first;
 
       // finds the rightmost interval intersecting x
       last = current + 1;
-      while ( (last<(int)size()) && (v_[last].overlaps(x)))
+      while ((last < (int)size()) && (v_[last].overlaps(x)))
          ++last;
       --last;
 
@@ -292,70 +298,67 @@ void IntervalUnion::clear()
 double IntervalUnion::width() const
 {
    double s = 0.0;
-   for (size_t i=0; i<size(); ++i)
+   for (size_t i = 0; i < size(); ++i)
       s += v_[i].width();
    return s;
 }
 
-bool IntervalUnion::equals(const IntervalUnion& other) const
+bool IntervalUnion::equals(const IntervalUnion &other) const
 {
-   if (isEmpty() || other.isEmpty()) return false;
-   if (size() != other.size()) return false;
+   if (isEmpty() || other.isEmpty())
+      return false;
+   if (size() != other.size())
+      return false;
 
-   for (size_t i=0; i<size(); ++i)
+   for (size_t i = 0; i < size(); ++i)
       if (v_[i].isSetNeq(other.v_[i]))
          return false;
 
    return true;
 }
 
-std::ostream& operator<<(std::ostream& os, const IntervalUnion& u)
+std::ostream &operator<<(std::ostream &os, const IntervalUnion &u)
 {
    u.print(os);
    return os;
 }
 
-IntervalUnion addPX(const Interval& x, const Interval& y,
-                    const IntervalUnion& Z)
+IntervalUnion addPX(const Interval &x, const Interval &y, const IntervalUnion &Z)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Z.size(); ++i)
+   for (size_t i = 0; i < Z.size(); ++i)
       U.insert(addPX(x, y, Z.v_[i]));
    return U;
 }
 
-IntervalUnion addPY(const Interval& x, const Interval& y,
-                    const IntervalUnion& Z)
+IntervalUnion addPY(const Interval &x, const Interval &y, const IntervalUnion &Z)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Z.size(); ++i)
+   for (size_t i = 0; i < Z.size(); ++i)
       U.insert(addPY(x, y, Z.v_[i]));
    return U;
 }
 
-IntervalUnion subPX(const Interval& x, const Interval& y,
-                    const IntervalUnion& Z)
+IntervalUnion subPX(const Interval &x, const Interval &y, const IntervalUnion &Z)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Z.size(); ++i)
+   for (size_t i = 0; i < Z.size(); ++i)
       U.insert(subPX(x, y, Z.v_[i]));
    return U;
 }
 
-IntervalUnion subPY(const Interval& x, const Interval& y,
-                    const IntervalUnion& Z)
+IntervalUnion subPY(const Interval &x, const Interval &y, const IntervalUnion &Z)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Z.size(); ++i)
+   for (size_t i = 0; i < Z.size(); ++i)
       U.insert(subPY(x, y, Z.v_[i]));
    return U;
 }
 
-IntervalUnion mulPX(const Interval& x, const Interval& y,
-                    const IntervalUnion& Z)
+IntervalUnion mulPX(const Interval &x, const Interval &y, const IntervalUnion &Z)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Z.size(); ++i)
+   for (size_t i = 0; i < Z.size(); ++i)
    {
       Interval z = Z.v_[i];
       if (y.strictlyContainsZero())
@@ -371,11 +374,10 @@ IntervalUnion mulPX(const Interval& x, const Interval& y,
    return U;
 }
 
-IntervalUnion mulPY(const Interval& x, const Interval& y,
-                    const IntervalUnion& Z)
+IntervalUnion mulPY(const Interval &x, const Interval &y, const IntervalUnion &Z)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Z.size(); ++i)
+   for (size_t i = 0; i < Z.size(); ++i)
    {
       Interval z = Z.v_[i];
       if (x.strictlyContainsZero())
@@ -391,10 +393,10 @@ IntervalUnion mulPY(const Interval& x, const Interval& y,
    return U;
 }
 
-IntervalUnion sqrPX(const Interval& x, const IntervalUnion& Y)
+IntervalUnion sqrPX(const Interval &x, const IntervalUnion &Y)
 {
    IntervalUnion U;
-   for (size_t i=0; i<Y.size(); ++i)
+   for (size_t i = 0; i < Y.size(); ++i)
    {
       Interval y = Y.v_[i];
       if (y.left() > 0.0)
@@ -412,4 +414,4 @@ IntervalUnion sqrPX(const Interval& x, const IntervalUnion& Y)
    return U;
 }
 
-} // namespace
+} // namespace realpaver

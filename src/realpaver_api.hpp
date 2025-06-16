@@ -16,12 +16,16 @@
  * @brief  Imports the main classes for solving nonlinear problems.
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Timer.hpp"
 
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintCond.hpp"
+#include "realpaver/ConstraintPiecewise.hpp"
+#include "realpaver/ConstraintTable.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"

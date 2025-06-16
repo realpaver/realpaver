@@ -16,15 +16,18 @@
  * @brief  Inflator of intervals
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Inflator.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-Inflator::Inflator() : delta_(1.125), chi_(1.0e-12)
-{}
+Inflator::Inflator()
+    : delta_(1.125)
+    , chi_(1.0e-12)
+{
+}
 
 Inflator::Inflator(double delta, double chi)
 {
@@ -32,14 +35,14 @@ Inflator::Inflator(double delta, double chi)
    setChi(chi);
 }
 
-Interval Inflator::inflate(const Interval& x) const
+Interval Inflator::inflate(const Interval &x) const
 {
    return x.inflate(delta_, chi_);
 }
 
-void Inflator::inflate(IntervalVector& X) const
+void Inflator::inflate(IntervalVector &X) const
 {
-   for (size_t i=0; i<X.size(); ++i)
+   for (size_t i = 0; i < X.size(); ++i)
       X.set(i, X[i].inflate(delta_, chi_));
 }
 
@@ -67,4 +70,4 @@ void Inflator::setChi(double chi)
    chi_ = chi;
 }
 
-} // namespace
+} // namespace realpaver

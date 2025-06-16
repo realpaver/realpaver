@@ -38,10 +38,10 @@ public:
    ObjectiveRep(Term f, bool minimization);
 
    /// No copy
-   ObjectiveRep(const ObjectiveRep&) = delete;
+   ObjectiveRep(const ObjectiveRep &) = delete;
 
    /// No assignment
-   ObjectiveRep& operator=(const ObjectiveRep&) = delete;
+   ObjectiveRep &operator=(const ObjectiveRep &) = delete;
 
    /// Default destructor
    ~ObjectiveRep() = default;
@@ -53,7 +53,7 @@ public:
    bool isConstant() const;
 
    /// Returns true if v occurs in this
-   bool dependsOn(const Variable& v) const;
+   bool dependsOn(const Variable &v) const;
 
    /// Returns true if this is linear
    bool isLinear() const;
@@ -80,10 +80,10 @@ private:
 class Objective {
 public:
    /// Default copy constructor
-   Objective(const Objective&) = default;
+   Objective(const Objective &) = default;
 
    /// Default assignment operator
-   Objective& operator=(const Objective&) = default;
+   Objective &operator=(const Objective &) = default;
 
    /// Default destructor
    ~Objective() = default;
@@ -95,7 +95,7 @@ public:
    bool isConstant() const;
 
    /// Returns true if v occurs in this
-   bool dependsOn(const Variable& v) const;
+   bool dependsOn(const Variable &v) const;
 
    /// Returns true if this is linear
    bool isLinear() const;
@@ -116,7 +116,7 @@ private:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, Objective obj);
+std::ostream &operator<<(std::ostream &os, Objective obj);
 
 /// Returns the objective: minimize f
 Objective MIN(Term f);
@@ -124,6 +124,6 @@ Objective MIN(Term f);
 /// Returns the objective: maximize f
 Objective MAX(Term f);
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -1,0 +1,11 @@
+# In: Floudas C.A. et al.
+# Handbook of Test Problems in Local and Global Optimization.
+# Kluwer, 1999.
+
+Variables
+   x1 in [-1.0e8, 1.0e8],
+   x2 in [-1.0e8, 1.0e8];
+
+Constraints
+   -0.25/pi*x2 - 0.5*x1  + 0.5*sin(x1*x2) == 0,
+   exp(1)/pi*x2 - 2*exp(1)*x1  + (1 - 0.25/pi)*(exp(2*x1) -exp(1)) == 0;

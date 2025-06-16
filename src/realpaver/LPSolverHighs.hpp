@@ -14,15 +14,15 @@
 /**
  * @file   LPSolverHighs.hpp
  * @brief  Wrapper class for the LP solver Highs
- * @author Raphaël Chenouard
+ * @author Raphaël Chenouard, Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_LPSOLVER_HIGHS_HPP
 #define REALPAVER_LPSOLVER_HIGHS_HPP
 
-#include <Highs.h>
 #include "realpaver/LPModel.hpp"
+#include <Highs.h>
 
 namespace realpaver {
 
@@ -41,25 +41,35 @@ public:
    ~LPSolver();
 
    /// No copy
-   LPSolver(const LPSolver&) = delete;
+   LPSolver(const LPSolver &) = delete;
 
    /// No assignment
-   LPSolver& operator=(const LPSolver&) = delete;
+   LPSolver &operator=(const LPSolver &) = delete;
 
-   bool optimize() override;
-   bool reoptimize() override;
+   LPStatus optimize() override;
+   LPStatus reoptimize() override;
+   double costSolution() const override;
+   RealVector primalSolution() const override;
+   RealVector dualSolution() const override;
+   bool infeasibleRay(RealVector &ray) const override;
 
 private:
-   Highs* simplex_;
-  
+   Highs *simplex_;
+
+   // makes a Highs problem from a LPModel
    void makeVars();
    void makeCtrs();
-   void makeObj();
-   void makeHighsSimplex();
+   void makeCost();
+   void makeSimplex();
+   void setOptions();
 
-   bool run();
+   // optimization
+   LPStatus run();
+
+   // gets the status from Highs
+   LPStatus toLPStatus() const;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

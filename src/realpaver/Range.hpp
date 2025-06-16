@@ -48,37 +48,37 @@ public:
    Range();
 
    /// Creates the range [a, a]
-   Range(const int& a);
+   Range(const int &a);
 
    /// Creates the range [a, b]
-   Range(const int& a, const int& b);
+   Range(const int &a, const int &b);
 
    /// Creates the range [a, a]
-   Range(const Integer& a);
+   Range(const Integer &a);
 
    /// Creates the range [a, b]
-   Range(const Integer& a, const Integer& b);
+   Range(const Integer &a, const Integer &b);
 
    /// Default copy constructor
-   Range(const Range&) = default;
+   Range(const Range &) = default;
 
    /// Default assignment operator
-   Range& operator=(const Range&) = default;
+   Range &operator=(const Range &) = default;
 
    /// Default destructor
    ~Range() = default;
 
    /// Returns the range [MIN(), a]
-   static Range lessThan(const Integer& a);
+   static Range lessThan(const Integer &a);
 
    /// Returns the range [MIN(), a-1]
-   static Range strictlyLessThan(const Integer& a);
+   static Range strictlyLessThan(const Integer &a);
 
    /// Returns the range [a, MAX()]
-   static Range moreThan(const Integer& a);
+   static Range moreThan(const Integer &a);
 
    /// Returns the range [a+1, MAX()]
-   static Range strictlyGreaterThan(const Integer& a);
+   static Range strictlyGreaterThan(const Integer &a);
    ///@}
 
    /// Returns the smallest finite bound
@@ -101,28 +101,28 @@ public:
 
    /**
     * @brief Outward rounding of an interval.
-    * 
+    *
     * Returns the smallest range that contains x; throws an exception if x is
     * not representable
     */
-   static Range roundOutward(const Interval& x);
+   static Range roundOutward(const Interval &x);
 
    /**
     * @brief Inward rounding of an interval.
-    * 
+    *
     * Returns the largest range that is contained in x; throws an exception if
     * x is not representable
     */
-   static Range roundInward(const Interval& x);
+   static Range roundInward(const Interval &x);
 
    /// Returns an interval representation of this
    Interval toInterval() const;
 
    /// Assigns the left bound of this
-   void setLeft(const Integer& a);
+   void setLeft(const Integer &a);
 
    /// Assigns the right bound of this
-   void setRight(const Integer& a);
+   void setRight(const Integer &a);
 
    /// Assigns this to the empty set
    void setEmpty();
@@ -159,32 +159,32 @@ public:
 
    /// @name Set operations
    ///@{
-   bool contains(const Integer& a) const;
-   bool strictlyContains(const Integer& a) const;
+   bool contains(const Integer &a) const;
+   bool strictlyContains(const Integer &a) const;
    bool containsZero() const;
    bool strictlyContainsZero() const;
-   bool contains(const Range& other) const;
-   bool strictlyContains(const Range& other) const;
+   bool contains(const Range &other) const;
+   bool strictlyContains(const Range &other) const;
 
-   bool isSetEq(const Range& other) const;
-   bool isSetNeq(const Range& other) const;
-   bool isPossiblyEq(const Range& other) const;
-   bool isPossiblyNeq(const Range& other) const;
-   bool isPossiblyLe(const Range& other) const;
-   bool isPossiblyLt(const Range& other) const;
-   bool isPossiblyGe(const Range& other) const;
-   bool isPossiblyGt(const Range& other) const;
+   bool isSetEq(const Range &other) const;
+   bool isSetNeq(const Range &other) const;
+   bool isPossiblyEq(const Range &other) const;
+   bool isPossiblyNeq(const Range &other) const;
+   bool isPossiblyLe(const Range &other) const;
+   bool isPossiblyLt(const Range &other) const;
+   bool isPossiblyGe(const Range &other) const;
+   bool isPossiblyGt(const Range &other) const;
 
-   bool isCertainlyEq(const Range& other) const;
-   bool isCertainlyNeq(const Range& other) const;
-   bool isCertainlyLe(const Range& other) const;
-   bool isCertainlyLt(const Range& other) const;
-   bool isCertainlyGe(const Range& other) const;
-   bool isCertainlyGt(const Range& other) const;
+   bool isCertainlyEq(const Range &other) const;
+   bool isCertainlyNeq(const Range &other) const;
+   bool isCertainlyLe(const Range &other) const;
+   bool isCertainlyLt(const Range &other) const;
+   bool isCertainlyGe(const Range &other) const;
+   bool isCertainlyGt(const Range &other) const;
 
-   bool isDisjoint(const Range& other) const;
-   bool overlaps(const Range& other) const;
-   bool isJoinable(const Range& other) const;
+   bool isDisjoint(const Range &other) const;
+   bool overlaps(const Range &other) const;
+   bool isJoinable(const Range &other) const;
 
    bool isCertainlyLeZero() const;
    bool isCertainlyLtZero() const;
@@ -194,110 +194,110 @@ public:
 
    /// @name Intersection
    ///@{
-   Range& operator&=(const Range& other);
-   friend Range operator&(const Range& x, const Range& y);
+   Range &operator&=(const Range &other);
+   friend Range operator&(const Range &x, const Range &y);
    ///@}
 
    /// @name Hull
    ///@{
-   Range& operator|=(const Range& other);
-   friend Range operator|(const Range& x, const Range& y);
+   Range &operator|=(const Range &other);
+   friend Range operator|(const Range &x, const Range &y);
    ///@}
 
    /// @name Addition
    ///@{
-   Range& operator+=(const Range& other);
-   friend Range operator+(const Range& x, const Range& y);
-   friend Range addPX(const Range& x, const Range& y, const Range& z);
-   friend Range addPY(const Range& x, const Range& y, const Range& z);
-   friend Range addPZ(const Range& x, const Range& y, const Range& z);
+   Range &operator+=(const Range &other);
+   friend Range operator+(const Range &x, const Range &y);
+   friend Range addPX(const Range &x, const Range &y, const Range &z);
+   friend Range addPY(const Range &x, const Range &y, const Range &z);
+   friend Range addPZ(const Range &x, const Range &y, const Range &z);
    ///@}
 
    /// @name Subtraction
    ///@{
-   Range& operator-=(const Range& other);
-   friend Range operator-(const Range& x, const Range& y);
-   friend Range subPX(const Range& x, const Range& y, const Range& z);
-   friend Range subPY(const Range& x, const Range& y, const Range& z);
-   friend Range subPZ(const Range& x, const Range& y, const Range& z);
+   Range &operator-=(const Range &other);
+   friend Range operator-(const Range &x, const Range &y);
+   friend Range subPX(const Range &x, const Range &y, const Range &z);
+   friend Range subPY(const Range &x, const Range &y, const Range &z);
+   friend Range subPZ(const Range &x, const Range &y, const Range &z);
    ///@}
 
    /// @name Unary subtraction
    ///@{
-   friend Range operator-(const Range& x);
-   friend Range usubPX(const Range& x, const Range& y);
-   friend Range usubPY(const Range& x, const Range& y);
+   friend Range operator-(const Range &x);
+   friend Range usubPX(const Range &x, const Range &y);
+   friend Range usubPY(const Range &x, const Range &y);
    ///@}
 
    /// @name Multiplication
    ///@{
-   Range& operator*=(const Range& other);
-   friend Range operator*(const Range& x, const Range& y);
-   friend Range mulPX(const Range& x, const Range& y, const Range& z);
-   friend Range mulPY(const Range& x, const Range& y, const Range& z);
-   friend Range mulPZ(const Range& x, const Range& y, const Range& z);
+   Range &operator*=(const Range &other);
+   friend Range operator*(const Range &x, const Range &y);
+   friend Range mulPX(const Range &x, const Range &y, const Range &z);
+   friend Range mulPY(const Range &x, const Range &y, const Range &z);
+   friend Range mulPZ(const Range &x, const Range &y, const Range &z);
    ///@}
 
    /// @name Division
    ///@{
-   Range& operator/=(const Range& other);
-   friend Range operator/(const Range& x, const Range& y);
-   friend Range divPX(const Range& x, const Range& y, const Range& z);
-   friend Range divPY(const Range& x, const Range& y, const Range& z);
-   friend Range divPZ(const Range& x, const Range& y, const Range& z);
+   Range &operator/=(const Range &other);
+   friend Range operator/(const Range &x, const Range &y);
+   friend Range divPX(const Range &x, const Range &y, const Range &z);
+   friend Range divPY(const Range &x, const Range &y, const Range &z);
+   friend Range divPZ(const Range &x, const Range &y, const Range &z);
    ///@}
 
    /// @name Modulo
    ///@{
-   friend Range operator%(const Range& x, int n);
-   friend std::pair<Range,Range> extMod(const Range& x, int n);
-   friend Range modPX(const Range& x, int n, const Range& y);
-   friend Range modPY(const Range& x, int n, const Range& y);
+   friend Range operator%(const Range &x, int n);
+   friend std::pair<Range, Range> extMod(const Range &x, int n);
+   friend Range modPX(const Range &x, int n, const Range &y);
+   friend Range modPY(const Range &x, int n, const Range &y);
    ///@}
 
    /// @name Square
    ///@{
-   friend Range sqr(const Range& x);
-   friend Range sqrPX(const Range& x, const Range& y);
-   friend Range sqrPY(const Range& x, const Range& y);   
+   friend Range sqr(const Range &x);
+   friend Range sqrPX(const Range &x, const Range &y);
+   friend Range sqrPY(const Range &x, const Range &y);
 
    /// @name Minimum
    ///@{
-   friend Range min(const Range& x, const Range& y);
-   friend Range minPX(const Range& x, const Range& y, const Range& z);
-   friend Range minPY(const Range& x, const Range& y, const Range& z);
-   friend Range minPZ(const Range& x, const Range& y, const Range& z);
+   friend Range min(const Range &x, const Range &y);
+   friend Range minPX(const Range &x, const Range &y, const Range &z);
+   friend Range minPY(const Range &x, const Range &y, const Range &z);
+   friend Range minPZ(const Range &x, const Range &y, const Range &z);
    ///@}
 
    /// @name Maximum
    ///@{
-   friend Range max(const Range& x, const Range& y);
-   friend Range maxPX(const Range& x, const Range& y, const Range& z);
-   friend Range maxPY(const Range& x, const Range& y, const Range& z);
-   friend Range maxPZ(const Range& x, const Range& y, const Range& z);
+   friend Range max(const Range &x, const Range &y);
+   friend Range maxPX(const Range &x, const Range &y, const Range &z);
+   friend Range maxPY(const Range &x, const Range &y, const Range &z);
+   friend Range maxPZ(const Range &x, const Range &y, const Range &z);
    ///@}
 
    /// @name Absolute value
    ///@{
-   friend Range abs(const Range& x);
-   friend Range absPX(const Range& x, const Range& y);
-   friend Range absPY(const Range& x, const Range& y);
+   friend Range abs(const Range &x);
+   friend Range absPX(const Range &x, const Range &y);
+   friend Range absPY(const Range &x, const Range &y);
    ///@}
 
    /// @name Sign
    ///@{
-   friend Range sgn(const Range& x);
-   friend Range sgnPX(const Range& x, const Range& y);
-   friend Range sgnPY(const Range& x, const Range& y);
+   friend Range sgn(const Range &x);
+   friend Range sgnPX(const Range &x, const Range &y);
+   friend Range sgnPY(const Range &x, const Range &y);
    ///@}
 
 private:
-   Integer l_, r_;   // bounds
+   Integer l_, r_; // bounds
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Range& x);
+std::ostream &operator<<(std::ostream &os, const Range &x);
 
-} // namespace
+} // namespace realpaver
 
 #endif

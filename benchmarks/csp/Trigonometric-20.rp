@@ -1,0 +1,49 @@
+# In: Luksan L. and Vleck J.
+#     Sparse and partially separable test problems for unconstrained
+#     and equality constrained optimization.
+#     Research Report 767, Institute of Computer Science, Academy of 
+#     Sciences of the Czeck Republic, Janvier 1999
+
+Variables
+x1 in [0, 2*PI-0.001],
+x2 in [0, 2*PI-0.001],
+x3 in [0, 2*PI-0.001],
+x4 in [0, 2*PI-0.001],
+x5 in [0, 2*PI-0.001],
+x6 in [0, 2*PI-0.001],
+x7 in [0, 2*PI-0.001],
+x8 in [0, 2*PI-0.001],
+x9 in [0, 2*PI-0.001],
+x10 in [0, 2*PI-0.001],
+x11 in [0, 2*PI-0.001],
+x12 in [0, 2*PI-0.001],
+x13 in [0, 2*PI-0.001],
+x14 in [0, 2*PI-0.001],
+x15 in [0, 2*PI-0.001],
+x16 in [0, 2*PI-0.001],
+x17 in [0, 2*PI-0.001],
+x18 in [0, 2*PI-0.001],
+x19 in [0, 2*PI-0.001],
+x20 in [0, 2*PI-0.001];
+
+Constraints
+20+1*(1-cos(x1))-sin(x1)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+2*(1-cos(x2))-sin(x2)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+3*(1-cos(x3))-sin(x3)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+4*(1-cos(x4))-sin(x4)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+5*(1-cos(x5))-sin(x5)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+6*(1-cos(x6))-sin(x6)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+7*(1-cos(x7))-sin(x7)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+8*(1-cos(x8))-sin(x8)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+9*(1-cos(x9))-sin(x9)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+10*(1-cos(x10))-sin(x10)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+11*(1-cos(x11))-sin(x11)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+12*(1-cos(x12))-sin(x12)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+13*(1-cos(x13))-sin(x13)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+14*(1-cos(x14))-sin(x14)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+15*(1-cos(x15))-sin(x15)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+16*(1-cos(x16))-sin(x16)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+17*(1-cos(x17))-sin(x17)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+18*(1-cos(x18))-sin(x18)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+19*(1-cos(x19))-sin(x19)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0,
+20+20*(1-cos(x20))-sin(x20)-cos(x1)-cos(x2)-cos(x3)-cos(x4)-cos(x5)-cos(x6)-cos(x7)-cos(x8)-cos(x9)-cos(x10)-cos(x11)-cos(x12)-cos(x13)-cos(x14)-cos(x15)-cos(x16)-cos(x17)-cos(x18)-cos(x19)-cos(x20) == 0;

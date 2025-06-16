@@ -16,7 +16,7 @@
  * @brief  Interval Newton method
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalNewton.hpp"
@@ -26,41 +26,40 @@
 namespace realpaver {
 
 IntervalNewton::IntervalNewton(IntervalFunctionVector F)
-      : Contractor(),
-        F_(F),
-        jac_(F.nbFuns(), F.nbVars()),
-        val_(F.nbFuns()),
-        y_(F.nbVars()),
-        b_(F.nbFuns()),
-        c_(F.scope()),
-        gs_(nullptr),
-        maxiter_(Param::GetIntParam("NEWTON_ITER_LIMIT")),
-        tol_(Param::GetDblParam("NEWTON_REL_TOL"), 0.0),
-        wlim_(Param::GetDblParam("NEWTON_WIDTH_LIMIT")),
-        delta_(Param::GetDblParam("INFLATION_DELTA")),
-        chi_(Param::GetDblParam("INFLATION_CHI")),
-        cmaxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
+    : Contractor()
+    , F_(F)
+    , jac_(F.nbFuns(), F.nbVars())
+    , val_(F.nbFuns())
+    , y_(F.nbVars())
+    , b_(F.nbFuns())
+    , c_(F.scope())
+    , gs_(nullptr)
+    , maxiter_(Params::GetIntParam("NEWTON_ITER_LIMIT"))
+    , tol_(Params::GetDblParam("NEWTON_TOL"))
+    , wlim_(Params::GetDblParam("NEWTON_WIDTH_LIMIT"))
+    , delta_(Params::GetDblParam("INFLATION_DELTA"))
+    , chi_(Params::GetDblParam("INFLATION_CHI"))
+    , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
-   ASSERT(F.nbVars() == F.nbFuns(),
-          "Interval Newton defined with a non-square system");
+   ASSERT(F.nbVars() == F.nbFuns(), "Interval Newton defined with a non-square system");
 
    gs_ = new IntervalGaussSeidel();
 }
 
-IntervalNewton::IntervalNewton(const IntervalNewton& N)
-      : Contractor(N),
-        F_(N.F_),
-        jac_(N.jac_),
-        val_(N.val_),
-        y_(N.y_),
-        b_(N.b_),
-        c_(N.c_),
-        gs_(nullptr),
-        maxiter_(N.maxiter_),
-        tol_(N.tol_),
-        delta_(N.delta_),
-        chi_(N.chi_),
-        cmaxiter_(N.cmaxiter_)
+IntervalNewton::IntervalNewton(const IntervalNewton &N)
+    : Contractor(N)
+    , F_(N.F_)
+    , jac_(N.jac_)
+    , val_(N.val_)
+    , y_(N.y_)
+    , b_(N.b_)
+    , c_(N.c_)
+    , gs_(nullptr)
+    , maxiter_(N.maxiter_)
+    , tol_(N.tol_)
+    , delta_(N.delta_)
+    , chi_(N.chi_)
+    , cmaxiter_(N.cmaxiter_)
 {
    gs_ = new IntervalGaussSeidel(*N.gs_);
 }
@@ -85,13 +84,14 @@ size_t IntervalNewton::getMaxIter() const
    return maxiter_;
 }
 
-Tolerance IntervalNewton::getTol() const
+double IntervalNewton::getTol() const
 {
    return tol_;
 }
 
-void IntervalNewton::setTol(const Tolerance& tol)
+void IntervalNewton::setTol(const double &tol)
 {
+   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -107,15 +107,16 @@ double IntervalNewton::getWidthLimit() const
    return wlim_;
 }
 
-IntervalGaussSeidel* IntervalNewton::getGaussSeidel() const
+IntervalGaussSeidel *IntervalNewton::getGaussSeidel() const
 {
    return gs_;
 }
 
-Proof IntervalNewton::contract(IntervalBox& X)
+Proof IntervalNewton::contract(IntervalBox &X)
 {
-   if (X.width() >= wlim_) return Proof::Maybe;
-   
+   if (X.width() >= wlim_)
+      return Proof::Maybe;
+
    bool iter = true;
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
@@ -129,7 +130,7 @@ Proof IntervalNewton::contract(IntervalBox& X)
 
    do
    {
-      ++ nb_steps;
+      ++nb_steps;
 
       // evaluates the function on X
       F_.eval(X, val_);
@@ -142,7 +143,7 @@ Proof IntervalNewton::contract(IntervalBox& X)
          continue;
       }
 
-      makeC(X);          // c := midpoint of X
+      makeC(X); // c := midpoint of X
       F_.eval(c_, val_);
 
       if (val_.isEmpty())
@@ -152,14 +153,14 @@ Proof IntervalNewton::contract(IntervalBox& X)
          continue;
       }
 
-      makeY(X);      // y := X - c
-      b_ = -val_;    // b := -F(c)
+      makeY(X);   // y := X - c
+      b_ = -val_; // b := -F(c)
 
       // calculates the Hansen's matrix
-      F_.diffHansen(X, jac_);
+      F_.diffHansen(X, c_, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
-            
+
       if (certif == Proof::Empty)
       {
          proof = Proof::Empty;
@@ -195,10 +196,9 @@ Proof IntervalNewton::contract(IntervalBox& X)
          iter = false;
          LOG_INTER("Stops on the tolerance " << tol_);
       }
-      
+
       LOG_LOW("Inner step of interval Newton  -> " << X);
-   }
-   while (iter);
+   } while (iter);
 
    LOG_INTER("End of interval Newton -> " << proof);
    LOG_INTER("Reduced box -> " << X);
@@ -218,35 +218,33 @@ Proof IntervalNewton::contract(IntervalBox& X)
    return proof;
 }
 
-void IntervalNewton::makeY(IntervalBox& X)
+void IntervalNewton::makeY(IntervalBox &X)
 {
    // y := X - c
    int i = 0;
-   for (const auto& v : scope())
+   for (const auto &v : scope())
    {
       y_.set(i, X.get(v) - c_.get(v));
-      i = i+1;
+      i = i + 1;
    }
 }
 
-void IntervalNewton::makeC(IntervalBox& X)
+void IntervalNewton::makeC(IntervalBox &X)
 {
-   for (const auto& v : scope())
+   for (const auto &v : scope())
       c_.set(v, X.get(v).midpoint());
 }
 
-
-Proof IntervalNewton::reduceX(IntervalBox& X, bool& improved)
+Proof IntervalNewton::reduceX(IntervalBox &X, bool &improved)
 {
    int i = 0;
    Proof proof = Proof::Feasible;
 
    improved = false;
 
-   for (const auto& v : scope())
+   for (const auto &v : scope())
    {
-      Interval dom = X.get(v),
-               z = y_.get(i) + c_.get(v);
+      Interval dom = X.get(v), z = y_.get(i) + c_.get(v);
 
       if (dom.isDisjoint(z))
          return Proof::Empty;
@@ -256,16 +254,16 @@ Proof IntervalNewton::reduceX(IntervalBox& X, bool& improved)
 
       Interval reduced = dom & z;
 
-      if (tol_.isImproved(dom, reduced))
+      if (reduced.improves(dom, tol_))
          improved = true;
 
       X.set(v, reduced);
-      i = i+1;
+      i = i + 1;
    }
    return proof;
 }
 
-Proof IntervalNewton::certify(IntervalBox& box)
+Proof IntervalNewton::certify(IntervalBox &box)
 {
    bool iter = true;
    Proof proof = Proof::Maybe;
@@ -284,7 +282,7 @@ Proof IntervalNewton::certify(IntervalBox& box)
 
    do
    {
-      ++ nb_steps;
+      ++nb_steps;
 
       IntervalBox prev(X);
 
@@ -304,7 +302,7 @@ Proof IntervalNewton::certify(IntervalBox& box)
          continue;
       }
 
-      makeC(X);            // c := midpoint of X
+      makeC(X); // c := midpoint of X
       F_.eval(c_, val_);
 
       if (val_.isEmpty())
@@ -314,14 +312,14 @@ Proof IntervalNewton::certify(IntervalBox& box)
          continue;
       }
 
-      makeY(X);      // y := X - c
-      b_ = -val_;    // b := -F(c)
+      makeY(X);   // y := X - c
+      b_ = -val_; // b := -F(c)
 
       // calculates the Hansen's matrix
-      F_.diffHansen(X, jac_);
+      F_.diffHansen(X, c_, jac_);
 
       Proof certif = gs_->contractPrecond(jac_, y_, b_);
-            
+
       if (certif == Proof::Empty)
       {
          proof = Proof::Empty;
@@ -352,8 +350,7 @@ Proof IntervalNewton::certify(IntervalBox& box)
       }
 
       LOG_LOW("Inner step of interval Newton certification  -> " << X);
-   }
-   while (iter);
+   } while (iter);
 
    if (proof == Proof::Feasible)
       box.setOnScope(X, scope());
@@ -364,22 +361,21 @@ Proof IntervalNewton::certify(IntervalBox& box)
    return proof;
 }
 
-Proof IntervalNewton::certifyX(IntervalBox& X)
+Proof IntervalNewton::certifyX(IntervalBox &X)
 {
    // X := y + c
    int i = 0;
    Proof proof = Proof::Feasible;
 
-   for (const auto& v : scope())
+   for (const auto &v : scope())
    {
-      Interval dom = X.get(v),
-               z = y_.get(i) + c_.get(v);
+      Interval dom = X.get(v), z = y_.get(i) + c_.get(v);
 
       if (!dom.strictlyContains(z))
          proof = Proof::Maybe;
 
       X.set(v, z);
-      i = i+1;
+      i = i + 1;
    }
    return proof;
 }
@@ -389,7 +385,7 @@ double IntervalNewton::getInflationDelta() const
    return delta_;
 }
 
-void IntervalNewton::setInflationDelta(const double& val)
+void IntervalNewton::setInflationDelta(const double &val)
 {
    ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
    delta_ = val;
@@ -400,7 +396,7 @@ double IntervalNewton::getInflationChi() const
    return chi_;
 }
 
-void IntervalNewton::setInflationChi(const double& val)
+void IntervalNewton::setInflationChi(const double &val)
 {
    ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
    chi_ = val;
@@ -416,9 +412,9 @@ size_t IntervalNewton::getCertifyMaxIter() const
    return cmaxiter_;
 }
 
-void IntervalNewton::print(std::ostream& os) const
+void IntervalNewton::print(std::ostream &os) const
 {
    os << "Interval Newton";
 }
 
-} // namespace
+} // namespace realpaver

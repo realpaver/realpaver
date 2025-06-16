@@ -16,30 +16,30 @@
  * @brief  Macros for assertion checking and debugging
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_ASSERT_DEBUG_HPP
 #define REALPAVER_ASSERT_DEBUG_HPP
 
-#include <iostream>
 #include "realpaver/Exception.hpp"
+#include <iostream>
 
 namespace realpaver {
 
 #if ASSERT_ON
-#   define ASSERT(cond, msg)                                \
-      if (!(cond))                                          \
-         THROW(msg)
+#define ASSERT(cond, msg)                                                                \
+   if (!(cond))                                                                          \
+   THROW(msg)
 #else
-#   define ASSERT(cond, msg)
+#define ASSERT(cond, msg)
 #endif
 
 #if DEBUG_ON
-#   define DEBUG(msg)  std::cerr << msg << std::endl
+#define DEBUG(msg) std::cerr << msg << std::endl
 #else
-#   define DEBUG(msg)
+#define DEBUG(msg)
 #endif
 
-} // namespace
+} // namespace realpaver
 
 #endif

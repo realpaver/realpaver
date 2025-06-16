@@ -16,24 +16,25 @@
  * @brief  Interval slicers
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
 IntervalSlicer::~IntervalSlicer()
-{}
+{
+}
 
-size_t IntervalSlicer::apply(const Interval& x)
+size_t IntervalSlicer::apply(const Interval &x)
 {
    cont_.clear();
    applyImpl(x);
    return cont_.size();
 }
 
-void IntervalSlicer::push(const Interval& x)
+void IntervalSlicer::push(const Interval &x)
 {
    if (!x.isEmpty())
       cont_.push_back(x);
@@ -53,7 +54,6 @@ Interval IntervalSlicer::slice(size_t i) const
 {
    return cont_[i];
 }
-
 
 IntervalSlicer::iterator IntervalSlicer::begin()
 {
@@ -77,7 +77,7 @@ IntervalSlicer::reverse_iterator IntervalSlicer::rend()
 
 /*----------------------------------------------------------------------------*/
 
-void IntervalBisecter::applyImpl(const Interval& x)
+void IntervalBisecter::applyImpl(const Interval &x)
 {
    double m = x.midpoint();
    push(Interval(x.left(), m));
@@ -86,7 +86,8 @@ void IntervalBisecter::applyImpl(const Interval& x)
 
 /*----------------------------------------------------------------------------*/
 
-IntervalPeeler::IntervalPeeler(double f) : IntervalSlicer()
+IntervalPeeler::IntervalPeeler(double f)
+    : IntervalSlicer()
 {
    setFactor(f);
 }
@@ -98,14 +99,13 @@ double IntervalPeeler::getFactor() const
 
 void IntervalPeeler::setFactor(double f)
 {
-   ASSERT(f>=0.0 && f<=100.0, "Bad width factor " << f
-                                                  << " in an interval peeler");
+   ASSERT(f >= 0.0 && f <= 100.0, "Bad width factor " << f << " in an interval peeler");
 
    f_ = f;
    p_ = f_ / Interval(100.0);
 }
 
-void IntervalPeeler::applyImpl(const Interval& x)
+void IntervalPeeler::applyImpl(const Interval &x)
 {
    // width of x
    double wx = x.width();
@@ -119,10 +119,9 @@ void IntervalPeeler::applyImpl(const Interval& x)
    a += w;
    b -= w;
 
-   double c = a.left(),
-          d = b.right();
+   double c = a.left(), d = b.right();
 
-   THROW_IF(c<=x.left() || c>=d || d>=x.right(),
+   THROW_IF(c <= x.left() || c >= d || d >= x.right(),
             "Peeling of " << x << " impossible");
 
    push(Interval(x.left(), c));
@@ -130,7 +129,7 @@ void IntervalPeeler::applyImpl(const Interval& x)
    push(Interval(d, x.right()));
 }
 
-Interval IntervalPeeler::peelLeft(const Interval& x) const
+Interval IntervalPeeler::peelLeft(const Interval &x) const
 {
    // width of x
    double wx = x.width();
@@ -147,7 +146,7 @@ Interval IntervalPeeler::peelLeft(const Interval& x) const
    return x.strictlyContains(c) ? Interval(x.left(), c) : x;
 }
 
-Interval IntervalPeeler::peelRight(const Interval& x) const
+Interval IntervalPeeler::peelRight(const Interval &x) const
 {
    // width of x
    double wx = x.width();
@@ -183,7 +182,7 @@ void IntervalPartitionMaker::setArity(size_t n)
    n_ = n;
 }
 
-void IntervalPartitionMaker::applyImpl(const Interval& x)
+void IntervalPartitionMaker::applyImpl(const Interval &x)
 {
    if (n_ == 2)
    {
@@ -199,24 +198,24 @@ void IntervalPartitionMaker::applyImpl(const Interval& x)
       bool cond = true;
       double l, r = x.left(), h = x.width() / n_;
       size_t i = 1;
- 
+
       while (cond && i < n_)
       {
          l = r;
-         r = x.left() + i*h;
+         r = x.left() + i * h;
          if (l >= r)
             cond = false;
          else
          {
-            push(Interval(l,r));
+            push(Interval(l, r));
             ++i;
          }
       }
       if (r >= x.right())
          cond = false;
-      
+
       else
-         push(Interval(r,x.right()));
+         push(Interval(r, x.right()));
 
       if (!cond)
       {
@@ -231,4 +230,4 @@ void IntervalPartitionMaker::applyImpl(const Interval& x)
    }
 }
 
-} // namespace
+} // namespace realpaver

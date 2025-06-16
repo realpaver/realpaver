@@ -21,9 +21,9 @@
 #ifndef REALPAVER_TERM_QUADRATIC_HPP
 #define REALPAVER_TERM_QUADRATIC_HPP
 
+#include "realpaver/Term.hpp"
 #include <list>
 #include <set>
-#include "realpaver/Term.hpp"
 
 namespace realpaver {
 
@@ -34,28 +34,28 @@ public:
    TermQuadratic();
 
    /// Constructor from a term
-   TermQuadratic(const Term& t);
+   TermQuadratic(const Term &t);
 
    /// Default copy constructor
-   TermQuadratic(const TermQuadratic&) = default;
+   TermQuadratic(const TermQuadratic &) = default;
 
    /// No copy
-   TermQuadratic& operator=(const TermQuadratic&) = default;
+   TermQuadratic &operator=(const TermQuadratic &) = default;
 
    /// Default destructor
    ~TermQuadratic() = default;
 
    /// Adds a constant in this
-   void addConstant(const Interval& a);
+   void addConstant(const Interval &a);
 
    /// Adds a square term of the form a*v^2 in this
-   void addSquare(const Interval& a, const Variable& v);
+   void addSquare(const Interval &a, const Variable &v);
 
    /// Adds a bilinear  term of the form a*v1*v2 in this
-   void addBilin(const Interval& a, const Variable& v1, const Variable& v2);
+   void addBilin(const Interval &a, const Variable &v1, const Variable &v2);
 
    /// Adds a linear term of the form a*v in this
-   void addLin(const Interval& a, const Variable& v);
+   void addLin(const Interval &a, const Variable &v);
 
    /// Returns the term represented by this
    Term toTerm() const;
@@ -65,7 +65,7 @@ public:
 
    /**
     * @brief Factorization method.
-    * 
+    *
     * Return a term resulting from the factorization of this such that the
     * variables are ordered by a decreasing number of occurrences
     *
@@ -84,7 +84,7 @@ private:
 
    // comparator of square terms
    struct CompSquare {
-      bool operator()(const Square& s1, const Square& s2) const
+      bool operator()(const Square &s1, const Square &s2) const
       {
          return s1.v.id() < s2.v.id();
       }
@@ -98,7 +98,7 @@ private:
 
    // comparator of linear term
    struct CompLin {
-      bool operator()(const Lin& l1, const Lin& l2) const
+      bool operator()(const Lin &l1, const Lin &l2) const
       {
          return l1.v.id() < l2.v.id();
       }
@@ -113,28 +113,28 @@ private:
 
    // comparator of bilinear term
    struct CompBilin {
-      bool operator()(const Bilin& b1, const Bilin& b2) const
+      bool operator()(const Bilin &b1, const Bilin &b2) const
       {
          return (b1.v1.id() < b2.v1.id()) ||
-                ( (b1.v1.id() == b2.v1.id()) && (b1.v2.id() < b2.v2.id()) );
+                ((b1.v1.id() == b2.v1.id()) && (b1.v2.id() < b2.v2.id()));
       }
    };
 
-   Interval cst_;                      // constant
-   std::set<Square, CompSquare> sq_;   // square terms
-   std::set<Bilin, CompBilin> sb_;     // bilinear terms
-   std::set<Lin, CompLin> sl_;         // linear terms
+   Interval cst_;                    // constant
+   std::set<Square, CompSquare> sq_; // square terms
+   std::set<Bilin, CompBilin> sb_;   // bilinear terms
+   std::set<Lin, CompLin> sl_;       // linear terms
 
-   friend std::ostream& operator<<(std::ostream& os, const TermQuadratic& t);
+   friend std::ostream &operator<<(std::ostream &os, const TermQuadratic &t);
 
-   void sortByOcc(std::list<Variable>& lv) const;
+   void sortByOcc(std::list<Variable> &lv) const;
 };
 
 /// Output on a stream
 /// @param os a stream
 /// @param t quadratic term written
 /// @return a reference to the given stream
-std::ostream& operator<<(std::ostream& os, const TermQuadratic& t);
+std::ostream &operator<<(std::ostream &os, const TermQuadratic &t);
 
 /*----------------------------------------------------------------------------*/
 
@@ -142,47 +142,47 @@ std::ostream& operator<<(std::ostream& os, const TermQuadratic& t);
 class TermQuadraticCreator : public TermVisitor {
 public:
    /// Constructor given a pointer to the quadratic term modified by a visit
-   TermQuadraticCreator(TermQuadratic* qt);
+   TermQuadraticCreator(TermQuadratic *qt);
 
    /// Returns true if this has visited a term representing a quadratic term
    bool visitSuccessfull() const;
 
    /// Returns the quadratic term in this
-   TermQuadratic* getTermQuadratic() const;
+   TermQuadratic *getTermQuadratic() const;
 
-   void apply(const TermCst* t) override;
-   void apply(const TermVar* t) override;
-   void apply(const TermAdd* t) override;
-   void apply(const TermSub* t) override;
-   void apply(const TermMul* t) override;
-   void apply(const TermDiv* t) override;
-   void apply(const TermMin* t) override;
-   void apply(const TermMax* t) override;
-   void apply(const TermUsb* t) override;
-   void apply(const TermAbs* t) override;
-   void apply(const TermSgn* t) override;
-   void apply(const TermSqr* t) override;
-   void apply(const TermSqrt* t) override;
-   void apply(const TermPow* t) override;
-   void apply(const TermExp* t) override;
-   void apply(const TermLog* t) override;
-   void apply(const TermCos* t) override;
-   void apply(const TermSin* t) override;
-   void apply(const TermTan* t) override;
-   void apply(const TermCosh* t) override;
-   void apply(const TermSinh* t) override;
-   void apply(const TermTanh* t) override;
+   void apply(const TermCst *t) override;
+   void apply(const TermVar *t) override;
+   void apply(const TermAdd *t) override;
+   void apply(const TermSub *t) override;
+   void apply(const TermMul *t) override;
+   void apply(const TermDiv *t) override;
+   void apply(const TermMin *t) override;
+   void apply(const TermMax *t) override;
+   void apply(const TermUsb *t) override;
+   void apply(const TermAbs *t) override;
+   void apply(const TermSgn *t) override;
+   void apply(const TermSqr *t) override;
+   void apply(const TermSqrt *t) override;
+   void apply(const TermPow *t) override;
+   void apply(const TermExp *t) override;
+   void apply(const TermLog *t) override;
+   void apply(const TermCos *t) override;
+   void apply(const TermSin *t) override;
+   void apply(const TermTan *t) override;
+   void apply(const TermCosh *t) override;
+   void apply(const TermSinh *t) override;
+   void apply(const TermTanh *t) override;
 
 private:
-   TermQuadratic* qt_;
+   TermQuadratic *qt_;
    bool plus_;
    bool success_;
 
-   bool makeProd(const TermCst* tc, const TermMul* tm);
-   bool makeProd(const TermCst* tc, const TermSqr* ts);
-   bool makeProd(const TermVar* tv, const TermMul* tm);
+   bool makeProd(const TermCst *tc, const TermMul *tm);
+   bool makeProd(const TermCst *tc, const TermSqr *ts);
+   bool makeProd(const TermVar *tv, const TermMul *tm);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

@@ -16,7 +16,7 @@
  * @brief  Factory of domain slicer maps
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_DOMAIN_SLICER_FACTORY_HPP
 #define REALPAVER_DOMAIN_SLICER_FACTORY_HPP
@@ -27,14 +27,14 @@ namespace realpaver {
 
 /**
  * @brief Factory of domain slicer maps.
- * 
+ *
  * A factory implements various strategies for creating domain slicer maps.
  */
 class DomainSlicerFactory {
 public:
    /**
     * @brief Bisection strategy.
-    * 
+    *
     * Returns a domain slicer map such that every doman is split in two parts.
     * - range: bisection
     * - interval: [a, b] -> a + sip*(b-a)
@@ -47,6 +47,6 @@ public:
    static std::unique_ptr<DomainSlicerMap> makeBiStrategy(double sip);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

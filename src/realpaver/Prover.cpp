@@ -19,25 +19,25 @@
  */
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalThickFunction.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Prover.hpp"
-#include "realpaver/IntervalThickFunction.hpp"
 
 namespace realpaver {
 
-Prover::Prover(const Problem& p)
-      : v_(),
-        dag_(nullptr),
-        mnewton_(nullptr),
-        unewton_(nullptr),
-        delta_(Param::GetDblParam("INFLATION_DELTA")),
-        chi_(Param::GetDblParam("INFLATION_CHI")),
-        maxiter_(Param::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
+Prover::Prover(const Problem &p)
+    : v_()
+    , dag_(nullptr)
+    , mnewton_(nullptr)
+    , unewton_(nullptr)
+    , delta_(Params::GetDblParam("INFLATION_DELTA"))
+    , chi_(Params::GetDblParam("INFLATION_CHI"))
+    , maxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
    dag_ = std::make_shared<Dag>();
 
-   for (size_t i=0; i<p.nbCtrs(); ++i)
+   for (size_t i = 0; i < p.nbCtrs(); ++i)
    {
       Constraint c = p.ctrAt(i);
       bool eq = c.isEquation();
@@ -75,18 +75,20 @@ Prover::Prover(const Problem& p)
 
 Prover::~Prover()
 {
-   if (mnewton_ != nullptr) delete mnewton_;
-   if (unewton_ != nullptr) delete unewton_;
+   if (mnewton_ != nullptr)
+      delete mnewton_;
+   if (unewton_ != nullptr)
+      delete unewton_;
 }
 
-Proof Prover::certify(IntervalBox& B)
+Proof Prover::certify(IntervalBox &B)
 {
-   bool inner = true;     // Iner certificate for the problem
-   bool innerbis = true;  // Inner certificate for the problem but the equations
+   bool inner = true;    // Iner certificate for the problem
+   bool innerbis = true; // Inner certificate for the problem but the equations
 
    LOG_INTER("Certification of the box " << B);
 
-   for (auto& it : v_)
+   for (auto &it : v_)
    {
       it.proof = it.ctr.isSatisfied(B);
 
@@ -96,7 +98,7 @@ Proof Prover::certify(IntervalBox& B)
       if (it.proof != Proof::Inner)
       {
          inner = false;
-         
+
          if (!it.iseq)
             innerbis = false;
       }
@@ -150,7 +152,7 @@ double Prover::getInflationDelta() const
    return delta_;
 }
 
-void Prover::setInflationDelta(const double& val)
+void Prover::setInflationDelta(const double &val)
 {
    ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
    delta_ = val;
@@ -167,7 +169,7 @@ double Prover::getInflationChi() const
    return chi_;
 }
 
-void Prover::setInflationChi(const double& val)
+void Prover::setInflationChi(const double &val)
 {
    ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
    chi_ = val;
@@ -195,4 +197,4 @@ size_t Prover::getMaxIter() const
    return maxiter_;
 }
 
-} // namespace
+} // namespace realpaver

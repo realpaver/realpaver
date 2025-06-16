@@ -18,18 +18,19 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/ScopeBank.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
 ScopeBank ScopeBank::instance_;
 
 ScopeBank::ScopeBank()
-      : bank_(),
-        nb_(0)
-{}
+    : bank_()
+    , nb_(0)
+{
+}
 
 size_t ScopeBank::size() const
 {
@@ -53,9 +54,9 @@ Scope ScopeBank::insertScope(Scope scop)
    return scop;
 }
 
-ScopeBank* ScopeBank::getInstance()
+ScopeBank *ScopeBank::getInstance()
 {
    return &instance_;
 }
 
-} // namespace
+} // namespace realpaver

@@ -16,7 +16,7 @@
  * @brief  List of contractors applied in sequence
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CONTRACTOR_LIST_HPP
 #define REALPAVER_CONTRACTOR_LIST_HPP
@@ -32,10 +32,10 @@ public:
    ContractorList(SharedContractorPool pool = nullptr);
 
    /// Default copy constructor
-   ContractorList(const ContractorList&) = default;
+   ContractorList(const ContractorList &) = default;
 
    /// No assignment
-   ContractorList& operator=(const ContractorList&) = delete;
+   ContractorList &operator=(const ContractorList &) = delete;
 
    /// Default destructor
    ~ContractorList() = default;
@@ -53,8 +53,8 @@ public:
    void push(SharedContractor op);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
 private:
    SharedContractorPool pool_;
@@ -63,6 +63,6 @@ private:
 /// Type of shared pointers on list contractors
 using SharedContractorList = std::shared_ptr<ContractorList>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

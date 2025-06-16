@@ -1,12 +1,12 @@
-#include "test_config.hpp"
 #include "realpaver/Scope.hpp"
+#include "test_config.hpp"
 
 Variable v("v"), w("w"), x("x"), y("y");
 
 void test_init()
 {
-    Scope s;
-    TEST_TRUE(s.isEmpty());
+   Scope s;
+   TEST_TRUE(s.isEmpty());
 }
 
 void test_insert()
@@ -92,11 +92,10 @@ void test_id_eq()
 
    Scope R(S);
 
-   TEST_TRUE (R == S);
-   TEST_TRUE (S == S);
-   TEST_TRUE (S != T);
+   TEST_TRUE(R == S);
+   TEST_TRUE(S == S);
+   TEST_TRUE(S != T);
 }
-
 
 void test_id_insert()
 {

@@ -16,7 +16,7 @@
  * @brief  The Bitset class
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_BITSET_HPP
 #define REALPAVER_BITSET_HPP
@@ -43,22 +43,22 @@ public:
    Bitset(int first, int last);
 
    /// Creates a bitset in extension given a list of bits
-   Bitset(const std::initializer_list<int>& l);
+   Bitset(const std::initializer_list<int> &l);
 
    /// Copy constructor
-   Bitset(const Bitset& other);
+   Bitset(const Bitset &other);
 
    /// Move constructor
-   Bitset(Bitset&& other);
+   Bitset(Bitset &&other);
 
    /// Destructor
    ~Bitset();
 
    /// Assignment
-   Bitset& operator=(const Bitset& other);
+   Bitset &operator=(const Bitset &other);
 
    /// Move assignment
-   Bitset& operator=(Bitset&& other);
+   Bitset &operator=(Bitset &&other);
 
    /// Rreturns the number of bits
    size_t size() const;
@@ -76,16 +76,16 @@ public:
    size_t get(int i) const;
 
    /// Sets the i-th bit to 0
-   Bitset& setZero(int i);
+   Bitset &setZero(int i);
 
    /// Sets all bits to 0
-   Bitset& setAllZero();
+   Bitset &setAllZero();
 
    /// Sets the i-th bit to 1
-   Bitset& setOne(int i);
+   Bitset &setOne(int i);
 
    /// Sets all bits to 1
-   Bitset& setAllOne();
+   Bitset &setAllOne();
 
    /// Flips the value of the i-th bit
    void flip(int i);
@@ -106,33 +106,33 @@ public:
    bool areAllZeros() const;
 
    /// Output on a stream
-   void print(std::ostream& os) const;
+   void print(std::ostream &os) const;
 
    /// Returns the hash code of this
    size_t hashCode() const;
 
    /// Returns true if this and other share at least one bit equal to 1
-   bool overlaps(const Bitset& other) const;
+   bool overlaps(const Bitset &other) const;
 
    /// Bitwise AND with assignment
-   Bitset& operator&=(const Bitset& other);
+   Bitset &operator&=(const Bitset &other);
 
    /// Bitwise OR with assignment
-   Bitset& operator|=(const Bitset& other);
+   Bitset &operator|=(const Bitset &other);
 
-   friend Bitset operator&(const Bitset& b1, const Bitset& b2);
-   friend Bitset operator|(const Bitset& b1, const Bitset& b2);
-   friend Bitset operator~(const Bitset& b);
+   friend Bitset operator&(const Bitset &b1, const Bitset &b2);
+   friend Bitset operator|(const Bitset &b1, const Bitset &b2);
+   friend Bitset operator~(const Bitset &b);
 
 private:
    typedef size_t word_t;
    static const size_t BITS_PER_WORD = 8 * sizeof(word_t);
 
-   size_t size_;     // number of bits
-   int first_;       // index of first bit
-   int last_;        // index of last bit
-   size_t wcount_;   // number of words
-   word_t* word_;    // array of words
+   size_t size_;   // number of bits
+   int first_;     // index of first bit
+   int last_;      // index of last bit
+   size_t wcount_; // number of words
+   word_t *word_;  // array of words
 
    // let (b0, b1, ..., b_{n-1}) be a bitset (i.e. n == size_)
    // let w be the number of words (i.e. w == wcount_)
@@ -144,10 +144,16 @@ private:
    // 0,...,0 are the shadow bits which must remain equal to 0
 
    // returns the index of the word that stores the i-th bit
-   static size_t bitIndex(size_t i) { return i / BITS_PER_WORD; }
+   static size_t bitIndex(size_t i)
+   {
+      return i / BITS_PER_WORD;
+   }
 
    // returns the position of the i-th bit in the word bitIndex(i)
-   static size_t bitOffset(size_t i) { return i % BITS_PER_WORD; }
+   static size_t bitOffset(size_t i)
+   {
+      return i % BITS_PER_WORD;
+   }
 
    // assigns the last irrelevant bits in the last word to 0
    void keepShadowBits();
@@ -157,17 +163,17 @@ private:
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, const Bitset& b);
+std::ostream &operator<<(std::ostream &os, const Bitset &b);
 
 /// Bitwise AND of b1 and b2
-Bitset operator&(const Bitset& b1, const Bitset& b2);
+Bitset operator&(const Bitset &b1, const Bitset &b2);
 
 /// Bitwise OR of b1 and b2
-Bitset operator|(const Bitset& b1, const Bitset& b2);
+Bitset operator|(const Bitset &b1, const Bitset &b2);
 
 /// Bitwise NOT of b
-Bitset operator~(const Bitset& b);
+Bitset operator~(const Bitset &b);
 
-} // namespace
+} // namespace realpaver
 
 #endif

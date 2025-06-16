@@ -11,35 +11,37 @@
  * file for information.
  *----------------------------------------------------------------------------*/
 
- /**
-  * @file   BoxReporter.cpp
-  * @brief  Reporter of solutions of problems
-  * @author Laurent Granvilliers
-  * @date   2024-12-19
-  */
+/**
+ * @file   BoxReporter.cpp
+ * @brief  Reporter of solutions of problems
+ * @author Laurent Granvilliers
+ * @date   2024-12-19
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/BoxReporter.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Problem.hpp"
 
 namespace realpaver {
 
 EntityReported::~EntityReported()
-{}
+{
+}
 
 /*----------------------------------------------------------------------------*/
 
 VariableReported::VariableReported(Variable v)
-   : EntityReported(),
-     v_(v)
-{}
+    : EntityReported()
+    , v_(v)
+{
+}
 
 std::string VariableReported::name() const
 {
    return v_.getName();
 }
 
-std::unique_ptr<Domain> VariableReported::domain(const DomainBox& box) const
+std::unique_ptr<Domain> VariableReported::domain(const DomainBox &box) const
 {
    std::unique_ptr<Domain> p(box.get(v_)->clone());
    return p;
@@ -48,16 +50,17 @@ std::unique_ptr<Domain> VariableReported::domain(const DomainBox& box) const
 /*----------------------------------------------------------------------------*/
 
 AliasReported::AliasReported(Alias a)
-      : EntityReported(),
-        a_(a)
-{}
+    : EntityReported()
+    , a_(a)
+{
+}
 
 std::string AliasReported::name() const
 {
    return a_.name();
 }
 
-std::unique_ptr<Domain> AliasReported::domain(const DomainBox& box) const
+std::unique_ptr<Domain> AliasReported::domain(const DomainBox &box) const
 {
    return a_.term().eval(box);
 }
@@ -86,17 +89,18 @@ void EntityReportedVector::addAlias(Alias a)
    ents_.push_back(std::make_shared<AliasReported>(a));
 }
 
-bool EntityReportedVector::contains(const std::string& name) const
+bool EntityReportedVector::contains(const std::string &name) const
 {
-   for (size_t i=0; i<size(); ++i)
+   for (size_t i = 0; i < size(); ++i)
    {
       std::shared_ptr<EntityReported> p = ents_[i];
-      if (p->name() == name) return true;
+      if (p->name() == name)
+         return true;
    }
    return false;
 }
 
-void EntityReportedVector::remove(const std::string& name)
+void EntityReportedVector::remove(const std::string &name)
 {
    for (auto it = ents_.begin(); it != ents_.end(); ++it)
    {
@@ -112,10 +116,11 @@ void EntityReportedVector::remove(const std::string& name)
 size_t EntityReportedVector::maxNameLength() const
 {
    size_t lmax = 0;
-   for (size_t i=0; i<ents_.size(); ++i)
+   for (size_t i = 0; i < ents_.size(); ++i)
    {
       size_t l = ents_[i]->name().length();
-      if (l > lmax) lmax = l;
+      if (l > lmax)
+         lmax = l;
    }
    return lmax;
 }
@@ -123,27 +128,31 @@ size_t EntityReportedVector::maxNameLength() const
 /*----------------------------------------------------------------------------*/
 
 BoxReporter::BoxReporter()
-      : ents_()
-{}
-
-BoxReporter::BoxReporter(const Problem& p)
-      : ents_()
+    : ents_()
 {
-   for (size_t i=0; i<p.nbVars(); ++i)
+}
+
+BoxReporter::BoxReporter(const Problem &p)
+    : ents_()
+{
+   for (size_t i = 0; i < p.nbVars(); ++i)
    {
       Variable v = p.varAt(i);
-      if (p.isVarReported(v)) addVariable(v);
+      if (p.isVarReported(v))
+         addVariable(v);
    }
 
-   for (size_t i=0; i<p.nbAliases(); ++i)
+   for (size_t i = 0; i < p.nbAliases(); ++i)
    {
       Alias a = p.aliasAt(i);
-      if (p.isAliasReported(a)) addAlias(a);
+      if (p.isAliasReported(a))
+         addAlias(a);
    }
 }
 
 BoxReporter::~BoxReporter()
-{}
+{
+}
 
 void BoxReporter::addVariable(Variable v)
 {
@@ -155,7 +164,7 @@ void BoxReporter::addAlias(Alias a)
    ents_.addAlias(a);
 }
 
-void BoxReporter::remove(const std::string& name)
+void BoxReporter::remove(const std::string &name)
 {
    ents_.remove(name);
 }
@@ -167,19 +176,21 @@ size_t BoxReporter::maxNameLength() const
 
 /*----------------------------------------------------------------------------*/
 
-StreamReporter::StreamReporter(std::ostream& os)
-      : BoxReporter(),
-        os_(&os),
-        vertical_(true)
-{}
+StreamReporter::StreamReporter(std::ostream &os)
+    : BoxReporter()
+    , os_(&os)
+    , vertical_(true)
+{
+}
 
-StreamReporter::StreamReporter(const Problem& p, std::ostream& os)
-      : BoxReporter(p),
-        os_(&os),
-        vertical_(true)
-{}
+StreamReporter::StreamReporter(const Problem &p, std::ostream &os)
+    : BoxReporter(p)
+    , os_(&os)
+    , vertical_(true)
+{
+}
 
-std::ostream* StreamReporter::get() const
+std::ostream *StreamReporter::get() const
 {
    return os_;
 }
@@ -189,19 +200,20 @@ void StreamReporter::setVertical(bool b)
    vertical_ = b;
 }
 
-void StreamReporter::report(const DomainBox& box)
+void StreamReporter::report(const DomainBox &box)
 {
    if (vertical_)
    {
       size_t lmax = maxNameLength();
 
-      for (size_t i=0; i<ents_.size(); ++i)
+      for (size_t i = 0; i < ents_.size(); ++i)
       {
          auto e = ents_.get(i);
          (*os_) << e->name();
 
          size_t n = e->name().length();
-         for (size_t i=0; i<lmax-n; ++i) (*os_) << ' ';
+         for (size_t i = 0; i < lmax - n; ++i)
+            (*os_) << ' ';
 
          (*os_) << " = " << (*e->domain(box)) << std::endl;
       }
@@ -210,9 +222,10 @@ void StreamReporter::report(const DomainBox& box)
    {
       (*os_) << '(';
 
-      for (size_t i=0; i<ents_.size(); ++i)
+      for (size_t i = 0; i < ents_.size(); ++i)
       {
-         if (i!=0) (*os_) << ", ";
+         if (i != 0)
+            (*os_) << ", ";
          auto e = ents_.get(i);
          (*os_) << e->name() << " = " << (*e->domain(box));
       }
@@ -220,4 +233,4 @@ void StreamReporter::report(const DomainBox& box)
    }
 }
 
-} // namespace
+} // namespace realpaver

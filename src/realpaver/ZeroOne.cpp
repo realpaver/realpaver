@@ -18,18 +18,22 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Range.hpp"
 #include "realpaver/ZeroOne.hpp"
+#include "realpaver/Range.hpp"
 
 namespace realpaver {
 
 ZeroOne::ZeroOne()
-      : zro_(true), one_(true)
-{}
+    : zro_(true)
+    , one_(true)
+{
+}
 
 ZeroOne::ZeroOne(bool zro, bool one)
-      : zro_(zro), one_(one)
-{}
+    : zro_(zro)
+    , one_(one)
+{
+}
 
 ZeroOne ZeroOne::universe()
 {
@@ -40,7 +44,7 @@ ZeroOne ZeroOne::universe()
 ZeroOne ZeroOne::zero()
 {
    static ZeroOne zo(true, false);
-   return zo;   
+   return zo;
 }
 
 ZeroOne ZeroOne::one()
@@ -85,13 +89,13 @@ bool ZeroOne::hasOne() const
    return one_;
 }
 
-ZeroOne& ZeroOne::setZero(bool b)
+ZeroOne &ZeroOne::setZero(bool b)
 {
    zro_ = b;
    return *this;
 }
 
-ZeroOne& ZeroOne::setOne(bool b)
+ZeroOne &ZeroOne::setOne(bool b)
 {
    one_ = b;
    return *this;
@@ -113,14 +117,13 @@ Range ZeroOne::toRange() const
       return Range::emptyset();
 }
 
-bool ZeroOne::equals(const ZeroOne& other) const
+bool ZeroOne::equals(const ZeroOne &other) const
 {
-   return (isZero() && other.isZero()) ||
-          (isOne() && other.isOne()) ||
+   return (isZero() && other.isZero()) || (isOne() && other.isOne()) ||
           (isUniverse() || other.isUniverse());
 }
- 
-std::ostream& operator<<(std::ostream& os, const ZeroOne& zo)
+
+std::ostream &operator<<(std::ostream &os, const ZeroOne &zo)
 {
    if (zo.hasZero())
 
@@ -134,8 +137,8 @@ std::ostream& operator<<(std::ostream& os, const ZeroOne& zo)
 
    else
       os << "empty";
-   
+
    return os;
 }
- 
-} // namespace
+
+} // namespace realpaver

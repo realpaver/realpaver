@@ -22,8 +22,8 @@
 #define REALPAVER_PROVER_HPP
 
 #include "realpaver/IntervalNewton.hpp"
-#include "realpaver/Problem.hpp"
 #include "realpaver/IntervalNewtonUni.hpp"
+#include "realpaver/Problem.hpp"
 
 namespace realpaver {
 
@@ -32,28 +32,28 @@ namespace realpaver {
  *
  * It implements an epsilon-inflation algorithm based on an interval Newton
  * operator applied to square system of equations.
- * 
+ *
  * The epsilon-inflation algorithm has two parameters, delta and chi.
- * 
+ *
  * @see Inflator
  * @see IntervalNewton
  */
 class Prover {
 public:
    /// Constructor
-   Prover(const Problem& p);
+   Prover(const Problem &p);
 
    /// Destructor
    ~Prover();
 
    /// No copy
-   Prover(const Prover&) = delete;
+   Prover(const Prover &) = delete;
 
    /// No asignment
-   Prover& operator=(const Prover&) = delete;
+   Prover &operator=(const Prover &) = delete;
 
    /// Certification method
-   Proof certify(IntervalBox& B);
+   Proof certify(IntervalBox &B);
 
    /// Sets a limit of iterations of the Newton operator
    void setMaxIter(size_t n);
@@ -65,13 +65,13 @@ public:
    double getInflationDelta() const;
 
    /// Assigns delta
-   void setInflationDelta(const double& val);
+   void setInflationDelta(const double &val);
 
    /// Returns the value of chi
    double getInflationChi() const;
 
    /// Assigns chi
-   void setInflationChi(const double& val);
+   void setInflationChi(const double &val);
 
 private:
    struct Item {
@@ -79,15 +79,15 @@ private:
       bool iseq;
       Proof proof;
    };
-   std::vector<Item> v_;            // vector of constraints
-   SharedDag dag_;                  // dag of equations
-   IntervalNewton* mnewton_;        // multivariate Newton operator on the dag
-   IntervalNewtonUni* unewton_;     // univariate Newton operator
-   double delta_;                   // parameter delta of inflation
-   double chi_;                     // parameter chi of inflation
-   size_t maxiter_;                 // maximum number of iterations
+   std::vector<Item> v_;        // vector of constraints
+   SharedDag dag_;              // dag of equations
+   IntervalNewton *mnewton_;    // multivariate Newton operator on the dag
+   IntervalNewtonUni *unewton_; // univariate Newton operator
+   double delta_;               // parameter delta of inflation
+   double chi_;                 // parameter chi of inflation
+   size_t maxiter_;             // maximum number of iterations
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

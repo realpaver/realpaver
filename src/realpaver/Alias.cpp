@@ -22,15 +22,15 @@
 
 namespace realpaver {
 
-AliasRep::AliasRep(const std::string& name, Term t)
-      : name_(name),
-        t_(t),
-        scop_()
+AliasRep::AliasRep(const std::string &name, Term t)
+    : name_(name)
+    , t_(t)
+    , scop_()
 {
    t.makeScope(scop_);
 
    THROW_IF(scop_.isEmpty(),
-      "Definition of alias " << name << " with constant term " << t);
+            "Definition of alias " << name << " with constant term " << t);
 }
 
 std::string AliasRep::name() const
@@ -50,9 +50,10 @@ Scope AliasRep::scope() const
 
 /*----------------------------------------------------------------------------*/
 
-Alias::Alias(const std::string& name, Term t)
-   : rep_(std::make_shared<AliasRep>(name, t))
-{}
+Alias::Alias(const std::string &name, Term t)
+    : rep_(std::make_shared<AliasRep>(name, t))
+{
+}
 
 std::string Alias::name() const
 {
@@ -69,10 +70,10 @@ Scope Alias::scope() const
    return rep_->scope();
 }
 
-std::ostream& operator<<(std::ostream& os, const Alias& a)
+std::ostream &operator<<(std::ostream &os, const Alias &a)
 {
    os << a.name() << " := " << a.term();
    return os;
 }
 
-} // namespace
+} // namespace realpaver

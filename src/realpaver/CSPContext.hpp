@@ -16,26 +16,26 @@
  * @brief  CSP search context
  * @author Laurent Granvilliers
  * @date   2024-4-11
-*/
+ */
 
 #ifndef REALPAVER_CSP_CONTEXT_HPP
 #define REALPAVER_CSP_CONTEXT_HPP
 
+#include "realpaver/Variable.hpp"
 #include <list>
 #include <memory>
 #include <unordered_map>
-#include "realpaver/Variable.hpp"
 
 namespace realpaver {
 
 ///  Type of informations that can be associated with CSP search nodes
 enum class CSPNodeInfoType {
-   SplitVar,      ///< selected variable in a splitting step
-   NbCID          ///< number of CID contractors
+   SplitVar, ///< selected variable in a splitting step
+   NbCID     ///< number of CID contractors
 };
 
 /// Output on a stream
-std::ostream& operator<<(std::ostream& os, CSPNodeInfoType typ);
+std::ostream &operator<<(std::ostream &os, CSPNodeInfoType typ);
 
 /*----------------------------------------------------------------------------*/
 
@@ -49,16 +49,16 @@ public:
    virtual ~CSPNodeInfo();
 
    /// Default copy constructor
-   CSPNodeInfo(const CSPNodeInfo&) = default;
+   CSPNodeInfo(const CSPNodeInfo &) = default;
 
    /// Default assignment operator
-   CSPNodeInfo& operator=(const CSPNodeInfo&) = default;
+   CSPNodeInfo &operator=(const CSPNodeInfo &) = default;
 
    /// Returns the type of this
    CSPNodeInfoType getType() const;
 
 private:
-   CSPNodeInfoType typ_;  // type
+   CSPNodeInfoType typ_; // type
 };
 
 /*----------------------------------------------------------------------------*/
@@ -73,16 +73,16 @@ public:
    ~CSPNodeInfoVar() = default;
 
    /// Default copy constructor
-   CSPNodeInfoVar(const CSPNodeInfoVar&) = default;
+   CSPNodeInfoVar(const CSPNodeInfoVar &) = default;
 
    /// No assignment
-   CSPNodeInfoVar& operator=(const CSPNodeInfoVar&) = delete;
+   CSPNodeInfoVar &operator=(const CSPNodeInfoVar &) = delete;
 
    /// Returns the variable enclosed in this
    Variable getVar() const;
 
 private:
-   Variable v_;   // variable
+   Variable v_; // variable
 };
 
 /*----------------------------------------------------------------------------*/
@@ -97,10 +97,10 @@ public:
    ~CSPNodeInfoCID() = default;
 
    /// Default copy constructor
-   CSPNodeInfoCID(const CSPNodeInfoCID&) = default;
+   CSPNodeInfoCID(const CSPNodeInfoCID &) = default;
 
    /// No assignment
-   CSPNodeInfoCID& operator=(const CSPNodeInfoCID&) = delete;
+   CSPNodeInfoCID &operator=(const CSPNodeInfoCID &) = delete;
 
    /// Returns the number of CID contractors
    size_t getNbCID() const;
@@ -128,10 +128,10 @@ public:
    ~CSPContext() = default;
 
    /// No copy
-   CSPContext(const CSPContext&) = delete;
+   CSPContext(const CSPContext &) = delete;
 
    /// No assignment
-   CSPContext& operator=(const CSPContext&) = delete;
+   CSPContext &operator=(const CSPContext &) = delete;
 
    /// Inserts a new entry in this
    void insert(int index, std::shared_ptr<CSPNodeInfo> info);
@@ -152,13 +152,13 @@ public:
 
 private:
    // map node index -> list of infos
-   typedef std::list< std::shared_ptr<CSPNodeInfo> > ListType;
+   typedef std::list<std::shared_ptr<CSPNodeInfo>> ListType;
    std::unordered_map<int, ListType> map_;
 
    // test used in assertions
-   bool hasInfo(int index,  CSPNodeInfoType typ) const;
+   bool hasInfo(int index, CSPNodeInfoType typ) const;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

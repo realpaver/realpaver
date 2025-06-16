@@ -1,0 +1,42 @@
+# Heart-dipole problem
+#
+# In: Morgan, A.P. and Sommese, A. and Watson, L.T..
+#     Mathematical reduction of a heart dipole model.
+#     J. Comput. Appl. Math. Vol. 27, pages 407-410, 1989.
+
+Variables
+a in [-10, 10],
+b in [-10, 10],
+c in [-10, 10],
+d in [-10, 10],
+t in [-10, 10],
+u in [-10, 10],
+v in [-10, 10],
+w in [-10, 10],
+v1 in [-1e8, 1e8],
+v2 in [-1e8, 1e8],
+v3 in [-1e8, 1e8],
+v4 in [-1e8, 1e8],
+v5 in [-1e8, 1e8],
+v6 in [-1e8, 1e8];
+
+Constraints
+a + b == 0.63254,
+c + d == -1.34534,
+
+t*a + u*b - v*c - w*d == -0.8365348,
+v*a + w*b + t*c + u*d == 1.7345334,
+
+a*v1 - 2*c*t*v + b*v2 - 2*d*u*w == 1.352352,
+c*v1 + 2*a*t*v + d*v2 + 2*b*u*w == -0.843453,
+
+a*v3 + c*v4 + b*v5 + d*v6 == -0.9563453,
+
+c*v3 - a*v4 + d*v5 - b*v6 == 1.2342523,
+
+v1 == t^2 - v^2,
+v2 == u^2 - w^2,
+v3 == t^3 - 3*t*v^2,
+v4 == v^3 - 3*v*t^2,
+v5 == u^3 - 3*u*w^2,
+v6 == w^3 - 3*w*u^2;
