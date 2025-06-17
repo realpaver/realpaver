@@ -47,6 +47,16 @@ ConstraintRelation Constraint::relation() const
    return rep_->relation();
 }
 
+int Constraint::id() const
+{
+   return rep_->id();
+}
+
+void Constraint::setId(int id)
+{
+   rep_->setId(id);
+}
+
 bool Constraint::isConstant() const
 {
    return rep_->isConstant();

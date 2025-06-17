@@ -28,35 +28,10 @@ namespace realpaver {
 Linearizer::Linearizer(SharedDag dag)
     : dag_(dag)
     , scop_(dag->scope())
-    , lfun_()
     , tol_(Params::GetDblParam("RELAXATION_EQ_TOL"))
     , mvv_()
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");
-
-   for (size_t i = 0; i < dag->nbFuns(); ++i)
-      lfun_.push_back(i);
-
-   scop_ = ScopeBank::getInstance()->insertScope(scop_);
-}
-
-Linearizer::Linearizer(SharedDag dag, const IndexList &lfun)
-    : dag_(dag)
-    , scop_()
-    , lfun_()
-    , tol_(Params::GetDblParam("RELAXATION_TOL"))
-    , mvv_()
-{
-   ASSERT(dag_ != nullptr, "No dag in a polytope maker");
-   ASSERT(!lfun.empty(), "No list of functions in a polytope maker");
-
-   for (size_t i : lfun)
-   {
-      ASSERT(i < dag_->nbFuns(), "Bad function index in a polytope maker");
-
-      lfun_.push_back(i);
-      scop_.insert(dag->fun(i)->scope());
-   }
 
    scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
@@ -108,6 +83,18 @@ void Linearizer::setRelaxTol(double tol)
    ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
 
    tol_ = tol;
+}
+
+bool Linearizer::makeLP(LPModel &lpm, const IntervalBox &B)
+{
+   Bitset active(1 + dag_->maxCtrId());
+   active.setAllOne();
+   return makeLPImpl(lpm, B, active);
+}
+
+bool Linearizer::makeLP(LPModel &lpm, const IntervalBox &B, const Bitset &active)
+{
+   return makeLPImpl(lpm, B, active);
 }
 
 } // namespace realpaver

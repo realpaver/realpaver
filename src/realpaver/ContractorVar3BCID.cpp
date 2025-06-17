@@ -65,6 +65,16 @@ void ContractorVar3BCID::setVarMinWidth(double val)
 
 Proof ContractorVar3BCID::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorVar3BCID::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorVar3BCID::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    Interval dom = B.get(v_);
 
    // not handles too small domains
@@ -105,7 +115,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
       leftSlice = slicer.slice(i);
 
       B.set(v_, leftSlice);
-      Proof certif = op_->contract(B);
+      Proof certif = contract.apply(*op_, B);
 
       if (certif == Proof::Empty)
       {
@@ -143,7 +153,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
       B = save;
       rightSlice = slicer.slice(j);
       B.set(v_, rightSlice);
-      Proof certif = op_->contract(B);
+      Proof certif = contract.apply(*op_, B);
 
       if (certif == Proof::Empty)
       {
@@ -174,7 +184,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
 
    // varCID on the remaining box, use savebox
    save.set(v_, Interval(leftSlice.right(), rightSlice.left()));
-   bool reduced = contractCID(save, newbox);
+   bool reduced = contractCID(save, newbox, contract);
 
    if (reduced)
    {
@@ -189,7 +199,8 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
    return Proof::Maybe;
 }
 
-bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid)
+bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid,
+                                     const ContractMethod &contract)
 {
    if (nsCID_ == 0 || Bcid.equals(B3bCid, v_))
       return false;
@@ -206,7 +217,7 @@ bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid)
       if (i > 0)
          B = Bcid;
       B.set(v_, slicer.slice(i));
-      Proof certif = op_->contract(B);
+      Proof certif = contract.apply(*op_, B);
 
       if (certif != Proof::Empty)
       {

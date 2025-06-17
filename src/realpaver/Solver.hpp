@@ -12,29 +12,29 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSolver.hpp
- * @brief  CSP solver
+ * @file   Solver.hpp
+ * @brief  Solver of constraint systems
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#ifndef REALPAVER_CSP_SOLVER_HPP
-#define REALPAVER_CSP_SOLVER_HPP
+#ifndef REALPAVER_SOLVER_HPP
+#define REALPAVER_SOLVER_HPP
 
-#include "realpaver/CSPEnv.hpp"
-#include "realpaver/CSPPropagator.hpp"
-#include "realpaver/CSPSpace.hpp"
-#include "realpaver/CSPSplit.hpp"
+#include "realpaver/EnvSolver.hpp"
+#include "realpaver/NodePropagator.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Prover.hpp"
+#include "realpaver/Space.hpp"
+#include "realpaver/Split.hpp"
 #include "realpaver/Timer.hpp"
 #include <memory>
 
 namespace realpaver {
 
 /**
- * @brief Solver for Numerical CSPs.
+ * @brief Solver for constraint systems.
  *
  * A solver is a two-phase constraint solving algorithm. The first phase is
  * a preprocessing step that tries to reduce the variable domains, to
@@ -42,9 +42,8 @@ namespace realpaver {
  * or unfeasible constraints. The second phase is an interval-based
  * branch-and-prune algorithm parameterized by several components.
  *
- * The solver takes as input a problem that must be a CSP. Its components
- * are generated according to a Param object prm that can be assigned as
- * follows:
+ * The solver takes as input a problem. Its components are generated according to
+ * a Param object prm that can be assigned as follows:
  *
    @verbatim
    solver.getEnv()->setParam(prm);
@@ -60,19 +59,19 @@ namespace realpaver {
  *
  * The scope of each solution is the one of the input problem.
  */
-class CSPSolver {
+class Solver {
 public:
    /// Constructor
-   CSPSolver(const Problem &problem);
+   Solver(const Problem &problem);
 
    /// Destructor
-   ~CSPSolver();
+   ~Solver();
 
    /// No copy constructor
-   CSPSolver(const CSPSolver &) = delete;
+   Solver(const Solver &) = delete;
 
    /// No assignment
-   CSPSolver &operator=(const CSPSolver &) = delete;
+   Solver &operator=(const Solver &) = delete;
 
    /// Solving method
    void solve();
@@ -84,10 +83,10 @@ public:
    int getTotalNodes() const;
 
    /// Returns the environment of this
-   std::shared_ptr<CSPEnv> getEnv() const;
+   std::shared_ptr<EnvSolver> getEnv() const;
 
    /// Returns the space of this
-   CSPSpace *getSpace() const;
+   Space *getSpace() const;
 
    /// Returns the preprocessor used by this
    Preprocessor *getPreprocessor() const;
@@ -122,14 +121,14 @@ private:
    Problem *preprob_;      // problem resulting from preprocessing
    Preprocessor *preproc_; // preprocessor
 
-   CSPContext *context_; // solving context for the BP algorithm
+   NodeContext *context_; // solving context for the BP algorithm
 
-   std::shared_ptr<CSPEnv> env_; // environment
-   CSPSpace *space_;             // search tree
-   SharedDag dag_;               // dag
-   CSPPropagator *propagator_;   // contraction method
-   CSPSplit *split_;             // splitting strategy
-   ContractorFactory *factory_;  // contractor factory
+   std::shared_ptr<EnvSolver> env_; // environment
+   Space *space_;                   // search tree
+   SharedDag dag_;                  // dag
+   NodePropagator *propagator_;     // contraction method
+   Split *split_;                   // splitting strategy
+   ContractorFactory *factory_;     // contractor factory
 
    Prover *prover_; // solution prover
 
@@ -142,9 +141,9 @@ private:
    void makePropagator();
    void makeSplit();
    void bpStep(int depthlimit);
-   void bpStepAux(SharedCSPNode node, int depthlimit);
-   bool isInner(DomainBox *box) const;
+   void bpStepAux(SharedNode node, int depthlimit);
    void certifySolutions();
+   Proof checkActivity(Node &node);
 };
 
 } // namespace realpaver

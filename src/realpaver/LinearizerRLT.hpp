@@ -39,11 +39,6 @@ public:
     */
    LinearizerRLT(SharedDag dag);
 
-   /**
-    * @brief Creates a creator for a subset of a DAG.
-    */
-   LinearizerRLT(SharedDag dag, const IndexList &lfun);
-
    /// No copy
    LinearizerRLT(const LinearizerRLT &) = delete;
 
@@ -53,7 +48,7 @@ public:
    /// Default destructor
    ~LinearizerRLT() = default;
 
-   bool make(LPModel &lpm, const IntervalBox &B) override;
+   bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) override;
 
 private:
    size_t nodeToLinVar(DagNode *node) const;

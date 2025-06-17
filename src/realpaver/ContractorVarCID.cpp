@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 
 namespace realpaver {
 
@@ -65,10 +65,20 @@ void ContractorVarCID::setVar(Variable v)
 
 Proof ContractorVarCID::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorVarCID::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorVarCID::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    slicer_->apply(B.get(v_));
 
    if (slicer_->nbSlices() == 1)
-      return op_->contract(B);
+      return contract.apply(*op_, B);
 
    IntervalBox *init = B.clone();
    Proof proof = Proof::Empty, certif;
@@ -77,7 +87,7 @@ Proof ContractorVarCID::contract(IntervalBox &B)
    {
       IntervalBox *slice = init->clone();
       slice->set(v_, *it);
-      certif = op_->contract(*slice);
+      certif = contract.apply(*op_, *slice);
 
       if (certif != Proof::Empty)
       {

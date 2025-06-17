@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -39,8 +39,26 @@ Proof ContractorHC4Revise::contract(IntervalBox &B)
 
    Proof proof = dag_->fun(idx_)->hc4Revise(B);
 
+   LOG_LOW(" contractor applied");
    LOG_LOW(" -> " << proof << ", " << B);
 
+   return proof;
+}
+
+Proof ContractorHC4Revise::contract(IntervalBox &B, const Bitset &active)
+{
+   LOG_LOW("HC4Revise contractor @ " << idx_ << " on " << B);
+
+   DagFun *f = dag_->fun(idx_);
+   Proof proof = Proof::Inner;
+
+   if (active.get(f->ctrId()))
+   {
+      proof = f->hc4Revise(B);
+      LOG_LOW(" contractor applied");
+   }
+
+   LOG_LOW(" -> " << proof << ", " << B);
    return proof;
 }
 

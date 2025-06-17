@@ -20,6 +20,7 @@
 
 #include "realpaver/AffineCreator.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -27,34 +28,9 @@ AffineCreator::AffineCreator(SharedDag dag, bool minrange)
     : dag_(dag)
     , minrange_(minrange)
     , v_(dag_->nbNodes())
-    , lfun_(dag->nbFuns())
+    , lfun_()
 {
    ASSERT(dag != nullptr, "Null pointer");
-
-   for (size_t i = 0; i < dag->nbFuns(); ++i)
-      lfun_[i] = i;
-}
-
-AffineCreator::AffineCreator(SharedDag dag, const IndexList &lfun, bool minrange)
-    : dag_(dag)
-    , minrange_(minrange)
-    , v_(dag_->nbNodes())
-    , lfun_(lfun)
-{
-   ASSERT(dag != nullptr, "Null pointer");
-   ASSERT(!lfun.empty(), "Empty list of indexes");
-}
-
-AffineCreator::AffineCreator(SharedDag dag, size_t i, bool minrange)
-    : dag_(dag)
-    , minrange_(minrange)
-    , v_(dag_->nbNodes())
-    , lfun_(1)
-{
-   ASSERT(dag != nullptr, "Null pointer");
-   ASSERT(i < dag->nbFuns(), "Bad function index in a DAG @ " << i);
-
-   lfun_[0] = i;
 }
 
 size_t AffineCreator::nbFuns() const
@@ -82,31 +58,45 @@ void AffineCreator::useMinrange(bool minrange)
    minrange_ = minrange;
 }
 
-void AffineCreator::create(const IntervalBox &B)
+void AffineCreator::create(const IntervalBox &B, const Bitset &active)
 {
    ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
 
    AffineForm::useMinrange(minrange_);
 
-   if (lfun_.size() == dag_->nbFuns())
+   lfun_.clear();
+   for (size_t i = 0; i < dag_->nbFuns(); ++i)
    {
-      for (int i = 0; i < dag_->nbNodes(); ++i)
-         makeNode(i, B);
-   }
-   else
-   {
-      for (int i = 0; i < lfun_.size(); ++i)
+      if (active.get(dag_->fun(i)->ctrId()))
       {
-         DagFun *fun = dag_->fun(lfun_[i]);
-         for (size_t j = 0; j < fun->nbNodes(); ++j)
-         {
-            DagNode *node = fun->node(j);
-            size_t k = node->index();
-            if (v_[k] == nullptr)
-               makeNode(k, B);
-         }
+         makeFun(B, i);
+         LOG_LOW("Affine relaxation for constraint @ " << dag_->fun(i)->ctrId());
       }
    }
+}
+
+void AffineCreator::create(const IntervalBox &B, size_t i)
+{
+   ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
+   ASSERT(i < dag_->nbFuns(), "Bad index of function @ " << i);
+
+   AffineForm::useMinrange(minrange_);
+
+   lfun_.clear();
+   makeFun(B, i);
+}
+
+void AffineCreator::makeFun(const IntervalBox &B, size_t i)
+{
+   DagFun *f = dag_->fun(i);
+   for (size_t j = 0; j < f->nbNodes(); ++j)
+   {
+      DagNode *node = f->node(j);
+      size_t k = node->index();
+      if (v_[k] == nullptr)
+         makeNode(k, B);
+   }
+   lfun_.push_back(i);
 }
 
 void AffineCreator::makeNode(int i, const IntervalBox &B)

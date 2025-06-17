@@ -12,44 +12,44 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPEnv.cpp
- * @brief  Environment for CSP solver
+ * @file   EnvSolver.cpp
+ * @brief  Environment for solvers
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPEnv.hpp"
+#include "realpaver/EnvSolver.hpp"
 
 namespace realpaver {
 
-CSPEnv::CSPEnv()
+EnvSolver::EnvSolver()
     : Env()
     , slim_(false)
     , dlim_(false)
 {
 }
 
-void CSPEnv::setSolutionLimit(bool b)
+void EnvSolver::setSolutionLimit(bool b)
 {
    slim_ = b;
 }
 
-bool CSPEnv::usedSolutionLimit() const
+bool EnvSolver::usedSolutionLimit() const
 {
    return slim_;
 }
 
-void CSPEnv::setDepthLimit(bool b)
+void EnvSolver::setDepthLimit(bool b)
 {
    dlim_ = b;
 }
 
-bool CSPEnv::usedDepthLimit() const
+bool EnvSolver::usedDepthLimit() const
 {
    return dlim_;
 }
 
-bool CSPEnv::usedNoLimit() const
+bool EnvSolver::usedNoLimit() const
 {
    return !(usedTimeLimit() || usedNodeLimit() || usedSolutionLimit() ||
             usedDepthLimit());

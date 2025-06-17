@@ -12,16 +12,16 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSpaceHybridDFS.hpp
- * @brief  Hybrid strategies
+ * @file   SpaceHybridDFS.hpp
+ * @brief  Search space for hybrid strategies
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#ifndef REALPAVER_CSP_SPACE_HYBRID_DFS_HPP
-#define REALPAVER_CSP_SPACE_HYBRID_DFS_HPP
+#ifndef REALPAVER_SPACE_HYBRID_DFS_HPP
+#define REALPAVER_SPACE_HYBRID_DFS_HPP
 
-#include "realpaver/CSPSpace.hpp"
+#include "realpaver/Space.hpp"
 #include <set>
 #include <vector>
 
@@ -39,20 +39,20 @@ std::ostream &operator<<(std::ostream &os, const HybridDFSStyle &style);
 
 /*----------------------------------------------------------------------------*/
 
-/// Abstract class representing a set of shared CSP nodes
-class HybridCSPNodeSet {
+/// Abstract class representing a set of shared nodes
+class HybridNodeSet {
 public:
    /// Constructor
-   HybridCSPNodeSet() = default;
+   HybridNodeSet() = default;
 
    /// Virtual destructor
-   virtual ~HybridCSPNodeSet();
+   virtual ~HybridNodeSet();
 
    /// Default copy constructor
-   HybridCSPNodeSet(const HybridCSPNodeSet &) = default;
+   HybridNodeSet(const HybridNodeSet &) = default;
 
    /// No assignment
-   HybridCSPNodeSet &operator=(const HybridCSPNodeSet &) = delete;
+   HybridNodeSet &operator=(const HybridNodeSet &) = delete;
 
    /// Returns true if this is empty
    virtual bool isEmpty() const = 0;
@@ -61,41 +61,41 @@ public:
    virtual size_t size() const = 0;
 
    /// Inserts a node in this
-   virtual void insert(const SharedCSPNode &node) = 0;
+   virtual void insert(const SharedNode &node) = 0;
 
    /// Extracts the first node of this
-   virtual SharedCSPNode extract() = 0;
+   virtual SharedNode extract() = 0;
 
    /// Returns the i-th node of this
-   virtual SharedCSPNode getNode(size_t i) const = 0;
+   virtual SharedNode getNode(size_t i) const = 0;
 };
 
 /*----------------------------------------------------------------------------*/
 
-/// Set of shared CSP nodes ordered by depth (ascending)
-class DepthCSPNodeSet : public HybridCSPNodeSet {
+/// Set of shared nodes ordered by depth (ascending)
+class DepthNodeSet : public HybridNodeSet {
 public:
    /// Constructor of an empty set
-   DepthCSPNodeSet() = default;
+   DepthNodeSet() = default;
 
    /// Default destructor
-   ~DepthCSPNodeSet() = default;
+   ~DepthNodeSet() = default;
 
    /// Default copy constructor
-   DepthCSPNodeSet(const DepthCSPNodeSet &) = default;
+   DepthNodeSet(const DepthNodeSet &) = default;
 
    /// No assignment
-   DepthCSPNodeSet &operator=(const DepthCSPNodeSet &) = delete;
+   DepthNodeSet &operator=(const DepthNodeSet &) = delete;
 
    bool isEmpty() const override;
    size_t size() const override;
-   void insert(const SharedCSPNode &node) override;
-   SharedCSPNode extract() override;
-   SharedCSPNode getNode(size_t i) const override;
+   void insert(const SharedNode &node) override;
+   SharedNode extract() override;
+   SharedNode getNode(size_t i) const override;
 
 private:
    struct Elem {
-      SharedCSPNode node;
+      SharedNode node;
       int depth;
    };
 
@@ -112,30 +112,30 @@ private:
 
 /*----------------------------------------------------------------------------*/
 
-/// Set of shared CSP nodes ordered by perimeter (descending)
-class PerimeterCSPNodeSet : public HybridCSPNodeSet {
+/// Set of shared nodes ordered by perimeter (descending)
+class PerimeterNodeSet : public HybridNodeSet {
 public:
    /// Constructor of an empty set
-   PerimeterCSPNodeSet() = default;
+   PerimeterNodeSet() = default;
 
    /// Default destructor
-   ~PerimeterCSPNodeSet() = default;
+   ~PerimeterNodeSet() = default;
 
    /// Default copy constructor
-   PerimeterCSPNodeSet(const PerimeterCSPNodeSet &) = default;
+   PerimeterNodeSet(const PerimeterNodeSet &) = default;
 
    /// No assignment
-   PerimeterCSPNodeSet &operator=(const PerimeterCSPNodeSet &) = delete;
+   PerimeterNodeSet &operator=(const PerimeterNodeSet &) = delete;
 
    bool isEmpty() const override;
    size_t size() const override;
-   void insert(const SharedCSPNode &node) override;
-   SharedCSPNode extract() override;
-   SharedCSPNode getNode(size_t i) const override;
+   void insert(const SharedNode &node) override;
+   SharedNode extract() override;
+   SharedNode getNode(size_t i) const override;
 
 private:
    struct Elem {
-      SharedCSPNode node;
+      SharedNode node;
       double peri;
    };
 
@@ -152,30 +152,30 @@ private:
 
 /*----------------------------------------------------------------------------*/
 
-/// Set of shared CSP nodes ordered by grid perimeter (descending)
-class GridPerimeterCSPNodeSet : public HybridCSPNodeSet {
+/// Set of shared nodes ordered by grid perimeter (descending)
+class GridPerimeterNodeSet : public HybridNodeSet {
 public:
    /// Constructor of an empty set
-   GridPerimeterCSPNodeSet() = default;
+   GridPerimeterNodeSet() = default;
 
    /// Default destructor
-   ~GridPerimeterCSPNodeSet() = default;
+   ~GridPerimeterNodeSet() = default;
 
    /// Default copy constructor
-   GridPerimeterCSPNodeSet(const GridPerimeterCSPNodeSet &) = default;
+   GridPerimeterNodeSet(const GridPerimeterNodeSet &) = default;
 
    /// No assignment
-   GridPerimeterCSPNodeSet &operator=(const GridPerimeterCSPNodeSet &) = delete;
+   GridPerimeterNodeSet &operator=(const GridPerimeterNodeSet &) = delete;
 
    bool isEmpty() const override;
    size_t size() const override;
-   void insert(const SharedCSPNode &node) override;
-   SharedCSPNode extract() override;
-   SharedCSPNode getNode(size_t i) const override;
+   void insert(const SharedNode &node) override;
+   SharedNode extract() override;
+   SharedNode getNode(size_t i) const override;
 
 private:
    struct Elem {
-      SharedCSPNode node;
+      SharedNode node;
       double peri;
    };
 
@@ -201,37 +201,37 @@ private:
  *
  * @see HybridDFSStyle
  */
-class CSPSpaceHybridDFS : public CSPSpace {
+class SpaceHybridDFS : public Space {
 public:
    /// Constructor
-   CSPSpaceHybridDFS(HybridDFSStyle style);
+   SpaceHybridDFS(HybridDFSStyle style);
 
    /// Destructor
-   ~CSPSpaceHybridDFS();
+   ~SpaceHybridDFS();
 
    /// No copy
-   CSPSpaceHybridDFS(const CSPSpaceHybridDFS &) = delete;
+   SpaceHybridDFS(const SpaceHybridDFS &) = delete;
 
    /// No assignment
-   CSPSpaceHybridDFS &operator=(const CSPSpaceHybridDFS &) = delete;
+   SpaceHybridDFS &operator=(const SpaceHybridDFS &) = delete;
 
    size_t nbSolNodes() const override;
-   void pushSolNode(const SharedCSPNode &node) override;
-   SharedCSPNode popSolNode() override;
-   SharedCSPNode getSolNode(size_t i) const override;
+   void pushSolNode(const SharedNode &node) override;
+   SharedNode popSolNode() override;
+   SharedNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
-   SharedCSPNode nextPendingNode() override;
-   void insertPendingNode(const SharedCSPNode &node) override;
-   SharedCSPNode getPendingNode(size_t i) const override;
-   void insertPendingNodes(CSPSplit::iterator first, CSPSplit::iterator last) override;
+   SharedNode nextPendingNode() override;
+   void insertPendingNode(const SharedNode &node) override;
+   SharedNode getPendingNode(size_t i) const override;
+   void insertPendingNodes(Split::iterator first, Split::iterator last) override;
 
 private:
-   std::vector<SharedCSPNode> sta_;  // stack of pending nodes (for DFS)
-   HybridCSPNodeSet *set_;           // set of pending nodes (for BestFS)
-   std::vector<SharedCSPNode> vsol_; // vector of solution nodes
-   bool leftRight_;                  // true if the current DFS stage is
-                                     // left-to-right, false for right-to-left
+   std::vector<SharedNode> sta_;  // stack of pending nodes (for DFS)
+   HybridNodeSet *set_;           // set of pending nodes (for BestFS)
+   std::vector<SharedNode> vsol_; // vector of solution nodes
+   bool leftRight_;               // true if the current DFS stage is
+                                  // left-to-right, false for right-to-left
 };
 
 } // namespace realpaver

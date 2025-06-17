@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -83,6 +83,11 @@ Proof ContractorBC4Revise::contract(IntervalBox &B)
 
    LOG_LOW("BC4Revise -> " << proof);
    return proof;
+}
+
+Proof ContractorBC4Revise::contract(IntervalBox &B, const Bitset &active)
+{
+   return (active.get(dag_->fun(if_)->ctrId())) ? contract(B) : Proof::Inner;
 }
 
 void ContractorBC4Revise::setPeelFactor(double f)

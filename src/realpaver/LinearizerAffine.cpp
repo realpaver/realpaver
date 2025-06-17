@@ -29,22 +29,17 @@ LinearizerAffine::LinearizerAffine(SharedDag dag, bool minrange)
 {
 }
 
-LinearizerAffine::LinearizerAffine(SharedDag dag, const IndexList &lfun, bool minrange)
-    : Linearizer(dag, lfun)
-    , minrange_(minrange)
-{
-}
-
 void LinearizerAffine::useMinrange(bool minrange)
 {
    minrange_ = minrange;
 }
 
-bool LinearizerAffine::make(LPModel &lpm, const IntervalBox &B)
+bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
+                                  const Bitset &active)
 {
    // creates the affine forms
-   AffineCreator creator(dag_, lfun_, minrange_);
-   creator.create(B);
+   AffineCreator creator(dag_, minrange_);
+   creator.create(B, active);
 
    // creates the linear variables for the variables of the DAG
    for (const auto &v : scop_)

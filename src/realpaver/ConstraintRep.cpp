@@ -26,6 +26,7 @@ namespace realpaver {
 ConstraintRep::ConstraintRep(const ConstraintRelation &rel)
     : scop_()
     , rel_(rel)
+    , id_(-1)
     , hcode_(0)
 {
 }
@@ -57,6 +58,16 @@ bool ConstraintRep::dependsOn(Variable v) const
 ConstraintRelation ConstraintRep::relation() const
 {
    return rel_;
+}
+
+int ConstraintRep::id() const
+{
+   return id_;
+}
+
+void ConstraintRep::setId(int id)
+{
+   id_ = id;
 }
 
 bool ConstraintRep::isEquation() const

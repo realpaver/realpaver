@@ -12,45 +12,90 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSpace.cpp
- * @brief  Spaces of CSP solver
+ * @file   Space.cpp
+ * @brief  Base class of search spaces
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSpace.hpp"
+#include "realpaver/Space.hpp"
+#include "realpaver/UnionFind.hpp"
 #include <list>
 
 namespace realpaver {
 
-CSPSpace::~CSPSpace()
+Space::~Space()
 {
 }
 
-void CSPSpace::insertPendingNodes(CSPSplit::iterator first, CSPSplit::iterator last)
+void Space::insertPendingNodes(Split::iterator first, Split::iterator last)
 {
    for (auto it = first; it != last; ++it)
       insertPendingNode(*it);
 }
 
-void CSPSpace::makeSolClusters(double gap)
+// void Space::makeSolClusters(double gap)
+// {
+//    size_t nsol = nbSolNodes();
+
+//    // no clustering ?
+//    if (gap < 0.0 || nsol <= 1)
+//       return;
+
+//    // gets the solution nodes
+//    std::vector<SharedNode> vnod(nsol);
+//    for (size_t i = 0; i < nsol; ++i)
+//       vnod[i] = popSolNode();
+
+//    // makes the clusters using a UnionFind data structure
+//    UnionFind uf(nsol);
+//    for (size_t i = 0; i < nsol - 1; ++i)
+//       for (size_t j = i + 1; j < nsol; ++j)
+//          if (vnod[i]->box()->gap(*vnod[j]->box()) <= gap)
+//             uf.merge(i, j);
+
+//    // gets the clusters
+//    std::vector<std::vector<size_t>> parts = uf.parts();
+
+//    // makes the solutions, one for each part
+//    for (size_t i = 0; i < parts.size(); ++i)
+//    {
+//       std::vector<size_t> part = parts[i];
+
+//       // gets the first node of the part
+//       size_t idxnod = part[0];
+//       SharedNode sol = vnod[idxnod];
+
+//       // glues the boxes of the other nodes of the part
+//       for (size_t j = 1; j < part.size(); ++j)
+//       {
+//          idxnod = part[j];
+//          sol->box()->glueOnScope(*vnod[idxnod]->box(), sol->scope());
+//       }
+//       pushSolNode(sol);
+//    }
+// }
+
+void Space::makeSolClusters(double gap)
 {
-   // no clustering if the gap is negative
-   if (gap < 0.0)
+   size_t nsol = nbSolNodes();
+
+   // no clustering?
+   if (gap < 0.0 || nsol <= 1)
       return;
 
    // moves the solution nodes in a list
-   std::list<SharedCSPNode> lnode;
+   std::list<SharedNode> lnode;
    while (nbSolNodes() > 0)
       lnode.push_back(popSolNode());
 
    // resulting list of nodes
-   std::list<SharedCSPNode> res;
+   std::list<SharedNode> res;
 
    while (!lnode.empty())
    {
       // extracts the first node
-      SharedCSPNode node = lnode.front();
+      SharedNode node = lnode.front();
       DomainBox *box = node->box();
       lnode.pop_front();
 
@@ -59,12 +104,12 @@ void CSPSpace::makeSolClusters(double gap)
       auto it = lnode.begin();
       while (!found && it != lnode.end())
       {
-         SharedCSPNode bis = *it;
+         SharedNode bis = *it;
          DomainBox *boxbis = bis->box();
 
-         if (box->gap(*boxbis) < gap)
+         if (box->gap(*boxbis) <= gap)
          {
-            // merges node in bisnode and iterates
+            // merges node in bis and iterates
             boxbis->glueOnScope(*box, node->scope());
             found = true;
          }

@@ -12,15 +12,15 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSpaceHybridDFS.cpp
- * @brief  Hybrid strategies
+ * @file   SpaceHybridDFS.cpp
+ * @brief  Search space for hybrid strategies
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSpaceHybridDFS.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/SpaceHybridDFS.hpp"
 #include <algorithm>
 #include <list>
 
@@ -44,32 +44,32 @@ std::ostream &operator<<(std::ostream &os, const HybridDFSStyle &style)
 
 /*----------------------------------------------------------------------------*/
 
-HybridCSPNodeSet::~HybridCSPNodeSet()
+HybridNodeSet::~HybridNodeSet()
 {
 }
 
 /*----------------------------------------------------------------------------*/
 
-bool DepthCSPNodeSet::isEmpty() const
+bool DepthNodeSet::isEmpty() const
 {
    return set_.empty();
 }
 
-size_t DepthCSPNodeSet::size() const
+size_t DepthNodeSet::size() const
 {
    return set_.size();
 }
 
-void DepthCSPNodeSet::insert(const SharedCSPNode &node)
+void DepthNodeSet::insert(const SharedNode &node)
 {
    Elem e = {node, node->depth()};
    set_.insert(e);
 }
 
-SharedCSPNode DepthCSPNodeSet::extract()
+SharedNode DepthNodeSet::extract()
 {
    auto it = set_.begin();
-   SharedCSPNode node = it->node;
+   SharedNode node = it->node;
 
    LOG_INTER("Extract node " << node->index() << " / depth : " << it->depth);
 
@@ -77,7 +77,7 @@ SharedCSPNode DepthCSPNodeSet::extract()
    return node;
 }
 
-SharedCSPNode DepthCSPNodeSet::getNode(size_t i) const
+SharedNode DepthNodeSet::getNode(size_t i) const
 {
    auto it = set_.begin();
    std::advance(it, i);
@@ -86,17 +86,17 @@ SharedCSPNode DepthCSPNodeSet::getNode(size_t i) const
 
 /*----------------------------------------------------------------------------*/
 
-bool PerimeterCSPNodeSet::isEmpty() const
+bool PerimeterNodeSet::isEmpty() const
 {
    return set_.empty();
 }
 
-size_t PerimeterCSPNodeSet::size() const
+size_t PerimeterNodeSet::size() const
 {
    return set_.size();
 }
 
-void PerimeterCSPNodeSet::insert(const SharedCSPNode &node)
+void PerimeterNodeSet::insert(const SharedNode &node)
 {
    double p = node->box()->perimeter();
 
@@ -106,10 +106,10 @@ void PerimeterCSPNodeSet::insert(const SharedCSPNode &node)
    set_.insert(e);
 }
 
-SharedCSPNode PerimeterCSPNodeSet::extract()
+SharedNode PerimeterNodeSet::extract()
 {
    auto it = set_.begin();
-   SharedCSPNode node = it->node;
+   SharedNode node = it->node;
 
    LOG_INTER("Extract node " << node->index() << " / perimeter : " << it->peri);
 
@@ -117,7 +117,7 @@ SharedCSPNode PerimeterCSPNodeSet::extract()
    return node;
 }
 
-SharedCSPNode PerimeterCSPNodeSet::getNode(size_t i) const
+SharedNode PerimeterNodeSet::getNode(size_t i) const
 {
    auto it = set_.begin();
    std::advance(it, i);
@@ -126,17 +126,17 @@ SharedCSPNode PerimeterCSPNodeSet::getNode(size_t i) const
 
 /*----------------------------------------------------------------------------*/
 
-bool GridPerimeterCSPNodeSet::isEmpty() const
+bool GridPerimeterNodeSet::isEmpty() const
 {
    return set_.empty();
 }
 
-size_t GridPerimeterCSPNodeSet::size() const
+size_t GridPerimeterNodeSet::size() const
 {
    return set_.size();
 }
 
-void GridPerimeterCSPNodeSet::insert(const SharedCSPNode &node)
+void GridPerimeterNodeSet::insert(const SharedNode &node)
 {
    double p = node->box()->gridPerimeter();
 
@@ -146,10 +146,10 @@ void GridPerimeterCSPNodeSet::insert(const SharedCSPNode &node)
    set_.insert(e);
 }
 
-SharedCSPNode GridPerimeterCSPNodeSet::extract()
+SharedNode GridPerimeterNodeSet::extract()
 {
    auto it = set_.begin();
-   SharedCSPNode node = it->node;
+   SharedNode node = it->node;
 
    LOG_INTER("Extract node " << node->index() << " / grid perimeter : " << it->peri);
 
@@ -157,7 +157,7 @@ SharedCSPNode GridPerimeterCSPNodeSet::extract()
    return node;
 }
 
-SharedCSPNode GridPerimeterCSPNodeSet::getNode(size_t i) const
+SharedNode GridPerimeterNodeSet::getNode(size_t i) const
 {
    auto it = set_.begin();
    std::advance(it, i);
@@ -166,37 +166,38 @@ SharedCSPNode GridPerimeterCSPNodeSet::getNode(size_t i) const
 
 /*----------------------------------------------------------------------------*/
 
-CSPSpaceHybridDFS::CSPSpaceHybridDFS(HybridDFSStyle style)
-    : sta_()
+SpaceHybridDFS::SpaceHybridDFS(HybridDFSStyle style)
+    : Space()
+    , sta_()
     , set_(nullptr)
     , vsol_()
     , leftRight_(true)
 {
    if (style == HybridDFSStyle::Depth)
-      set_ = new DepthCSPNodeSet();
+      set_ = new DepthNodeSet();
 
    else if (style == HybridDFSStyle::Perimeter)
-      set_ = new PerimeterCSPNodeSet();
+      set_ = new PerimeterNodeSet();
 
    else if (style == HybridDFSStyle::GridPerimeter)
-      set_ = new GridPerimeterCSPNodeSet();
+      set_ = new GridPerimeterNodeSet();
 
    else
-      THROW("CSPSpaceHybridDFS, style not yet supported");
+      THROW("SpaceHybridDFS, style not yet supported");
 }
 
-CSPSpaceHybridDFS::~CSPSpaceHybridDFS()
+SpaceHybridDFS::~SpaceHybridDFS()
 {
    if (set_ != nullptr)
       delete set_;
 }
 
-size_t CSPSpaceHybridDFS::nbSolNodes() const
+size_t SpaceHybridDFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void CSPSpaceHybridDFS::pushSolNode(const SharedCSPNode &node)
+void SpaceHybridDFS::pushSolNode(const SharedNode &node)
 {
    vsol_.push_back(node);
 
@@ -210,21 +211,21 @@ void CSPSpaceHybridDFS::pushSolNode(const SharedCSPNode &node)
    sta_.clear();
 }
 
-SharedCSPNode CSPSpaceHybridDFS::popSolNode()
+SharedNode SpaceHybridDFS::popSolNode()
 {
-   SharedCSPNode node = vsol_.back();
+   SharedNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedCSPNode CSPSpaceHybridDFS::getSolNode(size_t i) const
+SharedNode SpaceHybridDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
+   ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
 
    return vsol_[i];
 }
 
-bool CSPSpaceHybridDFS::hasFeasibleSolNode() const
+bool SpaceHybridDFS::hasFeasibleSolNode() const
 {
    for (auto node : vsol_)
    {
@@ -235,37 +236,37 @@ bool CSPSpaceHybridDFS::hasFeasibleSolNode() const
    return false;
 }
 
-size_t CSPSpaceHybridDFS::nbPendingNodes() const
+size_t SpaceHybridDFS::nbPendingNodes() const
 {
    return sta_.size() + set_->size();
 }
 
-SharedCSPNode CSPSpaceHybridDFS::nextPendingNode()
+SharedNode SpaceHybridDFS::nextPendingNode()
 {
    // gets the top of the stack if it is not empty
    if (sta_.empty())
    {
-      SharedCSPNode node = set_->extract();
+      SharedNode node = set_->extract();
       return node;
    }
    // the first element of the set otherwise
    else
    {
-      SharedCSPNode node = sta_.back();
+      SharedNode node = sta_.back();
       sta_.pop_back();
       return node;
    }
 }
 
-void CSPSpaceHybridDFS::insertPendingNode(const SharedCSPNode &node)
+void SpaceHybridDFS::insertPendingNode(const SharedNode &node)
 {
    // inserts a node in the stack during a DFS stage
    sta_.push_back(node);
 }
 
-SharedCSPNode CSPSpaceHybridDFS::getPendingNode(size_t i) const
+SharedNode SpaceHybridDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a CSP space");
+   ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a space");
 
    if (i < sta_.size())
    {
@@ -280,8 +281,7 @@ SharedCSPNode CSPSpaceHybridDFS::getPendingNode(size_t i) const
    }
 }
 
-void CSPSpaceHybridDFS::insertPendingNodes(CSPSplit::iterator first,
-                                           CSPSplit::iterator last)
+void SpaceHybridDFS::insertPendingNodes(Split::iterator first, Split::iterator last)
 {
    // the nodes between first and last are ordered from left to right
    // if the DFS ordering is left to right then it is necessary to inverse
@@ -289,7 +289,7 @@ void CSPSpaceHybridDFS::insertPendingNodes(CSPSplit::iterator first,
 
    if (leftRight_)
    {
-      std::list<SharedCSPNode> aux;
+      std::list<SharedNode> aux;
       for (auto it = first; it != last; ++it)
          aux.push_front(*it);
 

@@ -19,7 +19,6 @@
  */
 
 #include "realpaver/ContractorList.hpp"
-#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
@@ -59,11 +58,22 @@ Scope ContractorList::scope() const
 
 Proof ContractorList::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorList::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorList::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    Proof proof;
 
    for (size_t i = 0; i < poolSize(); ++i)
    {
-      proof = pool_->contractorAt(i)->contract(B);
+      SharedContractor op = pool_->contractorAt(i);
+      proof = contract.apply(*op, B);
       if (proof == Proof::Empty)
          return Proof::Empty;
    }

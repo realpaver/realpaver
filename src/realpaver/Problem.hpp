@@ -134,7 +134,7 @@ public:
    Scope scope() const;
 
    /// Inserts a constraint
-   void addCtr(Constraint c);
+   size_t addCtr(Constraint c);
 
    /// Inserts a list of constraints
    void addCtr(const std::initializer_list<Constraint> &l);

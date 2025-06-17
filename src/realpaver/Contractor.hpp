@@ -63,6 +63,17 @@ public:
    /// Contracts a box B and returns a certificate of proof
    virtual Proof contract(IntervalBox &B) = 0;
 
+   /**
+    * @brief Contraction method.
+    *
+    * It contracts a box B and returns a certificate of proof. The given bitset
+    * defines the activity of constraints. If a contractor only depends on inactive
+    * constraints then its application is useless.
+    *
+    * The default implementation calls contract(B).
+    */
+   virtual Proof contract(IntervalBox &B, const Bitset &active);
+
    /// Output on a stream
    virtual void print(std::ostream &os) const;
 };
@@ -72,6 +83,44 @@ std::ostream &operator<<(std::ostream &os, const Contractor &op);
 
 /// Type of shared pointers on contractors
 using SharedContractor = std::shared_ptr<Contractor>;
+
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Base class implementing a choice of contraction methods.
+ *
+ * Any contractor has two contractions methods, one that simply contracts a box B,
+ * and one that takes into account an active bitset. Such an objet has an apply(ctc, B)
+ * method that must apply one contraction method of ctc on B.
+ */
+class ContractMethod {
+public:
+   /// Virtual destructor
+   virtual ~ContractMethod();
+
+   /// Applies a contraction of ctc on B
+   virtual Proof apply(Contractor &ctc, IntervalBox &B) const = 0;
+};
+
+/// Calls the contraction method with no bitset
+class ContractSimple : public ContractMethod {
+public:
+   /// Returns ctc.contract(B)
+   Proof apply(Contractor &ctc, IntervalBox &B) const override;
+};
+
+/// Calls the contraction method with an active bitset
+class ContractActive : public ContractMethod {
+public:
+   /// Creates an object encapsulating an active set
+   ContractActive(const Bitset &active);
+
+   /// Returns ctc.contract(B, active)
+   Proof apply(Contractor &ctc, IntervalBox &B) const override;
+
+private:
+   const Bitset &active_;
+};
 
 } // namespace realpaver
 

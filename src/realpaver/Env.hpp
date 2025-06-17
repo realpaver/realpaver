@@ -63,24 +63,10 @@ public:
    /// Returns true if a solving process is aborted due a node limit
    bool usedNodeLimit() const;
 
-   /// Sets a flag related to the preprocessing
-   void setPresolved(bool b = false);
-
-   /// Returns true if a problem is solved at preprocessing
-   bool isPresolved() const;
-
-   /// Sets a flag related to the preprocessing
-   void setConstraintViolated(bool b = false);
-
-   /// Returns true if a constraint is violated at preprocessing
-   bool hasConstraintViolated() const;
-
 private:
    Params *params_; // management of parameters
    bool tlim_;      // time limit reached
    bool nlim_;      // node limit reached
-   bool presolved_; // true if a problem is solved at preprocessing
-   bool cviol_;     // true if a constraint is violated at preprocessing
 };
 
 } // namespace realpaver

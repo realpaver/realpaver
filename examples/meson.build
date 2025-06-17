@@ -40,9 +40,9 @@ if local_solver_dep.found()
   )
 endif
 
-csp = executable(
-  'csp',
-  sources: 'csp.cpp',
+ncsp = executable(
+  'ncsp',
+  sources: 'ncsp.cpp',
   link_with: realpaver_lib,
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,

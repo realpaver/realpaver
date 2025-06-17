@@ -57,6 +57,12 @@ Proof ContractorBC4::contract(IntervalBox &B)
    return propag_->contract(B);
 }
 
+Proof ContractorBC4::contract(IntervalBox &B, const Bitset &active)
+{
+   LOG_INTER("BC4");
+   return propag_->contract(B, active);
+}
+
 void ContractorBC4::print(std::ostream &os) const
 {
    os << "BC4";

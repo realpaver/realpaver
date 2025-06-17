@@ -74,24 +74,4 @@ bool Env::usedNodeLimit() const
    return nlim_;
 }
 
-void Env::setPresolved(bool b)
-{
-   presolved_ = b;
-}
-
-bool Env::isPresolved() const
-{
-   return presolved_;
-}
-
-void Env::setConstraintViolated(bool b)
-{
-   cviol_ = b;
-}
-
-bool Env::hasConstraintViolated() const
-{
-   return cviol_;
-}
-
 } // namespace realpaver
