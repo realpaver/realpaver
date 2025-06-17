@@ -18,7 +18,7 @@ int main(void)
       problem.addCtr({sqr(x) + sqr(y) == sqr(n), y == sqr(x) + 1.0});
 
       // Solves the NCSP
-      CSPSolver solver(problem);
+      Solver solver(problem);
 
       Timer tim;
       tim.start();

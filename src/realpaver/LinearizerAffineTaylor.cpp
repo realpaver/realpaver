@@ -33,9 +33,10 @@ LinearizerAffineTaylor::LinearizerAffineTaylor(std::unique_ptr<LinearizerAffine>
    ASSERT(taylor_ != nullptr, "Null pointer (taylor linearizer)");
 }
 
-bool LinearizerAffineTaylor::make(LPModel &lpm, const IntervalBox &B)
+bool LinearizerAffineTaylor::makeLPImpl(LPModel &lpm, const IntervalBox &B,
+                                        const Bitset &active)
 {
-   bool b = affine_->make(lpm, B);
+   bool b = affine_->makeLP(lpm, B, active);
 
    for (const auto &v : scop_)
    {
@@ -46,7 +47,7 @@ bool LinearizerAffineTaylor::make(LPModel &lpm, const IntervalBox &B)
    }
 
    if (b)
-      b = taylor_->makeCtrs(lpm, B);
+      b = taylor_->makeCtrs(lpm, B, active);
 
    return b;
 }

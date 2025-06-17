@@ -42,6 +42,12 @@ public:
    /// Returns the relation symbol of this
    ConstraintRelation relation() const;
 
+   /// Returns the identifier of this
+   int id() const;
+
+   /// Assigns the identifier of this
+   void setId(int id);
+
    /// Returns true if this is variable free */
    bool isConstant() const;
 

@@ -69,6 +69,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
    /// Returns the threshold on the width of variable domains
@@ -87,7 +88,11 @@ private:
    // CID process applied to Bcid
    // B3bCid is the resulting box
    // Returns true if it leads to a contraction
-   bool contractCID(IntervalBox &Bcid, IntervalBox &B3bCid);
+   bool contractCID(IntervalBox &Bcid, IntervalBox &B3bCid,
+                    const ContractMethod &contract);
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
 };
 
 } // namespace realpaver

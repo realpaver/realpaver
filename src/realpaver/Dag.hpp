@@ -802,6 +802,12 @@ public:
     */
    DagLin *getLinearExpr() const;
 
+   /// Returns the id of the associated constraint
+   int ctrId() const;
+
+   /// Assigns the id of the associated constraint to i
+   void setCtrId(int i);
+
 private:
    Dag *dag_;                           // the DAG
    std::vector<DagNode *> node_;        // vector of nodes of the function sorted by
@@ -813,6 +819,7 @@ private:
    Scope scop_;                         // the set of variables
    Interval image_;                     // bounds of the function, i.e. the co-domain
    size_t idx_;                         // index in the dag
+   int ctrid_;                          // identifier of associated constraint
    std::shared_ptr<FlatFunction> flat_; // implements hc4Revise
 
    // tests if a node is already present in this function
@@ -970,6 +977,12 @@ public:
     */
    void rDiff(const RealPoint &pt, RealMatrix &J);
 
+   /// Returns the maximum among the constraint ids of the functions in this
+   size_t maxCtrId() const;
+
+   /// Considers a constraint id and asigns the result of maxCtrId()
+   void addCtrId(size_t id);
+
 private:
    // vector of nodes sorted by a topological ordering from the leaves
    // to the roots
@@ -997,6 +1010,9 @@ private:
 
    // scope
    Scope scop_;
+
+   // max {f.ctrId()} for all f in this
+   size_t maxCtrId_;
 
    // find methods
    DagConst *findConstNode(const Interval &x) const;

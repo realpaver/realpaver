@@ -35,9 +35,6 @@ public:
    /// Creates a linearizer for a DAG
    Linearizer(SharedDag dag);
 
-   /// Creates a linearizer for a subset of a DAG given by a list of indexes
-   Linearizer(SharedDag dag, const IndexList &lfun);
-
    /// Destructor
    virtual ~Linearizer();
 
@@ -56,11 +53,36 @@ public:
    /**
     * @brief Makes the linear relaxation.
     *
-    * It makes a linear relaxation of the DAG (or a subset) on
-    * the given box B. The new linear program is assigned to lpm
-    * and it returns true in case of success, false otherwise.
+    * It makes a linear relaxation of the DAG on the given box B. The new linear program
+    * is assigned to lpm and it returns true in case of success, false otherwise.
+    *
+    * Calls makeLPImpl(lpm, B, active) with the bitset active = (1, 1, ..., 1).
     */
-   virtual bool make(LPModel &lpm, const IntervalBox &B) = 0;
+   bool makeLP(LPModel &lpm, const IntervalBox &B);
+
+   /**
+    * @brief Makes the linear relaxation.
+    *
+    * It makes a linear relaxation of a subset of the DAG on the given box B. The subset
+    * is determined by the bitset. The new linear program is assigned to lpm and it
+    * returns true in case of success, false otherwise.
+    *
+    * Calls makeLPImpl(lpm, B, active).
+    */
+   bool makeLP(LPModel &lpm, const IntervalBox &B, const Bitset &active);
+
+   /**
+    * @brief Implementation of the linear relaxation in sub-classes.
+    *
+    * It makes a linear relaxation of a subset of the DAG on the given box B. The subset
+    * is determined by the bitset. The new linear program is assigned to lpm and it
+    * returns true in case of success, false otherwise.
+    *
+    * There are two cases for the bitset active. If its size is empty, then all the
+    * constraints are considered as active. Otherwise, it corresponds to the constraint
+    * activities.
+    */
+   virtual bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) = 0;
 
    /// Returns the index of the linear variable associated with v
    size_t linVarIndex(Variable v) const;
@@ -78,10 +100,9 @@ public:
    void setRelaxTol(double tol);
 
 protected:
-   SharedDag dag_;  // DAG
-   Scope scop_;     // scope
-   IndexList lfun_; // list of indexes of functions
-   double tol_;     // relaxation tol for the equations
+   SharedDag dag_; // DAG
+   Scope scop_;    // scope
+   double tol_;    // relaxation tol for the equations
 
 private:
    using MapType = std::unordered_map<size_t, size_t>;

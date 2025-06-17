@@ -12,14 +12,14 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPContext.hpp
- * @brief  CSP search context
+ * @file   NodeContext.hpp
+ * @brief  Context for search nodes
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#ifndef REALPAVER_CSP_CONTEXT_HPP
-#define REALPAVER_CSP_CONTEXT_HPP
+#ifndef REALPAVER_NODE_CONTEXT_HPP
+#define REALPAVER_NODE_CONTEXT_HPP
 
 #include "realpaver/Variable.hpp"
 #include <list>
@@ -28,55 +28,55 @@
 
 namespace realpaver {
 
-///  Type of informations that can be associated with CSP search nodes
-enum class CSPNodeInfoType {
+///  Type of informations that can be associated with search nodes
+enum class NodeInfoType {
    SplitVar, ///< selected variable in a splitting step
    NbCID     ///< number of CID contractors
 };
 
 /// Output on a stream
-std::ostream &operator<<(std::ostream &os, CSPNodeInfoType typ);
+std::ostream &operator<<(std::ostream &os, NodeInfoType typ);
 
 /*----------------------------------------------------------------------------*/
 
-/// Base class of informations that can be associated with CSP search nodes
-class CSPNodeInfo {
+/// Base class of informations that can be associated with search nodes
+class NodeInfo {
 public:
    /// Constructor
-   CSPNodeInfo(CSPNodeInfoType typ);
+   NodeInfo(NodeInfoType typ);
 
    /// Virtual destructor
-   virtual ~CSPNodeInfo();
+   virtual ~NodeInfo();
 
    /// Default copy constructor
-   CSPNodeInfo(const CSPNodeInfo &) = default;
+   NodeInfo(const NodeInfo &) = default;
 
    /// Default assignment operator
-   CSPNodeInfo &operator=(const CSPNodeInfo &) = default;
+   NodeInfo &operator=(const NodeInfo &) = default;
 
    /// Returns the type of this
-   CSPNodeInfoType getType() const;
+   NodeInfoType getType() const;
 
 private:
-   CSPNodeInfoType typ_; // type
+   NodeInfoType typ_; // type
 };
 
 /*----------------------------------------------------------------------------*/
 
 /// Information that contains a variable
-class CSPNodeInfoVar : public CSPNodeInfo {
+class NodeInfoVar : public NodeInfo {
 public:
    /// Constructor
-   CSPNodeInfoVar(Variable v);
+   NodeInfoVar(Variable v);
 
    /// Default destructor
-   ~CSPNodeInfoVar() = default;
+   ~NodeInfoVar() = default;
 
    /// Default copy constructor
-   CSPNodeInfoVar(const CSPNodeInfoVar &) = default;
+   NodeInfoVar(const NodeInfoVar &) = default;
 
    /// No assignment
-   CSPNodeInfoVar &operator=(const CSPNodeInfoVar &) = delete;
+   NodeInfoVar &operator=(const NodeInfoVar &) = delete;
 
    /// Returns the variable enclosed in this
    Variable getVar() const;
@@ -88,19 +88,19 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Information that contains a number of CID contractors
-class CSPNodeInfoCID : public CSPNodeInfo {
+class NodeInfoCID : public NodeInfo {
 public:
    /// Constructor
-   CSPNodeInfoCID(int nbcid = 0);
+   NodeInfoCID(int nbcid = 0);
 
    /// Default destructor
-   ~CSPNodeInfoCID() = default;
+   ~NodeInfoCID() = default;
 
    /// Default copy constructor
-   CSPNodeInfoCID(const CSPNodeInfoCID &) = default;
+   NodeInfoCID(const NodeInfoCID &) = default;
 
    /// No assignment
-   CSPNodeInfoCID &operator=(const CSPNodeInfoCID &) = delete;
+   NodeInfoCID &operator=(const NodeInfoCID &) = delete;
 
    /// Returns the number of CID contractors
    size_t getNbCID() const;
@@ -115,26 +115,26 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Map that stores the informations associated with CSP search nodes.
+ * @brief Map that stores the informations associated with search nodes.
  *
  * An entry is a couple (node index, list of infos).
  */
-class CSPContext {
+class NodeContext {
 public:
    /// Default constructor
-   CSPContext() = default;
+   NodeContext() = default;
 
    /// Default destructor
-   ~CSPContext() = default;
+   ~NodeContext() = default;
 
    /// No copy
-   CSPContext(const CSPContext &) = delete;
+   NodeContext(const NodeContext &) = delete;
 
    /// No assignment
-   CSPContext &operator=(const CSPContext &) = delete;
+   NodeContext &operator=(const NodeContext &) = delete;
 
    /// Inserts a new entry in this
-   void insert(int index, std::shared_ptr<CSPNodeInfo> info);
+   void insert(int index, std::shared_ptr<NodeInfo> info);
 
    /// Removes all the informations associated with a node
    void remove(int index);
@@ -145,18 +145,18 @@ public:
     * Returns the information associated with the node index and the given type
     * if it exists, a null pointer otherwise
     */
-   std::shared_ptr<CSPNodeInfo> getInfo(int index, CSPNodeInfoType typ) const;
+   std::shared_ptr<NodeInfo> getInfo(int index, NodeInfoType typ) const;
 
    /// Returns the number of entries in this
    size_t size() const;
 
 private:
    // map node index -> list of infos
-   typedef std::list<std::shared_ptr<CSPNodeInfo>> ListType;
+   typedef std::list<std::shared_ptr<NodeInfo>> ListType;
    std::unordered_map<int, ListType> map_;
 
    // test used in assertions
-   bool hasInfo(int index, CSPNodeInfoType typ) const;
+   bool hasInfo(int index, NodeInfoType typ) const;
 };
 
 } // namespace realpaver

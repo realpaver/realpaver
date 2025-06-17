@@ -12,16 +12,16 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSpaceBFS.hpp
- * @brief  Breadth-First-Search strategy
+ * @file   SpaceBFS.hpp
+ * @brief  Search space for a Breadth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#ifndef REALPAVER_CSP_SPACE_BFS_HPP
-#define REALPAVER_CSP_SPACE_BFS_HPP
+#ifndef REALPAVER_SPACE_BFS_HPP
+#define REALPAVER_SPACE_BFS_HPP
 
-#include "realpaver/CSPSpace.hpp"
+#include "realpaver/Space.hpp"
 #include <list>
 
 namespace realpaver {
@@ -32,33 +32,33 @@ namespace realpaver {
  * The pending nodes are stored in a FIFO queue in order to implement a BFS
  * strategy.
  */
-class CSPSpaceBFS : public CSPSpace {
+class SpaceBFS : public Space {
 public:
    /// Constructor
-   CSPSpaceBFS();
+   SpaceBFS();
 
    /// Default destructor
-   ~CSPSpaceBFS() = default;
+   ~SpaceBFS() = default;
 
    /// No assignment
-   CSPSpaceBFS &operator=(const CSPSpaceBFS &) = delete;
+   SpaceBFS &operator=(const SpaceBFS &) = delete;
 
    /// Default copy constructor
-   CSPSpaceBFS(const CSPSpaceBFS &) = default;
+   SpaceBFS(const SpaceBFS &) = default;
 
    size_t nbSolNodes() const override;
-   void pushSolNode(const SharedCSPNode &node) override;
-   SharedCSPNode popSolNode() override;
-   SharedCSPNode getSolNode(size_t i) const override;
+   void pushSolNode(const SharedNode &node) override;
+   SharedNode popSolNode() override;
+   SharedNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
-   SharedCSPNode nextPendingNode() override;
-   void insertPendingNode(const SharedCSPNode &node) override;
-   SharedCSPNode getPendingNode(size_t i) const override;
+   SharedNode nextPendingNode() override;
+   void insertPendingNode(const SharedNode &node) override;
+   SharedNode getPendingNode(size_t i) const override;
 
 private:
-   std::vector<SharedCSPNode> vsol_; // vector of solution nodes
-   std::list<SharedCSPNode> lnode_;  // list of pending nodes
+   std::vector<SharedNode> vsol_; // vector of solution nodes
+   std::list<SharedNode> lnode_;  // list of pending nodes
 };
 
 } // namespace realpaver

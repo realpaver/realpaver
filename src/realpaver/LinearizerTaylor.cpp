@@ -20,25 +20,12 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/LinearizerTaylor.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 LinearizerTaylor::LinearizerTaylor(SharedDag dag, bool hansen, CornerStyle style,
                                    unsigned seed)
     : Linearizer(dag)
-    , hansen_(hansen)
-    , style_(style)
-    , corner_(scope().size())
-    , gen_()
-{
-   if (seed == 0)
-      gen_ = IntRandom();
-   else
-      gen_ = IntRandom(seed);
-}
-
-LinearizerTaylor::LinearizerTaylor(SharedDag dag, const IndexList &lfun, bool hansen,
-                                   CornerStyle style, unsigned seed)
-    : Linearizer(dag, lfun)
     , hansen_(hansen)
     , style_(style)
     , corner_(scope().size())
@@ -101,7 +88,8 @@ void LinearizerTaylor::makeVars(LPModel &lpm, const IntervalBox &B)
    }
 }
 
-bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner)
+bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner,
+                               const Bitset &active)
 {
    // makes the corner of the box
    RealPoint c(scop_);
@@ -114,22 +102,22 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
          c.set(v, dom.left());
    }
 
-   // evaluates the functions at c
-   IntervalVector fc(lfun_.size());
-   for (size_t i : lfun_)
-   {
-      DagFun *f = dag_->fun(i);
-      Interval x = f->iEval(c);
-      if (x.isEmpty())
-         return false;
-      fc.set(i, x);
-   }
-
    // generates the constraints
-   for (size_t i : lfun_)
+   for (size_t i = 0; i < dag_->nbFuns(); ++i)
    {
       DagFun *f = dag_->fun(i);
+
+      if (active.get(f->ctrId()) == 0)
+         continue;
+
+      LOG_LOW("Taylor relaxation for constraint @ " << f->ctrId());
+
       Interval img = f->getImage();
+
+      // evaluates the function at c
+      Interval fc = f->iEval(c);
+      if (fc.isEmpty())
+         return false;
 
       // transforms an equation into an inequality
       if (img.isSingleton())
@@ -152,7 +140,7 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
       // bound of the image of the function is finite
       if (!Double::isInf(img.right()))
       {
-         Interval u = img.right() - fc.get(i);
+         Interval u = img.right() - fc;
          LinExpr lo;
 
          for (const auto &v : f->scope())
@@ -184,7 +172,7 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
       // bound of the image of the function is finite
       if (!Double::isInf(img.left()))
       {
-         Interval l = img.left() - fc.get(i);
+         Interval l = img.left() - fc;
 
          LinExpr up;
 
@@ -216,13 +204,13 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
    return true;
 }
 
-bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
+bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B, const Bitset &active)
 {
    // selects the first corner
    selectCorner(B);
 
    // generates the constraints for this corner
-   bool b = makeOne(lpm, B, corner_);
+   bool b = makeOne(lpm, B, corner_, active);
    if (!b)
       return false;
 
@@ -230,16 +218,17 @@ bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B)
    if (style_ == CornerStyle::RandomOpposite || style_ == CornerStyle::UserOpposite)
    {
       corner_.flipAll();
-      return makeOne(lpm, B, corner_);
+      return makeOne(lpm, B, corner_, active);
    }
    else
       return true;
 }
 
-bool LinearizerTaylor::make(LPModel &lpm, const IntervalBox &B)
+bool LinearizerTaylor::makeLPImpl(LPModel &lpm, const IntervalBox &B,
+                                  const Bitset &active)
 {
    makeVars(lpm, B);
-   return makeCtrs(lpm, B);
+   return makeCtrs(lpm, B, active);
 }
 
 } // namespace realpaver

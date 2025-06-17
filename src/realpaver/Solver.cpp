@@ -12,27 +12,33 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSolver.cpp
- * @brief  CSP solver
+ * @file   Solver.cpp
+ * @brief  Solver of constraint systems
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/CSPSolver.hpp"
-#include "realpaver/CSPSpaceBFS.hpp"
-#include "realpaver/CSPSpaceDFS.hpp"
-#include "realpaver/CSPSpaceDMDFS.hpp"
-#include "realpaver/CSPSpaceHybridDFS.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/Solver.hpp"
+#include "realpaver/SpaceBFS.hpp"
+#include "realpaver/SpaceDFS.hpp"
+#include "realpaver/SpaceDMDFS.hpp"
+#include "realpaver/SpaceHybridDFS.hpp"
+#include "realpaver/SplitLF.hpp"
+#include "realpaver/SplitRR.hpp"
+#include "realpaver/SplitSF.hpp"
+#include "realpaver/SplitSLF.hpp"
+#include "realpaver/SplitSSR.hpp"
+#include "realpaver/SplitSSRLF.hpp"
 #include <limits>
 #include <list>
 #include <string>
 
 namespace realpaver {
 
-CSPSolver::CSPSolver(const Problem &problem)
+Solver::Solver(const Problem &problem)
     : problem_(nullptr)
     , preprob_(nullptr)
     , preproc_(nullptr)
@@ -47,15 +53,12 @@ CSPSolver::CSPSolver(const Problem &problem)
     , nbnodes_(0)
     , withPreprocessing_(true)
 {
-   THROW_IF(!problem.isCSP(), "CSP solver applied to a problem that is "
-                                  << "not a constraint satisfaction problem");
-
-   env_ = std::make_shared<CSPEnv>();
+   env_ = std::make_shared<EnvSolver>();
    preproc_ = new Preprocessor();
    problem_ = new Problem(problem);
 }
 
-CSPSolver::~CSPSolver()
+Solver::~Solver()
 {
    if (context_ != nullptr)
       delete context_;
@@ -77,17 +80,17 @@ CSPSolver::~CSPSolver()
       delete problem_;
 }
 
-double CSPSolver::getSolvingTime() const
+double Solver::getSolvingTime() const
 {
    return stimer_.elapsedTime();
 }
 
-int CSPSolver::getTotalNodes() const
+int Solver::getTotalNodes() const
 {
    return nbnodes_;
 }
 
-void CSPSolver::solve()
+void Solver::solve()
 {
    LOG_MAIN("Input problem\n" << (*problem_));
 
@@ -117,55 +120,56 @@ void CSPSolver::solve()
    }
 }
 
-void CSPSolver::makeSpace()
+void Solver::makeSpace()
 {
-   LOG_LOW("Makes the space in the CSP solver");
+   LOG_LOW("Makes the space in the solver");
 
    // gets the strategy from the parameters
    std::string s = env_->getParams()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS")
-      space_ = new CSPSpaceDFS();
+      space_ = new SpaceDFS();
 
    else if (s == "BFS")
-      space_ = new CSPSpaceBFS();
+      space_ = new SpaceBFS();
 
    else if (s == "DMDFS")
-      space_ = new CSPSpaceDMDFS();
+      space_ = new SpaceDMDFS();
 
    else if (s == "IDFS")
-      space_ = new CSPSpaceHybridDFS(HybridDFSStyle::Depth);
+      space_ = new SpaceHybridDFS(HybridDFSStyle::Depth);
 
    else if (s == "PDFS")
-      space_ = new CSPSpaceHybridDFS(HybridDFSStyle::Perimeter);
+      space_ = new SpaceHybridDFS(HybridDFSStyle::Perimeter);
 
    else if (s == "GPDFS")
-      space_ = new CSPSpaceHybridDFS(HybridDFSStyle::GridPerimeter);
+      space_ = new SpaceHybridDFS(HybridDFSStyle::GridPerimeter);
 
-   THROW_IF(space_ == nullptr, "Unable to make the space object in a CSP solver");
+   THROW_IF(space_ == nullptr, "Unable to make the space object in the solver");
 
    // creates and inserts the root node
-   SharedCSPNode node = std::make_shared<CSPNode>(preprob_->scope());
+   SharedNode node = std::make_shared<Node>(preprob_->scope(), preprob_->nbCtrs());
+   node->setAllActive();
    node->setIndex(0);
 
    space_->insertPendingNode(node);
    ++nbnodes_;
 }
 
-void CSPSolver::makePropagator()
+void Solver::makePropagator()
 {
-   LOG_LOW("Makes the propagator in the CSP solver");
+   LOG_LOW("Makes the propagator in the solver");
 
-   CSPPropagatorList *aux = new CSPPropagatorList();
+   NodePropagatorList *aux = new NodePropagatorList();
 
    // Constraint propagation algorithm: HC4, BC4, or AFFIBE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
-      aux->pushBack(CSPPropagAlgo::HC4, *factory_);
+      aux->pushBack(NodePropagAlgo::HC4, *factory_);
    else if (base == "BC4")
-      aux->pushBack(CSPPropagAlgo::BC4, *factory_);
+      aux->pushBack(NodePropagAlgo::BC4, *factory_);
    else if (base == "AFFINE")
-      aux->pushBack(CSPPropagAlgo::AFFINE, *factory_);
+      aux->pushBack(NodePropagAlgo::AFFINE, *factory_);
    else
       THROW("Bad parameter value for the propagation algorithm");
 
@@ -173,31 +177,30 @@ void CSPSolver::makePropagator()
    std::string with_acid = env_->getParams()->getStrParam("PROPAGATION_WITH_ACID");
 
    if (with_acid == "YES")
-      aux->pushBack(CSPPropagAlgo::ACID, *factory_);
+      aux->pushBack(NodePropagAlgo::ACID, *factory_);
 
    // Polytope hull contractor: YES or NO
    std::string with_polytope =
        env_->getParams()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
 
    if (with_polytope == "YES")
-      aux->pushBack(CSPPropagAlgo::Polytope, *factory_);
+      aux->pushBack(NodePropagAlgo::Polytope, *factory_);
 
    // Newton: YES or NO
    std::string with_newton = env_->getParams()->getStrParam("PROPAGATION_WITH_NEWTON");
 
    if (with_newton == "YES")
-      aux->pushBack(CSPPropagAlgo::Newton, *factory_);
+      aux->pushBack(NodePropagAlgo::Newton, *factory_);
 
    if (aux->size() == 0)
-      THROW("Unable to create the propagator in the CSP solver");
+      THROW("Unable to create the propagator in the solver");
 
    propagator_ = aux;
-   dag_ = factory_->getDag();
 }
 
-void CSPSolver::makeSplit()
+void Solver::makeSplit()
 {
-   LOG_LOW("Makes the split object in the CSP solver");
+   LOG_LOW("Makes the split object in the solver");
 
    Scope scop = preprob_->scope();
 
@@ -211,71 +214,86 @@ void CSPSolver::makeSplit()
       smap = DomainSlicerFactory::makeBiStrategy(sip);
    }
 
-   THROW_IF(smap == nullptr, "Unable to make the split object in a CSP solver");
+   THROW_IF(smap == nullptr, "Unable to make the split object in the solver");
 
    // makes the spliting object acording the variable selection strategy
    std::string sel = env_->getParams()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
-      split_ = new CSPSplitRR(scop, std::move(smap));
+      split_ = new SplitRR(scop, std::move(smap));
 
    else if (sel == "LF")
-      split_ = new CSPSplitLF(scop, std::move(smap));
+      split_ = new SplitLF(scop, std::move(smap));
 
    else if (sel == "SF")
-      split_ = new CSPSplitSF(scop, std::move(smap));
+      split_ = new SplitSF(scop, std::move(smap));
 
    else if (sel == "SLF")
-      split_ = new CSPSplitSLF(scop, std::move(smap));
+      split_ = new SplitSLF(scop, std::move(smap));
 
    else if (sel == "SSR")
-      if (!dag_->isEmpty())
-         split_ = new CSPSplitSSR(scop, std::move(smap),
-                                  factory_->makeIntervalFunctionVector());
+   {
+      if (dag_->isEmpty())
+      {
+         LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
+         split_ = new SplitLF(scop, std::move(smap));
+      }
       else
       {
-         std::cout << "WARNING: Empty DAG, switching to Largest First splitting strategy!"
-                   << std::endl;
-         split_ = new CSPSplitLF(scop, std::move(smap));
+         IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
+         split_ = new SplitSSR(scop, std::move(smap), F);
       }
+   }
 
    else if (sel == "SSR_LF")
    {
-      if (!dag_->isEmpty())
+      if (dag_->isEmpty())
       {
-         CSPSplitSSRLF *hybrid = new CSPSplitSSRLF(
-             scop, std::move(smap), factory_->makeIntervalFunctionVector());
-
-         double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
-         hybrid->setFrequency(f);
-
-         split_ = hybrid;
+         LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
+         split_ = new SplitLF(scop, std::move(smap));
       }
       else
       {
-         std::cout << "WARNING: Empty DAG, switching to Largest First splitting strategy!"
-                   << std::endl;
-         split_ = new CSPSplitLF(scop, std::move(smap));
+         IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
+         SplitSSRLF *hybrid = new SplitSSRLF(scop, std::move(smap), F);
+         double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
+         hybrid->setFrequency(f);
+         split_ = hybrid;
       }
    }
 
-   THROW_IF(split_ == nullptr, "Unable to make the split object in a CSP solver");
+   THROW_IF(split_ == nullptr, "Unable to make the split object in the solver");
 }
 
-bool CSPSolver::isInner(DomainBox *box) const
+// this method is called after a propagation step => it is not possible
+// to detect an inconsistency
+Proof Solver::checkActivity(Node &node)
 {
-   IntervalBox B(*box);
+   bool inactive = true;
+   IntervalBox B(*node.box());
+
    for (size_t i = 0; i < preprob_->nbCtrs(); ++i)
    {
       Constraint c = preprob_->ctrAt(i);
-      if (c.isSatisfied(B) != Proof::Inner)
-         return false;
-   }
+      int ic = c.id();
 
-   return true;
+      if (node.isInactive(ic))
+         continue;
+
+      Proof proof = c.isSatisfied(B);
+      if (proof == Proof::Inner)
+      {
+         node.setInactive(ic);
+      }
+      else
+      {
+         inactive = false;
+      }
+   }
+   return inactive ? Proof::Inner : Proof::Maybe;
 }
 
-void CSPSolver::bpStep(int depthlimit)
+void Solver::bpStep(int depthlimit)
 {
 #if LOG_ON
    static Timer timerStep;
@@ -283,7 +301,7 @@ void CSPSolver::bpStep(int depthlimit)
 #endif
 
    // extracts a node from the space
-   SharedCSPNode node = space_->nextPendingNode();
+   SharedNode node = space_->nextPendingNode();
 
    // processes it
    bpStepAux(node, depthlimit);
@@ -297,7 +315,7 @@ void CSPSolver::bpStep(int depthlimit)
 #endif
 }
 
-void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
+void Solver::bpStepAux(SharedNode node, int depthlimit)
 {
 #if LOG_ON
    static Timer timerPropag, timerSplit;
@@ -333,12 +351,12 @@ void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
       LOG_INTER("Contracted box: " << (*node->box()));
    }
 
-   if (isInner(node->box()))
+   // checks the activity of constraints
+   proof = checkActivity(*node);
+   if (proof == Proof::Inner)
    {
-      LOG_INTER("Node " << node->index() << " contains an inner box");
-
+      LOG_INTER("Node " << node->index() << " has an inner box");
       node->setProof(Proof::Inner);
-
       std::string str = env_->getParams()->getStrParam("SPLIT_INNER_BOX");
       if (str == "NO")
       {
@@ -378,7 +396,7 @@ void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
 #if LOG_ON
       for (auto it = split_->begin(); it != split_->end(); ++it)
       {
-         SharedCSPNode subnode = *it;
+         SharedNode subnode = *it;
          LOG_INTER("Inserts node " << subnode->index() << " in the space");
          LOG_LOW(*subnode->box());
       }
@@ -394,18 +412,19 @@ void CSPSolver::bpStepAux(SharedCSPNode node, int depthlimit)
 #endif
 }
 
-void CSPSolver::branchAndPrune()
+void Solver::branchAndPrune()
 {
    LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
    LOG_INTER("Parameters\n" << *env_->getParams());
 
    stimer_.start();
 
-   context_ = new CSPContext();
+   context_ = new NodeContext();
 
    LOG_NL_LOW();
-   LOG_LOW("Makes the factory in the CSP solver");
+   LOG_LOW("Makes the factory in the solver");
    factory_ = new ContractorFactory(*preprob_, env_);
+   dag_ = factory_->getDag();
 
    makeSpace();
    makePropagator();
@@ -547,12 +566,12 @@ void CSPSolver::branchAndPrune()
    stimer_.stop();
 }
 
-void CSPSolver::certifySolutions()
+void Solver::certifySolutions()
 {
-   std::list<SharedCSPNode> lsol;
+   std::list<SharedNode> lsol;
    while (space_->nbSolNodes() > 0)
    {
-      SharedCSPNode node = space_->popSolNode();
+      SharedNode node = space_->popSolNode();
       Proof proof = node->getProof();
 
       DomainBox *dbox = node->box();
@@ -588,22 +607,22 @@ void CSPSolver::certifySolutions()
    }
 }
 
-std::shared_ptr<CSPEnv> CSPSolver::getEnv() const
+std::shared_ptr<EnvSolver> Solver::getEnv() const
 {
    return env_;
 }
 
-CSPSpace *CSPSolver::getSpace() const
+Space *Solver::getSpace() const
 {
    return space_;
 }
 
-Preprocessor *CSPSolver::getPreprocessor() const
+Preprocessor *Solver::getPreprocessor() const
 {
    return preproc_;
 }
 
-size_t CSPSolver::nbSolutions() const
+size_t Solver::nbSolutions() const
 {
    if (withPreprocessing_ && preproc_->isSolved())
       return preproc_->isUnfeasible() ? 0 : 1;
@@ -612,9 +631,9 @@ size_t CSPSolver::nbSolutions() const
       return space_->nbSolNodes();
 }
 
-std::pair<DomainBox, Proof> CSPSolver::getSolution(size_t i) const
+std::pair<DomainBox, Proof> Solver::getSolution(size_t i) const
 {
-   ASSERT(i < nbSolutions(), "Bad access to a solution in a CSP solver @ " << i);
+   ASSERT(i < nbSolutions(), "Bad access to a solution in the solver @ " << i);
 
    if (withPreprocessing_)
    {
@@ -633,7 +652,7 @@ std::pair<DomainBox, Proof> CSPSolver::getSolution(size_t i) const
       // assigns the values of the unfixed variables
       if (!preproc_->allVarsFixed())
       {
-         SharedCSPNode node = space_->getSolNode(i);
+         SharedNode node = space_->getSolNode(i);
          proof = node->getProof();
 
          DomainBox *aux = node->box();
@@ -651,14 +670,14 @@ std::pair<DomainBox, Proof> CSPSolver::getSolution(size_t i) const
    }
    else
    {
-      SharedCSPNode node = space_->getSolNode(i);
+      SharedNode node = space_->getSolNode(i);
       Proof proof = node->getProof();
       DomainBox aux(*node->box());
       return std::make_pair(aux, proof);
    }
 }
 
-size_t CSPSolver::nbPendingNodes() const
+size_t Solver::nbPendingNodes() const
 {
    if (preproc_->isSolved())
       return 0;
@@ -667,9 +686,9 @@ size_t CSPSolver::nbPendingNodes() const
       return space_->nbPendingNodes();
 }
 
-DomainBox CSPSolver::getPendingBox(size_t i) const
+DomainBox Solver::getPendingBox(size_t i) const
 {
-   ASSERT(i < nbPendingNodes(), "Bad access to a pending box in a CSP solver");
+   ASSERT(i < nbPendingNodes(), "Bad access to a pending box in the solver");
 
    if (withPreprocessing_)
    {
@@ -687,7 +706,7 @@ DomainBox CSPSolver::getPendingBox(size_t i) const
       // assigns the values of the unfixed variables
       if (!preproc_->allVarsFixed())
       {
-         SharedCSPNode node = space_->getPendingNode(i);
+         SharedNode node = space_->getPendingNode(i);
          DomainBox *aux = node->box();
 
          for (size_t i = 0; i < preproc_->nbUnfixedVars(); ++i)
@@ -703,13 +722,13 @@ DomainBox CSPSolver::getPendingBox(size_t i) const
    }
    else
    {
-      SharedCSPNode node = space_->getPendingNode(i);
+      SharedNode node = space_->getPendingNode(i);
       DomainBox aux(*node->box());
       return aux;
    }
 }
 
-const Problem &CSPSolver::getProblem() const
+const Problem &Solver::getProblem() const
 {
    return *problem_;
 }

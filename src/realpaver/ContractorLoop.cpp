@@ -47,13 +47,25 @@ Scope ContractorLoop::scope() const
 
 Proof ContractorLoop::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorLoop::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorLoop::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    ASSERT(B.scope().contains(op_->scope()), "Bad scopes in the loop contractor");
 
    bool iter = true;
    IntervalBox prev(B);
    while (iter)
    {
-      if (op_->contract(B) == Proof::Empty)
+      Proof proof = contract.apply(*op_, B);
+
+      if (proof == Proof::Empty)
          return Proof::Empty;
       if (!B.improves(prev, tol_))
          iter = false;

@@ -90,6 +90,16 @@ SharedContractor ContractorACID::sliceContractor() const
 
 Proof ContractorACID::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorACID::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorACID::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    LOG_INTER("ACID call " << nbCalls_ << " on " << B);
    Proof proof = Proof::Maybe;
 
@@ -140,7 +150,7 @@ Proof ContractorACID::contract(IntervalBox &B)
       Variable v = ssr_->getVar(j);
       size_t k = scop_.index(v);
 
-      proof = var3BCID_[k]->contract(B);
+      proof = contract.apply(*var3BCID_[k], B);
 
       LOG_LOW(k << "-th var3BCID on " << v.getName());
       LOG_LOW(" -> " << proof << ", " << B);

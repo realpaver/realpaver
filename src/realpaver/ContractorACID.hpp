@@ -89,6 +89,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
 private:
@@ -129,6 +130,9 @@ private:
    // Calculates the gain ratio between prev and the reduced box next
    static double gainRatio(const IntervalBox &prev, const IntervalBox &next,
                            const Scope &scop);
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
 };
 
 /** @brief Type of shared pointers on contractors */

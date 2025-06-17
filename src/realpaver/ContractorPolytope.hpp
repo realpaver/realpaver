@@ -28,6 +28,44 @@
 namespace realpaver {
 
 /**
+ * @brief Base class implementing a choice of contraction methods.
+ *
+ * Any contractor has two contractions methods, one that simply contracts a box B,
+ * and one that takes into account an active bitset. Such an objet has an apply(ctc, B)
+ * method that must apply one contraction method of ctc on B.
+ */
+class LinearizeMethod {
+public:
+   /// Virtual destructor
+   virtual ~LinearizeMethod();
+
+   /// Applies a linearization method of lzr on B to create the LP model
+   virtual bool apply(Linearizer &lzr, LPModel &lpm, IntervalBox &B) const = 0;
+};
+
+/// Calls the linearization method with no bitset
+class LinearizeSimple : public LinearizeMethod {
+public:
+   /// apply lzr.make(solver, B)
+   bool apply(Linearizer &lzr, LPModel &lpm, IntervalBox &B) const override;
+};
+
+/// Calls the linearization method with an active bitset
+class LinearizeActive : public LinearizeMethod {
+public:
+   /// Creates an object encapsulating an active set
+   LinearizeActive(const Bitset &active);
+
+   /// apply lzr.make(solver, B, active)
+   bool apply(Linearizer &lzr, LPModel &lpm, IntervalBox &B) const override;
+
+private:
+   const Bitset &active_;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/**
  * @brief Polytope Hull contractor.
  *
  * This is a contractor based on linear relaxations of constraint systems,
@@ -99,6 +137,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
 private:
@@ -115,7 +154,8 @@ private:
    void tuneLPSolver(LPSolver &solver);
 
    // contraction methods
-   Proof contractImpl(IntervalBox &B);
+   Proof contractLoop(IntervalBox &B, const LinearizeMethod &linearize);
+   Proof contractImpl(IntervalBox &B, const LinearizeMethod &linearize);
    Proof run(LPSolver &solver, IntervalBox &B, int *lb, int &nlb, int *rb, int &nrb,
              int &iv, LPSense &sense);
 

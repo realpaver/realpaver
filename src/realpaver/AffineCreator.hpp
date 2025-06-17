@@ -56,26 +56,6 @@ public:
     */
    AffineCreator(SharedDag dag, bool minrange = true);
 
-   /**
-    * @brief Creates a creator on a subset of a DAG.
-    *
-    * The boolean minrage is true if the linearization of the elementary
-    * functions must use the Minrange approximation, false for the Chebyshev
-    * approximation.
-    */
-   AffineCreator(SharedDag dag, const IndexList &lfun, bool minrange = true);
-
-   /**
-    * @brief Creates a creator on one function of a DAG.
-    *
-    * The function considered has index i.
-    *
-    * The boolean minrage is true if the linearization of the elementary
-    * functions must use the Minrange approximation, false for the Chebyshev
-    * approximation.
-    */
-   AffineCreator(SharedDag dag, size_t i, bool minrange = true);
-
    /// No copy
    AffineCreator(const AffineCreator &) = delete;
 
@@ -85,8 +65,11 @@ public:
    /// Default destructor
    ~AffineCreator() = default;
 
-   /// Creates the affine forms on B
-   void create(const IntervalBox &B);
+   /// Creates the affine forms of the active functions of the DAG on B
+   void create(const IntervalBox &B, const Bitset &active);
+
+   /// Creates the affine form of the i-th function of the DAG on B
+   void create(const IntervalBox &B, size_t i);
 
    /// Selects the Minrange or the Chebyshev approximation
    void useMinrange(bool minrange = true);
@@ -119,6 +102,9 @@ private:
 
    // Creates the affine form of the i-th node of the DAG
    void makeNode(int i, const IntervalBox &B);
+
+   // Creates the affine form of the i-th function of the DAG
+   void makeFun(const IntervalBox &B, size_t i);
 };
 
 } // namespace realpaver

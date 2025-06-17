@@ -27,6 +27,28 @@
 
 namespace realpaver {
 
+LinearizeMethod::~LinearizeMethod()
+{
+}
+
+bool LinearizeSimple::apply(Linearizer &lzr, LPModel &lpm, IntervalBox &B) const
+{
+   return lzr.makeLP(lpm, B);
+}
+
+LinearizeActive::LinearizeActive(const Bitset &active)
+    : LinearizeMethod()
+    , active_(active)
+{
+}
+
+bool LinearizeActive::apply(Linearizer &lzr, LPModel &lpm, IntervalBox &B) const
+{
+   return lzr.makeLP(lpm, B, active_);
+}
+
+/*----------------------------------------------------------------------------*/
+
 ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
     : Contractor()
     , lzr_(std::move(lzr))
@@ -97,14 +119,24 @@ void ContractorPolytope::enforceLoop(bool loop, double tol)
 
 Proof ContractorPolytope::contract(IntervalBox &B)
 {
+   return contractLoop(B, LinearizeSimple());
+}
+
+Proof ContractorPolytope::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractLoop(B, LinearizeActive(active));
+}
+
+Proof ContractorPolytope::contractLoop(IntervalBox &B, const LinearizeMethod &linearize)
+{
    if (!loop_)
-      return contractImpl(B);
+      return contractImpl(B, linearize);
 
    bool iter = true;
    IntervalBox prev(B);
    while (iter)
    {
-      if (contractImpl(B) == Proof::Empty)
+      if (contractImpl(B, linearize) == Proof::Empty)
          return Proof::Empty;
       if (!B.improves(prev, looptol_))
          iter = false;
@@ -114,7 +146,7 @@ Proof ContractorPolytope::contract(IntervalBox &B)
    return Proof::Maybe;
 }
 
-Proof ContractorPolytope::contractImpl(IntervalBox &B)
+Proof ContractorPolytope::contractImpl(IntervalBox &B, const LinearizeMethod &linearize)
 {
    LOG_INTER("Polytope hull contractor " << B);
 
@@ -123,7 +155,7 @@ Proof ContractorPolytope::contractImpl(IntervalBox &B)
    tuneLPSolver(solver);
 
    // linearizes the constraints
-   bool ok = lzr_->make(solver, B);
+   bool ok = linearize.apply(*lzr_, solver, B);
    if (!ok)
       return Proof::Maybe;
 

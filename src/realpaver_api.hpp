@@ -30,6 +30,6 @@
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
 
-#include "realpaver/CSPSolver.hpp"
 #include "realpaver/ContractorFactory.hpp"
 #include "realpaver/LPSolver.hpp"
+#include "realpaver/Solver.hpp"

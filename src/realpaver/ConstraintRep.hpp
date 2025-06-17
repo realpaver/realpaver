@@ -31,7 +31,9 @@ class ConstraintVisitor;
 /**
  * @brief Base class of the hierarchy of constraint representations.
  *
- * The common attributes are a scope, a relation symbol, and an hash code.
+ * The common attributes are a scope, a relation symbol, an identifier,
+ * and an hash code. The identifier is positive if the constraint has been
+ * added in a problem, strictly negative otherwise.
  */
 class ConstraintRep {
 public:
@@ -58,6 +60,12 @@ public:
 
    /// Returns the relation symbol of this
    ConstraintRelation relation() const;
+
+   /// Returns the identifier of this
+   int id() const;
+
+   /// Assigns the identifier of this
+   void setId(int id);
 
    /// Returns true if this constraint is variable free
    virtual bool isConstant() const = 0;
@@ -126,6 +134,7 @@ protected:
 private:
    Scope scop_;             // scope
    ConstraintRelation rel_; // relation symbol
+   int id_;                 // identifier
 
 protected:
    size_t hcode_; // hash code
