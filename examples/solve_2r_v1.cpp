@@ -18,7 +18,7 @@ int main()
 
       if (ok)
       {
-         CSPSolver solver(problem);
+         Solver solver(problem);
          solver.getEnv()->setParams(params);
          solver.solve();
          for (size_t i = 0; i < solver.nbSolutions(); ++i)

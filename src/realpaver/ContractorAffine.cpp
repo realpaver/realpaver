@@ -51,8 +51,14 @@ Scope ContractorAffine::scope() const
 
 Proof ContractorAffine::contract(IntervalBox &B)
 {
-   LOG_INTER("HC4");
+   LOG_INTER("Affine contractor");
    return propag_->contract(B);
+}
+
+Proof ContractorAffine::contract(IntervalBox &B, const Bitset &active)
+{
+   LOG_INTER("Affine contractor");
+   return propag_->contract(B, active);
 }
 
 void ContractorAffine::print(std::ostream &os) const

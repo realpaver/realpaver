@@ -60,10 +60,10 @@ public:
    /// Move assignment
    Bitset &operator=(Bitset &&other);
 
-   /// Rreturns the number of bits
+   /// Returns the number of bits
    size_t size() const;
 
-   /// Rreturns the index of the first bit
+   /// Returns the index of the first bit
    int first() const;
 
    /// Returns the index of the last bit

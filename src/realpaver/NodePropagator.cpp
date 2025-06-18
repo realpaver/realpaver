@@ -12,25 +12,25 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPPropagator.cpp
- * @brief  Propagators of CSP solver
+ * @file   NodePropagator.cpp
+ * @brief  Propagators of for search tree nodes
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPPropagator.hpp"
+#include "realpaver/NodePropagator.hpp"
 
 namespace realpaver {
 
-CSPPropagator::CSPPropagator()
+NodePropagator::NodePropagator()
 {
 }
 
-CSPPropagator::~CSPPropagator()
+NodePropagator::~NodePropagator()
 {
 }
 
-Proof CSPPropagator::contractBox(const IntervalBox &B, DomainBox &box)
+Proof NodePropagator::contractBox(const IntervalBox &B, DomainBox &box)
 {
    for (const auto &v : box.scope())
    {
@@ -43,13 +43,13 @@ Proof CSPPropagator::contractBox(const IntervalBox &B, DomainBox &box)
    return Proof::Maybe;
 }
 
-Proof CSPPropagator::contract(CSPNode &node, CSPContext &ctx)
+Proof NodePropagator::contract(Node &node, NodeContext &ctx)
 {
    // creates an interval box from the domain box in the given node
    IntervalBox B(*node.box());
 
    // contractor of sub-class
-   Proof proof = contractImpl(B);
+   Proof proof = contractImpl(B, node.active());
 
    // contracts the domains using a reduced interval box from contractImpl
    // if any
@@ -77,160 +77,160 @@ Proof CSPPropagator::contract(CSPNode &node, CSPContext &ctx)
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorHC4::CSPPropagatorHC4(ContractorFactory &facto)
-    : CSPPropagator()
+NodePropagatorHC4::NodePropagatorHC4(ContractorFactory &facto)
+    : NodePropagator()
 {
    hc4_ = facto.makeHC4();
 }
 
-Proof CSPPropagatorHC4::contractImpl(IntervalBox &B)
+Proof NodePropagatorHC4::contractImpl(IntervalBox &B, const Bitset &active)
 {
-   return hc4_->contract(B);
+   return hc4_->contract(B, active);
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorBC4::CSPPropagatorBC4(ContractorFactory &facto)
-    : CSPPropagator()
+NodePropagatorBC4::NodePropagatorBC4(ContractorFactory &facto)
+    : NodePropagator()
 {
    bc4_ = facto.makeBC4();
 }
 
-Proof CSPPropagatorBC4::contractImpl(IntervalBox &B)
+Proof NodePropagatorBC4::contractImpl(IntervalBox &B, const Bitset &active)
 {
-   return bc4_->contract(B);
+   return bc4_->contract(B, active);
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorAffine::CSPPropagatorAffine(ContractorFactory &facto)
-    : CSPPropagator()
+NodePropagatorAffine::NodePropagatorAffine(ContractorFactory &facto)
+    : NodePropagator()
 {
    ctc_ = facto.makeAffine();
 }
 
-Proof CSPPropagatorAffine::contractImpl(IntervalBox &B)
+Proof NodePropagatorAffine::contractImpl(IntervalBox &B, const Bitset &active)
 {
-   return ctc_->contract(B);
+   return ctc_->contract(B, active);
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorNewton::CSPPropagatorNewton(ContractorFactory &facto)
-    : CSPPropagator()
+NodePropagatorNewton::NodePropagatorNewton(ContractorFactory &facto)
+    : NodePropagator()
 {
    nwt_ = facto.makeNewton();
 }
 
-Proof CSPPropagatorNewton::contractImpl(IntervalBox &B)
+Proof NodePropagatorNewton::contractImpl(IntervalBox &B, const Bitset &active)
 {
    Proof proof = Proof::Maybe;
    if (nwt_ != nullptr)
-      proof = nwt_->contract(B);
+      proof = nwt_->contract(B, active);
    return proof;
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorPolytope::CSPPropagatorPolytope(ContractorFactory &facto)
-    : CSPPropagator()
+NodePropagatorPolytope::NodePropagatorPolytope(ContractorFactory &facto)
+    : NodePropagator()
 {
    poly_ = facto.makePolytope();
 }
 
-Proof CSPPropagatorPolytope::contractImpl(IntervalBox &B)
+Proof NodePropagatorPolytope::contractImpl(IntervalBox &B, const Bitset &active)
 {
    Proof proof = Proof::Maybe;
    if (poly_ != nullptr)
-      proof = poly_->contract(B);
+      proof = poly_->contract(B, active);
    return proof;
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorACID::CSPPropagatorACID(ContractorFactory &facto)
-    : CSPPropagator()
+NodePropagatorACID::NodePropagatorACID(ContractorFactory &facto)
+    : NodePropagator()
 {
    hc4_ = facto.makeHC4();
    acid_ = facto.makeACID();
 }
 
-Proof CSPPropagatorACID::contractImpl(IntervalBox &B)
+Proof NodePropagatorACID::contractImpl(IntervalBox &B, const Bitset &active)
 {
    // applies HC4
-   Proof proof = hc4_->contract(B);
+   Proof proof = hc4_->contract(B, active);
    if (proof == Proof::Empty)
       return proof;
 
    // applies ACID
    if (acid_ != nullptr)
-      proof = acid_->contract(B);
+      proof = acid_->contract(B, active);
 
    return proof;
 }
 
 /*----------------------------------------------------------------------------*/
 
-CSPPropagatorList::CSPPropagatorList()
-    : CSPPropagator()
+NodePropagatorList::NodePropagatorList()
+    : NodePropagator()
     , v_()
 {
 }
 
-void CSPPropagatorList::pushBack(CSPPropagAlgo alg, ContractorFactory &facto)
+void NodePropagatorList::pushBack(NodePropagAlgo alg, ContractorFactory &facto)
 {
-   SharedCSPPropagator op;
+   SharedNodePropagator op;
    switch (alg)
    {
-   case CSPPropagAlgo::HC4:
-      op = std::make_shared<CSPPropagatorHC4>(facto);
+   case NodePropagAlgo::HC4:
+      op = std::make_shared<NodePropagatorHC4>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;
 
-   case CSPPropagAlgo::BC4:
-      op = std::make_shared<CSPPropagatorBC4>(facto);
+   case NodePropagAlgo::BC4:
+      op = std::make_shared<NodePropagatorBC4>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;
 
-   case CSPPropagAlgo::AFFINE:
-      op = std::make_shared<CSPPropagatorAffine>(facto);
+   case NodePropagAlgo::AFFINE:
+      op = std::make_shared<NodePropagatorAffine>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;
 
-   case CSPPropagAlgo::ACID:
-      op = std::make_shared<CSPPropagatorACID>(facto);
+   case NodePropagAlgo::ACID:
+      op = std::make_shared<NodePropagatorACID>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;
 
-   case CSPPropagAlgo::Polytope:
-      op = std::make_shared<CSPPropagatorPolytope>(facto);
+   case NodePropagAlgo::Polytope:
+      op = std::make_shared<NodePropagatorPolytope>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;
 
-   case CSPPropagAlgo::Newton:
-      op = std::make_shared<CSPPropagatorNewton>(facto);
+   case NodePropagAlgo::Newton:
+      op = std::make_shared<NodePropagatorNewton>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;
    }
 }
 
-size_t CSPPropagatorList::size() const
+size_t NodePropagatorList::size() const
 {
    return v_.size();
 }
 
-Proof CSPPropagatorList::contractImpl(IntervalBox &B)
+Proof NodePropagatorList::contractImpl(IntervalBox &B, const Bitset &active)
 {
    Proof proof = Proof::Maybe;
    for (int i = 0; i < v_.size(); ++i)
    {
-      proof = v_[i]->contractImpl(B);
+      proof = v_[i]->contractImpl(B, active);
       if (proof == Proof::Empty)
          return proof;
    }

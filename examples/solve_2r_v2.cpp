@@ -23,7 +23,7 @@ int main()
       problem.addCtr({x == l1 * cos(q1) + l2 * cos(q1 + q2),
                       y == l1 * sin(q1) + l2 * sin(q1 + q2), x == 5.75, y == 4.25});
 
-      CSPSolver solver(problem);
+      Solver solver(problem);
       solver.getEnv()->setParams(params);
       solver.solve();
       for (size_t i = 0; i < solver.nbSolutions(); ++i)

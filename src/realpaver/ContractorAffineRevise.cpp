@@ -42,8 +42,8 @@ Scope ContractorAffineRevise::scope() const
 
 Proof ContractorAffineRevise::contract(IntervalBox &B)
 {
-   AffineCreator creator(dag_, idx_, minrange_);
-   creator.create(B);
+   AffineCreator creator(dag_, minrange_);
+   creator.create(B, idx_);
    const AffineForm &f = creator.fun(0);
 
    Interval I = dag_->fun(idx_)->getImage();
@@ -87,6 +87,11 @@ Proof ContractorAffineRevise::contract(IntervalBox &B)
    }
 
    return Proof::Maybe;
+}
+
+Proof ContractorAffineRevise::contract(IntervalBox &B, const Bitset &active)
+{
+   return (active.get(dag_->fun(idx_)->ctrId())) ? contract(B) : Proof::Inner;
 }
 
 void ContractorAffineRevise::print(std::ostream &os) const

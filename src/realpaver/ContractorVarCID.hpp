@@ -61,12 +61,16 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
 private:
    SharedContractor op_;
    Variable v_;
    std::unique_ptr<IntervalSlicer> slicer_;
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
 };
 
 } // namespace realpaver

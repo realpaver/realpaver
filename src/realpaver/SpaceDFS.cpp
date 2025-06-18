@@ -12,48 +12,49 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPSpaceBFS.cpp
- * @brief  Breadth-First-Search strategy
+ * @file   SpaceDFS.cpp
+ * @brief  Search space for a Depth-First-Search strategy
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSpaceBFS.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/SpaceDFS.hpp"
 
 namespace realpaver {
 
-CSPSpaceBFS::CSPSpaceBFS()
-    : vsol_()
-    , lnode_()
+SpaceDFS::SpaceDFS()
+    : Space()
+    , vsol_()
+    , vnode_()
 {
 }
 
-size_t CSPSpaceBFS::nbSolNodes() const
+size_t SpaceDFS::nbSolNodes() const
 {
    return vsol_.size();
 }
 
-void CSPSpaceBFS::pushSolNode(const SharedCSPNode &node)
+void SpaceDFS::pushSolNode(const SharedNode &node)
 {
    vsol_.push_back(node);
 }
 
-SharedCSPNode CSPSpaceBFS::popSolNode()
+SharedNode SpaceDFS::popSolNode()
 {
-   SharedCSPNode node = vsol_.back();
+   SharedNode node = vsol_.back();
    vsol_.pop_back();
    return node;
 }
 
-SharedCSPNode CSPSpaceBFS::getSolNode(size_t i) const
+SharedNode SpaceDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
+   ASSERT(i < vsol_.size(), "Bad access to a solution node in a space @ " << i);
 
    return vsol_[i];
 }
 
-bool CSPSpaceBFS::hasFeasibleSolNode() const
+bool SpaceDFS::hasFeasibleSolNode() const
 {
    for (auto node : vsol_)
    {
@@ -64,32 +65,28 @@ bool CSPSpaceBFS::hasFeasibleSolNode() const
    return false;
 }
 
-size_t CSPSpaceBFS::nbPendingNodes() const
+size_t SpaceDFS::nbPendingNodes() const
 {
-   return lnode_.size();
+   return vnode_.size();
 }
 
-SharedCSPNode CSPSpaceBFS::nextPendingNode()
+SharedNode SpaceDFS::nextPendingNode()
 {
-   SharedCSPNode node = lnode_.back();
-   lnode_.pop_back();
+   SharedNode node = vnode_.back();
+   vnode_.pop_back();
    return node;
 }
 
-void CSPSpaceBFS::insertPendingNode(const SharedCSPNode &node)
+void SpaceDFS::insertPendingNode(const SharedNode &node)
 {
-   lnode_.push_front(node);
+   vnode_.push_back(node);
 }
 
-SharedCSPNode CSPSpaceBFS::getPendingNode(size_t i) const
+SharedNode SpaceDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < lnode_.size(), "Bad access to a pending node in a CSP space");
+   ASSERT(i < vnode_.size(), "Bad access to a pending node in a space @ " << i);
 
-   auto it = lnode_.begin();
-   if (i != 0)
-      std::advance(it, i);
-
-   return *it;
+   return vnode_[i];
 }
 
 } // namespace realpaver

@@ -12,24 +12,24 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   CSPPropagator.hpp
- * @brief  Propagators of CSP solver
+ * @file   NodePropagator.hpp
+ * @brief  Propagators of for search tree nodes
  * @author Laurent Granvilliers
  * @date   2024-4-11
  */
 
-#ifndef REALPAVER_CSP_PROPAGATOR_HPP
-#define REALPAVER_CSP_PROPAGATOR_HPP
+#ifndef REALPAVER_NODE_PROPAGATOR_HPP
+#define REALPAVER_NODE_PROPAGATOR_HPP
 
-#include "realpaver/CSPContext.hpp"
-#include "realpaver/CSPNode.hpp"
 #include "realpaver/ContractorFactory.hpp"
+#include "realpaver/Node.hpp"
+#include "realpaver/NodeContext.hpp"
 #include <vector>
 
 namespace realpaver {
 
-/// Type of reduction methods for CSPs
-enum class CSPPropagAlgo {
+/// Type of reduction methods for constraint systems
+enum class NodePropagAlgo {
    HC4,      ///< propagation algorithm based on HC4 contractors
    BC4,      ///< propagation algorithm based on BC4 contractors
    AFFINE,   ///< propagation algorithm based on affine contractors
@@ -39,26 +39,26 @@ enum class CSPPropagAlgo {
 };
 
 /**
- * @brief Base class of propagators of CSP solver.
+ * @brief Base class of propagators for tree search nodes.
  *
  * A propagator is an algorithm / operator that contracts the domains of
- * variables occurring in a CSP search node.
+ * variables occurring in a search node.
  *
  * Concrete propagators are built in contractor factories.
  */
-class CSPPropagator {
+class NodePropagator {
 public:
    /// Constructor
-   CSPPropagator();
+   NodePropagator();
 
    /// Default copy constructor
-   CSPPropagator(const CSPPropagator &) = default;
+   NodePropagator(const NodePropagator &) = default;
 
    /// No assignment
-   CSPPropagator &operator=(const CSPPropagator &) = delete;
+   NodePropagator &operator=(const NodePropagator &) = delete;
 
    /// Virtual destructor
-   virtual ~CSPPropagator();
+   virtual ~NodePropagator();
 
    /**
     * @brief Contraction method.
@@ -66,38 +66,40 @@ public:
     * It applies first contractImpl and then the domain contractors for
     * the variables with disconnected domains.
     *
+    * The bitset stores the constraint activities.
+    *
     * Returns a certificate of proof
     */
-   Proof contract(CSPNode &node, CSPContext &ctx);
+   Proof contract(Node &node, NodeContext &ctx);
 
    /// Reduces box by intersecting it with B
    static Proof contractBox(const IntervalBox &B, DomainBox &box);
 
-   /// Contraction method to be overriden in sub-classes
-   virtual Proof contractImpl(IntervalBox &B) = 0;
+   /// Contraction method called by contract, to be overriden in sub-classes
+   virtual Proof contractImpl(IntervalBox &B, const Bitset &active) = 0;
 };
 
-/// Type of shared pointers on CSP propagators
-using SharedCSPPropagator = std::shared_ptr<CSPPropagator>;
+/// Type of shared pointers on node propagators
+using SharedNodePropagator = std::shared_ptr<NodePropagator>;
 
 /*----------------------------------------------------------------------------*/
 
 /// HC4 constraint propagation algorithm
-class CSPPropagatorHC4 : public CSPPropagator {
+class NodePropagatorHC4 : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorHC4(ContractorFactory &facto);
+   NodePropagatorHC4(ContractorFactory &facto);
 
    /// Default copy constructor
-   CSPPropagatorHC4(const CSPPropagatorHC4 &) = default;
+   NodePropagatorHC4(const NodePropagatorHC4 &) = default;
 
    /// No assignment
-   CSPPropagatorHC4 &operator=(const CSPPropagatorHC4 &) = delete;
+   NodePropagatorHC4 &operator=(const NodePropagatorHC4 &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorHC4() = default;
+   ~NodePropagatorHC4() = default;
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
    SharedContractor hc4_;
@@ -106,21 +108,21 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// BC4 constraint propagation algorithm
-class CSPPropagatorBC4 : public CSPPropagator {
+class NodePropagatorBC4 : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorBC4(ContractorFactory &facto);
+   NodePropagatorBC4(ContractorFactory &facto);
 
    /// Default copy constructor
-   CSPPropagatorBC4(const CSPPropagatorBC4 &) = default;
+   NodePropagatorBC4(const NodePropagatorBC4 &) = default;
 
    /// No assignment
-   CSPPropagatorBC4 &operator=(const CSPPropagatorBC4 &) = delete;
+   NodePropagatorBC4 &operator=(const NodePropagatorBC4 &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorBC4() = default;
+   ~NodePropagatorBC4() = default;
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
    SharedContractor bc4_;
@@ -129,21 +131,21 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Constraint propagation algorithm based on affine contractors
-class CSPPropagatorAffine : public CSPPropagator {
+class NodePropagatorAffine : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorAffine(ContractorFactory &facto);
+   NodePropagatorAffine(ContractorFactory &facto);
 
    /// Default copy constructor
-   CSPPropagatorAffine(const CSPPropagatorAffine &) = default;
+   NodePropagatorAffine(const NodePropagatorAffine &) = default;
 
    /// No assignment
-   CSPPropagatorAffine &operator=(const CSPPropagatorAffine &) = delete;
+   NodePropagatorAffine &operator=(const NodePropagatorAffine &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorAffine() = default;
+   ~NodePropagatorAffine() = default;
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
    SharedContractor ctc_;
@@ -152,21 +154,21 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Interval Newton operator
-class CSPPropagatorNewton : public CSPPropagator {
+class NodePropagatorNewton : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorNewton(ContractorFactory &facto);
+   NodePropagatorNewton(ContractorFactory &facto);
 
    /// Default copy constructor
-   CSPPropagatorNewton(const CSPPropagatorNewton &) = default;
+   NodePropagatorNewton(const NodePropagatorNewton &) = default;
 
    /// No assignment
-   CSPPropagatorNewton &operator=(const CSPPropagatorNewton &) = delete;
+   NodePropagatorNewton &operator=(const NodePropagatorNewton &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorNewton() = default;
+   ~NodePropagatorNewton() = default;
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
    SharedContractor nwt_;
@@ -175,21 +177,21 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// Poly hull contractor
-class CSPPropagatorPolytope : public CSPPropagator {
+class NodePropagatorPolytope : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorPolytope(ContractorFactory &facto);
+   NodePropagatorPolytope(ContractorFactory &facto);
 
    /// Default copy constructor
-   CSPPropagatorPolytope(const CSPPropagatorPolytope &) = default;
+   NodePropagatorPolytope(const NodePropagatorPolytope &) = default;
 
    /// No assignment
-   CSPPropagatorPolytope &operator=(const CSPPropagatorPolytope &) = delete;
+   NodePropagatorPolytope &operator=(const NodePropagatorPolytope &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorPolytope() = default;
+   ~NodePropagatorPolytope() = default;
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
    SharedContractor poly_;
@@ -198,21 +200,21 @@ private:
 /*----------------------------------------------------------------------------*/
 
 /// ACID algorithm based on HC4 contractors
-class CSPPropagatorACID : public CSPPropagator {
+class NodePropagatorACID : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorACID(ContractorFactory &facto);
+   NodePropagatorACID(ContractorFactory &facto);
 
    /// Default copy constructor
-   CSPPropagatorACID(const CSPPropagatorACID &) = default;
+   NodePropagatorACID(const NodePropagatorACID &) = default;
 
    /// No assignment
-   CSPPropagatorACID &operator=(const CSPPropagatorACID &) = delete;
+   NodePropagatorACID &operator=(const NodePropagatorACID &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorACID() = default;
+   ~NodePropagatorACID() = default;
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
    SharedContractor hc4_;
@@ -221,31 +223,31 @@ private:
 
 /*----------------------------------------------------------------------------*/
 
-/// List of propagators applied in sequence to contract a CSP node
-class CSPPropagatorList : public CSPPropagator {
+/// List of propagators applied in sequence to contract a node
+class NodePropagatorList : public NodePropagator {
 public:
    /// Constructor
-   CSPPropagatorList();
+   NodePropagatorList();
 
    /// Default copy constructor
-   CSPPropagatorList(const CSPPropagatorList &) = default;
+   NodePropagatorList(const NodePropagatorList &) = default;
 
    /// No assignment
-   CSPPropagatorList &operator=(const CSPPropagatorList &) = delete;
+   NodePropagatorList &operator=(const NodePropagatorList &) = delete;
 
    /// Default destructor
-   ~CSPPropagatorList() = default;
+   ~NodePropagatorList() = default;
 
    /// Returns the number of contractors
    size_t size() const;
 
    /// Inserts a new algorithm in the last place
-   void pushBack(CSPPropagAlgo alg, ContractorFactory &facto);
+   void pushBack(NodePropagAlgo alg, ContractorFactory &facto);
 
-   Proof contractImpl(IntervalBox &B) override;
+   Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:
-   std::vector<SharedCSPPropagator> v_;
+   std::vector<SharedNodePropagator> v_;
 };
 
 } // namespace realpaver

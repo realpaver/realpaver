@@ -55,17 +55,6 @@ public:
    LinearizerTaylor(SharedDag dag, bool hansen = false,
                     CornerStyle style = CornerStyle::RandomOpposite, unsigned seed = 0);
 
-   /**
-    * @brief Creates a creator for a subset of a DAG.
-    *
-    * The boolean hansen is true if Hansen's differentiation algorithm is
-    * used, false otherwise. The style specifies how the first corner is
-    * selected. A seed is used to initialize the generator of pseudo-random
-    * numbers is necessary (0: system time, a positive value otherwise).
-    */
-   LinearizerTaylor(SharedDag dag, const IndexList &lfun, bool hansen = false,
-                    CornerStyle style = CornerStyle::RandomOpposite, unsigned seed = 0);
-
    /// No copy
    LinearizerTaylor(const LinearizerTaylor &) = delete;
 
@@ -79,9 +68,9 @@ public:
    void makeVars(LPModel &lpm, const IntervalBox &B);
 
    /// Makes the constraints in the linear model
-   bool makeCtrs(LPModel &lpm, const IntervalBox &B);
+   bool makeCtrs(LPModel &lpm, const IntervalBox &B, const Bitset &active);
 
-   bool make(LPModel &lpm, const IntervalBox &B) override;
+   bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) override;
 
    /// Uses Hansen's derivatives if b=true, classical ones if b=false.
    void useHansenDerivatives(bool b);
@@ -107,7 +96,8 @@ private:
    void selectCorner(const IntervalBox &B);
 
    // Makes the constraints on a given corner
-   bool makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner);
+   bool makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner,
+                const Bitset &active);
 };
 
 } // namespace realpaver

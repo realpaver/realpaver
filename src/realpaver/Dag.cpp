@@ -857,6 +857,7 @@ DagFun::DagFun(Dag *dag, size_t root, Scope scop, const Interval &image)
     , scop_()
     , image_(image)
     , idx_(0)
+    , ctrid_(-1)
     , inode_()
 {
    scop_ = ScopeBank::getInstance()->insertScope(scop);
@@ -932,6 +933,17 @@ size_t DagFun::index() const
 Scope DagFun::scope() const
 {
    return scop_;
+}
+
+int DagFun::ctrId() const
+{
+   return ctrid_;
+}
+
+void DagFun::setCtrId(int i)
+{
+   ctrid_ = i;
+   dag_->addCtrId(i);
 }
 
 std::shared_ptr<FlatFunction> DagFun::flatFunction() const
@@ -1053,6 +1065,7 @@ Dag::Dag()
     , vmap_()
     , omap_()
     , scop_()
+    , maxCtrId_(0)
 {
 }
 
@@ -1111,7 +1124,9 @@ size_t Dag::insert(Constraint c)
 {
    DagCreator creator(this, c);
    c.acceptVisitor(creator);
-   return creator.index();
+   size_t idx = creator.index();
+   fun_[idx]->setCtrId(c.id());
+   return idx;
 }
 
 size_t Dag::insert(Term t, const Interval &img)
@@ -1321,6 +1336,17 @@ void Dag::print(std::ostream &os) const
 
       os << std::endl;
    }
+}
+
+size_t Dag::maxCtrId() const
+{
+   return maxCtrId_;
+}
+
+void Dag::addCtrId(size_t id)
+{
+   if (id > maxCtrId_)
+      maxCtrId_ = id;
 }
 
 std::ostream &operator<<(std::ostream &os, const Dag &dag)

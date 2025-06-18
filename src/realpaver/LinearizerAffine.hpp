@@ -36,9 +36,6 @@ public:
    /// Creates a linearizer of a DAG
    LinearizerAffine(SharedDag dag, bool minrange = true);
 
-   /// Creates a linearizer of a subset of a DAG
-   LinearizerAffine(SharedDag dag, const IndexList &lfun, bool minrange = true);
-
    /// No copy
    LinearizerAffine(const LinearizerAffine &) = delete;
 
@@ -51,7 +48,7 @@ public:
    /// Uses the Minrange approximation (true) or Chebyshev (false)
    void useMinrange(bool minrange = true);
 
-   bool make(LPModel &lpm, const IntervalBox &B) override;
+   bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) override;
 
 private:
    bool minrange_; // true: Minrange, false: Chebyshev

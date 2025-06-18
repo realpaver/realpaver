@@ -42,7 +42,7 @@ public:
    /// Default destructor
    ~LinearizerAffineTaylor() = default;
 
-   bool make(LPModel &lpm, const IntervalBox &B) override;
+   bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) override;
 
 private:
    std::unique_ptr<LinearizerAffine> affine_;

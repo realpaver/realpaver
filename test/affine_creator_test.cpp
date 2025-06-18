@@ -31,7 +31,9 @@ void test_single_occ()
    dag->insert(y - sqr(x) == 0.0);
 
    AffineCreator creator(dag);
-   creator.create(*B);
+   Bitset active(dag->nbFuns());
+   active.setAllOne();
+   creator.create(*B, active);
 
    AffineForm f(3.0, {4.0}, {0}, 4.0), g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
 
@@ -51,7 +53,7 @@ void test_lin()
    dag->insert(1.5 * x - 2.5 * y - 2.0 == 0);
 
    AffineCreator creator(dag);
-   creator.create(*B);
+   creator.create(*B, 0);
 
    AffineForm f(-9.25, {3.0, -6.25}, {0, 1});
    TEST_TRUE(f.equals(creator.fun(0)));
@@ -68,9 +70,9 @@ void test_subset()
    dag->insert(1.5 * x - 2.5 * y - 2.0 == 0);
    dag->insert(y - sqr(x) == 0.0);
 
-   std::vector<size_t> lfun = {0, 2};
-   AffineCreator creator(dag, lfun);
-   creator.create(*B);
+   Bitset active({1, 0, 1});
+   AffineCreator creator(dag);
+   creator.create(*B, active);
 
    AffineForm f(3.0, {4.0}, {0}, 4.0), g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
 

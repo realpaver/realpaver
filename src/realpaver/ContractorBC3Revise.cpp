@@ -223,6 +223,11 @@ Proof ContractorBC3Revise::contract(IntervalBox &B)
    return std::max(proof, certif);
 }
 
+Proof ContractorBC3Revise::contract(IntervalBox &B, const Bitset &active)
+{
+   return (active.get(f_.getFun()->ctrId())) ? contract(B) : Proof::Inner;
+}
+
 void ContractorBC3Revise::print(std::ostream &os) const
 {
    os << "BC3Revise contractor #" << f_.getFun()->index();

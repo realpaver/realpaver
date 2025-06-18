@@ -275,9 +275,12 @@ void Problem::pushVar(Variable v)
    erv_->addVariable(v);
 }
 
-void Problem::addCtr(Constraint c)
+size_t Problem::addCtr(Constraint c)
 {
+   size_t id = ctrs_.size();
+   c.setId(id);
    ctrs_.push_back(c);
+   return id;
 }
 
 void Problem::addCtr(const std::initializer_list<Constraint> &l)

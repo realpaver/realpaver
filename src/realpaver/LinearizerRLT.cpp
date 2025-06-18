@@ -19,6 +19,7 @@
  */
 
 #include "realpaver/LinearizerRLT.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/RelaxationRLT.hpp"
 
 namespace realpaver {
@@ -29,18 +30,12 @@ LinearizerRLT::LinearizerRLT(SharedDag dag)
 {
 }
 
-LinearizerRLT::LinearizerRLT(SharedDag dag, const IndexList &lfun)
-    : Linearizer(dag, lfun)
-    , mnv_()
-{
-}
-
-bool LinearizerRLT::make(LPModel &lpm, const IntervalBox &B)
+bool LinearizerRLT::makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active)
 {
    if (!dag_->iEvalNodes(B))
       return false;
 
-   if (lfun_.size() == dag_->nbFuns())
+   if (active.areAllOnes())
    {
       for (size_t i = 0; i < dag_->nbNodes(); ++i)
       {
@@ -53,33 +48,43 @@ bool LinearizerRLT::make(LPModel &lpm, const IntervalBox &B)
          RLTCreator vis(&lpm, &mnv_);
          node->acceptVisitor(vis);
       }
+      LOG_LOW("RLT relaxation for the DAG");
    }
    else
    {
-      for (size_t i : lfun_)
+      for (size_t i = 0; i < dag_->nbFuns(); ++i)
       {
          DagFun *f = dag_->fun(i);
-         for (size_t j = 0; j < f->nbNodes(); ++j)
-         {
-            DagNode *node = f->node(j);
-            auto it = mnv_.find(node->index());
-            if (it == mnv_.end())
-            {
-               // creates the linear variable
-               createLinVar(lpm, dag_->node(i));
 
-               // constrains this variable
-               RLTCreator vis(&lpm, &mnv_);
-               node->acceptVisitor(vis);
+         if (active.get(f->ctrId()))
+         {
+            for (size_t j = 0; j < f->nbNodes(); ++j)
+            {
+               DagNode *node = f->node(j);
+               auto it = mnv_.find(node->index());
+               if (it == mnv_.end())
+               {
+                  // creates the linear variable
+                  createLinVar(lpm, node);
+
+                  // constrains this variable
+                  RLTCreator vis(&lpm, &mnv_);
+                  node->acceptVisitor(vis);
+               }
             }
+            LOG_LOW("RLT relaxation for the constraint @ " << f->ctrId());
          }
       }
    }
 
    // takes into account the root nodes
-   for (size_t i : lfun_)
+   for (size_t i = 0; i < dag_->nbFuns(); ++i)
    {
       DagFun *f = dag_->fun(i);
+
+      if (active.get(f->ctrId()) == 0)
+         continue;
+
       DagNode *node = f->rootNode();
 
       auto it = mnv_.find(node->index());

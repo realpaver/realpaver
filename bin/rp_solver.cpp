@@ -1,9 +1,9 @@
 #include "realpaver/BoxReporter.hpp"
-#include "realpaver/CSPSolver.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
+#include "realpaver/Solver.hpp"
 #include "realpaver/configure.hpp"
 #include <chrono>
 #include <fstream>
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
          THROW("Not a CSP");
 
       // solving
-      CSPSolver solver(problem);
+      Solver solver(problem);
       solver.getEnv()->setParams(params);
 
       std::string sep = "########################################";
@@ -206,12 +206,12 @@ int main(int argc, char **argv)
          cout << BLUE("No preprocessing") << endl;
       }
 
-      std::shared_ptr<CSPEnv> env = solver.getEnv();
+      std::shared_ptr<EnvSolver> env = solver.getEnv();
 
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
       {
-         CSPSpace *space = solver.getSpace();
+         Space *space = solver.getSpace();
 
          fsol << "--- SOLVING ---" << endl << endl;
          cout << GRAY(sep) << endl;

@@ -77,6 +77,16 @@ void ContractorVar3B::setVarMinWidth(double val)
 
 Proof ContractorVar3B::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorVar3B::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorVar3B::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    Interval dom = B.get(v_);
 
    // not handles too small domains
@@ -92,7 +102,7 @@ Proof ContractorVar3B::contract(IntervalBox &B)
    size_t nbs = slicer_->nbSlices();
 
    if (nbs == 1)
-      return op_->contract(B);
+      return contract.apply(*op_, B);
 
    // left to right
    size_t nbl = 0;             // number of left inconsistent facets
@@ -106,7 +116,7 @@ Proof ContractorVar3B::contract(IntervalBox &B)
       lslice = *it;
       facet->set(v_, lslice);
 
-      Proof certif = op_->contract(*facet);
+      Proof certif = contract.apply(*op_, *facet);
 
       if (certif == Proof::Empty)
       {
@@ -139,7 +149,7 @@ Proof ContractorVar3B::contract(IntervalBox &B)
       rslice = *jt;
       facet->set(v_, rslice);
 
-      Proof certif = op_->contract(*facet);
+      Proof certif = contract.apply(*op_, *facet);
 
       if (certif == Proof::Empty)
       {
