@@ -1704,4 +1704,17 @@ void Params::setParam(const std::string &name, const std::string &val)
    processParam(name, val);
 }
 
+bool Params::readParam(const std::string &str)
+{
+   try
+   {
+      readParam(str, 0);
+   }
+   catch (realpaver::Exception &e)
+   {
+      return false;
+   }
+   return true;
+}
+
 } // namespace realpaver
