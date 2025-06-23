@@ -1,3 +1,4 @@
+#include "Domain.hpp"
 #include "realpaver/BoxReporter.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
@@ -26,7 +27,7 @@ using namespace std;
 // processes the arguments on the command line
 bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
                  string &paramFilename, string &logFilename, vector<string> &options,
-                 string &msgError);
+                 Interval &objBounds, string &msgError);
 
 // parses the filename
 void parseFilename(const std::string &filename, std::string &path, std::string &base,
@@ -49,10 +50,11 @@ int main(int argc, char **argv)
       string pbFilename = "", paramFilename = "", solFilename = "", logFilename = "",
              msgError = "";
       vector<string> options;
+      Interval objBounds = Interval::universe();
 
       // processes the arguments
       bool ok = processArgs(argc, argv, pbFilename, solFilename, paramFilename,
-                            logFilename, options, msgError);
+                            logFilename, options, objBounds, msgError);
       if (!ok)
          THROW(msgError);
 
@@ -80,8 +82,6 @@ int main(int argc, char **argv)
       LogLevel loglevel = StringToLogLevel(params.getStrParam("LOG_LEVEL"));
       if (loglevel != LogLevel::none)
       {
-         cout << "logFilename : (" << logFilename << ")" << endl;
-
          if (logFilename == "")
             logFilename = baseFilename + ".log";
          Logger::init(loglevel, logFilename);
@@ -106,8 +106,35 @@ int main(int argc, char **argv)
       if (problem.nbCtrs() == 0)
          THROW("There is no constraint!");
 
+      if (objBounds.isEmpty())
+      {
+         THROW("The bounds of the objective function are invalid");
+         std::cout << "tutu" << endl;
+      }
+
       if (problem.hasObjective())
-         LOG_MAIN("The objective function is not considered by the solver.");
+      {
+         Objective obj = problem.getObjective();
+         Variable z = obj.getVar();
+         Domain *dom = z.getDomain();
+         dom->contract(objBounds);
+
+         if (dom->isEmpty())
+            THROW("The objective function has an empty domain");
+
+         Constraint cobj(obj.getVar() == obj.getTerm());
+         problem.addCtr(cobj);
+
+         LOG_MAIN("Bounds of objective function: " << objBounds);
+         LOG_MAIN("Constraint added: " << cobj);
+      }
+      else
+      {
+         if (objBounds.isSetNeq(Interval::universe()))
+         {
+            LOG_MAIN("Bound(s) given but there is no objective function")
+         }
+      }
 
       // solving
       Solver solver(problem);
@@ -448,7 +475,7 @@ int main(int argc, char **argv)
 
 bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
                  string &paramFilename, string &logFilename, vector<string> &options,
-                 string &msgError)
+                 Interval &objBounds, string &msgError)
 {
    int i = 1;
    bool ok = true;
@@ -489,6 +516,30 @@ bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
             }
          }
       }
+      else if (text.length() > 7 && text.substr(0, 7) == "-LOWER=")
+      {
+         string str = text.substr(7, text.length() - 7);
+         Interval x(str.c_str());
+         if (!x.isEmpty())
+            objBounds.setLeft(x.left());
+         else
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+      }
+      else if (text.length() > 7 && text.substr(0, 7) == "-UPPER=")
+      {
+         string str = text.substr(7, text.length() - 7);
+         Interval x(str.c_str());
+         if (!x.isEmpty())
+            objBounds.setRight(x.right());
+         else
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+      }
       else if (text.length() > 2 && text.substr(0, 2) == "-L")
       {
          if (logFilename != "")
@@ -500,6 +551,21 @@ bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
          {
             string str = text.substr(2, text.length() - 2);
             ok = expandTildeInPath(str, logFilename, msgError);
+
+            if (ok)
+            {
+               std::ofstream of;
+               of.open(logFilename, std::ofstream::out);
+               if (of.bad())
+               {
+                  msgError = "Open error of log file";
+                  ok = false;
+               }
+               else
+               {
+                  of.close();
+               }
+            }
          }
       }
       else if (text.length() > 2 && text.substr(0, 2) == "-O")
@@ -513,6 +579,21 @@ bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
          {
             string str = text.substr(2, text.length() - 2);
             ok = expandTildeInPath(str, solFilename, msgError);
+
+            if (ok)
+            {
+               std::ofstream of;
+               of.open(solFilename, std::ofstream::out);
+               if (of.bad())
+               {
+                  msgError = "Open error of solution file";
+                  ok = false;
+               }
+               else
+               {
+                  of.close();
+               }
+            }
          }
       }
       else if (text.length() > 2 && text.substr(0, 2) == "-D")
@@ -531,9 +612,8 @@ bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
             pbFilename = text;
             ifstream f(pbFilename);
             if (f)
-            {
                f.close();
-            }
+
             else
             {
                msgError = "Bad argument: " + text;

@@ -178,4 +178,11 @@ void ProblemBridge::removeFixedVar(const Variable &v)
       fixmap_.erase(it);
 }
 
+void ProblemBridge::removeUnfixedVar(const Variable &v)
+{
+   auto it = varmap_.find(v);
+   if (it != varmap_.end())
+      varmap_.erase(it);
+}
+
 } // namespace realpaver

@@ -32,7 +32,7 @@ Problem::Problem(const std::string &name)
     : name_()
     , vars_()
     , ctrs_()
-    , obj_(MIN(Term(0)))
+    , obj_()
     , scop_()
     , als_()
     , vname_()
@@ -299,22 +299,30 @@ std::ostream &operator<<(std::ostream &os, const Problem &p)
    if (p.isEmpty())
       return os << "empty problem";
 
-   std::string indent = "", s_var = "Variables", s_ctr = "Constraints", s_int = "Integer",
-               s_obj = "Objectives", s_als = "Aliases";
+   std::string indent = "  ", s_var = "Variables", s_ctr = "Constraints",
+               s_int = "Integer", s_als = "Aliases";
 
    // variables
    bool first = true;
    os << s_var << std::endl;
    for (size_t i = 0; i < p.nbVars(); ++i)
    {
+      Variable v = p.varAt(i);
+
       if (!first)
          os << "," << std::endl;
       else
          first = false;
 
-      os << p.varAt(i);
+      os << indent << p.varAt(i);
    }
    os << std::endl << ";";
+
+   // objective function
+   if (p.hasObjective())
+   {
+      os << std::endl << p.getObjective() << ";";
+   }
 
    // constraints
    if (p.nbCtrs() > 0)
@@ -331,13 +339,6 @@ std::ostream &operator<<(std::ostream &os, const Problem &p)
          os << indent << p.ctrAt(i);
       }
       os << std::endl << ";";
-   }
-
-   // objective function
-   if (p.hasObjective())
-   {
-      os << std::endl << s_obj << std::endl;
-      os << indent << p.getObjective() << std::endl << ";";
    }
 
    // aliases
@@ -530,7 +531,7 @@ bool Problem::isConstrained() const
 
 bool Problem::hasObjective() const
 {
-   return !obj_.isConstant();
+   return !obj_.hasNullRep();
 }
 
 bool Problem::isLinObjective() const

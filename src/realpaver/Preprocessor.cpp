@@ -142,6 +142,46 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
 
    LOG_MAIN("Number of removed variables: " << bridge_->nbFixedVars());
 
+   // rewrites the objective function; it must be done before processing the constraints
+   // because the status of the objective variable can be changed from unfixed to fixed
+   if (src.hasObjective())
+   {
+      Variable z = obj.getVar();
+      Term f = obj.getTerm();
+      Interval e = f.eval(box)->intervalHull();
+      Domain *dom = z.getDomain();
+      dom->contract(e);
+
+      if (dom->isEmpty())
+      {
+         LOG_MAIN("Empty range of the objective function");
+         unfeasible_ = true;
+         return;
+      }
+
+      // simplifies the objective function
+      TermFixer fixer(bridge_);
+      f.acceptVisitor(fixer);
+
+      if (fixer.getTerm().isConstant())
+      {
+         LOG_INTER("Fixed objective function: " << fixer.getTerm());
+         if (bridge_->isUnfixed(z))
+         {
+            bridge_->removeUnfixedVar(z);
+            bridge_->insertFixed(z, *dom);
+         }
+      }
+      else
+      {
+         Variable dz = bridge_->srcToDestVar(z);
+         if (obj.isMinimization())
+            dest.addObjective(minimize(dz, fixer.getTerm()));
+         else
+            dest.addObjective(maximize(dz, fixer.getTerm()));
+      }
+   }
+
    // rewrites the constraints
    for (Constraint input : active_)
    {
@@ -157,32 +197,6 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
 
       else
          dest.addCtr(c);
-   }
-
-   // checks the range of the objective function
-   Interval dobj = obj.getTerm().eval(box)->intervalHull();
-   if (dobj.isEmpty())
-   {
-      LOG_MAIN("Empty range of the objective function");
-      unfeasible_ = true;
-      return;
-   }
-
-   // simplifies the objective function
-   TermFixer fixer(bridge_);
-   obj.getTerm().acceptVisitor(fixer);
-
-   if ((!obj.isConstant()) && fixer.getTerm().isConstant())
-   {
-      LOG_INTER("Fixed objective function: " << fixer.getTerm());
-   }
-   else
-   {
-      if (obj.isMinimization())
-         dest.addObjective(MIN(fixer.getTerm()));
-
-      else
-         dest.addObjective(MAX(fixer.getTerm()));
    }
 }
 

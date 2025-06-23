@@ -95,7 +95,12 @@ public:
    /// Returns a clone of this
    DomainBox *clone() const;
 
-   /// Tests if the domain of a variable is splitable
+   /**
+    * @brief Tests if the domain of a variable is splitable.
+    *
+    * It returns false if v is not a splitable variable or if its domain in this box
+    * has the required tolerance; true otherwise.
+    */
    bool isSplitable(const Variable &v) const;
 
    /// Output on a stream using a vector notation
