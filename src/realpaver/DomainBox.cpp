@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "DomainBox.hpp"
 #include "AssertDebug.hpp"
+#include "DomainBox.hpp"
 #include "IntervalBox.hpp"
 #include "Logger.hpp"
 
@@ -115,11 +115,12 @@ DomainBox *DomainBox::clone() const
 
 bool DomainBox::isSplitable(const Variable &v) const
 {
-   Domain *dom = get(v);
+   if (!v.isSplitable())
+      return false;
 
+   Domain *dom = get(v);
    if (dom->isReal())
       return !v.getTolerance().isTight(dom->intervalHull());
-
    else
       return !dom->isCanonical();
 }

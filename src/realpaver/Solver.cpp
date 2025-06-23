@@ -263,6 +263,14 @@ void Solver::makeSplit()
    }
 
    THROW_IF(split_ == nullptr, "Unable to make the split object in the solver");
+
+   // is the objective variable splitable?
+   std::string splitobj = env_->getParams()->getStrParam("SPLIT_OBJECTIVE");
+   if (splitobj == "NO")
+   {
+      Variable z = preprob_->getObjective().getVar();
+      z.setSplitable(false);
+   }
 }
 
 // this method is called after a propagation step => it is not possible
@@ -418,7 +426,6 @@ void Solver::branchAndPrune()
    LOG_INTER("Parameters\n" << *env_->getParams());
 
    stimer_.start();
-
    context_ = new NodeContext();
 
    LOG_NL_LOW();

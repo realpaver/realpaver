@@ -100,7 +100,7 @@ public:
    /**
     * @brief Inserts an unfixed variable of the source problem.
     *
-    * Createsa clone of v in the destination problem and returns it.
+    * Creates a clone of v in the destination problem and returns it.
     */
    Variable insertVar(Variable v, const Domain &dom);
 
@@ -117,6 +117,9 @@ public:
 
    /// Removes v as a fixed variable
    void removeFixedVar(const Variable &v);
+
+   /// Removes v as a unfixed variable
+   void removeUnfixedVar(const Variable &v);
 
 private:
    /// Map type Variable -> Variable
