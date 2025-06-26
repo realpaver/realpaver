@@ -179,6 +179,24 @@ public:
    /// Hyperbolic tangent
    friend AffineForm tanh(const AffineForm &f);
 
+   /// Arc-cosine
+   friend AffineForm acos(const AffineForm &f);
+
+   /// Arc-sine
+   friend AffineForm asin(const AffineForm &f);
+
+   /// Arc-tangent
+   friend AffineForm atan(const AffineForm &f);
+
+   /// Hyperbolic arc-cosine
+   friend AffineForm acosh(const AffineForm &f);
+
+   /// Hyperbolic arc-sine
+   friend AffineForm asinh(const AffineForm &f);
+
+   /// Hyperbolic arc-tangent
+   friend AffineForm atanh(const AffineForm &f);
+
    /// Interval evaluation
    Interval eval() const;
 
@@ -274,6 +292,30 @@ public:
    static void minrangeTanh(const Interval &x, Interval &alpha, Interval &dzeta,
                             Interval &delta);
 
+   // Minrange approximation of function acos(z) with z in x
+   static void minrangeAcos(const Interval &x, Interval &alpha, Interval &dzeta,
+                            Interval &delta);
+
+   // Minrange approximation of function asin(z) with z in x
+   static void minrangeAsin(const Interval &x, Interval &alpha, Interval &dzeta,
+                            Interval &delta);
+
+   // Minrange approximation of function atan(z) with z in x
+   static void minrangeAtan(const Interval &x, Interval &alpha, Interval &dzeta,
+                            Interval &delta);
+
+   // Minrange approximation of function acosh(z) with z in x
+   static void minrangeAcosh(const Interval &x, Interval &alpha, Interval &dzeta,
+                             Interval &delta);
+
+   // Minrange approximation of function asinh(z) with z in x
+   static void minrangeAsinh(const Interval &x, Interval &alpha, Interval &dzeta,
+                             Interval &delta);
+
+   // Minrange approximation of function atanh(z) with z in x
+   static void minrangeAtanh(const Interval &x, Interval &alpha, Interval &dzeta,
+                             Interval &delta);
+
    /// Chebyshev approximation of function cos(z) with z in x
    static void chebyshevCos(const Interval &x, Interval &alpha, Interval &dzeta,
                             Interval &delta);
@@ -297,6 +339,30 @@ public:
    /// Chebyshev approximation of function tanh(z) with z in x
    static void chebyshevTanh(const Interval &x, Interval &alpha, Interval &dzeta,
                              Interval &delta);
+
+   /// Chebyshev approximation of function acos(z) with z in x
+   static void chebyshevAcos(const Interval &x, Interval &alpha, Interval &dzeta,
+                             Interval &delta);
+
+   /// Chebyshev approximation of function asin(z) with z in x
+   static void chebyshevAsin(const Interval &x, Interval &alpha, Interval &dzeta,
+                             Interval &delta);
+
+   /// Chebyshev approximation of function atan(z) with z in x
+   static void chebyshevAtan(const Interval &x, Interval &alpha, Interval &dzeta,
+                             Interval &delta);
+
+   /// Chebyshev approximation of function acosh(z) with z in x
+   static void chebyshevAcosh(const Interval &x, Interval &alpha, Interval &dzeta,
+                              Interval &delta);
+
+   /// Chebyshev approximation of function asinh(z) with z in x
+   static void chebyshevAsinh(const Interval &x, Interval &alpha, Interval &dzeta,
+                              Interval &delta);
+
+   /// Chebyshev approximation of function atanh(z) with z in x
+   static void chebyshevAtanh(const Interval &x, Interval &alpha, Interval &dzeta,
+                              Interval &delta);
 
 private:
    // linear term

@@ -294,6 +294,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
    /// Returns the new term
    Term getTerm() const;

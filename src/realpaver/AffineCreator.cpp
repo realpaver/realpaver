@@ -116,126 +116,138 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       break;
    }
    case DagSymbol::Add: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t l = aux->left()->index(), r = aux->right()->index();
+      size_t l = node->left()->index(), r = node->right()->index();
       f = std::make_unique<AffineForm>(*v_[l] + *v_[r]);
       break;
    }
    case DagSymbol::Sub: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t l = aux->left()->index(), r = aux->right()->index();
+      size_t l = node->left()->index(), r = node->right()->index();
       f = std::make_unique<AffineForm>(*v_[l] - *v_[r]);
       break;
    }
    case DagSymbol::Mul: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t l = aux->left()->index(), r = aux->right()->index();
+      size_t l = node->left()->index(), r = node->right()->index();
       f = std::make_unique<AffineForm>(*v_[l] * *v_[r]);
       break;
    }
    case DagSymbol::Div: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t l = aux->left()->index(), r = aux->right()->index();
+      size_t l = node->left()->index(), r = node->right()->index();
       f = std::make_unique<AffineForm>(*v_[l] / *v_[r]);
       break;
    }
    case DagSymbol::Min: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t l = aux->left()->index(), r = aux->right()->index();
+      size_t l = node->left()->index(), r = node->right()->index();
       f = std::make_unique<AffineForm>(min(*v_[l], *v_[r]));
       break;
    }
    case DagSymbol::Max: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t l = aux->left()->index(), r = aux->right()->index();
+      size_t l = node->left()->index(), r = node->right()->index();
       f = std::make_unique<AffineForm>(max(*v_[l], *v_[r]));
       break;
    }
    case DagSymbol::Usb: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(-(*v_[c]));
       break;
    }
    case DagSymbol::Abs: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(abs(*v_[c]));
       break;
    }
    case DagSymbol::Sgn: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(sgn(*v_[c]));
       break;
    }
    case DagSymbol::Sqr: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(sqr(*v_[c]));
       break;
    }
    case DagSymbol::Sqrt: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(sqrt(*v_[c]));
       break;
    }
    case DagSymbol::Pow: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       int e = static_cast<DagPow *>(node)->exponent();
       f = std::make_unique<AffineForm>(pow(*v_[c], e));
       break;
    }
    case DagSymbol::Exp: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(exp(*v_[c]));
       break;
    }
    case DagSymbol::Log: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(log(*v_[c]));
       break;
    }
    case DagSymbol::Cos: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(cos(*v_[c]));
       break;
    }
    case DagSymbol::Sin: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(sin(*v_[c]));
       break;
    }
    case DagSymbol::Tan: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(tan(*v_[c]));
       break;
    }
    case DagSymbol::Cosh: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(cosh(*v_[c]));
       break;
    }
    case DagSymbol::Sinh: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(sinh(*v_[c]));
       break;
    }
    case DagSymbol::Tanh: {
-      DagAdd *aux = static_cast<DagAdd *>(node);
-      size_t c = aux->child()->index();
+      size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(tanh(*v_[c]));
       break;
    }
+   case DagSymbol::Acos: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(acos(*v_[c]));
+      break;
+   }
+   case DagSymbol::Asin: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(asin(*v_[c]));
+      break;
+   }
+   case DagSymbol::Atan: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(atan(*v_[c]));
+      break;
+   }
+
+   case DagSymbol::Acosh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(acosh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Asinh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(asinh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Atanh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(atanh(*v_[c]));
+      break;
+   }
+
    case DagSymbol::Lin: {
       DagLin *aux = static_cast<DagLin *>(node);
       f = std::make_unique<AffineForm>(aux->getCst());
@@ -253,6 +265,26 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
    }
    }
    v_[i] = std::move(f);
+}
+
+Term AffineCreator::funToTerm(size_t i) const
+{
+   AffineForm &f = const_cast<AffineForm &>(fun(i));
+   Interval x = f.constantTerm();
+   Term res(0);
+   for (auto it = f.begin(); it != f.end(); ++it)
+   {
+      Variable v = dag_->scope().var(AffineForm::var(it));
+      AffineForm &g = const_cast<AffineForm &>(fun(v));
+
+      Interval c = AffineForm::itv(it), a = g.constantTerm(),
+               b = AffineForm::itv(g.begin()), d = c / b;
+      x += -a * d;
+      res += d * v;
+   }
+   res += x;
+   res += f.errorTerm();
+   return res;
 }
 
 } // namespace realpaver

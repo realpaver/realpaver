@@ -199,4 +199,46 @@ void TermFixer::apply(const TermTanh *t)
    rt_ = tanh(vis.rt_);
 }
 
+void TermFixer::apply(const TermAcos *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = acos(vis.rt_);
+}
+
+void TermFixer::apply(const TermAsin *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = asin(vis.rt_);
+}
+
+void TermFixer::apply(const TermAtan *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = atan(vis.rt_);
+}
+
+void TermFixer::apply(const TermAcosh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = acosh(vis.rt_);
+}
+
+void TermFixer::apply(const TermAsinh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = asinh(vis.rt_);
+}
+
+void TermFixer::apply(const TermAtanh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = atanh(vis.rt_);
+}
+
 } // namespace realpaver

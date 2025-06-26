@@ -85,6 +85,14 @@ public:
    const AffineForm &fun(size_t i) const;
 
    /**
+    * @brief Gets a term from the i-th affine form in this.
+    *
+    * It corresponds to the affine form of the i-th function of the DAG
+    * where the affine variables are replaced by the variables of the DAG.
+    */
+   Term funToTerm(size_t i) const;
+
+   /**
     * @brief Gets the ownership of the i-th affine form in this.
     *
     * It corresponds to the affine form of the i-th function of the DAG.

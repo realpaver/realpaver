@@ -48,6 +48,9 @@ public:
    /// Assigns the identifier of this
    void setId(int id);
 
+   /// Returns true if the identifier of this has not been initiamized
+   bool hasNoId() const;
+
    /// Returns true if this is variable free */
    bool isConstant() const;
 

@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Interval.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver/Logger.hpp"
 #include <utility>
 
@@ -162,7 +162,7 @@ Interval Interval::minusPiPlusPi()
 
 Interval Interval::minusHalfPiPlusHalfPi()
 {
-   static Interval x(Interval::Traits::minusPiPlusPi() / 2.0);
+   static Interval x(Interval::Traits::minusHalfPiPlusHalfPi());
    return x;
 }
 
@@ -1231,9 +1231,53 @@ Interval acos(const Interval &x)
    return Interval(Interval::Traits::acos(x.impl_));
 }
 
+Interval acosPX(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::acosPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("acosPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval acosPY(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::acosPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("acosPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
 Interval asin(const Interval &x)
 {
    return Interval(Interval::Traits::asin(x.impl_));
+}
+
+Interval asinPX(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::asinPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("asinPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval asinPY(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::asinPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("asinPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval atan(const Interval &x)
@@ -1241,9 +1285,53 @@ Interval atan(const Interval &x)
    return Interval(Interval::Traits::atan(x.impl_));
 }
 
+Interval atanPX(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::atanPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("atanPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval atanPY(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::atanPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("atanPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
 Interval acosh(const Interval &x)
 {
    return Interval(Interval::Traits::acosh(x.impl_));
+}
+
+Interval acoshPX(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::acoshPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("acoshPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval acoshPY(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::acoshPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("acoshPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval asinh(const Interval &x)
@@ -1251,9 +1339,53 @@ Interval asinh(const Interval &x)
    return Interval(Interval::Traits::asinh(x.impl_));
 }
 
+Interval asinhPX(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::asinhPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("asinhPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval asinhPY(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::asinhPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("asinhPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
 Interval atanh(const Interval &x)
 {
    return Interval(Interval::Traits::atanh(x.impl_));
+}
+
+Interval atanhPX(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::atanhPX(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("atanhPX(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval atanhPY(const Interval &x, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::atanhPY(x.impl_, y.impl_));
+
+#if LOG_ON
+   LOG_FULL("atanhPY(x,y) on " << x << "," << y << " -> " << res);
+#endif
+
+   return res;
 }
 
 Interval abs(const Interval &x)

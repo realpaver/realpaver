@@ -34,6 +34,9 @@ class ConstraintVisitor;
  * The common attributes are a scope, a relation symbol, an identifier,
  * and an hash code. The identifier is positive if the constraint has been
  * added in a problem, strictly negative otherwise.
+ *
+ * The identifier is assigned to a negative value at initialization time, which means that
+ * a constraint has no identifier.
  */
 class ConstraintRep {
 public:
@@ -66,6 +69,9 @@ public:
 
    /// Assigns the identifier of this
    void setId(int id);
+
+   /// Returns true if the identifier of this has not been initiamized
+   bool hasNoId() const;
 
    /// Returns true if this constraint is variable free
    virtual bool isConstant() const = 0;

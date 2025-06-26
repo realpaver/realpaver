@@ -19,10 +19,12 @@ void test_1()
 {
    Problem prob;
    Variable x = prob.addRealVar(0, 0, "x"), y = prob.addRealVar(0, 0, "y");
+   size_t i = prob.addCtr(y - sqr(x) >= 0);
+   size_t j = prob.addCtr(y + sqr(x) - 2 <= 0);
 
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(y - sqr(x) >= 0);
-   dag->insert(y + sqr(x) - 2 <= 0);
+   dag->insert(prob.ctrAt(i));
+   dag->insert(prob.ctrAt(j));
 
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
@@ -56,10 +58,12 @@ void test_2()
 {
    Problem prob;
    Variable x = prob.addRealVar(0, 0, "x"), y = prob.addRealVar(0, 0, "y");
+   size_t i = prob.addCtr(y - sqr(x) >= 0);
+   size_t j = prob.addCtr(y + sqr(x) - 2 <= 0);
 
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(y - sqr(x) >= 0);
-   dag->insert(y + sqr(x) - 2 <= 0);
+   dag->insert(prob.ctrAt(i));
+   dag->insert(prob.ctrAt(j));
 
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
@@ -96,12 +100,18 @@ void brown_5_feasible()
             x3 = prob.addRealVar(0, 0, "x3"), x4 = prob.addRealVar(0, 0, "x4"),
             x5 = prob.addRealVar(0, 0, "x5");
 
+   size_t i1 = prob.addCtr(2 * x1 + x2 + x3 + x4 + x5 - 6 == 0);
+   size_t i2 = prob.addCtr(x1 + 2 * x2 + x3 + x4 + x5 - 6 == 0);
+   size_t i3 = prob.addCtr(x1 + x2 + 2 * x3 + x4 + x5 - 6 == 0);
+   size_t i4 = prob.addCtr(x1 + x2 + x3 + 2 * x4 + x5 - 6 == 0);
+   size_t i5 = prob.addCtr(x1 * x2 * x3 * x4 * x5 - 1 == 0);
+
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(2 * x1 + x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + 2 * x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + 2 * x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + x3 + 2 * x4 + x5 - 6 == 0);
-   dag->insert(x1 * x2 * x3 * x4 * x5 - 1 == 0);
+   dag->insert(prob.ctrAt(i1));
+   dag->insert(prob.ctrAt(i2));
+   dag->insert(prob.ctrAt(i3));
+   dag->insert(prob.ctrAt(i4));
+   dag->insert(prob.ctrAt(i5));
 
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 
@@ -138,12 +148,18 @@ void brown_5_infeasible()
             x3 = prob.addRealVar(0, 0, "x3"), x4 = prob.addRealVar(0, 0, "x4"),
             x5 = prob.addRealVar(0, 0, "x5");
 
+   size_t i1 = prob.addCtr(2 * x1 + x2 + x3 + x4 + x5 - 6 == 0);
+   size_t i2 = prob.addCtr(x1 + 2 * x2 + x3 + x4 + x5 - 6 == 0);
+   size_t i3 = prob.addCtr(x1 + x2 + 2 * x3 + x4 + x5 - 6 == 0);
+   size_t i4 = prob.addCtr(x1 + x2 + x3 + 2 * x4 + x5 - 6 == 0);
+   size_t i5 = prob.addCtr(x1 * x2 * x3 * x4 * x5 - 1 == 0);
+
    std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(2 * x1 + x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + 2 * x2 + x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + 2 * x3 + x4 + x5 - 6 == 0);
-   dag->insert(x1 + x2 + x3 + 2 * x4 + x5 - 6 == 0);
-   dag->insert(x1 * x2 * x3 * x4 * x5 - 1 == 0);
+   dag->insert(prob.ctrAt(i1));
+   dag->insert(prob.ctrAt(i2));
+   dag->insert(prob.ctrAt(i3));
+   dag->insert(prob.ctrAt(i4));
+   dag->insert(prob.ctrAt(i5));
 
    std::unique_ptr<LinearizerTaylor> lzr = std::make_unique<LinearizerTaylor>(dag);
 

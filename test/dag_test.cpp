@@ -12,9 +12,13 @@ void init()
    Variable x = prob->addRealVar(0, 0, "x"), y = prob->addRealVar(0, 0, "y"),
             z = prob->addRealVar(0, 0, "z");
 
-   dag->insert(y - sqr(x) == 0);
-   dag->insert(sqr(x) + sqr(y) == 0);
-   dag->insert(sqr(x) + sqr(y) - z == 0);
+   size_t i = prob->addCtr(y - sqr(x) == 0);
+   size_t j = prob->addCtr(sqr(x) + sqr(y) == 0);
+   size_t k = prob->addCtr(sqr(x) + sqr(y) - z == 0);
+
+   dag->insert(prob->ctrAt(i));
+   dag->insert(prob->ctrAt(j));
+   dag->insert(prob->ctrAt(k));
 }
 
 void clean()

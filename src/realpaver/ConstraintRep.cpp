@@ -67,7 +67,13 @@ int ConstraintRep::id() const
 
 void ConstraintRep::setId(int id)
 {
+   ASSERT(id >= 0, "A constraint identifier must be positive: " << id);
    id_ = id;
+}
+
+bool ConstraintRep::hasNoId() const
+{
+   return id_ < 0;
 }
 
 bool ConstraintRep::isEquation() const

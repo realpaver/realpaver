@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/TermDeriver.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/TermDeriver.hpp"
 
 namespace realpaver {
 
@@ -198,6 +198,48 @@ void TermDeriver::apply(const TermTanh *t)
    TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = vis.dt_ * (1.0 - sqr(tanh(t->child())));
+}
+
+void TermDeriver::apply(const TermAcos *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = (-vis.dt_) / sqrt(1.0 - sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAsin *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / sqrt(1.0 - sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAtan *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / (1.0 + sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAcosh *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / sqrt(sqr(t->child()) - 1.0);
+}
+
+void TermDeriver::apply(const TermAsinh *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / sqrt(1.0 + sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAtanh *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / (1.0 - sqr(t->child()));
 }
 
 } // namespace realpaver
