@@ -140,8 +140,8 @@ private:
    void makeSpace();
    void makePropagator();
    void makeSplit();
-   void bpStep(int depthlimit);
-   void bpStepAux(SharedNode node, int depthlimit);
+   void bpStep(int depthlimit, bool splitOff);
+   void bpStepAux(SharedNode node, int depthlimit, bool splitOff);
    void certifySolutions();
    Proof checkActivity(Node &node);
 };

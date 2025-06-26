@@ -266,7 +266,7 @@ void Solver::makeSplit()
 
    // is the objective variable splitable?
    std::string splitobj = env_->getParams()->getStrParam("SPLIT_OBJECTIVE");
-   if (splitobj == "NO")
+   if (splitobj == "NO" && preprob_->hasObjective())
    {
       Variable z = preprob_->getObjective().getVar();
       z.setSplitable(false);
@@ -301,7 +301,7 @@ Proof Solver::checkActivity(Node &node)
    return inactive ? Proof::Inner : Proof::Maybe;
 }
 
-void Solver::bpStep(int depthlimit)
+void Solver::bpStep(int depthlimit, bool splitOff)
 {
 #if LOG_ON
    static Timer timerStep;
@@ -312,7 +312,7 @@ void Solver::bpStep(int depthlimit)
    SharedNode node = space_->nextPendingNode();
 
    // processes it
-   bpStepAux(node, depthlimit);
+   bpStepAux(node, depthlimit, splitOff);
 
    // removes the node informations
    context_->remove(node->index());
@@ -323,7 +323,7 @@ void Solver::bpStep(int depthlimit)
 #endif
 }
 
-void Solver::bpStepAux(SharedNode node, int depthlimit)
+void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
 {
 #if LOG_ON
    static Timer timerPropag, timerSplit;
@@ -402,16 +402,25 @@ void Solver::bpStepAux(SharedNode node, int depthlimit)
                         << " sub-nodes");
 
 #if LOG_ON
-      for (auto it = split_->begin(); it != split_->end(); ++it)
-      {
-         SharedNode subnode = *it;
-         LOG_INTER("Inserts node " << subnode->index() << " in the space");
-         LOG_LOW(*subnode->box());
-      }
+      if (!splitOff)
+         for (auto it = split_->begin(); it != split_->end(); ++it)
+         {
+            SharedNode subnode = *it;
+            LOG_INTER("Inserts node " << subnode->index() << " in the space");
+            LOG_LOW(*subnode->box());
+         }
 #endif
 
-      nbnodes_ += std::distance(split_->begin(), split_->end());
-      space_->insertPendingNodes(split_->begin(), split_->end());
+      if (splitOff)
+      {
+         LOG_INTER("Node limit reached");
+         space_->insertPendingNode(node);
+      }
+      else
+      {
+         nbnodes_ += std::distance(split_->begin(), split_->end());
+         space_->insertPendingNodes(split_->begin(), split_->end());
+      }
    }
 
 #if LOG_ON
@@ -432,7 +441,6 @@ void Solver::branchAndPrune()
    LOG_LOW("Makes the factory in the solver");
    factory_ = new ContractorFactory(*preprob_, env_);
    dag_ = factory_->getDag();
-
    makeSpace();
    makePropagator();
    makeSplit();
@@ -489,7 +497,8 @@ void Solver::branchAndPrune()
    do
    {
       ++nb_nodes_processed;
-      bpStep(depth_limit);
+      bool splitOff = nbnodes_ >= node_limit;
+      bpStep(depth_limit, splitOff);
 
       // trace every new solution
       size_t nb_sol = space_->nbSolNodes();
@@ -530,7 +539,7 @@ void Solver::branchAndPrune()
          iter = false;
       }
 
-      if (iter && nbnodes_ > node_limit)
+      if (iter && splitOff)
       {
          LOG_MAIN("Stops on node limit (" << node_limit << ")");
          env_->setNodeLimit(true);
