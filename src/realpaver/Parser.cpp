@@ -38,11 +38,11 @@ extern std::string realpaver_parse_error;
 namespace realpaver {
 
 static std::vector<std::string> keywords = {
-    "Variables", "Constants", "Constraints", "Aliases", "Functions", "Objectives",
-    "integer",   "in",        "binary",      "tol",     "inf",       "MIN",
-    "MAX",       "min",       "max",         "abs",     "sgn",       "sqr",
-    "sqrt",      "pow",       "log",         "exp",     "cos",       "sin",
-    "tan",       "cosh",      "sinh",        "tanh",    "if",        "then",
+    "Variables", "Constants", "Constraints", "Aliases", "Functions", "integer", "in",
+    "binary",    "tol",       "inf",         "MIN",     "MAX",       "min",     "max",
+    "abs",       "sgn",       "sqr",         "sqrt",    "pow",       "log",     "exp",
+    "cos",       "sin",       "tan",         "cosh",    "sinh",      "tanh",    "acos",
+    "asin",      "atan",      "acosh",       "asinh",   "atanh",     "if",      "then",
     "else",      "or",        "and",         "not"};
 
 Parser::Parser()

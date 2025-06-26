@@ -685,7 +685,7 @@ void RLTCreator::apply(const DagTanh *node)
          // the slope of the 2 other opposite corners if the maximum of the
          // derivative numbers over [a, b], that is tanh'(0) = 1.0
 
-         // 2 opposite facets of slope mindv
+         // 2 opposite facets of slope dvmin
          underLine(lm, iy, ix, a, fa.left(), dvmin.left());
          overLine(lm, iy, ix, b, fb.right(), dvmin.left());
 
@@ -694,6 +694,42 @@ void RLTCreator::apply(const DagTanh *node)
          overLine(lm, iy, ix, a, fa.right(), 1.0);
       }
    }
+}
+
+void RLTCreator::apply(const DagAcos *node)
+{
+   // TODO
+   THROW("NOT YET IMPLEMENTED");
+}
+
+void RLTCreator::apply(const DagAsin *node)
+{
+   // TODO
+   THROW("NOT YET IMPLEMENTED");
+}
+
+void RLTCreator::apply(const DagAtan *node)
+{
+   // TODO
+   THROW("NOT YET IMPLEMENTED");
+}
+
+void RLTCreator::apply(const DagAcosh *node)
+{
+   // TODO
+   THROW("NOT YET IMPLEMENTED");
+}
+
+void RLTCreator::apply(const DagAsinh *node)
+{
+   // TODO
+   THROW("NOT YET IMPLEMENTED");
+}
+
+void RLTCreator::apply(const DagAtanh *node)
+{
+   // TODO
+   THROW("NOT YET IMPLEMENTED");
 }
 
 void RLTCreator::apply(const DagLin *node)

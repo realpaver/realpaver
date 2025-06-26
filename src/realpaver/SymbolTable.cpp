@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/SymbolTable.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/SymbolTable.hpp"
 
 namespace realpaver {
 
@@ -541,6 +541,54 @@ void FunctionCallProcessor::apply(const TermTanh *t)
    t->child()->acceptVisitor(vis);
 
    t_ = tanh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAcos *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = acos(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAsin *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = asin(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAtan *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = atan(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAcosh *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = acosh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAsinh *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = asinh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAtanh *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = atanh(vis.getTerm());
 }
 
 Term FunctionCallProcessor::getTerm() const

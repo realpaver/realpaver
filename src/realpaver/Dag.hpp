@@ -21,13 +21,13 @@
 #ifndef REALPAVER_DAG_HPP
 #define REALPAVER_DAG_HPP
 
-#include "RealPoint.hpp"
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/ConstraintArithmetic.hpp"
 #include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include "realpaver/RealPoint.hpp"
 #include "realpaver/TermLin.hpp"
 #include <memory>
 #include <unordered_map>
@@ -45,29 +45,35 @@ using IndexList = std::vector<size_t>;
 
 /// Enumeration of dag node symbols
 enum class DagSymbol {
-   Cst,  ///< constant
-   Var,  ///< variable
-   Add,  ///< addition
-   Sub,  ///< subtraction
-   Mul,  ///< multiplication
-   Div,  ///< division
-   Min,  ///< minimum
-   Max,  ///< maximum
-   Usb,  ///< unary subtraction
-   Abs,  ///< absolute value
-   Sgn,  ///< sign
-   Sqr,  ///< square
-   Sqrt, ///< square root
-   Pow,  ///< power
-   Exp,  ///< exponential
-   Log,  ///< logarithm
-   Cos,  ///< cosine
-   Sin,  ///< sine
-   Tan,  ///< tangent
-   Cosh, ///< hyperbolic cosine
-   Sinh, ///< hyperbolic sine
-   Tanh, ///< hyperbolic tangent
-   Lin   ///< linear expression
+   Cst,   ///< constant
+   Var,   ///< variable
+   Add,   ///< addition
+   Sub,   ///< subtraction
+   Mul,   ///< multiplication
+   Div,   ///< division
+   Min,   ///< minimum
+   Max,   ///< maximum
+   Usb,   ///< unary subtraction
+   Abs,   ///< absolute value
+   Sgn,   ///< sign
+   Sqr,   ///< square
+   Sqrt,  ///< square root
+   Pow,   ///< power
+   Exp,   ///< exponential
+   Log,   ///< logarithm
+   Cos,   ///< cosine
+   Sin,   ///< sine
+   Tan,   ///< tangent
+   Cosh,  ///< hyperbolic cosine
+   Sinh,  ///< hyperbolic sine
+   Tanh,  ///< hyperbolic tangent
+   Acos,  ///< arc-cosine
+   Asin,  ///< arc-sine
+   Atan,  ///< arc-tangent
+   Acosh, ///< hyperbolic arc-cosine
+   Asinh, ///< hyperbolic arc-sine
+   Atanh, ///< hyperbolic arc-tangent
+   Lin    ///< linear expression
 };
 
 /// Output on a stream
@@ -599,6 +605,102 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
+/// DAG node representing the arc-cosine function
+class DagAcos : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAcos(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the arc-sine function
+class DagAsin : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAsin(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the arc-tangent function
+class DagAtan : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAtan(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic arc-cosine function
+class DagAcosh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAcosh(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic arc-sine function
+class DagAsinh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAsinh(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic arc-tangent function
+class DagAtanh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAtanh(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
 /**
  * @brief DAG node representing a (non-constant) linear expression.
  *
@@ -883,16 +985,12 @@ public:
    /**
     * @brief Inserts a constraint in this and returns its index.
     *
-    * Throws an exception if the constraint cannot be handled.
+    * Throws an exception if the constraint cannot be handled or if the
+    * constraint has no identifier.
     */
    size_t insert(Constraint c);
 
-   /**
-    * @brief Inserts a constraint in this and returns its index.
-    *
-    * The constraint is given by a term and its image.
-    * Throws an exception if the constraint cannot be handled.
-    */
+   /// Inserts a term and its image in this and returns its index.
    size_t insert(Term t, const Interval &img = Interval::universe());
 
    /**
@@ -1060,6 +1158,12 @@ public:
    virtual void apply(const DagCosh *d);
    virtual void apply(const DagSinh *d);
    virtual void apply(const DagTanh *d);
+   virtual void apply(const DagAcos *d);
+   virtual void apply(const DagAsin *d);
+   virtual void apply(const DagAtan *d);
+   virtual void apply(const DagAcosh *d);
+   virtual void apply(const DagAsinh *d);
+   virtual void apply(const DagAtanh *d);
    virtual void apply(const DagLin *d);
    ///@}
 };
@@ -1096,6 +1200,12 @@ public:
    void apply(const DagCosh *d) override;
    void apply(const DagSinh *d) override;
    void apply(const DagTanh *d) override;
+   void apply(const DagAcos *d) override;
+   void apply(const DagAsin *d) override;
+   void apply(const DagAtan *d) override;
+   void apply(const DagAcosh *d) override;
+   void apply(const DagAsinh *d) override;
+   void apply(const DagAtanh *d) override;
    void apply(const DagLin *d) override;
    ///@}
 
@@ -1170,6 +1280,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    Dag *dag_;       // DAG

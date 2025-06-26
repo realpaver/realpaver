@@ -655,8 +655,8 @@ void LPModel::printSystem(std::ostream &os) const
    }
 
    os << "cost: " << getSense() << ' ' << cost << std::endl
+      << A << std::endl
       << "lhs: " << lhs << std::endl
-      << "matrix: " << A << std::endl
       << "rhs: " << rhs << std::endl;
 }
 

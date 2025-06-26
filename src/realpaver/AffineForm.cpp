@@ -173,7 +173,7 @@ void AffineForm::useMinrange(bool b)
 
 void AffineForm::useChebyshev(bool b)
 {
-   MINRANGE = b;
+   MINRANGE = !b;
 }
 
 const Interval &AffineForm::constantTerm() const
@@ -399,7 +399,6 @@ void AffineForm::minrangeSqrt(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = sqrt(a), fb = sqrt(b);
-
    alpha = 1.0 / (2.0 * fb);
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
@@ -408,12 +407,8 @@ void AffineForm::chebyshevSqrt(const Interval &x, Interval &alpha, Interval &dze
                                Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = sqrt(a), fb = sqrt(b);
-
    alpha = (fb - fa) / (b - a);
-
-   // c is such that f'(c) = alpha -> 1/2*sqrt(x)=alpha
    Interval c = 0.25 / sqr(alpha), fc = sqrt(c);
-
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
 
@@ -449,7 +444,6 @@ void AffineForm::minrangeUdiv(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = 1.0 / a, fb = 1.0 / b;
-
    alpha = x.isPositive() ? (-1.0 / sqr(b)) : (-1.0 / sqr(a));
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
@@ -458,13 +452,8 @@ void AffineForm::chebyshevUdiv(const Interval &x, Interval &alpha, Interval &dze
                                Interval &delta)
 {
    Interval a(x.left()), b(x.right()), ab = a * b, fa = 1.0 / a;
-
-   // (f(b)-f(a))/(b-a) -> -1/ab
    alpha = -1.0 / ab;
-
-   // c is such that f'(c) = alpha -> c = sqrt(ab)
    Interval c = (x.isPositive() ? sqrt(ab) : -sqrt(ab)), fc = 1.0 / c;
-
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
 
@@ -644,7 +633,6 @@ void AffineForm::minrangeExp(const Interval &x, Interval &alpha, Interval &dzeta
                              Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = exp(a), fb = exp(b);
-
    alpha = exp(a);
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
@@ -653,9 +641,7 @@ void AffineForm::chebyshevExp(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = exp(a), fb = exp(b);
-
    alpha = (fb - fa) / (b - a);
-
    Interval c = log(alpha), fc = alpha;
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
@@ -685,7 +671,6 @@ void AffineForm::minrangeLog(const Interval &x, Interval &alpha, Interval &dzeta
                              Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = log(a), fb = log(b);
-
    alpha = 1 / b;
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
@@ -694,9 +679,7 @@ void AffineForm::chebyshevLog(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = log(a), fb = log(b);
-
    alpha = (fb - fa) / (b - a);
-
    Interval c = 1.0 / alpha, fc = log(c);
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
@@ -706,8 +689,8 @@ AffineForm log(const AffineForm &f)
    if (f.isEmpty())
       return AffineForm::emptyForm();
 
-   Interval x = f.eval();
-   if (x.isEmpty() || x.isNegative())
+   Interval x = f.eval() & Interval::positive();
+   if (x.isEmpty())
       return AffineForm::emptyForm();
    if (x.containsZero() || x.isInf())
       return AffineForm::infForm();
@@ -726,13 +709,8 @@ void AffineForm::minrangeCos(const Interval &x, Interval &alpha, Interval &dzeta
                              Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = cos(a), fb = cos(b);
-
-   // interval of derivatives
    Interval d = -sin(x);
-
-   // derivative nearest 0
-   alpha = (d.left() > 0.0) ? d.left() : d.right();
-
+   alpha = (d.left() > 0.0) ? d.left() : d.right(); // derivative nearest 0
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
 
@@ -817,13 +795,8 @@ void AffineForm::minrangeSin(const Interval &x, Interval &alpha, Interval &dzeta
                              Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = sin(a), fb = sin(b);
-
-   // interval of derivatives
    Interval d = cos(x);
-
-   // derivative nearest 0
-   alpha = (d.left() > 0.0) ? d.left() : d.right();
-
+   alpha = (d.left() > 0.0) ? d.left() : d.right(); // derivative nearest 0
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
 
@@ -862,13 +835,8 @@ void AffineForm::minrangeTan(const Interval &x, Interval &alpha, Interval &dzeta
                              Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = tan(a), fb = tan(b);
-
-   // interval of derivatives
    Interval d = 1.0 / sqr(cos(x));
-
-   // smallest derivative
-   alpha = (d.left() < d.right()) ? d.left() : d.right();
-
+   alpha = (d.left() < d.right()) ? d.left() : d.right(); // smallest derivative
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
 
@@ -929,13 +897,8 @@ void AffineForm::minrangeCosh(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = cosh(a), fb = cosh(b);
-
-   // interval of derivatives
    Interval d = sinh(x);
-
-   // smallest derivative
-   alpha = (d.left() < d.right()) ? d.left() : d.right();
-
+   alpha = (d.left() < d.right()) ? d.left() : d.right(); // smallest derivative
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
 
@@ -943,11 +906,8 @@ void AffineForm::chebyshevCosh(const Interval &x, Interval &alpha, Interval &dze
                                Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = cosh(a), fb = cosh(b);
-
    alpha = (fb - fa) / (b - a);
-
    Interval c = asinh(alpha), fc = cosh(c);
-
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
 
@@ -980,13 +940,8 @@ void AffineForm::minrangeSinh(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = sinh(a), fb = sinh(b);
-
-   // interval of derivatives
    Interval d = cosh(x);
-
-   // smallest derivative
-   alpha = (d.left() < d.right()) ? d.left() : d.right();
-
+   alpha = (d.left() < d.right()) ? d.left() : d.right(); // smallest derivative
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
 
@@ -1000,11 +955,8 @@ void AffineForm::chebyshevSinh(const Interval &x, Interval &alpha, Interval &dze
    }
 
    Interval a(x.left()), b(x.right()), fa = sinh(a), fb = sinh(b);
-
    alpha = (fb - fa) / (b - a);
-
    Interval c = (x.isPositive() ? acosh(alpha) : -acosh(alpha)), fc = sinh(c);
-
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
 
@@ -1031,13 +983,8 @@ void AffineForm::minrangeTanh(const Interval &x, Interval &alpha, Interval &dzet
                               Interval &delta)
 {
    Interval a(x.left()), b(x.right()), fa = tanh(a), fb = tanh(b);
-
-   // interval of derivatives
    Interval d = 1.0 / sqr(cosh(x));
-
-   // smallest derivative
-   alpha = (d.left() < d.right()) ? d.left() : d.right();
-
+   alpha = (d.left() < d.right()) ? d.left() : d.right(); // smallest derivative
    approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
 }
 
@@ -1051,12 +998,9 @@ void AffineForm::chebyshevTanh(const Interval &x, Interval &alpha, Interval &dze
    }
 
    Interval a(x.left()), b(x.right()), fa = tanh(a), fb = tanh(b);
-
    alpha = (fb - fa) / (b - a);
-
    Interval c = (x.isPositive() ? acosh(sqrt(1.0 / alpha)) : -acosh(sqrt(1.0 / alpha))),
             fc = tanh(c);
-
    approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 }
 
@@ -1075,6 +1019,264 @@ AffineForm tanh(const AffineForm &f)
       AffineForm::minrangeTanh(x, alpha, dzeta, delta);
    else
       AffineForm::chebyshevTanh(x, alpha, dzeta, delta);
+
+   return AffineForm::linearize(f, alpha, dzeta, delta);
+}
+
+void AffineForm::minrangeAcos(const Interval &x, Interval &alpha, Interval &dzeta,
+                              Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = acos(a), fb = acos(b);
+   Interval d = -1.0 / sqrt(1 - sqr(x));
+   alpha = (d.left() > 0.0) ? d.left() : d.right(); // derivative nearest 0
+   approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
+}
+
+void AffineForm::chebyshevAcos(const Interval &x, Interval &alpha, Interval &dzeta,
+                               Interval &delta)
+{
+   if (x.strictlyContainsZero())
+   {
+      minrangeAcos(x, alpha, dzeta, delta);
+      return;
+   }
+
+   Interval a(x.left()), b(x.right()), fa = acos(a), fb = acos(b);
+   alpha = (fb - fa) / (b - a);
+   Interval d = sqrt(1.0 - 1.0 / sqr(alpha)), c = (x.isNegative() ? (-d) : d),
+            fc = acos(c);
+   approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+}
+
+AffineForm acos(const AffineForm &f)
+{
+   if (f.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval x = f.eval() & Interval::minusOnePlusOne();
+   if (x.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval alpha, dzeta, delta;
+
+   if (AffineForm::usesMinrange())
+      AffineForm::minrangeAcos(x, alpha, dzeta, delta);
+   else
+      AffineForm::chebyshevAcos(x, alpha, dzeta, delta);
+
+   return AffineForm::linearize(f, alpha, dzeta, delta);
+}
+
+void AffineForm::minrangeAsin(const Interval &x, Interval &alpha, Interval &dzeta,
+                              Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = asin(a), fb = asin(b);
+   Interval d = 1.0 / sqrt(1 - sqr(x));
+   alpha = (d.left() > 0.0) ? d.left() : d.right(); // derivative nearest 0
+   approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
+}
+
+void AffineForm::chebyshevAsin(const Interval &x, Interval &alpha, Interval &dzeta,
+                               Interval &delta)
+{
+   if (x.strictlyContainsZero())
+   {
+      minrangeAsin(x, alpha, dzeta, delta);
+      return;
+   }
+
+   Interval a(x.left()), b(x.right()), fa = asin(a), fb = asin(b);
+   alpha = (fb - fa) / (b - a);
+   Interval d = sqrt(1.0 - 1.0 / sqr(alpha)), c = (x.isNegative() ? (-d) : d),
+            fc = asin(c);
+   approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+}
+
+AffineForm asin(const AffineForm &f)
+{
+   if (f.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval x = f.eval() & Interval::minusOnePlusOne();
+   if (x.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval alpha, dzeta, delta;
+
+   if (AffineForm::usesMinrange())
+      AffineForm::minrangeAsin(x, alpha, dzeta, delta);
+   else
+      AffineForm::chebyshevAsin(x, alpha, dzeta, delta);
+
+   return AffineForm::linearize(f, alpha, dzeta, delta);
+}
+
+void AffineForm::minrangeAtan(const Interval &x, Interval &alpha, Interval &dzeta,
+                              Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = atan(a), fb = atan(b);
+   Interval d = 1.0 / (1.0 + sqr(x));
+   alpha = d.left();
+   approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
+}
+
+void AffineForm::chebyshevAtan(const Interval &x, Interval &alpha, Interval &dzeta,
+                               Interval &delta)
+{
+   if (x.strictlyContainsZero())
+   {
+      minrangeAtan(x, alpha, dzeta, delta);
+      return;
+   }
+
+   Interval a(x.left()), b(x.right()), fa = atan(a), fb = atan(b);
+   alpha = (fb - fa) / (b - a);
+   Interval d = sqrt(1.0 / alpha - 1.0), c = (x.isNegative() ? (-d) : d), fc = atan(c);
+   approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+}
+
+AffineForm atan(const AffineForm &f)
+{
+   if (f.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval x = f.eval();
+   if (x.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval alpha, dzeta, delta;
+
+   if (AffineForm::usesMinrange())
+      AffineForm::minrangeAtan(x, alpha, dzeta, delta);
+   else
+      AffineForm::chebyshevAtan(x, alpha, dzeta, delta);
+
+   return AffineForm::linearize(f, alpha, dzeta, delta);
+}
+
+void AffineForm::minrangeAcosh(const Interval &x, Interval &alpha, Interval &dzeta,
+                               Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = acosh(a), fb = acosh(b);
+   Interval d = 1.0 / sqrt(sqr(x) - 1.0);
+   alpha = d.left();
+   approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
+}
+
+void AffineForm::chebyshevAcosh(const Interval &x, Interval &alpha, Interval &dzeta,
+                                Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = acosh(a), fb = acosh(b);
+   alpha = (fb - fa) / (b - a);
+   Interval c = sqrt(1.0 + 1.0 / sqr(alpha)), fc = acosh(c);
+   approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+}
+
+AffineForm acosh(const AffineForm &f)
+{
+   if (f.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval x = f.eval() & Interval::moreThan(1.0);
+   if (x.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval alpha, dzeta, delta;
+
+   if (AffineForm::usesMinrange())
+      AffineForm::minrangeAcosh(x, alpha, dzeta, delta);
+   else
+      AffineForm::chebyshevAcosh(x, alpha, dzeta, delta);
+
+   return AffineForm::linearize(f, alpha, dzeta, delta);
+}
+
+void AffineForm::minrangeAsinh(const Interval &x, Interval &alpha, Interval &dzeta,
+                               Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = asinh(a), fb = asinh(b);
+   Interval d = 1.0 / sqrt(1.0 + sqr(x));
+   alpha = d.left();
+   approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
+}
+
+void AffineForm::chebyshevAsinh(const Interval &x, Interval &alpha, Interval &dzeta,
+                                Interval &delta)
+{
+   if (x.strictlyContainsZero())
+   {
+      minrangeAsinh(x, alpha, dzeta, delta);
+      return;
+   }
+
+   Interval a(x.left()), b(x.right()), fa = asinh(a), fb = asinh(b);
+   alpha = (fb - fa) / (b - a);
+   Interval d = sqrt(1.0 / sqr(alpha) - 1.0), c = (x.isNegative() ? (-d) : d),
+            fc = asinh(c);
+   approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+}
+
+AffineForm asinh(const AffineForm &f)
+{
+   if (f.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval x = f.eval();
+   if (x.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval alpha, dzeta, delta;
+
+   if (AffineForm::usesMinrange())
+      AffineForm::minrangeAsinh(x, alpha, dzeta, delta);
+   else
+      AffineForm::chebyshevAsinh(x, alpha, dzeta, delta);
+
+   return AffineForm::linearize(f, alpha, dzeta, delta);
+}
+
+void AffineForm::minrangeAtanh(const Interval &x, Interval &alpha, Interval &dzeta,
+                               Interval &delta)
+{
+   Interval a(x.left()), b(x.right()), fa = atanh(a), fb = atanh(b);
+   Interval d = 1.0 / (1.0 - sqr(x));
+   alpha = (d.left() > 0.0) ? d.left() : d.right(); // derivative nearest 0
+   approxDzetaDelta(alpha, a, fa, b, fb, dzeta, delta);
+}
+
+void AffineForm::chebyshevAtanh(const Interval &x, Interval &alpha, Interval &dzeta,
+                                Interval &delta)
+{
+   if (x.strictlyContainsZero())
+   {
+      minrangeAtanh(x, alpha, dzeta, delta);
+      return;
+   }
+
+   Interval a(x.left()), b(x.right()), fa = atanh(a), fb = atanh(b);
+   alpha = (fb - fa) / (b - a);
+   Interval d = sqrt(1.0 - 1.0 / alpha), c = (x.isNegative() ? (-d) : d), fc = atanh(c);
+   approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+}
+
+AffineForm atanh(const AffineForm &f)
+{
+   if (f.isEmpty())
+      return AffineForm::emptyForm();
+
+   Interval x = f.eval() & Interval::minusOnePlusOne();
+   if (x.isEmpty())
+      return AffineForm::emptyForm();
+
+   if (x.contains(1.0) || x.contains(-1.0))
+      return AffineForm::infForm();
+
+   Interval alpha, dzeta, delta;
+
+   if (AffineForm::usesMinrange())
+      AffineForm::minrangeAtanh(x, alpha, dzeta, delta);
+   else
+      AffineForm::chebyshevAtanh(x, alpha, dzeta, delta);
 
    return AffineForm::linearize(f, alpha, dzeta, delta);
 }

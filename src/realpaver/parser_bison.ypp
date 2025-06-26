@@ -94,6 +94,7 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN TK_COSH TK_SINH TK_TANH
+%token TK_ACOS TK_ASIN TK_ATAN TK_ACOSH TK_ASINH TK_ATANH
 %token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_LCBR TK_RCBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
@@ -952,6 +953,42 @@ expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(tanh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ACOS TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(acos(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ASIN TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(asin(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ATAN TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(atan(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ACOSH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(acosh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ASINH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(asinh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ATANH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(atanh(t));
       $$ = res.cloneRoot();
     }
   | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR

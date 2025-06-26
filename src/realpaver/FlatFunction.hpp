@@ -29,36 +29,42 @@ namespace realpaver {
 
 /// Enumeration of flat function node symbols
 enum class FlatSymbol {
-   Cst,  ///< constant
-   Var,  ///< variable
-   Add,  ///< addition
-   AddL, ///< addition with a constant in the left node
-   AddR, ///< addition with a constant in the right node
-   Sub,  ///< subtraction
-   SubL, ///< subtraction with a constant in the left node
-   SubR, ///< subtraction with a constant in the right node
-   Mul,  ///< multiplication
-   MulL, ///< multiplication with a constant in the left node
-   MulR, ///< multiplication with a constant in the right node
-   Div,  ///< division
-   DivL, ///< division with a constant in the left node
-   DivR, ///< division with a constant in the right node
-   Min,  ///< minimum
-   Max,  ///< maximum
-   Usb,  ///< unary subtraction
-   Abs,  ///< absolute value
-   Sgn,  ///< sign
-   Sqr,  ///< square
-   Sqrt, ///< square root
-   Pow,  ///< power
-   Exp,  ///< exponential
-   Log,  ///< logarithm
-   Cos,  ///< cosine
-   Sin,  ///< sine
-   Tan,  ///< tangent
-   Cosh, ///< hyperbolic cosine
-   Sinh, ///< hyperbolic sine
-   Tanh  ///< hyperbolic tangent
+   Cst,   ///< constant
+   Var,   ///< variable
+   Add,   ///< addition
+   AddL,  ///< addition with a constant in the left node
+   AddR,  ///< addition with a constant in the right node
+   Sub,   ///< subtraction
+   SubL,  ///< subtraction with a constant in the left node
+   SubR,  ///< subtraction with a constant in the right node
+   Mul,   ///< multiplication
+   MulL,  ///< multiplication with a constant in the left node
+   MulR,  ///< multiplication with a constant in the right node
+   Div,   ///< division
+   DivL,  ///< division with a constant in the left node
+   DivR,  ///< division with a constant in the right node
+   Min,   ///< minimum
+   Max,   ///< maximum
+   Usb,   ///< unary subtraction
+   Abs,   ///< absolute value
+   Sgn,   ///< sign
+   Sqr,   ///< square
+   Sqrt,  ///< square root
+   Pow,   ///< power
+   Exp,   ///< exponential
+   Log,   ///< logarithm
+   Cos,   ///< cosine
+   Sin,   ///< sine
+   Tan,   ///< tangent
+   Cosh,  ///< hyperbolic cosine
+   Sinh,  ///< hyperbolic sine
+   Tanh,  ///< hyperbolic tangent
+   Acos,  ///< arc-cosine
+   Asin,  ///< arc-sine
+   Atan,  ///< arc-tangent
+   Acosh, ///< hyperbolic arc-cosine
+   Asinh, ///< hyperbolic arc-sine
+   Atanh  ///< hyperbolic arc-tangent
 };
 
 /// Output on a stream
@@ -278,6 +284,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    FlatFunction *f_; // target function
@@ -316,6 +328,12 @@ public:
    void apply(const DagCosh *d) override;
    void apply(const DagSinh *d) override;
    void apply(const DagTanh *d) override;
+   void apply(const DagAcos *d) override;
+   void apply(const DagAsin *d) override;
+   void apply(const DagAtan *d) override;
+   void apply(const DagAcosh *d) override;
+   void apply(const DagAsinh *d) override;
+   void apply(const DagAtanh *d) override;
    void apply(const DagLin *d) override;
    ///@}
 
@@ -362,6 +380,12 @@ public:
    void apply(const DagCosh *d) override;
    void apply(const DagSinh *d) override;
    void apply(const DagTanh *d) override;
+   void apply(const DagAcos *d) override;
+   void apply(const DagAsin *d) override;
+   void apply(const DagAtan *d) override;
+   void apply(const DagAcosh *d) override;
+   void apply(const DagAsinh *d) override;
+   void apply(const DagAtanh *d) override;
    void apply(const DagLin *d) override;
    ///@}
 

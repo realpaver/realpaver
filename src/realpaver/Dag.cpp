@@ -78,6 +78,18 @@ std::ostream &operator<<(std::ostream &os, DagSymbol op)
       return os << "sinh";
    case DagSymbol::Tanh:
       return os << "tanh";
+   case DagSymbol::Acos:
+      return os << "acos";
+   case DagSymbol::Asin:
+      return os << "asin";
+   case DagSymbol::Atan:
+      return os << "atan";
+   case DagSymbol::Acosh:
+      return os << "acosh";
+   case DagSymbol::Asinh:
+      return os << "asinh";
+   case DagSymbol::Atanh:
+      return os << "atanh";
    case DagSymbol::Lin:
       return os << "lin";
 
@@ -721,6 +733,108 @@ void DagTanh::iEvalNode()
 
 /*----------------------------------------------------------------------------*/
 
+DagAcos::DagAcos(Dag *dag, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Acos, lsub)
+{
+}
+
+void DagAcos::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagAcos::iEvalNode()
+{
+   setIval(acos(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagAsin::DagAsin(Dag *dag, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Asin, lsub)
+{
+}
+
+void DagAsin::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagAsin::iEvalNode()
+{
+   setIval(asin(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagAtan::DagAtan(Dag *dag, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Atan, lsub)
+{
+}
+
+void DagAtan::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagAtan::iEvalNode()
+{
+   setIval(atan(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagAcosh::DagAcosh(Dag *dag, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Acosh, lsub)
+{
+}
+
+void DagAcosh::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagAcosh::iEvalNode()
+{
+   setIval(acosh(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagAsinh::DagAsinh(Dag *dag, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Asinh, lsub)
+{
+}
+
+void DagAsinh::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagAsinh::iEvalNode()
+{
+   setIval(asinh(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagAtanh::DagAtanh(Dag *dag, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Atanh, lsub)
+{
+}
+
+void DagAtanh::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagAtanh::iEvalNode()
+{
+   setIval(atanh(child()->ival()));
+}
+
+/*----------------------------------------------------------------------------*/
+
 DagLin::DagLin(Dag *dag, const TermLin &tl, const IndexList &lsub)
     : DagOp(dag, DagSymbol::Lin, lsub)
     , cst_()
@@ -1122,6 +1236,9 @@ DagFun *Dag::fun(size_t i) const
 
 size_t Dag::insert(Constraint c)
 {
+   if (c.hasNoId())
+      THROW("An identifier is required for: " << c);
+
    DagCreator creator(this, c);
    c.acceptVisitor(creator);
    size_t idx = creator.index();
@@ -1132,6 +1249,7 @@ size_t Dag::insert(Constraint c)
 size_t Dag::insert(Term t, const Interval &img)
 {
    Constraint c(t == 0.0);
+   c.setId(0);
    size_t idx = insert(c);
    fun_[idx]->setImage(img);
    return idx;
@@ -1576,6 +1694,36 @@ void DagVisitor::apply(const DagTanh *d)
    THROW("visit method not implemented");
 }
 
+void DagVisitor::apply(const DagAcos *d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagAsin *d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagAtan *d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagAcosh *d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagAsinh *d)
+{
+   THROW("visit method not implemented");
+}
+
+void DagVisitor::apply(const DagAtanh *d)
+{
+   THROW("visit method not implemented");
+}
+
 void DagVisitor::apply(const DagLin *d)
 {
    THROW("visit method not implemented");
@@ -1746,6 +1894,48 @@ void DagFunCreator::apply(const DagTanh *d)
 {
    visitSubNodes(d);
    DagTanh *aux = const_cast<DagTanh *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagAcos *d)
+{
+   visitSubNodes(d);
+   DagAcos *aux = const_cast<DagAcos *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagAsin *d)
+{
+   visitSubNodes(d);
+   DagAsin *aux = const_cast<DagAsin *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagAtan *d)
+{
+   visitSubNodes(d);
+   DagAtan *aux = const_cast<DagAtan *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagAcosh *d)
+{
+   visitSubNodes(d);
+   DagAcosh *aux = const_cast<DagAcosh *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagAsinh *d)
+{
+   visitSubNodes(d);
+   DagAsinh *aux = const_cast<DagAsinh *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagAtanh *d)
+{
+   visitSubNodes(d);
+   DagAtanh *aux = const_cast<DagAtanh *>(d);
    f_->insertOpNode(aux);
 }
 
@@ -2013,6 +2203,48 @@ void DagTermCreator::apply(const TermTanh *t)
 {
    visitSubnodes(t);
    DagTanh *node = new DagTanh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermAcos *t)
+{
+   visitSubnodes(t);
+   DagAcos *node = new DagAcos(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermAsin *t)
+{
+   visitSubnodes(t);
+   DagAsin *node = new DagAsin(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermAtan *t)
+{
+   visitSubnodes(t);
+   DagAtan *node = new DagAtan(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermAcosh *t)
+{
+   visitSubnodes(t);
+   DagAcosh *node = new DagAcosh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermAsinh *t)
+{
+   visitSubnodes(t);
+   DagAsinh *node = new DagAsinh(dag_, lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermAtanh *t)
+{
+   visitSubnodes(t);
+   DagAtanh *node = new DagAtanh(dag_, lsub_);
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 

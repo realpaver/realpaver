@@ -395,34 +395,46 @@ public:
    friend Interval sinhPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Arccosine
+   /// @name Arc-cosine
    ///@{
    friend Interval acos(const Interval &x);
+   friend Interval acosPX(const Interval &x, const Interval &y);
+   friend Interval acosPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Arcsine
+   /// @name Arc-sine
    ///@{
    friend Interval asin(const Interval &x);
+   friend Interval asinPX(const Interval &x, const Interval &y);
+   friend Interval asinPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Arctangent
+   /// @name Arc-tangent
    ///@{
    friend Interval atan(const Interval &x);
+   friend Interval atanPX(const Interval &x, const Interval &y);
+   friend Interval atanPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Hyperbolic arccosine
+   /// @name Hyperbolic arc-cosine
    ///@{
    friend Interval acosh(const Interval &x);
+   friend Interval acoshPX(const Interval &x, const Interval &y);
+   friend Interval acoshPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Hyperbolic arcsine
+   /// @name Hyperbolic arc-sine
    ///@{
    friend Interval asinh(const Interval &x);
+   friend Interval asinhPX(const Interval &x, const Interval &y);
+   friend Interval asinhPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Hyperbolic arctangent
+   /// @name Hyperbolic arc-tangent
    ///@{
    friend Interval atanh(const Interval &x);
+   friend Interval atanhPX(const Interval &x, const Interval &y);
+   friend Interval atanhPY(const Interval &x, const Interval &y);
    ///@}
 
    ///@{

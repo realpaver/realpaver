@@ -57,6 +57,11 @@ void Constraint::setId(int id)
    rep_->setId(id);
 }
 
+bool Constraint::hasNoId() const
+{
+   return rep_->hasNoId();
+}
+
 bool Constraint::isConstant() const
 {
    return rep_->isConstant();

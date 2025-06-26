@@ -15,10 +15,14 @@ void init()
    y = prob->addRealVar(0, 0, "y");
    z = prob->addRealVar(0, 0, "z");
 
+   size_t i = prob->addCtr(2 * x - y + z - 1 == 0);
+   size_t j = prob->addCtr(2 * x - y + z - 1 >= 0);
+   size_t k = prob->addCtr(2 * x + sqr(y) + z == 0);
+
    dag = std::make_shared<Dag>();
-   dag->insert(2 * x - y + z - 1 == 0);
-   dag->insert(2 * x - y + z - 1 >= 0);
-   dag->insert(2 * x + sqr(y) + z == 0);
+   dag->insert(prob->ctrAt(i));
+   dag->insert(prob->ctrAt(j));
+   dag->insert(prob->ctrAt(k));
 
    B = new IntervalBox(prob->scope());
 }
