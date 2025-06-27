@@ -1,3 +1,4 @@
+#include "Domain.hpp"
 #include "realpaver/BoxReporter.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
@@ -6,6 +7,7 @@
 #include "realpaver/Solver.hpp"
 #include "realpaver/configure.hpp"
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -22,12 +24,20 @@ using namespace std;
 #define CYAN(s) "\033[36m" << s << "\033[39m"
 #define GRAY(s) "\033[37m" << s << "\033[39m"
 
+// processes the arguments on the command line
+bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
+                 string &paramFilename, string &logFilename, vector<string> &options,
+                 Interval &objBounds, string &msgError);
+
 // parses the filename
 void parseFilename(const std::string &filename, std::string &path, std::string &base,
                    std::string &ext);
 
-// processes the argulments on the command line
-bool processArgs(int argc, char **argv, string &filename, string &pfilename);
+// processes the options to assign parameters
+bool processOptions(Params &params, vector<string> &options, string &msgError);
+
+// replaces a tilde by the home directory in a filename.
+bool expandTildeInPath(const string &path, string &res, string &msgError);
 
 // inserts points at the end of a string
 string WP(const string &s, int n);
@@ -37,55 +47,94 @@ int main(int argc, char **argv)
 {
    try
    {
-      string filename = "", pfilename = "", sfilename = "";
+      string pbFilename = "", paramFilename = "", solFilename = "", logFilename = "",
+             msgError = "";
+      vector<string> options;
+      Interval objBounds = Interval::universe();
 
       // processes the arguments
-      bool ok = processArgs(argc, argv, filename, pfilename);
+      bool ok = processArgs(argc, argv, pbFilename, solFilename, paramFilename,
+                            logFilename, options, objBounds, msgError);
       if (!ok)
-         THROW("Bad arguments on the command line");
+         THROW(msgError);
 
       // parses the problem file name
       string baseFilename, pathFilename, extFilename;
-      parseFilename(filename, pathFilename, baseFilename, extFilename);
+      parseFilename(pbFilename, pathFilename, baseFilename, extFilename);
 
       // tries to open the problem file
-      ifstream infile(filename);
+      ifstream infile(pbFilename);
       if (!infile.is_open())
-         THROW("Bad problem filename: " << filename);
+         THROW("Bad problem filename: " << pbFilename);
       else
          infile.close();
 
       // reads the parameters
       Params params;
-      if (pfilename != "")
-         params.loadParam(pfilename);
+      if (paramFilename != "")
+         params.loadParam(paramFilename);
+      ok = processOptions(params, options, msgError);
+      if (!ok)
+         THROW(msgError);
 
       // logger
 #if LOG_ON
       LogLevel loglevel = StringToLogLevel(params.getStrParam("LOG_LEVEL"));
-      string flog = "";
       if (loglevel != LogLevel::none)
       {
-         flog = baseFilename + ".log";
-         Logger::init(loglevel, flog);
+         if (logFilename == "")
+            logFilename = baseFilename + ".log";
+         Logger::init(loglevel, logFilename);
       }
 #endif
 
       LOG_MAIN("CSP solving");
-      LOG_MAIN("Input file: " << filename);
+      LOG_MAIN("Input file: " << pbFilename);
+      if (paramFilename != "")
+         LOG_MAIN("Parameter file: " << paramFilename);
       LOG_MAIN("Parsing...");
 
       // parsing
       Parser parser(params);
       Problem problem;
 
-      ok = parser.parseFile(filename, problem);
+      ok = parser.parseFile(pbFilename, problem);
       if (!ok)
          THROW("Parse error: " << parser.getParseError());
 
       LOG_MAIN("End of parsing");
-      if (!problem.isCSP())
-         THROW("Not a CSP");
+      if (problem.nbCtrs() == 0)
+         THROW("There is no constraint!");
+
+      if (objBounds.isEmpty())
+      {
+         THROW("The bounds of the objective function are invalid");
+         std::cout << "tutu" << endl;
+      }
+
+      if (problem.hasObjective())
+      {
+         Objective obj = problem.getObjective();
+         Variable z = obj.getVar();
+         Domain *dom = z.getDomain();
+         dom->contract(objBounds);
+
+         if (dom->isEmpty())
+            THROW("The objective function has an empty domain");
+
+         Constraint cobj(obj.getVar() == obj.getTerm());
+         problem.addCtr(cobj);
+
+         LOG_MAIN("Bounds of objective function: " << objBounds);
+         LOG_MAIN("Constraint added: " << cobj);
+      }
+      else
+      {
+         if (objBounds.isSetNeq(Interval::universe()))
+         {
+            LOG_MAIN("Bound(s) given but there is no objective function")
+         }
+      }
 
       // solving
       Solver solver(problem);
@@ -103,9 +152,10 @@ int main(int argc, char **argv)
       solver.solve();
       ////////////////////
 
-      string solfilename = baseFilename + ".sol";
+      if (solFilename == "")
+         solFilename = baseFilename + ".sol";
       ofstream fsol;
-      fsol.open(solfilename, std::ofstream::out);
+      fsol.open(solFilename, std::ofstream::out);
       if (fsol.bad())
          THROW("Open error of solution file");
 
@@ -113,15 +163,18 @@ int main(int argc, char **argv)
       cout << GRAY(sep) << endl;
       cout << BLUE("Files") << endl;
 
-      cout << indent << WP("Input file", wpl) << BLACK(filename) << endl;
+      cout << indent << WP("Input file", wpl) << BLACK(pbFilename) << endl;
+
+      if (paramFilename != "")
+         cout << indent << WP("Parameter file", wpl) << BLACK(paramFilename) << endl;
 
 #if LOG_ON
       cout << indent << WP("Log file", wpl);
-      string meslog = (loglevel != LogLevel::none) ? flog : "no log";
+      string meslog = (loglevel != LogLevel::none) ? logFilename : "no log";
       cout << BLACK(meslog) << endl;
 #endif
 
-      cout << indent << WP("Output file", wpl) << BLACK(solfilename) << endl;
+      cout << indent << WP("Output file", wpl) << BLACK(solFilename) << endl;
 
       // preprocessing
       cout << GRAY(sep) << endl;
@@ -134,7 +187,7 @@ int main(int argc, char **argv)
       auto now = chrono::system_clock::now();
       std::time_t end_time = chrono::system_clock::to_time_t(now);
 
-      fsol << WP("Input file", wpl) << filename << endl;
+      fsol << WP("Input file", wpl) << pbFilename << endl;
       fsol << WP("Current date and time", wpl) << ctime(&end_time) << endl;
 
       if (prepro == "YES")
@@ -420,36 +473,164 @@ int main(int argc, char **argv)
    return 0;
 }
 
-bool processArgs(int argc, char **argv, string &filename, string &pfilename)
+bool processArgs(int argc, char **argv, string &pbFilename, string &solFilename,
+                 string &paramFilename, string &logFilename, vector<string> &options,
+                 Interval &objBounds, string &msgError)
 {
-   bool hasfile = false;
    int i = 1;
+   bool ok = true;
 
-   while (i < argc)
+   pbFilename = "";
+   paramFilename = "";
+   solFilename = "";
+   logFilename = "";
+   options.clear();
+
+   while (i < argc && ok)
    {
       std::string text(argv[i]);
-      if (text[0] != '-' && !hasfile)
+
+      if (text.length() > 2 && text.substr(0, 2) == "-P")
       {
-         filename = text;
-         hasfile = true;
-         i = i + 1;
-      }
-      else if (text == "-p")
-      {
-         i = i + 1;
-         if (i == argc)
-            return false;
+         if (paramFilename != "")
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
          else
          {
-            pfilename = std::string(argv[i]);
-            i = i + 1;
+            string str = text.substr(2, text.length() - 2);
+            ok = expandTildeInPath(str, paramFilename, msgError);
+
+            if (ok)
+            {
+               ifstream f(paramFilename);
+               if (f)
+                  f.close();
+
+               else
+               {
+                  msgError = "Bad argument: " + text;
+                  ok = false;
+               }
+            }
          }
       }
+      else if (text.length() > 7 && text.substr(0, 7) == "-LOWER=")
+      {
+         string str = text.substr(7, text.length() - 7);
+         Interval x(str.c_str());
+         if (!x.isEmpty())
+            objBounds.setLeft(x.left());
+         else
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+      }
+      else if (text.length() > 7 && text.substr(0, 7) == "-UPPER=")
+      {
+         string str = text.substr(7, text.length() - 7);
+         Interval x(str.c_str());
+         if (!x.isEmpty())
+            objBounds.setRight(x.right());
+         else
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+      }
+      else if (text.length() > 2 && text.substr(0, 2) == "-L")
+      {
+         if (logFilename != "")
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+         else
+         {
+            string str = text.substr(2, text.length() - 2);
+            ok = expandTildeInPath(str, logFilename, msgError);
+
+            if (ok)
+            {
+               std::ofstream of;
+               of.open(logFilename, std::ofstream::out);
+               if (of.bad())
+               {
+                  msgError = "Open error of log file";
+                  ok = false;
+               }
+               else
+               {
+                  of.close();
+               }
+            }
+         }
+      }
+      else if (text.length() > 2 && text.substr(0, 2) == "-O")
+      {
+         if (solFilename != "")
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+         else
+         {
+            string str = text.substr(2, text.length() - 2);
+            ok = expandTildeInPath(str, solFilename, msgError);
+
+            if (ok)
+            {
+               std::ofstream of;
+               of.open(solFilename, std::ofstream::out);
+               if (of.bad())
+               {
+                  msgError = "Open error of solution file";
+                  ok = false;
+               }
+               else
+               {
+                  of.close();
+               }
+            }
+         }
+      }
+      else if (text.length() > 2 && text.substr(0, 2) == "-D")
+      {
+         options.push_back(text.substr(2, text.length() - 2));
+      }
       else
-         return false;
+      {
+         if (pbFilename != "")
+         {
+            msgError = "Bad argument: " + text;
+            ok = false;
+         }
+         else
+         {
+            pbFilename = text;
+            ifstream f(pbFilename);
+            if (f)
+               f.close();
+
+            else
+            {
+               msgError = "Bad argument: " + text;
+               ok = false;
+            }
+         }
+      }
+      i++;
    }
 
-   return hasfile;
+   if (pbFilename == "")
+   {
+      msgError = "No problem file!";
+      ok = false;
+   }
+
+   return ok;
 }
 
 void parseFilename(const std::string &filename, std::string &path, std::string &base,
@@ -495,6 +676,45 @@ void parseFilename(const std::string &filename, std::string &path, std::string &
       base = filename.substr(pos, k - pos);
       ext = filename.substr(k, filename.length() - k);
    }
+}
+
+bool processOptions(Params &params, vector<string> &options, string &msgError)
+{
+   for (const string &opt : options)
+   {
+      if (!params.readParam(opt))
+      {
+         msgError = "Bad option: " + opt;
+         return false;
+      }
+   }
+   return true;
+}
+
+bool expandTildeInPath(const string &path, string &res, string &msgError)
+{
+   res = "";
+   for (char c : path)
+   {
+      if (c == '~')
+      {
+         const char *home = std::getenv("HOME");
+         if (home)
+         {
+            res += string(home);
+         }
+         else
+         {
+            msgError = "Not able to replace ~ by HOME in " + path;
+            return false;
+         }
+      }
+      else
+      {
+         res += string(1, c);
+      }
+   }
+   return true;
 }
 
 string WP(const string &s, int n)

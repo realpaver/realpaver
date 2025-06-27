@@ -34,28 +34,34 @@ class TermVisitor;
 
 /// Enumeration of term node symbols
 enum class TermSymbol {
-   Cst,  ///< constant
-   Var,  ///< variable
-   Add,  ///< addition
-   Sub,  ///< subtraction
-   Mul,  ///< multiplication
-   Div,  ///< division
-   Min,  ///< minimum
-   Max,  ///< maximum
-   Usb,  ///< unary subtraction
-   Abs,  ///< absolute value
-   Sgn,  ///< sign
-   Sqr,  ///< square
-   Sqrt, ///< square root
-   Pow,  ///< power
-   Exp,  ///< exponential
-   Log,  ///< logarithm
-   Cos,  ///< cosine
-   Sin,  ///< sine
-   Tan,  ///< tangent
-   Cosh, ///< hyperbolic cosine
-   Sinh, ///< hyperbolic sine
-   Tanh  ///< hyperbolic tangent
+   Cst,   ///< constant
+   Var,   ///< variable
+   Add,   ///< addition
+   Sub,   ///< subtraction
+   Mul,   ///< multiplication
+   Div,   ///< division
+   Min,   ///< minimum
+   Max,   ///< maximum
+   Usb,   ///< unary subtraction
+   Abs,   ///< absolute value
+   Sgn,   ///< sign
+   Sqr,   ///< square
+   Sqrt,  ///< square root
+   Pow,   ///< power
+   Exp,   ///< exponential
+   Log,   ///< logarithm
+   Cos,   ///< cosine
+   Sin,   ///< sine
+   Tan,   ///< tangent
+   Cosh,  ///< hyperbolic cosine
+   Sinh,  ///< hyperbolic sine
+   Tanh,  ///< hyperbolic tangent
+   Acos,  ///< arc-cosine
+   Asin,  ///< arc-sine
+   Atan,  ///< arc-tangent
+   Acosh, ///< hyperbolic arc-cosine
+   Asinh, ///< hyperbolic arc-sine
+   Atanh  ///< hyperbolic arc-tangent
 };
 
 /// Output on a stream
@@ -441,6 +447,24 @@ Term sinh(Term t);
 
 /// Returns tanh(t)
 Term tanh(Term t);
+
+/// Returns acos(t)
+Term acos(Term t);
+
+/// Returns asin(t)
+Term asin(Term t);
+
+/// Returns atan(t)
+Term atan(Term t);
+
+/// Returns acosh(t)
+Term acosh(Term t);
+
+/// Returns asinh(t)
+Term asinh(Term t);
+
+/// Returns atanh(t)
+Term atanh(Term t);
 ///@}
 
 /*----------------------------------------------------------------------------*/
@@ -893,6 +917,96 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
+/// Arc-cosine of a term
+class TermAcos : public TermOp {
+public:
+   /// Constructor
+   TermAcos(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Arc-sine of a term
+class TermAsin : public TermOp {
+public:
+   /// Constructor
+   TermAsin(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Arc-tangent of a term
+class TermAtan : public TermOp {
+public:
+   /// Constructor
+   TermAtan(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic arc-cosine of a term
+class TermAcosh : public TermOp {
+public:
+   /// Constructor
+   TermAcosh(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic arc-sine of a term
+class TermAsinh : public TermOp {
+public:
+   /// Constructor
+   TermAsinh(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic arc-tangent of a term
+class TermAtanh : public TermOp {
+public:
+   /// Constructor
+   TermAtanh(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
 /// Base class of visitors of terms
 class TermVisitor {
 public:
@@ -921,6 +1035,12 @@ public:
    virtual void apply(const TermCosh *t);
    virtual void apply(const TermSinh *t);
    virtual void apply(const TermTanh *t);
+   virtual void apply(const TermAcos *t);
+   virtual void apply(const TermAsin *t);
+   virtual void apply(const TermAtan *t);
+   virtual void apply(const TermAcosh *t);
+   virtual void apply(const TermAsinh *t);
+   virtual void apply(const TermAtanh *t);
 };
 
 /*----------------------------------------------------------------------------*/
@@ -967,6 +1087,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    bool sos_;            // true if this has visited a sum of squares

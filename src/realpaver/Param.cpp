@@ -955,6 +955,29 @@ void Params::makeGeneral()
    add(var_abs_tol);
 
    ////////////////////
+   ParamDbl obj_rel_tol;
+   str = std::string("Relative tolerance on the width of an interval domain ") +
+         "of the objective function";
+   obj_rel_tol.setName("OBJ_REL_TOL")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(0.0)
+       .setMinValue(0.0)
+       .setMaxValue(1.0);
+   add(obj_rel_tol);
+
+   ////////////////////
+   ParamDbl obj_abs_tol;
+   str = std::string("Absolute tolerance on the width of an interval domain ") +
+         "of the objective function";
+   obj_abs_tol.setName("OBJ_ABS_TOL")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(1.0e-6)
+       .setMinValue(0.0);
+   add(obj_abs_tol);
+
+   ////////////////////
    ParamInt float_prec;
    float_prec.setName("FLOAT_PRECISION")
        .setCat(cat)
@@ -1702,6 +1725,19 @@ void Params::makeInterval()
 void Params::setParam(const std::string &name, const std::string &val)
 {
    processParam(name, val);
+}
+
+bool Params::readParam(const std::string &str)
+{
+   try
+   {
+      readParam(str, 0);
+   }
+   catch (realpaver::Exception &e)
+   {
+      return false;
+   }
+   return true;
 }
 
 } // namespace realpaver

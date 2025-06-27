@@ -278,6 +278,42 @@ struct Double {
       return std::tanh(x);
    }
 
+   /// Arc-cosine
+   static inline ValueType acos(ValueType x)
+   {
+      return std::acos(x);
+   }
+
+   /// Arc-sine
+   static inline ValueType asin(ValueType x)
+   {
+      return std::asin(x);
+   }
+
+   /// Arc-tangent
+   static inline ValueType atan(ValueType x)
+   {
+      return std::atan(x);
+   }
+
+   /// Hyperbolic arc-cosine
+   static inline ValueType acosh(ValueType x)
+   {
+      return std::acosh(x);
+   }
+
+   /// Hyperbolic arc-sine
+   static inline ValueType asinh(ValueType x)
+   {
+      return std::asinh(x);
+   }
+
+   /// Hyperbolic arc-tangent
+   static inline ValueType atanh(ValueType x)
+   {
+      return std::atanh(x);
+   }
+
    /// Sign function
    static inline ValueType sgn(ValueType x)
    {

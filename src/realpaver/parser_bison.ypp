@@ -46,6 +46,8 @@ extern realpaver::RangeUnion* realpaver_range_union;
 
 extern realpaver::ConstraintRep* realpaver_ctr_rep;
 
+extern bool realpaver_minimization;
+
 extern int realpaver_bison_lex(void);
 int realpaver_bison_error(const char* str);
 
@@ -85,13 +87,14 @@ extern realpaver::FunctionSymbol* realpaver_fun_symbol;
 %type <u_ctr>     ctr_atom
 
 %token TK_IDENT TK_INT TK_REAL
-%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_OBJ TK_STR_FUN TK_STR_ALIAS
+%token TK_STR_VAR TK_STR_CONST TK_STR_CTR TK_STR_FUN TK_STR_ALIAS
 %token TK_STR_INT TK_STR_TOL TK_STR_BIN TK_STR_REAL
 %token TK_TABLE TK_PW
 %token TK_EQ TK_EQ_EQ TK_LE TK_GE TK_IN TK_LT TK_GT TK_IMPLY
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_POW TK_CARET TK_SQR TK_SQRT TK_LOG TK_EXP
 %token TK_TAN TK_COS TK_SIN TK_COSH TK_SINH TK_TANH
+%token TK_ACOS TK_ASIN TK_ATAN TK_ACOSH TK_ASINH TK_ATANH
 %token TK_LPAR TK_RPAR TK_LSBR TK_RSBR TK_LCBR TK_RCBR TK_PIPE
 %token TK_COMMA TK_SCOLON TK_COLON
 %token TK_SGN TK_ABS TK_MIN TK_MAX
@@ -587,40 +590,57 @@ ctr_atom
   ;
 
 obj_statement
-  : TK_STR_OBJ obj_list
-  ;
-
-obj_list
-  : obj_def obj_tail
-  ;
-
-obj_tail
-  :
-  | TK_COMMA obj_list
+  : TK_MIN
+    {
+      realpaver_minimization = true;
+    }
+    obj_def
+  | TK_MAX
+    {
+      realpaver_minimization = false;
+    }
+    obj_def
   ;
 
 obj_def
-  : TK_MIN expr
+   : ident TK_EQ expr
     {
-      realpaver::Term f(realpaver::Term::SharedRep($2));
+      // objective variable
+      realpaver::Variable v;
+
+      realpaver::VariableSymbol* vs =
+         realpaver_bison_symtab->findVariable($1);
+
+      if (vs != nullptr)
+      {
+        // this variable has been declared => reuse it
+        v = vs->getVar();
+      }
+      else
+      {
+        // this variable has not been declared => create it
+        v = realpaver_bison_problem->addRealVar(realpaver::Interval::universe(), $1);
+
+        realpaver_bison_symtab->insertVariable($1, v);
+      }
+
+      // tolerances
+      double rtol = realpaver_bison_params->getDblParam("OBJ_REL_TOL"),
+             atol = realpaver_bison_params->getDblParam("OBJ_ABS_TOL");
+      v.setTolerance(realpaver::Tolerance(rtol, atol));
+
+      // objective function
+      realpaver::Term f(realpaver::Term::SharedRep($3));
       if (f.isConstant())
       {
         realpaver_bison_error("Constant objective function");
         YYABORT;
       }
 
-      realpaver_bison_problem->addObjective(MIN(f));
-    }
-  | TK_MAX expr
-    {
-      realpaver::Term f(realpaver::Term::SharedRep($2));
-      if (f.isConstant())
-      {
-        realpaver_bison_error("Constant objective function");
-        YYABORT;
-      }
-
-      realpaver_bison_problem->addObjective(MAX(f));
+      if (realpaver_minimization)
+        realpaver_bison_problem->addObjective(minimize(v, f));
+      else
+        realpaver_bison_problem->addObjective(maximize(v, f));
     }
   ;
 
@@ -933,6 +953,42 @@ expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
                       res(tanh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ACOS TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(acos(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ASIN TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(asin(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ATAN TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(atan(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ACOSH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(acosh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ASINH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(asinh(t));
+      $$ = res.cloneRoot();
+    }
+  | TK_ATANH TK_LPAR expr TK_RPAR
+    {
+      realpaver::Term t(realpaver::Term::SharedRep($3)),
+                      res(atanh(t));
       $$ = res.cloneRoot();
     }
   | TK_MIN TK_LPAR expr TK_COMMA expr TK_RPAR

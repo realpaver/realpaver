@@ -346,7 +346,7 @@ void IntervalBox::print(std::ostream &os) const
 
 bool IntervalBox::isSplitable(const Variable &v) const
 {
-   return !v.getTolerance().isTight(get(v));
+   return v.isSplitable() && (!v.getTolerance().isTight(get(v)));
 }
 
 bool IntervalBox::isVectorizable() const

@@ -43,7 +43,6 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "Constants"     return TK_STR_CONST;
 "Aliases"       return TK_STR_ALIAS;
 "Constraints"   return TK_STR_CTR;
-"Objectives"    return TK_STR_OBJ;
 "Functions"     return TK_STR_FUN;
 
 "integer"       return TK_STR_INT;
@@ -57,6 +56,8 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "max"    return TK_MAX;
 "MIN"    return TK_MIN;
 "MAX"	   return TK_MAX;
+"Min"    return TK_MIN;
+"Max"	   return TK_MAX;
 "sqr"	   return TK_SQR;
 "sqrt"	return TK_SQRT;
 "log"    return TK_LOG;
@@ -70,6 +71,12 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "cosh"   return TK_COSH;
 "sinh"   return TK_SINH;
 "tanh"   return TK_TANH;
+"acos"   return TK_ACOS;
+"asin"   return TK_ASIN;
+"atan"   return TK_ATAN;
+"acosh"  return TK_ACOSH;
+"asinh"  return TK_ASINH;
+"atanh"  return TK_ATANH;
 
 "in"     return TK_IN;
 "-inf"   return TK_MINUS_INF;
@@ -126,6 +133,9 @@ realpaver::RangeUnion* realpaver_range_union;
 
 // constraint representation used to parse (conditional) constraints
 realpaver::ConstraintRep* realpaver_ctr_rep;
+
+// optimization sense
+bool realpaver_minimization;
 
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;

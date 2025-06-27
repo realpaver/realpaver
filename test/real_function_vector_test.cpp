@@ -9,7 +9,7 @@ void test_diff()
    Term t = pow(x, 2) + 2 * y;
 
    SharedDag dag = std::make_shared<Dag>();
-   dag->insert(t == 0);
+   dag->insert(t);
    RealFunctionVector rfv(dag);
 
    RealPoint rp(rfv.scope());

@@ -50,6 +50,7 @@ VariableRep::VariableRep(const std::string &name)
     , dom_(nullptr)
     , status_(VariableStatus::Decision)
     , tol_(0.0, 0.0)
+    , split_(true)
 {
    dom_ = new IntervalDomain(Interval::universe());
 }
@@ -132,6 +133,16 @@ Tolerance VariableRep::getTolerance() const
 void VariableRep::setTolerance(const Tolerance &tol)
 {
    tol_ = tol;
+}
+
+void VariableRep::setSplitable(bool splitable)
+{
+   split_ = splitable;
+}
+
+bool VariableRep::isSplitable() const
+{
+   return split_;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -231,6 +242,17 @@ bool Variable::operator!=(const Variable &other) const
    return rep_.get() != other.rep_.get();
 }
 
+Variable &Variable::setSplitable(bool splitable)
+{
+   rep_->setSplitable(splitable);
+   return *this;
+}
+
+bool Variable::isSplitable() const
+{
+   return rep_->isSplitable();
+}
+
 std::ostream &operator<<(std::ostream &os, const Variable &v)
 {
    os << v.getName() << " in " << (*v.getDomain());
@@ -250,12 +272,13 @@ Variable Variable::clone() const
    v.setId(id())
        .setDomain(std::move(dom))
        .setTolerance(getTolerance())
-       .setStatus(getStatus());
+       .setStatus(getStatus())
+       .setSplitable(isSplitable());
 
    return v;
 }
 
-bool Variable::hasNullPointer() const
+bool Variable::hasNullRep() const
 {
    return rep_ == nullptr;
 }

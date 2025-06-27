@@ -2,77 +2,75 @@
 #include "realpaver/Problem.hpp"
 #include "test_config.hpp"
 
-Problem *P;
-IntervalBox *B;
-Variable x, y, z;
-
 void init()
 {
-   P = new Problem();
-   x = P->addRealVar(-10, 10, "x");
-   y = P->addRealVar(-10, 10, "y");
-   z = P->addRealVar(-10, 10, "z");
-   B = new IntervalBox(P->scope());
 }
 
 void clean()
 {
-   delete B;
-   delete P;
 }
 
 void test_single_occ()
 {
-   B->set(x, Interval(-1, 3));
-   B->set(y, Interval(-2, 2));
+   Problem P;
+   Variable x = P.addRealVar(-1, 3, "x"), y = P.addRealVar(-2, 2, "y");
+   IntervalBox B(P.scope());
+   size_t i = P.addCtr(sqr(x) + sqr(y) == 2.0);
+   size_t j = P.addCtr(y - sqr(x) == 0.0);
 
    SharedDag dag = std::make_shared<Dag>();
-   dag->insert(sqr(x) + sqr(y) == 2.0);
-   dag->insert(y - sqr(x) == 0.0);
+   dag->insert(P.ctrAt(i));
+   dag->insert(P.ctrAt(j));
 
    AffineCreator creator(dag);
    Bitset active(dag->nbFuns());
    active.setAllOne();
-   creator.create(*B, active);
+   creator.create(B, active);
 
    AffineForm f(3.0, {4.0}, {0}, 4.0), g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
 
    TEST_TRUE(f.equals(creator.fun(0)));
    TEST_TRUE(g.equals(creator.fun(1)));
 
-   TEST_TRUE(creator.fun(0).eval().contains(dag->fun(0)->iEval(*B)));
-   TEST_TRUE(creator.fun(1).eval().contains(dag->fun(1)->iEval(*B)));
+   TEST_TRUE(creator.fun(0).eval().contains(dag->fun(0)->iEval(B)));
+   TEST_TRUE(creator.fun(1).eval().contains(dag->fun(1)->iEval(B)));
 }
 
 void test_lin()
 {
-   B->set(x, Interval(-1, 3));
-   B->set(y, Interval(1, 6));
+   Problem P;
+   Variable x = P.addRealVar(-1, 3, "x"), y = P.addRealVar(1, 6, "y");
+   IntervalBox B(P.scope());
+   size_t i = P.addCtr(1.5 * x - 2.5 * y - 2.0 == 0);
 
    SharedDag dag = std::make_shared<Dag>();
-   dag->insert(1.5 * x - 2.5 * y - 2.0 == 0);
+   dag->insert(P.ctrAt(i));
 
    AffineCreator creator(dag);
-   creator.create(*B, 0);
+   creator.create(B, 0);
 
    AffineForm f(-9.25, {3.0, -6.25}, {0, 1});
    TEST_TRUE(f.equals(creator.fun(0)));
-   TEST_TRUE(creator.fun(0).eval().isSetEq(dag->fun(0)->iEval(*B)));
+   TEST_TRUE(creator.fun(0).eval().isSetEq(dag->fun(0)->iEval(B)));
 }
 
 void test_subset()
 {
-   B->set(x, Interval(-1, 3));
-   B->set(y, Interval(-2, 2));
+   Problem P;
+   Variable x = P.addRealVar(-1, 3, "x"), y = P.addRealVar(-2, 2, "y");
+   IntervalBox B(P.scope());
+   size_t i = P.addCtr(sqr(x) + sqr(y) == 2.0);
+   size_t j = P.addCtr(1.5 * x - 2.5 * y - 2.0 == 0);
+   size_t k = P.addCtr(y - sqr(x) == 0.0);
 
    SharedDag dag = std::make_shared<Dag>();
-   dag->insert(sqr(x) + sqr(y) == 2.0);
-   dag->insert(1.5 * x - 2.5 * y - 2.0 == 0);
-   dag->insert(y - sqr(x) == 0.0);
+   dag->insert(P.ctrAt(i));
+   dag->insert(P.ctrAt(j));
+   dag->insert(P.ctrAt(k));
 
    Bitset active({1, 0, 1});
    AffineCreator creator(dag);
-   creator.create(*B, active);
+   creator.create(B, active);
 
    AffineForm f(3.0, {4.0}, {0}, 4.0), g(-3.0, {-4.0, 2.0}, {0, 1}, 2.0);
 
