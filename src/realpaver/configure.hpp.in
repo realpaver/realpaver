@@ -12,13 +12,13 @@
  *----------------------------------------------------------------------------*/
 
 /* Define this to 1 to check assertions. */
-#mesondefine ASSERT_ON
+#mesondefine REALPAVER_ASSERT_ON
 
 /* Define this to 1 to turn on debugging. */
-#mesondefine DEBUG_ON
+#mesondefine REALPAVER_DEBUG_ON
 
 /* Define this to 1 to generate log files. */
-#mesondefine LOG_ON
+#mesondefine REALPAVER_LOG_ON
 
 /* Define to the full name of this package. */
 #define REALPAVER_NAME "@project_full_name@"

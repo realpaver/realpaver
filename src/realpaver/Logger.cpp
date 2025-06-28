@@ -18,6 +18,7 @@
  * @date   2024-4-11
  */
 
+#include "realpaver/Exception.hpp"
 #include "realpaver/Logger.hpp"
 #include <ctime>
 #include <limits>

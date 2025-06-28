@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/LPSolverHighs.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/LPModel.hpp"
+#include "realpaver/LPSolverHighs.hpp"
 #include "realpaver/Logger.hpp"
 #include <ostream>
 
@@ -160,7 +160,7 @@ LPStatus LPSolver::run()
 
    LPStatus status = toLPStatus();
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (status == LPStatus::Optimal)
    {
       LOG_INTER("Status: " << status << std::endl
