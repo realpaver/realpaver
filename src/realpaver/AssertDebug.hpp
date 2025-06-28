@@ -26,7 +26,7 @@
 
 namespace realpaver {
 
-#if ASSERT_ON
+#if REALPAVER_ASSERT_ON
 #define ASSERT(cond, msg)                                                                \
    if (!(cond))                                                                          \
    THROW(msg)
@@ -34,7 +34,7 @@ namespace realpaver {
 #define ASSERT(cond, msg)
 #endif
 
-#if DEBUG_ON
+#if REALPAVER_DEBUG_ON
 #define DEBUG(msg) std::cerr << msg << std::endl
 #else
 #define DEBUG(msg)

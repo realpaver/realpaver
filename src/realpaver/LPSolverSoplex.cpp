@@ -168,7 +168,7 @@ LPStatus LPSolver::run()
 
    LPStatus status = toLPStatus();
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (status == LPStatus::Optimal)
    {
       LOG_INTER("Status: " << status << std::endl

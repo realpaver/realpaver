@@ -303,7 +303,7 @@ Proof Solver::checkActivity(Node &node)
 
 void Solver::bpStep(int depthlimit, bool splitOff)
 {
-#if LOG_ON
+#if REALPAVER_LOG_ON
    static Timer timerStep;
    timerStep.start();
 #endif
@@ -317,7 +317,7 @@ void Solver::bpStep(int depthlimit, bool splitOff)
    // removes the node informations
    context_->remove(node->index());
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    timerStep.stop();
    LOG_INTER("Total time steps : " << timerStep.elapsedTime() << "(s)");
 #endif
@@ -325,7 +325,7 @@ void Solver::bpStep(int depthlimit, bool splitOff)
 
 void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
 {
-#if LOG_ON
+#if REALPAVER_LOG_ON
    static Timer timerPropag, timerSplit;
 #endif
 
@@ -335,14 +335,14 @@ void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
 
    node->setProof(Proof::Maybe);
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    timerPropag.start();
 #endif
 
    // contracts the box
    Proof proof = propagator_->contract(*node, *context_);
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    timerPropag.stop();
    LOG_INTER("Total time contraction : " << timerPropag.elapsedTime() << "(s)");
 #endif
@@ -382,7 +382,7 @@ void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
       return;
    }
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    timerSplit.start();
 #endif
 
@@ -401,7 +401,7 @@ void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
       LOG_INTER("Node " << node->index() << " is split into " << split_->getNbNodes()
                         << " sub-nodes");
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
       if (!splitOff)
          for (auto it = split_->begin(); it != split_->end(); ++it)
          {
@@ -423,7 +423,7 @@ void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
       }
    }
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    timerSplit.stop();
    LOG_INTER("Total time split : " << timerSplit.elapsedTime() << "(s)");
 #endif
@@ -489,7 +489,7 @@ void Solver::branchAndPrune()
    size_t last_nb_sol = 0;
    size_t nb_nodes_processed = 0;
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    static Timer timerBP;
    timerBP.start();
 #endif
@@ -553,7 +553,7 @@ void Solver::branchAndPrune()
          iter = false;
       }
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
       LOG_INTER("Total time BP : " << timerBP.elapsedTime() << "(s)");
 #endif
    } while (iter);
@@ -561,7 +561,7 @@ void Solver::branchAndPrune()
    double gap = env_->getParams()->getDblParam("SOLUTION_CLUSTER_GAP");
    space_->makeSolClusters(gap);
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    timerBP.stop();
    LOG_INTER("Total time BP : " << timerBP.elapsedTime() << "(s)");
 #endif

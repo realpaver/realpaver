@@ -124,7 +124,7 @@ Proof IntervalNewton::contract(IntervalBox &X)
    LOG_INTER("Interval Newton contractor on " << X);
 
 // analysis of the degree of contraction
-#if LOG_ON
+#if REALPAVER_LOG_ON
    IntervalBox saveX(X);
 #endif
 
@@ -204,7 +204,7 @@ Proof IntervalNewton::contract(IntervalBox &X)
    LOG_INTER("Reduced box -> " << X);
 
 // analysis of the degree of contraction
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (proof != Proof::Empty)
    {
       LOG_INTER("Newton reduction: " << saveX.width() << ", " << X.width());

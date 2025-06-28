@@ -21,12 +21,9 @@
 #ifndef REALPAVER_LOGGER_HPP
 #define REALPAVER_LOGGER_HPP
 
-#include "realpaver/Exception.hpp"
 #include "realpaver/configure.hpp"
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
 
 namespace realpaver {
@@ -109,7 +106,7 @@ private:
    Logger &operator=(const Logger &) = delete;
 };
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
 #define LOG(level, msg)                                                                  \
    if (level <= Logger::getInstance()->getLogLevel())                                    \
    {                                                                                     \
@@ -130,7 +127,7 @@ private:
 #define LOG_LOW(msg) LOG(LogLevel::low, msg)
 #define LOG_FULL(msg) LOG(LogLevel::full, msg)
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
 #define LOG_NL(level)                                                                    \
    if (level <= Logger::getInstance()->getLogLevel())                                    \
    {                                                                                     \
