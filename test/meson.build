@@ -193,6 +193,15 @@ real_function_vector_test = executable(
 )
 test('Test of real function vector', real_function_vector_test)
 
+relaxation_rlt_test = executable(
+  'relaxation_rlt_test',
+  sources: 'relaxation_rlt_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of RLT relaxations', relaxation_rlt_test)
+
 if local_solver_dep.found()
   nlp_solver_test = executable(
     'nlp_solver_test',

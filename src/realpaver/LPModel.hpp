@@ -221,6 +221,9 @@ public:
    /// Returns a pointer to the array of variable indexes of the terms of this
    int *getIndexVars() const;
 
+   /// Equality test
+   bool equals(const LinExprRep &other) const;
+
    /// Output on a stream
    void print(std::ostream &os) const;
 
@@ -279,6 +282,9 @@ public:
 
    /// Returns a pointer to the array of variable indexes of the terms of this
    int *getIndexVars() const;
+
+   /// Equality test
+   bool equals(const LinExpr &other) const;
 
    /// Output on a stream
    friend std::ostream &operator<<(std::ostream &os, const LinExpr &e);
