@@ -211,3 +211,12 @@ piecewise_test = executable(
   include_directories: ['../src'],
 )
 test('Test of piecewise', piecewise_test)
+
+h5_test = executable(
+  'hdf5_test',
+  sources: 'hdf5_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of HDF5', h5_test)

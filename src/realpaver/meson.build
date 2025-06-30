@@ -171,6 +171,7 @@ rp_headers += [
   'Env.hpp',
   'EnvSolver.hpp',
   'Exception.hpp',
+  'ExporterHDF5.hpp',
   'FlatFunction.hpp',
   'Inflator.hpp',
   'Integer.hpp',
@@ -307,6 +308,7 @@ rp_sources += [
   'Env.cpp',
   'EnvSolver.cpp',
   'Exception.cpp',
+  'ExporterHDF5.cpp',
   'FlatFunction.cpp',
   'Inflator.cpp',
   'Integer.cpp',
@@ -386,7 +388,7 @@ rp_sources += [
   'UnionFind.cpp',
   'Variable.cpp',
   'VariableVector.cpp',
-  'ZeroOne.cpp'
+  'ZeroOne.cpp',
 ]
 
 extra_dist = [
