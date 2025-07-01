@@ -15,16 +15,14 @@
  * @file   ConstraintPiecewise.cpp
  * @brief  Piecewise constraints
  * @author Laurent Granvilliers
- * @date   29 may 2025
+ * @date   29 May 2025
  */
 
 #include "Variable.hpp"
 #include "realpaver/ConstraintPiecewise.hpp"
 #include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/Problem.hpp"
-#include <algorithm>
 #include <initializer_list>
-#include <numeric>
 
 namespace realpaver {
 

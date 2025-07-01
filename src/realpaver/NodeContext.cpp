@@ -15,7 +15,7 @@
  * @file   NodeContext.cpp
  * @brief  Context for search nodes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"

@@ -15,32 +15,31 @@
  * @file   Common.hpp
  * @brief  Common types and functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_COMMON_HPP
 #define REALPAVER_COMMON_HPP
 
 #include <iostream>
-#include <limits>
 
 namespace realpaver {
 
 /// Returns the hash code of a value using std::hash
-template <typename T> std::size_t hash1(const T &x)
+template <typename T> size_t hash1(const T &x)
 {
    std::hash<T> fun;
    return fun(x);
 }
 
 /// Combines two hash codes
-std::size_t hash2(std::size_t h1, std::size_t h2);
+size_t hash2(size_t h1, size_t h2);
 
 /// Combines three hash codes
-std::size_t hash3(std::size_t h1, std::size_t h2, std::size_t h3);
+size_t hash3(size_t h1, size_t h2, size_t h3);
 
 /// Combines four hash codes
-std::size_t hash4(std::size_t h1, std::size_t h2, std::size_t h3, std::size_t h4);
+size_t hash4(size_t h1, size_t h2, size_t h3, size_t h4);
 
 /*----------------------------------------------------------------------------*/
 

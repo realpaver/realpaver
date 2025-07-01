@@ -15,12 +15,12 @@
  * @file   IntervalVector.cpp
  * @brief  Vector of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/IntervalVector.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 

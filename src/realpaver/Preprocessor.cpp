@@ -15,59 +15,75 @@
  * @file   Preprocessor.cpp
  * @brief  Preprocessor of problems
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
-#include "realpaver/ScopeBank.hpp"
 #include "realpaver/TermFixer.hpp"
 
 namespace realpaver {
 
-Preprocessor::Preprocessor()
-    : bridge_(nullptr)
+Preprocessor::Preprocessor(SharedProblem src)
+    : src_(src)
+    , dest_(nullptr)
+    , bridge_(nullptr)
     , inactive_()
     , active_()
     , unfeasible_(false)
     , timer_()
 {
+   ASSERT(src != nullptr, "Preprocessing error: empty problem");
+   ASSERT(!src->isEmpty(), "Preprocessing error: empty problem");
 }
 
-void Preprocessor::apply(Problem &src, Problem &dest)
+SharedProblem Preprocessor::srcProblem() const
 {
-   ASSERT(!src.isEmpty(), "Preprocessing error");
-   ASSERT(dest.isEmpty(), "Preprocessing error");
+   return src_;
+}
+
+SharedProblem Preprocessor::destProblem() const
+{
+   return dest_;
+}
+
+void Preprocessor::apply(bool on)
+{
+   if (!on)
+   {
+      dest_ = src_;
+      return;
+   }
 
    // resets this
    inactive_.clear();
    active_.clear();
    unfeasible_ = false;
 
-   // makes the bridge
-   bridge_ = std::make_shared<ProblemBridge>(src, dest);
+   // makes the new problem and the bridge
+   dest_ = std::make_shared<Problem>();
+   bridge_ = std::make_shared<ProblemBridge>(src_, dest_);
 
    LOG_MAIN("Preprocessing");
    LOG_INTER("Box: " << (bridge_->srcRegion()));
 
    timer_.reset();
    timer_.start();
-   applyImpl(src, dest);
+   applyImpl();
    timer_.stop();
 }
 
-void Preprocessor::applyImpl(Problem &src, Problem &dest)
+void Preprocessor::applyImpl()
 {
    DomainBox &box = bridge_->srcRegion();
-   Objective obj = src.getObjective();
+   Objective obj = src_->getObjective();
 
    // test empty domains
-   for (size_t i = 0; i < src.nbVars(); ++i)
+   for (size_t i = 0; i < src_->nbVars(); ++i)
    {
-      Variable v = src.varAt(i);
+      Variable v = src_->varAt(i);
       Domain *domain = box.get(v);
 
       if (domain->isEmpty())
@@ -79,7 +95,7 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
    }
 
    // propagation
-   bool ok = propagate(src, box);
+   bool ok = propagate(box);
    if (!ok)
    {
       unfeasible_ = true;
@@ -89,9 +105,9 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
    LOG_INTER("Contracted box: " << (box));
 
    // satisfaction tests
-   for (size_t i = 0; i < src.nbCtrs(); ++i)
+   for (size_t i = 0; i < src_->nbCtrs(); ++i)
    {
-      Constraint c = src.ctrAt(i);
+      Constraint c = src_->ctrAt(i);
       Proof proof = c.isSatisfied(box);
 
       if (proof == Proof::Empty)
@@ -116,9 +132,9 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
    LOG_MAIN("Number of inactive constraints: " << inactive_.size());
 
    // rewrites the variables
-   for (size_t i = 0; i < src.nbVars(); ++i)
+   for (size_t i = 0; i < src_->nbVars(); ++i)
    {
-      Variable v = src.varAt(i);
+      Variable v = src_->varAt(i);
       Domain *domain = box.get(v);
 
       bool isFixed = domain->isCanonical();
@@ -144,7 +160,7 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
 
    // rewrites the objective function; it must be done before processing the constraints
    // because the status of the objective variable can be changed from unfixed to fixed
-   if (src.hasObjective())
+   if (src_->hasObjective())
    {
       Variable z = obj.getVar();
       Term f = obj.getTerm();
@@ -176,9 +192,9 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
       {
          Variable dz = bridge_->srcToDestVar(z);
          if (obj.isMinimization())
-            dest.addObjective(minimize(dz, fixer.getTerm()));
+            dest_->addObjective(minimize(dz, fixer.getTerm()));
          else
-            dest.addObjective(maximize(dz, fixer.getTerm()));
+            dest_->addObjective(maximize(dz, fixer.getTerm()));
       }
    }
 
@@ -196,11 +212,11 @@ void Preprocessor::applyImpl(Problem &src, Problem &dest)
       }
 
       else
-         dest.addCtr(c);
+         dest_->addCtr(c);
    }
 }
 
-bool Preprocessor::propagate(Problem &problem, DomainBox &box)
+bool Preprocessor::propagate(DomainBox &box)
 {
    // AC1 propagation algorithm
    bool modified;
@@ -210,9 +226,9 @@ bool Preprocessor::propagate(Problem &problem, DomainBox &box)
       modified = false;
       DomainBox save(box);
 
-      for (size_t i = 0; i < problem.nbCtrs(); ++i)
+      for (size_t i = 0; i < src_->nbCtrs(); ++i)
       {
-         Constraint c = problem.ctrAt(i);
+         Constraint c = src_->ctrAt(i);
          Proof proof = c.contract(box);
          if (proof == Proof::Empty)
          {

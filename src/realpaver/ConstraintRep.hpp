@@ -15,14 +15,16 @@
  * @file   ConstraintRep.hpp
  * @brief  Base class of constraint representations
  * @author Laurent Granvilliers
- * @date   28 may 2025
+ * @date   28 May 2025
  */
 
 #ifndef REALPAVER_CONSTRAINT_REP_HPP
 #define REALPAVER_CONSTRAINT_REP_HPP
 
 #include "realpaver/ConstraintRelation.hpp"
-#include "realpaver/Term.hpp"
+#include "realpaver/DomainBox.hpp"
+#include "realpaver/IntervalBox.hpp"
+#include "realpaver/Scope.hpp"
 
 namespace realpaver {
 

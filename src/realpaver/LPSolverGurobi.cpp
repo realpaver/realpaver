@@ -15,7 +15,7 @@
  * @file   LPSolverGurobi.cpp
  * @brief  Wrapper class for the LP solver Gurobi.
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "gurobi_c++.h"

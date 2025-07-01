@@ -15,12 +15,12 @@
  * @file   ScopeMap.cpp
  * @brief  Map between two sets of integers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/ScopeMap.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/ScopeMap.hpp"
 
 namespace realpaver {
 

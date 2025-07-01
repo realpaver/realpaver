@@ -15,14 +15,14 @@
  * @file   ScopeMap.hpp
  * @brief  Map between two sets of integers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SCOPE_MAP_HPP
 #define REALPAVER_SCOPE_MAP_HPP
 
-#include <unordered_map>
 #include <cstddef>
+#include <unordered_map>
 
 namespace realpaver {
 

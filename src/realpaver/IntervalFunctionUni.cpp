@@ -15,7 +15,7 @@
  * @file   IntervalFunctionUni.cpp
  * @brief  Base class of univariate interval functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/IntervalFunctionUni.hpp"

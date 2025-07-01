@@ -15,7 +15,7 @@
  * @file   IntervalPropagator.hpp
  * @brief  Constraint propagation over interval contractors
  * @author Laurent Granvilliers
- * @date   2024-7-1
+ * @date   7 July 2024
  */
 
 #ifndef REALPAVER_INTERVAL_PROPAGATOR_HPP

@@ -15,11 +15,10 @@
  * @file   LPSolverSoplex.cpp
  * @brief  Wrapper class for the LP solver Soplex.
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "LPModel.hpp"
-#include "realpaver/AssertDebug.hpp"
+#include "realpaver/LPModel.hpp"
 #include "realpaver/LPSolverSoplex.hpp"
 #include "realpaver/Logger.hpp"
 #include <cstddef>

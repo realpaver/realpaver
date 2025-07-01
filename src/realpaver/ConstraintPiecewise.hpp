@@ -15,7 +15,7 @@
  * @file   ConstraintPiecewise.hpp
  * @brief  Piecewise constraints
  * @author Raphaël Chenouard
- * @date   29 may 2025
+ * @date   29 May 2025
  */
 
 #ifndef REALPAVER_CONSTRAINT_PIECEWISE_HPP

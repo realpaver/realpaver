@@ -15,7 +15,7 @@
  * @file   IntervalInum64.hpp
  * @brief  Interface of the inum64 library
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_INUM64_HPP

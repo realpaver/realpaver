@@ -15,7 +15,7 @@
  * @file   Solver.hpp
  * @brief  Solver of constraint systems
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SOLVER_HPP
@@ -64,8 +64,8 @@ public:
    /// Constructor
    Solver(const Problem &problem);
 
-   /// Destructor
-   ~Solver();
+   /// Default estructor
+   ~Solver() = default;
 
    /// No copy constructor
    Solver(const Solver &) = delete;
@@ -86,10 +86,10 @@ public:
    std::shared_ptr<EnvSolver> getEnv() const;
 
    /// Returns the space of this
-   Space *getSpace() const;
+   SharedSpace getSpace() const;
 
    /// Returns the preprocessor used by this
-   Preprocessor *getPreprocessor() const;
+   SharedPreprocessor getPreprocessor() const;
 
    /// Returns the number of solutions after the preprocessing / solving phase
    size_t nbSolutions() const;
@@ -113,28 +113,20 @@ public:
     */
    DomainBox getPendingBox(size_t i) const;
 
-   /// Returns the problem
-   const Problem &getProblem() const;
-
 private:
-   Problem *problem_;      // initial problem
-   Problem *preprob_;      // problem resulting from preprocessing
-   Preprocessor *preproc_; // preprocessor
-
-   NodeContext *context_; // solving context for the BP algorithm
-
-   std::shared_ptr<EnvSolver> env_; // environment
-   Space *space_;                   // search tree
-   SharedDag dag_;                  // dag
-   NodePropagator *propagator_;     // contraction method
-   Split *split_;                   // splitting strategy
-   ContractorFactory *factory_;     // contractor factory
-
-   Prover *prover_; // solution prover
-
-   Timer stimer_;           // timer for the solving phase
-   int nbnodes_;            // number of nodes processed
-   bool withPreprocessing_; // true if preprocessing enabled
+   SharedProblem problem_;                      // copy of initial problem
+   SharedPreprocessor pp_;                      // preprocessor
+   std::unique_ptr<NodeContext> context_;       // solving context for the BP algorithm
+   std::shared_ptr<EnvSolver> env_;             // environment
+   SharedSpace space_;                          // search tree
+   SharedDag dag_;                              // dag
+   std::unique_ptr<NodePropagator> propagator_; // contraction method
+   std::unique_ptr<Split> split_;               // splitting strategy
+   std::unique_ptr<ContractorFactory> factory_; // contractor factory
+   std::unique_ptr<Prover> prover_;             // solution prover
+   Timer stimer_;                               // timer for the solving phase
+   int nbnodes_;                                // number of nodes processed
+   bool withPreprocessing_;                     // true if preprocessing enabled
 
    void branchAndPrune();
    void makeSpace();

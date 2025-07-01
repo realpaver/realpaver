@@ -15,7 +15,7 @@
  * @file   AffineForm.cpp
  * @brief  Affine arithmetic
  * @author Laurent Granvilliers
- * @date   10/03/2025
+ * @date   10 Mar 2025
  */
 
 #include "realpaver/AffineForm.hpp"

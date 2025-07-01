@@ -15,7 +15,7 @@
  * @file   ContractorLoop.cpp
  * @brief. Loop on a contractor
  * @author Laurent Granvilliers
- * @date   4-3-2025
+ * @date   3 Apr 2025
  */
 #include "realpaver/ContractorLoop.hpp"
 #include "realpaver/Param.hpp"

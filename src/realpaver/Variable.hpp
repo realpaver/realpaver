@@ -12,10 +12,10 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   Variables.hpp
+ * @file   Variable.hpp
  * @brief  Variable in a problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_VARIABLE_HPP

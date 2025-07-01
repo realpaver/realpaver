@@ -15,11 +15,11 @@
  * @file   ZeroOne.cpp
  * @brief  Subset of {0, 1}
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/ZeroOne.hpp"
 #include "realpaver/Range.hpp"
+#include "realpaver/ZeroOne.hpp"
 
 namespace realpaver {
 

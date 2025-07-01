@@ -12,13 +12,13 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   Variables.cpp
+ * @file   Variable.cpp
  * @brief  Variable in a problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
+#include "realpaver/Exception.hpp"
 #include "realpaver/Variable.hpp"
 #include <memory>
 

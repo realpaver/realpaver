@@ -15,12 +15,13 @@
  * @file   Contractor3BCID.cpp
  * @brief  3BCID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorVar3BCID.hpp"
 #include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 

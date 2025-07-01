@@ -15,10 +15,9 @@
  * @file   ContractorBC4Revise.cpp
  * @brief  BC4Revise contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorBC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 

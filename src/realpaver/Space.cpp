@@ -15,11 +15,10 @@
  * @file   Space.cpp
  * @brief  Base class of search spaces
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/Space.hpp"
-#include "realpaver/UnionFind.hpp"
 #include <list>
 
 namespace realpaver {

@@ -15,7 +15,7 @@
  * @file   IntervalNewtonUni.hpp
  * @brief  Univariate interval Newton operator
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_NEWTON_UNI_HPP

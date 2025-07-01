@@ -15,7 +15,7 @@
  * @file   Term.hpp
  * @brief  Terms (nonlinear expressions)
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_TERM_HPP
@@ -24,8 +24,6 @@
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/Scope.hpp"
-#include <set>
-#include <unordered_map>
 #include <vector>
 
 namespace realpaver {

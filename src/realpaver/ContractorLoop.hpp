@@ -15,7 +15,7 @@
  * @file   ContractorLoop.hpp
  * @brief  Loop on a contractor
  * @author Laurent Granvilliers
- * @date   4-3-2025
+ * @date   3 Apr 2025
  */
 
 #ifndef REALPAVER_CONTRACTOR_LOOP_HPP

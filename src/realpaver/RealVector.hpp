@@ -15,14 +15,12 @@
  * @file   RealVector.hpp
  * @brief  Real vector
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_VECTOR_HPP
 #define REALPAVER_REAL_VECTOR_HPP
 
-#include "realpaver/Double.hpp"
-#include "realpaver/NumericDoubleTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealMatrix.hpp"
 

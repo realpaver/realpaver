@@ -15,11 +15,11 @@
  * @file   RealVector.cpp
  * @brief  Real vector
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/RealVector.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/RealVector.hpp"
 
 namespace realpaver {
 

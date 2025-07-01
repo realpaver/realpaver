@@ -15,7 +15,7 @@
  * @file   Common.cpp
  * @brief  Common types and functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/Common.hpp"

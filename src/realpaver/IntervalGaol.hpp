@@ -15,7 +15,7 @@
  * @file   IntervalGaol.hpp
  * @brief  Interface of the Gaol library
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_GAOL_HPP
@@ -23,36 +23,7 @@
 
 #include "realpaver/IntervalTraits.hpp"
 #include <gaol/gaol>
-#include <iomanip>
 #include <iostream>
-
-#if defined(PACKAGE_BUGREPORT)
-#undef PACKAGE_BUGREPORT
-#endif
-
-#if defined(PACKAGE_NAME)
-#undef PACKAGE_NAME
-#endif
-
-#if defined(PACKAGE_STRING)
-#undef PACKAGE_STRING
-#endif
-
-#if defined(PACKAGE_TARNAME)
-#undef PACKAGE_TARNAME
-#endif
-
-#if defined(PACKAGE_VERSION)
-#undef PACKAGE_VERSION
-#endif
-
-#if defined(PACKAGE_URL)
-#undef PACKAGE_URL
-#endif
-
-#if defined(VERSION)
-#undef VERSION
-#endif
 
 namespace realpaver {
 

@@ -15,7 +15,7 @@
  * @file   AffineForm.hpp
  * @brief  Affine arithmetic
  * @author Laurent Granvilliers
- * @date   10/03/2025
+ * @date   10 Mar 2025
  */
 
 #ifndef REALPAVER_AFFINE_FORM_HPP

@@ -15,11 +15,11 @@
  * @file   Inlator.cpp
  * @brief  Inflator of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Inflator.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Inflator.hpp"
 
 namespace realpaver {
 

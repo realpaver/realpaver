@@ -15,10 +15,9 @@
  * @file   Env.cpp
  * @brief  Base class of environments for solvers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Env.hpp"
 
 namespace realpaver {

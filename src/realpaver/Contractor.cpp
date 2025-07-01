@@ -15,10 +15,9 @@
  * @file   Contractor.cpp
  * @brief  Base class of contractors
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Contractor.hpp"
 
 namespace realpaver {

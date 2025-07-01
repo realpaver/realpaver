@@ -15,12 +15,10 @@
  * @file   Scope.cpp
  * @brief  Scope of variables
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Common.hpp"
-#include "realpaver/Logger.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {

@@ -15,12 +15,12 @@
  * @file   TermQuadratic.cpp
  * @brief  Quadratic expression
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/TermQuadratic.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/TermQuadratic.hpp"
 
 namespace realpaver {
 

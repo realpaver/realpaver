@@ -15,7 +15,7 @@
  * @file   EnvSolver.hpp
  * @brief  Environment for solvers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_ENV_SOLVER_HPP

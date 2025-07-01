@@ -15,11 +15,11 @@
  * @file   RealFunctionVector.hpp
  * @brief  Vector of real functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/RealFunctionVector.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/RealFunctionVector.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {

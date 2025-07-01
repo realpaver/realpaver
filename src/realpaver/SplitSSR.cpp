@@ -15,7 +15,7 @@
  * @file   SplitSSR.cpp
  * @brief  Smear-Sum-Relative splitting strategy
  * @author Laurent Granvilliers
- * @date   10 june 2025
+ * @date   10 June 2025
  */
 
 #include "realpaver/Logger.hpp"

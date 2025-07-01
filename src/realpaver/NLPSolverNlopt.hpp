@@ -15,7 +15,7 @@
  * @file   NLPSolverNlopt.hpp
  * @brief  Implementation of NLP solver for Nlopt
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NLP_SOLVER_NLOPT_HPP

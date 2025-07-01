@@ -15,12 +15,12 @@
  * @file   RangeUnion.cpp
  * @brief  Union of ranges
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/RangeUnion.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Interval.hpp"
+#include "realpaver/RangeUnion.hpp"
 
 namespace realpaver {
 

@@ -15,7 +15,7 @@
  * @file   ContractorFactory.cpp
  * @brief  Factory of interval contractors
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
