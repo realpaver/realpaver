@@ -15,11 +15,11 @@
  * @file   VariableVector.cpp
  * @brief  Vector of variables
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/VariableVector.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/VariableVector.hpp"
 #include <sstream>
 
 namespace realpaver {

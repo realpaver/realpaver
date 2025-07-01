@@ -15,7 +15,7 @@
  * @file   ConstraintFixer.cpp
  * @brief  Rewriting of constraints
  * @author Laurent Granvilliers
- * @date   28 may 2025
+ * @date   28 May 2025
  */
 
 #include "Constraint.hpp"
@@ -99,7 +99,7 @@ void ConstraintFixer::apply(const ConstraintTable *c)
 
 void ConstraintFixer::apply(const ConstraintPiecewise *c)
 {
-   DomainBox &box = bridge_->srcRegion();
+   const DomainBox &box = bridge_->srcRegion();
    Variable v = c->variable();
    Interval vdom = box.get(v)->intervalHull();
 

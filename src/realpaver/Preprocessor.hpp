@@ -15,7 +15,7 @@
  * @file   Preprocessor.hpp
  * @brief  Preprocessor of problems
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_PREPROCESSOR_HPP
@@ -24,6 +24,7 @@
 #include "realpaver/Problem.hpp"
 #include "realpaver/ProblemBridge.hpp"
 #include "realpaver/Timer.hpp"
+#include <memory>
 #include <vector>
 
 namespace realpaver {
@@ -40,8 +41,8 @@ namespace realpaver {
  */
 class Preprocessor {
 public:
-   /// Constructor
-   Preprocessor();
+   /// Constructor given the source problem
+   Preprocessor(SharedProblem src);
 
    /// No copy
    Preprocessor(const Preprocessor &) = delete;
@@ -55,16 +56,14 @@ public:
    /**
     * @brief Creates a simplified problem from a source problem.
     *
-    * @param src source problem
-    * @param dest simplified problem
-    *
-    * It removes the fixed variables and the inactive constraints and it
-    * creates a new problem with a new set of variables.
+    * If the boolean on is false, then the simplified problem corresponds to the source.
+    * Otherwise, the fixed variables and the inactive constraints are removed and a new
+    * problem with a new set of variables is created.
     *
     * After a call to apply, it is possible to check if the input problem is
     * not feasible with the method isProblemUnfeasible().
     */
-   void apply(Problem &src, Problem &dest);
+   void apply(bool on = true);
 
    /// Returns the number of inactive constraints detected by this
    size_t nbInactiveCtrs() const;
@@ -140,17 +139,28 @@ public:
    /// Display on a stream after preprocessing
    void print(std::ostream &os) const;
 
+   /// Returns the source problem
+   SharedProblem srcProblem() const;
+
+   /// Returns the target problem
+   SharedProblem destProblem() const;
+
 private:
-   SharedProblemBridge bridge_;       // bridge between problems
+   SharedProblem src_;                // problem before preprocessing
+   SharedProblem dest_;               // problem after preprocessing
+   SharedProblemBridge bridge_;       // bridge between these two problems
    std::vector<Constraint> inactive_; // constraints inactive
    std::vector<Constraint> active_;   // constraints not inactive
    bool unfeasible_;                  // true if problem unfeasible
    Timer timer_;                      // timer
 
    bool occursInActiveConstraint(const Variable &v) const;
-   bool propagate(Problem &problem, DomainBox &box);
-   void applyImpl(Problem &src, Problem &dest);
+   bool propagate(DomainBox &box);
+   void applyImpl();
 };
+
+/// Type of shared pointers on a preprocessor
+using SharedPreprocessor = std::shared_ptr<Preprocessor>;
 
 } // namespace realpaver
 

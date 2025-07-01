@@ -15,10 +15,9 @@
  * @file   Parser.cpp
  * @brief  Wrapper for the parser of the modelling language
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Parser.hpp"
 #include <vector>
 

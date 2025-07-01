@@ -15,7 +15,7 @@
  * @file   DomainSlicerFactory.cpp
  * @brief  Factory of domain slicer maps
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/DomainSlicerFactory.hpp"

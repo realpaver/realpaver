@@ -15,7 +15,7 @@
  * @file   ConstraintTable.hpp
  * @brief  Table constraints
  * @author Laurent Granvilliers
- * @date   28 may 2025
+ * @date   28 May 2025
  */
 
 #ifndef REALPAVER_CONSTRAINT_TABLE_HPP

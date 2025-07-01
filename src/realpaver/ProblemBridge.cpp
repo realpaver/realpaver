@@ -15,7 +15,7 @@
  * @file   ProblemBridge.cpp
  * @brief  Bridge between problems managed by the preprocessor
  * @author Laurent Granvilliers
- * @date   3 june 2025
+ * @date   3 June 2025
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -24,14 +24,16 @@
 
 namespace realpaver {
 
-ProblemBridge::ProblemBridge(Problem &src, Problem &dest)
-    : src_(&src)
+ProblemBridge::ProblemBridge(SharedProblem src, SharedProblem dest)
+    : src_(src)
     , box_(nullptr)
-    , dest_(&dest)
+    , dest_(dest)
     , varmap_()
     , fixmap_()
 {
-   box_ = new DomainBox(src.scope());
+   ASSERT(src != nullptr, "Empty problem");
+   ASSERT(dest != nullptr, "Empty problem");
+   box_ = new DomainBox(src->scope());
 }
 
 ProblemBridge::~ProblemBridge()

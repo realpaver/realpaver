@@ -15,18 +15,13 @@
  * @file   Dag.cpp
  * @brief  DAG of constraints
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
-#include "realpaver/Double.hpp"
 #include "realpaver/FlatFunction.hpp"
-#include "realpaver/IntervalSlicer.hpp"
-#include "realpaver/Logger.hpp"
-#include "realpaver/Param.hpp"
 #include "realpaver/ScopeBank.hpp"
-#include <sstream>
 
 namespace realpaver {
 

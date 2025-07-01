@@ -15,7 +15,7 @@
  * @file   Space.hpp
  * @brief  Base class of search spaces
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SPACE_HPP
@@ -23,6 +23,7 @@
 
 #include "realpaver/Node.hpp"
 #include "realpaver/Split.hpp"
+#include <memory>
 #include <unordered_set>
 
 namespace realpaver {
@@ -102,6 +103,9 @@ public:
    virtual SharedNode getPendingNode(size_t i) const = 0;
    ///@}
 };
+
+/// Type of shared pointers of a space
+using SharedSpace = std::shared_ptr<Space>;
 
 } // namespace realpaver
 

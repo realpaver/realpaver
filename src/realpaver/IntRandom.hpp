@@ -15,7 +15,7 @@
  * @file   IntRandom.hpp
  * @brief  Generator of pseudo-random integers.
  * @author Laurent Granvilliers
- * @date   2024-26-11
+ * @date   26 Nov 2024
  */
 
 #ifndef REALPAVER_INT_RANDOM_HPP

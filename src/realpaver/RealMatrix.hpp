@@ -16,13 +16,12 @@
  * @brief  Dense real matrix
  * @author Laurent Granvilliers
  * @author Raphaël Chenouard (LU decomposition)
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_MATRIX_HPP
 #define REALPAVER_REAL_MATRIX_HPP
 
-#include "realpaver/Double.hpp"
 #include "realpaver/NumericDoubleTraits.hpp"
 #include "realpaver/NumericMatrix.hpp"
 

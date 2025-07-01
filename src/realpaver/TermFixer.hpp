@@ -15,7 +15,7 @@
  * @file   TermFixer.hpp
  * @brief  Rewriting of terms
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_TERM_FIXER_HPP

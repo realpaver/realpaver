@@ -15,14 +15,14 @@
  * @file   NumericDoubleTraits.hpp
  * @brief  Specialization of template NumericTraits for doubles
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP
 #define REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP
 
-#include "Double.hpp"
-#include "NumericTraits.hpp"
+#include "realpaver/Double.hpp"
+#include "realpaver/NumericTraits.hpp"
 
 namespace realpaver {
 

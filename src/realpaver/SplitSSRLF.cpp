@@ -15,7 +15,7 @@
  * @file   SplitSSRLF.cpp
  * @brief  Splitting strategy hybridizing SSR and LF
  * @author Laurent Granvilliers
- * @date   10 june 2025
+ * @date   10 June 2025
  */
 
 #include "realpaver/Logger.hpp"

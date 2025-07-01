@@ -15,7 +15,7 @@
  * @file   LinearizerTaylor.hpp
  * @brief  Linearization of nonlinear problems based on Taylor forms
  * @author Laurent Granvilliers
- * @date   11 Fev 2025
+ * @date   11 Feb 2025
  */
 
 #ifndef REALPAVER_LINEARIZER_TAYLOR_HPP

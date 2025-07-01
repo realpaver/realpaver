@@ -15,11 +15,11 @@
  * @file   ConstraintVisitor.cpp
  * @brief  Base class of constraint visitors
  * @author Laurent Granvilliers
- * @date   28 may 2025
+ * @date   28 May 2025
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintVisitor.hpp"
+#include "realpaver/Exception.hpp"
 
 namespace realpaver {
 

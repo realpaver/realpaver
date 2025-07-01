@@ -15,7 +15,7 @@
  * @file   Param.hpp
  * @brief  Parameters of solvers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   4 Feb 2025
  */
 
 #ifndef REALPAVER_PARAM_HPP

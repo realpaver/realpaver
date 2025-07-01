@@ -15,7 +15,7 @@
  * @file   Stat.hpp
  * @brief  Statistics on solving processes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_STAT_HPP

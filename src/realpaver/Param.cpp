@@ -15,7 +15,7 @@
  * @file   Param.cpp
  * @brief  Parameters of solvers
  * @author Laurent Granvilliers
- * @date   2025-4-2
+ * @date   4 Feb 2025
  */
 
 #include "realpaver/Double.hpp"

@@ -2,12 +2,12 @@
 #include "realpaver/Preprocessor.hpp"
 #include "test_config.hpp"
 
-Problem *pb1;
+SharedProblem pb1;
 Variable u1, v1, w1;
 
 void init()
 {
-   pb1 = new Problem();
+   pb1 = std::make_shared<Problem>();
    u1 = pb1->addRealVar(-10, 10, "u1");
    v1 = pb1->addRealVar(-10, 10, "v1");
    w1 = pb1->addRealVar(-10, 10, "w1");
@@ -19,74 +19,53 @@ void init()
 
 void clean()
 {
-   delete pb1;
 }
 
 void test_1()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   TEST_TRUE(proc.isFixed(u1));
-   TEST_TRUE(proc.isFixed(v1));
-   TEST_FALSE(proc.isFixed(w1));
+   Preprocessor pp(pb1);
+   pp.apply();
+   TEST_TRUE(pp.isFixed(u1));
+   TEST_TRUE(pp.isFixed(v1));
+   TEST_FALSE(pp.isFixed(w1));
 }
 
 void test_2()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   TEST_TRUE(proc.getFixedDomain(u1).isSetEq(Interval(-1.0)));
-   TEST_TRUE(proc.getFixedDomain(v1).isSetEq(Interval(1.0)));
+   Preprocessor pp(pb1);
+   pp.apply();
+   TEST_TRUE(pp.getFixedDomain(u1).isSetEq(Interval(-1.0)));
+   TEST_TRUE(pp.getFixedDomain(v1).isSetEq(Interval(1.0)));
 }
 
 void test_3()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   Scope scop(proc.fixedScope());
-
+   Preprocessor pp(pb1);
+   pp.apply();
+   Scope scop(pp.fixedScope());
    TEST_TRUE(scop.contains(u1));
    TEST_TRUE(scop.contains(v1));
 }
 
 void test_4()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   TEST_TRUE(!proc.allVarsFixed());
+   Preprocessor pp(pb1);
+   pp.apply();
+   TEST_TRUE(!pp.allVarsFixed());
 }
 
 void test_5()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   TEST_TRUE(proc.nbInactiveCtrs() == 2);
+   Preprocessor pp(pb1);
+   pp.apply();
+   TEST_TRUE(pp.nbInactiveCtrs() == 2);
 }
 
 void test_6()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   DomainBox box = proc.fixedRegion();
-
+   Preprocessor pp(pb1);
+   pp.apply();
+   DomainBox box = pp.fixedRegion();
    TEST_TRUE(box.scope().size() == 2);
    TEST_TRUE(box.scope().contains(u1));
    TEST_TRUE(box.scope().contains(v1));
@@ -95,14 +74,10 @@ void test_6()
 
 void test_7()
 {
-   Preprocessor proc;
-   Problem dest;
-
-   proc.apply(*pb1, dest);
-
-   DomainBox box = proc.destRegion();
-   Variable w = proc.srcToDestVar(w1);
-
+   Preprocessor pp(pb1);
+   pp.apply();
+   DomainBox box = pp.destRegion();
+   Variable w = pp.srcToDestVar(w1);
    TEST_TRUE(box.scope().size() == 1);
    TEST_TRUE(box.scope().contains(w));
 }

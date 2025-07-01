@@ -15,7 +15,7 @@
  * @file   FlatFunction.cpp
  * @brief  Function with fast hc4Revise
  * @author Laurent Granvilliers
- * @date   2024-6-11
+ * @date   6 Nov 2024
  */
 
 #include "realpaver/Dag.hpp"

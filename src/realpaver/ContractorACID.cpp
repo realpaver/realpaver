@@ -15,12 +15,11 @@
  * @file   ContractorACID.cpp
  * @brief  ACID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorACID.hpp"
-#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {

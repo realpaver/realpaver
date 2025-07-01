@@ -180,7 +180,7 @@ int main(int argc, char **argv)
       cout << GRAY(sep) << endl;
       string prepro = solver.getEnv()->getParams()->getStrParam("PREPROCESSING");
 
-      Preprocessor *preproc = solver.getPreprocessor();
+      SharedPreprocessor preproc = solver.getPreprocessor();
 
       fsol << WP("CSP solver", wpl) << REALPAVER_STRING << endl;
 
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
       {
-         Space *space = solver.getSpace();
+         SharedSpace space = solver.getSpace();
 
          fsol << "--- SOLVING ---" << endl << endl;
          cout << GRAY(sep) << endl;

@@ -15,11 +15,11 @@
  * @file   DomainSlicer.cpp
  * @brief  Classes of domain slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/DomainSlicer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DomainSlicer.hpp"
 
 namespace realpaver {
 

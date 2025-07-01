@@ -15,7 +15,7 @@
  * @file   Linearizer.cpp
  * @brief  Linearization of nonlinear problems
  * @author Laurent Granvilliers
- * @date   2025-fev-11
+ * @date   11 Feb 2025
  */
 
 #include "realpaver/AssertDebug.hpp"

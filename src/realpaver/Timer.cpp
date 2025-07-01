@@ -15,7 +15,7 @@
  * @file   Timer.cpp
  * @brief  Timer measuring computation times
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/Timer.hpp"

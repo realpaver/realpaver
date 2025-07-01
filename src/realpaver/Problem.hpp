@@ -15,7 +15,7 @@
  * @file   Problem.hpp
  * @brief  Constraint satisfaction and optimization problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_PROBLEM_HPP
@@ -26,6 +26,7 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Objective.hpp"
 #include "realpaver/VariableVector.hpp"
+#include <memory>
 #include <unordered_set>
 #include <vector>
 
@@ -260,6 +261,9 @@ private:
 
 /// Output on a stream
 std::ostream &operator<<(std::ostream &os, const Problem &p);
+
+/// Type of shared pointers on a problem
+using SharedProblem = std::shared_ptr<Problem>;
 
 } // namespace realpaver
 

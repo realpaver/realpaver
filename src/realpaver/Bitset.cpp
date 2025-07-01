@@ -15,11 +15,11 @@
  * @file   Bitset.cpp
  * @brief  The Bitset class
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Bitset.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/Common.hpp"
 #include <algorithm>
 

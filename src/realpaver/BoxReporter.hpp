@@ -15,7 +15,7 @@
  * @file   BoxReporter.hpp
  * @brief  Reporter of solutions of problems
  * @author Laurent Granvilliers
- * @date   2024-12-19
+ * @date   19 Dec 2024
  */
 
 #ifndef REALPAVER_BOX_REPORTER_HPP

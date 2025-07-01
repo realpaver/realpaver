@@ -15,7 +15,7 @@
  * @file   SpaceDFS.hpp
  * @brief  Search space for a Depth-First-Search strategy
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SPACE_DFS_HPP

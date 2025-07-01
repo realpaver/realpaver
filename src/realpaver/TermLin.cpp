@@ -15,12 +15,12 @@
  * @file   TermLin.hpp
  * @brief  Linear expression
  * @author Laurent Granvilliers
- * @date   2024-6-22
+ * @date   22 June 2024
  */
 
-#include "realpaver/TermLin.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/TermLin.hpp"
 
 namespace realpaver {
 

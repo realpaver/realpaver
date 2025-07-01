@@ -15,7 +15,7 @@
  * @file   SpaceHybridDFS.hpp
  * @brief  Search space for hybrid strategies
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SPACE_HYBRID_DFS_HPP

@@ -15,7 +15,7 @@
  * @file   Linearizer.hpp
  * @brief  Linearization of nonlinear problems
  * @author Laurent Granvilliers
- * @date   11 Fev 2025
+ * @date   11 Feb 2025
  */
 
 #ifndef REALPAVER_LINEARIZER_HPP

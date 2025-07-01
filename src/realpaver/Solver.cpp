@@ -15,7 +15,7 @@
  * @file   Solver.cpp
  * @brief  Solver of constraint systems
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -40,8 +40,7 @@ namespace realpaver {
 
 Solver::Solver(const Problem &problem)
     : problem_(nullptr)
-    , preprob_(nullptr)
-    , preproc_(nullptr)
+    , pp_(nullptr)
     , context_(nullptr)
     , env_(nullptr)
     , space_(nullptr)
@@ -54,30 +53,8 @@ Solver::Solver(const Problem &problem)
     , withPreprocessing_(true)
 {
    env_ = std::make_shared<EnvSolver>();
-   preproc_ = new Preprocessor();
-   problem_ = new Problem(problem);
-}
-
-Solver::~Solver()
-{
-   if (context_ != nullptr)
-      delete context_;
-   if (preproc_ != nullptr)
-      delete preproc_;
-   if (space_ != nullptr)
-      delete space_;
-   if (factory_ != nullptr)
-      delete factory_;
-   if (split_ != nullptr)
-      delete split_;
-   if (propagator_ != nullptr)
-      delete propagator_;
-   if (prover_ != nullptr)
-      delete prover_;
-   if (preprob_ != nullptr)
-      delete preprob_;
-   if (problem_ != nullptr)
-      delete problem_;
+   problem_ = std::make_shared<Problem>(problem);
+   pp_ = std::make_shared<Preprocessor>(problem_);
 }
 
 double Solver::getSolvingTime() const
@@ -97,57 +74,43 @@ void Solver::solve()
    int fp = env_->getParams()->getIntParam("FLOAT_PRECISION");
    Logger::getInstance()->setFloatPrecision(fp);
 
-   std::string pre = env_->getParams()->getStrParam("PREPROCESSING");
-   if (pre == "YES")
-   {
-      // preprocessing + branch-and-prune
-      withPreprocessing_ = true;
-      preprob_ = new Problem();
-      preproc_->apply(*problem_, *preprob_);
+   withPreprocessing_ = env_->getParams()->getStrParam("PREPROCESSING") == "YES";
+   pp_->apply(withPreprocessing_);
 
-      if (!preproc_->isSolved())
-         branchAndPrune();
-   }
-   else
-   {
-      // only branch-and-prune
-      LOG_MAIN("No preprocessing");
-
-      withPreprocessing_ = false;
-      preprob_ = problem_;
-      problem_ = nullptr;
+   if (!pp_->isSolved())
       branchAndPrune();
-   }
 }
 
 void Solver::makeSpace()
 {
    LOG_LOW("Makes the space in the solver");
 
+   SharedProblem newprob = pp_->destProblem();
+
    // gets the strategy from the parameters
    std::string s = env_->getParams()->getStrParam("BP_NODE_SELECTION");
    if (s == "DFS")
-      space_ = new SpaceDFS();
+      space_ = std::make_shared<SpaceDFS>();
 
    else if (s == "BFS")
-      space_ = new SpaceBFS();
+      space_ = std::make_shared<SpaceBFS>();
 
    else if (s == "DMDFS")
-      space_ = new SpaceDMDFS();
+      space_ = std::make_shared<SpaceDMDFS>();
 
    else if (s == "IDFS")
-      space_ = new SpaceHybridDFS(HybridDFSStyle::Depth);
+      space_ = std::make_shared<SpaceHybridDFS>(HybridDFSStyle::Depth);
 
    else if (s == "PDFS")
-      space_ = new SpaceHybridDFS(HybridDFSStyle::Perimeter);
+      space_ = std::make_shared<SpaceHybridDFS>(HybridDFSStyle::Perimeter);
 
    else if (s == "GPDFS")
-      space_ = new SpaceHybridDFS(HybridDFSStyle::GridPerimeter);
+      space_ = std::make_shared<SpaceHybridDFS>(HybridDFSStyle::GridPerimeter);
 
    THROW_IF(space_ == nullptr, "Unable to make the space object in the solver");
 
    // creates and inserts the root node
-   SharedNode node = std::make_shared<Node>(preprob_->scope(), preprob_->nbCtrs());
+   SharedNode node = std::make_shared<Node>(newprob->scope(), newprob->nbCtrs());
    node->setAllActive();
    node->setIndex(0);
 
@@ -159,7 +122,7 @@ void Solver::makePropagator()
 {
    LOG_LOW("Makes the propagator in the solver");
 
-   NodePropagatorList *aux = new NodePropagatorList();
+   std::unique_ptr<NodePropagatorList> aux = std::make_unique<NodePropagatorList>();
 
    // Constraint propagation algorithm: HC4, BC4, or AFFIBE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
@@ -195,14 +158,15 @@ void Solver::makePropagator()
    if (aux->size() == 0)
       THROW("Unable to create the propagator in the solver");
 
-   propagator_ = aux;
+   propagator_ = std::move(aux);
 }
 
 void Solver::makeSplit()
 {
    LOG_LOW("Makes the split object in the solver");
 
-   Scope scop = preprob_->scope();
+   SharedProblem newprob = pp_->destProblem();
+   Scope scop = newprob->scope();
 
    // makes the slicer
    std::string sli = env_->getParams()->getStrParam("SPLIT_SLICING");
@@ -220,28 +184,28 @@ void Solver::makeSplit()
    std::string sel = env_->getParams()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
-      split_ = new SplitRR(scop, std::move(smap));
+      split_ = std::make_unique<SplitRR>(scop, std::move(smap));
 
    else if (sel == "LF")
-      split_ = new SplitLF(scop, std::move(smap));
+      split_ = std::make_unique<SplitLF>(scop, std::move(smap));
 
    else if (sel == "SF")
-      split_ = new SplitSF(scop, std::move(smap));
+      split_ = std::make_unique<SplitSF>(scop, std::move(smap));
 
    else if (sel == "SLF")
-      split_ = new SplitSLF(scop, std::move(smap));
+      split_ = std::make_unique<SplitSLF>(scop, std::move(smap));
 
    else if (sel == "SSR")
    {
       if (dag_->isEmpty())
       {
          LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
-         split_ = new SplitLF(scop, std::move(smap));
+         split_ = std::make_unique<SplitLF>(scop, std::move(smap));
       }
       else
       {
          IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
-         split_ = new SplitSSR(scop, std::move(smap), F);
+         split_ = std::make_unique<SplitSSR>(scop, std::move(smap), F);
       }
    }
 
@@ -250,15 +214,16 @@ void Solver::makeSplit()
       if (dag_->isEmpty())
       {
          LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
-         split_ = new SplitLF(scop, std::move(smap));
+         split_ = std::make_unique<SplitLF>(scop, std::move(smap));
       }
       else
       {
          IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
-         SplitSSRLF *hybrid = new SplitSSRLF(scop, std::move(smap), F);
+         std::unique_ptr<SplitSSRLF> hybrid =
+             std::make_unique<SplitSSRLF>(scop, std::move(smap), F);
          double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
          hybrid->setFrequency(f);
-         split_ = hybrid;
+         split_ = std::move(hybrid);
       }
    }
 
@@ -266,9 +231,9 @@ void Solver::makeSplit()
 
    // is the objective variable splitable?
    std::string splitobj = env_->getParams()->getStrParam("SPLIT_OBJECTIVE");
-   if (splitobj == "NO" && preprob_->hasObjective())
+   if (splitobj == "NO" && newprob->hasObjective())
    {
-      Variable z = preprob_->getObjective().getVar();
+      Variable z = newprob->getObjective().getVar();
       z.setSplitable(false);
    }
 }
@@ -279,10 +244,11 @@ Proof Solver::checkActivity(Node &node)
 {
    bool inactive = true;
    IntervalBox B(*node.box());
+   SharedProblem newprob = pp_->destProblem();
 
-   for (size_t i = 0; i < preprob_->nbCtrs(); ++i)
+   for (size_t i = 0; i < newprob->nbCtrs(); ++i)
    {
-      Constraint c = preprob_->ctrAt(i);
+      Constraint c = newprob->ctrAt(i);
       int ic = c.id();
 
       if (node.isInactive(ic))
@@ -431,22 +397,24 @@ void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
 
 void Solver::branchAndPrune()
 {
-   LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*preprob_));
+   SharedProblem newprob = pp_->destProblem();
+
+   LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*newprob));
    LOG_INTER("Parameters\n" << *env_->getParams());
 
    stimer_.start();
-   context_ = new NodeContext();
+   context_ = std::make_unique<NodeContext>();
 
    LOG_NL_LOW();
    LOG_LOW("Makes the factory in the solver");
-   factory_ = new ContractorFactory(*preprob_, env_);
+   factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
    dag_ = factory_->getDag();
    makeSpace();
    makePropagator();
    makeSplit();
 
    // prover that derives proof certificates of the solutions
-   prover_ = new Prover(*preprob_);
+   prover_ = std::make_unique<Prover>(*newprob);
 
    int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
    prover_->setMaxIter(niter);
@@ -532,7 +500,7 @@ void Solver::branchAndPrune()
          iter = false;
       }
 
-      if (iter && preproc_->elapsedTime() + stimer_.elapsedTime() > time_limit)
+      if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
       {
          LOG_MAIN("Stops on time limit (" << time_limit << "s)");
          env_->setTimeLimit(true);
@@ -628,20 +596,20 @@ std::shared_ptr<EnvSolver> Solver::getEnv() const
    return env_;
 }
 
-Space *Solver::getSpace() const
+SharedSpace Solver::getSpace() const
 {
    return space_;
 }
 
-Preprocessor *Solver::getPreprocessor() const
+SharedPreprocessor Solver::getPreprocessor() const
 {
-   return preproc_;
+   return pp_;
 }
 
 size_t Solver::nbSolutions() const
 {
-   if (withPreprocessing_ && preproc_->isSolved())
-      return preproc_->isUnfeasible() ? 0 : 1;
+   if (withPreprocessing_ && pp_->isSolved())
+      return pp_->isUnfeasible() ? 0 : 1;
 
    else
       return space_->nbSolNodes();
@@ -657,26 +625,26 @@ std::pair<DomainBox, Proof> Solver::getSolution(size_t i) const
       Proof proof = Proof::Inner;
 
       // assigns the values of the fixed variables
-      for (size_t i = 0; i < preproc_->nbFixedVars(); ++i)
+      for (size_t i = 0; i < pp_->nbFixedVars(); ++i)
       {
-         Variable v = preproc_->getFixedVar(i);
-         Interval x = preproc_->getFixedDomain(v);
+         Variable v = pp_->getFixedVar(i);
+         Interval x = pp_->getFixedDomain(v);
          Domain *dom = box.get(v);
          dom->contract(x);
       }
 
       // assigns the values of the unfixed variables
-      if (!preproc_->allVarsFixed())
+      if (!pp_->allVarsFixed())
       {
          SharedNode node = space_->getSolNode(i);
          proof = node->getProof();
 
          DomainBox *aux = node->box();
 
-         for (size_t i = 0; i < preproc_->nbUnfixedVars(); ++i)
+         for (size_t i = 0; i < pp_->nbUnfixedVars(); ++i)
          {
-            Variable v = preproc_->getUnfixedVar(i);
-            Variable w = preproc_->srcToDestVar(v);
+            Variable v = pp_->getUnfixedVar(i);
+            Variable w = pp_->srcToDestVar(v);
             std::unique_ptr<Domain> p(aux->get(w)->clone());
             box.set(v, std::move(p));
          }
@@ -695,7 +663,7 @@ std::pair<DomainBox, Proof> Solver::getSolution(size_t i) const
 
 size_t Solver::nbPendingNodes() const
 {
-   if (preproc_->isSolved())
+   if (pp_->isSolved())
       return 0;
 
    else
@@ -711,24 +679,24 @@ DomainBox Solver::getPendingBox(size_t i) const
       DomainBox box(problem_->scope());
 
       // assigns the values of the fixed variables
-      for (size_t i = 0; i < preproc_->nbFixedVars(); ++i)
+      for (size_t i = 0; i < pp_->nbFixedVars(); ++i)
       {
-         Variable v = preproc_->getFixedVar(i);
-         Interval x = preproc_->getFixedDomain(v);
+         Variable v = pp_->getFixedVar(i);
+         Interval x = pp_->getFixedDomain(v);
          Domain *dom = box.get(v);
          dom->contract(x);
       }
 
       // assigns the values of the unfixed variables
-      if (!preproc_->allVarsFixed())
+      if (!pp_->allVarsFixed())
       {
          SharedNode node = space_->getPendingNode(i);
          DomainBox *aux = node->box();
 
-         for (size_t i = 0; i < preproc_->nbUnfixedVars(); ++i)
+         for (size_t i = 0; i < pp_->nbUnfixedVars(); ++i)
          {
-            Variable v = preproc_->getUnfixedVar(i);
-            Variable w = preproc_->srcToDestVar(v);
+            Variable v = pp_->getUnfixedVar(i);
+            Variable w = pp_->srcToDestVar(v);
             std::unique_ptr<Domain> p(aux->get(w)->clone());
             box.set(v, std::move(p));
          }
@@ -742,11 +710,6 @@ DomainBox Solver::getPendingBox(size_t i) const
       DomainBox aux(*node->box());
       return aux;
    }
-}
-
-const Problem &Solver::getProblem() const
-{
-   return *problem_;
 }
 
 } // namespace realpaver

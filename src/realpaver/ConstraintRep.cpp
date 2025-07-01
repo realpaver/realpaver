@@ -15,7 +15,7 @@
  * @file   ConstraintRep.cpp
  * @brief  Base class of constraint representations
  * @author Laurent Granvilliers
- * @date   28 may 2025
+ * @date   28 May 2025
  */
 
 #include "realpaver/ConstraintRep.hpp"

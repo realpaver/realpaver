@@ -15,7 +15,7 @@
  * @file   ContractorList.hpp
  * @brief  List of contractors applied in sequence
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_LIST_HPP

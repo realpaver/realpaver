@@ -15,11 +15,11 @@
  * @file   ContractorPool.cpp
  * @brief  Classes of pools of contractoirs
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/ContractorPool.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorPool.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {

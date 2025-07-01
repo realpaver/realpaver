@@ -19,7 +19,6 @@
  */
 
 #include "realpaver/SelectorSSR.hpp"
-
 #include <algorithm>
 
 namespace realpaver {

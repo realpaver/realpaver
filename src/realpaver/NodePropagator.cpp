@@ -15,7 +15,7 @@
  * @file   NodePropagator.cpp
  * @brief  Propagators of for search tree nodes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/NodePropagator.hpp"
