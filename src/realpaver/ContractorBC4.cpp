@@ -15,7 +15,7 @@
  * @file   ContractorBC4.cpp
  * @brief  BC4 contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/ContractorBC4.hpp"

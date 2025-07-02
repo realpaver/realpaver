@@ -15,7 +15,7 @@
  * @file   NLPModel.hpp
  * @brief  Interface for local optimization solvers
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NLP_MODEL_HPP

@@ -15,7 +15,7 @@
  * @file   ProblemBridge.hpp
  * @brief  Bridge between problems managed by the preprocessor
  * @author Laurent Granvilliers
- * @date   3 june 2025
+ * @date   3 June 2025
  */
 
 #ifndef REALPAVER_PROBLEM_BRIDGE_HPP
@@ -30,7 +30,7 @@ namespace realpaver {
 class ProblemBridge {
 public:
    /// Creates a bridge between src and dest
-   ProblemBridge(Problem &src, Problem &dest);
+   ProblemBridge(SharedProblem src, SharedProblem dest);
 
    /// No copy
    ProblemBridge(const ProblemBridge &) = delete;
@@ -128,11 +128,11 @@ private:
    /// Map type Variable -> Interval
    using FixedMap = std::unordered_map<Variable, Interval, VariableHasher>;
 
-   Problem *src_;    // source problem
-   DomainBox *box_;  // domains of the source problems
-   Problem *dest_;   // destination problem
-   VarMap varmap_;   // map Variable of src -> Variable of dest
-   FixedMap fixmap_; // map Variable of src -> Interval (its fixed value)
+   SharedProblem src_;  // source problem
+   DomainBox *box_;     // domains of the source problems
+   SharedProblem dest_; // destination problem
+   VarMap varmap_;      // map Variable of src -> Variable of dest
+   FixedMap fixmap_;    // map Variable of src -> Interval (its fixed value)
 };
 
 /// Shared pointer to problem bridge

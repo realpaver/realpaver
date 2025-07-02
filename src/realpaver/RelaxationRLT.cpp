@@ -444,7 +444,6 @@ void RLTCreator::apply(const DagCos *node)
    Interval val = node->ival();
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return cos(x); };
@@ -456,7 +455,6 @@ void RLTCreator::apply(const DagCos *node)
       overConcave(lm, iy, ix, a, b, a, f, df);
       overConcave(lm, iy, ix, a, b, b, f, df);
       overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       underConcave(lm, iy, ix, a, b, f);
    }
    else if (val.isNegative())
@@ -465,7 +463,6 @@ void RLTCreator::apply(const DagCos *node)
       underConvex(lm, iy, ix, a, b, a, f, df);
       underConvex(lm, iy, ix, a, b, b, f, df);
       underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       overConvex(lm, iy, ix, a, b, f);
    }
    else if (Interval::minusOnePlusOne().strictlyContains(val))
@@ -473,7 +470,7 @@ void RLTCreator::apply(const DagCos *node)
       // concavo-convex function
       relaxConcavoConvexCosSin(lm, iy, ix, a, b, f, df);
    }
-   // else there is a stationaty point => no relaxation
+   // else there is a stationary point => no relaxation
 }
 
 void RLTCreator::apply(const DagSin *node)
@@ -482,7 +479,6 @@ void RLTCreator::apply(const DagSin *node)
    Interval val = node->ival();
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return sin(x); };
@@ -494,7 +490,6 @@ void RLTCreator::apply(const DagSin *node)
       overConcave(lm, iy, ix, a, b, a, f, df);
       overConcave(lm, iy, ix, a, b, b, f, df);
       overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       underConcave(lm, iy, ix, a, b, f);
    }
    else if (val.isNegative())
@@ -503,7 +498,6 @@ void RLTCreator::apply(const DagSin *node)
       underConvex(lm, iy, ix, a, b, a, f, df);
       underConvex(lm, iy, ix, a, b, b, f, df);
       underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       overConvex(lm, iy, ix, a, b, f);
    }
    else if (Interval::minusOnePlusOne().strictlyContains(val))
@@ -523,48 +517,40 @@ void RLTCreator::apply(const DagTan *node)
       return;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return tan(x); };
-   auto df = [](const Interval &x) { return 1.0 / sqr(cos(x)); };
+   auto df = [](const Interval &x) { return 1.0 + sqr(tan(x)); };
 
-   if (val.isNegative())
+   if (val.isPositive())
    {
       // convex function
       underConvex(lm, iy, ix, a, b, a, f, df);
       underConvex(lm, iy, ix, a, b, b, f, df);
       underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       overConvex(lm, iy, ix, a, b, f);
    }
-   else if (val.isPositive())
+   else if (val.isNegative())
    {
       // concave function
       overConcave(lm, iy, ix, a, b, a, f, df);
       overConcave(lm, iy, ix, a, b, b, f, df);
       overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       underConcave(lm, iy, ix, a, b, f);
    }
    else
    {
-      // concavo-convex function
-      LinVar x = lm.getLinVar(ix), y = lm.getLinVar(iy);
+      // concave and then convex, slope positive with minimum slope = 1.0
+      LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
 
-      // TODO
-
-      // underestimation: under the line passing through
-      // (b, tan(b)) with slope 1, i.e. y <= x + p
-      Interval p1(node->ival().right() - Interval(b));
-      LinExpr e1({1.0, -1.0}, {y, x});
-      lm.addCtr(e1, p1.right());
-
-      // overestimation: over the line passing through
-      // (a, tan(a)) with slope 1, i.e. y >= x + p
-      Interval p2(node->ival().left() - Interval(a));
-      LinExpr e2({1.0, -1.0}, {y, x});
-      lm.addCtr(p2.left(), e2);
+      // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+      // maximum of the derivative numbers over [a, b] and the two other facets have
+      // slope 1.0 (i.e. the minimum of the derivative numbers)
+      Interval dvmax = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+      underLine(lm, iy, ix, a, fa.right(), 1.0);
+      overLine(lm, iy, ix, a, fa.left(), dvmax.right());
+      underLine(lm, iy, ix, b, fb.right(), dvmax.right());
+      overLine(lm, iy, ix, b, fb.left(), 1.0);
    }
 }
 
@@ -573,7 +559,6 @@ void RLTCreator::apply(const DagCosh *node)
    LPModel &lm = *lpm_;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return cosh(x); };
@@ -582,7 +567,6 @@ void RLTCreator::apply(const DagCosh *node)
    underConvex(lm, iy, ix, a, b, a, f, df);
    underConvex(lm, iy, ix, a, b, b, f, df);
    underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
    overConvex(lm, iy, ix, a, b, f);
 }
 
@@ -591,7 +575,6 @@ void RLTCreator::apply(const DagSinh *node)
    LPModel &lm = *lpm_;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return sinh(x); };
@@ -603,7 +586,6 @@ void RLTCreator::apply(const DagSinh *node)
       underConvex(lm, iy, ix, a, b, a, f, df);
       underConvex(lm, iy, ix, a, b, b, f, df);
       underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
       overConvex(lm, iy, ix, a, b, f);
    }
    else
@@ -614,29 +596,21 @@ void RLTCreator::apply(const DagSinh *node)
          overConcave(lm, iy, ix, a, b, a, f, df);
          overConcave(lm, iy, ix, a, b, b, f, df);
          overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
          underConcave(lm, iy, ix, a, b, f);
       }
       else
       {
-         // concave over [a, 0] and convex in [0, b]
+         // concave and then convex, slope positive with minimum slope = 1.0
          LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
 
-         // encloses the curve in a parallelepiped
-         // the slope of 2 opposite facets is the maximum of the derivative
-         // numbers over [a, b]
-         Interval maxdv = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
-
-         // the slope of the 2 other opposite corners if the minimum of the
-         // derivative numbers over [a, b], that is sinh'(0) = 1.0
-
-         // 2 opposite facets of slope maxdv
-         overLine(lm, iy, ix, a, fa.right(), maxdv.right());
-         underLine(lm, iy, ix, b, fb.left(), maxdv.right());
-
-         // 2 opposite facets of slope 1.0
-         underLine(lm, iy, ix, a, fa.left(), 1.0);
-         overLine(lm, iy, ix, b, fb.right(), 1.0);
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // maximum of the derivative numbers over [a, b] and the two other facets have
+         // slope 1.0 (i.e. the minimum of the derivative numbers)
+         Interval dvmax = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+         underLine(lm, iy, ix, a, fa.right(), 1.0);
+         overLine(lm, iy, ix, a, fa.left(), dvmax.right());
+         underLine(lm, iy, ix, b, fb.right(), dvmax.right());
+         overLine(lm, iy, ix, b, fb.left(), 1.0);
       }
    }
 }
@@ -644,92 +618,300 @@ void RLTCreator::apply(const DagSinh *node)
 void RLTCreator::apply(const DagTanh *node)
 {
    LPModel &lm = *lpm_;
-
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
 
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return tanh(x); };
-   auto df = [](const Interval &x) { return 1.0 - sqr(tanh(x)); };
+   auto df = [](const Interval &x) { return 1.0 - (sqr(tanh(x))); };
 
-   if (b <= 0.0)
+   if (a >= 0)
    {
-      // convex function
-      underConvex(lm, iy, ix, a, b, a, f, df);
-      underConvex(lm, iy, ix, a, b, b, f, df);
-      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-      overConvex(lm, iy, ix, a, b, f);
+      // concave function
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+      underConcave(lm, iy, ix, a, b, f);
    }
    else
    {
-      if (a >= 0.0)
+      if (b <= 0)
       {
-         // concave function
-         overConcave(lm, iy, ix, a, b, a, f, df);
-         overConcave(lm, iy, ix, a, b, b, f, df);
-         overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
-
-         underConcave(lm, iy, ix, a, b, f);
+         // convex function
+         underConvex(lm, iy, ix, a, b, a, f, df);
+         underConvex(lm, iy, ix, a, b, b, f, df);
+         underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+         overConvex(lm, iy, ix, a, b, f);
       }
       else
       {
-         // convex over [a, 0] and concave in [0, b]
+         // convex and then concave, slope positive with minimum slope = 1.0
          LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
 
-         // encloses the curve in a parallelepiped
-         // the slope of 2 opposite facets is the minimum of the derivative
-         // numbers over [a, b]
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // maximum of the derivative numbers over [a, b] and the two other facets have
+         // slope 1.0 (i.e. the minimum of the derivative numbers)
          Interval dvmin = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
-
-         // the slope of the 2 other opposite corners if the maximum of the
-         // derivative numbers over [a, b], that is tanh'(0) = 1.0
-
-         // 2 opposite facets of slope dvmin
          underLine(lm, iy, ix, a, fa.left(), dvmin.left());
-         overLine(lm, iy, ix, b, fb.right(), dvmin.left());
-
-         // 2 opposite facets of slope 1.0
+         overLine(lm, iy, ix, a, fa.left(), 1.0);
          underLine(lm, iy, ix, b, fb.left(), 1.0);
-         overLine(lm, iy, ix, a, fa.right(), 1.0);
+         overLine(lm, iy, ix, b, fb.right(), dvmin.left());
       }
    }
 }
 
 void RLTCreator::apply(const DagAcos *node)
 {
-   // TODO
-   THROW("NOT YET IMPLEMENTED");
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double a = std::max(-1.0, node->child()->ival().left()),
+          b = std::min(1.0, node->child()->ival().right());
+   if (a > b)
+      return; // no relaxation
+
+   auto f = [](const Interval &x) { return acos(x); };
+   auto df = [](const Interval &x) { return -1.0 / sqrt(1 - sqr(x)); };
+
+   if (b <= 0)
+   {
+      // convex function
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+      overConvex(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      if (a >= 0)
+      {
+         // concave function
+         overConcave(lm, iy, ix, a, b, a, f, df);
+         overConcave(lm, iy, ix, a, b, b, f, df);
+         overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+         underConcave(lm, iy, ix, a, b, f);
+      }
+      else
+      {
+         // convex and then concave, slope positive with maximum slope = -1.0
+         LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
+
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // minimum of the derivative numbers over [a, b] and the two other facets have
+         // slope -1.0 (i.e. the maximum of the derivative numbers)
+         Interval dvmin = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+         underLine(lm, iy, ix, a, fa.left(), dvmin.left());
+         overLine(lm, iy, ix, a, fa.right(), -1.0);
+         underLine(lm, iy, ix, b, fb.left(), -1.0);
+         overLine(lm, iy, ix, b, fb.right(), dvmin.left());
+      }
+   }
 }
 
 void RLTCreator::apply(const DagAsin *node)
 {
-   // TODO
-   THROW("NOT YET IMPLEMENTED");
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double a = std::max(-1.0, node->child()->ival().left()),
+          b = std::min(1.0, node->child()->ival().right());
+   if (a > b)
+      return; // no relaxation
+
+   auto f = [](const Interval &x) { return asin(x); };
+   auto df = [](const Interval &x) { return 1.0 / sqrt(1 - sqr(x)); };
+
+   if (b <= 0)
+   {
+      // concave function
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+      underConcave(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      if (a >= 0)
+      {
+         // convex function
+         underConvex(lm, iy, ix, a, b, a, f, df);
+         underConvex(lm, iy, ix, a, b, b, f, df);
+         underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+         overConvex(lm, iy, ix, a, b, f);
+      }
+      else
+      {
+         // concave and then convex, slope positive with minimum slope = 1.0
+         LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
+
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // maximum of the derivative numbers over [a, b] and the two other facets have
+         // slope 1.0 (i.e. the minimum of the derivative numbers)
+         Interval dvmax = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+         underLine(lm, iy, ix, a, fa.right(), 1.0);
+         overLine(lm, iy, ix, a, fa.left(), dvmax.right());
+         underLine(lm, iy, ix, b, fb.right(), dvmax.right());
+         overLine(lm, iy, ix, b, fb.left(), 1.0);
+      }
+   }
 }
 
 void RLTCreator::apply(const DagAtan *node)
 {
-   // TODO
-   THROW("NOT YET IMPLEMENTED");
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double a = node->child()->ival().left(), b = node->child()->ival().right();
+
+   auto f = [](const Interval &x) { return atan(x); };
+   auto df = [](const Interval &x) { return 1.0 / (1 + sqr(x)); };
+
+   if (a >= 0)
+   {
+      // concave function
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+      underConcave(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      if (b <= 0)
+      {
+         // convex function
+         underConvex(lm, iy, ix, a, b, a, f, df);
+         underConvex(lm, iy, ix, a, b, b, f, df);
+         underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+         overConvex(lm, iy, ix, a, b, f);
+      }
+      else
+      {
+         // convex and then concave, slope positive with maximum slope = 1.0
+         LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
+
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // minimum of the derivative numbers over [a, b] and the two other facets have
+         // slope 1.0 (i.e. the maximum of the derivative numbers)
+         Interval dvmin = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+         underLine(lm, iy, ix, a, fa.left(), dvmin.left());
+         overLine(lm, iy, ix, a, fa.left(), 1.0);
+         underLine(lm, iy, ix, b, fb.left(), 1.0);
+         overLine(lm, iy, ix, b, fb.right(), dvmin.left());
+      }
+   }
 }
 
 void RLTCreator::apply(const DagAcosh *node)
 {
-   // TODO
-   THROW("NOT YET IMPLEMENTED");
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double a = std::max(1.0, node->child()->ival().left()),
+          b = node->child()->ival().right();
+   if (a > b || a == 1.0)
+      return; // no relaxation
+
+   auto f = [](const Interval &x) { return acosh(x); };
+   auto df = [](const Interval &x) { return 1.0 / sqrt(sqr(x) - 1.0); };
+
+   // concave function
+   overConcave(lm, iy, ix, a, b, a, f, df);
+   overConcave(lm, iy, ix, a, b, b, f, df);
+   overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+   underConcave(lm, iy, ix, a, b, f);
 }
 
 void RLTCreator::apply(const DagAsinh *node)
 {
-   // TODO
-   THROW("NOT YET IMPLEMENTED");
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double a = node->child()->ival().left(), b = node->child()->ival().right();
+
+   auto f = [](const Interval &x) { return asinh(x); };
+   auto df = [](const Interval &x) { return 1.0 / sqrt(1 + sqr(x)); };
+
+   if (b <= 0)
+   {
+      // convex function
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+      overConvex(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      if (a >= 0)
+      {
+         // concave function
+         overConcave(lm, iy, ix, a, b, a, f, df);
+         overConcave(lm, iy, ix, a, b, b, f, df);
+         overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+         underConcave(lm, iy, ix, a, b, f);
+      }
+      else
+      {
+         // convex and then concave, slope positive with maximum slope = 1.0
+         LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
+
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // minimum of the derivative numbers over [a, b] and the two other facets have
+         // slope 1.0 (i.e. the maximum of the derivative numbers)
+         Interval dvmin = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+         underLine(lm, iy, ix, a, fa.left(), dvmin.left());
+         overLine(lm, iy, ix, a, fa.right(), 1.0);
+         underLine(lm, iy, ix, b, fb.left(), 1.0);
+         overLine(lm, iy, ix, b, fb.right(), dvmin.left());
+      }
+   }
 }
 
 void RLTCreator::apply(const DagAtanh *node)
 {
-   // TODO
-   THROW("NOT YET IMPLEMENTED");
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double a = std::max(-1.0, node->child()->ival().left()),
+          b = std::min(1.0, node->child()->ival().right());
+   if (a > b || a == -1.0 || b == 1.0)
+      return; // no relaxation
+
+   auto f = [](const Interval &x) { return atanh(x); };
+   auto df = [](const Interval &x) { return 1.0 / (1 - sqr(x)); };
+
+   if (b <= 0)
+   {
+      // concave function
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+      underConcave(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      if (a >= 0)
+      {
+         // convex function
+         underConvex(lm, iy, ix, a, b, a, f, df);
+         underConvex(lm, iy, ix, a, b, b, f, df);
+         underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+         overConvex(lm, iy, ix, a, b, f);
+      }
+      else
+      {
+         // concave and then convex, slope positive with minimum slope = 1.0
+         LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
+
+         // encloses the curve in a parallelepiped: the slope of 2 opposite facets is the
+         // maximum of the derivative numbers over [a, b] and the two other facets have
+         // slope 1.0 (i.e. the minimum of the derivative numbers)
+         Interval dvmax = (b > (-a)) ? df(b) : df(a), fa = f(a), fb = f(b);
+         underLine(lm, iy, ix, a, fa.right(), 1.0);
+         overLine(lm, iy, ix, a, fa.left(), dvmax.right());
+         underLine(lm, iy, ix, b, fb.right(), dvmax.right());
+         overLine(lm, iy, ix, b, fb.left(), 1.0);
+      }
+   }
 }
 
 void RLTCreator::apply(const DagLin *node)
@@ -950,52 +1132,34 @@ void relaxConcavoConvexCosSin(LPModel &lm, size_t iy, size_t ix, double a, doubl
                               std::function<Interval(Interval)> df)
 {
    LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
-
    Interval dva = df(a), dvb = df(b), fa = f(a), fb = f(b);
 
    if (fa.isNegative())
    {
-      // slope positive with maximum slope = 1
-      // convex and then concave
+      // convex and then concave; slope positive with maximum slope = 1
       LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
 
-      // encloses the curve in a parallelepiped
-      // the slope of 2 opposite facets is the minimum of the derivative
-      // numbers over [a, b]
+      // encloses the curve in a parallelepiped; the slope of 2 opposite facets is the
+      // minimum of the derivative numbers over [a, b] and the two other facets have
+      // slope 1.0 (i.e. the maximum of the derivative numbers)
       double dvmin = Double::min(dva.left(), dvb.left());
-
-      // the slope of the 2 other opposite corners if the maximum of the
-      // derivative numbers over [a, b], that is 1.0
-
-      // 2 opposite facets of slope mindv
       underLine(lm, iy, ix, a, fa.left(), dvmin);
-      overLine(lm, iy, ix, b, fb.right(), dvmin);
-
-      // 2 opposite facets of slope 1.0
-      underLine(lm, iy, ix, b, fb.left(), 1.0);
       overLine(lm, iy, ix, a, fa.right(), 1.0);
+      underLine(lm, iy, ix, b, fb.left(), 1.0);
+      overLine(lm, iy, ix, b, fb.right(), dvmin);
    }
-
    else
    {
-      // slope negative with minimum slope = -1
-      // concave and then convex
+      // concave and then convex; slope negative with minimum slope = -1
       LinVar y = lm.getLinVar(iy), x = lm.getLinVar(ix);
 
-      // encloses the curve in a parallelepiped
-      // the slope of 2 opposite facets is the maximum of the derivative
-      // numbers over [a, b]
-      double dvmax = Double::max(dva.left(), dvb.left());
-
-      // the slope of the 2 other opposite corners if the minimum of the
-      // derivative numbers over [a, b], that is -1.0
-
-      // 2 opposite facets of slope maxdv
-      underLine(lm, iy, ix, b, fb.left(), dvmax);
-      overLine(lm, iy, ix, a, fa.right(), dvmax);
-
-      // 2 opposite facets of slope -1.0
+      // encloses the curve in a parallelepiped; the slope of 2 opposite facets is the
+      // maximum of the derivative numbers over [a, b] and the two other facets have
+      // slope -1.0 (i.e. the minimum of the derivative numbers)
+      double dvmax = Double::max(dva.right(), dvb.right());
       underLine(lm, iy, ix, a, fa.right(), -1.0);
+      overLine(lm, iy, ix, a, fa.right(), dvmax);
+      underLine(lm, iy, ix, b, fb.left(), dvmax);
       overLine(lm, iy, ix, b, fb.left(), -1.0);
    }
 }

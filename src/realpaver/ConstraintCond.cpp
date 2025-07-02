@@ -15,7 +15,7 @@
  * @file   ConstraintCond.cpp
  * @brief  Conditional constraints
  * @author Laurent Granvilliers
- * @date   28 may 2025
+ * @date   28 May 2025
  */
 
 #include "realpaver/ConstraintCond.hpp"

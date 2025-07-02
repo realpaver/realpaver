@@ -15,11 +15,11 @@
  * @file   IntervalSlicer.cpp
  * @brief  Interval slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 
 namespace realpaver {
 

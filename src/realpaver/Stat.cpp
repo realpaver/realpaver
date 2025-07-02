@@ -15,12 +15,11 @@
  * @file   Stat.cpp
  * @brief  Statistics on solving processes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Stat.hpp"
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Exception.hpp"
+#include "realpaver/Stat.hpp"
 #include <map>
 #include <sstream>
 

@@ -15,7 +15,7 @@
  * @file   Interval.cpp
  * @brief  Class of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -712,7 +712,7 @@ Interval operator+(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::add(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("add on " << x << "," << y << " -> " << res);
 #endif
 
@@ -723,7 +723,7 @@ Interval addPX(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::addPX(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("addPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -734,7 +734,7 @@ Interval addPY(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::addPY(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("addPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -745,7 +745,7 @@ Interval addPZ(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::addPZ(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("addPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -762,7 +762,7 @@ Interval operator-(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sub(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sub on " << x << "," << y << " -> " << res);
 #endif
 
@@ -773,7 +773,7 @@ Interval subPX(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::subPX(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("subPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -784,7 +784,7 @@ Interval subPY(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::subPY(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("subPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -795,7 +795,7 @@ Interval subPZ(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::subPZ(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("subPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -811,7 +811,7 @@ Interval usubPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::usubPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("usubPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -822,7 +822,7 @@ Interval usubPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::usubPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("usubPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -839,7 +839,7 @@ Interval operator*(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::mul(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("mul on " << x << "," << y << " -> " << res);
 #endif
 
@@ -850,7 +850,7 @@ Interval mulPX(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::mulPX(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("mulPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -861,7 +861,7 @@ Interval mulPY(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::mulPY(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("mulPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -872,7 +872,7 @@ Interval mulPZ(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::mulPZ(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("mulPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -894,7 +894,7 @@ Interval divPX(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::divPX(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("divPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -905,7 +905,7 @@ Interval divPY(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::divPY(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("divPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -916,7 +916,7 @@ Interval divPZ(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::divPZ(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("divPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -927,7 +927,7 @@ Interval sqr(const Interval &x)
 {
    Interval res = Interval(Interval::Traits::sqr(x.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sqr on " << x << " -> " << res);
 #endif
 
@@ -938,7 +938,7 @@ Interval sqrPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sqrPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sqrPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -949,7 +949,7 @@ Interval sqrPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sqrPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sqrPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -965,7 +965,7 @@ Interval sqrtPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sqrtPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sqrtPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -976,7 +976,7 @@ Interval sqrtPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sqrtPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sqrtPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -992,7 +992,7 @@ Interval powPX(const Interval &x, int n, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::powPX(x.impl_, n, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("powPX(x,n,y) on " << x << "," << n << "," << y << " -> " << res);
 #endif
 
@@ -1003,7 +1003,7 @@ Interval powPY(const Interval &x, int n, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::powPY(x.impl_, n, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("powPY(x,n,y) on " << x << "," << n << "," << y << " -> " << res);
 #endif
 
@@ -1019,7 +1019,7 @@ Interval expPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::expPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("expPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1030,7 +1030,7 @@ Interval expPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::expPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("expPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1046,7 +1046,7 @@ Interval logPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::logPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("logPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1057,7 +1057,7 @@ Interval logPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::logPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("logPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1073,7 +1073,7 @@ Interval sinPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sinPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sinPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1084,7 +1084,7 @@ Interval sinPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sinPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sinPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1100,7 +1100,7 @@ Interval cosPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::cosPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("cosPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1111,7 +1111,7 @@ Interval cosPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::cosPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("cosPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1127,7 +1127,7 @@ Interval tanPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::tanPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("tanPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1138,7 +1138,7 @@ Interval tanPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::tanPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("tanPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1154,7 +1154,7 @@ Interval coshPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::coshPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("coshPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1165,7 +1165,7 @@ Interval coshPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::coshPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("coshPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1181,7 +1181,7 @@ Interval sinhPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sinhPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sinhPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1192,7 +1192,7 @@ Interval sinhPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sinhPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sinhPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1208,7 +1208,7 @@ Interval tanhPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::tanhPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("tanhPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1219,7 +1219,7 @@ Interval tanhPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::tanhPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("tanhPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1235,7 +1235,7 @@ Interval acosPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::acosPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("acosPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1246,7 +1246,7 @@ Interval acosPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::acosPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("acosPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1262,7 +1262,7 @@ Interval asinPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::asinPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("asinPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1273,7 +1273,7 @@ Interval asinPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::asinPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("asinPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1289,7 +1289,7 @@ Interval atanPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::atanPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("atanPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1300,7 +1300,7 @@ Interval atanPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::atanPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("atanPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1316,7 +1316,7 @@ Interval acoshPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::acoshPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("acoshPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1327,7 +1327,7 @@ Interval acoshPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::acoshPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("acoshPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1343,7 +1343,7 @@ Interval asinhPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::asinhPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("asinhPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1354,7 +1354,7 @@ Interval asinhPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::asinhPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("asinhPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1370,7 +1370,7 @@ Interval atanhPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::atanhPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("atanhPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1381,7 +1381,7 @@ Interval atanhPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::atanhPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("atanhPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1397,7 +1397,7 @@ Interval absPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::absPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("absPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1408,7 +1408,7 @@ Interval absPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::absPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("absPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1424,7 +1424,7 @@ Interval minPX(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::minPX(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("minPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -1435,7 +1435,7 @@ Interval minPY(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::minPY(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("minPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -1446,7 +1446,7 @@ Interval minPZ(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::minPZ(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("minPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -1462,7 +1462,7 @@ Interval maxPX(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::maxPX(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("maxPX(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -1473,7 +1473,7 @@ Interval maxPY(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::maxPY(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("maxPY(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -1484,7 +1484,7 @@ Interval maxPZ(const Interval &x, const Interval &y, const Interval &z)
 {
    Interval res = Interval(Interval::Traits::maxPZ(x.impl_, y.impl_, z.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("maxPZ(x,y,z) on " << x << "," << y << "," << z << " -> " << res);
 #endif
 
@@ -1500,7 +1500,7 @@ Interval sgnPX(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sgnPX(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sgnPX(x,y) on " << x << "," << y << " -> " << res);
 #endif
 
@@ -1511,7 +1511,7 @@ Interval sgnPY(const Interval &x, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::sgnPY(x.impl_, y.impl_));
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    LOG_FULL("sgnPY(x,y) on " << x << "," << y << " -> " << res);
 #endif
 

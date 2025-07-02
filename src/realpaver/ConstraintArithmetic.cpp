@@ -15,7 +15,7 @@
  * @file   ConstraintArithmetic.cpp
  * @brief  Arithmetic constraints
  * @author Laurent Granvilliers
- * @date   29 may 2025
+ * @date   29 May 2025
  */
 
 #include "realpaver/ConstraintArithmetic.hpp"

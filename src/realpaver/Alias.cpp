@@ -15,7 +15,7 @@
  * @file   Alias.cpp
  * @brief  Alias of term in a problem
  * @author Laurent Granvilliers
- * @date   2024-12-19
+ * @date   19 Dec 2024
  */
 
 #include "realpaver/Alias.hpp"

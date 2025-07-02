@@ -15,7 +15,7 @@
  * @file   ContractorList.cpp
  * @brief  List of contractors applied in sequence
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/ContractorList.hpp"

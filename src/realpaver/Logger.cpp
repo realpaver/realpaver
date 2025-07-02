@@ -15,9 +15,10 @@
  * @file   Logger.cpp
  * @brief  Logger
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
+#include "realpaver/Exception.hpp"
 #include "realpaver/Logger.hpp"
 #include <ctime>
 #include <limits>

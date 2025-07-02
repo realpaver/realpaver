@@ -15,7 +15,7 @@
  * @file   ScopeBank.hpp
  * @brief  Bank of scopes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SCOPE_BANK_HPP

@@ -15,7 +15,7 @@
  * @file   SplitSLF.hpp
  * @brief  Splitting strategy for mixed problems
  * @author Laurent Granvilliers
- * @date   10 june 2025
+ * @date   10 June 2025
  */
 
 #ifndef REALPAVER_SPLIT_SLF_HPP

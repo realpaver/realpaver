@@ -15,7 +15,7 @@
  * @file   IntervalNewton.cpp
  * @brief  Interval Newton method
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -124,7 +124,7 @@ Proof IntervalNewton::contract(IntervalBox &X)
    LOG_INTER("Interval Newton contractor on " << X);
 
 // analysis of the degree of contraction
-#if LOG_ON
+#if REALPAVER_LOG_ON
    IntervalBox saveX(X);
 #endif
 
@@ -204,7 +204,7 @@ Proof IntervalNewton::contract(IntervalBox &X)
    LOG_INTER("Reduced box -> " << X);
 
 // analysis of the degree of contraction
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (proof != Proof::Empty)
    {
       LOG_INTER("Newton reduction: " << saveX.width() << ", " << X.width());

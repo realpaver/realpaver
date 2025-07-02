@@ -15,7 +15,7 @@
  * @file   FlatFunction.hpp
  * @brief  Function used to implement a fast version of hc4Revise
  * @author Laurent Granvilliers
- * @date   2024-6-11
+ * @date   6 Nov 2024
  */
 
 #ifndef REALPAVER_FLAT_FUNCTION_HPP

@@ -15,14 +15,14 @@
  * @file   NumericIntervalTraits.hpp
  * @brief  Specialization of template NumericTraits for intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NUMERIC_INTERVAL_TRAITS_HPP
 #define REALPAVER_NUMERIC_INTERVAL_TRAITS_HPP
 
-#include "Interval.hpp"
-#include "NumericTraits.hpp"
+#include "realpaver/Interval.hpp"
+#include "realpaver/NumericTraits.hpp"
 
 namespace realpaver {
 

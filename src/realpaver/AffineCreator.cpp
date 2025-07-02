@@ -15,7 +15,7 @@
  * @file   AffineCreator.cpp
  * @brief  Creators of affine forms
  * @author Laurent Granvilliers
- * @date   16/03/2025
+ * @date   16 Mar 2025
  */
 
 #include "realpaver/AffineCreator.hpp"

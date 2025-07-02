@@ -15,12 +15,12 @@
  * @file   NLPSolverNlopt.cpp
  * @brief  Implementation of NLP solver for Nlopt
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/NLPSolverNlopt.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/NLPSolverNlopt.hpp"
 
 namespace realpaver {
 

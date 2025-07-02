@@ -15,7 +15,7 @@
  * @file   realpaver_api.hpp
  * @brief  Imports the main classes for solving nonlinear problems.
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"

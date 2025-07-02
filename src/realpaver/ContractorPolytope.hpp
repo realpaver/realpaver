@@ -15,7 +15,7 @@
  * @file   ContractorPolytope.hpp
  * @brief  Polytope Hull contractor
  * @author Laurent Granvilliers
- * @date   2025-fev-11
+ * @date   11 Feb 2025
  */
 
 #ifndef REALPAVER_CONTRACTOR_POLYTOPE_HPP

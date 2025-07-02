@@ -15,11 +15,11 @@
  * @file   LPSolverClp.cpp
  * @brief  Wrapper class for the LP solver Clp.
  * @author Laurent Granvilliers, Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/LPSolverClp.hpp"
 #include "realpaver/LPModel.hpp"
+#include "realpaver/LPSolverClp.hpp"
 #include "realpaver/Logger.hpp"
 #include <CoinFinite.hpp>
 
@@ -122,7 +122,7 @@ LPStatus LPSolver::run()
 
    LPStatus status = toLPStatus();
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (status == LPStatus::Optimal)
    {
       LOG_INTER("Status: " << status << std::endl

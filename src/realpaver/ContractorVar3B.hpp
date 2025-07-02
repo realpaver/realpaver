@@ -15,7 +15,7 @@
  * @file   ContractorVar3B.hpp
  * @brief  3B contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_VAR_3B_HPP

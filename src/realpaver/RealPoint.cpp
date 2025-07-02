@@ -15,11 +15,11 @@
  * @file   RealPoint.cpp
  * @brief  Classes of real points
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/RealPoint.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
 

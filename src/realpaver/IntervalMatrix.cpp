@@ -15,11 +15,11 @@
  * @file   IntervalMatrix.cpp
  * @brief  Dense interval matrix
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalMatrix.hpp"
 
 namespace realpaver {
 

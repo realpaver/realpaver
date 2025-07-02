@@ -15,10 +15,9 @@
  * @file   ContractorConstraint.cpp
  * @brief  Contractor associated with a constraint
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 
 namespace realpaver {

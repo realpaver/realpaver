@@ -15,14 +15,13 @@
  * @file   DomainSlicerMap.hpp
  * @brief  Map of domain slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_DOMAIN_SLICER_MAP_HPP
 #define REALPAVER_DOMAIN_SLICER_MAP_HPP
 
 #include "realpaver/DomainSlicer.hpp"
-#include "realpaver/Scope.hpp"
 #include <memory>
 #include <vector>
 

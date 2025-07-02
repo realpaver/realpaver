@@ -15,13 +15,13 @@
  * @file   DomainBox.cpp
  * @brief  Box of domains
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "AssertDebug.hpp"
-#include "DomainBox.hpp"
-#include "IntervalBox.hpp"
-#include "Logger.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/DomainBox.hpp"
+#include "realpaver/IntervalBox.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 

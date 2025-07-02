@@ -15,13 +15,12 @@
  * @file   SpaceHybridDFS.cpp
  * @brief  Search space for hybrid strategies
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/SpaceHybridDFS.hpp"
-#include <algorithm>
 #include <list>
 
 namespace realpaver {

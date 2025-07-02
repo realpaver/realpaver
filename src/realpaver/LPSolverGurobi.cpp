@@ -15,13 +15,13 @@
  * @file   LPSolverGurobi.cpp
  * @brief  Wrapper class for the LP solver Gurobi.
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/LPSolverGurobi.hpp"
 #include "gurobi_c++.h"
 #include "gurobi_c.h"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/LPSolverGurobi.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -201,7 +201,7 @@ LPStatus LPSolver::run()
       status = toLPStatus();
    }
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (status == LPStatus::Optimal)
    {
       LOG_INTER("Status: " << status << std::endl

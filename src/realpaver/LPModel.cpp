@@ -15,7 +15,7 @@
  * @file   LPModel.cpp
  * @brief  Classes for representing linear programs
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -229,6 +229,29 @@ int *LinExprRep::getIndexVars() const
    return const_cast<int *>(vars_.data());
 }
 
+bool LinExprRep::equals(const LinExprRep &other) const
+{
+   size_t n = getNbTerms();
+   if (n != other.getNbTerms())
+      return false;
+
+   for (size_t i = 0; i < n; ++i)
+   {
+      bool found = false;
+      size_t j = 0;
+      while (!found && (j < n))
+      {
+         if ((vars_[i] == other.vars_[j]) && (coefs_[i] == other.coefs_[j]))
+            found = true;
+         else
+            j++;
+      }
+      if (!found)
+         return false;
+   }
+   return true;
+}
+
 void LinExprRep::print(std::ostream &os) const
 {
    for (size_t i = 0; i < coefs_.size(); ++i)
@@ -292,6 +315,11 @@ double *LinExpr::getCoefs() const
 int *LinExpr::getIndexVars() const
 {
    return rep_->getIndexVars();
+}
+
+bool LinExpr::equals(const LinExpr &other) const
+{
+   return rep_->equals(*other.rep_);
 }
 
 std::ostream &operator<<(std::ostream &os, const LinExpr &e)
@@ -662,7 +690,7 @@ void LPModel::printSystem(std::ostream &os) const
 
 std::ostream &operator<<(std::ostream &os, const LPModel &model)
 {
-   model.printSystem(os);
+   model.print(os);
    return os;
 }
 

@@ -15,7 +15,7 @@
  * @file   NumericTraits.hpp
  * @brief  Traits class for numbers used in linear algebra
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NUMERIC_TRAITS_HPP

@@ -15,7 +15,7 @@
  * @file   NodeContext.hpp
  * @brief  Context for search nodes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NODE_CONTEXT_HPP
