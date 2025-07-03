@@ -464,6 +464,9 @@ int main(int argc, char **argv)
 
       // closes the solution file
       fsol.close();
+
+      ExporterHDF5 h5(problem);
+      h5.save(solver, baseFilename + ".h5");
    }
    catch (Exception e)
    {

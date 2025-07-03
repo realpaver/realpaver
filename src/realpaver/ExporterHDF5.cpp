@@ -83,13 +83,14 @@ void ExporterHDF5::write_solver_info(H5::Group *g, const Solver &s) const
 
    SolverDesc solverInfo[1];
    strcpy(solverInfo[0].realpaver_version, REALPAVER_VERSION);
-   strcpy(solverInfo[0].problem_name, s.getProblem().getName().c_str());
+   strcpy(solverInfo[0].problem_name,
+          s.getPreprocessor()->srcProblem()->getName().c_str());
    solverInfo[0].total_time = s.getSolvingTime();
    solverInfo[0].preprocessing_time = s.getPreprocessor()->elapsedTime();
    solverInfo[0].nb_var_fixed = s.getPreprocessor()->nbFixedVars();
    solverInfo[0].nb_ctr_inactive = s.getPreprocessor()->nbInactiveCtrs();
-   solverInfo[0].search_status = s.nbPendingNodes() > 0;
-   solverInfo[0].solution_status = s.nbSolutions() > 0;
+   solverInfo[0].search_status = s.getEnv()->usedNoLimit() && s.nbPendingNodes() == 0;
+   solverInfo[0].solution_status = s.getSpace()->hasFeasibleSolNode() > 0;
 
    // Define dataspace (1D array with size equal to number of strings)
    hsize_t solver_dims[1] = {1};
@@ -270,8 +271,8 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
 /// Reporting method for a complete space to a h5 file
 void ExporterHDF5::save(const Solver &solver, const std::string filename) const
 {
-   Scope s = solver.getProblem().scope();
-   const Space *space = solver.getSpace();
+   Scope s = solver.getPreprocessor()->srcProblem()->scope();
+   SharedSpace space = solver.getSpace();
    try
    {
       H5::H5File *file = new H5::H5File(filename, H5F_ACC_TRUNC);
