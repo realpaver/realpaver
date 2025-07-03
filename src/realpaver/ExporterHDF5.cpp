@@ -19,10 +19,14 @@
  */
 
 #include "DomainBox.hpp"
+#include "H5Lpublic.h"
 #include "NodeContext.hpp"
+#include "Preprocessor.hpp"
 #include "realpaver/Domain.hpp"
 #include "realpaver/ExporterHDF5.hpp"
 #include "realpaver/Scope.hpp"
+#include <ios>
+#include <memory>
 
 namespace realpaver {
 
@@ -45,6 +49,7 @@ int proof2int(Proof pf)
 }
 
 ExporterHDF5::ExporterHDF5(const Problem &pb)
+    : pp_(nullptr)
 {
    for (size_t i = 0; i < pb.nbAliases(); ++i)
    {
@@ -155,9 +160,11 @@ void ExporterHDF5::write_variables_info(H5::Group *g, const DomainBox &box) cons
 void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
 {
    const hsize_t nbNod = space.nbSolNodes();
+   Scope s = pp_->srcProblem()->scope();
+   DomainBox fixed = pp_->fixedRegion();
    if (nbNod > 0)
    {
-      const int nbVar = space.getSolNode(0)->scope().size();
+      const int nbVar = s.size(); // space.getSolNode(0)->scope().size();
       const hsize_t nbDim = nbVar + aliasesToExport_.size();
 
       H5::CompType NodeInfo(sizeof(NodeDesc));
@@ -193,7 +200,16 @@ void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
          nodeInfo[i].depth = sol->depth();
          for (size_t j = 0; j < nbVar; j++)
          {
-            Interval d = sol->box()->get(j)->intervalHull();
+            Interval d;
+            if (fixed.scope().contains(s.var(j)))
+            {
+               d = fixed.get(s.var(j))->intervalHull();
+            }
+            else
+            {
+               Variable vj = pp_->srcToDestVar(s.var(j));
+               d = sol->box()->get(vj)->intervalHull();
+            }
             l_values[i][j] = d.left();
             u_values[i][j] = d.right();
          }
@@ -213,9 +229,11 @@ void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
 void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
 {
    const hsize_t nbNod = space.nbPendingNodes();
+   Scope s = pp_->srcProblem()->scope();
+   DomainBox fixed = pp_->fixedRegion();
    if (nbNod > 0)
    {
-      const int nbVar = space.getPendingNode(0)->scope().size();
+      const int nbVar = s.size();
       const hsize_t nbDim = nbVar + aliasesToExport_.size();
 
       H5::CompType NodeInfo(sizeof(NodeDesc));
@@ -251,7 +269,16 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
          nodeInfo[i].depth = sol->depth();
          for (size_t j = 0; j < nbVar; j++)
          {
-            Interval d = sol->box()->get(j)->intervalHull();
+            Interval d;
+            if (fixed.scope().contains(s.var(j)))
+            {
+               d = fixed.get(s.var(j))->intervalHull();
+            }
+            else
+            {
+               Variable vj = pp_->srcToDestVar(s.var(j));
+               d = sol->box()->get(vj)->intervalHull();
+            }
             l_values[i][j] = d.left();
             u_values[i][j] = d.right();
          }
@@ -269,9 +296,9 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
 }
 
 /// Reporting method for a complete space to a h5 file
-void ExporterHDF5::save(const Solver &solver, const std::string filename) const
+void ExporterHDF5::save(const Solver &solver, const std::string filename)
 {
-   Scope s = solver.getPreprocessor()->srcProblem()->scope();
+   pp_ = solver.getPreprocessor();
    SharedSpace space = solver.getSpace();
    try
    {
@@ -280,7 +307,7 @@ void ExporterHDF5::save(const Solver &solver, const std::string filename) const
       H5::Group *group = new H5::Group(file->openGroup("/")); // Get default root group
 
       write_solver_info(group, solver);
-      DomainBox box(s);
+      DomainBox box(pp_->srcProblem()->scope());
       write_variables_info(group, box);
 
       H5::Group gsol = group->createGroup("SOLUTIONS");

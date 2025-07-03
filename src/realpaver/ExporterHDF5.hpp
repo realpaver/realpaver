@@ -23,10 +23,12 @@
 
 #include "H5Cpp.h"
 
+#include "Preprocessor.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Solver.hpp"
 
+#include <memory>
 #include <string>
 
 namespace realpaver {
@@ -83,13 +85,14 @@ public:
    ExporterHDF5 &operator=(const ExporterHDF5 &) = delete;
 
    /// Method for saving solver state to a h5 file
-   void save(const Solver &solver, const std::string filename) const;
+   void save(const Solver &solver, const std::string filename);
 
    /// Method for saving a complete space to a h5 file
-   void save(const Space &space, const std::string filename) const;
+   void save(const Space &space, const std::string filename);
 
 private:
    std::vector<Alias> aliasesToExport_;
+   SharedPreprocessor pp_;
 
    /// Method for writing variables and aliases information
    void write_variables_info(H5::Group *g, const DomainBox &box) const;

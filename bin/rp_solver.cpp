@@ -1,6 +1,7 @@
 #include "Domain.hpp"
 #include "realpaver/BoxReporter.hpp"
 #include "realpaver/DomainBox.hpp"
+#include "realpaver/ExporterHDF5.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
