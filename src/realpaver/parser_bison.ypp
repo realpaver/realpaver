@@ -415,6 +415,8 @@ alias_def
   : ident TK_EQ expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($3));
+      realpaver::Alias al($1, t);
+      realpaver_bison_problem->addAlias(al);
 
       if (realpaver_bison_symtab->hasSymbol($1))
       {

@@ -18,14 +18,11 @@
  * @date   2025-6-27
  */
 
-#include "DomainBox.hpp"
-#include "H5Lpublic.h"
-#include "NodeContext.hpp"
-#include "Preprocessor.hpp"
 #include "realpaver/Domain.hpp"
 #include "realpaver/ExporterHDF5.hpp"
 #include "realpaver/Scope.hpp"
-#include <ios>
+
+#include <iostream>
 #include <memory>
 
 namespace realpaver {
@@ -49,14 +46,8 @@ int proof2int(Proof pf)
 }
 
 ExporterHDF5::ExporterHDF5(const Problem &pb)
-    : pp_(nullptr)
+    : Exporter(pb)
 {
-   for (size_t i = 0; i < pb.nbAliases(); ++i)
-   {
-      Alias a = pb.aliasAt(i);
-      if (pb.isAliasReported(a))
-         aliasesToExport_.push_back(a);
-   }
 }
 
 ExporterHDF5::~ExporterHDF5()
@@ -136,6 +127,7 @@ void ExporterHDF5::write_variables_info(H5::Group *g, const DomainBox &box) cons
       varInfo[i].lower_bound = v.getDomain()->intervalHull().left();
       varInfo[i].upper_bound = v.getDomain()->intervalHull().right();
    }
+   // std::cout << aliasesToExport_.size() << " aliases to export" << std::endl;
    for (size_t k = 0; k < aliasesToExport_.size(); k++)
    {
       strcpy(varInfo[s.size() + k].name, aliasesToExport_[k].name().c_str());
@@ -164,9 +156,8 @@ void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
    DomainBox fixed = pp_->fixedRegion();
    if (nbNod > 0)
    {
-      const int nbVar = s.size(); // space.getSolNode(0)->scope().size();
+      const int nbVar = s.size();
       const hsize_t nbDim = nbVar + aliasesToExport_.size();
-
       H5::CompType NodeInfo(sizeof(NodeDesc));
       NodeInfo.insertMember("id", HOFFSET(NodeDesc, id), H5::PredType::NATIVE_INT);
       NodeInfo.insertMember("parent_id", HOFFSET(NodeDesc, parent_id),
@@ -188,8 +179,8 @@ void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
       // Create dataset
       H5::DataSet node_dset = g->createDataSet("NODES", NodeInfo, dspace_node);
 
-      double l_values[nbNod][nbDim];
-      double u_values[nbNod][nbDim];
+      double *l_values = new double[nbNod * nbDim];
+      double *u_values = new double[nbNod * nbDim];
       std::vector<NodeDesc> nodeInfo(nbNod);
       for (size_t i = 0; i < nbNod; i++)
       {
@@ -200,29 +191,37 @@ void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
          nodeInfo[i].depth = sol->depth();
          for (size_t j = 0; j < nbVar; j++)
          {
-            Interval d;
-            if (fixed.scope().contains(s.var(j)))
+            Interval d = Interval::universe();
+            Variable vj = s.var(j);
+            if (fixed.scope().contains(vj))
             {
-               d = fixed.get(s.var(j))->intervalHull();
+               d = fixed.get(vj)->intervalHull();
             }
             else
             {
-               Variable vj = pp_->srcToDestVar(s.var(j));
+               vj = pp_->srcToDestVar(vj);
                d = sol->box()->get(vj)->intervalHull();
             }
-            l_values[i][j] = d.left();
-            u_values[i][j] = d.right();
+            l_values[i * nbDim + j] = d.left();
+            u_values[i * nbDim + j] = d.right();
          }
-         for (size_t k = 0; k < aliasesToExport_.size(); k++)
-         {
-            Interval d = aliasesToExport_[k].term().eval(*(sol->box()))->intervalHull();
-            l_values[i][nbVar + k] = d.left();
-            u_values[i][nbVar + k] = d.right();
-         }
+         // for (size_t k = 0; k < aliasesToExport_.size(); k++)
+         // {
+         //    // std::cout << i << " " << k << " " << nbVar + k << " " << nbDim <<
+         //    // std::endl; std::cout << aliasesToExport_[k].term() << std::endl;
+         //    Interval d;
+         //    // std::cout << aliasesToExport_[k].term().eval(*(sol->box())) <<
+         //    // std::endl;
+         //    d = aliasesToExport_[k].term().eval(*(sol->box()))->intervalHull();
+         //    l_values[i*nbDim+nbVar + k] = d.left();
+         //    u_values[i*nbDim+nbVar + k] = d.right();
+         // }
+         dset_sol_l.write(l_values, H5::PredType::NATIVE_DOUBLE);
+         dset_sol_u.write(u_values, H5::PredType::NATIVE_DOUBLE);
+         node_dset.write(nodeInfo.data(), NodeInfo);
+         // delete[] l_values;
+         // delete[] u_values;
       }
-      dset_sol_l.write(l_values, H5::PredType::NATIVE_DOUBLE);
-      dset_sol_u.write(u_values, H5::PredType::NATIVE_DOUBLE);
-      node_dset.write(nodeInfo.data(), NodeInfo);
    }
 }
 
@@ -257,8 +256,8 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
       // Create dataset
       H5::DataSet node_dset = g->createDataSet("NODES", NodeInfo, dspace_node);
 
-      double l_values[nbNod][nbDim];
-      double u_values[nbNod][nbDim];
+      double *l_values = new double[nbNod * nbDim];
+      double *u_values = new double[nbNod * nbDim];
       std::vector<NodeDesc> nodeInfo(nbNod);
       for (size_t i = 0; i < nbNod; i++)
       {
@@ -269,35 +268,40 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
          nodeInfo[i].depth = sol->depth();
          for (size_t j = 0; j < nbVar; j++)
          {
-            Interval d;
-            if (fixed.scope().contains(s.var(j)))
+            Variable vj = s.var(j);
+            Interval d = Interval::universe();
+            if (fixed.scope().contains(vj))
             {
                d = fixed.get(s.var(j))->intervalHull();
             }
             else
             {
-               Variable vj = pp_->srcToDestVar(s.var(j));
+               vj = pp_->srcToDestVar(vj);
                d = sol->box()->get(vj)->intervalHull();
             }
-            l_values[i][j] = d.left();
-            u_values[i][j] = d.right();
+            l_values[i * nbDim + j] = d.left();
+            u_values[i * nbDim + j] = d.right();
          }
-         for (size_t k = 0; k < aliasesToExport_.size(); k++)
-         {
-            Interval d = aliasesToExport_[k].term().eval(*(sol->box()))->intervalHull();
-            l_values[i][nbVar + k] = d.left();
-            u_values[i][nbVar + k] = d.right();
-         }
+         // for (size_t k = 0; k < aliasesToExport_.size(); k++)
+         // {
+         //    Interval d =
+         //    aliasesToExport_[k].term().eval(*(sol->box()))->intervalHull();
+         //    l_values[i*nbDim+nbVar + k] = d.left();
+         //    u_values[i*nbDim+nbVar + k] = d.right();
+         // }
       }
       dset_sol_l.write(l_values, H5::PredType::NATIVE_DOUBLE);
       dset_sol_u.write(u_values, H5::PredType::NATIVE_DOUBLE);
       node_dset.write(nodeInfo.data(), NodeInfo);
+      delete[] l_values;
+      delete[] u_values;
    }
 }
 
 /// Reporting method for a complete space to a h5 file
 void ExporterHDF5::save(const Solver &solver, const std::string filename)
 {
+   std::cout << "Exporting to " << filename << "..." << std::endl;
    pp_ = solver.getPreprocessor();
    SharedSpace space = solver.getSpace();
    try
@@ -307,13 +311,67 @@ void ExporterHDF5::save(const Solver &solver, const std::string filename)
       H5::Group *group = new H5::Group(file->openGroup("/")); // Get default root group
 
       write_solver_info(group, solver);
+      std::cout << "Solver info written" << std::endl;
       DomainBox box(pp_->srcProblem()->scope());
       write_variables_info(group, box);
+      std::cout << "Variables and aliases info written" << std::endl;
 
       H5::Group gsol = group->createGroup("SOLUTIONS");
       write_solutions(&gsol, *space);
+      std::cout << "Solutions written" << std::endl;
       H5::Group gpend = group->createGroup("PENDINGS");
       write_pendings(&gpend, *space);
+      std::cout << "Pendings written" << std::endl;
+
+      delete group;
+   } // end of try block
+   // catch failure caused by the H5File operations
+   catch (H5::FileIException error)
+   {
+      error.printErrorStack();
+   }
+   // catch failure caused by the DataSet operations
+   catch (H5::DataSetIException error)
+   {
+      error.printErrorStack();
+   }
+   // catch failure caused by the DataSpace operations
+   catch (H5::DataSpaceIException error)
+   {
+      error.printErrorStack();
+   }
+   // catch failure caused by the DataSpace operations
+   catch (H5::DataTypeIException error)
+   {
+      error.printErrorStack();
+   }
+   catch (H5::AttributeIException error)
+   {
+      error.printErrorStack();
+   }
+}
+
+/// Reporting method for a complete space to a h5 file
+void ExporterHDF5::save(const Space &space, const std::string filename)
+{
+   std::cout << "Exporting to " << filename << "..." << std::endl;
+   // pp_ = solver.getPreprocessor();
+   try
+   {
+      H5::H5File *file = new H5::H5File(filename, H5F_ACC_TRUNC);
+
+      H5::Group *group = new H5::Group(file->openGroup("/")); // Get default root group
+
+      DomainBox box(pp_->srcProblem()->scope());
+      write_variables_info(group, box);
+      std::cout << "Variables and aliases info written" << std::endl;
+
+      H5::Group gsol = group->createGroup("SOLUTIONS");
+      write_solutions(&gsol, space);
+      std::cout << "Solutions written" << std::endl;
+      H5::Group gpend = group->createGroup("PENDINGS");
+      write_pendings(&gpend, space);
+      std::cout << "Pendings written" << std::endl;
 
       delete group;
    } // end of try block

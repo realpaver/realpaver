@@ -23,10 +23,8 @@
 
 #include "H5Cpp.h"
 
-#include "Preprocessor.hpp"
 #include "realpaver/DomainBox.hpp"
-#include "realpaver/Problem.hpp"
-#include "realpaver/Solver.hpp"
+#include "realpaver/Exporter.hpp"
 
 #include <memory>
 #include <string>
@@ -34,9 +32,9 @@
 namespace realpaver {
 
 /**
- * @brief HDF5 Input-Output for RealPaver.
+ * @brief HDF5 exporter for RealPaver.
  *
- * Load or dump CSPSpace from or to H5 files.
+ * Dump Space to H5 files.
  */
 
 const int MAX_STR_LEN = 128;
@@ -70,9 +68,9 @@ typedef struct {
    int proof;
 } NodeDesc;
 
-class ExporterHDF5 {
+class ExporterHDF5 : public Exporter {
 public:
-   /// Constructor of HDF5IO on a problem
+   /// Constructor of ExporterHDF5 on a problem
    ExporterHDF5(const Problem &pb);
 
    /// Destructor
@@ -91,9 +89,6 @@ public:
    void save(const Space &space, const std::string filename);
 
 private:
-   std::vector<Alias> aliasesToExport_;
-   SharedPreprocessor pp_;
-
    /// Method for writing variables and aliases information
    void write_variables_info(H5::Group *g, const DomainBox &box) const;
 
