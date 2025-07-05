@@ -138,20 +138,27 @@ void Preprocessor::applyImpl()
       Domain *domain = box.get(v);
 
       bool isFixed = domain->isCanonical();
-      bool isFake = !(occursInActiveConstraint(v) || obj.dependsOn(v));
+      bool isUsed = false;
+      if (occursInActiveConstraint(v))
+         isUsed = true;
+      if (src_->hasObjective() && obj.dependsOn(v))
+         isUsed = true;
+      if (occursInAlias(v))
+         isUsed = true;
 
-      if (isFake)
+      if (isFixed)
       {
-         LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
+         LOG_INTER("Variable fixed: " << v.getName() << " := " << (*domain));
          bridge_->insertFixed(v, *domain);
       }
-      else if (isFixed)
+      else if (!isUsed)
       {
-         LOG_INTER("Fixes and removes " << v.getName() << " := " << (*domain));
+         LOG_INTER("Variable unused: " << v.getName() << " := " << (*domain));
          bridge_->insertFixed(v, *domain);
       }
       else
       {
+         LOG_INTER("Variable used: " << v.getName());
          bridge_->insertVar(v, *domain);
       }
    }
@@ -198,21 +205,46 @@ void Preprocessor::applyImpl()
       }
    }
 
+   // rewrites the aliases
+   for (size_t i = 0; i < src_->nbAliases(); ++i)
+   {
+      Alias als = src_->aliasAt(i);
+      Interval e = als.term().eval(box)->intervalHull();
+      if (e.isEmpty())
+      {
+         unfeasible_ = true;
+         LOG_INTER("Evaluation of alias " << als.name() << " -> empty");
+         return;
+      }
+
+      TermFixer fixer(bridge_);
+      als.term().acceptVisitor(fixer);
+      Term rt = fixer.getTerm();
+      if (rt.isConstant())
+      {
+         LOG_INTER("Fixed alias: " << als.name() << " = " << rt);
+      }
+      else
+      {
+         Alias ra(als.name(), rt);
+         dest_->addAlias(ra);
+      }
+   }
+
    // rewrites the constraints
    for (Constraint input : active_)
    {
       ConstraintFixer fixer(bridge_);
       input.acceptVisitor(fixer);
-      Constraint c = fixer.getConstraint();
+      Constraint rc = fixer.getConstraint();
 
-      if (c.isConstant())
+      if (rc.isConstant())
       {
-         LOG_INTER("Constraint with no variable: " << c);
+         LOG_INTER("Fixed constraint: " << rc);
          inactive_.push_back(input);
       }
-
       else
-         dest_->addCtr(c);
+         dest_->addCtr(rc);
    }
 }
 
@@ -249,6 +281,16 @@ bool Preprocessor::occursInActiveConstraint(const Variable &v) const
    for (Constraint c : active_)
       if (c.dependsOn(v))
          return true;
+   return false;
+}
+
+bool Preprocessor::occursInAlias(const Variable &v) const
+{
+   for (size_t i = 0; i < src_->nbAliases(); ++i)
+   {
+      if (src_->aliasAt(i).term().dependsOn(v))
+         return true;
+   }
    return false;
 }
 
