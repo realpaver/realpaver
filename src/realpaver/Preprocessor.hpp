@@ -155,6 +155,7 @@ private:
    Timer timer_;                      // timer
 
    bool occursInActiveConstraint(const Variable &v) const;
+   bool occursInAlias(const Variable &v) const;
    bool propagate(DomainBox &box);
    void applyImpl();
 };
