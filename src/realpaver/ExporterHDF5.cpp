@@ -19,7 +19,9 @@
  */
 
 #include "realpaver/Domain.hpp"
+#include "realpaver/DomainBox.hpp"
 #include "realpaver/ExporterHDF5.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/Scope.hpp"
 
 #include <iostream>
@@ -149,6 +151,20 @@ void ExporterHDF5::write_variables_info(H5::Group *g, const DomainBox &box) cons
    str_dset.write(varInfo.data(), VarInfo);
 }
 
+Alias findAlias(const Problem &p, std::string alias_name)
+{
+   bool found = false;
+   int i = 0;
+   while (!found && i < p.nbAliases())
+   {
+      found = (p.aliasAt(i).name() == alias_name);
+      i++;
+   }
+   if (found)
+      return p.aliasAt(i);
+   return p.aliasAt(0);
+}
+
 void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
 {
    const hsize_t nbNod = space.nbSolNodes();
@@ -189,33 +205,26 @@ void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
          nodeInfo[i].id = sol->index();
          nodeInfo[i].parent_id = sol->parent();
          nodeInfo[i].depth = sol->depth();
+         // Copy all domain in a consistent box with source problem scope
+         DomainBox b(pp_->srcProblem()->scope());
+         for (auto v : pp_->unfixedScope())
+            b.get(v)->contract(sol->box()->get(pp_->srcToDestVar(v))->intervalHull());
+         for (auto v : pp_->fixedScope())
+            b.get(v)->contract(pp_->getFixedDomain(v));
          for (size_t j = 0; j < nbVar; j++)
          {
-            Interval d = Interval::universe();
             Variable vj = s.var(j);
-            if (fixed.scope().contains(vj))
-            {
-               d = fixed.get(vj)->intervalHull();
-            }
-            else
-            {
-               vj = pp_->srcToDestVar(vj);
-               d = sol->box()->get(vj)->intervalHull();
-            }
+            Interval d = b.get(vj)->intervalHull();
             l_values[i * nbDim + j] = d.left();
             u_values[i * nbDim + j] = d.right();
          }
-         // for (size_t k = 0; k < aliasesToExport_.size(); k++)
-         // {
-         //    // std::cout << i << " " << k << " " << nbVar + k << " " << nbDim <<
-         //    // std::endl; std::cout << aliasesToExport_[k].term() << std::endl;
-         //    Interval d;
-         //    // std::cout << aliasesToExport_[k].term().eval(*(sol->box())) <<
-         //    // std::endl;
-         //    d = aliasesToExport_[k].term().eval(*(sol->box()))->intervalHull();
-         //    l_values[i*nbDim+nbVar + k] = d.left();
-         //    u_values[i*nbDim+nbVar + k] = d.right();
-         // }
+         for (size_t k = 0; k < aliasesToExport_.size(); k++)
+         {
+            Interval d;
+            d = aliasesToExport_[k].term().eval(b)->intervalHull();
+            l_values[i * nbDim + nbVar + k] = d.left();
+            u_values[i * nbDim + nbVar + k] = d.right();
+         }
          dset_sol_l.write(l_values, H5::PredType::NATIVE_DOUBLE);
          dset_sol_u.write(u_values, H5::PredType::NATIVE_DOUBLE);
          node_dset.write(nodeInfo.data(), NodeInfo);
@@ -266,29 +275,26 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
          nodeInfo[i].id = sol->index();
          nodeInfo[i].parent_id = sol->parent();
          nodeInfo[i].depth = sol->depth();
+         // Copy all domain in a consistent box with source problem scope
+         DomainBox b(pp_->srcProblem()->scope());
+         for (auto v : pp_->unfixedScope())
+            b.get(v)->contract(sol->box()->get(pp_->srcToDestVar(v))->intervalHull());
+         for (auto v : pp_->fixedScope())
+            b.get(v)->contract(pp_->getFixedDomain(v));
          for (size_t j = 0; j < nbVar; j++)
          {
             Variable vj = s.var(j);
-            Interval d = Interval::universe();
-            if (fixed.scope().contains(vj))
-            {
-               d = fixed.get(s.var(j))->intervalHull();
-            }
-            else
-            {
-               vj = pp_->srcToDestVar(vj);
-               d = sol->box()->get(vj)->intervalHull();
-            }
+            Interval d = b.get(vj)->intervalHull();
             l_values[i * nbDim + j] = d.left();
             u_values[i * nbDim + j] = d.right();
          }
-         // for (size_t k = 0; k < aliasesToExport_.size(); k++)
-         // {
-         //    Interval d =
-         //    aliasesToExport_[k].term().eval(*(sol->box()))->intervalHull();
-         //    l_values[i*nbDim+nbVar + k] = d.left();
-         //    u_values[i*nbDim+nbVar + k] = d.right();
-         // }
+         for (size_t k = 0; k < aliasesToExport_.size(); k++)
+         {
+            Interval d;
+            d = aliasesToExport_[k].term().eval(b)->intervalHull();
+            l_values[i * nbDim + nbVar + k] = d.left();
+            u_values[i * nbDim + nbVar + k] = d.right();
+         }
       }
       dset_sol_l.write(l_values, H5::PredType::NATIVE_DOUBLE);
       dset_sol_u.write(u_values, H5::PredType::NATIVE_DOUBLE);

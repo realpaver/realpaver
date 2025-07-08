@@ -28,8 +28,8 @@ Exporter::Exporter(const Problem &pb)
    for (size_t i = 0; i < pb.nbAliases(); ++i)
    {
       Alias a = pb.aliasAt(i);
-      // if (pb.isAliasReported(a))
-      // aliasesToExport_.push_back(a);
+      if (pb.isAliasReported(a))
+         aliasesToExport_.push_back(a);
    }
 }
 
