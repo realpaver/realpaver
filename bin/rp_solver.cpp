@@ -1,6 +1,7 @@
-#include "Domain.hpp"
 #include "realpaver/BoxReporter.hpp"
+#include "realpaver/Domain.hpp"
 #include "realpaver/DomainBox.hpp"
+#include "realpaver/Exporter.hpp"
 #include "realpaver/ExporterHDF5.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
@@ -153,13 +154,6 @@ int main(int argc, char **argv)
       solver.solve();
       ////////////////////
 
-      if (solFilename == "")
-         solFilename = baseFilename + ".sol";
-      ofstream fsol;
-      fsol.open(solFilename, std::ofstream::out);
-      if (fsol.bad())
-         THROW("Open error of solution file");
-
       // preliminaries
       cout << GRAY(sep) << endl;
       cout << BLUE("Files") << endl;
@@ -183,22 +177,11 @@ int main(int argc, char **argv)
 
       SharedPreprocessor preproc = solver.getPreprocessor();
 
-      fsol << WP("CSP solver", wpl) << REALPAVER_STRING << endl;
-
       auto now = chrono::system_clock::now();
       std::time_t end_time = chrono::system_clock::to_time_t(now);
 
-      fsol << WP("Input file", wpl) << pbFilename << endl;
-      fsol << WP("Current date and time", wpl) << ctime(&end_time) << endl;
-
       if (prepro == "YES")
       {
-         fsol << "--- PREPROCESSING ---" << endl
-              << endl
-              << std::fixed << std::setprecision(3) << WP("Elapsed time", wpl)
-              << preproc->elapsedTime() << " (seconds)" << endl
-              << std::fixed << std::setprecision(2) << WP("Status", wpl);
-
          cout << BLUE("Preprocessing") << endl;
          cout << std::fixed << std::setprecision(3) << indent << WP("Time", wpl)
               << GREEN(preproc->elapsedTime() << " (seconds)") << endl
@@ -208,51 +191,21 @@ int main(int argc, char **argv)
          {
             if (preproc->isUnfeasible())
             {
-               fsol << "solved unfeasible" << endl;
                cout << RED("solved unfeasible") << endl;
             }
             else
             {
-               fsol << "solved feasible" << endl;
                cout << GREEN("solved feasible") << endl;
-
-               IntervalBox B(preproc->fixedRegion());
-               fsol << endl
-                    << "SOLUTION " << std::scientific << "[" << B.width() << "]" << endl;
-               B.print(fsol);
             }
          }
          else
          {
-            fsol << "checked" << endl;
             cout << GREEN("checked") << endl;
-
-            fsol << WP("Number of variables fixed", wpl) << preproc->nbFixedVars()
-                 << endl;
 
             cout << indent << WP("Number of variables fixed", wpl)
                  << GREEN(preproc->nbFixedVars()) << endl
                  << indent << WP("Number of inactive constraints", wpl)
                  << GREEN(preproc->nbInactiveCtrs()) << endl;
-
-            if (preproc->nbFixedVars() > 0)
-            {
-               IntervalBox B(preproc->fixedRegion());
-               Scope sco = preproc->fixedScope();
-               B.print(fsol);
-            }
-
-            fsol << WP("Number of inactive constraints", wpl) << preproc->nbInactiveCtrs()
-                 << endl;
-
-            if (preproc->nbInactiveCtrs() > 0)
-            {
-               for (size_t i = 0; i < preproc->nbInactiveCtrs(); ++i)
-               {
-                  fsol << preproc->getInactiveCtr(i) << endl;
-               }
-            }
-            fsol << endl;
          }
       }
       else
@@ -267,13 +220,8 @@ int main(int argc, char **argv)
       {
          SharedSpace space = solver.getSpace();
 
-         fsol << "--- SOLVING ---" << endl << endl;
          cout << GRAY(sep) << endl;
          cout << BLUE("Solving") << endl;
-
-         fsol << WP("Elapsed time", wpl) << std::fixed << std::setprecision(3)
-              << solver.getSolvingTime() << " (seconds)" << endl
-              << WP("Number of nodes", wpl) << solver.getTotalNodes() << endl;
 
          cout << indent << WP("Time", wpl) << std::fixed << std::setprecision(3)
               << GREEN(solver.getSolvingTime() << " (seconds)") << endl
@@ -282,31 +230,25 @@ int main(int argc, char **argv)
 
          bool complete = env->usedNoLimit() && space->nbPendingNodes() == 0;
 
-         fsol << WP("Search status", wpl);
          cout << indent << WP("Search status", wpl);
          if (complete)
          {
-            fsol << "complete" << endl;
             cout << GREEN("complete") << endl;
          }
          else
          {
-            fsol << "partial" << endl;
             cout << RED("partial") << endl;
          }
 
-         fsol << WP("Solution status", wpl);
          cout << indent << WP("Solution status", wpl);
          if (solver.nbSolutions() == 0)
          {
             if (complete)
             {
-               fsol << "proved unfeasible" << endl;
                cout << RED("unfeasible") << endl;
             }
             else
             {
-               fsol << "no solution found" << endl;
                cout << RED("no solution found") << endl;
             }
          }
@@ -314,17 +256,13 @@ int main(int argc, char **argv)
          {
             if (space->hasFeasibleSolNode())
             {
-               fsol << "proved feasible" << endl;
                cout << GREEN("feasible") << endl;
             }
             else
             {
-               fsol << "no proof certificate" << endl;
                cout << RED("no proof certificate") << endl;
             }
          }
-
-         fsol << WP("Number of solutions", wpl) << solver.nbSolutions() << endl;
 
          if (solver.nbSolutions() > 0)
          {
@@ -342,38 +280,200 @@ int main(int argc, char **argv)
          {
             double tl = env->getParams()->getDblParam("TIME_LIMIT");
             cout << std::fixed << std::setprecision(3);
-            fsol << std::fixed << std::setprecision(3);
             cout << indent << WP("Time limit enabled", wpl) << RED(tl << " (seconds)")
                  << endl;
-            fsol << WP("Time limit enabled", wpl) << tl << " (seconds)" << endl;
          }
 
          if (env->usedSolutionLimit())
          {
             int nb = env->getParams()->getIntParam("SOLUTION_LIMIT");
             cout << indent << WP("Solution limit enabled", wpl) << RED(nb) << endl;
-            fsol << WP("Solution limit enabled", wpl) << nb << endl;
          }
 
          if (env->usedNodeLimit())
          {
             int nb = env->getParams()->getIntParam("NODE_LIMIT");
             cout << indent << WP("Node limit enabled", wpl) << RED(nb) << endl;
-            fsol << WP("Node limit enabled", wpl) << nb << endl;
          }
 
          if (env->usedDepthLimit())
          {
             int nb = env->getParams()->getIntParam("DEPTH_LIMIT");
             cout << indent << WP("Depth limit enabled", wpl) << RED(nb) << endl;
-            fsol << WP("Depth limit enabled", wpl) << endl;
          }
 
          if (space->nbPendingNodes() > 0)
-         {
-            fsol << WP("Number of pending nodes", wpl) << space->nbPendingNodes() << endl;
             cout << indent << WP("Number of pending nodes", wpl)
                  << RED(space->nbPendingNodes()) << endl;
+      }
+
+      string output_format = solver.getEnv()->getParams()->getStrParam("OUTPUT_FORMAT");
+      bool save_pendings =
+          solver.getEnv()->getParams()->getStrParam("OUTPUT_PENDINGS") == "YES";
+      if (output_format == "HDF5")
+      {
+         ExporterHDF5 h5(problem);
+         h5.setSavePendings(save_pendings);
+         if (solFilename == "")
+            solFilename = baseFilename + ".h5";
+         h5.save(solver, solFilename);
+      }
+      else // if (output_format == "SOL")
+      {
+         if (solFilename == "")
+            solFilename = baseFilename + ".sol";
+         ofstream fsol;
+         fsol.open(solFilename, std::ofstream::out);
+         if (fsol.bad())
+            THROW("Open error of solution file");
+
+         SharedPreprocessor preproc = solver.getPreprocessor();
+
+         fsol << WP("CSP solver", wpl) << REALPAVER_STRING << endl;
+
+         auto now = chrono::system_clock::now();
+         std::time_t end_time = chrono::system_clock::to_time_t(now);
+
+         fsol << WP("Input file", wpl) << pbFilename << endl;
+         fsol << WP("Current date and time", wpl) << ctime(&end_time) << endl;
+
+         if (prepro == "YES")
+         {
+            fsol << "--- PREPROCESSING ---" << endl
+                 << endl
+                 << std::fixed << std::setprecision(3) << WP("Elapsed time", wpl)
+                 << preproc->elapsedTime() << " (seconds)" << endl
+                 << std::fixed << std::setprecision(2) << WP("Status", wpl);
+
+            if (preproc->isSolved())
+            {
+               if (preproc->isUnfeasible())
+               {
+                  fsol << "solved unfeasible" << endl;
+               }
+               else
+               {
+                  fsol << "solved feasible" << endl;
+
+                  IntervalBox B(preproc->fixedRegion());
+                  fsol << endl
+                       << "SOLUTION " << std::scientific << "[" << B.width() << "]"
+                       << endl;
+                  B.print(fsol);
+               }
+            }
+            else
+            {
+               fsol << "checked" << endl;
+
+               fsol << WP("Number of variables fixed", wpl) << preproc->nbFixedVars()
+                    << endl;
+
+               if (preproc->nbFixedVars() > 0)
+               {
+                  IntervalBox B(preproc->fixedRegion());
+                  Scope sco = preproc->fixedScope();
+                  B.print(fsol);
+               }
+
+               fsol << WP("Number of inactive constraints", wpl)
+                    << preproc->nbInactiveCtrs() << endl;
+
+               if (preproc->nbInactiveCtrs() > 0)
+               {
+                  for (size_t i = 0; i < preproc->nbInactiveCtrs(); ++i)
+                  {
+                     fsol << preproc->getInactiveCtr(i) << endl;
+                  }
+               }
+               fsol << endl;
+            }
+         }
+         // solving
+         if (!(prepro == "YES" && preproc->isSolved()))
+         {
+            SharedSpace space = solver.getSpace();
+
+            bool complete = env->usedNoLimit() && space->nbPendingNodes() == 0;
+
+            fsol << "--- SOLVING ---" << endl << endl;
+            cout << GRAY(sep) << endl;
+            cout << BLUE("Solving") << endl;
+
+            fsol << WP("Elapsed time", wpl) << std::fixed << std::setprecision(3)
+                 << solver.getSolvingTime() << " (seconds)" << endl
+                 << WP("Number of nodes", wpl) << solver.getTotalNodes() << endl;
+
+            fsol << WP("Search status", wpl);
+            if (complete)
+            {
+               fsol << "complete" << endl;
+            }
+            else
+            {
+               fsol << "partial" << endl;
+            }
+
+            fsol << WP("Solution status", wpl);
+            if (solver.nbSolutions() == 0)
+            {
+               if (complete)
+               {
+                  fsol << "proved unfeasible" << endl;
+               }
+               else
+               {
+                  fsol << "no solution found" << endl;
+               }
+            }
+            else
+            {
+               if (space->hasFeasibleSolNode())
+               {
+                  fsol << "proved feasible" << endl;
+               }
+               else
+               {
+                  fsol << "no proof certificate" << endl;
+               }
+            }
+
+            fsol << WP("Number of solutions", wpl) << solver.nbSolutions() << endl;
+
+            // limits
+            if (env->usedTimeLimit())
+            {
+               double tl = env->getParams()->getDblParam("TIME_LIMIT");
+               cout << std::fixed << std::setprecision(3);
+               fsol << std::fixed << std::setprecision(3);
+               cout << indent << WP("Time limit enabled", wpl) << RED(tl << " (seconds)")
+                    << endl;
+               fsol << WP("Time limit enabled", wpl) << tl << " (seconds)" << endl;
+            }
+
+            if (env->usedSolutionLimit())
+            {
+               int nb = env->getParams()->getIntParam("SOLUTION_LIMIT");
+               cout << indent << WP("Solution limit enabled", wpl) << RED(nb) << endl;
+               fsol << WP("Solution limit enabled", wpl) << nb << endl;
+            }
+
+            if (env->usedNodeLimit())
+            {
+               int nb = env->getParams()->getIntParam("NODE_LIMIT");
+               fsol << WP("Node limit enabled", wpl) << nb << endl;
+            }
+
+            if (env->usedDepthLimit())
+            {
+               int nb = env->getParams()->getIntParam("DEPTH_LIMIT");
+            }
+
+            if (space->nbPendingNodes() > 0)
+
+               fsol << WP("Number of pending nodes", wpl) << space->nbPendingNodes()
+                    << endl;
+            fsol << WP("Depth limit enabled", wpl) << endl;
          }
 
          // writes the solutions
@@ -441,33 +541,30 @@ int main(int argc, char **argv)
             fsol << endl << "HULL OF PENDING NODES" << " [" << hp.width() << "]" << endl;
             hp.print(fsol);
          }
+
+         // writes the problem
+         fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
+         DomainBox box(problem.scope());
+         fsol << "BOX" << endl;
+         box.print(fsol);
+         fsol << endl;
+
+         // writes the constraints
+         fsol << "CONSTRAINTS" << endl;
+         for (size_t i = 0; i < problem.nbCtrs(); ++i)
+         {
+            fsol << problem.ctrAt(i) << endl;
+         }
+
+         // writes the parameters in the solution file
+         fsol << endl << "--- PARAMETERS ---" << endl << endl;
+         env->getParams()->printValues(fsol);
+
+         cout << GRAY(sep) << endl;
+
+         // closes the solution file
+         fsol.close();
       }
-
-      // writes the problem
-      fsol << endl << "--- INPUT PROBLEM ---" << endl << endl;
-      DomainBox box(problem.scope());
-      fsol << "BOX" << endl;
-      box.print(fsol);
-      fsol << endl;
-
-      // writes the constraints
-      fsol << "CONSTRAINTS" << endl;
-      for (size_t i = 0; i < problem.nbCtrs(); ++i)
-      {
-         fsol << problem.ctrAt(i) << endl;
-      }
-
-      // writes the parameters in the solution file
-      fsol << endl << "--- PARAMETERS ---" << endl << endl;
-      env->getParams()->printValues(fsol);
-
-      cout << GRAY(sep) << endl;
-
-      // closes the solution file
-      fsol.close();
-
-      ExporterHDF5 h5(problem);
-      h5.save(solver, baseFilename + ".h5");
    }
    catch (Exception e)
    {

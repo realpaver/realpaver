@@ -24,6 +24,7 @@ namespace realpaver {
 
 Exporter::Exporter(const Problem &pb)
     : pp_(nullptr)
+    , save_pendings_(false)
 {
    for (size_t i = 0; i < pb.nbAliases(); ++i)
    {
@@ -35,6 +36,11 @@ Exporter::Exporter(const Problem &pb)
 
 Exporter::~Exporter()
 {
+}
+
+void Exporter::setSavePendings(bool s)
+{
+   save_pendings_ = s;
 }
 
 } // namespace realpaver

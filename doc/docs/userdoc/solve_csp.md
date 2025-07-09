@@ -112,7 +112,7 @@ bool ok = parser.parseFile("2r-robot.rp", problem);
 The solver is created for the problem. The parameters are applied to the solver inner context, i.e. its environment, and finally it is called to solve the problem:
 
 ``` cpp
-CSPSolver solver(problem);
+Solver solver(problem);
 solver.getEnv()->setParam(prm);
 solver.solve();
 ```
@@ -186,7 +186,7 @@ int main()
                          x == 5.75,
                          y == 4.25});
 
-        CSPSolver solver(problem);
+        Solver solver(problem);
         solver.getEnv()->setParam(prm);
         solver.solve();
         for (size_t i=0; i<solver.nbSolutions(); ++i)

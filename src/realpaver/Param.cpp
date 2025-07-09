@@ -1038,6 +1038,26 @@ void Params::makeGeneral()
        .addChoice("NO", "no certification")
        .setValue("YES");
    add(postpro);
+
+   ////////////////////
+   ParamStr output;
+   output.setName("OUTPUT_FORMAT")
+       .setCat(cat)
+       .setWhat("File format for output to store results and solving details")
+       .addChoice("HDF5", "Use HDF5 file format")
+       .addChoice("SOL", "Use the initial textual format")
+       .setValue("SOL");
+   add(output);
+
+   ////////////////////
+   ParamStr output_pend;
+   output_pend.setName("OUTPUT_PENDINGS")
+       .setCat(cat)
+       .setWhat("Defines if pendings nodes should be stored in the output file")
+       .addChoice("YES", "Stores pending nodes")
+       .addChoice("NO", "Does not store pending nodes")
+       .setValue("NO");
+   add(output_pend);
 }
 
 void Params::makeBranch()

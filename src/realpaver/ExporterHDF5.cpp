@@ -168,10 +168,14 @@ Alias findAlias(const Problem &p, std::string alias_name)
 void ExporterHDF5::write_solutions(H5::Group *g, const Space &space) const
 {
    const hsize_t nbNod = space.nbSolNodes();
-   Scope s = pp_->srcProblem()->scope();
-   DomainBox fixed = pp_->fixedRegion();
    if (nbNod > 0)
    {
+      Scope s;
+      if (pp_ != nullptr)
+         s = pp_->srcProblem()->scope();
+      else
+         s = space.getSolNode(0)->scope();
+      // DomainBox fixed = pp_->fixedRegion();
       const int nbVar = s.size();
       const hsize_t nbDim = nbVar + aliasesToExport_.size();
       H5::CompType NodeInfo(sizeof(NodeDesc));
@@ -238,9 +242,14 @@ void ExporterHDF5::write_pendings(H5::Group *g, const Space &space) const
 {
    const hsize_t nbNod = space.nbPendingNodes();
    Scope s = pp_->srcProblem()->scope();
-   DomainBox fixed = pp_->fixedRegion();
    if (nbNod > 0)
    {
+      Scope s;
+      if (pp_ != nullptr)
+         s = pp_->srcProblem()->scope();
+      else
+         s = space.getSolNode(0)->scope();
+      // DomainBox fixed = pp_->fixedRegion();
       const int nbVar = s.size();
       const hsize_t nbDim = nbVar + aliasesToExport_.size();
 
@@ -316,18 +325,32 @@ void ExporterHDF5::save(const Solver &solver, const std::string filename)
 
       H5::Group *group = new H5::Group(file->openGroup("/")); // Get default root group
 
+      Timer t;
+      t.start();
       write_solver_info(group, solver);
-      std::cout << "Solver info written" << std::endl;
+      t.stop();
+      std::cout << "Solver info written in " << t.elapsedTime() << " s" << std::endl;
+      t.reset();
+      t.start();
       DomainBox box(pp_->srcProblem()->scope());
       write_variables_info(group, box);
-      std::cout << "Variables and aliases info written" << std::endl;
+      t.stop();
+      std::cout << "Variables and aliases info written in " << t.elapsedTime() << " s"
+                << std::endl;
 
+      t.reset();
+      t.start();
       H5::Group gsol = group->createGroup("SOLUTIONS");
       write_solutions(&gsol, *space);
-      std::cout << "Solutions written" << std::endl;
+      t.stop();
+      std::cout << "Solutions written in " << t.elapsedTime() << " s" << std::endl;
+      t.reset();
+      t.start();
       H5::Group gpend = group->createGroup("PENDINGS");
-      write_pendings(&gpend, *space);
-      std::cout << "Pendings written" << std::endl;
+      if (save_pendings_)
+         write_pendings(&gpend, *space);
+      t.stop();
+      std::cout << "Pendings written in " << t.elapsedTime() << " s" << std::endl;
 
       delete group;
    } // end of try block
@@ -368,16 +391,34 @@ void ExporterHDF5::save(const Space &space, const std::string filename)
 
       H5::Group *group = new H5::Group(file->openGroup("/")); // Get default root group
 
-      DomainBox box(pp_->srcProblem()->scope());
-      write_variables_info(group, box);
-      std::cout << "Variables and aliases info written" << std::endl;
+      Timer t;
+      t.start();
 
+      Scope s;
+      if (space.nbSolNodes() > 0)
+         s = space.getSolNode(0)->scope();
+      else if (space.nbPendingNodes() > 0)
+         s = space.getPendingNode(0)->scope();
+      else
+         std::cerr << "ERROR: Trying to export an empty space!" << std::endl;
+      DomainBox box(s);
+      write_variables_info(group, box);
+      t.stop();
+      std::cout << "Variables and aliases info written in " << t.elapsedTime() << " s"
+                << std::endl;
+      t.reset();
+      t.start();
       H5::Group gsol = group->createGroup("SOLUTIONS");
       write_solutions(&gsol, space);
-      std::cout << "Solutions written" << std::endl;
+      t.stop();
+      std::cout << "Solutions written in " << t.elapsedTime() << " s" << std::endl;
+      t.reset();
+      t.start();
       H5::Group gpend = group->createGroup("PENDINGS");
-      write_pendings(&gpend, space);
-      std::cout << "Pendings written" << std::endl;
+      if (save_pendings_)
+         write_pendings(&gpend, space);
+      t.stop();
+      std::cout << "Pendings written in " << t.elapsedTime() << " s" << std::endl;
 
       delete group;
    } // end of try block

@@ -55,9 +55,12 @@ public:
    /// Method for saving a complete space to a file
    virtual void save(const Space &space, const std::string filename) = 0;
 
+   void setSavePendings(bool save);
+
 protected:
    std::vector<Alias> aliasesToExport_;
    SharedPreprocessor pp_;
+   bool save_pendings_;
 };
 
 } // namespace realpaver
