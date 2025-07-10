@@ -910,6 +910,9 @@ public:
    /// Assigns the id of the associated constraint to i
    void setCtrId(int i);
 
+   /// Checks if the constraint associated with this is active
+   bool isActive(const Bitset &active) const;
+
 private:
    Dag *dag_;                           // the DAG
    std::vector<DagNode *> node_;        // vector of nodes of the function sorted by

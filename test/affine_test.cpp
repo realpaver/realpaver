@@ -213,14 +213,30 @@ void test_udiv_3()
 
 void test_udiv_4()
 {
-   AffineForm f(1.0, {2.0}, {0}), h = udiv(f);
-   TEST_TRUE(h.errorTerm().isInf());
+   bool b = true;
+   try
+   {
+      AffineForm f(1.0, {2.0}, {0}), h = udiv(f);
+   }
+   catch (Exception &e)
+   {
+      b = false;
+   }
+   TEST_TRUE(!b);
 }
 
 void test_udiv_5()
 {
-   AffineForm f(0.0, {}, {}), h = udiv(f);
-   TEST_TRUE(h.isEmpty());
+   bool b = true;
+   try
+   {
+      AffineForm f(0.0, {}, {}), h = udiv(f);
+   }
+   catch (Exception &e)
+   {
+      b = false;
+   }
+   TEST_TRUE(!b);
 }
 
 void test_pow()
@@ -322,9 +338,17 @@ void test_sgn_3()
 
 void test_sqrt_1()
 {
-   AffineForm f(-2.5, {-2.0}, {0}), // -2.5 - 2v0 in [-4.5, -0.5]
-       h = sqrt(f);
-   TEST_TRUE(h.isEmpty());
+   bool b = true;
+   try
+   {
+      AffineForm f(-2.5, {-2.0}, {0}), // -2.5 - 2v0 in [-4.5, -0.5]
+          h = sqrt(f);
+   }
+   catch (Exception &e)
+   {
+      b = false;
+   }
+   TEST_TRUE(!b);
 }
 
 void test_sqrt_2()
@@ -455,16 +479,32 @@ void test_tan_1()
 
 void test_tan_2()
 {
-   AffineForm f(1.0, {1.0}, {0}), // 1 + v0 in [0, 2]
-       h = tan(f), res(0.0, {}, {}, Interval::positive());
-   TEST_TRUE(h.equals(res));
+   bool b = true;
+   try
+   {
+      // 1 + v0 in [0, 2]
+      AffineForm f(1.0, {1.0}, {0}), h = tan(f), res(0.0, {}, {}, Interval::positive());
+   }
+   catch (Exception &e)
+   {
+      b = false;
+   }
+   TEST_TRUE(!b);
 }
 
 void test_tan_3()
 {
-   AffineForm f(1.25, {0.5}, {0}), // 1.25 + 0.5v0 in [0.75, 1.75]
-       g = tan(f);
-   TEST_TRUE(g.isInf());
+   bool b = true;
+   try
+   {
+      AffineForm f(1.25, {0.5}, {0}), // 1.25 + 0.5v0 in [0.75, 1.75]
+          g = tan(f);
+   }
+   catch (Exception &e)
+   {
+      b = false;
+   }
+   TEST_TRUE(!b);
 }
 
 void test_cosh()

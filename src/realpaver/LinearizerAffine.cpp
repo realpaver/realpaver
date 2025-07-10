@@ -39,7 +39,10 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
 {
    // creates the affine forms
    AffineCreator creator(dag_, minrange_);
-   creator.create(B, active);
+   bool ok = creator.create(B, active);
+
+   if (!ok)
+      return false;
 
    // creates the linear variables for the variables of the DAG
    for (const auto &v : scop_)
@@ -70,12 +73,6 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
    for (int i = 0; i < creator.nbFuns(); ++i)
    {
       const AffineForm &f = creator.fun(i);
-
-      if (f.isEmpty())
-         return false;
-      if (f.isInf() || f.nbLinearTerms() == 0)
-         continue;
-
       const Interval &cst = f.constantTerm();
       const Interval &err = f.errorTerm();
       Interval img = dag_->fun(i)->getImage();
@@ -111,6 +108,7 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
       else
          lpm.addCtr(low.left(), expr, up.right());
    }
+
    return true;
 }
 

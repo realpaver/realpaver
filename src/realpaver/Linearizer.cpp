@@ -32,7 +32,6 @@ Linearizer::Linearizer(SharedDag dag)
     , mvv_()
 {
    ASSERT(dag_ != nullptr, "No dag in a polytope maker");
-
    scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
@@ -53,14 +52,14 @@ Scope Linearizer::scope() const
 size_t Linearizer::linVarIndex(Variable v) const
 {
    auto it = mvv_.find(v.id());
-   ASSERT(it != mvv_.end(), "Iterator null");
+   THROW_IF(it == mvv_.end(), "Variable " << v << " not active in the linear model");
    return it->second;
 }
 
 size_t Linearizer::linVarIndex(size_t id) const
 {
    auto it = mvv_.find(id);
-   ASSERT(it != mvv_.end(), "Iterator null");
+   THROW_IF(it == mvv_.end(), "Variable " << id << " not active in the linear model");
    return it->second;
 }
 
@@ -81,7 +80,6 @@ double Linearizer::getRelaxTol() const
 void Linearizer::setRelaxTol(double tol)
 {
    ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
-
    tol_ = tol;
 }
 
@@ -89,6 +87,7 @@ bool Linearizer::makeLP(LPModel &lpm, const IntervalBox &B)
 {
    Bitset active(1 + dag_->maxCtrId());
    active.setAllOne();
+   mvv_.clear();
    return makeLPImpl(lpm, B, active);
 }
 

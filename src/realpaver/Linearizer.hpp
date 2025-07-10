@@ -26,7 +26,13 @@
 
 namespace realpaver {
 
-/// Base class of linearizers of nonlinear problems
+/**
+ * @brief Base class of linearizers of nonlinear problems.
+ *
+ * A linearizer is used to linearize constraints from a DAG. Its scope corresponds
+ * to the DAG's scope. A resulting linear model must involve all the variables from
+ * the scope, even if some variable does not ocur in active constraints.
+ */
 class Linearizer {
 public:
    /// Type of lists of indexes
@@ -81,6 +87,9 @@ public:
     * There are two cases for the bitset active. If its size is empty, then all the
     * constraints are considered as active. Otherwise, it corresponds to the constraint
     * activities.
+    *
+    * All the variables of the scope must be involved in the linear model, even if
+    * they do not occur in active constraints.
     */
    virtual bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) = 0;
 

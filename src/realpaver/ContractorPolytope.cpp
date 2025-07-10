@@ -317,6 +317,7 @@ void ContractorPolytope::selectAchterberg(LPSolver &solver, IntervalBox &B, int 
       int jv = lb[j]; // index of variable in the scope
       Variable aux = scope().var(jv);
       LinVar lin = solver.getLinVar(lzr_->linVarIndex(aux));
+
       double bnd = B.get(aux).left(), sol = primal[lin.getIndex()],
              delta = Double::abs(sol - bnd);
 

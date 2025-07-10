@@ -1,4 +1,5 @@
 #include "realpaver/LPSolver.hpp"
+#include "realpaver/Problem.hpp"
 #include "realpaver/RelaxationRLT.hpp"
 #include "test_config.hpp"
 
