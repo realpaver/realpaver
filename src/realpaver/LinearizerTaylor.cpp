@@ -107,7 +107,7 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
    {
       DagFun *f = dag_->fun(i);
 
-      if (active.get(f->ctrId()) == 0)
+      if (!f->isActive(active))
          continue;
 
       LOG_LOW("Taylor relaxation for constraint @ " << f->ctrId());

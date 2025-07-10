@@ -20,20 +20,23 @@
 
 #include "realpaver/LinearizerRLT.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/RelaxationRLT.hpp"
+#include <cstddef>
 
 namespace realpaver {
 
 LinearizerRLT::LinearizerRLT(SharedDag dag)
     : Linearizer(dag)
-    , mnv_()
+    , mnv_(nullptr)
 {
+   mnv_ = std::make_shared<MapType>();
 }
 
 bool LinearizerRLT::makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active)
 {
    if (!dag_->iEvalNodes(B))
       return false;
+
+   mnv_->clear();
 
    if (active.areAllOnes())
    {
@@ -45,8 +48,10 @@ bool LinearizerRLT::makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset 
          createLinVar(lpm, node);
 
          // constrains this variable
-         RLTCreator vis(&lpm, &mnv_);
+         RLTCreator vis(&lpm, mnv_);
          node->acceptVisitor(vis);
+         if (vis.fails())
+            return false;
       }
       LOG_LOW("RLT relaxation for the DAG");
    }
@@ -55,25 +60,37 @@ bool LinearizerRLT::makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset 
       for (size_t i = 0; i < dag_->nbFuns(); ++i)
       {
          DagFun *f = dag_->fun(i);
-
-         if (active.get(f->ctrId()))
+         if (f->isActive(active))
          {
             for (size_t j = 0; j < f->nbNodes(); ++j)
             {
                DagNode *node = f->node(j);
-               auto it = mnv_.find(node->index());
-               if (it == mnv_.end())
+               auto it = mnv_->find(node->index());
+
+               if (it == mnv_->end())
                {
                   // creates the linear variable
                   createLinVar(lpm, node);
 
                   // constrains this variable
-                  RLTCreator vis(&lpm, &mnv_);
+                  RLTCreator vis(&lpm, mnv_);
                   node->acceptVisitor(vis);
+                  if (vis.fails())
+                     return false;
                }
             }
             LOG_LOW("RLT relaxation for the constraint @ " << f->ctrId());
          }
+      }
+
+      // manages the variables that are not involved in active constraints
+      // simply creates a linear variable for each of these variables
+      for (size_t i = 0; i < dag_->nbVars(); ++i)
+      {
+         DagVar *node = dag_->varNode(i);
+         auto it = mnv_->find(node->index());
+         if (it == mnv_->end())
+            createLinVar(lpm, node);
       }
    }
 
@@ -82,12 +99,11 @@ bool LinearizerRLT::makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset 
    {
       DagFun *f = dag_->fun(i);
 
-      if (active.get(f->ctrId()) == 0)
+      if (!f->isActive(active))
          continue;
 
       DagNode *node = f->rootNode();
-
-      auto it = mnv_.find(node->index());
+      auto it = mnv_->find(node->index());
       LinVar v = lpm.getLinVar(it->second);
 
       Interval img = f->getImage();
@@ -105,7 +121,7 @@ bool LinearizerRLT::makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset 
 
 size_t LinearizerRLT::nodeToLinVar(DagNode *node) const
 {
-   auto it = mnv_.find(node->index());
+   auto it = mnv_->find(node->index());
    return it->second;
 }
 
@@ -117,7 +133,7 @@ void LinearizerRLT::createLinVar(LPModel &lpm, DagNode *node)
    LinVar v = lpm.makeVar(val.left(), val.right());
 
    // inserts the couple (node index, lin var index)
-   mnv_.insert(std::make_pair(node->index(), v.getIndex()));
+   mnv_->insert(std::make_pair(node->index(), v.getIndex()));
 
    // for a variable node, associates (var index, lin var index)
    DagVar *vnode = dynamic_cast<DagVar *>(node);

@@ -35,13 +35,16 @@ namespace realpaver {
  */
 class RLTCreator : public DagVisitor {
 public:
+   /// Map node index -> lin var index
+   using MapType = std::unordered_map<size_t, size_t>;
+
    /**
     * @brief Constructor.
     *
-    * lpm is the resulting linear program and mpi is a map that associates
+    * lpm is the resulting linear program and mnv is a map that associates
     * the index of a linear variable in lpm to a node index in the DAG.
     */
-   RLTCreator(LPModel *lpm, std::unordered_map<size_t, size_t> *mpi);
+   RLTCreator(LPModel *lpm, std::shared_ptr<MapType> mnv);
 
    void apply(const DagConst *node) override;
    void apply(const DagVar *node) override;
@@ -73,9 +76,13 @@ public:
    void apply(const DagAtanh *node) override;
    void apply(const DagLin *node) override;
 
+   /// Returns true if the visit leads to a failure, false otherwise
+   bool fails() const;
+
 private:
-   LPModel *lpm_;
-   std::unordered_map<size_t, size_t> *mpi_;
+   LPModel *lpm_;                 // linear model
+   std::shared_ptr<MapType> mnv_; // map node index -> lin var index
+   bool fail_;                    // true in case of failure
 
    /// Returns the index of the linear variable associated with this node
    size_t indexLinVar(const DagNode *node) const;

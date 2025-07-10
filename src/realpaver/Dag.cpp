@@ -1055,6 +1055,12 @@ void DagFun::setCtrId(int i)
    dag_->addCtrId(i);
 }
 
+bool DagFun::isActive(const Bitset &active) const
+{
+   ASSERT(ctrid_ < active.size(), "Bad access in the bitset");
+   return active.get(ctrid_);
+}
+
 std::shared_ptr<FlatFunction> DagFun::flatFunction() const
 {
    return flat_;

@@ -30,7 +30,7 @@ namespace realpaver {
 /**
  * @brief Affine form of a nonlinear expression.
  *
- * This represents a modified affine form AF1 described in:
+ * This represents a modified version of the affine form AF1 described in:
  *   F. Messine. Extensions of Affine Arithmetic: Application to
  *   Unconstrained Global Optimization, JUCS 2002.
  *
@@ -53,19 +53,34 @@ namespace realpaver {
  * The elemenrary functions can be linearized with either the Minrange
  * approximation or the Chebyshev approximation. It suffices to call
  * useMinrange or useChebyshev before the creation of an affine form.
+ *
+ * When creating affine forms, an exception is thrown if a constant value is not valid,
+ * i.e. empty or infinite interval, NaN or infinite double.
  */
 class AffineForm {
 public:
    /// Creates an affine form equal to zero
    AffineForm();
 
-   /// Creates an affine form of a variable given its domain
+   /**
+    * @brief Creates an affine form of a variable given its domain.
+    *
+    * Throws an exception if the domain is empty or infinite.
+    */
    AffineForm(int var, const Interval &domain);
 
-   /// Creates an affine form of a constant
+   /*
+    * @brief Creates an affine form of a constant.
+    *
+    * Throws an exception if x is empty or infinite.
+    */
    AffineForm(const Interval &x);
 
-   /// Creates an affine form of a constant
+   /**
+    * @brief Creates an affine form of a constant.
+    *
+    * Throws an exception if a is empty or infinite.
+    */
    AffineForm(const double &a);
 
    /**
@@ -76,6 +91,8 @@ public:
     * and the magnitude e of the error term.
     *
     * Assumes that V is sorted by increasing ordering.
+    *
+    * Throws an exception is a double (a0, A) is NaN or infinite.
     */
    AffineForm(const double &a0, const std::initializer_list<double> &A,
               const std::initializer_list<int> &V, const Interval &e = Interval::zero());
@@ -88,6 +105,8 @@ public:
     * and the magnitude e of the error term.
     *
     * Assumes that V is sorted by increasing ordering.
+    *
+    * Throws an exception is an interval (a0, A) is empty or infinite.
     */
    AffineForm(const Interval &a0, const std::initializer_list<Interval> &A,
               const std::initializer_list<int> &V, const Interval &e = Interval::zero());
@@ -110,10 +129,14 @@ public:
    /// Returns the magnitude of the error term a_(n+1)
    const Interval &errorTerm() const;
 
-   // Inserts a linear term in the list
+   /**
+    * @brief Inserts a linear term in the list.
+    *
+    * Throws an exception if x is empty or infinite.
+    */
    void push(const Interval &x, int var);
 
-   // Inserts an affine form into this (this := this + f)
+   /// Inserts an affine form into this (this := this + f).
    void push(const AffineForm &f);
 
    /// Addition
@@ -200,23 +223,8 @@ public:
    /// Interval evaluation
    Interval eval() const;
 
-   /// assigns this to a form representing the empty set
-   void setEmpty();
-
-   /// Returns true if this represents an empty set
-   bool isEmpty() const;
-
    /// Returns the number of linear terms
    size_t nbLinearTerms() const;
-
-   /// Returns an affine form that represents an empty set
-   static AffineForm emptyForm();
-
-   /// Returns an affine form that represents the universe
-   static AffineForm infForm();
-
-   /// Returns true if this represents the universe
-   bool isInf() const;
 
    /// Is the Minrange approximation used?
    static bool usesMinrange();
@@ -378,7 +386,16 @@ private:
                          // false for Chebyshev
 
    // Inserts a linear term at the end of the list
+   // Throws an exception if x is empty or infinite
    void pushBack(const Interval &x, int var);
+
+   // Assigns the constant term
+   // Throws an exception if x is empty or infinite
+   void setConstant(const Interval &x);
+
+   // Assigns the error term
+   // Throws an exception if x is empty or infinite
+   void setError(const Interval &x);
 
    // Linearization of elementary function
    // return alpha*f + dzeta + alpha*[-1,1]

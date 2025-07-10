@@ -52,7 +52,7 @@ Proof ContractorHC4Revise::contract(IntervalBox &B, const Bitset &active)
    DagFun *f = dag_->fun(idx_);
    Proof proof = Proof::Inner;
 
-   if (active.get(f->ctrId()))
+   if (f->isActive(active))
    {
       proof = f->hc4Revise(B);
       LOG_LOW(" contractor applied");

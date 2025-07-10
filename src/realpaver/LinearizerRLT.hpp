@@ -22,7 +22,7 @@
 #define REALPAVER_LINEARIZER_RLT_HPP
 
 #include "realpaver/Linearizer.hpp"
-#include <unordered_map>
+#include "realpaver/RelaxationRLT.hpp"
 
 namespace realpaver {
 
@@ -51,10 +51,11 @@ public:
    bool makeLPImpl(LPModel &lpm, const IntervalBox &B, const Bitset &active) override;
 
 private:
+   using MapType = RLTCreator::MapType;
+   std::shared_ptr<MapType> mnv_; // Map node index -> lin var index
+
    size_t nodeToLinVar(DagNode *node) const;
    void createLinVar(LPModel &lpm, DagNode *node);
-
-   std::unordered_map<size_t, size_t> mnv_; // node index -> lin var index
 };
 
 } // namespace realpaver

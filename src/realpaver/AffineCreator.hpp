@@ -65,11 +65,19 @@ public:
    /// Default destructor
    ~AffineCreator() = default;
 
-   /// Creates the affine forms of the active functions of the DAG on B
-   void create(const IntervalBox &B, const Bitset &active);
+   /**
+    * @brief Creates the affine forms of the active functions of the DAG on B.
+    *
+    * Returns true in case of success, false otherwise.
+    */
+   bool create(const IntervalBox &B, const Bitset &active);
 
-   /// Creates the affine form of the i-th function of the DAG on B
-   void create(const IntervalBox &B, size_t i);
+   /**
+    * @brief Creates the affine form of the i-th function of the DAG on B.
+    *
+    * Returns true in case of success, false otherwise.
+    */
+   bool create(const IntervalBox &B, size_t i);
 
    /// Selects the Minrange or the Chebyshev approximation
    void useMinrange(bool minrange = true);
@@ -112,7 +120,8 @@ private:
    void makeNode(int i, const IntervalBox &B);
 
    // Creates the affine form of the i-th function of the DAG
-   void makeFun(const IntervalBox &B, size_t i);
+   // Returns true in case of success
+   bool makeFun(const IntervalBox &B, size_t i);
 };
 
 } // namespace realpaver

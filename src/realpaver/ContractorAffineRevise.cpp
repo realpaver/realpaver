@@ -43,7 +43,10 @@ Scope ContractorAffineRevise::scope() const
 Proof ContractorAffineRevise::contract(IntervalBox &B)
 {
    AffineCreator creator(dag_, minrange_);
-   creator.create(B, idx_);
+   bool ok = creator.create(B, idx_);
+   if (!ok)
+      return Proof::Maybe;
+
    const AffineForm &f = creator.fun(0);
 
    Interval I = dag_->fun(idx_)->getImage();

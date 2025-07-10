@@ -58,7 +58,7 @@ void AffineCreator::useMinrange(bool minrange)
    minrange_ = minrange;
 }
 
-void AffineCreator::create(const IntervalBox &B, const Bitset &active)
+bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
 {
    ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
 
@@ -69,13 +69,16 @@ void AffineCreator::create(const IntervalBox &B, const Bitset &active)
    {
       if (active.get(dag_->fun(i)->ctrId()))
       {
-         makeFun(B, i);
+         bool ok = makeFun(B, i);
+         if (!ok)
+            return false;
          LOG_LOW("Affine relaxation for constraint @ " << dag_->fun(i)->ctrId());
       }
    }
+   return true;
 }
 
-void AffineCreator::create(const IntervalBox &B, size_t i)
+bool AffineCreator::create(const IntervalBox &B, size_t i)
 {
    ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
    ASSERT(i < dag_->nbFuns(), "Bad index of function @ " << i);
@@ -83,10 +86,10 @@ void AffineCreator::create(const IntervalBox &B, size_t i)
    AffineForm::useMinrange(minrange_);
 
    lfun_.clear();
-   makeFun(B, i);
+   return makeFun(B, i);
 }
 
-void AffineCreator::makeFun(const IntervalBox &B, size_t i)
+bool AffineCreator::makeFun(const IntervalBox &B, size_t i)
 {
    DagFun *f = dag_->fun(i);
    for (size_t j = 0; j < f->nbNodes(); ++j)
@@ -94,9 +97,20 @@ void AffineCreator::makeFun(const IntervalBox &B, size_t i)
       DagNode *node = f->node(j);
       size_t k = node->index();
       if (v_[k] == nullptr)
-         makeNode(k, B);
+      {
+         try
+         {
+            makeNode(k, B);
+         }
+         catch (Exception &e)
+         {
+            LOG_LOW("Affine form of node " << k << " invalid");
+            return false;
+         }
+      }
    }
    lfun_.push_back(i);
+   return true;
 }
 
 void AffineCreator::makeNode(int i, const IntervalBox &B)
@@ -231,7 +245,6 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       f = std::make_unique<AffineForm>(atan(*v_[c]));
       break;
    }
-
    case DagSymbol::Acosh: {
       size_t c = node->child()->index();
       f = std::make_unique<AffineForm>(acosh(*v_[c]));
@@ -247,7 +260,6 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       f = std::make_unique<AffineForm>(atanh(*v_[c]));
       break;
    }
-
    case DagSymbol::Lin: {
       DagLin *aux = static_cast<DagLin *>(node);
       f = std::make_unique<AffineForm>(aux->getCst());

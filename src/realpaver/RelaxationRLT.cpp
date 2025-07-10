@@ -23,18 +23,24 @@
 
 namespace realpaver {
 
-RLTCreator::RLTCreator(LPModel *lpm, std::unordered_map<size_t, size_t> *mpi)
+RLTCreator::RLTCreator(LPModel *lpm, std::shared_ptr<MapType> mnv)
     : lpm_(lpm)
-    , mpi_(mpi)
+    , mnv_(mnv)
+    , fail_(false)
 {
    ASSERT(lpm != nullptr, "Null pointer ");
-   ASSERT(mpi != nullptr, "Null pointer");
+   ASSERT(mnv != nullptr, "Null pointer");
 }
 
 size_t RLTCreator::indexLinVar(const DagNode *node) const
 {
-   auto it = mpi_->find(node->index());
+   auto it = mnv_->find(node->index());
    return it->second;
+}
+
+bool RLTCreator::fails() const
+{
+   return fail_;
 }
 
 void RLTCreator::apply(const DagConst *node)
@@ -44,6 +50,14 @@ void RLTCreator::apply(const DagConst *node)
 
 void RLTCreator::apply(const DagVar *node)
 {
+   Interval val = node->ival();
+
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    if (node->getVar().isInteger())
    {
       LinVar lv = lpm_->getLinVar(indexLinVar(node));
@@ -53,6 +67,13 @@ void RLTCreator::apply(const DagVar *node)
 
 void RLTCreator::apply(const DagAdd *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar z = lm.getLinVar(indexLinVar(node)),
@@ -66,6 +87,13 @@ void RLTCreator::apply(const DagAdd *node)
 
 void RLTCreator::apply(const DagSub *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar z = lm.getLinVar(indexLinVar(node)),
@@ -79,6 +107,13 @@ void RLTCreator::apply(const DagSub *node)
 
 void RLTCreator::apply(const DagMul *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar z = lm.getLinVar(indexLinVar(node)),
@@ -133,6 +168,13 @@ void RLTCreator::apply(const DagMul *node)
 
 void RLTCreator::apply(const DagDiv *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf() || node->right()->ival().containsZero())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar z = lm.getLinVar(indexLinVar(node)),
@@ -182,6 +224,13 @@ void RLTCreator::apply(const DagDiv *node)
 
 void RLTCreator::apply(const DagMin *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar z = lm.getLinVar(indexLinVar(node)),
@@ -218,6 +267,13 @@ void RLTCreator::apply(const DagMin *node)
 
 void RLTCreator::apply(const DagMax *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar z = lm.getLinVar(indexLinVar(node)),
@@ -254,6 +310,13 @@ void RLTCreator::apply(const DagMax *node)
 
 void RLTCreator::apply(const DagUsb *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    LinVar y = lm.getLinVar(indexLinVar(node)),
@@ -266,6 +329,13 @@ void RLTCreator::apply(const DagUsb *node)
 
 void RLTCreator::apply(const DagAbs *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
@@ -309,6 +379,13 @@ void RLTCreator::apply(const DagSgn *node)
 
 void RLTCreator::apply(const DagSqr *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
@@ -327,6 +404,14 @@ void RLTCreator::apply(const DagSqr *node)
 
 void RLTCreator::apply(const DagSqrt *node)
 {
+   Interval val = node->ival();
+
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
@@ -353,6 +438,13 @@ void RLTCreator::apply(const DagSqrt *node)
 
 void RLTCreator::apply(const DagPow *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
 
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
@@ -401,10 +493,15 @@ void RLTCreator::apply(const DagPow *node)
 
 void RLTCreator::apply(const DagExp *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
-
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return exp(x); };
@@ -419,11 +516,14 @@ void RLTCreator::apply(const DagExp *node)
 
 void RLTCreator::apply(const DagLog *node)
 {
-   LPModel &lm = *lpm_;
-
-   if (node->ival().isInf())
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
       return;
+   }
 
+   LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
 
    double a = node->child()->ival().left(), b = node->child()->ival().right();
@@ -440,9 +540,14 @@ void RLTCreator::apply(const DagLog *node)
 
 void RLTCreator::apply(const DagCos *node)
 {
-   LPModel &lm = *lpm_;
    Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
 
+   LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
@@ -475,9 +580,14 @@ void RLTCreator::apply(const DagCos *node)
 
 void RLTCreator::apply(const DagSin *node)
 {
-   LPModel &lm = *lpm_;
    Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
 
+   LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
@@ -510,12 +620,14 @@ void RLTCreator::apply(const DagSin *node)
 
 void RLTCreator::apply(const DagTan *node)
 {
-   LPModel &lm = *lpm_;
    Interval val = node->ival();
-
-   if (val.isInf())
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
       return;
+   }
 
+   LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
@@ -556,8 +668,14 @@ void RLTCreator::apply(const DagTan *node)
 
 void RLTCreator::apply(const DagCosh *node)
 {
-   LPModel &lm = *lpm_;
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
 
+   LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
@@ -572,8 +690,14 @@ void RLTCreator::apply(const DagCosh *node)
 
 void RLTCreator::apply(const DagSinh *node)
 {
-   LPModel &lm = *lpm_;
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
 
+   LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
@@ -617,9 +741,15 @@ void RLTCreator::apply(const DagSinh *node)
 
 void RLTCreator::apply(const DagTanh *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return tanh(x); };
@@ -662,6 +792,13 @@ void RLTCreator::apply(const DagTanh *node)
 
 void RLTCreator::apply(const DagAcos *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
 
@@ -710,6 +847,13 @@ void RLTCreator::apply(const DagAcos *node)
 
 void RLTCreator::apply(const DagAsin *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
 
@@ -758,9 +902,15 @@ void RLTCreator::apply(const DagAsin *node)
 
 void RLTCreator::apply(const DagAtan *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return atan(x); };
@@ -803,9 +953,15 @@ void RLTCreator::apply(const DagAtan *node)
 
 void RLTCreator::apply(const DagAcosh *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = std::max(1.0, node->child()->ival().left()),
           b = node->child()->ival().right();
    if (a > b || a == 1.0)
@@ -823,9 +979,15 @@ void RLTCreator::apply(const DagAcosh *node)
 
 void RLTCreator::apply(const DagAsinh *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
    auto f = [](const Interval &x) { return asinh(x); };
@@ -868,9 +1030,15 @@ void RLTCreator::apply(const DagAsinh *node)
 
 void RLTCreator::apply(const DagAtanh *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    LPModel &lm = *lpm_;
    size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
-
    double a = std::max(-1.0, node->child()->ival().left()),
           b = std::min(1.0, node->child()->ival().right());
    if (a > b || a == -1.0 || b == 1.0)
@@ -916,6 +1084,13 @@ void RLTCreator::apply(const DagAtanh *node)
 
 void RLTCreator::apply(const DagLin *node)
 {
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
    //`y = a_0 + sum_i a_i*x_i
    // where a_0, a_i are intervals, hence it comes
    //`y >= a_0 + sum_i MIN(a_i*x_i)
@@ -926,7 +1101,6 @@ void RLTCreator::apply(const DagLin *node)
 
    size_t iy = indexLinVar(node);
    LinVar y = lm.getLinVar(iy);
-
    LinExpr e;
    int status = 2;
 
@@ -1262,7 +1436,6 @@ void underLine(LPModel &lm, size_t iy, size_t ix, double x1, double y1, double x
          m = M.left();
 
          Interval v1(Interval(m) * x1 + P - y1), v2(Interval(m) * x2 + P - y2);
-
          double d = std::max(v1.right(), v2.right());
 
          if (d > 0.0)
