@@ -60,7 +60,7 @@ public:
 protected:
    std::vector<Alias> aliasesToExport_;
    SharedPreprocessor pp_;
-   bool save_pendings_;
+   bool savePendings_;
 };
 
 } // namespace realpaver

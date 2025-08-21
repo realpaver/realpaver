@@ -95,11 +95,15 @@ private:
    /// Method for writing solver information
    void write_solver_info(H5::Group *g, const Solver &s) const;
 
+   /// Method for writing nodes information
+   void write_nodes(H5::Group *g, const Space &s, bool save_sol) const;
+   // void write_nodes2(H5::Group *g, const Space &s, bool save_sol) const;
+
    /// Method for writing solutions information
-   void write_solutions(H5::Group *g, const Space &s) const;
+   // void write_solutions(H5::Group *g, const Space &s) const;
 
    /// Method for writing pending nodes information
-   void write_pendings(H5::Group *g, const Space &s) const;
+   // void write_pendings(H5::Group *g, const Space &s) const;
 };
 
 } // namespace realpaver
