@@ -14,7 +14,7 @@ The RealPaver library provides a C++ API to deal with interval analysis, constra
 - a supported interval library (eg: GAOL https://github.com/goualard-f/GAOL)
 - a supported linear solver library:
   - CLP: https://github.com/coin-or/Clp
-  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/
+  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/ (a sample pkg-config file for Gurobi (gurobi.pc) is provided but it must be adapted to your context)
   - HiGHS: https://highs.dev/
 
 ### Optional dependencies
