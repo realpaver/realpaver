@@ -81,6 +81,7 @@ ctc_var_3b_test = executable(
   'ctc_var_3b_test',
   sources: 'ctc_var_3b_test.cpp',
   link_with: realpaver_lib,
+  dependencies: deps_lib,
   include_directories: ['../src'],
 )
 test('Test of var3B contractor', ctc_var_3b_test)
@@ -208,6 +209,7 @@ piecewise_test = executable(
   'piecewise_test',
   sources: 'piecewise_test.cpp',
   link_with: realpaver_lib,
+    dependencies: deps_lib,
   include_directories: ['../src'],
 )
 test('Test of piecewise', piecewise_test)
