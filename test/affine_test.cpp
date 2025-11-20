@@ -1,5 +1,8 @@
 #include "realpaver/AffineForm.hpp"
+#include "realpaver/AssertDebug.hpp"
 #include "test_config.hpp"
+
+#include <iomanip>
 
 void test_var()
 {
@@ -591,6 +594,12 @@ void test_cos_chebyshev_1()
 {
    Interval alpha, dzeta, delta;
    AffineForm::chebyshevCos(Interval(0.2, 1.2), alpha, dzeta, delta);
+
+   std::cerr << std::setprecision(16) << std::endl;
+   DEBUG("alpha = " << alpha);
+   DEBUG("dzeta = " << dzeta);
+   DEBUG("delta = " << delta);
+
    Interval x = -0.617708823365 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(alpha));
    Interval y = 1.15065088172 + Interval(-1.0e-8, 1.0e-8);

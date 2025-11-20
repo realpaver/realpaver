@@ -3,6 +3,7 @@
 #include "realpaver/Problem.hpp"
 #include "test_config.hpp"
 
+#include <iomanip>
 #include <memory>
 
 using namespace std;
@@ -24,13 +25,16 @@ Result my_test(const Interval &I)
    shared_ptr<Contractor> ctc = make_shared<ContractorConstraint>(c);
    ContractorVar3B ctc3b(ctc, x, 10);
    Proof p = ctc3b.contract(B);
-
    return make_pair(p, B.get(x));
 }
 
 void test_1()
 {
    Result res = my_test(Interval(0.5, 1));
+
+   std::cerr << std::setprecision(16) << "test_1 NEW: " << res.first << " " << res.second
+             << std::endl;
+
    TEST_TRUE(res.first == Proof::Maybe);
    TEST_TRUE(res.second.isSetEq(Interval(0.5, 1)));
 }

@@ -9,6 +9,7 @@
 using namespace realpaver;
 
 #include <filesystem>
+#include <string>
 
 std::shared_ptr<Problem> pb;
 std::shared_ptr<RealFunction> obj;
@@ -19,7 +20,7 @@ bool init_pointers(std::string filepath)
    {
       pb = std::make_shared<Problem>(Problem(filepath));
       Parser parser;
-      string fullpath = std::filesystem::current_path().string() + "/" + filepath;
+      std::string fullpath = std::filesystem::current_path().string() + "/" + filepath;
       if (!parser.parseFile(fullpath, *pb))
       {
          std::cerr << "Unable to parse file " << fullpath << std::endl;
