@@ -30,7 +30,8 @@ Constraint Programming (CP) is a paradigm for solving constraint satisfaction an
 
 RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. Constraint Satisfaction Problems (CSPs) can be described either in C++ with the API or in a text file using the syntax of RealPaver specific language.  Then, they can be solved using the C++ API or using the CSP solver from the command line. The CSP solver is pre-configured, but various parameters can be modified in another text file.
 
-With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API. It achieves performances equivalent to the competing library Ibex [@ibex] for pure continuous problems.
+With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API.
+
 
 # Statement of need
 
@@ -41,6 +42,9 @@ This technology has been applied with success in many fields of engineering like
 This library can be used by anyone wanting to compute sets of solutions for numerical or mixed discrete-continuous constraint satisfaction problems. It can also be used to prove infeasibility or existence of solutions, thanks to the B\&P algorithm and interval analysis [@moore2009].
 Since the library contains most of the state-of-the art algorithms relating to CP over intervals, it can also be used by researchers in this field to define new algorithms.
 
+# State of the field
+
+Various solvers on discrete domains exist in CP, like OR-tools and Chuffed, but they are not able to handle continuous variables. Compared to Ibex [@ibex] library, RealPaver proposes some new kinds of constraints like table constraints, conditional constraints and piecewise constraints, and the definition of discrete variables (integer, enumeration of values). For pure  continuous problems, RealPaver achieves performances equivalent to Ibex. Regarding other mixed integer non-linear solvers like Couenne or Baron, they only solve optimization problems. These solvers are not able to compute several solutions for CSPs, even by adding a constant objective.
 
 # Brief overview
 
