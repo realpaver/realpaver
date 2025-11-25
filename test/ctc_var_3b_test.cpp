@@ -31,10 +31,6 @@ Result my_test(const Interval &I)
 void test_1()
 {
    Result res = my_test(Interval(0.5, 1));
-
-   std::cerr << std::setprecision(16) << "test_1 NEW: " << res.first << " " << res.second
-             << std::endl;
-
    TEST_TRUE(res.first == Proof::Maybe);
    TEST_TRUE(res.second.isSetEq(Interval(0.5, 1)));
 }

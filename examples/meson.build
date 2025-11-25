@@ -48,6 +48,14 @@ csp = executable(
   dependencies: deps_lib,
 )
 
+joss_test = executable(
+  'joss_test',
+  sources: 'joss_test.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
 parsing = executable(
   'parsing',
   sources: 'parsing.cpp',

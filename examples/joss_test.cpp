@@ -1,33 +1,19 @@
+#include "realpaver/AffineForm.hpp"
 #include "realpaver_api.hpp"
+#include <iomanip>
 #include <iostream>
 
 using namespace realpaver;
 using namespace std;
 
-class MyFun : public IntervalFunctionUni {
-   Interval eval(const Interval &x)
-   {
-      return sqr(x) - 2.0;
-   }
-   Interval diff(const Interval &x)
-   {
-      return 2.0 * x;
-   }
-};
-
 int main(void)
 {
    Logger::init(LogLevel::full, "newton.log");
 
-   IntervalNewtonUni newton;
-   MyFun f;
-   Interval I(1, 10);
+   Interval alpha, dzeta, delta, x("0.2", "1.2");
 
-   Proof p = newton.contract(f, I);
-   cout << "Proof: " << p << endl;
-
-   if (p != Proof::Empty)
-      cout << "New domain: " << I << endl;
+   std::cerr << std::setprecision(16) << std::endl;
+   AffineForm::chebyshevCos(x, alpha, dzeta, delta);
 
    return 0;
 }

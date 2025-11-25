@@ -739,53 +739,99 @@ void AffineForm::minrangeCos(const Interval &x, Interval &alpha, Interval &dzeta
 void AffineForm::chebyshevCos(const Interval &x, Interval &alpha, Interval &dzeta,
                               Interval &delta)
 {
+   DEBUG("chebyshevCos---------------------------------------\n\n");
+   DEBUG("x: " << x);
    Interval cx = cos(x);
+
+   DEBUG("cos(x): " << cos(x));
+
    if (cx.strictlyContainsZero())
    {
+      DEBUG("minrangeCos");
       minrangeCos(x, alpha, dzeta, delta);
       return;
    }
 
    Interval a(x.left()), b(x.right()), fa = cos(a), fb = cos(b);
 
+   DEBUG("left bnd a:  " << a);
+   DEBUG("right bnd b: " << b);
+   DEBUG("cos(a):      " << fa);
+   DEBUG("cos(b):      " << fb);
+
    alpha = (fb - fa) / (b - a);
+
+   DEBUG("alpha:      " << alpha);
 
    if (alpha.isNegative())
    {
+
+      DEBUG("alpha negative");
+
       // shift x + 2*k*pi in [0, pi]
       Interval k = round((Interval::zeroPi() - x) / Interval::twoPi());
 
+      DEBUG("k: " << k);
+
       if (!k.isSingleton())
       {
+         DEBUG("minrangeCos");
+
          minrangeCos(x, alpha, dzeta, delta);
          return;
       }
       Interval c = asin(-alpha);
+      DEBUG("c: " << c);
+
       if (fa.isNegative())
+      {
          c = Interval::pi() - c;
+         DEBUG("fa negative -> c: " << c);
+      }
       c -= k * Interval::twoPi();
+      DEBUG("c: " << c);
       Interval fc = cos(c);
+      DEBUG("cos(c): " << fc);
 
       approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+
+      DEBUG("dzeta: " << dzeta);
+      DEBUG("delta: " << delta);
    }
    else
    {
+      DEBUG("alpha positive");
+
       // shift x + 2*k*pi in [-pi, 0]
       Interval k = round((Interval::minusPiZero() - x) / Interval::twoPi());
 
+      DEBUG("k: " << k);
+
       if (!k.isSingleton())
       {
-         minrangeTan(x, alpha, dzeta, delta);
+         DEBUG("minrangeCos");
+
+         minrangeCos(x, alpha, dzeta, delta);
          return;
       }
 
       Interval c = asin(-alpha);
+      DEBUG("c: " << c);
+
       if (fa.isNegative())
+      {
          c = -(Interval::pi() + c);
+         DEBUG("fa negative -> c: " << c);
+      }
       c -= k * Interval::twoPi();
+      DEBUG("c: " << c);
       Interval fc = cos(c);
+      DEBUG("cos(c): " << fc);
 
       approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
+
+      DEBUG("dzeta: " << dzeta);
+      DEBUG("delta: " << delta);
    }
 }
 
