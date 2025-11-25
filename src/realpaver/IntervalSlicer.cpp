@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 
 namespace realpaver {
 
@@ -99,7 +99,8 @@ double IntervalPeeler::getFactor() const
 
 void IntervalPeeler::setFactor(double f)
 {
-   ASSERT(f >= 0.0 && f <= 100.0, "Bad width factor " << f << " in an interval peeler");
+   REALPAVER_ASSERT(f >= 0.0 && f <= 100.0,
+                    "Bad width factor " << f << " in an interval peeler");
 
    f_ = f;
    p_ = f_ / Interval(100.0);
@@ -177,7 +178,7 @@ size_t IntervalPartitionMaker::getArity() const
 
 void IntervalPartitionMaker::setArity(size_t n)
 {
-   ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
+   REALPAVER_ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
 
    n_ = n;
 }

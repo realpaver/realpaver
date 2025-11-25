@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ConstraintRelaxor.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ConstraintRelaxor.hpp"
 
 namespace realpaver {
 
@@ -27,7 +27,7 @@ ConstraintRelaxor::ConstraintRelaxor(double nu)
     : nu_(nu)
     , relaxed_(nullptr)
 {
-   ASSERT(nu_ > 0.0, "Bad relaxation value " << nu);
+   REALPAVER_ASSERT(nu_ > 0.0, "Bad relaxation value " << nu);
 }
 
 Constraint ConstraintRelaxor::getRelaxedCtr() const

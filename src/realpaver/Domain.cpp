@@ -395,7 +395,7 @@ BinaryDomain::BinaryDomain(const ZeroOne &zo)
     : Domain(DomainType::Binary)
     , val_(zo)
 {
-   ASSERT(!zo.isEmpty(), "Creation of an empty binary domain");
+   REALPAVER_ASSERT(!zo.isEmpty(), "Creation of an empty binary domain");
 }
 
 const ZeroOne &BinaryDomain::getVal() const

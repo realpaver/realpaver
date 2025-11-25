@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ScopeMap.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/ScopeMap.hpp"
 
 namespace realpaver {
 
@@ -43,7 +43,7 @@ ScopeIdMap::ScopeIdMap(size_t last)
 
 size_t ScopeIdMap::index(size_t id) const
 {
-   ASSERT(id <= last_, "Bad access in a scope index map");
+   REALPAVER_ASSERT(id <= last_, "Bad access in a scope index map");
 
    return id;
 }
@@ -84,7 +84,7 @@ ScopeSeqMap::ScopeSeqMap(size_t first, size_t last)
 
 size_t ScopeSeqMap::index(size_t id) const
 {
-   ASSERT(id >= first_ && id <= last_, "Bad access in a scope index map");
+   REALPAVER_ASSERT(id >= first_ && id <= last_, "Bad access in a scope index map");
 
    return id - first_;
 }
@@ -123,7 +123,7 @@ size_t ScopeHashMap::index(size_t id) const
 {
    auto it = m_.find(id);
 
-   ASSERT(it != m_.end(), "Bad access in a scope index map");
+   REALPAVER_ASSERT(it != m_.end(), "Bad access in a scope index map");
 
    return it->second;
 }

@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalVector.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/IntervalVector.hpp"
 
 namespace realpaver {
 
@@ -140,12 +140,12 @@ RealVector IntervalVector::rCorner() const
 
 RealVector IntervalVector::corner(const Bitset &bs) const
 {
-   ASSERT(size() == bs.size(),
-          "Bad access to the corner of " << (*this) << " given a bitset " << bs);
+   REALPAVER_ASSERT(size() == bs.size(), "Bad access to the corner of "
+                                             << (*this) << " given a bitset " << bs);
 
-   ASSERT(bs.first() == 0, "Bad access to the corner of "
-                               << (*this)
-                               << " given a bitset whose first index is not 0");
+   REALPAVER_ASSERT(bs.first() == 0, "Bad access to the corner of "
+                                         << (*this)
+                                         << " given a bitset whose first index is not 0");
 
    RealVector co(size());
 
@@ -160,12 +160,12 @@ RealVector IntervalVector::corner(const Bitset &bs) const
 
 RealVector IntervalVector::oppositeCorner(const Bitset &bs) const
 {
-   ASSERT(size() == bs.size(),
-          "Bad access to the corner of " << (*this) << " given a bitset " << bs);
+   REALPAVER_ASSERT(size() == bs.size(), "Bad access to the corner of "
+                                             << (*this) << " given a bitset " << bs);
 
-   ASSERT(bs.first() == 0, "Bad access to the corner of "
-                               << (*this)
-                               << " given a bitset whose first index is not 0");
+   REALPAVER_ASSERT(bs.first() == 0, "Bad access to the corner of "
+                                         << (*this)
+                                         << " given a bitset whose first index is not 0");
 
    RealVector co(size());
 
@@ -180,7 +180,7 @@ RealVector IntervalVector::oppositeCorner(const Bitset &bs) const
 
 bool IntervalVector::contains(const IntervalVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i = 0; i < size(); ++i)
       if (!get(i).contains(X[i]))
@@ -191,7 +191,7 @@ bool IntervalVector::contains(const IntervalVector &X) const
 
 bool IntervalVector::strictlyContains(const IntervalVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i = 0; i < size(); ++i)
       if (!get(i).strictlyContains(X[i]))
@@ -202,7 +202,7 @@ bool IntervalVector::strictlyContains(const IntervalVector &X) const
 
 bool IntervalVector::contains(const RealVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i = 0; i < size(); ++i)
       if (!get(i).contains(X[i]))
@@ -213,7 +213,7 @@ bool IntervalVector::contains(const RealVector &X) const
 
 bool IntervalVector::strictlyContains(const RealVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i = 0; i < size(); ++i)
       if (!get(i).strictlyContains(X[i]))
@@ -242,7 +242,7 @@ bool IntervalVector::strictlyContainsZero() const
 
 bool IntervalVector::overlaps(const IntervalVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    for (size_t i = 0; i < size(); ++i)
       if (!get(i).overlaps(X[i]))
@@ -282,7 +282,7 @@ IntervalVector *IntervalVector::clone() const
 
 double IntervalVector::distance(const IntervalVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    double d = 0.0;
    for (size_t i = 0; i < size(); ++i)
@@ -296,7 +296,7 @@ double IntervalVector::distance(const IntervalVector &X) const
 
 double IntervalVector::gap(const IntervalVector &X) const
 {
-   ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
+   REALPAVER_ASSERT(size() == X.size(), "Bad dimensions: " << (*this) << ", " << X);
 
    double gap = 0.0;
    for (size_t i = 0; i < size(); ++i)
@@ -310,8 +310,8 @@ double IntervalVector::gap(const IntervalVector &X) const
 
 void IntervalVector::inflate(double delta, double chi)
 {
-   ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
-   ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
+   REALPAVER_ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
+   REALPAVER_ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
 
    for (size_t i = 0; i < size(); ++i)
       set(i, get(i).inflate(delta, chi));
@@ -319,7 +319,8 @@ void IntervalVector::inflate(double delta, double chi)
 
 Interval operator*(const IntervalVector &X, const IntervalVector &Y)
 {
-   ASSERT(X.size() == Y.size(), "Scalar product of vectors having different sizes");
+   REALPAVER_ASSERT(X.size() == Y.size(),
+                    "Scalar product of vectors having different sizes");
 
    Interval prod = X.get(0) * Y.get(0);
    for (size_t i = 1; i < X.size(); ++i)
@@ -330,7 +331,8 @@ Interval operator*(const IntervalVector &X, const IntervalVector &Y)
 
 Interval operator*(const RealVector &X, const IntervalVector &Y)
 {
-   ASSERT(X.size() == Y.size(), "Scalar product of vectors having different sizes");
+   REALPAVER_ASSERT(X.size() == Y.size(),
+                    "Scalar product of vectors having different sizes");
 
    Interval prod = X.get(0) * Y.get(0);
    for (size_t i = 1; i < X.size(); ++i)
@@ -341,7 +343,8 @@ Interval operator*(const RealVector &X, const IntervalVector &Y)
 
 Interval operator*(const IntervalVector &X, const RealVector &Y)
 {
-   ASSERT(X.size() == Y.size(), "Scalar product of vectors having different sizes");
+   REALPAVER_ASSERT(X.size() == Y.size(),
+                    "Scalar product of vectors having different sizes");
 
    Interval prod = X.get(0) * Y.get(0);
    for (size_t i = 1; i < X.size(); ++i)
@@ -352,7 +355,7 @@ Interval operator*(const IntervalVector &X, const RealVector &Y)
 
 IntervalVector operator*(const RealMatrix &A, const IntervalVector &X)
 {
-   ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
+   REALPAVER_ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
 
    IntervalVector Y(A.nrows());
 

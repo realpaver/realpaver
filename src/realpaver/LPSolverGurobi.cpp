@@ -18,10 +18,10 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/LPSolverGurobi.hpp"
 #include "gurobi_c++.h"
 #include "gurobi_c.h"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/LPSolverGurobi.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -246,16 +246,16 @@ LPStatus LPSolver::reoptimize()
 
 double LPSolver::costSolution() const
 {
-   ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-          "Bad access to a solution in Gurobi");
+   REALPAVER_ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
+                    "Bad access to a solution in Gurobi");
 
    return simplex_->get(GRB_DoubleAttr_ObjVal);
 }
 
 RealVector LPSolver::primalSolution() const
 {
-   ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-          "Bad access to a solution in Gurobi");
+   REALPAVER_ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
+                    "Bad access to a solution in Gurobi");
 
    int m = getNbLinVars();
    RealVector primal(m);
@@ -267,8 +267,8 @@ RealVector LPSolver::primalSolution() const
 
 RealVector LPSolver::dualSolution() const
 {
-   ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-          "Bad access to a solution in Gurobi");
+   REALPAVER_ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
+                    "Bad access to a solution in Gurobi");
 
    int p = getNbLinVars() + getNbLinCtrs();
    RealVector dual(p);

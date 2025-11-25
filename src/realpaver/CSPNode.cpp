@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPNode.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/CSPNode.hpp"
 
 namespace realpaver {
 
@@ -31,8 +31,8 @@ CSPNode::CSPNode(Scope scop, int depth)
     , parent_(-1)
     , proof_(Proof::Maybe)
 {
-   ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
-   ASSERT(!scop.isEmpty(), "Empty scope used to create a CSP node");
+   REALPAVER_ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope used to create a CSP node");
 
    box_ = new DomainBox(scop);
 }
@@ -45,7 +45,7 @@ CSPNode::CSPNode(std::unique_ptr<DomainBox> box, int depth)
     , parent_(-1)
     , proof_(Proof::Maybe)
 {
-   ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
+   REALPAVER_ASSERT(depth >= 0, "Bad depth of a CSP node " << depth);
 }
 
 CSPNode::CSPNode(const CSPNode &node)
@@ -71,7 +71,7 @@ int CSPNode::depth() const
 
 void CSPNode::setDepth(int depth)
 {
-   ASSERT(depth >= 0, "Bad node depth " << depth);
+   REALPAVER_ASSERT(depth >= 0, "Bad node depth " << depth);
 
    depth_ = depth;
 }

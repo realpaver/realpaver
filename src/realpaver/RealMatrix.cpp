@@ -37,12 +37,12 @@ RealMatrix::RealMatrix(const std::initializer_list<std::initializer_list<double>
 {
    size_t nrows = l.size();
 
-   ASSERT(nrows > 0, "Bad initialization of real matrix");
+   REALPAVER_ASSERT(nrows > 0, "Bad initialization of real matrix");
 
    auto it = l.begin();
    size_t ncols = it->size();
 
-   ASSERT(ncols > 0, "Bad initialization of real matrix");
+   REALPAVER_ASSERT(ncols > 0, "Bad initialization of real matrix");
 
    setNrows(nrows);
    setNcols(ncols);
@@ -109,7 +109,8 @@ double RealMatrix::linfNorm() const
 
 void RealMatrix::setIdentity()
 {
-   ASSERT(isSquare(), "Bad assignment of the identoity matrix to a non-square matrix");
+   REALPAVER_ASSERT(isSquare(),
+                    "Bad assignment of the identoity matrix to a non-square matrix");
 
    setAll(0.0);
    for (size_t i = 0; i < nrows(); ++i)
@@ -208,9 +209,9 @@ RealMatrix RealMatrix::transpose() const
 
 bool RealMatrix::inverse(RealMatrix &P)
 {
-   ASSERT(isSquare(), "Inversion of a non-square matrix");
-   ASSERT(nrows() == P.nrows(), "Bad dimension opf an inverse matrix");
-   ASSERT(ncols() == P.ncols(), "Bad dimension opf an inverse matrix");
+   REALPAVER_ASSERT(isSquare(), "Inversion of a non-square matrix");
+   REALPAVER_ASSERT(nrows() == P.nrows(), "Bad dimension opf an inverse matrix");
+   REALPAVER_ASSERT(ncols() == P.ncols(), "Bad dimension opf an inverse matrix");
 
    P.setIdentity();
 
@@ -349,20 +350,20 @@ bool RealMatrix::getMinPivot() const
 
 void RealMatrix::setMinPivot(double val)
 {
-   ASSERT(val >= 0.0, "Bad threshold on the values of pivots");
+   REALPAVER_ASSERT(val >= 0.0, "Bad threshold on the values of pivots");
    minpiv_ = val;
 }
 
 // Doolittle algorithm
 void RealMatrix::LU(RealMatrix &L, RealMatrix &U) const
 {
-   ASSERT(nrows() == ncols(), "LU decomposition only apply to square matrices");
+   REALPAVER_ASSERT(nrows() == ncols(), "LU decomposition only apply to square matrices");
 
-   ASSERT(nrows() == L.nrows(), "L has a wrong number of rows");
-   ASSERT(ncols() == L.ncols(), "L has a wrong number of columns");
+   REALPAVER_ASSERT(nrows() == L.nrows(), "L has a wrong number of rows");
+   REALPAVER_ASSERT(ncols() == L.ncols(), "L has a wrong number of columns");
 
-   ASSERT(nrows() == U.nrows(), "U has a wrong number of rows");
-   ASSERT(ncols() == U.ncols(), "U has a wrong number of columns");
+   REALPAVER_ASSERT(nrows() == U.nrows(), "U has a wrong number of rows");
+   REALPAVER_ASSERT(ncols() == U.ncols(), "U has a wrong number of columns");
 
    // Decomposing matrix into Upper and Lower triangular matrix
    // Adaptation from:

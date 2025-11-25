@@ -30,9 +30,9 @@ ContractorAffineRevise::ContractorAffineRevise(SharedDag dag, size_t i, bool min
     , idx_(i)
     , minrange_(minrange)
 {
-   ASSERT(dag != nullptr, "Creation of affine contractor from a null pointer");
-   ASSERT(i < dag->nbFuns(),
-          "Creation of affine contractor given a bad " << " function index " << i);
+   REALPAVER_ASSERT(dag != nullptr, "Creation of affine contractor from a null pointer");
+   REALPAVER_ASSERT(i < dag->nbFuns(), "Creation of affine contractor given a bad "
+                                           << " function index " << i);
 }
 
 Scope ContractorAffineRevise::scope() const

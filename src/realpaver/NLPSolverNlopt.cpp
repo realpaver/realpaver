@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/NLPSolverNlopt.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/NLPSolverNlopt.hpp"
 
 namespace realpaver {
 
@@ -70,7 +70,7 @@ double f_nlopt(const std::vector<double> &x, std::vector<double> &grad, void *f_
    NLPSolver *ls = reinterpret_cast<NLPSolver *>(f_data);
    RealFunction *obj = ls->obj();
 
-   ASSERT(x.size() == ls->scope().size(), "Bad scopes in f_nlopt");
+   REALPAVER_ASSERT(x.size() == ls->scope().size(), "Bad scopes in f_nlopt");
 
    // evaluates the function on x
    RealPoint pt(ls->scope());
@@ -131,11 +131,11 @@ NLPSolver::~NLPSolver()
 
 OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &src)
 {
-   ASSERT(box.scope().contains(scope()),
-          "Bad scope of an interval box given as input of NlpOpt");
+   REALPAVER_ASSERT(box.scope().contains(scope()),
+                    "Bad scope of an interval box given as input of NlpOpt");
 
-   ASSERT(src.scope().contains(scope()),
-          "Bad scope of astarting point given as input of NlpOpt");
+   REALPAVER_ASSERT(src.scope().contains(scope()),
+                    "Bad scope of astarting point given as input of NlpOpt");
 
    // gets the dimension
    size_t n = this->scope().size();

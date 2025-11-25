@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSpaceHybridDFS.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/CSPSpaceHybridDFS.hpp"
 #include "realpaver/Logger.hpp"
 #include <algorithm>
 #include <list>
@@ -219,7 +219,7 @@ SharedCSPNode CSPSpaceHybridDFS::popSolNode()
 
 SharedCSPNode CSPSpaceHybridDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
+   REALPAVER_ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
    return vsol_[i];
 }
@@ -265,7 +265,7 @@ void CSPSpaceHybridDFS::insertPendingNode(const SharedCSPNode &node)
 
 SharedCSPNode CSPSpaceHybridDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a CSP space");
+   REALPAVER_ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a CSP space");
 
    if (i < sta_.size())
    {

@@ -180,8 +180,8 @@ template <typename T>
 typename NumericMatrix<T>::ValueType NumericMatrix<T>::operator()(size_t i,
                                                                   size_t j) const
 {
-   ASSERT(i < nrows() && j < ncols(),
-          "Bad access in a matrix at position " << i << ", " << j);
+   REALPAVER_ASSERT(i < nrows() && j < ncols(),
+                    "Bad access in a matrix at position " << i << ", " << j);
 
    return elems_[i * ncols_ + j];
 }
@@ -189,8 +189,8 @@ typename NumericMatrix<T>::ValueType NumericMatrix<T>::operator()(size_t i,
 template <typename T>
 typename NumericMatrix<T>::RefType NumericMatrix<T>::operator()(size_t i, size_t j)
 {
-   ASSERT(i < nrows() && j < ncols(),
-          "Bad access in a matrix at position " << i << ", " << j);
+   REALPAVER_ASSERT(i < nrows() && j < ncols(),
+                    "Bad access in a matrix at position " << i << ", " << j);
 
    return elems_[i * ncols_ + j];
 }
@@ -262,10 +262,10 @@ template <typename T>
 void NumericMatrix<T>::add(const NumericMatrix &A, const NumericMatrix &B,
                            NumericMatrix &res)
 {
-   ASSERT(A.nrows() == B.nrows(), "Bad matrix sizes in an addition");
-   ASSERT(A.ncols() == B.ncols(), "Bad matrix sizes in an addition");
-   ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in an addition");
-   ASSERT(A.ncols() == res.ncols(), "Bad matrix sizes in an addition");
+   REALPAVER_ASSERT(A.nrows() == B.nrows(), "Bad matrix sizes in an addition");
+   REALPAVER_ASSERT(A.ncols() == B.ncols(), "Bad matrix sizes in an addition");
+   REALPAVER_ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in an addition");
+   REALPAVER_ASSERT(A.ncols() == res.ncols(), "Bad matrix sizes in an addition");
 
    for (size_t i = 0; i < A.elems_.size(); ++i)
       res.elems_[i] = TraitsType::add(A.elems_[i], B.elems_[i]);
@@ -275,10 +275,10 @@ template <typename T>
 void NumericMatrix<T>::sub(const NumericMatrix &A, const NumericMatrix &B,
                            NumericMatrix &res)
 {
-   ASSERT(A.nrows() == B.nrows(), "Bad matrix sizes in a subtraction");
-   ASSERT(A.ncols() == B.ncols(), "Bad matrix sizes in a subtraction");
-   ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in a subtraction");
-   ASSERT(A.ncols() == res.ncols(), "Bad matrix sizes in a subtraction");
+   REALPAVER_ASSERT(A.nrows() == B.nrows(), "Bad matrix sizes in a subtraction");
+   REALPAVER_ASSERT(A.ncols() == B.ncols(), "Bad matrix sizes in a subtraction");
+   REALPAVER_ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in a subtraction");
+   REALPAVER_ASSERT(A.ncols() == res.ncols(), "Bad matrix sizes in a subtraction");
 
    for (size_t i = 0; i < A.elems_.size(); ++i)
       res.elems_[i] = TraitsType::sub(A.elems_[i], B.elems_[i]);
@@ -287,8 +287,8 @@ void NumericMatrix<T>::sub(const NumericMatrix &A, const NumericMatrix &B,
 template <typename T>
 void NumericMatrix<T>::usb(const NumericMatrix &A, NumericMatrix &res)
 {
-   ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in a subtraction");
-   ASSERT(A.ncols() == res.ncols(), "Bad matrix sizes in a subtraction");
+   REALPAVER_ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in a subtraction");
+   REALPAVER_ASSERT(A.ncols() == res.ncols(), "Bad matrix sizes in a subtraction");
 
    for (size_t i = 0; i < A.elems_.size(); ++i)
       res.elems_[i] = TraitsType::usb(A.elems_[i]);
@@ -298,8 +298,8 @@ template <typename T>
 void NumericMatrix<T>::mulScalar(ConstRefType a, const NumericMatrix &B,
                                  NumericMatrix &res)
 {
-   ASSERT(B.nrows() == res.nrows(), "Bad matrix sizes in a multiplication");
-   ASSERT(B.ncols() == res.ncols(), "Bad matrix sizes in a multiplication");
+   REALPAVER_ASSERT(B.nrows() == res.nrows(), "Bad matrix sizes in a multiplication");
+   REALPAVER_ASSERT(B.ncols() == res.ncols(), "Bad matrix sizes in a multiplication");
 
    for (size_t i = 0; i < B.elems_.size(); ++i)
       res.elems_[i] = TraitsType::mul(a, B.elems_[i]);
@@ -309,8 +309,8 @@ template <typename T>
 void NumericMatrix<T>::divScalar(const NumericMatrix &B, ConstRefType a,
                                  NumericMatrix &res)
 {
-   ASSERT(B.nrows() == res.nrows(), "Bad matrix sizes in a division");
-   ASSERT(B.ncols() == res.ncols(), "Bad matrix sizes in a division");
+   REALPAVER_ASSERT(B.nrows() == res.nrows(), "Bad matrix sizes in a division");
+   REALPAVER_ASSERT(B.ncols() == res.ncols(), "Bad matrix sizes in a division");
 
    for (size_t i = 0; i < B.elems_.size(); ++i)
       res.elems_[i] = TraitsType::div(B.elems_[i], a);
@@ -320,9 +320,9 @@ template <typename T>
 void NumericMatrix<T>::mul(const NumericMatrix &A, const NumericMatrix &B,
                            NumericMatrix &res)
 {
-   ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in a multiplication");
-   ASSERT(A.ncols() == B.nrows(), "Bad matrix sizes in a multiplication");
-   ASSERT(B.ncols() == res.ncols(), "Bad matrix sizes in a multiplication");
+   REALPAVER_ASSERT(A.nrows() == res.nrows(), "Bad matrix sizes in a multiplication");
+   REALPAVER_ASSERT(A.ncols() == B.nrows(), "Bad matrix sizes in a multiplication");
+   REALPAVER_ASSERT(B.ncols() == res.ncols(), "Bad matrix sizes in a multiplication");
 
    for (size_t i = 0; i < res.nrows(); ++i)
       for (size_t j = 0; j < res.ncols(); ++j)

@@ -135,20 +135,33 @@ void LPSolver::setOptions()
    double tol = getFeasTol();
    HighsStatus hs, ok = HighsStatus::kOk;
 
+   // From the HiGHS' doc: HiGHS has efficient implementations of both the primal and dual
+   // simplex methods, although the dual simplex solver is likely to be faster and is more
+   // robust,
+   hs = simplex_->setOptionValue("solver", "simplex");
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
+   // From the HiGHS' doc: Strategy for simplex solver 0 => Choose; 1 => Dual (serial); 2
+   // => Dual (SIP); 3 => Dual (PAMI); 4 => Primal
+   hs = simplex_->setOptionValue("simplex_strategy", 1);
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
+
    hs = simplex_->setOptionValue("time_limit", maxsec);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
 
    hs = simplex_->setOptionValue("simplex_iteration_limit", maxiter);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
 
    hs = simplex_->setOptionValue("log_to_console", false);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
 
    hs = simplex_->setOptionValue("output_flag", false);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
 
    hs = simplex_->setOptionValue("primal_feasibility_tolerance", tol);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
+
+   hs = simplex_->setOptionValue("dual_feasibility_tolerance", tol);
+   REALPAVER_ASSERT(hs == ok, "Bad option in Highs: ");
 }
 
 LPStatus LPSolver::run()

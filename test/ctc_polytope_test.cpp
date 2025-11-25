@@ -4,6 +4,9 @@
 #include "realpaver/Problem.hpp"
 #include "test_config.hpp"
 #include <memory>
+#ifdef REALPAVER_DEBUG_ON
+#include "realpaver/Logger.hpp"
+#endif
 
 void init()
 {
@@ -15,6 +18,9 @@ void clean()
 
 void test_1()
 {
+#ifdef REALPAVER_DEBUG_ON
+   LOG_INTER("\n************* test1\n")
+#endif
    Problem prob;
    Variable x = prob.addRealVar(0, 0, "x"), y = prob.addRealVar(0, 0, "y");
 
@@ -52,6 +58,9 @@ void test_1()
 
 void test_2()
 {
+#ifdef REALPAVER_DEBUG_ON
+   LOG_INTER("\n************* test2\n")
+#endif
    Problem prob;
    Variable x = prob.addRealVar(0, 0, "x"), y = prob.addRealVar(0, 0, "y");
 
@@ -89,6 +98,9 @@ void test_2()
 
 void brown_5_feasible()
 {
+#ifdef REALPAVER_DEBUG_ON
+   LOG_INTER("\n************* brown_5_feasible\n")
+#endif
    Problem prob;
    Variable x1 = prob.addRealVar(0, 0, "x1"), x2 = prob.addRealVar(0, 0, "x2"),
             x3 = prob.addRealVar(0, 0, "x3"), x4 = prob.addRealVar(0, 0, "x4"),
@@ -131,6 +143,9 @@ void brown_5_feasible()
 
 void brown_5_infeasible()
 {
+#ifdef REALPAVER_DEBUG_ON
+   LOG_INTER("\n************* brown_5_infeasible\n")
+#endif
    Problem prob;
    Variable x1 = prob.addRealVar(0, 0, "x1"), x2 = prob.addRealVar(0, 0, "x2"),
             x3 = prob.addRealVar(0, 0, "x3"), x4 = prob.addRealVar(0, 0, "x4"),
@@ -162,6 +177,9 @@ void brown_5_infeasible()
 
 int main()
 {
+#ifdef REALPAVER_DEBUG_ON
+   Logger::init(LogLevel::full, "ctc_polytope_test.log");
+#endif
    INIT_TEST
 
    TEST(test_1)

@@ -138,15 +138,16 @@ if local_solver_name.to_lower() == 'nlopt'
 endif
 
 assert_opt = get_option('ASSERT')
-conf_data.set('ASSERT_ON', assert_opt.to_int())
+conf_data.set('REALPAVER_ASSERT_ON', assert_opt.to_int())
 log_opt = get_option('LOG')
-conf_data.set('LOG_ON', log_opt.to_int())
+conf_data.set('REALPAVER_LOG_ON', log_opt.to_int())
 
 buildtype = get_option('buildtype')
 if buildtype == 'debug'
-  conf_data.set('DEBUG_ON', 1)
+  conf_data.set('REALPAVER_DEBUG_ON', 1)
+  conf_data.set('REALPAVER_LOG_ON', 1) # Activate logging if debug mode
 else
-  conf_data.set('DEBUG_ON', 0)
+  conf_data.set('REALPAVER_DEBUG_ON', 0)
 endif
 
 check_headers = [

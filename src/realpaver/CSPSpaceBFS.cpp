@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSpaceBFS.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/CSPSpaceBFS.hpp"
 
 namespace realpaver {
 
@@ -48,7 +48,7 @@ SharedCSPNode CSPSpaceBFS::popSolNode()
 
 SharedCSPNode CSPSpaceBFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
+   REALPAVER_ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
    return vsol_[i];
 }
@@ -83,7 +83,7 @@ void CSPSpaceBFS::insertPendingNode(const SharedCSPNode &node)
 
 SharedCSPNode CSPSpaceBFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < lnode_.size(), "Bad access to a pending node in a CSP space");
+   REALPAVER_ASSERT(i < lnode_.size(), "Bad access to a pending node in a CSP space");
 
    auto it = lnode_.begin();
    if (i != 0)

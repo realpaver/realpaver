@@ -18,10 +18,10 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Preprocessor.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/Preprocessor.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
@@ -56,7 +56,7 @@ bool Preprocessor::hasFixedDomain(Variable v) const
 
 Interval Preprocessor::getFixedDomain(Variable v) const
 {
-   ASSERT(hasFixedDomain(v), "Domain of " << v.getName() << " is not fixed");
+   REALPAVER_ASSERT(hasFixedDomain(v), "Domain of " << v.getName() << " is not fixed");
 
    auto it = vim_.find(v);
    return it->second;
@@ -64,7 +64,7 @@ Interval Preprocessor::getFixedDomain(Variable v) const
 
 Variable Preprocessor::srcToDestVar(Variable v) const
 {
-   ASSERT(!hasFixedDomain(v), "Domain of " << v.getName() << " is fixed");
+   REALPAVER_ASSERT(!hasFixedDomain(v), "Domain of " << v.getName() << " is fixed");
 
    auto it = vvm_.find(v);
    return it->second;
@@ -93,8 +93,8 @@ DomainBox Preprocessor::destRegion() const
 
 void Preprocessor::apply(const Problem &src, Problem &dest)
 {
-   ASSERT(!src.isEmpty(), "Preprocessing error");
-   ASSERT(dest.isEmpty(), "Preprocessing error");
+   REALPAVER_ASSERT(!src.isEmpty(), "Preprocessing error");
+   REALPAVER_ASSERT(dest.isEmpty(), "Preprocessing error");
 
    // resets this
    vvm_.clear();
@@ -311,7 +311,7 @@ size_t Preprocessor::nbInactiveCtrs() const
 
 Constraint Preprocessor::getInactiveCtr(size_t i) const
 {
-   ASSERT(i < inactive_.size(), "Bad access to an inactive constraint");
+   REALPAVER_ASSERT(i < inactive_.size(), "Bad access to an inactive constraint");
    return inactive_[i];
 }
 
@@ -327,7 +327,8 @@ size_t Preprocessor::nbUnfixedVars() const
 
 Variable Preprocessor::getFixedVar(size_t i) const
 {
-   ASSERT(i < nbFixedVars(), "Bad access to a fixed variable in a preprocessor");
+   REALPAVER_ASSERT(i < nbFixedVars(),
+                    "Bad access to a fixed variable in a preprocessor");
 
    auto it = vim_.begin();
    std::advance(it, i);
@@ -336,7 +337,8 @@ Variable Preprocessor::getFixedVar(size_t i) const
 
 Variable Preprocessor::getUnfixedVar(size_t i) const
 {
-   ASSERT(i < nbUnfixedVars(), "Bad access to a-n unfixed variable in a preprocessor");
+   REALPAVER_ASSERT(i < nbUnfixedVars(),
+                    "Bad access to a-n unfixed variable in a preprocessor");
 
    auto it = vvm_.begin();
    std::advance(it, i);
@@ -345,7 +347,7 @@ Variable Preprocessor::getUnfixedVar(size_t i) const
 
 DomainBox Preprocessor::fixedRegion() const
 {
-   ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
+   REALPAVER_ASSERT(vim_.size() > 0, "Fixed region required but no fixed variable");
 
    IntervalBox B(fixedScope());
    for (auto p : vim_)

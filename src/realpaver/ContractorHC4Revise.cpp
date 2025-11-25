@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
@@ -28,9 +28,10 @@ ContractorHC4Revise::ContractorHC4Revise(SharedDag dag, size_t i)
     : dag_(dag)
     , idx_(i)
 {
-   ASSERT(dag != nullptr, "Creation of HC4Revise contractor from a null pointer");
-   ASSERT(i < dag->nbFuns(),
-          "Creation of HC4Revise contractor given a bad " << " function index " << i);
+   REALPAVER_ASSERT(dag != nullptr,
+                    "Creation of HC4Revise contractor from a null pointer");
+   REALPAVER_ASSERT(i < dag->nbFuns(), "Creation of HC4Revise contractor given a bad "
+                                           << " function index " << i);
 }
 
 Proof ContractorHC4Revise::contract(IntervalBox &B)

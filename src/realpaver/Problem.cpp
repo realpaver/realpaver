@@ -476,8 +476,8 @@ size_t Problem::nbVars() const
 
 Variable Problem::varAt(size_t i) const
 {
-   ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
-   ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
+   REALPAVER_ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
+   REALPAVER_ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
 
    return vars_[i];
 }
@@ -494,8 +494,8 @@ size_t Problem::nbCtrs() const
 
 Constraint Problem::ctrAt(size_t i) const
 {
-   ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
-   ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
+   REALPAVER_ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
+   REALPAVER_ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
 
    return ctrs_[i];
 }
@@ -587,7 +587,7 @@ size_t Problem::nbAliases() const
 
 Alias Problem::aliasAt(size_t i) const
 {
-   ASSERT(i < als_.size(), "Bad access to aa alias in a problem");
+   REALPAVER_ASSERT(i < als_.size(), "Bad access to aa alias in a problem");
    return als_[i];
 }
 

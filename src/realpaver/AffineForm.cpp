@@ -38,8 +38,8 @@ AffineForm::AffineForm(const Interval &x)
     , l_()
     , e_(0.0)
 {
-   ASSERT(!x.isEmpty(), "Affine form invalid (empty)");
-   ASSERT(!x.isInf(), "Affine form invalid (inf)");
+   REALPAVER_ASSERT(!x.isEmpty(), "Affine form invalid (empty)");
+   REALPAVER_ASSERT(!x.isInf(), "Affine form invalid (inf)");
 }
 
 AffineForm::AffineForm(const double &a)
@@ -47,8 +47,8 @@ AffineForm::AffineForm(const double &a)
     , l_()
     , e_(0.0)
 {
-   ASSERT(!Double::isNan(a), "Affine form invalid (NaN)");
-   ASSERT(!Double::isInf(a), "Affine form invalid (inf)");
+   REALPAVER_ASSERT(!Double::isNan(a), "Affine form invalid (NaN)");
+   REALPAVER_ASSERT(!Double::isInf(a), "Affine form invalid (inf)");
 }
 
 AffineForm::AffineForm(int var, const Interval &domain)
@@ -56,7 +56,7 @@ AffineForm::AffineForm(int var, const Interval &domain)
     , l_()
     , e_(0.0)
 {
-   ASSERT(!domain.isEmpty(), "Affine form invalid (empty domain)");
+   REALPAVER_ASSERT(!domain.isEmpty(), "Affine form invalid (empty domain)");
 
    std::pair<double, double> p = domain.midrad();
    c_ = Interval(p.first);
@@ -69,9 +69,9 @@ AffineForm::AffineForm(const double &a0, const std::initializer_list<double> &A,
     , l_()
     , e_(e)
 {
-   ASSERT(!Double::isNan(a0), "Affine form invalid (NaN)");
-   ASSERT(!Double::isInf(a0), "Affine form invalid (inf)");
-   ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
+   REALPAVER_ASSERT(!Double::isNan(a0), "Affine form invalid (NaN)");
+   REALPAVER_ASSERT(!Double::isInf(a0), "Affine form invalid (inf)");
+   REALPAVER_ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
 
    auto ita = A.begin();
    auto itv = V.begin();
@@ -90,9 +90,9 @@ AffineForm::AffineForm(const Interval &a0, const std::initializer_list<Interval>
     , l_()
     , e_(e)
 {
-   ASSERT(!a0.isEmpty(), "Affine form invalid (empty)");
-   ASSERT(!a0.isInf(), "Affine form invalid (inf)");
-   ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
+   REALPAVER_ASSERT(!a0.isEmpty(), "Affine form invalid (empty)");
+   REALPAVER_ASSERT(!a0.isInf(), "Affine form invalid (inf)");
+   REALPAVER_ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
 
    auto ita = A.begin();
    auto itv = V.begin();
@@ -739,99 +739,99 @@ void AffineForm::minrangeCos(const Interval &x, Interval &alpha, Interval &dzeta
 void AffineForm::chebyshevCos(const Interval &x, Interval &alpha, Interval &dzeta,
                               Interval &delta)
 {
-   DEBUG("chebyshevCos---------------------------------------\n\n");
-   DEBUG("x: " << x);
+   REALPAVER_DEBUG("chebyshevCos---------------------------------------\n\n");
+   REALPAVER_DEBUG("x: " << x);
    Interval cx = cos(x);
 
-   DEBUG("cos(x): " << cos(x));
+   REALPAVER_DEBUG("cos(x): " << cos(x));
 
    if (cx.strictlyContainsZero())
    {
-      DEBUG("minrangeCos");
+      REALPAVER_DEBUG("minrangeCos");
       minrangeCos(x, alpha, dzeta, delta);
       return;
    }
 
    Interval a(x.left()), b(x.right()), fa = cos(a), fb = cos(b);
 
-   DEBUG("left bnd a:  " << a);
-   DEBUG("right bnd b: " << b);
-   DEBUG("cos(a):      " << fa);
-   DEBUG("cos(b):      " << fb);
+   REALPAVER_DEBUG("left bnd a:  " << a);
+   REALPAVER_DEBUG("right bnd b: " << b);
+   REALPAVER_DEBUG("cos(a):      " << fa);
+   REALPAVER_DEBUG("cos(b):      " << fb);
 
    alpha = (fb - fa) / (b - a);
 
-   DEBUG("alpha:      " << alpha);
+   REALPAVER_DEBUG("alpha:      " << alpha);
 
    if (alpha.isNegative())
    {
 
-      DEBUG("alpha negative");
+      REALPAVER_DEBUG("alpha negative");
 
       // shift x + 2*k*pi in [0, pi]
       Interval k = round((Interval::zeroPi() - x) / Interval::twoPi());
 
-      DEBUG("k: " << k);
+      REALPAVER_DEBUG("k: " << k);
 
       if (!k.isSingleton())
       {
-         DEBUG("minrangeCos");
+         REALPAVER_DEBUG("minrangeCos");
 
          minrangeCos(x, alpha, dzeta, delta);
          return;
       }
       Interval c = asin(-alpha);
-      DEBUG("c: " << c);
+      REALPAVER_DEBUG("c: " << c);
 
       if (fa.isNegative())
       {
          c = Interval::pi() - c;
-         DEBUG("fa negative -> c: " << c);
+         REALPAVER_DEBUG("fa negative -> c: " << c);
       }
       c -= k * Interval::twoPi();
-      DEBUG("c: " << c);
+      REALPAVER_DEBUG("c: " << c);
       Interval fc = cos(c);
-      DEBUG("cos(c): " << fc);
+      REALPAVER_DEBUG("cos(c): " << fc);
 
       approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 
-      DEBUG("dzeta: " << dzeta);
-      DEBUG("delta: " << delta);
+      REALPAVER_DEBUG("dzeta: " << dzeta);
+      REALPAVER_DEBUG("delta: " << delta);
    }
    else
    {
-      DEBUG("alpha positive");
+      REALPAVER_DEBUG("alpha positive");
 
       // shift x + 2*k*pi in [-pi, 0]
       Interval k = round((Interval::minusPiZero() - x) / Interval::twoPi());
 
-      DEBUG("k: " << k);
+      REALPAVER_DEBUG("k: " << k);
 
       if (!k.isSingleton())
       {
-         DEBUG("minrangeCos");
+         REALPAVER_DEBUG("minrangeCos");
 
          minrangeCos(x, alpha, dzeta, delta);
          return;
       }
 
       Interval c = asin(-alpha);
-      DEBUG("c: " << c);
+      REALPAVER_DEBUG("c: " << c);
 
       if (fa.isNegative())
       {
          c = -(Interval::pi() + c);
-         DEBUG("fa negative -> c: " << c);
+         REALPAVER_DEBUG("fa negative -> c: " << c);
       }
       c -= k * Interval::twoPi();
-      DEBUG("c: " << c);
+      REALPAVER_DEBUG("c: " << c);
       Interval fc = cos(c);
-      DEBUG("cos(c): " << fc);
+      REALPAVER_DEBUG("cos(c): " << fc);
 
       approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
 
-      DEBUG("dzeta: " << dzeta);
-      DEBUG("delta: " << delta);
+      REALPAVER_DEBUG("dzeta: " << dzeta);
+      REALPAVER_DEBUG("delta: " << delta);
    }
 }
 

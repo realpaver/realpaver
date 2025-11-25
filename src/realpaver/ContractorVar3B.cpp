@@ -31,9 +31,10 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v,
     , slicer_(std::move(slicer))
     , var_min_width_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
-   ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");
-   ASSERT(slicer_ != nullptr, "No slicer in a var3B contractor");
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a var3B contractor");
+   REALPAVER_ASSERT(slicer_ != nullptr, "No slicer in a var3B contractor");
 }
 
 ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
@@ -41,9 +42,10 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
     , v_(v)
     , slicer_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");
-   ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a var3B contractor");
+   REALPAVER_ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
 
    slicer_ = std::make_unique<IntervalPartitionMaker>(n);
 }
@@ -60,7 +62,8 @@ Variable ContractorVar3B::getVar() const
 
 void ContractorVar3B::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a var3B contractor");
+   REALPAVER_ASSERT(scope().contains(v),
+                    "Bad variable " << v << " in a var3B contractor");
 
    v_ = v;
 }

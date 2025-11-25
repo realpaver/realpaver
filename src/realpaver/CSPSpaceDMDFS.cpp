@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPSpaceDMDFS.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/CSPSpaceDMDFS.hpp"
 #include "realpaver/Logger.hpp"
 #include <algorithm>
 
@@ -33,7 +33,8 @@ DistCalculator::~DistCalculator()
 
 double HausdorffDistCalculator::distance(const DomainBox &db1, const DomainBox &db2)
 {
-   ASSERT(db1.scope() == db2.scope(), "The scopes of the two boxes must be equal");
+   REALPAVER_ASSERT(db1.scope() == db2.scope(),
+                    "The scopes of the two boxes must be equal");
 
    double d = 0.0;
    for (const auto &v : db1.scope())
@@ -102,7 +103,7 @@ SharedCSPNode CSPSpaceDMDFS::popSolNode()
 
 SharedCSPNode CSPSpaceDMDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
+   REALPAVER_ASSERT(i < vsol_.size(), "Bad access to a solution node in a CSP space");
 
    return vsol_[i];
 }
@@ -182,7 +183,7 @@ void CSPSpaceDMDFS::insertPendingNode(const SharedCSPNode &node)
 
 SharedCSPNode CSPSpaceDMDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < vnode_.size(), "Bad access to a pending node in a CSP space");
+   REALPAVER_ASSERT(i < vnode_.size(), "Bad access to a pending node in a CSP space");
 
    return vnode_[i].node;
 }

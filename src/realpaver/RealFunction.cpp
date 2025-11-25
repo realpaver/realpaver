@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/RealFunction.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/RealFunction.hpp"
 
 namespace realpaver {
 
@@ -52,7 +52,8 @@ RealFunction::RealFunction(Term t, const Interval &img)
 RealFunction::RealFunction(SharedRep rep)
     : rep_(rep)
 {
-   ASSERT(rep != nullptr, "Creation of an interval function from a null pointer");
+   REALPAVER_ASSERT(rep != nullptr,
+                    "Creation of an interval function from a null pointer");
 }
 
 RealFunction::SharedRep RealFunction::rep() const
@@ -97,8 +98,8 @@ RealFunctionDag::RealFunctionDag(SharedDag dag, size_t i)
     , dag_(dag)
     , index_(i)
 {
-   ASSERT(dag_ != nullptr, "Null pointer used to create a real function");
-   ASSERT(i < dag_->nbFuns(), "Bad index used to create a real function");
+   REALPAVER_ASSERT(dag_ != nullptr, "Null pointer used to create a real function");
+   REALPAVER_ASSERT(i < dag_->nbFuns(), "Bad index used to create a real function");
 
    img_ = dag->fun(i)->getImage();
 }

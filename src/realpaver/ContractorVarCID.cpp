@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/ContractorVarCID.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorVarCID.hpp"
 
 namespace realpaver {
 
@@ -29,9 +29,10 @@ ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v,
     , v_(v)
     , slicer_(std::move(slicer))
 {
-   ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a varCID contractor");
-   ASSERT(slicer != nullptr, "No slicer given");
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a varCID contractor");
+   REALPAVER_ASSERT(slicer != nullptr, "No slicer given");
 }
 
 ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t nsCID)
@@ -39,9 +40,10 @@ ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t nsCID
     , v_(v)
     , slicer_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a varCID contractor");
-   ASSERT(nsCID > 1, "Bad number of slices in a varCID contractor: " << nsCID);
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a varCID contractor");
+   REALPAVER_ASSERT(nsCID > 1, "Bad number of slices in a varCID contractor: " << nsCID);
 
    slicer_ = std::make_unique<IntervalPartitionMaker>(nsCID);
 }
@@ -58,7 +60,8 @@ Variable ContractorVarCID::getVar() const
 
 void ContractorVarCID::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a varCID contractor");
+   REALPAVER_ASSERT(scope().contains(v),
+                    "Bad variable " << v << " in a varCID contractor");
 
    v_ = v;
 }

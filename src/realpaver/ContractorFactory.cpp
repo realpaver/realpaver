@@ -366,7 +366,7 @@ SharedContractorPolytope ContractorFactory::makePolytope()
          std::unique_ptr<LinearizerTaylor> taylor =
              std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
 
-         ASSERT(taylor != nullptr, "taylor null");
+         REALPAVER_ASSERT(taylor != nullptr, "taylor null");
 
          bool minrange =
              env_->getParams()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
@@ -374,7 +374,7 @@ SharedContractorPolytope ContractorFactory::makePolytope()
          std::unique_ptr<LinearizerAffine> affine =
              std::make_unique<LinearizerAffine>(dag_, minrange);
 
-         ASSERT(affine != nullptr, "affine null");
+         REALPAVER_ASSERT(affine != nullptr, "affine null");
 
          std::unique_ptr<Linearizer> lzr = std::make_unique<LinearizerAffineTaylor>(
              dag_, std::move(affine), std::move(taylor));

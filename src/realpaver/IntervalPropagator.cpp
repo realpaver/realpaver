@@ -46,7 +46,8 @@ double IntervalPropagator::getTol() const
 
 void IntervalPropagator::setTol(double tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -82,7 +83,7 @@ Scope IntervalPropagator::scope() const
 
 Proof IntervalPropagator::contract(IntervalBox &B)
 {
-   ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
+   REALPAVER_ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
    // initialization: activates all contractors
    size_t N = pool_->poolSize();

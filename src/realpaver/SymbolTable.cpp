@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/SymbolTable.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/SymbolTable.hpp"
 
 namespace realpaver {
 
@@ -92,7 +92,7 @@ FunctionSymbol::FunctionSymbol(const std::string &name)
 
 void FunctionSymbol::addArgument(const std::string &name)
 {
-   ASSERT(!hasArgument(name), "Bad argument");
+   REALPAVER_ASSERT(!hasArgument(name), "Bad argument");
 
    Variable v(name);
    v.setId(1000000 + args_.size());
@@ -102,14 +102,14 @@ void FunctionSymbol::addArgument(const std::string &name)
 
 Variable FunctionSymbol::getArgument(size_t i) const
 {
-   ASSERT(i < args_.size(), "Access out of range to an argument @ " << i);
+   REALPAVER_ASSERT(i < args_.size(), "Access out of range to an argument @ " << i);
 
    return args_[i];
 }
 
 Variable FunctionSymbol::getVar(const std::string &name) const
 {
-   ASSERT(hasArgument(name), "Bad argument [" << name << "]");
+   REALPAVER_ASSERT(hasArgument(name), "Bad argument [" << name << "]");
 
    for (auto v : args_)
       if (v.getName() == name)

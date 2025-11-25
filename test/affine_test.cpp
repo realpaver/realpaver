@@ -596,9 +596,9 @@ void test_cos_chebyshev_1()
    AffineForm::chebyshevCos(Interval(0.2, 1.2), alpha, dzeta, delta);
 
    std::cerr << std::setprecision(16) << std::endl;
-   DEBUG("alpha = " << alpha);
-   DEBUG("dzeta = " << dzeta);
-   DEBUG("delta = " << delta);
+   REALPAVER_DEBUG("alpha = " << alpha);
+   REALPAVER_DEBUG("dzeta = " << dzeta);
+   REALPAVER_DEBUG("delta = " << delta);
 
    Interval x = -0.617708823365 + Interval(-1.0e-8, 1.0e-8);
    TEST_TRUE(x.contains(alpha));

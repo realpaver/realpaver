@@ -18,10 +18,10 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Term.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 
@@ -475,7 +475,7 @@ Term operator*(Term l, Term r)
 
 Term operator/(Term l, Term r)
 {
-   ASSERT(!r.isZero(), "Term divided by zero");
+   REALPAVER_ASSERT(!r.isZero(), "Term divided by zero");
 
    if (!Term::simplification())
       return Term(std::make_shared<TermDiv>(l.rep(), r.rep()));
@@ -828,7 +828,7 @@ TermCst::TermCst(const Interval &x)
     : TermRep(TermSymbol::Cst, NodePriority::Low)
     , x_(x)
 {
-   ASSERT(!x.isEmpty(), "Bad constant term " << x);
+   REALPAVER_ASSERT(!x.isEmpty(), "Bad constant term " << x);
 
    hcode_ = x.hashCode();
    constant_ = true;
@@ -1144,28 +1144,28 @@ size_t TermOp::arity() const
 
 TermRep::SharedRep TermOp::subTerm(size_t i) const
 {
-   ASSERT(i < arity(), "Access out of range to a term operand");
+   REALPAVER_ASSERT(i < arity(), "Access out of range to a term operand");
 
    return v_[i];
 }
 
 TermRep::SharedRep TermOp::left() const
 {
-   ASSERT(arity() == 2, "Access out of range to a term operand");
+   REALPAVER_ASSERT(arity() == 2, "Access out of range to a term operand");
 
    return v_[0];
 }
 
 TermRep::SharedRep TermOp::right() const
 {
-   ASSERT(arity() == 2, "Access out of range to a term operand");
+   REALPAVER_ASSERT(arity() == 2, "Access out of range to a term operand");
 
    return v_[1];
 }
 
 TermRep::SharedRep TermOp::child() const
 {
-   ASSERT(arity() == 1, "Access out of range to a term operand");
+   REALPAVER_ASSERT(arity() == 1, "Access out of range to a term operand");
 
    return v_[0];
 }
@@ -1721,7 +1721,7 @@ TermPow::TermPow(const SharedRep &t, int n)
     : TermOp(t, TermSymbol::Pow, NodePriority::High)
     , n_(n)
 {
-   ASSERT(n > 0, "Bad integral exponent in a term " << n);
+   REALPAVER_ASSERT(n > 0, "Bad integral exponent in a term " << n);
 
    size_t h = hash1<int>(n);
    hcode_ = hash2(h, hcode_);

@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Inflator.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Inflator.hpp"
 
 namespace realpaver {
 
@@ -58,14 +58,14 @@ double Inflator::getChi() const
 
 void Inflator::setDelta(double delta)
 {
-   ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
+   REALPAVER_ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
 
    delta_ = delta;
 }
 
 void Inflator::setChi(double chi)
 {
-   ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
+   REALPAVER_ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
 
    chi_ = chi;
 }

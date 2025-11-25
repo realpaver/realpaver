@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/RangeUnion.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Interval.hpp"
+#include "realpaver/RangeUnion.hpp"
 
 namespace realpaver {
 
@@ -56,7 +56,7 @@ size_t RangeUnion::size() const
 
 Range RangeUnion::operator[](size_t i) const
 {
-   ASSERT(i >= 0 && i < v_.size(), "Bad access in a range union @ " << i);
+   REALPAVER_ASSERT(i >= 0 && i < v_.size(), "Bad access in a range union @ " << i);
 
    return v_[i];
 }
@@ -83,9 +83,9 @@ RangeUnion::iterator RangeUnion::end()
 
 RangeUnion RangeUnion::subUnion(size_t i, size_t j) const
 {
-   ASSERT(i >= 0 && i < v_.size(), "Bad access in a range union @ " << i);
-   ASSERT(j >= 0 && j < v_.size(), "Bad access in a range union @ " << j);
-   ASSERT(i <= j, "Bad indexes used to create a sub range union");
+   REALPAVER_ASSERT(i >= 0 && i < v_.size(), "Bad access in a range union @ " << i);
+   REALPAVER_ASSERT(j >= 0 && j < v_.size(), "Bad access in a range union @ " << j);
+   REALPAVER_ASSERT(i <= j, "Bad indexes used to create a sub range union");
 
    RangeUnion u;
    for (size_t k = i; k <= j; ++k)

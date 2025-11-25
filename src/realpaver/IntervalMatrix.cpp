@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalMatrix.hpp"
 
 namespace realpaver {
 
@@ -34,12 +34,12 @@ IntervalMatrix::IntervalMatrix(
 {
    size_t nrows = l.size();
 
-   ASSERT(nrows > 0, "Bad initialization of interval matrix");
+   REALPAVER_ASSERT(nrows > 0, "Bad initialization of interval matrix");
 
    auto it = l.begin();
    size_t ncols = it->size();
 
-   ASSERT(ncols > 0, "Bad initialization of interval matrix");
+   REALPAVER_ASSERT(ncols > 0, "Bad initialization of interval matrix");
 
    setNrows(nrows);
    setNcols(ncols);
@@ -222,7 +222,8 @@ IntervalMatrix operator*(const RealMatrix &A, const IntervalMatrix &B)
 
 IntervalVector operator*(const IntervalMatrix &A, const IntervalVector &X)
 {
-   ASSERT(A.ncols() == X.size(), "Bad dimensions in a product of a matric and a vector");
+   REALPAVER_ASSERT(A.ncols() == X.size(),
+                    "Bad dimensions in a product of a matric and a vector");
 
    IntervalVector Y(A.nrows());
    for (size_t i = 0; i < A.nrows(); ++i)

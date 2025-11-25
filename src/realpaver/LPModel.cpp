@@ -737,7 +737,7 @@ double LPModel::certifiedCostSolution() const
    IntervalMatrix M = matrix().transpose();
    IntervalVector B = bounds(), C = cost(), R = M * dual - C, X = varBounds();
 
-   ASSERT(X.isFinite(), "Certification impossible due to an infinite bound");
+   REALPAVER_ASSERT(X.isFinite(), "Certification impossible due to an infinite bound");
 
    Interval val = dual * B - R * X;
 

@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/RangeSlicer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/RangeSlicer.hpp"
 
 namespace realpaver {
 
@@ -29,7 +29,7 @@ RangeSlicer::~RangeSlicer()
 
 size_t RangeSlicer::apply(const Range &x)
 {
-   ASSERT(x.nbElems() > 0, "Slicing of a degenerated range: " << x);
+   REALPAVER_ASSERT(x.nbElems() > 0, "Slicing of a degenerated range: " << x);
 
    cont_.clear();
    applyImpl(x);

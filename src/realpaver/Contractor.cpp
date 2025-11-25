@@ -19,7 +19,6 @@
  */
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 

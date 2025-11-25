@@ -26,18 +26,18 @@
 
 namespace realpaver {
 
-#if ASSERT_ON
-#define ASSERT(cond, msg)                                                                \
+#if REALPAVER_ASSERT_ON
+#define REALPAVER_ASSERT(cond, msg)                                                      \
    if (!(cond))                                                                          \
    THROW(msg)
 #else
-#define ASSERT(cond, msg)
+#define REALPAVER_ASSERT(cond, msg)
 #endif
 
-#if DEBUG_ON
-#define DEBUG(msg) std::cerr << msg << std::endl
+#if REALPAVER_DEBUG_ON
+#define REALPAVER_DEBUG(msg) std::cerr << msg << std::endl
 #else
-#define DEBUG(msg)
+#define REALPAVER_DEBUG(msg)
 #endif
 
 } // namespace realpaver

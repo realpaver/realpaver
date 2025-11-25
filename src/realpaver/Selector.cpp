@@ -27,7 +27,7 @@ Selector::Selector(Scope scop)
     : scop_(scop)
     , v_()
 {
-   ASSERT(!scop.isEmpty(), "Empty scope");
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope");
 }
 
 Selector::~Selector()

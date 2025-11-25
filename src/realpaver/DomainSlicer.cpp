@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/DomainSlicer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DomainSlicer.hpp"
 
 namespace realpaver {
 
@@ -65,7 +65,7 @@ DomainSlicer::iterator DomainSlicer::end()
 
 std::unique_ptr<Domain> DomainSlicer::next(iterator &it)
 {
-   ASSERT(it != end(), "Bad iterator in a domain slicer");
+   REALPAVER_ASSERT(it != end(), "Bad iterator in a domain slicer");
 
    std::unique_ptr<Domain> p = std::move(*it);
    iterator aux = it;
@@ -78,11 +78,11 @@ std::unique_ptr<Domain> DomainSlicer::next(iterator &it)
 
 void BinaryDomainSlicer::applyImpl(Domain *dom)
 {
-   ASSERT(dynamic_cast<BinaryDomain *>(dom) != nullptr,
-          "Bad domain type as input of a binary slicer");
+   REALPAVER_ASSERT(dynamic_cast<BinaryDomain *>(dom) != nullptr,
+                    "Bad domain type as input of a binary slicer");
 
-   ASSERT(static_cast<BinaryDomain *>(dom)->getVal().isUniverse(),
-          "Binary domain not splitable");
+   REALPAVER_ASSERT(static_cast<BinaryDomain *>(dom)->getVal().isUniverse(),
+                    "Binary domain not splitable");
 
    push(new BinaryDomain(ZeroOne::zero()));
    push(new BinaryDomain(ZeroOne::one()));
@@ -94,16 +94,17 @@ IntervalDomainBisecter::IntervalDomainBisecter(double sip)
     : DomainSlicer()
     , sip_(sip)
 {
-   ASSERT(sip > 0.0 && sip < 1.0, "Bad parameter of interval bisecter");
+   REALPAVER_ASSERT(sip > 0.0 && sip < 1.0, "Bad parameter of interval bisecter");
 }
 
 void IntervalDomainBisecter::applyImpl(Domain *dom)
 {
    IntervalDomain *ptr = dynamic_cast<IntervalDomain *>(dom);
 
-   ASSERT(ptr != nullptr, "Bad domain type as input of an interval domain slicer");
+   REALPAVER_ASSERT(ptr != nullptr,
+                    "Bad domain type as input of an interval domain slicer");
 
-   ASSERT(!ptr->isCanonical(), "Interval domain not splitable");
+   REALPAVER_ASSERT(!ptr->isCanonical(), "Interval domain not splitable");
 
    const Interval &x = ptr->getVal();
    double m = (x.isInf()) ? x.midpoint() : x.left() + sip_ * x.width();
@@ -119,16 +120,17 @@ IntervalUnionDomainBisecter::IntervalUnionDomainBisecter(double sip)
     : DomainSlicer()
     , sip_(sip)
 {
-   ASSERT(sip > 0.0 && sip < 1.0, "Bad parameter of interval bisecter");
+   REALPAVER_ASSERT(sip > 0.0 && sip < 1.0, "Bad parameter of interval bisecter");
 }
 
 void IntervalUnionDomainBisecter::applyImpl(Domain *dom)
 {
    IntervalUnionDomain *ptr = dynamic_cast<IntervalUnionDomain *>(dom);
 
-   ASSERT(ptr != nullptr, "Bad domain type as input of an interval union domain slicer");
+   REALPAVER_ASSERT(ptr != nullptr,
+                    "Bad domain type as input of an interval union domain slicer");
 
-   ASSERT(!ptr->isCanonical(), "Interval union domain not splitable");
+   REALPAVER_ASSERT(!ptr->isCanonical(), "Interval union domain not splitable");
 
    const IntervalUnion &u = ptr->getVal();
    size_t n = u.size();
@@ -157,9 +159,9 @@ void RangeDomainBisecter::applyImpl(Domain *dom)
 {
    RangeDomain *ptr = dynamic_cast<RangeDomain *>(dom);
 
-   ASSERT(ptr != nullptr, "Bad domain type as input of a range domain slicer");
+   REALPAVER_ASSERT(ptr != nullptr, "Bad domain type as input of a range domain slicer");
 
-   ASSERT(!ptr->isCanonical(), "Range domain not splitable");
+   REALPAVER_ASSERT(!ptr->isCanonical(), "Range domain not splitable");
 
    const Range &r = ptr->getVal();
    Integer m = r.midpoint();
@@ -173,9 +175,10 @@ void RangeUnionDomainBisecter::applyImpl(Domain *dom)
 {
    RangeUnionDomain *ptr = dynamic_cast<RangeUnionDomain *>(dom);
 
-   ASSERT(ptr != nullptr, "Bad domain type as input of a range union domain slicer");
+   REALPAVER_ASSERT(ptr != nullptr,
+                    "Bad domain type as input of a range union domain slicer");
 
-   ASSERT(!ptr->isCanonical(), "Range union domain not splitable");
+   REALPAVER_ASSERT(!ptr->isCanonical(), "Range union domain not splitable");
 
    const RangeUnion &u = ptr->getVal();
    size_t n = u.size();

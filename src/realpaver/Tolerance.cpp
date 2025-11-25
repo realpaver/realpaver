@@ -28,8 +28,8 @@ Tolerance::Tolerance(double rtol, double atol)
     : rtol_(rtol)
     , atol_(atol)
 {
-   ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
-   ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
+   REALPAVER_ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
+   REALPAVER_ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
 }
 
 double Tolerance::getRelTol() const
@@ -44,14 +44,14 @@ double Tolerance::getAbsTol() const
 
 void Tolerance::setRelTol(double val)
 {
-   ASSERT(val >= 0.0, "A relative tolerance must be positive");
+   REALPAVER_ASSERT(val >= 0.0, "A relative tolerance must be positive");
 
    rtol_ = val;
 }
 
 void Tolerance::setAbsTol(double val)
 {
-   ASSERT(val >= 0.0, "An absolute tolerance must be positive");
+   REALPAVER_ASSERT(val >= 0.0, "An absolute tolerance must be positive");
 
    atol_ = val;
 }

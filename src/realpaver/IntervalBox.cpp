@@ -29,7 +29,7 @@ IntervalBox::IntervalBox(Scope scop)
     : IntervalVector(scop.size())
     , scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
 
    for (const auto &v : scop)
       set(v, v.getDomain()->intervalHull());
@@ -39,22 +39,22 @@ IntervalBox::IntervalBox(Scope scop, const Interval &x)
     : IntervalVector(scop.size(), x)
     , scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
 }
 
 IntervalBox::IntervalBox(Scope scop, const IntervalVector &X)
     : IntervalVector(X)
     , scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
-   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
+   REALPAVER_ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
 }
 
 IntervalBox::IntervalBox(Scope scop, const RealPoint &pt)
     : IntervalVector(scop.size())
     , scop_(scop)
 {
-   ASSERT(pt.scope().contains(scop), "Bad initialization of an interval box");
+   REALPAVER_ASSERT(pt.scope().contains(scop), "Bad initialization of an interval box");
 
    for (const auto &v : scop)
       set(v, pt.get(v));
@@ -70,15 +70,15 @@ IntervalBox::IntervalBox(Scope scop, const RealVector &X)
     : IntervalVector(X)
     , scop_(scop)
 {
-   ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
-   ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope used to create an interval box");
+   REALPAVER_ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
 }
 
 IntervalBox::IntervalBox(const IntervalBox &B, Scope scop)
     : IntervalVector(scop.size())
     , scop_(scop)
 {
-   ASSERT(B.scope().contains(scop), "Bad scope used to create a sub-box");
+   REALPAVER_ASSERT(B.scope().contains(scop), "Bad scope used to create a sub-box");
 
    for (const auto &v : scop)
       set(v, B.get(v));
@@ -99,13 +99,13 @@ Scope IntervalBox::scope() const
 
 Interval IntervalBox::get(const Variable &v) const
 {
-   ASSERT(scop_.contains(v), "Bad access in an interval box");
+   REALPAVER_ASSERT(scop_.contains(v), "Bad access in an interval box");
    return operator[](scop_.index(v));
 }
 
 void IntervalBox::set(const Variable &v, const Interval &x)
 {
-   ASSERT(scop_.contains(v), "Bad access in an interval box");
+   REALPAVER_ASSERT(scop_.contains(v), "Bad access in an interval box");
 
    operator[](scop_.index(v)) = x;
 }
@@ -209,10 +209,11 @@ RealPoint IntervalBox::midpointOnScope(const Scope &scop) const
 
 void IntervalBox::midpointOnScope(const Scope &scop, RealPoint &pt) const
 {
-   ASSERT(scop_.contains(scop), "Bad scope used t create the midpoint of a box" << scop);
+   REALPAVER_ASSERT(scop_.contains(scop),
+                    "Bad scope used t create the midpoint of a box" << scop);
 
-   ASSERT(pt.scope().contains(scop),
-          "Bad scope used t create the midpoint of a box" << scop);
+   REALPAVER_ASSERT(pt.scope().contains(scop),
+                    "Bad scope used t create the midpoint of a box" << scop);
 
    for (const auto &v : scop)
       pt.set(v, get(v).midpoint());
@@ -220,7 +221,7 @@ void IntervalBox::midpointOnScope(const Scope &scop, RealPoint &pt) const
 
 IntervalBox IntervalBox::subRegion(const Scope &scop) const
 {
-   ASSERT(scop_.contains(scop), "Bad scope used to create a sub-box " << scop);
+   REALPAVER_ASSERT(scop_.contains(scop), "Bad scope used to create a sub-box " << scop);
 
    IntervalBox B(scop);
    for (const auto &v : scop)
@@ -235,8 +236,8 @@ double IntervalBox::distance(const IntervalBox &B) const
 
 double IntervalBox::distanceOnScope(const IntervalBox &B, const Scope &scop) const
 {
-   ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
-          "Bad scopes used to calculate the distance between interval boxes");
+   REALPAVER_ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
+                    "Bad scopes used to calculate the distance between interval boxes");
 
    double d = 0.0;
    for (const auto &v : scop)
@@ -255,8 +256,8 @@ double IntervalBox::gap(const IntervalBox &B) const
 
 double IntervalBox::gapOnScope(const IntervalBox &B, const Scope &scop) const
 {
-   ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
-          "Bad scopes used to calculate the gap between interval boxes");
+   REALPAVER_ASSERT(scop_.contains(scop) && B.scop_.contains(scop),
+                    "Bad scopes used to calculate the gap between interval boxes");
 
    double gap = 0.0;
    for (const auto &v : scop)
@@ -270,8 +271,8 @@ double IntervalBox::gapOnScope(const IntervalBox &B, const Scope &scop) const
 
 void IntervalBox::inflateOnScope(const Scope &scop, double delta, double chi)
 {
-   ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
-   ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
+   REALPAVER_ASSERT(delta > 1.0, "Bad parameter delta of inflation: " << delta);
+   REALPAVER_ASSERT(chi > 0.0, "Bad parameter chi of inflation: " << chi);
 
    for (const auto &v : scop)
       set(v, get(v).inflate(delta, chi));
@@ -389,8 +390,8 @@ bool IntervalBox::improves(const IntervalBox &old, double tol)
 
 bool IntervalBox::improvesOnScope(const IntervalBox &old, double tol, const Scope &scop)
 {
-   ASSERT(scop_.contains(scop) && scop_.contains(scop),
-          "Bad scopes used to test an improvement between interval boxes");
+   REALPAVER_ASSERT(scop_.contains(scop) && scop_.contains(scop),
+                    "Bad scopes used to test an improvement between interval boxes");
 
    for (const auto &v : scop)
       if (get(v).improves(old.get(v), tol))

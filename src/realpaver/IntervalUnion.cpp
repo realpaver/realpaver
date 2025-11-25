@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/IntervalUnion.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalUnion.hpp"
 
 namespace realpaver {
 
@@ -48,7 +48,7 @@ size_t IntervalUnion::size() const
 
 const Interval &IntervalUnion::operator[](size_t i) const
 {
-   ASSERT(i >= 0 && i < v_.size(), "Bad access in an interval union @ " << i);
+   REALPAVER_ASSERT(i >= 0 && i < v_.size(), "Bad access in an interval union @ " << i);
 
    return v_[i];
 }
@@ -75,9 +75,9 @@ IntervalUnion::iterator IntervalUnion::end()
 
 IntervalUnion IntervalUnion::subUnion(size_t i, size_t j) const
 {
-   ASSERT(i >= 0 && i < v_.size(), "Bad access in an interval union @ " << i);
-   ASSERT(j >= 0 && j < v_.size(), "Bad access in an interval union @ " << j);
-   ASSERT(i <= j, "Bad indexes used to create a sub interval union");
+   REALPAVER_ASSERT(i >= 0 && i < v_.size(), "Bad access in an interval union @ " << i);
+   REALPAVER_ASSERT(j >= 0 && j < v_.size(), "Bad access in an interval union @ " << j);
+   REALPAVER_ASSERT(i <= j, "Bad indexes used to create a sub interval union");
 
    IntervalUnion u;
    for (size_t k = i; k <= j; ++k)

@@ -26,7 +26,7 @@ ContractorLoop::ContractorLoop(SharedContractor op)
     : op_(op)
     , tol_(Params::GetDblParam("LOOP_CONTRACTOR_TOL"))
 {
-   ASSERT(op != nullptr, "Bad operator in the loop contractor");
+   REALPAVER_ASSERT(op != nullptr, "Bad operator in the loop contractor");
 }
 
 double ContractorLoop::getTol() const
@@ -36,7 +36,7 @@ double ContractorLoop::getTol() const
 
 void ContractorLoop::setTol(double tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must be in [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must be in [0, 1]");
    tol_ = tol;
 }
 
@@ -47,7 +47,8 @@ Scope ContractorLoop::scope() const
 
 Proof ContractorLoop::contract(IntervalBox &B)
 {
-   ASSERT(B.scope().contains(op_->scope()), "Bad scopes in the loop contractor");
+   REALPAVER_ASSERT(B.scope().contains(op_->scope()),
+                    "Bad scopes in the loop contractor");
 
    bool iter = true;
    IntervalBox prev(B);

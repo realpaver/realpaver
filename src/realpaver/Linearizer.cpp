@@ -33,7 +33,7 @@ Linearizer::Linearizer(SharedDag dag)
     , tol_(Params::GetDblParam("RELAXATION_EQ_TOL"))
     , mvv_()
 {
-   ASSERT(dag_ != nullptr, "No dag in a polytope maker");
+   REALPAVER_ASSERT(dag_ != nullptr, "No dag in a polytope maker");
 
    for (size_t i = 0; i < dag->nbFuns(); ++i)
       lfun_.push_back(i);
@@ -48,12 +48,12 @@ Linearizer::Linearizer(SharedDag dag, const IndexList &lfun)
     , tol_(Params::GetDblParam("RELAXATION_TOL"))
     , mvv_()
 {
-   ASSERT(dag_ != nullptr, "No dag in a polytope maker");
-   ASSERT(!lfun.empty(), "No list of functions in a polytope maker");
+   REALPAVER_ASSERT(dag_ != nullptr, "No dag in a polytope maker");
+   REALPAVER_ASSERT(!lfun.empty(), "No list of functions in a polytope maker");
 
    for (size_t i : lfun)
    {
-      ASSERT(i < dag_->nbFuns(), "Bad function index in a polytope maker");
+      REALPAVER_ASSERT(i < dag_->nbFuns(), "Bad function index in a polytope maker");
 
       lfun_.push_back(i);
       scop_.insert(dag->fun(i)->scope());
@@ -79,14 +79,14 @@ Scope Linearizer::scope() const
 size_t Linearizer::linVarIndex(Variable v) const
 {
    auto it = mvv_.find(v.id());
-   ASSERT(it != mvv_.end(), "Iterator null");
+   REALPAVER_ASSERT(it != mvv_.end(), "Iterator null");
    return it->second;
 }
 
 size_t Linearizer::linVarIndex(size_t id) const
 {
    auto it = mvv_.find(id);
-   ASSERT(it != mvv_.end(), "Iterator null");
+   REALPAVER_ASSERT(it != mvv_.end(), "Iterator null");
    return it->second;
 }
 
@@ -106,7 +106,7 @@ double Linearizer::getRelaxTol() const
 
 void Linearizer::setRelaxTol(double tol)
 {
-   ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
+   REALPAVER_ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
 
    tol_ = tol;
 }
@@ -148,7 +148,7 @@ void LinearizerTaylor::useHansenDerivatives(bool b)
 
 void LinearizerTaylor::fixCorner(const Bitset &corner, bool opposite)
 {
-   ASSERT(corner_.size() == corner.size(), "Bad corner");
+   REALPAVER_ASSERT(corner_.size() == corner.size(), "Bad corner");
 
    style_ = opposite ? CornerStyle::UserOpposite : CornerStyle::User;
    corner_ = corner;
@@ -440,8 +440,8 @@ LinearizerAffineTaylor::LinearizerAffineTaylor(SharedDag dag,
     , affine_(std::move(affine))
     , taylor_(std::move(taylor))
 {
-   ASSERT(affine_ != nullptr, "Null pointer (affine linearizer)");
-   ASSERT(taylor_ != nullptr, "Null pointer (taylor linearizer)");
+   REALPAVER_ASSERT(affine_ != nullptr, "Null pointer (affine linearizer)");
+   REALPAVER_ASSERT(taylor_ != nullptr, "Null pointer (taylor linearizer)");
 }
 
 bool LinearizerAffineTaylor::make(LPModel &lpm, const IntervalBox &B)

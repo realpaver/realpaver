@@ -32,21 +32,21 @@ ContractorACID::ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContracto
     , ssr_(std::move(ssr))
     , op_(op)
 {
-   ASSERT(ssr_ != nullptr, "No smear sum rel object in ACID");
-   ASSERT(op_ != nullptr, "No operator in ACID");
-   ASSERT(op->scope().contains(ssr_->scope()), "Bad scopes in ACID");
+   REALPAVER_ASSERT(ssr_ != nullptr, "No smear sum rel object in ACID");
+   REALPAVER_ASSERT(op_ != nullptr, "No operator in ACID");
+   REALPAVER_ASSERT(op->scope().contains(ssr_->scope()), "Bad scopes in ACID");
 
-   ASSERT(ns3B >= 2, "Bad number of slices for 3B contractors");
-   ASSERT(nsCID >= 2, "Bad number of slices for CID contractors");
-   ASSERT(learnLength >= 2, "Bad learning length in ACID");
-   ASSERT(cycleLength > learnLength, "Bad cycle length in ACID");
-   ASSERT(ctRatio > 0.0 && ctRatio < 1.0, "Bad ctRatio in ACID");
+   REALPAVER_ASSERT(ns3B >= 2, "Bad number of slices for 3B contractors");
+   REALPAVER_ASSERT(nsCID >= 2, "Bad number of slices for CID contractors");
+   REALPAVER_ASSERT(learnLength >= 2, "Bad learning length in ACID");
+   REALPAVER_ASSERT(cycleLength > learnLength, "Bad cycle length in ACID");
+   REALPAVER_ASSERT(ctRatio > 0.0 && ctRatio < 1.0, "Bad ctRatio in ACID");
 
    scop_ = op_->scope();
    n_ = op_->scope().size();
    numVarCID_ = n_;
 
-   ASSERT(n_ > 0, "No variable in ACID");
+   REALPAVER_ASSERT(n_ > 0, "No variable in ACID");
 
    for (size_t i = 0; i < n_; ++i)
    {

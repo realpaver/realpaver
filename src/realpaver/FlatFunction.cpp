@@ -140,7 +140,8 @@ FlatFunction::FlatFunction(const DagFun *f, const IntervalBox &B, Variable v)
     , cst_()
     , var_()
 {
-   ASSERT(f->scope().contains(v), "The DAG function lustr depend on " << v.getName());
+   REALPAVER_ASSERT(f->scope().contains(v),
+                    "The DAG function lustr depend on " << v.getName());
 
    scop_.insert(v);
 
@@ -1210,9 +1211,9 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector &V)
 
 void FlatFunction::iDiff(const IntervalBox &B, IntervalVector &G)
 {
-   ASSERT(scop_.size() == G.size(),
-          "The size of the gradient must be equal to the number "
-              << "of variables of the flat function");
+   REALPAVER_ASSERT(scop_.size() == G.size(),
+                    "The size of the gradient must be equal to the number "
+                        << "of variables of the flat function");
 
    // forward phase: evaluates this on B
    Interval val = iEval(B);
@@ -1444,9 +1445,9 @@ void FlatFunction::iDiff()
 
 void FlatFunction::rDiff(const RealPoint &pt, RealVector &G)
 {
-   ASSERT(scop_.size() == G.size(),
-          "The size of the gradient must be equal to the number "
-              << "of variables of the flat function");
+   REALPAVER_ASSERT(scop_.size() == G.size(),
+                    "The size of the gradient must be equal to the number "
+                        << "of variables of the flat function");
 
    // forward phase: evaluates this at pt
    double val = rEval(pt);

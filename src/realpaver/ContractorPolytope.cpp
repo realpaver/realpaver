@@ -36,7 +36,7 @@ ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
     , loop_(Params::GetStrParam("POLYTOPE_HULL_LOOP") == "YES")
     , looptol_(Params::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
 {
-   ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
+   REALPAVER_ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
 }
 
 double ContractorPolytope::getRelaxTol() const
@@ -46,7 +46,7 @@ double ContractorPolytope::getRelaxTol() const
 
 void ContractorPolytope::setRelaxTol(double tol)
 {
-   ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
+   REALPAVER_ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
 
    lzr_->setRelaxTol(tol);
 }
@@ -83,14 +83,15 @@ double ContractorPolytope::getFeasTol() const
 
 void ContractorPolytope::setFeasTol(double tol)
 {
-   ASSERT(tol > 0.0, "Bad tolerance in the polytope hull contractor");
+   REALPAVER_ASSERT(tol > 0.0, "Bad tolerance in the polytope hull contractor");
 
    feastol_ = tol;
 }
 
 void ContractorPolytope::enforceLoop(bool loop, double tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    loop_ = loop;
    looptol_ = tol;
 }
@@ -170,7 +171,7 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
 
       LOG_LOW("LP solved: " << sense << " " << v.getName());
 
-      DEBUG("\n\nLP solved: " << sense << " " << v.getName());
+      REALPAVER_DEBUG("\n\nLP solved: " << sense << " " << v.getName());
       solver.print(std::cerr);
       std::cerr << std::endl;
 
@@ -178,7 +179,7 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
       status = (status != LPStatus::Optimal) ? solver.optimize() : solver.reoptimize();
 
       LOG_LOW("Status : " << status);
-      DEBUG("Status : " << status);
+      REALPAVER_DEBUG("Status : " << status);
 
       switch (status)
       {
@@ -187,7 +188,7 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
          LOG_LOW("Certified cost: " << bnd);
          LOG_LOW("Primal: " << solver.primalSolution());
 
-         DEBUG("bnd = " << bnd);
+         REALPAVER_DEBUG("bnd = " << bnd);
          Interval x = B.get(v);
          if (sense == LPSense::Min)
          {

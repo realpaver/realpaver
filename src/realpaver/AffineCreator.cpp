@@ -29,7 +29,7 @@ AffineCreator::AffineCreator(SharedDag dag, bool minrange)
     , v_(dag_->nbNodes())
     , lfun_(dag->nbFuns())
 {
-   ASSERT(dag != nullptr, "Null pointer");
+   REALPAVER_ASSERT(dag != nullptr, "Null pointer");
 
    for (size_t i = 0; i < dag->nbFuns(); ++i)
       lfun_[i] = i;
@@ -41,8 +41,8 @@ AffineCreator::AffineCreator(SharedDag dag, const IndexList &lfun, bool minrange
     , v_(dag_->nbNodes())
     , lfun_(lfun)
 {
-   ASSERT(dag != nullptr, "Null pointer");
-   ASSERT(!lfun.empty(), "Empty list of indexes");
+   REALPAVER_ASSERT(dag != nullptr, "Null pointer");
+   REALPAVER_ASSERT(!lfun.empty(), "Empty list of indexes");
 }
 
 AffineCreator::AffineCreator(SharedDag dag, size_t i, bool minrange)
@@ -51,8 +51,8 @@ AffineCreator::AffineCreator(SharedDag dag, size_t i, bool minrange)
     , v_(dag_->nbNodes())
     , lfun_(1)
 {
-   ASSERT(dag != nullptr, "Null pointer");
-   ASSERT(i < dag->nbFuns(), "Bad function index in a DAG @ " << i);
+   REALPAVER_ASSERT(dag != nullptr, "Null pointer");
+   REALPAVER_ASSERT(i < dag->nbFuns(), "Bad function index in a DAG @ " << i);
 
    lfun_[0] = i;
 }
@@ -84,7 +84,7 @@ void AffineCreator::useMinrange(bool minrange)
 
 void AffineCreator::create(const IntervalBox &B)
 {
-   ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
+   REALPAVER_ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
 
    AffineForm::useMinrange(minrange_);
 

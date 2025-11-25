@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "DomainBox.hpp"
 #include "AssertDebug.hpp"
+#include "DomainBox.hpp"
 #include "IntervalBox.hpp"
 #include "Logger.hpp"
 
@@ -29,7 +29,7 @@ DomainBox::DomainBox(Scope scop)
     : scop_(scop)
     , doms_(scop.size())
 {
-   ASSERT(!scop_.isEmpty(), "Creation of a domain box with an empty scope");
+   REALPAVER_ASSERT(!scop_.isEmpty(), "Creation of a domain box with an empty scope");
 
    for (size_t i = 0; i < size(); ++i)
       doms_[i] = scop_.var(i).getDomain()->clone();
@@ -78,30 +78,32 @@ bool DomainBox::isEmpty() const
 
 Domain *DomainBox::get(const Variable &v) const
 {
-   ASSERT(scop_.contains(v), "Bad access in a domain box to variable " << v.getName());
+   REALPAVER_ASSERT(scop_.contains(v),
+                    "Bad access in a domain box to variable " << v.getName());
 
    return doms_[scop_.index(v)];
 }
 
 Domain *DomainBox::get(size_t i) const
 {
-   ASSERT(i >= 0 && i < size(), "Bad access in a domain box at index " << i);
+   REALPAVER_ASSERT(i >= 0 && i < size(), "Bad access in a domain box at index " << i);
 
    return doms_[i];
 }
 
 Variable DomainBox::var(size_t i) const
 {
-   ASSERT(i >= 0 && i < size(), "Bad access in a domain box at index " << i);
+   REALPAVER_ASSERT(i >= 0 && i < size(), "Bad access in a domain box at index " << i);
 
    return scop_.var(i);
 }
 
 void DomainBox::set(const Variable &v, std::unique_ptr<Domain> p)
 {
-   ASSERT(scop_.contains(v), "Bad access in a domain box to variable " << v.getName());
+   REALPAVER_ASSERT(scop_.contains(v),
+                    "Bad access in a domain box to variable " << v.getName());
 
-   ASSERT((p != nullptr) && (!p->isEmpty()), "Bad domain assignment in a box");
+   REALPAVER_ASSERT((p != nullptr) && (!p->isEmpty()), "Bad domain assignment in a box");
 
    size_t i = scop_.index(v);
    delete doms_[i];
@@ -165,8 +167,8 @@ double DomainBox::gap(const DomainBox &box) const
 
 double DomainBox::gapOnScope(const DomainBox &box, const Scope &scop) const
 {
-   ASSERT(scop_.contains(scop) && box.scop_.contains(scop),
-          "Bad scopes used to calculate the gap between domain boxes");
+   REALPAVER_ASSERT(scop_.contains(scop) && box.scop_.contains(scop),
+                    "Bad scopes used to calculate the gap between domain boxes");
 
    double gap = 0.0;
    for (const auto &v : scop)

@@ -1,6 +1,9 @@
 #include "realpaver/LPSolver.hpp"
 #include "test_config.hpp"
 #include <vector>
+#ifdef REALPAVER_DEBUG_ON
+#include "realpaver/Logger.hpp"
+#endif
 
 void test_optimal_1()
 {
@@ -709,6 +712,9 @@ void test_model()
 
 int main()
 {
+#ifdef REALPAVER_DEBUG_ON
+   Logger::init(LogLevel::full, "lp_solver_test.log");
+#endif
    TEST(test_optimal_1)
    TEST(test_optimal_2)
    TEST(test_optimal_safe_1)

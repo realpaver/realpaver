@@ -159,7 +159,7 @@ template <typename T> void NumericVector<T>::resize(size_t n)
 template <typename T>
 typename NumericVector<T>::ValueType NumericVector<T>::operator[](size_t i) const
 {
-   ASSERT(i < size(), "Bad access in a vector at index " << i);
+   REALPAVER_ASSERT(i < size(), "Bad access in a vector at index " << i);
 
    return elems_[i];
 }
@@ -167,7 +167,7 @@ typename NumericVector<T>::ValueType NumericVector<T>::operator[](size_t i) cons
 template <typename T>
 typename NumericVector<T>::RefType NumericVector<T>::operator[](size_t i)
 {
-   ASSERT(i < size(), "Bad access in a vector at index " << i);
+   REALPAVER_ASSERT(i < size(), "Bad access in a vector at index " << i);
 
    return elems_[i];
 }
@@ -180,7 +180,7 @@ template <typename T> void NumericVector<T>::setAll(ConstRefType x)
 
 template <typename T> void NumericVector<T>::setAll(const NumericVector &V)
 {
-   ASSERT(size() == V.size(), "Bad assignemnt of numeric vectors");
+   REALPAVER_ASSERT(size() == V.size(), "Bad assignemnt of numeric vectors");
 
    for (size_t i = 0; i < elems_.size(); ++i)
       elems_[i] = V.elems_[i];
@@ -257,8 +257,8 @@ template <typename T>
 void NumericVector<T>::add(const NumericVector &V, const NumericVector &W,
                            NumericVector &res)
 {
-   ASSERT(V.size() == W.size(), "Bad vector sizes in an addition");
-   ASSERT(V.size() == res.size(), "Bad vector sizes in an addition");
+   REALPAVER_ASSERT(V.size() == W.size(), "Bad vector sizes in an addition");
+   REALPAVER_ASSERT(V.size() == res.size(), "Bad vector sizes in an addition");
 
    for (size_t i = 0; i < V.size(); ++i)
       res.elems_[i] = TraitsType::add(V.elems_[i], W.elems_[i]);
@@ -268,8 +268,8 @@ template <typename T>
 void NumericVector<T>::sub(const NumericVector &V, const NumericVector &W,
                            NumericVector &res)
 {
-   ASSERT(V.size() == W.size(), "Bad vector sizes in a subtraction");
-   ASSERT(V.size() == res.size(), "Bad vector sizes in a subtraction");
+   REALPAVER_ASSERT(V.size() == W.size(), "Bad vector sizes in a subtraction");
+   REALPAVER_ASSERT(V.size() == res.size(), "Bad vector sizes in a subtraction");
 
    for (size_t i = 0; i < V.size(); ++i)
       res.elems_[i] = TraitsType::sub(V.elems_[i], W.elems_[i]);
@@ -278,7 +278,7 @@ void NumericVector<T>::sub(const NumericVector &V, const NumericVector &W,
 template <typename T>
 void NumericVector<T>::usb(const NumericVector &V, NumericVector &res)
 {
-   ASSERT(V.size() == res.size(), "Bad vector sizes in a subtraction");
+   REALPAVER_ASSERT(V.size() == res.size(), "Bad vector sizes in a subtraction");
 
    for (size_t i = 0; i < V.size(); ++i)
       res.elems_[i] = TraitsType::usb(V.elems_[i]);
@@ -288,7 +288,7 @@ template <typename T>
 void NumericVector<T>::mulScalar(ConstRefType a, const NumericVector &V,
                                  NumericVector &res)
 {
-   ASSERT(V.size() == res.size(), "Bad vector sizes in a multiplication");
+   REALPAVER_ASSERT(V.size() == res.size(), "Bad vector sizes in a multiplication");
 
    for (size_t i = 0; i < V.size(); ++i)
       res.elems_[i] = TraitsType::mul(a, V.elems_[i]);
@@ -298,7 +298,7 @@ template <typename T>
 void NumericVector<T>::divScalar(const NumericVector &V, ConstRefType a,
                                  NumericVector &res)
 {
-   ASSERT(V.size() == res.size(), "Bad vector sizes in a multiplication");
+   REALPAVER_ASSERT(V.size() == res.size(), "Bad vector sizes in a multiplication");
 
    for (size_t i = 0; i < V.size(); ++i)
       res.elems_[i] = TraitsType::div(a, V.elems_[i]);

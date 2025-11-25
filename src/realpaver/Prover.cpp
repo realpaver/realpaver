@@ -154,7 +154,7 @@ double Prover::getInflationDelta() const
 
 void Prover::setInflationDelta(const double &val)
 {
-   ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
+   REALPAVER_ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
    delta_ = val;
 
    if (mnewton_ != nullptr)
@@ -171,7 +171,7 @@ double Prover::getInflationChi() const
 
 void Prover::setInflationChi(const double &val)
 {
-   ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
+   REALPAVER_ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
    chi_ = val;
 
    if (mnewton_ != nullptr)

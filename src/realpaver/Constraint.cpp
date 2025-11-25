@@ -24,8 +24,8 @@
 #include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
 
-#include <numeric>
 #include <algorithm>
+#include <numeric>
 
 namespace realpaver {
 
@@ -738,7 +738,8 @@ ArithCtrIn::ArithCtrIn(Term t, const Interval &x)
     : ArithCtrBinary(t, x, RelSymbol::In)
     , x_(x)
 {
-   ASSERT(!(x.isEmpty() || x.isUniverse()), "Bad interval target in a IN constraint");
+   REALPAVER_ASSERT(!(x.isEmpty() || x.isUniverse()),
+                    "Bad interval target in a IN constraint");
 
    fun_ = std::make_shared<FlatFunction>(t, x);
 }
@@ -874,7 +875,7 @@ void TableCtrCol::addValue(const Interval &x)
 
 Interval TableCtrCol::getVal(size_t i) const
 {
-   ASSERT(i < size(), "Bad access in a column of a table constraint @ " << i);
+   REALPAVER_ASSERT(i < size(), "Bad access in a column of a table constraint @ " << i);
    return vval_[i];
 }
 
@@ -895,8 +896,8 @@ TableCtr::TableCtr(const std::initializer_list<TableCtrCol> &l)
     : ConstraintRep(RelSymbol::Table)
     , vcol_(l)
 {
-   ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
-   ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
+   REALPAVER_ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
+   REALPAVER_ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
 
    // makes the scope and calculates the hash code
    makeScopeAndHashCode();
@@ -910,8 +911,8 @@ TableCtr::TableCtr(const std::initializer_list<Variable> &vars,
    size_t nbvar = vars.size();
    size_t nbitv = values.size();
 
-   ASSERT(nbvar > 0 && nbitv > nbvar && (nbitv % nbvar == 0),
-          "Bad initialization of a constraint table");
+   REALPAVER_ASSERT(nbvar > 0 && nbitv > nbvar && (nbitv % nbvar == 0),
+                    "Bad initialization of a constraint table");
 
    // creates the columns
    for (auto itv = vars.begin(); itv != vars.end(); ++itv)
@@ -975,30 +976,31 @@ size_t TableCtr::nbRows() const
 
 Variable TableCtr::getVar(size_t j) const
 {
-   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   REALPAVER_ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j].getVar();
 }
 
 Interval TableCtr::getVal(size_t i, size_t j) const
 {
-   ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
-   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   REALPAVER_ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
+   REALPAVER_ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j].getVal(i);
 }
 
 TableCtrCol TableCtr::getCol(size_t j) const
 {
-   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   REALPAVER_ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j];
 }
 
 void TableCtr::addCol(const TableCtrCol &col)
 {
-   ASSERT(vcol_.empty() || col.size() == nbRows(),
-          "Bad insertion of a new column in a table constraint");
+   REALPAVER_ASSERT(vcol_.empty() || col.size() == nbRows(),
+                    "Bad insertion of a new column in a table constraint");
 
-   ASSERT(!dependsOn(col.getVar()),
-          "Variable already present in a table constraint: " << col.getVar().getName());
+   REALPAVER_ASSERT(
+       !dependsOn(col.getVar()),
+       "Variable already present in a table constraint: " << col.getVar().getName());
 
    vcol_.push_back(col);
 
@@ -1413,14 +1415,15 @@ PiecewiseCtr::PiecewiseCtr(Variable v, const std::initializer_list<Variable> &bi
     , constraints_()
     , guard_hull_(Interval::emptyset())
 {
-   ASSERT(binaries.size() == intervals.size() && intervals.size() == constraints.size(),
-          "Error: inconsistent number of pieces");
+   REALPAVER_ASSERT(binaries.size() == intervals.size() &&
+                        intervals.size() == constraints.size(),
+                    "Error: inconsistent number of pieces");
    hcode_ = 0;
    Scope scop;
    scop.insert(v_);
    for (auto b : binaries_)
    {
-      ASSERT(b.isBinary(), "Error a variable is not binary");
+      REALPAVER_ASSERT(b.isBinary(), "Error a variable is not binary");
       scop.insert(b);
    }
    for (auto iv : intervals_)
@@ -1448,14 +1451,15 @@ PiecewiseCtr::PiecewiseCtr(Variable v, const std::vector<Variable> &binaries,
     , constraints_()
     , guard_hull_(Interval::emptyset())
 {
-   ASSERT(binaries.size() == intervals.size() && intervals.size() == constraints.size(),
-          "Error: inconsistent number of pieces");
+   REALPAVER_ASSERT(binaries.size() == intervals.size() &&
+                        intervals.size() == constraints.size(),
+                    "Error: inconsistent number of pieces");
    hcode_ = 0;
    Scope scop;
    scop.insert(v_);
    for (auto b : binaries_)
    {
-      ASSERT(b.isBinary(), "Error a variable is not binary");
+      REALPAVER_ASSERT(b.isBinary(), "Error a variable is not binary");
       scop.insert(b);
    }
    for (auto iv : intervals_)

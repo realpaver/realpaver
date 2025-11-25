@@ -32,8 +32,8 @@ ContractorVar3BCID::ContractorVar3BCID(SharedContractor op, Variable v, size_t n
     , nsCID_(nsCID)
     , varMnWidth_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
-   ASSERT(ns3B >= 2, "Bas number of slices in a var3BCID contractor");
-   ASSERT(nsCID >= 2, "Bas number of slices in a var3BCID contractor");
+   REALPAVER_ASSERT(ns3B >= 2, "Bas number of slices in a var3BCID contractor");
+   REALPAVER_ASSERT(nsCID >= 2, "Bas number of slices in a var3BCID contractor");
 }
 
 Variable ContractorVar3BCID::getVar() const
@@ -43,7 +43,8 @@ Variable ContractorVar3BCID::getVar() const
 
 void ContractorVar3BCID::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a var3BCID contractor");
+   REALPAVER_ASSERT(scope().contains(v),
+                    "Bad variable " << v << " in a var3BCID contractor");
 
    v_ = v;
 }

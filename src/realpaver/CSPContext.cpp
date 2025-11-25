@@ -18,8 +18,8 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/CSPContext.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/CSPContext.hpp"
 
 namespace realpaver {
 
@@ -88,9 +88,9 @@ void CSPNodeInfoCID::setNbCID(size_t nbcid)
 
 void CSPContext::insert(int index, std::shared_ptr<CSPNodeInfo> info)
 {
-   ASSERT(!hasInfo(index, info->getType()),
-          "Info '" << info->getType() << "' already present in the map for node "
-                   << index);
+   REALPAVER_ASSERT(!hasInfo(index, info->getType()),
+                    "Info '" << info->getType()
+                             << "' already present in the map for node " << index);
 
    auto it = map_.find(index);
    if (it == map_.end())

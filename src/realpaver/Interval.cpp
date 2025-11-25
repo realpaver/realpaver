@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/Interval.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
+#include "realpaver/Interval.hpp"
 #include "realpaver/Logger.hpp"
 #include <utility>
 
@@ -192,8 +192,8 @@ double Interval::infinity()
 
 Interval Interval::inflate(double delta, double chi) const
 {
-   ASSERT(delta > 1.0, "Bad inflation factor delta = " << delta);
-   ASSERT(chi > 0.0, "Bad inflation factor chi = " << chi);
+   REALPAVER_ASSERT(delta > 1.0, "Bad inflation factor delta = " << delta);
+   REALPAVER_ASSERT(chi > 0.0, "Bad inflation factor chi = " << chi);
 
    if (isEmpty() || isInf())
       return *this;
@@ -205,8 +205,8 @@ Interval Interval::inflate(double delta, double chi) const
 
 bool Interval::improves(const Interval &old, double tol) const
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "Bad tolerance");
-   ASSERT(old.contains(*this), "Bad test of improvement between intervals");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0, "Bad tolerance");
+   REALPAVER_ASSERT(old.contains(*this), "Bad test of improvement between intervals");
 
    if (isEmpty() || old.isEmpty())
       return false;

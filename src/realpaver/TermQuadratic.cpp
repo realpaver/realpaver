@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/TermQuadratic.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/TermQuadratic.hpp"
 
 namespace realpaver {
 
@@ -313,7 +313,7 @@ TermQuadraticCreator::TermQuadraticCreator(TermQuadratic *qt)
     , plus_(true)
     , success_(false)
 {
-   ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
+   REALPAVER_ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
 }
 
 bool TermQuadraticCreator::visitSuccessfull() const
