@@ -12,7 +12,7 @@ The RealPaver library provides a C++ API to deal with interval analysis, constra
 
 - meson build system (https://mesonbuild.com/)
 - a supported interval library
-  - GAOL: https://github.com/goualard-f/GAOL
+  - GAOL: https://github.com/goualard-f/GAOL or https://github.com/raphaelchenouard/GAOL (for MacOS ARM users)
   - Inum64: https://gitlab.univ-nantes.fr/granvilliers-l/inum64 (configure it with MPFR)
 - a supported linear solver library:
   - CLP: https://github.com/coin-or/Clp
