@@ -18,9 +18,9 @@
  * @date   2024-4-11
  */
 
-#include "realpaver/LPSolverHighs.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/LPModel.hpp"
+#include "realpaver/LPSolverHighs.hpp"
 #include "realpaver/Logger.hpp"
 #include <ostream>
 
@@ -73,12 +73,11 @@ void LPSolver::makeCtrs()
 void LPSolver::makeCost()
 {
    LinExpr obj = getCost();
+
    int n = obj.getNbTerms();
    for (int i = 0; i < n; ++i)
    {
-      LinVar v = getLinVar(i);
-      int j = v.getIndex();
-      simplex_->changeColCost(j, obj.getCoef(i));
+      simplex_->changeColCost(obj.getIndexVar(i), obj.getCoef(i));
    }
 
    ObjSense sense =

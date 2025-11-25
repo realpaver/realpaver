@@ -30,6 +30,14 @@ lp2 = executable(
   dependencies: deps_lib,
 )
 
+lp3 = executable(
+  'lp3',
+  sources: 'lp3.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
 if local_solver_dep.found()
   nlp = executable(
     'nlp',
