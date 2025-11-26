@@ -739,99 +739,55 @@ void AffineForm::minrangeCos(const Interval &x, Interval &alpha, Interval &dzeta
 void AffineForm::chebyshevCos(const Interval &x, Interval &alpha, Interval &dzeta,
                               Interval &delta)
 {
-   REALPAVER_DEBUG("chebyshevCos---------------------------------------\n\n");
-   REALPAVER_DEBUG("x: " << x);
    Interval cx = cos(x);
-
-   REALPAVER_DEBUG("cos(x): " << cos(x));
-
    if (cx.strictlyContainsZero())
    {
-      REALPAVER_DEBUG("minrangeCos");
       minrangeCos(x, alpha, dzeta, delta);
       return;
    }
 
    Interval a(x.left()), b(x.right()), fa = cos(a), fb = cos(b);
-
-   REALPAVER_DEBUG("left bnd a:  " << a);
-   REALPAVER_DEBUG("right bnd b: " << b);
-   REALPAVER_DEBUG("cos(a):      " << fa);
-   REALPAVER_DEBUG("cos(b):      " << fb);
-
    alpha = (fb - fa) / (b - a);
-
-   REALPAVER_DEBUG("alpha:      " << alpha);
 
    if (alpha.isNegative())
    {
-
-      REALPAVER_DEBUG("alpha negative");
-
       // shift x + 2*k*pi in [0, pi]
       Interval k = round((Interval::zeroPi() - x) / Interval::twoPi());
 
-      REALPAVER_DEBUG("k: " << k);
-
       if (!k.isSingleton())
       {
-         REALPAVER_DEBUG("minrangeCos");
-
          minrangeCos(x, alpha, dzeta, delta);
          return;
       }
       Interval c = asin(-alpha);
-      REALPAVER_DEBUG("c: " << c);
 
       if (fa.isNegative())
       {
          c = Interval::pi() - c;
-         REALPAVER_DEBUG("fa negative -> c: " << c);
       }
       c -= k * Interval::twoPi();
-      REALPAVER_DEBUG("c: " << c);
       Interval fc = cos(c);
-      REALPAVER_DEBUG("cos(c): " << fc);
-
       approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
-
-      REALPAVER_DEBUG("dzeta: " << dzeta);
-      REALPAVER_DEBUG("delta: " << delta);
    }
    else
    {
-      REALPAVER_DEBUG("alpha positive");
-
       // shift x + 2*k*pi in [-pi, 0]
       Interval k = round((Interval::minusPiZero() - x) / Interval::twoPi());
-
-      REALPAVER_DEBUG("k: " << k);
-
       if (!k.isSingleton())
       {
-         REALPAVER_DEBUG("minrangeCos");
-
          minrangeCos(x, alpha, dzeta, delta);
          return;
       }
 
       Interval c = asin(-alpha);
-      REALPAVER_DEBUG("c: " << c);
 
       if (fa.isNegative())
       {
          c = -(Interval::pi() + c);
-         REALPAVER_DEBUG("fa negative -> c: " << c);
       }
       c -= k * Interval::twoPi();
-      REALPAVER_DEBUG("c: " << c);
       Interval fc = cos(c);
-      REALPAVER_DEBUG("cos(c): " << fc);
-
       approxDzetaDelta(alpha, a, fa, c, fc, dzeta, delta);
-
-      REALPAVER_DEBUG("dzeta: " << dzeta);
-      REALPAVER_DEBUG("delta: " << delta);
    }
 }
 

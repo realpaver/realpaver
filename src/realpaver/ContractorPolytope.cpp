@@ -171,15 +171,10 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
 
       LOG_LOW("LP solved: " << sense << " " << v.getName());
 
-      REALPAVER_DEBUG("\n\nLP solved: " << sense << " " << v.getName());
-      solver.print(std::cerr);
-      std::cerr << std::endl;
-
       // optimization
       status = (status != LPStatus::Optimal) ? solver.optimize() : solver.reoptimize();
 
       LOG_LOW("Status : " << status);
-      REALPAVER_DEBUG("Status : " << status);
 
       switch (status)
       {
@@ -188,7 +183,6 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
          LOG_LOW("Certified cost: " << bnd);
          LOG_LOW("Primal: " << solver.primalSolution());
 
-         REALPAVER_DEBUG("bnd = " << bnd);
          Interval x = B.get(v);
          if (sense == LPSense::Min)
          {
