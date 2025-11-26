@@ -46,12 +46,12 @@ interval_dep = dependency('', required: false)
 mathlib_dep = dependency('', required: false)
 if interval_lib_name.to_upper() == 'GAOL'
   # Search first for apmathlib if present
-  mathlib_dep = cpp_comp.find_library('ultim', required: false)
+  mathlib_dep = dependency('ultim', required: false)
   # Else consider to use crlibm
   if not mathlib_dep.found()
-    mathlib_dep = cpp_comp.find_library('crlibm', required: true)
+    mathlib_dep = dependency('crlibm', required: true)
   endif
-  interval_dep = cpp_comp.find_library('gaol', required: true)
+  interval_dep = dependency('gaol', required: true)
 elif interval_lib_name.to_upper() == 'INUM64'
   interval_dep = dependency('inum64', required: true)
 else
