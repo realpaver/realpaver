@@ -48,7 +48,7 @@ meson compile
 Theses options can be used directly with the `meson setup` command, but also afterwards.
 In realpaver root folder, run `meson configure` command, while specifying one of the supported options:
 
-### Some of tge pre-defined options:
+### Some of the pre-defined options:
 
 - `--prefix PATH`: specify the path where to install (default is /usr/local)
 - `--backend BACKEND`: specify the backend used to build (default is ninja, can be replace by vs,vs2010,vs2012,vs2013,vs2015,vs2017,vs2019,vs2022,xcode,none)
@@ -96,6 +96,11 @@ In the build folder run:
 ```bash
 meson install
 ```
+
+## Build and test RealPaver using Docker
+
+The folder `docker` contains Dockerfiles and a `Readme.md` file explaining how to use them.
+
 
 ## More documentation on meson:
 

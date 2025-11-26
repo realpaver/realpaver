@@ -1,0 +1,47 @@
+# Use the official Ubuntu image as the base image
+FROM ubuntu:latest
+
+# Set the working directory in the container
+WORKDIR /realpaver
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    g++ \
+    git \
+    cmake \
+    pkg-config \
+    meson \
+    ninja-build \
+    bison \
+    flex \
+    zlib1g-dev \
+    wget \
+    unzip \
+    coinor-libclp-dev
+
+
+# Copy the source code into the container
+RUN LD_LIBRARY_PATH=/usr/local/lib && export LD_LIBRARY_PATH && ldconfig
+RUN echo "LD_LIBRARY_PATH=/usr/local/lib \nexport LD_LIBRARY_PATH" >> ~/.bashrc
+
+# Get the IBM Accurate Portable Mathematical Library source code
+RUN wget https://frederic.goualard.net/software/mathlib-2.1.1.tar.gz
+RUN tar -xzf mathlib-2.1.1.tar.gz
+RUN cd mathlib-2.1.1 && ./configure && make && make install
+
+# Get Interval library source code
+RUN git clone https://github.com/goualard-f/GAOL.git
+RUN cd GAOL && ./configure && make && make install
+
+# Get the source code
+RUN git clone https://github.com/realpaver/realpaver.git
+
+# Compile the C++ code
+ARG assert=true
+ARG log=true
+ARG branch=main
+ARG test=false
+RUN cd realpaver && git checkout ${branch} && \
+    meson setup build -DLP_LIB=CLP -DINTERVAL_LIB=GAOL -DASSERT=${assert} -DLOG=${log} --buildtype=debug && \
+    cd build && meson compile && \
+    if ${test}; then meson test; fi

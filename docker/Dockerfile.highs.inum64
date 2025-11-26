@@ -1,0 +1,46 @@
+# Use the official Ubuntu image as the base image
+FROM ubuntu:latest
+
+# Set the working directory in the container
+WORKDIR /realpaver
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    g++ \
+    git \
+    cmake \
+    pkg-config \
+    meson \
+    ninja-build \
+    bison \
+    flex \
+    zlib1g-dev \
+    wget \
+    unzip \
+    libmpfr-dev
+
+
+
+# Copy the source code into the container
+RUN LD_LIBRARY_PATH=/usr/local/lib && export LD_LIBRARY_PATH && ldconfig
+RUN echo "LD_LIBRARY_PATH=/usr/local/lib \nexport LD_LIBRARY_PATH" >> ~/.bashrc
+
+# Get Interval library source code
+RUN git clone https://gitlab.univ-nantes.fr/granvilliers-l/inum64.git
+RUN cd inum64 && meson setup build -DLIB_M=MPFR && cd build && meson compile && meson install
+
+RUN git clone https://github.com/ERGO-Code/HiGHS.git
+RUN cd HiGHS && cmake -S . -B build && cmake --build build && cmake --install build
+
+# Get the source code
+RUN git clone https://github.com/realpaver/realpaver.git
+
+# Compile the C++ code
+ARG assert=true
+ARG log=true
+ARG branch=main
+ARG test=false
+RUN cd realpaver && git checkout ${branch} && \
+    meson setup build -DLP_LIB=HiGHS -DINTERVAL_LIB=inum64 -DASSERT=${assert} -DLOG=${log} --buildtype=debug && \
+    cd build && meson compile && \
+    if ${test}; then meson test; fi
