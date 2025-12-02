@@ -29,11 +29,11 @@ RUN cd HiGHS && cmake -S . -B build && cmake --build build && cmake --install bu
 # Get the IBM Accurate Portable Mathematical Library source code
 RUN wget https://frederic.goualard.net/software/mathlib-2.1.1.tar.gz
 RUN tar -xzf mathlib-2.1.1.tar.gz
-RUN cd mathlib-2.1.1 && ./configure && make && make install
+RUN cd mathlib-2.1.1 && ./configure --prefix=/usr && make && make install
 
 # Get Interval library source code
 RUN git clone https://github.com/goualard-f/GAOL.git
-RUN cd GAOL && ./configure && make && make install
+RUN cd GAOL && ./configure --prefix=/usr && make && make install
 
 # Get the source code
 RUN git clone https://github.com/realpaver/realpaver.git
