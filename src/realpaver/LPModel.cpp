@@ -622,23 +622,23 @@ void LPModel::printSystem(std::ostream &os) const
    size_t n = ctrs_.size(), m = vars_.size();
 
    RealVector lhs(m + n), rhs(m + n);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       lhs[i] = vars_[i].getLB();
       rhs[i] = vars_[i].getUB();
    }
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       lhs[m + i] = ctrs_[i].getLB();
       rhs[m + i] = ctrs_[i].getUB();
    }
 
    RealMatrix A(m + n, m, 0.0);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       A.set(i, i, 1.0);
    }
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       LinExpr e = ctrs_[i].getExpr();
       for (int j = 0; j < e.getNbTerms(); ++j)

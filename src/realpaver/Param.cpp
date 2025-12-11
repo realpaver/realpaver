@@ -155,7 +155,7 @@ void Param::printStr(std::ostream &os, const std::string &str, size_t ncols)
          os << "# ";
          if (first != 0 && item)
             os << "  ";
-         for (int i = first; i <= last; ++i)
+         for (size_t i = first; i <= last; ++i)
             os << line[i];
          os << std::endl;
 

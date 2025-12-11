@@ -228,7 +228,7 @@ size_t CSPPropagatorList::size() const
 Proof CSPPropagatorList::contractImpl(IntervalBox &B)
 {
    Proof proof = Proof::Maybe;
-   for (int i = 0; i < v_.size(); ++i)
+   for (size_t i = 0; i < v_.size(); ++i)
    {
       proof = v_[i]->contractImpl(B);
       if (proof == Proof::Empty)

@@ -90,12 +90,12 @@ void AffineCreator::create(const IntervalBox &B)
 
    if (lfun_.size() == dag_->nbFuns())
    {
-      for (int i = 0; i < dag_->nbNodes(); ++i)
+      for (size_t i = 0; i < dag_->nbNodes(); ++i)
          makeNode(i, B);
    }
    else
    {
-      for (int i = 0; i < lfun_.size(); ++i)
+      for (size_t i = 0; i < lfun_.size(); ++i)
       {
          DagFun *fun = dag_->fun(lfun_[i]);
          for (size_t j = 0; j < fun->nbNodes(); ++j)
@@ -251,7 +251,7 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       f = std::make_unique<AffineForm>(aux->getCst());
 
       // loop on the linear terms
-      for (int j = 0; j < aux->nbTerms(); ++j)
+      for (size_t j = 0; j < aux->nbTerms(); ++j)
       {
          // affine form of the variable in this term
          const AffineForm &g = *v_[aux->varNode(j)->index()];
