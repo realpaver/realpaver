@@ -39,8 +39,7 @@ CP associates a rich modeling language with powerful solving techniques. The mai
 
 This technology has been applied with success in many fields of engineering like automatic control [@jaulin2001], preliminary design [@yvars2021] and robotics [@merlet2004].
 
-This library can be used by anyone wanting to compute sets of solutions for numerical or mixed discrete-continuous constraint satisfaction problems. It can also be used to prove infeasibility or existence of solutions, thanks to the B\&P algorithm and interval analysis [@moore2009].
-Since the library contains most of the state-of-the art algorithms relating to CP over intervals, it can also be used by researchers in this field to define new algorithms.
+The set of solutions of a numerical CSP or a mixed discrete-continuous problem can be rigorously bounded, even in the presence of roundoff errors. All the solutions of continuous nonlinear equations or inequations can be automatically separated and rigorously bounded. The B\&P algorithm with interval analysis [@moore2009] can provide proof of infeasibility or proof of existence of solutions.
 
 # State of the field
 
