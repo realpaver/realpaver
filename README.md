@@ -19,7 +19,7 @@ The RealPaver library provides a C++ API to deal with interval analysis, constra
   - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/ (a sample pkg-config file for Gurobi (gurobi.pc) is provided but it must be adapted to your context)
   - HiGHS: https://highs.dev/
 
-**WARNING: interval libraries rely on the used math library that must preserve floating-point rounding mode during computations! (This is not guaranteed by most standard math libraries)**
+**WARNING: interval libraries rely on the used math library to make safe computations. It must preserve floating-point rounding mode during computations! (This is not guaranteed by most standard math libraries)**
 
 ### Optional dependencies
 
