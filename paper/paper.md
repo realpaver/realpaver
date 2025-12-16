@@ -43,7 +43,7 @@ The set of solutions of a numerical CSP or a mixed discrete-continuous problem c
 
 # State of the field
 
-Various solvers on discrete domains exist in CP, like OR-tools and Chuffed, but they are not able to handle continuous variables. Compared to Ibex [@ibex] library, RealPaver proposes some new kinds of constraints like table constraints, conditional constraints and piecewise constraints, and the definition of discrete variables (integer, enumeration of values). For pure  continuous problems, RealPaver achieves performances equivalent to Ibex. Regarding other mixed integer non-linear solvers like Couenne or Baron, they only solve optimization problems. These solvers are not able to compute several solutions for CSPs, even by adding a constant objective.
+Various solvers on discrete domains exist in CP, like OR-tools and Chuffed, but they are not able to handle continuous variables. Ibex [@ibex] library like RealPaver are based on a similar branch-and-contract framework, but RealPaver proposes some new kinds of constraints like table constraints, conditional constraints and piecewise constraints, and the native definition of discrete variables (integer, enumeration of values). For pure  continuous problems, RealPaver achieves performances equivalent to Ibex. Regarding other mixed integer non-linear solvers like Couenne or Baron, they only solve optimization problems. These solvers are not able to compute several solutions for CSPs, even by adding a constant objective.
 
 # Brief overview
 
