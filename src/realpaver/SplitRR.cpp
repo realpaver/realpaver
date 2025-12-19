@@ -28,7 +28,7 @@ SplitRR::SplitRR(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
 {
 }
 
-void SplitRR::applyImpl(SharedNode &node, NodeContext &context)
+void SplitRR::applyImpl(SharedNode node, NodeContext &context)
 {
    // variable selection
    std::pair<bool, Variable> res = selectVar(node, context);

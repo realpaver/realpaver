@@ -624,6 +624,9 @@ obj_def
         realpaver_bison_symtab->insertVariable($1, v);
       }
 
+      // status
+      v.setStatus(realpaver::VariableStatus::Objective);
+
       // tolerances
       double rtol = realpaver_bison_params->getDblParam("OBJ_REL_TOL"),
              atol = realpaver_bison_params->getDblParam("OBJ_ABS_TOL");
@@ -631,6 +634,49 @@ obj_def
 
       // objective function
       realpaver::Term f(realpaver::Term::SharedRep($3));
+      if (f.isConstant())
+      {
+        realpaver_bison_error("Constant objective function");
+        YYABORT;
+      }
+
+      if (realpaver_minimization)
+        realpaver_bison_problem->addObjective(minimize(v, f));
+      else
+        realpaver_bison_problem->addObjective(maximize(v, f));
+    }
+    | expr
+    {
+      // objective variable
+      const char* obj_varname = "__obj";
+      realpaver::Variable v;
+
+      realpaver::VariableSymbol* vs =
+         realpaver_bison_symtab->findVariable(obj_varname);
+
+      if (vs != nullptr)
+      {
+        // this variable has been declared => reuse it
+        v = vs->getVar();
+      }
+      else
+      {
+        // this variable has not been declared => create it
+        v = realpaver_bison_problem->addRealVar(realpaver::Interval::universe(), obj_varname);
+
+        realpaver_bison_symtab->insertVariable(obj_varname, v);
+      }
+
+      // status
+      v.setStatus(realpaver::VariableStatus::Objective);
+
+      // tolerances
+      double rtol = realpaver_bison_params->getDblParam("OBJ_REL_TOL"),
+             atol = realpaver_bison_params->getDblParam("OBJ_ABS_TOL");
+      v.setTolerance(realpaver::Tolerance(rtol, atol));
+
+      // objective function
+      realpaver::Term f(realpaver::Term::SharedRep($1));
       if (f.isConstant())
       {
         realpaver_bison_error("Constant objective function");

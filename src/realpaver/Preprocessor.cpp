@@ -18,11 +18,13 @@
  * @date   11 Apr 2024
  */
 
+#include "Variable.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/TermFixer.hpp"
+#include <memory>
 
 namespace realpaver {
 
@@ -34,6 +36,7 @@ Preprocessor::Preprocessor(SharedProblem src)
     , active_()
     , unfeasible_(false)
     , timer_()
+    , on_(false)
 {
    ASSERT(src != nullptr, "Preprocessing error: empty problem");
    ASSERT(!src->isEmpty(), "Preprocessing error: empty problem");
@@ -51,7 +54,7 @@ SharedProblem Preprocessor::destProblem() const
 
 void Preprocessor::apply(bool on)
 {
-   if (!on)
+   if (!(on_ = on))
    {
       dest_ = src_;
       return;
@@ -145,6 +148,8 @@ void Preprocessor::applyImpl()
          isUsed = true;
       if (occursInAlias(v))
          isUsed = true;
+      if (v.getStatus() == VariableStatus::Objective)
+         isUsed = true;
 
       if (isFixed)
       {
@@ -167,12 +172,12 @@ void Preprocessor::applyImpl()
 
    // rewrites the objective function; it must be done before processing the constraints
    // because the status of the objective variable can be changed from unfixed to fixed
-   if (src_->hasObjective())
+   if (src_->hasObjective() && (!bridge_->isFixed(obj.getVar())))
    {
       Variable z = obj.getVar();
       Term f = obj.getTerm();
       Interval e = f.eval(box)->intervalHull();
-      Domain *dom = z.getDomain();
+      std::unique_ptr<Domain> dom(box.get(z)->clone());
       dom->contract(e);
 
       if (dom->isEmpty())
@@ -181,6 +186,9 @@ void Preprocessor::applyImpl()
          unfeasible_ = true;
          return;
       }
+
+      Variable zdest = bridge_->srcToDestVar(z);
+      zdest.setDomain(std::move(dom));
 
       // simplifies the objective function
       TermFixer fixer(bridge_);
@@ -310,9 +318,35 @@ bool Preprocessor::isUnfeasible() const
    return unfeasible_;
 }
 
+bool Preprocessor::isSolvedOptimal() const
+{
+   if (!on_)
+      return false;
+
+   if (unfeasible_)
+      return false;
+
+   if (src_->hasObjective() && !dest_->hasObjective())
+      return true;
+
+   return false;
+}
+
 bool Preprocessor::isSolved() const
 {
-   return unfeasible_ || bridge_->allVarsFixed();
+   if (!on_)
+      return false;
+
+   if (unfeasible_)
+      return true;
+
+   if (bridge_ != nullptr && bridge_->allVarsFixed())
+      return true;
+
+   if (src_->hasObjective() && !dest_->hasObjective())
+      return true;
+
+   return false;
 }
 
 double Preprocessor::elapsedTime() const
@@ -322,76 +356,101 @@ double Preprocessor::elapsedTime() const
 
 bool Preprocessor::allVarsFixed() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->allVarsFixed();
 }
 
 Variable Preprocessor::srcToDestVar(const Variable &v) const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->srcToDestVar(v);
 }
 
 size_t Preprocessor::nbFixedVars() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->nbFixedVars();
 }
 
 size_t Preprocessor::nbUnfixedVars() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->nbUnfixedVars();
 }
 
 Variable Preprocessor::getFixedVar(size_t i) const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->getFixedVar(i);
 }
 
 Variable Preprocessor::getUnfixedVar(size_t i) const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->getUnfixedVar(i);
 }
 
 Interval Preprocessor::getFixedDomain(const Variable &v) const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->getFixedDomain(v);
 }
 
 bool Preprocessor::isFixed(const Variable &v) const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->isFixed(v);
 }
 
 bool Preprocessor::isUnfixed(const Variable &v) const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->isUnfixed(v);
 }
 
 DomainBox Preprocessor::fixedRegion() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->fixedRegion();
 }
 
 DomainBox Preprocessor::destRegion() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->destRegion();
 }
 
 Scope Preprocessor::destScope() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->destScope();
 }
 
 Scope Preprocessor::fixedScope() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->fixedScope();
 }
 
 Scope Preprocessor::unfixedScope() const
 {
+   ASSERT(on_, "Preprocessor inactive");
    return bridge_->unfixedScope();
+}
+
+bool Preprocessor::isOn() const
+{
+   return on_;
 }
 
 void Preprocessor::print(std::ostream &os) const
 {
+   if (!on_)
+   {
+      os << "preprocessor inactive" << std::endl;
+      return;
+   }
+
    os << "Status: ";
    if (unfeasible_)
    {

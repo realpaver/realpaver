@@ -41,7 +41,7 @@ public:
    /// No assignment
    SplitSF &operator=(const SplitSF &) = delete;
 
-   void applyImpl(SharedNode &node, NodeContext &context) override;
+   void applyImpl(SharedNode node, NodeContext &context) override;
 
 private:
    SelectorSF sel_;

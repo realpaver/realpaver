@@ -21,10 +21,8 @@
 #ifndef REALPAVER_SPACE_HPP
 #define REALPAVER_SPACE_HPP
 
-#include "realpaver/Node.hpp"
-#include "realpaver/Split.hpp"
+#include <list>
 #include <memory>
-#include <unordered_set>
 
 namespace realpaver {
 
@@ -37,7 +35,7 @@ namespace realpaver {
  * Two sorts of nodes are stored: the final nodes that are not fathomed during
  * the search (the solutions), and the pending (unexplored) nodes.
  */
-class Space {
+template <typename Node> class Space {
 public:
    /// Default constructor
    Space() = default;
@@ -58,13 +56,13 @@ public:
    virtual size_t nbSolNodes() const = 0;
 
    /// Inserts a solution node in this
-   virtual void pushSolNode(const SharedNode &node) = 0;
+   virtual void pushSolNode(const std::shared_ptr<Node> &node) = 0;
 
    /// Removes a solution node from this
-   virtual SharedNode popSolNode() = 0;
+   virtual std::shared_ptr<Node> popSolNode() = 0;
 
    /// Returns the i-th solution node
-   virtual SharedNode getSolNode(size_t i) const = 0;
+   virtual std::shared_ptr<Node> getSolNode(size_t i) const = 0;
 
    /// Returns true if a solution node is feasible
    virtual bool hasFeasibleSolNode() const = 0;
@@ -86,26 +84,70 @@ public:
    virtual size_t nbPendingNodes() const = 0;
 
    /// Extracts the next pending node from this
-   virtual SharedNode nextPendingNode() = 0;
+   virtual std::shared_ptr<Node> popPendingNode() = 0;
 
    /// Inserts a pending node in this
-   virtual void insertPendingNode(const SharedNode &node) = 0;
-
-   /**
-    * @brief Inserts a collection of pending nodes in this.
-    *
-    * The default behavior calls insertPendingNode for each node in
-    * the range of iterators.
-    */
-   virtual void insertPendingNodes(Split::iterator first, Split::iterator last);
+   virtual void pushPendingNode(const std::shared_ptr<Node> &node) = 0;
 
    /// Returns the i-th pending node
-   virtual SharedNode getPendingNode(size_t i) const = 0;
+   virtual std::shared_ptr<Node> getPendingNode(size_t i) const = 0;
    ///@}
 };
 
-/// Type of shared pointers of a space
-using SharedSpace = std::shared_ptr<Space>;
+template <typename Node> Space<Node>::~Space()
+{
+}
+
+template <typename Node> void Space<Node>::makeSolClusters(double gap)
+{
+   size_t nsol = nbSolNodes();
+
+   // no clustering?
+   if (gap < 0.0 || nsol <= 1)
+      return;
+
+   // moves the solution nodes in a list
+   std::list<std::shared_ptr<Node>> lnode;
+   while (nbSolNodes() > 0)
+      lnode.push_back(popSolNode());
+
+   // resulting list of nodes
+   std::list<std::shared_ptr<Node>> res;
+
+   while (!lnode.empty())
+   {
+      // extracts the first node
+      std::shared_ptr<Node> node = lnode.front();
+      DomainBox *box = node->box();
+      lnode.pop_front();
+
+      // finds another node that is close enough
+      bool found = false;
+      auto it = lnode.begin();
+      while (!found && it != lnode.end())
+      {
+         std::shared_ptr<Node> bis = *it;
+         DomainBox *boxbis = bis->box();
+
+         if (box->gap(*boxbis) <= gap)
+         {
+            // merges node in bis and iterates
+            boxbis->glueOnScope(*box, node->scope());
+            found = true;
+         }
+         else
+            ++it;
+      }
+
+      // this is a solution node and no other solution is close enough
+      if (!found)
+         res.push_back(node);
+   }
+
+   // pushes the solution nodes in this
+   for (const auto &node : res)
+      pushSolNode(node);
+}
 
 } // namespace realpaver
 

@@ -125,10 +125,14 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
 
       // differentiates the function
       IntervalVector G(f->nbVars());
+
+      /*
       if (hansen_)
          f->iDiffHansen(B, c, G);
       else
          f->iDiff(B, G);
+      */
+      f->iDiff(B, G);
 
       if (G.isEmpty())
          return false;

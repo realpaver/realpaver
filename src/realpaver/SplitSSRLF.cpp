@@ -40,7 +40,7 @@ void SplitSSRLF::setFrequency(double f)
    sel_.setFrequency(f);
 }
 
-void SplitSSRLF::applyImpl(SharedNode &node, NodeContext &context)
+void SplitSSRLF::applyImpl(SharedNode node, NodeContext &context)
 {
    if (sel_.apply(*node->box()))
    {

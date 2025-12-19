@@ -37,6 +37,8 @@ bool LinearizerAffineTaylor::makeLPImpl(LPModel &lpm, const IntervalBox &B,
                                         const Bitset &active)
 {
    bool b = affine_->makeLP(lpm, B, active);
+   if (!b)
+      return b;
 
    for (const auto &v : scop_)
    {
@@ -46,10 +48,7 @@ bool LinearizerAffineTaylor::makeLPImpl(LPModel &lpm, const IntervalBox &B,
       taylor_->setLinVarIndex(v.id(), affine_->linVarIndex(v.id()));
    }
 
-   if (b)
-      b = taylor_->makeCtrs(lpm, B, active);
-
-   return b;
+   return taylor_->makeCtrs(lpm, B, active);
 }
 
 } // namespace realpaver

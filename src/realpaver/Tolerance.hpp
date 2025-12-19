@@ -70,6 +70,13 @@ public:
    bool isTight(const IntervalVector &X) const;
 
    /**
+    * @brief Tests if the enclosure of a global optimum is tight enough.
+    *
+    * Return true if we have u-l <= max(rtol*|u|, atol).
+    */
+   bool isTightOptimum(const double &l, const double &u) const;
+
+   /**
     * @brief Gets the largest interval having this tolerance.
     *
     * Returns the largest interval [lb, ub] having the absolute or the

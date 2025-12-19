@@ -41,6 +41,15 @@ bitset_test = executable(
 )
 test('Test of bitset', bitset_test)
 
+ctr_prover_test = executable(
+  'ctr_prover_test',
+  sources: 'ctr_prover_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of constraint prover', ctr_prover_test)
+
 ctc_affine_test = executable(
   'ctc_affine_test',
   sources: 'ctc_affine_test.cpp',
@@ -103,6 +112,15 @@ dag_test = executable(
 )
 test('Test of dag', dag_test)
 
+domain_picker_test = executable(
+  'domain_picker_test',
+  sources: 'domain_picker_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of domain pickers', domain_picker_test)
+
 integer_test = executable(
   'integer_test',
   sources: 'integer_test.cpp',
@@ -148,6 +166,14 @@ lp_solver_test = executable(
 )
 test('Test of LP solver', lp_solver_test)
 
+piecewise_test = executable(
+  'piecewise_test',
+  sources: 'piecewise_test.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'],
+)
+test('Test of piecewise', piecewise_test)
+
 preprocessor_test = executable(
   'preprocessor_test',
   sources: 'preprocessor_test.cpp',
@@ -156,6 +182,15 @@ preprocessor_test = executable(
   include_directories: ['../src'],
 )
 test('Test of preprocessor', preprocessor_test)
+
+prover_optim_test = executable(
+  'prover_optim_test',
+  sources: 'prover_optim_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of prover for optimization problems', prover_optim_test)
 
 range_test = executable(
   'range_test',
@@ -175,15 +210,6 @@ real_matrix_test = executable(
 )
 test('Test of real matrix', real_matrix_test)
 
-scope_test = executable(
-  'scope_test',
-  sources: 'scope_test.cpp',
-  link_with: realpaver_lib,
-  dependencies: deps_lib,
-  include_directories: ['../src'],
-)
-test('Test of scope', scope_test)
-
 real_function_vector_test = executable(
   'real_function_vector_test',
   sources: 'real_function_vector_test.cpp',
@@ -202,6 +228,24 @@ relaxation_rlt_test = executable(
 )
 test('Test of RLT relaxations', relaxation_rlt_test)
 
+scope_test = executable(
+  'scope_test',
+  sources: 'scope_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of scope', scope_test)
+
+space_optim_test = executable(
+  'space_optim_test',
+  sources: 'space_optim_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of optimization space', space_optim_test)
+
 if local_solver_dep.found()
   nlp_solver_test = executable(
     'nlp_solver_test',
@@ -212,11 +256,3 @@ if local_solver_dep.found()
   )
   test('Test of NLP solver API', nlp_solver_test)
 endif
-
-piecewise_test = executable(
-  'piecewise_test',
-  sources: 'piecewise_test.cpp',
-  link_with: realpaver_lib,
-  include_directories: ['../src'],
-)
-test('Test of piecewise', piecewise_test)

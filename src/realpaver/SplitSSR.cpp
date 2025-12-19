@@ -33,7 +33,7 @@ SplitSSR::SplitSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
    ASSERT(scop.contains(F.scope()), "Bad scopes");
 }
 
-void SplitSSR::applyImpl(SharedNode &node, NodeContext &context)
+void SplitSSR::applyImpl(SharedNode node, NodeContext &context)
 {
    const DomainBox &box = *node->box();
 

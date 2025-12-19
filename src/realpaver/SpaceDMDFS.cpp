@@ -154,14 +154,14 @@ size_t SpaceDMDFS::nbPendingNodes() const
    return vnode_.size();
 }
 
-SharedNode SpaceDMDFS::nextPendingNode()
+SharedNode SpaceDMDFS::popPendingNode()
 {
    SharedNode node = vnode_.back().node;
    vnode_.pop_back();
    return node;
 }
 
-void SpaceDMDFS::insertPendingNode(const SharedNode &node)
+void SpaceDMDFS::pushPendingNode(const SharedNode &node)
 {
    // Finds the distance to the closest solution
    double d = Double::inf();

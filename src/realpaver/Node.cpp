@@ -176,10 +176,19 @@ const Bitset &Node::active() const
    return active_;
 }
 
+void Node::print(std::ostream &os) const
+{
+   os << *box_ << " (" << proof_ << ")";
+}
+
+Node *Node::clone() const
+{
+   return new Node(*this);
+}
+
 std::ostream &operator<<(std::ostream &os, const Node &node)
 {
-   os << *node.box() << " proof: " << node.getProof();
-
+   node.print(os);
    return os;
 }
 

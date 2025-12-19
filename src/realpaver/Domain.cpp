@@ -164,6 +164,11 @@ bool IntervalDomain::equals(const Domain &dom) const
    return (d == nullptr) ? false : d->val_.isSetEq(val_);
 }
 
+void IntervalDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
+}
+
 /*----------------------------------------------------------------------------*/
 
 IntervalUnionDomain::IntervalUnionDomain(const IntervalUnion &u)
@@ -239,6 +244,11 @@ bool IntervalUnionDomain::equals(const Domain &dom) const
    return (d == nullptr) ? false : d->val_.equals(val_);
 }
 
+void IntervalUnionDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
+}
+
 /*----------------------------------------------------------------------------*/
 
 RangeDomain::RangeDomain(const Range &r)
@@ -306,6 +316,11 @@ bool RangeDomain::equals(const Domain &dom) const
 {
    const RangeDomain *d = dynamic_cast<const RangeDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.isSetEq(val_);
+}
+
+void RangeDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -381,6 +396,11 @@ bool RangeUnionDomain::equals(const Domain &dom) const
 {
    const RangeUnionDomain *d = dynamic_cast<const RangeUnionDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.equals(val_);
+}
+
+void RangeUnionDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -465,6 +485,42 @@ bool BinaryDomain::equals(const Domain &dom) const
 {
    const BinaryDomain *d = dynamic_cast<const BinaryDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.equals(val_);
+}
+
+void BinaryDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+/*----------------------------------------------------------------------------*/
+
+DomainVisitor::~DomainVisitor()
+{
+}
+
+void DomainVisitor::apply(const IntervalDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const IntervalUnionDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const RangeDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const RangeUnionDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const BinaryDomain *d)
+{
+   THROW("Visit method not implemented");
 }
 
 } // namespace realpaver

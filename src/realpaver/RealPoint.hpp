@@ -29,12 +29,15 @@ namespace realpaver {
 /// Scoped real vector
 class RealPoint : public RealVector {
 public:
+   /// Constructor
+   RealPoint(Scope scop);
+
    /**
     * @brief Constructor.
     *
     * Each variable from scop is assigned to a.
     */
-   RealPoint(Scope scop, double a = 0.0);
+   RealPoint(Scope scop, double a);
 
    /**
     * @brief Constructor.

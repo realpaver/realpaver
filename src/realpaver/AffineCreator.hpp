@@ -85,6 +85,9 @@ public:
    /// Returns the number of affine forms created
    size_t nbFuns() const;
 
+   /// Returns true if the i-th affine form exists, false otherwise
+   bool hasFun(size_t i) const;
+
    /**
     * @brief Gets the i-th affine form in this.
     *
@@ -106,6 +109,9 @@ public:
     * It corresponds to the affine form of the i-th function of the DAG.
     */
    std::unique_ptr<AffineForm> moveFun(size_t i);
+
+   /// Returns true if the affine form of a variable exists, false otherwise
+   bool hasFun(const Variable &v) const;
 
    /// Gets the affine form of a variable.
    const AffineForm &fun(const Variable &v) const;

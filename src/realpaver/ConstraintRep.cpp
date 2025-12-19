@@ -27,6 +27,7 @@ ConstraintRep::ConstraintRep(const ConstraintRelation &rel)
     : scop_()
     , rel_(rel)
     , id_(-1)
+    , initial_(true)
     , hcode_(0)
 {
 }
@@ -74,6 +75,16 @@ void ConstraintRep::setId(int id)
 bool ConstraintRep::hasNoId() const
 {
    return id_ < 0;
+}
+
+bool ConstraintRep::isInitial() const
+{
+   return initial_;
+}
+
+void ConstraintRep::setInitial(bool b)
+{
+   initial_ = b;
 }
 
 bool ConstraintRep::isEquation() const

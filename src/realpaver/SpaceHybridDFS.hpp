@@ -21,6 +21,7 @@
 #ifndef REALPAVER_SPACE_HYBRID_DFS_HPP
 #define REALPAVER_SPACE_HYBRID_DFS_HPP
 
+#include "realpaver/Node.hpp"
 #include "realpaver/Space.hpp"
 #include <set>
 #include <vector>
@@ -201,7 +202,7 @@ private:
  *
  * @see HybridDFSStyle
  */
-class SpaceHybridDFS : public Space {
+class SpaceHybridDFS : public Space<Node> {
 public:
    /// Constructor
    SpaceHybridDFS(HybridDFSStyle style);
@@ -221,10 +222,9 @@ public:
    SharedNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
-   SharedNode nextPendingNode() override;
-   void insertPendingNode(const SharedNode &node) override;
+   SharedNode popPendingNode() override;
+   void pushPendingNode(const SharedNode &node) override;
    SharedNode getPendingNode(size_t i) const override;
-   void insertPendingNodes(Split::iterator first, Split::iterator last) override;
 
 private:
    std::vector<SharedNode> sta_;  // stack of pending nodes (for DFS)

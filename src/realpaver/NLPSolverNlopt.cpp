@@ -158,7 +158,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    // assigns the parameters
    optimizer_->set_ftol_rel(tol_.getRelTol());
    optimizer_->set_ftol_abs(tol_.getAbsTol());
-   optimizer_->set_maxeval(iter_limit_);
+   optimizer_->set_maxeval(this->iterLimit());
    optimizer_->set_maxtime(this->timeLimit());
 
    // assigns the bound constraints
@@ -259,10 +259,18 @@ void NLPSolver::makeAlgorithm()
 
       if (alg == "NLOPT_MMA")
          nlopt_alg_ = nlopt::algorithm::LD_MMA;
+      else if (alg != "NLOPT_SLSQP")
+      {
+         LOG_INTER("WARNING: irrelevant NLOPT algorithm selection! With constraints "
+                   << "SLSQP or MMA have to be used (default: SLSQP)")
+      }
    }
    else
    {
-      if (alg == "NLOPT_BOBYQA")
+      if (alg == "NLOPT_LBFGS")
+         nlopt_alg_ = nlopt::algorithm::LD_LBFGS;
+
+      else if (alg == "NLOPT_BOBYQA")
          nlopt_alg_ = nlopt::algorithm::LN_BOBYQA;
 
       else if (alg == "NLOPT_MMA")
@@ -274,6 +282,7 @@ void NLPSolver::makeAlgorithm()
       else
          nlopt_alg_ = nlopt::algorithm::LN_NELDERMEAD;
    }
+   LOG_INTER("Using NLOPT with " << nlopt_alg_)
 }
 
 } // namespace realpaver

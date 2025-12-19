@@ -9,8 +9,7 @@ Variables
    r5 in [-10,10]
 ;
 
-Objectives
-   MIN r1^2 + r2^2 + r3^2 + r4^2 + r5^2;
+MIN r1^2 + r2^2 + r3^2 + r4^2 + r5^2;
 
 Constraints
 #   r1 - (b1 + b2*exp(b3*(-5)) - 127) == 0,
@@ -22,4 +21,4 @@ Constraints
    r2 == (b1 + b2*exp(b3*(-3)) - 151),
    r3 == (b1 + b2*exp(b3*(-1)) - 379),
    r4 == (b1 + b2*exp(b3*5) - 421),
-   r5 == (b1 + b2*exp(b3*3) - 460); 
+   r5 == (b1 + b2*exp(b3*3) - 460);

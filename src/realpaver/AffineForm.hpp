@@ -50,7 +50,7 @@ namespace realpaver {
  * L is the list of linear terms (a_i, i), i.e. a_i*e_i where e_i is
  * represented by its index i, for i=1,...,n.
  *
- * The elemenrary functions can be linearized with either the Minrange
+ * The elementary functions can be linearized with either the Minrange
  * approximation or the Chebyshev approximation. It suffices to call
  * useMinrange or useChebyshev before the creation of an affine form.
  *

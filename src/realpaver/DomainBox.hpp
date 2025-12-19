@@ -28,6 +28,7 @@
 namespace realpaver {
 
 class IntervalBox;
+class RealPoint;
 
 /**
  * @brief Box of domains.
@@ -135,6 +136,9 @@ public:
 
    /// Equality test
    bool equals(const DomainBox &box) const;
+
+   /// Membership test
+   bool contains(const RealPoint &pt) const;
 
 private:
    Scope scop_;                 // ordered set of variables

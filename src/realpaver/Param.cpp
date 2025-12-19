@@ -938,7 +938,7 @@ void Params::makeGeneral()
    var_rel_tol.setName("VAR_REL_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(0.0)
+       .setValue(1.0e-6)
        .setMinValue(0.0)
        .setMaxValue(1.0);
    add(var_rel_tol);
@@ -961,7 +961,7 @@ void Params::makeGeneral()
    obj_rel_tol.setName("OBJ_REL_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(0.0)
+       .setValue(1.0e-4)
        .setMinValue(0.0)
        .setMaxValue(1.0);
    add(obj_rel_tol);
@@ -973,7 +973,7 @@ void Params::makeGeneral()
    obj_abs_tol.setName("OBJ_ABS_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(1.0e-6)
+       .setValue(1.0e-4)
        .setMinValue(0.0);
    add(obj_abs_tol);
 
@@ -1053,12 +1053,12 @@ void Params::makeBranch()
          "problems. On the contrary, the search can be stopped when " +
          "the following limits are reached: TIME_LIMIT, SOLUTION_LIMIT " +
          "NODE_LIMIT, and DEPTH_LIMIT.";
-   search_stat.setName("SEARCH_STATUS")
+   search_stat.setName("LIMITS_ENABLED")
        .setCat(cat)
        .setWhat(str)
-       .addChoice("COMPLETE", "the whole search space is explorated")
-       .addChoice("LIMITED", "the search is possibly stopped due to the limits")
-       .setValue("LIMITED");
+       .addChoice("YES", "the limits are enabled")
+       .addChoice("NO", "the limits are disabled")
+       .setValue("YES");
    add(search_stat);
 
    ////////////////////
@@ -1103,19 +1103,36 @@ void Params::makeBranch()
    add(sol_clu_gap);
 
    ////////////////////
-   ParamInt bb_freq;
-   str = std::string("In a branch-and-bound algorithm, the next node can be either ") +
-         "the node with the lowest lower bound or the node with the lowest upper " +
-         "bound (diving). The frequency manages the selection of the next node:\n" +
-         "- 1 means that the node with the lowest lower bound is always selected;\n" +
-         "- a value > 1 means that the node with the lowest upper bound is selected " +
-         "when the node counter modulo the frequency is equal to 0.";
-   bb_freq.setName("BB_SPACE_FREQUENCY")
+   ParamDbl bb_lurat;
+   str = std::string("In a branch-and-bound algorithm, the strategy Lower-Upper  ") +
+         "selects the next node randomly using two criteria, either the lowest lower " +
+         "bound or the lowest upper bound. The criteria 'lowest upper bound' is chosen " +
+         "with probability R where R is the value of this parameter. Typical values " +
+         "lie in [0.2, 0.8]." + "See BB_NODE_SELECTION with value LU";
+   bb_lurat.setName("BB_LU_RATIO")
        .setCat(cat)
        .setWhat(str)
-       .setValue(1)
-       .setMinValue(1);
-   add(bb_freq);
+       .setValue(0.5)
+       .setMinValue(0.0)
+       .setMaxValue(1.0);
+   add(bb_lurat);
+
+   ////////////////////
+   ParamStr bb_incomplete;
+   str = std::string("A branch-and-bound algorithm stops when the enclosure ") +
+         "of the optimum has the derired precision and at least one feasible " +
+         "point has been found. Now, the search can be stopped as soon as both " +
+         "criteria are satisfied (incomplete search), or it continues until there " +
+         "is no more pending node, which leads to enclose all the minimizers " +
+         "(complete search)";
+   bb_incomplete.setName("BB_INCOMPLETE_SEARCH")
+       .setCat(cat)
+       .setWhat("Stopping criterion for branch-and-bound algorithms")
+       .addChoice("YES", "Incomplete search")
+       .addChoice("NO", "Complete search")
+       .setValue("YES")
+       .setText(str);
+   add(bb_incomplete);
 
    ////////////////////
    ParamStr node_sel;
@@ -1144,6 +1161,23 @@ void Params::makeBranch()
        .setValue("DFS")
        .setText(text);
    add(node_sel);
+
+   ////////////////////
+   ParamStr bb_node_sel;
+   str = std::string("");
+   std::string bb_lu =
+       std::string("Lower-Upper strategy that alternates the choice between nodes ") +
+       "with the lowest lower bound and the lowest upper bound. See the parameter "
+       "BB_LU_RATIO to assign the ratio";
+   std::string bb_fd = std::string("Feasible diving strategy");
+   bb_node_sel.setName("BB_NODE_SELECTION")
+       .setCat(cat)
+       .setWhat("Exploration strategy for branch-and-bound algorithms")
+       .addChoice("LU", bb_lu)
+       .addChoice("FD", bb_fd)
+       .setValue("LU")
+       .setText(str);
+   add(bb_node_sel);
 }
 
 void Params::makeSplit()
@@ -1321,7 +1355,7 @@ void Params::makeContract()
    relax_tol.setName("RELAXATION_EQ_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(1.0e-10)
+       .setValue(1.0e-8)
        .setMinValue(0.0);
    add(relax_tol);
 
@@ -1524,6 +1558,8 @@ void Params::makeLocalOptim()
                   "gradient-based constrained local optimization using NlOpt")
        .addChoice("NLOPT_SLSQP",
                   "gradient-based constrained local optimization using NlOpt")
+       .addChoice("NLOPT_LBFGS",
+                  "gradient-based constrained local optimization using NlOpt")
        .setValue("DEFAULT");
    add(solver);
 
@@ -1563,6 +1599,16 @@ void Params::makeLocalOptim()
        .setValue(1.0e-8)
        .setMinValue(0.0);
    add(obj_abs_tol);
+
+   ////////////////////
+   ParamStr pros;
+   pros.setName("PROSPECTOR")
+       .setCat(cat)
+       .setWhat("Exploration strategy to find feasible points")
+       .addChoice("SIMPLE", "simple test of the point returned by the domain picker")
+       .addChoice("LOCALSOLVER", "Use a local solver to find a feasible point")
+       .setValue("SIMPLE");
+   add(pros);
 }
 
 void Params::makeLinearSolver()

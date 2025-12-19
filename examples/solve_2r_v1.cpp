@@ -9,7 +9,7 @@ int main()
    try
    {
       Params params;
-      params.loadParam("../../examples/param.txt");
+      params.loadParam("bin/rp_params.txt");
 
       Problem problem;
 

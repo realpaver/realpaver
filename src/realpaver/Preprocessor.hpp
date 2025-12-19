@@ -77,6 +77,14 @@ public:
    /// Returns true if the source problem is solved by this
    bool isSolved() const;
 
+   /**
+    * @brief Test function.
+    *
+    * Returns true if the source problem is an optimization problem solved by this
+    * such that no constraint is violated and the objective variable is fixed.
+    */
+   bool isSolvedOptimal() const;
+
    /// Returns the elapsed time of the preprocessing stage in seconds
    double elapsedTime() const;
 
@@ -145,6 +153,9 @@ public:
    /// Returns the target problem
    SharedProblem destProblem() const;
 
+   /// Returns true if this has been used
+   bool isOn() const;
+
 private:
    SharedProblem src_;                // problem before preprocessing
    SharedProblem dest_;               // problem after preprocessing
@@ -153,6 +164,7 @@ private:
    std::vector<Constraint> active_;   // constraints not inactive
    bool unfeasible_;                  // true if problem unfeasible
    Timer timer_;                      // timer
+   bool on_;                          // true if used
 
    bool occursInActiveConstraint(const Variable &v) const;
    bool occursInAlias(const Variable &v) const;

@@ -26,6 +26,7 @@ namespace realpaver {
 LinearizerAffine::LinearizerAffine(SharedDag dag, bool minrange)
     : Linearizer(dag)
     , minrange_(minrange)
+    , mve_()
 {
 }
 
@@ -54,11 +55,17 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
    }
 
    // creates the linear variables for the variables of the affine forms
+   mve_.clear();
    for (const auto &v : scop_)
    {
+      // no form if the variable does not occur in an active constraint
+      if (!creator.hasFun(v))
+         continue;
+
       // creates an affine variable associated with v
       LinVar ev = lpm.makeVar(-1.0, 1.0);
       ev.setName("e!" + v.getName());
+      mve_.insert(std::make_pair(scop_.index(v), ev.getIndex()));
 
       // inserts the constraint v = m + r*ev <=> v - r*ev = m
       const AffineForm &f = creator.fun(v);
@@ -88,10 +95,14 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
 
       Double::rndUp();
       auto it = f.cbegin();
+
       while (it != f.cend())
       {
          std::pair<double, double> p = AffineForm::itv(it).midrad();
-         LinVar ev = lpm.getLinVar(AffineForm::var(it) + scop_.size());
+
+         auto jt = mve_.find(AffineForm::var(it));
+
+         LinVar ev = lpm.getLinVar(jt->second);
          expr.addTerm(p.first, ev);
          ac += Interval(p.second);
          ++it;

@@ -39,6 +39,9 @@ class ConstraintVisitor;
  *
  * The identifier is assigned to a negative value at initialization time, which means that
  * a constraint has no identifier.
+ *
+ * A constraint can be labelled as a constraint of the initial problem (default) or not
+ * (redundant constraint, constraint used to bound an objective function, etc.).
  */
 class ConstraintRep {
 public:
@@ -74,6 +77,12 @@ public:
 
    /// Returns true if the identifier of this has not been initiamized
    bool hasNoId() const;
+
+   /// Returns true if this belongs to the initial problem, false otherwise
+   bool isInitial() const;
+
+   /// Assigns the status of the constraint: initial or not (redundant, ...)
+   void setInitial(bool b = true);
 
    /// Returns true if this constraint is variable free
    virtual bool isConstant() const = 0;
@@ -143,6 +152,7 @@ private:
    Scope scop_;             // scope
    ConstraintRelation rel_; // relation symbol
    int id_;                 // identifier
+   bool initial_;           // true if it belongs to the initial problem
 
 protected:
    size_t hcode_; // hash code

@@ -62,6 +62,16 @@ bool Constraint::hasNoId() const
    return rep_->hasNoId();
 }
 
+bool Constraint::isInitial() const
+{
+   return rep_->isInitial();
+}
+
+void Constraint::setInitial(bool b)
+{
+   rep_->setInitial(b);
+}
+
 bool Constraint::isConstant() const
 {
    return rep_->isConstant();

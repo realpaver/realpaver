@@ -254,4 +254,20 @@ bool DomainBox::equals(const DomainBox &box) const
    return true;
 }
 
+bool DomainBox::contains(const RealPoint &pt) const
+{
+   if (scop_ != pt.scope())
+      return false;
+
+   for (size_t i = 0; i < doms_.size(); ++i)
+   {
+      Interval x(pt.get(scop_.var(i)));
+      doms_[i]->contractInterval(x);
+      if (x.isEmpty())
+         return false;
+   }
+
+   return true;
+}
+
 } // namespace realpaver

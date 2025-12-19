@@ -52,12 +52,19 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "table"         return TK_TABLE;
 "piecewise"     return TK_PW;
 
-"min"    return TK_MIN;
-"max"    return TK_MAX;
-"MIN"    return TK_MIN;
-"MAX"	   return TK_MAX;
-"Min"    return TK_MIN;
-"Max"	   return TK_MAX;
+"min"         return TK_MIN;
+"max"         return TK_MAX;
+"MIN"         return TK_MIN;
+"MAX"	        return TK_MAX;
+"Min"         return TK_MIN;
+"Max"	        return TK_MAX;
+"minimize"    return TK_MIN;
+"maximize"    return TK_MAX;
+"MINIMIZE"    return TK_MIN;
+"MAXIMIZE"	  return TK_MAX;
+"Minimize"    return TK_MIN;
+"Maximize"	  return TK_MAX;
+
 "sqr"	   return TK_SQR;
 "sqrt"	return TK_SQRT;
 "log"    return TK_LOG;

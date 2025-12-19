@@ -139,7 +139,7 @@ private:
 std::ostream &operator<<(std::ostream &os, Objective obj);
 
 /**
- * @brief Creates an abjective function.
+ * @brief Creates an objective function.
  *
  * If f is a constant expression then an exception is thrown. Otherwise, it returns
  * the objective 'minimize z = f'
@@ -147,7 +147,7 @@ std::ostream &operator<<(std::ostream &os, Objective obj);
 Objective minimize(Variable z, Term f);
 
 /**
- * @brief Creates an abjective function.
+ * @brief Creates an objective function.
  *
  * If f is a constant expression then an exception is thrown. Otherwise, it returns
  * the objective 'maximize z = f'

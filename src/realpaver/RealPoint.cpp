@@ -23,6 +23,13 @@
 
 namespace realpaver {
 
+RealPoint::RealPoint(Scope scop)
+    : RealVector(scop.size())
+    , scop_(scop)
+{
+   ASSERT(!scop.isEmpty(), "Empty scope used to create a real point");
+}
+
 RealPoint::RealPoint(Scope scop, double a)
     : RealVector(scop.size(), a)
     , scop_(scop)

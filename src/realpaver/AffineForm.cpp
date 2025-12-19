@@ -676,7 +676,7 @@ void AffineForm::chebyshevCos(const Interval &x, Interval &alpha, Interval &dzet
 
       if (!k.isSingleton())
       {
-         minrangeTan(x, alpha, dzeta, delta);
+         minrangeCos(x, alpha, dzeta, delta);
          return;
       }
 

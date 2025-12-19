@@ -1,0 +1,32 @@
+# Principles of Optimal Design: Modeling and Principles. Papalambros and Wilde,
+# p61-66, 3rd edition, Cambridge.
+Constants
+  L1 = 0.405, # Length of gear/drive screw interface segment (in)
+  C_m = 1, #material cost ($/in3)
+  sigma_all = 20000, #maximum allowable bending stress (psi)
+  tau_all = 22000, #maximum allowable shear stress (psi)
+  f = 0.35; # friction coefficient for steel on plastic
+
+Variables
+  d1 in [0.1,0.625], # diameter of the gear/drive screw interface (in)
+  d2 in [0.1,0.625], # diameter of the thread (in)
+  d3 in [0.1,0.625], # diameter of the bearing surface segment (in)
+  L2 in [7.023,7.523], # length of the thread (in)
+  L3 in [1.1525,1.6525], # length of the bearing surface segment (in)
+  N_m integer in [8,100], # number of teeth of the motor gear
+  N_s integer in [1,52], # number of teeth of the screw
+  N_T integer in [1,24]; # numbre of threads per inch
+
+Minimize C_m*(pi/4)*(0.405*d1^2 + d2^2*L2 + d3^2*L3);
+
+Constraints
+38.88 + 96*L2 + 96*L3 - pi*sigma_all*d2^3 <= 0,
+6*(N_s/N_m) - pi*tau_all*d1^3 <= 0,
+8.345 - L2 - L3 <= 0,
+-9.595 + L2 + L3 <= 0,
+
+5*(N_m/N_s) - 0.0583*N_T <= 0,
+1.5*d2*(pi*f*d2+0.5*N_T^-1)/(0.5*pi*d2-f*N_T^-1) - 0.125*(N_s/N_m) <= 0,
+
+d3<=d2,
+d1<=d2;
