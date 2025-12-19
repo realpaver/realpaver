@@ -40,7 +40,7 @@ public:
    /// No assignment
    SplitRR &operator=(const SplitRR &) = delete;
 
-   void applyImpl(SharedNode &node, NodeContext &context) override;
+   void applyImpl(SharedNode node, NodeContext &context) override;
 
 private:
    // variable selection method

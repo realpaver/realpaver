@@ -56,6 +56,12 @@ void Tolerance::setAbsTol(double val)
    atol_ = val;
 }
 
+bool Tolerance::isTightOptimum(const double &l, const double &u) const
+{
+   return (l != Double::neginf()) && (u != Double::inf()) &&
+          (u - l) <= Double::max(rtol_ * Double::abs(u), atol_);
+}
+
 bool Tolerance::isTight(const Interval &x) const
 {
    if (x.isEmpty())

@@ -48,7 +48,7 @@ public:
    /// Assigns the frequency of application of the SSR strategy
    void setFrequency(double f);
 
-   void applyImpl(SharedNode &node, NodeContext &context) override;
+   void applyImpl(SharedNode node, NodeContext &context) override;
 
 private:
    SelectorSSRLF sel_; // hybrid selector

@@ -18,6 +18,7 @@
  * @date   11 Feb 2025
  */
 
+#include "RealPoint.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/LPModel.hpp"
@@ -57,8 +58,25 @@ ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
     , feastol_(Params::GetDblParam("LP_FEAS_TOL"))
     , loop_(Params::GetStrParam("POLYTOPE_HULL_LOOP") == "YES")
     , looptol_(Params::GetDblParam("POLYTOPE_HULL_LOOP_TOL"))
+    , id_var_obj_(-1)
+    , has_minimizer_(false)
+    , minimizer_(nullptr)
 {
    ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
+
+   for (const auto &v : scope())
+      if (v.getStatus() == VariableStatus::Objective)
+      {
+         id_var_obj_ = scope().index(v);
+         break;
+      }
+
+   minimizer_ = new RealPoint(scope());
+}
+
+ContractorPolytope::~ContractorPolytope()
+{
+   delete minimizer_;
 }
 
 double ContractorPolytope::getRelaxTol() const
@@ -162,22 +180,40 @@ Proof ContractorPolytope::contractImpl(IntervalBox &B, const LinearizeMethod &li
    LOG_LOW("Relaxation " << solver);
 
    // creates additional structures
-   int nv = scope().size(),
-       nlb = nv - 1,               // number of left bounds
-       nrb = nv,                   // number of right bounds
-           *lb = new int[nlb],     // array of indexes of variables (left bounds)
-               *rb = new int[nrb], // array of indexes of variables (right bounds)
-       iv = 0;                     // current variable t be handled
-   LPSense sense = LPSense::Min;   // current optimization sense
+   int nv = scope().size(), // number of variables
+       nlb,                 // number of left bounds
+       nrb,                 // number of right bounds
+       *lb,                 // array of indexes of variables for the left bounds
+       *rb,                 // array of indexes of variables for the right bounds
+       iv;                  // current variable to be handled
+   LPSense sense;           // current optimization sense
 
-   // lb: 1, 2,, ..., n-1 (no need to record the left bound of the first var)
-   for (int i = 0; i < nlb; ++i)
-      lb[i] = i + 1;
+   // the bounds of all the variables but the objective variable are considered here
+   if (id_var_obj_ < 0)
+      nlb = nrb = nv;
+   else
+      nlb = nrb = nv - 1;
 
-   // rb: 0, 1, 2, ..., n-1 (right bounds of all the variables)
-   for (int i = 0; i < nrb; ++i)
-      rb[i] = i;
+   lb = new int[nlb];
+   rb = new int[nrb];
 
+   int k = 0;
+   for (int i = 0; i < nv; ++i)
+   {
+      if (i != id_var_obj_)
+      {
+         lb[k] = rb[k] = i;
+         ++k;
+      }
+   }
+
+   // current variable to be handled
+   iv = lb[0];
+   sense = LPSense::Min;
+   lb[0] = lb[nlb - 1];
+   --nlb;
+
+   has_minimizer_ = false;
    Proof proof = run(solver, B, lb, nlb, rb, nrb, iv, sense);
 
    delete[] lb;
@@ -247,6 +283,9 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
                LOG_LOW("New domain: " << dom);
             }
          }
+         if (iv == id_var_obj_)
+            makeMinimizer(solver);
+
          break;
       }
       case LPStatus::Infeasible: {
@@ -296,13 +335,22 @@ void ContractorPolytope::selectAchterberg(LPSolver &solver, IntervalBox &B, int 
 
    if (nlb + nrb == 0)
    {
-      iv = -1;
+      if (id_var_obj_ < 0 || iv == id_var_obj_)
+      {
+         iv = -1;
+      }
+      else
+      {
+         // last problem: minimize the objective variable
+         iv = id_var_obj_;
+         sense = LPSense::Min;
+      }
       return;
    }
 
    // Achterberg's heuristics. Each bound that is too close to the current
    // primal solution is discarded. Among the other bounds, the one that is
-   // the clothest to the primal solution is selected., which aims at
+   // the clothest to the primal solution is selected, which aims at
    // minimizing the number of iterations of the Simplex algorithm.
    double dist = Double::greatest();
    int idx = -1;
@@ -382,7 +430,18 @@ void ContractorPolytope::selectAchterberg(LPSolver &solver, IntervalBox &B, int 
    }
 
    if (idx == -1)
-      iv = -1;
+   {
+      if (id_var_obj_ < 0)
+      {
+         iv = -1;
+      }
+      else
+      {
+         // last problem: minimize the objective variable
+         iv = id_var_obj_;
+         sense = LPSense::Min;
+      }
+   }
    else
    {
       sense = sns;
@@ -404,23 +463,55 @@ void ContractorPolytope::selectNext(int *lb, int &nlb, int *rb, int &nrb, int &i
 {
    if (nlb + nrb == 0)
    {
-      iv = -1;
-      return;
-   }
-
-   if ((nrb == 0) || (nlb > 0 && sense == LPSense::Max))
-   {
-      iv = lb[0];
-      sense = LPSense::Min;
-      std::swap(lb[0], lb[--nlb]);
+      if (id_var_obj_ < 0 || iv == id_var_obj_)
+      {
+         iv = -1;
+      }
+      else
+      {
+         iv = id_var_obj_;
+         sense = LPSense::Min;
+      }
    }
    else
    {
-      iv = rb[0];
-      sense = LPSense::Max;
-      std::swap(rb[0], rb[--nrb]);
+      if ((nrb == 0) || (nlb > 0 && sense == LPSense::Max))
+      {
+         iv = lb[0];
+         sense = LPSense::Min;
+         std::swap(lb[0], lb[--nlb]);
+      }
+      else
+      {
+         iv = rb[0];
+         sense = LPSense::Max;
+         std::swap(rb[0], rb[--nrb]);
+      }
    }
+
    LOG_LOW("Select next var: " << iv);
+}
+
+bool ContractorPolytope::hasMinimizer() const
+{
+   return has_minimizer_;
+}
+
+const RealPoint &ContractorPolytope::minimizer() const
+{
+   return *minimizer_;
+}
+
+void ContractorPolytope::makeMinimizer(LPSolver &solver)
+{
+   RealVector primal = solver.primalSolution();
+   for (auto v : scope())
+   {
+      LinVar lv = solver.getLinVar(lzr_->linVarIndex(v));
+      minimizer_->set(v, primal[lv.getIndex()]);
+   }
+
+   has_minimizer_ = true;
 }
 
 void ContractorPolytope::print(std::ostream &os) const

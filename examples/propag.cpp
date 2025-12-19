@@ -13,6 +13,8 @@ int main(void)
       Problem problem;
 
       Variable x = problem.addRealVar(-7, 3, "x"), y = problem.addRealVar(-3, 6, "y");
+      size_t i1 = problem.addCtr(y - sqr(x) == 0),
+             i2 = problem.addCtr(sqr(x) + sqr(y) - 2.0 == 0);
 
       DomainBox dbox(problem.scope());
       cout << "Box:    " << dbox << endl;
@@ -21,17 +23,14 @@ int main(void)
       cout << "Interval box:     " << B << endl;
 
       SharedDag dag = std::make_shared<Dag>();
-      //~ size_t i = dag->insert( y == 0.5*x );
-      //~ size_t j = dag->insert( y == 2*x );
+      size_t j1 = dag->insert(problem.ctrAt(i1));
+      size_t j2 = dag->insert(problem.ctrAt(i2));
 
-      size_t i = dag->insert(y - sqr(x) == 0);
-      size_t j = dag->insert(sqr(x) + sqr(y) - 2.0 == 0);
-
-      cout << (*dag) << endl;
+      cout << "-- DAG:" << endl << (*dag) << "--" << endl;
 
       SharedContractorPool pool = std::make_shared<ContractorPool>();
-      pool->push(std::make_shared<ContractorHC4Revise>(dag, i));
-      pool->push(std::make_shared<ContractorHC4Revise>(dag, j));
+      pool->push(std::make_shared<ContractorHC4Revise>(dag, j1));
+      pool->push(std::make_shared<ContractorHC4Revise>(dag, j2));
 
       IntervalPropagator tor(pool);
       tor.setTol(1.0e-4);

@@ -38,6 +38,11 @@ size_t AffineCreator::nbFuns() const
    return lfun_.size();
 }
 
+bool AffineCreator::hasFun(size_t i) const
+{
+   return v_[dag_->fun(lfun_[i])->rootNode()->index()] != nullptr;
+}
+
 const AffineForm &AffineCreator::fun(size_t i) const
 {
    return *v_[dag_->fun(lfun_[i])->rootNode()->index()];
@@ -46,6 +51,11 @@ const AffineForm &AffineCreator::fun(size_t i) const
 std::unique_ptr<AffineForm> AffineCreator::moveFun(size_t i)
 {
    return std::move(v_[dag_->fun(lfun_[i])->rootNode()->index()]);
+}
+
+bool AffineCreator::hasFun(const Variable &v) const
+{
+   return v_[dag_->findVarNode(v.id())->index()] != nullptr;
 }
 
 const AffineForm &AffineCreator::fun(const Variable &v) const
@@ -75,6 +85,7 @@ bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
          LOG_LOW("Affine relaxation for constraint @ " << dag_->fun(i)->ctrId());
       }
    }
+
    return true;
 }
 

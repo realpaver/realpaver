@@ -51,6 +51,12 @@ public:
    /// Returns true if the identifier of this has not been initiamized
    bool hasNoId() const;
 
+   /// Returns true if this belongs to the initial problem, false otherwise
+   bool isInitial() const;
+
+   /// Assigns the status of the constraint: initial or not (redundant, ...)
+   void setInitial(bool b = true);
+
    /// Returns true if this is variable free */
    bool isConstant() const;
 

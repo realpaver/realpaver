@@ -130,6 +130,12 @@ public:
    /// Returns the bitset storing the constraint activities
    const Bitset &active() const;
 
+   /// Output on a stream
+   virtual void print(std::ostream &os) const;
+
+   /// Returns a clone
+   virtual Node *clone() const;
+
 private:
    Scope scop_;     // set of variables
    DomainBox *box_; // variable domains

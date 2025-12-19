@@ -31,7 +31,7 @@
 
 namespace realpaver {
 
-ContractorFactory::ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env)
+ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
     : env_(env)
     , dag_(nullptr)
     , ve_()
@@ -71,6 +71,30 @@ ContractorFactory::ContractorFactory(const Problem &pbm, std::shared_ptr<Env> en
          vc_.push_back(c);
          sc_.insert(c.scope());
       }
+   }
+
+   // objective function
+   if (pbm.hasObjective())
+   {
+      // inserts a constraint used to calculate lower bounds of an equivalent
+      // minimization problem
+      Objective obj = pbm.getObjective();
+      size_t i = 0;
+      if (obj.isMinimization())
+      {
+         // min z = f(X) => equation z-f(X)==0
+         i = pbm.addCtr(obj.getVar() - obj.getTerm() == 0.0);
+      }
+      else
+      {
+         // max z = f(X) <=> min z = -f(X) => equation z+f(X)==0
+         i = pbm.addCtr(obj.getVar() + obj.getTerm() == 0.0);
+      }
+      Constraint c = pbm.ctrAt(i);
+      c.setInitial(false);
+      size_t j = dag_->insert(c);
+      ve_.push_back(j);
+      se_.insert(c.scope());
    }
 
    // inserts the scopes in the bank

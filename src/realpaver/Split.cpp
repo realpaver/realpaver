@@ -45,7 +45,7 @@ Scope Split::scope() const
    return scop_;
 }
 
-void Split::apply(SharedNode &node, NodeContext &context)
+void Split::apply(SharedNode node, NodeContext &context)
 {
    LOG_INTER("Split node " << node->index() << ": " << (*node->box()));
 
@@ -69,7 +69,7 @@ size_t Split::getNbSplits() const
 
 SharedNode Split::cloneNode(const SharedNode &node)
 {
-   SharedNode aux = std::make_shared<Node>(*node);
+   SharedNode aux(node->clone());
    aux->setIndex(++idx_);
    aux->setDepth(1 + node->depth());
    aux->setParent(node->index());

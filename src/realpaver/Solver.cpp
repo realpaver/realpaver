@@ -21,6 +21,7 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/NodePropagatorList.hpp"
 #include "realpaver/Solver.hpp"
 #include "realpaver/SpaceBFS.hpp"
 #include "realpaver/SpaceDFS.hpp"
@@ -114,7 +115,7 @@ void Solver::makeSpace()
    node->setAllActive();
    node->setIndex(0);
 
-   space_->insertPendingNode(node);
+   space_->pushPendingNode(node);
    ++nbnodes_;
 }
 
@@ -275,7 +276,7 @@ void Solver::bpStep(int depthlimit, bool splitOff)
 #endif
 
    // extracts a node from the space
-   SharedNode node = space_->nextPendingNode();
+   SharedNode node = space_->popPendingNode();
 
    // processes it
    bpStepAux(node, depthlimit, splitOff);
@@ -380,12 +381,13 @@ void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
       if (splitOff)
       {
          LOG_INTER("Node limit reached");
-         space_->insertPendingNode(node);
+         space_->pushPendingNode(node);
       }
       else
       {
          nbnodes_ += std::distance(split_->begin(), split_->end());
-         space_->insertPendingNodes(split_->begin(), split_->end());
+         for (auto it = split_->begin(); it != split_->end(); ++it)
+            space_->pushPendingNode(*it);
       }
    }
 
@@ -428,24 +430,24 @@ void Solver::branchAndPrune()
    // parameters
    bool trace = env_->getParams()->getStrParam("TRACE") == "YES";
    int tracefreq = env_->getParams()->getIntParam("TRACE_FREQUENCY");
-   bool complete = (env_->getParams()->getStrParam("SEARCH_STATUS") == "COMPLETE");
+   bool limits = (env_->getParams()->getStrParam("LIMITS_ENABLED") == "YES");
 
    double time_limit;
    int node_limit, sol_limit, depth_limit;
 
-   if (complete)
-   {
-      time_limit = Double::inf();
-      node_limit = std::numeric_limits<int>::max();
-      sol_limit = std::numeric_limits<int>::max();
-      depth_limit = std::numeric_limits<int>::max();
-   }
-   else
+   if (limits)
    {
       time_limit = env_->getParams()->getDblParam("TIME_LIMIT");
       node_limit = env_->getParams()->getIntParam("NODE_LIMIT");
       sol_limit = env_->getParams()->getIntParam("SOLUTION_LIMIT");
       depth_limit = env_->getParams()->getIntParam("DEPTH_LIMIT");
+   }
+   else
+   {
+      time_limit = Double::inf();
+      node_limit = std::numeric_limits<int>::max();
+      sol_limit = std::numeric_limits<int>::max();
+      depth_limit = std::numeric_limits<int>::max();
    }
 
    env_->setTimeLimit(false);
@@ -596,7 +598,7 @@ std::shared_ptr<EnvSolver> Solver::getEnv() const
    return env_;
 }
 
-SharedSpace Solver::getSpace() const
+std::shared_ptr<Space<Node>> Solver::getSpace() const
 {
    return space_;
 }

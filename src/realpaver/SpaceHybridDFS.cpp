@@ -240,7 +240,7 @@ size_t SpaceHybridDFS::nbPendingNodes() const
    return sta_.size() + set_->size();
 }
 
-SharedNode SpaceHybridDFS::nextPendingNode()
+SharedNode SpaceHybridDFS::popPendingNode()
 {
    // gets the top of the stack if it is not empty
    if (sta_.empty())
@@ -257,7 +257,7 @@ SharedNode SpaceHybridDFS::nextPendingNode()
    }
 }
 
-void SpaceHybridDFS::insertPendingNode(const SharedNode &node)
+void SpaceHybridDFS::pushPendingNode(const SharedNode &node)
 {
    // inserts a node in the stack during a DFS stage
    sta_.push_back(node);
@@ -277,28 +277,6 @@ SharedNode SpaceHybridDFS::getPendingNode(size_t i) const
       // gets the j-th node from the set
       size_t j = i - sta_.size();
       return set_->getNode(j);
-   }
-}
-
-void SpaceHybridDFS::insertPendingNodes(Split::iterator first, Split::iterator last)
-{
-   // the nodes between first and last are ordered from left to right
-   // if the DFS ordering is left to right then it is necessary to inverse
-   // the range of iterators
-
-   if (leftRight_)
-   {
-      std::list<SharedNode> aux;
-      for (auto it = first; it != last; ++it)
-         aux.push_front(*it);
-
-      for (auto it = aux.begin(); it != aux.end(); ++it)
-         insertPendingNode(*it);
-   }
-   else
-   {
-      for (auto it = first; it != last; ++it)
-         insertPendingNode(*it);
    }
 }
 

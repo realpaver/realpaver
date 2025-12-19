@@ -21,6 +21,7 @@
 #ifndef REALPAVER_SPACE_BFS_HPP
 #define REALPAVER_SPACE_BFS_HPP
 
+#include "realpaver/Node.hpp"
 #include "realpaver/Space.hpp"
 #include <list>
 
@@ -32,7 +33,7 @@ namespace realpaver {
  * The pending nodes are stored in a FIFO queue in order to implement a BFS
  * strategy.
  */
-class SpaceBFS : public Space {
+class SpaceBFS : public Space<Node> {
 public:
    /// Constructor
    SpaceBFS();
@@ -52,8 +53,8 @@ public:
    SharedNode getSolNode(size_t i) const override;
    bool hasFeasibleSolNode() const override;
    size_t nbPendingNodes() const override;
-   SharedNode nextPendingNode() override;
-   void insertPendingNode(const SharedNode &node) override;
+   SharedNode popPendingNode() override;
+   void pushPendingNode(const SharedNode &node) override;
    SharedNode getPendingNode(size_t i) const override;
 
 private:

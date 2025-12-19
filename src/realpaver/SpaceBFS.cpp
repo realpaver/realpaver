@@ -70,14 +70,14 @@ size_t SpaceBFS::nbPendingNodes() const
    return lnode_.size();
 }
 
-SharedNode SpaceBFS::nextPendingNode()
+SharedNode SpaceBFS::popPendingNode()
 {
    SharedNode node = lnode_.back();
    lnode_.pop_back();
    return node;
 }
 
-void SpaceBFS::insertPendingNode(const SharedNode &node)
+void SpaceBFS::pushPendingNode(const SharedNode &node)
 {
    lnode_.push_front(node);
 }

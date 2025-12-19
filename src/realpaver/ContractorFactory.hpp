@@ -45,7 +45,7 @@ namespace realpaver {
 class ContractorFactory {
 public:
    /// Creates a factory given a problem and an environment for the parameters
-   ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env);
+   ContractorFactory(Problem &pbm, std::shared_ptr<Env> env);
 
    /// Default destructor
    ~ContractorFactory() = default;

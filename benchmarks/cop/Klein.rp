@@ -1,0 +1,8 @@
+Variables
+  j in [0,1],
+  Y in [0.01,0.99];
+
+Min Y*(j+1)*(2-2*Y);
+
+Constraints
+  -Y*log(Y) - (1-Y)*log(1-Y) - (1-0.75*j/(j+1)) == 0;

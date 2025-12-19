@@ -80,14 +80,16 @@ private:
  * tuned according to Achterberg's heuristics, see: A. Baharev, T. Achterberg,
  * and E. Rév. Computation of an extractive distillation column with affine
  * arithmetic. AIChE journal, 2009, 55(7):1695-1704.
+ *
+ * If there is an objective variable, it is minimized after all the other variables.
  */
 class ContractorPolytope : public Contractor {
 public:
    /// Creates a contractor based on a given relaxation technique
    ContractorPolytope(std::unique_ptr<Linearizer> lzr);
 
-   /// Default destructor
-   ~ContractorPolytope() = default;
+   /// Destructor
+   ~ContractorPolytope();
 
    /// No copy
    ContractorPolytope(const ContractorPolytope &) = delete;
@@ -135,6 +137,22 @@ public:
     */
    void enforceLoop(bool loop, double tol = 0.0);
 
+   /**
+    * @brief Result of the minimization of the objective variable.
+    *
+    * Returns true if the LP problem "minimize z" where z is the objective variable
+    * has been successfully solved by the last call of a contract method, false otherwise.
+    */
+   bool hasMinimizer() const;
+
+   /**
+    * @brief Result of the minimization of the objective variable.
+    *
+    * If hasMinimizer()==true, it returns the vertex of the polytope leading to the
+    * optimum of the problem "minimize z" where z is the objective variable.
+    */
+   const RealPoint &minimizer() const;
+
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
    Proof contract(IntervalBox &B, const Bitset &active) override;
@@ -149,6 +167,11 @@ private:
    double feastol_;    // feasibility tolerance
    bool loop_;         // true when applied in a fixed-point loop
    double looptol_;    // improvement factor of the fixed-point loop
+   int id_var_obj_;    // local index of the objective variable in the scope if it
+   // exists, -1 otherwise
+
+   bool has_minimizer_;
+   RealPoint *minimizer_;
 
    // tunes the LP solver
    void tuneLPSolver(LPSolver &solver);
@@ -163,6 +186,8 @@ private:
    void selectAchterberg(LPSolver &solver, IntervalBox &B, int *lb, int &nlb, int *rb,
                          int &nrb, int &iv, LPSense &sense);
    void selectNext(int *lb, int &nlb, int *rb, int &nrb, int &iv, LPSense &sense);
+
+   void makeMinimizer(LPSolver &solver);
 };
 
 /// type of shared contractors

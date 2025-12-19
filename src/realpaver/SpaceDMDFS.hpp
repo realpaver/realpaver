@@ -21,6 +21,7 @@
 #ifndef REALPAVER_SPACE_DMDFS_HPP
 #define REALPAVER_SPACE_DMDFS_HPP
 
+#include "realpaver/Node.hpp"
 #include "realpaver/Space.hpp"
 
 namespace realpaver {
@@ -58,7 +59,7 @@ public:
  * The distance used can be parameterized through a distance calculator.
  * The default one is the Hausdorff distance.
  */
-class SpaceDMDFS : public Space {
+class SpaceDMDFS : public Space<Node> {
 public:
    /// Constructor
    SpaceDMDFS();
@@ -79,8 +80,8 @@ public:
    bool hasFeasibleSolNode() const override;
    void makeSolClusters(double gap) override;
    size_t nbPendingNodes() const override;
-   SharedNode nextPendingNode() override;
-   void insertPendingNode(const SharedNode &node) override;
+   SharedNode popPendingNode() override;
+   void pushPendingNode(const SharedNode &node) override;
    SharedNode getPendingNode(size_t i) const override;
 
    /// Assigns the distance calculator in this

@@ -41,7 +41,7 @@ public:
    /// No assignment
    SplitSSR &operator=(const SplitSSR &) = delete;
 
-   void applyImpl(SharedNode &node, NodeContext &context) override;
+   void applyImpl(SharedNode node, NodeContext &context) override;
 
 private:
    SelectorSSR ssr_; // main selector based on SSR values

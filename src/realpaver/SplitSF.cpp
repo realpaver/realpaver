@@ -29,7 +29,7 @@ SplitSF::SplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
 {
 }
 
-void SplitSF::applyImpl(SharedNode &node, NodeContext &context)
+void SplitSF::applyImpl(SharedNode node, NodeContext &context)
 {
    if (sel_.apply(*node->box()))
    {

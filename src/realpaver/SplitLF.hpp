@@ -41,7 +41,7 @@ public:
    /// No assignment
    SplitLF &operator=(const SplitLF &) = delete;
 
-   void applyImpl(SharedNode &node, NodeContext &context) override;
+   void applyImpl(SharedNode node, NodeContext &context) override;
 
 private:
    SelectorLF sel_;

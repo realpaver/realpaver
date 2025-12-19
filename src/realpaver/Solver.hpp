@@ -21,6 +21,7 @@
 #ifndef REALPAVER_SOLVER_HPP
 #define REALPAVER_SOLVER_HPP
 
+#include "realpaver/ContractorFactory.hpp"
 #include "realpaver/EnvSolver.hpp"
 #include "realpaver/NodePropagator.hpp"
 #include "realpaver/Preprocessor.hpp"
@@ -86,7 +87,7 @@ public:
    std::shared_ptr<EnvSolver> getEnv() const;
 
    /// Returns the space of this
-   SharedSpace getSpace() const;
+   std::shared_ptr<Space<Node>> getSpace() const;
 
    /// Returns the preprocessor used by this
    SharedPreprocessor getPreprocessor() const;
@@ -118,7 +119,7 @@ private:
    SharedPreprocessor pp_;                      // preprocessor
    std::unique_ptr<NodeContext> context_;       // solving context for the BP algorithm
    std::shared_ptr<EnvSolver> env_;             // environment
-   SharedSpace space_;                          // search tree
+   std::shared_ptr<Space<Node>> space_;         // search tree
    SharedDag dag_;                              // dag
    std::unique_ptr<NodePropagator> propagator_; // contraction method
    std::unique_ptr<Split> split_;               // splitting strategy
