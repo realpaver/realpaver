@@ -18,6 +18,7 @@
  * @date   6 Oct 2025
  */
 
+#include "DomainBox.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BoxPicker.hpp"
 #include "realpaver/Common.hpp"
@@ -79,10 +80,6 @@ Optimizer::Optimizer(const Problem &problem)
    problem_ = std::make_shared<Problem>(problem);
    pp_ = std::make_shared<Preprocessor>(problem_);
 }
-
-// TODO : attention au signe de [L, U] si le pb initial est un max
-// dans getSolution, il faut inverser le signe du domaine de z apres un branch and
-// bound, sauf si le probleme est resolu par le preprocesseur
 
 double Optimizer::getSolvingTime() const
 {
@@ -161,6 +158,18 @@ void Optimizer::makeSpace()
        std::make_shared<NodeOptim>(newprob->scope(), newprob->nbCtrs());
    node->setAllActive();
    node->setIndex(0);
+
+   Objective o = newprob->getObjective();
+   if (o.isMaximization())
+   {
+      // the domain of the objective variable after the preprocessing step corresponds to
+      // a maximization problem; since the branch and bound solves a minimization problem
+      // (max f replaced by min -f) then the opposite of this domain must be considered
+      DomainBox *box = node->box();
+      Interval dom = box->get(z_)->intervalHull();
+      std::unique_ptr<IntervalDomain> mod = std::make_unique<IntervalDomain>(-dom);
+      box->set(z_, std::move(mod));
+   }
 
    space_->pushPendingNode(node);
    ++nbnodes_;
@@ -361,8 +370,8 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
          // gets a node and contracts the box
          SharedNodeOptim subnode = std::static_pointer_cast<NodeOptim>(*it);
 
-         LOG_INTER("Node " << node->index() << ": processing of subnode "
-                           << subnode->index());
+         LOG_INTER("Processing of subnode " << subnode->index());
+         LOG_INTER("Box: " << (*subnode->box()));
 
          // Updates the upper bound to U_
          Domain *zdom = subnode->box()->get(z_);
@@ -473,10 +482,16 @@ void Optimizer::branchAndBound()
    SharedProblem newprob = pp_->destProblem();
    Objective o = newprob->getObjective();
    z_ = o.getVar();
+   int sign_obj = 1; // used to trace the bounds
    if (o.isMinimization())
+   {
       obj_ = o.getTerm();
+   }
    else
+   {
       obj_ = -o.getTerm();
+      sign_obj = -1;
+   }
 
    // assigns the tolerance of each variable to (0.0, 0.0)
    for (auto v : newprob->scope())
@@ -563,14 +578,14 @@ void Optimizer::branchAndBound()
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat
-                   << "\t\tL: " << "\033[35m" << L_ << "\033[39m" << std::endl;
+                   << "\t\tL: " << "\033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
       }
       if (trace && saveU_ != U_)
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat
-                   << "\t\tU: " << "\033[36m" << U_ << "\033[39m" << std::endl;
+                   << "\t\tU: " << "\033[36m" << U_ * sign_obj << "\033[39m" << std::endl;
       }
 
       if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
