@@ -339,7 +339,7 @@ void Optimizer::bbStep(int depthlimit)
 
 #if REALPAVER_LOG_ON
    timerStep.stop();
-   LOG_INTER("Total time steps : " << timerStep.elapsedTime() << "(s)");
+   LOG_INTER("Total time steps: " << timerStep.elapsedTime() << "(s)");
 #endif
 }
 
