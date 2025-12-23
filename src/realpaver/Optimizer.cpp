@@ -483,6 +483,7 @@ void Optimizer::branchAndBound()
    Objective o = newprob->getObjective();
    z_ = o.getVar();
    int sign_obj = 1; // used to trace the bounds
+   std::string sL = "L", sU = "U";
    if (o.isMinimization())
    {
       obj_ = o.getTerm();
@@ -491,6 +492,7 @@ void Optimizer::branchAndBound()
    {
       obj_ = -o.getTerm();
       sign_obj = -1;
+      std::swap(sL, sU);
    }
 
    // assigns the tolerance of each variable to (0.0, 0.0)
@@ -577,15 +579,15 @@ void Optimizer::branchAndBound()
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
-         std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat
-                   << "\t\tL: " << "\033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
+         std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
+                   << sL << ": \033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
       }
       if (trace && saveU_ != U_)
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
-         std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat
-                   << "\t\tU: " << "\033[36m" << U_ * sign_obj << "\033[39m" << std::endl;
+         std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
+                   << sU << ": \033[36m" << U_ * sign_obj << "\033[39m" << std::endl;
       }
 
       if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
