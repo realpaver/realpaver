@@ -54,7 +54,7 @@ void ConstraintTableCol::addValue(const Interval &x)
 
 Interval ConstraintTableCol::getVal(size_t i) const
 {
-   ASSERT(i < size(), "Bad access in a column of a table constraint @ " << i);
+   REALPAVER_ASSERT(i < size(), "Bad access in a column of a table constraint @ " << i);
    return vval_[i];
 }
 
@@ -82,8 +82,8 @@ ConstraintTable::ConstraintTable(const std::initializer_list<ConstraintTableCol>
     : ConstraintRep(ConstraintRelation::Table)
     , vcol_(l)
 {
-   ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
-   ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
+   REALPAVER_ASSERT(nbCols() > 0, "Bad initialization of a constraint table");
+   REALPAVER_ASSERT(nbRows() > 0, "Bad initialization of a constraint table");
 
    // makes the scope and calculates the hash code
    makeScopeAndHashCode();
@@ -97,8 +97,8 @@ ConstraintTable::ConstraintTable(const std::initializer_list<Variable> &vars,
    size_t nbvar = vars.size();
    size_t nbitv = values.size();
 
-   ASSERT(nbvar > 0 && nbitv > nbvar && (nbitv % nbvar == 0),
-          "Bad initialization of a constraint table");
+   REALPAVER_ASSERT(nbvar > 0 && nbitv > nbvar && (nbitv % nbvar == 0),
+                    "Bad initialization of a constraint table");
 
    // creates the columns
    for (auto itv = vars.begin(); itv != vars.end(); ++itv)
@@ -162,30 +162,31 @@ size_t ConstraintTable::nbRows() const
 
 Variable ConstraintTable::getVar(size_t j) const
 {
-   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   REALPAVER_ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j].getVar();
 }
 
 Interval ConstraintTable::getVal(size_t i, size_t j) const
 {
-   ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
-   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   REALPAVER_ASSERT(i < nbRows(), "Bad access to a row in a table constraint @ " << i);
+   REALPAVER_ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j].getVal(i);
 }
 
 ConstraintTableCol ConstraintTable::getCol(size_t j) const
 {
-   ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
+   REALPAVER_ASSERT(j < nbCols(), "Bad access to a column in a table constraint @ " << j);
    return vcol_[j];
 }
 
 void ConstraintTable::addCol(const ConstraintTableCol &col)
 {
-   ASSERT(vcol_.empty() || col.size() == nbRows(),
-          "Bad insertion of a new column in a table constraint");
+   REALPAVER_ASSERT(vcol_.empty() || col.size() == nbRows(),
+                    "Bad insertion of a new column in a table constraint");
 
-   ASSERT(!dependsOn(col.getVar()),
-          "Variable already present in a table constraint: " << col.getVar().getName());
+   REALPAVER_ASSERT(
+       !dependsOn(col.getVar()),
+       "Variable already present in a table constraint: " << col.getVar().getName());
 
    vcol_.push_back(col);
 

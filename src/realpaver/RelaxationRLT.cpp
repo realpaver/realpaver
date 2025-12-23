@@ -28,8 +28,8 @@ RLTCreator::RLTCreator(LPModel *lpm, std::shared_ptr<MapType> mnv)
     , mnv_(mnv)
     , fail_(false)
 {
-   ASSERT(lpm != nullptr, "Null pointer ");
-   ASSERT(mnv != nullptr, "Null pointer");
+   REALPAVER_ASSERT(lpm != nullptr, "Null pointer ");
+   REALPAVER_ASSERT(mnv != nullptr, "Null pointer");
 }
 
 size_t RLTCreator::indexLinVar(const DagNode *node) const
@@ -1176,7 +1176,8 @@ void underConvex(LPModel &lm, size_t iy, size_t ix, double a, double b, double c
                  std::function<Interval(Interval)> f,
                  std::function<Interval(Interval)> df)
 {
-   ASSERT(a <= c && c <= b, "Bad values for the relaxation of a convex function");
+   REALPAVER_ASSERT(a <= c && c <= b,
+                    "Bad values for the relaxation of a convex function");
 
    if (a == b)
       return;
@@ -1243,7 +1244,8 @@ void overConcave(LPModel &lm, size_t iy, size_t ix, double a, double b, double c
                  std::function<Interval(Interval)> f,
                  std::function<Interval(Interval)> df)
 {
-   ASSERT(a <= c && c <= b, "Bad values for the relaxation of a concave function");
+   REALPAVER_ASSERT(a <= c && c <= b,
+                    "Bad values for the relaxation of a concave function");
 
    if (a == b)
       return;

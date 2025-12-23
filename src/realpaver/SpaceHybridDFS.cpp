@@ -219,7 +219,7 @@ SharedNode SpaceHybridDFS::popSolNode()
 
 SharedNode SpaceHybridDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
+   REALPAVER_ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
 
    return vsol_[i];
 }
@@ -265,7 +265,7 @@ void SpaceHybridDFS::pushPendingNode(const SharedNode &node)
 
 SharedNode SpaceHybridDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a space");
+   REALPAVER_ASSERT(i < nbPendingNodes(), "Bad access to a pending node in a space");
 
    if (i < sta_.size())
    {

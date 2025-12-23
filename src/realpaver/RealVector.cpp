@@ -164,7 +164,8 @@ RealVector operator-(const RealVector &V)
 
 double operator*(const RealVector &V, const RealVector &W)
 {
-   ASSERT(V.size() == W.size(), "Scalar product of vectors having different sizes");
+   REALPAVER_ASSERT(V.size() == W.size(),
+                    "Scalar product of vectors having different sizes");
 
    double res = Double::mul(V[0], W[0]);
 
@@ -188,7 +189,7 @@ RealVector operator*(const RealVector &V, double a)
 
 RealVector operator*(const RealMatrix &A, const RealVector &X)
 {
-   ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
+   REALPAVER_ASSERT(A.ncols() == X.size(), "Bad dimensions " << A << " * " << X);
 
    RealVector Y(A.nrows());
 

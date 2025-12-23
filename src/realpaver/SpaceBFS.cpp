@@ -49,7 +49,7 @@ SharedNode SpaceBFS::popSolNode()
 
 SharedNode SpaceBFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
+   REALPAVER_ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
 
    return vsol_[i];
 }
@@ -84,7 +84,7 @@ void SpaceBFS::pushPendingNode(const SharedNode &node)
 
 SharedNode SpaceBFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < lnode_.size(), "Bad access to a pending node in a space");
+   REALPAVER_ASSERT(i < lnode_.size(), "Bad access to a pending node in a space");
 
    auto it = lnode_.begin();
    if (i != 0)

@@ -31,7 +31,7 @@ Linearizer::Linearizer(SharedDag dag)
     , tol_(Params::GetDblParam("RELAXATION_EQ_TOL"))
     , mvv_()
 {
-   ASSERT(dag_ != nullptr, "No dag in a polytope maker");
+   REALPAVER_ASSERT(dag_ != nullptr, "No dag in a polytope maker");
    scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
@@ -79,7 +79,7 @@ double Linearizer::getRelaxTol() const
 
 void Linearizer::setRelaxTol(double tol)
 {
-   ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
+   REALPAVER_ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
    tol_ = tol;
 }
 

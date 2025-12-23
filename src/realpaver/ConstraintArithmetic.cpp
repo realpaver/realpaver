@@ -537,7 +537,8 @@ ConstraintIn::ConstraintIn(Term t, const Interval &x)
     : ConstraintBinary(t, x, ConstraintRelation::In)
     , x_(x)
 {
-   ASSERT(!(x.isEmpty() || x.isUniverse()), "Bad interval target in a IN constraint");
+   REALPAVER_ASSERT(!(x.isEmpty() || x.isUniverse()),
+                    "Bad interval target in a IN constraint");
 
    fun_ = std::make_shared<FlatFunction>(t, x);
 }
@@ -550,6 +551,11 @@ Interval ConstraintIn::image() const
 Term ConstraintIn::term() const
 {
    return left();
+}
+
+void ConstraintIn::print(std::ostream &os) const
+{
+   os << left() << " in " << x_;
 }
 
 void ConstraintIn::acceptVisitor(ConstraintVisitor &vis) const

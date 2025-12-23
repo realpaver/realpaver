@@ -33,8 +33,8 @@ Node::Node(Scope scop, int nbc, int depth)
     , parent_(-1)
     , proof_(Proof::Maybe)
 {
-   ASSERT(depth >= 0, "Bad node depth: " << depth);
-   ASSERT(!scop.isEmpty(), "Empty scope used to create a node");
+   REALPAVER_ASSERT(depth >= 0, "Bad node depth: " << depth);
+   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope used to create a node");
 
    box_ = new DomainBox(scop);
    active_.setAllOne();
@@ -49,7 +49,7 @@ Node::Node(std::unique_ptr<DomainBox> box, int nbc, int depth)
     , parent_(-1)
     , proof_(Proof::Maybe)
 {
-   ASSERT(depth >= 0, "Bad node depth: " << depth);
+   REALPAVER_ASSERT(depth >= 0, "Bad node depth: " << depth);
    active_.setAllOne();
 }
 
@@ -77,7 +77,7 @@ int Node::depth() const
 
 void Node::setDepth(int depth)
 {
-   ASSERT(depth >= 0, "Bad node depth: " << depth);
+   REALPAVER_ASSERT(depth >= 0, "Bad node depth: " << depth);
 
    depth_ = depth;
 }
@@ -129,25 +129,29 @@ void Node::setProof(Proof p)
 
 bool Node::isActive(size_t i) const
 {
-   ASSERT(i < active_.size(), "Bad access to the activity of a constraint @ " << i);
+   REALPAVER_ASSERT(i < active_.size(),
+                    "Bad access to the activity of a constraint @ " << i);
    return active_.get(i) != 0;
 }
 
 void Node::setActive(size_t i)
 {
-   ASSERT(i < active_.size(), "Bad access to the activity of a constraint @ " << i);
+   REALPAVER_ASSERT(i < active_.size(),
+                    "Bad access to the activity of a constraint @ " << i);
    active_.setOne(i);
 }
 
 bool Node::isInactive(size_t i) const
 {
-   ASSERT(i < active_.size(), "Bad access to the activity of a constraint @ " << i);
+   REALPAVER_ASSERT(i < active_.size(),
+                    "Bad access to the activity of a constraint @ " << i);
    return active_.get(i) == 0;
 }
 
 void Node::setInactive(size_t i)
 {
-   ASSERT(i < active_.size(), "Bad access to the activity of a constraint @ " << i);
+   REALPAVER_ASSERT(i < active_.size(),
+                    "Bad access to the activity of a constraint @ " << i);
    active_.setZero(i);
 }
 

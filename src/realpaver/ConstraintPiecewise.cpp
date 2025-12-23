@@ -45,8 +45,8 @@ ConstraintPiecewise::ConstraintPiecewise(Variable v)
 
 void ConstraintPiecewise::addPiece(Variable b, const Interval &guard, Constraint body)
 {
-   ASSERT(!guard.isEmpty(), "Empty guard in a piecewise constraint");
-   ASSERT(b.isBinary(), "Non binary variable in a piecewise constraint");
+   REALPAVER_ASSERT(!guard.isEmpty(), "Empty guard in a piecewise constraint");
+   REALPAVER_ASSERT(b.isBinary(), "Non binary variable in a piecewise constraint");
 
    // checks that the guards do not strictly overlap
    for (const auto &x : itvs_)
@@ -484,8 +484,8 @@ std::string ConstraintPiecewise::getNextBinaryName()
 Constraint piecewise(Variable v, const std::vector<Interval> &guards,
                      const std::vector<Constraint> &bodies, Problem &pb)
 {
-   ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
-   ASSERT(guards.size() > 0, "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() > 0, "Bad piecewise constraint");
 
    std::shared_ptr<ConstraintPiecewise> rep = std::make_shared<ConstraintPiecewise>(v);
    for (size_t i = 0; i < guards.size(); i++)
@@ -501,8 +501,8 @@ Constraint piecewise(Variable v, const std::vector<Interval> &guards,
 Constraint piecewise(Variable v, const std::initializer_list<Interval> &guards,
                      const std::initializer_list<Constraint> &bodies, Problem &pb)
 {
-   ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
-   ASSERT(guards.size() > 0, "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() > 0, "Bad piecewise constraint");
 
    std::shared_ptr<ConstraintPiecewise> rep = std::make_shared<ConstraintPiecewise>(v);
    auto it1 = guards.begin();
@@ -521,9 +521,9 @@ Constraint piecewise(Variable v, const std::vector<Variable> &bins,
                      const std::vector<Interval> &guards,
                      const std::vector<Constraint> &bodies)
 {
-   ASSERT(bins.size() == guards.size(), "Bad piecewise constraint");
-   ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
-   ASSERT(guards.size() > 0, "Bad piecewise constraint");
+   REALPAVER_ASSERT(bins.size() == guards.size(), "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() > 0, "Bad piecewise constraint");
 
    std::shared_ptr<ConstraintPiecewise> rep = std::make_shared<ConstraintPiecewise>(v);
    for (size_t i = 0; i < guards.size(); i++)
@@ -537,9 +537,9 @@ Constraint piecewise(Variable v, const std::initializer_list<Variable> &bins,
                      const std::initializer_list<Interval> &guards,
                      const std::initializer_list<Constraint> &bodies)
 {
-   ASSERT(bins.size() == guards.size(), "Bad piecewise constraint");
-   ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
-   ASSERT(guards.size() > 0, "Bad piecewise constraint");
+   REALPAVER_ASSERT(bins.size() == guards.size(), "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() == bodies.size(), "Bad piecewise constraint");
+   REALPAVER_ASSERT(guards.size() > 0, "Bad piecewise constraint");
 
    std::shared_ptr<ConstraintPiecewise> rep = std::make_shared<ConstraintPiecewise>(v);
    auto it1 = bins.begin();

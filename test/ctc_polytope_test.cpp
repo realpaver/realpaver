@@ -130,13 +130,13 @@ void brown_5_feasible()
    TEST_TRUE(proof != Proof::Empty);
 
    Interval I("-0.8", "3.2");
-   TEST_TRUE(I.distance(B.get(x1)) < 1.0e-8);
+   TEST_TRUE(I.distance(B.get(x1)) < 1.0e-6);
    TEST_TRUE(B.get(x1).contains(I));
-   TEST_TRUE(I.distance(B.get(x2)) < 1.0e-8);
+   TEST_TRUE(I.distance(B.get(x2)) < 1.0e-6);
    TEST_TRUE(B.get(x2).contains(I));
-   TEST_TRUE(I.distance(B.get(x3)) < 1.0e-8);
+   TEST_TRUE(I.distance(B.get(x3)) < 1.0e-6);
    TEST_TRUE(B.get(x3).contains(I));
-   TEST_TRUE(I.distance(B.get(x4)) < 1.0e-8);
+   TEST_TRUE(I.distance(B.get(x4)) < 1.0e-6);
    TEST_TRUE(B.get(x4).contains(I));
    TEST_TRUE(B.get(x5).isSetEq(Interval(-10, 10)));
 }

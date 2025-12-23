@@ -30,7 +30,7 @@ AffineCreator::AffineCreator(SharedDag dag, bool minrange)
     , v_(dag_->nbNodes())
     , lfun_()
 {
-   ASSERT(dag != nullptr, "Null pointer");
+   REALPAVER_ASSERT(dag != nullptr, "Null pointer");
 }
 
 size_t AffineCreator::nbFuns() const
@@ -70,7 +70,7 @@ void AffineCreator::useMinrange(bool minrange)
 
 bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
 {
-   ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
+   REALPAVER_ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
 
    AffineForm::useMinrange(minrange_);
 
@@ -91,8 +91,8 @@ bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
 
 bool AffineCreator::create(const IntervalBox &B, size_t i)
 {
-   ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
-   ASSERT(i < dag_->nbFuns(), "Bad index of function @ " << i);
+   REALPAVER_ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
+   REALPAVER_ASSERT(i < dag_->nbFuns(), "Bad index of function @ " << i);
 
    AffineForm::useMinrange(minrange_);
 
@@ -276,7 +276,7 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
       f = std::make_unique<AffineForm>(aux->getCst());
 
       // loop on the linear terms
-      for (int j = 0; j < aux->nbTerms(); ++j)
+      for (size_t j = 0; j < aux->nbTerms(); ++j)
       {
          // affine form of the variable in this term
          const AffineForm &g = *v_[aux->varNode(j)->index()];

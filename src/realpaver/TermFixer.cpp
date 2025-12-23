@@ -27,7 +27,7 @@ TermFixer::TermFixer(SharedProblemBridge bridge)
     : bridge_(bridge)
     , rt_()
 {
-   ASSERT(bridge != nullptr, "Bad initialization of a term fixer");
+   REALPAVER_ASSERT(bridge != nullptr, "Bad initialization of a term fixer");
 }
 
 Term TermFixer::getTerm() const

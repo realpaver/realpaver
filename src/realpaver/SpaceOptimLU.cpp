@@ -38,7 +38,7 @@ SpaceOptimLU::SpaceOptimLU()
 
 void SpaceOptimLU::setRatio(double ratio)
 {
-   ASSERT(ratio >= 0.0 && ratio <= 1.0, "Bad ratio");
+   REALPAVER_ASSERT(ratio >= 0.0 && ratio <= 1.0, "Bad ratio");
    r_ = ratio;
 }
 

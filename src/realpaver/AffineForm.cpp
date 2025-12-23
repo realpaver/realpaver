@@ -66,7 +66,7 @@ AffineForm::AffineForm(const double &a0, const std::initializer_list<double> &A,
     , l_()
     , e_(e)
 {
-   ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
+   REALPAVER_ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
    THROW_IF(Double::isNan(a0) || Double::isInf(a0), "Affine form invalid");
    THROW_IF(e.isEmpty() || e.isInf(), "Affine form invalid");
 
@@ -88,7 +88,7 @@ AffineForm::AffineForm(const Interval &a0, const std::initializer_list<Interval>
     , l_()
     , e_(e)
 {
-   ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
+   REALPAVER_ASSERT(A.size() == V.size(), "Bad initialization of an affine form");
    THROW_IF(a0.isEmpty() || a0.isInf(), "Affine form invalid");
    THROW_IF(e.isEmpty() || e.isInf(), "Affine form invalid");
 

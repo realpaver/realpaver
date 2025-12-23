@@ -31,8 +31,8 @@ Split::Split(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
     , nbs_(0)
     , idx_(0)
 {
-   ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
-   ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
+   REALPAVER_ASSERT(!scop.isEmpty(), "Creation of a split object with an empty scope");
+   REALPAVER_ASSERT(slicerMap_ != nullptr, "No domain slicer map in a split object");
 }
 
 Split::~Split()

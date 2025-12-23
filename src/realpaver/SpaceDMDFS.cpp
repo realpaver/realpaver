@@ -33,7 +33,8 @@ DistCalculator::~DistCalculator()
 
 double HausdorffDistCalculator::distance(const DomainBox &db1, const DomainBox &db2)
 {
-   ASSERT(db1.scope() == db2.scope(), "The scopes of the two boxes must be equal");
+   REALPAVER_ASSERT(db1.scope() == db2.scope(),
+                    "The scopes of the two boxes must be equal");
 
    double d = 0.0;
    for (const auto &v : db1.scope())
@@ -103,7 +104,7 @@ SharedNode SpaceDMDFS::popSolNode()
 
 SharedNode SpaceDMDFS::getSolNode(size_t i) const
 {
-   ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
+   REALPAVER_ASSERT(i < vsol_.size(), "Bad access to a solution node in a space");
 
    return vsol_[i];
 }
@@ -183,7 +184,7 @@ void SpaceDMDFS::pushPendingNode(const SharedNode &node)
 
 SharedNode SpaceDMDFS::getPendingNode(size_t i) const
 {
-   ASSERT(i < vnode_.size(), "Bad access to a pending node in a space");
+   REALPAVER_ASSERT(i < vnode_.size(), "Bad access to a pending node in a space");
 
    return vnode_[i].node;
 }

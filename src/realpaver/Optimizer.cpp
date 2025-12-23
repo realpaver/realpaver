@@ -361,7 +361,8 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
          // gets a node and contracts the box
          SharedNodeOptim subnode = std::static_pointer_cast<NodeOptim>(*it);
 
-         LOG_INTER("Processing of subnode " << subnode->index());
+         LOG_INTER("Node " << node->index() << ": processing of subnode "
+                           << subnode->index());
 
          // Updates the upper bound to U_
          Domain *zdom = subnode->box()->get(z_);

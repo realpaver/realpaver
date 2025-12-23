@@ -349,11 +349,11 @@ NLPSolver::~NLPSolver()
 
 OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &src)
 {
-   ASSERT(box.scope().contains(scope()),
-          "Bad scope of an interval box given as input of NlpOpt");
+   REALPAVER_ASSERT(box.scope().contains(scope()),
+                    "Bad scope of an interval box given as input of NlpOpt");
 
-   ASSERT(src.scope().contains(scope()),
-          "Bad scope of astarting point given as input of NlpOpt");
+   REALPAVER_ASSERT(src.scope().contains(scope()),
+                    "Bad scope of astarting point given as input of NlpOpt");
 
    // projects B and src on the scope of this
    IntervalBox X(box, this->scope());

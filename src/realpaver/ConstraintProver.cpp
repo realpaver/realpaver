@@ -33,7 +33,7 @@ ConstraintProver::ConstraintProver(IntervalBox &B, double tol)
     , tol_(tol)
     , feasible_(false)
 {
-   ASSERT(tol >= 0.0, "A tolerance used to relax constraints must be positive");
+   REALPAVER_ASSERT(tol >= 0.0, "A tolerance used to relax constraints must be positive");
 }
 
 double ConstraintProver::getTolerance() const

@@ -113,7 +113,7 @@ The solver is created for the problem. The parameters are applied to the solver 
 
 ``` cpp
 CSPSolver solver(problem);
-solver.getEnv()->setParam(prm);
+solver.getEnv()->setParams(prm);
 solver.solve();
 ```
 
@@ -187,7 +187,7 @@ int main()
                          y == 4.25});
 
         CSPSolver solver(problem);
-        solver.getEnv()->setParam(prm);
+        solver.getEnv()->setParams(prm);
         solver.solve();
         for (size_t i=0; i<solver.nbSolutions(); ++i)
         {

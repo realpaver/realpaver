@@ -176,6 +176,7 @@ public:
    /// Returns the term
    Term term() const;
 
+   void print(std::ostream &os) const override;
    void acceptVisitor(ConstraintVisitor &vis) const override;
    Proof isSatisfied(const IntervalBox &B) override;
    double violation(const IntervalBox &B) override;

@@ -941,7 +941,7 @@ size_t DagLin::nbTerms() const
 
 DagVar *DagLin::varNode(size_t i) const
 {
-   ASSERT(i < nbTerms(), "Bad access in a DagLin node @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a DagLin node @ " << i);
 
    auto it = terms_.begin();
    std::advance(it, i);
@@ -950,7 +950,7 @@ DagVar *DagLin::varNode(size_t i) const
 
 Interval DagLin::coef(size_t i) const
 {
-   ASSERT(i < nbTerms(), "Bad access in a DagLin node @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a DagLin node @ " << i);
 
    auto it = terms_.begin();
    std::advance(it, i);
@@ -1057,7 +1057,7 @@ void DagFun::setCtrId(int i)
 
 bool DagFun::isActive(const Bitset &active) const
 {
-   ASSERT(ctrid_ < active.size(), "Bad access in the bitset");
+   REALPAVER_ASSERT(ctrid_ < active.size(), "Bad access in the bitset");
    return active.get(ctrid_);
 }
 
@@ -1230,7 +1230,7 @@ DagVar *Dag::varNode(size_t i) const
 
 DagFun *Dag::fun(size_t i) const
 {
-   ASSERT(i < nbFuns(), "Access out of range to a DAG function");
+   REALPAVER_ASSERT(i < nbFuns(), "Access out of range to a DAG function");
 
    return fun_[i];
 }
@@ -1484,8 +1484,8 @@ void Dag::iEval(const IntervalBox &B, IntervalVector &V)
 
 void Dag::iDiff(const IntervalBox &B, IntervalMatrix &J)
 {
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a DAG");
+   REALPAVER_ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+                    "Bad dimensions of a Jacobian matrix used in a DAG");
 
    for (size_t i = 0; i < nbFuns(); ++i)
    {
@@ -1510,11 +1510,11 @@ void Dag::iDiff(const IntervalBox &B, IntervalMatrix &J)
 
 void Dag::iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H)
 {
-   ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
-          "Bad dimensions of a Hansen matrix used in a DAG");
+   REALPAVER_ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
+                    "Bad dimensions of a Hansen matrix used in a DAG");
 
-   ASSERT(nbVars() == nbFuns(),
-          "Hansen's derivatives can be computed only for square systems");
+   REALPAVER_ASSERT(nbVars() == nbFuns(),
+                    "Hansen's derivatives can be computed only for square systems");
 
    IntervalBox X(scop_, c);
 
@@ -1555,8 +1555,8 @@ void Dag::rEval(const RealPoint &pt, RealVector &V)
 
 void Dag::rDiff(const RealPoint &pt, RealMatrix &J)
 {
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a DAG");
+   REALPAVER_ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+                    "Bad dimensions of a Jacobian matrix used in a DAG");
 
    for (size_t i = 0; i < nbFuns(); ++i)
    {

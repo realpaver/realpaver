@@ -62,7 +62,7 @@ ContractorPolytope::ContractorPolytope(std::unique_ptr<Linearizer> lzr)
     , has_minimizer_(false)
     , minimizer_(nullptr)
 {
-   ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
+   REALPAVER_ASSERT((lzr_ != nullptr), "Empty linearizer in a polytope contractor");
 
    for (const auto &v : scope())
       if (v.getStatus() == VariableStatus::Objective)
@@ -86,7 +86,7 @@ double ContractorPolytope::getRelaxTol() const
 
 void ContractorPolytope::setRelaxTol(double tol)
 {
-   ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
+   REALPAVER_ASSERT(tol >= 0.0, "The relaxation tolerance must be positive: " << tol);
 
    lzr_->setRelaxTol(tol);
 }
@@ -123,14 +123,15 @@ double ContractorPolytope::getFeasTol() const
 
 void ContractorPolytope::setFeasTol(double tol)
 {
-   ASSERT(tol > 0.0, "Bad tolerance in the polytope hull contractor");
+   REALPAVER_ASSERT(tol > 0.0, "Bad tolerance in the polytope hull contractor");
 
    feastol_ = tol;
 }
 
 void ContractorPolytope::enforceLoop(bool loop, double tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    loop_ = loop;
    looptol_ = tol;
 }

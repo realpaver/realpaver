@@ -27,7 +27,7 @@ Prospector::Prospector(std::unique_ptr<ProverOptim> prover)
     : prover_(std::move(prover))
     , pt_(nullptr)
 {
-   ASSERT(prover_ != nullptr, "No prover is given as input");
+   REALPAVER_ASSERT(prover_ != nullptr, "No prover is given as input");
 }
 
 Prospector::~Prospector()

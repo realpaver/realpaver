@@ -38,7 +38,7 @@ size_t IntervalGaussSeidel::getMaxIter() const
 
 void IntervalGaussSeidel::setMaxIter(size_t n)
 {
-   ASSERT(n > 0, "Bad parameter in the interval Gauss Seidel method");
+   REALPAVER_ASSERT(n > 0, "Bad parameter in the interval Gauss Seidel method");
 
    maxiter_ = n;
 }
@@ -50,7 +50,8 @@ double IntervalGaussSeidel::getTol() const
 
 void IntervalGaussSeidel::setTol(const double &tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -71,14 +72,14 @@ Proof IntervalGaussSeidel::contractPrecond(const IntervalMatrix &A, IntervalVect
 Proof IntervalGaussSeidel::contract(const IntervalMatrix &A, IntervalVector &x,
                                     const IntervalVector &b)
 {
-   ASSERT(A.nrows() == x.size(),
-          "Bad interval linear system as input of the Gauss Seidel method");
+   REALPAVER_ASSERT(A.nrows() == x.size(),
+                    "Bad interval linear system as input of the Gauss Seidel method");
 
-   ASSERT(A.nrows() == b.size(),
-          "Bad interval linear system as input of the Gauss Seidel method");
+   REALPAVER_ASSERT(A.nrows() == b.size(),
+                    "Bad interval linear system as input of the Gauss Seidel method");
 
-   ASSERT(A.nrows() == A.ncols(),
-          "Bad interval linear system as input of the Gauss Seidel method");
+   REALPAVER_ASSERT(A.nrows() == A.ncols(),
+                    "Bad interval linear system as input of the Gauss Seidel method");
 
    LOG_LOW("Interval Gauss-Seidel on A:\n" << A << "\nx: " << x << "\nb: " << b);
 

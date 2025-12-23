@@ -24,18 +24,18 @@
 #include "realpaver/Exception.hpp"
 
 #if REALPAVER_ASSERT_ON
-#define ASSERT(cond, msg)                                                                \
+#define REALPAVER_ASSERT(cond, msg)                                                      \
    if (!(cond))                                                                          \
    THROW(msg)
 #else
-#define ASSERT(cond, msg)
+#define REALPAVER_ASSERT(cond, msg)
 #endif
 
 #if REALPAVER_DEBUG_ON
 #include <iostream>
-#define DEBUG(msg) std::cerr << msg << std::endl
+#define REALPAVER_DEBUG(msg) std::cerr << msg << std::endl
 #else
-#define DEBUG(msg)
+#define REALPAVER_DEBUG(msg)
 #endif
 
 #endif

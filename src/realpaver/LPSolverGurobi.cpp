@@ -44,9 +44,9 @@ LPSolver::~LPSolver()
 
 void LPSolver::makeVars()
 {
-   int n = getNbLinVars();
+   size_t n = getNbLinVars();
 
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       LinVar v = getLinVar(i);
       char type = v.isContinuous() ? GRB_CONTINUOUS : GRB_INTEGER;
@@ -60,8 +60,8 @@ GRBLinExpr LPSolver::makeGrbLinExpr(LinExpr e)
 {
    GRBLinExpr ge;
 
-   int n = e.getNbTerms();
-   for (int i = 0; i < n; ++i)
+   size_t n = e.getNbTerms();
+   for (size_t i = 0; i < n; ++i)
    {
       int j = e.getIndexVar(i);
       double coef = e.getCoef(i);
@@ -77,8 +77,8 @@ void LPSolver::makeCtrs()
    GRBConstr cgur;
 
    // bound constraints (necessary for certification methods)
-   int n = getNbLinVars();
-   for (int i = 0; i < n; ++i)
+   size_t n = getNbLinVars();
+   for (size_t i = 0; i < n; ++i)
    {
       LinVar v = getLinVar(i);
       LinExpr e = {{1.0}, {v}};
@@ -88,8 +88,8 @@ void LPSolver::makeCtrs()
    }
 
    // primal constraints
-   int m = getNbLinCtrs();
-   for (int i = 0; i < m; ++i)
+   size_t m = getNbLinCtrs();
+   for (size_t i = 0; i < m; ++i)
    {
       LinCtr c = getLinCtr(i);
       LinExpr e = c.getExpr();
@@ -162,8 +162,8 @@ void LPSolver::createEnv()
       delete env_;
    env_ = new GRBEnv(true);
 
-   int maxsec = getMaxSeconds();
-   int maxiter = getMaxIter();
+   double maxsec = getMaxSeconds();
+   size_t maxiter = getMaxIter();
    double tol = getFeasTol();
 
    // limits
@@ -246,20 +246,20 @@ LPStatus LPSolver::reoptimize()
 
 double LPSolver::costSolution() const
 {
-   ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-          "Bad access to a solution in Gurobi");
+   REALPAVER_ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
+                    "Bad access to a solution in Gurobi");
 
    return simplex_->get(GRB_DoubleAttr_ObjVal);
 }
 
 RealVector LPSolver::primalSolution() const
 {
-   ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-          "Bad access to a solution in Gurobi");
+   REALPAVER_ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
+                    "Bad access to a solution in Gurobi");
 
-   int m = getNbLinVars();
+   size_t m = getNbLinVars();
    RealVector primal(m);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
       primal[i] = gvars_[i].get(GRB_DoubleAttr_X);
 
    return primal;
@@ -267,15 +267,15 @@ RealVector LPSolver::primalSolution() const
 
 RealVector LPSolver::dualSolution() const
 {
-   ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
-          "Bad access to a solution in Gurobi");
+   REALPAVER_ASSERT(simplex_->get(GRB_IntAttr_Status) == GRB_OPTIMAL,
+                    "Bad access to a solution in Gurobi");
 
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    RealVector dual(p);
 
    // the first m values are the reduced costs of the variables
    // and the next n values are the shadow prices of the constraints
-   for (int i = 0; i < p; ++i)
+   for (size_t i = 0; i < p; ++i)
       dual[i] = gctrs_[i].get(GRB_DoubleAttr_Pi);
 
    return dual;
@@ -286,11 +286,11 @@ bool LPSolver::infeasibleRay(RealVector &ray) const
    if (simplex_->get(GRB_IntAttr_Status) != GRB_INFEASIBLE)
       return false;
 
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    if (ray.size() != p)
       ray.resize(p);
 
-   for (int i = 0; i < p; ++i)
+   for (size_t i = 0; i < p; ++i)
       ray[i] = gctrs_[i].get(GRB_DoubleAttr_FarkasDual);
 
    return true;

@@ -117,7 +117,7 @@ size_t TermLin::nbTerms() const
 
 Interval TermLin::coef(size_t i) const
 {
-   ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
 
    auto it = sl_.cbegin();
    std::advance(it, i);
@@ -126,7 +126,7 @@ Interval TermLin::coef(size_t i) const
 
 Variable TermLin::var(size_t i) const
 {
-   ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
 
    auto it = sl_.cbegin();
    std::advance(it, i);
