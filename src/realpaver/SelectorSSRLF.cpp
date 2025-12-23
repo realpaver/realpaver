@@ -40,7 +40,7 @@ double SelectorSSRLF::getFrequency() const
 
 void SelectorSSRLF::setFrequency(double f)
 {
-   ASSERT(f >= 0.0 && f <= 1.0, "Bad frequency");
+   REALPAVER_ASSERT(f >= 0.0 && f <= 1.0, "Bad frequency");
 
    f_ = f;
 }

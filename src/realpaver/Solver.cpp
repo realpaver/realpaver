@@ -619,7 +619,7 @@ size_t Solver::nbSolutions() const
 
 std::pair<DomainBox, Proof> Solver::getSolution(size_t i) const
 {
-   ASSERT(i < nbSolutions(), "Bad access to a solution in the solver @ " << i);
+   REALPAVER_ASSERT(i < nbSolutions(), "Bad access to a solution in the solver @ " << i);
 
    if (withPreprocessing_)
    {
@@ -674,7 +674,7 @@ size_t Solver::nbPendingNodes() const
 
 DomainBox Solver::getPendingBox(size_t i) const
 {
-   ASSERT(i < nbPendingNodes(), "Bad access to a pending box in the solver");
+   REALPAVER_ASSERT(i < nbPendingNodes(), "Bad access to a pending box in the solver");
 
    if (withPreprocessing_)
    {

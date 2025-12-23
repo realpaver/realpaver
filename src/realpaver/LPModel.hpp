@@ -207,13 +207,13 @@ public:
    void addTerm(double a, LinVar v);
 
    /// Returns the number of terms in this
-   int getNbTerms() const;
+   size_t getNbTerms() const;
 
    /// Returns the coefficient of the i-th term of this
-   double getCoef(int i) const;
+   double getCoef(size_t i) const;
 
    /// Returns the index of the variable of the i-th term of this
-   int getIndexVar(int i) const;
+   int getIndexVar(size_t i) const;
 
    /// Returns a pointer to the array of coefficients of the terms of this
    double *getCoefs() const;
@@ -269,13 +269,13 @@ public:
    LinExpr &addTerm(double a, LinVar v);
 
    /// Returns the number of terms in this
-   int getNbTerms() const;
+   size_t getNbTerms() const;
 
    /// Returns the coefficient of the i-th term of this
-   double getCoef(int i) const;
+   double getCoef(size_t i) const;
 
    /// Returns the index of the variable of the i-th term of this
-   int getIndexVar(int i) const;
+   int getIndexVar(size_t i) const;
 
    /// Returns a pointer to the array of coefficients of the terms of this
    double *getCoefs() const;
@@ -520,16 +520,16 @@ public:
    LPSense getSense() const;
 
    /// Returns the number of linear variables in this
-   int getNbLinVars() const;
+   size_t getNbLinVars() const;
 
    /// Returns the i-th variable in this
-   LinVar getLinVar(int i) const;
+   LinVar getLinVar(size_t i) const;
 
    /// Returns the number of linear constraints in this
-   int getNbLinCtrs() const;
+   size_t getNbLinCtrs() const;
 
    /// Returns the i-th constraint in this
-   LinCtr getLinCtr(int i) const;
+   LinCtr getLinCtr(size_t i) const;
 
    /// Returns the expression of the objective function of this
    LinExpr getCost() const;

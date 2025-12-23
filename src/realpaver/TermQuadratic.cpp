@@ -313,7 +313,7 @@ TermQuadraticCreator::TermQuadraticCreator(TermQuadratic *qt)
     , plus_(true)
     , success_(false)
 {
-   ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
+   REALPAVER_ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
 }
 
 bool TermQuadraticCreator::visitSuccessfull() const

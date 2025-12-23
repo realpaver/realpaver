@@ -44,7 +44,7 @@ void LinearizerTaylor::useHansenDerivatives(bool b)
 
 void LinearizerTaylor::fixCorner(const Bitset &corner, bool opposite)
 {
-   ASSERT(corner_.size() == corner.size(), "Bad corner");
+   REALPAVER_ASSERT(corner_.size() == corner.size(), "Bad corner");
 
    style_ = opposite ? CornerStyle::UserOpposite : CornerStyle::User;
    corner_ = corner;

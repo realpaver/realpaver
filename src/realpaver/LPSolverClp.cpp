@@ -38,10 +38,10 @@ LPSolver::~LPSolver()
 
 void LPSolver::makeVars()
 {
-   int m = getNbLinVars();
+   size_t m = getNbLinVars();
    simplex_->resize(0, m);
 
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       LinVar v = getLinVar(i);
       int j = v.getIndex();
@@ -53,8 +53,8 @@ void LPSolver::makeVars()
 void LPSolver::makeCtrs()
 {
    // bound constraints (necessary for certification methods)
-   int m = getNbLinVars();
-   for (int i = 0; i < m; ++i)
+   size_t m = getNbLinVars();
+   for (size_t i = 0; i < m; ++i)
    {
       LinVar v = getLinVar(i);
       LinExpr e = {{1.0}, {v}};
@@ -64,8 +64,8 @@ void LPSolver::makeCtrs()
    }
 
    // constraints
-   int n = getNbLinCtrs();
-   for (int i = 0; i < n; ++i)
+   size_t n = getNbLinCtrs();
+   for (size_t i = 0; i < n; ++i)
    {
       LinCtr c = getLinCtr(i);
       LinExpr e = c.getExpr();
@@ -78,9 +78,9 @@ void LPSolver::makeCtrs()
 void LPSolver::makeCost()
 {
    LinExpr obj = getCost();
-   int n = obj.getNbTerms();
+   size_t n = obj.getNbTerms();
 
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
       simplex_->setObjectiveCoefficient(obj.getIndexVar(i), obj.getCoef(i));
 
    int sense = (getSense() == LPSense::Min) ? 1.0 : -1.0;
@@ -104,8 +104,8 @@ void LPSolver::makeSimplex()
 
 void LPSolver::setOptions()
 {
-   int maxsec = getMaxSeconds();
-   int maxiter = getMaxIter();
+   double maxsec = getMaxSeconds();
+   size_t maxiter = getMaxIter();
    double tol = getFeasTol();
 
    simplex_->setMaximumSeconds(maxsec);
@@ -166,7 +166,7 @@ LPStatus LPSolver::optimize()
 
 LPStatus LPSolver::reoptimize()
 {
-   for (int i = 0; i < getNbLinVars(); ++i)
+   for (size_t i = 0; i < getNbLinVars(); ++i)
       simplex_->setObjectiveCoefficient(i, 0.0);
 
    makeCost();
@@ -181,9 +181,9 @@ double LPSolver::costSolution() const
 RealVector LPSolver::primalSolution() const
 {
    double *colPrimal = simplex_->primalColumnSolution();
-   int m = getNbLinVars();
+   size_t m = getNbLinVars();
    RealVector primal(m);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
       primal[i] = colPrimal[i];
 
    return primal;
@@ -191,11 +191,11 @@ RealVector LPSolver::primalSolution() const
 
 RealVector LPSolver::dualSolution() const
 {
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    RealVector dual(p);
 
    double *rowDual = simplex_->dualRowSolution();
-   for (int i = 0; i < p; ++i)
+   for (size_t i = 0; i < p; ++i)
       dual[i] = rowDual[i];
 
    return dual;
@@ -210,10 +210,10 @@ bool LPSolver::infeasibleRay(RealVector &ray) const
    if (clpRay == nullptr)
       return false;
 
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    if (ray.size() != p)
       ray.resize(p);
-   for (int i = 0; i < p; ++i)
+   for (size_t i = 0; i < p; ++i)
       ray[i] = clpRay[i];
    delete[] clpRay;
    return true;

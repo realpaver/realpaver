@@ -204,17 +204,17 @@ void LinExprRep::addTerm(double a, LinVar v)
    vars_.push_back(v.getIndex());
 }
 
-int LinExprRep::getNbTerms() const
+size_t LinExprRep::getNbTerms() const
 {
    return coefs_.size();
 }
 
-double LinExprRep::getCoef(int i) const
+double LinExprRep::getCoef(size_t i) const
 {
    return coefs_[i];
 }
 
-int LinExprRep::getIndexVar(int i) const
+int LinExprRep::getIndexVar(size_t i) const
 {
    return vars_[i];
 }
@@ -292,17 +292,17 @@ LinExpr &LinExpr::addTerm(double a, LinVar v)
    return *this;
 }
 
-int LinExpr::getNbTerms() const
+size_t LinExpr::getNbTerms() const
 {
    return rep_->getNbTerms();
 }
 
-double LinExpr::getCoef(int i) const
+double LinExpr::getCoef(size_t i) const
 {
    return rep_->getCoef(i);
 }
 
-int LinExpr::getIndexVar(int i) const
+int LinExpr::getIndexVar(size_t i) const
 {
    return rep_->getIndexVar(i);
 }
@@ -522,7 +522,7 @@ LPModel::~LPModel()
 
 LinVar LPModel::makeVar(double lb, double ub, const std::string &name)
 {
-   int index = vars_.size();
+   int index = (int)vars_.size();
    bool continuous = true;
    vars_.push_back(LinVar(index, lb, ub, continuous, name));
    return vars_.back();
@@ -567,7 +567,7 @@ LPSense LPModel::getSense() const
 
 void LPModel::printVars(std::ostream &os) const
 {
-   for (int i = 0; i < getNbLinVars(); ++i)
+   for (size_t i = 0; i < getNbLinVars(); ++i)
    {
       LinVar v = getLinVar(i);
       os << v.getLB() << " <= " << v.getName() << " <= " << v.getUB() << std::endl;
@@ -576,7 +576,7 @@ void LPModel::printVars(std::ostream &os) const
 
 void LPModel::printLinExpr(std::ostream &os, LinExpr e) const
 {
-   for (int i = 0; i < e.getNbTerms(); ++i)
+   for (size_t i = 0; i < e.getNbTerms(); ++i)
    {
       double a = e.getCoef(i);
 
@@ -650,26 +650,26 @@ void LPModel::printSystem(std::ostream &os) const
    size_t n = ctrs_.size(), m = vars_.size();
 
    RealVector lhs(m + n), rhs(m + n);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       lhs[i] = vars_[i].getLB();
       rhs[i] = vars_[i].getUB();
    }
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       lhs[m + i] = ctrs_[i].getLB();
       rhs[m + i] = ctrs_[i].getUB();
    }
 
    RealMatrix A(m + n, m, 0.0);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       A.set(i, i, 1.0);
    }
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       LinExpr e = ctrs_[i].getExpr();
-      for (int j = 0; j < e.getNbTerms(); ++j)
+      for (size_t j = 0; j < e.getNbTerms(); ++j)
       {
          A.set(m + i, e.getIndexVar(j), e.getCoef(j));
       }
@@ -677,7 +677,7 @@ void LPModel::printSystem(std::ostream &os) const
 
    RealVector cost(m, 0.0);
    LinExpr e = getCost();
-   for (int j = 0; j < e.getNbTerms(); ++j)
+   for (size_t j = 0; j < e.getNbTerms(); ++j)
    {
       cost[e.getIndexVar(j)] = e.getCoef(j);
    }
@@ -704,22 +704,22 @@ LPStatus LPModel::reoptimize()
    return optimize();
 }
 
-int LPModel::getNbLinVars() const
+size_t LPModel::getNbLinVars() const
 {
-   return vars_.size();
+   return (int)vars_.size();
 }
 
-LinVar LPModel::getLinVar(int i) const
+LinVar LPModel::getLinVar(size_t i) const
 {
    return vars_[i];
 }
 
-int LPModel::getNbLinCtrs() const
+size_t LPModel::getNbLinCtrs() const
 {
-   return ctrs_.size();
+   return (int)ctrs_.size();
 }
 
-LinCtr LPModel::getLinCtr(int i) const
+LinCtr LPModel::getLinCtr(size_t i) const
 {
    return ctrs_[i];
 }
@@ -765,7 +765,7 @@ double LPModel::certifiedCostSolution() const
    IntervalMatrix M = matrix().transpose();
    IntervalVector B = bounds(), C = cost(), R = M * dual - C, X = varBounds();
 
-   ASSERT(X.isFinite(), "Certification impossible due to an infinite bound");
+   REALPAVER_ASSERT(X.isFinite(), "Certification impossible due to an infinite bound");
 
    Interval val = dual * B - R * X;
 
@@ -816,16 +816,16 @@ bool LPModel::isCertifiedInfeasible() const
 
 IntervalMatrix LPModel::matrix() const
 {
-   int n = getNbLinCtrs(), m = getNbLinVars();
+   size_t n = getNbLinCtrs(), m = getNbLinVars();
    IntervalMatrix A(m + n, m, Interval::zero());
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       A.set(i, i, Interval::one());
    }
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       const LinExpr &e = getLinCtr(i).getExpr();
-      for (int j = 0; j < e.getNbTerms(); ++j)
+      for (size_t j = 0; j < e.getNbTerms(); ++j)
          A.set(i + m, e.getIndexVar(j), e.getCoef(j));
    }
    return A;
@@ -833,9 +833,9 @@ IntervalMatrix LPModel::matrix() const
 
 IntervalVector LPModel::cost() const
 {
-   int n = getNbLinVars();
+   size_t n = getNbLinVars();
    IntervalVector V(n, Interval::zero());
-   for (int i = 0; i < cost_.getNbTerms(); ++i)
+   for (size_t i = 0; i < cost_.getNbTerms(); ++i)
    {
       int j = cost_.getIndexVar(i);
       V[j] = Interval(cost_.getCoef(i));
@@ -845,9 +845,9 @@ IntervalVector LPModel::cost() const
 
 IntervalVector LPModel::varBounds() const
 {
-   int n = getNbLinVars();
+   size_t n = getNbLinVars();
    IntervalVector V(n);
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       const LinVar &v = getLinVar(i);
       V[i] = Interval(v.getLB(), v.getUB());
@@ -857,9 +857,9 @@ IntervalVector LPModel::varBounds() const
 
 IntervalVector LPModel::ctrBounds() const
 {
-   int m = getNbLinCtrs();
+   size_t m = getNbLinCtrs();
    IntervalVector V(m);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       const LinCtr &c = getLinCtr(i);
       V[i] = Interval(c.getLB(), c.getUB());
@@ -869,15 +869,15 @@ IntervalVector LPModel::ctrBounds() const
 
 IntervalVector LPModel::bounds() const
 {
-   int n = getNbLinVars();
-   int m = getNbLinCtrs();
+   size_t n = getNbLinVars();
+   size_t m = getNbLinCtrs();
    IntervalVector V(n + m);
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       const LinVar &v = getLinVar(i);
       V[i] = Interval(v.getLB(), v.getUB());
    }
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
    {
       const LinCtr &c = getLinCtr(i);
       V[i + n] = Interval(c.getLB(), c.getUB());

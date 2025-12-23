@@ -77,7 +77,7 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
    }
 
    // inserts the affine forms as constraints in the linear model
-   for (int i = 0; i < creator.nbFuns(); ++i)
+   for (size_t i = 0; i < creator.nbFuns(); ++i)
    {
       const AffineForm &f = creator.fun(i);
       const Interval &cst = f.constantTerm();

@@ -88,9 +88,9 @@ void NodeInfoCID::setNbCID(size_t nbcid)
 
 void NodeContext::insert(int index, std::shared_ptr<NodeInfo> info)
 {
-   ASSERT(!hasInfo(index, info->getType()),
-          "Info '" << info->getType() << "' already present in the map for node "
-                   << index);
+   REALPAVER_ASSERT(!hasInfo(index, info->getType()),
+                    "Info '" << info->getType()
+                             << "' already present in the map for node " << index);
 
    auto it = map_.find(index);
    if (it == map_.end())

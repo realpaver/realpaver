@@ -30,7 +30,7 @@ ProspectorLocalSolver::ProspectorLocalSolver(std::unique_ptr<BoxPicker> picker,
                                              std::unique_ptr<NLPModel> localSolver)
     : Prospector(std::move(prover))
 {
-   ASSERT(picker != nullptr, "No picker is given as input");
+   REALPAVER_ASSERT(picker != nullptr, "No picker is given as input");
    picker_ = std::move(picker);
    localSolver_ = std::move(localSolver);
 }

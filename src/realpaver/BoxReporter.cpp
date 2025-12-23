@@ -74,7 +74,7 @@ size_t EntityReportedVector::size() const
 
 std::shared_ptr<EntityReported> EntityReportedVector::get(size_t i) const
 {
-   ASSERT(i < size(), "Bad access in a vector of reported entities @ " << i);
+   REALPAVER_ASSERT(i < size(), "Bad access in a vector of reported entities @ " << i);
 
    return ents_[i];
 }

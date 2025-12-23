@@ -28,7 +28,7 @@ ProverOptim::ProverOptim(const Problem &p, const double &tol)
     : ctrs_()
     , tol_(tol)
 {
-   ASSERT(tol >= 0.0, "A tolerance used to relax constraints must be positive");
+   REALPAVER_ASSERT(tol >= 0.0, "A tolerance used to relax constraints must be positive");
 
    for (size_t i = 0; i < p.nbCtrs(); ++i)
    {
@@ -72,7 +72,7 @@ double ProverOptim::getTol() const
 
 void ProverOptim::setTol(const double &tol)
 {
-   ASSERT(tol >= 0.0, "A tolerance used to relax constraints must be positive");
+   REALPAVER_ASSERT(tol >= 0.0, "A tolerance used to relax constraints must be positive");
    tol_ = tol;
 }
 

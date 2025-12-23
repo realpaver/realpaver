@@ -52,7 +52,8 @@ IntervalFunction::IntervalFunction(Term t, const Interval &img)
 IntervalFunction::IntervalFunction(SharedRep rep)
     : rep_(rep)
 {
-   ASSERT(rep != nullptr, "Creation of an interval function from a null pointer");
+   REALPAVER_ASSERT(rep != nullptr,
+                    "Creation of an interval function from a null pointer");
 }
 
 IntervalFunction::SharedRep IntervalFunction::rep() const
@@ -103,8 +104,8 @@ IntervalFunctionDag::IntervalFunctionDag(SharedDag dag, size_t i)
     , dag_(dag)
     , index_(i)
 {
-   ASSERT(dag_ != nullptr, "Null pointer used to create an interval function");
-   ASSERT(i < dag_->nbFuns(), "Bad index used to create an interval function");
+   REALPAVER_ASSERT(dag_ != nullptr, "Null pointer used to create an interval function");
+   REALPAVER_ASSERT(i < dag_->nbFuns(), "Bad index used to create an interval function");
 }
 
 IntervalFunctionDag::IntervalFunctionDag(Term t, const Interval &img)

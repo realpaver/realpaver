@@ -29,8 +29,8 @@ BoxPicker::~BoxPicker()
 
 void BoxPicker::apply(const DomainBox &box, RealPoint &pt)
 {
-   ASSERT(box.scope() == pt.scope(), "The scopes are different");
-   ASSERT(!box.isEmpty(), "Empty box");
+   REALPAVER_ASSERT(box.scope() == pt.scope(), "The scopes are different");
+   REALPAVER_ASSERT(!box.isEmpty(), "Empty box");
 
    for (const auto &v : box.scope())
    {

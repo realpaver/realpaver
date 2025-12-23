@@ -85,7 +85,7 @@ size_t NodePropagatorList::size() const
 Proof NodePropagatorList::contractImpl(IntervalBox &B, const Bitset &active)
 {
    Proof proof = Proof::Maybe;
-   for (int i = 0; i < v_.size(); ++i)
+   for (size_t i = 0; i < v_.size(); ++i)
    {
       proof = v_[i]->contractImpl(B, active);
       if (proof == Proof::Empty)

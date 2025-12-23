@@ -50,8 +50,8 @@ size_t ContractorDomain::nbVars() const
 
 void ContractorDomain::insertVar(Variable v)
 {
-   ASSERT(!v.getDomain()->isConnected(),
-          "Domain contractor applied to a continuous variable " << v.getName());
+   REALPAVER_ASSERT(!v.getDomain()->isConnected(),
+                    "Domain contractor applied to a continuous variable " << v.getName());
 
    scop_.insert(v);
 }

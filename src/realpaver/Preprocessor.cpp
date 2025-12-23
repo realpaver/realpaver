@@ -38,8 +38,8 @@ Preprocessor::Preprocessor(SharedProblem src)
     , timer_()
     , on_(false)
 {
-   ASSERT(src != nullptr, "Preprocessing error: empty problem");
-   ASSERT(!src->isEmpty(), "Preprocessing error: empty problem");
+   REALPAVER_ASSERT(src != nullptr, "Preprocessing error: empty problem");
+   REALPAVER_ASSERT(!src->isEmpty(), "Preprocessing error: empty problem");
 }
 
 SharedProblem Preprocessor::srcProblem() const
@@ -309,7 +309,7 @@ size_t Preprocessor::nbInactiveCtrs() const
 
 Constraint Preprocessor::getInactiveCtr(size_t i) const
 {
-   ASSERT(i < inactive_.size(), "Bad access to an inactive constraint");
+   REALPAVER_ASSERT(i < inactive_.size(), "Bad access to an inactive constraint");
    return inactive_[i];
 }
 
@@ -356,85 +356,85 @@ double Preprocessor::elapsedTime() const
 
 bool Preprocessor::allVarsFixed() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->allVarsFixed();
 }
 
 Variable Preprocessor::srcToDestVar(const Variable &v) const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->srcToDestVar(v);
 }
 
 size_t Preprocessor::nbFixedVars() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->nbFixedVars();
 }
 
 size_t Preprocessor::nbUnfixedVars() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->nbUnfixedVars();
 }
 
 Variable Preprocessor::getFixedVar(size_t i) const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->getFixedVar(i);
 }
 
 Variable Preprocessor::getUnfixedVar(size_t i) const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->getUnfixedVar(i);
 }
 
 Interval Preprocessor::getFixedDomain(const Variable &v) const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->getFixedDomain(v);
 }
 
 bool Preprocessor::isFixed(const Variable &v) const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->isFixed(v);
 }
 
 bool Preprocessor::isUnfixed(const Variable &v) const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->isUnfixed(v);
 }
 
 DomainBox Preprocessor::fixedRegion() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->fixedRegion();
 }
 
 DomainBox Preprocessor::destRegion() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->destRegion();
 }
 
 Scope Preprocessor::destScope() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->destScope();
 }
 
 Scope Preprocessor::fixedScope() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->fixedScope();
 }
 
 Scope Preprocessor::unfixedScope() const
 {
-   ASSERT(on_, "Preprocessor inactive");
+   REALPAVER_ASSERT(on_, "Preprocessor inactive");
    return bridge_->unfixedScope();
 }
 

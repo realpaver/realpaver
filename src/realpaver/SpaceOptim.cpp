@@ -100,7 +100,7 @@ SharedNodeOptim SpaceOptim::popSolNode()
 
 SharedNodeOptim SpaceOptim::getSolNode(size_t i) const
 {
-   ASSERT(i < sol_.size(), "Bad access to a solution node in a space @ " << i);
+   REALPAVER_ASSERT(i < sol_.size(), "Bad access to a solution node in a space @ " << i);
    auto it = sol_.begin();
    std::advance(it, i);
    return *it;

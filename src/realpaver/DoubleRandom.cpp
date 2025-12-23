@@ -40,14 +40,14 @@ DoubleRandom::DoubleRandom(double lo, double up)
     : gen_(std::chrono::steady_clock::now().time_since_epoch().count())
     , dis_(lo, up)
 {
-   ASSERT("lo <= up", "Bad initialization of the pseudo-randolm generator");
+   REALPAVER_ASSERT("lo <= up", "Bad initialization of the pseudo-randolm generator");
 }
 
 DoubleRandom::DoubleRandom(double lo, double up, unsigned seed)
     : gen_(seed)
     , dis_(lo, up)
 {
-   ASSERT("lo <= up", "Bad initialization of the pseudo-randolm generator");
+   REALPAVER_ASSERT("lo <= up", "Bad initialization of the pseudo-randolm generator");
 }
 
 double DoubleRandom::next()

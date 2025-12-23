@@ -41,7 +41,8 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
     , chi_(Params::GetDblParam("INFLATION_CHI"))
     , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
-   ASSERT(F.nbVars() == F.nbFuns(), "Interval Newton defined with a non-square system");
+   REALPAVER_ASSERT(F.nbVars() == F.nbFuns(),
+                    "Interval Newton defined with a non-square system");
 
    gs_ = new IntervalGaussSeidel();
 }
@@ -91,13 +92,14 @@ double IntervalNewton::getTol() const
 
 void IntervalNewton::setTol(const double &tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
 void IntervalNewton::setWidthLimit(double val)
 {
-   ASSERT(val > 0.0, "Bad threshold on the width of a box: " << val);
+   REALPAVER_ASSERT(val > 0.0, "Bad threshold on the width of a box: " << val);
 
    wlim_ = val;
 }
@@ -387,7 +389,7 @@ double IntervalNewton::getInflationDelta() const
 
 void IntervalNewton::setInflationDelta(const double &val)
 {
-   ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
+   REALPAVER_ASSERT(val > 1.0, "Bad parameter delta of inflation: " << val);
    delta_ = val;
 }
 
@@ -398,7 +400,7 @@ double IntervalNewton::getInflationChi() const
 
 void IntervalNewton::setInflationChi(const double &val)
 {
-   ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
+   REALPAVER_ASSERT(val > 0.0, "Bad parameter chi of inflation: " << val);
    chi_ = val;
 }
 

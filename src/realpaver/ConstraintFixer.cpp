@@ -33,7 +33,7 @@ ConstraintFixer::ConstraintFixer(SharedProblemBridge bridge)
     : bridge_(bridge)
     , rc_()
 {
-   ASSERT(bridge != nullptr, "Bad initiualization of a constraint fixer");
+   REALPAVER_ASSERT(bridge != nullptr, "Bad initiualization of a constraint fixer");
 }
 
 Constraint ConstraintFixer::getConstraint() const

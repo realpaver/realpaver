@@ -41,7 +41,7 @@ size_t IntervalNewtonUni::getMaxIter() const
 
 void IntervalNewtonUni::setMaxIter(size_t n)
 {
-   ASSERT(n > 0, "bad parameter in the interval Interval Newton method");
+   REALPAVER_ASSERT(n > 0, "bad parameter in the interval Interval Newton method");
 
    maxiter_ = n;
 }
@@ -53,7 +53,8 @@ double IntervalNewtonUni::getTol() const
 
 void IntervalNewtonUni::setTol(const double &tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must belong to [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 

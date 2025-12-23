@@ -1386,7 +1386,7 @@ void Params::makePolytope()
        .addChoice("TAYLOR", "use of Taylor (mean value) forms")
        .addChoice("AFFINE_TAYLOR", "use of affine and Taylor (mean value) forms")
        .addChoice("RLT", "use of Relaxation-Reformulation Techniques")
-       .setValue("AFFINE");
+       .setValue("TAYLOR");
    add(relax);
 
    ////////////////////
@@ -1396,7 +1396,7 @@ void Params::makePolytope()
        .setWhat("Use of Hansen's derivatives in the Taylor forms")
        .addChoice("YES", "Hansen's derivatives")
        .addChoice("NO", "classical derivatives")
-       .setValue("YES");
+       .setValue("NO");
    add(hansen);
 
    ////////////////////

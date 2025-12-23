@@ -29,8 +29,8 @@ LinearizerAffineTaylor::LinearizerAffineTaylor(std::unique_ptr<LinearizerAffine>
     , affine_(std::move(affine))
     , taylor_(std::move(taylor))
 {
-   ASSERT(affine_ != nullptr, "Null pointer (affine linearizer)");
-   ASSERT(taylor_ != nullptr, "Null pointer (taylor linearizer)");
+   REALPAVER_ASSERT(affine_ != nullptr, "Null pointer (affine linearizer)");
+   REALPAVER_ASSERT(taylor_ != nullptr, "Null pointer (taylor linearizer)");
 }
 
 bool LinearizerAffineTaylor::makeLPImpl(LPModel &lpm, const IntervalBox &B,

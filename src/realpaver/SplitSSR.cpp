@@ -30,7 +30,7 @@ SplitSSR::SplitSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
     , ssr_(F)
     , sbis_(scop.setminus(F.scope()))
 {
-   ASSERT(scop.contains(F.scope()), "Bad scopes");
+   REALPAVER_ASSERT(scop.contains(F.scope()), "Bad scopes");
 }
 
 void SplitSSR::applyImpl(SharedNode node, NodeContext &context)

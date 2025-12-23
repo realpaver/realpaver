@@ -31,8 +31,8 @@ ProblemBridge::ProblemBridge(SharedProblem src, SharedProblem dest)
     , varmap_()
     , fixmap_()
 {
-   ASSERT(src != nullptr, "Empty problem");
-   ASSERT(dest != nullptr, "Empty problem");
+   REALPAVER_ASSERT(src != nullptr, "Empty problem");
+   REALPAVER_ASSERT(dest != nullptr, "Empty problem");
    box_ = new DomainBox(src->scope());
 }
 
@@ -60,7 +60,7 @@ bool ProblemBridge::isUnfixed(const Variable &v) const
 
 Interval ProblemBridge::getFixedDomain(const Variable &v) const
 {
-   ASSERT(isFixed(v), "Domain of " << v.getName() << " is not fixed");
+   REALPAVER_ASSERT(isFixed(v), "Domain of " << v.getName() << " is not fixed");
 
    auto it = fixmap_.find(v);
    return it->second;
@@ -68,7 +68,7 @@ Interval ProblemBridge::getFixedDomain(const Variable &v) const
 
 Variable ProblemBridge::srcToDestVar(const Variable &v) const
 {
-   ASSERT(!isFixed(v), "Domain of " << v.getName() << " is fixed");
+   REALPAVER_ASSERT(!isFixed(v), "Domain of " << v.getName() << " is fixed");
 
    auto it = varmap_.find(v);
    return it->second;
@@ -110,7 +110,8 @@ size_t ProblemBridge::nbUnfixedVars() const
 
 Variable ProblemBridge::getFixedVar(size_t i) const
 {
-   ASSERT(i < nbFixedVars(), "Bad access to a fixed variable in a preprocessor");
+   REALPAVER_ASSERT(i < nbFixedVars(),
+                    "Bad access to a fixed variable in a preprocessor");
 
    auto it = fixmap_.begin();
    std::advance(it, i);
@@ -119,7 +120,8 @@ Variable ProblemBridge::getFixedVar(size_t i) const
 
 Variable ProblemBridge::getUnfixedVar(size_t i) const
 {
-   ASSERT(i < nbUnfixedVars(), "Bad access to a-n unfixed variable in a preprocessor");
+   REALPAVER_ASSERT(i < nbUnfixedVars(),
+                    "Bad access to a-n unfixed variable in a preprocessor");
 
    auto it = varmap_.begin();
    std::advance(it, i);
@@ -128,7 +130,7 @@ Variable ProblemBridge::getUnfixedVar(size_t i) const
 
 DomainBox ProblemBridge::fixedRegion() const
 {
-   ASSERT(fixmap_.size() > 0, "Fixed region required but no fixed variable");
+   REALPAVER_ASSERT(fixmap_.size() > 0, "Fixed region required but no fixed variable");
 
    IntervalBox B(fixedScope());
    for (auto p : fixmap_)
