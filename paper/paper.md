@@ -30,20 +30,20 @@ Constraint Programming (CP) is a paradigm for solving constraint satisfaction an
 
 RealPaver is a C++ library for CP over numeric or mixed discrete-continuous domains. Constraint Satisfaction Problems (CSPs) can be described either in C++ with the API or in a text file using the syntax of RealPaver specific language.  Then, they can be solved using the C++ API or using the CSP solver from the command line. The CSP solver is pre-configured, but various parameters can be modified in another text file.
 
-With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares and a C++ API.
+With respect to the first version of the software developed twenty years ago [@granvilliers2006], this new library incorporates new types of variables and constraints, new algorithms, a clean object-oriented architecture, the management of parameters, Meson Build as build engine [@meson], an interface with third-party softwares, and a C++ API.
 
 
 # Statement of need
 
-CP associates a rich modeling language with powerful solving techniques. The main algorithm behind the RealPaver solver is a branch-and-prune (B&P) that implements a complete search to find all the solutions of a given problem [@pvh1997; @chabert2009]. The branching component separates a problem into sub-problems easier to solve. The pruning or contracting component aims at reducing the region delimited by a sub-problem. RealPaver relies on the GAOL interval library [@GAOL] to ensure rigorous computations.
+CP associates a rich modeling language with powerful solving techniques. The main algorithm behind the RealPaver solver is branch-and-prune (B&P), which implements a complete search to find all the solutions of a given problem [@pvh1997; @chabert2009]. The branching component separates a problem into easier-to-solve sub-problems. The pruning or contracting component aims at reducing the region delimited by a sub-problem. RealPaver relies on the GAOL interval library [@GAOL] to ensure rigorous computations.
 
-This technology has been applied with success in many fields of engineering like automatic control [@jaulin2001], preliminary design [@yvars2021] and robotics [@merlet2004].
+This technology has been applied with success in many fields of engineering like automatic control [@jaulin2001], preliminary design [@yvars2021], and robotics [@merlet2004].
 
 The set of solutions of a numerical CSP or a mixed discrete-continuous problem can be rigorously bounded, even in the presence of roundoff errors. All the solutions of continuous nonlinear equations or inequations can be automatically separated and rigorously bounded. The B\&P algorithm with interval analysis [@moore2009] can provide proof of infeasibility or proof of existence of solutions.
 
 # State of the field
 
-Various solvers on discrete domains exist in CP, like OR-tools and Chuffed, but they are not able to handle continuous variables. Ibex [@ibex] library like RealPaver are based on a similar branch-and-contract framework, but RealPaver proposes some new kinds of constraints like table constraints, conditional constraints and piecewise constraints, and the native definition of discrete variables (integer, enumeration of values). For pure  continuous problems, RealPaver achieves performances equivalent to Ibex. Regarding other mixed integer non-linear solvers like Couenne or Baron, they only solve optimization problems. These solvers are not able to compute several solutions for CSPs, even by adding a constant objective.
+Various solvers on discrete domains exist in CP, like OR-tools and Chuffed, but they are not able to handle continuous variables. The Ibex [@ibex] library is based on a similar branch-and-contract framework to that of RealPaver, but RealPaver proposes some new types of constraints such as table constraints, conditional constraints, and piecewise constraints, and the native definition of discrete variables (integer, enumeration of values). For pure  continuous problems, RealPaver achieves performances equivalent to Ibex. Regarding other mixed integer non-linear solvers like Couenne or Baron, they only solve optimization problems. These solvers are not able to compute several solutions for CSPs, even by adding a constant objective.
 
 # Brief overview
 
@@ -51,33 +51,33 @@ Various solvers on discrete domains exist in CP, like OR-tools and Chuffed, but 
 
 There are three types of variables:
 
-* A boolean variable has domain $\{0, 1\}$;
-* An integer variable can take values from a set of integers;
-* A real variable lies in a union of intervals.
+* A boolean variable has domain $\{0, 1\}$
+* An integer variable can take values from a set of integers
+* A real variable lies in a union of intervals
 
 The language defines several types of constraints:
 
-* An arithmetic constraint involves the usual operations over the reals and relations from the set $\{=, \leq, \geq\}$;
-* $G\to B$ is a conditional constraint, where a constraint $B$ (body) is activated when a constraint $G$ (guard) holds true;
-* $table(X, S)$ is a table constraint, where $X$ is a vector of variables and $S$ is a set of valid assignments for $X$;
-* $piecewise(x, \{I_k\to C_k\}_{k})$ is a piecewise constraint where a constraint $C_k$ is activated when the variable $x$ lies in the interval $I_k$.
+* An arithmetic constraint involves the usual operations over the reals and relations from the set $\{=, \leq, \geq\}$
+* $G\to B$ is a conditional constraint, where a constraint $B$ (body) is activated when a constraint $G$ (guard) holds true
+* $table(X, S)$ is a table constraint, where $X$ is a vector of variables and $S$ is a set of valid assignments for $X$
+* $piecewise(x, \{I_k\to C_k\}_{k})$ is a piecewise constraint where a constraint $C_k$ is activated when the variable $x$ lies in the interval $I_k$
 
 ## Solving strategies
 
-The B&P algorithm creates a search tree by recursively dividing the initial region, i.e. the Cartesian product of variable domains. Each solving step applies a pruning of domains based on a propagation of contractors:
+The B&P algorithm creates a search tree by recursively dividing the initial region, i.e., the Cartesian product of variable domains. Each solving step applies a pruning of domains based on a propagation of contractors:
 
-- the HC4 or BC4 operators [@benhamou1999],
-- the ACID algorithm [@neveu2015],
-- the interval Newton operator for nonlinear systems of equations [@moore2009],
+- the HC4 or BC4 operators [@benhamou1999]
+- the ACID algorithm [@neveu2015]
+- the interval Newton operator for nonlinear systems of equations [@moore2009]
 - linear methods applied to affine or Taylor relaxations of nonlinear problems [@trombettoni2011; @Ninin40R2015]
-- specific algorithms for the non-arithmetic or global constraints.
+- specific algorithms for the non-arithmetic or global constraints
 
-It uses a search strategy responsible for the selection of the next node to explore (depth-first search, breadth-first search and distant-most-depth-first search [@chenouard2009]) and the selection of a variable in this node defining the domain to be split (e.g. largest domains or the greatest impacts on the constraints [@trombettoni2011]), hence generating sub-nodes.
+It uses a search strategy responsible for the selection of the next node to explore (depth-first search, breadth-first search, and distant-most-depth-first search [@chenouard2009]) and the selection of a variable in this node defining the domain to be split (e.g., the largest domains or the greatest impacts on the constraints [@trombettoni2011]), hence generating sub-nodes.
 
 
 ## Parameters and RealPaver customization
 
-RealPaver integrates classes to handle three types of parameters: double-valued, integer-valued or string-valued parameters.
+RealPaver integrates classes to handle three types of parameters: double-valued, integer-valued, and string-valued parameters.
 
 All existing parameters, with their default value, are defined in the class `Params`.
 This class organizes them using 10 categories that cover all the aspects of the library.
@@ -87,9 +87,9 @@ Moreover, the section about the parameters in the documentation (processed by Mk
 
 ## Building system and requirements
 
-The meson build system is used to orchestrate the configuration, the building of the library, and the generation of `rp_solver` (the CSP solver executable). The user can select one of the supported linear solving libraries (Coin-or CLP, HiGHS, SoPlex and Gurobi) and can activate assertions, logging, or the generation of the documentation, directly as meson command line options.
+The meson build system is used to orchestrate the configuration, the building of the library, and the generation of `rp_solver` (the CSP solver executable). The user can select one of the supported linear solving libraries (Coin-or CLP, HiGHS, SoPlex, and Gurobi) and can activate assertions, logging, or the generation of the documentation, directly as meson command line options.
 
-The current building system does not install dependencies or third party softwares. The user has to install, by its own, the GAOL interval library [@GAOL] and one of the supported linear solving libraries, as well as MkDocs if the building of the documentation is activated.
+The current building system does not install dependencies or third party softwares. The user has to install, on their own, the GAOL interval library [@GAOL] and one of the supported linear solving libraries, as well as MkDocs if the building of the documentation is activated.
 
 
 ## Running the solver and getting the solutions
@@ -100,7 +100,7 @@ Using the C++ API, one can use the `CSPSolver` class and call the `solve` method
 rp_solver my_problem.rp -p params.txt
 ```
 
-The `-p` is optional and allows customizing the parameters using a text file (here `params.txt`). By default, the summary of the solving process and all computed solutions will be stored in a text file, automatically named from the base file name, so `my_problem.sol` in this example. A brief report is also displayed in the console, with the processed files, pre-processing summary, and solving summary (time, number of solutions, solving status, number of nodes in the search tree, and number of pending nodes when ending with a partial solving).
+The `-p` is optional and allows customizing the parameters using a text file (here `params.txt`). By default, the summary of the solving process and all computed solutions will be stored in a text file, automatically named from the base file name, `my_problem.sol` in this example. A brief report is also displayed in the console, with the processed files, pre-processing summary, and solving summary (time, number of solutions, solving status, number of nodes in the search tree, and number of pending nodes when ending with a partial solving).
 
 
 # References
