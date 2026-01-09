@@ -1,3 +1,5 @@
+# COCONUT Library
+
 Variables
   x1 in [0.001, 1.e8],
   x2 in [0.001, 1.e8],
