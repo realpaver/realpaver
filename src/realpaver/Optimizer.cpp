@@ -473,7 +473,10 @@ void Optimizer::traceOptimum()
 
    std::cout << "\033[39m"
              << "Best feasible point: " << "\033[32m" << std::setprecision(flp)
-             << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl
+             << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl;
+
+   std::cout << "\033[39m" << "Open nodes:          " << "\033[32m"
+             << space_->nbPendingNodes() << "\033[39m" << std::endl
              << std::endl;
 }
 
@@ -552,6 +555,7 @@ void Optimizer::branchAndBound()
 #endif
 
    int tracediv = 0, traceaux = 0;
+   bool traceendl = true, limit = false;
 
    do
    {
@@ -566,11 +570,24 @@ void Optimizer::branchAndBound()
       // trace every N nodes where N is the frequency
       if (trace && (traceaux = nbnodes_ / tracefreq) > tracediv)
       {
+         if (traceendl)
+         {
+            std::cout << std::endl;
+            traceendl = false;
+         }
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s" << "\033[39m"
                    << "\t\tNodes: " << "\033[32m" << traceaux * tracefreq << "\033[39m"
-                   << "\t\tSpace size: " << "\033[32m" << space_->nbPendingNodes()
-                   << "\033[39m" << std::endl;
+                   << " / Open: " << "\033[32m" << space_->nbPendingNodes() << "\033[39m"
+                   << std::endl;
+
+         std::cout << std::setprecision(flp) << std::defaultfloat << "\t\t\t" << sL
+                   << ": \033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
+
+         std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat
+                   << "\t\t\t" << sU << ": \033[36m" << U_ * sign_obj << "\033[39m"
+                   << std::endl;
+         std::cout << std::endl;
          tracediv = traceaux;
       }
 
@@ -581,6 +598,7 @@ void Optimizer::branchAndBound()
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
                    << sL << ": \033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
+         traceendl = true;
       }
       if (trace && saveU_ != U_)
       {
@@ -588,6 +606,7 @@ void Optimizer::branchAndBound()
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
                    << sU << ": \033[36m" << U_ * sign_obj << "\033[39m" << std::endl;
+         traceendl = true;
       }
 
       if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
@@ -596,6 +615,7 @@ void Optimizer::branchAndBound()
          env_->setTimeLimit(true);
          status_ = OptimizationStatus::StopOnTimeLimit;
          iter = false;
+         limit = true;
       }
 
       if (iter && nbnodes_ >= node_limit)
@@ -604,6 +624,7 @@ void Optimizer::branchAndBound()
          env_->setNodeLimit(true);
          status_ = OptimizationStatus::StopOnNodeLimit;
          iter = false;
+         limit = true;
       }
 
       if (iter && incomplete && optimumFound())
@@ -634,6 +655,9 @@ void Optimizer::branchAndBound()
       LOG_INTER("Total time BB : " << timerBB.elapsedTime() << "(s)");
 #endif
    } while (iter);
+
+   if (limit)
+      traceOptimum();
 
 #if REALPAVER_LOG_ON
    timerBB.stop();
