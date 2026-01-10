@@ -334,6 +334,10 @@ void Optimizer::bbStep(int depthlimit)
    // processes it
    bbStepAux(node, depthlimit);
 
+   // updates the lowest lower bound
+   L_ = space_->getLowestLowerBound();
+   LOG_INTER("L = " << L_);
+
    // removes the node informations
    context_->remove(node->index());
 
@@ -395,6 +399,8 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
          double lo = subnode->box()->get(z_)->intervalHull().left();
          subnode->setLower(lo);
 
+         LOG_INTER("Assign the lower bound: " << lo);
+
          // finds a feasible point
          bool found = prospector_->explore(*subnode, *context_);
 
@@ -425,16 +431,12 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
             // tolerance reached => solution node
             LOG_INTER("Tolerance reached => solution node");
             space_->pushSolNode(subnode);
-            L_ = space_->getLowestLowerBound();
          }
          else
          {
-            LOG_INTER("   => new pending node");
-
             // new pending node
-            LOG_INTER("Tolerance no reached => new pending node");
+            LOG_INTER("Tolerance not reached => new pending node");
             space_->pushPendingNode(subnode);
-            L_ = space_->getLowestLowerBound();
          }
       }
    }
