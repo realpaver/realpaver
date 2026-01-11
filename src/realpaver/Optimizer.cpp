@@ -579,15 +579,15 @@ void Optimizer::branchAndBound()
          }
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s" << "\033[39m"
-                   << "\t\tNodes: " << "\033[32m" << traceaux * tracefreq << "\033[39m"
-                   << " / Open: " << "\033[32m" << space_->nbPendingNodes() << "\033[39m"
+                   << "\t\tNodes: " << "\033[34m" << traceaux * tracefreq << "\033[39m"
+                   << " / Open: " << "\033[34m" << space_->nbPendingNodes() << "\033[39m"
                    << std::endl;
 
          std::cout << std::setprecision(flp) << std::defaultfloat << "\t\t\t" << sL
-                   << ": \033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
+                   << ": \033[34m" << L_ * sign_obj << "\033[39m" << std::endl;
 
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat
-                   << "\t\t\t" << sU << ": \033[36m" << U_ * sign_obj << "\033[39m"
+                   << "\t\t\t" << sU << ": \033[34m" << U_ * sign_obj << "\033[39m"
                    << std::endl;
          std::cout << std::endl;
          tracediv = traceaux;
@@ -607,7 +607,7 @@ void Optimizer::branchAndBound()
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
-                   << sU << ": \033[36m" << U_ * sign_obj << "\033[39m" << std::endl;
+                   << sU << ": \033[32m" << U_ * sign_obj << "\033[39m" << std::endl;
          traceendl = true;
       }
 
