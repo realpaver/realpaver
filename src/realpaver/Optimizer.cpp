@@ -475,7 +475,8 @@ void Optimizer::traceOptimum()
 
    std::cout << "\033[39m"
              << "Best feasible point: " << "\033[32m" << std::setprecision(flp)
-             << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl;
+             << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl
+             << std::endl;
 }
 
 void Optimizer::branchAndBound()
