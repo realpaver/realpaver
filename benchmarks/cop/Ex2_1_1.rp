@@ -1,6 +1,13 @@
 # COCONUT Library
 
 Variables
+#x1 in [0.99, 1],
+#x2 in [0.99, 1],
+#x3 in [0, 0.1],
+#x4 in [0.99, 1],
+#x5 in [0, 0.1];
+
+
 x1 in [0, 1],
 x2 in [0, 1],
 x3 in [0, 1],

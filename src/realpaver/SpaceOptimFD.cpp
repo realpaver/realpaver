@@ -58,7 +58,7 @@ void SpaceOptimFD::simplifyImpl(double u)
    while (it != nod_.rend())
    {
       double l = (*it)->getLower();
-      if (tol_.isTightOptimum(l, u))
+      if (l > u)
       {
          ++n;
          it++;

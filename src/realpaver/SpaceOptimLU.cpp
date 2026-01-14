@@ -106,7 +106,7 @@ void SpaceOptimLU::simplifyImpl(double u)
    while (itm != ma_.end())
    {
       double l = itm->second.itlo->node->getLower();
-      if (tol_.isTightOptimum(l, u))
+      if (l > u)
       {
          lo_.erase(itm->second.itlo);
          up_.erase(itm->second.itup);

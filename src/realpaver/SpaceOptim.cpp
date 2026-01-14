@@ -56,7 +56,7 @@ void SpaceOptim::simplify(double u)
    while (it != sol_.rend())
    {
       double l = (*it)->getLower();
-      if (tol_.isTightOptimum(l, u))
+      if (l > u)
       {
          ++n;
          it++;

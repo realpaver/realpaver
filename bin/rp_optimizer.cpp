@@ -244,21 +244,6 @@ int main(int argc, char **argv)
               << indent << WP("Number of nodes", wpl) << GREEN(bbopt.getTotalNodes())
               << endl;
 
-         bool complete = env->usedNoLimit() && space->nbPendingNodes() == 0;
-
-         fsol << WP("Search status", wpl);
-         cout << indent << WP("Search status", wpl);
-         if (complete)
-         {
-            fsol << "complete" << endl;
-            cout << GREEN("complete") << endl;
-         }
-         else
-         {
-            fsol << "partial" << endl;
-            cout << RED("partial") << endl;
-         }
-
          fsol << WP("Optimization status", wpl);
          cout << indent << WP("Optimization status", wpl);
 
@@ -293,13 +278,6 @@ int main(int argc, char **argv)
             int nb = env->getParams()->getIntParam("DEPTH_LIMIT");
             cout << indent << WP("Depth limit enabled", wpl) << RED(nb) << endl;
             fsol << WP("Depth limit enabled", wpl) << endl;
-         }
-
-         if (space->nbPendingNodes() > 0)
-         {
-            fsol << WP("Number of pending nodes", wpl) << space->nbPendingNodes() << endl;
-            cout << indent << WP("Number of pending nodes", wpl)
-                 << RED(space->nbPendingNodes()) << endl;
          }
 
          // writes the solution

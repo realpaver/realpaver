@@ -24,7 +24,6 @@
 #include "realpaver/Common.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
-#include <ios>
 
 #ifdef LOCAL_OPTIMIZER
 #include "realpaver/NLPSolver.hpp"
@@ -44,7 +43,9 @@
 #include "realpaver/SplitSLF.hpp"
 #include "realpaver/SplitSSR.hpp"
 #include "realpaver/SplitSSRLF.hpp"
+
 #include <iomanip>
+#include <ios>
 #include <memory>
 
 namespace realpaver {
@@ -335,7 +336,10 @@ void Optimizer::bbStep(int depthlimit)
    bbStepAux(node, depthlimit);
 
    // updates the lowest lower bound
-   L_ = space_->getLowestLowerBound();
+   L_ = (space_->nbSolNodes() == 0 && space_->nbPendingNodes() == 0)
+            ? U_ - space_->getTol().getAbsTol()
+            : space_->getLowestLowerBound();
+
    LOG_INTER("L = " << L_);
 
    // removes the node informations
@@ -426,18 +430,9 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
             }
          }
 
-         if (space_->getTol().isTightOptimum(lo, U_))
-         {
-            // tolerance reached => solution node
-            LOG_INTER("Tolerance reached => solution node");
-            space_->pushSolNode(subnode);
-         }
-         else
-         {
-            // new pending node
-            LOG_INTER("Tolerance not reached => new pending node");
-            space_->pushPendingNode(subnode);
-         }
+         // new pending node
+         LOG_INTER("Tolerance not reached => new pending node");
+         space_->pushPendingNode(subnode);
       }
    }
 }
@@ -597,6 +592,7 @@ void Optimizer::branchAndBound()
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
                    << sL << ": \033[35m" << L_ * sign_obj << "\033[39m" << std::endl;
+
          traceendl = true;
       }
       if (trace && saveU_ != U_)
