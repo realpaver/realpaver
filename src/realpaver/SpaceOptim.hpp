@@ -88,12 +88,12 @@ protected:
    struct SolCmp {
       bool operator()(const SharedNodeOptim &x, const SharedNodeOptim &y) const
       {
-         return x->getLower() < y->getLower();
+         return (x->getLower() < y->getLower());
       }
    };
 
-   std::set<SharedNodeOptim, SolCmp> sol_; // set of solution nodes
-   Tolerance tol_;                         // tolerance on the optimum
+   std::multiset<SharedNodeOptim, SolCmp> sol_; // set of solution nodes
+   Tolerance tol_;                              // tolerance on the optimum
 };
 
 /// Output on a stream

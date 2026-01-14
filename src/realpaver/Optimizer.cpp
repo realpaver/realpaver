@@ -73,7 +73,7 @@ Optimizer::Optimizer(const Problem &problem)
    if (!problem.hasObjective())
       THROW("No objective function in this problem");
 
-   // TODO: remove this if bound-constrained optimization problems can be handled
+   // TODO: remove this to handle bound-constrained optimization problems
    if (problem.nbCtrs() == 0)
       THROW("No constraint in this problem");
 

@@ -72,9 +72,9 @@ private:
       }
    };
 
-   std::set<SharedNodeOptim, NodeCmpLo> nod_; // set of open nodes
-   SharedNodeOptim next_;                     // next node in the DFS search
-   int last_;                                 // index of the last extracted node
+   std::multiset<SharedNodeOptim, NodeCmpLo> nod_; // set of open nodes
+   SharedNodeOptim next_;                          // next node in the DFS search
+   int last_;                                      // index of the last extracted node
 };
 
 } // namespace realpaver
