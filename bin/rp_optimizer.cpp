@@ -195,10 +195,13 @@ int main(int argc, char **argv)
             fsol << WP("Number of variables fixed", wpl) << preproc->nbFixedVars()
                  << endl;
 
-            cout << indent << WP("Number of variables fixed", wpl)
-                 << GREEN(preproc->nbFixedVars()) << endl
-                 << indent << WP("Number of inactive constraints", wpl)
-                 << GREEN(preproc->nbInactiveCtrs()) << endl;
+            cout << indent << WP("Number of variables", wpl)
+                 << GREEN(preproc->srcProblem()->nbVars())
+                 << "\t fixed: " << GREEN(preproc->nbFixedVars()) << endl;
+
+            cout << indent << WP("Number of constraints", wpl)
+                 << GREEN(preproc->srcProblem()->nbCtrs())
+                 << "\t inactive: " << GREEN(preproc->nbInactiveCtrs()) << endl;
 
             if (preproc->nbFixedVars() > 0)
             {
@@ -237,11 +240,13 @@ int main(int argc, char **argv)
 
          fsol << WP("Elapsed time", wpl) << std::fixed << std::setprecision(3)
               << bbopt.getSolvingTime() << " (seconds)" << endl
-              << WP("Number of nodes", wpl) << bbopt.getTotalNodes() << endl;
+              << WP("Number of nodes", wpl) << bbopt.getNbNodes() << endl
+              << WP("Number of splits", wpl) << bbopt.getNbSplits() << endl;
 
          cout << indent << WP("Time", wpl) << std::fixed << std::setprecision(3)
               << GREEN(bbopt.getSolvingTime() << " (seconds)") << endl
-              << indent << WP("Number of nodes", wpl) << GREEN(bbopt.getTotalNodes())
+              << indent << WP("Number of nodes", wpl) << GREEN(bbopt.getNbNodes()) << endl
+              << indent << WP("Number of splits", wpl) << GREEN(bbopt.getNbSplits())
               << endl;
 
          fsol << WP("Optimization status", wpl);

@@ -65,8 +65,11 @@ public:
    /// Returns the solving time in seconds
    double getSolvingTime() const;
 
-   /// Returns the number of nodes processed
-   int getTotalNodes() const;
+   /// Returns the number of nodes processed (reduction, ...)
+   int getNbNodes() const;
+
+   /// Returns the number of splitting steps
+   int getNbSplits() const;
 
    /// Returns the environment of this
    std::shared_ptr<EnvOptimizer> getEnv() const;

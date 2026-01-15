@@ -87,9 +87,14 @@ double Optimizer::getSolvingTime() const
    return stimer_.elapsedTime();
 }
 
-int Optimizer::getTotalNodes() const
+int Optimizer::getNbNodes() const
 {
    return nbnodes_;
+}
+
+int Optimizer::getNbSplits() const
+{
+   return split_->getNbSplits();
 }
 
 std::shared_ptr<EnvOptimizer> Optimizer::getEnv() const
