@@ -312,19 +312,23 @@ void Optimizer::makeProspector()
       prospector_ =
           std::make_unique<ProspectorSimple>(std::move(picker), std::move(prover));
    }
-#ifdef LOCAL_OPTIMIZER
    else if (prospect == "LOCALSOLVER")
    {
+#ifdef LOCAL_OPTIMIZER
       std::unique_ptr<NLPModel> localSolver = std::make_unique<NLPSolver>(*newprob);
       localSolver->setAlgorithm(env_->getParams()->getStrParam("NLP_SOLVER_ALGORITHM"));
       std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
       prospector_ = std::make_unique<ProspectorLocalSolver>(
           std::move(picker), std::move(prover), std::move(localSolver));
-   }
 #endif
 
-   THROW_IF(prospector_ == nullptr,
-            "Unable to make the explorer object in the optimizer");
+      THROW_IF(prospector_ == nullptr,
+               "No local solver is available to create the prospector");
+   }
+   else
+   {
+      THROW("Bad option to create the prospector");
+   }
 }
 
 void Optimizer::bbStep(int depthlimit)
