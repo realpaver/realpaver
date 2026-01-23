@@ -317,6 +317,11 @@ void Optimizer::makeProspector()
 #ifdef LOCAL_OPTIMIZER
       std::unique_ptr<NLPModel> localSolver = std::make_unique<NLPSolver>(*newprob);
       localSolver->setAlgorithm(env_->getParams()->getStrParam("NLP_SOLVER_ALGORITHM"));
+      localSolver->setIterLimit(env_->getParams()->getIntParam("NLP_SOLVER_ITER_LIMIT"));
+      localSolver->setTimeLimit(env_->getParams()->getDblParam("NLP_SOLVER_TIME_LIMIT"));
+      Tolerance tolNlp(env_->getParams()->getDblParam("NLP_SOLVER_OBJ_REL_TOL"),
+                       env_->getParams()->getDblParam("NLP_SOLVER_OBJ_ABS_TOL"));
+      localSolver->setTol(tolNlp);
       std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
       prospector_ = std::make_unique<ProspectorLocalSolver>(
           std::move(picker), std::move(prover), std::move(localSolver));
