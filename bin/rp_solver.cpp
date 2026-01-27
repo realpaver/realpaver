@@ -50,7 +50,7 @@ int main(int argc, char **argv)
          THROW(msgError);
 
       // logger
-#if LOG_ON
+#if REALPAVER_LOG_ON
       LogLevel loglevel = StringToLogLevel(params.getStrParam("LOG_LEVEL"));
       if (loglevel != LogLevel::none)
       {
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
       if (paramFilename != "")
          cout << indent << WP("Parameter file", wpl) << BLACK(paramFilename) << endl;
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
       cout << indent << WP("Log file", wpl);
       string meslog = (loglevel != LogLevel::none) ? logFilename : "no log";
       cout << BLACK(meslog) << endl;

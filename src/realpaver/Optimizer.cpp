@@ -570,7 +570,7 @@ void Optimizer::branchAndBound()
       double saveL_ = L_, saveU_ = U_;
       bbStep(depth_limit);
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
       if (L_ != saveL_)
          LOG_INTER("New lower bound: " << L_);
 #endif
