@@ -458,6 +458,7 @@ void Optimizer::traceOptimum()
    double w = optimum.width();
    bool a = (w <= tol.getAbsTol()),
         r = (w <= tol.getRelTol() * Double::abs(optimum.right()));
+   bool t = this->getSolvingTime() >= env_->getParams()->getDblParam("TIME_LIMIT");
 
    LOG_MAIN("Optimum: " << optimum);
 
@@ -480,12 +481,19 @@ void Optimizer::traceOptimum()
                 << "\033[35m" << tol.getRelTol() << "\033[39m"
                 << ")";
    }
+   if (t)
+   {
+      std::cout << "\033[39m" << std::scientific << std::setprecision(3) << " (timeout "
+                << "\033[35m" << getSolvingTime() << "\033[39m"
+                << ")";
+   }
    std::cout << std::endl;
 
-   std::cout << "\033[39m"
-             << "Best feasible point: " << "\033[32m" << std::setprecision(flp)
-             << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl
-             << std::endl;
+   if (optimumFound())
+      std::cout << "\033[39m"
+                << "Best feasible point: " << "\033[32m" << std::setprecision(flp)
+                << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl
+                << std::endl;
 }
 
 void Optimizer::branchAndBound()
@@ -653,7 +661,7 @@ void Optimizer::branchAndBound()
          }
          else
          {
-            status_ = OptimizationStatus::Infeasible;
+            status_ = OptimizationStatus::Other;
          }
 
          LOG_MAIN("Stops since there is no more pending node");
