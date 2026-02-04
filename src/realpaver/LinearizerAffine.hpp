@@ -52,9 +52,6 @@ public:
 
 private:
    bool minrange_; // true: Minrange, false: Chebyshev
-
-   using MapType = std::unordered_map<size_t, size_t>;
-   MapType mve_; // map var index -> lin var index of the epsilon variable
 };
 
 } // namespace realpaver

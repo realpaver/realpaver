@@ -40,7 +40,7 @@ namespace realpaver {
  * A solver is a two-phase constraint solving algorithm. The first phase is
  * a preprocessing step that tries to reduce the variable domains, to
  * fix and then eliminate some variables, to detect inactive constraints
- * or unfeasible constraints. The second phase is an interval-based
+ * or infeasible constraints. The second phase is an interval-based
  * branch-and-prune algorithm parameterized by several components.
  *
  * The solver takes as input a problem. Its components are generated according to

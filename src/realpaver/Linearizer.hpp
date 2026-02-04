@@ -31,7 +31,7 @@ namespace realpaver {
  *
  * A linearizer is used to linearize constraints from a DAG. Its scope corresponds
  * to the DAG's scope. A resulting linear model must involve all the variables from
- * the scope, even if some variable does not ocur in active constraints.
+ * the scope, even if some variable does not occur in active constraints.
  */
 class Linearizer {
 public:

@@ -179,8 +179,8 @@ int main(int argc, char **argv)
          {
             if (preproc->isUnfeasible())
             {
-               fsol << "solved unfeasible" << endl;
-               cout << RED("solved unfeasible") << endl;
+               fsol << "solved infeasible" << endl;
+               cout << RED("solved infeasible") << endl;
             }
             else
             {
@@ -270,8 +270,8 @@ int main(int argc, char **argv)
          {
             if (complete)
             {
-               fsol << "proved unfeasible" << endl;
-               cout << RED("unfeasible") << endl;
+               fsol << "proved infeasible" << endl;
+               cout << RED("infeasible") << endl;
             }
             else
             {

@@ -34,7 +34,7 @@ Preprocessor::Preprocessor(SharedProblem src)
     , bridge_(nullptr)
     , inactive_()
     , active_()
-    , unfeasible_(false)
+    , infeasible_(false)
     , timer_()
     , on_(false)
 {
@@ -63,7 +63,7 @@ void Preprocessor::apply(bool on)
    // resets this
    inactive_.clear();
    active_.clear();
-   unfeasible_ = false;
+   infeasible_ = false;
 
    // makes the new problem and the bridge
    dest_ = std::make_shared<Problem>();
@@ -92,7 +92,7 @@ void Preprocessor::applyImpl()
       if (domain->isEmpty())
       {
          LOG_MAIN("Empty domain of variable: " << v.getName());
-         unfeasible_ = true;
+         infeasible_ = true;
          return;
       }
    }
@@ -101,8 +101,26 @@ void Preprocessor::applyImpl()
    bool ok = propagate(box);
    if (!ok)
    {
-      unfeasible_ = true;
+      infeasible_ = true;
       return;
+   }
+
+   // evaluates the objective function and assigns the domain of the corresponding
+   // variable since this is not done by the propagation algorithm (there is no constraint
+   // of the form z = f(...))
+   if (src_->hasObjective())
+   {
+      Variable z = obj.getVar();
+      Term f = obj.getTerm();
+      Interval e = f.eval(box)->intervalHull();
+      box.get(z)->contract(e);
+
+      if (box.get(z)->isEmpty())
+      {
+         LOG_MAIN("Empty range of the objective function");
+         infeasible_ = true;
+         return;
+      }
    }
 
    LOG_INTER("Contracted box: " << (box));
@@ -116,7 +134,7 @@ void Preprocessor::applyImpl()
       if (proof == Proof::Empty)
       {
          LOG_INTER("Constraint violated (normally does not arise): " << c);
-         unfeasible_ = true;
+         infeasible_ = true;
          return;
       }
 
@@ -176,16 +194,7 @@ void Preprocessor::applyImpl()
    {
       Variable z = obj.getVar();
       Term f = obj.getTerm();
-      Interval e = f.eval(box)->intervalHull();
       std::unique_ptr<Domain> dom(box.get(z)->clone());
-      dom->contract(e);
-
-      if (dom->isEmpty())
-      {
-         LOG_MAIN("Empty range of the objective function");
-         unfeasible_ = true;
-         return;
-      }
 
       Variable zdest = bridge_->srcToDestVar(z);
       zdest.setDomain(std::move(dom));
@@ -220,7 +229,7 @@ void Preprocessor::applyImpl()
       Interval e = als.term().eval(box)->intervalHull();
       if (e.isEmpty())
       {
-         unfeasible_ = true;
+         infeasible_ = true;
          LOG_INTER("Evaluation of alias " << als.name() << " -> empty");
          return;
       }
@@ -315,7 +324,7 @@ Constraint Preprocessor::getInactiveCtr(size_t i) const
 
 bool Preprocessor::isUnfeasible() const
 {
-   return unfeasible_;
+   return infeasible_;
 }
 
 bool Preprocessor::isSolvedOptimal() const
@@ -323,7 +332,7 @@ bool Preprocessor::isSolvedOptimal() const
    if (!on_)
       return false;
 
-   if (unfeasible_)
+   if (infeasible_)
       return false;
 
    if (src_->hasObjective() && !dest_->hasObjective())
@@ -337,7 +346,7 @@ bool Preprocessor::isSolved() const
    if (!on_)
       return false;
 
-   if (unfeasible_)
+   if (infeasible_)
       return true;
 
    if (bridge_ != nullptr && bridge_->allVarsFixed())
@@ -452,7 +461,7 @@ void Preprocessor::print(std::ostream &os) const
    }
 
    os << "Status: ";
-   if (unfeasible_)
+   if (infeasible_)
    {
       os << "infeasible" << std::endl;
       return;
