@@ -162,7 +162,7 @@ private:
    SharedProblemBridge bridge_;       // bridge between these two problems
    std::vector<Constraint> inactive_; // constraints inactive
    std::vector<Constraint> active_;   // constraints not inactive
-   bool unfeasible_;                  // true if problem unfeasible
+   bool infeasible_;                  // true if problem infeasible
    Timer timer_;                      // timer
    bool on_;                          // true if used
 

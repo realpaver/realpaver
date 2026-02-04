@@ -653,7 +653,7 @@ void Optimizer::branchAndBound()
          }
          else
          {
-            status_ = OptimizationStatus::Other;
+            status_ = OptimizationStatus::Infeasible;
          }
 
          LOG_MAIN("Stops since there is no more pending node");

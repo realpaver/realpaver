@@ -63,6 +63,11 @@ const AffineForm &AffineCreator::fun(const Variable &v) const
    return *v_[dag_->findVarNode(v.id())->index()];
 }
 
+const AffineForm &AffineCreator::funEpsilon(size_t i) const
+{
+   return fun(dag_->scope().var(i));
+}
+
 void AffineCreator::useMinrange(bool minrange)
 {
    minrange_ = minrange;
@@ -122,6 +127,12 @@ bool AffineCreator::makeFun(const IntervalBox &B, size_t i)
    }
    lfun_.push_back(i);
    return true;
+}
+
+size_t AffineCreator::dagIndex(size_t i) const
+{
+   REALPAVER_ASSERT(i < lfun_.size(), "Bad access in lfun");
+   return lfun_[i];
 }
 
 void AffineCreator::makeNode(int i, const IntervalBox &B)
@@ -305,8 +316,7 @@ Term AffineCreator::funToTerm(size_t i) const
       x += -a * d;
       res += d * v;
    }
-   res += x;
-   res += f.errorTerm();
+   res += x + f.errorTerm() * Interval::minusOnePlusOne();
    return res;
 }
 

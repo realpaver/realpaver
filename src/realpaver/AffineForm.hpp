@@ -22,6 +22,8 @@
 #define REALPAVER_AFFINE_FORM_HPP
 
 #include "realpaver/Interval.hpp"
+#include "realpaver/TermLin.hpp"
+
 #include <initializer_list>
 #include <list>
 

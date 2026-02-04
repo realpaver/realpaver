@@ -173,8 +173,8 @@ int main(int argc, char **argv)
          {
             if (preproc->isUnfeasible())
             {
-               fsol << "solved unfeasible" << endl;
-               cout << RED("solved unfeasible") << endl;
+               fsol << "solved infeasible" << endl;
+               cout << RED("solved infeasible") << endl;
             }
             else
             {
@@ -185,6 +185,10 @@ int main(int argc, char **argv)
                fsol << endl
                     << "SOLUTION " << std::scientific << "[" << B.width() << "]" << endl;
                B.print(fsol);
+
+               Objective obj = problem.getObjective();
+               cout << indent << WP("Optimum", wpl) << GREEN(B.get(obj.getVar())) << endl;
+               cout << indent << WP("Domains", wpl) << GREEN(B) << endl;
             }
          }
          else

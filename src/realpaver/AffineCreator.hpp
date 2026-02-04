@@ -113,8 +113,14 @@ public:
    /// Returns true if the affine form of a variable exists, false otherwise
    bool hasFun(const Variable &v) const;
 
-   /// Gets the affine form of a variable.
+   /// Gets the affine form of a variable
    const AffineForm &fun(const Variable &v) const;
+
+   /// Gets the affine form of a variable associated with the i-th epsilon variable
+   const AffineForm &funEpsilon(size_t i) const;
+
+   /// Returns the index in the DAG of the i-th function in this
+   size_t dagIndex(size_t i) const;
 
 private:
    SharedDag dag_;                              // a DAG

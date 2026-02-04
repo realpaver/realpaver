@@ -127,6 +127,7 @@ endif
 rp_headers += [
   'AffineCreator.hpp',
   'AffineForm.hpp',
+  'AffineTightener.hpp',
   'Alias.hpp',
   'AssertDebug.hpp',
   'Bitset.hpp',
@@ -285,6 +286,7 @@ rp_headers += [
 rp_sources += [
   'AffineCreator.cpp',
   'AffineForm.cpp',
+  'AffineTightener.cpp',
   'Alias.cpp',
   'AssertDebug.hpp',
   'Bitset.cpp',
