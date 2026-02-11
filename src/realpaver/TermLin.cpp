@@ -41,6 +41,17 @@ TermLin::TermLin(const Term &t)
       THROW("Creation of linear term failed");
 }
 
+TermLin::TermLin(const TermRep *rep)
+    : cst_(Interval::zero())
+    , sl_()
+{
+   TermLinCreator creator(this);
+   rep->acceptVisitor(creator);
+
+   if (!creator.visitSuccessfull())
+      THROW("Creation of linear term failed");
+}
+
 bool TermLin::isConstant() const
 {
    return sl_.empty();

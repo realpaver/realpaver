@@ -1,6 +1,6 @@
-#include "Common.hpp"
-#include "Domain.hpp"
 #include "realpaver/BoxReporter.hpp"
+#include "realpaver/Common.hpp"
+#include "realpaver/Domain.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Optimizer.hpp"

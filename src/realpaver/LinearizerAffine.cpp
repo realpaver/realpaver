@@ -28,6 +28,7 @@ LinearizerAffine::LinearizerAffine(SharedDag dag, bool minrange)
     : Linearizer(dag)
     , minrange_(minrange)
 {
+   REALPAVER_ASSERT(dag != nullptr, "empty DAG");
 }
 
 void LinearizerAffine::useMinrange(bool minrange)
@@ -55,12 +56,13 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
    }
 
    // inserts the affine forms as constraints in the linear model
-   for (size_t i = 0; i < creator.nbFuns(); ++i)
+   for (size_t k = 0; k < creator.nbFuns(); ++k)
    {
-      const AffineForm &f = creator.fun(i);
+      const AffineForm &f = creator.fun(k);
+      size_t p = creator.dagIndex(k);
       Interval cst = f.constantTerm();
       const Interval &err = f.errorTerm();
-      Interval img = dag_->fun(creator.dagIndex(i))->getImage();
+      const Interval &img = dag_->fun(p)->getImage();
 
       // let img be the interval [L, U]
       // the constraint is: L <= a_0 + sum_i a_i*e_i + a_err*e_err <= U
@@ -84,16 +86,16 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
          size_t i = AffineForm::var(it);
 
          // variable associated with e_i
-         Variable xi = scop_.var(i);
+         const Variable &xi = scop_.var(i);
 
          // coefficient a_i
-         Interval ai = AffineForm::itv(it);
+         const Interval &ai = AffineForm::itv(it);
 
          // affine form of the variable associated with e_i
          AffineForm &fi = const_cast<AffineForm &>(creator.funEpsilon(i));
 
          // fi = mi + ri*e_i
-         Interval mi = fi.constantTerm(), ri = AffineForm::itv(fi.begin());
+         const Interval &mi = fi.constantTerm(), ri = AffineForm::itv(fi.begin());
 
          // term a_i*e_i -> a_i * (x_i - mi) / ri
          Interval ai_ri = ai / ri;
@@ -106,26 +108,18 @@ bool LinearizerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
          ++it;
       }
 
-      Interval low = img.left() - cst - err - ac, up = img.right() - cst + err + ac;
-
-      // relaxation of equation
-      if (img.isSingleton())
+      // lower bounding function
+      if (!img.isInfRight())
       {
-         low -= tol_;
-         up += tol_;
-      }
-
-      if (Double::isInf(img.left()))
-      {
+         Interval up = img.right() - cst + err + ac;
          lpm.addCtr(expr, up.right());
       }
-      else if (Double::isInf(img.right()))
+
+      // upper bounding function
+      if (!img.isInfLeft())
       {
-         lpm.addCtr(low.left(), expr);
-      }
-      else
-      {
-         lpm.addCtr(low.left(), expr, up.right());
+         Interval lo = img.left() - cst - err - ac;
+         lpm.addCtr(lo.left(), expr);
       }
    }
    return true;

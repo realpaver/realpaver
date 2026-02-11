@@ -22,6 +22,7 @@
 #define REALPAVER_LINEARIZER_AFFINE_HPP
 
 #include "realpaver/Linearizer.hpp"
+#include <vector>
 
 namespace realpaver {
 
