@@ -101,7 +101,7 @@ Proof ContractorVar3BCID::contractImpl(IntervalBox &B, const ContractMethod &con
 
    // 3B
    IntervalBox save(B);
-   IntervalPartitionMaker slicer(n3B);
+   IntervalPartitioner slicer(n3B);
    slicer.apply(dom);
    n3B = slicer.nbSlices();
 
@@ -210,7 +210,7 @@ bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid,
    IntervalBox B(Bcid);
    Interval dom(Bcid.get(v_));
 
-   IntervalPartitionMaker slicer(nsCID_);
+   IntervalPartitioner slicer(nsCID_);
    slicer.apply(dom);
    size_t nCID = slicer.nbSlices();
 

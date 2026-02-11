@@ -48,7 +48,6 @@ Proof ContractorAffineRevise::contract(IntervalBox &B)
       return Proof::Maybe;
 
    const AffineForm &f = creator.fun(0);
-
    Interval I = dag_->fun(idx_)->getImage();
    Interval E = f.errorTerm();
    Interval J = I - f.constantTerm() + Interval(-E.right(), E.right());
@@ -72,6 +71,10 @@ Proof ContractorAffineRevise::contract(IntervalBox &B)
    // reduction of domains
    for (auto it = f.cbegin(); it != f.cend(); ++it)
    {
+      // no reduction if it->itv contains 0
+      if (it->itv.containsZero())
+         continue;
+
       const Variable &v = dag_->scope().var(it->var);
 
       // new domain of the variable ei associated with v

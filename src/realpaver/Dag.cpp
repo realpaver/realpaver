@@ -224,6 +224,16 @@ DagConst::DagConst(Dag *dag, size_t index, const Interval &x)
 {
 }
 
+const Interval &DagConst::getValue() const
+{
+   return x_;
+}
+
+void DagConst::setValue(const Interval &x)
+{
+   x_ = x;
+}
+
 void DagConst::acceptVisitor(DagVisitor &vis) const
 {
    vis.apply(this);
@@ -245,11 +255,6 @@ void DagConst::iEvalNode(const IntervalBox &B)
 void DagConst::iEvalTree(const IntervalBox &B)
 {
    setIval(x_);
-}
-
-const Interval &DagConst::getConst() const
-{
-   return x_;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -834,6 +839,7 @@ DagLin::DagLin(Dag *dag, const TermLin &tl, const IndexList &lsub)
     : DagOp(dag, DagSymbol::Lin, lsub)
     , cst_()
     , terms_()
+    , map_()
 {
    cst_ = tl.getCst();
 
@@ -841,7 +847,8 @@ DagLin::DagLin(Dag *dag, const TermLin &tl, const IndexList &lsub)
    {
       DagVar *node = dag->findVarNode(tl.var(i).id());
       Item it = {tl.coef(i), node, Interval::universe()};
-      terms_.insert(it);
+      auto jt = terms_.insert(it);
+      map_.insert(std::make_pair(node->getVar().id(), jt.first));
    }
 }
 
@@ -914,7 +921,17 @@ DagLin::const_iterator DagLin::begin() const
    return terms_.begin();
 }
 
+DagLin::iterator DagLin::begin()
+{
+   return terms_.begin();
+}
+
 DagLin::const_iterator DagLin::end() const
+{
+   return terms_.end();
+}
+
+DagLin::iterator DagLin::end()
 {
    return terms_.end();
 }
@@ -932,6 +949,12 @@ DagVar *DagLin::getNodeSub(const_iterator it) const
 Interval DagLin::getCst() const
 {
    return cst_;
+}
+
+void DagLin::setCst(const Interval &x)
+{
+   REALPAVER_ASSERT(!x.isEmpty(), "empty interval");
+   cst_ = x;
 }
 
 size_t DagLin::nbTerms() const
@@ -957,13 +980,25 @@ Interval DagLin::coef(size_t i) const
    return it->coef;
 }
 
+void DagLin::setCoef(const Interval &x, const Variable &v)
+{
+   auto it = map_.find(v.id());
+   if (it == map_.end())
+      THROW("Variable not found in this linear term: " << v.getName());
+
+   iterator jt = it->second;
+   Interval &I = const_cast<Interval &>((*jt).coef);
+   I = x;
+}
+
 /*----------------------------------------------------------------------------*/
 
-DagFun::DagFun(Dag *dag, size_t root, Scope scop, const Interval &image)
+DagFun::DagFun(Dag *dag, size_t root, Scope scop, Term t, const Interval &image)
     : dag_(dag)
     , node_()
     , vnode_()
     , scop_()
+    , t_(t)
     , image_(image)
     , idx_(0)
     , ctrid_(-1)
@@ -987,6 +1022,11 @@ Interval DagFun::getImage() const
 void DagFun::setImage(const Interval &x)
 {
    image_ = x;
+}
+
+Term DagFun::getTerm() const
+{
+   return t_;
 }
 
 Dag *DagFun::dag() const
@@ -1349,7 +1389,7 @@ DagConst *Dag::findConstNode(const Interval &x) const
    for (size_t i = 0; i < cnode_.size(); ++i)
    {
       DagConst *node = cnode_[i];
-      if (node->getConst().isSetEq(x))
+      if (node->getValue().isSetEq(x))
          return node;
    }
    return nullptr;
@@ -2028,7 +2068,7 @@ void DagCreator::make(const Term &t, Scope scop, const Interval &img,
    }
 
    // creates the function
-   DagFun *f = new DagFun(dag_, root, scop, img);
+   DagFun *f = new DagFun(dag_, root, scop, t, img);
    f->setFlatFunction(fun);
    index_ = dag_->insertFun(f);
 }

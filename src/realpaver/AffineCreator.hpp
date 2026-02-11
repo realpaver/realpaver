@@ -122,6 +122,9 @@ public:
    /// Returns the index in the DAG of the i-th function in this
    size_t dagIndex(size_t i) const;
 
+   /// Returns the variable corresponding to the affine variable of index i
+   Variable varToVar(size_t i) const;
+
 private:
    SharedDag dag_;                              // a DAG
    bool minrange_;                              // true: Minrange, false:Chebyshev

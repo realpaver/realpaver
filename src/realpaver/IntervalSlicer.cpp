@@ -50,7 +50,7 @@ size_t IntervalSlicer::nbSlices() const
    return cont_.size();
 }
 
-Interval IntervalSlicer::slice(size_t i) const
+const Interval &IntervalSlicer::slice(size_t i) const
 {
    return cont_[i];
 }
@@ -166,24 +166,24 @@ Interval IntervalPeeler::peelRight(const Interval &x) const
 
 /*----------------------------------------------------------------------------*/
 
-IntervalPartitionMaker::IntervalPartitionMaker(size_t n)
+IntervalPartitioner::IntervalPartitioner(size_t n)
 {
    setArity(n);
 }
 
-size_t IntervalPartitionMaker::getArity() const
+size_t IntervalPartitioner::getArity() const
 {
    return n_;
 }
 
-void IntervalPartitionMaker::setArity(size_t n)
+void IntervalPartitioner::setArity(size_t n)
 {
    REALPAVER_ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
 
    n_ = n;
 }
 
-void IntervalPartitionMaker::applyImpl(const Interval &x)
+void IntervalPartitioner::applyImpl(const Interval &x)
 {
    if (n_ == 2)
    {

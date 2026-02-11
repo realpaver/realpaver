@@ -45,7 +45,7 @@ ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t nsCID
                     "Bad variable " << v << " in a varCID contractor");
    REALPAVER_ASSERT(nsCID > 1, "Bad number of slices in a varCID contractor: " << nsCID);
 
-   slicer_ = std::make_unique<IntervalPartitionMaker>(nsCID);
+   slicer_ = std::make_unique<IntervalPartitioner>(nsCID);
 }
 
 Scope ContractorVarCID::scope() const

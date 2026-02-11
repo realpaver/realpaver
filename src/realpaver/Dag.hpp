@@ -203,8 +203,11 @@ public:
    void iEvalNode(const IntervalBox &B) override;
    void iEvalTree(const IntervalBox &B) override;
 
+   /// Assigns the value
+   void setValue(const Interval &x);
+
    /// Returns the constant interval value
-   const Interval &getConst() const;
+   const Interval &getValue() const;
 
 private:
    Interval x_;
@@ -727,6 +730,9 @@ public:
    /// Returns the constant value of this linear expression
    Interval getCst() const;
 
+   /// Assigns the constant value of this linear expression
+   void setCst(const Interval &x);
+
    /// Returns the number of linear terms
    size_t nbTerms() const;
 
@@ -754,20 +760,37 @@ private:
    std::set<Item, CompItem> terms_; // set of linear terms
 
 public:
-   /// Type of iterators on the list of linear terms
+   /// Type of constant iterators on the list of linear terms
    typedef std::set<Item, CompItem>::const_iterator const_iterator;
 
-   /// Returns an iterator on the beginning of the list of linear terms
+   /// Type of iterators on the list of linear terms
+   typedef std::set<Item, CompItem>::iterator iterator;
+
+   /// Returns a constant iterator on the beginning of the list of linear terms
    const_iterator begin() const;
 
-   /// Returns an iterator on the end of the list of linear terms
+   /// Returns an iterator on the beginning of the list of linear terms
+   iterator begin();
+
+   /// Returns a constant iterator on the end of the list of linear terms
    const_iterator end() const;
+
+   /// Returns an iterator on the end of the list of linear terms
+   iterator end();
 
    /// Returns the coefficient of a linear term pointed by an iterator
    Interval getCoefSub(const_iterator it) const;
 
    /// Returns the variable of a linear term pointed by an iterator
    DagVar *getNodeSub(const_iterator it) const;
+
+   /// Assigns the coefficient of the term on v
+   void setCoef(const Interval &x, const Variable &v);
+
+private:
+   // map var id -> iterator in the set
+   typedef std::unordered_map<size_t, iterator> map_type_;
+   map_type_ map_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -784,9 +807,10 @@ public:
     * @param dag owner of this
     * @param root DAG index of the root node
     * @param scop set of variables
+    * @param t term used to create this
     * @param image image of this
     */
-   DagFun(Dag *dag, size_t root, Scope scop, const Interval &image);
+   DagFun(Dag *dag, size_t root, Scope scop, Term t, const Interval &image);
 
    /// Destructor
    ~DagFun();
@@ -796,6 +820,9 @@ public:
 
    /// Assigns the image of this
    void setImage(const Interval &x);
+
+   /// Returns the term used to create this
+   Term getTerm() const;
 
    /// Returns the dag
    Dag *dag() const;
@@ -922,6 +949,7 @@ private:
                                         // sorted by an ascending ordering of the
                                         // identifiers of the variables
    Scope scop_;                         // the set of variables
+   Term t_;                             // term used to create this
    Interval image_;                     // bounds of the function, i.e. the co-domain
    size_t idx_;                         // index in the dag
    int ctrid_;                          // identifier of associated constraint

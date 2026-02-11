@@ -39,6 +39,8 @@ public:
     */
    TermLin(const Term &t);
 
+   TermLin(const TermRep *rep);
+
    /// Default copy constructor
    TermLin(const TermLin &) = default;
 

@@ -364,7 +364,7 @@ SharedContractorPolytope ContractorFactory::makePolytope()
          bool minrange =
              env_->getParams()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
 
-         std::unique_ptr<Linearizer> lzr =
+         std::unique_ptr<LinearizerAffine> lzr =
              std::make_unique<LinearizerAffine>(dag_, minrange);
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));

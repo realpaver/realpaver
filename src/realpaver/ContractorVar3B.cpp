@@ -47,7 +47,7 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
                     "Bad variable " << v << " in a var3B contractor");
    REALPAVER_ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
 
-   slicer_ = std::make_unique<IntervalPartitionMaker>(n);
+   slicer_ = std::make_unique<IntervalPartitioner>(n);
 }
 
 Scope ContractorVar3B::scope() const

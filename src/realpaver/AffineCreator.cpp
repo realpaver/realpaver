@@ -143,7 +143,7 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
    switch (node->symbol())
    {
    case DagSymbol::Cst: {
-      f = std::make_unique<AffineForm>(static_cast<DagConst *>(node)->getConst());
+      f = std::make_unique<AffineForm>(static_cast<DagConst *>(node)->getValue());
       break;
    }
    case DagSymbol::Var: {
@@ -318,6 +318,11 @@ Term AffineCreator::funToTerm(size_t i) const
    }
    res += x + f.errorTerm() * Interval::minusOnePlusOne();
    return res;
+}
+
+Variable AffineCreator::varToVar(size_t i) const
+{
+   return dag_->scope().var(i);
 }
 
 } // namespace realpaver

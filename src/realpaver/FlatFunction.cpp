@@ -2171,7 +2171,7 @@ FlatFunDagCreator::FlatFunDagCreator(FlatFunction *f)
 
 void FlatFunDagCreator::apply(const DagConst *d)
 {
-   idx_ = f_->insertCst(d->getConst());
+   idx_ = f_->insertCst(d->getValue());
 }
 
 void FlatFunDagCreator::apply(const DagVar *d)
@@ -2439,7 +2439,7 @@ FlatFunUniCreator::FlatFunUniCreator(FlatFunction *f, const IntervalBox &B, Vari
 
 void FlatFunUniCreator::apply(const DagConst *d)
 {
-   idx_ = f_->insertCst(d->getConst());
+   idx_ = f_->insertCst(d->getValue());
 }
 
 void FlatFunUniCreator::apply(const DagVar *d)
