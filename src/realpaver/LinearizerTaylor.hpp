@@ -32,6 +32,7 @@ enum class CornerStyle {
    RandomOpposite, ///< random choice of one corner and use of its opposite
    Left,           ///< corner of left bounds
    Right,          ///< corner of right bounds
+   LeftRight,      ///< corner of left bounds and its opposite corner
    User,           ///< fixed by the user (useful for testing)
    UserOpposite    ///< fixed by the user (useful for testing)
 };

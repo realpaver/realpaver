@@ -74,7 +74,7 @@ public:
    void resize(size_t n);
 
    /// Returns the i-th element of this
-   ValueType operator[](size_t i) const;
+   ConstRefType operator[](size_t i) const;
 
    /// Returns a reference to the i-th element of this
    RefType operator[](size_t i);
@@ -157,7 +157,7 @@ template <typename T> void NumericVector<T>::resize(size_t n)
 }
 
 template <typename T>
-typename NumericVector<T>::ValueType NumericVector<T>::operator[](size_t i) const
+typename NumericVector<T>::ConstRefType NumericVector<T>::operator[](size_t i) const
 {
    REALPAVER_ASSERT(i < size(), "Bad access in a vector at index " << i);
 

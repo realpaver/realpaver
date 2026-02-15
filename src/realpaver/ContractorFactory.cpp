@@ -386,6 +386,8 @@ SharedContractorPolytope ContractorFactory::makePolytope()
             style = CornerStyle::Left;
          else if (corner == "RIGHT")
             style = CornerStyle::Right;
+         else if (corner == "LEFT_RIGHT")
+            style = CornerStyle::LeftRight;
 
          unsigned seed =
              (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
