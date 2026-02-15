@@ -61,7 +61,7 @@ bool IntervalVector::equals(const IntervalVector &X) const
    return true;
 }
 
-Interval IntervalVector::get(size_t i) const
+const Interval &IntervalVector::get(size_t i) const
 {
    return operator[](i);
 }

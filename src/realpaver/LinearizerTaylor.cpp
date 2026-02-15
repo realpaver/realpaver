@@ -65,6 +65,7 @@ void LinearizerTaylor::selectCorner(const IntervalBox &B)
       }
       break;
    case CornerStyle::Left:
+   case CornerStyle::LeftRight:
       corner_.setAllZero();
       break;
    case CornerStyle::Right:
@@ -119,20 +120,13 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
       if (fc.isEmpty())
          return false;
 
-      // transforms an equation into an inequality
-      if (img.isSingleton())
-         img += Interval(-tol_, tol_);
-
       // differentiates the function
       IntervalVector G(f->nbVars());
 
-      /*
       if (hansen_)
          f->iDiffHansen(B, c, G);
       else
          f->iDiff(B, G);
-      */
-      f->iDiff(B, G);
 
       if (G.isEmpty())
          return false;
@@ -152,7 +146,7 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
             LinVar lv = lpm.getLinVar(linVarIndex(v));
 
             // derivative of f wrt. v
-            Interval z = G[f->scope().index(v)];
+            const Interval &z = G[f->scope().index(v)];
 
             if (corner.get(scop_.index(v)))
             {
@@ -185,7 +179,7 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
             LinVar lv = lpm.getLinVar(linVarIndex(v));
 
             // derivative of f wrt. v
-            Interval z = G[f->scope().index(v)];
+            const Interval &z = G[f->scope().index(v)];
 
             if (corner.get(scop_.index(v)))
             {
@@ -219,7 +213,8 @@ bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B, const Bitset
       return false;
 
    // manages the opposite corner if necessary
-   if (style_ == CornerStyle::RandomOpposite || style_ == CornerStyle::UserOpposite)
+   if (style_ == CornerStyle::RandomOpposite || style_ == CornerStyle::UserOpposite ||
+       style_ == CornerStyle::LeftRight)
    {
       corner_.flipAll();
       return makeOne(lpm, B, corner_, active);

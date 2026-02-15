@@ -62,7 +62,7 @@ public:
    bool equals(const IntervalVector &X) const;
 
    /// Returns the i-th element of this
-   Interval get(size_t i) const;
+   const Interval &get(size_t i) const;
 
    /// Sets the i-th element of this to x
    void set(size_t i, const Interval &x);

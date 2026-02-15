@@ -1408,6 +1408,7 @@ void Params::makePolytope()
        .addChoice("RANDOM_OPPOSITE", "two opposite corners, one selected randomly")
        .addChoice("LEFT", "corner of left bounds")
        .addChoice("RIGHT", "corner of right bounds")
+       .addChoice("LEFT_RIGHT", "corner of right bounds and its opposite corner")
        .setValue("RANDOM_OPPOSITE");
    add(tayl_corn);
 
