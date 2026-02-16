@@ -374,6 +374,11 @@ public:
    static void chebyshevAtanh(const Interval &x, Interval &alpha, Interval &dzeta,
                               Interval &delta);
 
+   // Linearization of elementary function
+   // return alpha*f + dzeta + alpha*[-1,1]
+   static AffineForm linearize(const AffineForm &f, const Interval &alpha,
+                               const Interval &dzeta, const Interval &delta);
+
 private:
    // linear term
    struct Item {
@@ -398,11 +403,6 @@ private:
    // Assigns the error term
    // Throws an exception if x is empty or infinite
    void setError(const Interval &x);
-
-   // Linearization of elementary function
-   // return alpha*f + dzeta + alpha*[-1,1]
-   static AffineForm linearize(const AffineForm &f, const Interval &alpha,
-                               const Interval &dzeta, const Interval &delta);
 
    /// Power with e>2
    static AffineForm powrec(const AffineForm &f, int e);
