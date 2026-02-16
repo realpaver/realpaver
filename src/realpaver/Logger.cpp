@@ -21,6 +21,7 @@
 #include "realpaver/Exception.hpp"
 #include "realpaver/Logger.hpp"
 #include <ctime>
+#include <iomanip>
 #include <limits>
 
 namespace realpaver {

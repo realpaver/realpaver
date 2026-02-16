@@ -20,6 +20,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DoubleRandom.hpp"
+#include <chrono>
 #include <limits>
 
 namespace realpaver {

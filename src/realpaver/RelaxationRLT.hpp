@@ -23,6 +23,7 @@
 
 #include "realpaver/Dag.hpp"
 #include "realpaver/LPModel.hpp"
+#include <functional>
 #include <unordered_map>
 
 namespace realpaver {
