@@ -983,12 +983,12 @@ Interval sqrtPY(const Interval &x, const Interval &y)
    return res;
 }
 
-Interval pow(const Interval &x, int n)
+Interval pow(const Interval &x, unsigned int n)
 {
    return Interval(Interval::Traits::pow(x.impl_, n));
 }
 
-Interval powPX(const Interval &x, int n, const Interval &y)
+Interval powPX(const Interval &x, unsigned int n, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::powPX(x.impl_, n, y.impl_));
 
@@ -999,12 +999,39 @@ Interval powPX(const Interval &x, int n, const Interval &y)
    return res;
 }
 
-Interval powPY(const Interval &x, int n, const Interval &y)
+Interval powPY(const Interval &x, unsigned int n, const Interval &y)
 {
    Interval res = Interval(Interval::Traits::powPY(x.impl_, n, y.impl_));
 
 #if REALPAVER_LOG_ON
    LOG_FULL("powPY(x,n,y) on " << x << "," << n << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval powr(const Interval &x, const double &r)
+{
+   return Interval(Interval::Traits::powr(x.impl_, r));
+}
+
+Interval powrPX(const Interval &x, const double &r, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::powrPX(x.impl_, r, y.impl_));
+
+#if REALPAVER_LOG_ON
+   LOG_FULL("powrPX(x,r,y) on " << x << "," << r << "," << y << " -> " << res);
+#endif
+
+   return res;
+}
+
+Interval powrPY(const Interval &x, const double &r, const Interval &y)
+{
+   Interval res = Interval(Interval::Traits::powrPY(x.impl_, r, y.impl_));
+
+#if REALPAVER_LOG_ON
+   LOG_FULL("powrPY(x,r,y) on " << x << "," << r << "," << y << " -> " << res);
 #endif
 
    return res;

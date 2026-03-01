@@ -901,17 +901,36 @@ expr
   | expr TK_CARET expr
     {
       realpaver::Term t(realpaver::Term::SharedRep($1)),
-                      e(realpaver::Term::SharedRep($3)),
-                      res(pow(t, e));
+                      e(realpaver::Term::SharedRep($3));
 
-      $$ = res.cloneRoot();
+      if (e.isConstant())
+      {
+         realpaver::Interval x = e.evalConst();
+         realpaver::Term res(pow(t, x.left()));
+         $$ = res.cloneRoot();
+      }
+      else
+      {
+         realpaver::Term res(pow(t, e));
+         $$ = res.cloneRoot();
+      }
     }
   | TK_POW TK_LPAR expr TK_COMMA expr TK_RPAR
     {
       realpaver::Term t(realpaver::Term::SharedRep($3)),
-                      e(realpaver::Term::SharedRep($5)),
-                      res(pow(t, e));
-      $$ = res.cloneRoot();
+                      e(realpaver::Term::SharedRep($5));
+
+      if (e.isConstant())
+      {
+         realpaver::Interval x = e.evalConst();
+         realpaver::Term res(pow(t, x.left()));
+         $$ = res.cloneRoot();
+      }
+      else
+      {
+         realpaver::Term res(pow(t, e));
+         $$ = res.cloneRoot();
+      }
     }
   | TK_MINUS expr %prec TK_UMINUS
     {

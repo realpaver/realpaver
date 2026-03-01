@@ -58,7 +58,8 @@ enum class DagSymbol {
    Sgn,   ///< sign
    Sqr,   ///< square
    Sqrt,  ///< square root
-   Pow,   ///< power
+   Pow,   ///< power (integral exponent)
+   Powr,  ///< power (real exponent)
    Exp,   ///< exponential
    Log,   ///< logarithm
    Cos,   ///< cosine
@@ -455,7 +456,7 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// DAG node representing the power operation
+/// DAG node representing the power operation (integral exponent)
 class DagPow : public DagOp {
 public:
    /**
@@ -464,10 +465,10 @@ public:
     * @param n exponent
     * @param lsub list of DAG indexes of the sub-nodes of this
     */
-   DagPow(Dag *dag, int n, const IndexList &lsub);
+   DagPow(Dag *dag, unsigned int n, const IndexList &lsub);
 
    /// Returns the exponent
-   int exponent() const;
+   unsigned int exponent() const;
 
    bool eqSymbol(const DagOp *other) const override;
    void print(std::ostream &os) const override;
@@ -475,7 +476,32 @@ public:
    void iEvalNode() override;
 
 private:
-   int n_; // exponent
+   unsigned int n_; // exponent
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the power operation (real exponent)
+class DagPowr : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param n exponent
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagPowr(Dag *dag, const double &r, const IndexList &lsub);
+
+   /// Returns the exponent
+   double exponent() const;
+
+   bool eqSymbol(const DagOp *other) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+
+private:
+   double r_; // exponent
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1181,6 +1207,7 @@ public:
    virtual void apply(const DagSqr *d);
    virtual void apply(const DagSqrt *d);
    virtual void apply(const DagPow *d);
+   virtual void apply(const DagPowr *d);
    virtual void apply(const DagExp *d);
    virtual void apply(const DagLog *d);
    virtual void apply(const DagCos *d);
@@ -1223,6 +1250,7 @@ public:
    void apply(const DagSqr *d) override;
    void apply(const DagSqrt *d) override;
    void apply(const DagPow *d) override;
+   void apply(const DagPowr *d) override;
    void apply(const DagExp *d) override;
    void apply(const DagLog *d) override;
    void apply(const DagCos *d) override;
@@ -1303,6 +1331,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;

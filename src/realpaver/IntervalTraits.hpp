@@ -303,12 +303,20 @@ template <typename T> struct IntervalTraits {
    static interval sqrtPY(const interval &x, const interval &y);
    ///@}
 
-   /// @name Power function
+   /// @name Power function with integral exponent
    ///@{
 
-   static interval pow(const interval &x, int n);
-   static interval powPX(const interval &x, int n, const interval &y);
-   static interval powPY(const interval &x, int n, const interval &y);
+   static interval pow(const interval &x, unsigned int n);
+   static interval powPX(const interval &x, unsigned int n, const interval &y);
+   static interval powPY(const interval &x, unsigned int n, const interval &y);
+   ///@}
+
+   /// @name Power function with real exponent
+   ///@{
+
+   static interval powr(const interval &x, const double &r);
+   static interval powrPX(const interval &x, const double &r, const interval &y);
+   static interval powrPY(const interval &x, const double &r, const interval &y);
    ///@}
 
    /// @name Exponential function

@@ -45,7 +45,8 @@ enum class TermSymbol {
    Sgn,   ///< sign
    Sqr,   ///< square
    Sqrt,  ///< square root
-   Pow,   ///< power
+   Pow,   ///< power (integral)
+   Powr,  ///< power (real exponent)
    Exp,   ///< exponential
    Log,   ///< logarithm
    Cos,   ///< cosine
@@ -411,15 +412,15 @@ Term sqr(Term t);
 Term sqrt(Term t);
 
 /// Returns t^n
+Term pow(Term t, unsigned int n);
+
+/// Returns t^n
 Term pow(Term t, int n);
 
 /// Returns t^d
 Term pow(Term t, double d);
 
-/// Returns t^x
-Term pow(Term t, const Interval &x);
-
-/// Returns t^e
+/// Returns exp(e*log(t))
 Term pow(Term t, Term e);
 
 /// Returns exp(t)
@@ -772,14 +773,14 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// Power of a term
+/// Power of a term (integral exponent >= 3)
 class TermPow : public TermOp {
 public:
    /// Constructor
-   TermPow(const SharedRep &t, int n);
+   TermPow(const SharedRep &t, unsigned int n);
 
    /// Returns the exponent
-   int exponent() const;
+   unsigned int exponent() const;
 
    Interval evalConst() const override;
    void evalRoot() override;
@@ -790,7 +791,29 @@ public:
    TermRep *clone() const override;
 
 private:
-   int n_;
+   unsigned int n_;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Power of a term
+class TermPowr : public TermOp {
+public:
+   /// Constructor
+   TermPowr(const SharedRep &t, double r);
+
+   /// Returns the exponent
+   double exponent() const;
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+
+private:
+   double r_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1025,6 +1048,7 @@ public:
    virtual void apply(const TermSqr *t);
    virtual void apply(const TermSqrt *t);
    virtual void apply(const TermPow *t);
+   virtual void apply(const TermPowr *t);
    virtual void apply(const TermExp *t);
    virtual void apply(const TermLog *t);
    virtual void apply(const TermCos *t);
@@ -1077,6 +1101,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;

@@ -451,7 +451,7 @@ void RLTCreator::apply(const DagPow *node)
 
    double a = node->child()->ival().left(), b = node->child()->ival().right();
 
-   int n = node->exponent();
+   unsigned int n = node->exponent();
 
    auto f = [&n](const Interval &x) { return pow(x, n); };
    auto df = [&n](const Interval &x) { return n * pow(x, n - 1); };
@@ -488,6 +488,46 @@ void RLTCreator::apply(const DagPow *node)
          overLine(lm, iy, ix, a, fa.right(), dv.right());
          underLine(lm, iy, ix, b, fb.left(), dv.right());
       }
+   }
+}
+
+void RLTCreator::apply(const DagPowr *node)
+{
+
+   Interval val = node->ival();
+   if (val.isEmpty() || val.isInf())
+   {
+      fail_ = true;
+      return;
+   }
+
+   LPModel &lm = *lpm_;
+   size_t iy = indexLinVar(node), ix = indexLinVar(node->child());
+
+   double e = node->exponent();
+   double a = node->child()->ival().left(), b = node->child()->ival().right();
+
+   if (a <= 0.0)
+      return;
+
+   auto f = [&e](const Interval &x) { return powr(x, e); };
+   auto df = [&e](const Interval &x) { return e * powr(x, e - 1); };
+
+   if (e > 0.0)
+   {
+      overConcave(lm, iy, ix, a, b, a, f, df);
+      overConcave(lm, iy, ix, a, b, b, f, df);
+      overConcave(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      underConcave(lm, iy, ix, a, b, f);
+   }
+   else
+   {
+      underConvex(lm, iy, ix, a, b, a, f, df);
+      underConvex(lm, iy, ix, a, b, b, f, df);
+      underConvex(lm, iy, ix, a, b, Interval(a, b).midpoint(), f, df);
+
+      overConvex(lm, iy, ix, a, b, f);
    }
 }
 

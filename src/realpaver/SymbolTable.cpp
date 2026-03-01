@@ -479,6 +479,14 @@ void FunctionCallProcessor::apply(const TermPow *t)
    t_ = pow(vis.getTerm(), t->exponent());
 }
 
+void FunctionCallProcessor::apply(const TermPowr *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = pow(vis.getTerm(), t->exponent());
+}
+
 void FunctionCallProcessor::apply(const TermExp *t)
 {
    FunctionCallProcessor vis(fc_);

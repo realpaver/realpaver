@@ -200,10 +200,16 @@ struct Double {
       return (x > y) ? x : y;
    }
 
-   /// Power function
-   static inline ValueType pow(ValueType x, int n)
+   /// Power function (integral exponent)
+   static inline ValueType pow(ValueType x, unsigned int n)
    {
       return std::pow(x, n);
+   }
+
+   /// Power function (real exponent)
+   static inline ValueType powr(ValueType x, double r)
+   {
+      return std::pow(x, r);
    }
 
    /// Absolute value

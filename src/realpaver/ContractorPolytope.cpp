@@ -157,8 +157,10 @@ Proof ContractorPolytope::contractLoop(IntervalBox &B, const LinearizeMethod &li
    {
       if (contractImpl(B, linearize) == Proof::Empty)
          return Proof::Empty;
-      if (!B.improves(prev, looptol_))
+
+      else if (!B.improves(prev, looptol_))
          iter = false;
+
       else
          prev.setOnScope(B, scope());
    }

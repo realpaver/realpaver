@@ -528,6 +528,10 @@ void TermQuadraticCreator::apply(const TermPow *t)
 {
 }
 
+void TermQuadraticCreator::apply(const TermPowr *t)
+{
+}
+
 void TermQuadraticCreator::apply(const TermExp *t)
 {
 }
@@ -557,6 +561,30 @@ void TermQuadraticCreator::apply(const TermSinh *t)
 }
 
 void TermQuadraticCreator::apply(const TermTanh *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAcos *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAsin *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAtan *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAcosh *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAsinh *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAtanh *t)
 {
 }
 

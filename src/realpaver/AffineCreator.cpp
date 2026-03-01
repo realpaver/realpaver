@@ -90,7 +90,6 @@ bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
          LOG_LOW("Affine relaxation for constraint @ " << dag_->fun(i)->ctrId());
       }
    }
-
    return true;
 }
 
@@ -208,8 +207,14 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
    }
    case DagSymbol::Pow: {
       size_t c = node->child()->index();
-      int e = static_cast<DagPow *>(node)->exponent();
+      unsigned int e = static_cast<DagPow *>(node)->exponent();
       f = std::make_unique<AffineForm>(pow(*v_[c], e));
+      break;
+   }
+   case DagSymbol::Powr: {
+      size_t c = node->child()->index();
+      double e = static_cast<DagPowr *>(node)->exponent();
+      f = std::make_unique<AffineForm>(powr(*v_[c], e));
       break;
    }
    case DagSymbol::Exp: {

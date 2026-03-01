@@ -376,6 +376,16 @@ void TermLinCreator::apply(const TermPow *t)
    }
 }
 
+void TermLinCreator::apply(const TermPowr *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
 void TermLinCreator::apply(const TermExp *t)
 {
    if (t->isConstant())
@@ -447,6 +457,66 @@ void TermLinCreator::apply(const TermSinh *t)
 }
 
 void TermLinCreator::apply(const TermTanh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAcos *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAsin *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAtan *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAcosh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAsinh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAtanh *t)
 {
    if (t->isConstant())
    {

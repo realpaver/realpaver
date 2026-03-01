@@ -18,6 +18,7 @@
  * @date   6 Nov 2024
  */
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/FlatFunction.hpp"
 
@@ -71,6 +72,8 @@ std::ostream &operator<<(std::ostream &os, FlatSymbol op)
       return os << "sqrt";
    case FlatSymbol::Pow:
       return os << "pow";
+   case FlatSymbol::Powr:
+      return os << "powr";
    case FlatSymbol::Exp:
       return os << "exp";
    case FlatSymbol::Log:
@@ -344,16 +347,31 @@ size_t FlatFunction::insertLin(const Interval &x, Variable v)
    }
 }
 
-size_t FlatFunction::insertPow(FlatSymbol symb, size_t ic, int e)
+size_t FlatFunction::insertPow(size_t ic, unsigned int e)
 {
    extendCapacity();
 
    size_t i = nb_++;
-   symb_[i] = symb;
+   symb_[i] = FlatSymbol::Pow;
    arg_[i] = new size_t[3];
    arg_[i][0] = 3;
    arg_[i][1] = ic;
    arg_[i][2] = (size_t)e;
+   return i;
+}
+
+size_t FlatFunction::insertPowr(size_t ic, const double &r)
+{
+   size_t ie = insertCst(r);
+
+   extendCapacity();
+
+   size_t i = nb_++;
+   symb_[i] = FlatSymbol::Powr;
+   arg_[i] = new size_t[3];
+   arg_[i][0] = 3;
+   arg_[i][1] = ic;
+   arg_[i][2] = ie;
    return i;
 }
 
@@ -442,6 +460,12 @@ Interval FlatFunction::iEval(const IntervalVector &V)
       case FlatSymbol::Pow:
          ival_[i] = pow(ival_[arg_[i][1]], arg_[i][2]);
          break;
+
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[i] = powr(ival_[arg_[i][1]], r);
+      }
+      break;
 
       case FlatSymbol::Exp:
          ival_[i] = exp(ival_[arg_[i][1]]);
@@ -578,6 +602,12 @@ Interval FlatFunction::iEval(const IntervalBox &B)
       case FlatSymbol::Pow:
          ival_[i] = pow(ival_[arg_[i][1]], arg_[i][2]);
          break;
+
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[i] = powr(ival_[arg_[i][1]], r);
+      }
+      break;
 
       case FlatSymbol::Exp:
          ival_[i] = exp(ival_[arg_[i][1]]);
@@ -716,6 +746,12 @@ double FlatFunction::rEval(const RealVector &V)
          rval_[i] = Double::pow(rval_[arg_[i][1]], arg_[i][2]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         rval_[i] = Double::powr(rval_[arg_[i][1]], r);
+      }
+      break;
+
       case FlatSymbol::Exp:
          rval_[i] = Double::exp(rval_[arg_[i][1]]);
          break;
@@ -851,6 +887,12 @@ double FlatFunction::rEval(const RealPoint &pt)
       case FlatSymbol::Pow:
          rval_[i] = Double::pow(rval_[arg_[i][1]], arg_[i][2]);
          break;
+
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         rval_[i] = Double::powr(rval_[arg_[i][1]], r);
+      }
+      break;
 
       case FlatSymbol::Exp:
          rval_[i] = Double::exp(rval_[arg_[i][1]]);
@@ -1141,6 +1183,12 @@ Proof FlatFunction::hc4ReviseBackward(IntervalBox &B)
          ival_[arg_[i][1]] = powPX(ival_[arg_[i][1]], arg_[i][2], ival_[i]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[arg_[i][1]] = powrPX(ival_[arg_[i][1]], r, ival_[i]);
+      }
+      break;
+
       case FlatSymbol::Exp:
          ival_[arg_[i][1]] = expPX(ival_[arg_[i][1]], ival_[i]);
          break;
@@ -1303,6 +1351,12 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector &V)
       case FlatSymbol::Pow:
          ival_[arg_[i][1]] = powPX(ival_[arg_[i][1]], arg_[i][2], ival_[i]);
          break;
+
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[arg_[i][1]] = powrPX(ival_[arg_[i][1]], r, ival_[i]);
+      }
+      break;
 
       case FlatSymbol::Exp:
          ival_[arg_[i][1]] = expPX(ival_[arg_[i][1]], ival_[i]);
@@ -1551,8 +1605,15 @@ void FlatFunction::iDiff()
 
       case FlatSymbol::Pow: {
          // d(u^n)/du = n * u^(n-1)
-         int e = (int)arg_[i][2];
+         unsigned int e = arg_[i][2];
          idv_[arg_[i][1]] = Interval(e) * idv_[i] * pow(ival_[arg_[i][1]], e - 1);
+      }
+      break;
+
+      case FlatSymbol::Powr: {
+         // d(u^n)/du = n * u^(n-1)
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         idv_[arg_[i][1]] = Interval(r) * idv_[i] * powr(ival_[arg_[i][1]], r - 1);
       }
       break;
 
@@ -1822,9 +1883,17 @@ bool FlatFunction::rDiff()
 
       case FlatSymbol::Pow: {
          // d(u^n)/du = n * u^(n-1)
-         int e = (int)arg_[i][2];
+         unsigned int e = arg_[i][2];
          rdv_[arg_[i][1]] =
              Double::mul(Double::mul(e, rdv_[i]), Double::pow(rval_[arg_[i][1]], e - 1));
+      }
+      break;
+
+      case FlatSymbol::Powr: {
+         // d(u^n)/du = n * u^(n-1)
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         rdv_[arg_[i][1]] =
+             Double::mul(Double::mul(r, rdv_[i]), Double::powr(rval_[arg_[i][1]], r - 1));
       }
       break;
 
@@ -2061,7 +2130,14 @@ void FlatFunTermCreator::apply(const TermPow *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, t->exponent());
+   idx_ = f_->insertPow(vc.idx_, t->exponent());
+}
+
+void FlatFunTermCreator::apply(const TermPowr *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertPowr(vc.idx_, t->exponent());
 }
 
 void FlatFunTermCreator::apply(const TermExp *t)
@@ -2272,7 +2348,14 @@ void FlatFunDagCreator::apply(const DagPow *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, d->exponent());
+   idx_ = f_->insertPow(vc.idx_, d->exponent());
+}
+
+void FlatFunDagCreator::apply(const DagPowr *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertPowr(vc.idx_, d->exponent());
 }
 
 void FlatFunDagCreator::apply(const DagExp *d)
@@ -2678,7 +2761,15 @@ void FlatFunUniCreator::apply(const DagPow *d)
    FlatFunUniCreator vc(f_, B_, v_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, d->exponent());
+   idx_ = f_->insertPow(vc.idx_, d->exponent());
+}
+
+void FlatFunUniCreator::apply(const DagPowr *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertPowr(vc.idx_, d->exponent());
 }
 
 void FlatFunUniCreator::apply(const DagExp *d)
