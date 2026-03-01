@@ -61,6 +61,7 @@ public:
    void apply(const DagSqr *node) override;
    void apply(const DagSqrt *node) override;
    void apply(const DagPow *node) override;
+   void apply(const DagPowr *node) override;
    void apply(const DagExp *node) override;
    void apply(const DagLog *node) override;
    void apply(const DagCos *node) override;

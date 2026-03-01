@@ -132,6 +132,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -140,6 +141,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    TermLin *lt_;

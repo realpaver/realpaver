@@ -57,6 +57,8 @@ std::ostream &operator<<(std::ostream &os, DagSymbol op)
       return os << "sqrt";
    case DagSymbol::Pow:
       return os << "pow";
+   case DagSymbol::Powr:
+      return os << "powr";
    case DagSymbol::Exp:
       return os << "exp";
    case DagSymbol::Log:
@@ -558,13 +560,13 @@ void DagSqrt::iEvalNode()
 
 /*----------------------------------------------------------------------------*/
 
-DagPow::DagPow(Dag *dag, int n, const IndexList &lsub)
+DagPow::DagPow(Dag *dag, unsigned int n, const IndexList &lsub)
     : DagOp(dag, DagSymbol::Pow, lsub)
     , n_(n)
 {
 }
 
-int DagPow::exponent() const
+unsigned int DagPow::exponent() const
 {
    return n_;
 }
@@ -593,6 +595,45 @@ void DagPow::acceptVisitor(DagVisitor &vis) const
 void DagPow::iEvalNode()
 {
    setIval(pow(child()->ival(), n_));
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagPowr::DagPowr(Dag *dag, const double &r, const IndexList &lsub)
+    : DagOp(dag, DagSymbol::Powr, lsub)
+    , r_(r)
+{
+}
+
+double DagPowr::exponent() const
+{
+   return r_;
+}
+
+bool DagPowr::eqSymbol(const DagOp *other) const
+{
+   const DagPowr *aux = dynamic_cast<const DagPowr *>(other);
+
+   if (aux == nullptr)
+      return false;
+
+   else
+      return r_ == aux->r_;
+}
+
+void DagPowr::print(std::ostream &os) const
+{
+   os << "^" << r_;
+}
+
+void DagPowr::acceptVisitor(DagVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+void DagPowr::iEvalNode()
+{
+   setIval(powr(child()->ival(), r_));
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1695,6 +1736,11 @@ void DagVisitor::apply(const DagPow *d)
    THROW("visit method not implemented");
 }
 
+void DagVisitor::apply(const DagPowr *d)
+{
+   THROW("visit method not implemented");
+}
+
 void DagVisitor::apply(const DagExp *d)
 {
    THROW("visit method not implemented");
@@ -1879,6 +1925,13 @@ void DagFunCreator::apply(const DagPow *d)
 {
    visitSubNodes(d);
    DagPow *aux = const_cast<DagPow *>(d);
+   f_->insertOpNode(aux);
+}
+
+void DagFunCreator::apply(const DagPowr *d)
+{
+   visitSubNodes(d);
+   DagPowr *aux = const_cast<DagPowr *>(d);
    f_->insertOpNode(aux);
 }
 
@@ -2188,6 +2241,13 @@ void DagTermCreator::apply(const TermPow *t)
 {
    visitSubnodes(t);
    DagPow *node = new DagPow(dag_, t->exponent(), lsub_);
+   index_ = dag_->insertOpNode(t->hashCode(), node);
+}
+
+void DagTermCreator::apply(const TermPowr *t)
+{
+   visitSubnodes(t);
+   DagPowr *node = new DagPowr(dag_, t->exponent(), lsub_);
    index_ = dag_->insertOpNode(t->hashCode(), node);
 }
 

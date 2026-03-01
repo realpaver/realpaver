@@ -50,7 +50,8 @@ enum class FlatSymbol {
    Sgn,   ///< sign
    Sqr,   ///< square
    Sqrt,  ///< square root
-   Pow,   ///< power
+   Pow,   ///< power (positive integral exponent)
+   Powr,  ///< power (real exponent)
    Exp,   ///< exponential
    Log,   ///< logarithm
    Cos,   ///< cosine
@@ -189,7 +190,10 @@ public:
    size_t insertBinary(FlatSymbol symb, size_t il, size_t ir);
 
    /// Inserts a power node and returns its index
-   size_t insertPow(FlatSymbol symb, size_t ic, int e);
+   size_t insertPow(size_t ic, unsigned int e);
+
+   /// Inserts a power node and returns its index
+   size_t insertPowr(size_t ic, const double &r);
 
    /// Inserts a linear term x*v
    size_t insertLin(const Interval &x, Variable v);
@@ -276,6 +280,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -320,6 +325,7 @@ public:
    void apply(const DagSqr *d) override;
    void apply(const DagSqrt *d) override;
    void apply(const DagPow *d) override;
+   void apply(const DagPowr *d) override;
    void apply(const DagExp *d) override;
    void apply(const DagLog *d) override;
    void apply(const DagCos *d) override;
@@ -372,6 +378,7 @@ public:
    void apply(const DagSqr *d) override;
    void apply(const DagSqrt *d) override;
    void apply(const DagPow *d) override;
+   void apply(const DagPowr *d) override;
    void apply(const DagExp *d) override;
    void apply(const DagLog *d) override;
    void apply(const DagCos *d) override;

@@ -143,6 +143,13 @@ void TermFixer::apply(const TermPow *t)
    rt_ = pow(vis.rt_, t->exponent());
 }
 
+void TermFixer::apply(const TermPowr *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = pow(vis.rt_, t->exponent());
+}
+
 void TermFixer::apply(const TermExp *t)
 {
    TermFixer vis(bridge_);

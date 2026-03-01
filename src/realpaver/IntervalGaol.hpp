@@ -612,19 +612,34 @@ template <> struct IntervalTraits<RawInterval> {
       return y & gaol::sqrt(x);
    }
 
-   static inline interval pow(const interval &x, int n)
+   static inline interval pow(const interval &x, unsigned int n)
    {
-      return gaol::pow(x, n);
+      return gaol::pow(x, (int)n);
    }
 
-   static inline interval powPX(const interval &x, int n, const interval &y)
+   static inline interval powPX(const interval &x, unsigned int n, const interval &y)
    {
       return gaol::nth_root_rel(y, n, x);
    }
 
-   static inline interval powPY(const interval &x, int n, const interval &y)
+   static inline interval powPY(const interval &x, unsigned int n, const interval &y)
    {
-      return y & gaol::pow(x, n);
+      return y & gaol::pow(x, (int)n);
+   }
+
+   static inline interval powr(const interval &x, const double &r)
+   {
+      return exp(r * log(x));
+   }
+
+   static inline interval powrPX(const interval &x, const double &r, const interval &y)
+   {
+      return x & exp(log(y) / r);
+   }
+
+   static inline interval powrPY(const interval &x, const double &r, const interval &y)
+   {
+      return y & powr(x, r);
    }
 
    static inline interval exp(const interval &x)

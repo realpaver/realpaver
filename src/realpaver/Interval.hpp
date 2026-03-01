@@ -339,11 +339,18 @@ public:
    friend Interval sqrtPY(const Interval &x, const Interval &y);
    ///@}
 
-   /// @name Power function
+   /// @name Power function with integral exponent
    ///@{
-   friend Interval pow(const Interval &x, int n);
-   friend Interval powPX(const Interval &x, int n, const Interval &y);
-   friend Interval powPY(const Interval &x, int n, const Interval &y);
+   friend Interval pow(const Interval &x, unsigned int n);
+   friend Interval powPX(const Interval &x, unsigned int n, const Interval &y);
+   friend Interval powPY(const Interval &x, unsigned int n, const Interval &y);
+   ///@}
+
+   /// @name Power function with real exponent (and not integral in disguise)
+   ///@{
+   friend Interval powr(const Interval &x, const double &r);
+   friend Interval powrPX(const Interval &x, const double &r, const Interval &y);
+   friend Interval powrPY(const Interval &x, const double &r, const Interval &y);
    ///@}
 
    /// @name Exponential

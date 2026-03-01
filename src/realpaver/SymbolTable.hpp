@@ -286,6 +286,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;

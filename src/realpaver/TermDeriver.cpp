@@ -144,6 +144,15 @@ void TermDeriver::apply(const TermPow *t)
    dt_ = (n * vis.dt_) * pow(t->child(), n - 1);
 }
 
+void TermDeriver::apply(const TermPowr *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+
+   double r = t->exponent();
+   dt_ = (r * vis.dt_) * pow(t->child(), r - 1);
+}
+
 void TermDeriver::apply(const TermExp *t)
 {
    TermDeriver vis(v_);
