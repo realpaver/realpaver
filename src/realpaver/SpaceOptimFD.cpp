@@ -89,6 +89,8 @@ void SpaceOptimFD::print(std::ostream &os) const
    os << "Pending nodes (" << nbPendingNodes() << ")" << std::endl;
    for (const auto &it : nod_)
       os << "   " << (*it) << std::endl;
+   if (next_ != nullptr)
+      os << "Next node (DFS): " << (*next_) << std::endl;
    os << "Solution nodes (" << nbSolNodes() << ")" << std::endl;
    for (const auto &it : sol_)
       os << "   " << (*it) << std::endl;

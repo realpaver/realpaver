@@ -169,9 +169,9 @@ void test_5()
    space.pushPendingNode(n6);
 
    SharedNodeOptim n2 = std::make_shared<NodeOptim>(prob->scope(), 2);
-   n1->setLower(1.0).setUpper(10.0);
-   n1->setIndex(1);
-   space.pushPendingNode(n1);
+   n2->setLower(1.0).setUpper(10.0);
+   n2->setIndex(1);
+   space.pushPendingNode(n2);
 
    SharedNodeOptim n3 = std::make_shared<NodeOptim>(prob->scope(), 2);
    n3->setLower(2.0).setUpper(8.0);
