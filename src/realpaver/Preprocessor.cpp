@@ -18,12 +18,13 @@
  * @date   11 Apr 2024
  */
 
-#include "Variable.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/Param.hpp"
 #include "realpaver/Preprocessor.hpp"
 #include "realpaver/TermFixer.hpp"
+#include "realpaver/Variable.hpp"
 #include <memory>
 
 namespace realpaver {
@@ -265,11 +266,24 @@ void Preprocessor::applyImpl()
    }
 }
 
+bool testImprove(const DomainBox &prev, const DomainBox &curr, const double &tol)
+{
+   for (const auto &v : prev.scope())
+   {
+      const Interval &dprev = prev.get(v)->intervalHull();
+      const Interval &dcurr = curr.get(v)->intervalHull();
+      if (dcurr.improves(dprev, tol))
+         return true;
+   }
+   return false;
+}
+
 bool Preprocessor::propagate(DomainBox &box)
 {
+   double tol(Params::GetDblParam("PROPAGATION_TOL"));
+
    // AC1 propagation algorithm
    bool modified;
-
    do
    {
       modified = false;
@@ -286,7 +300,7 @@ bool Preprocessor::propagate(DomainBox &box)
          }
       }
 
-      if (!save.equals(box))
+      if (testImprove(save, box, tol))
          modified = true;
    } while (modified);
 
