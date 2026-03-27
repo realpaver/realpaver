@@ -70,9 +70,16 @@ int main(int argc, char **argv)
       Parser parser(params);
       Problem problem;
 
-      ok = parser.parseFile(pbFilename, problem);
-      if (!ok)
-         THROW("Parse error: " << parser.getParseError());
+      try
+      {
+         ok = parser.parseFile(pbFilename, problem);
+         if (!ok)
+            THROW("Parse error: " << parser.getParseError());
+      }
+      catch (Exception &e)
+      {
+         THROW("Parse error: " << e.what());
+      }
 
       LOG_MAIN("End of parsing");
       if (problem.nbCtrs() == 0)

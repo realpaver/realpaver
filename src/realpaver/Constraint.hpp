@@ -57,7 +57,7 @@ public:
    /// Assigns the status of the constraint: initial or not (redundant, ...)
    void setInitial(bool b = true);
 
-   /// Returns true if this is variable free */
+   /// Returns true if this is variable free
    bool isConstant() const;
 
    /// Checks the satisfaction of this on a box
