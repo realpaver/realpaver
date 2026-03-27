@@ -21,6 +21,7 @@
 #include "realpaver/ConstraintArithmetic.hpp"
 #include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/FlatFunction.hpp"
+#include "realpaver/TermLin.hpp"
 
 namespace realpaver {
 
@@ -116,6 +117,19 @@ Proof ConstraintBinary::contract(DomainBox &box)
    return proof;
 }
 
+Term ConstraintBinary::simplify(Term t)
+{
+   try
+   {
+      TermLin tl(t);
+      return tl.toTerm();
+   }
+   catch (Exception &e)
+   {
+      return t;
+   }
+}
+
 /*----------------------------------------------------------------------------*/
 
 ConstraintEq::ConstraintEq(Term l, Term r)
@@ -196,7 +210,12 @@ ConstraintRep *ConstraintEq::cloneRoot() const
 
 Constraint operator==(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintEq>(l.rep(), r.rep()));
+   Term rew = ConstraintBinary::simplify(l - r);
+   if (rew.isConstant())
+   {
+      THROW("Bad constraint: " << l << " == " << r);
+   }
+   return Constraint(std::make_shared<ConstraintEq>(rew, Term(0.0)));
 }
 
 /*----------------------------------------------------------------------------*/
@@ -279,7 +298,12 @@ ConstraintRep *ConstraintLe::cloneRoot() const
 
 Constraint operator<=(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintLe>(l.rep(), r.rep()));
+   Term rew = ConstraintBinary::simplify(l - r);
+   if (rew.isConstant())
+   {
+      THROW("Bad constraint: " << l << " <= " << r);
+   }
+   return Constraint(std::make_shared<ConstraintLe>(rew, Term(0.0)));
 }
 
 /*----------------------------------------------------------------------------*/
@@ -362,7 +386,12 @@ ConstraintRep *ConstraintLt::cloneRoot() const
 
 Constraint operator<(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintLt>(l.rep(), r.rep()));
+   Term rew = ConstraintBinary::simplify(l - r);
+   if (rew.isConstant())
+   {
+      THROW("Bad constraint: " << l << " < " << r);
+   }
+   return Constraint(std::make_shared<ConstraintLt>(rew, Term(0.0)));
 }
 
 /*----------------------------------------------------------------------------*/
@@ -445,7 +474,12 @@ ConstraintRep *ConstraintGe::cloneRoot() const
 
 Constraint operator>=(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintGe>(l.rep(), r.rep()));
+   Term rew = ConstraintBinary::simplify(l - r);
+   if (rew.isConstant())
+   {
+      THROW("Bad constraint: " << l << " >= " << r);
+   }
+   return Constraint(std::make_shared<ConstraintGe>(rew, Term(0.0)));
 }
 
 /*----------------------------------------------------------------------------*/
@@ -528,7 +562,12 @@ ConstraintRep *ConstraintGt::cloneRoot() const
 
 Constraint operator>(Term l, Term r)
 {
-   return Constraint(std::make_shared<ConstraintGt>(l.rep(), r.rep()));
+   Term rew = ConstraintBinary::simplify(l - r);
+   if (rew.isConstant())
+   {
+      THROW("Bad constraint: " << l << " > " << r);
+   }
+   return Constraint(std::make_shared<ConstraintGt>(rew, Term(0.0)));
 }
 
 /*----------------------------------------------------------------------------*/
@@ -630,17 +669,28 @@ ConstraintRep *ConstraintIn::cloneRoot() const
 
 Constraint in(Term t, const Interval &x)
 {
+   if (x.isEmpty())
+   {
+      THROW("Constraint with an empty interval: " << t << " in " << x);
+   }
+
+   Term rew = ConstraintBinary::simplify(t);
+   if (rew.isConstant())
+   {
+      THROW("Bad constraint: " << t << " in " << x);
+   }
+
    if (x.isSingleton())
-      return t == x;
+      return rew == x;
 
    else if (x.isInfLeft())
-      return t <= x.right();
+      return rew <= x.right();
 
    else if (x.isInfRight())
-      return t >= x.left();
+      return rew >= x.left();
 
    else
-      return Constraint(std::make_shared<ConstraintIn>(t.rep(), x));
+      return Constraint(std::make_shared<ConstraintIn>(rew, x));
 }
 
 Constraint in(Term t, double a, double b)

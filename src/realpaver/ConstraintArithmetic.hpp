@@ -56,6 +56,14 @@ public:
    Proof contract(IntervalBox &B) override;
    Proof contract(DomainBox &box) override;
 
+   /**
+    * @brief Simplifies a term.
+    *
+    * It tries to rewrite t if it is a linear term to eliminate
+    * multiple occurrences of variables.
+    */
+   static Term simplify(Term t);
+
 protected:
    std::shared_ptr<FlatFunction> fun_; // flat function
 
@@ -79,7 +87,12 @@ public:
    ConstraintRep *cloneRoot() const override;
 };
 
-/// Generates l == r
+/**
+ * @brief Creates an equation.
+ *
+ * Generates l == r.
+ * Throws an exception if there is no variable in l-r.
+ */
 Constraint operator==(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
@@ -98,7 +111,12 @@ public:
    ConstraintRep *cloneRoot() const override;
 };
 
-/// Generates l <= r
+/**
+ * @brief Creates an equation.
+ *
+ * Generates l <= r.
+ * Throws an exception if there is no variable in l-r.
+ */
 Constraint operator<=(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
@@ -117,7 +135,12 @@ public:
    ConstraintRep *cloneRoot() const override;
 };
 
-/// Generates l < r
+/**
+ * @brief Creates an equation.
+ *
+ * Generates l < r.
+ * Throws an exception if there is no variable in l-r.
+ */
 Constraint operator<(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
@@ -136,7 +159,12 @@ public:
    ConstraintRep *cloneRoot() const override;
 };
 
-/// Generates l >= r
+/**
+ * @brief Creates an equation.
+ *
+ * Generates l >= r.
+ * Throws an exception if there is no variable in l-r.
+ */
 Constraint operator>=(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
@@ -155,7 +183,12 @@ public:
    ConstraintRep *cloneRoot() const override;
 };
 
-/// Generates l > r
+/**
+ * @brief Creates an equation.
+ *
+ * Generates l > r.
+ * Throws an exception if there is no variable in l-r.
+ */
 Constraint operator>(Term l, Term r);
 
 /*----------------------------------------------------------------------------*/
@@ -188,10 +221,20 @@ private:
    Interval x_;
 };
 
-/// Generates t in x
+/**
+ * @brief Creates an equation.
+ *
+ * Generates t in x.
+ * Throws an exception if there is no variable in t or x is empty.
+ */
 Constraint in(Term t, const Interval &x);
 
-/// Generates t in [a, b]
+/**
+ * @brief Creates an equation.
+ *
+ * Generates t in [a,b].
+ * Throws an exception if there is no variable in t or [a,b] is empty.
+ */
 Constraint in(Term t, double a, double b);
 
 } // namespace realpaver
