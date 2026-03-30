@@ -112,6 +112,7 @@ void LPSolver::setOptions()
    simplex_->setMaximumIterations(maxiter);
    simplex_->setLogLevel(0);
    simplex_->setPrimalTolerance(tol);
+   simplex_->setDualTolerance(tol);
 }
 
 LPStatus LPSolver::run()
