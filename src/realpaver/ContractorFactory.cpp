@@ -37,6 +37,7 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
     , ve_()
     , vi_()
     , vc_()
+    , obj_ctr_dag_id_(-1)
     , se_()
     , si_()
     , sc_()
@@ -92,8 +93,8 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
       }
       Constraint c = pbm.ctrAt(i);
       c.setInitial(false);
-      size_t j = dag_->insert(c);
-      ve_.push_back(j);
+      obj_ctr_dag_id_ = dag_->insert(c);
+      ve_.push_back(obj_ctr_dag_id_);
       se_.insert(c.scope());
    }
 
@@ -437,6 +438,11 @@ SharedContractorPolytope ContractorFactory::makePolytope()
    }
 
    return op;
+}
+
+int ContractorFactory::getObjectiveConstraintDagId() const
+{
+   return obj_ctr_dag_id_;
 }
 
 } // namespace realpaver

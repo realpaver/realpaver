@@ -149,12 +149,18 @@ public:
     */
    SharedContractorPolytope makePolytope();
 
+   /**
+    * @brief Returns the index in the DAG of the objective constraint
+    */
+   int getObjectiveConstraintDagId() const;
+
 private:
    std::shared_ptr<Env> env_;   // environment for parameters
    SharedDag dag_;              // DAG of numerical constraints
    std::vector<size_t> ve_;     // indexes of equations in the DAG
    std::vector<size_t> vi_;     // indexes of inequalities in the DAG
    std::vector<Constraint> vc_; // other constraints
+   int obj_ctr_dag_id_;         // idx of objective constraint in problem definition
 
    Scope se_; // scope of equations
    Scope si_; // scope of inequalities
