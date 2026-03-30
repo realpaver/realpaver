@@ -292,6 +292,8 @@ void Problem::addCtr(const std::initializer_list<Constraint> &l)
 void Problem::addObjective(Objective obj)
 {
    obj_ = obj;
+   IntervalBox box(this->scope());
+   obj_.getVar().setDomain(std::make_unique<IntervalDomain>(obj_.getTerm().eval(box)));
 }
 
 std::ostream &operator<<(std::ostream &os, const Problem &p)
