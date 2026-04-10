@@ -87,18 +87,7 @@ elif local_solver_name.to_upper() == 'NLOPT'
     local_solver_dep = dependency('nlopt', required: true)
 endif
 
-h5_dep = dependency('hdf5_cpp')
-
-deps_lib = [
-  lp_dep,
-  mathlib_dep,
-  interval_dep,
-  m_dep,
-  local_solver_dep,
-  z_dep,
-  gmp_dep,
-  h5_dep,
-]
+deps_lib = [lp_dep, mathlib_dep, interval_dep, m_dep, local_solver_dep, z_dep, gmp_dep]
 
 ## Config
 os_unix = false
