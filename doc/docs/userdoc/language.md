@@ -232,8 +232,7 @@ Constraints
 
 ## Objectives
 
-For now, only single optimization problems can be defined.
-
+One or several objectives can be defined using the `Objectives` keyword.
 An objective is defined by a direction (`MIN` or `MAX`) and an arithmetic expression.
 
 For instance minimizing the Sphere function over 3 dimensions can be expressed as:
@@ -243,10 +242,21 @@ Variables
   x1 in [-inf,+inf],
   x2 in [-inf,+inf],
   x3 in [-inf,+inf];
-MIN x1^2 + x2^2 + x3^2;
+Objectives
+  MIN x1^2 + x2^2 + x3^2;
 ```
 
-**NB:** A global single optimization algorithm is in development, but not usable yet!
+The Schaffer bi-objective optimization problem is simply defined as:
+
+``` py
+Variables
+  x in [-10,10];
+Objectives
+  MIN x^2,
+  MIN (x-2)^2;
+```
+
+**NB:** Currently, no optimization algorithm is implemented!
 
 
 ## A complete example
@@ -281,7 +291,8 @@ Variables
    K in [0,1e8],
    volume in [0,1e8];
 
-MIN volume;
+Objectives
+  MIN volume;
 
 Constraints
     volume == ((N + 2)/2)*PI*coil*wire^2, # definition of total volume of coil spring
