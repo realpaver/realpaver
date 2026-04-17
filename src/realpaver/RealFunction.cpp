@@ -140,7 +140,7 @@ double RealFunctionDag::eval(const RealPoint &pt)
 
 void RealFunctionDag::diff(const RealPoint &pt, RealVector &G)
 {
-   DagFun *f = dag_->fun(index_);
+   SharedDagFun f = dag_->fun(index_);
    return f->rDiff(pt, G);
 }
 

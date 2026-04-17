@@ -62,14 +62,14 @@ bool Constraint::hasNoId() const
    return rep_->hasNoId();
 }
 
-bool Constraint::isInitial() const
+ConstraintStatus Constraint::status() const
 {
-   return rep_->isInitial();
+   return rep_->status();
 }
 
-void Constraint::setInitial(bool b)
+void Constraint::setStatus(ConstraintStatus status)
 {
-   rep_->setInitial(b);
+   rep_->setStatus(status);
 }
 
 bool Constraint::isConstant() const
@@ -130,6 +130,11 @@ bool Constraint::isEquation() const
 bool Constraint::isInequality() const
 {
    return rep_->isInequality();
+}
+
+bool Constraint::isArithmetic() const
+{
+   return isEquation() || isInequality();
 }
 
 bool Constraint::isLinear() const

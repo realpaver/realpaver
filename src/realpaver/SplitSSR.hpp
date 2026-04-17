@@ -45,7 +45,6 @@ public:
 
 private:
    SelectorSSR ssr_; // main selector based on SSR values
-   Scope sbis_;      // selector for the variables not handled by the SSR selector
 };
 
 } // namespace realpaver

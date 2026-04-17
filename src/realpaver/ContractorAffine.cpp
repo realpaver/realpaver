@@ -20,18 +20,19 @@
 
 #include "realpaver/ContractorAffine.hpp"
 #include "realpaver/ContractorAffineRevise.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorAffine::ContractorAffine(SharedDag dag, bool minrange)
-    : dag_(dag)
+ContractorAffine::ContractorAffine(SharedDagExtended edag, bool minrange)
+    : edag_(edag)
 {
    SharedContractorPool pool = std::make_shared<ContractorPool>();
 
-   for (size_t i = 0; i < dag_->nbFuns(); ++i)
+   for (size_t i = 0; i < edag_->size(); ++i)
    {
-      SharedContractor op = std::make_shared<ContractorAffineRevise>(dag_, i, minrange);
+      SharedContractor op = std::make_shared<ContractorAffineRevise>(edag_, i, minrange);
       pool->push(op);
    }
 
@@ -46,7 +47,7 @@ ContractorAffine::~ContractorAffine()
 
 Scope ContractorAffine::scope() const
 {
-   return dag_->scope();
+   return edag_->scope();
 }
 
 Proof ContractorAffine::contract(IntervalBox &B)

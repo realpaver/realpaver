@@ -24,41 +24,21 @@
 
 namespace realpaver {
 
-ContractorHC4::ContractorHC4(SharedDag dag)
-    : dag_(dag)
-{
-   SharedContractorPool pool = std::make_shared<ContractorPool>();
-
-   for (size_t i = 0; i < dag_->nbFuns(); ++i)
-   {
-      SharedContractor op = std::make_shared<ContractorHC4Revise>(dag_, i);
-      pool->push(op);
-   }
-
-   propag_ = new IntervalPropagator(pool);
-}
-
-ContractorHC4::~ContractorHC4()
-{
-   if (propag_ != nullptr)
-      delete propag_;
-}
-
 Scope ContractorHC4::scope() const
 {
-   return dag_->scope();
+   return propag_.scope();
 }
 
 Proof ContractorHC4::contract(IntervalBox &B)
 {
    LOG_INTER("HC4");
-   return propag_->contract(B);
+   return propag_.contract(B);
 }
 
 Proof ContractorHC4::contract(IntervalBox &B, const Bitset &active)
 {
    LOG_INTER("HC4");
-   return propag_->contract(B, active);
+   return propag_.contract(B, active);
 }
 
 void ContractorHC4::print(std::ostream &os) const
@@ -68,17 +48,17 @@ void ContractorHC4::print(std::ostream &os) const
 
 double ContractorHC4::getTol() const
 {
-   return propag_->getTol();
+   return propag_.getTol();
 }
 
 void ContractorHC4::setTol(double tol)
 {
-   propag_->setTol(tol);
+   propag_.setTol(tol);
 }
 
 void ContractorHC4::push(SharedContractor op)
 {
-   propag_->push(op);
+   propag_.push(op);
 }
 
 } // namespace realpaver

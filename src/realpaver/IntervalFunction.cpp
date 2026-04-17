@@ -39,8 +39,8 @@ Interval IntervalFunctionRep::getImage() const
 
 /*----------------------------------------------------------------------------*/
 
-IntervalFunction::IntervalFunction(SharedDag dag, size_t i)
-    : rep_(std::make_shared<IntervalFunctionDag>(dag, i))
+IntervalFunction::IntervalFunction(SharedDagFun f)
+    : rep_(std::make_shared<IntervalFunctionDag>(f))
 {
 }
 
@@ -99,59 +99,44 @@ void IntervalFunction::diffHansen(const IntervalBox &B, const RealPoint &c,
 
 /*----------------------------------------------------------------------------*/
 
-IntervalFunctionDag::IntervalFunctionDag(SharedDag dag, size_t i)
+IntervalFunctionDag::IntervalFunctionDag(SharedDagFun f)
     : IntervalFunctionRep()
-    , dag_(dag)
-    , index_(i)
+    , f_(f)
 {
-   REALPAVER_ASSERT(dag_ != nullptr, "Null pointer used to create an interval function");
-   REALPAVER_ASSERT(i < dag_->nbFuns(), "Bad index used to create an interval function");
 }
 
 IntervalFunctionDag::IntervalFunctionDag(Term t, const Interval &img)
-    : dag_(nullptr)
-    , index_(0)
+    : f_(nullptr)
 {
-   dag_ = std::make_shared<Dag>();
-   index_ = dag_->insert(t, img);
-}
-
-SharedDag IntervalFunctionDag::dag() const
-{
-   return dag_;
-}
-
-size_t IntervalFunctionDag::index() const
-{
-   return index_;
+   SharedDag dag = std::make_shared<Dag>();
+   size_t i = dag->insert(t, img);
+   f_ = dag->fun(i);
 }
 
 Scope IntervalFunctionDag::scope() const
 {
-   return dag_->fun(index_)->scope();
+   return f_->scope();
 }
 
 size_t IntervalFunctionDag::nbVars() const
 {
-   return dag_->fun(index_)->nbVars();
+   return f_->nbVars();
 }
 
 Interval IntervalFunctionDag::eval(const IntervalBox &B)
 {
-   return dag_->fun(index_)->iEval(B);
+   return f_->iEval(B);
 }
 
 void IntervalFunctionDag::diff(const IntervalBox &B, IntervalVector &G)
 {
-   DagFun *f = dag_->fun(index_);
-   return f->iDiff(B, G);
+   return f_->iDiff(B, G);
 }
 
 void IntervalFunctionDag::diffHansen(const IntervalBox &B, const RealPoint &c,
                                      IntervalVector &G)
 {
-   DagFun *f = dag_->fun(index_);
-   return f->iDiffHansen(B, c, G);
+   return f_->iDiffHansen(B, c, G);
 }
 
 } // namespace realpaver

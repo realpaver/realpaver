@@ -454,6 +454,7 @@ ctr_cond
     {
       realpaver::Constraint::SharedRep rep(realpaver_ctr_rep);
       realpaver::Constraint c(rep);
+      c.setStatus(realpaver::ConstraintStatus::Initial);
       realpaver_bison_problem->addCtr(c);
     }
   | TK_IMPLY ctr_atom
@@ -466,6 +467,7 @@ ctr_cond
 
       try {
          realpaver::Constraint c(cond(guard, body));
+         c.setStatus(realpaver::ConstraintStatus::Initial);
          realpaver_bison_problem->addCtr(c);
       }
       catch (realpaver::Exception& e)

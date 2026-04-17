@@ -18,16 +18,35 @@
  * @date   28 May 2025
  */
 
+#include "ConstraintRep.hpp"
 #include "realpaver/ConstraintRep.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
+std::ostream &operator<<(std::ostream &os, ConstraintStatus status)
+{
+   switch (status)
+   {
+   case ConstraintStatus::Initial:
+      return os << "Initial";
+   case ConstraintStatus::Objective:
+      return os << "Objective";
+   case ConstraintStatus::Redundant:
+      return os << "Redundant";
+   default:
+      os.setstate(std::ios::failbit);
+   }
+   return os;
+}
+
+/*----------------------------------------------------------------------------*/
+
 ConstraintRep::ConstraintRep(const ConstraintRelation &rel)
     : scop_()
     , rel_(rel)
     , id_(-1)
-    , initial_(true)
+    , status_(ConstraintStatus::Initial)
     , hcode_(0)
 {
 }
@@ -77,14 +96,14 @@ bool ConstraintRep::hasNoId() const
    return id_ < 0;
 }
 
-bool ConstraintRep::isInitial() const
+ConstraintStatus ConstraintRep::status() const
 {
-   return initial_;
+   return status_;
 }
 
-void ConstraintRep::setInitial(bool b)
+void ConstraintRep::setStatus(ConstraintStatus status)
 {
-   initial_ = b;
+   status_ = status;
 }
 
 bool ConstraintRep::isEquation() const

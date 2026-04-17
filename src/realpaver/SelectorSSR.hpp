@@ -79,6 +79,9 @@ public:
    /// Returns the interval function vector of this
    IntervalFunctionVector getFun() const;
 
+   /// Updates the interval function vector enclosed
+   void update(const IntervalBox &B, const Bitset &active);
+
    /// Calculates the smearSumRel values of the variables in a box
    void calculate(const IntervalBox &B);
 
@@ -114,7 +117,7 @@ public:
    /// Output on a stream
    void print(std::ostream &os) const;
 
-   bool apply(const DomainBox &box) override;
+   bool apply(SharedNode node, NodeContext &context) override;
 
 private:
    struct Item {

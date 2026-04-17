@@ -25,7 +25,7 @@ namespace realpaver {
 
 LinearizerAffineTaylor::LinearizerAffineTaylor(std::unique_ptr<LinearizerAffine> affine,
                                                std::unique_ptr<LinearizerTaylor> taylor)
-    : Linearizer(affine->dag())
+    : Linearizer(affine->edag())
     , affine_(std::move(affine))
     , taylor_(std::move(taylor))
 {

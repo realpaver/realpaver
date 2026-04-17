@@ -18,7 +18,9 @@
  * @date   11 Apr 2024
  */
 
+#include "ConstraintRep.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -35,6 +37,9 @@ Problem::Problem(const std::string &name)
     , obj_()
     , scop_()
     , als_()
+    , init_ctrs_()
+    , red_ctrs_()
+    , obj_ctr_(-1)
     , vname_()
     , erv_(std::make_shared<EntityReportedVector>())
     , id_(NP++)
@@ -280,6 +285,20 @@ size_t Problem::addCtr(Constraint c)
    size_t id = ctrs_.size();
    c.setId(id);
    ctrs_.push_back(c);
+   switch (c.status())
+   {
+   case ConstraintStatus::Initial:
+      init_ctrs_.push_back(id);
+      break;
+
+   case ConstraintStatus::Objective:
+      obj_ctr_ = id;
+      break;
+
+   case ConstraintStatus::Redundant:
+      red_ctrs_.push_back(id);
+      break;
+   }
    return id;
 }
 
@@ -291,9 +310,41 @@ void Problem::addCtr(const std::initializer_list<Constraint> &l)
 
 void Problem::addObjective(Objective obj)
 {
+   THROW_IF(obj.hasNullRep(), "Empty objective function");
+   THROW_IF(hasObjective(), "Only one objective function is allowed");
+
+   // assigns the objective
    obj_ = obj;
+
+   // assigns the domain of the objective variable
    IntervalBox box(this->scope());
    obj_.getVar().setDomain(std::make_unique<IntervalDomain>(obj_.getTerm().eval(box)));
+}
+
+bool Problem::hasObjectiveConstraint() const
+{
+   return obj_ctr_ >= 0;
+}
+
+void Problem::generateObjectiveConstraint()
+{
+   if (hasObjective() && (!hasObjectiveConstraint()))
+   {
+      if (obj_.isMinimization())
+      {
+         // min z = f(X) => equation z-f(X)==0
+         Constraint c(obj_.getVar() - obj_.getTerm() == 0.0);
+         c.setStatus(ConstraintStatus::Objective);
+         addCtr(c);
+      }
+      else
+      {
+         // max z = f(X) <=> min z = -f(X) => equation z+f(X)==0
+         Constraint c(obj_.getVar() + obj_.getTerm() == 0.0);
+         c.setStatus(ConstraintStatus::Objective);
+         addCtr(c);
+      }
+   }
 }
 
 std::ostream &operator<<(std::ostream &os, const Problem &p)
@@ -506,8 +557,35 @@ Constraint Problem::ctrAt(size_t i) const
    return ctrs_[i];
 }
 
+size_t Problem::nbInitialCtrs() const
+{
+   return init_ctrs_.size();
+}
+
+Constraint Problem::ctrInitialAt(size_t i) const
+{
+   return ctrAt(init_ctrs_[i]);
+}
+
+size_t Problem::nbRedundantCtrs() const
+{
+   return red_ctrs_.size();
+}
+
+Constraint Problem::ctrRedundantAt(size_t i) const
+{
+   return ctrAt(red_ctrs_[i]);
+}
+
+Constraint Problem::ctrObjective() const
+{
+   THROW_IF(hasObjective(), "No objective constraint");
+   return ctrAt(obj_ctr_);
+}
+
 Objective Problem::getObjective() const
 {
+   THROW_IF(!hasObjective(), "No objective function");
    return obj_;
 }
 

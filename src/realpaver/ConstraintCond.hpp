@@ -29,8 +29,8 @@ namespace realpaver {
  * @brief Representation of a conditional constraint guard -> body.
  *
  * The guard must be an integer constraint or an inequality constraint, i.e.
- * a constraint that can be certainly satisfied in a box. The body is any
- * constraint.
+ * a constraint that can be certainly satisfied in a box. The body is an
+ * arithmetic constraint.
  */
 class ConstraintCond : public ConstraintRep {
 public:

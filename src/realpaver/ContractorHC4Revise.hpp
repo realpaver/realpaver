@@ -21,8 +21,7 @@
 #ifndef REALPAVER_CONTRACTOR_HC4_REVISE_HPP
 #define REALPAVER_CONTRACTOR_HC4_REVISE_HPP
 
-#include "realpaver/Contractor.hpp"
-#include "realpaver/Dag.hpp"
+#include "realpaver/ContractorConstraint.hpp"
 
 namespace realpaver {
 
@@ -33,15 +32,13 @@ namespace realpaver {
  * The first phase is an interval evaluation from the leaves to the root.
  * The second phase calculates the projections from the root to the leaves.
  * The expression of the constraint comes from a DAG.
+ *
+ * This class is another name of the ContractorConstraint class.
  */
 class ContractorHC4Revise : public Contractor {
 public:
-   /**
-    * @brief Constructor.
-    * @param dag a DAG
-    * @param i index of a function in the dag with 0 <= i < dag->nbFuns()
-    */
-   ContractorHC4Revise(SharedDag dag, size_t i);
+   /// Constructor
+   ContractorHC4Revise(Constraint c);
 
    /// Default copy constructor
    ContractorHC4Revise(const ContractorHC4Revise &) = default;
@@ -57,15 +54,8 @@ public:
    Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
-   /// Returns the dag
-   SharedDag getDag() const;
-
-   /// Returns the function index in the dag
-   size_t getFunIndex() const;
-
 private:
-   SharedDag dag_; // dag
-   size_t idx_;    // function index in the dag
+   ContractorConstraint ctc_;
 };
 
 } // namespace realpaver

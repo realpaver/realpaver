@@ -21,7 +21,7 @@
 #ifndef REALPAVER_CONTRACTOR_AFFINE_HPP
 #define REALPAVER_CONTRACTOR_AFFINE_HPP
 
-#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/IntervalPropagator.hpp"
 
 namespace realpaver {
@@ -34,13 +34,13 @@ namespace realpaver {
 class ContractorAffine : public Contractor {
 public:
    /**
-    * @brief Constructor given a DAG.
+    * @brief Constructor given an extended DAG.
     *
     * The boolean minrage is true if the linearization of the elementary
     * functions must use the Minrange approximation, false for the Chebyshev
     * approximation.
     */
-   ContractorAffine(SharedDag dag, bool minrange = true);
+   ContractorAffine(SharedDagExtended edag, bool minrange = true);
 
    /// Destructor
    ~ContractorAffine();
@@ -66,7 +66,7 @@ public:
    void setTol(double tol);
 
 private:
-   SharedDag dag_;              // DAG
+   SharedDagExtended edag_;     // extended DAG
    IntervalPropagator *propag_; // propagation algorithm
 };
 

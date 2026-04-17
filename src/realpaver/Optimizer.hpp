@@ -51,7 +51,7 @@ namespace realpaver {
 class Optimizer {
 public:
    /// Constructor
-   Optimizer(const Problem &problem);
+   Optimizer(const Problem &pbm);
 
    /// Default destructor
    ~Optimizer() = default;
@@ -101,7 +101,7 @@ public:
    OptimizationStatus getStatus() const;
 
 private:
-   SharedProblem problem_;                      // copy of initial problem
+   SharedProblem pbm_;                          // copy of initial problem
    SharedPreprocessor pp_;                      // preprocessor
    std::unique_ptr<NodeContext> context_;       // solving context for the BP algorithm
    std::shared_ptr<EnvOptimizer> env_;          // environment

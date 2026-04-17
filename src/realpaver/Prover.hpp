@@ -21,9 +21,9 @@
 #ifndef REALPAVER_PROVER_HPP
 #define REALPAVER_PROVER_HPP
 
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/IntervalNewtonUni.hpp"
-#include "realpaver/Problem.hpp"
 
 namespace realpaver {
 
@@ -41,10 +41,10 @@ namespace realpaver {
 class Prover {
 public:
    /// Constructor
-   Prover(const Problem &p);
+   Prover(SharedDagExtended edag);
 
-   /// Destructor
-   ~Prover();
+   /// Default destructor
+   ~Prover() = default;
 
    /// No copy
    Prover(const Prover &) = delete;
@@ -74,18 +74,10 @@ public:
    void setInflationChi(const double &val);
 
 private:
-   struct Item {
-      Constraint ctr;
-      bool iseq;
-      Proof proof;
-   };
-   std::vector<Item> v_;        // vector of constraints
-   SharedDag dag_;              // dag of equations
-   IntervalNewton *mnewton_;    // multivariate Newton operator on the dag
-   IntervalNewtonUni *unewton_; // univariate Newton operator
-   double delta_;               // parameter delta of inflation
-   double chi_;                 // parameter chi of inflation
-   size_t maxiter_;             // maximum number of iterations
+   SharedDagExtended edag_; // extended dag
+   double delta_;           // parameter delta of inflation
+   double chi_;             // parameter chi of inflation
+   size_t maxiter_;         // maximum number of iterations
 };
 
 } // namespace realpaver

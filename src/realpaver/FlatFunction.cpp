@@ -130,9 +130,9 @@ FlatFunction::FlatFunction(const Term &t, const Interval &img)
    t.acceptVisitor(creator);
 }
 
-FlatFunction::FlatFunction(const DagFun *f)
-    : scop_(f->scope())
-    , img_(f->getImage())
+FlatFunction::FlatFunction(const DagFun &f)
+    : scop_(f.scope())
+    , img_(f.getImage())
     , cst_()
     , var_()
 {
@@ -146,17 +146,17 @@ FlatFunction::FlatFunction(const DagFun *f)
    nb_ = 0;
 
    FlatFunDagCreator creator(this);
-   f->rootNode()->acceptVisitor(creator);
+   f.rootNode()->acceptVisitor(creator);
 }
 
-FlatFunction::FlatFunction(const DagFun *f, const IntervalBox &B, Variable v)
+FlatFunction::FlatFunction(const DagFun &f, const IntervalBox &B, Variable v)
     : scop_()
-    , img_(f->getImage())
+    , img_(f.getImage())
     , cst_()
     , var_()
 {
-   REALPAVER_ASSERT(f->scope().contains(v),
-                    "The DAG function lustr depend on " << v.getName());
+   REALPAVER_ASSERT(f.scope().contains(v),
+                    "The DAG function must depend on " << v.getName());
 
    scop_.insert(v);
 
@@ -170,7 +170,7 @@ FlatFunction::FlatFunction(const DagFun *f, const IntervalBox &B, Variable v)
    nb_ = 0;
 
    FlatFunUniCreator creator(this, B, v);
-   f->rootNode()->acceptVisitor(creator);
+   f.rootNode()->acceptVisitor(creator);
 }
 
 void FlatFunction::extendCapacity()

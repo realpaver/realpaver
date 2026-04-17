@@ -28,6 +28,10 @@ IntervalFunctionVectorRep::~IntervalFunctionVectorRep()
 {
 }
 
+void IntervalFunctionVectorRep::update(const IntervalBox &B, const Bitset &active)
+{
+}
+
 /*----------------------------------------------------------------------------*/
 
 IntervalFunctionVector::IntervalFunctionVector()
@@ -35,8 +39,13 @@ IntervalFunctionVector::IntervalFunctionVector()
 {
 }
 
-IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
-    : rep_(std::make_shared<IntervalFunctionVectorDag>(dag))
+// IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
+//     : rep_(std::make_shared<IntervalFunctionVectorDag>(dag))
+// {
+// }
+
+IntervalFunctionVector::IntervalFunctionVector(SharedDagExtended edag)
+    : rep_(std::make_shared<IntervalFunctionVectorExtDag>(edag))
 {
 }
 
@@ -67,6 +76,13 @@ IntervalFunctionVector::IntervalFunctionVector(SharedRep rep)
 {
    REALPAVER_ASSERT(rep != nullptr,
                     "Creation of an interval function vector from a null pointer");
+}
+
+void IntervalFunctionVector::update(const IntervalBox &B, const Bitset &active)
+{
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+
+   rep_->update(B, active);
 }
 
 Scope IntervalFunctionVector::scope() const
@@ -156,10 +172,18 @@ void IntervalFunctionVector::diffHansen(const IntervalBox &B, const RealPoint &c
 /*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorDag::IntervalFunctionVectorDag(SharedDag dag)
-    : dag_(dag)
+    : IntervalFunctionVectorRep()
+    , dag_(dag)
 {
    REALPAVER_ASSERT(dag->nbFuns() > 0,
                     "Creation of an interval function vector from an empty Dag");
+
+   vl_ = std::make_shared<IntervalFunctionVectorList>();
+
+   for (size_t i = 0; i < dag_->nbFuns(); ++i)
+   {
+      vl_->addFun(dag_->fun(i));
+   }
 }
 
 IntervalFunctionVectorDag::IntervalFunctionVectorDag(
@@ -214,7 +238,11 @@ IntervalFunction IntervalFunctionVectorDag::fun(size_t i) const
 {
    REALPAVER_ASSERT(i < nbFuns(), "Bad access to an interval function in a vector");
 
-   return IntervalFunction(dag_, i);
+   return IntervalFunction(dag_->fun(i));
+}
+
+void IntervalFunctionVectorDag::update(const IntervalBox &B, const Bitset &active)
+{
 }
 
 void IntervalFunctionVectorDag::eval(const IntervalBox &B, IntervalVector &val)
@@ -236,7 +264,8 @@ void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, const RealPoint
 /*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorList::IntervalFunctionVectorList()
-    : vf_()
+    : IntervalFunctionVectorRep()
+    , vf_()
     , scop_()
 {
 }
@@ -340,6 +369,63 @@ void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoin
          ++j;
       }
    }
+}
+
+/*----------------------------------------------------------------------------*/
+
+IntervalFunctionVectorExtDag::IntervalFunctionVectorExtDag(SharedDagExtended edag)
+    : IntervalFunctionVectorRep()
+    , edag_(edag)
+    , vl_(nullptr)
+{
+}
+
+void IntervalFunctionVectorExtDag::update(const IntervalBox &B, const Bitset &active)
+{
+   vl_ = std::make_shared<IntervalFunctionVectorList>();
+
+   for (size_t i = 0; i < edag_->size(); ++i)
+   {
+      SharedDagFun f = edag_->getActiveFun(i, B, active);
+      if (f != nullptr)
+         vl_->addFun(f);
+   }
+}
+
+Scope IntervalFunctionVectorExtDag::scope() const
+{
+   return vl_->scope();
+}
+
+size_t IntervalFunctionVectorExtDag::nbVars() const
+{
+   return vl_->nbVars();
+}
+
+size_t IntervalFunctionVectorExtDag::nbFuns() const
+{
+   return vl_->nbFuns();
+}
+
+IntervalFunction IntervalFunctionVectorExtDag::fun(size_t i) const
+{
+   return vl_->fun(i);
+}
+
+void IntervalFunctionVectorExtDag::eval(const IntervalBox &B, IntervalVector &val)
+{
+   return vl_->eval(B, val);
+}
+
+void IntervalFunctionVectorExtDag::diff(const IntervalBox &B, IntervalMatrix &J)
+{
+   return vl_->diff(B, J);
+}
+
+void IntervalFunctionVectorExtDag::diffHansen(const IntervalBox &B, const RealPoint &c,
+                                              IntervalMatrix &H)
+{
+   return vl_->diffHansen(B, c, H);
 }
 
 } // namespace realpaver

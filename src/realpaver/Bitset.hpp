@@ -105,6 +105,9 @@ public:
    /// Returns true if all the bits are equal to 0
    bool areAllZeros() const;
 
+   /// Returns true if this has been created by Bitset()
+   bool isEmpty() const;
+
    /// Output on a stream
    void print(std::ostream &os) const;
 

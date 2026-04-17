@@ -21,20 +21,21 @@
 #ifndef REALPAVER_SELECTOR_HPP
 #define REALPAVER_SELECTOR_HPP
 
-#include "realpaver/DomainBox.hpp"
+#include "realpaver/Node.hpp"
+#include "realpaver/NodeContext.hpp"
 
 namespace realpaver {
 
 /**
- * @brief Selector of a variable in a scope.
+ * @brief Selector of a variable in a node.
  *
- * A selector selects a variable in a scope given a box. A variable can be selected only
+ * A selector selects a variable in a node. A variable can be selected only
  * if its domain is large enough, i.e. it is splitable.
  */
 class Selector {
 public:
-   /// Creates a selector on a non empty scope
-   Selector(Scope scop);
+   /// Creates a selector
+   Selector();
 
    /// Destructor
    virtual ~Selector();
@@ -46,22 +47,17 @@ public:
    Selector &operator=(const Selector &) = delete;
 
    /**
-    * @brief Selects a variable of the scope given a box.
+    * @brief Selects a variable of the scope in a node.
     *
     * Returns true if a variable is selected. In this case, getVar() returns this
     * variable. Returns false if no variable can be selected.
     */
-   virtual bool apply(const DomainBox &box) = 0;
+   virtual bool apply(SharedNode node, NodeContext &context) = 0;
 
    /// Returns the selected variable
    Variable getSelectedVar() const;
 
-   /// Returns the scope
-   Scope scope() const;
-
 protected:
-   Scope scop_; // scope
-
    // Assigns the selected variable
    void setSelectedVar(Variable v);
 

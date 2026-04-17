@@ -41,33 +41,10 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
     , chi_(Params::GetDblParam("INFLATION_CHI"))
     , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
-   REALPAVER_ASSERT(F.nbVars() == F.nbFuns(),
-                    "Interval Newton defined with a non-square system");
+   THROW_IF(F.nbVars() < 2 && F.nbVars() != F.nbFuns(),
+            "Interval Newton defined with a non-square system");
 
-   gs_ = new IntervalGaussSeidel();
-}
-
-IntervalNewton::IntervalNewton(const IntervalNewton &N)
-    : Contractor(N)
-    , F_(N.F_)
-    , jac_(N.jac_)
-    , val_(N.val_)
-    , y_(N.y_)
-    , b_(N.b_)
-    , c_(N.c_)
-    , gs_(nullptr)
-    , maxiter_(N.maxiter_)
-    , tol_(N.tol_)
-    , delta_(N.delta_)
-    , chi_(N.chi_)
-    , cmaxiter_(N.cmaxiter_)
-{
-   gs_ = new IntervalGaussSeidel(*N.gs_);
-}
-
-IntervalNewton::~IntervalNewton()
-{
-   delete gs_;
+   gs_ = std::make_unique<IntervalGaussSeidel>();
 }
 
 Scope IntervalNewton::scope() const
@@ -109,9 +86,9 @@ double IntervalNewton::getWidthLimit() const
    return wlim_;
 }
 
-IntervalGaussSeidel *IntervalNewton::getGaussSeidel() const
+IntervalGaussSeidel &IntervalNewton::getGaussSeidel()
 {
-   return gs_;
+   return *gs_;
 }
 
 Proof IntervalNewton::contract(IntervalBox &X)

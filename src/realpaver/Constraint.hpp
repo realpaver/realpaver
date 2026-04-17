@@ -51,11 +51,11 @@ public:
    /// Returns true if the identifier of this has not been initiamized
    bool hasNoId() const;
 
-   /// Returns true if this belongs to the initial problem, false otherwise
-   bool isInitial() const;
+   /// Returns the status of this
+   ConstraintStatus status() const;
 
-   /// Assigns the status of the constraint: initial or not (redundant, ...)
-   void setInitial(bool b = true);
+   /// Assigns the status of this
+   void setStatus(ConstraintStatus status);
 
    /// Returns true if this is variable free
    bool isConstant() const;
@@ -97,7 +97,10 @@ public:
    /// Returns true if v belongs to the scope of this
    bool dependsOn(Variable v) const;
 
-   /** @return true if this is an equation */
+   /// Returns true if this is an arithmetic constraint
+   bool isArithmetic() const;
+
+   /// Returns true if this is an equation
    bool isEquation() const;
 
    /// Returns true if this is an inequality constraint

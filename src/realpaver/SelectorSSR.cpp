@@ -18,21 +18,17 @@
  * @date   25 Apr 2025
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/SelectorSSR.hpp"
 #include <algorithm>
 
 namespace realpaver {
 
 SelectorSSR::SelectorSSR(IntervalFunctionVector F)
-    : Selector(F.scope())
+    : Selector()
     , F_(F)
     , ssr_()
 {
-   for (size_t i = 0; i < F_.nbVars(); ++i)
-   {
-      Item itm = {scop_.var(i), 0.0};
-      ssr_.push_back(itm);
-   }
 }
 
 IntervalFunctionVector SelectorSSR::getFun() const
@@ -57,6 +53,11 @@ Variable SelectorSSR::getMaxVar() const
    return ssr_[imax].var;
 }
 
+void SelectorSSR::update(const IntervalBox &B, const Bitset &active)
+{
+   F_.update(B, active);
+}
+
 void SelectorSSR::calculate(const IntervalBox &B)
 {
    IntervalMatrix jac(F_.nbFuns(), F_.nbVars());
@@ -71,7 +72,7 @@ void SelectorSSR::calculate(const IntervalBox &B)
       double sum = 0.0;
       for (size_t j = 0; j < F_.nbVars(); ++j)
       {
-         const auto &v = scope().var(j);
+         const auto &v = F_.scope().var(j);
          double smear = jac.get(i, j).mag() * B.get(v).width();
          S.set(i, j, smear);
          sum += smear;
@@ -84,13 +85,16 @@ void SelectorSSR::calculate(const IntervalBox &B)
    }
 
    // calculates the smearSumRel values
+   ssr_.clear();
    for (size_t j = 0; j < F_.nbVars(); ++j)
    {
-      ssr_[j].var = scope().var(j);
-      ssr_[j].val = 0.0;
+      Item it = {F_.scope().var(j), 0.0};
+      ssr_.push_back(it);
 
       for (size_t i = 0; i < F_.nbFuns(); ++i)
+      {
          ssr_[j].val += S.get(i, j);
+      }
    }
 }
 
@@ -114,15 +118,18 @@ size_t SelectorSSR::nbVars() const
    return ssr_.size();
 }
 
-bool SelectorSSR::apply(const DomainBox &box)
+bool SelectorSSR::apply(SharedNode node, NodeContext &context)
 {
-   IntervalBox B(box);
+   const DomainBox *box = node->box();
+   IntervalBox B(*box);
+
+   update(B, node->active());
    calculate(B);
 
    // Selects the variable with the maximum smear value
    Variable v = getMaxVar();
 
-   if (box.isSplitable(v))
+   if (box->isSplitable(v))
    {
       setSelectedVar(v);
       return true;
@@ -132,7 +139,7 @@ bool SelectorSSR::apply(const DomainBox &box)
    for (size_t i = 0; i < nbVars(); ++i)
    {
       v = getVar(i);
-      if (box.isSplitable(v))
+      if (box->isSplitable(v))
       {
          setSelectedVar(v);
          return true;

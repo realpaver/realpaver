@@ -21,6 +21,7 @@
 #ifndef REALPAVER_LINEARIZER_AFFINE_HPP
 #define REALPAVER_LINEARIZER_AFFINE_HPP
 
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Linearizer.hpp"
 #include <vector>
 
@@ -35,7 +36,7 @@ namespace realpaver {
 class LinearizerAffine : public Linearizer {
 public:
    /// Creates a linearizer of a DAG
-   LinearizerAffine(SharedDag dag, bool minrange = true);
+   LinearizerAffine(SharedDagExtended edag, bool minrange = true);
 
    /// No copy
    LinearizerAffine(const LinearizerAffine &) = delete;

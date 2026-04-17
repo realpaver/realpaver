@@ -18,10 +18,11 @@
  * @date   6 Oct 2025
  */
 
-#include "DomainBox.hpp"
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/BoxPicker.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/DomainBox.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
 
@@ -50,8 +51,8 @@
 
 namespace realpaver {
 
-Optimizer::Optimizer(const Problem &problem)
-    : problem_(nullptr)
+Optimizer::Optimizer(const Problem &pbm)
+    : pbm_(nullptr)
     , pp_(nullptr)
     , context_(nullptr)
     , env_(nullptr)
@@ -70,16 +71,17 @@ Optimizer::Optimizer(const Problem &problem)
     , status_(OptimizationStatus::Other)
 
 {
-   if (!problem.hasObjective())
+   if (!pbm.hasObjective())
       THROW("No objective function in this problem");
 
    // TODO: remove this to handle bound-constrained optimization problems
-   if (problem.nbCtrs() == 0)
+   if (pbm.nbCtrs() == 0)
       THROW("No constraint in this problem");
 
    env_ = std::make_shared<EnvOptimizer>();
-   problem_ = std::make_shared<Problem>(problem);
-   pp_ = std::make_shared<Preprocessor>(problem_);
+   pbm_ = std::make_shared<Problem>(pbm);
+   pbm_->generateObjectiveConstraint();
+   pp_ = std::make_shared<Preprocessor>(pbm_);
 }
 
 double Optimizer::getSolvingTime() const
@@ -114,7 +116,7 @@ SharedPreprocessor Optimizer::getPreprocessor() const
 
 void Optimizer::optimize()
 {
-   LOG_MAIN("Input problem\n" << (*problem_));
+   LOG_MAIN("Input problem\n" << (*pbm_));
 
    int fp = env_->getParams()->getIntParam("FLOAT_PRECISION");
    Logger::getInstance()->setFloatPrecision(fp);
@@ -187,13 +189,11 @@ void Optimizer::makePropagator()
 
    std::unique_ptr<NodePropagatorList> aux = std::make_unique<NodePropagatorList>();
 
-   // Constraint propagation algorithm: HC4, BC4, or AFFINE
+   // Constraint propagation algorithm: HC4 or AFFINE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
       aux->pushBack(NodePropagAlgo::HC4, *factory_);
-   else if (base == "BC4")
-      aux->pushBack(NodePropagAlgo::BC4, *factory_);
    else if (base == "AFFINE")
       aux->pushBack(NodePropagAlgo::AFFINE, *factory_);
    else
@@ -261,7 +261,7 @@ void Optimizer::makeSplit()
       }
       else
       {
-         IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
+         IntervalFunctionVector F(factory_->extDag());
          split_ = std::make_unique<SplitSSR>(scop, std::move(smap), F);
       }
    }
@@ -275,7 +275,7 @@ void Optimizer::makeSplit()
       }
       else
       {
-         IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
+         IntervalFunctionVector F(factory_->extDag());
          std::unique_ptr<SplitSSRLF> hybrid =
              std::make_unique<SplitSSRLF>(scop, std::move(smap), F);
          double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
@@ -515,8 +515,8 @@ void Optimizer::branchAndBound()
    }
 
    // assigns the tolerance of each variable to (0.0, 0.0)
-   for (auto v : newprob->scope())
-      v.setTolerance(Tolerance(0.0, 0.0));
+   // for (auto v : newprob->scope())
+   //    v.setTolerance(Tolerance(0.0, 0.0));
 
    LOG_MAIN("Branch-and-bound algorithm on the following problem\n" << (*newprob));
    LOG_INTER("Parameters\n" << *env_->getParams());
@@ -528,7 +528,7 @@ void Optimizer::branchAndBound()
    LOG_LOW("Makes the factory in the optimizer");
    factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
 
-   dag_ = factory_->getDag();
+   dag_ = factory_->extDag()->dag();
    makeSpace();
    makePropagator();
    makeSplit();
@@ -712,7 +712,7 @@ Interval Optimizer::getOptimum() const
 
 RealPoint Optimizer::bestFeasible() const
 {
-   RealPoint pt(problem_->scope());
+   RealPoint pt(pbm_->scope());
 
    // assigns the values of the fixed variables
    for (size_t i = 0; i < pp_->nbFixedVars(); ++i)

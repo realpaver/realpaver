@@ -19,13 +19,14 @@
  */
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/LinearizerTaylor.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
-LinearizerTaylor::LinearizerTaylor(SharedDag dag, bool hansen, CornerStyle style,
+LinearizerTaylor::LinearizerTaylor(SharedDagExtended edag, bool hansen, CornerStyle style,
                                    unsigned seed)
-    : Linearizer(dag)
+    : Linearizer(edag)
     , hansen_(hansen)
     , style_(style)
     , corner_(scope().size())
@@ -104,14 +105,14 @@ bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset 
    }
 
    // generates the constraints
-   for (size_t i = 0; i < dag_->nbFuns(); ++i)
+   //   std::vector<SharedDagFun> funs;
+   //   edag()->getActiveFuns(funs, B, active);
+
+   for (size_t i = 0; i < edag()->size(); ++i)
    {
-      DagFun *f = dag_->fun(i);
-
-      if (!f->isActive(active))
+      SharedDagFun f = edag()->getActiveFun(i, B, active);
+      if (f == nullptr)
          continue;
-
-      LOG_LOW("Taylor relaxation for constraint @ " << f->ctrId());
 
       Interval img = f->getImage();
 

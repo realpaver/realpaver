@@ -1042,7 +1042,6 @@ DagFun::DagFun(Dag *dag, size_t root, Scope scop, Term t, const Interval &image)
     , t_(t)
     , image_(image)
     , idx_(0)
-    , ctrid_(-1)
     , inode_()
 {
    scop_ = ScopeBank::getInstance()->insertScope(scop);
@@ -1063,6 +1062,11 @@ Interval DagFun::getImage() const
 void DagFun::setImage(const Interval &x)
 {
    image_ = x;
+}
+
+bool DagFun::isAnEquation() const
+{
+   return image_.isZero();
 }
 
 Term DagFun::getTerm() const
@@ -1123,23 +1127,6 @@ size_t DagFun::index() const
 Scope DagFun::scope() const
 {
    return scop_;
-}
-
-int DagFun::ctrId() const
-{
-   return ctrid_;
-}
-
-void DagFun::setCtrId(int i)
-{
-   ctrid_ = i;
-   dag_->addCtrId(i);
-}
-
-bool DagFun::isActive(const Bitset &active) const
-{
-   REALPAVER_ASSERT(ctrid_ < active.size(), "Bad access in the bitset");
-   return active.get(ctrid_);
 }
 
 std::shared_ptr<FlatFunction> DagFun::flatFunction() const
@@ -1261,7 +1248,6 @@ Dag::Dag()
     , vmap_()
     , omap_()
     , scop_()
-    , maxCtrId_(0)
 {
 }
 
@@ -1269,9 +1255,6 @@ Dag::~Dag()
 {
    for (DagNode *node : node_)
       delete node;
-
-   for (DagFun *fun : fun_)
-      delete fun;
 }
 
 bool Dag::isEmpty() const
@@ -1309,7 +1292,7 @@ DagVar *Dag::varNode(size_t i) const
    return vnode_[i];
 }
 
-DagFun *Dag::fun(size_t i) const
+SharedDagFun Dag::fun(size_t i) const
 {
    REALPAVER_ASSERT(i < nbFuns(), "Access out of range to a DAG function");
 
@@ -1318,13 +1301,9 @@ DagFun *Dag::fun(size_t i) const
 
 size_t Dag::insert(Constraint c)
 {
-   if (c.hasNoId())
-      THROW("An identifier is required for: " << c);
-
    DagCreator creator(this, c);
    c.acceptVisitor(creator);
    size_t idx = creator.index();
-   fun_[idx]->setCtrId(c.id());
    return idx;
 }
 
@@ -1337,7 +1316,7 @@ size_t Dag::insert(Term t, const Interval &img)
    return idx;
 }
 
-size_t Dag::insertFun(DagFun *f)
+size_t Dag::insertFun(SharedDagFun f)
 {
    size_t idx = fun_.size();
    f->setIndex(idx);
@@ -1494,7 +1473,7 @@ void Dag::print(std::ostream &os) const
 {
    for (size_t i = 0; i < nbFuns(); ++i)
    {
-      DagFun *f = fun(i);
+      SharedDagFun f = fun(i);
       os << "fun " << i << ": ";
 
       os << "[";
@@ -1538,17 +1517,6 @@ void Dag::print(std::ostream &os) const
    }
 }
 
-size_t Dag::maxCtrId() const
-{
-   return maxCtrId_;
-}
-
-void Dag::addCtrId(size_t id)
-{
-   if (id > maxCtrId_)
-      maxCtrId_ = id;
-}
-
 std::ostream &operator<<(std::ostream &os, const Dag &dag)
 {
    dag.print(os);
@@ -1571,7 +1539,7 @@ void Dag::iDiff(const IntervalBox &B, IntervalMatrix &J)
    for (size_t i = 0; i < nbFuns(); ++i)
    {
       // differentiates the i-th function
-      DagFun *f = fun_[i];
+      SharedDagFun f = fun_[i];
       IntervalVector G(f->nbVars());
       f->iDiff(B, G);
 
@@ -1608,7 +1576,7 @@ void Dag::iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &
       // calculates every dfi/dv and assigns it in the Jacobian matrix
       for (size_t i = 0; i < nbFuns(); ++i)
       {
-         DagFun *f = fun_[i];
+         SharedDagFun f = fun_[i];
 
          if (f->dependsOn(v))
          {
@@ -1642,7 +1610,7 @@ void Dag::rDiff(const RealPoint &pt, RealMatrix &J)
    for (size_t i = 0; i < nbFuns(); ++i)
    {
       // differentiates the i-th function
-      DagFun *f = fun_[i];
+      SharedDagFun f = fun_[i];
       RealVector G(f->nbVars());
       f->rDiff(pt, G);
 
@@ -2121,7 +2089,7 @@ void DagCreator::make(const Term &t, Scope scop, const Interval &img,
    }
 
    // creates the function
-   DagFun *f = new DagFun(dag_, root, scop, t, img);
+   SharedDagFun f = std::make_shared<DagFun>(dag_, root, scop, t, img);
    f->setFlatFunction(fun);
    index_ = dag_->insertFun(f);
 }

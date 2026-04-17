@@ -23,10 +23,10 @@
 
 namespace realpaver {
 
-SelectorSSRLF::SelectorSSRLF(Scope scop, IntervalFunctionVector F)
-    : Selector(scop)
+SelectorSSRLF::SelectorSSRLF(IntervalFunctionVector F)
+    : Selector()
     , ssr_(F)
-    , lf_(scop)
+    , lf_()
     , nb_(0)
     , nbssr_(0)
     , f_(Params::GetDblParam("SPLIT_SSR_LF_FREQUENCY"))
@@ -45,19 +45,19 @@ void SelectorSSRLF::setFrequency(double f)
    f_ = f;
 }
 
-bool SelectorSSRLF::apply(const DomainBox &box)
+bool SelectorSSRLF::apply(SharedNode node, NodeContext &context)
 {
    bool res = true;
    if (nbssr_ < f_ * (++nb_))
    {
       ++nbssr_;
-      res = ssr_.apply(box);
+      res = ssr_.apply(node, context);
       if (res)
          setSelectedVar(ssr_.getSelectedVar());
    }
    else
    {
-      res = lf_.apply(box);
+      res = lf_.apply(node, context);
       if (res)
          setSelectedVar(lf_.getSelectedVar());
    }

@@ -22,18 +22,13 @@ int main(void)
       IntervalBox B(dbox);
       cout << "Interval box:     " << B << endl;
 
-      SharedDag dag = std::make_shared<Dag>();
-      size_t j1 = dag->insert(problem.ctrAt(i1));
-      size_t j2 = dag->insert(problem.ctrAt(i2));
+      SharedContractor ctc1 = std::make_shared<ContractorHC4Revise>(problem.ctrAt(i1)),
+                       ctc2 = std::make_shared<ContractorHC4Revise>(problem.ctrAt(i2));
 
-      cout << "-- DAG:" << endl << (*dag) << "--" << endl;
-
-      SharedContractorPool pool = std::make_shared<ContractorPool>();
-      pool->push(std::make_shared<ContractorHC4Revise>(dag, j1));
-      pool->push(std::make_shared<ContractorHC4Revise>(dag, j2));
-
-      IntervalPropagator tor(pool);
+      ContractorHC4 tor;
       tor.setTol(1.0e-4);
+      tor.push(ctc1);
+      tor.push(ctc2);
 
       Proof proof = tor.contract(B);
 

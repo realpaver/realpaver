@@ -33,7 +33,6 @@ ContractorACID::ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContracto
 {
    REALPAVER_ASSERT(ssr_ != nullptr, "No smear sum rel object in ACID");
    REALPAVER_ASSERT(op_ != nullptr, "No operator in ACID");
-   REALPAVER_ASSERT(op->scope().contains(ssr_->scope()), "Bad scopes in ACID");
 
    REALPAVER_ASSERT(ns3B >= 2, "Bad number of slices for 3B contractors");
    REALPAVER_ASSERT(nsCID >= 2, "Bad number of slices for CID contractors");
@@ -64,7 +63,7 @@ ContractorACID::ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContracto
 
 Scope ContractorACID::scope() const
 {
-   return ssr_->scope();
+   return op_->scope();
 }
 
 int ContractorACID::learnLength() const
@@ -89,15 +88,17 @@ SharedContractor ContractorACID::sliceContractor() const
 
 Proof ContractorACID::contract(IntervalBox &B)
 {
-   return contractImpl(B, ContractSimple());
+   return contractImpl(B, Bitset(), ContractSimple());
 }
 
 Proof ContractorACID::contract(IntervalBox &B, const Bitset &active)
 {
-   return contractImpl(B, ContractActive(active));
+   ssr_->update(B, active);
+   return contractImpl(B, active, ContractActive(active));
 }
 
-Proof ContractorACID::contractImpl(IntervalBox &B, const ContractMethod &contract)
+Proof ContractorACID::contractImpl(IntervalBox &B, const Bitset &active,
+                                   const ContractMethod &contract)
 {
    LOG_INTER("ACID call " << nbCalls_ << " on " << B);
    Proof proof = Proof::Maybe;
@@ -135,12 +136,12 @@ Proof ContractorACID::contractImpl(IntervalBox &B, const ContractMethod &contrac
    if (vhandled > 0)
    {
       // sorts the variables according to their impact
+      ssr_->update(B, active);
       ssr_->calculate(B);
       ssr_->sort();
    }
 
    IntervalBox save(B);
-
    int stop = 0;
 
    for (int i = 0; i < vhandled; ++i)

@@ -111,7 +111,7 @@ public:
    FlatFunction(const Term &t, const Interval &img);
 
    /// Creates a flat function representing a function f from a DAG
-   FlatFunction(const DagFun *f);
+   FlatFunction(const DagFun &f);
 
    /**
     * @brief Creates a univariate flat function.
@@ -119,7 +119,7 @@ public:
     * It represents f where all the variables but v are replaced with their
     * domains in B.
     */
-   FlatFunction(const DagFun *f, const IntervalBox &B, Variable v);
+   FlatFunction(const DagFun &f, const IntervalBox &B, Variable v);
 
    /// Destructor
    ~FlatFunction();
