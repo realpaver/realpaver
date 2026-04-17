@@ -25,13 +25,13 @@ namespace realpaver {
 
 SplitSF::SplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
     : Split(scop, std::move(smap))
-    , sel_(scop)
+    , sel_()
 {
 }
 
 void SplitSF::applyImpl(SharedNode node, NodeContext &context)
 {
-   if (sel_.apply(*node->box()))
+   if (sel_.apply(node, context))
    {
       Variable v = sel_.getSelectedVar();
       splitOne(node, v);

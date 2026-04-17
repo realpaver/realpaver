@@ -30,6 +30,16 @@ namespace realpaver {
 
 class ConstraintVisitor;
 
+/// Status of a constraint
+enum class ConstraintStatus {
+   Initial,   ///< constraint of initial problem (default value)
+   Objective, ///< constraint representing an objective function
+   Redundant  ///< redundant constraint
+};
+
+/// Output on a stream
+std::ostream &operator<<(std::ostream &os, ConstraintStatus status);
+
 /**
  * @brief Base class of the hierarchy of constraint representations.
  *
@@ -40,8 +50,9 @@ class ConstraintVisitor;
  * The identifier is assigned to a negative value at initialization time, which means that
  * a constraint has no identifier.
  *
- * A constraint can be labelled as a constraint of the initial problem (default) or not
- * (redundant constraint, constraint used to bound an objective function, etc.).
+ * A constraint can be labelled as a constraint of the initial problem (default) or
+ * a constraint used to bound an objective function, or a redundant constraint. Use its
+ * status for this.
  */
 class ConstraintRep {
 public:
@@ -78,11 +89,11 @@ public:
    /// Returns true if the identifier of this has not been initiamized
    bool hasNoId() const;
 
-   /// Returns true if this belongs to the initial problem, false otherwise
-   bool isInitial() const;
+   /// Returns the status of this
+   ConstraintStatus status() const;
 
-   /// Assigns the status of the constraint: initial or not (redundant, ...)
-   void setInitial(bool b = true);
+   /// Assigns the status of this
+   void setStatus(ConstraintStatus status);
 
    /// Returns true if this constraint is variable free
    virtual bool isConstant() const = 0;
@@ -149,10 +160,10 @@ protected:
    void setScope(Scope scop);
 
 private:
-   Scope scop_;             // scope
-   ConstraintRelation rel_; // relation symbol
-   int id_;                 // identifier
-   bool initial_;           // true if it belongs to the initial problem
+   Scope scop_;              // scope
+   ConstraintRelation rel_;  // relation symbol
+   int id_;                  // identifier
+   ConstraintStatus status_; // status
 
 protected:
    size_t hcode_; // hash code

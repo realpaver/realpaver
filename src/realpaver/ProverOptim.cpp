@@ -20,6 +20,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintProver.hpp"
+#include "realpaver/ConstraintRep.hpp"
 #include "realpaver/ProverOptim.hpp"
 
 namespace realpaver {
@@ -33,7 +34,7 @@ ProverOptim::ProverOptim(const Problem &p, const double &tol)
    for (size_t i = 0; i < p.nbCtrs(); ++i)
    {
       Constraint c = p.ctrAt(i);
-      if (c.isInitial())
+      if (c.status() == ConstraintStatus::Initial)
          ctrs_.push_back(c);
    }
 }

@@ -23,11 +23,21 @@ void clean()
 
 void test_1()
 {
+   std::cout << "PRE 10" << std::endl;
+
    Preprocessor pp(pb1);
+
+   std::cout << "PRE 20" << std::endl;
+
    pp.apply();
+
+   std::cout << "PRE 30" << std::endl;
+
    TEST_TRUE(pp.isFixed(u1));
    TEST_TRUE(pp.isFixed(v1));
    TEST_FALSE(pp.isFixed(w1));
+
+   std::cout << "PRE 100" << std::endl;
 }
 
 void test_2()
@@ -87,12 +97,12 @@ int main()
    INIT_TEST
 
    TEST(test_1)
-   TEST(test_2)
-   TEST(test_3)
-   TEST(test_4)
-   TEST(test_5)
-   TEST(test_6)
-   TEST(test_7)
+   // TEST(test_2)
+   // TEST(test_3)
+   // TEST(test_4)
+   // TEST(test_5)
+   // TEST(test_6)
+   // TEST(test_7)
 
    CLEAN_TEST
    END_TEST

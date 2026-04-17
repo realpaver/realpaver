@@ -22,7 +22,7 @@
 #define REALPAVER_CONTRACTOR_AFFINE_REVISE_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 
 namespace realpaver {
 
@@ -42,13 +42,13 @@ namespace realpaver {
 class ContractorAffineRevise : public Contractor {
 public:
    /**
-    * @brief Creates a contractor on the i-th function of the DAG.
+    * @brief Creates a contractor on the i-th function of an extended DAG.
     *
     * The boolean minrage is true if the linearization of the elementary
     * functions must use the Minrange approximation, false for the Chebyshev
     * approximation.
     */
-   ContractorAffineRevise(SharedDag dag, size_t i, bool minrange = true);
+   ContractorAffineRevise(SharedDagExtended edag, size_t i, bool minrange = true);
 
    /// Default copy constructor
    ContractorAffineRevise(const ContractorAffineRevise &) = default;
@@ -64,19 +64,13 @@ public:
    Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
-   /// Returns the dag
-   SharedDag getDag() const;
-
-   /// Returns the function index in the dag
-   size_t getFunIndex() const;
-
    /// Selects the Minrange or the Chebyshev approximation
    void useMinrange(bool minrange = true);
 
 private:
-   SharedDag dag_; // dag
-   size_t idx_;    // function index in the dag
-   bool minrange_; // true: Minrange, false:Chebyshev
+   SharedDagExtended edag_; // extended dag
+   size_t idx_;             // function index in the dag
+   bool minrange_;          // true: Minrange, false:Chebyshev
 };
 
 } // namespace realpaver

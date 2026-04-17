@@ -21,7 +21,7 @@
 #ifndef REALPAVER_INTERVAL_FUNCTION_UNI_HPP
 #define REALPAVER_INTERVAL_FUNCTION_UNI_HPP
 
-#include "realpaver/Interval.hpp"
+#include "realpaver/IntervalFunction.hpp"
 
 namespace realpaver {
 
@@ -45,6 +45,20 @@ public:
 
    /// Returns the interval derivative of this on x
    virtual Interval diff(const Interval &x) = 0;
+};
+
+/// Base class of univariate interval functions
+class IntervalFunctionUniv : public IntervalFunctionUni {
+public:
+   IntervalFunctionUniv(IntervalFunction f);
+
+   Interval eval(const Interval &x);
+
+   Interval diff(const Interval &x);
+
+private:
+   IntervalFunction f_;
+   IntervalBox B_;
 };
 
 } // namespace realpaver

@@ -21,7 +21,7 @@
 #ifndef REALPAVER_LINEARIZER_HPP
 #define REALPAVER_LINEARIZER_HPP
 
-#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/LPModel.hpp"
 
 namespace realpaver {
@@ -39,7 +39,7 @@ public:
    using IndexList = std::vector<size_t>;
 
    /// Creates a linearizer for a DAG
-   Linearizer(SharedDag dag);
+   Linearizer(SharedDagExtended edag);
 
    /// Destructor
    virtual ~Linearizer();
@@ -51,20 +51,10 @@ public:
    Linearizer &operator=(const Linearizer &) = delete;
 
    /// Returns the dag of this
-   SharedDag dag() const;
+   SharedDagExtended edag() const;
 
    /// Returns the scope of this
    Scope scope() const;
-
-   /**
-    * @brief Makes the linear relaxation.
-    *
-    * It makes a linear relaxation of the DAG on the given box B. The new linear program
-    * is assigned to lpm and it returns true in case of success, false otherwise.
-    *
-    * Calls makeLPImpl(lpm, B, active) with the bitset active = (1, 1, ..., 1).
-    */
-   bool makeLP(LPModel &lpm, const IntervalBox &B);
 
    /**
     * @brief Makes the linear relaxation.
@@ -75,7 +65,7 @@ public:
     *
     * Calls makeLPImpl(lpm, B, active).
     */
-   bool makeLP(LPModel &lpm, const IntervalBox &B, const Bitset &active);
+   bool makeLP(LPModel &lpm, const IntervalBox &B, const Bitset &active = Bitset());
 
    /**
     * @brief Implementation of the linear relaxation in sub-classes.
@@ -109,9 +99,9 @@ public:
    void setRelaxTol(double tol);
 
 protected:
-   SharedDag dag_; // DAG
-   Scope scop_;    // scope
-   double tol_;    // relaxation tol for the equations
+   SharedDagExtended edag_; // extended DAG
+   Scope scop_;             // scope
+   double tol_;             // relaxation tol for the equations
 
 private:
    using MapType = std::unordered_map<size_t, size_t>;

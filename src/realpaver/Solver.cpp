@@ -125,13 +125,11 @@ void Solver::makePropagator()
 
    std::unique_ptr<NodePropagatorList> aux = std::make_unique<NodePropagatorList>();
 
-   // Constraint propagation algorithm: HC4, BC4, or AFFIBE
+   // Constraint propagation algorithm: HC4 or AFFIBE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
       aux->pushBack(NodePropagAlgo::HC4, *factory_);
-   else if (base == "BC4")
-      aux->pushBack(NodePropagAlgo::BC4, *factory_);
    else if (base == "AFFINE")
       aux->pushBack(NodePropagAlgo::AFFINE, *factory_);
    else
@@ -205,7 +203,7 @@ void Solver::makeSplit()
       }
       else
       {
-         IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
+         IntervalFunctionVector F(factory_->extDag());
          split_ = std::make_unique<SplitSSR>(scop, std::move(smap), F);
       }
    }
@@ -219,7 +217,7 @@ void Solver::makeSplit()
       }
       else
       {
-         IntervalFunctionVector F = factory_->makeIntervalFunctionVector();
+         IntervalFunctionVector F(factory_->extDag());
          std::unique_ptr<SplitSSRLF> hybrid =
              std::make_unique<SplitSSRLF>(scop, std::move(smap), F);
          double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
@@ -410,13 +408,14 @@ void Solver::branchAndPrune()
    LOG_NL_LOW();
    LOG_LOW("Makes the factory in the solver");
    factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
-   dag_ = factory_->getDag();
+   dag_ = factory_->extDag()->dag();
+
    makeSpace();
    makePropagator();
    makeSplit();
 
    // prover that derives proof certificates of the solutions
-   prover_ = std::make_unique<Prover>(*newprob);
+   prover_ = std::make_unique<Prover>(factory_->extDag());
 
    int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
    prover_->setMaxIter(niter);

@@ -281,6 +281,11 @@ bool Bitset::areAllZeros() const
    return true;
 }
 
+bool Bitset::isEmpty() const
+{
+   return word_ == nullptr;
+}
+
 void Bitset::print(std::ostream &os) const
 {
    if (size_ == 0)

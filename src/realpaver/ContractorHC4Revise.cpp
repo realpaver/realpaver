@@ -18,69 +18,37 @@
  * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorHC4Revise::ContractorHC4Revise(SharedDag dag, size_t i)
-    : dag_(dag)
-    , idx_(i)
+ContractorHC4Revise::ContractorHC4Revise(Constraint c)
+    : Contractor()
+    , ctc_(c)
 {
-   REALPAVER_ASSERT(dag != nullptr,
-                    "Creation of HC4Revise contractor from a null pointer");
-   REALPAVER_ASSERT(i < dag->nbFuns(), "Creation of HC4Revise contractor given a bad "
-                                           << " function index " << i);
 }
 
 Proof ContractorHC4Revise::contract(IntervalBox &B)
 {
-   LOG_LOW("HC4Revise contractor @ " << idx_ << " on " << B);
-
-   Proof proof = dag_->fun(idx_)->hc4Revise(B);
-
-   LOG_LOW(" contractor applied");
-   LOG_LOW(" -> " << proof << ", " << B);
-
-   return proof;
+   LOG_LOW("HC4Revise contractor @ " << ctc_.getConstraint().id() << " on " << B);
+   return ctc_.contract(B);
 }
 
 Proof ContractorHC4Revise::contract(IntervalBox &B, const Bitset &active)
 {
-   LOG_LOW("HC4Revise contractor @ " << idx_ << " on " << B);
-
-   DagFun *f = dag_->fun(idx_);
-   Proof proof = Proof::Inner;
-
-   if (f->isActive(active))
-   {
-      proof = f->hc4Revise(B);
-      LOG_LOW(" contractor applied");
-   }
-
-   LOG_LOW(" -> " << proof << ", " << B);
-   return proof;
+   LOG_LOW("HC4Revise contractor @ " << ctc_.getConstraint().id() << " on " << B);
+   return ctc_.contract(B, active);
 }
 
 void ContractorHC4Revise::print(std::ostream &os) const
 {
-   os << "HC4Revise contractor / function " << " @ " << idx_;
-}
-
-size_t ContractorHC4Revise::getFunIndex() const
-{
-   return idx_;
-}
-
-SharedDag ContractorHC4Revise::getDag() const
-{
-   return dag_;
+   os << "HC4Revise contractor on @ " << ctc_.getConstraint();
 }
 
 Scope ContractorHC4Revise::scope() const
 {
-   return dag_->fun(idx_)->scope();
+   return ctc_.scope();
 }
 
 } // namespace realpaver

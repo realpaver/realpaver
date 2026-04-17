@@ -20,7 +20,6 @@
 
 #include "realpaver/NodePropagatorACID.hpp"
 #include "realpaver/NodePropagatorAffine.hpp"
-#include "realpaver/NodePropagatorBC4.hpp"
 #include "realpaver/NodePropagatorHC4.hpp"
 #include "realpaver/NodePropagatorList.hpp"
 #include "realpaver/NodePropagatorNewton.hpp"
@@ -41,12 +40,6 @@ void NodePropagatorList::pushBack(NodePropagAlgo alg, ContractorFactory &facto)
    {
    case NodePropagAlgo::HC4:
       op = std::make_shared<NodePropagatorHC4>(facto);
-      if (op != nullptr)
-         v_.push_back(op);
-      break;
-
-   case NodePropagAlgo::BC4:
-      op = std::make_shared<NodePropagatorBC4>(facto);
       if (op != nullptr)
          v_.push_back(op);
       break;

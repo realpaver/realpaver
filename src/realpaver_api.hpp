@@ -31,6 +31,7 @@
 #include "realpaver/Problem.hpp"
 
 #include "realpaver/ContractorFactory.hpp"
+#include "realpaver/IntervalFunctionUni.hpp"
 #include "realpaver/LPSolver.hpp"
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Solver.hpp"

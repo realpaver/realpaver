@@ -26,19 +26,14 @@
 
 namespace realpaver {
 
-/**
- * @brief HC4 contractor.
- *
- * Constraint propagation algorithm applying HC4Revise contractors on a DAG
- * such that the projections are intersected at the shared nodes.
- */
+/// @brief Constraint propagation algorithm applying HC4Revise contractors
 class ContractorHC4 : public Contractor {
 public:
-   /// Constructor
-   ContractorHC4(SharedDag dag);
+   /// Default constructor
+   ContractorHC4() = default;
 
-   /// Destructor
-   ~ContractorHC4();
+   /// Default destructor
+   ~ContractorHC4() = default;
 
    /// No copy
    ContractorHC4(const ContractorHC4 &) = delete;
@@ -61,8 +56,7 @@ public:
    void setTol(double tol);
 
 private:
-   SharedDag dag_;              // DAG
-   IntervalPropagator *propag_; // propagation algorithm
+   IntervalPropagator propag_; // propagation algorithm
 };
 
 /// Type of shared pointers of HC4 contractors

@@ -1280,31 +1280,6 @@ void Params::makeContract()
    add(propag_tol);
 
    ////////////////////
-   ParamDbl bc3_peel;
-   str = std::string("Peel factor for the BC3 contractor\nGiven an interval ") +
-         "[a, b] and the peel factor f, let w = (b - a) * (p / 100) be a ratio " +
-         "of the interval width. Then the consistency of the intervals [a, a+w] " +
-         "and [b-w, w] is checked in order to stop the search.";
-   bc3_peel.setName("BC3_PEEL_FACTOR")
-       .setCat(cat)
-       .setWhat(str)
-       .setValue(2.0)
-       .setMinValue(0.0)
-       .setMaxValue(100.0);
-   add(bc3_peel);
-
-   ////////////////////
-   ParamInt bc3_iter;
-   str = std::string("Iteration limit for the iterative method of the BC3 contractor ") +
-         "used to find the outermost zeros of a function in a given interval";
-   bc3_iter.setName("BC3_ITER_LIMIT")
-       .setCat(cat)
-       .setWhat(str)
-       .setValue(30)
-       .setMinValue(1);
-   add(bc3_iter);
-
-   ////////////////////
    ParamStr propag_base;
    str = std::string("Propagation strategy: the default one is a classical ") +
          "propagation algorithm that uses one contractor per constraint";
@@ -1312,7 +1287,6 @@ void Params::makeContract()
        .setCat(cat)
        .setWhat(str)
        .addChoice("HC4", "HC4 contractor")
-       .addChoice("BC4", "BC4 contractor")
        .addChoice("AFFINE", "contractor based on affine forms")
        .setValue("HC4");
    add(propag_base);
@@ -1385,7 +1359,6 @@ void Params::makePolytope()
        .addChoice("AFFINE", "use of affine forms")
        .addChoice("TAYLOR", "use of Taylor (mean value) forms")
        .addChoice("AFFINE_TAYLOR", "use of affine and Taylor (mean value) forms")
-       .addChoice("RLT", "use of Relaxation-Reformulation Techniques")
        .setValue("TAYLOR");
    add(relax);
 
@@ -1449,7 +1422,7 @@ void Params::makePolytope()
    ////////////////////
    ParamStr approx;
    str = "Approximation method that generates affine forms for the elementary functions";
-   approx.setName("POLYTOPE_HULL_AFFINE_APPROX")
+   approx.setName("AFFINE_APPROXIMATION")
        .setCat(cat)
        .setWhat(str)
        .addChoice("MINRANGE", "MinRange approximation")

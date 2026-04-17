@@ -20,17 +20,18 @@
 
 #include "realpaver/AffineCreator.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-AffineCreator::AffineCreator(SharedDag dag, bool minrange)
-    : dag_(dag)
+AffineCreator::AffineCreator(SharedDagExtended edag, bool minrange)
+    : edag_(edag)
     , minrange_(minrange)
-    , v_(dag_->nbNodes())
+    , v_(edag_->dag()->nbNodes())
     , lfun_()
 {
-   REALPAVER_ASSERT(dag != nullptr, "Null pointer");
+   REALPAVER_ASSERT(edag != nullptr, "Null pointer");
 }
 
 size_t AffineCreator::nbFuns() const
@@ -40,32 +41,37 @@ size_t AffineCreator::nbFuns() const
 
 bool AffineCreator::hasFun(size_t i) const
 {
-   return v_[dag_->fun(lfun_[i])->rootNode()->index()] != nullptr;
+   return v_[lfun_[i]->rootNode()->index()] != nullptr;
 }
 
 const AffineForm &AffineCreator::fun(size_t i) const
 {
-   return *v_[dag_->fun(lfun_[i])->rootNode()->index()];
+   return *v_[lfun_[i]->rootNode()->index()];
+}
+
+Interval AffineCreator::image(size_t i) const
+{
+   return lfun_[i]->getImage();
 }
 
 std::unique_ptr<AffineForm> AffineCreator::moveFun(size_t i)
 {
-   return std::move(v_[dag_->fun(lfun_[i])->rootNode()->index()]);
+   return std::move(v_[lfun_[i]->rootNode()->index()]);
 }
 
 bool AffineCreator::hasFun(const Variable &v) const
 {
-   return v_[dag_->findVarNode(v.id())->index()] != nullptr;
+   return v_[edag_->dag()->findVarNode(v.id())->index()] != nullptr;
 }
 
 const AffineForm &AffineCreator::fun(const Variable &v) const
 {
-   return *v_[dag_->findVarNode(v.id())->index()];
+   return *v_[edag_->dag()->findVarNode(v.id())->index()];
 }
 
 const AffineForm &AffineCreator::funEpsilon(size_t i) const
 {
-   return fun(dag_->scope().var(i));
+   return fun(edag_->dag()->scope().var(i));
 }
 
 void AffineCreator::useMinrange(bool minrange)
@@ -75,38 +81,50 @@ void AffineCreator::useMinrange(bool minrange)
 
 bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
 {
-   REALPAVER_ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
+   REALPAVER_ASSERT(B.scope().contains(edag_->scope()), "Bad scopes");
 
    AffineForm::useMinrange(minrange_);
-
    lfun_.clear();
-   for (size_t i = 0; i < dag_->nbFuns(); ++i)
+
+   for (size_t i = 0; i < edag_->size(); ++i)
    {
-      if (active.get(dag_->fun(i)->ctrId()))
+      SharedDagFun f = edag_->getActiveFun(i, B, active);
+      size_t j = lfun_.size();
+      if (f != nullptr)
       {
-         bool ok = makeFun(B, i);
+         lfun_.push_back(f);
+         bool ok = makeFun(B, j);
          if (!ok)
             return false;
-         LOG_LOW("Affine relaxation for constraint @ " << dag_->fun(i)->ctrId());
       }
    }
+
    return true;
 }
 
-bool AffineCreator::create(const IntervalBox &B, size_t i)
+bool AffineCreator::create(const IntervalBox &B, size_t i, const Bitset &active)
 {
-   REALPAVER_ASSERT(B.scope().contains(dag_->scope()), "Bad scopes");
-   REALPAVER_ASSERT(i < dag_->nbFuns(), "Bad index of function @ " << i);
+   REALPAVER_ASSERT(B.scope().contains(edag_->fun(i)->ctr().scope()), "Bad scopes");
+   REALPAVER_ASSERT(i < edag_->size(), "Bad index of function @ " << i);
 
    AffineForm::useMinrange(minrange_);
-
    lfun_.clear();
-   return makeFun(B, i);
+
+   SharedDagFun f = edag_->getActiveFun(i, B, active);
+   if (f != nullptr)
+   {
+      lfun_.push_back(f);
+      return makeFun(B, 0);
+   }
+   else
+   {
+      return false;
+   }
 }
 
 bool AffineCreator::makeFun(const IntervalBox &B, size_t i)
 {
-   DagFun *f = dag_->fun(i);
+   SharedDagFun f = lfun_[i];
    for (size_t j = 0; j < f->nbNodes(); ++j)
    {
       DagNode *node = f->node(j);
@@ -124,11 +142,10 @@ bool AffineCreator::makeFun(const IntervalBox &B, size_t i)
          }
       }
    }
-   lfun_.push_back(i);
    return true;
 }
 
-size_t AffineCreator::dagIndex(size_t i) const
+SharedDagFun AffineCreator::dagFun(size_t i) const
 {
    REALPAVER_ASSERT(i < lfun_.size(), "Bad access in lfun");
    return lfun_[i];
@@ -136,7 +153,7 @@ size_t AffineCreator::dagIndex(size_t i) const
 
 void AffineCreator::makeNode(int i, const IntervalBox &B)
 {
-   DagNode *node = dag_->node(i);
+   DagNode *node = edag_->dag()->node(i);
    std::unique_ptr<AffineForm> f = nullptr;
 
    switch (node->symbol())
@@ -147,7 +164,7 @@ void AffineCreator::makeNode(int i, const IntervalBox &B)
    }
    case DagSymbol::Var: {
       const Variable &v = static_cast<DagVar *>(node)->getVar();
-      f = std::make_unique<AffineForm>(dag_->scope().index(v), B.get(v));
+      f = std::make_unique<AffineForm>(edag_->scope().index(v), B.get(v));
       break;
    }
    case DagSymbol::Add: {
@@ -313,7 +330,7 @@ Term AffineCreator::funToTerm(size_t i) const
    Term res(0);
    for (auto it = f.begin(); it != f.end(); ++it)
    {
-      Variable v = dag_->scope().var(AffineForm::var(it));
+      Variable v = edag_->scope().var(AffineForm::var(it));
       AffineForm &g = const_cast<AffineForm &>(fun(v));
 
       Interval c = AffineForm::itv(it), a = g.constantTerm(),
@@ -327,7 +344,7 @@ Term AffineCreator::funToTerm(size_t i) const
 
 Variable AffineCreator::varToVar(size_t i) const
 {
-   return dag_->scope().var(i);
+   return edag_->scope().var(i);
 }
 
 } // namespace realpaver

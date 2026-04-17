@@ -21,6 +21,7 @@
 #ifndef REALPAVER_LINEARIZER_TAYLOR_HPP
 #define REALPAVER_LINEARIZER_TAYLOR_HPP
 
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/IntRandom.hpp"
 #include "realpaver/Linearizer.hpp"
 
@@ -53,7 +54,7 @@ public:
     * selected. A seed is used to initialize the generator of pseudo-random
     * numbers is necessary (0: system time, a positive value otherwise).
     */
-   LinearizerTaylor(SharedDag dag, bool hansen = false,
+   LinearizerTaylor(SharedDagExtended edag, bool hansen = false,
                     CornerStyle style = CornerStyle::RandomOpposite, unsigned seed = 0);
 
    /// No copy

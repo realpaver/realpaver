@@ -110,14 +110,14 @@ void test_6()
    B.set(y, Interval(2, 3));
    B.set(z, Interval(8, 11));
 
-   prob->ctrAt(1).setInitial(false);
+   prob->ctrAt(1).setStatus(ConstraintStatus::Redundant);
 
    Bitset active(4);
    active.setOne(0);
    active.setOne(1);
 
    ProverOptim prover(*prob, 4.5);
-   prob->ctrAt(1).setInitial(true);
+   prob->ctrAt(1).setStatus(ConstraintStatus::Initial);
 
    TEST_TRUE(prover.certify(B, active));
 }

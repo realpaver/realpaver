@@ -39,10 +39,9 @@ public:
    /**
     * @brief Constructor.
     *
-    * The scope is given as input to the LF selector and F is an input of
-    * the SSR selector.
+    * The SSR selector is based on F.
     */
-   SelectorSSRLF(Scope scop, IntervalFunctionVector F);
+   SelectorSSRLF(IntervalFunctionVector F);
 
    /// Returns the frequency of application of the SSR strategy
    double getFrequency() const;
@@ -50,7 +49,7 @@ public:
    /// Assigns the frequency of application of the SSR strategy
    void setFrequency(double f);
 
-   bool apply(const DomainBox &box) override;
+   bool apply(SharedNode node, NodeContext &context) override;
 
 private:
    SelectorSSR ssr_; // SSR strategy

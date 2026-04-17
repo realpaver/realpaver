@@ -28,16 +28,12 @@ SplitSSR::SplitSSR(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
                    IntervalFunctionVector F)
     : Split(scop, std::move(smap))
     , ssr_(F)
-    , sbis_(scop.setminus(F.scope()))
 {
-   REALPAVER_ASSERT(scop.contains(F.scope()), "Bad scopes");
 }
 
 void SplitSSR::applyImpl(SharedNode node, NodeContext &context)
 {
-   const DomainBox &box = *node->box();
-
-   if (ssr_.apply(box))
+   if (ssr_.apply(node, context))
    {
       Variable v = ssr_.getSelectedVar();
       splitOne(node, v);
@@ -45,15 +41,12 @@ void SplitSSR::applyImpl(SharedNode node, NodeContext &context)
       return;
    }
 
-   if (!sbis_.isEmpty())
+   SelectorLF sel;
+   if (sel.apply(node, context))
    {
-      SelectorLF sel(sbis_);
-      if (sel.apply(box))
-      {
-         Variable v = sel.getSelectedVar();
-         splitOne(node, v);
-         LOG_INTER("LF selects " << v.getName() << " in node " << node->index());
-      }
+      Variable v = sel.getSelectedVar();
+      splitOne(node, v);
+      LOG_INTER("LF selects " << v.getName() << " in node " << node->index());
    }
 }
 

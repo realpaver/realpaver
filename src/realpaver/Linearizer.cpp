@@ -19,19 +19,20 @@
  */
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Linearizer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
 
-Linearizer::Linearizer(SharedDag dag)
-    : dag_(dag)
-    , scop_(dag->scope())
+Linearizer::Linearizer(SharedDagExtended edag)
+    : edag_(edag)
+    , scop_(edag->scope())
     , tol_(Params::GetDblParam("RELAXATION_EQ_TOL"))
     , mvv_()
 {
-   REALPAVER_ASSERT(dag_ != nullptr, "No dag in a polytope maker");
+   REALPAVER_ASSERT(edag_ != nullptr, "No dag in a polytope maker");
    scop_ = ScopeBank::getInstance()->insertScope(scop_);
 }
 
@@ -39,9 +40,9 @@ Linearizer::~Linearizer()
 {
 }
 
-SharedDag Linearizer::dag() const
+SharedDagExtended Linearizer::edag() const
 {
-   return dag_;
+   return edag_;
 }
 
 Scope Linearizer::scope() const
@@ -83,16 +84,9 @@ void Linearizer::setRelaxTol(double tol)
    tol_ = tol;
 }
 
-bool Linearizer::makeLP(LPModel &lpm, const IntervalBox &B)
-{
-   Bitset active(1 + dag_->maxCtrId());
-   active.setAllOne();
-   mvv_.clear();
-   return makeLPImpl(lpm, B, active);
-}
-
 bool Linearizer::makeLP(LPModel &lpm, const IntervalBox &B, const Bitset &active)
 {
+   mvv_.clear();
    return makeLPImpl(lpm, B, active);
 }
 

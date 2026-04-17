@@ -23,11 +23,9 @@
 
 namespace realpaver {
 
-Selector::Selector(Scope scop)
-    : scop_(scop)
-    , v_()
+Selector::Selector()
+    : v_()
 {
-   REALPAVER_ASSERT(!scop.isEmpty(), "Empty scope");
 }
 
 Selector::~Selector()
@@ -42,11 +40,6 @@ void Selector::setSelectedVar(Variable v)
 Variable Selector::getSelectedVar() const
 {
    return v_;
-}
-
-Scope Selector::scope() const
-{
-   return scop_;
 }
 
 } // namespace realpaver

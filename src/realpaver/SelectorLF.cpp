@@ -22,21 +22,19 @@
 
 namespace realpaver {
 
-SelectorLF::SelectorLF(Scope scop)
-    : Selector(scop)
+bool SelectorLF::apply(SharedNode node, NodeContext &context)
 {
-}
+   const DomainBox *box = node->box();
+   const Scope &scop = node->scope();
 
-bool SelectorLF::apply(const DomainBox &box)
-{
    double dmax;
    bool found = false;
 
-   for (const auto &v : scop_)
+   for (const auto &v : scop)
    {
-      if (box.isSplitable(v))
+      if (box->isSplitable(v))
       {
-         double d = box.get(v)->discreteSize(v.getTolerance().getAbsTol());
+         double d = box->get(v)->discreteSize(v.getTolerance().getAbsTol());
          if ((!found) || (d > dmax))
          {
             setSelectedVar(v);

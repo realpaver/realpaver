@@ -18,6 +18,7 @@
  * @date   13 Oct 2025
  */
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/NodePropagatorACID.hpp"
 
 namespace realpaver {

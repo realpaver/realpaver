@@ -21,11 +21,8 @@ void test_1()
    Variable x = prob.addRealVar(0, 10, "x");
    size_t i = prob.addCtr(sqr(x) - x == 0);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-
    IntervalBox B(prob.scope());
-   SharedContractor op = std::make_shared<ContractorHC4Revise>(dag, 0);
+   SharedContractor op = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
 
    ContractorLoop ctc(op);
    ctc.setTol(1.0e-1);
@@ -43,11 +40,8 @@ void test_2()
    Variable x = prob.addRealVar(0, 10, "x");
    size_t i = prob.addCtr(sqr(x) - x == 0);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-
    IntervalBox B(prob.scope());
-   SharedContractor op = std::make_shared<ContractorHC4Revise>(dag, 0);
+   SharedContractor op = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
 
    ContractorLoop ctc(op);
    ctc.setTol(1.0e-2);
@@ -65,11 +59,8 @@ void test_3()
    Variable x = prob.addRealVar(0, 10, "x");
    size_t i = prob.addCtr(sqr(x) - x == 0);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-
    IntervalBox B(prob.scope());
-   SharedContractor op = std::make_shared<ContractorHC4Revise>(dag, 0);
+   SharedContractor op = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
 
    ContractorLoop ctc(op);
    ctc.setTol(1.0e-3);
@@ -87,11 +78,8 @@ void test_4()
    Variable x = prob.addRealVar(1.5, 10, "x");
    size_t i = prob.addCtr(sqr(x) - x == 0);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-
    IntervalBox B(prob.scope());
-   SharedContractor op = std::make_shared<ContractorHC4Revise>(dag, 0);
+   SharedContractor op = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
 
    ContractorLoop ctc(op);
    ctc.setTol(1.0);
@@ -104,11 +92,8 @@ void test_5()
    Variable x = prob.addRealVar(1.5, 10, "x");
    size_t i = prob.addCtr(sqr(x) - x == 0);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-
    IntervalBox B(prob.scope());
-   SharedContractor op = std::make_shared<ContractorHC4Revise>(dag, 0);
+   SharedContractor op = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
 
    ContractorLoop ctc(op);
    ctc.setTol(0.5);
@@ -122,13 +107,9 @@ void test_6()
    size_t i = prob.addCtr(sqr(x) - y == 0);
    size_t j = prob.addCtr(sqr(x) + sqr(y) == 2);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-   dag->insert(prob.ctrAt(j));
-
    IntervalBox B(prob.scope());
-   SharedContractor h0 = std::make_shared<ContractorHC4Revise>(dag, 0);
-   SharedContractor h1 = std::make_shared<ContractorHC4Revise>(dag, 1);
+   SharedContractor h0 = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
+   SharedContractor h1 = std::make_shared<ContractorHC4Revise>(prob.ctrAt(j));
    SharedContractorList op = std::make_shared<ContractorList>();
    op->push(h0);
    op->push(h1);
@@ -149,13 +130,9 @@ void test_7()
    size_t i = prob.addCtr(sqr(x) - y == 0);
    size_t j = prob.addCtr(sqr(x) + sqr(y) == 2);
 
-   std::shared_ptr<Dag> dag = std::make_shared<Dag>();
-   dag->insert(prob.ctrAt(i));
-   dag->insert(prob.ctrAt(j));
-
    IntervalBox B(prob.scope());
-   SharedContractor h0 = std::make_shared<ContractorHC4Revise>(dag, 0);
-   SharedContractor h1 = std::make_shared<ContractorHC4Revise>(dag, 1);
+   SharedContractor h0 = std::make_shared<ContractorHC4Revise>(prob.ctrAt(i));
+   SharedContractor h1 = std::make_shared<ContractorHC4Revise>(prob.ctrAt(j));
    SharedContractorList op = std::make_shared<ContractorList>();
    op->push(h0);
    op->push(h1);

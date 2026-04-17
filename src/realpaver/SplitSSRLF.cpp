@@ -26,7 +26,7 @@ namespace realpaver {
 SplitSSRLF::SplitSSRLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap,
                        IntervalFunctionVector F)
     : Split(scop, std::move(smap))
-    , sel_(scop, F)
+    , sel_(F)
 {
 }
 
@@ -42,7 +42,7 @@ void SplitSSRLF::setFrequency(double f)
 
 void SplitSSRLF::applyImpl(SharedNode node, NodeContext &context)
 {
-   if (sel_.apply(*node->box()))
+   if (sel_.apply(node, context))
    {
       Variable v = sel_.getSelectedVar();
       splitOne(node, v);

@@ -27,6 +27,7 @@
 
 namespace realpaver {
 
+/// Status of a variable
 enum class VariableStatus {
    Decision,  ///< decision variable
    Objective, ///< variable representing an objective function

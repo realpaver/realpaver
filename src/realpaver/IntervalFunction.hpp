@@ -100,8 +100,8 @@ private:
  */
 class IntervalFunction {
 public:
-   /// Constructor from the i-th function of a DAG
-   IntervalFunction(SharedDag dag, size_t i);
+   /// Constructor from a DAG function
+   IntervalFunction(SharedDagFun f);
 
    /// Constructor that creates a DAG from a term and assigns its image
    IntervalFunction(Term t, const Interval &img = Interval::universe());
@@ -169,7 +169,7 @@ private:
 class IntervalFunctionDag : public IntervalFunctionRep {
 public:
    /// Constructor from the i-th function of a DAG
-   IntervalFunctionDag(SharedDag dag, size_t i);
+   IntervalFunctionDag(SharedDagFun f);
 
    /// Constructor that creates a DAG from a term and assigns its image
    IntervalFunctionDag(Term t, const Interval &img = Interval::universe());
@@ -183,12 +183,6 @@ public:
    /// No asssignment
    IntervalFunctionDag &operator=(const IntervalFunctionDag &) = delete;
 
-   /// Returns the dag
-   SharedDag dag() const;
-
-   /// Returns the function index in the dag
-   size_t index() const;
-
    Scope scope() const override;
    size_t nbVars() const override;
    Interval eval(const IntervalBox &B) override;
@@ -196,8 +190,7 @@ public:
    void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G) override;
 
 private:
-   SharedDag dag_; // DAG
-   size_t index_;  // index of function
+   SharedDagFun f_;
 };
 
 } // namespace realpaver

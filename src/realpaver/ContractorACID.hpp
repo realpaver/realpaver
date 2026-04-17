@@ -53,6 +53,7 @@ class ContractorACID : public Contractor {
 public:
    /**
     * @brief Constructor.
+    * @param scope set of variables
     * @param ssr calculator of smear sum rel values
     * @param op contractor of slices
     * @param ns3B number of slices for 3B contractors
@@ -132,7 +133,8 @@ private:
                            const Scope &scop);
 
    // Implements the two contraction methods
-   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
+   Proof contractImpl(IntervalBox &B, const Bitset &active,
+                      const ContractMethod &contract);
 };
 
 /** @brief Type of shared pointers on contractors */

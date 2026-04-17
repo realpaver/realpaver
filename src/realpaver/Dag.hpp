@@ -853,6 +853,9 @@ public:
    /// Returns the dag
    Dag *dag() const;
 
+   /// Returns true if this is an equation
+   bool isAnEquation() const;
+
    /// Inserts a constant node
    void insertConstNode(DagConst *node);
 
@@ -957,15 +960,6 @@ public:
     */
    DagLin *getLinearExpr() const;
 
-   /// Returns the id of the associated constraint
-   int ctrId() const;
-
-   /// Assigns the id of the associated constraint to i
-   void setCtrId(int i);
-
-   /// Checks if the constraint associated with this is active
-   bool isActive(const Bitset &active) const;
-
 private:
    Dag *dag_;                           // the DAG
    std::vector<DagNode *> node_;        // vector of nodes of the function sorted by
@@ -978,7 +972,6 @@ private:
    Term t_;                             // term used to create this
    Interval image_;                     // bounds of the function, i.e. the co-domain
    size_t idx_;                         // index in the dag
-   int ctrid_;                          // identifier of associated constraint
    std::shared_ptr<FlatFunction> flat_; // implements hc4Revise
 
    // tests if a node is already present in this function
@@ -987,6 +980,9 @@ private:
    // set of node indexes used to implement hasNode in O(1)
    std::unordered_set<size_t> inode_;
 };
+
+/// Shared pointer on DAG function
+using SharedDagFun = std::shared_ptr<DagFun>;
 
 /*----------------------------------------------------------------------------*/
 
@@ -1023,7 +1019,7 @@ public:
    size_t nbFuns() const;
 
    /// Gets the i-th function with 0 <= i < nbFuns()
-   DagFun *fun(size_t i) const;
+   SharedDagFun fun(size_t i) const;
 
    /// Returns the number of variables
    size_t nbVars() const;
@@ -1075,7 +1071,7 @@ public:
    size_t insertOpNode(size_t hcode, DagOp *node);
 
    /// Inserts a function and returns its index
-   size_t insertFun(DagFun *f);
+   size_t insertFun(SharedDagFun f);
 
    /// Returns the scope of this
    Scope scope() const;
@@ -1132,12 +1128,6 @@ public:
     */
    void rDiff(const RealPoint &pt, RealMatrix &J);
 
-   /// Returns the maximum among the constraint ids of the functions in this
-   size_t maxCtrId() const;
-
-   /// Considers a constraint id and asigns the result of maxCtrId()
-   void addCtrId(size_t id);
-
 private:
    // vector of nodes sorted by a topological ordering from the leaves
    // to the roots
@@ -1155,7 +1145,7 @@ private:
    std::vector<DagOp *> onode_;
 
    // vector of functions
-   std::vector<DagFun *> fun_;
+   std::vector<SharedDagFun> fun_;
 
    // map (variable id -> node index)
    std::unordered_map<size_t, size_t> vmap_;
@@ -1165,9 +1155,6 @@ private:
 
    // scope
    Scope scop_;
-
-   // max {f.ctrId()} for all f in this
-   size_t maxCtrId_;
 
    // find methods
    DagConst *findConstNode(const Interval &x) const;

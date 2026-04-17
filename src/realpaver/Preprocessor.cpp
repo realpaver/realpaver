@@ -82,7 +82,6 @@ void Preprocessor::apply(bool on)
 void Preprocessor::applyImpl()
 {
    DomainBox &box = bridge_->srcRegion();
-   Objective obj = src_->getObjective();
 
    // test empty domains
    for (size_t i = 0; i < src_->nbVars(); ++i)
@@ -107,10 +106,11 @@ void Preprocessor::applyImpl()
    }
 
    // evaluates the objective function and assigns the domain of the corresponding
-   // variable since this is not done by the propagation algorithm (there is no constraint
-   // of the form z = f(...))
+   // variable since this is not done by the propagation algorithm (there is no
+   // constraint of the form z = f(...))
    if (src_->hasObjective())
    {
+      Objective obj = src_->getObjective();
       Variable z = obj.getVar();
       Term f = obj.getTerm();
       Interval e = f.eval(box)->intervalHull();
@@ -163,8 +163,12 @@ void Preprocessor::applyImpl()
       bool isUsed = false;
       if (occursInActiveConstraint(v))
          isUsed = true;
-      if (src_->hasObjective() && obj.dependsOn(v))
-         isUsed = true;
+      if (src_->hasObjective())
+      {
+         Objective obj = src_->getObjective();
+         if (obj.dependsOn(v))
+            isUsed = true;
+      }
       if (occursInAlias(v))
          isUsed = true;
       if (v.getStatus() == VariableStatus::Objective)
@@ -189,37 +193,43 @@ void Preprocessor::applyImpl()
 
    LOG_MAIN("Number of removed variables: " << bridge_->nbFixedVars());
 
-   // rewrites the objective function; it must be done before processing the constraints
-   // because the status of the objective variable can be changed from unfixed to fixed
-   if (src_->hasObjective() && (!bridge_->isFixed(obj.getVar())))
+   // rewrites the objective function; it must be done before processing the
+   // constraints because the status of the objective variable can be changed from
+   // unfixed to fixed
+   if (src_->hasObjective())
    {
-      Variable z = obj.getVar();
-      Term f = obj.getTerm();
-      std::unique_ptr<Domain> dom(box.get(z)->clone());
-
-      Variable zdest = bridge_->srcToDestVar(z);
-      zdest.setDomain(std::move(dom));
-
-      // simplifies the objective function
-      TermFixer fixer(bridge_);
-      f.acceptVisitor(fixer);
-
-      if (fixer.getTerm().isConstant())
+      Objective obj = src_->getObjective();
+      if (!bridge_->isFixed(obj.getVar()))
       {
-         LOG_INTER("Fixed objective function: " << fixer.getTerm());
-         if (bridge_->isUnfixed(z))
+
+         Variable z = obj.getVar();
+         Term f = obj.getTerm();
+         std::unique_ptr<Domain> dom(box.get(z)->clone());
+
+         Variable zdest = bridge_->srcToDestVar(z);
+         zdest.setDomain(std::move(dom));
+
+         // simplifies the objective function
+         TermFixer fixer(bridge_);
+         f.acceptVisitor(fixer);
+
+         if (fixer.getTerm().isConstant())
          {
-            bridge_->removeUnfixedVar(z);
-            bridge_->insertFixed(z, *dom);
+            LOG_INTER("Fixed objective function: " << fixer.getTerm());
+            if (bridge_->isUnfixed(z))
+            {
+               bridge_->removeUnfixedVar(z);
+               bridge_->insertFixed(z, *dom);
+            }
          }
-      }
-      else
-      {
-         Variable dz = bridge_->srcToDestVar(z);
-         if (obj.isMinimization())
-            dest_->addObjective(minimize(dz, fixer.getTerm()));
          else
-            dest_->addObjective(maximize(dz, fixer.getTerm()));
+         {
+            Variable dz = bridge_->srcToDestVar(z);
+            if (obj.isMinimization())
+               dest_->addObjective(minimize(dz, fixer.getTerm()));
+            else
+               dest_->addObjective(maximize(dz, fixer.getTerm()));
+         }
       }
    }
 
@@ -252,17 +262,18 @@ void Preprocessor::applyImpl()
    // rewrites the constraints
    for (Constraint input : active_)
    {
+      if (bridge_->fixedScope().contains(input.scope()))
+      {
+         LOG_INTER("Fixed constraint: " << input);
+         inactive_.push_back(input);
+         continue;
+      }
+
       ConstraintFixer fixer(bridge_);
       input.acceptVisitor(fixer);
       Constraint rc = fixer.getConstraint();
-
-      if (rc.isConstant())
-      {
-         LOG_INTER("Fixed constraint: " << rc);
-         inactive_.push_back(input);
-      }
-      else
-         dest_->addCtr(rc);
+      rc.setStatus(input.status());
+      dest_->addCtr(rc);
    }
 }
 

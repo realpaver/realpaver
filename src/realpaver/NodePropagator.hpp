@@ -31,7 +31,6 @@ namespace realpaver {
 /// Type of reduction methods for constraint systems
 enum class NodePropagAlgo {
    HC4,      ///< propagation algorithm based on HC4 contractors
-   BC4,      ///< propagation algorithm based on BC4 contractors
    AFFINE,   ///< propagation algorithm based on affine contractors
    ACID,     ///< adaptive CID
    Polytope, ///< polytope hull contractor
