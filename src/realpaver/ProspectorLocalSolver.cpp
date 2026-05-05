@@ -40,7 +40,7 @@ bool ProspectorLocalSolver::exploreImpl(Node &node, RealPoint &pt)
    picker_->apply(*node.box(), pt);
    IntervalBox B(*node.box());
 
-   localSolver_->minimize(B, pt);
+   localSolver_->minimize(B, pt, node.active());
    if (localSolver_->status() != OptimizationStatus::Optimal)
       return false;
 

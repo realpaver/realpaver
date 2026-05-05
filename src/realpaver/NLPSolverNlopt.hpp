@@ -21,6 +21,7 @@
 #ifndef REALPAVER_NLP_SOLVER_NLOPT_HPP
 #define REALPAVER_NLP_SOLVER_NLOPT_HPP
 
+#include "realpaver/Bitset.hpp"
 #include "realpaver/NLPModel.hpp"
 #include <nlopt.hpp>
 
@@ -38,8 +39,9 @@ public:
    /// Constructor given an objective function to be minimized
    NLPSolver(const RealFunction &obj);
 
-   /// Constructor given an objective function and a set of constraints
-   NLPSolver(const RealFunction &obj, const RealFunctionVector &ctrs);
+   /// Creates a minimization NLPModel from a DAG and extended DAG
+   NLPSolver(SharedDag obj_dag, int obj_idx, SharedDagExtended edag);
+
    ///@}
    /// Destructor
    ~NLPSolver();
@@ -50,13 +52,16 @@ public:
    /// No assignment
    NLPSolver &operator=(const NLPSolver &) = delete;
 
-   OptimizationStatus minimize(const IntervalBox &box, const RealPoint &src) override;
+   OptimizationStatus minimizeImpl(const IntervalBox &box, const RealPoint &src,
+                                   const Bitset &active) override;
 
    /// Structure used to process a constraint
    struct Ctr {
-      NLPSolver *ls; // the solver vector
-      size_t idx;    // constraint index
-      bool isleft;   // true if the left bound is considered
+      NLPSolver *ls;  // the solver vector
+      SharedDagFun f; // Function of the constraint
+      std::shared_ptr<ConstraintRep>
+          ctr;     // Constraint pointer for those not stored in a dag
+      bool isleft; // true if the left bound is considered
    };
 
 private:
@@ -65,7 +70,7 @@ private:
    std::vector<Ctr> nl_ctrs_;   // management of constraints
 
    void makeAlgorithm();
-   void makeCtrs();
+   void makeCtrs(const IntervalBox &box, const Bitset &active);
 };
 
 } // namespace realpaver

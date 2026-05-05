@@ -21,6 +21,7 @@
 #ifndef REALPAVER_DAG_EXTENDED_HPP
 #define REALPAVER_DAG_EXTENDED_HPP
 
+#include "RealPoint.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/Dag.hpp"
@@ -66,6 +67,15 @@ public:
     */
    SharedDagFun getActive(const IntervalBox &B, const Bitset &active);
 
+   /**
+    * @brief Activates a DAG function.
+    *
+    * Returns a DAG function (constraint) associated with the given constraint
+    * that is active in B; nullptr if there is no function to activate, in particular
+    * if the constraint is not active with respect to the given bitset.
+    */
+   SharedDagFun getActive(const RealPoint &P, const Bitset &active);
+
    /// Visitor pattern
    virtual void acceptVisitor(DagFunExtVisitor &vis) const = 0;
 
@@ -75,6 +85,7 @@ protected:
 
    // Implementation
    virtual SharedDagFun getActiveImpl(const IntervalBox &B) = 0;
+   virtual SharedDagFun getActiveImpl(const RealPoint &P) = 0;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -98,6 +109,7 @@ public:
    int index() const;
 
    SharedDagFun getActiveImpl(const IntervalBox &B) override;
+   SharedDagFun getActiveImpl(const RealPoint &P) override;
    void acceptVisitor(DagFunExtVisitor &vis) const override;
 
 private:
@@ -128,6 +140,7 @@ public:
    ~DagFunCond() = default;
 
    SharedDagFun getActiveImpl(const IntervalBox &B) override;
+   SharedDagFun getActiveImpl(const RealPoint &P) override;
    void acceptVisitor(DagFunExtVisitor &vis) const override;
 
 private:
@@ -159,6 +172,7 @@ public:
    void addIndex(int i);
 
    SharedDagFun getActiveImpl(const IntervalBox &B) override;
+   SharedDagFun getActiveImpl(const RealPoint &P) override;
    void acceptVisitor(DagFunExtVisitor &vis) const override;
 
 private:
@@ -188,7 +202,7 @@ public:
  *
  * An extended DAG is a DAG with a control on the activation of the constraints.
  * Every constraint in this can activate a constraint, e.g.: the constraint itself for
- * an arithmetic constraint, the bofy of a conditional constraint, one piece of a
+ * an arithmetic constraint, the body of a conditional constraint, one piece of a
  * piecewise constraint.
  */
 class DagExtended {
@@ -230,6 +244,7 @@ public:
     * if there is no active function.
     */
    SharedDagFun getActiveFun(size_t i, const IntervalBox &B, const Bitset &active);
+   SharedDagFun getActiveFun(size_t i, const RealPoint &P, const Bitset &active);
 
    /// Returns the number of constraints that have not been inserted
    size_t nbBadCtrs() const;

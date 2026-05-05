@@ -21,6 +21,8 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NLPSolverNlopt.hpp"
+#include "realpaver/Timer.hpp"
+#include <cstddef>
 
 namespace realpaver {
 
@@ -28,40 +30,76 @@ double ctr_nlopt(const std::vector<double> &x, std::vector<double> &grad, void *
 {
    NLPSolver::Ctr *c = reinterpret_cast<NLPSolver::Ctr *>(f_data);
    NLPSolver *ls = c->ls;
-   RealFunctionVector *V = ls->ctrs();
-   RealFunction f = V->fun(c->idx);
-   Interval img = f.getImage();
+   SharedDagFun f = c->f;
 
    // evaluates the function on x
    // we have a <= f (if c->isleft) or f <= b
    // i.e. a - f <= 0 or f - b <= 0
    RealPoint pt(ls->scope());
    pt.setArray(x.data());
-   double tmp = f.eval(pt), val = (c->isleft ? img.left() - tmp : tmp - img.right());
 
-   // no evaluation of the gradient if grad is empty
-   if (grad.empty())
-      return val;
+   LOG_LOW("NLOPT EVALUATE CTR " << f->index() << ": " << f->getTerm())
 
-   // evaluates the gradient
-   RealVector g(f.nbVars(), 0.0);
-   f.diff(pt, g);
-
-   // puts g (scope : variables in f) in grad (scope : all the variables)
-   size_t i = 0, j = 0;
-   for (auto v : ls->scope())
+   double val = 0.0;
+   if (f != nullptr)
    {
-      if (f.scope().contains(v))
+      Interval img = f->getImage();
+
+      double tmp = f->rEval(pt);
+      val = (c->isleft ? img.left() - tmp : tmp - img.right());
+
+      LOG_LOW("ctr val: " << val)
+      // no evaluation of the gradient if grad is empty
+      if (grad.empty())
+         return val;
+
+      // evaluates the gradient
+      RealVector g(ls->scope().size(), 0.0);
+      f->rDiff(pt, g);
+
+      // puts g (scope : variables in f) in grad (scope : all the variables)
+      size_t i = 0, j = 0;
+      for (auto v : ls->scope())
       {
-         grad[i] = (c->isleft ? -g[j] : g[j]);
-         ++j;
+         if (f->scope().contains(v))
+         {
+            grad[i] = (c->isleft ? -g[j] : g[j]);
+            ++j;
+         }
+         else
+            grad[i] = 0.0;
+
+         ++i;
       }
-      else
-         grad[i] = 0.0;
-
-      ++i;
+      return val;
    }
+   else
+   {
+      std::shared_ptr<ConstraintRep> ctr = c->ctr;
+      val = ctr->violation(pt);
 
+      // no evaluation of the gradient if grad is empty
+      if (grad.empty())
+         return val;
+
+      // evaluates the gradient
+      RealVector g(ls->scope().size(), 0.0);
+
+      // puts g (scope : variables in f) in grad (scope : all the variables)
+      size_t i = 0, j = 0;
+      for (auto v : ls->scope())
+      {
+         if (f->scope().contains(v))
+         {
+            grad[i] = g[j];
+            ++j;
+         }
+         else
+            grad[i] = 0.0;
+
+         ++i;
+      }
+   }
    return val;
 }
 
@@ -71,12 +109,14 @@ double f_nlopt(const std::vector<double> &x, std::vector<double> &grad, void *f_
    RealFunction *obj = ls->obj();
 
    REALPAVER_ASSERT(x.size() == ls->scope().size(), "Bad scopes in f_nlopt");
+   LOG_LOW("NLOPT EVALUATE OBJ")
 
    // evaluates the function on x
    RealPoint pt(ls->scope());
    pt.setArray(x.data());
    double val = obj->eval(pt);
 
+   LOG_LOW("obj: " << val)
    // no evaluation of the gradient if grad is empty
    if (grad.empty())
       return val;
@@ -116,8 +156,8 @@ NLPSolver::NLPSolver(const RealFunction &obj)
 {
 }
 
-NLPSolver::NLPSolver(const RealFunction &obj, const RealFunctionVector &ctrs)
-    : NLPModel(obj, ctrs)
+NLPSolver::NLPSolver(SharedDag obj_dag, int obj_idx, SharedDagExtended edag)
+    : NLPModel(obj_dag, obj_idx, edag)
     , optimizer_(nullptr)
     , nl_ctrs_()
 {
@@ -129,7 +169,8 @@ NLPSolver::~NLPSolver()
       delete optimizer_;
 }
 
-OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &src)
+OptimizationStatus NLPSolver::minimizeImpl(const IntervalBox &box, const RealPoint &src,
+                                           const Bitset &active)
 {
    REALPAVER_ASSERT(box.scope().contains(scope()),
                     "Bad scope of an interval box given as input of NlpOpt");
@@ -173,7 +214,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    optimizer_->set_upper_bounds(x_u);
 
    // creates the constraints
-   makeCtrs();
+   makeCtrs(box, active);
    for (size_t i = 0; i < nl_ctrs_.size(); ++i)
       optimizer_->add_inequality_constraint(ctr_nlopt, &nl_ctrs_[i], tol_.getAbsTol());
 
@@ -181,7 +222,12 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    nlopt::result status;
    try
    {
+      Timer opt_time;
+      opt_time.start();
       status = optimizer_->optimize(x, best_val_);
+      opt_time.stop();
+      iter_ = optimizer_->get_numevals();
+      time_ = opt_time.elapsedTime();
    }
    catch (std::exception &e)
    {
@@ -223,28 +269,40 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    return status_;
 }
 
-void NLPSolver::makeCtrs()
+void NLPSolver::makeCtrs(const IntervalBox &B, const Bitset &active)
 {
-   RealFunctionVector *V = this->ctrs();
+   // RealFunctionVector *V = this->ctrs();
 
-   for (size_t i = 0; i < nbCtrs(); ++i)
+   for (size_t i = 0; i < edag()->size(); ++i)
    {
-      RealFunction f = V->fun(i);
-      Interval img = f.getImage();
+      SharedDagFun f = edag()->getActiveFun(i, B, active);
+      if (f == nullptr)
+         continue;
+
+      Interval img = f->getImage();
 
       // left bound
       if (!img.isInfLeft())
       {
-         Ctr c = {this, i, true};
+         // Ctr c = {this, f, i, true};
+         Ctr c = {this, f, nullptr, true};
          nl_ctrs_.push_back(c);
       }
 
       // right bound
       if (!img.isInfRight())
       {
-         Ctr c = {this, i, false};
+         // Ctr c = {this, f, i, false};
+         Ctr c = {this, f, nullptr, false};
          nl_ctrs_.push_back(c);
       }
+   }
+
+   for (size_t i = 0; i < edag()->nbBadCtrs(); i++)
+   {
+      std::shared_ptr<ConstraintRep> c = edag()->badCtr(i).rep();
+      Ctr ctr = {this, nullptr, c, true};
+      nl_ctrs_.push_back(ctr);
    }
 }
 

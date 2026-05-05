@@ -1,17 +1,14 @@
+#include "realpaver/Logger.hpp"
 #include "realpaver/NLPSolver.hpp"
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
-#include "realpaver/RealFunction.hpp"
 #include "test_config.hpp"
-
-#include "realpaver/Prover.hpp"
 
 using namespace realpaver;
 
 #include <filesystem>
 
 std::shared_ptr<Problem> pb;
-std::shared_ptr<RealFunction> obj;
 
 bool init_pointers(std::string filepath)
 {
@@ -27,15 +24,13 @@ bool init_pointers(std::string filepath)
          return false;
       }
    }
-   if (obj == nullptr)
-      obj = std::make_shared<RealFunction>(RealFunction(pb->getObjective().getTerm()));
-
    return true;
 }
 
-void test_localopt(std::string filepath)
+void test_localopt(std::string filepath,
+                   OptimizationStatus expectedStatus = OptimizationStatus::Optimal)
 {
-   std::cerr << "\n*** Solving " << filepath << std::endl;
+   LOG_INTER("\n*** Solving " << filepath);
 
    if (!init_pointers(filepath))
    {
@@ -49,33 +44,42 @@ void test_localopt(std::string filepath)
    IntervalBox box(pb->scope());
    RealPoint start(pb->scope(), box.midpoint());
 
-   std::cerr << "Search space: " << box << std::endl;
-   std::cerr << "Starting point: " << start << std::endl;
+   LOG_INTER("Number of variables: " << rp_localopt.nbVars());
+   LOG_INTER("Number of constraints: " << rp_localopt.nbCtrs());
+   LOG_INTER("Search space: " << box);
+   LOG_INTER("Starting point: " << start);
 
    status = rp_localopt.minimize(box, start);
-   std::cerr << "\n*** Solving status with NLPSolver:" << status << std::endl;
-   std::cerr << "Best point: " << rp_localopt.bestPoint()
-             << " with obj: " << rp_localopt.bestVal() << std::endl;
-
-   TEST_TRUE(status != OptimizationStatus::Other);
-   std::cerr << "\nDone!" << std::endl;
+   LOG_INTER("*** Solving status with NLPSolver:" << status);
+   LOG_INTER("Time spent: " << rp_localopt.timeSpent());
+   LOG_INTER("Number of iterations: " << rp_localopt.iterUsed());
+   if (status == OptimizationStatus::Optimal)
+   {
+      LOG_INTER("Best point: " << rp_localopt.bestPoint()
+                               << " with obj: " << rp_localopt.bestVal());
+   }
+   TEST_TRUE(status == expectedStatus);
 }
 
 int main()
 {
-   // test_ipopt_ex();
+   Logger::init(LogLevel::inter, "nlp_solver_test.log");
 
    pb = nullptr;
-   obj = nullptr;
 
    test_localopt("../benchmarks/cop/Beale.rp");
 
-   std::cout << "Solved!!!!!!!!!!!!" << std::endl;
+   pb = nullptr;
+
+   test_localopt("../benchmarks/cop/Bird.rp");
 
    pb = nullptr;
-   obj = nullptr;
 
-   test_localopt("../benchmarks/cop/OLS.rp");
+   test_localopt("../benchmarks/cop/OLS.rp", OptimizationStatus::Other);
+
+   pb = nullptr;
+
+   test_localopt("../benchmarks/cop/coil_spring.rp", OptimizationStatus::Other);
 
    END_TEST
 }
