@@ -24,6 +24,7 @@
 #include "realpaver/ConstraintCond.hpp"
 #include "realpaver/ConstraintPiecewise.hpp"
 #include "realpaver/DagExtended.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -54,6 +55,7 @@ SharedDagFun DagFunExt::getActive(const IntervalBox &B, const Bitset &active)
 
 SharedDagFun DagFunExt::getActive(const RealPoint &P, const Bitset &active)
 {
+   // LOG_LOW("GET ACTIVE: " << (active.isEmpty() || active.get(ctr_.id())))
    return (active.isEmpty() || active.get(ctr_.id())) ? getActiveImpl(P) : nullptr;
 }
 
@@ -193,6 +195,7 @@ DagExtended::DagExtended(const Problem &pbm)
     : dag_(nullptr)
     , lfun_()
     , lctr_()
+    , scope_(pbm.scope())
 {
    dag_ = std::make_shared<Dag>();
    for (size_t i = 0; i < pbm.nbCtrs(); ++i)
@@ -213,7 +216,8 @@ SharedDag DagExtended::dag() const
 
 Scope DagExtended::scope() const
 {
-   return dag_->scope();
+   // return dag_->scope();
+   return scope_;
 }
 
 size_t DagExtended::size() const

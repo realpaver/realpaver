@@ -23,6 +23,7 @@
 
 #include "realpaver/Bitset.hpp"
 #include "realpaver/NLPModel.hpp"
+#include <memory>
 #include <nlopt.hpp>
 
 namespace realpaver {
@@ -57,17 +58,21 @@ public:
 
    /// Structure used to process a constraint
    struct Ctr {
-      NLPSolver *ls;  // the solver vector
-      SharedDagFun f; // Function of the constraint
+      NLPSolver *ls; // the solver vector
+      // SharedDagFun f; // Function of the constraint
+      std::shared_ptr<DagFunExt> f;
       std::shared_ptr<ConstraintRep>
-          ctr;     // Constraint pointer for those not stored in a dag
-      bool isleft; // true if the left bound is considered
+          ctr; // Constraint pointer for those not stored in a dag
+      Bitset active;
+      // bool isleft; // true if the left bound is considered
    };
 
 private:
    nlopt::opt *optimizer_;      // nlopt optimizer
    nlopt::algorithm nlopt_alg_; // optimization technique
    std::vector<Ctr> nl_ctrs_;   // management of constraints
+
+   Bitset cur_active_;
 
    void makeAlgorithm();
    void makeCtrs(const IntervalBox &box, const Bitset &active);

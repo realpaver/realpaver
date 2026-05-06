@@ -256,6 +256,7 @@ private:
    SharedDag dag_;                                // DAG
    std::vector<std::shared_ptr<DagFunExt>> lfun_; // functions
    std::vector<Constraint> lctr_;                 // constraints not inserted
+   Scope scope_;
 };
 
 /// Shared pointer on extended DAG

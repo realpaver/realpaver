@@ -18,7 +18,8 @@
  * @date   11 Apr 2024
  */
 
-#include "Bitset.hpp"
+#include "realpaver/Bitset.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/NLPModel.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ScopeBank.hpp"
