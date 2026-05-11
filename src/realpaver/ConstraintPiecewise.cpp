@@ -52,7 +52,7 @@ void ConstraintPiecewise::addPiece(Variable b, const Interval &guard, Constraint
    for (const auto &x : itvs_)
    {
       Interval y = x & guard;
-      if (y.right() > y.left())
+      if (Double::prevDouble(y.right()) > Double::nextDouble(y.left()))
          THROW("The guards overlap: " << guard << ", " << x);
    }
 

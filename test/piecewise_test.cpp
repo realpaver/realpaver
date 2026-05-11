@@ -441,11 +441,33 @@ void test_prob3_4()
    TEST_TRUE(p == Proof::Empty);
 }
 
+void test_create2()
+{
+   std::string pb_str = R"RP(
+     Variables
+         x in [0,1],
+         y in [-10,10];
+     Constraints
+         piecewise(x,{
+             [0,0.21] : y == 2,
+             [0.21,0.6] : y == 4,
+             [0.6,1]: y == 8
+         });
+     )RP";
+   Problem pb;
+   Parser parser;
+   parser.parseStr(pb_str, pb);
+   std::cout << pb << std::endl;
+   TEST_TRUE(pb.nbVars() == 5)
+   TEST_TRUE(pb.nbCtrs() == 1)
+}
+
 int main()
 {
    INIT_TEST
 
    TEST(test_create)
+   TEST(test_create2)
 
    TEST(testDB_empty1)
    TEST(testDB_empty2)
