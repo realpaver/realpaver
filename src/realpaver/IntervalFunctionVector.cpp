@@ -394,17 +394,17 @@ void IntervalFunctionVectorExtDag::update(const IntervalBox &B, const Bitset &ac
 
 Scope IntervalFunctionVectorExtDag::scope() const
 {
-   return vl_->scope();
+   return (vl_ == nullptr) ? Scope() : vl_->scope();
 }
 
 size_t IntervalFunctionVectorExtDag::nbVars() const
 {
-   return vl_->nbVars();
+   return (vl_ == nullptr) ? 0 : vl_->nbVars();
 }
 
 size_t IntervalFunctionVectorExtDag::nbFuns() const
 {
-   return vl_->nbFuns();
+   return (vl_ == nullptr) ? 0 : vl_->nbFuns();
 }
 
 IntervalFunction IntervalFunctionVectorExtDag::fun(size_t i) const

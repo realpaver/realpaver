@@ -34,8 +34,8 @@ namespace realpaver {
  */
 class Selector {
 public:
-   /// Creates a selector
-   Selector();
+   /// Creates a selector on a scope
+   Selector(Scope scop);
 
    /// Destructor
    virtual ~Selector();
@@ -57,7 +57,15 @@ public:
    /// Returns the selected variable
    Variable getSelectedVar() const;
 
+   /// Returns the scope
+   Scope scope() const;
+
+   /// Assigns the scope
+   void setScope(Scope scop);
+
 protected:
+   Scope scop_; // set of variables considered by this
+
    // Assigns the selected variable
    void setSelectedVar(Variable v);
 

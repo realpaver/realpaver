@@ -516,4 +516,26 @@ bool Scope::isIdentity() const
    return rep_->isIdentity();
 }
 
+Scope Scope::continuousScope() const
+{
+   Scope scop;
+   for (const auto &v : *this)
+   {
+      if (v.isReal())
+         scop.insert(v);
+   }
+   return scop;
+}
+
+Scope Scope::discreteScope() const
+{
+   Scope scop;
+   for (const auto &v : *this)
+   {
+      if (!v.isReal())
+         scop.insert(v);
+   }
+   return scop;
+}
+
 } // namespace realpaver

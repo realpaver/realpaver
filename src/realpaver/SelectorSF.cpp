@@ -22,14 +22,18 @@
 
 namespace realpaver {
 
+SelectorSF::SelectorSF(Scope scop)
+    : Selector(scop)
+{
+}
+
 bool SelectorSF::apply(SharedNode node, NodeContext &context)
 {
    const DomainBox *box = node->box();
-   const Scope &scop = node->scope();
    double dmin;
    bool found = false;
 
-   for (const auto &v : scop)
+   for (const auto &v : scop_)
    {
       if (box->isSplitable(v))
       {

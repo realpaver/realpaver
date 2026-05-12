@@ -18,6 +18,7 @@
  * @date   11 Apr 2024
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
@@ -156,6 +157,9 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
       }
    }
 
+   if (F.nbFuns() < 2)
+      return nullptr;
+
    std::shared_ptr<IntervalNewton> newton;
 
    try
@@ -190,6 +194,7 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
       LOG_LOW("Newton operator NOT built by the factory");
       newton = nullptr;
    }
+
    return newton;
 }
 
@@ -214,7 +219,6 @@ SharedContractorACID ContractorFactory::makeACID()
 
    IntervalFunctionVector F(edag_);
    std::unique_ptr<SelectorSSR> ssr = std::make_unique<SelectorSSR>(F);
-
    double tol = env_->getParams()->getDblParam("ACID_HC4_TOL");
    SharedContractorHC4 hc4 = makeHC4(tol);
 
