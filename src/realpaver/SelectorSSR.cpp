@@ -18,14 +18,13 @@
  * @date   25 Apr 2025
  */
 
-#include "AssertDebug.hpp"
 #include "realpaver/SelectorSSR.hpp"
 #include <algorithm>
 
 namespace realpaver {
 
 SelectorSSR::SelectorSSR(IntervalFunctionVector F)
-    : Selector()
+    : Selector(F.scope())
     , F_(F)
     , ssr_()
 {
@@ -56,6 +55,7 @@ Variable SelectorSSR::getMaxVar() const
 void SelectorSSR::update(const IntervalBox &B, const Bitset &active)
 {
    F_.update(B, active);
+   setScope(F_.scope());
 }
 
 void SelectorSSR::calculate(const IntervalBox &B)

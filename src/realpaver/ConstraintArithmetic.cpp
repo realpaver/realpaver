@@ -93,7 +93,10 @@ bool ConstraintBinary::isLinear() const
 
 bool ConstraintBinary::isBoundConstraint() const
 {
-   return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
+   //   return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
+   //
+
+   return isLinear() && scope().size() == 1;
 }
 
 bool ConstraintBinary::isInteger() const

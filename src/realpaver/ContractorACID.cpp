@@ -51,7 +51,7 @@ ContractorACID::ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContracto
       Variable v = scop_.var(i);
       ContractorVar3BCID *c3bc = new ContractorVar3BCID(op_, v, ns3B, nsCID);
       c3bc->setVarMinWidth(varMinWidth);
-      var3BCID_.push_back(c3bc);
+      var3BCID_.insert(std::make_pair(v.id(), c3bc));
    }
 
    sumGood_ = 0.0;
@@ -59,6 +59,12 @@ ContractorACID::ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContracto
    cycleLength_ = cycleLength;
    learnLength_ = learnLength;
    ctRatio_ = ctRatio;
+}
+
+ContractorACID::~ContractorACID()
+{
+   for (auto &entry : var3BCID_)
+      delete entry.second;
 }
 
 Scope ContractorACID::scope() const
@@ -142,17 +148,18 @@ Proof ContractorACID::contractImpl(IntervalBox &B, const Bitset &active,
    }
 
    IntervalBox save(B);
-   int stop = 0;
+   int stop = 0, ns = ssr_->scope().size();
 
    for (int i = 0; i < vhandled; ++i)
    {
-      size_t j = i % n_;
+      size_t j = i % ns;
       Variable v = ssr_->getVar(j);
-      size_t k = scop_.index(v);
+      auto it = var3BCID_.find(v.id());
+      ContractorVar3BCID *op = it->second;
 
-      proof = contract.apply(*var3BCID_[k], B);
+      proof = contract.apply(*op, B);
 
-      LOG_LOW(k << "-th var3BCID on " << v.getName());
+      LOG_LOW("var3BCID on " << v.getName());
       LOG_LOW(" -> " << proof << ", " << B);
 
       if (proof == Proof::Empty)

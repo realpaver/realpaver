@@ -18,21 +18,20 @@
  * @date   11 Apr 2024
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NodePropagatorList.hpp"
+#include "realpaver/SelectorLF.hpp"
+#include "realpaver/SelectorSF.hpp"
 #include "realpaver/Solver.hpp"
 #include "realpaver/SpaceBFS.hpp"
 #include "realpaver/SpaceDFS.hpp"
 #include "realpaver/SpaceDMDFS.hpp"
 #include "realpaver/SpaceHybridDFS.hpp"
-#include "realpaver/SplitLF.hpp"
+#include "realpaver/SplitDefault.hpp"
 #include "realpaver/SplitRR.hpp"
-#include "realpaver/SplitSF.hpp"
-#include "realpaver/SplitSLF.hpp"
-#include "realpaver/SplitSSR.hpp"
-#include "realpaver/SplitSSRLF.hpp"
 #include <limits>
 #include <list>
 #include <string>
@@ -183,47 +182,50 @@ void Solver::makeSplit()
    std::string sel = env_->getParams()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
+   {
       split_ = std::make_unique<SplitRR>(scop, std::move(smap));
-
-   else if (sel == "LF")
-      split_ = std::make_unique<SplitLF>(scop, std::move(smap));
-
-   else if (sel == "SF")
-      split_ = std::make_unique<SplitSF>(scop, std::move(smap));
-
-   else if (sel == "SLF")
-      split_ = std::make_unique<SplitSLF>(scop, std::move(smap));
-
-   else if (sel == "SSR")
-   {
-      if (dag_->isEmpty())
-      {
-         LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
-         split_ = std::make_unique<SplitLF>(scop, std::move(smap));
-      }
-      else
-      {
-         IntervalFunctionVector F(factory_->extDag());
-         split_ = std::make_unique<SplitSSR>(scop, std::move(smap), F);
-      }
    }
-
-   else if (sel == "SSR_LF")
+   else if (sel == "DEFAULT")
    {
-      if (dag_->isEmpty())
+      // continuous variables
+      std::string cont_var = env_->getParams()->getStrParam("SPLIT_CONTINUOUS");
+      std::unique_ptr<Selector> slc = nullptr;
+
+      if (newprob->scope().continuousScope().isEmpty())
       {
-         LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
-         split_ = std::make_unique<SplitLF>(scop, std::move(smap));
+         slc = std::make_unique<SelectorLF>(Scope());
       }
-      else
+      else if (cont_var == "LF")
+      {
+         slc = std::make_unique<SelectorLF>(newprob->scope().continuousScope());
+      }
+      else if (cont_var == "SSR")
       {
          IntervalFunctionVector F(factory_->extDag());
-         std::unique_ptr<SplitSSRLF> hybrid =
-             std::make_unique<SplitSSRLF>(scop, std::move(smap), F);
-         double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
-         hybrid->setFrequency(f);
-         split_ = std::move(hybrid);
+         slc = std::make_unique<SelectorSSR>(F);
       }
+      THROW_IF(slc == nullptr, "Bad option");
+
+      std::unique_ptr<Selector> sld =
+          std::make_unique<SelectorSF>(newprob->scope().discreteScope());
+
+      std::unique_ptr<SplitDefault> sdef = std::make_unique<SplitDefault>(
+          scop, std::move(smap), std::move(slc), std::move(sld));
+
+      // assigns the parameters
+      double sdef_rr = env_->getParams()->getDblParam("SPLIT_DEFAULT_RR_CYCLE");
+      double sdef_spe = env_->getParams()->getDblParam("SPLIT_DEFAULT_SPECIFIC_CYCLE");
+      bool discrete_first =
+          (env_->getParams()->getStrParam("SPLIT_DISCRETE_FIRST") == "YES");
+
+      int nb_rr = sdef_rr * scop.size();
+      int nb_spe = sdef_spe * scop.size();
+
+      sdef->setCycleLengthRR(nb_rr);
+      sdef->setCycleLength(nb_rr + nb_spe);
+      sdef->setDiscreteFirst(discrete_first);
+
+      split_ = std::move(sdef);
    }
 
    THROW_IF(split_ == nullptr, "Unable to make the split object in the solver");
@@ -411,7 +413,9 @@ void Solver::branchAndPrune()
    dag_ = factory_->extDag()->dag();
 
    makeSpace();
+
    makePropagator();
+
    makeSplit();
 
    // prover that derives proof certificates of the solutions

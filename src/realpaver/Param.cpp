@@ -1175,7 +1175,7 @@ void Params::makeBranch()
        .setWhat("Exploration strategy for branch-and-bound algorithms")
        .addChoice("LU", bb_lu)
        .addChoice("FD", bb_fd)
-       .setValue("LU")
+       .setValue("FD")
        .setText(str);
    add(bb_node_sel);
 }
@@ -1198,34 +1198,67 @@ void Params::makeSplit()
    add(split_obj);
 
    ////////////////////
+   ParamStr split_cont_var;
+   str = std::string("Selection strategy of the next continuous variable ") +
+         "in a splitting step, e.g. in the default splitting strategy";
+   split_cont_var.setName("SPLIT_CONTINUOUS")
+       .setCat(cat)
+       .setWhat(str)
+       .addChoice("LF", "Largest-First strategy")
+       .addChoice("SSR", "Smear-Sum-Relative strategy")
+       .setValue("LF");
+   add(split_cont_var);
+
+   ////////////////////
+   ParamDbl def_rr_cycle;
+   str =
+       std::string("The default splitting strategy is used when we have ") +
+       "SPLIT_SELECTION=DEFAULT. It alternates between a cycle of steps " +
+       "based on a round-robin strategy and a cycle of steps based on specific "
+       "strategies according to the nature of the variables (typically Largest-First " +
+       "for continuous variables and Smallest-First for discrete variables. This "
+       "parameter controls the length of the round-robin based cycle and it " +
+       "corresponds to a factor of the number of variables of the problem. " +
+       "For example, given 10 variables and the value 1.5, 15 round-robin based steps " +
+       "will be applied consecutively.";
+   def_rr_cycle.setName("SPLIT_DEFAULT_RR_CYCLE")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(3.0)
+       .setMinValue(0.0);
+   add(def_rr_cycle);
+
+   ////////////////////
+   ParamDbl def_specific_cycle;
+   str = std::string("The default splitting strategy is used when we have ") +
+         "SPLIT_SELECTION=DEFAULT. It alternates between a cycle of steps " +
+         "based on a round-robin strategy and a cycle of steps based on specific "
+         "strategies according to the nature of the variables (typically Largest-First " +
+         "for continuous variables and Smallest-First for discrete variables. This "
+         "parameter controls the length of the specific cycle and it " +
+         "corresponds to a factor of the number of variables of the problem. " +
+         "For example, given 10 variables and the value 0.5, 5 specific steps " +
+         "will be applied consecutively.";
+   def_specific_cycle.setName("SPLIT_DEFAULT_SPECIFIC_CYCLE")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(0.5)
+       .setMinValue(0.0);
+   add(def_specific_cycle);
+
+   ////////////////////
    ParamStr var_sel;
    str = std::string("Variable selection strategy that chooses the next variable ") +
-         "to split";
+         "to split. RR is a fair round-robin strategy that takes the variables in the " +
+         "ordering given in the model. DEFAULT combines RR with specific strategies " +
+         "applied to continuous and discrete variables";
    var_sel.setName("SPLIT_SELECTION")
        .setCat(cat)
        .setWhat(str)
        .addChoice("RR", "round-robin strategy")
-       .addChoice("LF", "largest domain")
-       .addChoice("SF", "smallest domain")
-       .addChoice("SSR", "smear sum relative values (using derivatives)")
-       .addChoice("SLF", "integer variable with smallest first and then real variable")
-       .addChoice("SSR_LF", "SSR and LF alternating with a given frequency")
-       .setValue("SSR");
+       .addChoice("DEFAULT", "default strategy")
+       .setValue("DEFAULT");
    add(var_sel);
-
-   ////////////////////
-   ParamDbl freq_ssr;
-   str = std::string("Frequency 0 <= f <= 1 used by the SSR_LF strategy. ") +
-         "If f = 1 then SSR is used. If f = 0 then LF is used. Otherwise SSR " +
-         "is used with frequency f with respect to LF, e.g. f = 0.75 means " +
-         "that SSR is used 3 times out of 4.";
-   freq_ssr.setName("SPLIT_SSR_LF_FREQUENCY")
-       .setCat(cat)
-       .setWhat(str)
-       .setValue(0.75)
-       .setMinValue(0.0)
-       .setMaxValue(1.0);
-   add(freq_ssr);
 
    ////////////////////
    ParamStr split_sl;
@@ -1258,6 +1291,16 @@ void Params::makeSplit()
        .addChoice("NO", "it is considered as a solution")
        .setValue("NO");
    add(split_inner);
+
+   ////////////////////
+   ParamStr split_discrete_first;
+   split_discrete_first.setName("SPLIT_DISCRETE_FIRST")
+       .setCat(cat)
+       .setWhat("Choice between discrete variables and continuous variables")
+       .addChoice("YES", "discrete variables must be chosen before continuous variables")
+       .addChoice("NO", "no impact on the splitting strategy")
+       .setValue("NO");
+   add(split_discrete_first);
 }
 
 void Params::makeContract()
@@ -1359,7 +1402,7 @@ void Params::makePolytope()
        .addChoice("AFFINE", "use of affine forms")
        .addChoice("TAYLOR", "use of Taylor (mean value) forms")
        .addChoice("AFFINE_TAYLOR", "use of affine and Taylor (mean value) forms")
-       .setValue("TAYLOR");
+       .setValue("AFFINE_TAYLOR");
    add(relax);
 
    ////////////////////

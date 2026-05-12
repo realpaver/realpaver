@@ -24,6 +24,7 @@
 #include "realpaver/ContractorVar3BCID.hpp"
 #include "realpaver/SelectorSSR.hpp"
 #include <memory>
+#include <unordered_map>
 
 namespace realpaver {
 
@@ -73,8 +74,8 @@ public:
    /// No assignment
    ContractorACID &operator=(const ContractorACID &) = delete;
 
-   /// Default destructor
-   ~ContractorACID() = default;
+   /// Destructor
+   ~ContractorACID();
 
    /// Returns the length of the learning phase
    int learnLength() const;
@@ -102,9 +103,8 @@ private:
    int numVarCID_; // number of var3BCID contractors that must be applied
                    // in a call to the contract method
 
-   std::vector<ContractorVar3BCID *> // var3BCID_[i] is the var3BCID contractor
-       var3BCID_;                    // associated with the i-th variable
-                                     // of the scope
+   // map variable index -> Var3BCID contractor
+   std::unordered_map<int, ContractorVar3BCID *> var3BCID_;
 
    int sumGood_; // during the learning phase, it counts the number of
                  // applications of var3BCID contractors that have reduced
