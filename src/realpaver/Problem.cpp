@@ -18,9 +18,9 @@
  * @date   11 Apr 2024
  */
 
-#include "ConstraintRep.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintRep.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -476,7 +476,7 @@ bool Problem::isEqConstrained() const
       return false;
 
    for (size_t i = 0; i < nbCtrs(); ++i)
-      if (!ctrAt(i).isEquation())
+      if (!ctrAt(i).isAnEquation())
          return false;
 
    return true;
@@ -488,7 +488,7 @@ bool Problem::isIneqConstrained() const
       return false;
 
    for (size_t i = 0; i < nbCtrs(); ++i)
-      if (!ctrAt(i).isInequality())
+      if (!ctrAt(i).isAnInequality())
          return false;
 
    return true;
@@ -503,9 +503,9 @@ bool Problem::isMixedConstrained() const
 
    for (size_t i = 0; i < nbCtrs(); ++i)
    {
-      if (ctrAt(i).isEquation())
+      if (ctrAt(i).isAnEquation())
          eq = true;
-      if (ctrAt(i).isInequality())
+      if (ctrAt(i).isAnInequality())
          ineq = true;
 
       if (eq && ineq)

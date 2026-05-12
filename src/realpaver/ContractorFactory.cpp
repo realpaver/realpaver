@@ -55,11 +55,11 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
       // inserts c in the different constraint sets
       Constraint c = pbm.ctrAt(i);
       cs_.insert(c);
-      if (c.isEquation())
+      if (c.isAnEquation())
       {
          cse_.insert(c);
       }
-      else if (c.isInequality())
+      else if (c.isAnInequality())
       {
          csi_.insert(c);
       }

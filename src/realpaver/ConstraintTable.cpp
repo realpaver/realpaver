@@ -141,7 +141,7 @@ void ConstraintTable::makeScopeAndHashCode()
    setScope(s);
 }
 
-bool ConstraintTable::isInteger() const
+bool ConstraintTable::isAnIntegerConstraint() const
 {
    for (auto &col : vcol_)
       if (!col.isInteger())

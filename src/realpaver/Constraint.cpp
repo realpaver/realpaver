@@ -122,19 +122,14 @@ bool Constraint::dependsOn(Variable v) const
    return rep_->dependsOn(v);
 }
 
-bool Constraint::isEquation() const
+bool Constraint::isAnEquation() const
 {
-   return rep_->isEquation();
+   return rep_->isAnEquation();
 }
 
-bool Constraint::isInequality() const
+bool Constraint::isAnInequality() const
 {
-   return rep_->isInequality();
-}
-
-bool Constraint::isArithmetic() const
-{
-   return isEquation() || isInequality();
+   return rep_->isAnInequality();
 }
 
 bool Constraint::isLinear() const
@@ -142,14 +137,29 @@ bool Constraint::isLinear() const
    return rep_->isLinear();
 }
 
-bool Constraint::isBoundConstraint() const
+bool Constraint::isQuadratic() const
 {
-   return rep_->isBoundConstraint();
+   return rep_->isQuadratic();
 }
 
-bool Constraint::isInteger() const
+bool Constraint::isPolynomial() const
 {
-   return rep_->isInteger();
+   return rep_->isPolynomial();
+}
+
+bool Constraint::isNonLinear() const
+{
+   return (!isLinear()) && (!isQuadratic()) && (!isPolynomial());
+}
+
+bool Constraint::isABoundConstraint() const
+{
+   return rep_->isABoundConstraint();
+}
+
+bool Constraint::isAnIntegerConstraint() const
+{
+   return rep_->isAnIntegerConstraint();
 }
 
 std::ostream &operator<<(std::ostream &os, const Constraint &c)
