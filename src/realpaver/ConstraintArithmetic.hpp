@@ -48,11 +48,13 @@ public:
 
    void print(std::ostream &os) const override;
    bool isConstant() const override;
-   bool isEquation() const override;
-   bool isInequality() const override;
+   bool isAnEquation() const override;
+   bool isAnInequality() const override;
    bool isLinear() const override;
-   bool isBoundConstraint() const override;
-   bool isInteger() const override;
+   bool isQuadratic() const override;
+   bool isPolynomial() const override;
+   bool isABoundConstraint() const override;
+   bool isAnIntegerConstraint() const override;
    Proof contract(IntervalBox &B) override;
    Proof contract(DomainBox &box) override;
 

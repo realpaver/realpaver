@@ -159,6 +159,9 @@ public:
    /// Returns true if this is a linear expression
    virtual bool isLinear() const = 0;
 
+   // Returns true if this is a polynomial expression
+   virtual bool isPolynomial() const = 0;
+
    /// Returns true if this is an integer term
    virtual bool isInteger() const = 0;
 
@@ -287,6 +290,9 @@ public:
 
    /// Returns true if this is a linear expression
    bool isLinear() const;
+
+   // Returns true if this is a polynomial expression
+   bool isPolynomial() const;
 
    /**
     * @brief Returns true if this is an integer term.
@@ -486,6 +492,7 @@ public:
    bool isMinusOne() const override;
    bool dependsOn(const Variable &v) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isInteger() const override;
    void makeScope(Scope &scop) const override;
    TermRep *cloneRoot() const override;
@@ -515,6 +522,7 @@ public:
    void acceptVisitor(TermVisitor &vis) const override;
    bool dependsOn(const Variable &v) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isInteger() const override;
    void makeScope(Scope &scop) const override;
    bool isVar() const override;
@@ -568,6 +576,7 @@ public:
    bool isUsb() const override;
    bool isInteger() const override;
    virtual bool isLinear() const override;
+   virtual bool isPolynomial() const override;
    void eval(const IntervalBox &B) override;
    void eval(const DomainBox &box) override;
    virtual void print(std::ostream &os) const override;
@@ -598,6 +607,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -616,6 +626,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -634,6 +645,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -651,6 +663,8 @@ public:
    void evalRoot() override;
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
+   bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -701,6 +715,7 @@ public:
    void evalRoot() override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -751,6 +766,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
+   bool isPolynomial() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
 };
@@ -787,6 +803,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
+   bool isPolynomial() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
 

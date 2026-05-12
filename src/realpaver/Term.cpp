@@ -347,6 +347,11 @@ bool Term::isLinear() const
    return rep_->isLinear();
 }
 
+bool Term::isPolynomial() const
+{
+   return rep_->isPolynomial();
+}
+
 bool Term::isInteger() const
 {
    return rep_->isInteger();
@@ -971,6 +976,11 @@ bool TermCst::isLinear() const
    return true;
 }
 
+bool TermCst::isPolynomial() const
+{
+   return true;
+}
+
 bool TermCst::isInteger() const
 {
    return x_.isAnInt();
@@ -1042,6 +1052,11 @@ bool TermVar::dependsOn(const Variable &v) const
 }
 
 bool TermVar::isLinear() const
+{
+   return true;
+}
+
+bool TermVar::isPolynomial() const
 {
    return true;
 }
@@ -1145,6 +1160,11 @@ bool TermOp::isInteger() const
 }
 
 bool TermOp::isLinear() const
+{
+   return isConstant();
+}
+
+bool TermOp::isPolynomial() const
 {
    return isConstant();
 }
@@ -1277,6 +1297,11 @@ bool TermAdd::isLinear() const
    return left()->isLinear() && right()->isLinear();
 }
 
+bool TermAdd::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isPolynomial();
+}
+
 TermRep *TermAdd::cloneRoot() const
 {
    return new TermAdd(left(), right());
@@ -1330,6 +1355,11 @@ void TermSub::acceptVisitor(TermVisitor &vis) const
 bool TermSub::isLinear() const
 {
    return left()->isLinear() && right()->isLinear();
+}
+
+bool TermSub::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isPolynomial();
 }
 
 bool TermSub::isIntegerRoot() const
@@ -1401,6 +1431,11 @@ bool TermMul::isLinear() const
           (left()->isLinear() && right()->isConstant());
 }
 
+bool TermMul::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isPolynomial();
+}
+
 bool TermMul::isIntegerRoot() const
 {
    return true;
@@ -1461,6 +1496,16 @@ void TermDiv::print(std::ostream &os) const
 void TermDiv::acceptVisitor(TermVisitor &vis) const
 {
    vis.apply(this);
+}
+
+bool TermDiv::isLinear() const
+{
+   return left()->isLinear() && right()->isConstant();
+}
+
+bool TermDiv::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isConstant();
 }
 
 bool TermDiv::isIntegerRoot() const
@@ -1585,6 +1630,11 @@ bool TermUsb::isIntegerRoot() const
 bool TermUsb::isLinear() const
 {
    return child()->isLinear();
+}
+
+bool TermUsb::isPolynomial() const
+{
+   return child()->isPolynomial();
 }
 
 void TermUsb::print(std::ostream &os) const
@@ -1734,6 +1784,11 @@ bool TermSqr::isIntegerRoot() const
    return true;
 }
 
+bool TermSqr::isPolynomial() const
+{
+   return child()->isPolynomial();
+}
+
 TermRep *TermSqr::cloneRoot() const
 {
    return new TermSqr(child());
@@ -1825,6 +1880,11 @@ void TermPow::acceptVisitor(TermVisitor &vis) const
 bool TermPow::isIntegerRoot() const
 {
    return true;
+}
+
+bool TermPow::isPolynomial() const
+{
+   return child()->isPolynomial();
 }
 
 TermRep *TermPow::cloneRoot() const

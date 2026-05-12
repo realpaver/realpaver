@@ -133,19 +133,25 @@ public:
    virtual void acceptVisitor(ConstraintVisitor &vis) const = 0;
 
    /// Returns true if this is an equation
-   virtual bool isEquation() const;
+   virtual bool isAnEquation() const;
 
    /// Returns true if this is an inequality constraint (default: false)
-   virtual bool isInequality() const;
+   virtual bool isAnInequality() const;
 
    /// Returns true if this is linear
    virtual bool isLinear() const;
 
+   /// Returns true if this is quadratic
+   virtual bool isQuadratic() const;
+
+   /// Returns true if this is polynomial, not linear, and not quadratic
+   virtual bool isPolynomial() const;
+
    /// Returns true if this is an integer arithmetic constraint
-   virtual bool isInteger() const = 0;
+   virtual bool isAnIntegerConstraint() const = 0;
 
    /// Return true if this just bounds a variable
-   virtual bool isBoundConstraint() const;
+   virtual bool isABoundConstraint() const;
 
    /// Returns a new representation such that only the root of this is cloned
    virtual ConstraintRep *cloneRoot() const = 0;

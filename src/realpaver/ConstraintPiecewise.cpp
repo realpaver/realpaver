@@ -466,10 +466,10 @@ ConstraintRep *ConstraintPiecewise::cloneRoot() const
    return rep;
 }
 
-bool ConstraintPiecewise::isInteger() const
+bool ConstraintPiecewise::isAnIntegerConstraint() const
 {
    for (const auto &c : ctrs_)
-      if (!c.isInteger())
+      if (!c.isAnIntegerConstraint())
          return false;
    return true;
 }

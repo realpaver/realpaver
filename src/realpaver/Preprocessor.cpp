@@ -140,7 +140,7 @@ void Preprocessor::applyImpl()
          return;
       }
 
-      else if (proof == Proof::Inner || c.isBoundConstraint())
+      else if (proof == Proof::Inner || c.isABoundConstraint())
       {
          LOG_INTER("Inactive constraint: " << c);
          inactive_.push_back(c);

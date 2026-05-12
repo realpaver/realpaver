@@ -22,6 +22,7 @@
 #include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/FlatFunction.hpp"
 #include "realpaver/TermLin.hpp"
+#include "realpaver/TermQuadratic.hpp"
 
 namespace realpaver {
 
@@ -72,12 +73,12 @@ void ConstraintBinary::print(std::ostream &os) const
    r_.print(os);
 }
 
-bool ConstraintBinary::isEquation() const
+bool ConstraintBinary::isAnEquation() const
 {
    return relation() == ConstraintRelation::Eq;
 }
 
-bool ConstraintBinary::isInequality() const
+bool ConstraintBinary::isAnInequality() const
 {
    ConstraintRelation rel = relation();
 
@@ -91,15 +92,30 @@ bool ConstraintBinary::isLinear() const
    return l_.isLinear() && r_.isLinear();
 }
 
-bool ConstraintBinary::isBoundConstraint() const
+bool ConstraintBinary::isQuadratic() const
 {
-   //   return (l_.isVar() && r_.isNumber()) || (l_.isNumber() && r_.isVar());
-   //
+   try
+   {
+      TermQuadratic t(l_ - r_);
+      return true;
+   }
+   catch (Exception &e)
+   {
+      return false;
+   }
+}
 
+bool ConstraintBinary::isPolynomial() const
+{
+   return l_.isPolynomial() && r_.isPolynomial();
+}
+
+bool ConstraintBinary::isABoundConstraint() const
+{
    return isLinear() && scope().size() == 1;
 }
 
-bool ConstraintBinary::isInteger() const
+bool ConstraintBinary::isAnIntegerConstraint() const
 {
    return l_.isInteger() && r_.isInteger();
 }

@@ -53,7 +53,7 @@ public:
    Constraint body() const;
 
    bool isConstant() const override;
-   bool isInteger() const override;
+   bool isAnIntegerConstraint() const override;
    Proof isSatisfied(const IntervalBox &B) override;
    double violation(const IntervalBox &B) override;
    Proof contract(IntervalBox &B) override;
