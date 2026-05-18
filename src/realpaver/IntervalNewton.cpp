@@ -325,7 +325,7 @@ Proof IntervalNewton::certify(IntervalBox &box)
       else if (nb_steps > cmaxiter_)
       {
          iter = false;
-         LOG_INTER("Stops on a maximum number of iterations: " << maxiter_);
+         LOG_INTER("Stops on a maximum number of iterations: " << cmaxiter_);
       }
 
       LOG_LOW("Inner step of interval Newton certification  -> " << X);

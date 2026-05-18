@@ -21,7 +21,7 @@
 #ifndef REALPAVER_PROSPECTOR_SIMPLE_HPP
 #define REALPAVER_PROSPECTOR_SIMPLE_HPP
 
-#include "realpaver/BoxPicker.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/Prospector.hpp"
 #include "realpaver/ProverOptim.hpp"
 
@@ -36,13 +36,13 @@ namespace realpaver {
 class ProspectorSimple : public Prospector {
 public:
    /// Constructor
-   ProspectorSimple(std::unique_ptr<BoxPicker> picker,
+   ProspectorSimple(std::unique_ptr<DomainBoxPicker> picker,
                     std::unique_ptr<ProverOptim> prover);
 
    bool exploreImpl(Node &node, RealPoint &pt) override;
 
 private:
-   std::unique_ptr<BoxPicker> picker_;
+   std::unique_ptr<DomainBoxPicker> picker_;
 };
 
 } // namespace realpaver

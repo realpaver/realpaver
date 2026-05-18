@@ -21,7 +21,7 @@
 #ifndef REALPAVER_PROSPECTOR_LOCALSOLVER_HPP
 #define REALPAVER_PROSPECTOR_LOCALSOLVER_HPP
 
-#include "realpaver/BoxPicker.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/NLPModel.hpp"
 #include "realpaver/Prospector.hpp"
 
@@ -36,14 +36,14 @@ namespace realpaver {
 class ProspectorLocalSolver : public Prospector {
 public:
    /// Constructor
-   ProspectorLocalSolver(std::unique_ptr<BoxPicker> picker,
+   ProspectorLocalSolver(std::unique_ptr<DomainBoxPicker> picker,
                          std::unique_ptr<ProverOptim> prover,
                          std::unique_ptr<NLPModel> localSolver);
 
    bool exploreImpl(Node &node, RealPoint &pt) override;
 
 private:
-   std::unique_ptr<BoxPicker> picker_;
+   std::unique_ptr<DomainBoxPicker> picker_;
    std::unique_ptr<NLPModel> localSolver_;
 };
 

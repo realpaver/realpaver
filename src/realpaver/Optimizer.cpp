@@ -19,9 +19,9 @@
  */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/BoxPicker.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/DomainBox.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/SelectorLF.hpp"
@@ -306,7 +306,7 @@ void Optimizer::makeProspector()
    std::string prospect = env_->getParams()->getStrParam("PROSPECTOR");
    if (prospect == "SIMPLE")
    {
-      std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
+      std::unique_ptr<DomainBoxPicker> picker = std::make_unique<DomainBoxPicker>();
       prospector_ =
           std::make_unique<ProspectorSimple>(std::move(picker), std::move(prover));
    }
@@ -320,7 +320,7 @@ void Optimizer::makeProspector()
       Tolerance tolNlp(env_->getParams()->getDblParam("NLP_SOLVER_OBJ_REL_TOL"),
                        env_->getParams()->getDblParam("NLP_SOLVER_OBJ_ABS_TOL"));
       localSolver->setTol(tolNlp);
-      std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
+      std::unique_ptr<DomainBoxPicker> picker = std::make_unique<DomainBoxPicker>();
       prospector_ = std::make_unique<ProspectorLocalSolver>(
           std::move(picker), std::move(prover), std::move(localSolver));
 #endif

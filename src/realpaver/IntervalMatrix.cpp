@@ -20,6 +20,7 @@
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalMatrix.hpp"
+#include <algorithm>
 
 namespace realpaver {
 
@@ -163,6 +164,97 @@ IntervalMatrix &IntervalMatrix::operator/=(double a)
 {
    IntervalMatrix::BaseType::divScalar(*this, a, *this);
    return *this;
+}
+
+bool IntervalMatrix::findMaxPivot(size_t i, size_t &row, size_t &col)
+{
+   double pmax;        // pivot value
+   bool found = false; // nonzero pivot found
+
+   for (size_t j = i; j < nrows(); ++j)
+   {
+      for (size_t k = i; k < ncols(); ++k)
+      {
+         const Interval &x = get(j, k);
+         if (x.isEmpty())
+         {
+            return false;
+         }
+         else if (x.containsZero())
+         {
+            continue;
+         }
+         else
+         {
+            double p = x.mag();
+            if ((!found) || (p > pmax))
+            {
+               pmax = p;
+               row = j;
+               col = k;
+               found = true;
+            }
+         }
+      }
+   }
+   return found;
+}
+
+bool IntervalMatrix::selectMostSensitive(IndexList &columns)
+{
+   REALPAVER_ASSERT(columns.size() == ncols(), "Bad list of indexes");
+   REALPAVER_ASSERT(nrows() <= ncols(), "Bad matrix");
+
+   for (size_t i = 0; i < columns.size(); ++i)
+   {
+      columns[i] = i;
+   }
+
+   size_t row, col;
+
+   for (size_t i = 0; i < nrows(); ++i)
+   {
+      REALPAVER_DEBUG("--- i = " << i);
+
+      bool b = findMaxPivot(i, row, col);
+      if (!b)
+         return false;
+
+      // swaps rows and columns in order to get the pivot at (i, i)
+      if (i != row)
+      {
+         REALPAVER_DEBUG("    swap with row : " << row);
+
+         swapRows(i, row);
+      }
+      if (i != col)
+      {
+         REALPAVER_DEBUG("    swap with col : " << col);
+         swapCols(i, col);
+         std::swap(columns[i], columns[col]);
+      }
+
+      Interval pivot = get(i, i);
+      REALPAVER_DEBUG("    pivot : " << pivot);
+
+      // puts zeros in the column under the pivot
+      for (size_t j = i + 1; j < nrows(); ++j)
+      {
+         Interval c = get(j, i) / pivot;
+
+         for (size_t k = i + 1; k < ncols(); ++k)
+         {
+            Interval val = get(j, k) - c * get(i, k);
+            set(j, k, val);
+         }
+
+         // set(j, i, Interval::zero()); (useless)
+      }
+      print(std::cout);
+      REALPAVER_DEBUG("\n\n");
+   }
+
+   return true;
 }
 
 IntervalMatrix operator+(const IntervalMatrix &A, const IntervalMatrix &B)

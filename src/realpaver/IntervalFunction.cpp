@@ -91,7 +91,7 @@ void IntervalFunction::diff(const IntervalBox &B, IntervalVector &G)
    return rep_->diff(B, G);
 }
 
-void IntervalFunction::diffHansen(const IntervalBox &B, const RealPoint &c,
+void IntervalFunction::diffHansen(const IntervalBox &B, const IntervalBox &c,
                                   IntervalVector &G)
 {
    rep_->diffHansen(B, c, G);
@@ -133,7 +133,7 @@ void IntervalFunctionDag::diff(const IntervalBox &B, IntervalVector &G)
    return f_->iDiff(B, G);
 }
 
-void IntervalFunctionDag::diffHansen(const IntervalBox &B, const RealPoint &c,
+void IntervalFunctionDag::diffHansen(const IntervalBox &B, const IntervalBox &c,
                                      IntervalVector &G)
 {
    return f_->iDiffHansen(B, c, G);

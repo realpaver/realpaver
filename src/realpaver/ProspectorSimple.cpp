@@ -23,7 +23,7 @@
 
 namespace realpaver {
 
-ProspectorSimple::ProspectorSimple(std::unique_ptr<BoxPicker> picker,
+ProspectorSimple::ProspectorSimple(std::unique_ptr<DomainBoxPicker> picker,
                                    std::unique_ptr<ProverOptim> prover)
     : Prospector(std::move(prover))
 {

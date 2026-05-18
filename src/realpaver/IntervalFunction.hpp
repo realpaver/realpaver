@@ -77,7 +77,7 @@ public:
     * G is the output vector such that G[i] if the derivative of this in B
     * with respect to the i-th variable of its scope.
     */
-   virtual void diffHansen(const IntervalBox &B, const RealPoint &c,
+   virtual void diffHansen(const IntervalBox &B, const IntervalBox &c,
                            IntervalVector &G) = 0;
 
 private:
@@ -144,7 +144,7 @@ public:
     * G is the output vector such that G[i] if the derivative of this in B
     * with respect to the i-th variable of its scope
     */
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G);
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, IntervalVector &G);
 
    /// Type of shared pointer to a representation
    using SharedRep = std::shared_ptr<IntervalFunctionRep>;
@@ -187,7 +187,8 @@ public:
    size_t nbVars() const override;
    Interval eval(const IntervalBox &B) override;
    void diff(const IntervalBox &B, IntervalVector &G) override;
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c,
+                   IntervalVector &G) override;
 
 private:
    SharedDagFun f_;
