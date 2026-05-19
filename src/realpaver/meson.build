@@ -438,3 +438,5 @@ realpaver_lib = both_libraries(
 )
 
 install_headers(rp_headers, subdir: 'realpaver')
+
+librealpaver_dep = declare_dependency(include_directories: incdir, link_with: realpaver_lib)
