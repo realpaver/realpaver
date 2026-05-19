@@ -117,6 +117,54 @@ Proof IntervalGaussSeidel::contract(const IntervalMatrix &A, IntervalVector &x,
    return proof;
 }
 
+Proof IntervalGaussSeidel::certify(const IntervalMatrix &A, IntervalVector &x,
+                                   const IntervalVector &b)
+{
+
+   bool strictContraction = true;
+
+   // for each row
+   for (size_t i = 0; i < x.size(); ++i)
+   {
+      if (A.get(i, i).containsZero())
+         return Proof::Maybe;
+
+      // save x[i] to test the strict contraction
+      Interval save(x[i]);
+
+      // inversion of the i-th row: sum{ij} A{ij} x{j} = b{i}
+      // I := b{i} - sum{ij, j!=i} A{ij} x{j}
+      Interval I = b.get(i);
+      for (size_t j = 0; j < i; ++j)
+      {
+         I -= A.get(i, j) * x.get(j);
+      }
+      for (size_t j = i + 1; j < x.size(); ++j)
+      {
+         I -= A.get(i, j) * x.get(j);
+      }
+
+      // standard division used to inverse: A(i,i)*x[i] = I
+      x.set(i, I / A.get(i, i));
+      strictContraction = strictContraction && save.strictlyContains(x.get(i));
+   }
+   return (strictContraction ? Proof::Feasible : Proof::Maybe);
+}
+
+Proof IntervalGaussSeidel::certifyPrecond(const IntervalMatrix &A, IntervalVector &x,
+                                          const IntervalVector &b)
+{
+   int dim = A.ncols();
+   RealMatrix M = A.midpoint();
+   RealMatrix P(dim, dim);
+
+   bool inv = M.inverse(P);
+   if (!inv)
+      return Proof::Maybe;
+
+   return certify(P * A, x, P * b);
+}
+
 int IntervalGaussSeidel::innerStep(const IntervalMatrix &A, IntervalVector &x,
                                    const IntervalVector &b)
 {

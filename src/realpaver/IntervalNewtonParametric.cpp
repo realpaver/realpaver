@@ -47,7 +47,7 @@ bool IntervalNewtonParametric::makeScopes(IntervalBox &B, Scope &mainScop,
    IntervalMatrix J(F_.nbFuns(), F_.nbVars());
    F_.diff(B, J);
 
-   //   REALPAVER_DEBUG("---- Jacobian ----\n" << J);
+   REALPAVER_DEBUG("---- Jacobian ----\n" << J);
 
    IntervalMatrix::IndexList ind(F_.nbVars());
    bool ok = J.selectMostSensitive(ind);
@@ -143,7 +143,7 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
 
       REALPAVER_DEBUG("H\n" << H);
 
-      Proof certif = gs_->contractPrecond(H, y, b);
+      Proof certif = gs_->certifyPrecond(H, y, b);
 
       REALPAVER_DEBUG("certif : " << certif);
 
@@ -177,6 +177,7 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
       }
 
       LOG_LOW("Inner step of interval Newton certification  -> " << X);
+
    } while (iter);
 
    if (proof == Proof::Feasible)

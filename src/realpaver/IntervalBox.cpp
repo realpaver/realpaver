@@ -74,7 +74,7 @@ IntervalBox::IntervalBox(Scope scop, const RealVector &X)
    REALPAVER_ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
 }
 
-IntervalBox::IntervalBox(const IntervalBox &B, Scope scop)
+IntervalBox::IntervalBox(Scope scop, const IntervalBox &B)
     : IntervalVector(scop.size())
     , scop_(scop)
 {

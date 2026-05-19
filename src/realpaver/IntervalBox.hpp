@@ -81,7 +81,7 @@ public:
     *
     * Assigns this to B restricted to scop
     */
-   IntervalBox(const IntervalBox &B, Scope scop);
+   IntervalBox(Scope scop, const IntervalBox &B);
    ///@}
 
    /// Default assignment operator

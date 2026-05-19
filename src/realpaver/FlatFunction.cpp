@@ -1029,7 +1029,7 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox &B)
             aux[i] = ival_[i];
 
          // contracts the first part
-         IntervalBox Xl(B, scop_);
+         IntervalBox Xl(scop_, B);
          ival_[nb_ - 1] = e & Interval::lessThan(img_.left());
          Proof pl = hc4ReviseBackward(Xl);
 
@@ -1038,7 +1038,7 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox &B)
             ival_[i] = aux[i];
 
          // contracts the second part
-         IntervalBox Xr(B, scop_);
+         IntervalBox Xr(scop_, B);
          ival_[nb_ - 1] = e & Interval::moreThan(img_.right());
          Proof pr = hc4ReviseBackward(Xr);
 
