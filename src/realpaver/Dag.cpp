@@ -1579,13 +1579,7 @@ void Dag::iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &s
    REALPAVER_ASSERT(scop.size() == H.ncols() && nbFuns() == H.nrows(),
                     "Bad dimensions of a Hansen matrix used in a DAG");
 
-   REALPAVER_DEBUG("iDiffHansen 10");
-   REALPAVER_DEBUG("scop_ : " << scop_);
-   REALPAVER_DEBUG("c : " << c);
-
    IntervalBox X(scop_, c);
-
-   REALPAVER_DEBUG("iDiffHansen 20");
 
    size_t j = 0;
    for (const auto &v : scop)

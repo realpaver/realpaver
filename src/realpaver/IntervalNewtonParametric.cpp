@@ -33,9 +33,6 @@ IntervalNewtonParametric::IntervalNewtonParametric(IntervalFunctionVector F)
     , chi_(Params::GetDblParam("INFLATION_CHI"))
     , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
-
-   REALPAVER_DEBUG("nv : " << F.nbVars() << "  nf: " << F.nbFuns());
-
    THROW_IF(F.nbFuns() >= F.nbVars(), "Bad system");
 
    gs_ = std::make_unique<IntervalGaussSeidel>();
@@ -46,8 +43,6 @@ bool IntervalNewtonParametric::makeScopes(IntervalBox &B, Scope &mainScop,
 {
    IntervalMatrix J(F_.nbFuns(), F_.nbVars());
    F_.diff(B, J);
-
-   REALPAVER_DEBUG("---- Jacobian ----\n" << J);
 
    IntervalMatrix::IndexList ind(F_.nbVars());
    bool ok = J.selectMostSensitive(ind);
@@ -79,9 +74,6 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
    if (!ok)
       return Proof::Maybe;
 
-   REALPAVER_DEBUG("main scope : " << mainScop);
-   REALPAVER_DEBUG("param scope : " << paramScop);
-
    size_t n = mainScop.size();
 
    bool iter = true;
@@ -100,8 +92,6 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
 
    LOG_INTER("Interval Newton certification on " << X);
 
-   REALPAVER_DEBUG("X : " << X);
-
    do
    {
       ++nb_steps;
@@ -110,17 +100,11 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
 
       // inflation on the main scope
       X.inflateOnScope(mainScop, delta_, chi_);
-
-      REALPAVER_DEBUG("inflate X : " << X);
-
       LOG_LOW("Inflated box -> " << X);
 
       IntervalVector fmid(n);
       makeC(X, mainScop, c); // c := midpoint of X on the main scope
       F_.eval(c, fmid);
-
-      REALPAVER_DEBUG("mid : " << c);
-      REALPAVER_DEBUG("fmid : " << fmid);
 
       if (fmid.isEmpty())
       {
@@ -132,20 +116,12 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
       IntervalVector y(n);
       makeY(X, c, mainScop, y); // y := X - c on the main scope
 
-      REALPAVER_DEBUG("y : " << y);
-
       IntervalVector b = -fmid;
-
-      REALPAVER_DEBUG("b : " << b);
 
       // calculates the Hansen's matrix
       F_.diffHansen(X, c, mainScop, H);
 
-      REALPAVER_DEBUG("H\n" << H);
-
       Proof certif = gs_->certifyPrecond(H, y, b);
-
-      REALPAVER_DEBUG("certif : " << certif);
 
       if (certif == Proof::Empty)
       {

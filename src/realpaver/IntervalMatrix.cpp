@@ -214,8 +214,6 @@ bool IntervalMatrix::selectMostSensitive(IndexList &columns)
 
    for (size_t i = 0; i < nrows(); ++i)
    {
-      REALPAVER_DEBUG("--- i = " << i);
-
       bool b = findMaxPivot(i, row, col);
       if (!b)
          return false;
@@ -223,19 +221,15 @@ bool IntervalMatrix::selectMostSensitive(IndexList &columns)
       // swaps rows and columns in order to get the pivot at (i, i)
       if (i != row)
       {
-         REALPAVER_DEBUG("    swap with row : " << row);
-
          swapRows(i, row);
       }
       if (i != col)
       {
-         REALPAVER_DEBUG("    swap with col : " << col);
          swapCols(i, col);
          std::swap(columns[i], columns[col]);
       }
 
       Interval pivot = get(i, i);
-      REALPAVER_DEBUG("    pivot : " << pivot);
 
       // puts zeros in the column under the pivot
       for (size_t j = i + 1; j < nrows(); ++j)
@@ -251,7 +245,6 @@ bool IntervalMatrix::selectMostSensitive(IndexList &columns)
          // set(j, i, Interval::zero()); (useless)
       }
       print(std::cout);
-      REALPAVER_DEBUG("\n\n");
    }
 
    return true;
