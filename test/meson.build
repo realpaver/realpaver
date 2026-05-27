@@ -204,6 +204,15 @@ preprocessor_test = executable(
 )
 test('Test of preprocessor', preprocessor_test)
 
+prover_test = executable(
+  'prover_test',
+  sources: 'prover_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of prover for satisfaction problems', prover_test)
+
 prover_optim_test = executable(
   'prover_optim_test',
   sources: 'prover_optim_test.cpp',

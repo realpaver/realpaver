@@ -206,12 +206,12 @@ SharedDagFun DagExtended::getActiveFun(size_t i, const IntervalBox &B,
    return lfun_[i]->getActive(B, active);
 }
 
-size_t DagExtended::nbBadCtrs() const
+size_t DagExtended::nbOutsideCtrs() const
 {
    return lctr_.size();
 }
 
-Constraint DagExtended::badCtr(size_t i) const
+Constraint DagExtended::outsideCtr(size_t i) const
 {
    return lctr_[i];
 }

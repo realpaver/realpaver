@@ -118,10 +118,10 @@ SharedContractorAffine ContractorFactory::makeAffine(double tol)
    SharedContractorAffine ctc = std::make_shared<ContractorAffine>(edag_, minrange);
 
    // other constraints
-   for (size_t i = 0; i < edag_->nbBadCtrs(); ++i)
+   for (size_t i = 0; i < edag_->nbOutsideCtrs(); ++i)
    {
       std::shared_ptr<ContractorConstraint> op =
-          std::make_shared<ContractorConstraint>(edag_->badCtr(i));
+          std::make_shared<ContractorConstraint>(edag_->outsideCtr(i));
       ctc->push(op);
    }
 

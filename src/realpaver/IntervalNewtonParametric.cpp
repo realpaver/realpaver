@@ -80,8 +80,10 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
    Proof proof = Proof::Maybe;
    size_t nb_steps = 0;
 
-   IntervalBox X(B);       // inflated box
-   IntervalBox c(B);       // midpoint
+   IntervalBox X(fullScop, B);
+   X.setMidpointOnScope(B, mainScop);
+
+   IntervalBox c(X);       // midpoint of X on the main scope
    IntervalMatrix H(n, n); // Hansen's matrix
 
    // given X(k-2), X(k-1), Xk three boxes from the sequence calculated
@@ -122,14 +124,6 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
       F_.diffHansen(X, c, mainScop, H);
 
       Proof certif = gs_->certifyPrecond(H, y, b);
-
-      if (certif == Proof::Empty)
-      {
-         proof = Proof::Empty;
-         iter = false;
-         LOG_INTER("Stops on Gauss-Seidel -> empty");
-         continue;
-      }
 
       // X := y + c
       certif = certifyX(c, y, mainScop, X);

@@ -169,6 +169,13 @@ public:
    void setOnScope(const IntervalBox &B, const Scope &scop);
 
    /**
+    * @brief Assignment on a scope.
+    *
+    * For each v in scope, this[v] is assigned to the midpoint of B[v].
+    */
+   void setMidpointOnScope(const IntervalBox &B, const Scope &scop);
+
+   /**
     * @brief Midpoint on a scope.
     *
     * For each v in scop, the value of v in the resulting point is assigned

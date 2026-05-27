@@ -200,6 +200,12 @@ void IntervalBox::setOnScope(const IntervalBox &B, const Scope &scop)
       set(v, B.get(v));
 }
 
+void IntervalBox::setMidpointOnScope(const IntervalBox &B, const Scope &scop)
+{
+   for (const auto &v : scop)
+      set(v, B.get(v).midpoint());
+}
+
 RealPoint IntervalBox::midpointOnScope(const Scope &scop) const
 {
    RealPoint pt(scop);

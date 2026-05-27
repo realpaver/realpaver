@@ -21,6 +21,9 @@
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintProver.hpp"
 #include "realpaver/IntervalFunctionUni.hpp"
+#include "realpaver/IntervalNewton.hpp"
+#include "realpaver/IntervalNewtonParametric.hpp"
+#include "realpaver/IntervalNewtonUni.hpp"
 #include "realpaver/IntervalThickFunction.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
@@ -39,10 +42,10 @@ Prover::Prover(SharedDagExtended edag)
 Proof Prover::certify(IntervalBox &B)
 {
    // checks the constraints not in the DAG
-   for (size_t i = 0; i < edag_->nbBadCtrs(); ++i)
+   for (size_t i = 0; i < edag_->nbOutsideCtrs(); ++i)
    {
       ConstraintProver prover(B);
-      edag_->badCtr(i).acceptVisitor(prover);
+      edag_->outsideCtr(i).acceptVisitor(prover);
       if (!prover.isFeasible())
          return Proof::Maybe;
    }
@@ -118,8 +121,10 @@ Proof Prover::certify(IntervalBox &B)
    }
    else
    {
-      // TODO : parametric Newton
-      return Proof::Maybe;
+      IntervalNewtonParametric nwt(F);
+      nwt.setInflationChi(chi_);
+      nwt.setInflationDelta(delta_);
+      return nwt.certify(B);
    }
 }
 
