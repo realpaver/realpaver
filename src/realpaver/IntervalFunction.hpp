@@ -48,11 +48,8 @@ public:
    /// Virtual destructor
    virtual ~IntervalFunctionRep();
 
-   /// Assigns the image of this
-   void setImage(const Interval &img);
-
    /// Returns the image of this
-   Interval getImage() const;
+   virtual Interval getImage() const = 0;
 
    /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
@@ -79,9 +76,6 @@ public:
     */
    virtual void diffHansen(const IntervalBox &B, const IntervalBox &c,
                            IntervalVector &G) = 0;
-
-private:
-   Interval img_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -114,9 +108,6 @@ public:
 
    /// No assignment
    IntervalFunction &operator=(const IntervalFunction &) = delete;
-
-   /// Assigns the image of this
-   void setImage(const Interval &img);
 
    /// Returns the image of this
    Interval getImage() const;
@@ -183,6 +174,7 @@ public:
    /// No asssignment
    IntervalFunctionDag &operator=(const IntervalFunctionDag &) = delete;
 
+   Interval getImage() const override;
    Scope scope() const override;
    size_t nbVars() const override;
    Interval eval(const IntervalBox &B) override;

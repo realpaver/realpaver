@@ -23,7 +23,7 @@
 
 namespace realpaver {
 
-Prospector::Prospector(std::unique_ptr<ProverOptim> prover)
+Prospector::Prospector(std::unique_ptr<Prover> prover)
     : prover_(std::move(prover))
     , pt_(nullptr)
 {
@@ -46,7 +46,8 @@ bool Prospector::explore(Node &node, NodeContext &ctx)
    if (res)
    {
       IntervalBox P(*pt_);
-      res = prover_->certify(P, node.active());
+      Proof proof = prover_->certify(P, node.active());
+      res = (proof == Proof::Feasible || proof == Proof::Inner);
    }
    return res;
 }

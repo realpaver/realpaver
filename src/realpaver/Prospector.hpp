@@ -23,7 +23,7 @@
 
 #include "realpaver/Node.hpp"
 #include "realpaver/NodeContext.hpp"
-#include "realpaver/ProverOptim.hpp"
+#include "realpaver/Prover.hpp"
 #include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
@@ -37,7 +37,7 @@ namespace realpaver {
 class Prospector {
 public:
    /// Constructor
-   Prospector(std::unique_ptr<ProverOptim> prover);
+   Prospector(std::unique_ptr<Prover> prover);
 
    /// No copy constructor
    Prospector(const Prospector &) = delete;
@@ -67,7 +67,7 @@ public:
    virtual bool exploreImpl(Node &node, RealPoint &pt) = 0;
 
 private:
-   std::unique_ptr<ProverOptim> prover_;
+   std::unique_ptr<Prover> prover_;
    RealPoint *pt_; // feasible point if found
 };
 

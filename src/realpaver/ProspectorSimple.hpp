@@ -23,7 +23,7 @@
 
 #include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/Prospector.hpp"
-#include "realpaver/ProverOptim.hpp"
+#include "realpaver/Prover.hpp"
 
 namespace realpaver {
 
@@ -37,7 +37,7 @@ class ProspectorSimple : public Prospector {
 public:
    /// Constructor
    ProspectorSimple(std::unique_ptr<DomainBoxPicker> picker,
-                    std::unique_ptr<ProverOptim> prover);
+                    std::unique_ptr<Prover> prover);
 
    bool exploreImpl(Node &node, RealPoint &pt) override;
 

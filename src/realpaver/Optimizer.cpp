@@ -35,7 +35,7 @@
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ProspectorSimple.hpp"
-#include "realpaver/ProverOptim.hpp"
+#include "realpaver/Prover.hpp"
 #include "realpaver/SelectorLF.hpp"
 #include "realpaver/SelectorSF.hpp"
 #include "realpaver/SpaceOptimFD.hpp"
@@ -55,7 +55,6 @@ Optimizer::Optimizer(const Problem &pbm)
     , context_(nullptr)
     , env_(nullptr)
     , space_(nullptr)
-    , dag_(nullptr)
     , propagator_(nullptr)
     , factory_(nullptr)
     , prospector_(nullptr)
@@ -300,8 +299,17 @@ void Optimizer::makeProspector()
    SharedProblem newprob = pp_->destProblem();
    Scope scop = newprob->scope();
 
-   double tol = env_->getParams()->getDblParam("RELAXATION_EQ_TOL");
-   std::unique_ptr<ProverOptim> prover = std::make_unique<ProverOptim>(*newprob, tol);
+   std::unique_ptr<Prover> prover = std::make_unique<Prover>(factory_->extDag());
+   prover->setInitBox(IntervalBox(newprob->scope()));
+
+   int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
+   prover->setMaxIter(niter);
+
+   double delta = env_->getParams()->getDblParam("INFLATION_DELTA");
+   prover->setInflationDelta(delta);
+
+   double chi = env_->getParams()->getDblParam("INFLATION_CHI");
+   prover->setInflationChi(chi);
 
    std::string prospect = env_->getParams()->getStrParam("PROSPECTOR");
    if (prospect == "SIMPLE")
@@ -525,8 +533,6 @@ void Optimizer::branchAndBound()
    LOG_NL_LOW();
    LOG_LOW("Makes the factory in the optimizer");
    factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
-
-   dag_ = factory_->extDag()->dag();
 
    makeSpace();
 

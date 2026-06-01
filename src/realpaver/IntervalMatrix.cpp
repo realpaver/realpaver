@@ -18,6 +18,7 @@
  * @date   11 Apr 2024
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include <algorithm>
@@ -244,7 +245,6 @@ bool IntervalMatrix::selectMostSensitive(IndexList &columns)
 
          // set(j, i, Interval::zero()); (useless)
       }
-      print(std::cout);
    }
 
    return true;

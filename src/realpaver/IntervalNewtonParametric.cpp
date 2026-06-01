@@ -97,7 +97,6 @@ Proof IntervalNewtonParametric::certify(IntervalBox &B)
    do
    {
       ++nb_steps;
-
       IntervalBox prev(X);
 
       // inflation on the main scope

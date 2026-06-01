@@ -211,16 +211,7 @@ prover_test = executable(
   dependencies: deps_lib,
   include_directories: ['../src'],
 )
-test('Test of prover for satisfaction problems', prover_test)
-
-prover_optim_test = executable(
-  'prover_optim_test',
-  sources: 'prover_optim_test.cpp',
-  link_with: realpaver_lib,
-  dependencies: deps_lib,
-  include_directories: ['../src'],
-)
-test('Test of prover for optimization problems', prover_optim_test)
+test('Test of prover', prover_test)
 
 range_test = executable(
   'range_test',

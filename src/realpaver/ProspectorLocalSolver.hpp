@@ -37,7 +37,7 @@ class ProspectorLocalSolver : public Prospector {
 public:
    /// Constructor
    ProspectorLocalSolver(std::unique_ptr<DomainBoxPicker> picker,
-                         std::unique_ptr<ProverOptim> prover,
+                         std::unique_ptr<Prover> prover,
                          std::unique_ptr<NLPModel> localSolver);
 
    bool exploreImpl(Node &node, RealPoint &pt) override;

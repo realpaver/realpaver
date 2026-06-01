@@ -24,6 +24,7 @@
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/IntervalGaussSeidel.hpp"
+#include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
 

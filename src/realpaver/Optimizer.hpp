@@ -106,7 +106,6 @@ private:
    std::unique_ptr<NodeContext> context_;       // solving context for the BP algorithm
    std::shared_ptr<EnvOptimizer> env_;          // environment
    std::shared_ptr<SpaceOptim> space_;          // search tree
-   SharedDag dag_;                              // dag
    std::unique_ptr<NodePropagator> propagator_; // contraction method
    std::unique_ptr<Split> split_;               // splitting strategy
    std::unique_ptr<ContractorFactory> factory_; // contractor factory

@@ -22,8 +22,7 @@
 #define REALPAVER_PROVER_HPP
 
 #include "realpaver/DagExtended.hpp"
-#include "realpaver/IntervalNewton.hpp"
-#include "realpaver/IntervalNewtonUni.hpp"
+#include <memory>
 
 namespace realpaver {
 
@@ -55,6 +54,12 @@ public:
    /// Certification method
    Proof certify(IntervalBox &B);
 
+   /// Certification method
+   Proof certify(IntervalBox &B, const Bitset &active);
+
+   /// Assigns the initial box
+   void setInitBox(const IntervalBox &B);
+
    /// Sets a limit of iterations of the Newton operator
    void setMaxIter(size_t n);
 
@@ -74,10 +79,11 @@ public:
    void setInflationChi(const double &val);
 
 private:
-   SharedDagExtended edag_; // extended dag
-   double delta_;           // parameter delta of inflation
-   double chi_;             // parameter chi of inflation
-   size_t maxiter_;         // maximum number of iterations
+   SharedDagExtended edag_;               // extended dag
+   std::unique_ptr<IntervalBox> initBox_; // initial hull
+   double delta_;                         // parameter delta of inflation
+   double chi_;                           // parameter chi of inflation
+   size_t maxiter_;                       // maximum number of iterations
 };
 
 } // namespace realpaver
