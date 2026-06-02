@@ -18,6 +18,7 @@
  * @date   6 Oct 2025
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/DomainBox.hpp"
@@ -430,17 +431,26 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
 
          if (found)
          {
+            REALPAVER_DEBUG("\nfeasible found -> " << prospector_->feasibleBox());
+
             // evaluates the objective function at the feasible point
-            Interval e = obj_.eval(prospector_->feasiblePoint());
+            Interval e = obj_.eval(prospector_->feasibleBox());
             double up = e.right();
+
+            // TODO
+            // if (up < L_)
+            //    up = Double::inf();
+
             subnode->setUpper(up);
 
-            LOG_INTER("Feasible point found: " << prospector_->feasiblePoint());
+            REALPAVER_DEBUG("   e = " << e);
+
+            LOG_INTER("Feasible box found: " << prospector_->feasibleBox());
 
             // new upper bound ?
             if (up < U_)
             {
-               best_ = std::make_unique<RealPoint>(prospector_->feasiblePoint());
+               best_ = std::make_unique<RealPoint>(prospector_->feasibleBox().midpoint());
                space_->simplify(up);
                U_ = up;
                subnode->box()->get(z_)->contract(Interval(lo, up));

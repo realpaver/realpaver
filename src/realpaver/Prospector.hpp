@@ -31,8 +31,9 @@ namespace realpaver {
 /**
  * @brief Base class of prospectors.
  *
- * A prospector is used to find feasible points, defined by a real point that certainly
- * satisfies all the active constraints in a node.
+ * A prospector is used to find feasible points, which is implemented by explore.
+ * Since the equations can be processed by an inflating interval Newton operator
+ * an interval box is computed in case of success.
  */
 class Prospector {
 public:
@@ -56,8 +57,8 @@ public:
     */
    bool explore(Node &node, NodeContext &ctx);
 
-   /// Gets the feasible point after a successfull exploration
-   const RealPoint &feasiblePoint() const;
+   /// Gets the feasible box after a successfull exploration
+   const IntervalBox &feasibleBox() const;
 
    /**
     * @brief Exploration method called by explore, to be overriden in sub-classes.
@@ -68,7 +69,7 @@ public:
 
 private:
    std::unique_ptr<Prover> prover_;
-   RealPoint *pt_; // feasible point if found
+   IntervalBox *feasible_; // feasible box if found
 };
 
 } // namespace realpaver

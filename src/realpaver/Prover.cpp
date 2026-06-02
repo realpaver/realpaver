@@ -13,7 +13,7 @@
 
 /**
  * @file   Prover.cpp
- * @brief  Prover based on interval Newton
+ * @brief  Certification method
  * @author Laurent Granvilliers
  * @date   11 Apr 2024
  */
@@ -145,9 +145,7 @@ Proof Prover::certify(IntervalBox &B, const Bitset &active)
       Interval img = f.getImage();
 
       if (!img.contains(e))
-      {
          return Proof::Maybe;
-      }
    }
 
    // checks the constraints not in the DAG
@@ -206,6 +204,22 @@ void Prover::setMaxIter(size_t n)
 size_t Prover::getMaxIter() const
 {
    return maxiter_;
+}
+
+bool Prover::checkSatisfaction(const IntervalBox &B) const
+{
+   for (size_t i = 0; i < edag_->size(); ++i)
+   {
+      Constraint c = edag_->fun(i)->ctr();
+
+      if (c.status() != ConstraintStatus::Initial)
+         continue;
+
+      double v = c.violation(B);
+      if (v > 0.0)
+         return false;
+   }
+   return true;
 }
 
 } // namespace realpaver

@@ -13,7 +13,7 @@
 
 /**
  * @file   Prover.hpp
- * @brief  Prover based on interval Newton
+ * @brief  Certification method
  * @author Laurent Granvilliers
  * @date   11 Apr 2024
  */
@@ -27,15 +27,14 @@
 namespace realpaver {
 
 /**
- * @brief Prover based on interval Newton.
+ * @brief Certification method.
  *
- * It implements an epsilon-inflation algorithm based on an interval Newton
- * operator applied to square system of equations.
+ * A prover is used to certify an interval box with respect to a constraint
+ * system, i.e. a set of equations, inequality constraints, and other constraints, e.g.
+ * table constraints.
  *
- * The epsilon-inflation algorithm has two parameters, delta and chi.
- *
- * @see Inflator
- * @see IntervalNewton
+ * The equations are processed first by an inflating interval Newton operator (parametric
+ * or not). The inequality constraints are checked by interval evaluation.
  */
 class Prover {
 public:
@@ -84,6 +83,8 @@ private:
    double delta_;                         // parameter delta of inflation
    double chi_;                           // parameter chi of inflation
    size_t maxiter_;                       // maximum number of iterations
+
+   bool checkSatisfaction(const IntervalBox &B) const;
 };
 
 } // namespace realpaver
