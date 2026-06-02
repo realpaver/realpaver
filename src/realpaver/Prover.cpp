@@ -58,20 +58,6 @@ Proof Prover::certify(IntervalBox &B, const Bitset &active)
    if (active.size() > 0 && active.areAllZeros())
       return Proof::Inner;
 
-   // checks the constraints not in the DAG
-   for (size_t i = 0; i < edag_->nbOutsideCtrs(); ++i)
-   {
-      ConstraintProver prover(B);
-      Constraint c = edag_->outsideCtr(i);
-
-      if (active.size() > 0 && active.get(c.id()))
-      {
-         c.acceptVisitor(prover);
-         if (!prover.isFeasible())
-            return Proof::Maybe;
-      }
-   }
-
    // checks the constraints in the DAG
    IntervalFunctionVector Fe; // vector of equations
    IntervalFunctionVector Fi; // vector of inequalities
@@ -161,6 +147,20 @@ Proof Prover::certify(IntervalBox &B, const Bitset &active)
       if (!img.contains(e))
       {
          return Proof::Maybe;
+      }
+   }
+
+   // checks the constraints not in the DAG
+   for (size_t i = 0; i < edag_->nbOutsideCtrs(); ++i)
+   {
+      ConstraintProver prover(B);
+      Constraint c = edag_->outsideCtr(i);
+
+      if (active.size() > 0 && active.get(c.id()))
+      {
+         c.acceptVisitor(prover);
+         if (!prover.isFeasible())
+            return Proof::Maybe;
       }
    }
 
