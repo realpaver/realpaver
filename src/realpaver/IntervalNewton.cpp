@@ -41,7 +41,7 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
     , chi_(Params::GetDblParam("INFLATION_CHI"))
     , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
-   THROW_IF(F.nbVars() < 2 && F.nbVars() != F.nbFuns(),
+   THROW_IF(F.nbVars() < 2 || F.nbVars() != F.nbFuns(),
             "Interval Newton defined with a non-square system");
 
    gs_ = std::make_unique<IntervalGaussSeidel>();

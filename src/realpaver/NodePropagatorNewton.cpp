@@ -25,7 +25,7 @@ namespace realpaver {
 NodePropagatorNewton::NodePropagatorNewton(ContractorFactory &facto)
     : NodePropagator()
 {
-   nwt_ = facto.makeNewton();
+   nwt_ = facto.makeSquareNewton();
 }
 
 Proof NodePropagatorNewton::contractImpl(IntervalBox &B, const Bitset &active)

@@ -143,7 +143,7 @@ SharedContractorAffine ContractorFactory::makeAffine()
    return makeAffine(tol);
 }
 
-std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
+std::shared_ptr<IntervalNewton> ContractorFactory::makeSquareNewton()
 {
    IntervalFunctionVector F;
    for (size_t i = 0; i < edag_->size(); ++i)

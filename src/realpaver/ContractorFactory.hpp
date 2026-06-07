@@ -116,7 +116,7 @@ public:
     * there are at least two equations and the system is square, nullptr
     * otherwise.
     */
-   std::shared_ptr<IntervalNewton> makeNewton();
+   std::shared_ptr<IntervalNewton> makeSquareNewton();
 
    /**
     * @brief Returns a domain contractor.
