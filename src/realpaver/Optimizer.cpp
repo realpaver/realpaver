@@ -431,20 +431,10 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
 
          if (found)
          {
-            REALPAVER_DEBUG("\nfeasible found -> " << prospector_->feasibleBox());
-
             // evaluates the objective function at the feasible point
             Interval e = obj_.eval(prospector_->feasibleBox());
             double up = e.right();
-
-            // TODO
-            // if (up < L_)
-            //    up = Double::inf();
-
             subnode->setUpper(up);
-
-            REALPAVER_DEBUG("   e = " << e);
-
             LOG_INTER("Feasible box found: " << prospector_->feasibleBox());
 
             // new upper bound ?
