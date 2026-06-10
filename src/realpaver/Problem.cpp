@@ -318,7 +318,8 @@ void Problem::addObjective(Objective obj)
 
    // assigns the domain of the objective variable
    IntervalBox box(this->scope());
-   obj_.getVar().setDomain(std::make_unique<IntervalDomain>(obj_.getTerm().eval(box)));
+   Interval x = obj_.getTerm().eval(box);
+   obj_.getVar().getDomain()->contractInterval(x);
 }
 
 bool Problem::hasObjectiveConstraint() const
