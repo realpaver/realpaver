@@ -81,7 +81,7 @@ public:
     * H[i, j] is the partial derivative dfi / dxj. H must have nbFuns() rows
     * and nbVars() columns.
     */
-   virtual void diffHansen(const IntervalBox &B, const RealPoint &c,
+   virtual void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
                            IntervalMatrix &H) = 0;
 };
 
@@ -182,7 +182,10 @@ public:
     * H[i, j] is the partial derivative dfi / dxj. H must have nbFuns() rows
     * and nbVars() columns.
     */
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H);
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, IntervalMatrix &H);
+
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H);
 
    /// Type of the representation of interval functions vectors
    using SharedRep = std::shared_ptr<IntervalFunctionVectorRep>;
@@ -226,7 +229,8 @@ public:
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox &B, IntervalVector &val) override;
    void diff(const IntervalBox &B, IntervalMatrix &J) override;
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H) override;
 
 private:
    std::vector<IntervalFunction> vf_;
@@ -272,7 +276,8 @@ public:
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox &B, IntervalVector &val) override;
    void diff(const IntervalBox &B, IntervalMatrix &J) override;
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H) override;
 
 private:
    SharedDag dag_;
@@ -303,7 +308,8 @@ public:
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox &B, IntervalVector &val) override;
    void diff(const IntervalBox &B, IntervalMatrix &J) override;
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H) override;
 
 private:
    SharedDagExtended edag_;

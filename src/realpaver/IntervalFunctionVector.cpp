@@ -161,12 +161,20 @@ void IntervalFunctionVector::diff(const IntervalBox &B, IntervalMatrix &J)
    rep_->diff(B, J);
 }
 
-void IntervalFunctionVector::diffHansen(const IntervalBox &B, const RealPoint &c,
+void IntervalFunctionVector::diffHansen(const IntervalBox &B, const IntervalBox &c,
                                         IntervalMatrix &H)
 {
    REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->diffHansen(B, c, H);
+   rep_->diffHansen(B, c, scope(), H);
+}
+
+void IntervalFunctionVector::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                        const Scope &scop, IntervalMatrix &H)
+{
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+
+   rep_->diffHansen(B, c, scop, H);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -255,10 +263,10 @@ void IntervalFunctionVectorDag::diff(const IntervalBox &B, IntervalMatrix &J)
    dag_->iDiff(B, J);
 }
 
-void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, const RealPoint &c,
-                                           IntervalMatrix &H)
+void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                           const Scope &scop, IntervalMatrix &H)
 {
-   dag_->iDiffHansen(B, c, H);
+   dag_->iDiffHansen(B, c, scop, H);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -343,10 +351,12 @@ void IntervalFunctionVectorList::diff(const IntervalBox &B, IntervalMatrix &J)
    }
 }
 
-void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoint &c,
-                                            IntervalMatrix &H)
+void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                            const Scope &scop, IntervalMatrix &H)
 {
-   REALPAVER_ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
+   REALPAVER_ASSERT(scope().contains(scop), "Bad scope");
+
+   REALPAVER_ASSERT(scop.size() == H.ncols() && nbFuns() == H.nrows(),
                     "Bad dimensions of a Jacobian matrix used in a function vector");
 
    for (size_t i = 0; i < nbFuns(); ++i)
@@ -358,7 +368,7 @@ void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoin
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (auto v : scop)
       {
          if (f.scope().contains(v))
             H.set(i, j, G.get(f.scope().index(v)));
@@ -422,10 +432,10 @@ void IntervalFunctionVectorExtDag::diff(const IntervalBox &B, IntervalMatrix &J)
    return vl_->diff(B, J);
 }
 
-void IntervalFunctionVectorExtDag::diffHansen(const IntervalBox &B, const RealPoint &c,
-                                              IntervalMatrix &H)
+void IntervalFunctionVectorExtDag::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                              const Scope &scop, IntervalMatrix &H)
 {
-   return vl_->diffHansen(B, c, H);
+   return vl_->diffHansen(B, c, scop, H);
 }
 
 } // namespace realpaver

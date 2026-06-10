@@ -410,7 +410,6 @@ void Solver::branchAndPrune()
    LOG_NL_LOW();
    LOG_LOW("Makes the factory in the solver");
    factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
-   dag_ = factory_->extDag()->dag();
 
    makeSpace();
 
@@ -420,6 +419,7 @@ void Solver::branchAndPrune()
 
    // prover that derives proof certificates of the solutions
    prover_ = std::make_unique<Prover>(factory_->extDag());
+   prover_->setInitBox(IntervalBox(newprob->scope()));
 
    int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
    prover_->setMaxIter(niter);

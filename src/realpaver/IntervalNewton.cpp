@@ -41,7 +41,7 @@ IntervalNewton::IntervalNewton(IntervalFunctionVector F)
     , chi_(Params::GetDblParam("INFLATION_CHI"))
     , cmaxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
 {
-   THROW_IF(F.nbVars() < 2 && F.nbVars() != F.nbFuns(),
+   THROW_IF(F.nbVars() < 2 || F.nbVars() != F.nbFuns(),
             "Interval Newton defined with a non-square system");
 
    gs_ = std::make_unique<IntervalGaussSeidel>();
@@ -249,7 +249,7 @@ Proof IntervalNewton::certify(IntervalBox &box)
    size_t nb_steps = 0;
 
    IntervalBox X(scope());
-   X.setOnScope(box, scope());
+   X.setMidpointOnScope(box, scope());
 
    // given X(k-2), X(k-1), Xk three boxes from the sequence calculated
    // by this method, dprev is the distance between X(k-2) and X(k-1), dcurr
@@ -267,19 +267,7 @@ Proof IntervalNewton::certify(IntervalBox &box)
 
       // inflation
       X.inflate(delta_, chi_);
-
       LOG_LOW("Inflated box -> " << X);
-
-      // evaluates the function on X
-      F_.eval(X, val_);
-
-      if (!val_.containsZero())
-      {
-         proof = Proof::Empty;
-         iter = false;
-         LOG_INTER("Stops on the evaluation test -> 0 not in F(X)");
-         continue;
-      }
 
       makeC(X); // c := midpoint of X
       F_.eval(c_, val_);
@@ -297,15 +285,7 @@ Proof IntervalNewton::certify(IntervalBox &box)
       // calculates the Hansen's matrix
       F_.diffHansen(X, c_, jac_);
 
-      Proof certif = gs_->contractPrecond(jac_, y_, b_);
-
-      if (certif == Proof::Empty)
-      {
-         proof = Proof::Empty;
-         iter = false;
-         LOG_INTER("Stops on Gauss-Seidel -> empty");
-         continue;
-      }
+      Proof certif = gs_->certifyPrecond(jac_, y_, b_);
 
       // X := y + c
       certif = certifyX(X);
@@ -325,7 +305,7 @@ Proof IntervalNewton::certify(IntervalBox &box)
       else if (nb_steps > cmaxiter_)
       {
          iter = false;
-         LOG_INTER("Stops on a maximum number of iterations: " << maxiter_);
+         LOG_INTER("Stops on a maximum number of iterations: " << cmaxiter_);
       }
 
       LOG_LOW("Inner step of interval Newton certification  -> " << X);

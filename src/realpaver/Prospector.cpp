@@ -18,42 +18,45 @@
  * @date   13 Oct 2025
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Prospector.hpp"
 
 namespace realpaver {
 
-Prospector::Prospector(std::unique_ptr<ProverOptim> prover)
+Prospector::Prospector(std::unique_ptr<Prover> prover)
     : prover_(std::move(prover))
-    , pt_(nullptr)
+    , feasible_(nullptr)
 {
    REALPAVER_ASSERT(prover_ != nullptr, "No prover is given as input");
 }
 
 Prospector::~Prospector()
 {
-   if (pt_ != nullptr)
-      delete pt_;
+   if (feasible_ != nullptr)
+      delete feasible_;
 }
 
 bool Prospector::explore(Node &node, NodeContext &ctx)
 {
-   if (pt_ != nullptr)
-      delete pt_;
-   pt_ = new RealPoint(node.scope());
-
-   bool res = exploreImpl(node, *pt_);
+   RealPoint pt(node.scope());
+   bool res = exploreImpl(node, pt);
    if (res)
    {
-      IntervalBox P(*pt_);
-      res = prover_->certify(P, node.active());
+      if (feasible_ != nullptr)
+         delete feasible_;
+      feasible_ = new IntervalBox(pt);
+
+      Proof proof = prover_->certify(*feasible_, node.active());
+      res = (proof == Proof::Feasible || proof == Proof::Inner);
    }
    return res;
 }
 
-const RealPoint &Prospector::feasiblePoint() const
+const IntervalBox &Prospector::feasibleBox() const
 {
-   return *pt_;
+   REALPAVER_ASSERT(feasible_ != nullptr, "No feasible point found");
+   return *feasible_;
 }
 
 } // namespace realpaver

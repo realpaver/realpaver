@@ -23,8 +23,8 @@
 
 namespace realpaver {
 
-ProspectorSimple::ProspectorSimple(std::unique_ptr<BoxPicker> picker,
-                                   std::unique_ptr<ProverOptim> prover)
+ProspectorSimple::ProspectorSimple(std::unique_ptr<DomainBoxPicker> picker,
+                                   std::unique_ptr<Prover> prover)
     : Prospector(std::move(prover))
 {
    REALPAVER_ASSERT(picker != nullptr, "No picker is given as input");

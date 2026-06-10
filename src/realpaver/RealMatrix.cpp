@@ -210,8 +210,8 @@ RealMatrix RealMatrix::transpose() const
 bool RealMatrix::inverse(RealMatrix &P)
 {
    REALPAVER_ASSERT(isSquare(), "Inversion of a non-square matrix");
-   REALPAVER_ASSERT(nrows() == P.nrows(), "Bad dimension opf an inverse matrix");
-   REALPAVER_ASSERT(ncols() == P.ncols(), "Bad dimension opf an inverse matrix");
+   REALPAVER_ASSERT(nrows() == P.nrows(), "Bad dimension of an inverse matrix");
+   REALPAVER_ASSERT(ncols() == P.ncols(), "Bad dimension of an inverse matrix");
 
    P.setIdentity();
 

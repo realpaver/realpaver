@@ -131,6 +131,15 @@ domain_picker_test = executable(
 )
 test('Test of domain pickers', domain_picker_test)
 
+flat_function_test = executable(
+  'flat_function_test',
+  sources: 'flat_function_test.cpp',
+  link_with: realpaver_lib,
+  dependencies: deps_lib,
+  include_directories: ['../src'],
+)
+test('Test of flat function', flat_function_test)
+
 integer_test = executable(
   'integer_test',
   sources: 'integer_test.cpp',
@@ -149,14 +158,15 @@ interval_test = executable(
 )
 test('Test of interval', interval_test)
 
-flat_function_test = executable(
-  'flat_function_test',
-  sources: 'flat_function_test.cpp',
+
+interval_newton_test = executable(
+  'interval_newton_test',
+  sources: 'interval_newton_test.cpp',
   link_with: realpaver_lib,
   dependencies: deps_lib,
   include_directories: ['../src'],
 )
-test('Test of flat function', flat_function_test)
+test('Test of interval newton', interval_newton_test)
 
 linearizer_test = executable(
   'linearizer_test',
@@ -194,14 +204,14 @@ preprocessor_test = executable(
 )
 test('Test of preprocessor', preprocessor_test)
 
-prover_optim_test = executable(
-  'prover_optim_test',
-  sources: 'prover_optim_test.cpp',
+prover_test = executable(
+  'prover_test',
+  sources: 'prover_test.cpp',
   link_with: realpaver_lib,
   dependencies: deps_lib,
   include_directories: ['../src'],
 )
-test('Test of prover for optimization problems', prover_optim_test)
+test('Test of prover', prover_test)
 
 range_test = executable(
   'range_test',

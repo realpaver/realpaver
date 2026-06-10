@@ -232,10 +232,10 @@ public:
    SharedDagFun getActiveFun(size_t i, const IntervalBox &B, const Bitset &active);
 
    /// Returns the number of constraints that have not been inserted
-   size_t nbBadCtrs() const;
+   size_t nbOutsideCtrs() const;
 
    /// Returns the i-th constraints that has not been inserted
-   Constraint badCtr(size_t i) const;
+   Constraint outsideCtr(size_t i) const;
 
 private:
    SharedDag dag_;                                // DAG
