@@ -936,7 +936,18 @@ public:
     *
     * The point c must belong to B on the scope of this.
     */
-   void iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G);
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, IntervalVector &G);
+
+   /**
+    * @brief Interval differentiation method using Hansen's strategy.
+    *
+    * Calculates the gradient of this on B (reverse mode) on a sub-scope. G[i] is the
+    * partial derivative of this with respect to the i-th variable of the input scope.
+    *
+    * The box c must belong to B on the scope of this.
+    */
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                    IntervalVector &G);
 
    /// Returns the real evaluation of this at pt
    double rEval(const RealPoint &pt);
@@ -1111,7 +1122,18 @@ public:
     *
     * The point c must belong to B.
     */
-   void iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H);
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, IntervalMatrix &H);
+
+   /**
+    * @brief Calculates the Hansen matrix of this on B on a sub-scope.
+    *
+    * H[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the input scope.
+    *
+    * The box c must belong to B.
+    */
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                    IntervalMatrix &H);
 
    /**
     * @brief Real evaluation of the functions at pt.

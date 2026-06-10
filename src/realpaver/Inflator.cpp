@@ -46,6 +46,12 @@ void Inflator::inflate(IntervalVector &X) const
       X.set(i, X[i].inflate(delta_, chi_));
 }
 
+void Inflator::inflateOnScope(IntervalBox &B, const Scope &scop) const
+{
+   for (const Variable &v : scop)
+      B.set(v, B.get(v).inflate(delta_, chi_));
+}
+
 double Inflator::getDelta() const
 {
    return delta_;

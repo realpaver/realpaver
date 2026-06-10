@@ -12,43 +12,31 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   BoxPicker.hpp
- * @brief  Base class of pickers
+ * @file   IntervalBoxPicker.hpp
+ * @brief  Base class of pickers on interval boxes
  * @author Laurent Granvilliers
- * @date   14 Oct 2025
+ * @date   13 May 2026
  */
 
-#ifndef REALPAVER_BOX_PICKER_HPP
-#define REALPAVER_BOX_PICKER_HPP
-
-#include "realpaver/DomainBox.hpp"
-#include "realpaver/RealPoint.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalBoxPicker.hpp"
 
 namespace realpaver {
 
-/// A picker chooses a point in a box.
-class BoxPicker {
-public:
-   /// Default constructor
-   BoxPicker() = default;
+void IntervalBoxPicker::apply(const IntervalBox &B, RealPoint &pt)
+{
+   applyOnScope(B, pt, pt.scope());
+}
 
-   /// Virtual destructor
-   virtual ~BoxPicker();
+void IntervalBoxPicker::applyOnScope(const IntervalBox &B, RealPoint &pt,
+                                     const Scope &scop)
+{
+   REALPAVER_ASSERT(pt.scope().contains(scop), "Bad scopes");
+   REALPAVER_ASSERT(B.scope().contains(scop), "Bad scopes");
+   REALPAVER_ASSERT(!B.isEmpty(), "Empty box");
 
-   // Default copy constructor
-   BoxPicker(const BoxPicker &) = default;
-
-   /// No assignment
-   BoxPicker &operator=(const BoxPicker &) = delete;
-
-   /**
-    * @brief Selection method.
-    *
-    * It selects the point pt within the box, both having the same scope.
-    */
-   virtual void apply(const DomainBox &box, RealPoint &pt);
-};
+   for (const auto &v : scop)
+      pt.set(v, B.get(v).midpoint());
+}
 
 } // namespace realpaver
-
-#endif

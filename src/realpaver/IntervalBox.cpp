@@ -74,7 +74,7 @@ IntervalBox::IntervalBox(Scope scop, const RealVector &X)
    REALPAVER_ASSERT(scop.size() == X.size(), "Bad initialization of an interval box");
 }
 
-IntervalBox::IntervalBox(const IntervalBox &B, Scope scop)
+IntervalBox::IntervalBox(Scope scop, const IntervalBox &B)
     : IntervalVector(scop.size())
     , scop_(scop)
 {
@@ -198,6 +198,12 @@ void IntervalBox::setOnScope(const IntervalBox &B, const Scope &scop)
 {
    for (const auto &v : scop)
       set(v, B.get(v));
+}
+
+void IntervalBox::setMidpointOnScope(const IntervalBox &B, const Scope &scop)
+{
+   for (const auto &v : scop)
+      set(v, B.get(v).midpoint());
 }
 
 RealPoint IntervalBox::midpointOnScope(const Scope &scop) const

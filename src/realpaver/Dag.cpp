@@ -1202,17 +1202,26 @@ void DagFun::iDiff(const IntervalBox &B, IntervalVector &G)
    flat_->iDiff(B, G);
 }
 
-void DagFun::iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G)
+void DagFun::iDiffHansen(const IntervalBox &B, const IntervalBox &c, IntervalVector &G)
 {
+   return iDiffHansen(B, c, scop_, G);
+}
+
+void DagFun::iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                         IntervalVector &G)
+{
+   REALPAVER_ASSERT(scop_.contains(scop), "Bad scope");
+   REALPAVER_ASSERT(scop_.size() == G.size(), "Bad vector");
+
    IntervalBox X(scop_, c);
-   IntervalVector V(G.size());
+   IntervalVector V(nbVars());
 
    size_t i = 0;
-   for (const auto &v : scop_)
+   for (const auto &v : scop)
    {
       X.set(v, B.get(v));
       flat_->iDiff(X, V);
-      G[i] = V[i];
+      G[i] = V[scop_.index(v)];
       ++i;
    }
 }
@@ -1557,18 +1566,23 @@ void Dag::iDiff(const IntervalBox &B, IntervalMatrix &J)
    }
 }
 
-void Dag::iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H)
+void Dag::iDiffHansen(const IntervalBox &B, const IntervalBox &c, IntervalMatrix &H)
 {
-   REALPAVER_ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
-                    "Bad dimensions of a Hansen matrix used in a DAG");
+   return iDiffHansen(B, c, scop_, H);
+}
 
-   REALPAVER_ASSERT(nbVars() == nbFuns(),
-                    "Hansen's derivatives can be computed only for square systems");
+void Dag::iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                      IntervalMatrix &H)
+{
+   REALPAVER_ASSERT(scop_.contains(scop), "Bad scope");
+
+   REALPAVER_ASSERT(scop.size() == H.ncols() && nbFuns() == H.nrows(),
+                    "Bad dimensions of a Hansen matrix used in a DAG");
 
    IntervalBox X(scop_, c);
 
    size_t j = 0;
-   for (const auto &v : scope())
+   for (const auto &v : scop)
    {
       // assigns the domain of v
       X.set(v, B.get(v));

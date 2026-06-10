@@ -18,10 +18,11 @@
  * @date   6 Oct 2025
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/BoxPicker.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/DomainBox.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/SelectorLF.hpp"
@@ -35,7 +36,7 @@
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ProspectorSimple.hpp"
-#include "realpaver/ProverOptim.hpp"
+#include "realpaver/Prover.hpp"
 #include "realpaver/SelectorLF.hpp"
 #include "realpaver/SelectorSF.hpp"
 #include "realpaver/SpaceOptimFD.hpp"
@@ -55,7 +56,6 @@ Optimizer::Optimizer(const Problem &pbm)
     , context_(nullptr)
     , env_(nullptr)
     , space_(nullptr)
-    , dag_(nullptr)
     , propagator_(nullptr)
     , factory_(nullptr)
     , prospector_(nullptr)
@@ -300,13 +300,22 @@ void Optimizer::makeProspector()
    SharedProblem newprob = pp_->destProblem();
    Scope scop = newprob->scope();
 
-   double tol = env_->getParams()->getDblParam("RELAXATION_EQ_TOL");
-   std::unique_ptr<ProverOptim> prover = std::make_unique<ProverOptim>(*newprob, tol);
+   std::unique_ptr<Prover> prover = std::make_unique<Prover>(factory_->extDag());
+   prover->setInitBox(IntervalBox(newprob->scope()));
+
+   int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
+   prover->setMaxIter(niter);
+
+   double delta = env_->getParams()->getDblParam("INFLATION_DELTA");
+   prover->setInflationDelta(delta);
+
+   double chi = env_->getParams()->getDblParam("INFLATION_CHI");
+   prover->setInflationChi(chi);
 
    std::string prospect = env_->getParams()->getStrParam("PROSPECTOR");
    if (prospect == "SIMPLE")
    {
-      std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
+      std::unique_ptr<DomainBoxPicker> picker = std::make_unique<DomainBoxPicker>();
       prospector_ =
           std::make_unique<ProspectorSimple>(std::move(picker), std::move(prover));
    }
@@ -320,7 +329,7 @@ void Optimizer::makeProspector()
       Tolerance tolNlp(env_->getParams()->getDblParam("NLP_SOLVER_OBJ_REL_TOL"),
                        env_->getParams()->getDblParam("NLP_SOLVER_OBJ_ABS_TOL"));
       localSolver->setTol(tolNlp);
-      std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
+      std::unique_ptr<DomainBoxPicker> picker = std::make_unique<DomainBoxPicker>();
       prospector_ = std::make_unique<ProspectorLocalSolver>(
           std::move(picker), std::move(prover), std::move(localSolver));
 #endif
@@ -422,17 +431,26 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
 
          if (found)
          {
+            REALPAVER_DEBUG("\nfeasible found -> " << prospector_->feasibleBox());
+
             // evaluates the objective function at the feasible point
-            Interval e = obj_.eval(prospector_->feasiblePoint());
+            Interval e = obj_.eval(prospector_->feasibleBox());
             double up = e.right();
+
+            // TODO
+            // if (up < L_)
+            //    up = Double::inf();
+
             subnode->setUpper(up);
 
-            LOG_INTER("Feasible point found: " << prospector_->feasiblePoint());
+            REALPAVER_DEBUG("   e = " << e);
+
+            LOG_INTER("Feasible box found: " << prospector_->feasibleBox());
 
             // new upper bound ?
             if (up < U_)
             {
-               best_ = std::make_unique<RealPoint>(prospector_->feasiblePoint());
+               best_ = std::make_unique<RealPoint>(prospector_->feasibleBox().midpoint());
                space_->simplify(up);
                U_ = up;
                subnode->box()->get(z_)->contract(Interval(lo, up));
@@ -525,8 +543,6 @@ void Optimizer::branchAndBound()
    LOG_NL_LOW();
    LOG_LOW("Makes the factory in the optimizer");
    factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
-
-   dag_ = factory_->extDag()->dag();
 
    makeSpace();
 

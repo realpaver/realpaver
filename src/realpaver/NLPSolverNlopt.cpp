@@ -141,7 +141,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    size_t n = this->scope().size();
 
    // projects B and src on the scope of this
-   IntervalBox X(box, this->scope());
+   IntervalBox X(this->scope(), box);
    RealPoint P(src, this->scope());
 
    LOG_LOW("Nlopt optimize at point: " << P);

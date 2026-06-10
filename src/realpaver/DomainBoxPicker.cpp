@@ -12,27 +12,27 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   BoxPicker.cpp
- * @brief  Base class of pickers
+ * @file   DomainBoxPicker.cpp
+ * @brief  Base class of pickers on domain boxes
  * @author Laurent Granvilliers
  * @date   14 Oct 2025
  */
 
-#include "realpaver/BoxPicker.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/DomainPicker.hpp"
 
 namespace realpaver {
 
-BoxPicker::~BoxPicker()
+DomainBoxPicker::~DomainBoxPicker()
 {
 }
 
-void BoxPicker::apply(const DomainBox &box, RealPoint &pt)
+void DomainBoxPicker::apply(const DomainBox &box, RealPoint &pt)
 {
-   REALPAVER_ASSERT(box.scope() == pt.scope(), "The scopes are different");
+   REALPAVER_ASSERT(pt.scope().contains(pt.scope()), "Bad scopes");
    REALPAVER_ASSERT(!box.isEmpty(), "Empty box");
 
-   for (const auto &v : box.scope())
+   for (const auto &v : pt.scope())
    {
       Domain *dom = box.get(v);
       DomainPicker vis;
