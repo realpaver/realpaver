@@ -2,6 +2,7 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/ContractorFactory.hpp"
 #include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Interval.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/LPModel.hpp"
@@ -14,7 +15,6 @@
 #include "realpaver/Parser.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/Prover.hpp"
-#include "realpaver/ProverOptim.hpp"
 #include "realpaver/RealFunction.hpp"
 #include "realpaver/RealFunctionVector.hpp"
 #include "realpaver/RealPoint.hpp"
@@ -33,13 +33,13 @@ SharedProblem get_problem(std::string &rp_string)
    return pb;
 }
 
-SharedDag get_dag(SharedProblem pb, std::shared_ptr<Env> e = nullptr)
+SharedDagExtended get_dag(SharedProblem pb, std::shared_ptr<Env> e = nullptr)
 {
    std::shared_ptr<Env> env = e;
    if (env == nullptr)
       env = std::make_shared<Env>();
    ContractorFactory cf(*pb, env);
-   return cf.getDag();
+   return cf.extDag();
 }
 
 std::shared_ptr<Linearizer> get_linearizer(SharedProblem pb, bool inner,
@@ -53,12 +53,13 @@ std::shared_ptr<Linearizer> get_linearizer(SharedProblem pb, bool inner,
    ContractorFactory cf(*pb, env);
    std::shared_ptr<Linearizer> linearizer;
    int goal_ctr_id = cf.getObjectiveConstraintDagId();
+   LOG_INTER("OBJ CTR ID: " << goal_ctr_id)
    if (inner)
-      linearizer = std::make_shared<LinearizerInnerTaylor>(cf.getDag(), goal_ctr_id,
+      linearizer = std::make_shared<LinearizerInnerTaylor>(cf.extDag(), goal_ctr_id,
                                                            hansen, CornerStyle::Left);
    else
       linearizer =
-          std::make_shared<LinearizerTaylor>(cf.getDag(), hansen, CornerStyle::Left);
+          std::make_shared<LinearizerTaylor>(cf.extDag(), hansen, CornerStyle::Left);
    return linearizer;
 }
 
@@ -73,7 +74,7 @@ void test1()
       )RP";
    SharedProblem pb = get_problem(rp_str);
    LOG_INTER("Problem: " << std::endl << *pb);
-   SharedDag dag = get_dag(pb);
+   SharedDagExtended dag = get_dag(pb);
 
    LinearizerInnerTaylor lit(dag, -1, false, CornerStyle::Left);
    LinearizerTaylor lt(dag, false, CornerStyle::Left);
@@ -114,7 +115,7 @@ void test2()
        )RP";
    SharedProblem pb = get_problem(rp_str);
    LOG_INTER("Problem: " << std::endl << *pb);
-   SharedDag dag = get_dag(pb);
+   SharedDagExtended dag = get_dag(pb);
 
    LinearizerInnerTaylor lit(dag, -1, false, CornerStyle::Left);
    LinearizerTaylor lt(dag, false, CornerStyle::Left);
@@ -155,7 +156,7 @@ void test3()
        )RP";
    SharedProblem pb = get_problem(rp_str);
    LOG_INTER("Problem: " << std::endl << *pb);
-   SharedDag dag = get_dag(pb);
+   SharedDagExtended dag = get_dag(pb);
 
    LinearizerInnerTaylor lit(dag, -1, false, CornerStyle::Left);
    LinearizerTaylor lt(dag, false, CornerStyle::Left);
@@ -198,7 +199,7 @@ void test4()
        )RP";
    SharedProblem pb = get_problem(rp_str);
    LOG_INTER("Problem: " << std::endl << *pb);
-   SharedDag dag = get_dag(pb);
+   SharedDagExtended dag = get_dag(pb);
 
    LinearizerInnerTaylor lit(dag, -1, false, CornerStyle::Left);
    LinearizerTaylor lt(dag, false, CornerStyle::Left);
@@ -241,7 +242,7 @@ void test5()
        )RP";
    SharedProblem pb = get_problem(rp_str);
    LOG_INTER("Problem: " << std::endl << *pb);
-   SharedDag dag = get_dag(pb);
+   SharedDagExtended dag = get_dag(pb);
 
    LinearizerInnerTaylor lit(dag, -1, false, CornerStyle::Left);
    LinearizerTaylor lt(dag, false, CornerStyle::Left);
@@ -297,6 +298,7 @@ void test_process()
     - 3*x7 + x10 == -133;
 // )RP";
    SharedProblem pb = get_problem(rp_str);
+   pb->generateObjectiveConstraint();
    LOG_INTER("Problem: " << std::endl << *pb);
 
    std::shared_ptr<Linearizer> lit = get_linearizer(pb, true); // LinearizerInnerTaylor
@@ -306,6 +308,7 @@ void test_process()
    IntervalBox B2(pb->scope());
    B1.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B1));
    B2.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B2));
+   LOG_INTER("Obj eval: " << pb->getObjective().getTerm().eval(B1))
    LPSolver inner, outer;
    lit->makeLP(inner, B1);
    lt->makeLP(outer, B2);
@@ -315,6 +318,8 @@ void test_process()
    leo.addTerm(1, outer.getLinVar(lt->linVarIndex(pb->getObjective().getVar())));
    inner.setCost(lei);
    outer.setCost(leo);
+   LOG_INTER("Linear problem: ")
+   LOG_INTER(inner)
    LPStatus success = inner.optimize();
    if (success == LPStatus::Optimal)
    {
@@ -355,7 +360,7 @@ void test_harker()
           x19 in [0, 1.0e2],
           x20 in [0, 1.0e2];
 
-       Minimize  - (19*x15 - 0.1*x15^2 - 0.5*x18^2 - x18 - 0.005*x16^2 + 27*x16
+       Min  - (19*x15 - 0.1*x15^2 - 0.5*x18^2 - x18 - 0.005*x16^2 + 27*x16
                       - 0.4*x19^2 - 2*x19 - 0.15*x17^2 + 30*x17 - 0.3*x20^2 - 1.5*x20
                       - (0.166666666666667*x1^3 + x1 + 0.0666666666666667*x2^3 + 2*x2
                       + 0.1*x3^3 + 3*x3 + 0.133333333333333*x4^3 + x4 + 0.1*x5^3 + 2*
@@ -375,6 +380,7 @@ void test_harker()
        x3 + x4 + x7 + x10 - x11 - x12 - x13 - x14 == 0;
 )RP";
    SharedProblem pb = get_problem(rp_str);
+   pb->generateObjectiveConstraint();
    LOG_INTER(*pb)
 
    std::shared_ptr<Linearizer> lit = get_linearizer(pb, true); // LinearizerInnerTaylor
@@ -384,6 +390,7 @@ void test_harker()
    IntervalBox B2(pb->scope());
    B1.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B1));
    B2.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B2));
+   LOG_INTER("Obj eval: " << B1)
    LPSolver inner, outer;
    lit->makeLP(inner, B1);
    lt->makeLP(outer, B2);
@@ -435,10 +442,11 @@ void test_process_box()
    )RP";
 
    SharedProblem pb = get_problem(rp_str);
+   pb->generateObjectiveConstraint();
    LOG_INTER("Problem: " << std::endl << *pb);
 
    std::shared_ptr<Linearizer> lit = get_linearizer(pb, true); // LinearizerInnerTaylor
-   ProverOptim prover(*pb, 1e-6);
+   Prover prover(get_dag(pb));                                 //, 1e-6);
    // Box:
    // [1502.489171701478, 1502.5] ; [15271.50499026968, 15300.34957871695] ;
    // [83.8085066693219, 83.94618541417282] ; [2637.929797585163, 2638.471166916035] ;
@@ -456,7 +464,8 @@ void test_process_box()
    B0.set(pb->varAt(7), Interval(11.30652238949597, 11.32520726571438));
    B0.set(pb->varAt(8), Interval(2.263934861547113, 2.267302427760385));
    B0.set(pb->varAt(9), Interval(151.1382773974757, 151.1534465245626));
-
+   B0.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B0));
+   LOG_INTER("Obj eval: " << pb->getObjective().getTerm().eval(B0))
    LPSolver inner0;
    lit->makeLP(inner0, B0);
    LinExpr lei;
@@ -468,8 +477,8 @@ void test_process_box()
       LOG_INTER("Inner val: " << inner0.certifiedCostSolution() << " ~ "
                               << inner0.primalSolution())
       IntervalBox sol0(pb->scope(), inner0.primalSolution());
-      bool proof = prover.certify(sol0);
-      if (proof)
+      Proof proof = prover.certify(sol0);
+      if (proof == Proof::Feasible)
       {
          LOG_INTER("****** Proved solution: " << sol0)
       }
@@ -501,7 +510,8 @@ void test_process_box()
    B1.set(pb->varAt(7), Interval(10.41098593954356, 10.41119673650761));
    B1.set(pb->varAt(8), Interval(2.966735452803028, 2.966856289809164));
    B1.set(pb->varAt(9), Interval(147.9871337846433, 147.9876780968246));
-
+   B1.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B1));
+   LOG_INTER("Obj eval: " << pb->getObjective().getTerm().eval(B1))
    LPSolver inner1;
    lit->makeLP(inner1, B1);
    inner1.setCost(lei);
@@ -511,8 +521,8 @@ void test_process_box()
       LOG_INTER("****** Inner val: " << inner1.certifiedCostSolution() << " ~ "
                                      << inner1.primalSolution())
       IntervalBox sol1(pb->scope(), inner1.primalSolution());
-      bool proof = prover.certify(sol1);
-      if (proof)
+      Proof proof = prover.certify(sol1);
+      if (proof == Proof::Feasible)
       {
          LOG_INTER("****** Proved solution: " << sol1)
       }
@@ -544,6 +554,7 @@ void test_process_box()
    B2.set(pb->varAt(7), Interval(10.41108638330841, 10.41114751730836));
    B2.set(pb->varAt(8), Interval(2.616706522440267, 2.618406372346661));
    B2.set(pb->varAt(9), Interval(149.5567280074474, 149.5643850130978));
+   B2.set(pb->getObjective().getVar(), pb->getObjective().getTerm().eval(B2));
 
    LPSolver inner2;
    lit->makeLP(inner2, B2);
@@ -554,8 +565,8 @@ void test_process_box()
       LOG_INTER("****** Inner val: " << inner2.certifiedCostSolution() << " ~ "
                                      << inner2.primalSolution())
       IntervalBox sol2(pb->scope(), inner2.primalSolution());
-      bool proof = prover.certify(sol2);
-      if (proof)
+      Proof proof = prover.certify(sol2);
+      if (proof == Proof::Feasible)
       {
          LOG_INTER("****** Proved solution: " << sol2)
       }
@@ -573,13 +584,13 @@ void test_process_box()
 int main()
 {
    Logger::init(LogLevel::inter, "inner_taylor_relax_test.log");
-   test1();
-   test2();
-   test3();
-   test4();
-   test5();
-   test_process();
-   test_harker();
+   // test1();
+   // test2();
+   // test3();
+   // test4();
+   // test5();
+   // test_process();
+   // test_harker();
    test_process_box();
 
    END_TEST

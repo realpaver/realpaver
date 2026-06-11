@@ -23,7 +23,6 @@
 
 #include "realpaver/LinearizerInner.hpp"
 #include "realpaver/Prospector.hpp"
-#include "realpaver/ProverOptim.hpp"
 #include <memory>
 
 namespace realpaver {
@@ -39,7 +38,7 @@ public:
    /// Constructor
    ProspectorInnerRelax(const Variable &vobj, const Term &obj,
                         std::unique_ptr<LinearizerInner> linearizer,
-                        std::unique_ptr<ProverOptim> prover);
+                        std::unique_ptr<Prover> prover);
 
    bool exploreImpl(Node &node, RealPoint &pt) override;
 

@@ -1624,6 +1624,10 @@ void Params::makeLocalOptim()
        .setWhat("Exploration strategy to find feasible points")
        .addChoice("SIMPLE", "simple test of the point returned by the domain picker")
        .addChoice("LOCALSOLVER", "Use a local solver to find a feasible point")
+       .addChoice("INNER_TAYLOR",
+                  "Use an inner linear relaxation to find a feasible point")
+       .addChoice("INNER_AFFINE",
+                  "Use an inner linear relaxation to find a feasible point")
        .setValue("SIMPLE");
    add(pros);
 }

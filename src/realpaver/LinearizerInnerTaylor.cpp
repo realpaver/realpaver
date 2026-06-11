@@ -23,7 +23,7 @@
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
-LinearizerInnerTaylor::LinearizerInnerTaylor(SharedDag dag, int cobj, bool hansen,
+LinearizerInnerTaylor::LinearizerInnerTaylor(SharedDagExtended dag, int cobj, bool hansen,
                                              CornerStyle style, unsigned seed)
     : LinearizerInner(dag)
     , hansen_(hansen)
@@ -105,14 +105,18 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
    }
 
    // generates the constraints
-   for (size_t i = 0; i < dag_->nbFuns(); ++i)
+   for (size_t i = 0; i < edag_->size(); ++i)
    {
-      DagFun *f = dag_->fun(i);
+      SharedDagFun f;
+      if (i != cobj_)
+         f = edag_->getActiveFun(i, B, active);
+      else
+         f = edag_->dag()->fun(i);
 
-      if (!f->isActive(active) || (f->getImage().width() == 0 && i != cobj_))
+      if (f == nullptr || (f->getImage().width() == 0 && i != cobj_))
          continue;
 
-      LOG_LOW("Taylor relaxation for constraint @ " << f->ctrId());
+      LOG_LOW("Taylor relaxation for constraint @ " << f->index());
       Interval img = f->getImage();
 
       // evaluates the function at c

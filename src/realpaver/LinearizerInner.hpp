@@ -37,7 +37,7 @@ namespace realpaver {
 class LinearizerInner : public Linearizer {
 public:
    /// Creates a linearizer for a DAG
-   LinearizerInner(SharedDag dag);
+   LinearizerInner(SharedDagExtended dag);
 };
 
 } // namespace realpaver

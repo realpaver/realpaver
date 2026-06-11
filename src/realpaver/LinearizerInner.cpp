@@ -22,7 +22,7 @@
 
 namespace realpaver {
 
-LinearizerInner::LinearizerInner(SharedDag dag)
+LinearizerInner::LinearizerInner(SharedDagExtended dag)
     : Linearizer(dag)
 {
 }

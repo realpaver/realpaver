@@ -43,7 +43,7 @@ public:
     * selected. A seed is used to initialize the generator of pseudo-random
     * numbers is necessary (0: system time, a positive value otherwise).
     */
-   LinearizerInnerTaylor(SharedDag dag, int cobj = -1, bool hansen = false,
+   LinearizerInnerTaylor(SharedDagExtended dag, int cobj = -1, bool hansen = false,
                          CornerStyle style = CornerStyle::RandomOpposite,
                          unsigned seed = 0);
 

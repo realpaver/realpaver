@@ -31,6 +31,7 @@
 #include "realpaver/LinearizerTaylor.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include <cstddef>
 
 namespace realpaver {
 
@@ -41,6 +42,8 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
     , csi_()
     , cso_()
     , cs_()
+    , obj_ctr_idx_(-1)
+    , obj_ctr_dag_id_(-1)
 {
    // environment
    if (env == nullptr)
@@ -66,6 +69,17 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
       else
       {
          cso_.insert(c);
+      }
+   }
+   if (pbm.hasObjectiveConstraint())
+   {
+      obj_ctr_idx_ = pbm.ctrObjective().id();
+      for (size_t i = 0; i < edag_->size(); i++)
+      {
+         if (edag_->fun(i)->ctr().id() == obj_ctr_idx_)
+         {
+            obj_ctr_dag_id_ = i;
+         }
       }
    }
 }
@@ -345,6 +359,15 @@ SharedContractorPolytope ContractorFactory::makePolytope()
    }
 
    return op;
+}
+
+int ContractorFactory::getObjectiveConstraintId() const
+{
+   return obj_ctr_idx_;
+}
+int ContractorFactory::getObjectiveConstraintDagId() const
+{
+   return obj_ctr_dag_id_;
 }
 
 /*----------------------------------------------------------------------------*/

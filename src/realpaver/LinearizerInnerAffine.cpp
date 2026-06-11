@@ -24,7 +24,7 @@
 
 namespace realpaver {
 
-LinearizerInnerAffine::LinearizerInnerAffine(SharedDag dag, bool minrange)
+LinearizerInnerAffine::LinearizerInnerAffine(SharedDagExtended dag, bool minrange)
     : LinearizerInner(dag)
     , minrange_(minrange)
 {
@@ -40,7 +40,7 @@ bool LinearizerInnerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
                                        const Bitset &active)
 {
    // creates the affine forms
-   AffineCreator creator(dag_, minrange_);
+   AffineCreator creator(edag_, minrange_);
    bool ok = creator.create(B, active);
 
    if (!ok)
@@ -59,10 +59,9 @@ bool LinearizerInnerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
    for (size_t k = 0; k < creator.nbFuns(); ++k)
    {
       const AffineForm &f = creator.fun(k);
-      size_t p = creator.dagIndex(k);
       Interval cst = f.constantTerm();
       const Interval &err = f.errorTerm();
-      const Interval &img = dag_->fun(p)->getImage();
+      const Interval &img = creator.dagFun(k)->getImage();
 
       // let img be the interval [L, U]
       // the constraint is: L <= a_0 + sum_i a_i*e_i + a_err*e_err <= U
