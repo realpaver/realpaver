@@ -18,6 +18,7 @@
  * @date   13 Oct 2025
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/NodePropagatorPolytope.hpp"
 
 namespace realpaver {

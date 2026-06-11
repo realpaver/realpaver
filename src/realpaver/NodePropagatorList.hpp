@@ -48,6 +48,9 @@ public:
    /// Inserts a new algorithm in the last place
    void pushBack(NodePropagAlgo alg, ContractorFactory &facto);
 
+   /// Inserts a propagator in the last place
+   void pushBack(SharedNodePropagator op);
+
    Proof contractImpl(IntervalBox &B, const Bitset &active) override;
 
 private:

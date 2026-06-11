@@ -18,12 +18,12 @@
  * @date   11 Feb 2025
  */
 
-#include "RealPoint.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorPolytope.hpp"
 #include "realpaver/LPModel.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/RealPoint.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -249,46 +249,51 @@ Proof ContractorPolytope::run(LPSolver &solver, IntervalBox &B, int *lb, int &nl
       switch (status)
       {
       case LPStatus::Optimal: {
-         double bnd = solver.certifiedCostSolution();
-         LOG_LOW("Certified cost: " << bnd);
-         LOG_LOW("Primal: " << solver.primalSolution());
-
-         Interval x = B.get(v);
-         if (sense == LPSense::Min)
+         try
          {
-            if (bnd > x.right())
-            {
-               iv = -1;
-               proof = Proof::Empty;
-               LOG_LOW("Empty box");
-            }
-            else if (bnd > x.left())
-            {
-               Interval dom(bnd, x.right());
-               B.set(v, dom);
-               lv.setLB(bnd);
-               LOG_LOW("New domain: " << dom);
-            }
-         }
-         else
-         {
-            if (bnd < x.left())
-            {
-               iv = -1;
-               proof = Proof::Empty;
-               LOG_LOW("Empty box => stop");
-            }
-            else if (bnd < x.right())
-            {
-               Interval dom(x.left(), bnd);
-               B.set(v, dom);
-               lv.setUB(bnd);
-               LOG_LOW("New domain: " << dom);
-            }
-         }
-         if (iv == id_var_obj_)
-            makeMinimizer(solver);
+            double bnd = solver.certifiedCostSolution();
+            LOG_LOW("Certified cost: " << bnd);
+            LOG_LOW("Primal: " << solver.primalSolution());
 
+            Interval x = B.get(v);
+            if (sense == LPSense::Min)
+            {
+               if (bnd > x.right())
+               {
+                  iv = -1;
+                  proof = Proof::Empty;
+                  LOG_LOW("Empty box");
+               }
+               else if (bnd > x.left())
+               {
+                  Interval dom(bnd, x.right());
+                  B.set(v, dom);
+                  lv.setLB(bnd);
+                  LOG_LOW("New domain: " << dom);
+               }
+            }
+            else
+            {
+               if (bnd < x.left())
+               {
+                  iv = -1;
+                  proof = Proof::Empty;
+                  LOG_LOW("Empty box => stop");
+               }
+               else if (bnd < x.right())
+               {
+                  Interval dom(x.left(), bnd);
+                  B.set(v, dom);
+                  lv.setUB(bnd);
+                  LOG_LOW("New domain: " << dom);
+               }
+            }
+            if (iv == id_var_obj_)
+               makeMinimizer(solver);
+         }
+         catch (Exception &e)
+         {
+         }
          break;
       }
       case LPStatus::Infeasible: {
