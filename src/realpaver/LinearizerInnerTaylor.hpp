@@ -22,6 +22,7 @@
 #define REALPAVER_LINEARIZER_INNER_TAYLOR_HPP
 
 #include "realpaver/IntRandom.hpp"
+#include "realpaver/LinearizerInner.hpp"
 #include "realpaver/LinearizerTaylor.hpp"
 
 namespace realpaver {
@@ -32,7 +33,7 @@ namespace realpaver {
  * It generates a relaxation using Taylor forms in two opposite corners.
  * The first corner can be fixed manually or selected randomly.
  */
-class LinearizerInnerTaylor : public Linearizer {
+class LinearizerInnerTaylor : public LinearizerInner {
 public:
    /**
     * @brief Creates a linearizer of a DAG.

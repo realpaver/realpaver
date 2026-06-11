@@ -511,16 +511,17 @@ void test_process_box()
       if (proof)
       {
          LOG_INTER("****** Proved solution: " << sol1)
-         else
-         {
-            LOG_INTER("****** Solution not being proved!")
-         }
       }
       else
       {
-         LOG_INTER("****** No feasible point found")
+         LOG_INTER("****** Solution not being proved!")
       }
    }
+   else
+   {
+      LOG_INTER("****** No feasible point found")
+   }
+
    LOG_INTER(" ======= " << std::endl)
 
    // Box:

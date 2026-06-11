@@ -21,8 +21,7 @@
 #ifndef REALPAVER_LINEARIZER_INNER_AFFINE_HPP
 #define REALPAVER_LINEARIZER_INNER_AFFINE_HPP
 
-#include "realpaver/Linearizer.hpp"
-#include <vector>
+#include "realpaver/LinearizerInner.hpp"
 
 namespace realpaver {
 
@@ -32,7 +31,7 @@ namespace realpaver {
  * The elementary functions can be approximated by means of the Minrange
  * method or the Chebyshev method.
  */
-class LinearizerInnerAffine : public Linearizer {
+class LinearizerInnerAffine : public LinearizerInner {
 public:
    /// Creates a linearizer of a DAG
    LinearizerInnerAffine(SharedDag dag, bool minrange = true);

@@ -25,7 +25,7 @@
 namespace realpaver {
 LinearizerInnerTaylor::LinearizerInnerTaylor(SharedDag dag, int cobj, bool hansen,
                                              CornerStyle style, unsigned seed)
-    : Linearizer(dag)
+    : LinearizerInner(dag)
     , hansen_(hansen)
     , style_(style)
     , corner_(scope().size())
