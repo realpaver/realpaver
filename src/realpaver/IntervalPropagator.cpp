@@ -18,9 +18,9 @@
  * @date   7 July 2024
  */
 
-#include "Contractor.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
+#include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalPropagator.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"

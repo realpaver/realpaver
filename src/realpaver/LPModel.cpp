@@ -18,6 +18,7 @@
  * @date   11 Apr 2024
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Double.hpp"
 #include "realpaver/LPModel.hpp"
@@ -765,7 +766,7 @@ double LPModel::certifiedCostSolution() const
    IntervalMatrix M = matrix().transpose();
    IntervalVector B = bounds(), C = cost(), R = M * dual - C, X = varBounds();
 
-   REALPAVER_ASSERT(X.isFinite(), "Certification impossible due to an infinite bound");
+   THROW_IF(!X.isFinite(), "Certification impossible due to an infinite bound");
 
    Interval val = dual * B - R * X;
 

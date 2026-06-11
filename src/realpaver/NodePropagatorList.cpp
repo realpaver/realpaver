@@ -33,6 +33,11 @@ NodePropagatorList::NodePropagatorList()
 {
 }
 
+void NodePropagatorList::pushBack(SharedNodePropagator op)
+{
+   v_.push_back(op);
+}
+
 void NodePropagatorList::pushBack(NodePropagAlgo alg, ContractorFactory &facto)
 {
    SharedNodePropagator op;

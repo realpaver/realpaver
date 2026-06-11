@@ -18,7 +18,6 @@
  * @date   6 Oct 2025
  */
 
-#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/DomainBox.hpp"
@@ -33,6 +32,7 @@
 #endif
 
 #include "realpaver/NodePropagatorList.hpp"
+#include "realpaver/NodePropagatorLoop.hpp"
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/ProspectorSimple.hpp"
@@ -177,6 +177,8 @@ void Optimizer::makeSpace()
       box->set(z_, std::move(mod));
    }
 
+   U_ = node->box()->get(z_)->intervalHull().right();
+
    space_->pushPendingNode(node);
    ++nbnodes_;
 }
@@ -185,15 +187,15 @@ void Optimizer::makePropagator()
 {
    LOG_LOW("Makes the propagator in the optimizer");
 
-   std::unique_ptr<NodePropagatorList> aux = std::make_unique<NodePropagatorList>();
+   std::unique_ptr<NodePropagatorList> op = std::make_unique<NodePropagatorList>();
 
    // Constraint propagation algorithm: HC4 or AFFINE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
-      aux->pushBack(NodePropagAlgo::HC4, *factory_);
+      op->pushBack(NodePropagAlgo::HC4, *factory_);
    else if (base == "AFFINE")
-      aux->pushBack(NodePropagAlgo::AFFINE, *factory_);
+      op->pushBack(NodePropagAlgo::AFFINE, *factory_);
    else
       THROW("Bad parameter value for the propagation algorithm");
 
@@ -201,19 +203,30 @@ void Optimizer::makePropagator()
    std::string with_acid = env_->getParams()->getStrParam("PROPAGATION_WITH_ACID");
 
    if (with_acid == "YES")
-      aux->pushBack(NodePropagAlgo::ACID, *factory_);
+      op->pushBack(NodePropagAlgo::ACID, *factory_);
 
    // Polytope hull contractor: YES or NO
    std::string with_polytope =
        env_->getParams()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
 
    if (with_polytope == "YES")
+   {
+      std::shared_ptr<NodePropagatorList> aux = std::make_shared<NodePropagatorList>();
       aux->pushBack(NodePropagAlgo::Polytope, *factory_);
+      aux->pushBack(NodePropagAlgo::HC4, *factory_);
 
-   if (aux->size() == 0)
+      std::shared_ptr<NodePropagatorLoop> oploop =
+          std::make_shared<NodePropagatorLoop>(aux);
+      double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
+      oploop->setTol(tol);
+
+      op->pushBack(oploop);
+   }
+
+   if (op->size() == 0)
       THROW("Unable to create the propagator in the optimizer");
 
-   propagator_ = std::move(aux);
+   propagator_ = std::move(op);
 }
 
 void Optimizer::makeSplit()
