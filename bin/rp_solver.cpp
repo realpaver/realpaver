@@ -101,11 +101,10 @@ int main(int argc, char **argv)
          if (dom->isEmpty())
             THROW("The objective function has an empty domain");
 
-         Constraint cobj(obj.getVar() == obj.getTerm());
-         problem.addCtr(cobj);
+         problem.generateObjectiveConstraint();
 
          LOG_MAIN("Bounds of objective function: " << objBounds);
-         LOG_MAIN("Constraint added: " << cobj);
+         LOG_MAIN("Objective onstraint added: " << problem.ctrObjective());
       }
       else
       {

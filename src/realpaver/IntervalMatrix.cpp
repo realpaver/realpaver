@@ -213,7 +213,7 @@ bool IntervalMatrix::selectMostSensitive(IndexList &columns)
 
    size_t row, col;
 
-   for (size_t i = 0; i < nrows(); ++i)
+   for (size_t i = 0; i < nrows() - 1; ++i)
    {
       bool b = findMaxPivot(i, row, col);
       if (!b)
