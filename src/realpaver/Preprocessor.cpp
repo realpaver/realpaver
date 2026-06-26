@@ -18,7 +18,6 @@
  * @date   11 Apr 2024
  */
 
-#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Logger.hpp"

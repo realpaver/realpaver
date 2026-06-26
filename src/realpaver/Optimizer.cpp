@@ -177,7 +177,9 @@ void Optimizer::makeSpace()
       box->set(z_, std::move(mod));
    }
 
-   U_ = node->box()->get(z_)->intervalHull().right();
+   Interval dom = node->box()->get(z_)->intervalHull();
+   L_ = dom.left();
+   U_ = dom.right();
 
    space_->pushPendingNode(node);
    ++nbnodes_;
@@ -508,7 +510,7 @@ void Optimizer::traceOptimum()
    }
    std::cout << std::endl;
 
-   if (optimumFound())
+   if (best_ != nullptr)
       std::cout << "\033[39m"
                 << "Best feasible point: " << "\033[32m" << std::setprecision(flp)
                 << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl
@@ -592,7 +594,7 @@ void Optimizer::branchAndBound()
 #endif
 
    int tracediv = 0, traceaux = 0;
-   bool traceendl = true, limit = false;
+   bool traceendl = true, limit = false, traceFirstLU = true;
 
    do
    {
@@ -629,7 +631,7 @@ void Optimizer::branchAndBound()
       }
 
       // trace the bounds
-      if (trace && saveL_ != L_)
+      if (trace && (saveL_ != L_ || traceFirstLU))
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
@@ -638,13 +640,14 @@ void Optimizer::branchAndBound()
 
          traceendl = true;
       }
-      if (trace && saveU_ != U_)
+      if (trace && (saveU_ != U_ || traceFirstLU))
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
                    << sU << ": \033[32m" << U_ * sign_obj << "\033[39m" << std::endl;
          traceendl = true;
+         traceFirstLU = false;
       }
 
       if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
@@ -701,6 +704,16 @@ void Optimizer::branchAndBound()
    timerBB.stop();
    LOG_INTER("Total time BB : " << timerBB.elapsedTime() << "(s)");
 #endif
+
+   Interval optimum = getOptimum();
+   if (optimum.isEmpty() || optimum.isInf())
+   {
+      // example : a solution node does not belong to the domain of
+      // the objective function => the lower bound must be -oo and no
+      // precise enclosure is obtained
+      status_ = OptimizationStatus::Other;
+      LOG_INTER("Bad enclosure of the optimum (empty or infinite)");
+   }
 
    stimer_.stop();
 }
