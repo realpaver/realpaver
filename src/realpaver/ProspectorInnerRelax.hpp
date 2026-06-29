@@ -42,6 +42,8 @@ public:
 
    bool exploreImpl(Node &node, RealPoint &pt) override;
 
+   void setRelaxTol(double tol);
+
 private:
    Variable vobj_;
    Term obj_;

@@ -18,10 +18,13 @@
  * @date   13 Oct 2025
  */
 
+#include "Bitset.hpp"
+#include "DagExtended.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/LPSolver.hpp"
 #include "realpaver/LinearizerInner.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/ProspectorInnerRelax.hpp"
 #include "realpaver/RealPoint.hpp"
 
@@ -72,8 +75,35 @@ bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
       //           << lp_solver.primalSolution() << std::endl;
    }
    // else
-   //    std::cout << "No inner polytope found!";
+   //    std::cout << "No inner polytope found!" << std::endl;
+
+   // Check if prover is useful
+   if (success == LPStatus::Optimal)
+   {
+      Bitset active = node.active();
+      IntervalBox bsol(pt);
+      use_prover_ = false; // Useful only if non-relaxed equations
+      for (size_t i = 0; i < linearizer_->edag()->size(); i++)
+      {
+         SharedDagFun fun = linearizer_->edag()->getActiveFun(i, bsol, active);
+         if (fun == nullptr)
+         {
+            continue;
+         }
+         if (fun->isAnEquation() && linearizer_->getObjCtrIndex() != i &&
+             linearizer_->getRelaxTol() == 0)
+         {
+            use_prover_ = true;
+            break;
+         }
+      }
+   }
    return success == LPStatus::Optimal;
+}
+
+void ProspectorInnerRelax::setRelaxTol(double tol)
+{
+   linearizer_->setRelaxTol(tol);
 }
 
 } // namespace realpaver

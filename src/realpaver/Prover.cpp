@@ -18,6 +18,7 @@
  * @date   11 Apr 2024
  */
 
+#include "Common.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintProver.hpp"
 #include "realpaver/ConstraintRep.hpp"
@@ -38,7 +39,15 @@ Prover::Prover(SharedDagExtended edag)
     , delta_(Params::GetDblParam("INFLATION_DELTA"))
     , chi_(Params::GetDblParam("INFLATION_CHI"))
     , maxiter_(Params::GetIntParam("NEWTON_CERTIFY_ITER_LIMIT"))
+    , callNumber_(0)
+    , successNumber_(0)
 {
+}
+
+Prover::~Prover()
+{
+   LOG_MAIN("Number of prover calls: " << callNumber_);
+   LOG_MAIN("Number of prover success: " << successNumber_);
 }
 
 void Prover::setInitBox(const IntervalBox &B)
@@ -54,9 +63,13 @@ Proof Prover::certify(IntervalBox &B)
 
 Proof Prover::certify(IntervalBox &B, const Bitset &active)
 {
+   callNumber_++;
    // all the constraints inactive ?
    if (active.size() > 0 && active.areAllZeros())
+   {
+      successNumber_++;
       return Proof::Inner;
+   }
 
    // checks the constraints in the DAG
    IntervalFunctionVector Fe; // vector of equations
@@ -166,10 +179,14 @@ Proof Prover::certify(IntervalBox &B, const Bitset &active)
 
    if (initBox_ == nullptr)
    {
+      if (proof == Proof::Feasible || proof == Proof::Inner)
+         successNumber_++;
       return proof;
    }
    else
    {
+      if (initBox_->contains(B) && (proof == Proof::Feasible || proof == Proof::Inner))
+         successNumber_++;
       return initBox_->contains(B) ? proof : Proof::Maybe;
    }
 }

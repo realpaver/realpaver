@@ -70,6 +70,8 @@ public:
 private:
    std::unique_ptr<Prover> prover_;
    IntervalBox *feasible_; // feasible box if found
+protected:
+   bool use_prover_;
 };
 
 } // namespace realpaver

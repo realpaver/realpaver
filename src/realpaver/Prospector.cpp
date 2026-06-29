@@ -19,7 +19,9 @@
  */
 
 #include "AssertDebug.hpp"
+#include "Common.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Logger.hpp"
 #include "realpaver/Prospector.hpp"
 
 namespace realpaver {
@@ -27,6 +29,7 @@ namespace realpaver {
 Prospector::Prospector(std::unique_ptr<Prover> prover)
     : prover_(std::move(prover))
     , feasible_(nullptr)
+    , use_prover_(true)
 {
    REALPAVER_ASSERT(prover_ != nullptr, "No prover is given as input");
 }
@@ -47,8 +50,15 @@ bool Prospector::explore(Node &node, NodeContext &ctx)
          delete feasible_;
       feasible_ = new IntervalBox(pt);
 
-      Proof proof = prover_->certify(*feasible_, node.active());
-      res = (proof == Proof::Feasible || proof == Proof::Inner);
+      if (use_prover_)
+      {
+         Proof proof = prover_->certify(*feasible_, node.active());
+         res = (proof == Proof::Feasible || proof == Proof::Inner);
+      }
+      else
+      {
+         res = true;
+      }
    }
    return res;
 }

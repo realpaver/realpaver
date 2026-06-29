@@ -42,7 +42,7 @@ public:
    Prover(SharedDagExtended edag);
 
    /// Default destructor
-   ~Prover() = default;
+   ~Prover(); // = default;
 
    /// No copy
    Prover(const Prover &) = delete;
@@ -83,6 +83,9 @@ private:
    double delta_;                         // parameter delta of inflation
    double chi_;                           // parameter chi of inflation
    size_t maxiter_;                       // maximum number of iterations
+
+   size_t callNumber_;    // count the number of calls to the prover
+   size_t successNumber_; // count the number of proving success
 
    bool checkSatisfaction(const IntervalBox &B) const;
 };
