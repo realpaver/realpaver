@@ -34,7 +34,7 @@ namespace realpaver {
 class LinearizerInnerAffine : public LinearizerInner {
 public:
    /// Creates a linearizer of a DAG
-   LinearizerInnerAffine(SharedDagExtended dag, bool minrange = true);
+   LinearizerInnerAffine(SharedDagExtended dag, int cobj = -1, bool minrange = true);
 
    /// No copy
    LinearizerInnerAffine(const LinearizerInnerAffine &) = delete;

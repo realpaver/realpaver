@@ -3,6 +3,7 @@
 #include "realpaver/ContractorFactory.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/DagExtended.hpp"
+#include "realpaver/DomainBox.hpp"
 #include "realpaver/Interval.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/LPModel.hpp"
@@ -443,10 +444,46 @@ void test_process_box()
 
    SharedProblem pb = get_problem(rp_str);
    pb->generateObjectiveConstraint();
+   IntervalBox box(pb->scope());
+   Interval vobj = pb->getObjective().getTerm().eval(box);
+   pb->getObjective().getVar().getDomain()->contract(vobj);
+   box.set(pb->getObjective().getVar(), vobj);
    LOG_INTER("Problem: " << std::endl << *pb);
 
    std::shared_ptr<Linearizer> lit = get_linearizer(pb, true); // LinearizerInnerTaylor
    Prover prover(get_dag(pb));                                 //, 1e-6);
+
+   LPSolver inner;
+   lit->setRelaxTol(0);
+   lit->makeLP(inner, box);
+   LinExpr lei;
+   lei.addTerm(1, inner.getLinVar(lit->linVarIndex(pb->getObjective().getVar())));
+   inner.setCost(lei);
+   // LOG_INTER("LP:")
+   // LOG_INTER("\t" << inner)
+
+   LPStatus success = inner.optimize();
+   if (success == LPStatus::Optimal)
+   {
+      LOG_INTER("Inner val: " << inner.certifiedCostSolution() << " ~ "
+                              << inner.primalSolution())
+      IntervalBox sol0(pb->scope(), inner.primalSolution());
+      Proof proof = prover.certify(sol0);
+      if (proof == Proof::Feasible)
+      {
+         LOG_INTER("****** Proved solution: " << sol0)
+      }
+      else
+      {
+         LOG_INTER("****** Solution not being proved!")
+      }
+   }
+   else
+   {
+      LOG_INTER("****** No feasible point found")
+   }
+   LOG_INTER(" ======= " << std::endl)
+
    // Box:
    // [1502.489171701478, 1502.5] ; [15271.50499026968, 15300.34957871695] ;
    // [83.8085066693219, 83.94618541417282] ; [2637.929797585163, 2638.471166916035] ;
@@ -468,10 +505,10 @@ void test_process_box()
    LOG_INTER("Obj eval: " << pb->getObjective().getTerm().eval(B0))
    LPSolver inner0;
    lit->makeLP(inner0, B0);
-   LinExpr lei;
+   // LinExpr lei;
    lei.addTerm(1, inner0.getLinVar(lit->linVarIndex(pb->getObjective().getVar())));
    inner0.setCost(lei);
-   LPStatus success = inner0.optimize();
+   success = inner0.optimize();
    if (success == LPStatus::Optimal)
    {
       LOG_INTER("Inner val: " << inner0.certifiedCostSolution() << " ~ "

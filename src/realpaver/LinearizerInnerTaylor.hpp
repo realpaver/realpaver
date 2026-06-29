@@ -21,6 +21,9 @@
 #ifndef REALPAVER_LINEARIZER_INNER_TAYLOR_HPP
 #define REALPAVER_LINEARIZER_INNER_TAYLOR_HPP
 
+#include "Bitset.hpp"
+#include "IntervalMatrix.hpp"
+#include "LPModel.hpp"
 #include "realpaver/IntRandom.hpp"
 #include "realpaver/LinearizerInner.hpp"
 #include "realpaver/LinearizerTaylor.hpp"
@@ -83,7 +86,6 @@ private:
    CornerStyle style_; // selection method of corners
    Bitset corner_;     // one bit per variable: 0 left bound, 1 right bound
    IntRandom gen_;     // generator of pseudo-random numbers
-   int cobj_;          // index of constraint computing the optimization objective
 
    // Selects the first corner of B before solving and assigns corner_
    void selectCorner(const IntervalBox &B);

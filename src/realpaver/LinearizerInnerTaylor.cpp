@@ -25,12 +25,11 @@
 namespace realpaver {
 LinearizerInnerTaylor::LinearizerInnerTaylor(SharedDagExtended dag, int cobj, bool hansen,
                                              CornerStyle style, unsigned seed)
-    : LinearizerInner(dag)
+    : LinearizerInner(dag, cobj)
     , hansen_(hansen)
     , style_(style)
     , corner_(scope().size())
     , gen_()
-    , cobj_(cobj)
 {
    if (seed == 0)
       gen_ = IntRandom();
@@ -113,7 +112,11 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
       else
          f = edag_->dag()->fun(i);
 
-      if (f == nullptr || (f->getImage().width() == 0 && i != cobj_))
+      // Case of inactive constraints or equalities if not relaxed (except objective
+      // constraint)
+      if (f == nullptr ||
+          (f->getImage().width() == 0 && i != cobj_ &&
+           getRelaxTol() == 0)) // || (f->getImage().width() == 0 && i != cobj_))
          continue;
 
       LOG_LOW("Taylor relaxation for constraint @ " << f->index());
@@ -138,15 +141,19 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
       if (G.isInf())
          continue;
 
-      // if (i == cobj_)
-      // {
-      //    std::cout << ":::" << dag_->fun(i)->getTerm() << " in "
-      //              << dag_->fun(i)->getImage() << std::endl;
-      // }
-
       // lower bounding constraint of the form lo <= u generated if the right
       // bound of the image of the function is finite
-      if (!Double::isInf(img.right()) && (i != cobj_ || style_ != CornerStyle::Left))
+      // c(x)<=b
+      // Inner relaxation: c(x)-b <= c_inner(x)-b <= 0
+      // c_inner(x) = c(x_) + inner_taylor(x)
+      // inner_taylor(x) = sum(i in 1..n)(G_i^*(x-x_))
+      // c(x)-b <= c(x_) + sum(i in 1..n)(G_i^*(x-x_))-b <= 0
+      // Then focusing on: c(x_) + sum(i in 1..n)(G_i^*(x-x_))-b <= 0
+      // sum(i in 1..n)(G_i^*(x-x_)) <= b - c(x_)
+      // sum(i in 1..n)(G_i^*x) - sum(i in 1..n)(G_i^*x_) <= b - c(x_)
+      // lo=sum(i in 1..n)(G_i^*x) <= b - c(x_) + sum(i in 1..n)(G_i^*x_)=u
+      // lo <=u
+      if (!Double::isInf(img.right()))
       {
          Interval u = img.right() - fc;
          LinExpr lo;
@@ -161,26 +168,46 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
             if (corner.get(scop_.index(v)))
             {
                // right bound used for this variable (bit = 1)
-               // => right bound of the derivative
-               lo.addTerm(z.left(), lv);
-               u += z.left() * Interval(c.get(v));
+               // => left bound of the derivative //(i.e. opposite bound)
+               lo.addTerm(z.left(), lv);           // G_i_ * x
+               u += z.left() * Interval(c.get(v)); // G_i_ * x^
             }
             else
             {
                // left bound used for this variable (bit = 0)
-               // => left bound of the derivative
-               lo.addTerm(z.right(), lv);
-               u += z.right() * Interval(c.get(v));
+               // => right bound of the derivative
+               lo.addTerm(z.right(), lv);           // G_i^ * x
+               u += z.right() * Interval(c.get(v)); // G_i^ * x_
             }
          }
-         lpm.addCtr(lo, u.left() - lpm.getFeasTol());
+
+         if (img.width() == 0 &&
+             i != cobj_) // equation c(x) = b, relax as c_inner(x) <= b + tol_
+         {
+            lpm.addCtr(lo, u.left() + getRelaxTol());
+         }
+         else // inequalities or objective constraint
+            lpm.addCtr(lo, u.left());
       }
 
-      // upper bounding constraint of the form up >= l generated if the left
+      // upper bounding constraint of the form l <= up generated if the left
       // bound of the image of the function is finite
-      if (!Double::isInf(img.left()) && (i != cobj_ || style_ != CornerStyle::Right))
+      // b <= c(x) <=> -c(x) <= -b <=> c'(x) <= b'
+      // then previous formula applies:
+      // c_inner`(x) = -c_inner(x) = -c(x_) - inner_taylor(x)
+      // Then: -c(x) <= -c(x_) - inner_taylor(x) <= -b
+      // inner_taylor(x) = sum(i in 1..n)(G_i^*(x-x_))
+      // -c(x) + b <= -c(x_) - sum(i in 1..n)(G_i^*(x-x_)) + b <= 0
+      // Then focusing on: -c(x_) - sum(i in 1..n)(G_i^*(x-x_)) + b <= 0
+      // -sum(i in 1..n)(G_i^*(x-x_)) <= c(x_) - b
+      // -sum(i in 1..n)(G_i^*x) + sum(i in 1..n)(G_i^*x_) <= c(x_) - b
+      // sum(i in 1..n)(-G_i^*x) <= c(x_) - b + sum(i in 1..n)(-G_i^*x_)
+      // up' <= l'
+      // -l' <= -up'
+      // b - c(x_) + sum(i in 1..n)(G_i^*x_) <= sum(i in 1..n)(G_i^*x)
+      if (!Double::isInf(img.left()) && i != cobj_)
       {
-         Interval l = img.left() - fc;
+         Interval l = fc - img.left(); // c(x_)^ - b
 
          LinExpr up;
 
@@ -194,22 +221,27 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
             if (corner.get(scop_.index(v)))
             {
                // right bound used for this variable (bit = 1)
-               // => left bound of the derivative
-               up.addTerm(-z.right(), lv);
-               l += z.right() * Interval(c.get(v));
+               // => left bound of the derivative (opposite bound)
+               up.addTerm(-z.left(), lv);           // -G_i_*x
+               l += -z.left() * Interval(c.get(v)); // -G_i_*x^
             }
             else
             {
                // left bound used for this variable (bit = 1)
-               // => right bound of the derivative
-               up.addTerm(-z.left(), lv);
-               l += z.left() * Interval(c.get(v));
+               // => left bound of the derivative
+               up.addTerm(-z.right(), lv);           // G_i^*x
+               l += -z.right() * Interval(c.get(v)); // G_i^*x_
             }
          }
-         lpm.addCtr(up, -l.right() - lpm.getFeasTol());
+
+         if (img.width() == 0) // equation c(x) = b, relax as b - tol_ <= c_inner(x)
+         {
+            lpm.addCtr(up, l.left() + getRelaxTol());
+         }
+         else
+            lpm.addCtr(up, l.left());
       }
    }
-   // std::cout << "NB LINCTR: " << lpm.getNbLinCtrs() << std::endl;
    return true;
 }
 

@@ -22,9 +22,15 @@
 
 namespace realpaver {
 
-LinearizerInner::LinearizerInner(SharedDagExtended dag)
+LinearizerInner::LinearizerInner(SharedDagExtended dag, int cobj)
     : Linearizer(dag)
+    , cobj_(cobj)
 {
+}
+
+int LinearizerInner::getObjCtrIndex() const
+{
+   return cobj_;
 }
 
 } // namespace realpaver

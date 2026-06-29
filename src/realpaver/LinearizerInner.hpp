@@ -37,7 +37,12 @@ namespace realpaver {
 class LinearizerInner : public Linearizer {
 public:
    /// Creates a linearizer for a DAG
-   LinearizerInner(SharedDagExtended dag);
+   LinearizerInner(SharedDagExtended dag, int cobj);
+
+   int getObjCtrIndex() const;
+
+protected:
+   int cobj_; // index of constraint computing the optimization objective
 };
 
 } // namespace realpaver

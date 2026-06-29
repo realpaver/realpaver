@@ -24,8 +24,9 @@
 
 namespace realpaver {
 
-LinearizerInnerAffine::LinearizerInnerAffine(SharedDagExtended dag, bool minrange)
-    : LinearizerInner(dag)
+LinearizerInnerAffine::LinearizerInnerAffine(SharedDagExtended dag, int cobj,
+                                             bool minrange)
+    : LinearizerInner(dag, cobj)
     , minrange_(minrange)
 {
    REALPAVER_ASSERT(dag != nullptr, "empty DAG");
