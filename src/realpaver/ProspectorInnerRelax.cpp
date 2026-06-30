@@ -71,15 +71,8 @@ bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
       RealVector sol = lp_solver.primalSolution();
       for (Variable v : node.scope())
          pt.set(v, sol.get(linearizer_->linVarIndex(v)));
-      // std::cout << "Inner val: " << lp_solver.certifiedCostSolution() << " ~ "
-      //           << lp_solver.primalSolution() << std::endl;
-   }
-   // else
-   //    std::cout << "No inner polytope found!" << std::endl;
 
-   // Check if prover is useful
-   if (success == LPStatus::Optimal)
-   {
+      // Check if prover is useful
       Bitset active = node.active();
       IntervalBox bsol(pt);
       use_prover_ = false; // Useful only if non-relaxed equations
@@ -90,8 +83,7 @@ bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
          {
             continue;
          }
-         if (fun->isAnEquation() && linearizer_->getObjCtrIndex() != i &&
-             linearizer_->getRelaxTol() == 0)
+         if (fun->isAnEquation() && linearizer_->getObjCtrIndex() != i)
          {
             use_prover_ = true;
             break;
