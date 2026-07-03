@@ -83,7 +83,8 @@ bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
          {
             continue;
          }
-         if (fun->isAnEquation() && linearizer_->getObjCtrIndex() != i)
+         if (fun->isAnEquation() && linearizer_->getObjCtrIndex() != i &&
+             linearizer_->getRelaxTol() == 0)
          {
             use_prover_ = true;
             break;

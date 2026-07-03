@@ -103,6 +103,8 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
          c.set(v, dom.left());
    }
 
+   LOG_INTER("ACTIVE: " << active)
+
    // generates the constraints
    for (size_t i = 0; i < edag_->size(); ++i)
    {
@@ -140,6 +142,8 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
 
       if (G.isInf())
          continue;
+
+      // LOG_INTER("Gradient: " << G)
 
       // lower bounding constraint of the form lo <= u generated if the right
       // bound of the image of the function is finite
@@ -222,15 +226,19 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
             {
                // right bound used for this variable (bit = 1)
                // => left bound of the derivative (opposite bound)
-               up.addTerm(-z.left(), lv);           // -G_i_*x
-               l += -z.left() * Interval(c.get(v)); // -G_i_*x^
+               // up.addTerm(-z.right(), lv);           // -G_i_*x
+               // l += -z.right() * Interval(c.get(v)); // -G_i_*x^
+               up.addTerm(-z.right(), lv);           // -G_i_*x
+               l += -z.right() * Interval(c.get(v)); // -G_i_*x^
             }
             else
             {
                // left bound used for this variable (bit = 1)
                // => left bound of the derivative
-               up.addTerm(-z.right(), lv);           // G_i^*x
-               l += -z.right() * Interval(c.get(v)); // G_i^*x_
+               // up.addTerm(-z.right(), lv);           // G_i^*x
+               // l += -z.right() * Interval(c.get(v)); // G_i^*x_
+               up.addTerm(-z.left(), lv);           // G_i^*x
+               l += -z.left() * Interval(c.get(v)); // G_i^*x_
             }
          }
 

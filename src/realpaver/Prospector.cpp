@@ -57,9 +57,11 @@ bool Prospector::explore(Node &node, NodeContext &ctx)
       }
       else
       {
+         LOG_INTER("PROVER NOT USED")
          res = true;
       }
    }
+   LOG_INTER("PROSPECTOR END")
    return res;
 }
 

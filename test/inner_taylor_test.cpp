@@ -1,3 +1,4 @@
+#include "realpaver/Bitset.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/Constraint.hpp"
 #include "realpaver/ContractorFactory.hpp"
@@ -618,6 +619,90 @@ void test_process_box()
    }
 }
 
+void test_chance()
+{
+   std::string rp_str = R"RP(
+   Variables
+   x2 in [0, 1.0e8],
+   x3 in [0, 1.0e8],
+   x4 in [0, 1.0e8],
+   x5 in [0, 1.0e8];
+
+   Min 24.55*x2 + 26.75*x3 + 39*x4 + 40.5*x5;
+
+   Constraints
+    x2 + x3 + x4 + x5 == 1,
+    12*x2 - 1.645*sqrt(0.28*x2^2 + 0.19*x3^2 + 20.5*x4^2 + 0.62*x5^2) + 11.9*x3
+          + 41.8*x4 + 52.1*x5 >= 21,
+    2.3*x2 + 5.6*x3 + 11.1*x4 + 1.3*x5 >= 5;
+   )RP";
+
+   SharedProblem pb = get_problem(rp_str);
+   pb->generateObjectiveConstraint();
+   IntervalBox box(pb->scope());
+   Interval vobj = pb->getObjective().getTerm().eval(box);
+   pb->getObjective().getVar().getDomain()->contract(vobj);
+   box.set(pb->getObjective().getVar(), vobj);
+   LOG_INTER("Problem: " << std::endl << *pb);
+
+   std::shared_ptr<Linearizer> lit =
+       get_linearizer(pb, true, false); // LinearizerInnerTaylor without Hansen
+   // std::shared_ptr<Linearizer> lit =
+   //     get_linearizer(pb, true, true); // LinearizerInnerTaylor with Hansen
+   Prover prover(get_dag(pb)); //, 1e-6);
+
+   IntervalBox B(pb->scope());
+   // double eps = 1e-9;
+   // B.set(pb->varAt(0), Interval(0.644613432207 - eps, 0.644613432207 + eps));
+   // B.set(pb->varAt(1), Interval(0 - eps, 0 + eps));
+   // B.set(pb->varAt(2), Interval(0.311774140897 - eps, 0.311774140897 + eps));
+   // B.set(pb->varAt(3), Interval(0.0436124168959 - eps, 0.0436124168959 + eps));
+   // (x2 = [0.45, 0.64675556029], x3 = [0, 0.234488399843], x4 = [0.228744885783,
+   // 0.549993052596], x5 = [0, 0.204321495363], __obj = [29.7169154807, 32.4973996101])
+   B.set(pb->varAt(0), Interval(0.45, 0.64675556029));
+   B.set(pb->varAt(1), Interval(0, 0.234488399843));
+   B.set(pb->varAt(2), Interval(0.228744885783, 0.549993052596));
+   B.set(pb->varAt(3), Interval(0, 0.204321495363));
+   B.set(pb->varAt(4), Interval(29.7169154807, 32.4973996101));
+
+   LOG_INTER("Current Box: " << B)
+
+   LPSolver inner;
+   lit->setRelaxTol(1e-8);
+   Bitset active(pb->nbCtrs());
+   active.setAllOne();
+   lit->makeLP(inner, B, active);
+   // lit->makeLP(inner, B);
+   LinExpr lei;
+   lei.addTerm(1, inner.getLinVar(lit->linVarIndex(pb->getObjective().getVar())));
+   inner.setCost(lei);
+   // LOG_INTER("LP:")
+   // LOG_INTER("\t" << inner)
+
+   LPStatus success = inner.optimize();
+   if (success == LPStatus::Optimal)
+   {
+      LOG_INTER("Inner val: " << inner.certifiedCostSolution() << " ~ "
+                              << inner.primalSolution())
+      IntervalBox sol0(pb->scope(), inner.primalSolution());
+      LOG_INTER("Interval eval of obj: " << pb->getObjective().getTerm().eval(sol0))
+      Proof proof = prover.certify(sol0);
+      if (proof == Proof::Feasible)
+      {
+         LOG_INTER("****** Proved solution: " << sol0)
+      }
+      else
+      {
+         LOG_INTER("****** Solution not being proved!")
+      }
+   }
+   else
+   {
+      LOG_INTER("****** No feasible point found")
+   }
+   LOG_INTER(" ======= " << std::endl)
+}
+
 int main()
 {
    Logger::init(LogLevel::inter, "inner_taylor_relax_test.log");
@@ -628,7 +713,8 @@ int main()
    // test5();
    // test_process();
    // test_harker();
-   test_process_box();
+   // test_process_box();
+   test_chance();
 
    END_TEST
 }
