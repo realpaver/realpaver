@@ -44,8 +44,6 @@ bool LinearizerInnerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
    AffineCreator creator(edag_, minrange_);
    bool ok = creator.create(B, active);
 
-   // std::cout << "B: " << B << std::endl;
-
    if (!ok)
       return false;
 
@@ -66,7 +64,7 @@ bool LinearizerInnerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
       const Interval &err = f.errorTerm();
       const Interval &img = creator.dagFun(k)->getImage();
 
-      // Check if constraint is an equation not relaxed, if so go to next one
+      // Check if constraint is an equation not to be relaxed, if so go to next one
       if (img.width() == 0 && cobj_ != creator.dagFun(k)->index() && getRelaxTol() == 0)
          continue;
 
@@ -113,11 +111,6 @@ bool LinearizerInnerAffine::makeLPImpl(LPModel &lpm, const IntervalBox &B,
 
          ++it;
       }
-
-      // std::cout << "IMG: " << img << std::endl;
-      // std::cout << "CST: " << cst << std::endl;
-      // std::cout << "ERR: " << err << std::endl;
-      // std::cout << "ACC: " << ac << std::endl;
 
       // inner upper bounding function
       if (!img.isInfRight() && cobj_ != creator.dagFun(k)->index())
