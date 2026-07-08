@@ -384,7 +384,8 @@ void Optimizer::makeProspector()
              factory_->extDag(), factory_->getObjectiveConstraintDagId(), true,
              CornerStyle::Left);
       else
-         linearizer = std::make_unique<LinearizerInnerAffine>(factory_->extDag());
+         linearizer = std::make_unique<LinearizerInnerAffine>(
+             factory_->extDag(), factory_->getObjectiveConstraintDagId());
       linearizer->setRelaxTol(env_->getParams()->getDblParam("RELAXATION_EQ_TOL"));
       prospector_ = std::make_unique<ProspectorInnerRelax>(
           newprob->getObjective().getVar(), newprob->getObjective().getTerm(),

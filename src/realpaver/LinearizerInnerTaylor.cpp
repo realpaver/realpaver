@@ -157,7 +157,7 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
       // sum(i in 1..n)(G_i^*x) - sum(i in 1..n)(G_i^*x_) <= b - c(x_)
       // lo=sum(i in 1..n)(G_i^*x) <= b - c(x_) + sum(i in 1..n)(G_i^*x_)=u
       // lo <=u
-      if (!Double::isInf(img.right()))
+      if (!Double::isInf(img.right()) && i != cobj_)
       {
          Interval u = img.right() - fc;
          LinExpr lo;
@@ -185,8 +185,7 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
             }
          }
 
-         if (img.width() == 0 &&
-             i != cobj_) // equation c(x) = b, relax as c_inner(x) <= b + tol_
+         if (img.width() == 0) // equation c(x) = b, relax as c_inner(x) <= b + tol_
          {
             lpm.addCtr(lo, u.left() + getRelaxTol());
          }
@@ -209,7 +208,7 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
       // up' <= l'
       // -l' <= -up'
       // b - c(x_) + sum(i in 1..n)(G_i^*x_) <= sum(i in 1..n)(G_i^*x)
-      if (!Double::isInf(img.left()) && i != cobj_)
+      if (!Double::isInf(img.left()))
       {
          Interval l = fc - img.left(); // c(x_)^ - b
 
@@ -224,25 +223,18 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
 
             if (corner.get(scop_.index(v)))
             {
-               // right bound used for this variable (bit = 1)
-               // => left bound of the derivative (opposite bound)
-               // up.addTerm(-z.right(), lv);           // -G_i_*x
-               // l += -z.right() * Interval(c.get(v)); // -G_i_*x^
-               up.addTerm(-z.right(), lv);           // -G_i_*x
-               l += -z.right() * Interval(c.get(v)); // -G_i_*x^
+               up.addTerm(-z.right(), lv);           // -G_i^*x
+               l += -z.right() * Interval(c.get(v)); // -G_i^*x^
             }
             else
             {
-               // left bound used for this variable (bit = 1)
-               // => left bound of the derivative
-               // up.addTerm(-z.right(), lv);           // G_i^*x
-               // l += -z.right() * Interval(c.get(v)); // G_i^*x_
-               up.addTerm(-z.left(), lv);           // G_i^*x
-               l += -z.left() * Interval(c.get(v)); // G_i^*x_
+               up.addTerm(-z.left(), lv);           // -G_i_*x
+               l += -z.left() * Interval(c.get(v)); // -G_i_*x_
             }
          }
 
-         if (img.width() == 0) // equation c(x) = b, relax as b - tol_ <= c_inner(x)
+         if (img.width() == 0 &&
+             i != cobj_) // equation c(x) = b, relax as b - tol_ <= c_inner(x)
          {
             lpm.addCtr(up, l.left() + getRelaxTol());
          }

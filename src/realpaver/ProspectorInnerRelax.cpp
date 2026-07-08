@@ -48,23 +48,9 @@ bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
    LinVar lv = lp_solver.getLinVar(linearizer_->linVarIndex(vobj_));
    LinExpr e({1.0}, {lv});
 
-   // Dag obj_dag;
-   // size_t iobj = obj_dag.insert(obj_);
-   // IntervalBox box(*node.box());
-   // RealPoint mid(box.midpoint());
-   // IntervalBox G(box.scope());
-   // obj_dag.fun(iobj)->iDiff(IntervalBox(mid), G);
-   // LinVar lv = lp_solver.getLinVar(linearizer_->linVarIndex(vobj_));
-   // LinExpr e; //({1.0}, {lv});
-   // for (auto v : box.scope())
-   // {
-   //    e.addTerm(G.get(v).midpoint(), lp_solver.getLinVar(linearizer_->linVarIndex(v)));
-   // }
    lp_solver.setCost(e);
    lp_solver.setSense(LPSense::Min);
-   // std::cout << " ======" << std::endl;
-   // std::cout << *node.box() << std::endl;
-   // lp_solver.print(std::cout);
+
    LPStatus success = lp_solver.optimize();
    if (success == LPStatus::Optimal)
    {
@@ -83,6 +69,7 @@ bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
          {
             continue;
          }
+         // Use only prover when equation are not relaxed
          if (fun->isAnEquation() && linearizer_->getObjCtrIndex() != i &&
              linearizer_->getRelaxTol() == 0)
          {
