@@ -44,7 +44,9 @@ ProspectorInnerRelax::ProspectorInnerRelax(const Variable &vobj, const Term &obj
 bool ProspectorInnerRelax::exploreImpl(Node &node, RealPoint &pt)
 {
    LPSolver lp_solver;
-   linearizer_->makeLP(lp_solver, *node.box());
+   bool ok = linearizer_->makeLP(lp_solver, *node.box(), node.active());
+   if (!ok)
+      return false;
    LinVar lv = lp_solver.getLinVar(linearizer_->linVarIndex(vobj_));
    LinExpr e({1.0}, {lv});
 
