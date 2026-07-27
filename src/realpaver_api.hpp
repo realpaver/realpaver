@@ -35,3 +35,8 @@
 #include "realpaver/LPSolver.hpp"
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Solver.hpp"
+
+#include "realpaver/LinearizerAffine.hpp"
+#include "realpaver/LinearizerInnerAffine.hpp"
+#include "realpaver/LinearizerInnerTaylor.hpp"
+#include "realpaver/LinearizerTaylor.hpp"

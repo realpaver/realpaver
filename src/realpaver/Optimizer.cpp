@@ -31,10 +31,13 @@
 #include "realpaver/ProspectorLocalSolver.hpp"
 #endif
 
+#include "realpaver/LinearizerInnerAffine.hpp"
+#include "realpaver/LinearizerInnerTaylor.hpp"
 #include "realpaver/NodePropagatorList.hpp"
 #include "realpaver/NodePropagatorLoop.hpp"
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/ProspectorInnerRelax.hpp"
 #include "realpaver/ProspectorSimple.hpp"
 #include "realpaver/Prover.hpp"
 #include "realpaver/SelectorLF.hpp"
@@ -351,6 +354,44 @@ void Optimizer::makeProspector()
 
       THROW_IF(prospector_ == nullptr,
                "No local solver is available to create the prospector");
+   }
+   else if (prospect == "INNER_TAYLOR" || prospect == "INNER_AFFINE")
+   {
+      // SharedDag dagi = std::make_shared<Dag>();
+      // for (size_t i = 0; i < newprob->nbCtrs(); i++)
+      // {
+      //    if (newprob->ctrAt(i).isInequality())
+      //       dagi->insert(newprob->ctrAt(i));
+      // }
+      // if (dagi->scope().size() == 0)
+      // {
+      //    size_t i = 1;
+      //    for (auto v : newprob->scope())
+      //    {
+      //       if (!dagi->scope().contains(v))
+      //       {
+      //          Constraint ci(v >= -INFINITY);
+      //          ci.setId(newprob->nbCtrs() + i);
+      //          i++;
+      //          dagi->insert(ci);
+      //       }
+      //    }
+      // }
+      // Objective obj = newprob->getObjective();
+      // size_t id = newprob->addCtr(obj.getVar() == obj.getTerm());
+      // size_t cobj = dag_->insert(newprob->ctrAt(id));
+      std::unique_ptr<LinearizerInner> linearizer;
+      if (prospect == "INNER_TAYLOR")
+         linearizer = std::make_unique<LinearizerInnerTaylor>(
+             factory_->extDag(), factory_->getObjectiveConstraintDagId(), true,
+             CornerStyle::Left);
+      else
+         linearizer = std::make_unique<LinearizerInnerAffine>(
+             factory_->extDag(), factory_->getObjectiveConstraintDagId());
+      linearizer->setRelaxTol(env_->getParams()->getDblParam("RELAXATION_EQ_TOL"));
+      prospector_ = std::make_unique<ProspectorInnerRelax>(
+          newprob->getObjective().getVar(), newprob->getObjective().getTerm(),
+          std::move(linearizer), std::move(prover));
    }
    else
    {

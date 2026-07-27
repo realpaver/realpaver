@@ -580,7 +580,7 @@ Constraint Problem::ctrRedundantAt(size_t i) const
 
 Constraint Problem::ctrObjective() const
 {
-   THROW_IF(hasObjective(), "No objective constraint");
+   THROW_IF(!hasObjective(), "No objective constraint");
    return ctrAt(obj_ctr_);
 }
 

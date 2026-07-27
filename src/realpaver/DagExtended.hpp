@@ -188,7 +188,7 @@ public:
  *
  * An extended DAG is a DAG with a control on the activation of the constraints.
  * Every constraint in this can activate a constraint, e.g.: the constraint itself for
- * an arithmetic constraint, the bofy of a conditional constraint, one piece of a
+ * an arithmetic constraint, the body of a conditional constraint, one piece of a
  * piecewise constraint.
  */
 class DagExtended {

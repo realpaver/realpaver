@@ -1372,7 +1372,7 @@ void Params::makeContract()
    relax_tol.setName("RELAXATION_EQ_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(1.0e-8)
+       .setValue(1.0e-12)
        .setMinValue(0.0);
    add(relax_tol);
 
@@ -1402,7 +1402,7 @@ void Params::makePolytope()
        .addChoice("AFFINE", "use of affine forms")
        .addChoice("TAYLOR", "use of Taylor (mean value) forms")
        .addChoice("AFFINE_TAYLOR", "use of affine and Taylor (mean value) forms")
-       .setValue("AFFINE_TAYLOR");
+       .setValue("AFFINE");
    add(relax);
 
    ////////////////////
@@ -1624,7 +1624,11 @@ void Params::makeLocalOptim()
        .setWhat("Exploration strategy to find feasible points")
        .addChoice("SIMPLE", "simple test of the point returned by the domain picker")
        .addChoice("LOCALSOLVER", "Use a local solver to find a feasible point")
-       .setValue("SIMPLE");
+       .addChoice("INNER_TAYLOR",
+                  "Use an inner linear relaxation to find a feasible point")
+       .addChoice("INNER_AFFINE",
+                  "Use an inner linear relaxation to find a feasible point")
+       .setValue("INNER_TAYLOR");
    add(pros);
 }
 
