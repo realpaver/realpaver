@@ -280,11 +280,11 @@ test(
     inner_linearizer_taylor_test,
 )
 
-# inner_linearizer_affine_test = executable(
-#     'inner_linearizer_affine_test',
-#     sources: 'inner_affine_test.cpp',
-#     link_with: realpaver_lib,
-#     dependencies: deps_lib,
-#     include_directories: ['../src'],
-# )
-# test('Test of inner linearization based on Affine', inner_linearizer_affine_test)
+inner_linearizer_affine_test = executable(
+    'inner_linearizer_affine_test',
+    sources: 'inner_affine_test.cpp',
+    link_with: realpaver_lib,
+    dependencies: deps_lib,
+    include_directories: ['../src'],
+)
+test('Test of inner linearization based on Affine', inner_linearizer_affine_test)

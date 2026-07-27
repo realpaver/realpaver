@@ -103,8 +103,6 @@ bool LinearizerInnerTaylor::makeOne(LPModel &lpm, const IntervalBox &B,
          c.set(v, dom.left());
    }
 
-   LOG_INTER("ACTIVE: " << active)
-
    // generates the constraints
    for (size_t i = 0; i < edag_->size(); ++i)
    {
