@@ -18,11 +18,13 @@
  * @date   3 Apr 2026
  */
 
+#include "RealPoint.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintArithmetic.hpp"
 #include "realpaver/ConstraintCond.hpp"
 #include "realpaver/ConstraintPiecewise.hpp"
 #include "realpaver/DagExtended.hpp"
+#include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
@@ -51,6 +53,12 @@ SharedDagFun DagFunExt::getActive(const IntervalBox &B, const Bitset &active)
    return (active.isEmpty() || active.get(ctr_.id())) ? getActiveImpl(B) : nullptr;
 }
 
+SharedDagFun DagFunExt::getActive(const RealPoint &P, const Bitset &active)
+{
+   // LOG_LOW("GET ACTIVE: " << (active.isEmpty() || active.get(ctr_.id())))
+   return (active.isEmpty() || active.get(ctr_.id())) ? getActiveImpl(P) : nullptr;
+}
+
 /*----------------------------------------------------------------------------*/
 
 DagFunArith::DagFunArith(SharedDag dag, Constraint ctr, int i)
@@ -65,6 +73,11 @@ int DagFunArith::index() const
 }
 
 SharedDagFun DagFunArith::getActiveImpl(const IntervalBox &B)
+{
+   return dag_->fun(idx_);
+}
+
+SharedDagFun DagFunArith::getActiveImpl(const RealPoint &P)
 {
    return dag_->fun(idx_);
 }
@@ -86,6 +99,13 @@ SharedDagFun DagFunCond::getActiveImpl(const IntervalBox &B)
 {
    ConstraintCond *cc = static_cast<ConstraintCond *>(ctr_.rep().get());
    return ((cc->guard().isSatisfied(B) == Proof::Inner) && (idx_ >= 0)) ? dag_->fun(idx_)
+                                                                        : nullptr;
+}
+
+SharedDagFun DagFunCond::getActiveImpl(const RealPoint &P)
+{
+   ConstraintCond *cc = static_cast<ConstraintCond *>(ctr_.rep().get());
+   return ((cc->guard().isSatisfied(P) == Proof::Inner) && (idx_ >= 0)) ? dag_->fun(idx_)
                                                                         : nullptr;
 }
 
@@ -125,6 +145,24 @@ SharedDagFun DagFunPiecewise::getActiveImpl(const IntervalBox &B)
    return nullptr;
 }
 
+SharedDagFun DagFunPiecewise::getActiveImpl(const RealPoint &P)
+{
+   ConstraintPiecewise *cp = static_cast<ConstraintPiecewise *>(ctr_.rep().get());
+   Variable v = cp->variable();
+
+   for (size_t i = 0; i < cp->nbPieces(); ++i)
+   {
+      if (idx_[i] < 0)
+         continue;
+
+      if (P.get(cp->binary(i)) == 1 || cp->interval(i).contains(P.get(v)))
+      {
+         return dag_->fun(idx_[i]);
+      }
+   }
+   return nullptr;
+}
+
 void DagFunPiecewise::acceptVisitor(DagFunExtVisitor &vis) const
 {
    vis.apply(this);
@@ -157,6 +195,7 @@ DagExtended::DagExtended(const Problem &pbm)
     : dag_(nullptr)
     , lfun_()
     , lctr_()
+    , scope_(pbm.scope())
 {
    dag_ = std::make_shared<Dag>();
    for (size_t i = 0; i < pbm.nbCtrs(); ++i)
@@ -177,7 +216,8 @@ SharedDag DagExtended::dag() const
 
 Scope DagExtended::scope() const
 {
-   return dag_->scope();
+   // return dag_->scope();
+   return scope_;
 }
 
 size_t DagExtended::size() const
@@ -204,6 +244,11 @@ SharedDagFun DagExtended::getActiveFun(size_t i, const IntervalBox &B,
                                        const Bitset &active)
 {
    return lfun_[i]->getActive(B, active);
+}
+
+SharedDagFun DagExtended::getActiveFun(size_t i, const RealPoint &P, const Bitset &active)
+{
+   return lfun_[i]->getActive(P, active);
 }
 
 size_t DagExtended::nbOutsideCtrs() const

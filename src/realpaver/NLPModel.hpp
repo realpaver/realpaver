@@ -22,6 +22,8 @@
 #define REALPAVER_NLP_MODEL_HPP
 
 #include "realpaver/Common.hpp"
+#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/RealFunction.hpp"
@@ -49,8 +51,11 @@ public:
    /// Constructor given an objective function to be minimized
    NLPModel(const RealFunction &obj);
 
+   /// Creates a minimization NLPModel for a DAG
+   NLPModel(SharedDag obj_dag, int obj_idx, SharedDagExtended edag);
+
    /// Constructor given an objective function and a set of constraints
-   NLPModel(const RealFunction &obj, const RealFunctionVector &ctrs);
+   // NLPModel(const RealFunction &obj, const RealFunctionVector &ctrs);
 
    /// Default copy constructor
    NLPModel(const NLPModel &) = default;
@@ -72,7 +77,11 @@ public:
     * Both scopes of the box and src must contain the scope of this.
     * They do not necessarily correspond.
     */
-   virtual OptimizationStatus minimize(const IntervalBox &box, const RealPoint &src) = 0;
+   OptimizationStatus minimize(const IntervalBox &box, const RealPoint &src);
+   OptimizationStatus minimize(const IntervalBox &box, const RealPoint &src,
+                               const Bitset &active);
+   virtual OptimizationStatus minimizeImpl(const IntervalBox &box, const RealPoint &src,
+                                           const Bitset &active) = 0;
 
    /// Returns the time limit in seconds for a run of minimize
    double timeLimit() const;
@@ -104,8 +113,8 @@ public:
    /// Returns the a pointer to the objective function
    RealFunction *obj() const;
 
-   /// Returns the pointer to the vector of constraints functions
-   RealFunctionVector *ctrs() const;
+   /// Returns the pointer to the extended dag of constraints functions
+   SharedDagExtended edag() const;
 
    /// Returns the best value for the objective function
    double bestVal() const;
@@ -128,9 +137,17 @@ public:
    /// Returns the scope of this
    Scope scope() const;
 
+   /// Returns the time spent in optimizing
+   double timeSpent() const;
+
+   /// Return the number of iterations used
+   double iterUsed() const;
+
 protected:
-   RealFunction *obj_;        // Objective function on real numbers
-   RealFunctionVector *ctrs_; // Vector of functions for the constraints
+   RealFunction *obj_; // Objective function on real numbers
+   // RealFunctionVector *ctrs_; // Vector of functions for the constraints
+   // SharedDagFun obj_;       // DagFun for objective function
+   SharedDagExtended edag_; // extended DAG for constraints handling
 
    Scope scop_; // union of scopes of the objective function and the constraints
 
@@ -144,6 +161,9 @@ protected:
    double time_limit_; // Stop criterion based on time spend to optimize
    size_t iter_limit_; // Stop criterion based on the number of iterations
    Tolerance tol_;     // Stop criterion based on tolerance on the objective
+
+   double iter_; // count the number of iterations
+   double time_; // count the time spent in solving
 
    std::string alg_; // Local optimization algorithm
 };
