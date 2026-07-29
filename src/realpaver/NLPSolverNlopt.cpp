@@ -348,9 +348,9 @@ void NLPSolver::makeCtrs(const IntervalBox &B, const Bitset &active)
       // }
    }
 
-   for (size_t i = 0; i < edag()->nbBadCtrs(); i++)
+   for (size_t i = 0; i < edag()->nbOutsideCtrs(); i++)
    {
-      std::shared_ptr<ConstraintRep> c = edag()->badCtr(i).rep();
+      std::shared_ptr<ConstraintRep> c = edag()->outsideCtr(i).rep();
       Ctr ctr = {this, nullptr, c, active};
       nl_ctrs_.push_back(ctr);
    }
