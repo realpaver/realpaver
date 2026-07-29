@@ -12,39 +12,42 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   SplitLF.hpp
- * @brief  Largest-First splitting strategy
+ * @file   ProspectorSimple.hpp
+ * @brief  Prospector testing one point
  * @author Laurent Granvilliers
- * @date   10 June 2025
+ * @date   13 Oct 2025
  */
 
-#ifndef REALPAVER_SPLIT_LF_HPP
-#define REALPAVER_SPLIT_LF_HPP
+#ifndef REALPAVER_PROSPECTOR_INNER_RELAX_HPP
+#define REALPAVER_PROSPECTOR_INNER_RELAX_HPP
 
-#include "realpaver/SelectorLF.hpp"
-#include "realpaver/Split.hpp"
+#include "realpaver/LinearizerInner.hpp"
+#include "realpaver/Prospector.hpp"
+#include <memory>
 
 namespace realpaver {
 
-/// Largest-First splitting strategy
-class SplitLF : public Split {
+/**
+ * @brief Prospector making a simple test.
+ *
+ * A point is chosen in the given box and a prover is used to verify the feasibility
+ * property.
+ */
+class ProspectorInnerRelax : public Prospector {
 public:
    /// Constructor
-   SplitLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap);
+   ProspectorInnerRelax(const Variable &vobj, const Term &obj,
+                        std::unique_ptr<LinearizerInner> linearizer,
+                        std::unique_ptr<Prover> prover);
 
-   /// Default destructor
-   ~SplitLF() = default;
+   bool exploreImpl(Node &node, RealPoint &pt) override;
 
-   /// No copy
-   SplitLF(const SplitLF &) = delete;
-
-   /// No assignment
-   SplitLF &operator=(const SplitLF &) = delete;
-
-   void applyImpl(SharedNode node, NodeContext &context) override;
+   void setRelaxTol(double tol);
 
 private:
-   SelectorLF sel_;
+   Variable vobj_;
+   Term obj_;
+   std::unique_ptr<LinearizerInner> linearizer_;
 };
 
 } // namespace realpaver

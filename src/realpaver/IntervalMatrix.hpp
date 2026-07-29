@@ -24,6 +24,7 @@
 #include "realpaver/IntervalVector.hpp"
 #include "realpaver/NumericIntervalTraits.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include <vector>
 
 namespace realpaver {
 
@@ -37,6 +38,9 @@ class IntervalMatrix : public NumericMatrix<Interval> {
 public:
    /// Base class
    using BaseType = NumericMatrix<Interval>;
+
+   /// Type of lists of indexes
+   using IndexList = std::vector<size_t>;
 
    /// Creates a matrix with nrows rows and ncols columns
    IntervalMatrix(size_t nrows, size_t ncols, const Interval &x = Interval::zero());
@@ -88,6 +92,23 @@ public:
 
    /// Division with assignment
    IntervalMatrix &operator/=(double a);
+
+   /**
+    * @brief Selects the most sensitive variables.
+    *
+    * The number of rows of this must be less than the number of columns.
+    *
+    * Returns false if this is not invertible. Otherwise, columns is assigned to a list of
+    * column indexes from the most sensitive variables to the less sensitives ones. For
+    * example, if this is a rectangular matrix with n rows and m columns with n>m, columns
+    * is a permutation of the set {0, 1, ..., m-1} such that the n first indexes
+    * correspond to the most sensitive variables.
+    */
+   bool selectMostSensitive(IndexList &columns);
+
+private:
+   // finds the maximum pivit in the submatrix from coordinates (i, i)
+   bool findMaxPivot(size_t i, size_t &row, size_t &col);
 };
 
 /// Output on s stream

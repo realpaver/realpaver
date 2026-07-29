@@ -106,12 +106,12 @@ void ConstraintRep::setStatus(ConstraintStatus status)
    status_ = status;
 }
 
-bool ConstraintRep::isEquation() const
+bool ConstraintRep::isAnEquation() const
 {
    return false;
 }
 
-bool ConstraintRep::isInequality() const
+bool ConstraintRep::isAnInequality() const
 {
    return false;
 }
@@ -121,7 +121,17 @@ bool ConstraintRep::isLinear() const
    return false;
 }
 
-bool ConstraintRep::isBoundConstraint() const
+bool ConstraintRep::isQuadratic() const
+{
+   return false;
+}
+
+bool ConstraintRep::isPolynomial() const
+{
+   return false;
+}
+
+bool ConstraintRep::isABoundConstraint() const
 {
    return false;
 }

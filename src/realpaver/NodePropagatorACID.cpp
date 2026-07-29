@@ -32,10 +32,7 @@ NodePropagatorACID::NodePropagatorACID(ContractorFactory &facto)
 
 Proof NodePropagatorACID::contractImpl(IntervalBox &B, const Bitset &active)
 {
-   // applies HC4
-   Proof proof = hc4_->contract(B, active);
-   if (proof == Proof::Empty)
-      return proof;
+   Proof proof = Proof::Maybe;
 
    // applies ACID
    if (acid_ != nullptr)

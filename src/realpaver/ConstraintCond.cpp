@@ -28,7 +28,7 @@ ConstraintCond::ConstraintCond(Constraint guard, Constraint body)
     , guard_(guard)
     , body_(body)
 {
-   THROW_IF(!(guard.isInteger() || guard.isInequality()),
+   THROW_IF(!(guard.isAnIntegerConstraint() || guard.isAnInequality()),
             "Bad guard of conditional constraint: " << guard);
 
    hcode_ = guard.hashCode();
@@ -134,9 +134,9 @@ ConstraintRep *ConstraintCond::cloneRoot() const
    return new ConstraintCond(guard_, body_);
 }
 
-bool ConstraintCond::isInteger() const
+bool ConstraintCond::isAnIntegerConstraint() const
 {
-   return guard_.isInteger() && body_.isInteger();
+   return guard_.isAnIntegerConstraint() && body_.isAnIntegerConstraint();
 }
 
 Constraint cond(Constraint guard, Constraint body)

@@ -27,16 +27,6 @@ IntervalFunctionRep::~IntervalFunctionRep()
 {
 }
 
-void IntervalFunctionRep::setImage(const Interval &img)
-{
-   img_ = img;
-}
-
-Interval IntervalFunctionRep::getImage() const
-{
-   return img_;
-}
-
 /*----------------------------------------------------------------------------*/
 
 IntervalFunction::IntervalFunction(SharedDagFun f)
@@ -59,11 +49,6 @@ IntervalFunction::IntervalFunction(SharedRep rep)
 IntervalFunction::SharedRep IntervalFunction::rep() const
 {
    return rep_;
-}
-
-void IntervalFunction::setImage(const Interval &img)
-{
-   rep_->setImage(img);
 }
 
 Interval IntervalFunction::getImage() const
@@ -91,7 +76,7 @@ void IntervalFunction::diff(const IntervalBox &B, IntervalVector &G)
    return rep_->diff(B, G);
 }
 
-void IntervalFunction::diffHansen(const IntervalBox &B, const RealPoint &c,
+void IntervalFunction::diffHansen(const IntervalBox &B, const IntervalBox &c,
                                   IntervalVector &G)
 {
    rep_->diffHansen(B, c, G);
@@ -111,6 +96,11 @@ IntervalFunctionDag::IntervalFunctionDag(Term t, const Interval &img)
    SharedDag dag = std::make_shared<Dag>();
    size_t i = dag->insert(t, img);
    f_ = dag->fun(i);
+}
+
+Interval IntervalFunctionDag::getImage() const
+{
+   return f_->getImage();
 }
 
 Scope IntervalFunctionDag::scope() const
@@ -133,7 +123,7 @@ void IntervalFunctionDag::diff(const IntervalBox &B, IntervalVector &G)
    return f_->iDiff(B, G);
 }
 
-void IntervalFunctionDag::diffHansen(const IntervalBox &B, const RealPoint &c,
+void IntervalFunctionDag::diffHansen(const IntervalBox &B, const IntervalBox &c,
                                      IntervalVector &G)
 {
    return f_->iDiffHansen(B, c, G);

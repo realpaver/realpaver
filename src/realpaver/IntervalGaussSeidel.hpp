@@ -71,6 +71,13 @@ public:
    Proof contractPrecond(const IntervalMatrix &A, IntervalVector &x,
                          const IntervalVector &b);
 
+   ///
+   Proof certify(const IntervalMatrix &A, IntervalVector &x, const IntervalVector &b);
+
+   ///
+   Proof certifyPrecond(const IntervalMatrix &A, IntervalVector &x,
+                        const IntervalVector &b);
+
    /// Sets a limit of iterations of the iterative method
    void setMaxIter(size_t n);
 

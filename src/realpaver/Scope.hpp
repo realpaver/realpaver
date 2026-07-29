@@ -319,6 +319,12 @@ public:
    /// Returns this set minus scop
    Scope setminus(const Scope &scop) const;
 
+   /// Return the scope of all the continuous variables in this
+   Scope continuousScope() const;
+
+   /// Return the scope of all the discrete variables in this
+   Scope discreteScope() const;
+
 private:
    std::shared_ptr<ScopeRep> rep_; // shared representation
 

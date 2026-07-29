@@ -52,7 +52,7 @@ void ConstraintPiecewise::addPiece(Variable b, const Interval &guard, Constraint
    for (const auto &x : itvs_)
    {
       Interval y = x & guard;
-      if (y.right() > y.left())
+      if (Double::prevDouble(y.right()) > Double::nextDouble(y.left()))
          THROW("The guards overlap: " << guard << ", " << x);
    }
 
@@ -466,10 +466,10 @@ ConstraintRep *ConstraintPiecewise::cloneRoot() const
    return rep;
 }
 
-bool ConstraintPiecewise::isInteger() const
+bool ConstraintPiecewise::isAnIntegerConstraint() const
 {
    for (const auto &c : ctrs_)
-      if (!c.isInteger())
+      if (!c.isAnIntegerConstraint())
          return false;
    return true;
 }

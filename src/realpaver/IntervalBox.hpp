@@ -81,7 +81,7 @@ public:
     *
     * Assigns this to B restricted to scop
     */
-   IntervalBox(const IntervalBox &B, Scope scop);
+   IntervalBox(Scope scop, const IntervalBox &B);
    ///@}
 
    /// Default assignment operator
@@ -167,6 +167,13 @@ public:
     * For each v in scope, this[v] is assigned to B[v].
     */
    void setOnScope(const IntervalBox &B, const Scope &scop);
+
+   /**
+    * @brief Assignment on a scope.
+    *
+    * For each v in scope, this[v] is assigned to the midpoint of B[v].
+    */
+   void setMidpointOnScope(const IntervalBox &B, const Scope &scop);
 
    /**
     * @brief Midpoint on a scope.

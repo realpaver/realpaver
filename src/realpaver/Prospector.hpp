@@ -23,7 +23,7 @@
 
 #include "realpaver/Node.hpp"
 #include "realpaver/NodeContext.hpp"
-#include "realpaver/ProverOptim.hpp"
+#include "realpaver/Prover.hpp"
 #include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
@@ -31,13 +31,14 @@ namespace realpaver {
 /**
  * @brief Base class of prospectors.
  *
- * A prospector is used to find feasible points, defined by a real point that certainly
- * satisfies all the active constraints in a node.
+ * A prospector is used to find feasible points, which is implemented by explore.
+ * Since the equations can be processed by an inflating interval Newton operator
+ * an interval box is computed in case of success.
  */
 class Prospector {
 public:
    /// Constructor
-   Prospector(std::unique_ptr<ProverOptim> prover);
+   Prospector(std::unique_ptr<Prover> prover);
 
    /// No copy constructor
    Prospector(const Prospector &) = delete;
@@ -56,8 +57,8 @@ public:
     */
    bool explore(Node &node, NodeContext &ctx);
 
-   /// Gets the feasible point after a successfull exploration
-   const RealPoint &feasiblePoint() const;
+   /// Gets the feasible box after a successfull exploration
+   const IntervalBox &feasibleBox() const;
 
    /**
     * @brief Exploration method called by explore, to be overriden in sub-classes.
@@ -67,8 +68,10 @@ public:
    virtual bool exploreImpl(Node &node, RealPoint &pt) = 0;
 
 private:
-   std::unique_ptr<ProverOptim> prover_;
-   RealPoint *pt_; // feasible point if found
+   std::unique_ptr<Prover> prover_;
+   IntervalBox *feasible_; // feasible box if found
+protected:
+   bool use_prover_;
 };
 
 } // namespace realpaver

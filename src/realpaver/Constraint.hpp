@@ -97,23 +97,29 @@ public:
    /// Returns true if v belongs to the scope of this
    bool dependsOn(Variable v) const;
 
-   /// Returns true if this is an arithmetic constraint
-   bool isArithmetic() const;
-
    /// Returns true if this is an equation
-   bool isEquation() const;
+   bool isAnEquation() const;
 
    /// Returns true if this is an inequality constraint
-   bool isInequality() const;
+   bool isAnInequality() const;
 
    /// Returns true if this is linear
    bool isLinear() const;
 
+   /// Returns true if this is quadratic, i.e. a sum of square and bilinear terms
+   bool isQuadratic() const;
+
+   /// Returns true if this is a polynomial constraint
+   bool isPolynomial() const;
+
+   // Returns true if this is not polynomial, not linear, and not quadratic
+   bool isNonLinear() const;
+
    /// Returns true if this is a bound constraint
-   bool isBoundConstraint() const;
+   bool isABoundConstraint() const;
 
    /// Returns true if this is an integer constraint
-   bool isInteger() const;
+   bool isAnIntegerConstraint() const;
 
    /// Returns a new representation such that only the root of this is cloned
    ConstraintRep *cloneRoot() const;

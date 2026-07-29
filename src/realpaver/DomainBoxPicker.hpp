@@ -12,41 +12,42 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   SelectorSLF.hpp
- * @brief  Variable selection strategy for mixed problems
+ * @file   DomainBoxPicker.hpp
+ * @brief  Base class of pickers on domain boxes
  * @author Laurent Granvilliers
- * @date   25 Apr 2025
+ * @date   14 Oct 2025
  */
 
-#ifndef REALPAVER_SELECTOR_SLF_HPP
-#define REALPAVER_SELECTOR_SLF_HPP
+#ifndef REALPAVER_DOMAIN_BOX_PICKER_HPP
+#define REALPAVER_DOMAIN_BOX_PICKER_HPP
 
-#include "realpaver/Selector.hpp"
+#include "realpaver/DomainBox.hpp"
+#include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
 
-/**
- * @brief Variable selection strategy for mixed problems.
- *
- * If there is an integer variable whose domain is splitable, then it selects
- * the integer variable having the smallest domain. Otherwise, it selects the
- * real variable having the largest domain.
- */
-class SelectorSLF : public Selector {
+/// A picker chooses a point in a box.
+class DomainBoxPicker {
 public:
    /// Default constructor
-   SelectorSLF() = default;
+   DomainBoxPicker() = default;
 
-   /// Default destructor
-   ~SelectorSLF() = default;
+   /// Virtual destructor
+   virtual ~DomainBoxPicker();
 
-   /// Default copy constructor
-   SelectorSLF(const SelectorSLF &) = default;
+   // Default copy constructor
+   DomainBoxPicker(const DomainBoxPicker &) = default;
 
    /// No assignment
-   SelectorSLF &operator=(const SelectorSLF &) = delete;
+   DomainBoxPicker &operator=(const DomainBoxPicker &) = delete;
 
-   bool apply(SharedNode node, NodeContext &context) override;
+   /**
+    * @brief Selection method.
+    *
+    * It selects the point pt within the box. The scope of the box must
+    * contain the scope of the point.
+    */
+   virtual void apply(const DomainBox &box, RealPoint &pt);
 };
 
 } // namespace realpaver

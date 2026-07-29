@@ -35,8 +35,8 @@ namespace realpaver {
  */
 class SelectorLF : public Selector {
 public:
-   /// Default constructor
-   SelectorLF() = default;
+   /// Constructor
+   SelectorLF(Scope scop);
 
    /// Default destructor
    ~SelectorLF() = default;

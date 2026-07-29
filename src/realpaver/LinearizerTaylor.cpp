@@ -93,6 +93,9 @@ void LinearizerTaylor::makeVars(LPModel &lpm, const IntervalBox &B)
 bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner,
                                const Bitset &active)
 {
+   if (B.isInf())
+      return false;
+
    // makes the corner of the box
    RealPoint c(scop_);
    for (const auto &v : scop_)

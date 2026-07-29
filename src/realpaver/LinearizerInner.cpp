@@ -12,31 +12,25 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   SplitSF.cpp
- * @brief  Smallest-First splitting strategy
- * @author Laurent Granvilliers
- * @date   10 June 2025
+ * @file   LinearizerInner.cpp
+ * @brief  Inner linearization of nonlinear problems
+ * @author Raphaël Chenouard
+ * @date   11 Jun 2026
  */
 
-#include "realpaver/Logger.hpp"
-#include "realpaver/SplitSF.hpp"
+#include "realpaver/LinearizerInner.hpp"
 
 namespace realpaver {
 
-SplitSF::SplitSF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-    : Split(scop, std::move(smap))
-    , sel_()
+LinearizerInner::LinearizerInner(SharedDagExtended dag, int cobj)
+    : Linearizer(dag)
+    , cobj_(cobj)
 {
 }
 
-void SplitSF::applyImpl(SharedNode node, NodeContext &context)
+int LinearizerInner::getObjCtrIndex() const
 {
-   if (sel_.apply(node, context))
-   {
-      Variable v = sel_.getSelectedVar();
-      splitOne(node, v);
-      LOG_INTER("SF selects " << v.getName() << " in node " << node->index());
-   }
+   return cobj_;
 }
 
 } // namespace realpaver

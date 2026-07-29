@@ -21,7 +21,7 @@
 #ifndef REALPAVER_INFLATOR_HPP
 #define REALPAVER_INFLATOR_HPP
 
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalBox.hpp"
 
 namespace realpaver {
 
@@ -67,6 +67,9 @@ public:
 
    /// Inflates each component of an interval vector
    void inflate(IntervalVector &X) const;
+
+   /// Inflates an interval box for each component from a given scope
+   void inflateOnScope(IntervalBox &B, const Scope &scop) const;
 
 private:
    double delta_;

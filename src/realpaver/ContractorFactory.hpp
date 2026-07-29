@@ -116,7 +116,7 @@ public:
     * there are at least two equations and the system is square, nullptr
     * otherwise.
     */
-   std::shared_ptr<IntervalNewton> makeNewton();
+   std::shared_ptr<IntervalNewton> makeSquareNewton();
 
    /**
     * @brief Returns a domain contractor.
@@ -135,6 +135,9 @@ public:
     */
    SharedContractorPolytope makePolytope();
 
+   int getObjectiveConstraintId() const;
+   int getObjectiveConstraintDagId() const;
+
 private:
    std::shared_ptr<Env> env_; // environment for parameters
    SharedDagExtended edag_;   // extended DAG of constraints
@@ -142,6 +145,9 @@ private:
    ConstraintSet csi_;        // inequalities
    ConstraintSet cso_;        // other constraints
    ConstraintSet cs_;         // all constraints
+
+   int obj_ctr_idx_;    // idx of objective constraint in problem definition
+   int obj_ctr_dag_id_; // idx of objective constraint in problem definition
 };
 
 /*----------------------------------------------------------------------------*/

@@ -18,32 +18,34 @@
  * @date   6 Oct 2025
  */
 
-#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/BoxPicker.hpp"
 #include "realpaver/Common.hpp"
 #include "realpaver/DomainBox.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
 #include "realpaver/DomainSlicerFactory.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/SelectorLF.hpp"
 
 #ifdef LOCAL_OPTIMIZER
 #include "realpaver/NLPSolver.hpp"
 #include "realpaver/ProspectorLocalSolver.hpp"
 #endif
 
+#include "realpaver/LinearizerInnerAffine.hpp"
+#include "realpaver/LinearizerInnerTaylor.hpp"
 #include "realpaver/NodePropagatorList.hpp"
+#include "realpaver/NodePropagatorLoop.hpp"
 #include "realpaver/Optimizer.hpp"
 #include "realpaver/Param.hpp"
+#include "realpaver/ProspectorInnerRelax.hpp"
 #include "realpaver/ProspectorSimple.hpp"
-#include "realpaver/ProverOptim.hpp"
+#include "realpaver/Prover.hpp"
+#include "realpaver/SelectorLF.hpp"
+#include "realpaver/SelectorSF.hpp"
 #include "realpaver/SpaceOptimFD.hpp"
 #include "realpaver/SpaceOptimLU.hpp"
-#include "realpaver/SplitLF.hpp"
+#include "realpaver/SplitDefault.hpp"
 #include "realpaver/SplitRR.hpp"
-#include "realpaver/SplitSF.hpp"
-#include "realpaver/SplitSLF.hpp"
-#include "realpaver/SplitSSR.hpp"
-#include "realpaver/SplitSSRLF.hpp"
 
 #include <iomanip>
 #include <ios>
@@ -57,7 +59,6 @@ Optimizer::Optimizer(const Problem &pbm)
     , context_(nullptr)
     , env_(nullptr)
     , space_(nullptr)
-    , dag_(nullptr)
     , propagator_(nullptr)
     , factory_(nullptr)
     , prospector_(nullptr)
@@ -179,6 +180,10 @@ void Optimizer::makeSpace()
       box->set(z_, std::move(mod));
    }
 
+   Interval dom = node->box()->get(z_)->intervalHull();
+   L_ = dom.left();
+   U_ = dom.right();
+
    space_->pushPendingNode(node);
    ++nbnodes_;
 }
@@ -187,15 +192,15 @@ void Optimizer::makePropagator()
 {
    LOG_LOW("Makes the propagator in the optimizer");
 
-   std::unique_ptr<NodePropagatorList> aux = std::make_unique<NodePropagatorList>();
+   std::unique_ptr<NodePropagatorList> op = std::make_unique<NodePropagatorList>();
 
    // Constraint propagation algorithm: HC4 or AFFINE
    std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
 
    if (base == "HC4")
-      aux->pushBack(NodePropagAlgo::HC4, *factory_);
+      op->pushBack(NodePropagAlgo::HC4, *factory_);
    else if (base == "AFFINE")
-      aux->pushBack(NodePropagAlgo::AFFINE, *factory_);
+      op->pushBack(NodePropagAlgo::AFFINE, *factory_);
    else
       THROW("Bad parameter value for the propagation algorithm");
 
@@ -203,19 +208,30 @@ void Optimizer::makePropagator()
    std::string with_acid = env_->getParams()->getStrParam("PROPAGATION_WITH_ACID");
 
    if (with_acid == "YES")
-      aux->pushBack(NodePropagAlgo::ACID, *factory_);
+      op->pushBack(NodePropagAlgo::ACID, *factory_);
 
    // Polytope hull contractor: YES or NO
    std::string with_polytope =
        env_->getParams()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
 
    if (with_polytope == "YES")
+   {
+      std::shared_ptr<NodePropagatorList> aux = std::make_shared<NodePropagatorList>();
       aux->pushBack(NodePropagAlgo::Polytope, *factory_);
+      aux->pushBack(NodePropagAlgo::HC4, *factory_);
 
-   if (aux->size() == 0)
+      std::shared_ptr<NodePropagatorLoop> oploop =
+          std::make_shared<NodePropagatorLoop>(aux);
+      double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
+      oploop->setTol(tol);
+
+      op->pushBack(oploop);
+   }
+
+   if (op->size() == 0)
       THROW("Unable to create the propagator in the optimizer");
 
-   propagator_ = std::move(aux);
+   propagator_ = std::move(op);
 }
 
 void Optimizer::makeSplit()
@@ -241,47 +257,47 @@ void Optimizer::makeSplit()
    std::string sel = env_->getParams()->getStrParam("SPLIT_SELECTION");
 
    if (sel == "RR")
+   {
       split_ = std::make_unique<SplitRR>(scop, std::move(smap));
-
-   else if (sel == "LF")
-      split_ = std::make_unique<SplitLF>(scop, std::move(smap));
-
-   else if (sel == "SF")
-      split_ = std::make_unique<SplitSF>(scop, std::move(smap));
-
-   else if (sel == "SLF")
-      split_ = std::make_unique<SplitSLF>(scop, std::move(smap));
-
-   else if (sel == "SSR")
-   {
-      if (dag_->isEmpty())
-      {
-         LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
-         split_ = std::make_unique<SplitLF>(scop, std::move(smap));
-      }
-      else
-      {
-         IntervalFunctionVector F(factory_->extDag());
-         split_ = std::make_unique<SplitSSR>(scop, std::move(smap), F);
-      }
    }
-
-   else if (sel == "SSR_LF")
+   else if (sel == "DEFAULT")
    {
-      if (dag_->isEmpty())
+      // continuous variables
+      std::string cont_var = env_->getParams()->getStrParam("SPLIT_CONTINUOUS");
+      std::unique_ptr<Selector> slc = nullptr;
+
+      if (cont_var == "LF")
       {
-         LOG_LOW("WARNING: Empty DAG, switching to Largest-First splitting strategy!");
-         split_ = std::make_unique<SplitLF>(scop, std::move(smap));
+         slc = std::make_unique<SelectorLF>(newprob->scope().continuousScope());
       }
-      else
+      else if (cont_var == "SSR")
       {
          IntervalFunctionVector F(factory_->extDag());
-         std::unique_ptr<SplitSSRLF> hybrid =
-             std::make_unique<SplitSSRLF>(scop, std::move(smap), F);
-         double f = env_->getParams()->getDblParam("SPLIT_SSR_LF_FREQUENCY");
-         hybrid->setFrequency(f);
-         split_ = std::move(hybrid);
+         slc = std::make_unique<SelectorSSR>(F);
       }
+      THROW_IF(slc == nullptr, "Bad option");
+
+      // discrete variables
+      std::unique_ptr<Selector> sld =
+          std::make_unique<SelectorSF>(newprob->scope().discreteScope());
+
+      std::unique_ptr<SplitDefault> sdef = std::make_unique<SplitDefault>(
+          scop, std::move(smap), std::move(slc), std::move(sld));
+
+      // assigns the parameters
+      double sdef_rr = env_->getParams()->getDblParam("SPLIT_DEFAULT_RR_CYCLE");
+      double sdef_spe = env_->getParams()->getDblParam("SPLIT_DEFAULT_SPECIFIC_CYCLE");
+      bool discrete_first =
+          (env_->getParams()->getStrParam("SPLIT_DISCRETE_FIRST") == "YES");
+
+      int nb_rr = sdef_rr * scop.size();
+      int nb_spe = sdef_spe * scop.size();
+
+      sdef->setCycleLengthRR(nb_rr);
+      sdef->setCycleLength(nb_rr + nb_spe);
+      sdef->setDiscreteFirst(discrete_first);
+
+      split_ = std::move(sdef);
    }
 
    THROW_IF(split_ == nullptr, "Unable to make the split object in the optimizer");
@@ -302,13 +318,22 @@ void Optimizer::makeProspector()
    SharedProblem newprob = pp_->destProblem();
    Scope scop = newprob->scope();
 
-   double tol = env_->getParams()->getDblParam("RELAXATION_EQ_TOL");
-   std::unique_ptr<ProverOptim> prover = std::make_unique<ProverOptim>(*newprob, tol);
+   std::unique_ptr<Prover> prover = std::make_unique<Prover>(factory_->extDag());
+   prover->setInitBox(IntervalBox(newprob->scope()));
+
+   int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
+   prover->setMaxIter(niter);
+
+   double delta = env_->getParams()->getDblParam("INFLATION_DELTA");
+   prover->setInflationDelta(delta);
+
+   double chi = env_->getParams()->getDblParam("INFLATION_CHI");
+   prover->setInflationChi(chi);
 
    std::string prospect = env_->getParams()->getStrParam("PROSPECTOR");
    if (prospect == "SIMPLE")
    {
-      std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
+      std::unique_ptr<DomainBoxPicker> picker = std::make_unique<DomainBoxPicker>();
       prospector_ =
           std::make_unique<ProspectorSimple>(std::move(picker), std::move(prover));
    }
@@ -322,13 +347,51 @@ void Optimizer::makeProspector()
       Tolerance tolNlp(env_->getParams()->getDblParam("NLP_SOLVER_OBJ_REL_TOL"),
                        env_->getParams()->getDblParam("NLP_SOLVER_OBJ_ABS_TOL"));
       localSolver->setTol(tolNlp);
-      std::unique_ptr<BoxPicker> picker = std::make_unique<BoxPicker>();
+      std::unique_ptr<DomainBoxPicker> picker = std::make_unique<DomainBoxPicker>();
       prospector_ = std::make_unique<ProspectorLocalSolver>(
           std::move(picker), std::move(prover), std::move(localSolver));
 #endif
 
       THROW_IF(prospector_ == nullptr,
                "No local solver is available to create the prospector");
+   }
+   else if (prospect == "INNER_TAYLOR" || prospect == "INNER_AFFINE")
+   {
+      // SharedDag dagi = std::make_shared<Dag>();
+      // for (size_t i = 0; i < newprob->nbCtrs(); i++)
+      // {
+      //    if (newprob->ctrAt(i).isInequality())
+      //       dagi->insert(newprob->ctrAt(i));
+      // }
+      // if (dagi->scope().size() == 0)
+      // {
+      //    size_t i = 1;
+      //    for (auto v : newprob->scope())
+      //    {
+      //       if (!dagi->scope().contains(v))
+      //       {
+      //          Constraint ci(v >= -INFINITY);
+      //          ci.setId(newprob->nbCtrs() + i);
+      //          i++;
+      //          dagi->insert(ci);
+      //       }
+      //    }
+      // }
+      // Objective obj = newprob->getObjective();
+      // size_t id = newprob->addCtr(obj.getVar() == obj.getTerm());
+      // size_t cobj = dag_->insert(newprob->ctrAt(id));
+      std::unique_ptr<LinearizerInner> linearizer;
+      if (prospect == "INNER_TAYLOR")
+         linearizer = std::make_unique<LinearizerInnerTaylor>(
+             factory_->extDag(), factory_->getObjectiveConstraintDagId(), true,
+             CornerStyle::Left);
+      else
+         linearizer = std::make_unique<LinearizerInnerAffine>(
+             factory_->extDag(), factory_->getObjectiveConstraintDagId());
+      linearizer->setRelaxTol(env_->getParams()->getDblParam("RELAXATION_EQ_TOL"));
+      prospector_ = std::make_unique<ProspectorInnerRelax>(
+          newprob->getObjective().getVar(), newprob->getObjective().getTerm(),
+          std::move(linearizer), std::move(prover));
    }
    else
    {
@@ -425,16 +488,15 @@ void Optimizer::bbStepAux(SharedNodeOptim node, int depthlimit)
          if (found)
          {
             // evaluates the objective function at the feasible point
-            Interval e = obj_.eval(prospector_->feasiblePoint());
+            Interval e = obj_.eval(prospector_->feasibleBox());
             double up = e.right();
             subnode->setUpper(up);
-
-            LOG_INTER("Feasible point found: " << prospector_->feasiblePoint());
+            LOG_INTER("Feasible box found: " << prospector_->feasibleBox());
 
             // new upper bound ?
             if (up < U_)
             {
-               best_ = std::make_unique<RealPoint>(prospector_->feasiblePoint());
+               best_ = std::make_unique<RealPoint>(prospector_->feasibleBox().midpoint());
                space_->simplify(up);
                U_ = up;
                subnode->box()->get(z_)->contract(Interval(lo, up));
@@ -489,7 +551,7 @@ void Optimizer::traceOptimum()
    }
    std::cout << std::endl;
 
-   if (optimumFound())
+   if (best_ != nullptr)
       std::cout << "\033[39m"
                 << "Best feasible point: " << "\033[32m" << std::setprecision(flp)
                 << std::defaultfloat << bestFeasible() << "\033[39m" << std::endl
@@ -528,10 +590,12 @@ void Optimizer::branchAndBound()
    LOG_LOW("Makes the factory in the optimizer");
    factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
 
-   dag_ = factory_->extDag()->dag();
    makeSpace();
+
    makePropagator();
+
    makeSplit();
+
    makeProspector();
 
    // parameters
@@ -571,7 +635,7 @@ void Optimizer::branchAndBound()
 #endif
 
    int tracediv = 0, traceaux = 0;
-   bool traceendl = true, limit = false;
+   bool traceendl = true, limit = false, traceFirstLU = true;
 
    do
    {
@@ -608,7 +672,7 @@ void Optimizer::branchAndBound()
       }
 
       // trace the bounds
-      if (trace && saveL_ != L_)
+      if (trace && (saveL_ != L_ || traceFirstLU))
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
@@ -617,13 +681,14 @@ void Optimizer::branchAndBound()
 
          traceendl = true;
       }
-      if (trace && saveU_ != U_)
+      if (trace && (saveU_ != U_ || traceFirstLU))
       {
          std::cout << "Time: " << "\033[33m" << std::setw(8) << std::setprecision(3)
                    << std::fixed << stimer_.elapsedTime() << "s";
          std::cout << "\033[39m" << std::setprecision(flp) << std::defaultfloat << "\t\t"
                    << sU << ": \033[32m" << U_ * sign_obj << "\033[39m" << std::endl;
          traceendl = true;
+         traceFirstLU = false;
       }
 
       if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
@@ -680,6 +745,16 @@ void Optimizer::branchAndBound()
    timerBB.stop();
    LOG_INTER("Total time BB : " << timerBB.elapsedTime() << "(s)");
 #endif
+
+   Interval optimum = getOptimum();
+   if (optimum.isEmpty() || optimum.isInf())
+   {
+      // example : a solution node does not belong to the domain of
+      // the objective function => the lower bound must be -oo and no
+      // precise enclosure is obtained
+      status_ = OptimizationStatus::Other;
+      LOG_INTER("Bad enclosure of the optimum (empty or infinite)");
+   }
 
    stimer_.stop();
 }

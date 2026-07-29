@@ -12,30 +12,32 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   SplitSLF.cpp
- * @brief  Splitting strategy for mixed problems
+ * @file   DomainBoxPicker.cpp
+ * @brief  Base class of pickers on domain boxes
  * @author Laurent Granvilliers
- * @date   10 June 2025
+ * @date   14 Oct 2025
  */
 
-#include "realpaver/Logger.hpp"
-#include "realpaver/SplitSLF.hpp"
+#include "realpaver/DomainBoxPicker.hpp"
+#include "realpaver/DomainPicker.hpp"
 
 namespace realpaver {
 
-SplitSLF::SplitSLF(Scope scop, std::unique_ptr<DomainSlicerMap> smap)
-    : Split(scop, std::move(smap))
-    , sel_()
+DomainBoxPicker::~DomainBoxPicker()
 {
 }
 
-void SplitSLF::applyImpl(SharedNode node, NodeContext &context)
+void DomainBoxPicker::apply(const DomainBox &box, RealPoint &pt)
 {
-   if (sel_.apply(node, context))
+   REALPAVER_ASSERT(pt.scope().contains(pt.scope()), "Bad scopes");
+   REALPAVER_ASSERT(!box.isEmpty(), "Empty box");
+
+   for (const auto &v : pt.scope())
    {
-      Variable v = sel_.getSelectedVar();
-      splitOne(node, v);
-      LOG_INTER("SLF selects " << v.getName() << " in node " << node->index());
+      Domain *dom = box.get(v);
+      DomainPicker vis;
+      dom->acceptVisitor(vis);
+      pt.set(v, vis.getValue());
    }
 }
 

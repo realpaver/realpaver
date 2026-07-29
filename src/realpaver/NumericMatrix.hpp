@@ -222,7 +222,6 @@ template <typename T> void NumericMatrix<T>::swapCols(size_t i, size_t j)
 
 template <typename T> void NumericMatrix<T>::print(std::ostream &os) const
 {
-   os << '(';
    for (size_t i = 0; i < nrows_; ++i)
    {
       if (i > 0)
@@ -236,7 +235,6 @@ template <typename T> void NumericMatrix<T>::print(std::ostream &os) const
       }
       os << ')';
    }
-   os << ')';
 }
 
 template <typename T> bool NumericMatrix<T>::isInf() const

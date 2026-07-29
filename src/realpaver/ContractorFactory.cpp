@@ -18,6 +18,7 @@
  * @date   11 Apr 2024
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
@@ -30,6 +31,7 @@
 #include "realpaver/LinearizerTaylor.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include <cstddef>
 
 namespace realpaver {
 
@@ -40,6 +42,8 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
     , csi_()
     , cso_()
     , cs_()
+    , obj_ctr_idx_(-1)
+    , obj_ctr_dag_id_(-1)
 {
    // environment
    if (env == nullptr)
@@ -54,17 +58,28 @@ ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
       // inserts c in the different constraint sets
       Constraint c = pbm.ctrAt(i);
       cs_.insert(c);
-      if (c.isEquation())
+      if (c.isAnEquation())
       {
          cse_.insert(c);
       }
-      else if (c.isInequality())
+      else if (c.isAnInequality())
       {
          csi_.insert(c);
       }
       else
       {
          cso_.insert(c);
+      }
+   }
+   if (pbm.hasObjectiveConstraint())
+   {
+      obj_ctr_idx_ = pbm.ctrObjective().id();
+      for (size_t i = 0; i < edag_->size(); i++)
+      {
+         if (edag_->fun(i)->ctr().id() == obj_ctr_idx_)
+         {
+            obj_ctr_dag_id_ = i;
+         }
       }
    }
 }
@@ -117,10 +132,10 @@ SharedContractorAffine ContractorFactory::makeAffine(double tol)
    SharedContractorAffine ctc = std::make_shared<ContractorAffine>(edag_, minrange);
 
    // other constraints
-   for (size_t i = 0; i < edag_->nbBadCtrs(); ++i)
+   for (size_t i = 0; i < edag_->nbOutsideCtrs(); ++i)
    {
       std::shared_ptr<ContractorConstraint> op =
-          std::make_shared<ContractorConstraint>(edag_->badCtr(i));
+          std::make_shared<ContractorConstraint>(edag_->outsideCtr(i));
       ctc->push(op);
    }
 
@@ -142,7 +157,7 @@ SharedContractorAffine ContractorFactory::makeAffine()
    return makeAffine(tol);
 }
 
-std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
+std::shared_ptr<IntervalNewton> ContractorFactory::makeSquareNewton()
 {
    IntervalFunctionVector F;
    for (size_t i = 0; i < edag_->size(); ++i)
@@ -155,6 +170,9 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
          F.addFun(g);
       }
    }
+
+   if (F.nbFuns() < 2)
+      return nullptr;
 
    std::shared_ptr<IntervalNewton> newton;
 
@@ -190,6 +208,7 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
       LOG_LOW("Newton operator NOT built by the factory");
       newton = nullptr;
    }
+
    return newton;
 }
 
@@ -214,7 +233,6 @@ SharedContractorACID ContractorFactory::makeACID()
 
    IntervalFunctionVector F(edag_);
    std::unique_ptr<SelectorSSR> ssr = std::make_unique<SelectorSSR>(F);
-
    double tol = env_->getParams()->getDblParam("ACID_HC4_TOL");
    SharedContractorHC4 hc4 = makeHC4(tol);
 
@@ -341,6 +359,15 @@ SharedContractorPolytope ContractorFactory::makePolytope()
    }
 
    return op;
+}
+
+int ContractorFactory::getObjectiveConstraintId() const
+{
+   return obj_ctr_idx_;
+}
+int ContractorFactory::getObjectiveConstraintDagId() const
+{
+   return obj_ctr_dag_id_;
 }
 
 /*----------------------------------------------------------------------------*/

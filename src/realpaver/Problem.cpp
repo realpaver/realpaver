@@ -18,9 +18,9 @@
  * @date   11 Apr 2024
  */
 
-#include "ConstraintRep.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintRep.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -318,7 +318,8 @@ void Problem::addObjective(Objective obj)
 
    // assigns the domain of the objective variable
    IntervalBox box(this->scope());
-   obj_.getVar().setDomain(std::make_unique<IntervalDomain>(obj_.getTerm().eval(box)));
+   Interval x = obj_.getTerm().eval(box);
+   obj_.getVar().getDomain()->contractInterval(x);
 }
 
 bool Problem::hasObjectiveConstraint() const
@@ -476,7 +477,7 @@ bool Problem::isEqConstrained() const
       return false;
 
    for (size_t i = 0; i < nbCtrs(); ++i)
-      if (!ctrAt(i).isEquation())
+      if (!ctrAt(i).isAnEquation())
          return false;
 
    return true;
@@ -488,7 +489,7 @@ bool Problem::isIneqConstrained() const
       return false;
 
    for (size_t i = 0; i < nbCtrs(); ++i)
-      if (!ctrAt(i).isInequality())
+      if (!ctrAt(i).isAnInequality())
          return false;
 
    return true;
@@ -503,9 +504,9 @@ bool Problem::isMixedConstrained() const
 
    for (size_t i = 0; i < nbCtrs(); ++i)
    {
-      if (ctrAt(i).isEquation())
+      if (ctrAt(i).isAnEquation())
          eq = true;
-      if (ctrAt(i).isInequality())
+      if (ctrAt(i).isAnInequality())
          ineq = true;
 
       if (eq && ineq)
@@ -579,7 +580,7 @@ Constraint Problem::ctrRedundantAt(size_t i) const
 
 Constraint Problem::ctrObjective() const
 {
-   THROW_IF(hasObjective(), "No objective constraint");
+   THROW_IF(!hasObjective(), "No objective constraint");
    return ctrAt(obj_ctr_);
 }
 
