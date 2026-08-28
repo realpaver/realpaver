@@ -211,7 +211,7 @@ int main()
 
    pb = nullptr;
 
-   test_localopt("../benchmarks/cop/coil_spring.rp", OptimizationStatus::Optimal);
+   test_localopt("../benchmarks/cop/beam.rp", OptimizationStatus::Optimal);
 
    test_pw();
 
