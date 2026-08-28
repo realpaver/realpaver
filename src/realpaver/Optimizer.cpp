@@ -842,4 +842,9 @@ OptimizationStatus Optimizer::getStatus() const
    return status_;
 }
 
+bool Optimizer::isSolvedOptimal() const
+{
+   return status_ == OptimizationStatus::Optimal;
+}
+
 } // namespace realpaver
