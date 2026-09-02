@@ -1,0 +1,350 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   AffineCreator.cpp
+ * @brief  Creators of affine forms
+ * @author Laurent Granvilliers
+ * @date   16 Mar 2025
+ */
+
+#include "realpaver/AffineCreator.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/DagExtended.hpp"
+#include "realpaver/Logger.hpp"
+
+namespace realpaver {
+
+AffineCreator::AffineCreator(SharedDagExtended edag, bool minrange)
+    : edag_(edag)
+    , minrange_(minrange)
+    , v_(edag_->dag()->nbNodes())
+    , lfun_()
+{
+   REALPAVER_ASSERT(edag != nullptr, "Null pointer");
+}
+
+size_t AffineCreator::nbFuns() const
+{
+   return lfun_.size();
+}
+
+bool AffineCreator::hasFun(size_t i) const
+{
+   return v_[lfun_[i]->rootNode()->index()] != nullptr;
+}
+
+const AffineForm &AffineCreator::fun(size_t i) const
+{
+   return *v_[lfun_[i]->rootNode()->index()];
+}
+
+Interval AffineCreator::image(size_t i) const
+{
+   return lfun_[i]->getImage();
+}
+
+std::unique_ptr<AffineForm> AffineCreator::moveFun(size_t i)
+{
+   return std::move(v_[lfun_[i]->rootNode()->index()]);
+}
+
+bool AffineCreator::hasFun(const Variable &v) const
+{
+   return v_[edag_->dag()->findVarNode(v.id())->index()] != nullptr;
+}
+
+const AffineForm &AffineCreator::fun(const Variable &v) const
+{
+   return *v_[edag_->dag()->findVarNode(v.id())->index()];
+}
+
+const AffineForm &AffineCreator::funEpsilon(size_t i) const
+{
+   return fun(edag_->dag()->scope().var(i));
+}
+
+void AffineCreator::useMinrange(bool minrange)
+{
+   minrange_ = minrange;
+}
+
+bool AffineCreator::create(const IntervalBox &B, const Bitset &active)
+{
+   REALPAVER_ASSERT(B.scope().contains(edag_->scope()), "Bad scopes");
+
+   AffineForm::useMinrange(minrange_);
+   lfun_.clear();
+
+   for (size_t i = 0; i < edag_->size(); ++i)
+   {
+      SharedDagFun f = edag_->getActiveFun(i, B, active);
+      size_t j = lfun_.size();
+      if (f != nullptr)
+      {
+         lfun_.push_back(f);
+         bool ok = makeFun(B, j);
+         if (!ok)
+            return false;
+      }
+   }
+
+   return true;
+}
+
+bool AffineCreator::create(const IntervalBox &B, size_t i, const Bitset &active)
+{
+   REALPAVER_ASSERT(B.scope().contains(edag_->fun(i)->ctr().scope()), "Bad scopes");
+   REALPAVER_ASSERT(i < edag_->size(), "Bad index of function @ " << i);
+
+   AffineForm::useMinrange(minrange_);
+   lfun_.clear();
+
+   SharedDagFun f = edag_->getActiveFun(i, B, active);
+   if (f != nullptr)
+   {
+      lfun_.push_back(f);
+      return makeFun(B, 0);
+   }
+   else
+   {
+      return false;
+   }
+}
+
+bool AffineCreator::makeFun(const IntervalBox &B, size_t i)
+{
+   SharedDagFun f = lfun_[i];
+   for (size_t j = 0; j < f->nbNodes(); ++j)
+   {
+      DagNode *node = f->node(j);
+      size_t k = node->index();
+      if (v_[k] == nullptr)
+      {
+         try
+         {
+            makeNode(k, B);
+         }
+         catch (Exception &e)
+         {
+            LOG_LOW("Affine form of node " << k << " invalid");
+            return false;
+         }
+      }
+   }
+   return true;
+}
+
+SharedDagFun AffineCreator::dagFun(size_t i) const
+{
+   REALPAVER_ASSERT(i < lfun_.size(), "Bad access in lfun");
+   return lfun_[i];
+}
+
+void AffineCreator::makeNode(int i, const IntervalBox &B)
+{
+   DagNode *node = edag_->dag()->node(i);
+   std::unique_ptr<AffineForm> f = nullptr;
+
+   switch (node->symbol())
+   {
+   case DagSymbol::Cst: {
+      f = std::make_unique<AffineForm>(static_cast<DagConst *>(node)->getValue());
+      break;
+   }
+   case DagSymbol::Var: {
+      const Variable &v = static_cast<DagVar *>(node)->getVar();
+      f = std::make_unique<AffineForm>(edag_->scope().index(v), B.get(v));
+      break;
+   }
+   case DagSymbol::Add: {
+      size_t l = node->left()->index(), r = node->right()->index();
+      f = std::make_unique<AffineForm>(*v_[l] + *v_[r]);
+      break;
+   }
+   case DagSymbol::Sub: {
+      size_t l = node->left()->index(), r = node->right()->index();
+      f = std::make_unique<AffineForm>(*v_[l] - *v_[r]);
+      break;
+   }
+   case DagSymbol::Mul: {
+      size_t l = node->left()->index(), r = node->right()->index();
+      f = std::make_unique<AffineForm>(*v_[l] * *v_[r]);
+      break;
+   }
+   case DagSymbol::Div: {
+      size_t l = node->left()->index(), r = node->right()->index();
+      f = std::make_unique<AffineForm>(*v_[l] / *v_[r]);
+      break;
+   }
+   case DagSymbol::Min: {
+      size_t l = node->left()->index(), r = node->right()->index();
+      f = std::make_unique<AffineForm>(min(*v_[l], *v_[r]));
+      break;
+   }
+   case DagSymbol::Max: {
+      size_t l = node->left()->index(), r = node->right()->index();
+      f = std::make_unique<AffineForm>(max(*v_[l], *v_[r]));
+      break;
+   }
+   case DagSymbol::Usb: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(-(*v_[c]));
+      break;
+   }
+   case DagSymbol::Abs: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(abs(*v_[c]));
+      break;
+   }
+   case DagSymbol::Sgn: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(sgn(*v_[c]));
+      break;
+   }
+   case DagSymbol::Sqr: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(sqr(*v_[c]));
+      break;
+   }
+   case DagSymbol::Sqrt: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(sqrt(*v_[c]));
+      break;
+   }
+   case DagSymbol::Pow: {
+      size_t c = node->child()->index();
+      unsigned int e = static_cast<DagPow *>(node)->exponent();
+      f = std::make_unique<AffineForm>(pow(*v_[c], e));
+      break;
+   }
+   case DagSymbol::Powr: {
+      size_t c = node->child()->index();
+      double e = static_cast<DagPowr *>(node)->exponent();
+      f = std::make_unique<AffineForm>(powr(*v_[c], e));
+      break;
+   }
+   case DagSymbol::Exp: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(exp(*v_[c]));
+      break;
+   }
+   case DagSymbol::Log: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(log(*v_[c]));
+      break;
+   }
+   case DagSymbol::Cos: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(cos(*v_[c]));
+      break;
+   }
+   case DagSymbol::Sin: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(sin(*v_[c]));
+      break;
+   }
+   case DagSymbol::Tan: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(tan(*v_[c]));
+      break;
+   }
+   case DagSymbol::Cosh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(cosh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Sinh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(sinh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Tanh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(tanh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Acos: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(acos(*v_[c]));
+      break;
+   }
+   case DagSymbol::Asin: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(asin(*v_[c]));
+      break;
+   }
+   case DagSymbol::Atan: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(atan(*v_[c]));
+      break;
+   }
+   case DagSymbol::Acosh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(acosh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Asinh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(asinh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Atanh: {
+      size_t c = node->child()->index();
+      f = std::make_unique<AffineForm>(atanh(*v_[c]));
+      break;
+   }
+   case DagSymbol::Lin: {
+      DagLin *aux = static_cast<DagLin *>(node);
+      f = std::make_unique<AffineForm>(aux->getCst());
+
+      // loop on the linear terms
+      for (size_t j = 0; j < aux->nbTerms(); ++j)
+      {
+         // affine form of the variable in this term
+         const AffineForm &g = *v_[aux->varNode(j)->index()];
+
+         // adds the affine form of this term in f
+         f->push(AffineForm(aux->coef(j)) * g);
+      }
+      break;
+   }
+   }
+   v_[i] = std::move(f);
+}
+
+Term AffineCreator::funToTerm(size_t i) const
+{
+   AffineForm &f = const_cast<AffineForm &>(fun(i));
+   Interval x = f.constantTerm();
+   Term res(0);
+   for (auto it = f.begin(); it != f.end(); ++it)
+   {
+      Variable v = edag_->scope().var(AffineForm::var(it));
+      AffineForm &g = const_cast<AffineForm &>(fun(v));
+
+      Interval c = AffineForm::itv(it), a = g.constantTerm(),
+               b = AffineForm::itv(g.begin()), d = c / b;
+      x += -a * d;
+      res += d * v;
+   }
+   res += x + f.errorTerm() * Interval::minusOnePlusOne();
+   return res;
+}
+
+Variable AffineCreator::varToVar(size_t i) const
+{
+   return edag_->scope().var(i);
+}
+
+} // namespace realpaver

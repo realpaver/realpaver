@@ -15,7 +15,7 @@
  * @file   Tolerance.cpp
  * @brief  Tolerances for numerical computations
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -25,11 +25,11 @@
 namespace realpaver {
 
 Tolerance::Tolerance(double rtol, double atol)
-      : rtol_(rtol),
-        atol_(atol)
+    : rtol_(rtol)
+    , atol_(atol)
 {
-   ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
-   ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
+   REALPAVER_ASSERT(rtol >= 0.0 && rtol <= 1.0, "A relative tolerance must be in [0, 1]");
+   REALPAVER_ASSERT(atol >= 0.0, "An absolute tolerance must be positive");
 }
 
 double Tolerance::getRelTol() const
@@ -44,19 +44,25 @@ double Tolerance::getAbsTol() const
 
 void Tolerance::setRelTol(double val)
 {
-   ASSERT(val >= 0.0, "A relative tolerance must be positive");
+   REALPAVER_ASSERT(val >= 0.0, "A relative tolerance must be positive");
 
    rtol_ = val;
 }
 
 void Tolerance::setAbsTol(double val)
 {
-   ASSERT(val >= 0.0, "An absolute tolerance must be positive");
+   REALPAVER_ASSERT(val >= 0.0, "An absolute tolerance must be positive");
 
    atol_ = val;
 }
 
-bool Tolerance::isTight(const Interval& x) const
+bool Tolerance::isTightOptimum(const double &l, const double &u) const
+{
+   return (l != Double::neginf()) && (u != Double::inf()) &&
+          (u - l) <= Double::max(rtol_ * Double::abs(u), atol_);
+}
+
+bool Tolerance::isTight(const Interval &x) const
 {
    if (x.isEmpty())
       return false;
@@ -68,21 +74,13 @@ bool Tolerance::isTight(const Interval& x) const
       return Double::isClose(x.left(), x.right(), rtol_, atol_);
 }
 
-bool Tolerance::isTight(const IntervalVector& X) const
+bool Tolerance::isTight(const IntervalVector &X) const
 {
-   for (size_t i=0; i<X.size(); ++i)
+   for (size_t i = 0; i < X.size(); ++i)
       if (!isTight(X.get(i)))
          return false;
 
    return true;
-}
-
-bool Tolerance::isImproved(const Interval& old, const Interval& x) const
-{
-   if (old.isEmpty() || x.isEmpty())
-      return false;
-
-   return (1.0 - x.width() / old.width()) > rtol_;
 }
 
 double maxIntervalDnAbs(double ub, double atol)
@@ -95,7 +93,7 @@ double maxIntervalDnRel(double ub, double rtol)
 {
    if (ub > 1.0)
    {
-      Interval v(rtol), lb(ub*(1.0-v)/(1.0+v));
+      Interval v(rtol), lb(ub * (1.0 - v) / (1.0 + v));
       return lb.right();
    }
    else if (ub <= -1.0)
@@ -106,7 +104,7 @@ double maxIntervalDnRel(double ub, double rtol)
       }
       else
       {
-         Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+         Interval v(rtol), lb(ub * (1.0 + v) / (1.0 - v));
          return lb.right();
       }
    }
@@ -128,7 +126,7 @@ double maxIntervalDnRel(double ub, double rtol)
          }
          else
          {
-            Interval v(rtol), lb(ub*(1.0+v)/(1.0-v));
+            Interval v(rtol), lb(ub * (1.0 + v) / (1.0 - v));
             return lb.right();
          }
       }
@@ -160,43 +158,20 @@ Interval Tolerance::maxIntervalDn(double ub) const
 
    else
    {
-      double lb1 = maxIntervalDnAbs(ub, atol_),
-             lb2 = maxIntervalDnRel(ub, rtol_);
+      double lb1 = maxIntervalDnAbs(ub, atol_), lb2 = maxIntervalDnRel(ub, rtol_);
       return Interval(Double::min(lb1, lb2), ub);
    }
 }
 
 Interval Tolerance::maxIntervalUp(double lb) const
 {
-   return -maxIntervalDn(-lb); 
+   return -maxIntervalDn(-lb);
 }
 
-double Tolerance::discreteSize(const Interval& x) const
+std::ostream &operator<<(std::ostream &os, const Tolerance &tol)
 {
-   if (x.isEmpty())
-      return 0.0;
-   
-   else if (x.isCanonical())
-      return 1.0;
-  
-   else if (x.isInf())
-      return Double::floor(Double::greatest());
-
-   else
-   {
-      // absolute
-      double a = x.width() / atol_,
-             b = Double::floor(a);
-
-      return (a == b) ? b : b+1.0;
-   }
-}
-
-std::ostream& operator<<(std::ostream& os, const Tolerance& tol)
-{
-   os << "tol(" << tol.getRelTol() << ", "
-      << tol.getAbsTol() << ")";
+   os << "tol(" << tol.getRelTol() << ", " << tol.getAbsTol() << ")";
    return os;
 }
 
-} // namespace
+} // namespace realpaver

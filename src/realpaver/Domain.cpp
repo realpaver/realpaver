@@ -15,19 +15,23 @@
  * @file   Domain.cpp
  * @brief  Classes of domains
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Domain.hpp"
+#include "realpaver/Double.hpp"
 
 namespace realpaver {
 
 Domain::~Domain()
-{}
+{
+}
 
-Domain::Domain(DomainType type) : type_(type)
-{}
+Domain::Domain(DomainType type)
+    : type_(type)
+{
+}
 
 DomainType Domain::type() const
 {
@@ -54,7 +58,33 @@ bool Domain::isReal() const
    return false;
 }
 
-std::ostream& operator<<(std::ostream& os, const Domain& dom)
+double Domain::discreteSize(double tol) const
+{
+   if (isReal())
+   {
+      Interval x = intervalHull();
+      if (x.isEmpty())
+         return 0.0;
+
+      else if (x.isCanonical())
+         return 1.0;
+
+      else if (x.isInf())
+         return Double::floor(Double::greatest());
+
+      else
+      {
+         double a = x.width() / tol, b = Double::floor(a);
+         return (a == b) ? b : b + 1.0;
+      }
+   }
+   else
+   {
+      return size();
+   }
+}
+
+std::ostream &operator<<(std::ostream &os, const Domain &dom)
 {
    dom.print(os);
    return os;
@@ -62,10 +92,11 @@ std::ostream& operator<<(std::ostream& os, const Domain& dom)
 
 /*----------------------------------------------------------------------------*/
 
-IntervalDomain::IntervalDomain(const Interval& x)
-      : Domain(DomainType::Interval),
-        val_(x)
-{}
+IntervalDomain::IntervalDomain(const Interval &x)
+    : Domain(DomainType::Interval)
+    , val_(x)
+{
+}
 
 double IntervalDomain::size() const
 {
@@ -87,12 +118,12 @@ bool IntervalDomain::isReal() const
    return true;
 }
 
-const Interval& IntervalDomain::getVal() const
+const Interval &IntervalDomain::getVal() const
 {
    return val_;
 }
 
-void IntervalDomain::setVal(const Interval& x)
+void IntervalDomain::setVal(const Interval &x)
 {
    val_ = x;
 }
@@ -102,12 +133,12 @@ Interval IntervalDomain::intervalHull() const
    return val_;
 }
 
-void IntervalDomain::contractInterval(Interval& x) const
+void IntervalDomain::contractInterval(Interval &x) const
 {
    x &= val_;
 }
 
-void IntervalDomain::contract(const Interval& x)
+void IntervalDomain::contract(const Interval &x)
 {
    val_ &= x;
 }
@@ -117,41 +148,47 @@ bool IntervalDomain::isConnected() const
    return true;
 }
 
-IntervalDomain* IntervalDomain::clone() const
+IntervalDomain *IntervalDomain::clone() const
 {
    return new IntervalDomain(*this);
 }
 
-void IntervalDomain::print(std::ostream& os) const
+void IntervalDomain::print(std::ostream &os) const
 {
    os << val_;
 }
 
-bool IntervalDomain::equals(const Domain& dom) const
+bool IntervalDomain::equals(const Domain &dom) const
 {
-   const IntervalDomain* d = dynamic_cast<const IntervalDomain*>(&dom);
+   const IntervalDomain *d = dynamic_cast<const IntervalDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.isSetEq(val_);
+}
+
+void IntervalDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
 }
 
 /*----------------------------------------------------------------------------*/
 
-IntervalUnionDomain::IntervalUnionDomain(const IntervalUnion& u)
-      : Domain(DomainType::IntervalUnion),
-        val_(u)
-{}
+IntervalUnionDomain::IntervalUnionDomain(const IntervalUnion &u)
+    : Domain(DomainType::IntervalUnion)
+    , val_(u)
+{
+}
 
-IntervalUnionDomain::IntervalUnionDomain(
-   const std::initializer_list<Interval>& l)
-      : Domain(DomainType::IntervalUnion),
-        val_(l)
-{}
+IntervalUnionDomain::IntervalUnionDomain(const std::initializer_list<Interval> &l)
+    : Domain(DomainType::IntervalUnion)
+    , val_(l)
+{
+}
 
-const IntervalUnion& IntervalUnionDomain::getVal() const
+const IntervalUnion &IntervalUnionDomain::getVal() const
 {
    return val_;
 }
 
-void IntervalUnionDomain::setVal(const IntervalUnion& u)
+void IntervalUnionDomain::setVal(const IntervalUnion &u)
 {
    val_ = u;
 }
@@ -181,46 +218,51 @@ Interval IntervalUnionDomain::intervalHull() const
    return val_.hull();
 }
 
-void IntervalUnionDomain::contractInterval(Interval& x) const
+void IntervalUnionDomain::contractInterval(Interval &x) const
 {
    val_.contractInterval(x);
 }
 
-void IntervalUnionDomain::contract(const Interval& x)
+void IntervalUnionDomain::contract(const Interval &x)
 {
    val_.contract(x);
 }
 
-IntervalUnionDomain* IntervalUnionDomain::clone() const
+IntervalUnionDomain *IntervalUnionDomain::clone() const
 {
    return new IntervalUnionDomain(*this);
 }
 
-void IntervalUnionDomain::print(std::ostream& os) const
+void IntervalUnionDomain::print(std::ostream &os) const
 {
    os << val_;
 }
 
-bool IntervalUnionDomain::equals(const Domain& dom) const
+bool IntervalUnionDomain::equals(const Domain &dom) const
 {
-   const IntervalUnionDomain* d =
-      dynamic_cast<const IntervalUnionDomain*>(&dom);
+   const IntervalUnionDomain *d = dynamic_cast<const IntervalUnionDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.equals(val_);
+}
+
+void IntervalUnionDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
 }
 
 /*----------------------------------------------------------------------------*/
 
-RangeDomain::RangeDomain(const Range& r)
-      : Domain(DomainType::Range),
-        val_(r)
-{}
+RangeDomain::RangeDomain(const Range &r)
+    : Domain(DomainType::Range)
+    , val_(r)
+{
+}
 
-const Range& RangeDomain::getVal() const
+const Range &RangeDomain::getVal() const
 {
    return val_;
 }
 
-void RangeDomain::setVal(const Range& r)
+void RangeDomain::setVal(const Range &r)
 {
    val_ = r;
 }
@@ -250,50 +292,57 @@ Interval RangeDomain::intervalHull() const
    return val_.toInterval();
 }
 
-void RangeDomain::contractInterval(Interval& x) const
+void RangeDomain::contractInterval(Interval &x) const
 {
    x = round(x) & intervalHull();
 }
 
-void RangeDomain::contract(const Interval& x)
+void RangeDomain::contract(const Interval &x)
 {
    val_ &= Range::roundInward(x);
 }
 
-RangeDomain* RangeDomain::clone() const
+RangeDomain *RangeDomain::clone() const
 {
    return new RangeDomain(*this);
 }
 
-void RangeDomain::print(std::ostream& os) const
+void RangeDomain::print(std::ostream &os) const
 {
    os << val_;
 }
 
-bool RangeDomain::equals(const Domain& dom) const
+bool RangeDomain::equals(const Domain &dom) const
 {
-   const RangeDomain* d = dynamic_cast<const RangeDomain*>(&dom);
+   const RangeDomain *d = dynamic_cast<const RangeDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.isSetEq(val_);
+}
+
+void RangeDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
 }
 
 /*----------------------------------------------------------------------------*/
 
-RangeUnionDomain::RangeUnionDomain(const RangeUnion& u)
-      : Domain(DomainType::RangeUnion),
-        val_(u)
-{}
+RangeUnionDomain::RangeUnionDomain(const RangeUnion &u)
+    : Domain(DomainType::RangeUnion)
+    , val_(u)
+{
+}
 
-RangeUnionDomain::RangeUnionDomain(const std::initializer_list<Range>& l)
-      : Domain(DomainType::RangeUnion),
-        val_(l)
-{}
+RangeUnionDomain::RangeUnionDomain(const std::initializer_list<Range> &l)
+    : Domain(DomainType::RangeUnion)
+    , val_(l)
+{
+}
 
-const RangeUnion& RangeUnionDomain::getVal() const
+const RangeUnion &RangeUnionDomain::getVal() const
 {
    return val_;
 }
 
-void RangeUnionDomain::setVal(const RangeUnion& u)
+void RangeUnionDomain::setVal(const RangeUnion &u)
 {
    val_ = u;
 }
@@ -323,61 +372,68 @@ Interval RangeUnionDomain::intervalHull() const
    return val_.hull().toInterval();
 }
 
-void RangeUnionDomain::contractInterval(Interval& x) const
+void RangeUnionDomain::contractInterval(Interval &x) const
 {
    val_.contractInterval(x);
 }
 
-void RangeUnionDomain::contract(const Interval& x)
+void RangeUnionDomain::contract(const Interval &x)
 {
    val_.contract(x);
 }
 
-RangeUnionDomain* RangeUnionDomain::clone() const
+RangeUnionDomain *RangeUnionDomain::clone() const
 {
    return new RangeUnionDomain(*this);
 }
 
-void RangeUnionDomain::print(std::ostream& os) const
+void RangeUnionDomain::print(std::ostream &os) const
 {
    os << val_;
 }
 
-bool RangeUnionDomain::equals(const Domain& dom) const
+bool RangeUnionDomain::equals(const Domain &dom) const
 {
-   const RangeUnionDomain* d = dynamic_cast<const RangeUnionDomain*>(&dom);
+   const RangeUnionDomain *d = dynamic_cast<const RangeUnionDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.equals(val_);
+}
+
+void RangeUnionDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
 }
 
 /*----------------------------------------------------------------------------*/
 
 BinaryDomain::BinaryDomain()
-      : Domain(DomainType::Binary),
-        val_()
-{}
-
-BinaryDomain::BinaryDomain(const ZeroOne& zo)
-      : Domain(DomainType::Binary),
-        val_(zo)
+    : Domain(DomainType::Binary)
+    , val_()
 {
-   ASSERT(!zo.isEmpty(),
-          "Creation of an empty binary domain");
 }
 
-const ZeroOne& BinaryDomain::getVal() const
+BinaryDomain::BinaryDomain(const ZeroOne &zo)
+    : Domain(DomainType::Binary)
+    , val_(zo)
+{
+   REALPAVER_ASSERT(!zo.isEmpty(), "Creation of an empty binary domain");
+}
+
+const ZeroOne &BinaryDomain::getVal() const
 {
    return val_;
 }
 
-void BinaryDomain::setVal(const ZeroOne& zo)
+void BinaryDomain::setVal(const ZeroOne &zo)
 {
    val_ = zo;
 }
 
 double BinaryDomain::size() const
 {
-   if (val_.isEmpty()) return 0.0;
-   if (val_.isUniverse()) return 2.0;
+   if (val_.isEmpty())
+      return 0.0;
+   if (val_.isUniverse())
+      return 2.0;
    return 1.0;
 }
 
@@ -401,12 +457,12 @@ Interval BinaryDomain::intervalHull() const
    return val_.toRange().toInterval();
 }
 
-void BinaryDomain::contractInterval(Interval& x) const
+void BinaryDomain::contractInterval(Interval &x) const
 {
    x = round(x) & intervalHull();
 }
 
-void BinaryDomain::contract(const Interval& x)
+void BinaryDomain::contract(const Interval &x)
 {
    if (!x.contains(0.0))
       val_.setZero(false);
@@ -415,20 +471,56 @@ void BinaryDomain::contract(const Interval& x)
       val_.setOne(false);
 }
 
-BinaryDomain* BinaryDomain::clone() const
+BinaryDomain *BinaryDomain::clone() const
 {
    return new BinaryDomain(*this);
 }
 
-void BinaryDomain::print(std::ostream& os) const
+void BinaryDomain::print(std::ostream &os) const
 {
    os << val_;
 }
 
-bool BinaryDomain::equals(const Domain& dom) const
+bool BinaryDomain::equals(const Domain &dom) const
 {
-   const BinaryDomain* d = dynamic_cast<const BinaryDomain*>(&dom);
+   const BinaryDomain *d = dynamic_cast<const BinaryDomain *>(&dom);
    return (d == nullptr) ? false : d->val_.equals(val_);
 }
 
-} // namespace
+void BinaryDomain::acceptVisitor(DomainVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+/*----------------------------------------------------------------------------*/
+
+DomainVisitor::~DomainVisitor()
+{
+}
+
+void DomainVisitor::apply(const IntervalDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const IntervalUnionDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const RangeDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const RangeUnionDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+void DomainVisitor::apply(const BinaryDomain *d)
+{
+   THROW("Visit method not implemented");
+}
+
+} // namespace realpaver

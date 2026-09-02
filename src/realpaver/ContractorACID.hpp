@@ -15,16 +15,16 @@
  * @file   ContractorACID.hpp
  * @brief  ACID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #ifndef REALPAVER_CONTRACTOR_ACID_HPP
 #define REALPAVER_CONTRACTOR_ACID_HPP
 
-#include <memory>
 #include "realpaver/ContractorVar3BCID.hpp"
-#include "realpaver/IntervalSmearSumRel.hpp"
-#include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/SelectorSSR.hpp"
+#include <memory>
+#include <unordered_map>
 
 namespace realpaver {
 
@@ -54,6 +54,7 @@ class ContractorACID : public Contractor {
 public:
    /**
     * @brief Constructor.
+    * @param scope set of variables
     * @param ssr calculator of smear sum rel values
     * @param op contractor of slices
     * @param ns3B number of slices for 3B contractors
@@ -63,19 +64,18 @@ public:
     * @param ctRatio threshold on the quality of contractions
     * @param varMinWidth threshold on the wodth of variable domains
     */
-   ContractorACID(std::shared_ptr<IntervalSmearSumRel> ssr,
-                  SharedContractor op, int ns3B, int nsCID,
-                  int learnLength, int cycleLength, double ctRatio,
+   ContractorACID(std::unique_ptr<SelectorSSR> ssr, SharedContractor op, int ns3B,
+                  int nsCID, int learnLength, int cycleLength, double ctRatio,
                   double varMinWidth);
 
    /// Default copy constructor
-   ContractorACID(const ContractorACID&) = default;
+   ContractorACID(const ContractorACID &) = delete;
 
    /// No assignment
-   ContractorACID& operator=(const ContractorACID&) = delete;
+   ContractorACID &operator=(const ContractorACID &) = delete;
 
-   /// Default destructor
-   ~ContractorACID() = default;
+   /// Destructor
+   ~ContractorACID();
 
    /// Returns the length of the learning phase
    int learnLength() const;
@@ -90,32 +90,31 @@ public:
    SharedContractor sliceContractor() const;
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
+   void print(std::ostream &os) const override;
 
 private:
-   std::shared_ptr<IntervalSmearSumRel> ssr_;   // calculator of smear
-                                                // sum rel values
-   SharedContractor op_;                        // contractor of slices e.g. HC4
-   Scope scop_;                                 // scope
-   size_t n_;                                   // scope size
+   std::unique_ptr<SelectorSSR> ssr_; // calculator of smear sum rel values
+   SharedContractor op_;              // contractor of slices e.g. HC4
+   Scope scop_;                       // scope
+   size_t n_;                         // scope size
 
-   int numVarCID_;   // number of var3BCID contractors that must be applied
-                     // in a call to the contract method
+   int numVarCID_; // number of var3BCID contractors that must be applied
+                   // in a call to the contract method
 
-   std::vector<ContractorVar3BCID*> // var3BCID_[i] is the var3BCID contractor
-      var3BCID_;                    // associated with the i-th variable
-                                    // of the scope
+   // map variable index -> Var3BCID contractor
+   std::unordered_map<int, ContractorVar3BCID *> var3BCID_;
 
-   int sumGood_;  // during the learning phase, it counts the number of
-                  // applications of var3BCID contractors that have reduced
-                  // enough the box with respect to ctRatio_
+   int sumGood_; // during the learning phase, it counts the number of
+                 // applications of var3BCID contractors that have reduced
+                 // enough the box with respect to ctRatio_
 
-   int nbCalls_;        // number of calls of the contract method
-   int learnLength_;    // number of calls in the learning phase
-   int cycleLength_;    // number of calls in a cycle made of an exploitation
-                        // phase and a learning phase
-   double ctRatio_;     // threshold on the reduction gain
+   int nbCalls_;     // number of calls of the contract method
+   int learnLength_; // number of calls in the learning phase
+   int cycleLength_; // number of calls in a cycle made of an exploitation
+                     // phase and a learning phase
+   double ctRatio_;  // threshold on the reduction gain
 
    // Let ctcGains = g_0, ..., g_(p-1) be the reduction ratios obtained by the
    // p var3BCID contractors applied in some call of the contract method.
@@ -127,16 +126,20 @@ private:
    // indicates that the gains are not enough after k. Then it returns k+1,
    // which the maximum number of contractors that must be applied in order to
    // obtain a sufficient gain.
-   static int lastSignificantGain(double* ctcGains, double ctRatio, int imax);
+   static int lastSignificantGain(double *ctcGains, double ctRatio, int imax);
 
    // Calculates the gain ratio between prev and the reduced box next
-   static double gainRatio(const IntervalBox& prev, const IntervalBox& next,
-                           const Scope& scop);
+   static double gainRatio(const IntervalBox &prev, const IntervalBox &next,
+                           const Scope &scop);
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const Bitset &active,
+                      const ContractMethod &contract);
 };
 
 /** @brief Type of shared pointers on contractors */
-typedef std::shared_ptr<ContractorACID> SharedContractorACID;
+using SharedContractorACID = std::shared_ptr<ContractorACID>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

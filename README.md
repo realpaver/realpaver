@@ -1,16 +1,25 @@
-# realpaver
+# RealPaver
+
+The RealPaver library provides a C++ API to deal with interval analysis, constraint programming and global optimization techniques.
+
+## Documentation
+
+[https://realpavergroup.univ-nantes.io/realpaver/](https://realpavergroup.univ-nantes.io/realpaver/)
 
 ## Pre-requisite
 
 ### Mandatory dependencies
 
 - meson build system (https://mesonbuild.com/)
-- a supported interval library (eg: GAOL https://github.com/goualard-f/GAOL)
+- a supported interval library
+  - GAOL: https://github.com/goualard-f/GAOL or https://github.com/raphaelchenouard/GAOL (for MacOS ARM users)
+  - Inum64: https://gitlab.univ-nantes.fr/granvilliers-l/inum64 (configure it with MPFR)
 - a supported linear solver library:
   - CLP: https://github.com/coin-or/Clp
+  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/ (a sample pkg-config file for Gurobi (gurobi.pc) is provided but it must be adapted to your context, see below for details)
   - HiGHS: https://highs.dev/
-  - SoPlex: https://soplex.zib.de/
-  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/
+
+**WARNING: interval libraries rely on the used math library to make safe computations. It must preserve floating-point rounding mode during computations! (This is not guaranteed by most standard math libraries)**
 
 ### Optional dependencies
 
@@ -50,7 +59,7 @@ In realpaver root folder, run `meson configure` command, while specifying one of
 
 ### Realpaver specific options:
 
-- `-DLP_LIB=LIBNAME`: specify the linear programing library/solver to use (default: Clp, can be replaced by Highs, Soplex)
+- `-DLP_LIB=LIBNAME`: specify the linear programing library/solver to use (default: Highs, can be replaced by Clp, Gurobi)
 - `-DINTERVAL_LIB=LIBNAME`: specify the interval library to use (default: Gaol)
 - `-DLOCAL_SOLVER=LIBNAME`: specify the local optimization solver to use (default: none, can be replaced by NLOPT, IPOPT)
 - `-DASSERT=BOOLVAL`: activate assertions (default: true)
@@ -66,8 +75,8 @@ meson setup build --prefix /opt/homebrew/Cellar/realpaver/1.0.0 -DLP_LIB=Highs -
 
 **Requirements:** pkg-config
 
-1. Modify the gurobi100.pc file in the realpaver folder with your own configuration for gurobi
-2. Copy this file to a folder where meson will look at when searching for dependencies (e.g /opt/homebrew/share/pkgconfig in macOS with homebrew)
+1. Modify the gurobi.pc file in the realpaver folder with your own configuration for gurobi
+2. Copy this file to a folder where meson will look at when searching for dependencies (e.g /opt/homebrew/share/pkgconfig in macOS with homebrew) or add its path to the environment variable PKG_CONFIG_PATH
 3. Configure your build folder with gurobi as LP solver:
 
 ```bash
@@ -89,6 +98,11 @@ In the build folder run:
 ```bash
 meson install
 ```
+
+## Build and test RealPaver using Docker
+
+The folder `docker` contains Dockerfiles and a `Readme.md` file explaining how to use them.
+
 
 ## More documentation on meson:
 

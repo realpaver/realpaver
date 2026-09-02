@@ -1,0 +1,21 @@
+# In: V. W. Noonburg.
+#     A neural network modeled by an adaptive Lotka-Volterra system.
+#     SIAM J. Appl. Math (1988).
+
+Variables
+x1 in [-1e2, 1e2],
+x2 in [-1e2, 1e2],
+x3 in [-1e2, 1e2],
+x4 in [-1e2, 1e2],
+x5 in [-1e2, 1e2],
+x6 in [-1e2, 1e2],
+x7 in [-1e2, 1e2];
+
+Constraints
+x1*(x2^2+x3^2+x4^2+x5^2+x6^2+x7^2-1.1)+1 == 0,
+x2*(x1^2+x3^2+x4^2+x5^2+x6^2+x7^2-1.1)+1 == 0,
+x3*(x1^2+x2^2+x4^2+x5^2+x6^2+x7^2-1.1)+1 == 0,
+x4*(x1^2+x2^2+x3^2+x5^2+x6^2+x7^2-1.1)+1 == 0,
+x5*(x1^2+x2^2+x3^2+x4^2+x6^2+x7^2-1.1)+1 == 0,
+x6*(x1^2+x2^2+x3^2+x4^2+x5^2+x7^2-1.1)+1 == 0,
+x7*(x1^2+x2^2+x3^2+x4^2+x5^2+x6^2-1.1)+1 == 0;

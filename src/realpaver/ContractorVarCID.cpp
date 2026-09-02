@@ -15,8 +15,8 @@
  * @file   ContractorVarCID.cpp
  * @brief  CID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorVarCID.hpp"
@@ -25,27 +25,27 @@ namespace realpaver {
 
 ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v,
                                    std::unique_ptr<IntervalSlicer> slicer)
-         : op_(op),
-           v_(v),
-           slicer_(std::move(slicer))
+    : op_(op)
+    , v_(v)
+    , slicer_(std::move(slicer))
 {
-   ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
-   ASSERT(op->scope().contains(v), 
-          "Bad variable " << v << " in a varCID contractor");
-   ASSERT(slicer != nullptr, "No slicer given");   
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a varCID contractor");
+   REALPAVER_ASSERT(slicer != nullptr, "No slicer given");
 }
 
 ContractorVarCID::ContractorVarCID(SharedContractor op, Variable v, size_t nsCID)
-         : op_(op),
-           v_(v),
-           slicer_(nullptr)
+    : op_(op)
+    , v_(v)
+    , slicer_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
-   ASSERT(op->scope().contains(v), 
-          "Bad variable " << v << " in a varCID contractor");
-   ASSERT(nsCID > 1, "Bad number of slices in a varCID contractor: " << nsCID);
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a varCID contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a varCID contractor");
+   REALPAVER_ASSERT(nsCID > 1, "Bad number of slices in a varCID contractor: " << nsCID);
 
-   slicer_ = std::make_unique<IntervalPartitionMaker>(nsCID);
+   slicer_ = std::make_unique<IntervalPartitioner>(nsCID);
 }
 
 Scope ContractorVarCID::scope() const
@@ -60,28 +60,38 @@ Variable ContractorVarCID::getVar() const
 
 void ContractorVarCID::setVar(Variable v)
 {
-   ASSERT(scope().contains(v),
-          "Bad variable " << v << " in a varCID contractor");
+   REALPAVER_ASSERT(scope().contains(v),
+                    "Bad variable " << v << " in a varCID contractor");
 
    v_ = v;
 }
 
-Proof ContractorVarCID::contract(IntervalBox& B)
+Proof ContractorVarCID::contract(IntervalBox &B)
+{
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorVarCID::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorVarCID::contractImpl(IntervalBox &B, const ContractMethod &contract)
 {
    slicer_->apply(B.get(v_));
 
    if (slicer_->nbSlices() == 1)
-      return op_->contract(B);
+      return contract.apply(*op_, B);
 
-   IntervalBox* init = B.clone();
+   IntervalBox *init = B.clone();
    Proof proof = Proof::Empty, certif;
 
    for (auto it = slicer_->begin(); it != slicer_->end(); ++it)
    {
-      IntervalBox* slice = init->clone();
+      IntervalBox *slice = init->clone();
       slice->set(v_, *it);
-      certif = op_->contract(*slice);
-   
+      certif = contract.apply(*op_, *slice);
+
       if (certif != Proof::Empty)
       {
          if (proof == Proof::Empty)
@@ -102,9 +112,9 @@ Proof ContractorVarCID::contract(IntervalBox& B)
    return proof;
 }
 
-void ContractorVarCID::print(std::ostream& os) const
+void ContractorVarCID::print(std::ostream &os) const
 {
    os << "varCID contractor on " << v_.getName();
 }
 
-} // namespace
+} // namespace realpaver

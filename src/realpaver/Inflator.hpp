@@ -15,21 +15,20 @@
  * @file   Inlator.hpp
  * @brief  Inflator of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #ifndef REALPAVER_INFLATOR_HPP
 #define REALPAVER_INFLATOR_HPP
 
-#include "realpaver/IntervalVector.hpp"
+#include "realpaver/IntervalBox.hpp"
 
 namespace realpaver {
 
-
 /**
  * @brief Inflator of intervals.
- * 
- * 
+ *
+ *
  * Given an interval x and two real numbers delta > 1.0 and chi > 0.0,
  * an inflator calculates the interval m(x) + delta*(x - m(x)) + chi*[-1,1]
  * where m(x) is the midpoint of x.
@@ -43,10 +42,10 @@ public:
    Inflator(double delta, double chi);
 
    /// Default copy constructor
-   Inflator(const Inflator&) = default;
+   Inflator(const Inflator &) = default;
 
    /// Default asignment operator
-   Inflator& operator=(const Inflator&) = default;
+   Inflator &operator=(const Inflator &) = default;
 
    /// Default destructor
    ~Inflator() = default;
@@ -64,16 +63,19 @@ public:
    void setChi(double chi);
 
    /// Inflates an interval
-   Interval inflate(const Interval& x) const;
+   Interval inflate(const Interval &x) const;
 
    /// Inflates each component of an interval vector
-   void inflate(IntervalVector& X) const;
+   void inflate(IntervalVector &X) const;
+
+   /// Inflates an interval box for each component from a given scope
+   void inflateOnScope(IntervalBox &B, const Scope &scop) const;
 
 private:
    double delta_;
    double chi_;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

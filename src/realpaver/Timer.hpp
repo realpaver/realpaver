@@ -15,7 +15,7 @@
  * @file   Timer.hpp
  * @brief  Timer measuring computation times
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_TIMER_HPP
@@ -48,15 +48,15 @@ public:
    double elapsedTime() const;
 
 private:
-   using PointType    = std::chrono::time_point<std::chrono::system_clock>;
+   using PointType = std::chrono::time_point<std::chrono::system_clock>;
    using DurationType = std::chrono::duration<double>;
-   using UnitType     = std::chrono::milliseconds;
+   using UnitType = std::chrono::milliseconds;
 
-   bool on_;                  // true if this is started
-   PointType start_;          // last starting time point
-   DurationType total_;       // accumulated elapsed time
+   bool on_;            // true if this is started
+   PointType start_;    // last starting time point
+   DurationType total_; // accumulated elapsed time
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

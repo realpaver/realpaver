@@ -15,38 +15,42 @@
  * @file   Env.cpp
  * @brief  Base class of environments for solvers
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Env.hpp"
 
 namespace realpaver {
 
-Env::Env() : param_(nullptr), tlim_(false), nlim_(false)
+Env::Env()
+    : params_(nullptr)
+    , tlim_(false)
+    , nlim_(false)
 {
-   param_ = new Param();
+   params_ = new Params();
 }
 
 Env::~Env()
 {
-   if (param_ != nullptr) delete param_;   
+   if (params_ != nullptr)
+      delete params_;
 }
 
-Env::Env(const Env& e)
+Env::Env(const Env &e)
 {
-   param_ = new Param(*e.param_);
+   params_ = new Params(*e.params_);
 }
 
-void Env::setParam(const Param& prm)
+void Env::setParams(const Params &params)
 {
-   if (param_ != nullptr) delete param_;
-   param_ = new Param(prm);
+   if (params_ != nullptr)
+      delete params_;
+   params_ = new Params(params);
 }
 
-Param* Env::getParam() const
+Params *Env::getParams() const
 {
-   return param_;
+   return params_;
 }
 
 void Env::setTimeLimit(bool b)
@@ -69,24 +73,4 @@ bool Env::usedNodeLimit() const
    return nlim_;
 }
 
-void Env::setPresolved(bool b)
-{
-   presolved_ = b;
-}
-
-bool Env::isPresolved() const
-{
-   return presolved_;
-}
-
-void Env::setConstraintViolated(bool b)
-{
-   cviol_ = b;
-}
-
-bool Env::hasConstraintViolated() const
-{
-   return cviol_;
-}
-
-} // namespace
+} // namespace realpaver

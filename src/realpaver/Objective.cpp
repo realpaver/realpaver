@@ -15,18 +15,23 @@
  * @file   Objective.cpp
  * @brief  Objective function
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date  11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Objective.hpp"
 
 namespace realpaver {
 
-ObjectiveRep::ObjectiveRep(Term f, bool minimization)
-      : f_(f),
-        minimization_(minimization)
-{}
+ObjectiveRep::ObjectiveRep(Variable z, Term f, bool minimization)
+    : f_(f)
+    , z_(z)
+    , minimization_(minimization)
+{
+   z.setStatus(VariableStatus::Objective);
+
+   if (f.isConstant())
+      THROW("Constant objective function");
+}
 
 Term ObjectiveRep::getTerm() const
 {
@@ -38,7 +43,7 @@ bool ObjectiveRep::isConstant() const
    return f_.isConstant();
 }
 
-bool ObjectiveRep::dependsOn(const Variable& v) const
+bool ObjectiveRep::dependsOn(const Variable &v) const
 {
    return f_.dependsOn(v);
 }
@@ -55,14 +60,25 @@ bool ObjectiveRep::isMinimization() const
 
 bool ObjectiveRep::isMaximization() const
 {
-   return !minimization_; 
+   return !minimization_;
+}
+
+Variable ObjectiveRep::getVar() const
+{
+   return z_;
 }
 
 /*----------------------------------------------------------------------------*/
 
-Objective::Objective(Term f, bool minimization)
-      : rep_(std::make_shared<ObjectiveRep>(f, minimization))
-{}
+Objective::Objective()
+    : rep_(nullptr)
+{
+}
+
+Objective::Objective(Variable z, Term f, bool minimization)
+    : rep_(std::make_shared<ObjectiveRep>(z, f, minimization))
+{
+}
 
 Term Objective::getTerm() const
 {
@@ -74,7 +90,7 @@ bool Objective::isConstant() const
    return rep_->isConstant();
 }
 
-bool Objective::dependsOn(const Variable& v) const
+bool Objective::dependsOn(const Variable &v) const
 {
    return rep_->dependsOn(v);
 }
@@ -91,27 +107,37 @@ bool Objective::isMinimization() const
 
 bool Objective::isMaximization() const
 {
-   return rep_->isMaximization(); 
+   return rep_->isMaximization();
 }
 
-Objective MIN(Term f)
+Variable Objective::getVar() const
 {
-   return Objective(f, true);
+   return rep_->getVar();
 }
 
-Objective MAX(Term f)
+bool Objective::hasNullRep() const
 {
-   return Objective(f, false);
+   return rep_ == nullptr;
 }
 
-std::ostream& operator<<(std::ostream& os, Objective obj)
+Objective minimize(Variable z, Term f)
+{
+   return Objective(z, f, true);
+}
+
+Objective maximize(Variable z, Term f)
+{
+   return Objective(z, f, false);
+}
+
+std::ostream &operator<<(std::ostream &os, Objective obj)
 {
    if (obj.isMaximization())
-      os << "MAX ";
+      os << "Max ";
    else
-      os << "MIN ";
+      os << "Min ";
 
-   return os << obj.getTerm();
+   return os << obj.getVar().getName() << " = " << obj.getTerm();
 }
 
-} // namespace
+} // namespace realpaver

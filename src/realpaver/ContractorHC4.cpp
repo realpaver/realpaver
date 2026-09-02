@@ -15,63 +15,50 @@
  * @file   ContractorHC4.cpp
  * @brief  HC4 contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorHC4.hpp"
 #include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/Logger.hpp"
 
 namespace realpaver {
 
-ContractorHC4::ContractorHC4(SharedDag dag)
-      : dag_(dag)
-{
-   SharedContractorPool pool = std::make_shared<ContractorPool>();
-
-   for (size_t i=0; i<dag_->nbFuns(); ++i)
-   {
-      SharedContractor op = std::make_shared<ContractorHC4Revise>(dag_, i);
-      pool->push(op);
-   }
-
-   propag_ = new IntervalPropagator(pool);
-}
-
-ContractorHC4::~ContractorHC4()
-{
-   if (propag_ != nullptr) delete propag_;
-}
-
 Scope ContractorHC4::scope() const
 {
-   return dag_->scope();
+   return propag_.scope();
 }
 
-Proof ContractorHC4::contract(IntervalBox& B)
+Proof ContractorHC4::contract(IntervalBox &B)
 {
-   return propag_->contract(B);
+   LOG_INTER("HC4");
+   return propag_.contract(B);
 }
 
-void ContractorHC4::print(std::ostream& os) const
+Proof ContractorHC4::contract(IntervalBox &B, const Bitset &active)
+{
+   LOG_INTER("HC4");
+   return propag_.contract(B, active);
+}
+
+void ContractorHC4::print(std::ostream &os) const
 {
    os << "HC4";
 }
 
-Tolerance ContractorHC4::getTol() const
+double ContractorHC4::getTol() const
 {
-   return propag_->getTol();
+   return propag_.getTol();
 }
 
-void ContractorHC4::setTol(Tolerance tol)
+void ContractorHC4::setTol(double tol)
 {
-   propag_->setTol(tol);
+   propag_.setTol(tol);
 }
 
 void ContractorHC4::push(SharedContractor op)
 {
-   propag_->push(op);
+   propag_.push(op);
 }
 
-} // namespace
+} // namespace realpaver

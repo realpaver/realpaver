@@ -1,0 +1,11 @@
+# COCONUT Library
+
+Variables
+   x1 in [1, 100],
+   x2 in [1, 100],
+   x3 in [1, 100];
+
+Minimize  0.5*x1/x2 - x1 - 5/x2;
+
+Constraints
+   0.01*x2/x3 + 0.0005*x1*x3 + 0.01*x1 <= 1;

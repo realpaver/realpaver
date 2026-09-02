@@ -1,0 +1,237 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   LinearizerTaylor.cpp
+ * @brief  Linearization of nonlinear problems based on Taylor forms
+ * @author Laurent Granvilliers
+ * @date   11 Feb 2025
+ */
+
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/DagExtended.hpp"
+#include "realpaver/LinearizerTaylor.hpp"
+#include "realpaver/Logger.hpp"
+
+namespace realpaver {
+LinearizerTaylor::LinearizerTaylor(SharedDagExtended edag, bool hansen, CornerStyle style,
+                                   unsigned seed)
+    : Linearizer(edag)
+    , hansen_(hansen)
+    , style_(style)
+    , corner_(scope().size())
+    , gen_()
+{
+   if (seed == 0)
+      gen_ = IntRandom();
+   else
+      gen_ = IntRandom(seed);
+}
+
+void LinearizerTaylor::useHansenDerivatives(bool b)
+{
+   hansen_ = b;
+}
+
+void LinearizerTaylor::fixCorner(const Bitset &corner, bool opposite)
+{
+   REALPAVER_ASSERT(corner_.size() == corner.size(), "Bad corner");
+
+   style_ = opposite ? CornerStyle::UserOpposite : CornerStyle::User;
+   corner_ = corner;
+}
+
+void LinearizerTaylor::selectCorner(const IntervalBox &B)
+{
+   switch (style_)
+   {
+   case CornerStyle::Random:
+   case CornerStyle::RandomOpposite:
+      for (size_t i = 0; i < corner_.size(); ++i)
+      {
+         if (gen_.nextBool())
+            corner_.setOne(i);
+         else
+            corner_.setZero(i);
+      }
+      break;
+   case CornerStyle::Left:
+   case CornerStyle::LeftRight:
+      corner_.setAllZero();
+      break;
+   case CornerStyle::Right:
+      corner_.setAllOne();
+      break;
+   case CornerStyle::User:
+   case CornerStyle::UserOpposite:
+      // nothing
+      break;
+   }
+}
+
+void LinearizerTaylor::makeVars(LPModel &lpm, const IntervalBox &B)
+{
+   for (const auto &v : scop_)
+   {
+      Interval val = B.get(v);
+      LinVar lv = lpm.makeVar(val.left(), val.right());
+      lv.setName(v.getName());
+      setLinVarIndex(v.id(), lv.getIndex());
+   }
+}
+
+bool LinearizerTaylor::makeOne(LPModel &lpm, const IntervalBox &B, const Bitset &corner,
+                               const Bitset &active)
+{
+   if (B.isInf())
+      return false;
+
+   // makes the corner of the box
+   RealPoint c(scop_);
+   for (const auto &v : scop_)
+   {
+      Interval dom = B.get(v);
+      if (corner.get(scop_.index(v)))
+         c.set(v, dom.right());
+      else
+         c.set(v, dom.left());
+   }
+
+   // generates the constraints
+   //   std::vector<SharedDagFun> funs;
+   //   edag()->getActiveFuns(funs, B, active);
+
+   for (size_t i = 0; i < edag()->size(); ++i)
+   {
+      SharedDagFun f = edag()->getActiveFun(i, B, active);
+      if (f == nullptr)
+         continue;
+
+      Interval img = f->getImage();
+
+      // evaluates the function at c
+      Interval fc = f->iEval(c);
+      if (fc.isEmpty())
+         return false;
+
+      // differentiates the function
+      IntervalVector G(f->nbVars());
+
+      if (hansen_)
+         f->iDiffHansen(B, c, G);
+      else
+         f->iDiff(B, G);
+
+      if (G.isEmpty())
+         return false;
+
+      if (G.isInf())
+         continue;
+
+      // lower bounding constraint of the form lo <= u generated if the right
+      // bound of the image of the function is finite
+      if (!Double::isInf(img.right()))
+      {
+         Interval u = img.right() - fc;
+         LinExpr lo;
+
+         for (const auto &v : f->scope())
+         {
+            LinVar lv = lpm.getLinVar(linVarIndex(v));
+
+            // derivative of f wrt. v
+            const Interval &z = G[f->scope().index(v)];
+
+            if (corner.get(scop_.index(v)))
+            {
+               // right bound used for this variable (bit = 1)
+               // => right bound of the derivative
+               lo.addTerm(z.right(), lv);
+               u += z.right() * Interval(c.get(v));
+            }
+            else
+            {
+               // left bound used for this variable (bit = 0)
+               // => left bound of the derivative
+               lo.addTerm(z.left(), lv);
+               u += z.left() * Interval(c.get(v));
+            }
+         }
+         lpm.addCtr(lo, u.right());
+      }
+
+      // upper bounding constraint of the form up >= l generated if the left
+      // bound of the image of the function is finite
+      if (!Double::isInf(img.left()))
+      {
+         Interval l = img.left() - fc;
+
+         LinExpr up;
+
+         for (const auto &v : f->scope())
+         {
+            LinVar lv = lpm.getLinVar(linVarIndex(v));
+
+            // derivative of f wrt. v
+            const Interval &z = G[f->scope().index(v)];
+
+            if (corner.get(scop_.index(v)))
+            {
+               // right bound used for this variable (bit = 1)
+               // => left bound of the derivative
+               up.addTerm(z.left(), lv);
+               l += z.left() * Interval(c.get(v));
+            }
+            else
+            {
+               // left bound used for this variable (bit = 1)
+               // => right bound of the derivative
+               up.addTerm(z.right(), lv);
+               l += z.right() * Interval(c.get(v));
+            }
+         }
+         lpm.addCtr(l.left(), up);
+      }
+   }
+   return true;
+}
+
+bool LinearizerTaylor::makeCtrs(LPModel &lpm, const IntervalBox &B, const Bitset &active)
+{
+   // selects the first corner
+   selectCorner(B);
+
+   // generates the constraints for this corner
+   bool b = makeOne(lpm, B, corner_, active);
+   if (!b)
+      return false;
+
+   // manages the opposite corner if necessary
+   if (style_ == CornerStyle::RandomOpposite || style_ == CornerStyle::UserOpposite ||
+       style_ == CornerStyle::LeftRight)
+   {
+      corner_.flipAll();
+      return makeOne(lpm, B, corner_, active);
+   }
+   else
+      return true;
+}
+
+bool LinearizerTaylor::makeLPImpl(LPModel &lpm, const IntervalBox &B,
+                                  const Bitset &active)
+{
+   makeVars(lpm, B);
+   return makeCtrs(lpm, B, active);
+}
+
+} // namespace realpaver

@@ -15,13 +15,12 @@
  * @file   ContractorDomain.hpp
  * @brief  Contractor of domains
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #ifndef REALPAVER_CONTRACTOR_DOMAIN_HPP
 #define REALPAVER_CONTRACTOR_DOMAIN_HPP
 
-#include <vector>
 #include "realpaver/Contractor.hpp"
 #include "realpaver/Variable.hpp"
 
@@ -45,7 +44,7 @@ public:
    ContractorDomain(Variable v);
 
    /// Creates a contractor for a list of variables
-   ContractorDomain(const std::initializer_list<Variable>& l);
+   ContractorDomain(const std::initializer_list<Variable> &l);
 
    /// Inserts a variable in the list of variables
    void insertVar(Variable v);
@@ -54,8 +53,8 @@ public:
    size_t nbVars() const;
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   void print(std::ostream &os) const override;
 
 private:
    Scope scop_;
@@ -64,6 +63,6 @@ private:
 /// Type of shared pointers on contractors
 using SharedContractorDomain = std::shared_ptr<ContractorDomain>;
 
-} // namespace
+} // namespace realpaver
 
 #endif

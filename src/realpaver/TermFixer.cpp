@@ -15,224 +15,237 @@
  * @file   TermFixer.cpp
  * @brief  Rewriting of terms
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/TermFixer.hpp"
 
 namespace realpaver {
 
-TermFixer::TermFixer(VarVarMapType* vvm, VarIntervalMapType* vim)
-      : vvm_(vvm),
-        vim_(vim),
-        t_()
-{}
+TermFixer::TermFixer(SharedProblemBridge bridge)
+    : bridge_(bridge)
+    , rt_()
+{
+   REALPAVER_ASSERT(bridge != nullptr, "Bad initialization of a term fixer");
+}
 
 Term TermFixer::getTerm() const
 {
-   return t_;
+   return rt_;
 }
 
-void TermFixer::apply(const TermCst* t)
+void TermFixer::apply(const TermCst *t)
 {
-   t_ = Term(t->getVal());
+   rt_ = Term(t->getVal());
 }
 
-void TermFixer::apply(const TermVar* t)
+void TermFixer::apply(const TermVar *t)
 {
-   auto it1 = vvm_->find(t->var());
-   auto it2 = vim_->find(t->var());
-
-   if ((it1 != vvm_->end()) && (it2 != vim_->end()))
-      THROW("Term fixer error");
-
-   else if (it1 != vvm_->end())
-      t_ = Term(it1->second);
-
-   else if (it2 != vim_->end())
-      t_ = Term(it2->second);
-
+   Variable v = t->var();
+   if (bridge_->isFixed(v))
+   {
+      rt_ = Term(bridge_->getFixedDomain(v));
+   }
    else
-      t_ = Term(t->var());
+   {
+      rt_ = Term(bridge_->srcToDestVar(v));
+   }
 }
 
-void TermFixer::apply(const TermAdd* t)
+void TermFixer::apply(const TermAdd *t)
 {
-   TermFixer vl(vvm_, vim_);
+   TermFixer vl(bridge_), vr(bridge_);
    t->left()->acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
-
-   t_ = vl.t_ + vr.t_;
+   rt_ = vl.rt_ + vr.rt_;
 }
 
-void TermFixer::apply(const TermSub* t)
+void TermFixer::apply(const TermSub *t)
 {
-   TermFixer vl(vvm_, vim_);
+   TermFixer vl(bridge_), vr(bridge_);
    t->left()->acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
-
-   t_ = vl.t_ - vr.t_;   
+   rt_ = vl.rt_ - vr.rt_;
 }
 
-void TermFixer::apply(const TermMul* t)
+void TermFixer::apply(const TermMul *t)
 {
-   TermFixer vl(vvm_, vim_);
+   TermFixer vl(bridge_), vr(bridge_);
    t->left()->acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
-
-   t_ = vl.t_ * vr.t_;
+   rt_ = vl.rt_ * vr.rt_;
 }
 
-void TermFixer::apply(const TermDiv* t)
+void TermFixer::apply(const TermDiv *t)
 {
-   TermFixer vl(vvm_, vim_);
+   TermFixer vl(bridge_), vr(bridge_);
    t->left()->acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
-
-   t_ = vl.t_ / vr.t_;
+   rt_ = vl.rt_ / vr.rt_;
 }
 
-void TermFixer::apply(const TermMin* t)
+void TermFixer::apply(const TermMin *t)
 {
-   TermFixer vl(vvm_, vim_);
+   TermFixer vl(bridge_), vr(bridge_);
    t->left()->acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
-
-   t_ = MIN(vl.t_, vr.t_);
+   rt_ = MIN(vl.rt_, vr.rt_);
 }
 
-void TermFixer::apply(const TermMax* t)
+void TermFixer::apply(const TermMax *t)
 {
-   TermFixer vl(vvm_, vim_);
+   TermFixer vl(bridge_), vr(bridge_);
    t->left()->acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
    t->right()->acceptVisitor(vr);
-
-   t_ = MAX(vl.t_, vr.t_);
+   rt_ = MAX(vl.rt_, vr.rt_);
 }
 
-void TermFixer::apply(const TermUsb* t)
+void TermFixer::apply(const TermUsb *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = -vis.t_;
+   rt_ = -vis.rt_;
 }
 
-void TermFixer::apply(const TermAbs* t)
+void TermFixer::apply(const TermAbs *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = abs(vis.t_);
+   rt_ = abs(vis.rt_);
 }
 
-void TermFixer::apply(const TermSgn* t)
+void TermFixer::apply(const TermSgn *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = sgn(vis.t_);
+   rt_ = sgn(vis.rt_);
 }
 
-void TermFixer::apply(const TermSqr* t)
+void TermFixer::apply(const TermSqr *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = sqr(vis.t_);
+   rt_ = sqr(vis.rt_);
 }
 
-void TermFixer::apply(const TermSqrt* t)
+void TermFixer::apply(const TermSqrt *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = sqrt(vis.t_);
+   rt_ = sqrt(vis.rt_);
 }
 
-void TermFixer::apply(const TermPow* t)
+void TermFixer::apply(const TermPow *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = pow(vis.t_, t->exponent());
+   rt_ = pow(vis.rt_, t->exponent());
 }
 
-void TermFixer::apply(const TermExp* t)
+void TermFixer::apply(const TermPowr *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = exp(vis.t_);
+   rt_ = pow(vis.rt_, t->exponent());
 }
 
-void TermFixer::apply(const TermLog* t)
+void TermFixer::apply(const TermExp *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = log(vis.t_);
+   rt_ = exp(vis.rt_);
 }
 
-void TermFixer::apply(const TermCos* t)
+void TermFixer::apply(const TermLog *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = cos(vis.t_);
+   rt_ = log(vis.rt_);
 }
 
-void TermFixer::apply(const TermSin* t)
+void TermFixer::apply(const TermCos *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = sin(vis.t_);
+   rt_ = cos(vis.rt_);
 }
 
-void TermFixer::apply(const TermTan* t)
+void TermFixer::apply(const TermSin *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = tan(vis.t_);
+   rt_ = sin(vis.rt_);
 }
 
-void TermFixer::apply(const TermCosh* t)
+void TermFixer::apply(const TermTan *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = cosh(vis.t_);
+   rt_ = tan(vis.rt_);
 }
 
-void TermFixer::apply(const TermSinh* t)
+void TermFixer::apply(const TermCosh *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = sinh(vis.t_);
+   rt_ = cosh(vis.rt_);
 }
 
-void TermFixer::apply(const TermTanh* t)
+void TermFixer::apply(const TermSinh *t)
 {
-   TermFixer vis(vvm_, vim_);
+   TermFixer vis(bridge_);
    t->child()->acceptVisitor(vis);
-
-   t_ = tanh(vis.t_);
+   rt_ = sinh(vis.rt_);
 }
 
-} // namespace
+void TermFixer::apply(const TermTanh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = tanh(vis.rt_);
+}
+
+void TermFixer::apply(const TermAcos *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = acos(vis.rt_);
+}
+
+void TermFixer::apply(const TermAsin *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = asin(vis.rt_);
+}
+
+void TermFixer::apply(const TermAtan *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = atan(vis.rt_);
+}
+
+void TermFixer::apply(const TermAcosh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = acosh(vis.rt_);
+}
+
+void TermFixer::apply(const TermAsinh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = asinh(vis.rt_);
+}
+
+void TermFixer::apply(const TermAtanh *t)
+{
+   TermFixer vis(bridge_);
+   t->child()->acceptVisitor(vis);
+   rt_ = atanh(vis.rt_);
+}
+
+} // namespace realpaver

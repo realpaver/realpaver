@@ -2,46 +2,24 @@
 #     Newton - Constraint Programming over non-linear Constraints.
 #     Scientific Programming, 1997.
 
-
 Variables
-   aux1 in [-1.0e8, 1.0e8],
-   aux2 in [-1.0e8, 1.0e8],
-   aux3 in [-1.0e8, 1.0e8],
-   aux4 in [-1.0e8, 1.0e8],
-
-   x1 in [-1.0e2, 1.0e2],
-   x2 in [-1.0e2, 1.0e2],
-   x3 in [-1.0e2, 1.0e2],
-   x4 in [-1.0e2, 1.0e2],
-   x5 in [-1.0e2, 1.0e2],
-   x6 in [-1.0e2, 1.0e2];
+   x1 in [-1.0e3, 1.0e3],
+   x2 in [-1.0e3, 1.0e3],
+   x3 in [-1.0e3, 1.0e3],
+   x4 in [-1.0e3, 1.0e3],
+   x5 in [-1.0e3, 1.0e3],
+   x6 in [-1.0e3, 1.0e3];
 
 Constants
-   C1 = 5,
-   C2 = 4,
-   C3 = 3,
-   C4 = 2;
+   C1 = 1.25,
+   C2 = 1,
+   C3 = 2.5,
+   C4 = 5.75;
 
 Constraints
    x1^2 + x3^2             == 1,
    x2^2 + x4^2             == 1,
-   x5*x1^3 + x6*x2^3       == C2,
-
-
-   aux1 == x5*x1*x3^2,
-   aux2 == x6*x4^2*x2,
-   aux1 + aux2 == C3,
-
-#   x5*x1*x3^2 + x6*x4^2*x2 == C3,
    x5*x3^3 + x6*x4^3       == C1,
-
-#   x5*x1^2*x3 + x6*x2^2*x4 == C4,
-
-   aux3 == x5*x1^2*x3,
-   aux4 == x6*x2^2*x4,
-   aux3 + aux4 == C4,
-
-
-   x1 >= x2,
-   x1 >= 0,
-   x2 >= 0;
+   x5*x1^3 + x6*x2^3       == C2,
+   x5*x1*x3^2 + x6*x4^2*x2 == C3,
+   x5*x1^2*x3 + x6*x2^2*x4 == C4;

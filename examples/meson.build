@@ -14,9 +14,17 @@
 # Author: Raphaël Chenouard
 #-------------------------------------------------------------------------------
 
-lp = executable(
-  'lp',
-  sources: 'lp.cpp',
+lp1 = executable(
+  'lp1',
+  sources: 'lp1.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
+lp2 = executable(
+  'lp2',
+  sources: 'lp2.cpp',
   link_with: realpaver_lib,
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,
@@ -32,9 +40,9 @@ if local_solver_dep.found()
   )
 endif
 
-csp = executable(
-  'csp',
-  sources: 'csp.cpp',
+ncsp = executable(
+  'ncsp',
+  sources: 'ncsp.cpp',
   link_with: realpaver_lib,
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,

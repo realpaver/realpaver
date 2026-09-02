@@ -15,8 +15,8 @@
  * @file   ContractorVarCID.hpp
  * @brief  CID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #ifndef REALPAVER_CONTRACTOR_VAR_CID_HPP
 #define REALPAVER_CONTRACTOR_VAR_CID_HPP
@@ -48,10 +48,10 @@ public:
    ~ContractorVarCID() = default;
 
    /// No copy
-   ContractorVarCID(const ContractorVarCID&) = delete;
+   ContractorVarCID(const ContractorVarCID &) = delete;
 
    /// No assignment
-   ContractorVarCID& operator=(const ContractorVarCID&) = delete;
+   ContractorVarCID &operator=(const ContractorVarCID &) = delete;
 
    /// Returns the variable whose domain is sliced
    Variable getVar() const;
@@ -60,15 +60,19 @@ public:
    void setVar(Variable v);
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
+   void print(std::ostream &os) const override;
 
 private:
    SharedContractor op_;
    Variable v_;
    std::unique_ptr<IntervalSlicer> slicer_;
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

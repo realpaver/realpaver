@@ -15,41 +15,41 @@
  * @file   DomainSlicerMap.cpp
  * @brief  Map of domain slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/DomainSlicerMap.hpp"
 
 namespace realpaver {
 
 DomainSlicerMap::DomainSlicerMap()
-      : slc_()
-{}
+    : slc_()
+{
+}
 
 DomainSlicerMap::~DomainSlicerMap()
 {
-   for (DomainSlicer* slc : slc_)
+   for (DomainSlicer *slc : slc_)
       if (slc != nullptr)
          delete slc;
 }
 
-void DomainSlicerMap::setSlicer(DomainType type,
-                                std::unique_ptr<DomainSlicer> slc)
+void DomainSlicerMap::setSlicer(DomainType type, std::unique_ptr<DomainSlicer> slc)
 {
    int i = static_cast<int>(type);
 
    if (i >= (int)slc_.size())
    {
-      for (int k=slc_.size(); k<=i; ++k)
+      for (int k = slc_.size(); k <= i; ++k)
          slc_.push_back(nullptr);
    }
 
-   if (slc_[i] != nullptr) delete slc_[i];
+   if (slc_[i] != nullptr)
+      delete slc_[i];
    slc_[i] = slc.release();
 }
 
-DomainSlicer* DomainSlicerMap::getSlicer(DomainType type) const
+DomainSlicer *DomainSlicerMap::getSlicer(DomainType type) const
 {
    int i = static_cast<int>(type);
    return (i < (int)slc_.size()) ? slc_[i] : nullptr;
@@ -60,4 +60,4 @@ bool DomainSlicerMap::hasSlicer(DomainType type) const
    return getSlicer(type) != nullptr;
 }
 
-} // namespace
+} // namespace realpaver

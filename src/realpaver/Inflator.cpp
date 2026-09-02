@@ -15,16 +15,19 @@
  * @file   Inlator.cpp
  * @brief  Inflator of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Inflator.hpp"
 
 namespace realpaver {
 
-Inflator::Inflator() : delta_(1.125), chi_(1.0e-12)
-{}
+Inflator::Inflator()
+    : delta_(1.125)
+    , chi_(1.0e-12)
+{
+}
 
 Inflator::Inflator(double delta, double chi)
 {
@@ -32,15 +35,21 @@ Inflator::Inflator(double delta, double chi)
    setChi(chi);
 }
 
-Interval Inflator::inflate(const Interval& x) const
+Interval Inflator::inflate(const Interval &x) const
 {
    return x.inflate(delta_, chi_);
 }
 
-void Inflator::inflate(IntervalVector& X) const
+void Inflator::inflate(IntervalVector &X) const
 {
-   for (size_t i=0; i<X.size(); ++i)
+   for (size_t i = 0; i < X.size(); ++i)
       X.set(i, X[i].inflate(delta_, chi_));
+}
+
+void Inflator::inflateOnScope(IntervalBox &B, const Scope &scop) const
+{
+   for (const Variable &v : scop)
+      B.set(v, B.get(v).inflate(delta_, chi_));
 }
 
 double Inflator::getDelta() const
@@ -55,16 +64,16 @@ double Inflator::getChi() const
 
 void Inflator::setDelta(double delta)
 {
-   ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
+   REALPAVER_ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
 
    delta_ = delta;
 }
 
 void Inflator::setChi(double chi)
 {
-   ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
+   REALPAVER_ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
 
    chi_ = chi;
 }
 
-} // namespace
+} // namespace realpaver

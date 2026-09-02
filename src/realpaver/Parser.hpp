@@ -15,7 +15,7 @@
  * @file   Parser.hpp
  * @brief  Wrapper for the parser of the modelling language
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_PARSER_HPP
@@ -34,27 +34,36 @@ public:
    Parser();
 
    /// Constructor
-   Parser(const Param& prm);
+   Parser(const Params &params);
 
    /**
     * @brief Parses a model from a file.
-    * 
+    *
     * @param filename input file
     * @param problem output problem
     * @return true in case of success, false otherwise
     */
-   bool parseFile(const std::string& filename, Problem& problem);
+   bool parseFile(const std::string &filename, Problem &problem);
+
+   /**
+    * @brief Parses a model from a string.
+    *
+    * @param realpaver_str input string
+    * @param problem output problem
+    * @return true in case of success, false otherwise
+    */
+   bool parseStr(const std::string &realpaver_str, Problem &problem);
 
    /// Returns the parse error in case of failure
    std::string getParseError() const;
 
 private:
-   SymbolTable symtab_;    // table of symbols
-   Param param_;           // parameters
+   SymbolTable symtab_; // table of symbols
+   Params params_;      // parameters
 
    void initSymbolTable();
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

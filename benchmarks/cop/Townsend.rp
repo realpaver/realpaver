@@ -1,0 +1,11 @@
+Variables
+  x in [-2.5,2.5],
+  y in [-2.5,2.5];
+
+Aliases
+  t = atan2(x,y);
+
+Min -(cos((x-0.1)*y))^2 - x*sin(3*x+y);
+
+Constraints
+  x^2 + y^2 <= (2*cos(t)-0.5*cos(2*t)-0.25*cos(3*t)-0.125*cos(4*t))^2 + (2*sin(t))^2;

@@ -15,16 +15,15 @@
  * @file   ContractorList.cpp
  * @brief  List of contractors applied in sequence
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorList.hpp"
 
 namespace realpaver {
 
 ContractorList::ContractorList(SharedContractorPool pool)
-      : pool_(pool)
+    : pool_(pool)
 {
    if (pool == nullptr)
    {
@@ -57,21 +56,33 @@ Scope ContractorList::scope() const
    return pool_->scope();
 }
 
-Proof ContractorList::contract(IntervalBox& B)
+Proof ContractorList::contract(IntervalBox &B)
+{
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorList::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorList::contractImpl(IntervalBox &B, const ContractMethod &contract)
 {
    Proof proof;
 
-   for (size_t i=0; i<poolSize(); ++i)
+   for (size_t i = 0; i < poolSize(); ++i)
    {
-      proof = pool_->contractorAt(i)->contract(B);
-      if (proof == Proof::Empty) return Proof::Empty;
+      SharedContractor op = pool_->contractorAt(i);
+      proof = contract.apply(*op, B);
+      if (proof == Proof::Empty)
+         return Proof::Empty;
    }
    return Proof::Maybe;
 }
 
-void ContractorList::print(std::ostream& os) const
+void ContractorList::print(std::ostream &os) const
 {
    os << "List of " << poolSize() << " contractors";
 }
 
-} // namespace
+} // namespace realpaver

@@ -1,9 +1,7 @@
-#include "test_config.hpp"
 #include "realpaver/Integer.hpp"
+#include "test_config.hpp"
 
-Integer MIN = Integer::MIN(),
-        MAX = Integer::MAX(),
-        ZRO = 0;
+Integer MIN = Integer::MIN(), MAX = Integer::MAX(), ZRO = 0;
 
 void test_init()
 {
@@ -45,28 +43,28 @@ void test_overflow_mul()
 
 void test_add()
 {
-   TEST_TRUE(MIN + ZRO  == MIN);
-   TEST_TRUE(MAX + ZRO  == MAX);      
+   TEST_TRUE(MIN + ZRO == MIN);
+   TEST_TRUE(MAX + ZRO == MAX);
 }
 
 void test_sub()
 {
-   TEST_TRUE(MIN - ZRO  == MIN);
-   TEST_TRUE(MAX - ZRO  == MAX);      
+   TEST_TRUE(MIN - ZRO == MIN);
+   TEST_TRUE(MAX - ZRO == MAX);
 }
 
 void test_mul()
 {
-   TEST_TRUE(MIN * ZRO  == ZRO);
-   TEST_TRUE(MAX * ZRO  == ZRO);      
+   TEST_TRUE(MIN * ZRO == ZRO);
+   TEST_TRUE(MAX * ZRO == ZRO);
 }
 
 void test_div()
 {
    Integer x;
    TEST_THROW(x = MAX / 0);
-   TEST_TRUE(MIN / MIN  == 1);
-   TEST_TRUE(MAX / MAX  == 1);      
+   TEST_TRUE(MIN / MIN == 1);
+   TEST_TRUE(MAX / MAX == 1);
 }
 
 void test_mod()
@@ -110,21 +108,21 @@ void test_sqr()
 void test_div_floor()
 {
    Integer x = 13, y = 4, u = -13, v = -4;
-   TEST_TRUE(divFloor(x,y) == 3);
-   TEST_TRUE(divFloor(u,v) == 3);
-   TEST_TRUE(divFloor(x,v) == -4);
-   TEST_TRUE(divFloor(u,y) == -4);
-   TEST_TRUE(divFloor(x,u) == -1);      
+   TEST_TRUE(divFloor(x, y) == 3);
+   TEST_TRUE(divFloor(u, v) == 3);
+   TEST_TRUE(divFloor(x, v) == -4);
+   TEST_TRUE(divFloor(u, y) == -4);
+   TEST_TRUE(divFloor(x, u) == -1);
 }
 
 void test_div_ceil()
 {
    Integer x = 13, y = 4, u = -13, v = -4;
-   TEST_TRUE(divCeil(x,y) == 4);
-   TEST_TRUE(divCeil(u,v) == 4);
-   TEST_TRUE(divCeil(x,v) == -3);
-   TEST_TRUE(divCeil(u,y) == -3);
-   TEST_TRUE(divCeil(x,u) == -1);            
+   TEST_TRUE(divCeil(x, y) == 4);
+   TEST_TRUE(divCeil(u, v) == 4);
+   TEST_TRUE(divCeil(x, v) == -3);
+   TEST_TRUE(divCeil(u, y) == -3);
+   TEST_TRUE(divCeil(x, u) == -1);
 }
 
 void test_sqrt_floor()
@@ -138,23 +136,23 @@ void test_sqrt_ceil()
 {
    Integer x = 13, y = 16;
    TEST_TRUE(sqrtCeil(x) == 4);
-   TEST_TRUE(sqrtCeil(y) == 4);      
+   TEST_TRUE(sqrtCeil(y) == 4);
 }
 
 void test_min()
 {
    Integer x = 3, y = 4, u = -3, v = -4;
-   TEST_TRUE(min(x,y) == x);
-   TEST_TRUE(min(x,u) == u);
-   TEST_TRUE(min(u,v) == v);
+   TEST_TRUE(min(x, y) == x);
+   TEST_TRUE(min(x, u) == u);
+   TEST_TRUE(min(u, v) == v);
 }
 
 void test_max()
 {
    Integer x = 3, y = 4, u = -3, v = -4;
-   TEST_TRUE(max(x,y) == y);
-   TEST_TRUE(max(x,u) == x);
-   TEST_TRUE(max(u,v) == u);      
+   TEST_TRUE(max(x, y) == y);
+   TEST_TRUE(max(x, u) == x);
+   TEST_TRUE(max(u, v) == u);
 }
 
 void test_floor()
@@ -191,11 +189,11 @@ void test_ceil()
    TEST_THROW(si = Integer::ceil(u));
 }
 
-void test_cast_double ()
+void test_cast_double()
 {
    TEST_TRUE(MIN.toDouble() == MIN.get());
    TEST_TRUE(MAX.toDouble() == MAX.get());
-}  
+}
 
 int main()
 {

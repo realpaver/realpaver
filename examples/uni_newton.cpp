@@ -1,27 +1,35 @@
-#include <iostream>
 #include "realpaver_api.hpp"
+#include <iostream>
 
 using namespace realpaver;
 using namespace std;
 
 class MyFun : public IntervalFunctionUni {
-   Interval eval(const Interval& x)  { return sqr(x) - 2.0; }
-   Interval diff(const Interval& x) { return 2.0*x; }
+   Interval eval(const Interval &x)
+   {
+      return sqr(x) - 2.0;
+   }
+   Interval diff(const Interval &x)
+   {
+      return 2.0 * x;
+   }
 };
 
 int main(void)
 {
-   Logger::init(LogLevel::full, "newton.log");
 
-   IntervalNewtonUni newton;
-   MyFun f;
-   Interval I(1, 10);
+   // TODO
+   // Logger::init(LogLevel::full, "newton.log");
 
-   Proof p = newton.contract(f, I);
-   cout << "Proof: " << p << endl;
+   // IntervalNewtonUni newton;
+   // MyFun f;
+   // Interval I(1, 10);
 
-   if (p != Proof::Empty)
-      cout << "New domain: " << I << endl;
+   // Proof p = newton.contract(f, I);
+   // cout << "Proof: " << p << endl;
+
+   // if (p != Proof::Empty)
+   //    cout << "New domain: " << I << endl;
 
    return 0;
 }

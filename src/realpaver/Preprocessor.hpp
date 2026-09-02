@@ -15,17 +15,17 @@
  * @file   Preprocessor.hpp
  * @brief  Preprocessor of problems
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_PREPROCESSOR_HPP
 #define REALPAVER_PREPROCESSOR_HPP
 
-#include <unordered_set>
-#include <vector>
-#include "realpaver/ConstraintFixer.hpp"
 #include "realpaver/Problem.hpp"
+#include "realpaver/ProblemBridge.hpp"
 #include "realpaver/Timer.hpp"
+#include <memory>
+#include <vector>
 
 namespace realpaver {
 
@@ -41,63 +41,29 @@ namespace realpaver {
  */
 class Preprocessor {
 public:
-   /// Type of map Variable -> Variable
-   using VarVarMapType = ConstraintFixer::VarVarMapType;
-
-   /// Type of map Variable -> Interval
-   using VarIntervalMapType = ConstraintFixer::VarIntervalMapType;
-
-   /// Constructor
-   Preprocessor();
+   /// Constructor given the source problem
+   Preprocessor(SharedProblem src);
 
    /// No copy
-   Preprocessor(const Preprocessor&) = delete;
+   Preprocessor(const Preprocessor &) = delete;
 
    /// No assignment
-   Preprocessor& operator=(const Preprocessor&) = delete;
+   Preprocessor &operator=(const Preprocessor &) = delete;
 
-   /// Destructor
-   ~Preprocessor();
+   /// Default destructor
+   ~Preprocessor() = default;
 
    /**
     * @brief Creates a simplified problem from a source problem.
-    * 
-    * @param src source problem
-    * @param dest simplified problem
     *
-    * It removes the fixed variables and the inactive constraints and it
-    * creates a new problem with a new set of variables.
+    * If the boolean on is false, then the simplified problem corresponds to the source.
+    * Otherwise, the fixed variables and the inactive constraints are removed and a new
+    * problem with a new set of variables is created.
     *
     * After a call to apply, it is possible to check if the input problem is
     * not feasible with the method isProblemUnfeasible().
     */
-   void apply(const Problem& src, Problem& dest);
-
-   /// Returns true if the domain of v is fixed
-   bool hasFixedDomain(Variable v) const;
-
-   /// Gets the domain of a fixed variable v of the source problem
-   Interval getFixedDomain(Variable v) const;
-
-   /// Gets a variable of the new problem that is associated with v
-   Variable srcToDestVar(Variable v) const;
-
-   /// Returns true if all the variables from the source problem are fixed
-   bool allVarsFixed() const;
-
-   /// Returns the fixed variables of the source problem
-   Scope fixedScope() const;
-
-   /// Returns the unfixed variables of the source problem
-   Scope unfixedScope() const;
-
-   /**
-    * @brief Returns the (unfixed) variables of the destination problem.
-    *
-    * It corresponds to unfixedScope() mapped to the variables of the
-    * destination problem
-    */
-   Scope destScope() const;
+   void apply(bool on = true);
 
    /// Returns the number of inactive constraints detected by this
    size_t nbInactiveCtrs() const;
@@ -105,10 +71,33 @@ public:
    /// Gets the i-th inactive constraint in this
    Constraint getInactiveCtr(size_t i) const;
 
-   /// Returns the number of fixed variables detected by this
+   /// Returns true if the source problem is not feasible
+   bool isUnfeasible() const;
+
+   /// Returns true if the source problem is solved by this
+   bool isSolved() const;
+
+   /**
+    * @brief Test function.
+    *
+    * Returns true if the source problem is an optimization problem solved by this
+    * such that no constraint is violated and the objective variable is fixed.
+    */
+   bool isSolvedOptimal() const;
+
+   /// Returns the elapsed time of the preprocessing stage in seconds
+   double elapsedTime() const;
+
+   /// Returns true if all the variables from the source problem are fixed
+   bool allVarsFixed() const;
+
+   /// Gets a variable of the new problem that is associated with v
+   Variable srcToDestVar(const Variable &v) const;
+
+   /// Returns the number of fixed variables
    size_t nbFixedVars() const;
 
-   /// Returns the number of unfixed variables after preprocessing
+   /// Returns the number of unfixed variables
    size_t nbUnfixedVars() const;
 
    /// Gets the i-th fixed variable of the source problem
@@ -116,6 +105,15 @@ public:
 
    /// Gets the i-th unfixed variable of the source problem
    Variable getUnfixedVar(size_t i) const;
+
+   /// Gets the domain of a fixed variable v of the source problem
+   Interval getFixedDomain(const Variable &v) const;
+
+   /// Returns true if the domain of v is fixed
+   bool isFixed(const Variable &v) const;
+
+   /// Returns true if the domain of v is not fixed
+   bool isUnfixed(const Variable &v) const;
 
    /**
     * @brief Returns the domains of the fixed variables if nbFixedVars() > 0.
@@ -132,32 +130,51 @@ public:
     */
    DomainBox destRegion() const;
 
-   /// Returns true if the source problem is not feasible
-   bool isUnfeasible() const;
+   /**
+    * @brief Returns the (unfixed) variables of the destination problem.
+    *
+    * It corresponds to unfixedScope() mapped to the variables of the
+    * destination problem
+    */
+   Scope destScope() const;
 
-   /// Returns true if the source problem is solved by this
-   bool isSolved() const;
+   /// Returns the fixed variables of the source problem
+   Scope fixedScope() const;
 
-   /// Returns the elapsed time of the preprocessing stage in seconds
-   double elapsedTime() const;
+   /// Returns the unfixed variables of the source problem
+   Scope unfixedScope() const;
+
+   /// Display on a stream after preprocessing
+   void print(std::ostream &os) const;
+
+   /// Returns the source problem
+   SharedProblem srcProblem() const;
+
+   /// Returns the target problem
+   SharedProblem destProblem() const;
+
+   /// Returns true if this has been used
+   bool isOn() const;
 
 private:
-   VarVarMapType vvm_;                 // map for non fixed variables
-   VarIntervalMapType vim_;            // map for fixed variables
+   SharedProblem src_;                // problem before preprocessing
+   SharedProblem dest_;               // problem after preprocessing
+   SharedProblemBridge bridge_;       // bridge between these two problems
+   std::vector<Constraint> inactive_; // constraints inactive
+   std::vector<Constraint> active_;   // constraints not inactive
+   bool infeasible_;                  // true if problem infeasible
+   Timer timer_;                      // timer
+   bool on_;                          // true if used
 
-   DomainBox* box_;                    // box used for propagation
-
-   std::vector<Constraint> inactive_;  // constraints inactive
-   std::vector<Constraint> active_;    // constraints not inactive
-   bool unfeasible_;                   // true if problem unfeasible
-
-   Timer timer_;
-
-   bool occursInActiveConstraint(const Variable& v) const;
-   bool propagate(const Problem& problem, DomainBox& box);
-   void applyImpl(const Problem& src, Problem& dest);
+   bool occursInActiveConstraint(const Variable &v) const;
+   bool occursInAlias(const Variable &v) const;
+   bool propagate(DomainBox &box);
+   void applyImpl();
 };
 
-} // namespace
+/// Type of shared pointers on a preprocessor
+using SharedPreprocessor = std::shared_ptr<Preprocessor>;
+
+} // namespace realpaver
 
 #endif

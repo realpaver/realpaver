@@ -15,178 +15,177 @@
  * @file   Problem.cpp
  * @brief  Constraint satisfaction and optimization problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include <sstream>
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Logger.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintRep.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include <sstream>
 
 namespace realpaver {
 
 int Problem::NP = 0;
 
-Problem::Problem(const std::string& name)
-      : name_(),
-        vars_(),
-        ctrs_(),
-        obj_(MIN(Term(0))),
-        scop_(),
-        vname_(),
-        id_(NP++)
-{}
+Problem::Problem(const std::string &name)
+    : name_()
+    , vars_()
+    , ctrs_()
+    , obj_()
+    , scop_()
+    , als_()
+    , init_ctrs_()
+    , red_ctrs_()
+    , obj_ctr_(-1)
+    , vname_()
+    , erv_(std::make_shared<EntityReportedVector>())
+    , id_(NP++)
+{
+}
 
-Variable Problem::addVar(const std::string& name)
+Variable Problem::addVar(const std::string &name)
 {
    size_t id = nextVarId();
 
    std::ostringstream os;
 
-   if (name == "") os << "_v" << id;
-   else            os << name;
+   if (name == "")
+      os << "_v" << id;
+   else
+      os << name;
 
    checkSymbol(os.str());
 
    Variable v(os.str());
-   v.setId(id)
-    .setTolerance(Tolerance(0.0, 0.0));
+   v.setId(id).setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
-Variable Problem::addBinaryVar(const std::string& name)
+Variable Problem::addBinaryVar(const std::string &name)
 {
    size_t id = nextVarId();
 
    std::ostringstream os;
 
-   if (name == "") os << "_b" << id;
-   else            os << name;
+   if (name == "")
+      os << "_b" << id;
+   else
+      os << name;
 
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new BinaryDomain());
 
    Variable v(os.str());
-   v.setId(id)
-    .setDomain(std::move(dom))
-    .setTolerance(Tolerance(0.0, 0.0));
+   v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
-VariableVector Problem::addBinaryVarVector(const std::string& name, int first,
-                                           int last)
+VariableVector Problem::addBinaryVarVector(const std::string &name, int first, int last)
 {
    VariableVector vec(name, first, last);
 
-   for (int i=first; i<=last; ++i)
+   for (int i = first; i <= last; ++i)
    {
       Variable v = vec[i];
 
       size_t id = nextVarId();
       std::unique_ptr<Domain> dom(new BinaryDomain());
 
-      v.setId(id)
-       .setDomain(std::move(dom))
-       .setTolerance(Tolerance(0.0, 0.0));
+      v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(0.0, 0.0));
 
-      vars_.push_back(v);
+      pushVar(v);
    }
 
    return vec;
 }
 
-Variable Problem::addIntVar(int lo, int up, const std::string& name)
+Variable Problem::addIntVar(int lo, int up, const std::string &name)
 {
    return addIntVar(Range(lo, up), name);
 }
 
-Variable Problem::addIntVar(const Range& r, const std::string& name)
+Variable Problem::addIntVar(const Range &r, const std::string &name)
 {
    THROW_IF(r.isEmpty(), "Integer variable with an empty domain");
-   
+
    size_t id = nextVarId();
 
    std::ostringstream os;
 
-   if (name == "") os << "_i" << id;
-   else            os << name;
+   if (name == "")
+      os << "_i" << id;
+   else
+      os << name;
 
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new RangeDomain(r));
 
    Variable v(os.str());
-   v.setId(id)
-    .setDomain(std::move(dom))
-    .setTolerance(Tolerance(0.0, 0.0));
+   v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
-Variable Problem::addIntVar(const RangeUnion& u, const std::string& name)
+Variable Problem::addIntVar(const RangeUnion &u, const std::string &name)
 {
    THROW_IF(u.isEmpty(), "Integer variable with an empty domain");
-   
+
    size_t id = nextVarId();
 
    std::ostringstream os;
 
-   if (name == "") os << "_i" << id;
-   else            os << name;
+   if (name == "")
+      os << "_i" << id;
+   else
+      os << name;
 
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new RangeUnionDomain(u));
 
    Variable v(os.str());
-   v.setId(id)
-    .setDomain(std::move(dom))
-    .setTolerance(Tolerance(0.0, 0.0));
+   v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(0.0, 0.0));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
-VariableVector Problem::addIntVarVector(const std::string& name, int first, int last,
-                                        const Range& r)
+VariableVector Problem::addIntVarVector(const std::string &name, int first, int last,
+                                        const Range &r)
 {
    VariableVector vec(name, first, last);
 
-   for (int i=first; i<=last; ++i)
+   for (int i = first; i <= last; ++i)
    {
       Variable v = vec[i];
       size_t id = nextVarId();
 
       std::unique_ptr<Domain> dom(new RangeDomain(r));
 
-      v.setId(id)
-       .setDomain(std::move(dom))
-       .setTolerance(Tolerance(0.0, 0.0));
+      v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(0.0, 0.0));
 
-      vars_.push_back(v);
+      pushVar(v);
    }
 
    return vec;
 }
 
-Variable Problem::addRealVar(double lo, double up, const std::string& name)
+Variable Problem::addRealVar(double lo, double up, const std::string &name)
 {
    return addRealVar(Interval(lo, up), name);
 }
 
-Variable Problem::addRealVar(const Interval& x, const std::string& name)
+Variable Problem::addRealVar(const Interval &x, const std::string &name)
 {
    THROW_IF(x.isEmpty(), "Real variable with an empty domain");
 
@@ -194,27 +193,26 @@ Variable Problem::addRealVar(const Interval& x, const std::string& name)
 
    std::ostringstream os;
 
-   if (name == "") os << "_x" << id;
-   else            os << name;
-   
+   if (name == "")
+      os << "_x" << id;
+   else
+      os << name;
+
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new IntervalDomain(x));
 
-   double rtol = Param::GetDblParam("VAR_REL_TOL"),
-          atol = Param::GetDblParam("VAR_ABS_TOL");
+   double rtol = Params::GetDblParam("VAR_REL_TOL"),
+          atol = Params::GetDblParam("VAR_ABS_TOL");
 
    Variable v(os.str());
-   v.setId(id)
-    .setDomain(std::move(dom))
-    .setTolerance(Tolerance(rtol, atol));
+   v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(rtol, atol));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
-Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
+Variable Problem::addRealVar(const IntervalUnion &u, const std::string &name)
 {
    THROW_IF(u.isEmpty(), "Real variable with an empty domain");
 
@@ -222,46 +220,43 @@ Variable Problem::addRealVar(const IntervalUnion& u, const std::string& name)
 
    std::ostringstream os;
 
-   if (name == "") os << "_x" << id;
-   else            os << name;
-   
+   if (name == "")
+      os << "_x" << id;
+   else
+      os << name;
+
    checkSymbol(os.str());
 
    std::unique_ptr<Domain> dom(new IntervalUnionDomain(u));
 
-   double rtol = Param::GetDblParam("VAR_REL_TOL"),
-          atol = Param::GetDblParam("VAR_ABS_TOL");
+   double rtol = Params::GetDblParam("VAR_REL_TOL"),
+          atol = Params::GetDblParam("VAR_ABS_TOL");
 
    Variable v(os.str());
-   v.setId(id)
-    .setDomain(std::move(dom))
-    .setTolerance(Tolerance(rtol, atol));
+   v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(rtol, atol));
 
-   vars_.push_back(v);
-
+   pushVar(v);
    return v;
 }
 
-VariableVector Problem::addRealVarVector(const std::string& name, int first,
-                                         int last, const Interval& x)
+VariableVector Problem::addRealVarVector(const std::string &name, int first, int last,
+                                         const Interval &x)
 {
    VariableVector vec(name, first, last);
 
-   double rtol = Param::GetDblParam("VAR_REL_TOL"),
-          atol = Param::GetDblParam("VAR_ABS_TOL");
+   double rtol = Params::GetDblParam("VAR_REL_TOL"),
+          atol = Params::GetDblParam("VAR_ABS_TOL");
 
-   for (int i=first; i<=last; ++i)
+   for (int i = first; i <= last; ++i)
    {
       Variable v = vec[i];
       size_t id = nextVarId();
 
       std::unique_ptr<Domain> dom(new IntervalDomain(x));
 
-      v.setId(id)
-       .setDomain(std::move(dom))
-       .setTolerance(Tolerance(rtol, atol));
+      v.setId(id).setDomain(std::move(dom)).setTolerance(Tolerance(rtol, atol));
 
-      vars_.push_back(v);
+      pushVar(v);
    }
 
    return vec;
@@ -274,68 +269,147 @@ Variable Problem::addClonedVar(Variable v)
    size_t id = nextVarId();
    res.setId(id);
 
-   vars_.push_back(res);
-
+   pushVar(res);
    return res;
 }
 
-void Problem::addCtr(Constraint c)
+void Problem::pushVar(Variable v)
 {
-   ctrs_.push_back(c);
+   vars_.push_back(v);
+   scop_.insert(v);
+   erv_->addVariable(v);
 }
 
-void Problem::addCtr(const std::initializer_list<Constraint>& l)
+size_t Problem::addCtr(Constraint c)
 {
-   for (const auto& c : l) addCtr(c);
+   size_t id = ctrs_.size();
+   c.setId(id);
+   ctrs_.push_back(c);
+   switch (c.status())
+   {
+   case ConstraintStatus::Initial:
+      init_ctrs_.push_back(id);
+      break;
+
+   case ConstraintStatus::Objective:
+      obj_ctr_ = id;
+      break;
+
+   case ConstraintStatus::Redundant:
+      red_ctrs_.push_back(id);
+      break;
+   }
+   return id;
+}
+
+void Problem::addCtr(const std::initializer_list<Constraint> &l)
+{
+   for (const auto &c : l)
+      addCtr(c);
 }
 
 void Problem::addObjective(Objective obj)
 {
+   THROW_IF(obj.hasNullRep(), "Empty objective function");
+   THROW_IF(hasObjective(), "Only one objective function is allowed");
+
+   // assigns the objective
    obj_ = obj;
+
+   // assigns the domain of the objective variable
+   IntervalBox box(this->scope());
+   Interval x = obj_.getTerm().eval(box);
+   obj_.getVar().getDomain()->contractInterval(x);
 }
 
-std::ostream& operator<<(std::ostream& os, const Problem& p)
+bool Problem::hasObjectiveConstraint() const
 {
-   if (p.isEmpty()) return os << "Nothing in this problem";
-   
-   std::string indent = "",
-               s_var  = "Variables",
-               s_ctr  = "Constraints",
-               s_int  = "Integer",
-               s_obj  = "Objectives";
+   return obj_ctr_ >= 0;
+}
+
+void Problem::generateObjectiveConstraint()
+{
+   if (hasObjective() && (!hasObjectiveConstraint()))
+   {
+      if (obj_.isMinimization())
+      {
+         // min z = f(X) => equation z-f(X)==0
+         Constraint c(obj_.getVar() - obj_.getTerm() == 0.0);
+         c.setStatus(ConstraintStatus::Objective);
+         addCtr(c);
+      }
+      else
+      {
+         // max z = f(X) <=> min z = -f(X) => equation z+f(X)==0
+         Constraint c(obj_.getVar() + obj_.getTerm() == 0.0);
+         c.setStatus(ConstraintStatus::Objective);
+         addCtr(c);
+      }
+   }
+}
+
+std::ostream &operator<<(std::ostream &os, const Problem &p)
+{
+   if (p.isEmpty())
+      return os << "empty problem";
+
+   std::string indent = "  ", s_var = "Variables", s_ctr = "Constraints",
+               s_int = "Integer", s_als = "Aliases";
 
    // variables
    bool first = true;
    os << s_var << std::endl;
-   for (size_t i=0; i<p.nbVars(); ++i)
+   for (size_t i = 0; i < p.nbVars(); ++i)
    {
-      if (!first) os << "," << std::endl;
-      else first = false;
+      Variable v = p.varAt(i);
 
-      os << p.varAt(i);
+      if (!first)
+         os << "," << std::endl;
+      else
+         first = false;
+
+      os << indent << p.varAt(i);
    }
    os << std::endl << ";";
+
+   // objective function
+   if (p.hasObjective())
+   {
+      os << std::endl << p.getObjective() << ";";
+   }
 
    // constraints
    if (p.nbCtrs() > 0)
    {
       os << std::endl << s_ctr << std::endl;
       first = true;
-      for (size_t i=0; i<p.nbCtrs(); ++i)
+      for (size_t i = 0; i < p.nbCtrs(); ++i)
       {
-         if (!first) os << "," << std::endl;
-         else first = false;
+         if (!first)
+            os << "," << std::endl;
+         else
+            first = false;
 
          os << indent << p.ctrAt(i);
       }
       os << std::endl << ";";
    }
 
-   // objective function
-   if (p.hasObjective())
+   // aliases
+   if (p.nbAliases() > 0)
    {
-      os << std::endl << s_obj << std::endl;
-      os << indent << p.getObjective() << std::endl << ";";
+      os << std::endl << s_als << std::endl;
+      first = true;
+      for (size_t i = 0; i < p.nbAliases(); ++i)
+      {
+         if (!first)
+            os << "," << std::endl;
+         else
+            first = false;
+
+         os << indent << p.aliasAt(i);
+      }
+      os << std::endl << ";";
    }
 
    return os;
@@ -345,8 +419,8 @@ bool Problem::isFakeVar(Variable v) const
 {
    if (obj_.getTerm().dependsOn(v))
       return false;
-   
-   for (size_t i=0; i<nbCtrs(); ++i)
+
+   for (size_t i = 0; i < nbCtrs(); ++i)
       if (ctrAt(i).dependsOn(v))
          return false;
 
@@ -355,9 +429,10 @@ bool Problem::isFakeVar(Variable v) const
 
 bool Problem::isReal() const
 {
-   if (nbVars() == 0) return false;
+   if (nbVars() == 0)
+      return false;
 
-   for (size_t i=0; i<nbVars(); ++i)
+   for (size_t i = 0; i < nbVars(); ++i)
       if (!varAt(i).isReal())
          return false;
 
@@ -366,9 +441,10 @@ bool Problem::isReal() const
 
 bool Problem::isInteger() const
 {
-   if (nbVars() == 0) return false;
+   if (nbVars() == 0)
+      return false;
 
-   for (size_t i=0; i<nbVars(); ++i)
+   for (size_t i = 0; i < nbVars(); ++i)
       if (varAt(i).isReal())
          return false;
 
@@ -377,26 +453,31 @@ bool Problem::isInteger() const
 
 bool Problem::isMixed() const
 {
-   if (nbVars() < 2) return false;
+   if (nbVars() < 2)
+      return false;
 
    bool cont = false, dis = false;
 
-   for (size_t i=0; i<nbVars(); ++i)
+   for (size_t i = 0; i < nbVars(); ++i)
    {
-      if (varAt(i).isInteger()) dis = true;
-      if (varAt(i).isReal()) cont = true;
+      if (varAt(i).isInteger())
+         dis = true;
+      if (varAt(i).isReal())
+         cont = true;
 
-      if (dis && cont) return true;
+      if (dis && cont)
+         return true;
    }
    return false;
 }
 
 bool Problem::isEqConstrained() const
 {
-   if (nbCtrs() == 0) return false;
+   if (nbCtrs() == 0)
+      return false;
 
-   for (size_t i=0; i<nbCtrs(); ++i)
-      if (!ctrAt(i).isEquation())
+   for (size_t i = 0; i < nbCtrs(); ++i)
+      if (!ctrAt(i).isAnEquation())
          return false;
 
    return true;
@@ -404,10 +485,11 @@ bool Problem::isEqConstrained() const
 
 bool Problem::isIneqConstrained() const
 {
-   if (nbCtrs() == 0) return false;
+   if (nbCtrs() == 0)
+      return false;
 
-   for (size_t i=0; i<nbCtrs(); ++i)
-      if (!ctrAt(i).isInequality())
+   for (size_t i = 0; i < nbCtrs(); ++i)
+      if (!ctrAt(i).isAnInequality())
          return false;
 
    return true;
@@ -415,25 +497,30 @@ bool Problem::isIneqConstrained() const
 
 bool Problem::isMixedConstrained() const
 {
-   if (nbCtrs() < 2) return false;
+   if (nbCtrs() < 2)
+      return false;
 
    bool eq = false, ineq = false;
 
-   for (size_t i=0; i<nbCtrs(); ++i)
+   for (size_t i = 0; i < nbCtrs(); ++i)
    {
-      if (ctrAt(i).isEquation()) eq = true;
-      if (ctrAt(i).isInequality()) ineq = true;
+      if (ctrAt(i).isAnEquation())
+         eq = true;
+      if (ctrAt(i).isAnInequality())
+         ineq = true;
 
-      if (eq && ineq) return true;
+      if (eq && ineq)
+         return true;
    }
    return false;
 }
 
 bool Problem::isLinConstrained() const
 {
-   if (nbCtrs() == 0) return false;
+   if (nbCtrs() == 0)
+      return false;
 
-   for (size_t i=0; i<nbCtrs(); ++i)
+   for (size_t i = 0; i < nbCtrs(); ++i)
       if (!ctrAt(i).isLinear())
          return false;
 
@@ -447,15 +534,15 @@ size_t Problem::nbVars() const
 
 Variable Problem::varAt(size_t i) const
 {
-   ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
-   ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
+   REALPAVER_ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
+   REALPAVER_ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
 
    return vars_[i];
 }
 
 Variable Problem::lastVar() const
 {
-   return varAt(nbVars()-1);
+   return varAt(nbVars() - 1);
 }
 
 size_t Problem::nbCtrs() const
@@ -465,14 +552,41 @@ size_t Problem::nbCtrs() const
 
 Constraint Problem::ctrAt(size_t i) const
 {
-   ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
-   ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
+   REALPAVER_ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
+   REALPAVER_ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
 
    return ctrs_[i];
 }
 
+size_t Problem::nbInitialCtrs() const
+{
+   return init_ctrs_.size();
+}
+
+Constraint Problem::ctrInitialAt(size_t i) const
+{
+   return ctrAt(init_ctrs_[i]);
+}
+
+size_t Problem::nbRedundantCtrs() const
+{
+   return red_ctrs_.size();
+}
+
+Constraint Problem::ctrRedundantAt(size_t i) const
+{
+   return ctrAt(red_ctrs_[i]);
+}
+
+Constraint Problem::ctrObjective() const
+{
+   THROW_IF(!hasObjective(), "No objective constraint");
+   return ctrAt(obj_ctr_);
+}
+
 Objective Problem::getObjective() const
 {
+   THROW_IF(!hasObjective(), "No objective function");
    return obj_;
 }
 
@@ -482,10 +596,10 @@ Scope Problem::scope() const
    {
       Scope scop;
 
-      for (const auto& v : vars_)
+      for (const auto &v : vars_)
          scop.insert(v);
 
-      Problem* prob = const_cast<Problem*>(this);
+      Problem *prob = const_cast<Problem *>(this);
       prob->scop_ = ScopeBank::getInstance()->insertScope(scop);
    }
    return scop_;
@@ -498,7 +612,7 @@ bool Problem::isConstrained() const
 
 bool Problem::hasObjective() const
 {
-   return !obj_.isConstant();
+   return !obj_.hasNullRep();
 }
 
 bool Problem::isLinObjective() const
@@ -513,20 +627,20 @@ bool Problem::isCSP() const
 
 bool Problem::isBOP() const
 {
-   return (nbVars() > 0) && (nbCtrs() == 0) && hasObjective();   
+   return (nbVars() > 0) && (nbCtrs() == 0) && hasObjective();
 }
 
 bool Problem::isCOP() const
 {
-   return (nbVars() > 0) && (nbCtrs() > 0) && hasObjective();      
+   return (nbVars() > 0) && (nbCtrs() > 0) && hasObjective();
 }
 
 bool Problem::isEmpty() const
 {
-   return (nbVars() == 0) && (nbCtrs() == 0) && (!hasObjective()); 
+   return (nbVars() == 0) && (nbCtrs() == 0) && (!hasObjective());
 }
 
-void Problem::checkSymbol(const std::string& name)
+void Problem::checkSymbol(const std::string &name)
 {
    auto it = vname_.find(name);
    if (it != vname_.end())
@@ -540,4 +654,74 @@ size_t Problem::nextVarId() const
    return vars_.size();
 }
 
-} // namespace
+void Problem::addAlias(const Alias &a)
+{
+   checkSymbol(a.name());
+
+   THROW_IF(!scop_.contains(a.scope()),
+            "Alias " << a.name() << " not on the problem's scope");
+
+   als_.push_back(a);
+   erv_->addAlias(a);
+}
+
+size_t Problem::nbAliases() const
+{
+   return als_.size();
+}
+
+Alias Problem::aliasAt(size_t i) const
+{
+   REALPAVER_ASSERT(i < als_.size(), "Bad access to aa alias in a problem");
+   return als_[i];
+}
+
+void Problem::reportVariable(Variable v, bool b)
+{
+   if (erv_->contains(v.getName()))
+   {
+      if (!b)
+         erv_->remove(v.getName());
+   }
+   else
+   {
+      if (b)
+         erv_->addVariable(v);
+   }
+}
+
+void Problem::reportAlias(Alias a, bool b)
+{
+   if (erv_->contains(a.name()))
+   {
+      if (!b)
+         erv_->remove(a.name());
+   }
+   else
+   {
+      if (b)
+         erv_->addAlias(a);
+   }
+}
+
+bool Problem::isVarReported(const Variable &v) const
+{
+   return erv_->contains(v.getName());
+}
+
+bool Problem::isAliasReported(const Alias &a) const
+{
+   return erv_->contains(a.name());
+}
+
+std::string Problem::getName() const
+{
+   return name_;
+}
+
+void Problem::setName(std::string name)
+{
+   name_ = name;
+}
+
+} // namespace realpaver

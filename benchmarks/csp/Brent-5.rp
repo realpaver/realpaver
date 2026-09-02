@@ -1,0 +1,19 @@
+# In: Luksan L. and Vleck J.
+#     Sparse and partially separable test problems for unconstrained
+#     and equality constrained optimization.
+#     Research Report 767, Institute of Computer Science, Academy of 
+#     Sciences of the Czeck Republic, Janvier 1999
+
+Variables
+x1 in [-1.0e8, 1.0e8],
+x2 in [-1.0e8, 1.0e8],
+x3 in [-1.0e8, 1.0e8],
+x4 in [-1.0e8, 1.0e8],
+x5 in [-1.0e8, 1.0e8];
+
+Constraints
+3*x1*(x2-2*x1)+0.25*x2^2 == 0,
+3*x2*(x3-2*x2+x1)+0.25*(x3-x1)^2 == 0,
+3*x3*(x4-2*x3+x2)+0.25*(x4-x2)^2 == 0,
+3*x4*(x5-2*x4+x3)+0.25*(x5-x3)^2 == 0,
+3*x5*(20-2*x5+x4)+0.25*(20-x4)^2 == 0;

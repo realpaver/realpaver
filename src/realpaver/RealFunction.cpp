@@ -15,7 +15,7 @@
  * @file   RealFunction.hpp
  * @brief  Real functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -24,43 +24,36 @@
 namespace realpaver {
 
 RealFunctionRep::~RealFunctionRep()
-{}
-
-void RealFunctionRep::setImage(const Interval& img)
 {
-   img_ = img;
-}
-
-Interval RealFunctionRep::getImage() const
-{
-   return img_;
 }
 
 /*----------------------------------------------------------------------------*/
 
-RealFunction::RealFunction(SharedDag dag, size_t i)
-      : rep_(std::make_shared<RealFunctionDag>(dag, i))
-{}
+RealFunction::RealFunction(SharedDagFun f)
+    : rep_(std::make_shared<RealFunctionDag>(f))
+{
+}
 
-RealFunction::RealFunction(Term t, const Interval& img)
-      : rep_(std::make_shared<RealFunctionDag>(t, img))
-{}
+RealFunction::RealFunction(SharedDag dag, size_t i)
+    : rep_(std::make_shared<RealFunctionDag>(dag->fun(i)))
+{
+}
+
+RealFunction::RealFunction(Term t, const Interval &img)
+    : rep_(std::make_shared<RealFunctionDag>(t, img))
+{
+}
 
 RealFunction::RealFunction(SharedRep rep)
-      : rep_(rep)
+    : rep_(rep)
 {
-   ASSERT(rep != nullptr,
-          "Creation of an interval function from a null pointer");
+   REALPAVER_ASSERT(rep != nullptr,
+                    "Creation of an interval function from a null pointer");
 }
 
 RealFunction::SharedRep RealFunction::rep() const
 {
    return rep_;
-}
-
-void RealFunction::setImage(const Interval& img)
-{
-   rep_->setImage(img);
 }
 
 Interval RealFunction::getImage() const
@@ -78,67 +71,55 @@ size_t RealFunction::nbVars() const
    return rep_->nbVars();
 }
 
-double RealFunction::eval(const RealPoint& pt)
+double RealFunction::eval(const RealPoint &pt)
 {
    return rep_->eval(pt);
 }
 
-void RealFunction::diff(const RealPoint& pt, RealVector& G)
+void RealFunction::diff(const RealPoint &pt, RealVector &G)
 {
    return rep_->diff(pt, G);
 }
 
 /*----------------------------------------------------------------------------*/
 
-RealFunctionDag::RealFunctionDag(SharedDag dag, size_t i)
-      : RealFunctionRep(),
-        dag_(dag),
-        index_(i)
+RealFunctionDag::RealFunctionDag(SharedDagFun f)
+    : RealFunctionRep()
+    , f_(f)
 {
-   ASSERT(dag_ != nullptr, "Null pointer used to create a real function");
-   ASSERT(i < dag_->nbFuns(), "Bad index used to create a real function");
-
-   img_ = dag->fun(i)->getImage();
 }
 
-RealFunctionDag::RealFunctionDag(Term t, const Interval& img)
-      : dag_(nullptr),
-        index_(0)
+RealFunctionDag::RealFunctionDag(Term t, const Interval &img)
+    : f_(nullptr)
 {
-   dag_ = std::make_shared<Dag>();
-   index_ = dag_->insert(t, img);
-   img_ = img;
+   SharedDag dag = std::make_shared<Dag>();
+   size_t i = dag->insert(t, img);
+   f_ = dag->fun(i);
 }
 
-SharedDag RealFunctionDag::dag() const
+Interval RealFunctionDag::getImage() const
 {
-   return dag_;
-}
-
-size_t RealFunctionDag::index() const
-{
-   return index_;
+   return f_->getImage();
 }
 
 Scope RealFunctionDag::scope() const
 {
-   return dag_->fun(index_)->scope();
+   return f_->scope();
 }
 
 size_t RealFunctionDag::nbVars() const
 {
-   return dag_->fun(index_)->nbVars();   
+   return f_->nbVars();
 }
 
-double RealFunctionDag::eval(const RealPoint& pt)
+double RealFunctionDag::eval(const RealPoint &pt)
 {
-   return dag_->fun(index_)->rEval(pt);
+   return f_->rEval(pt);
 }
 
-void RealFunctionDag::diff(const RealPoint& pt, RealVector& G)
+void RealFunctionDag::diff(const RealPoint &pt, RealVector &G)
 {
-   DagFun* f = dag_->fun(index_);
-   return f->rDiff(pt, G);
+   return f_->rDiff(pt, G);
 }
 
-} // namespace
+} // namespace realpaver

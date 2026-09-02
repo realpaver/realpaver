@@ -21,6 +21,7 @@ Optional software or libraries:
   - mkdoxy
 - lex (or flex) and yacc (or bison)
 - pkg-config
+- zlib (depends on the LP library)
 
 
 ## Getting the source code

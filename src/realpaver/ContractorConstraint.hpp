@@ -15,8 +15,8 @@
  * @file   ContractorConstraint.hpp
  * @brief  Contractor associated with a constraint
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #ifndef REALPAVER_CONTRACTOR_CONSTRAINT_HPP
 #define REALPAVER_CONTRACTOR_CONSTRAINT_HPP
@@ -37,17 +37,18 @@ public:
    ContractorConstraint(Constraint c);
 
    /// Default copy constructor
-   ContractorConstraint(const ContractorConstraint&) = default;
+   ContractorConstraint(const ContractorConstraint &) = default;
 
    /// No assignment
-   ContractorConstraint& operator=(const ContractorConstraint&) = delete;
+   ContractorConstraint &operator=(const ContractorConstraint &) = delete;
 
    /// Default destructor
    ~ContractorConstraint() = default;
 
    Scope scope() const override;
-   Proof contract(IntervalBox& B) override;
-   void print(std::ostream& os) const override;
+   Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
+   void print(std::ostream &os) const override;
 
    /// Returns the constraint enclosed in this
    Constraint getConstraint() const;
@@ -56,6 +57,6 @@ private:
    Constraint c_;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

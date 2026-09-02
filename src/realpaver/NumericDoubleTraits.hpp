@@ -15,31 +15,29 @@
  * @file   NumericDoubleTraits.hpp
  * @brief  Specialization of template NumericTraits for doubles
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP
 #define REALPAVER_NUMERIC_DOUBLE_TRAITS_HPP
 
-#include "Double.hpp"
-#include "NumericTraits.hpp"
+#include "realpaver/Double.hpp"
+#include "realpaver/NumericTraits.hpp"
 
 namespace realpaver {
 
 /**
  * @brief Specialization of template NumericTraits for doubles.
- * 
+ *
  * This traits is used to parameterize matrices, vectors, and algorithms
  * from linear algebra.
- * 
+ *
  * @see NumericTraits
  */
-template <>
-struct NumericTraits<double>
-{
-   using ValueType    = double;
-   using RefType      = double&;
-   using ConstRefType = const double&;
+template <> struct NumericTraits<double> {
+   using ValueType = double;
+   using RefType = double &;
+   using ConstRefType = const double &;
 
    static inline ValueType zero()
    {
@@ -91,7 +89,7 @@ struct NumericTraits<double>
       Double::addAssign(x, y);
    }
 
-   static inline void subAssign(ValueType& x, ConstRefType y)
+   static inline void subAssign(ValueType &x, ConstRefType y)
    {
       Double::subAssign(x, y);
    }
@@ -101,7 +99,7 @@ struct NumericTraits<double>
       Double::mulAssign(x, y);
    }
 
-   static inline void divAssign(ValueType& x, ConstRefType y)
+   static inline void divAssign(ValueType &x, ConstRefType y)
    {
       Double::divAssign(x, y);
    }
@@ -116,12 +114,12 @@ struct NumericTraits<double>
       return Double::isEqual(x, y);
    }
 
-   static inline size_t hashCode(ConstRefType  x)
+   static inline size_t hashCode(ConstRefType x)
    {
       return Double::hashCode(x);
    }
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

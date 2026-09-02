@@ -15,7 +15,7 @@
  * @file   TermLin.hpp
  * @brief  Linear expression
  * @author Laurent Granvilliers
- * @date   2024-6-22
+ * @date   22 June 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -25,16 +25,28 @@
 namespace realpaver {
 
 TermLin::TermLin()
-      : cst_(Interval::zero()),
-        sl_()
-{}
+    : cst_(Interval::zero())
+    , sl_()
+{
+}
 
-TermLin::TermLin(const Term& t)
-      : cst_(Interval::zero()),
-        sl_()
+TermLin::TermLin(const Term &t)
+    : cst_(Interval::zero())
+    , sl_()
 {
    TermLinCreator creator(this);
    t.acceptVisitor(creator);
+
+   if (!creator.visitSuccessfull())
+      THROW("Creation of linear term failed");
+}
+
+TermLin::TermLin(const TermRep *rep)
+    : cst_(Interval::zero())
+    , sl_()
+{
+   TermLinCreator creator(this);
+   rep->acceptVisitor(creator);
 
    if (!creator.visitSuccessfull())
       THROW("Creation of linear term failed");
@@ -45,14 +57,15 @@ bool TermLin::isConstant() const
    return sl_.empty();
 }
 
-void TermLin::addConstant(const Interval& a)
+void TermLin::addConstant(const Interval &a)
 {
    cst_ += a;
 }
 
-void TermLin::addLin(const Interval& a, const Variable& v)
+void TermLin::addLin(const Interval &a, const Variable &v)
 {
-   if (a.isZero()) return;
+   if (a.isZero())
+      return;
 
    Lin l = {a, v};
    auto it = sl_.find(l);
@@ -78,13 +91,13 @@ Term TermLin::toTerm() const
 {
    Term t(cst_);
 
-   for (const auto& s : sl_)
+   for (const auto &s : sl_)
    {
       if (s.coef.isCertainlyLeZero())
-         t -= (-s.coef)*s.v;
+         t -= (-s.coef) * s.v;
 
       else
-         t += s.coef*s.v;
+         t += s.coef * s.v;
    }
 
    return t;
@@ -94,7 +107,7 @@ size_t TermLin::hashCode() const
 {
    size_t hcode = cst_.hashCode();
 
-   for (const auto& s : sl_)
+   for (const auto &s : sl_)
    {
       hcode = hash2(s.coef.hashCode(), hcode);
       hcode = hash2(s.v.hashCode(), hcode);
@@ -115,16 +128,16 @@ size_t TermLin::nbTerms() const
 
 Interval TermLin::coef(size_t i) const
 {
-   ASSERT(i<nbTerms(), "Bad access in a linear term @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
 
    auto it = sl_.cbegin();
    std::advance(it, i);
-   return it->coef;   
+   return it->coef;
 }
 
 Variable TermLin::var(size_t i) const
 {
-   ASSERT(i<nbTerms(), "Bad access in a linear term @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
 
    auto it = sl_.cbegin();
    std::advance(it, i);
@@ -135,24 +148,26 @@ Scope TermLin::makeScope() const
 {
    Scope scop;
 
-   for (const auto& s : sl_)
+   for (const auto &s : sl_)
       scop.insert(s.v);
 
    return ScopeBank::getInstance()->insertScope(scop);
 }
 
-std::ostream& operator<<(std::ostream& os, const TermLin& t)
+std::ostream &operator<<(std::ostream &os, const TermLin &t)
 {
 
    bool printed = false;
 
-   for (const auto& s : t.sl_)
+   for (const auto &s : t.sl_)
    {
-      if (printed) os << " ";
+      if (printed)
+         os << " ";
 
       if (s.coef.isPositive())
       {
-         if (printed) os << "+ ";
+         if (printed)
+            os << "+ ";
       }
       else
       {
@@ -160,7 +175,7 @@ std::ostream& operator<<(std::ostream& os, const TermLin& t)
       }
 
       Interval x = abs(s.coef);
-         
+
       if (x.isOne())
       {
          os << s.v.getName();
@@ -169,7 +184,7 @@ std::ostream& operator<<(std::ostream& os, const TermLin& t)
       {
          os << x << "*" << s.v.getName();
       }
-         
+
       printed = true;
    }
 
@@ -177,16 +192,19 @@ std::ostream& operator<<(std::ostream& os, const TermLin& t)
 
    if (t.cst_.isZero())
    {
-      if (!printed) os << "0";
+      if (!printed)
+         os << "0";
    }
    else if (t.cst_.isPositive())
    {
-      if (printed) os << " + ";
+      if (printed)
+         os << " + ";
       os << x;
    }
    else
    {
-      if (printed) os << " ";
+      if (printed)
+         os << " ";
       os << "- " << x;
    }
 
@@ -195,35 +213,37 @@ std::ostream& operator<<(std::ostream& os, const TermLin& t)
 
 /*----------------------------------------------------------------------------*/
 
-TermLinCreator::TermLinCreator(TermLin* lt, const Interval& factor)
-      : lt_(lt),
-        factor_(factor),
-        success_(false)
-{}
+TermLinCreator::TermLinCreator(TermLin *lt, const Interval &factor)
+    : lt_(lt)
+    , factor_(factor)
+    , success_(false)
+{
+}
 
 bool TermLinCreator::visitSuccessfull() const
 {
    return success_;
 }
 
-void TermLinCreator::apply(const TermCst* t)
+void TermLinCreator::apply(const TermCst *t)
 {
    lt_->addConstant(factor_ * t->getVal());
    success_ = true;
 }
 
-void TermLinCreator::apply(const TermVar* t)
+void TermLinCreator::apply(const TermVar *t)
 {
    lt_->addLin(factor_, t->var());
    success_ = true;
 }
 
-void TermLinCreator::apply(const TermAdd* t)
+void TermLinCreator::apply(const TermAdd *t)
 {
    TermLinCreator vl(lt_, factor_);
    t->left()->acceptVisitor(vl);
 
-   if (!vl.success_) return;
+   if (!vl.success_)
+      return;
 
    TermLinCreator vr(lt_, factor_);
    t->right()->acceptVisitor(vr);
@@ -231,12 +251,13 @@ void TermLinCreator::apply(const TermAdd* t)
    success_ = vr.success_;
 }
 
-void TermLinCreator::apply(const TermSub* t)
+void TermLinCreator::apply(const TermSub *t)
 {
    TermLinCreator vl(lt_, factor_);
    t->left()->acceptVisitor(vl);
 
-   if (!vl.success_) return;
+   if (!vl.success_)
+      return;
 
    TermLinCreator vr(lt_, -factor_);
    t->right()->acceptVisitor(vr);
@@ -244,30 +265,30 @@ void TermLinCreator::apply(const TermSub* t)
    success_ = vr.success_;
 }
 
-void TermLinCreator::apply(const TermMul* t)
+void TermLinCreator::apply(const TermMul *t)
 {
    if (t->left()->isConstant())
    {
       Interval x = t->left()->evalConst();
-      TermLinCreator vis(lt_, x*factor_);
+      TermLinCreator vis(lt_, x * factor_);
       t->right()->acceptVisitor(vis);
       success_ = vis.success_;
    }
    else if (t->right()->isConstant())
    {
       Interval x = t->right()->evalConst();
-      TermLinCreator vis(lt_, x*factor_);
+      TermLinCreator vis(lt_, x * factor_);
       t->left()->acceptVisitor(vis);
-      success_ = vis.success_;   
-   }   
+      success_ = vis.success_;
+   }
 }
 
-void TermLinCreator::apply(const TermDiv* t)
+void TermLinCreator::apply(const TermDiv *t)
 {
    if (t->right()->isConstant())
    {
       Interval x = t->right()->evalConst();
-      
+
       if (!x.isZero())
       {
          TermLinCreator vis(lt_, factor_ / x);
@@ -277,7 +298,7 @@ void TermLinCreator::apply(const TermDiv* t)
    }
 }
 
-void TermLinCreator::apply(const TermMin* t)
+void TermLinCreator::apply(const TermMin *t)
 {
    if (t->isConstant())
    {
@@ -287,8 +308,7 @@ void TermLinCreator::apply(const TermMin* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermMax* t)
+void TermLinCreator::apply(const TermMax *t)
 {
    if (t->isConstant())
    {
@@ -298,8 +318,7 @@ void TermLinCreator::apply(const TermMax* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermUsb* t)
+void TermLinCreator::apply(const TermUsb *t)
 {
    TermLinCreator vis(lt_, -factor_);
    t->child()->acceptVisitor(vis);
@@ -307,7 +326,7 @@ void TermLinCreator::apply(const TermUsb* t)
    success_ = vis.success_;
 }
 
-void TermLinCreator::apply(const TermAbs* t)
+void TermLinCreator::apply(const TermAbs *t)
 {
    if (t->isConstant())
    {
@@ -317,8 +336,7 @@ void TermLinCreator::apply(const TermAbs* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermSgn* t)
+void TermLinCreator::apply(const TermSgn *t)
 {
    if (t->isConstant())
    {
@@ -328,8 +346,7 @@ void TermLinCreator::apply(const TermSgn* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermSqr* t)
+void TermLinCreator::apply(const TermSqr *t)
 {
    if (t->isConstant())
    {
@@ -339,8 +356,7 @@ void TermLinCreator::apply(const TermSqr* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermSqrt* t)
+void TermLinCreator::apply(const TermSqrt *t)
 {
    if (t->isConstant())
    {
@@ -350,8 +366,7 @@ void TermLinCreator::apply(const TermSqrt* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermPow* t)
+void TermLinCreator::apply(const TermPow *t)
 {
    if (t->isConstant())
    {
@@ -361,8 +376,7 @@ void TermLinCreator::apply(const TermPow* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermExp* t)
+void TermLinCreator::apply(const TermPowr *t)
 {
    if (t->isConstant())
    {
@@ -372,8 +386,7 @@ void TermLinCreator::apply(const TermExp* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermLog* t)
+void TermLinCreator::apply(const TermExp *t)
 {
    if (t->isConstant())
    {
@@ -383,8 +396,7 @@ void TermLinCreator::apply(const TermLog* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermCos* t)
+void TermLinCreator::apply(const TermLog *t)
 {
    if (t->isConstant())
    {
@@ -394,8 +406,7 @@ void TermLinCreator::apply(const TermCos* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermSin* t)
+void TermLinCreator::apply(const TermCos *t)
 {
    if (t->isConstant())
    {
@@ -405,8 +416,7 @@ void TermLinCreator::apply(const TermSin* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermTan* t)
+void TermLinCreator::apply(const TermSin *t)
 {
    if (t->isConstant())
    {
@@ -416,8 +426,7 @@ void TermLinCreator::apply(const TermTan* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermCosh* t)
+void TermLinCreator::apply(const TermTan *t)
 {
    if (t->isConstant())
    {
@@ -427,8 +436,7 @@ void TermLinCreator::apply(const TermCosh* t)
    }
 }
 
-
-void TermLinCreator::apply(const TermSinh* t)
+void TermLinCreator::apply(const TermCosh *t)
 {
    if (t->isConstant())
    {
@@ -438,7 +446,7 @@ void TermLinCreator::apply(const TermSinh* t)
    }
 }
 
-void TermLinCreator::apply(const TermTanh* t)
+void TermLinCreator::apply(const TermSinh *t)
 {
    if (t->isConstant())
    {
@@ -448,4 +456,74 @@ void TermLinCreator::apply(const TermTanh* t)
    }
 }
 
-} // namespace
+void TermLinCreator::apply(const TermTanh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAcos *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAsin *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAtan *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAcosh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAsinh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAtanh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+} // namespace realpaver

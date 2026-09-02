@@ -14,11 +14,38 @@
 # Author: Raphaël Chenouard
 #-------------------------------------------------------------------------------
 
-csp_solver = executable(
-  'csp_solver',
-  sources: 'csp_solver.cpp',
+rp_gen_params = executable(
+  'rp_gen_params',
+  sources: 'rp_gen_params.cpp',
   link_with: realpaver_lib,
   include_directories: incdir,
+  install: true,
+  dependencies: deps_lib,
+)
+
+rp_default_params = custom_target(
+  command: [rp_gen_params, '@OUTPUT@'],
+  depend_files: files(['../src/realpaver/Param.hpp','../src/realpaver/Param.cpp']),
+  install: true,
+  install_dir: 'share/realpaver',
+  output: 'rp_params.txt',
+)
+
+rp_optimizer = executable(
+  'rp_optimizer',
+  sources: ['rp_optimizer.cpp', 'rp_util.cpp', rp_default_params],
+  link_with: realpaver_lib,
+  include_directories: incdir,
+  install: true,
+  dependencies: deps_lib,
+)
+
+rp_solver = executable(
+  'rp_solver',
+  sources: ['rp_solver.cpp', 'rp_util.cpp', rp_default_params],
+  link_with: realpaver_lib,
+  include_directories: incdir,
+  install: true,
   dependencies: deps_lib,
 )
 

@@ -15,11 +15,9 @@
  * @file   ScopeBank.cpp
  * @brief  Bank of scopes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
-#include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
@@ -27,9 +25,10 @@ namespace realpaver {
 ScopeBank ScopeBank::instance_;
 
 ScopeBank::ScopeBank()
-      : bank_(),
-        nb_(0)
-{}
+    : bank_()
+    , nb_(0)
+{
+}
 
 size_t ScopeBank::size() const
 {
@@ -53,9 +52,9 @@ Scope ScopeBank::insertScope(Scope scop)
    return scop;
 }
 
-ScopeBank* ScopeBank::getInstance()
+ScopeBank *ScopeBank::getInstance()
 {
    return &instance_;
 }
 
-} // namespace
+} // namespace realpaver

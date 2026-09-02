@@ -1,15 +1,17 @@
 # The Docker image that will be used to build your app
 image: python:latest
 # Functions that should be executed before the build script is run
-#before_script:
-#  - npm ci
+before_script:
+  - apt update
 
 pages:
   stage: deploy
   image: python:latest
   script:
+    - apt install -y doxygen
     - pip install mkdocs-material mkdoxy
-    - mkdocs build --site-dir public
+    - cd doc
+    - mkdocs build --site-dir ../public
   artifacts:
     paths:
       - public

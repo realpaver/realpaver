@@ -15,7 +15,7 @@
  * @file   RealPoint.hpp
  * @brief  Classes of real points
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_POINT_HPP
@@ -29,28 +29,31 @@ namespace realpaver {
 /// Scoped real vector
 class RealPoint : public RealVector {
 public:
+   /// Constructor
+   RealPoint(Scope scop);
+
    /**
     * @brief Constructor.
-    * 
+    *
     * Each variable from scop is assigned to a.
     */
-   RealPoint(Scope scop, double a = 0.0);
+   RealPoint(Scope scop, double a);
 
    /**
     * @brief Constructor.
-    * 
+    *
     * The i-th variable of scop is assigned to X[i] for each i.
     */
-   RealPoint(Scope scop, const RealVector& X);
+   RealPoint(Scope scop, const RealVector &X);
 
    /// Default copy constructor
-   RealPoint(const RealPoint&) = default;
+   RealPoint(const RealPoint &) = default;
 
    /// Creates a point from another point projected on a scope
-   RealPoint(const RealPoint& pt, Scope scop);
+   RealPoint(const RealPoint &pt, Scope scop);
 
    /// Default assignment operator
-   RealPoint& operator=(const RealPoint&) = default;
+   RealPoint &operator=(const RealPoint &) = default;
 
    /// Default destructor
    ~RealPoint() = default;
@@ -59,26 +62,26 @@ public:
    Scope scope() const;
 
    /// Gets the value of v in this
-   double get(const Variable& v) const;
+   double get(const Variable &v) const;
 
    /// Sets v to a
-   void set(const Variable& v, double a);
+   void set(const Variable &v, double a);
 
    /**
     * @brief Assignment on a scope.
-    * 
+    *
     * this[scop] is assigned to pt[scop]
     */
-   void setOnScope(const RealPoint& pt, const Scope& scop);
+   void setOnScope(const RealPoint &pt, const Scope &scop);
 
    /// Gets a sub-point corresponding to this restricted to scop
-   RealPoint subPoint(const Scope& scop) const;
+   RealPoint subPoint(const Scope &scop) const;
 
-   RealPoint* clone() const override;
+   RealPoint *clone() const override;
 
    /**
     * @brief Tests if this behaves like a vector.
-    * 
+    *
     * Returns true if the scope of this contains the variables whose
     * identifiers are 0, 1, 2, ..., which permits to consider this as a vector.
     * In other words, it is possible to cast this to a RealVector and to access
@@ -90,6 +93,6 @@ private:
    Scope scop_;
 };
 
-} // namespace
+} // namespace realpaver
 
 #endif

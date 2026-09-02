@@ -15,15 +15,14 @@
  * @file   DomainSlicerFactory.cpp
  * @brief  Factory of domain slicer maps
  * @author Laurent Granvilliers
- * @date   2024-4-11
-*/
+ * @date   11 Apr 2024
+ */
 
 #include "realpaver/DomainSlicerFactory.hpp"
 
 namespace realpaver {
 
-std::unique_ptr<DomainSlicerMap>
-DomainSlicerFactory::makeBiStrategy(double sip)
+std::unique_ptr<DomainSlicerMap> DomainSlicerFactory::makeBiStrategy(double sip)
 {
    std::unique_ptr<DomainSlicerMap> smap = std::make_unique<DomainSlicerMap>();
    std::unique_ptr<DomainSlicer> slc;
@@ -51,4 +50,4 @@ DomainSlicerFactory::makeBiStrategy(double sip)
    return smap;
 }
 
-} // namespace
+} // namespace realpaver

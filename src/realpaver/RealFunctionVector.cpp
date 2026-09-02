@@ -15,7 +15,7 @@
  * @file   RealFunctionVector.hpp
  * @brief  Vector of real functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -25,33 +25,36 @@
 namespace realpaver {
 
 RealFunctionVectorRep::~RealFunctionVectorRep()
-{}
+{
+}
 
 /*----------------------------------------------------------------------------*/
 
 RealFunctionVector::RealFunctionVector()
-      : rep_(nullptr)
-{}
+    : rep_(nullptr)
+{
+}
 
 RealFunctionVector::RealFunctionVector(SharedDag dag)
-      : rep_(std::make_shared<RealFunctionVectorDag>(dag))
-{}
+    : rep_(std::make_shared<RealFunctionVectorDag>(dag))
+{
+}
 
-RealFunctionVector::RealFunctionVector(
-   const std::initializer_list<Term>& lt)
-      : rep_(std::make_shared<RealFunctionVectorDag>(lt))
-{}
+RealFunctionVector::RealFunctionVector(const std::initializer_list<Term> &lt)
+    : rep_(std::make_shared<RealFunctionVectorDag>(lt))
+{
+}
 
-RealFunctionVector::RealFunctionVector(
-   const std::initializer_list<Term>& lt,
-   const std::initializer_list<Interval>& li)
-      : rep_(std::make_shared<RealFunctionVectorDag>(lt, li))
-{}
+RealFunctionVector::RealFunctionVector(const std::initializer_list<Term> &lt,
+                                       const std::initializer_list<Interval> &li)
+    : rep_(std::make_shared<RealFunctionVectorDag>(lt, li))
+{
+}
 
-RealFunctionVector::RealFunctionVector(
-   const std::initializer_list<RealFunction>& lf)
-      : rep_(std::make_shared<RealFunctionVectorList>(lf))
-{}
+RealFunctionVector::RealFunctionVector(const std::initializer_list<RealFunction> &lf)
+    : rep_(std::make_shared<RealFunctionVectorList>(lf))
+{
+}
 
 RealFunctionVector::SharedRep RealFunctionVector::rep() const
 {
@@ -59,36 +62,36 @@ RealFunctionVector::SharedRep RealFunctionVector::rep() const
 }
 
 RealFunctionVector::RealFunctionVector(SharedRep rep)
-      : rep_(rep)
+    : rep_(rep)
 {
-   ASSERT(rep != nullptr,
-          "Creation of a real function vector from a null pointer");
+   REALPAVER_ASSERT(rep != nullptr,
+                    "Creation of a real function vector from a null pointer");
 }
 
 Scope RealFunctionVector::scope() const
 {
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Real function vector with no representation");
 
    return rep_->scope();
 }
 
 size_t RealFunctionVector::nbVars() const
 {
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Real function vector with no representation");
 
    return rep_->nbVars();
 }
 
 size_t RealFunctionVector::nbFuns() const
 {
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Real function vector with no representation");
 
    return rep_->nbFuns();
 }
 
 RealFunction RealFunctionVector::fun(size_t i) const
 {
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Real function vector with no representation");
 
    return rep_->fun(i);
 }
@@ -98,8 +101,7 @@ void RealFunctionVector::addFun(RealFunction f)
    if (rep_ == nullptr)
       rep_ = std::make_shared<RealFunctionVectorList>();
 
-   RealFunctionVectorList* p
-      = dynamic_cast<RealFunctionVectorList*>(rep_.get());
+   RealFunctionVectorList *p = dynamic_cast<RealFunctionVectorList *>(rep_.get());
 
    if (p != nullptr)
       p->addFun(f);
@@ -108,9 +110,9 @@ void RealFunctionVector::addFun(RealFunction f)
    {
       // changes the representation
       SharedRep other = std::make_shared<RealFunctionVectorList>();
-      p = static_cast<RealFunctionVectorList*>(other.get());
+      p = static_cast<RealFunctionVectorList *>(other.get());
 
-      for (size_t i=0; i<nbFuns(); ++i)
+      for (size_t i = 0; i < nbFuns(); ++i)
          p->addFun(fun(i));
 
       p->addFun(f);
@@ -119,16 +121,16 @@ void RealFunctionVector::addFun(RealFunction f)
    }
 }
 
-void RealFunctionVector::eval(const RealPoint& pt, RealVector& val)
+void RealFunctionVector::eval(const RealPoint &pt, RealVector &val)
 {
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Real function vector with no representation");
 
    return rep_->eval(pt, val);
 }
 
-void RealFunctionVector::diff(const RealPoint& pt, RealMatrix& J)
+void RealFunctionVector::diff(const RealPoint &pt, RealMatrix &J)
 {
-   ASSERT(rep_ != nullptr, "Real function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Real function vector with no representation");
 
    rep_->diff(pt, J);
 }
@@ -136,34 +138,32 @@ void RealFunctionVector::diff(const RealPoint& pt, RealMatrix& J)
 /*----------------------------------------------------------------------------*/
 
 RealFunctionVectorDag::RealFunctionVectorDag(SharedDag dag)
-      : dag_(dag)
+    : dag_(dag)
 {
-   ASSERT(dag->nbFuns() > 0,
-          "Creation of a real function vector from an empty Dag");
+   REALPAVER_ASSERT(dag->nbFuns() > 0,
+                    "Creation of a real function vector from an empty Dag");
 }
 
-RealFunctionVectorDag::RealFunctionVectorDag(
-      const std::initializer_list<Term>& lt)
-      : dag_(nullptr)
+RealFunctionVectorDag::RealFunctionVectorDag(const std::initializer_list<Term> &lt)
+    : dag_(nullptr)
 {
-   ASSERT(lt.size() > 0,
-          "Creation of a real function vector from an empty list");
+   REALPAVER_ASSERT(lt.size() > 0,
+                    "Creation of a real function vector from an empty list");
 
    dag_ = std::make_shared<Dag>();
-   for (const auto& t : lt)
+   for (const auto &t : lt)
       dag_->insert(t);
 }
 
-RealFunctionVectorDag::RealFunctionVectorDag(
-      const std::initializer_list<Term>& lt,
-      const std::initializer_list<Interval>& li)
-      : dag_(nullptr)
+RealFunctionVectorDag::RealFunctionVectorDag(const std::initializer_list<Term> &lt,
+                                             const std::initializer_list<Interval> &li)
+    : dag_(nullptr)
 {
-   ASSERT(lt.size() > 0,
-          "Creation of a real function vector from an empty list");
+   REALPAVER_ASSERT(lt.size() > 0,
+                    "Creation of a real function vector from an empty list");
 
-   ASSERT(lt.size() == li.size(),
-          "Bad initialization of a real function vector ");
+   REALPAVER_ASSERT(lt.size() == li.size(),
+                    "Bad initialization of a real function vector ");
 
    dag_ = std::make_shared<Dag>();
 
@@ -195,34 +195,35 @@ size_t RealFunctionVectorDag::nbFuns() const
 
 RealFunction RealFunctionVectorDag::fun(size_t i) const
 {
-   ASSERT(i < nbFuns(), "Bad access to a real function in a vector");
+   REALPAVER_ASSERT(i < nbFuns(), "Bad access to a real function in a vector");
 
    return RealFunction(dag_, i);
 }
 
-void RealFunctionVectorDag::eval(const RealPoint& pt, RealVector& val)
+void RealFunctionVectorDag::eval(const RealPoint &pt, RealVector &val)
 {
    dag_->rEval(pt, val);
 }
 
-void RealFunctionVectorDag::diff(const RealPoint& pt, RealMatrix& J)
+void RealFunctionVectorDag::diff(const RealPoint &pt, RealMatrix &J)
 {
-   dag_->rDiff(pt, J);  
+   dag_->rDiff(pt, J);
 }
 
 /*----------------------------------------------------------------------------*/
 
 RealFunctionVectorList::RealFunctionVectorList()
-      : vf_(),
-        scop_()
-{}
+    : vf_()
+    , scop_()
+{
+}
 
 RealFunctionVectorList::RealFunctionVectorList(
-   const std::initializer_list<RealFunction>& lf)
-      : vf_(),
-        scop_()
+    const std::initializer_list<RealFunction> &lf)
+    : vf_()
+    , scop_()
 {
-   for (const auto& f : lf)
+   for (const auto &f : lf)
       addFun(f);
 }
 
@@ -250,27 +251,27 @@ size_t RealFunctionVectorList::nbFuns() const
 
 RealFunction RealFunctionVectorList::fun(size_t i) const
 {
-   ASSERT(i<nbFuns(), "Bad access in a function vector @ " << i);
+   REALPAVER_ASSERT(i < nbFuns(), "Bad access in a function vector @ " << i);
    return vf_[i];
 }
 
-void RealFunctionVectorList::eval(const RealPoint& pt, RealVector& val)
+void RealFunctionVectorList::eval(const RealPoint &pt, RealVector &val)
 {
-   ASSERT(val.size() == nbFuns(),
-          "Bad size of vector given for the evaluation of a function vector");
+   REALPAVER_ASSERT(val.size() == nbFuns(),
+                    "Bad size of vector given for the evaluation of a function vector");
 
-   for (size_t i=0; i<nbFuns(); ++i)
+   for (size_t i = 0; i < nbFuns(); ++i)
       val[i] = vf_[i].eval(pt);
 }
 
-void RealFunctionVectorList::diff(const RealPoint& pt, RealMatrix& J)
+void RealFunctionVectorList::diff(const RealPoint &pt, RealMatrix &J)
 {
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a function vector");
+   REALPAVER_ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+                    "Bad dimensions of a Jacobian matrix used in a function vector");
 
-   for (size_t i=0; i<nbFuns(); ++i)
+   for (size_t i = 0; i < nbFuns(); ++i)
    {
-      auto& f = vf_[i];
+      auto &f = vf_[i];
 
       RealVector G(f.nbVars());
       f.diff(pt, G);
@@ -281,7 +282,7 @@ void RealFunctionVectorList::diff(const RealPoint& pt, RealMatrix& J)
       {
          if (f.scope().contains(v))
             J.set(i, j, G.get(f.scope().index(v)));
- 
+
          else
             J.set(i, j, 0.0);
 
@@ -290,4 +291,4 @@ void RealFunctionVectorList::diff(const RealPoint& pt, RealMatrix& J)
    }
 }
 
-} // namespace
+} // namespace realpaver

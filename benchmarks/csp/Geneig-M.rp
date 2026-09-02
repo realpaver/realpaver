@@ -1,0 +1,36 @@
+# Generalized eigenvalue problem
+#
+# In: M. Chu, T.-Y. Li and T. Sauer.
+#     Homotopy method for general lambda-matrix problems.
+#     SIAM J. Matrix Anal. Appl., vol. 9, No. 4, pp 528-536, 1988.
+
+Variables
+   x1 in [-1.0e3, 1.0e3],
+   x2 in [-1.0e3, 1.0e3],
+   x3 in [-1.0e3, 1.0e3],
+   x4 in [-1.0e3, 1.0e3],
+   x5 in [-1.0e3, 1.0e3],
+   x6 in [-1.0e3, 1.0e3];
+
+Constraints
+x6^2*(-10*x1 + 2*x2 - x3 + x4+ 3*x5) +
+x6*(x1 + 2*x2 + x3 + 2*x4 + x5) +
+10*x1 + 2*x2 - x3 + 2*x4 - 2*x5 == 0,
+
+x6^2*(2*x1 - 11*x2 + 2*x3 - 2*x4 + x5) +
+x6*(2*x1 + x2 + 2*x3 + x4+ 3*x5) +
+2*x1 + 9*x2 + 3*x3 - x4 - 2*x5 == 0,
+
+x6^2*(-x1 + 2*x2 - 12*x3 - x4 + x5) +
+x6*(x1 + 2*x2 - 2*x4 - 2*x5) -
+x1 + 3*x2 + 10*x3 + 2*x4 - x5 == 0,
+
+x6^2*(x1 - 2*x2 - x3 - 10*x4+ 2*x5)+
+x6*(2*x1 + x2 - 2*x3 + 2*x4 + 3*x5) +
+2*x1 - x2 + 2*x3 + 12*x4 + x5 == 0,
+
+x6^2*(3*x1 + x2 + x3 + 2*x4 - 11*x5) +
+x6*(x1 + 3*x2 - 2*x3 + 3*x4 + 3*x5) -
+2*x1 - 2*x2 - x3 + x4 + 10*x5 == 0,
+
+x1 + x2 + x3 + x4 + x5 - 1 == 0;

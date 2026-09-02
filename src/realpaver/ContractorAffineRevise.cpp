@@ -1,0 +1,114 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   ContractorAffineRevise.cpp
+ * @brief  Contractor based on affine forms
+ * @author Laurent Granvilliers
+ * @date   21 Apr 2025
+ */
+
+#include "realpaver/AffineCreator.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorAffineRevise.hpp"
+
+namespace realpaver {
+
+ContractorAffineRevise::ContractorAffineRevise(SharedDagExtended edag, size_t i,
+                                               bool minrange)
+    : Contractor()
+    , edag_(edag)
+    , idx_(i)
+    , minrange_(minrange)
+{
+   REALPAVER_ASSERT(edag != nullptr, "Creation of affine contractor from a null pointer");
+   REALPAVER_ASSERT(i < edag->size(), "Creation of affine contractor given a bad "
+                                          << " function index " << i);
+}
+
+Scope ContractorAffineRevise::scope() const
+{
+   return edag_->fun(idx_)->ctr().scope();
+}
+
+Proof ContractorAffineRevise::contract(IntervalBox &B, const Bitset &active)
+{
+   AffineCreator creator(edag_, minrange_);
+   bool ok = creator.create(B, idx_, active);
+   if (!ok)
+      return Proof::Maybe;
+
+   const AffineForm &f = creator.fun(0);
+   Interval I = creator.image(0);
+   Interval E = f.errorTerm();
+   Interval J = I - f.constantTerm() + Interval(-E.right(), E.right());
+
+   if (J.isUniverse())
+      return Proof::Maybe;
+
+   // sum of absolute values of coefficients of the affine form
+   double s = 0.0;
+   Double::rndUp();
+   for (auto it = f.cbegin(); it != f.cend(); ++it)
+      s += abs(it->itv).right();
+
+   // satisfaction test
+   Interval K(-s, s);
+   if (J.contains(K))
+      return Proof::Inner;
+   else if (J.isDisjoint(K))
+      return Proof::Empty;
+
+   // reduction of domains
+   for (auto it = f.cbegin(); it != f.cend(); ++it)
+   {
+      // no reduction if it->itv contains 0
+      if (it->itv.containsZero())
+         continue;
+
+      const Variable &v = edag_->scope().var(it->var);
+
+      // new domain of the variable ei associated with v
+      Double::rndUp();
+      double si = s - abs(it->itv).right();
+      Interval domi = Interval::minusOnePlusOne() & ((J + Interval(-si, si)) / it->itv);
+
+      // new domain of v
+      const AffineForm &g = creator.fun(v);
+      Interval domv = g.constantTerm() + g.cbegin()->itv * domi;
+      domv &= B.get(v);
+      if (domv.isEmpty())
+         return Proof::Empty;
+      else
+         B.set(v, domv);
+   }
+
+   return Proof::Maybe;
+}
+
+Proof ContractorAffineRevise::contract(IntervalBox &B)
+{
+   return contract(B, Bitset());
+}
+
+void ContractorAffineRevise::print(std::ostream &os) const
+{
+   os << "Affine contractor / function " << " @ " << idx_;
+}
+
+void ContractorAffineRevise::useMinrange(bool minrange)
+{
+   minrange_ = minrange;
+}
+
+} // namespace realpaver

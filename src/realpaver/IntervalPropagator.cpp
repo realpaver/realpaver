@@ -15,23 +15,24 @@
  * @file   IntervalPropagator.cpp
  * @brief  Constraint propagation over interval contractors
  * @author Laurent Granvilliers
- * @date   2024-7-1
-*/
+ * @date   7 July 2024
+ */
 
-#include <queue>
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Bitset.hpp"
+#include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalPropagator.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/Param.hpp"
+#include <queue>
 
 namespace realpaver {
 
 IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
-      : Contractor(),
-        pool_(pool),
-        tol_(Param::GetDblParam("PROPAGATION_REL_TOL"), 0.0),
-        certif_()
+    : Contractor()
+    , pool_(pool)
+    , tol_(Params::GetDblParam("PROPAGATION_TOL"))
+    , certif_()
 {
    if (pool == nullptr)
    {
@@ -39,13 +40,15 @@ IntervalPropagator::IntervalPropagator(SharedContractorPool pool)
    }
 }
 
-Tolerance IntervalPropagator::getTol() const
+double IntervalPropagator::getTol() const
 {
    return tol_;
 }
 
-void IntervalPropagator::setTol(Tolerance tol)
+void IntervalPropagator::setTol(double tol)
 {
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0,
+                    "A relative tolerance must belong to [0, 1]");
    tol_ = tol;
 }
 
@@ -79,22 +82,34 @@ Scope IntervalPropagator::scope() const
    return pool_->scope();
 }
 
-Proof IntervalPropagator::contract(IntervalBox& B)
+Proof IntervalPropagator::contract(IntervalBox &B)
 {
-   ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
+   return contractImpl(B, ContractSimple());
+}
+
+Proof IntervalPropagator::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof IntervalPropagator::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
+   REALPAVER_ASSERT(pool_ != nullptr, "No pool is assigned in a propagator");
 
    // initialization: activates all contractors
    size_t N = pool_->poolSize();
 
    // propagation queue
    std::queue<size_t> queue;
-   for (size_t i=0; i<N; ++i) queue.push(i);
+   for (size_t i = 0; i < N; ++i)
+      queue.push(i);
 
    // vector of proof certificates
    certif_.resize(N);
 
-   Bitset active(N);
-   active.setAllOne();
+   // watch.get(i) = 0 <=> i is not in the queue
+   Bitset watch(N);
+   watch.setAllOne();
 
    Proof proof = Proof::Maybe;
    IntervalBox copy(B);
@@ -107,45 +122,52 @@ Proof IntervalPropagator::contract(IntervalBox& B)
 
       copy.setOnScope(B, op->scope());
 
-      proof = op->contract(B);
+      proof = contract.apply(*op, B);
       certif_[j] = proof;
-      active.setZero(j);
+      watch.setZero(j);
 
       if (proof != Proof::Empty)
       {
-         for (const auto& v : op->scope())
+         for (const auto &v : op->scope())
          {
-            const Interval& prev = copy.get(v);
-            const Interval& curr = B.get(v);
+            const Interval &prev = copy.get(v);
+            const Interval &curr = B.get(v);
 
-            LOG_LOW("Propagation test on " << v.getName() << " ("
-                                           << tol_ << ")");
+            LOG_LOW("Propagation test on " << v.getName() << " (" << tol_ << ")");
 
-            if (tol_.isImproved(prev, curr))
+            if (curr.improves(prev, tol_))
             {
                LOG_LOW("  " << prev << " -> " << curr << " reduced enough"
                             << " -> propagation");
 
                // considers the dependency relation of v
-               for (size_t k=0; k<pool_->depSize(v); ++k)
+               for (size_t k = 0; k < pool_->depSize(v); ++k)
                {
                   size_t l = pool_->depAt(v, k);
-                  if (!active.get(l) && (l != j))
+                  if (!watch.get(l) && (l != j) && (certif_[l] != Proof::Inner))
                   {
                      queue.push(l);
-                     active.setOne(l);
+                     watch.setOne(l);
                   }
                }
             }
          }
       }
    }
-   return proof;
+   return (proof == Proof::Empty) ? Proof::Empty : makeProof();
 }
 
-void IntervalPropagator::print(std::ostream& os) const
+Proof IntervalPropagator::makeProof() const
+{
+   for (Proof p : certif_)
+      if (p != Proof::Inner)
+         return Proof::Maybe;
+   return Proof::Inner;
+}
+
+void IntervalPropagator::print(std::ostream &os) const
 {
    os << "IntervalPropagator on " << pool_->poolSize() << " contractors";
 }
 
-} // namespace
+} // namespace realpaver
