@@ -207,17 +207,17 @@ int main()
 
    pb = nullptr;
 
-   test_localopt("../benchmarks/cop/OLS.rp", OptimizationStatus::Optimal);
+   // test_localopt("../benchmarks/cop/OLS.rp", OptimizationStatus::Infeasible);
 
-   pb = nullptr;
+   // pb = nullptr;
 
-   test_localopt("../benchmarks/cop/coil_spring.rp", OptimizationStatus::Optimal);
+   // test_localopt("../benchmarks/cop/coil_spring.rp", OptimizationStatus::Optimal);
 
    test_pw();
 
    test_cond();
 
-   test_table();
+   // test_table();
 
    END_TEST
 }

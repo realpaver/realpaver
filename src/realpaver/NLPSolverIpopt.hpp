@@ -21,6 +21,8 @@
 #ifndef REALPAVER_NLP_SOLVER_IPOPT_HPP
 #define REALPAVER_NLP_SOLVER_IPOPT_HPP
 
+#include "realpaver/Bitset.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/NLPModel.hpp"
 
@@ -40,7 +42,7 @@ class RealPaverTNLP : public Ipopt::TNLP {
 public:
    /// Constructor
    /// @param ls a pointer to a local optimizer object
-   RealPaverTNLP(NLPSolver *ls);
+   RealPaverTNLP(NLPSolver *ls, SharedDagExtended edag);
 
    bool get_nlp_info(Ipopt::Index &n, Ipopt::Index &m, Ipopt::Index &nnz_jac_g,
                      Ipopt::Index &nnz_h_lag, IndexStyleEnum &index_style);
@@ -81,7 +83,7 @@ public:
                           Ipopt::Number obj_value, const Ipopt::IpoptData *ip_data,
                           Ipopt::IpoptCalculatedQuantities *ip_cq);
 
-   void update(const IntervalBox &, const RealPoint src);
+   void update(const IntervalBox &, const RealPoint src, const Bitset &active);
 
    double getBestVal() const;
 
@@ -93,6 +95,8 @@ private:
    IntervalBox box_; // Interval region in which search for an optimal value
    RealPoint start_; // Starting point
    double best_val_;
+   Bitset active_;
+   SharedDagExtended edag_;
 };
 
 /// Implementation of NLP solver for Ipopt
@@ -107,8 +111,8 @@ public:
    /// Constructor given an objective function to be minimized
    NLPSolver(const RealFunction &obj);
 
-   /// Constructor given an objective function and a set of constraints
-   NLPSolver(const RealFunction &obj, const RealFunctionVector &ctrs);
+   /// Creates a minimization NLPModel for a DAG
+   NLPSolver(SharedDag obj_dag, int obj_idx, SharedDagExtended edag);
    ///@}
    /// Destructor
    ~NLPSolver();
@@ -119,11 +123,11 @@ public:
    /// No assignment
    NLPSolver &operator=(const NLPSolver &) = delete;
 
-   OptimizationStatus minimize(const IntervalBox &box, const RealPoint &src) override;
+   OptimizationStatus minimizeImpl(const IntervalBox &box, const RealPoint &src,
+                                   const Bitset &active) override;
 
 private:
-   Ipopt::SmartPtr<RealPaverTNLP> nlp_; // ipopt problem
-   // std::shared_ptr<RealPaverTNLP> nlp_;
+   Ipopt::SmartPtr<RealPaverTNLP> nlp_;                 // ipopt problem
    Ipopt::SmartPtr<Ipopt::IpoptApplication> optimizer_; // Ipopt optimizer
    void makeIpoptAlgorithm();
    void makeIpoptProblem();

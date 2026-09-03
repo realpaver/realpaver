@@ -30,7 +30,8 @@ namespace realpaver {
 NLPModel::NLPModel(const Problem &pb)
     : obj_(nullptr)
     , edag_(nullptr)
-    , n_(pb.nbVars())
+    // , n_(pb.nbVars())
+    , n_(0)
     , m_(pb.nbCtrs())
     , time_limit_(Params::GetDblParam("NLP_SOLVER_TIME_LIMIT"))
     , iter_limit_(Params::GetIntParam("NLP_SOLVER_ITER_LIMIT"))
@@ -47,6 +48,7 @@ NLPModel::NLPModel(const Problem &pb)
 
    // objective function to be minimized
    Term tomin = ismin ? to : -to;
+   LOG_LOW("Objective: " << tomin)
    std::shared_ptr<Dag> odag = std::make_shared<Dag>();
    int idx = odag->insert(tomin); // Add the objective expression to the objective dag
    obj_ = new RealFunction(odag, idx);
@@ -64,7 +66,7 @@ NLPModel::NLPModel(const Problem &pb)
    // objective variable that may occur in the problem
    scop_.insert(obj_->scope());
    scop_.insert(edag_->scope());
-
+   n_ = scop_.size();
    best_ = nullptr;
    best_val_ = Interval::universe().right();
 }
