@@ -15,8 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add inner relaxation strategies (Taylor or Affine)
 * Add prover based on parametric interval Newton
 * Add prospecting operator to find feasible points
-* Add optimizer to solve COPs
-* Add parameters to handle the new or modified features
+* Add optimizer to solve Constrained Optimization Problems (COPs)
+* Add parameters to handle the new or modified features (see the doc for details)
 * Add `rp_optimizer` as a new binary to be used in the same way of `rp_solver`
 
 ## [1.1.1] - 2025-05-20
