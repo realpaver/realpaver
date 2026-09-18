@@ -3,8 +3,8 @@ Variables
    y in [-4.5, 4.5]
 ;
 
-Objectives
-   MIN (1.5 - x + x*y)^2 + (2.25 - x + x*y^2)^2 + (2.625 - x + x*y^3)^2;
+Min
+  (1.5 - x + x*y)^2 + (2.25 - x + x*y^2)^2 + (2.625 - x + x*y^3)^2;
 
 Constraints
-   x*y >= 0;
+    x*y >= 0;

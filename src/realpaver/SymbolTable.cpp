@@ -15,12 +15,12 @@
  * @file   SymbolTable.cpp
  * @brief  Symbol table for parsing
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/SymbolTable.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/Common.hpp"
+#include "realpaver/SymbolTable.hpp"
 
 namespace realpaver {
 
@@ -92,7 +92,7 @@ FunctionSymbol::FunctionSymbol(const std::string &name)
 
 void FunctionSymbol::addArgument(const std::string &name)
 {
-   ASSERT(!hasArgument(name), "Bad argument");
+   REALPAVER_ASSERT(!hasArgument(name), "Bad argument");
 
    Variable v(name);
    v.setId(1000000 + args_.size());
@@ -102,14 +102,14 @@ void FunctionSymbol::addArgument(const std::string &name)
 
 Variable FunctionSymbol::getArgument(size_t i) const
 {
-   ASSERT(i < args_.size(), "Access out of range to an argument @ " << i);
+   REALPAVER_ASSERT(i < args_.size(), "Access out of range to an argument @ " << i);
 
    return args_[i];
 }
 
 Variable FunctionSymbol::getVar(const std::string &name) const
 {
-   ASSERT(hasArgument(name), "Bad argument [" << name << "]");
+   REALPAVER_ASSERT(hasArgument(name), "Bad argument [" << name << "]");
 
    for (auto v : args_)
       if (v.getName() == name)
@@ -479,6 +479,14 @@ void FunctionCallProcessor::apply(const TermPow *t)
    t_ = pow(vis.getTerm(), t->exponent());
 }
 
+void FunctionCallProcessor::apply(const TermPowr *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = pow(vis.getTerm(), t->exponent());
+}
+
 void FunctionCallProcessor::apply(const TermExp *t)
 {
    FunctionCallProcessor vis(fc_);
@@ -541,6 +549,54 @@ void FunctionCallProcessor::apply(const TermTanh *t)
    t->child()->acceptVisitor(vis);
 
    t_ = tanh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAcos *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = acos(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAsin *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = asin(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAtan *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = atan(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAcosh *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = acosh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAsinh *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = asinh(vis.getTerm());
+}
+
+void FunctionCallProcessor::apply(const TermAtanh *t)
+{
+   FunctionCallProcessor vis(fc_);
+   t->child()->acceptVisitor(vis);
+
+   t_ = atanh(vis.getTerm());
 }
 
 Term FunctionCallProcessor::getTerm() const

@@ -13,38 +13,36 @@
 
 /**
  * @file   Prover.hpp
- * @brief  Prover based on interval Newton
+ * @brief  Certification method
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_PROVER_HPP
 #define REALPAVER_PROVER_HPP
 
-#include "realpaver/IntervalNewton.hpp"
-#include "realpaver/IntervalNewtonUni.hpp"
-#include "realpaver/Problem.hpp"
+#include "realpaver/DagExtended.hpp"
+#include <memory>
 
 namespace realpaver {
 
 /**
- * @brief Prover based on interval Newton.
+ * @brief Certification method.
  *
- * It implements an epsilon-inflation algorithm based on an interval Newton
- * operator applied to square system of equations.
+ * A prover is used to certify an interval box with respect to a constraint
+ * system, i.e. a set of equations, inequality constraints, and other constraints, e.g.
+ * table constraints.
  *
- * The epsilon-inflation algorithm has two parameters, delta and chi.
- *
- * @see Inflator
- * @see IntervalNewton
+ * The equations are processed first by an inflating interval Newton operator (parametric
+ * or not). The inequality constraints are checked by interval evaluation.
  */
 class Prover {
 public:
    /// Constructor
-   Prover(const Problem &p);
+   Prover(SharedDagExtended edag);
 
-   /// Destructor
-   ~Prover();
+   /// Default destructor
+   ~Prover(); // = default;
 
    /// No copy
    Prover(const Prover &) = delete;
@@ -54,6 +52,12 @@ public:
 
    /// Certification method
    Proof certify(IntervalBox &B);
+
+   /// Certification method
+   Proof certify(IntervalBox &B, const Bitset &active);
+
+   /// Assigns the initial box
+   void setInitBox(const IntervalBox &B);
 
    /// Sets a limit of iterations of the Newton operator
    void setMaxIter(size_t n);
@@ -74,18 +78,16 @@ public:
    void setInflationChi(const double &val);
 
 private:
-   struct Item {
-      Constraint ctr;
-      bool iseq;
-      Proof proof;
-   };
-   std::vector<Item> v_;        // vector of constraints
-   SharedDag dag_;              // dag of equations
-   IntervalNewton *mnewton_;    // multivariate Newton operator on the dag
-   IntervalNewtonUni *unewton_; // univariate Newton operator
-   double delta_;               // parameter delta of inflation
-   double chi_;                 // parameter chi of inflation
-   size_t maxiter_;             // maximum number of iterations
+   SharedDagExtended edag_;               // extended dag
+   std::unique_ptr<IntervalBox> initBox_; // initial hull
+   double delta_;                         // parameter delta of inflation
+   double chi_;                           // parameter chi of inflation
+   size_t maxiter_;                       // maximum number of iterations
+
+   size_t callNumber_;    // count the number of calls to the prover
+   size_t successNumber_; // count the number of proving success
+
+   bool checkSatisfaction(const IntervalBox &B) const;
 };
 
 } // namespace realpaver

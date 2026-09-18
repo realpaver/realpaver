@@ -15,13 +15,15 @@
  * @file   AffineForm.hpp
  * @brief  Affine arithmetic
  * @author Laurent Granvilliers
- * @date   10/03/2025
+ * @date   10 Mar 2025
  */
 
 #ifndef REALPAVER_AFFINE_FORM_HPP
 #define REALPAVER_AFFINE_FORM_HPP
 
 #include "realpaver/Interval.hpp"
+#include "realpaver/TermLin.hpp"
+
 #include <initializer_list>
 #include <list>
 
@@ -30,7 +32,7 @@ namespace realpaver {
 /**
  * @brief Affine form of a nonlinear expression.
  *
- * This represents a modified affine form AF1 described in:
+ * This represents a modified version of the affine form AF1 described in:
  *   F. Messine. Extensions of Affine Arithmetic: Application to
  *   Unconstrained Global Optimization, JUCS 2002.
  *
@@ -50,22 +52,37 @@ namespace realpaver {
  * L is the list of linear terms (a_i, i), i.e. a_i*e_i where e_i is
  * represented by its index i, for i=1,...,n.
  *
- * The elemenrary functions can be linearized with either the Minrange
+ * The elementary functions can be linearized with either the Minrange
  * approximation or the Chebyshev approximation. It suffices to call
  * useMinrange or useChebyshev before the creation of an affine form.
+ *
+ * When creating affine forms, an exception is thrown if a constant value is not valid,
+ * i.e. empty or infinite interval, NaN or infinite double.
  */
 class AffineForm {
 public:
    /// Creates an affine form equal to zero
    AffineForm();
 
-   /// Creates an affine form of a variable given its domain
+   /**
+    * @brief Creates an affine form of a variable given its domain.
+    *
+    * Throws an exception if the domain is empty or infinite.
+    */
    AffineForm(int var, const Interval &domain);
 
-   /// Creates an affine form of a constant
+   /*
+    * @brief Creates an affine form of a constant.
+    *
+    * Throws an exception if x is empty or infinite.
+    */
    AffineForm(const Interval &x);
 
-   /// Creates an affine form of a constant
+   /**
+    * @brief Creates an affine form of a constant.
+    *
+    * Throws an exception if a is empty or infinite.
+    */
    AffineForm(const double &a);
 
    /**
@@ -76,6 +93,8 @@ public:
     * and the magnitude e of the error term.
     *
     * Assumes that V is sorted by increasing ordering.
+    *
+    * Throws an exception if a double (a0, A) is NaN or infinite.
     */
    AffineForm(const double &a0, const std::initializer_list<double> &A,
               const std::initializer_list<int> &V, const Interval &e = Interval::zero());
@@ -88,6 +107,8 @@ public:
     * and the magnitude e of the error term.
     *
     * Assumes that V is sorted by increasing ordering.
+    *
+    * Throws an exception if an interval (a0, A) is empty or infinite.
     */
    AffineForm(const Interval &a0, const std::initializer_list<Interval> &A,
               const std::initializer_list<int> &V, const Interval &e = Interval::zero());
@@ -110,10 +131,14 @@ public:
    /// Returns the magnitude of the error term a_(n+1)
    const Interval &errorTerm() const;
 
-   // Inserts a linear term in the list
+   /**
+    * @brief Inserts a linear term in the list.
+    *
+    * Throws an exception if x is empty or infinite.
+    */
    void push(const Interval &x, int var);
 
-   // Inserts an affine form into this (this := this + f)
+   /// Inserts an affine form into this (this := this + f).
    void push(const AffineForm &f);
 
    /// Addition
@@ -140,8 +165,11 @@ public:
    /// Square root
    friend AffineForm sqrt(const AffineForm &f);
 
-   /// Power
-   friend AffineForm pow(const AffineForm &f, int e);
+   /// Power (integral exponent)
+   friend AffineForm pow(const AffineForm &f, unsigned int e);
+
+   /// Power (real exponent)
+   friend AffineForm powr(const AffineForm &f, const double &r);
 
    /// Minimum
    friend AffineForm min(const AffineForm &f, const AffineForm &g);
@@ -179,26 +207,29 @@ public:
    /// Hyperbolic tangent
    friend AffineForm tanh(const AffineForm &f);
 
+   /// Arc-cosine
+   friend AffineForm acos(const AffineForm &f);
+
+   /// Arc-sine
+   friend AffineForm asin(const AffineForm &f);
+
+   /// Arc-tangent
+   friend AffineForm atan(const AffineForm &f);
+
+   /// Hyperbolic arc-cosine
+   friend AffineForm acosh(const AffineForm &f);
+
+   /// Hyperbolic arc-sine
+   friend AffineForm asinh(const AffineForm &f);
+
+   /// Hyperbolic arc-tangent
+   friend AffineForm atanh(const AffineForm &f);
+
    /// Interval evaluation
    Interval eval() const;
 
-   /// assigns this to a form representing the empty set
-   void setEmpty();
-
-   /// Returns true if this represents an empty set
-   bool isEmpty() const;
-
    /// Returns the number of linear terms
    size_t nbLinearTerms() const;
-
-   /// Returns an affine form that represents an empty set
-   static AffineForm emptyForm();
-
-   /// Returns an affine form that represents the universe
-   static AffineForm infForm();
-
-   /// Returns true if this represents the universe
-   bool isInf() const;
 
    /// Is the Minrange approximation used?
    static bool usesMinrange();
@@ -212,91 +243,160 @@ public:
    /// Output on a stream
    friend std::ostream &operator<<(std::ostream &os, const AffineForm &f);
 
-   /// Calculates dzeta and delta
-   static void approxDzetaDelta(const Interval &alpha, const Interval &a,
-                                const Interval &fa, const Interval &b, const Interval &fb,
-                                Interval &dzeta, Interval &delta);
+   /// Calculates zeta and delta
+   static void approxZetaDelta(const Interval &alpha, const Interval &a,
+                               const Interval &fa, const Interval &b, const Interval &fb,
+                               Interval &zeta, Interval &delta);
 
    // Minrange approximation of function 1/z with z in x
    // Assumes that 0 does not belong to x
-   static void minrangeUdiv(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeUdiv(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    /// Chebyshev approximation of function 1/z with z in x.
-   static void chebyshevUdiv(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevUdiv(const Interval &x, Interval &alpha, Interval &zeta,
                              Interval &delta);
 
    // Minrange approximation of function sqrt(z) with z in x
-   static void minrangeSqrt(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeSqrt(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    /// Chebyshev approximation of function sqrt(z) with z in x
-   static void chebyshevSqrt(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevSqrt(const Interval &x, Interval &alpha, Interval &zeta,
                              Interval &delta);
 
+   // Minrange approximation of function z^e with z in x
+   static void minrangePow(const Interval &x, unsigned int e, Interval &alpha,
+                           Interval &zeta, Interval &delta);
+
+   /// Chebyshev approximation of function z^e with z in x
+   static void chebyshevPow(const Interval &x, unsigned int e, Interval &alpha,
+                            Interval &zeta, Interval &delta);
+
+   // Minrange approximation of function z^r with z in x
+   static void minrangePowr(const Interval &x, const double &r, Interval &alpha,
+                            Interval &zeta, Interval &delta);
+
+   /// Chebyshev approximation of function z^r with z in x
+   static void chebyshevPowr(const Interval &x, const double &r, Interval &alpha,
+                             Interval &zeta, Interval &delta);
+
    // Minrange approximation of function exp(z) with z in x
-   static void minrangeExp(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeExp(const Interval &x, Interval &alpha, Interval &zeta,
                            Interval &delta);
 
    /// Chebyshev approximation of function exp(z) with z in x
-   static void chebyshevExp(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevExp(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    // Minrange approximation of function log(z) with z in x
-   static void minrangeLog(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeLog(const Interval &x, Interval &alpha, Interval &zeta,
                            Interval &delta);
 
    /// Chebyshev approximation of function log(z) with z in x
-   static void chebyshevLog(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevLog(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    // Minrange approximation of function cos(z) with z in x
-   static void minrangeCos(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeCos(const Interval &x, Interval &alpha, Interval &zeta,
                            Interval &delta);
 
    // Minrange approximation of function sin(z) with z in x
-   static void minrangeSin(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeSin(const Interval &x, Interval &alpha, Interval &zeta,
                            Interval &delta);
 
    // Minrange approximation of function tan(z) with z in x
-   static void minrangeTan(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeTan(const Interval &x, Interval &alpha, Interval &zeta,
                            Interval &delta);
 
    // Minrange approximation of function cosh(z) with z in x
-   static void minrangeCosh(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeCosh(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    // Minrange approximation of function sinh(z) with z in x
-   static void minrangeSinh(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeSinh(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    // Minrange approximation of function tanh(z) with z in x
-   static void minrangeTanh(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void minrangeTanh(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
+   // Minrange approximation of function acos(z) with z in x
+   static void minrangeAcos(const Interval &x, Interval &alpha, Interval &zeta,
+                            Interval &delta);
+
+   // Minrange approximation of function asin(z) with z in x
+   static void minrangeAsin(const Interval &x, Interval &alpha, Interval &zeta,
+                            Interval &delta);
+
+   // Minrange approximation of function atan(z) with z in x
+   static void minrangeAtan(const Interval &x, Interval &alpha, Interval &zeta,
+                            Interval &delta);
+
+   // Minrange approximation of function acosh(z) with z in x
+   static void minrangeAcosh(const Interval &x, Interval &alpha, Interval &zeta,
+                             Interval &delta);
+
+   // Minrange approximation of function asinh(z) with z in x
+   static void minrangeAsinh(const Interval &x, Interval &alpha, Interval &zeta,
+                             Interval &delta);
+
+   // Minrange approximation of function atanh(z) with z in x
+   static void minrangeAtanh(const Interval &x, Interval &alpha, Interval &zeta,
+                             Interval &delta);
+
    /// Chebyshev approximation of function cos(z) with z in x
-   static void chebyshevCos(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevCos(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    /// Chebyshev approximation of function sin(z) with z in x
-   static void chebyshevSin(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevSin(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    /// Chebyshev approximation of function tan(z) with z in x
-   static void chebyshevTan(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevTan(const Interval &x, Interval &alpha, Interval &zeta,
                             Interval &delta);
 
    /// Chebyshev approximation of function cosh(z) with z in x
-   static void chebyshevCosh(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevCosh(const Interval &x, Interval &alpha, Interval &zeta,
                              Interval &delta);
 
    /// Chebyshev approximation of function sinh(z) with z in x
-   static void chebyshevSinh(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevSinh(const Interval &x, Interval &alpha, Interval &zeta,
                              Interval &delta);
 
    /// Chebyshev approximation of function tanh(z) with z in x
-   static void chebyshevTanh(const Interval &x, Interval &alpha, Interval &dzeta,
+   static void chebyshevTanh(const Interval &x, Interval &alpha, Interval &zeta,
                              Interval &delta);
+
+   /// Chebyshev approximation of function acos(z) with z in x
+   static void chebyshevAcos(const Interval &x, Interval &alpha, Interval &zeta,
+                             Interval &delta);
+
+   /// Chebyshev approximation of function asin(z) with z in x
+   static void chebyshevAsin(const Interval &x, Interval &alpha, Interval &zeta,
+                             Interval &delta);
+
+   /// Chebyshev approximation of function atan(z) with z in x
+   static void chebyshevAtan(const Interval &x, Interval &alpha, Interval &zeta,
+                             Interval &delta);
+
+   /// Chebyshev approximation of function acosh(z) with z in x
+   static void chebyshevAcosh(const Interval &x, Interval &alpha, Interval &zeta,
+                              Interval &delta);
+
+   /// Chebyshev approximation of function asinh(z) with z in x
+   static void chebyshevAsinh(const Interval &x, Interval &alpha, Interval &zeta,
+                              Interval &delta);
+
+   /// Chebyshev approximation of function atanh(z) with z in x
+   static void chebyshevAtanh(const Interval &x, Interval &alpha, Interval &zeta,
+                              Interval &delta);
+
+   // Linearization of elementary function
+   // return alpha*f + zeta + alpha*[-1,1]
+   static AffineForm linearize(const AffineForm &f, const Interval &alpha,
+                               const Interval &zeta, const Interval &delta);
 
 private:
    // linear term
@@ -312,15 +412,22 @@ private:
                          // false for Chebyshev
 
    // Inserts a linear term at the end of the list
+   // Throws an exception if x is empty or infinite
    void pushBack(const Interval &x, int var);
 
-   // Linearization of elementary function
-   // return alpha*f + dzeta + alpha*[-1,1]
-   static AffineForm linearize(const AffineForm &f, const Interval &alpha,
-                               const Interval &dzeta, const Interval &delta);
+   // Assigns the constant term
+   // Throws an exception if x is empty or infinite
+   void setConstant(const Interval &x);
 
-   /// Power with e>2
-   static AffineForm powrec(const AffineForm &f, int e);
+   // Assigns the error term
+   // Throws an exception if x is empty or infinite
+   void setError(const Interval &x);
+
+   /// Power using a fast exponentiation algorithm
+   static AffineForm powrec(const AffineForm &f, unsigned int e);
+
+   /// Power based on an approximation method (Minrange or Chebyshev)
+   static AffineForm powapx(const AffineForm &f, unsigned int e);
 
 public:
    typedef std::list<Item>::iterator iterator;

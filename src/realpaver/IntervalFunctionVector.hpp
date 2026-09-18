@@ -15,13 +15,13 @@
  * @file   IntervalFunctionVector.hpp
  * @brief  Vector of interval functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 #define REALPAVER_INTERVAL_FUNCTION_VECTOR_HPP
 
-#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/IntervalFunction.hpp"
 #include <vector>
 
@@ -41,6 +41,9 @@ public:
 
    /// No assignment
    IntervalFunctionVectorRep &operator=(const IntervalFunctionVectorRep &) = delete;
+
+   /// Updates this with respect to a bitset; the default implementation does nothing
+   virtual void update(const IntervalBox &B, const Bitset &active);
 
    /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
@@ -78,7 +81,7 @@ public:
     * H[i, j] is the partial derivative dfi / dxj. H must have nbFuns() rows
     * and nbVars() columns.
     */
-   virtual void diffHansen(const IntervalBox &B, const RealPoint &c,
+   virtual void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
                            IntervalMatrix &H) = 0;
 };
 
@@ -98,8 +101,11 @@ public:
    /// Creates an empty vector
    IntervalFunctionVector();
 
-   /// Creates a vector corresponding to a DAG
-   IntervalFunctionVector(SharedDag dag);
+   /// Creates a vector corresponding to an extended DAG
+   IntervalFunctionVector(SharedDagExtended edag);
+
+   /// Creates a vector corresponding to an extended DAG
+   // IntervalFunctionVector(SharedDag dag);
 
    /// Creates  a vector corresponding to a DAG built from a list of terms
    IntervalFunctionVector(const std::initializer_list<Term> &lt);
@@ -125,6 +131,9 @@ public:
 
    /// Default destructor
    ~IntervalFunctionVector() = default;
+
+   /// Updates this with respect to a bitset
+   void update(const IntervalBox &B, const Bitset &active);
 
    /// Returns the scope of this, i.e. the set of variables
    Scope scope() const;
@@ -173,7 +182,10 @@ public:
     * H[i, j] is the partial derivative dfi / dxj. H must have nbFuns() rows
     * and nbVars() columns.
     */
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H);
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, IntervalMatrix &H);
+
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H);
 
    /// Type of the representation of interval functions vectors
    using SharedRep = std::shared_ptr<IntervalFunctionVectorRep>;
@@ -186,6 +198,43 @@ public:
 
 private:
    SharedRep rep_;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Vector of interval-valued functions based on a list
+class IntervalFunctionVectorList : public IntervalFunctionVectorRep {
+public:
+   /// Constructor of an empty function vector
+   IntervalFunctionVectorList();
+
+   /// Constructor
+   IntervalFunctionVectorList(const std::initializer_list<IntervalFunction> &lf);
+
+   /// Default copy constructor
+   IntervalFunctionVectorList(const IntervalFunctionVectorList &) = default;
+
+   /// No assignment
+   IntervalFunctionVectorList &operator=(const IntervalFunctionVectorList &) = delete;
+
+   /// Default destructor
+   ~IntervalFunctionVectorList() = default;
+
+   /// Inserts a function at the end
+   void addFun(IntervalFunction f);
+
+   Scope scope() const override;
+   size_t nbVars() const override;
+   size_t nbFuns() const override;
+   IntervalFunction fun(size_t i) const override;
+   void eval(const IntervalBox &B, IntervalVector &val) override;
+   void diff(const IntervalBox &B, IntervalMatrix &J) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H) override;
+
+private:
+   std::vector<IntervalFunction> vf_;
+   Scope scop_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -220,52 +269,51 @@ public:
    /// Returns the dag enclosed in this
    SharedDag dag() const;
 
+   void update(const IntervalBox &B, const Bitset &active) override;
    Scope scope() const override;
    size_t nbVars() const override;
    size_t nbFuns() const override;
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox &B, IntervalVector &val) override;
    void diff(const IntervalBox &B, IntervalMatrix &J) override;
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H) override;
 
 private:
    SharedDag dag_;
+   std::shared_ptr<IntervalFunctionVectorList> vl_;
 };
 
 /*----------------------------------------------------------------------------*/
 
-/// Vector of interval-valued functions based on a list
-class IntervalFunctionVectorList : public IntervalFunctionVectorRep {
+/// Vector of interval-valued functions based on an extended DAG
+class IntervalFunctionVectorExtDag : public IntervalFunctionVectorRep {
 public:
-   /// Constructor of an empty function vector
-   IntervalFunctionVectorList();
-
-   /// Constructor
-   IntervalFunctionVectorList(const std::initializer_list<IntervalFunction> &lf);
+   // Creates a vector corresponding to a DAG
+   IntervalFunctionVectorExtDag(SharedDagExtended edag);
 
    /// Default copy constructor
-   IntervalFunctionVectorList(const IntervalFunctionVectorList &) = default;
+   IntervalFunctionVectorExtDag(const IntervalFunctionVectorExtDag &) = default;
 
    /// No assignment
-   IntervalFunctionVectorList &operator=(const IntervalFunctionVectorList &) = delete;
+   IntervalFunctionVectorExtDag &operator=(const IntervalFunctionVectorExtDag &) = delete;
 
    /// Default destructor
-   ~IntervalFunctionVectorList() = default;
+   ~IntervalFunctionVectorExtDag() = default;
 
-   /// Inserts a function at the end
-   void addFun(IntervalFunction f);
-
+   void update(const IntervalBox &B, const Bitset &active) override;
    Scope scope() const override;
    size_t nbVars() const override;
    size_t nbFuns() const override;
    IntervalFunction fun(size_t i) const override;
    void eval(const IntervalBox &B, IntervalVector &val) override;
    void diff(const IntervalBox &B, IntervalMatrix &J) override;
-   void diffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H) override;
+   void diffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                   IntervalMatrix &H) override;
 
 private:
-   std::vector<IntervalFunction> vf_;
-   Scope scop_;
+   SharedDagExtended edag_;
+   std::shared_ptr<IntervalFunctionVectorList> vl_;
 };
 
 } // namespace realpaver

@@ -15,7 +15,7 @@
  * @file   ContractorLoop.cpp
  * @brief. Loop on a contractor
  * @author Laurent Granvilliers
- * @date   4-3-2025
+ * @date   3 Apr 2025
  */
 #include "realpaver/ContractorLoop.hpp"
 #include "realpaver/Param.hpp"
@@ -26,7 +26,7 @@ ContractorLoop::ContractorLoop(SharedContractor op)
     : op_(op)
     , tol_(Params::GetDblParam("LOOP_CONTRACTOR_TOL"))
 {
-   ASSERT(op != nullptr, "Bad operator in the loop contractor");
+   REALPAVER_ASSERT(op != nullptr, "Bad operator in the loop contractor");
 }
 
 double ContractorLoop::getTol() const
@@ -36,7 +36,7 @@ double ContractorLoop::getTol() const
 
 void ContractorLoop::setTol(double tol)
 {
-   ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must be in [0, 1]");
+   REALPAVER_ASSERT(tol >= 0.0 && tol <= 1.0, "A relative tolerance must be in [0, 1]");
    tol_ = tol;
 }
 
@@ -47,13 +47,26 @@ Scope ContractorLoop::scope() const
 
 Proof ContractorLoop::contract(IntervalBox &B)
 {
-   ASSERT(B.scope().contains(op_->scope()), "Bad scopes in the loop contractor");
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorLoop::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorLoop::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
+   REALPAVER_ASSERT(B.scope().contains(op_->scope()),
+                    "Bad scopes in the loop contractor");
 
    bool iter = true;
    IntervalBox prev(B);
    while (iter)
    {
-      if (op_->contract(B) == Proof::Empty)
+      Proof proof = contract.apply(*op_, B);
+
+      if (proof == Proof::Empty)
          return Proof::Empty;
       if (!B.improves(prev, tol_))
          iter = false;

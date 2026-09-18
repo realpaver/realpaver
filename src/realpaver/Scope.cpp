@@ -15,12 +15,10 @@
  * @file   Scope.cpp
  * @brief  Scope of variables
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Common.hpp"
-#include "realpaver/Logger.hpp"
 #include "realpaver/Scope.hpp"
 
 namespace realpaver {
@@ -248,7 +246,7 @@ void Scope::insert(Variable v)
 
 size_t Scope::hashCode() const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    return rep_->hashCode();
 }
@@ -271,7 +269,7 @@ void Scope::remove(const Variable &v)
 
 void Scope::remove(const Variable &v, size_t n)
 {
-   ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
+   REALPAVER_ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
 
    if (isShared())
    {
@@ -284,7 +282,7 @@ void Scope::remove(const Variable &v, size_t n)
 
 size_t Scope::size() const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    return rep_->size();
 }
@@ -308,42 +306,42 @@ bool Scope::contains(const Variable &v) const
 
 size_t Scope::minVarId() const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    return rep_->minVarId();
 }
 
 size_t Scope::maxVarId() const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    return rep_->maxVarId();
 }
 
 void Scope::print(std::ostream &os) const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    rep_->print(os);
 }
 
 typename Scope::const_iterator Scope::begin() const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    return rep_->begin();
 }
 
 typename Scope::const_iterator Scope::end() const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    return rep_->end();
 }
 
 typename Scope::const_iterator Scope::find(const Variable &v) const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
 
    auto it = rep_->find(v);
 
@@ -361,16 +359,16 @@ typename Scope::const_iterator Scope::find(const Variable &v) const
 
 size_t Scope::index(const Variable &v) const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
-   ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(contains(v), "No variable " << v.getName() << " in this scope");
 
    return rep_->index(v);
 }
 
 Variable Scope::var(size_t i) const
 {
-   ASSERT(rep_ != nullptr, "Scope with null pointer");
-   ASSERT(i < size(), "Bad access to a variable in a scope @ " << i);
+   REALPAVER_ASSERT(rep_ != nullptr, "Scope with null pointer");
+   REALPAVER_ASSERT(i < size(), "Bad access to a variable in a scope @ " << i);
 
    return rep_->var(i);
 }
@@ -516,6 +514,28 @@ size_t Scope::nameMaxLength() const
 bool Scope::isIdentity() const
 {
    return rep_->isIdentity();
+}
+
+Scope Scope::continuousScope() const
+{
+   Scope scop;
+   for (const auto &v : *this)
+   {
+      if (v.isReal())
+         scop.insert(v);
+   }
+   return scop;
+}
+
+Scope Scope::discreteScope() const
+{
+   Scope scop;
+   for (const auto &v : *this)
+   {
+      if (!v.isReal())
+         scop.insert(v);
+   }
+   return scop;
 }
 
 } // namespace realpaver

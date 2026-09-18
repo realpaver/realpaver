@@ -1,5 +1,7 @@
+#include "Objective.hpp"
 #include "realpaver/NLPSolver.hpp"
 #include "realpaver_api.hpp"
+#include <cmath>
 #include <iostream>
 
 using namespace realpaver;
@@ -12,16 +14,17 @@ int main(void)
    try
    {
       Problem problem;
-      Variable x = problem.addRealVar(1, 10, "x"), y = problem.addRealVar(-1, 9, "y"),
-               w = problem.addRealVar(0, 9, "w"), z = problem.addRealVar(2, 7, "z");
+      Variable x1 = problem.addRealVar(-2, 2, "x1"), x2 = problem.addRealVar(-3, 3, "x2");
 
-      RealFunction f(sqr(x) + sqr(z));
+      Variable vobj = problem.addRealVar(-INFINITY, INFINITY, "__obj__");
+      Objective obj = minimize(vobj, 100 * sqr(x2 - sqr(x1)) + sqr(1 - x1));
+      problem.addObjective(obj);
+      problem.addCtr(sqr(x1) + sqr(x2) <= 2);
 
-      RealFunctionVector G({y - z + 1, z - x - 2},
-                           {Interval::negative(), Interval::positive()});
-
-      NLPSolver optimizer(f, G);
+      NLPSolver optimizer(problem);
       optimizer.setAlgorithm("NLOPT_SLSQP");
+      optimizer.setIterLimit(1e4);
+      optimizer.setTimeLimit(10);
 
       IntervalBox box(problem.scope());
       RealPoint src = box.midpoint();

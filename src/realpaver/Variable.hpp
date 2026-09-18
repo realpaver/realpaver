@@ -12,10 +12,10 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   Variables.hpp
+ * @file   Variable.hpp
  * @brief  Variable in a problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_VARIABLE_HPP
@@ -26,6 +26,18 @@
 #include <memory>
 
 namespace realpaver {
+
+/// Status of a variable
+enum class VariableStatus {
+   Decision,  ///< decision variable
+   Objective, ///< variable representing an objective function
+   Auxiliary  ///< auxiliary variable introduced e.g. by reformulations
+};
+
+/// Output on a stream
+std::ostream &operator<<(std::ostream &os, VariableStatus status);
+
+/*----------------------------------------------------------------------------*/
 
 /// Shared representation of a variable in a problem.
 class VariableRep {
@@ -60,6 +72,12 @@ public:
    /// Sets the domain of this
    void setDomain(Domain *dom);
 
+   /// Returns the status of this
+   VariableStatus getStatus() const;
+
+   /// Sets the status of this
+   void setStatus(VariableStatus status);
+
    /// Returns true if this is a binary variable, false otherwise
    bool isBinary() const;
 
@@ -78,11 +96,19 @@ public:
    /// Sets the tolerance of this
    void setTolerance(const Tolerance &tol);
 
+   /// Sets this as a variable whose domain can be split if splitable=true
+   void setSplitable(bool splitable);
+
+   /// Returns true if the domain of this variable  can be split
+   bool isSplitable() const;
+
 private:
-   std::string name_; // name
-   size_t id_;        // identifier
-   Domain *dom_;      // domain
-   Tolerance tol_;    // tolerance
+   std::string name_;      // name
+   size_t id_;             // identifier
+   Domain *dom_;           // domain
+   VariableStatus status_; // status
+   Tolerance tol_;         // tolerance
+   bool split_;            // false if this is not splitable
 
    static int NEXT_ID; // management of ids
 };
@@ -94,6 +120,11 @@ private:
  *
  * This encloses a shared pointer to its representation. It is a lightweight
  * object that can be copied and assigned.
+ *
+ * A variable has a name, a unique identifier, a domain, a status, a tolerance, and a
+ * split status. The default status is Decision. The default tolerance is equal to 0.
+ * The default split status is true (when it is false, the domain of a variable cannot
+ * be split)
  */
 class Variable {
 public:
@@ -104,7 +135,15 @@ public:
     */
    Variable(const std::string &name);
 
-   /// Creates a variable having no representation
+   /**
+    * @brief Default constructor.
+    *
+    * It creates a variable having no representation. This constructor is useful
+    * when a Variable object must be initialized without effectively creating a
+    * new constrained variable.
+    *
+    * The resulting object v is such that v.hasNullRep() == true.
+    */
    Variable();
 
    /// Default copy constructor
@@ -138,6 +177,12 @@ public:
     */
    Variable &setDomain(std::unique_ptr<Domain> dom);
 
+   /// Returns the status of this
+   VariableStatus getStatus() const;
+
+   /// Sets the status of this
+   Variable &setStatus(VariableStatus status);
+
    /// Returns true if this is an integer variable in [0, 1]
    bool isBinary() const;
 
@@ -166,7 +211,13 @@ public:
    bool operator!=(const Variable &other) const;
 
    /// Returns true if this has no representation (nullptr)
-   bool hasNullPointer() const;
+   bool hasNullRep() const;
+
+   /// Sets this as a variable whose domain can be split if splitable=true
+   Variable &setSplitable(bool splitable);
+
+   /// Returns true if the domain of this variable  can be split
+   bool isSplitable() const;
 
 private:
    std::shared_ptr<VariableRep> rep_; // representation

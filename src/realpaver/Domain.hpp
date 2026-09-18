@@ -15,7 +15,7 @@
  * @file   Domain.hpp
  * @brief  Classes of domains
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_DOMAIN_HPP
@@ -45,6 +45,7 @@ class IntervalUnionDomain;
 class RangeDomain;
 class RangeUnionDomain;
 class BinaryDomain;
+class DomainVisitor;
 
 /*----------------------------------------------------------------------------*/
 
@@ -126,6 +127,9 @@ public:
     */
    virtual bool equals(const Domain &dom) const = 0;
 
+   /// Visitor pattern
+   virtual void acceptVisitor(DomainVisitor &vis) const = 0;
+
 private:
    DomainType type_;
 };
@@ -167,6 +171,7 @@ public:
    IntervalDomain *clone() const override;
    void print(std::ostream &os) const override;
    bool equals(const Domain &dom) const override;
+   void acceptVisitor(DomainVisitor &vis) const override;
 
 private:
    Interval val_;
@@ -208,6 +213,7 @@ public:
    IntervalUnionDomain *clone() const override;
    void print(std::ostream &os) const override;
    bool equals(const Domain &dom) const override;
+   void acceptVisitor(DomainVisitor &vis) const override;
 
 private:
    IntervalUnion val_;
@@ -246,6 +252,7 @@ public:
    RangeDomain *clone() const override;
    void print(std::ostream &os) const override;
    bool equals(const Domain &dom) const override;
+   void acceptVisitor(DomainVisitor &vis) const override;
 
 private:
    Range val_;
@@ -287,6 +294,7 @@ public:
    RangeUnionDomain *clone() const override;
    void print(std::ostream &os) const override;
    bool equals(const Domain &dom) const override;
+   void acceptVisitor(DomainVisitor &vis) const override;
 
 private:
    RangeUnion val_;
@@ -328,9 +336,25 @@ public:
    BinaryDomain *clone() const override;
    void print(std::ostream &os) const override;
    bool equals(const Domain &dom) const override;
+   void acceptVisitor(DomainVisitor &vis) const override;
 
 private:
    ZeroOne val_;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Visitor of domains
+class DomainVisitor {
+public:
+   /// Virtual destructor
+   virtual ~DomainVisitor();
+
+   virtual void apply(const IntervalDomain *d);
+   virtual void apply(const IntervalUnionDomain *d);
+   virtual void apply(const RangeDomain *d);
+   virtual void apply(const RangeUnionDomain *d);
+   virtual void apply(const BinaryDomain *d);
 };
 
 } // namespace realpaver

@@ -15,7 +15,7 @@
  * @file   ContractorVar3B.cpp
  * @brief  3B contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -31,9 +31,10 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v,
     , slicer_(std::move(slicer))
     , var_min_width_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
-   ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");
-   ASSERT(slicer_ != nullptr, "No slicer in a var3B contractor");
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a var3B contractor");
+   REALPAVER_ASSERT(slicer_ != nullptr, "No slicer in a var3B contractor");
 }
 
 ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
@@ -41,11 +42,12 @@ ContractorVar3B::ContractorVar3B(SharedContractor op, Variable v, size_t n)
     , v_(v)
     , slicer_(nullptr)
 {
-   ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
-   ASSERT(op->scope().contains(v), "Bad variable " << v << " in a var3B contractor");
-   ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
+   REALPAVER_ASSERT(op_.get() != nullptr, "No operator in a var3B contractor");
+   REALPAVER_ASSERT(op->scope().contains(v),
+                    "Bad variable " << v << " in a var3B contractor");
+   REALPAVER_ASSERT(n > 1, "Bad number of slices in a var3B contractor: " << n);
 
-   slicer_ = std::make_unique<IntervalPartitionMaker>(n);
+   slicer_ = std::make_unique<IntervalPartitioner>(n);
 }
 
 Scope ContractorVar3B::scope() const
@@ -60,7 +62,8 @@ Variable ContractorVar3B::getVar() const
 
 void ContractorVar3B::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a var3B contractor");
+   REALPAVER_ASSERT(scope().contains(v),
+                    "Bad variable " << v << " in a var3B contractor");
 
    v_ = v;
 }
@@ -77,6 +80,16 @@ void ContractorVar3B::setVarMinWidth(double val)
 
 Proof ContractorVar3B::contract(IntervalBox &B)
 {
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorVar3B::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorVar3B::contractImpl(IntervalBox &B, const ContractMethod &contract)
+{
    Interval dom = B.get(v_);
 
    // not handles too small domains
@@ -92,7 +105,7 @@ Proof ContractorVar3B::contract(IntervalBox &B)
    size_t nbs = slicer_->nbSlices();
 
    if (nbs == 1)
-      return op_->contract(B);
+      return contract.apply(*op_, B);
 
    // left to right
    size_t nbl = 0;             // number of left inconsistent facets
@@ -106,7 +119,7 @@ Proof ContractorVar3B::contract(IntervalBox &B)
       lslice = *it;
       facet->set(v_, lslice);
 
-      Proof certif = op_->contract(*facet);
+      Proof certif = contract.apply(*op_, *facet);
 
       if (certif == Proof::Empty)
       {
@@ -139,7 +152,7 @@ Proof ContractorVar3B::contract(IntervalBox &B)
       rslice = *jt;
       facet->set(v_, rslice);
 
-      Proof certif = op_->contract(*facet);
+      Proof certif = contract.apply(*op_, *facet);
 
       if (certif == Proof::Empty)
       {

@@ -15,7 +15,7 @@
  * @file   IntervalInum64.hpp
  * @brief  Interface of the inum64 library
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_INUM64_HPP
@@ -183,6 +183,12 @@ template <> struct IntervalTraits<RawInterval> {
    static inline interval zeroTwoPi()
    {
       static interval x = zero() | interval::two_pi();
+      return x;
+   }
+
+   static inline interval minusHalfPiPlusHalfPi()
+   {
+      static interval x = halfPi() | (-halfPi());
       return x;
    }
 
@@ -574,19 +580,34 @@ template <> struct IntervalTraits<RawInterval> {
       return inum64::sqrt_py(x, y);
    }
 
-   static inline interval pow(const interval &x, int n)
+   static inline interval pow(const interval &x, unsigned int n)
    {
       return inum64::pow(x, n);
    }
 
-   static inline interval powPX(const interval &x, int n, const interval &y)
+   static inline interval powPX(const interval &x, unsigned int n, const interval &y)
    {
       return inum64::pow_px(x, y, n);
    }
 
-   static inline interval powPY(const interval &x, int n, const interval &y)
+   static inline interval powPY(const interval &x, unsigned int n, const interval &y)
    {
       return inum64::pow_py(x, y, n);
+   }
+
+   static inline interval powr(const interval &x, const double &r)
+   {
+      return inum64::powr(x, r);
+   }
+
+   static inline interval powrPX(const interval &x, const double &r, const interval &y)
+   {
+      return inum64::powr_px(x, y, r);
+   }
+
+   static inline interval powrPY(const interval &x, const double &r, const interval &y)
+   {
+      return inum64::powr_py(x, y, r);
    }
 
    static inline interval exp(const interval &x)
@@ -714,9 +735,29 @@ template <> struct IntervalTraits<RawInterval> {
       return inum64::acos(x);
    }
 
+   static inline interval acosPX(const interval &x, const interval &y)
+   {
+      return inum64::acos_px(x, y);
+   }
+
+   static inline interval acosPY(const interval &x, const interval &y)
+   {
+      return inum64::acos_py(x, y);
+   }
+
    static inline interval asin(const interval &x)
    {
       return inum64::asin(x);
+   }
+
+   static inline interval asinPX(const interval &x, const interval &y)
+   {
+      return inum64::asin_px(x, y);
+   }
+
+   static inline interval asinPY(const interval &x, const interval &y)
+   {
+      return inum64::asin_py(x, y);
    }
 
    static inline interval atan(const interval &x)
@@ -724,9 +765,29 @@ template <> struct IntervalTraits<RawInterval> {
       return inum64::atan(x);
    }
 
+   static inline interval atanPX(const interval &x, const interval &y)
+   {
+      return inum64::atan_px(x, y);
+   }
+
+   static inline interval atanPY(const interval &x, const interval &y)
+   {
+      return inum64::atan_py(x, y);
+   }
+
    static inline interval acosh(const interval &x)
    {
       return inum64::acosh(x);
+   }
+
+   static inline interval acoshPX(const interval &x, const interval &y)
+   {
+      return inum64::acosh_px(x, y);
+   }
+
+   static inline interval acoshPY(const interval &x, const interval &y)
+   {
+      return inum64::acosh_py(x, y);
    }
 
    static inline interval asinh(const interval &x)
@@ -734,9 +795,29 @@ template <> struct IntervalTraits<RawInterval> {
       return inum64::asinh(x);
    }
 
+   static inline interval asinhPX(const interval &x, const interval &y)
+   {
+      return inum64::asinh_px(x, y);
+   }
+
+   static inline interval asinhPY(const interval &x, const interval &y)
+   {
+      return inum64::asinh_py(x, y);
+   }
+
    static inline interval atanh(const interval &x)
    {
       return inum64::atanh(x);
+   }
+
+   static inline interval atanhPX(const interval &x, const interval &y)
+   {
+      return inum64::atanh_px(x, y);
+   }
+
+   static inline interval atanhPY(const interval &x, const interval &y)
+   {
+      return inum64::atanh_py(x, y);
    }
 
    static inline interval abs(const interval &x)

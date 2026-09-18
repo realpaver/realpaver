@@ -14,10 +14,14 @@ void init()
    y = prob->addRealVar(0, 0, "y");
    z = prob->addRealVar(0, 0, "z");
 
+   size_t i = prob->addCtr(sqr(x + y) - 2 * z + 2 == 0);
+   size_t j = prob->addCtr(sqr(x + y) - 2 * z + 2 >= 0);
+   size_t k = prob->addCtr(2 * x - y + z == 1);
+
    dag = new Dag();
-   dag->insert(sqr(x + y) - 2 * z + 2 == 0);
-   dag->insert(sqr(x + y) - 2 * z + 2 >= 0);
-   dag->insert(2 * x - y + z == 1);
+   dag->insert(prob->ctrAt(i));
+   dag->insert(prob->ctrAt(j));
+   dag->insert(prob->ctrAt(k));
 
    B = new IntervalBox(prob->scope());
 }

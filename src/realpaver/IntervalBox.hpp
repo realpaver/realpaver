@@ -15,7 +15,7 @@
  * @file   IntervalBox.hpp
  * @brief  Class of interval boxes
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_BOX_HPP
@@ -81,7 +81,7 @@ public:
     *
     * Assigns this to B restricted to scop
     */
-   IntervalBox(const IntervalBox &B, Scope scop);
+   IntervalBox(Scope scop, const IntervalBox &B);
    ///@}
 
    /// Default assignment operator
@@ -169,6 +169,13 @@ public:
    void setOnScope(const IntervalBox &B, const Scope &scop);
 
    /**
+    * @brief Assignment on a scope.
+    *
+    * For each v in scope, this[v] is assigned to the midpoint of B[v].
+    */
+   void setMidpointOnScope(const IntervalBox &B, const Scope &scop);
+
+   /**
     * @brief Midpoint on a scope.
     *
     * For each v in scop, the value of v in the resulting point is assigned
@@ -225,7 +232,12 @@ public:
    IntervalBox *clone() const override;
    void print(std::ostream &os) const override;
 
-   /// Tests if the domain of a variable is splitable
+   /**
+    * @brief Tests if the domain of a variable is splitable.
+    *
+    * It returns false if v is not a splitable variable or if its domain in this box
+    * has the required tolerance; true otherwise.
+    */
    bool isSplitable(const Variable &v) const;
 
    /**

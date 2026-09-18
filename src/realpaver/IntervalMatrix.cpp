@@ -15,11 +15,13 @@
  * @file   IntervalMatrix.cpp
  * @brief  Dense interval matrix
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/IntervalMatrix.hpp"
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalMatrix.hpp"
+#include <algorithm>
 
 namespace realpaver {
 
@@ -34,12 +36,12 @@ IntervalMatrix::IntervalMatrix(
 {
    size_t nrows = l.size();
 
-   ASSERT(nrows > 0, "Bad initialization of interval matrix");
+   REALPAVER_ASSERT(nrows > 0, "Bad initialization of interval matrix");
 
    auto it = l.begin();
    size_t ncols = it->size();
 
-   ASSERT(ncols > 0, "Bad initialization of interval matrix");
+   REALPAVER_ASSERT(ncols > 0, "Bad initialization of interval matrix");
 
    setNrows(nrows);
    setNcols(ncols);
@@ -165,6 +167,89 @@ IntervalMatrix &IntervalMatrix::operator/=(double a)
    return *this;
 }
 
+bool IntervalMatrix::findMaxPivot(size_t i, size_t &row, size_t &col)
+{
+   double pmax;        // pivot value
+   bool found = false; // nonzero pivot found
+
+   for (size_t j = i; j < nrows(); ++j)
+   {
+      for (size_t k = i; k < ncols(); ++k)
+      {
+         const Interval &x = get(j, k);
+         if (x.isEmpty())
+         {
+            return false;
+         }
+         else if (x.containsZero())
+         {
+            continue;
+         }
+         else
+         {
+            double p = x.mag();
+            if ((!found) || (p > pmax))
+            {
+               pmax = p;
+               row = j;
+               col = k;
+               found = true;
+            }
+         }
+      }
+   }
+   return found;
+}
+
+bool IntervalMatrix::selectMostSensitive(IndexList &columns)
+{
+   REALPAVER_ASSERT(columns.size() == ncols(), "Bad list of indexes");
+   REALPAVER_ASSERT(nrows() <= ncols(), "Bad matrix");
+
+   for (size_t i = 0; i < columns.size(); ++i)
+   {
+      columns[i] = i;
+   }
+
+   size_t row, col;
+
+   for (size_t i = 0; i < nrows() - 1; ++i)
+   {
+      bool b = findMaxPivot(i, row, col);
+      if (!b)
+         return false;
+
+      // swaps rows and columns in order to get the pivot at (i, i)
+      if (i != row)
+      {
+         swapRows(i, row);
+      }
+      if (i != col)
+      {
+         swapCols(i, col);
+         std::swap(columns[i], columns[col]);
+      }
+
+      Interval pivot = get(i, i);
+
+      // puts zeros in the column under the pivot
+      for (size_t j = i + 1; j < nrows(); ++j)
+      {
+         Interval c = get(j, i) / pivot;
+
+         for (size_t k = i + 1; k < ncols(); ++k)
+         {
+            Interval val = get(j, k) - c * get(i, k);
+            set(j, k, val);
+         }
+
+         // set(j, i, Interval::zero()); (useless)
+      }
+   }
+
+   return true;
+}
+
 IntervalMatrix operator+(const IntervalMatrix &A, const IntervalMatrix &B)
 {
    IntervalMatrix res(A.nrows(), A.ncols());
@@ -222,7 +307,8 @@ IntervalMatrix operator*(const RealMatrix &A, const IntervalMatrix &B)
 
 IntervalVector operator*(const IntervalMatrix &A, const IntervalVector &X)
 {
-   ASSERT(A.ncols() == X.size(), "Bad dimensions in a product of a matric and a vector");
+   REALPAVER_ASSERT(A.ncols() == X.size(),
+                    "Bad dimensions in a product of a matric and a vector");
 
    IntervalVector Y(A.nrows());
    for (size_t i = 0; i < A.nrows(); ++i)

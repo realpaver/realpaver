@@ -1,0 +1,8 @@
+Variables
+  x in [-10,10],
+  y in [-10,10];
+
+Min sin(y)*exp((1-cos(x))^2) + cos(x)*exp((1-sin(y))^2) + (x-y)^2;
+
+Constraints
+  (x+5)^2 + (y+5)^2 <= 25;

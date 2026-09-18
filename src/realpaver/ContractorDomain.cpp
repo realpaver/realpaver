@@ -15,11 +15,11 @@
  * @file   ContractorDomain.cpp
  * @brief  Contractor of domains
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/ContractorDomain.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorDomain.hpp"
 #include "realpaver/Logger.hpp"
 #include <sstream>
 
@@ -50,8 +50,8 @@ size_t ContractorDomain::nbVars() const
 
 void ContractorDomain::insertVar(Variable v)
 {
-   ASSERT(!v.getDomain()->isConnected(),
-          "Domain contractor applied to a continuous variable " << v.getName());
+   REALPAVER_ASSERT(!v.getDomain()->isConnected(),
+                    "Domain contractor applied to a continuous variable " << v.getName());
 
    scop_.insert(v);
 }
@@ -62,7 +62,7 @@ Proof ContractorDomain::contract(IntervalBox &B)
    {
       Interval x = B.get(v);
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
       std::ostringstream os;
       os << "Domain contractor of " << v.getName() << " in " << x;
 #endif
@@ -70,7 +70,7 @@ Proof ContractorDomain::contract(IntervalBox &B)
       v.getDomain()->contractInterval(x);
       B.set(v, x);
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
       os << " -> " << x;
       LOG_LOW(os.str());
 #endif

@@ -15,14 +15,13 @@
  * @file   Contractor3BCID.hpp
  * @brief  3BCID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_VAR_3BCID_HPP
 #define REALPAVER_CONTRACTOR_VAR_3BCID_HPP
 
 #include "realpaver/Contractor.hpp"
-#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
@@ -69,6 +68,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
    /// Returns the threshold on the width of variable domains
@@ -87,7 +87,11 @@ private:
    // CID process applied to Bcid
    // B3bCid is the resulting box
    // Returns true if it leads to a contraction
-   bool contractCID(IntervalBox &Bcid, IntervalBox &B3bCid);
+   bool contractCID(IntervalBox &Bcid, IntervalBox &B3bCid,
+                    const ContractMethod &contract);
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
 };
 
 } // namespace realpaver

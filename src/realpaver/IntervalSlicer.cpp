@@ -15,11 +15,11 @@
  * @file   IntervalSlicer.cpp
  * @brief  Interval slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/IntervalSlicer.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/IntervalSlicer.hpp"
 
 namespace realpaver {
 
@@ -50,7 +50,7 @@ size_t IntervalSlicer::nbSlices() const
    return cont_.size();
 }
 
-Interval IntervalSlicer::slice(size_t i) const
+const Interval &IntervalSlicer::slice(size_t i) const
 {
    return cont_[i];
 }
@@ -99,7 +99,8 @@ double IntervalPeeler::getFactor() const
 
 void IntervalPeeler::setFactor(double f)
 {
-   ASSERT(f >= 0.0 && f <= 100.0, "Bad width factor " << f << " in an interval peeler");
+   REALPAVER_ASSERT(f >= 0.0 && f <= 100.0,
+                    "Bad width factor " << f << " in an interval peeler");
 
    f_ = f;
    p_ = f_ / Interval(100.0);
@@ -165,24 +166,24 @@ Interval IntervalPeeler::peelRight(const Interval &x) const
 
 /*----------------------------------------------------------------------------*/
 
-IntervalPartitionMaker::IntervalPartitionMaker(size_t n)
+IntervalPartitioner::IntervalPartitioner(size_t n)
 {
    setArity(n);
 }
 
-size_t IntervalPartitionMaker::getArity() const
+size_t IntervalPartitioner::getArity() const
 {
    return n_;
 }
 
-void IntervalPartitionMaker::setArity(size_t n)
+void IntervalPartitioner::setArity(size_t n)
 {
-   ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
+   REALPAVER_ASSERT(n >= 2, "Bad arity " << n << " for an interval partitionner");
 
    n_ = n;
 }
 
-void IntervalPartitionMaker::applyImpl(const Interval &x)
+void IntervalPartitioner::applyImpl(const Interval &x)
 {
    if (n_ == 2)
    {

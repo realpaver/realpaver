@@ -15,7 +15,7 @@
  * @file   ContractorACID.hpp
  * @brief  ACID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_ACID_HPP
@@ -24,6 +24,7 @@
 #include "realpaver/ContractorVar3BCID.hpp"
 #include "realpaver/SelectorSSR.hpp"
 #include <memory>
+#include <unordered_map>
 
 namespace realpaver {
 
@@ -53,6 +54,7 @@ class ContractorACID : public Contractor {
 public:
    /**
     * @brief Constructor.
+    * @param scope set of variables
     * @param ssr calculator of smear sum rel values
     * @param op contractor of slices
     * @param ns3B number of slices for 3B contractors
@@ -72,8 +74,8 @@ public:
    /// No assignment
    ContractorACID &operator=(const ContractorACID &) = delete;
 
-   /// Default destructor
-   ~ContractorACID() = default;
+   /// Destructor
+   ~ContractorACID();
 
    /// Returns the length of the learning phase
    int learnLength() const;
@@ -89,6 +91,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
 private:
@@ -100,9 +103,8 @@ private:
    int numVarCID_; // number of var3BCID contractors that must be applied
                    // in a call to the contract method
 
-   std::vector<ContractorVar3BCID *> // var3BCID_[i] is the var3BCID contractor
-       var3BCID_;                    // associated with the i-th variable
-                                     // of the scope
+   // map variable index -> Var3BCID contractor
+   std::unordered_map<int, ContractorVar3BCID *> var3BCID_;
 
    int sumGood_; // during the learning phase, it counts the number of
                  // applications of var3BCID contractors that have reduced
@@ -129,6 +131,10 @@ private:
    // Calculates the gain ratio between prev and the reduced box next
    static double gainRatio(const IntervalBox &prev, const IntervalBox &next,
                            const Scope &scop);
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const Bitset &active,
+                      const ContractMethod &contract);
 };
 
 /** @brief Type of shared pointers on contractors */

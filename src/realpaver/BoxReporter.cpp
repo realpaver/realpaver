@@ -15,11 +15,11 @@
  * @file   BoxReporter.cpp
  * @brief  Reporter of solutions of problems
  * @author Laurent Granvilliers
- * @date   2024-12-19
+ * @date   19 Dec 2024
  */
 
-#include "realpaver/BoxReporter.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/BoxReporter.hpp"
 #include "realpaver/Problem.hpp"
 
 namespace realpaver {
@@ -74,7 +74,7 @@ size_t EntityReportedVector::size() const
 
 std::shared_ptr<EntityReported> EntityReportedVector::get(size_t i) const
 {
-   ASSERT(i < size(), "Bad access in a vector of reported entities @ " << i);
+   REALPAVER_ASSERT(i < size(), "Bad access in a vector of reported entities @ " << i);
 
    return ents_[i];
 }

@@ -35,7 +35,7 @@ namespace realpaver {
  */
 class SelectorSF : public Selector {
 public:
-   /// Creates a selector on a scope
+   /// Constructor
    SelectorSF(Scope scop);
 
    /// Default destructor
@@ -47,7 +47,7 @@ public:
    /// No assignment
    SelectorSF &operator=(const SelectorSF &) = delete;
 
-   bool apply(const DomainBox &box) override;
+   bool apply(SharedNode node, NodeContext &context) override;
 };
 
 } // namespace realpaver

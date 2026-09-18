@@ -15,7 +15,7 @@
  * @file   IntervalSlicer.hpp
  * @brief  Interval slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_SLICER_HPP
@@ -57,7 +57,7 @@ public:
    size_t nbSlices() const;
 
    /// Returns the i-th slice
-   Interval slice(size_t i) const;
+   const Interval &slice(size_t i) const;
 
 protected:
    /// Implements the slicing method
@@ -144,10 +144,10 @@ private:
  *  [a,a+h], [a+h,a+2h], ..., [b-h,b] where h is obtained as the width of [a,b]
  *  divided by n. The number n is called arity.
  */
-class IntervalPartitionMaker : public IntervalSlicer {
+class IntervalPartitioner : public IntervalSlicer {
 public:
    /// Creates a slicer given a number of slices (arity)
-   IntervalPartitionMaker(size_t n = 2);
+   IntervalPartitioner(size_t n = 2);
 
    /// Return the arity of this
    size_t getArity() const;

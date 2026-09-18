@@ -15,65 +15,73 @@
  * @file   ContractorFactory.cpp
  * @brief  Factory of interval contractors
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
+#include "AssertDebug.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorConstraint.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorFactory.hpp"
-#include "realpaver/Linearizer.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
+
+#include "realpaver/Exception.hpp"
+#include "realpaver/LinearizerAffine.hpp"
+#include "realpaver/LinearizerAffineTaylor.hpp"
+#include "realpaver/LinearizerTaylor.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include <cstddef>
 
 namespace realpaver {
 
-ContractorFactory::ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env)
+ContractorFactory::ContractorFactory(Problem &pbm, std::shared_ptr<Env> env)
     : env_(env)
-    , dag_(nullptr)
-    , ve_()
-    , vi_()
-    , vc_()
-    , se_()
-    , si_()
-    , sc_()
+    , edag_(nullptr)
+    , cse_()
+    , csi_()
+    , cso_()
+    , cs_()
+    , obj_ctr_idx_(-1)
+    , obj_ctr_dag_id_(-1)
 {
    // environment
    if (env == nullptr)
       env_ = std::make_shared<Env>();
 
    // creates the shared DAG
-   dag_ = std::make_shared<Dag>();
+   edag_ = std::make_shared<DagExtended>(pbm);
 
    // separates the constraints in three parts
    for (size_t i = 0; i < pbm.nbCtrs(); ++i)
    {
+      // inserts c in the different constraint sets
       Constraint c = pbm.ctrAt(i);
-      try
+      cs_.insert(c);
+      if (c.isAnEquation())
       {
-         size_t j = dag_->insert(c);
-         if (c.isEquation())
-         {
-            ve_.push_back(j);
-            se_.insert(c.scope());
-         }
-         else
-         {
-            vi_.push_back(j);
-            si_.insert(c.scope());
-         }
+         cse_.insert(c);
       }
-      catch (Exception &e)
+      else if (c.isAnInequality())
       {
-         vc_.push_back(c);
-         sc_.insert(c.scope());
+         csi_.insert(c);
+      }
+      else
+      {
+         cso_.insert(c);
       }
    }
-
-   // inserts the scopes in the bank
-   se_ = ScopeBank::getInstance()->insertScope(se_);
-   si_ = ScopeBank::getInstance()->insertScope(si_);
-   sc_ = ScopeBank::getInstance()->insertScope(sc_);
+   if (pbm.hasObjectiveConstraint())
+   {
+      obj_ctr_idx_ = pbm.ctrObjective().id();
+      for (size_t i = 0; i < edag_->size(); i++)
+      {
+         if (edag_->fun(i)->ctr().id() == obj_ctr_idx_)
+         {
+            obj_ctr_dag_id_ = i;
+         }
+      }
+   }
 }
 
 std::shared_ptr<Env> ContractorFactory::getEnv() const
@@ -81,31 +89,20 @@ std::shared_ptr<Env> ContractorFactory::getEnv() const
    return env_;
 }
 
-SharedDag ContractorFactory::ContractorFactory::getDag() const
+SharedDagExtended ContractorFactory::ContractorFactory::extDag() const
 {
-   return dag_;
-}
-
-IntervalFunctionVector ContractorFactory::makeIntervalFunctionVector()
-{
-   IntervalFunctionVector F;
-   for (size_t i : ve_)
-      F.addFun(IntervalFunction(dag_, i));
-   for (size_t i : vi_)
-      F.addFun(IntervalFunction(dag_, i));
-   return F;
+   return edag_;
 }
 
 SharedContractorHC4 ContractorFactory::makeHC4(double tol)
 {
    // constraints from the dag
-   SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>(dag_);
+   SharedContractorHC4 hc4 = std::make_shared<ContractorHC4>();
 
-   // other constraints
-   for (const Constraint &c : vc_)
+   // constraints
+   for (const Constraint &c : cs_)
    {
-      std::shared_ptr<ContractorConstraint> op =
-          std::make_shared<ContractorConstraint>(c);
+      std::shared_ptr<ContractorHC4Revise> op = std::make_shared<ContractorHC4Revise>(c);
       hc4->push(op);
    }
 
@@ -127,49 +124,18 @@ SharedContractorHC4 ContractorFactory::makeHC4()
    return makeHC4(tol);
 }
 
-SharedContractorBC4 ContractorFactory::makeBC4()
-{
-   // constraints from the dag
-   SharedContractorBC4 bc4 = std::make_shared<ContractorBC4>(dag_);
-
-   // other constraints
-   for (const Constraint &c : vc_)
-   {
-      std::shared_ptr<ContractorConstraint> op =
-          std::make_shared<ContractorConstraint>(c);
-      bc4->push(op);
-   }
-
-   // variables with disconnected domains
-   std::shared_ptr<ContractorDomain> dop = makeContractorDomain();
-
-   if (dop->nbVars() > 0)
-      bc4->push(dop);
-
-   // tuning of propagation
-   double tol = env_->getParams()->getDblParam("PROPAGATION_TOL");
-   bc4->setTol(tol);
-
-   // tuning of BC4Revise operators
-   double f = env_->getParams()->getDblParam("BC3_PEEL_FACTOR");
-   bc4->setBC4RevisePeelFactor(f);
-
-   int niter = env_->getParams()->getIntParam("BC3_ITER_LIMIT");
-   bc4->setBC4ReviseMaxIter(niter);
-
-   return bc4;
-}
-
 SharedContractorAffine ContractorFactory::makeAffine(double tol)
 {
+   bool minrange = env_->getParams()->getStrParam("AFFINE_APPROXIMATION") == "MINRANGE";
+
    // constraints from the dag
-   SharedContractorAffine ctc = std::make_shared<ContractorAffine>(dag_);
+   SharedContractorAffine ctc = std::make_shared<ContractorAffine>(edag_, minrange);
 
    // other constraints
-   for (const Constraint &c : vc_)
+   for (size_t i = 0; i < edag_->nbOutsideCtrs(); ++i)
    {
       std::shared_ptr<ContractorConstraint> op =
-          std::make_shared<ContractorConstraint>(c);
+          std::make_shared<ContractorConstraint>(edag_->outsideCtr(i));
       ctc->push(op);
    }
 
@@ -191,33 +157,29 @@ SharedContractorAffine ContractorFactory::makeAffine()
    return makeAffine(tol);
 }
 
-std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
+std::shared_ptr<IntervalNewton> ContractorFactory::makeSquareNewton()
 {
-   size_t ne = ve_.size(), nv = se_.size();
+   IntervalFunctionVector F;
+   for (size_t i = 0; i < edag_->size(); ++i)
+   {
+      DagFunExtEquationFinder finder;
+      edag_->fun(i)->acceptVisitor(finder);
+      if (finder.isAnEquation())
+      {
+         IntervalFunction g(edag_->dag()->fun(finder.index()));
+         F.addFun(g);
+      }
+   }
 
-   if ((ne < 2) || (ne != nv))
+   if (F.nbFuns() < 2)
       return nullptr;
 
    std::shared_ptr<IntervalNewton> newton;
 
-   if (ne == dag_->nbFuns())
+   try
    {
-      IntervalFunctionVector F(dag_);
       newton = std::make_shared<IntervalNewton>(F);
-   }
-   else
-   {
-      IntervalFunctionVector F;
-      for (size_t i : ve_)
-      {
-         IntervalFunction g(dag_, i);
-         F.addFun(g);
-      }
-      newton = std::make_shared<IntervalNewton>(F);
-   }
 
-   if (newton != nullptr)
-   {
       LOG_LOW("Newton operator built by the factory");
 
       double tol = env_->getParams()->getDblParam("NEWTON_TOL");
@@ -236,14 +198,15 @@ std::shared_ptr<IntervalNewton> ContractorFactory::makeNewton()
       newton->setInflationChi(chi);
 
       tol = env_->getParams()->getDblParam("GAUSS_SEIDEL_TOL");
-      newton->getGaussSeidel()->setTol(tol);
+      newton->getGaussSeidel().setTol(tol);
 
       niter = env_->getParams()->getIntParam("GAUSS_SEIDEL_ITER_LIMIT");
-      newton->getGaussSeidel()->setMaxIter(niter);
+      newton->getGaussSeidel().setMaxIter(niter);
    }
-   else
+   catch (Exception &e)
    {
       LOG_LOW("Newton operator NOT built by the factory");
+      newton = nullptr;
    }
 
    return newton;
@@ -253,15 +216,7 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
 {
    std::shared_ptr<ContractorDomain> op = std::make_shared<ContractorDomain>();
 
-   for (Variable v : se_)
-      if (!v.getDomain()->isConnected())
-         op->insertVar(v);
-
-   for (Variable v : si_)
-      if (!v.getDomain()->isConnected())
-         op->insertVar(v);
-
-   for (Variable v : sc_)
+   for (const Variable &v : cs_.scope())
       if (!v.getDomain()->isConnected())
          op->insertVar(v);
 
@@ -270,15 +225,14 @@ std::shared_ptr<ContractorDomain> ContractorFactory::makeContractorDomain()
 
 SharedContractorACID ContractorFactory::makeACID()
 {
-   if (dag_->isEmpty() || (!dag_->scope().contains(sc_)))
+   if (edag_->isEmpty())
    {
       LOG_LOW("Unable to create an ACID contractor");
       return nullptr;
    }
 
-   IntervalFunctionVector F = makeIntervalFunctionVector();
+   IntervalFunctionVector F(edag_);
    std::unique_ptr<SelectorSSR> ssr = std::make_unique<SelectorSSR>(F);
-
    double tol = env_->getParams()->getDblParam("ACID_HC4_TOL");
    SharedContractorHC4 hc4 = makeHC4(tol);
 
@@ -295,7 +249,7 @@ SharedContractorACID ContractorFactory::makeACID()
 
 SharedContractorPolytope ContractorFactory::makePolytope()
 {
-   if (dag_->isEmpty())
+   if (edag_->isEmpty())
       return nullptr;
 
    SharedContractorPolytope op = nullptr;
@@ -328,17 +282,17 @@ SharedContractorPolytope ContractorFactory::makePolytope()
              (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
 
          std::unique_ptr<Linearizer> lzr =
-             std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
+             std::make_unique<LinearizerTaylor>(edag_, hansen, style, seed);
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
       else if (relaxation == "AFFINE")
       {
          bool minrange =
-             env_->getParams()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
+             env_->getParams()->getStrParam("AFFINE_APPROXIMATION") == "MINRANGE";
 
-         std::unique_ptr<Linearizer> lzr =
-             std::make_unique<LinearizerAffine>(dag_, minrange);
+         std::unique_ptr<LinearizerAffine> lzr =
+             std::make_unique<LinearizerAffine>(edag_, minrange);
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
@@ -359,25 +313,27 @@ SharedContractorPolytope ContractorFactory::makePolytope()
             style = CornerStyle::Left;
          else if (corner == "RIGHT")
             style = CornerStyle::Right;
+         else if (corner == "LEFT_RIGHT")
+            style = CornerStyle::LeftRight;
 
          unsigned seed =
              (unsigned)env_->getParams()->getIntParam("POLYTOPE_HULL_TAYLOR_SEED");
 
          std::unique_ptr<LinearizerTaylor> taylor =
-             std::make_unique<LinearizerTaylor>(dag_, hansen, style, seed);
+             std::make_unique<LinearizerTaylor>(edag_, hansen, style, seed);
 
-         ASSERT(taylor != nullptr, "taylor null");
+         REALPAVER_ASSERT(taylor != nullptr, "taylor null");
 
          bool minrange =
-             env_->getParams()->getStrParam("POLYTOPE_HULL_AFFINE_APPROX") == "MINRANGE";
+             env_->getParams()->getStrParam("AFFINE_APPROXIMATION") == "MINRANGE";
 
          std::unique_ptr<LinearizerAffine> affine =
-             std::make_unique<LinearizerAffine>(dag_, minrange);
+             std::make_unique<LinearizerAffine>(edag_, minrange);
 
-         ASSERT(affine != nullptr, "affine null");
+         REALPAVER_ASSERT(affine != nullptr, "affine null");
 
          std::unique_ptr<Linearizer> lzr = std::make_unique<LinearizerAffineTaylor>(
-             dag_, std::move(affine), std::move(taylor));
+             std::move(affine), std::move(taylor));
 
          op = std::make_shared<ContractorPolytope>(std::move(lzr));
       }
@@ -403,6 +359,54 @@ SharedContractorPolytope ContractorFactory::makePolytope()
    }
 
    return op;
+}
+
+int ContractorFactory::getObjectiveConstraintId() const
+{
+   return obj_ctr_idx_;
+}
+int ContractorFactory::getObjectiveConstraintDagId() const
+{
+   return obj_ctr_dag_id_;
+}
+
+/*----------------------------------------------------------------------------*/
+
+DagFunExtEquationFinder::DagFunExtEquationFinder()
+    : DagFunExtVisitor()
+    , idx_(-1)
+{
+}
+
+void DagFunExtEquationFinder::apply(const DagFunArith *f)
+{
+   SharedDag dag = f->dag();
+   int i = f->index();
+   if (dag->fun(i)->getImage().isSingleton())
+   {
+      idx_ = i;
+   }
+}
+
+void DagFunExtEquationFinder::apply(const DagFunCond *f)
+{
+   // nothing to do
+}
+
+void DagFunExtEquationFinder::apply(const DagFunPiecewise *f)
+{
+   // nothing to do
+}
+
+bool DagFunExtEquationFinder::isAnEquation() const
+{
+   return idx_ >= 0;
+}
+
+int DagFunExtEquationFinder::index() const
+{
+   THROW_IF(!isAnEquation(), "Bad access, not an equation");
+   return idx_;
 }
 
 } // namespace realpaver

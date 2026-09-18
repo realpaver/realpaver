@@ -15,19 +15,20 @@
  * @file   ContractorFactory.hpp
  * @brief  Factory of interval contractors
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_FACTORY_HPP
 #define REALPAVER_CONTRACTOR_FACTORY_HPP
 
+#include "realpaver/ConstraintSet.hpp"
 #include "realpaver/ContractorACID.hpp"
 #include "realpaver/ContractorAffine.hpp"
-#include "realpaver/ContractorBC4.hpp"
 #include "realpaver/ContractorDomain.hpp"
 #include "realpaver/ContractorHC4.hpp"
+#include "realpaver/ContractorHC4Revise.hpp"
 #include "realpaver/ContractorPolytope.hpp"
-#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Env.hpp"
 #include "realpaver/IntervalNewton.hpp"
 #include "realpaver/Problem.hpp"
@@ -45,7 +46,7 @@ namespace realpaver {
 class ContractorFactory {
 public:
    /// Creates a factory given a problem and an environment for the parameters
-   ContractorFactory(const Problem &pbm, std::shared_ptr<Env> env);
+   ContractorFactory(Problem &pbm, std::shared_ptr<Env> env);
 
    /// Default destructor
    ~ContractorFactory() = default;
@@ -60,10 +61,7 @@ public:
    std::shared_ptr<Env> getEnv() const;
 
    /// Returns the dag of equations and inequality constraints
-   SharedDag getDag() const;
-
-   /// Returns a vector with all the functions of the DAG
-   IntervalFunctionVector makeIntervalFunctionVector();
+   SharedDagExtended extDag() const;
 
    /**
     * @brief Returns an HC4 contractor.
@@ -82,18 +80,6 @@ public:
 
    /// Same as makeHC4(tol) with tol extracted from the environment
    SharedContractorHC4 makeHC4();
-
-   /**
-    * @brief Returns a BC4 contractor.
-    *
-    * Creates a contractor that implements a constraint propagation algorithm
-    * based on BC4 contractors.
-    * - A BC4 contractor is created for each equation or inequality constraint.
-    * - A constraint contractor is created for each other constraint.
-    * - A domain contractor is created for each variable whose initial domain
-    *   is not connected.
-    */
-   SharedContractorBC4 makeBC4();
 
    /**
     * @brief Returns an affine contractor.
@@ -130,7 +116,7 @@ public:
     * there are at least two equations and the system is square, nullptr
     * otherwise.
     */
-   std::shared_ptr<IntervalNewton> makeNewton();
+   std::shared_ptr<IntervalNewton> makeSquareNewton();
 
    /**
     * @brief Returns a domain contractor.
@@ -149,16 +135,49 @@ public:
     */
    SharedContractorPolytope makePolytope();
 
-private:
-   std::shared_ptr<Env> env_;   // environment for parameters
-   SharedDag dag_;              // DAG of numerical constraints
-   std::vector<size_t> ve_;     // indexes of equations in the DAG
-   std::vector<size_t> vi_;     // indexes of inequalities in the DAG
-   std::vector<Constraint> vc_; // other constraints
+   int getObjectiveConstraintId() const;
+   int getObjectiveConstraintDagId() const;
 
-   Scope se_; // scope of equations
-   Scope si_; // scope of inequalities
-   Scope sc_; // scope of the other constraints
+private:
+   std::shared_ptr<Env> env_; // environment for parameters
+   SharedDagExtended edag_;   // extended DAG of constraints
+   ConstraintSet cse_;        // equations
+   ConstraintSet csi_;        // inequalities
+   ConstraintSet cso_;        // other constraints
+   ConstraintSet cs_;         // all constraints
+
+   int obj_ctr_idx_;    // idx of objective constraint in problem definition
+   int obj_ctr_dag_id_; // idx of objective constraint in problem definition
+};
+
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief Visitor of function in extended DAG.
+ *
+ * This visitor checks if an extended DAG function corresponds to an equation. In this
+ * case, it is posible to get its index in the associated (non extended) DAG.
+ */
+class DagFunExtEquationFinder : public DagFunExtVisitor {
+public:
+   /// Constructor
+   DagFunExtEquationFinder();
+
+   /// @name Visit methods
+   ///@{
+   void apply(const DagFunArith *f) override;
+   void apply(const DagFunCond *f) override;
+   void apply(const DagFunPiecewise *f) override;
+   ///@}
+
+   /// Returns true if the visited function comes from an equation
+   bool isAnEquation() const;
+
+   /// Returns the index of the (non extended) DAG function if isAnEquation() is true
+   int index() const;
+
+private:
+   int idx_;
 };
 
 } // namespace realpaver

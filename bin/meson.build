@@ -31,9 +31,18 @@ rp_default_params = custom_target(
   output: 'rp_params.txt',
 )
 
+rp_optimizer = executable(
+  'rp_optimizer',
+  sources: ['rp_optimizer.cpp', 'rp_util.cpp', rp_default_params],
+  link_with: realpaver_lib,
+  include_directories: incdir,
+  install: true,
+  dependencies: deps_lib,
+)
+
 rp_solver = executable(
   'rp_solver',
-  sources: ['rp_solver.cpp', rp_default_params],
+  sources: ['rp_solver.cpp', 'rp_util.cpp', rp_default_params],
   link_with: realpaver_lib,
   include_directories: incdir,
   install: true,

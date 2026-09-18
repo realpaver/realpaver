@@ -15,7 +15,7 @@
  * @file   Problem.hpp
  * @brief  Constraint satisfaction and optimization problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_PROBLEM_HPP
@@ -26,6 +26,7 @@
 #include "realpaver/Constraint.hpp"
 #include "realpaver/Objective.hpp"
 #include "realpaver/VariableVector.hpp"
+#include <memory>
 #include <unordered_set>
 #include <vector>
 
@@ -133,16 +134,39 @@ public:
    /// Returns the scope of this (sorted set of variables)
    Scope scope() const;
 
-   /// Inserts a constraint
-   void addCtr(Constraint c);
+   /**
+    * @brief Inserts a constraint.
+    *
+    * The status of the constraint must be correctly assigned.
+    * A unique identifier is assigned to c.
+    */
+   size_t addCtr(Constraint c);
 
    /// Inserts a list of constraints
    void addCtr(const std::initializer_list<Constraint> &l);
 
-   /// Adds an objective function
+   /**
+    * @brief Adds an objective function.
+    *
+    * Throws an exception if several objective functions are inserted.
+    */
    void addObjective(Objective obj);
 
-   /// Returns the objective function
+   /**
+    * @brief Generates a constraint representing the objective function.
+    *
+    * Given min z = f(x) : z - f(x) = 0.
+    * Given max z = f(x) : z + f(x) = 0.
+    */
+   void generateObjectiveConstraint();
+
+   /// Returns true if there is an objective constraint in this
+   bool hasObjectiveConstraint() const;
+
+   /** @brief Returns the objective function.
+    *
+    * Throws an exception if there is no objective function.
+    */
    Objective getObjective() const;
 
    /// Returns the number of constraints
@@ -150,6 +174,21 @@ public:
 
    /// Gets the i-th constraint of this
    Constraint ctrAt(size_t i) const;
+
+   // Returns the number of initial constraints
+   size_t nbInitialCtrs() const;
+
+   /// Gets the i-th initial constraint of this
+   Constraint ctrInitialAt(size_t i) const;
+
+   /// Returns the number of redundant constraints
+   size_t nbRedundantCtrs() const;
+
+   /// Gets the i-th redundant constraint of this
+   Constraint ctrRedundantAt(size_t i) const;
+
+   /// Returns the objective constraint or throws an exception
+   Constraint ctrObjective() const;
 
    /// Returns true if this is a CSP
    bool isCSP() const;
@@ -240,6 +279,10 @@ private:
    Scope scop_;                   // set of variables
    std::vector<Alias> als_;       // vector of aliases
 
+   std::vector<size_t> init_ctrs_; // indexes of initial constraints in ctrs_
+   std::vector<size_t> red_ctrs_;  // indexes of redundant constraints in ctrs_
+   int obj_ctr_; // index of the objective constraint in ctrs_ (-1 if no objective)
+
    // set of symbols used in this problem
    std::unordered_set<std::string> vname_;
 
@@ -260,6 +303,9 @@ private:
 
 /// Output on a stream
 std::ostream &operator<<(std::ostream &os, const Problem &p);
+
+/// Type of shared pointers on a problem
+using SharedProblem = std::shared_ptr<Problem>;
 
 } // namespace realpaver
 

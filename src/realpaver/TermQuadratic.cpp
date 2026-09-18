@@ -15,12 +15,12 @@
  * @file   TermQuadratic.cpp
  * @brief  Quadratic expression
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/TermQuadratic.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/TermQuadratic.hpp"
 
 namespace realpaver {
 
@@ -313,7 +313,7 @@ TermQuadraticCreator::TermQuadraticCreator(TermQuadratic *qt)
     , plus_(true)
     , success_(false)
 {
-   ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
+   REALPAVER_ASSERT(qt != nullptr, "Null pointer in a creator of quadratic term");
 }
 
 bool TermQuadraticCreator::visitSuccessfull() const
@@ -528,6 +528,10 @@ void TermQuadraticCreator::apply(const TermPow *t)
 {
 }
 
+void TermQuadraticCreator::apply(const TermPowr *t)
+{
+}
+
 void TermQuadraticCreator::apply(const TermExp *t)
 {
 }
@@ -557,6 +561,30 @@ void TermQuadraticCreator::apply(const TermSinh *t)
 }
 
 void TermQuadraticCreator::apply(const TermTanh *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAcos *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAsin *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAtan *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAcosh *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAsinh *t)
+{
+}
+
+void TermQuadraticCreator::apply(const TermAtanh *t)
 {
 }
 

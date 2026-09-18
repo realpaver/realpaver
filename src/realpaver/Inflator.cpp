@@ -15,11 +15,11 @@
  * @file   Inlator.cpp
  * @brief  Inflator of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Inflator.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Inflator.hpp"
 
 namespace realpaver {
 
@@ -46,6 +46,12 @@ void Inflator::inflate(IntervalVector &X) const
       X.set(i, X[i].inflate(delta_, chi_));
 }
 
+void Inflator::inflateOnScope(IntervalBox &B, const Scope &scop) const
+{
+   for (const Variable &v : scop)
+      B.set(v, B.get(v).inflate(delta_, chi_));
+}
+
 double Inflator::getDelta() const
 {
    return delta_;
@@ -58,14 +64,14 @@ double Inflator::getChi() const
 
 void Inflator::setDelta(double delta)
 {
-   ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
+   REALPAVER_ASSERT(delta > 1.0, "bad inflation factor delta " << delta);
 
    delta_ = delta;
 }
 
 void Inflator::setChi(double chi)
 {
-   ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
+   REALPAVER_ASSERT(chi > 0.0, "bad inflation factor chi " << chi);
 
    chi_ = chi;
 }

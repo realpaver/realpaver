@@ -15,12 +15,13 @@
  * @file   IntervalPropagator.hpp
  * @brief  Constraint propagation over interval contractors
  * @author Laurent Granvilliers
- * @date   2024-7-1
+ * @date   7 July 2024
  */
 
 #ifndef REALPAVER_INTERVAL_PROPAGATOR_HPP
 #define REALPAVER_INTERVAL_PROPAGATOR_HPP
 
+#include "Contractor.hpp"
 #include "realpaver/ContractorPool.hpp"
 #include <vector>
 
@@ -54,6 +55,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
    /// Returns the tolerance used as stopping criterion
@@ -75,6 +77,12 @@ private:
    SharedContractorPool pool_; // pool of contractors
    double tol_;                // tolerance used for propagation
    std::vector<Proof> certif_; // proof certificates of contractors
+
+   // Implements the two contraction methods
+   Proof contractImpl(IntervalBox &B, const ContractMethod &contract);
+
+   // Determines the proof value after a propagation process
+   Proof makeProof() const;
 };
 
 } // namespace realpaver

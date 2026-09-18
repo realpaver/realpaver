@@ -15,11 +15,11 @@
  * @file   Bitset.cpp
  * @brief  The Bitset class
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Bitset.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Bitset.hpp"
 #include "realpaver/Common.hpp"
 #include <algorithm>
 
@@ -38,13 +38,13 @@ Bitset::Bitset()
 Bitset::Bitset(size_t n)
     : Bitset(0, n - 1)
 {
-   ASSERT(n > 0, "Creation of bitset with null size... "
-                     << "the default constructor must be used");
+   REALPAVER_ASSERT(n > 0, "Creation of bitset with null size... "
+                               << "the default constructor must be used");
 }
 
 Bitset::Bitset(int first, int last)
 {
-   ASSERT(first <= last, "Creation of bitset with bad indexes");
+   REALPAVER_ASSERT(first <= last, "Creation of bitset with bad indexes");
 
    size_ = 1 + (size_t)(last - first);
    first_ = first;
@@ -281,6 +281,11 @@ bool Bitset::areAllZeros() const
    return true;
 }
 
+bool Bitset::isEmpty() const
+{
+   return word_ == nullptr;
+}
+
 void Bitset::print(std::ostream &os) const
 {
    if (size_ == 0)
@@ -407,7 +412,7 @@ Bitset &Bitset::operator|=(const Bitset &other)
 
 Bitset operator&(const Bitset &b1, const Bitset &b2)
 {
-   ASSERT(b1.size() > 0 || b2.size() > 0, "bitwise AND with two empty bitsets");
+   REALPAVER_ASSERT(b1.size() > 0 || b2.size() > 0, "bitwise AND with two empty bitsets");
 
    Bitset res(b1);
    res &= b2;
@@ -416,7 +421,7 @@ Bitset operator&(const Bitset &b1, const Bitset &b2)
 
 Bitset operator|(const Bitset &b1, const Bitset &b2)
 {
-   ASSERT(b1.size() > 0 || b2.size() > 0, "bitwise OR with two empty bitsets");
+   REALPAVER_ASSERT(b1.size() > 0 || b2.size() > 0, "bitwise OR with two empty bitsets");
 
    Bitset res(b1);
    res |= b2;
@@ -425,7 +430,7 @@ Bitset operator|(const Bitset &b1, const Bitset &b2)
 
 Bitset operator~(const Bitset &b)
 {
-   ASSERT(b.size() > 0, "bitwise NOT over an empty bitset");
+   REALPAVER_ASSERT(b.size() > 0, "bitwise NOT over an empty bitset");
 
    Bitset res(b);
    res.flipAll();

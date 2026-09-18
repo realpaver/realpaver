@@ -15,7 +15,7 @@
  * @file   Param.cpp
  * @brief  Parameters of solvers
  * @author Laurent Granvilliers
- * @date   2025-4-2
+ * @date   4 Feb 2025
  */
 
 #include "realpaver/Double.hpp"
@@ -938,7 +938,7 @@ void Params::makeGeneral()
    var_rel_tol.setName("VAR_REL_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(0.0)
+       .setValue(1.0e-6)
        .setMinValue(0.0)
        .setMaxValue(1.0);
    add(var_rel_tol);
@@ -953,6 +953,29 @@ void Params::makeGeneral()
        .setValue(1.0e-8)
        .setMinValue(0.0);
    add(var_abs_tol);
+
+   ////////////////////
+   ParamDbl obj_rel_tol;
+   str = std::string("Relative tolerance on the width of an interval domain ") +
+         "of the objective function";
+   obj_rel_tol.setName("OBJ_REL_TOL")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(1.0e-4)
+       .setMinValue(0.0)
+       .setMaxValue(1.0);
+   add(obj_rel_tol);
+
+   ////////////////////
+   ParamDbl obj_abs_tol;
+   str = std::string("Absolute tolerance on the width of an interval domain ") +
+         "of the objective function";
+   obj_abs_tol.setName("OBJ_ABS_TOL")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(1.0e-4)
+       .setMinValue(0.0);
+   add(obj_abs_tol);
 
    ////////////////////
    ParamInt float_prec;
@@ -1030,12 +1053,12 @@ void Params::makeBranch()
          "problems. On the contrary, the search can be stopped when " +
          "the following limits are reached: TIME_LIMIT, SOLUTION_LIMIT " +
          "NODE_LIMIT, and DEPTH_LIMIT.";
-   search_stat.setName("SEARCH_STATUS")
+   search_stat.setName("LIMITS_ENABLED")
        .setCat(cat)
        .setWhat(str)
-       .addChoice("COMPLETE", "the whole search space is explorated")
-       .addChoice("LIMITED", "the search is possibly stopped due to the limits")
-       .setValue("LIMITED");
+       .addChoice("YES", "the limits are enabled")
+       .addChoice("NO", "the limits are disabled")
+       .setValue("YES");
    add(search_stat);
 
    ////////////////////
@@ -1080,19 +1103,36 @@ void Params::makeBranch()
    add(sol_clu_gap);
 
    ////////////////////
-   ParamInt bb_freq;
-   str = std::string("In a branch-and-bound algorithm, the next node can be either ") +
-         "the node with the lowest lower bound or the node with the lowest upper " +
-         "bound (diving). The frequency manages the selection of the next node:\n" +
-         "- 1 means that the node with the lowest lower bound is always selected;\n" +
-         "- a value > 1 means that the node with the lowest upper bound is selected " +
-         "when the node counter modulo the frequency is equal to 0.";
-   bb_freq.setName("BB_SPACE_FREQUENCY")
+   ParamDbl bb_lurat;
+   str = std::string("In a branch-and-bound algorithm, the strategy Lower-Upper  ") +
+         "selects the next node randomly using two criteria, either the lowest lower " +
+         "bound or the lowest upper bound. The criteria 'lowest upper bound' is chosen " +
+         "with probability R where R is the value of this parameter. Typical values " +
+         "lie in [0.2, 0.8]." + "See BB_NODE_SELECTION with value LU";
+   bb_lurat.setName("BB_LU_RATIO")
        .setCat(cat)
        .setWhat(str)
-       .setValue(1)
-       .setMinValue(1);
-   add(bb_freq);
+       .setValue(0.5)
+       .setMinValue(0.0)
+       .setMaxValue(1.0);
+   add(bb_lurat);
+
+   ////////////////////
+   ParamStr bb_incomplete;
+   str = std::string("A branch-and-bound algorithm stops when the enclosure ") +
+         "of the optimum has the derired precision and at least one feasible " +
+         "point has been found. Now, the search can be stopped as soon as both " +
+         "criteria are satisfied (incomplete search), or it continues until there " +
+         "is no more pending node, which leads to enclose all the minimizers " +
+         "(complete search)";
+   bb_incomplete.setName("BB_INCOMPLETE_SEARCH")
+       .setCat(cat)
+       .setWhat("Stopping criterion for branch-and-bound algorithms")
+       .addChoice("YES", "Incomplete search")
+       .addChoice("NO", "Complete search")
+       .setValue("YES")
+       .setText(str);
+   add(bb_incomplete);
 
    ////////////////////
    ParamStr node_sel;
@@ -1121,6 +1161,23 @@ void Params::makeBranch()
        .setValue("DFS")
        .setText(text);
    add(node_sel);
+
+   ////////////////////
+   ParamStr bb_node_sel;
+   str = std::string("");
+   std::string bb_lu =
+       std::string("Lower-Upper strategy that alternates the choice between nodes ") +
+       "with the lowest lower bound and the lowest upper bound. See the parameter "
+       "BB_LU_RATIO to assign the ratio";
+   std::string bb_fd = std::string("Feasible diving strategy");
+   bb_node_sel.setName("BB_NODE_SELECTION")
+       .setCat(cat)
+       .setWhat("Exploration strategy for branch-and-bound algorithms")
+       .addChoice("LU", bb_lu)
+       .addChoice("FD", bb_fd)
+       .setValue("FD")
+       .setText(str);
+   add(bb_node_sel);
 }
 
 void Params::makeSplit()
@@ -1141,34 +1198,67 @@ void Params::makeSplit()
    add(split_obj);
 
    ////////////////////
+   ParamStr split_cont_var;
+   str = std::string("Selection strategy of the next continuous variable ") +
+         "in a splitting step, e.g. in the default splitting strategy";
+   split_cont_var.setName("SPLIT_CONTINUOUS")
+       .setCat(cat)
+       .setWhat(str)
+       .addChoice("LF", "Largest-First strategy")
+       .addChoice("SSR", "Smear-Sum-Relative strategy")
+       .setValue("LF");
+   add(split_cont_var);
+
+   ////////////////////
+   ParamDbl def_rr_cycle;
+   str =
+       std::string("The default splitting strategy is used when we have ") +
+       "SPLIT_SELECTION=DEFAULT. It alternates between a cycle of steps " +
+       "based on a round-robin strategy and a cycle of steps based on specific "
+       "strategies according to the nature of the variables (typically Largest-First " +
+       "for continuous variables and Smallest-First for discrete variables. This "
+       "parameter controls the length of the round-robin based cycle and it " +
+       "corresponds to a factor of the number of variables of the problem. " +
+       "For example, given 10 variables and the value 1.5, 15 round-robin based steps " +
+       "will be applied consecutively.";
+   def_rr_cycle.setName("SPLIT_DEFAULT_RR_CYCLE")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(3.0)
+       .setMinValue(0.0);
+   add(def_rr_cycle);
+
+   ////////////////////
+   ParamDbl def_specific_cycle;
+   str = std::string("The default splitting strategy is used when we have ") +
+         "SPLIT_SELECTION=DEFAULT. It alternates between a cycle of steps " +
+         "based on a round-robin strategy and a cycle of steps based on specific "
+         "strategies according to the nature of the variables (typically Largest-First " +
+         "for continuous variables and Smallest-First for discrete variables. This "
+         "parameter controls the length of the specific cycle and it " +
+         "corresponds to a factor of the number of variables of the problem. " +
+         "For example, given 10 variables and the value 0.5, 5 specific steps " +
+         "will be applied consecutively.";
+   def_specific_cycle.setName("SPLIT_DEFAULT_SPECIFIC_CYCLE")
+       .setCat(cat)
+       .setWhat(str)
+       .setValue(0.5)
+       .setMinValue(0.0);
+   add(def_specific_cycle);
+
+   ////////////////////
    ParamStr var_sel;
    str = std::string("Variable selection strategy that chooses the next variable ") +
-         "to split";
+         "to split. RR is a fair round-robin strategy that takes the variables in the " +
+         "ordering given in the model. DEFAULT combines RR with specific strategies " +
+         "applied to continuous and discrete variables";
    var_sel.setName("SPLIT_SELECTION")
        .setCat(cat)
        .setWhat(str)
        .addChoice("RR", "round-robin strategy")
-       .addChoice("LF", "largest domain")
-       .addChoice("SF", "smallest domain")
-       .addChoice("SSR", "smear sum relative values (using derivatives)")
-       .addChoice("SLF", "integer variable with smallest first and then real variable")
-       .addChoice("SSR_LF", "SSR and LF alternating with a given frequency")
-       .setValue("SSR");
+       .addChoice("DEFAULT", "default strategy")
+       .setValue("DEFAULT");
    add(var_sel);
-
-   ////////////////////
-   ParamDbl freq_ssr;
-   str = std::string("Frequency 0 <= f <= 1 used by the SSR_LF strategy. ") +
-         "If f = 1 then SSR is used. If f = 0 then LF is used. Otherwise SSR " +
-         "is used with frequency f with respect to LF, e.g. f = 0.75 means " +
-         "that SSR is used 3 times out of 4.";
-   freq_ssr.setName("SPLIT_SSR_LF_FREQUENCY")
-       .setCat(cat)
-       .setWhat(str)
-       .setValue(0.75)
-       .setMinValue(0.0)
-       .setMaxValue(1.0);
-   add(freq_ssr);
 
    ////////////////////
    ParamStr split_sl;
@@ -1201,6 +1291,16 @@ void Params::makeSplit()
        .addChoice("NO", "it is considered as a solution")
        .setValue("NO");
    add(split_inner);
+
+   ////////////////////
+   ParamStr split_discrete_first;
+   split_discrete_first.setName("SPLIT_DISCRETE_FIRST")
+       .setCat(cat)
+       .setWhat("Choice between discrete variables and continuous variables")
+       .addChoice("YES", "discrete variables must be chosen before continuous variables")
+       .addChoice("NO", "no impact on the splitting strategy")
+       .setValue("NO");
+   add(split_discrete_first);
 }
 
 void Params::makeContract()
@@ -1223,31 +1323,6 @@ void Params::makeContract()
    add(propag_tol);
 
    ////////////////////
-   ParamDbl bc3_peel;
-   str = std::string("Peel factor for the BC3 contractor\nGiven an interval ") +
-         "[a, b] and the peel factor f, let w = (b - a) * (p / 100) be a ratio " +
-         "of the interval width. Then the consistency of the intervals [a, a+w] " +
-         "and [b-w, w] is checked in order to stop the search.";
-   bc3_peel.setName("BC3_PEEL_FACTOR")
-       .setCat(cat)
-       .setWhat(str)
-       .setValue(2.0)
-       .setMinValue(0.0)
-       .setMaxValue(100.0);
-   add(bc3_peel);
-
-   ////////////////////
-   ParamInt bc3_iter;
-   str = std::string("Iteration limit for the iterative method of the BC3 contractor ") +
-         "used to find the outermost zeros of a function in a given interval";
-   bc3_iter.setName("BC3_ITER_LIMIT")
-       .setCat(cat)
-       .setWhat(str)
-       .setValue(30)
-       .setMinValue(1);
-   add(bc3_iter);
-
-   ////////////////////
    ParamStr propag_base;
    str = std::string("Propagation strategy: the default one is a classical ") +
          "propagation algorithm that uses one contractor per constraint";
@@ -1255,7 +1330,6 @@ void Params::makeContract()
        .setCat(cat)
        .setWhat(str)
        .addChoice("HC4", "HC4 contractor")
-       .addChoice("BC4", "BC4 contractor")
        .addChoice("AFFINE", "contractor based on affine forms")
        .setValue("HC4");
    add(propag_base);
@@ -1298,7 +1372,7 @@ void Params::makeContract()
    relax_tol.setName("RELAXATION_EQ_TOL")
        .setCat(cat)
        .setWhat(str)
-       .setValue(1.0e-10)
+       .setValue(1.0e-12)
        .setMinValue(0.0);
    add(relax_tol);
 
@@ -1338,7 +1412,7 @@ void Params::makePolytope()
        .setWhat("Use of Hansen's derivatives in the Taylor forms")
        .addChoice("YES", "Hansen's derivatives")
        .addChoice("NO", "classical derivatives")
-       .setValue("YES");
+       .setValue("NO");
    add(hansen);
 
    ////////////////////
@@ -1350,6 +1424,7 @@ void Params::makePolytope()
        .addChoice("RANDOM_OPPOSITE", "two opposite corners, one selected randomly")
        .addChoice("LEFT", "corner of left bounds")
        .addChoice("RIGHT", "corner of right bounds")
+       .addChoice("LEFT_RIGHT", "corner of right bounds and its opposite corner")
        .setValue("RANDOM_OPPOSITE");
    add(tayl_corn);
 
@@ -1390,7 +1465,7 @@ void Params::makePolytope()
    ////////////////////
    ParamStr approx;
    str = "Approximation method that generates affine forms for the elementary functions";
-   approx.setName("POLYTOPE_HULL_AFFINE_APPROX")
+   approx.setName("AFFINE_APPROXIMATION")
        .setCat(cat)
        .setWhat(str)
        .addChoice("MINRANGE", "MinRange approximation")
@@ -1500,6 +1575,8 @@ void Params::makeLocalOptim()
                   "gradient-based constrained local optimization using NlOpt")
        .addChoice("NLOPT_SLSQP",
                   "gradient-based constrained local optimization using NlOpt")
+       .addChoice("NLOPT_LBFGS",
+                  "gradient-based constrained local optimization using NlOpt")
        .setValue("DEFAULT");
    add(solver);
 
@@ -1508,7 +1585,7 @@ void Params::makeLocalOptim()
    time_lim.setName("NLP_SOLVER_TIME_LIMIT")
        .setCat(cat)
        .setWhat("Time limit in seconds")
-       .setValue(10.0)
+       .setValue(1)
        .setMinValue(0.0);
    add(time_lim);
 
@@ -1539,6 +1616,20 @@ void Params::makeLocalOptim()
        .setValue(1.0e-8)
        .setMinValue(0.0);
    add(obj_abs_tol);
+
+   ////////////////////
+   ParamStr pros;
+   pros.setName("PROSPECTOR")
+       .setCat(cat)
+       .setWhat("Exploration strategy to find feasible points")
+       .addChoice("SIMPLE", "simple test of the point returned by the domain picker")
+       .addChoice("LOCALSOLVER", "Use a local solver to find a feasible point")
+       .addChoice("INNER_TAYLOR",
+                  "Use an inner linear relaxation to find a feasible point")
+       .addChoice("INNER_AFFINE",
+                  "Use an inner linear relaxation to find a feasible point")
+       .setValue("INNER_TAYLOR");
+   add(pros);
 }
 
 void Params::makeLinearSolver()
@@ -1701,6 +1792,19 @@ void Params::makeInterval()
 void Params::setParam(const std::string &name, const std::string &val)
 {
    processParam(name, val);
+}
+
+bool Params::readParam(const std::string &str)
+{
+   try
+   {
+      readParam(str, 0);
+   }
+   catch (realpaver::Exception &e)
+   {
+      return false;
+   }
+   return true;
 }
 
 } // namespace realpaver

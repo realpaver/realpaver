@@ -15,11 +15,11 @@
  * @file   TermDeriver.cpp
  * @brief  Symbolic differentiation
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
+#include "realpaver/Exception.hpp"
 #include "realpaver/TermDeriver.hpp"
-#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
@@ -144,6 +144,15 @@ void TermDeriver::apply(const TermPow *t)
    dt_ = (n * vis.dt_) * pow(t->child(), n - 1);
 }
 
+void TermDeriver::apply(const TermPowr *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+
+   double r = t->exponent();
+   dt_ = (r * vis.dt_) * pow(t->child(), r - 1);
+}
+
 void TermDeriver::apply(const TermExp *t)
 {
    TermDeriver vis(v_);
@@ -198,6 +207,48 @@ void TermDeriver::apply(const TermTanh *t)
    TermDeriver vis(v_);
    t->child()->acceptVisitor(vis);
    dt_ = vis.dt_ * (1.0 - sqr(tanh(t->child())));
+}
+
+void TermDeriver::apply(const TermAcos *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = (-vis.dt_) / sqrt(1.0 - sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAsin *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / sqrt(1.0 - sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAtan *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / (1.0 + sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAcosh *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / sqrt(sqr(t->child()) - 1.0);
+}
+
+void TermDeriver::apply(const TermAsinh *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / sqrt(1.0 + sqr(t->child()));
+}
+
+void TermDeriver::apply(const TermAtanh *t)
+{
+   TermDeriver vis(v_);
+   t->child()->acceptVisitor(vis);
+   dt_ = vis.dt_ / (1.0 - sqr(t->child()));
 }
 
 } // namespace realpaver

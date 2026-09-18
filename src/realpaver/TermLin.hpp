@@ -15,14 +15,13 @@
  * @file   TermLin.hpp
  * @brief  Linear expression
  * @author Laurent Granvilliers
- * @date   2024-6-22
+ * @date   22 June 2024
  */
 
 #ifndef REALPAVER_TERM_LIN_HPP
 #define REALPAVER_TERM_LIN_HPP
 
 #include "realpaver/Term.hpp"
-#include <list>
 #include <set>
 
 namespace realpaver {
@@ -39,6 +38,8 @@ public:
     * Throws an exception if t is not linear
     */
    TermLin(const Term &t);
+
+   TermLin(const TermRep *rep);
 
    /// Default copy constructor
    TermLin(const TermLin &) = default;
@@ -131,6 +132,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -139,6 +141,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    TermLin *lt_;

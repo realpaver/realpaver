@@ -15,7 +15,7 @@
  * @file   Double.hpp
  * @brief  Management of floating-point numbers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_DOUBLE_HPP
@@ -200,10 +200,16 @@ struct Double {
       return (x > y) ? x : y;
    }
 
-   /// Power function
-   static inline ValueType pow(ValueType x, int n)
+   /// Power function (integral exponent)
+   static inline ValueType pow(ValueType x, unsigned int n)
    {
       return std::pow(x, n);
+   }
+
+   /// Power function (real exponent)
+   static inline ValueType powr(ValueType x, double r)
+   {
+      return std::pow(x, r);
    }
 
    /// Absolute value
@@ -276,6 +282,42 @@ struct Double {
    static inline ValueType tanh(ValueType x)
    {
       return std::tanh(x);
+   }
+
+   /// Arc-cosine
+   static inline ValueType acos(ValueType x)
+   {
+      return std::acos(x);
+   }
+
+   /// Arc-sine
+   static inline ValueType asin(ValueType x)
+   {
+      return std::asin(x);
+   }
+
+   /// Arc-tangent
+   static inline ValueType atan(ValueType x)
+   {
+      return std::atan(x);
+   }
+
+   /// Hyperbolic arc-cosine
+   static inline ValueType acosh(ValueType x)
+   {
+      return std::acosh(x);
+   }
+
+   /// Hyperbolic arc-sine
+   static inline ValueType asinh(ValueType x)
+   {
+      return std::asinh(x);
+   }
+
+   /// Hyperbolic arc-tangent
+   static inline ValueType atanh(ValueType x)
+   {
+      return std::atanh(x);
    }
 
    /// Sign function

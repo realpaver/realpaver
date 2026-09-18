@@ -15,96 +15,47 @@
  * @file   ConstraintFixer.cpp
  * @brief  Rewriting of constraints
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   28 May 2025
  */
 
-#include "realpaver/AssertDebug.hpp"
+#include "Constraint.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintCond.hpp"
 #include "realpaver/ConstraintFixer.hpp"
+#include "realpaver/ConstraintPiecewise.hpp"
+#include "realpaver/ConstraintTable.hpp"
+#include "realpaver/TermFixer.hpp"
+#include <memory>
 
 namespace realpaver {
 
-ConstraintFixer::ConstraintFixer(VarVarMapType *vvm, VarIntervalMapType *vim,
-                                 const DomainBox &box)
-    : vvm_(vvm)
-    , vim_(vim)
-    , box_(box)
-    , c_()
+ConstraintFixer::ConstraintFixer(SharedProblemBridge bridge)
+    : bridge_(bridge)
+    , rc_()
 {
+   REALPAVER_ASSERT(bridge != nullptr, "Bad initiualization of a constraint fixer");
 }
 
 Constraint ConstraintFixer::getConstraint() const
 {
-   return c_;
+   return rc_;
 }
 
-void ConstraintFixer::apply(const ArithCtrEq *c)
+void ConstraintFixer::apply(const ConstraintCond *c)
 {
-   TermFixer vl(vvm_, vim_);
-   c->left().acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
-   c->right().acceptVisitor(vr);
-
-   c_ = (vl.getTerm() == vr.getTerm());
+   ConstraintFixer fg(bridge_), bg(bridge_);
+   c->guard().acceptVisitor(fg);
+   c->body().acceptVisitor(bg);
+   rc_ = cond(fg.getConstraint(), bg.getConstraint());
 }
 
-void ConstraintFixer::apply(const ArithCtrLe *c)
-{
-   TermFixer vl(vvm_, vim_);
-   c->left().acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
-   c->right().acceptVisitor(vr);
-
-   c_ = (vl.getTerm() <= vr.getTerm());
-}
-
-void ConstraintFixer::apply(const ArithCtrLt *c)
-{
-   TermFixer vl(vvm_, vim_);
-   c->left().acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
-   c->right().acceptVisitor(vr);
-
-   c_ = (vl.getTerm() < vr.getTerm());
-}
-
-void ConstraintFixer::apply(const ArithCtrGe *c)
-{
-   TermFixer vl(vvm_, vim_);
-   c->left().acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
-   c->right().acceptVisitor(vr);
-
-   c_ = (vl.getTerm() >= vr.getTerm());
-}
-
-void ConstraintFixer::apply(const ArithCtrGt *c)
-{
-   TermFixer vl(vvm_, vim_);
-   c->left().acceptVisitor(vl);
-
-   TermFixer vr(vvm_, vim_);
-   c->right().acceptVisitor(vr);
-
-   c_ = (vl.getTerm() > vr.getTerm());
-}
-
-void ConstraintFixer::apply(const ArithCtrIn *c)
-{
-   TermFixer vis(vvm_, vim_);
-   c->term().acceptVisitor(vis);
-
-   c_ = in(vis.getTerm(), c->image());
-}
-
-void ConstraintFixer::apply(const TableCtr *c)
+void ConstraintFixer::apply(const ConstraintTable *c)
 {
    // checks the consistent assignments with respect to the variable domains
    Bitset consistent(c->nbRows());
    consistent.setAllZero();
+
+   const DomainBox &box = bridge_->srcRegion();
 
    for (size_t i = 0; i < c->nbRows(); ++i)
    {
@@ -112,11 +63,11 @@ void ConstraintFixer::apply(const TableCtr *c)
       bool cons = true;
       while (cons && j < c->nbCols())
       {
-         auto it = vvm_->find(c->getVar(j));
-         if (it != vvm_->end())
+         Variable v = c->getVar(j);
+
+         if (bridge_->isUnfixed(v))
          {
-            Variable v = it->first;
-            if (c->getVal(i, j).isDisjoint(box_.get(v)->intervalHull()))
+            if (c->getVal(i, j).isDisjoint(box.get(v)->intervalHull()))
                cons = false;
          }
          ++j;
@@ -126,49 +77,196 @@ void ConstraintFixer::apply(const TableCtr *c)
    }
 
    // rewrites the constraint
-   Constraint::SharedRep srep = std::make_shared<TableCtr>();
-   TableCtr *rep = static_cast<TableCtr *>(srep.get());
+   std::shared_ptr<ConstraintTable> tbl = std::make_shared<ConstraintTable>();
 
    for (size_t j = 0; j < c->nbCols(); ++j)
    {
-      auto it = vvm_->find(c->getVar(j));
-      if (it != vvm_->end())
+      Variable v = c->getVar(j);
+      if (bridge_->isUnfixed(v))
       {
-         TableCtrCol col(it->second);
-
+         Variable w = bridge_->srcToDestVar(v);
+         ConstraintTableCol col(w);
          for (size_t i = 0; i < c->nbRows(); ++i)
             if (consistent.get(i))
                col.addValue(c->getVal(i, j));
 
-         rep->addCol(col);
+         tbl->addCol(col);
       }
    }
-   c_ = Constraint(srep);
+   tbl->removeRedundantRows();
+   rc_ = Constraint(tbl);
 }
 
-void ConstraintFixer::apply(const CondCtr *c)
+void ConstraintFixer::apply(const ConstraintPiecewise *c)
 {
-   ConstraintFixer fg(vvm_, vim_, box_);
-   c->guard().acceptVisitor(fg);
+   const DomainBox &box = bridge_->srcRegion();
+   Variable v = c->variable();
+   Interval vdom = box.get(v)->intervalHull();
 
-   ConstraintFixer bg(vvm_, vim_, box_);
-   c->body().acceptVisitor(bg);
-
-   Constraint guard = fg.getConstraint(), body = bg.getConstraint();
-
-   c_ = cond(guard, body);
-}
-
-void ConstraintFixer::apply(const PiecewiseCtr *c)
-{
-   std::vector<Constraint> ctrs;
-   for (size_t i = 0; i < c->nb_pieces(); i++)
+   // is the reference variable fixed ?
+   if (bridge_->isFixed(c->variable()))
    {
-      ConstraintFixer bg(vvm_, vim_, box_);
-      c->constraint(i).acceptVisitor(bg);
-      ctrs.push_back((bg.getConstraint()));
+      // yes, there are two cases:
+      // - one active guard
+      // - two active guards that share one bound which is also the value of the reference
+      //   variable
+      int n1 = -1, n2 = -1;
+      for (size_t i = 0; i < c->nbPieces(); i++)
+      {
+         if (vdom.overlaps(c->interval(i)))
+         {
+            if (n1 == -1)
+               n1 = i;
+            else
+               n2 = i;
+         }
+      }
+
+      // one active guard?
+      if (n2 == -1)
+      {
+         // yes => only the constraint of the active guard
+         ConstraintFixer fixer(bridge_);
+         c->constraint(n1).acceptVisitor(fixer);
+         rc_ = fixer.getConstraint();
+      }
+      else
+      {
+         // rewrites the body of the first constraint
+         ConstraintFixer fixer1(bridge_);
+         c->constraint(n1).acceptVisitor(fixer1);
+         Constraint c1 = fixer1.getConstraint();
+         if (c1.isConstant())
+            n1 = -1;
+
+         // rewrites the body of the second constraint
+         ConstraintFixer fixer2(bridge_);
+         c->constraint(n2).acceptVisitor(fixer2);
+         Constraint c2 = fixer2.getConstraint();
+         if (c2.isConstant())
+            n2 = -1;
+
+         if (n1 == -1)
+         {
+            rc_ = c2;
+         }
+         else if (n2 == -1)
+         {
+            rc_ = c1;
+         }
+         else
+         {
+            // creates a piecewise constraint on a new variable associated with v in the
+            // destination poblem
+            Variable w = bridge_->insertVar(v, *box.get(v));
+            std::shared_ptr<ConstraintPiecewise> pw =
+                std::make_shared<ConstraintPiecewise>(w);
+
+            Variable b1 = bridge_->srcToDestVar(c->binary(n1)),
+                     b2 = bridge_->srcToDestVar(c->binary(n2));
+
+            pw->addPiece(b1, c->interval(n1), c1);
+            pw->addPiece(b2, c->interval(n2), c2);
+
+            rc_ = Constraint(pw);
+
+            // remark: v is now is fixed and unfixed in the bridge
+            // it must be removed as a fixed variable
+            bridge_->removeFixedVar(v);
+         }
+      }
    }
-   c_ = piecewise(vvm_->find(c->variable())->second, c->binaries(), c->intervals(), ctrs);
+   else
+   {
+      // gets the new variable associated with v and makes a piecewise constraint for w
+      Variable w = bridge_->srcToDestVar(v);
+      std::shared_ptr<ConstraintPiecewise> pw = std::make_shared<ConstraintPiecewise>(w);
+
+      // examines the different pieces
+      for (size_t i = 0; i < c->nbPieces(); i++)
+      {
+         if (!vdom.overlaps(c->interval(i)))
+            continue; // piece inactive
+
+         Variable bv = c->binary(i);
+         if (bridge_->isFixed(bv))
+         {
+            // binary variable fixed: piece not considered if its domain
+            // is 0, otherwise only this piece is active
+            Interval bdom = box.get(bv)->intervalHull();
+            if (bdom.isOne())
+            {
+               ConstraintFixer fixer(bridge_);
+               c->constraint(i).acceptVisitor(fixer);
+               rc_ = fixer.getConstraint();
+               return;
+            }
+         }
+         else
+         {
+            // binary variable not fixed
+            Variable bw = bridge_->srcToDestVar(bv);
+            ConstraintFixer fixer(bridge_);
+            c->constraint(i).acceptVisitor(fixer);
+
+            Constraint body = fixer.getConstraint();
+            if (!body.isConstant())
+               pw->addPiece(bw, vdom & c->interval(i), body);
+         }
+      }
+
+      if (pw->nbPieces() > 1)
+         rc_ = Constraint(pw);
+      else
+         rc_ = pw->constraint(0);
+   }
+}
+
+void ConstraintFixer::apply(const ConstraintEq *c)
+{
+   TermFixer vl(bridge_), vr(bridge_);
+   c->left().acceptVisitor(vl);
+   c->right().acceptVisitor(vr);
+   rc_ = (vl.getTerm() == vr.getTerm());
+}
+
+void ConstraintFixer::apply(const ConstraintLe *c)
+{
+   TermFixer vl(bridge_), vr(bridge_);
+   c->left().acceptVisitor(vl);
+   c->right().acceptVisitor(vr);
+   rc_ = (vl.getTerm() <= vr.getTerm());
+}
+
+void ConstraintFixer::apply(const ConstraintLt *c)
+{
+   TermFixer vl(bridge_), vr(bridge_);
+   c->left().acceptVisitor(vl);
+   c->right().acceptVisitor(vr);
+   rc_ = (vl.getTerm() < vr.getTerm());
+}
+
+void ConstraintFixer::apply(const ConstraintGe *c)
+{
+   TermFixer vl(bridge_), vr(bridge_);
+   c->left().acceptVisitor(vl);
+   c->right().acceptVisitor(vr);
+   rc_ = (vl.getTerm() >= vr.getTerm());
+}
+
+void ConstraintFixer::apply(const ConstraintGt *c)
+{
+   TermFixer vl(bridge_), vr(bridge_);
+   c->left().acceptVisitor(vl);
+   c->right().acceptVisitor(vr);
+   rc_ = (vl.getTerm() > vr.getTerm());
+}
+
+void ConstraintFixer::apply(const ConstraintIn *c)
+{
+   TermFixer vis(bridge_);
+   c->term().acceptVisitor(vis);
+   rc_ = in(vis.getTerm(), c->image());
 }
 
 } // namespace realpaver

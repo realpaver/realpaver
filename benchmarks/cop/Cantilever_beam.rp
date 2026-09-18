@@ -1,0 +1,24 @@
+Constants
+  E = 1e7,
+  L = 36,
+  P =1000.0;
+
+Variables
+  b1 in [2,12],
+  h1 in [0.1,1],
+  b2 in [0.1,2],
+  H in [3,7];
+
+Aliases
+  I = 1 / 12 * b2 * (H - 2 * h1)^3 + 2 * (1 / 12 * b1 * h1^3 + b1 * h1 * (H - h1)^2 / 4),
+  sigma = P * L * H / (2 * I),
+  delta = P * L^3 / (3 * E * I),
+  volume = (2 * h1 * b1 + (H - 2 * h1) * b2) * L;
+
+Constraints
+  (sigma - 5000.0) / 5000.0 <= 0,
+  (delta - 0.1) / 0.1 <= 0;
+
+min volume;
+
+# Optimal value: 92.7693

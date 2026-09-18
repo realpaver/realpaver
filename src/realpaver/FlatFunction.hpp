@@ -15,7 +15,7 @@
  * @file   FlatFunction.hpp
  * @brief  Function used to implement a fast version of hc4Revise
  * @author Laurent Granvilliers
- * @date   2024-6-11
+ * @date   6 Nov 2024
  */
 
 #ifndef REALPAVER_FLAT_FUNCTION_HPP
@@ -29,36 +29,43 @@ namespace realpaver {
 
 /// Enumeration of flat function node symbols
 enum class FlatSymbol {
-   Cst,  ///< constant
-   Var,  ///< variable
-   Add,  ///< addition
-   AddL, ///< addition with a constant in the left node
-   AddR, ///< addition with a constant in the right node
-   Sub,  ///< subtraction
-   SubL, ///< subtraction with a constant in the left node
-   SubR, ///< subtraction with a constant in the right node
-   Mul,  ///< multiplication
-   MulL, ///< multiplication with a constant in the left node
-   MulR, ///< multiplication with a constant in the right node
-   Div,  ///< division
-   DivL, ///< division with a constant in the left node
-   DivR, ///< division with a constant in the right node
-   Min,  ///< minimum
-   Max,  ///< maximum
-   Usb,  ///< unary subtraction
-   Abs,  ///< absolute value
-   Sgn,  ///< sign
-   Sqr,  ///< square
-   Sqrt, ///< square root
-   Pow,  ///< power
-   Exp,  ///< exponential
-   Log,  ///< logarithm
-   Cos,  ///< cosine
-   Sin,  ///< sine
-   Tan,  ///< tangent
-   Cosh, ///< hyperbolic cosine
-   Sinh, ///< hyperbolic sine
-   Tanh  ///< hyperbolic tangent
+   Cst,   ///< constant
+   Var,   ///< variable
+   Add,   ///< addition
+   AddL,  ///< addition with a constant in the left node
+   AddR,  ///< addition with a constant in the right node
+   Sub,   ///< subtraction
+   SubL,  ///< subtraction with a constant in the left node
+   SubR,  ///< subtraction with a constant in the right node
+   Mul,   ///< multiplication
+   MulL,  ///< multiplication with a constant in the left node
+   MulR,  ///< multiplication with a constant in the right node
+   Div,   ///< division
+   DivL,  ///< division with a constant in the left node
+   DivR,  ///< division with a constant in the right node
+   Min,   ///< minimum
+   Max,   ///< maximum
+   Usb,   ///< unary subtraction
+   Abs,   ///< absolute value
+   Sgn,   ///< sign
+   Sqr,   ///< square
+   Sqrt,  ///< square root
+   Pow,   ///< power (positive integral exponent)
+   Powr,  ///< power (real exponent)
+   Exp,   ///< exponential
+   Log,   ///< logarithm
+   Cos,   ///< cosine
+   Sin,   ///< sine
+   Tan,   ///< tangent
+   Cosh,  ///< hyperbolic cosine
+   Sinh,  ///< hyperbolic sine
+   Tanh,  ///< hyperbolic tangent
+   Acos,  ///< arc-cosine
+   Asin,  ///< arc-sine
+   Atan,  ///< arc-tangent
+   Acosh, ///< hyperbolic arc-cosine
+   Asinh, ///< hyperbolic arc-sine
+   Atanh  ///< hyperbolic arc-tangent
 };
 
 /// Output on a stream
@@ -104,7 +111,7 @@ public:
    FlatFunction(const Term &t, const Interval &img);
 
    /// Creates a flat function representing a function f from a DAG
-   FlatFunction(const DagFun *f);
+   FlatFunction(const DagFun &f);
 
    /**
     * @brief Creates a univariate flat function.
@@ -112,7 +119,7 @@ public:
     * It represents f where all the variables but v are replaced with their
     * domains in B.
     */
-   FlatFunction(const DagFun *f, const IntervalBox &B, Variable v);
+   FlatFunction(const DagFun &f, const IntervalBox &B, Variable v);
 
    /// Destructor
    ~FlatFunction();
@@ -183,7 +190,10 @@ public:
    size_t insertBinary(FlatSymbol symb, size_t il, size_t ir);
 
    /// Inserts a power node and returns its index
-   size_t insertPow(FlatSymbol symb, size_t ic, int e);
+   size_t insertPow(size_t ic, unsigned int e);
+
+   /// Inserts a power node and returns its index
+   size_t insertPowr(size_t ic, const double &r);
 
    /// Inserts a linear term x*v
    size_t insertLin(const Interval &x, Variable v);
@@ -270,6 +280,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -278,6 +289,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    FlatFunction *f_; // target function
@@ -308,6 +325,7 @@ public:
    void apply(const DagSqr *d) override;
    void apply(const DagSqrt *d) override;
    void apply(const DagPow *d) override;
+   void apply(const DagPowr *d) override;
    void apply(const DagExp *d) override;
    void apply(const DagLog *d) override;
    void apply(const DagCos *d) override;
@@ -316,6 +334,12 @@ public:
    void apply(const DagCosh *d) override;
    void apply(const DagSinh *d) override;
    void apply(const DagTanh *d) override;
+   void apply(const DagAcos *d) override;
+   void apply(const DagAsin *d) override;
+   void apply(const DagAtan *d) override;
+   void apply(const DagAcosh *d) override;
+   void apply(const DagAsinh *d) override;
+   void apply(const DagAtanh *d) override;
    void apply(const DagLin *d) override;
    ///@}
 
@@ -354,6 +378,7 @@ public:
    void apply(const DagSqr *d) override;
    void apply(const DagSqrt *d) override;
    void apply(const DagPow *d) override;
+   void apply(const DagPowr *d) override;
    void apply(const DagExp *d) override;
    void apply(const DagLog *d) override;
    void apply(const DagCos *d) override;
@@ -362,6 +387,12 @@ public:
    void apply(const DagCosh *d) override;
    void apply(const DagSinh *d) override;
    void apply(const DagTanh *d) override;
+   void apply(const DagAcos *d) override;
+   void apply(const DagAsin *d) override;
+   void apply(const DagAtan *d) override;
+   void apply(const DagAcosh *d) override;
+   void apply(const DagAsinh *d) override;
+   void apply(const DagAtanh *d) override;
    void apply(const DagLin *d) override;
    ///@}
 

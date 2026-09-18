@@ -1,0 +1,720 @@
+/*------------------------------------------------------------------------------
+ * Realpaver -- Realpaver is a rigorous nonlinear constraint solver based on
+ *              interval computations.
+ *------------------------------------------------------------------------------
+ * Copyright (c) 2004-2016 Laboratoire d'Informatique de Nantes Atlantique,
+ *               France
+ * Copyright (c) 2017-2024 Laboratoire des Sciences du Numérique de Nantes,
+ *               France
+ *------------------------------------------------------------------------------
+ * Realpaver is a software distributed WITHOUT ANY WARRANTY. Read the COPYING
+ * file for information.
+ *----------------------------------------------------------------------------*/
+
+/**
+ * @file   Solver.cpp
+ * @brief  Solver of constraint systems
+ * @author Laurent Granvilliers
+ * @date   11 Apr 2024
+ */
+
+#include "AssertDebug.hpp"
+#include "realpaver/AssertDebug.hpp"
+#include "realpaver/DomainSlicerFactory.hpp"
+#include "realpaver/Logger.hpp"
+#include "realpaver/NodePropagatorList.hpp"
+#include "realpaver/SelectorLF.hpp"
+#include "realpaver/SelectorSF.hpp"
+#include "realpaver/Solver.hpp"
+#include "realpaver/SpaceBFS.hpp"
+#include "realpaver/SpaceDFS.hpp"
+#include "realpaver/SpaceDMDFS.hpp"
+#include "realpaver/SpaceHybridDFS.hpp"
+#include "realpaver/SplitDefault.hpp"
+#include "realpaver/SplitRR.hpp"
+#include <limits>
+#include <list>
+#include <string>
+
+namespace realpaver {
+
+Solver::Solver(const Problem &problem)
+    : problem_(nullptr)
+    , pp_(nullptr)
+    , context_(nullptr)
+    , env_(nullptr)
+    , space_(nullptr)
+    , propagator_(nullptr)
+    , split_(nullptr)
+    , factory_(nullptr)
+    , prover_(nullptr)
+    , stimer_()
+    , nbnodes_(0)
+    , withPreprocessing_(true)
+{
+   env_ = std::make_shared<EnvSolver>();
+   problem_ = std::make_shared<Problem>(problem);
+   pp_ = std::make_shared<Preprocessor>(problem_);
+}
+
+double Solver::getSolvingTime() const
+{
+   return stimer_.elapsedTime();
+}
+
+int Solver::getTotalNodes() const
+{
+   return nbnodes_;
+}
+
+void Solver::solve()
+{
+   LOG_MAIN("Input problem\n" << (*problem_));
+
+   int fp = env_->getParams()->getIntParam("FLOAT_PRECISION");
+   Logger::getInstance()->setFloatPrecision(fp);
+
+   withPreprocessing_ = env_->getParams()->getStrParam("PREPROCESSING") == "YES";
+   pp_->apply(withPreprocessing_);
+
+   if (!pp_->isSolved())
+      branchAndPrune();
+}
+
+void Solver::makeSpace()
+{
+   LOG_LOW("Makes the space in the solver");
+
+   SharedProblem newprob = pp_->destProblem();
+
+   // gets the strategy from the parameters
+   std::string s = env_->getParams()->getStrParam("BP_NODE_SELECTION");
+   if (s == "DFS")
+      space_ = std::make_shared<SpaceDFS>();
+
+   else if (s == "BFS")
+      space_ = std::make_shared<SpaceBFS>();
+
+   else if (s == "DMDFS")
+      space_ = std::make_shared<SpaceDMDFS>();
+
+   else if (s == "IDFS")
+      space_ = std::make_shared<SpaceHybridDFS>(HybridDFSStyle::Depth);
+
+   else if (s == "PDFS")
+      space_ = std::make_shared<SpaceHybridDFS>(HybridDFSStyle::Perimeter);
+
+   else if (s == "GPDFS")
+      space_ = std::make_shared<SpaceHybridDFS>(HybridDFSStyle::GridPerimeter);
+
+   THROW_IF(space_ == nullptr, "Unable to make the space object in the solver");
+
+   // creates and inserts the root node
+   SharedNode node = std::make_shared<Node>(newprob->scope(), newprob->nbCtrs());
+   node->setAllActive();
+   node->setIndex(0);
+
+   space_->pushPendingNode(node);
+   ++nbnodes_;
+}
+
+void Solver::makePropagator()
+{
+   LOG_LOW("Makes the propagator in the solver");
+
+   std::unique_ptr<NodePropagatorList> aux = std::make_unique<NodePropagatorList>();
+
+   // Constraint propagation algorithm: HC4 or AFFIBE
+   std::string base = env_->getParams()->getStrParam("PROPAGATION_BASE");
+
+   if (base == "HC4")
+      aux->pushBack(NodePropagAlgo::HC4, *factory_);
+   else if (base == "AFFINE")
+      aux->pushBack(NodePropagAlgo::AFFINE, *factory_);
+   else
+      THROW("Bad parameter value for the propagation algorithm");
+
+   // ACID contractor: YES or NO
+   std::string with_acid = env_->getParams()->getStrParam("PROPAGATION_WITH_ACID");
+
+   if (with_acid == "YES")
+      aux->pushBack(NodePropagAlgo::ACID, *factory_);
+
+   // Polytope hull contractor: YES or NO
+   std::string with_polytope =
+       env_->getParams()->getStrParam("PROPAGATION_WITH_POLYTOPE_HULL");
+
+   if (with_polytope == "YES")
+      aux->pushBack(NodePropagAlgo::Polytope, *factory_);
+
+   // Newton: YES or NO
+   std::string with_newton = env_->getParams()->getStrParam("PROPAGATION_WITH_NEWTON");
+
+   if (with_newton == "YES")
+      aux->pushBack(NodePropagAlgo::Newton, *factory_);
+
+   if (aux->size() == 0)
+      THROW("Unable to create the propagator in the solver");
+
+   propagator_ = std::move(aux);
+}
+
+void Solver::makeSplit()
+{
+   LOG_LOW("Makes the split object in the solver");
+
+   SharedProblem newprob = pp_->destProblem();
+   Scope scop = newprob->scope();
+
+   // makes the slicer
+   std::string sli = env_->getParams()->getStrParam("SPLIT_SLICING");
+   std::unique_ptr<DomainSlicerMap> smap = nullptr;
+
+   if (sli == "BI")
+   {
+      double sip = env_->getParams()->getDblParam("SPLIT_INTERVAL_POINT");
+      smap = DomainSlicerFactory::makeBiStrategy(sip);
+   }
+
+   THROW_IF(smap == nullptr, "Unable to make the split object in the solver");
+
+   // makes the spliting object acording the variable selection strategy
+   std::string sel = env_->getParams()->getStrParam("SPLIT_SELECTION");
+
+   if (sel == "RR")
+   {
+      split_ = std::make_unique<SplitRR>(scop, std::move(smap));
+   }
+   else if (sel == "DEFAULT")
+   {
+      // continuous variables
+      std::string cont_var = env_->getParams()->getStrParam("SPLIT_CONTINUOUS");
+      std::unique_ptr<Selector> slc = nullptr;
+
+      if (newprob->scope().continuousScope().isEmpty())
+      {
+         slc = std::make_unique<SelectorLF>(Scope());
+      }
+      else if (cont_var == "LF")
+      {
+         slc = std::make_unique<SelectorLF>(newprob->scope().continuousScope());
+      }
+      else if (cont_var == "SSR")
+      {
+         IntervalFunctionVector F(factory_->extDag());
+         slc = std::make_unique<SelectorSSR>(F);
+      }
+      THROW_IF(slc == nullptr, "Bad option");
+
+      std::unique_ptr<Selector> sld =
+          std::make_unique<SelectorSF>(newprob->scope().discreteScope());
+
+      std::unique_ptr<SplitDefault> sdef = std::make_unique<SplitDefault>(
+          scop, std::move(smap), std::move(slc), std::move(sld));
+
+      // assigns the parameters
+      double sdef_rr = env_->getParams()->getDblParam("SPLIT_DEFAULT_RR_CYCLE");
+      double sdef_spe = env_->getParams()->getDblParam("SPLIT_DEFAULT_SPECIFIC_CYCLE");
+      bool discrete_first =
+          (env_->getParams()->getStrParam("SPLIT_DISCRETE_FIRST") == "YES");
+
+      int nb_rr = sdef_rr * scop.size();
+      int nb_spe = sdef_spe * scop.size();
+
+      sdef->setCycleLengthRR(nb_rr);
+      sdef->setCycleLength(nb_rr + nb_spe);
+      sdef->setDiscreteFirst(discrete_first);
+
+      split_ = std::move(sdef);
+   }
+
+   THROW_IF(split_ == nullptr, "Unable to make the split object in the solver");
+
+   // is the objective variable splitable?
+   std::string splitobj = env_->getParams()->getStrParam("SPLIT_OBJECTIVE");
+   if (splitobj == "NO" && newprob->hasObjective())
+   {
+      Variable z = newprob->getObjective().getVar();
+      z.setSplitable(false);
+   }
+}
+
+// this method is called after a propagation step => it is not possible
+// to detect an inconsistency
+Proof Solver::checkActivity(Node &node)
+{
+   bool inactive = true;
+   IntervalBox B(*node.box());
+   SharedProblem newprob = pp_->destProblem();
+
+   for (size_t i = 0; i < newprob->nbCtrs(); ++i)
+   {
+      Constraint c = newprob->ctrAt(i);
+      int ic = c.id();
+
+      if (node.isInactive(ic))
+         continue;
+
+      Proof proof = c.isSatisfied(B);
+      if (proof == Proof::Inner)
+      {
+         node.setInactive(ic);
+      }
+      else
+      {
+         inactive = false;
+      }
+   }
+   return inactive ? Proof::Inner : Proof::Maybe;
+}
+
+void Solver::bpStep(int depthlimit, bool splitOff)
+{
+#if REALPAVER_LOG_ON
+   static Timer timerStep;
+   timerStep.start();
+#endif
+
+   // extracts a node from the space
+   SharedNode node = space_->popPendingNode();
+
+   // processes it
+   bpStepAux(node, depthlimit, splitOff);
+
+   // removes the node informations
+   context_->remove(node->index());
+
+#if REALPAVER_LOG_ON
+   timerStep.stop();
+   LOG_INTER("Total time steps : " << timerStep.elapsedTime() << "(s)");
+#endif
+}
+
+void Solver::bpStepAux(SharedNode node, int depthlimit, bool splitOff)
+{
+#if REALPAVER_LOG_ON
+   static Timer timerPropag, timerSplit;
+#endif
+
+   LOG_NL_INTER();
+   LOG_INTER("Extracts node " << node->index() << " (depth " << node->depth() << ")");
+   LOG_LOW("Node: " << (*node->box()));
+
+   node->setProof(Proof::Maybe);
+
+#if REALPAVER_LOG_ON
+   timerPropag.start();
+#endif
+
+   // contracts the box
+   Proof proof = propagator_->contract(*node, *context_);
+
+#if REALPAVER_LOG_ON
+   timerPropag.stop();
+   LOG_INTER("Total time contraction : " << timerPropag.elapsedTime() << "(s)");
+#endif
+
+   LOG_INTER("Contraction -> " << proof);
+
+   if (proof == Proof::Empty)
+   {
+      node->setProof(Proof::Empty);
+      return;
+   }
+   else
+   {
+      LOG_INTER("Contracted box: " << (*node->box()));
+   }
+
+   // checks the activity of constraints
+   proof = checkActivity(*node);
+   if (proof == Proof::Inner)
+   {
+      LOG_INTER("Node " << node->index() << " has an inner box");
+      node->setProof(Proof::Inner);
+      std::string str = env_->getParams()->getStrParam("SPLIT_INNER_BOX");
+      if (str == "NO")
+      {
+         space_->pushSolNode(node);
+         return;
+      }
+   }
+
+   // node depth limit
+   int depth = node->depth() + 1;
+   if (depth >= depthlimit)
+   {
+      LOG_INTER("Node fathomed due to the depth limit");
+      env_->setDepthLimit(true);
+      return;
+   }
+
+#if REALPAVER_LOG_ON
+   timerSplit.start();
+#endif
+
+   // splits the node
+   split_->apply(node, *context_);
+
+   if (split_->getNbNodes() <= 1)
+   {
+      LOG_INTER("Node " << node->index() << " is a solution");
+      LOG_LOW(*node->box());
+
+      space_->pushSolNode(node);
+   }
+   else
+   {
+      LOG_INTER("Node " << node->index() << " is split into " << split_->getNbNodes()
+                        << " sub-nodes");
+
+#if REALPAVER_LOG_ON
+      if (!splitOff)
+         for (auto it = split_->begin(); it != split_->end(); ++it)
+         {
+            SharedNode subnode = *it;
+            LOG_INTER("Inserts node " << subnode->index() << " in the space");
+            LOG_LOW(*subnode->box());
+         }
+#endif
+
+      if (splitOff)
+      {
+         LOG_INTER("Node limit reached");
+         space_->pushPendingNode(node);
+      }
+      else
+      {
+         nbnodes_ += std::distance(split_->begin(), split_->end());
+         for (auto it = split_->begin(); it != split_->end(); ++it)
+            space_->pushPendingNode(*it);
+      }
+   }
+
+#if REALPAVER_LOG_ON
+   timerSplit.stop();
+   LOG_INTER("Total time split : " << timerSplit.elapsedTime() << "(s)");
+#endif
+}
+
+void Solver::branchAndPrune()
+{
+   SharedProblem newprob = pp_->destProblem();
+
+   LOG_MAIN("Branch-and-prune algorithm on the following problem\n" << (*newprob));
+   LOG_INTER("Parameters\n" << *env_->getParams());
+
+   stimer_.start();
+   context_ = std::make_unique<NodeContext>();
+
+   LOG_NL_LOW();
+   LOG_LOW("Makes the factory in the solver");
+   factory_ = std::make_unique<ContractorFactory>(*newprob, env_);
+
+   makeSpace();
+
+   makePropagator();
+
+   makeSplit();
+
+   // prover that derives proof certificates of the solutions
+   prover_ = std::make_unique<Prover>(factory_->extDag());
+   prover_->setInitBox(IntervalBox(newprob->scope()));
+
+   int niter = env_->getParams()->getIntParam("NEWTON_CERTIFY_ITER_LIMIT");
+   prover_->setMaxIter(niter);
+
+   double delta = env_->getParams()->getDblParam("INFLATION_DELTA");
+   prover_->setInflationDelta(delta);
+
+   double chi = env_->getParams()->getDblParam("INFLATION_CHI");
+   prover_->setInflationChi(chi);
+
+   // parameters
+   bool trace = env_->getParams()->getStrParam("TRACE") == "YES";
+   int tracefreq = env_->getParams()->getIntParam("TRACE_FREQUENCY");
+   bool limits = (env_->getParams()->getStrParam("LIMITS_ENABLED") == "YES");
+
+   double time_limit;
+   int node_limit, sol_limit, depth_limit;
+
+   if (limits)
+   {
+      time_limit = env_->getParams()->getDblParam("TIME_LIMIT");
+      node_limit = env_->getParams()->getIntParam("NODE_LIMIT");
+      sol_limit = env_->getParams()->getIntParam("SOLUTION_LIMIT");
+      depth_limit = env_->getParams()->getIntParam("DEPTH_LIMIT");
+   }
+   else
+   {
+      time_limit = Double::inf();
+      node_limit = std::numeric_limits<int>::max();
+      sol_limit = std::numeric_limits<int>::max();
+      depth_limit = std::numeric_limits<int>::max();
+   }
+
+   env_->setTimeLimit(false);
+   env_->setNodeLimit(false);
+   env_->setSolutionLimit(false);
+   env_->setDepthLimit(false);
+
+   bool iter = true;
+   size_t last_nb_sol = 0;
+   size_t nb_nodes_processed = 0;
+
+#if REALPAVER_LOG_ON
+   static Timer timerBP;
+   timerBP.start();
+#endif
+
+   do
+   {
+      ++nb_nodes_processed;
+      bool splitOff = nbnodes_ >= node_limit;
+      bpStep(depth_limit, splitOff);
+
+      // trace every new solution
+      size_t nb_sol = space_->nbSolNodes();
+      if (nb_sol > last_nb_sol)
+      {
+         last_nb_sol = nb_sol;
+         if (trace)
+         {
+            std::cout << "\tnb sol: " << "\033[34m" << nb_sol << "\033[39m"
+                      << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime() << "s"
+                      << "\033[39m"
+                      << "\t\tspace size: " << "\033[31m" << space_->nbPendingNodes()
+                      << "\033[39m" << std::endl;
+         }
+      }
+
+      // trace every N nodes where N is the frequency
+      if (trace && nb_nodes_processed % tracefreq == 0)
+      {
+         std::cout << "\tnb nod: " << "\033[34m" << nb_nodes_processed << "\033[39m"
+                   << "\t\ttime: " << "\033[32m" << stimer_.elapsedTime() << "s"
+                   << "\033[39m"
+                   << "\t\tspace size: " << "\033[31m" << space_->nbPendingNodes()
+                   << "\033[39m" << std::endl;
+      }
+
+      // tests the stopping criteria
+      if (space_->nbPendingNodes() == 0)
+      {
+         LOG_MAIN("Stops since there is no more pending node");
+         iter = false;
+      }
+
+      if (iter && pp_->elapsedTime() + stimer_.elapsedTime() > time_limit)
+      {
+         LOG_MAIN("Stops on time limit (" << time_limit << "s)");
+         env_->setTimeLimit(true);
+         iter = false;
+      }
+
+      if (iter && splitOff)
+      {
+         LOG_MAIN("Stops on node limit (" << node_limit << ")");
+         env_->setNodeLimit(true);
+         iter = false;
+      }
+
+      if (iter && (int)space_->nbSolNodes() >= sol_limit)
+      {
+         LOG_MAIN("Stops on solution limit (" << sol_limit << ")");
+         env_->setSolutionLimit(true);
+         iter = false;
+      }
+
+#if REALPAVER_LOG_ON
+      LOG_INTER("Total time BP : " << timerBP.elapsedTime() << "(s)");
+#endif
+   } while (iter);
+
+   double gap = env_->getParams()->getDblParam("SOLUTION_CLUSTER_GAP");
+   space_->makeSolClusters(gap);
+
+#if REALPAVER_LOG_ON
+   timerBP.stop();
+   LOG_INTER("Total time BP : " << timerBP.elapsedTime() << "(s)");
+#endif
+
+   LOG_NL_MAIN();
+
+   std::string sc = env_->getParams()->getStrParam("CERTIFICATION");
+   if (sc == "YES")
+   {
+      LOG_INTER("Certification a posteriori");
+      certifySolutions();
+   }
+   else
+   {
+      LOG_INTER("No Certification a posteriori");
+   }
+
+   stimer_.stop();
+}
+
+void Solver::certifySolutions()
+{
+   std::list<SharedNode> lsol;
+   while (space_->nbSolNodes() > 0)
+   {
+      SharedNode node = space_->popSolNode();
+      Proof proof = node->getProof();
+
+      DomainBox *dbox = node->box();
+      IntervalBox B(*dbox);
+
+      proof = prover_->certify(B);
+
+      if (proof != Proof::Empty)
+      {
+         // B may be different from the hull of dbox, typically when
+         // a Newton operator is applied by the prover; it is then necessary
+         // to modify dbox
+         for (const auto &v : B.scope())
+         {
+            Interval x = B.get(v), y = dbox->get(v)->intervalHull();
+
+            if (x.isSetNeq(y))
+            {
+               std::unique_ptr<IntervalDomain> dom(new IntervalDomain(x));
+               dbox->set(v, std::move(dom));
+            }
+         }
+
+         node->setProof(proof);
+         lsol.push_back(node);
+      }
+   }
+
+   while (!lsol.empty())
+   {
+      space_->pushSolNode(lsol.front());
+      lsol.pop_front();
+   }
+}
+
+std::shared_ptr<EnvSolver> Solver::getEnv() const
+{
+   return env_;
+}
+
+std::shared_ptr<Space<Node>> Solver::getSpace() const
+{
+   return space_;
+}
+
+SharedPreprocessor Solver::getPreprocessor() const
+{
+   return pp_;
+}
+
+size_t Solver::nbSolutions() const
+{
+   if (withPreprocessing_ && pp_->isSolved())
+      return pp_->isUnfeasible() ? 0 : 1;
+
+   else
+      return space_->nbSolNodes();
+}
+
+std::pair<DomainBox, Proof> Solver::getSolution(size_t i) const
+{
+   REALPAVER_ASSERT(i < nbSolutions(), "Bad access to a solution in the solver @ " << i);
+
+   if (withPreprocessing_)
+   {
+      DomainBox box(problem_->scope());
+      Proof proof = Proof::Inner;
+
+      // assigns the values of the fixed variables
+      for (size_t i = 0; i < pp_->nbFixedVars(); ++i)
+      {
+         Variable v = pp_->getFixedVar(i);
+         Interval x = pp_->getFixedDomain(v);
+         Domain *dom = box.get(v);
+         dom->contract(x);
+      }
+
+      // assigns the values of the unfixed variables
+      if (!pp_->allVarsFixed())
+      {
+         SharedNode node = space_->getSolNode(i);
+         proof = node->getProof();
+
+         DomainBox *aux = node->box();
+
+         for (size_t i = 0; i < pp_->nbUnfixedVars(); ++i)
+         {
+            Variable v = pp_->getUnfixedVar(i);
+            Variable w = pp_->srcToDestVar(v);
+            std::unique_ptr<Domain> p(aux->get(w)->clone());
+            box.set(v, std::move(p));
+         }
+      }
+
+      return std::make_pair(box, proof);
+   }
+   else
+   {
+      SharedNode node = space_->getSolNode(i);
+      Proof proof = node->getProof();
+      DomainBox aux(*node->box());
+      return std::make_pair(aux, proof);
+   }
+}
+
+size_t Solver::nbPendingNodes() const
+{
+   if (pp_->isSolved())
+      return 0;
+
+   else
+      return space_->nbPendingNodes();
+}
+
+DomainBox Solver::getPendingBox(size_t i) const
+{
+   REALPAVER_ASSERT(i < nbPendingNodes(), "Bad access to a pending box in the solver");
+
+   if (withPreprocessing_)
+   {
+      DomainBox box(problem_->scope());
+
+      // assigns the values of the fixed variables
+      for (size_t i = 0; i < pp_->nbFixedVars(); ++i)
+      {
+         Variable v = pp_->getFixedVar(i);
+         Interval x = pp_->getFixedDomain(v);
+         Domain *dom = box.get(v);
+         dom->contract(x);
+      }
+
+      // assigns the values of the unfixed variables
+      if (!pp_->allVarsFixed())
+      {
+         SharedNode node = space_->getPendingNode(i);
+         DomainBox *aux = node->box();
+
+         for (size_t i = 0; i < pp_->nbUnfixedVars(); ++i)
+         {
+            Variable v = pp_->getUnfixedVar(i);
+            Variable w = pp_->srcToDestVar(v);
+            std::unique_ptr<Domain> p(aux->get(w)->clone());
+            box.set(v, std::move(p));
+         }
+      }
+
+      return box;
+   }
+   else
+   {
+      SharedNode node = space_->getPendingNode(i);
+      DomainBox aux(*node->box());
+      return aux;
+   }
+}
+
+} // namespace realpaver

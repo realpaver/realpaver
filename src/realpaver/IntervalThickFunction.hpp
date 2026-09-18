@@ -15,7 +15,7 @@
  * @file   IntervalThickFunction.hpp
  * @brief  Thick interval function
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_THICK_FUNCTION_HPP
@@ -45,7 +45,7 @@ public:
     * Creates a thick function from the i-th function of a dag with v as
     * argument.
     */
-   IntervalThickFunction(SharedDag dag, size_t i, Variable v);
+   IntervalThickFunction(SharedDagFun f, Variable v);
 
    /// Default copy constructor
    IntervalThickFunction(const IntervalThickFunction &) = default;
@@ -74,10 +74,10 @@ public:
    Variable getVar() const;
 
    /// Returns the function in the dag
-   DagFun *getFun() const;
+   SharedDagFun getFun() const;
 
 private:
-   DagFun *f_;          // function in the dag
+   SharedDagFun f_;     // function in the dag
    Variable v_;         // variable of this univariate function
    FlatFunction *flat_; // flat function
    IntervalBox B_;      // auxiliary box used to evaluate the function

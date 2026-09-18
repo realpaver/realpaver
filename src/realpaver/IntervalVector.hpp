@@ -15,7 +15,7 @@
  * @file   IntervalVector.hpp
  * @brief  Vector of intervals
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_VECTOR_HPP
@@ -62,7 +62,7 @@ public:
    bool equals(const IntervalVector &X) const;
 
    /// Returns the i-th element of this
-   Interval get(size_t i) const;
+   const Interval &get(size_t i) const;
 
    /// Sets the i-th element of this to x
    void set(size_t i, const Interval &x);

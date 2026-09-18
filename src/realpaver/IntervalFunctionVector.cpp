@@ -15,7 +15,7 @@
  * @file   IntervalFunctionVector.cpp
  * @brief  Vector of interval functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
@@ -28,6 +28,10 @@ IntervalFunctionVectorRep::~IntervalFunctionVectorRep()
 {
 }
 
+void IntervalFunctionVectorRep::update(const IntervalBox &B, const Bitset &active)
+{
+}
+
 /*----------------------------------------------------------------------------*/
 
 IntervalFunctionVector::IntervalFunctionVector()
@@ -35,8 +39,13 @@ IntervalFunctionVector::IntervalFunctionVector()
 {
 }
 
-IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
-    : rep_(std::make_shared<IntervalFunctionVectorDag>(dag))
+// IntervalFunctionVector::IntervalFunctionVector(SharedDag dag)
+//     : rep_(std::make_shared<IntervalFunctionVectorDag>(dag))
+// {
+// }
+
+IntervalFunctionVector::IntervalFunctionVector(SharedDagExtended edag)
+    : rep_(std::make_shared<IntervalFunctionVectorExtDag>(edag))
 {
 }
 
@@ -65,12 +74,20 @@ IntervalFunctionVector::SharedRep IntervalFunctionVector::rep() const
 IntervalFunctionVector::IntervalFunctionVector(SharedRep rep)
     : rep_(rep)
 {
-   ASSERT(rep != nullptr, "Creation of an interval function vector from a null pointer");
+   REALPAVER_ASSERT(rep != nullptr,
+                    "Creation of an interval function vector from a null pointer");
+}
+
+void IntervalFunctionVector::update(const IntervalBox &B, const Bitset &active)
+{
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+
+   rep_->update(B, active);
 }
 
 Scope IntervalFunctionVector::scope() const
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
    return rep_->scope();
 }
@@ -100,7 +117,7 @@ bool IntervalFunctionVector::isSquare() const
 
 IntervalFunction IntervalFunctionVector::fun(size_t i) const
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
    return rep_->fun(i);
 }
@@ -132,39 +149,57 @@ void IntervalFunctionVector::addFun(IntervalFunction f)
 
 void IntervalFunctionVector::eval(const IntervalBox &B, IntervalVector &val)
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
    return rep_->eval(B, val);
 }
 
 void IntervalFunctionVector::diff(const IntervalBox &B, IntervalMatrix &J)
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
    rep_->diff(B, J);
 }
 
-void IntervalFunctionVector::diffHansen(const IntervalBox &B, const RealPoint &c,
+void IntervalFunctionVector::diffHansen(const IntervalBox &B, const IntervalBox &c,
                                         IntervalMatrix &H)
 {
-   ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
 
-   rep_->diffHansen(B, c, H);
+   rep_->diffHansen(B, c, scope(), H);
+}
+
+void IntervalFunctionVector::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                        const Scope &scop, IntervalMatrix &H)
+{
+   REALPAVER_ASSERT(rep_ != nullptr, "Interval function vector with no representation");
+
+   rep_->diffHansen(B, c, scop, H);
 }
 
 /*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorDag::IntervalFunctionVectorDag(SharedDag dag)
-    : dag_(dag)
+    : IntervalFunctionVectorRep()
+    , dag_(dag)
 {
-   ASSERT(dag->nbFuns() > 0, "Creation of an interval function vector from an empty Dag");
+   REALPAVER_ASSERT(dag->nbFuns() > 0,
+                    "Creation of an interval function vector from an empty Dag");
+
+   vl_ = std::make_shared<IntervalFunctionVectorList>();
+
+   for (size_t i = 0; i < dag_->nbFuns(); ++i)
+   {
+      vl_->addFun(dag_->fun(i));
+   }
 }
 
 IntervalFunctionVectorDag::IntervalFunctionVectorDag(
     const std::initializer_list<Term> &lt)
     : dag_(nullptr)
 {
-   ASSERT(lt.size() > 0, "Creation of an interval function vector from an empty list");
+   REALPAVER_ASSERT(lt.size() > 0,
+                    "Creation of an interval function vector from an empty list");
 
    dag_ = std::make_shared<Dag>();
    for (const auto &t : lt)
@@ -175,9 +210,11 @@ IntervalFunctionVectorDag::IntervalFunctionVectorDag(
     const std::initializer_list<Term> &lt, const std::initializer_list<Interval> &li)
     : dag_(nullptr)
 {
-   ASSERT(lt.size() > 0, "Creation of an interval function vector from an empty list");
+   REALPAVER_ASSERT(lt.size() > 0,
+                    "Creation of an interval function vector from an empty list");
 
-   ASSERT(lt.size() == li.size(), "Bad initialization of an interval function vector ");
+   REALPAVER_ASSERT(lt.size() == li.size(),
+                    "Bad initialization of an interval function vector ");
 
    auto it = lt.begin();
    auto jt = li.begin();
@@ -207,9 +244,13 @@ size_t IntervalFunctionVectorDag::nbFuns() const
 
 IntervalFunction IntervalFunctionVectorDag::fun(size_t i) const
 {
-   ASSERT(i < nbFuns(), "Bad access to an interval function in a vector");
+   REALPAVER_ASSERT(i < nbFuns(), "Bad access to an interval function in a vector");
 
-   return IntervalFunction(dag_, i);
+   return IntervalFunction(dag_->fun(i));
+}
+
+void IntervalFunctionVectorDag::update(const IntervalBox &B, const Bitset &active)
+{
 }
 
 void IntervalFunctionVectorDag::eval(const IntervalBox &B, IntervalVector &val)
@@ -222,16 +263,17 @@ void IntervalFunctionVectorDag::diff(const IntervalBox &B, IntervalMatrix &J)
    dag_->iDiff(B, J);
 }
 
-void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, const RealPoint &c,
-                                           IntervalMatrix &H)
+void IntervalFunctionVectorDag::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                           const Scope &scop, IntervalMatrix &H)
 {
-   dag_->iDiffHansen(B, c, H);
+   dag_->iDiffHansen(B, c, scop, H);
 }
 
 /*----------------------------------------------------------------------------*/
 
 IntervalFunctionVectorList::IntervalFunctionVectorList()
-    : vf_()
+    : IntervalFunctionVectorRep()
+    , vf_()
     , scop_()
 {
 }
@@ -269,14 +311,14 @@ size_t IntervalFunctionVectorList::nbFuns() const
 
 IntervalFunction IntervalFunctionVectorList::fun(size_t i) const
 {
-   ASSERT(i < nbFuns(), "Bad access in a function vector @ " << i);
+   REALPAVER_ASSERT(i < nbFuns(), "Bad access in a function vector @ " << i);
    return vf_[i];
 }
 
 void IntervalFunctionVectorList::eval(const IntervalBox &B, IntervalVector &val)
 {
-   ASSERT(val.size() == nbFuns(),
-          "Bad size of vector given for the evaluation of a function vector");
+   REALPAVER_ASSERT(val.size() == nbFuns(),
+                    "Bad size of vector given for the evaluation of a function vector");
 
    for (size_t i = 0; i < nbFuns(); ++i)
       val[i] = vf_[i].eval(B);
@@ -284,8 +326,8 @@ void IntervalFunctionVectorList::eval(const IntervalBox &B, IntervalVector &val)
 
 void IntervalFunctionVectorList::diff(const IntervalBox &B, IntervalMatrix &J)
 {
-   ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a function vector");
+   REALPAVER_ASSERT(nbVars() == J.ncols() && nbFuns() == J.nrows(),
+                    "Bad dimensions of a Jacobian matrix used in a function vector");
 
    for (size_t i = 0; i < nbFuns(); ++i)
    {
@@ -309,11 +351,13 @@ void IntervalFunctionVectorList::diff(const IntervalBox &B, IntervalMatrix &J)
    }
 }
 
-void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoint &c,
-                                            IntervalMatrix &H)
+void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                            const Scope &scop, IntervalMatrix &H)
 {
-   ASSERT(nbVars() == H.ncols() && nbFuns() == H.nrows(),
-          "Bad dimensions of a Jacobian matrix used in a function vector");
+   REALPAVER_ASSERT(scope().contains(scop), "Bad scope");
+
+   REALPAVER_ASSERT(scop.size() == H.ncols() && nbFuns() == H.nrows(),
+                    "Bad dimensions of a Jacobian matrix used in a function vector");
 
    for (size_t i = 0; i < nbFuns(); ++i)
    {
@@ -324,7 +368,7 @@ void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoin
 
       // fills the i-th row of the matrix
       size_t j = 0;
-      for (auto v : scope())
+      for (auto v : scop)
       {
          if (f.scope().contains(v))
             H.set(i, j, G.get(f.scope().index(v)));
@@ -335,6 +379,63 @@ void IntervalFunctionVectorList::diffHansen(const IntervalBox &B, const RealPoin
          ++j;
       }
    }
+}
+
+/*----------------------------------------------------------------------------*/
+
+IntervalFunctionVectorExtDag::IntervalFunctionVectorExtDag(SharedDagExtended edag)
+    : IntervalFunctionVectorRep()
+    , edag_(edag)
+    , vl_(nullptr)
+{
+}
+
+void IntervalFunctionVectorExtDag::update(const IntervalBox &B, const Bitset &active)
+{
+   vl_ = std::make_shared<IntervalFunctionVectorList>();
+
+   for (size_t i = 0; i < edag_->size(); ++i)
+   {
+      SharedDagFun f = edag_->getActiveFun(i, B, active);
+      if (f != nullptr)
+         vl_->addFun(f);
+   }
+}
+
+Scope IntervalFunctionVectorExtDag::scope() const
+{
+   return (vl_ == nullptr) ? Scope() : vl_->scope();
+}
+
+size_t IntervalFunctionVectorExtDag::nbVars() const
+{
+   return (vl_ == nullptr) ? 0 : vl_->nbVars();
+}
+
+size_t IntervalFunctionVectorExtDag::nbFuns() const
+{
+   return (vl_ == nullptr) ? 0 : vl_->nbFuns();
+}
+
+IntervalFunction IntervalFunctionVectorExtDag::fun(size_t i) const
+{
+   return vl_->fun(i);
+}
+
+void IntervalFunctionVectorExtDag::eval(const IntervalBox &B, IntervalVector &val)
+{
+   return vl_->eval(B, val);
+}
+
+void IntervalFunctionVectorExtDag::diff(const IntervalBox &B, IntervalMatrix &J)
+{
+   return vl_->diff(B, J);
+}
+
+void IntervalFunctionVectorExtDag::diffHansen(const IntervalBox &B, const IntervalBox &c,
+                                              const Scope &scop, IntervalMatrix &H)
+{
+   return vl_->diffHansen(B, c, scop, H);
 }
 
 } // namespace realpaver

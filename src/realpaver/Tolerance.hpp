@@ -15,7 +15,7 @@
  * @file   Tolerance.hpp
  * @brief  Tolerances for numerical computations
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_TOLERANCE_HPP
@@ -68,6 +68,13 @@ public:
 
    /// Return true if every component of X is tight enough, false otherwise
    bool isTight(const IntervalVector &X) const;
+
+   /**
+    * @brief Tests if the enclosure of a global optimum is tight enough.
+    *
+    * Return true if we have u-l <= max(rtol*|u|, atol).
+    */
+   bool isTightOptimum(const double &l, const double &u) const;
 
    /**
     * @brief Gets the largest interval having this tolerance.

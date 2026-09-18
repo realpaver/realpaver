@@ -15,10 +15,9 @@
  * @file   Env.cpp
  * @brief  Base class of environments for solvers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Env.hpp"
 
 namespace realpaver {
@@ -72,26 +71,6 @@ void Env::setNodeLimit(bool b)
 bool Env::usedNodeLimit() const
 {
    return nlim_;
-}
-
-void Env::setPresolved(bool b)
-{
-   presolved_ = b;
-}
-
-bool Env::isPresolved() const
-{
-   return presolved_;
-}
-
-void Env::setConstraintViolated(bool b)
-{
-   cviol_ = b;
-}
-
-bool Env::hasConstraintViolated() const
-{
-   return cviol_;
 }
 
 } // namespace realpaver

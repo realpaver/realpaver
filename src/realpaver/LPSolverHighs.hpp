@@ -15,7 +15,7 @@
  * @file   LPSolverHighs.hpp
  * @brief  Wrapper class for the LP solver Highs
  * @author Raphaël Chenouard, Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_LPSOLVER_HIGHS_HPP

@@ -15,13 +15,12 @@
  * @file   Term.cpp
  * @brief  Terms (nonlinear expressions)
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Term.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Logger.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/Term.hpp"
 
 namespace realpaver {
 
@@ -57,6 +56,8 @@ std::ostream &operator<<(std::ostream &os, TermSymbol op)
       return os << "sqrt";
    case TermSymbol::Pow:
       return os << "pow";
+   case TermSymbol::Powr:
+      return os << "powr";
    case TermSymbol::Exp:
       return os << "exp";
    case TermSymbol::Log:
@@ -73,6 +74,18 @@ std::ostream &operator<<(std::ostream &os, TermSymbol op)
       return os << "sinh";
    case TermSymbol::Tanh:
       return os << "tanh";
+   case TermSymbol::Acos:
+      return os << "acos";
+   case TermSymbol::Asin:
+      return os << "asin";
+   case TermSymbol::Atan:
+      return os << "atan";
+   case TermSymbol::Acosh:
+      return os << "acosh";
+   case TermSymbol::Asinh:
+      return os << "asinh";
+   case TermSymbol::Atanh:
+      return os << "atanh";
    default:
       os.setstate(std::ios::failbit);
    }
@@ -334,6 +347,11 @@ bool Term::isLinear() const
    return rep_->isLinear();
 }
 
+bool Term::isPolynomial() const
+{
+   return rep_->isPolynomial();
+}
+
 bool Term::isInteger() const
 {
    return rep_->isInteger();
@@ -475,7 +493,7 @@ Term operator*(Term l, Term r)
 
 Term operator/(Term l, Term r)
 {
-   ASSERT(!r.isZero(), "Term divided by zero");
+   REALPAVER_ASSERT(!r.isZero(), "Term divided by zero");
 
    if (!Term::simplification())
       return Term(std::make_shared<TermDiv>(l.rep(), r.rep()));
@@ -604,56 +622,53 @@ Term sqrt(Term t)
       Interval x(sqrt(t.evalConst()));
       return Term(x);
    }
-
    else
       return Term(std::make_shared<TermSqrt>(t.rep()));
 }
 
+Term pow(Term t, unsigned int n)
+{
+   switch (n)
+   {
+   case 0:
+      return Term(1.0);
+   case 1:
+      return t;
+   case 2:
+      return sqr(t);
+   default:
+      if (Term::simplification() && t.isConstant())
+      {
+         Interval x(pow(t.evalConst(), n));
+         return Term(x);
+      }
+      return Term(std::make_shared<TermPow>(t.rep(), n));
+   }
+}
+
 Term pow(Term t, int n)
 {
-   if (!Term::simplification())
-      return Term(std::make_shared<TermPow>(t.rep(), n));
-
-   if (t.isConstant())
-   {
-      Interval x(pow(t.evalConst(), n));
-      return Term(x);
-   }
-
+   if (n < 0)
+      return 1.0 / pow(t, (unsigned int)(-n));
    else
-   {
-      switch (n)
-      {
-      case -2:
-         return Term(1.0) / sqr(t);
-      case -1:
-         return Term(1.0) / t;
-      case 0:
-         return Term(1.0);
-      case 1:
-         return t;
-      case 2:
-         return sqr(t);
-      }
-
-      if (n < 0)
-         return pow(t, double(n));
-
-      else
-         return Term(std::make_shared<TermPow>(t.rep(), n));
-   }
+      return pow(t, (unsigned int)n);
 }
 
 Term pow(Term t, double d)
 {
+   int n = (int)d;
+
+   if (n == d)
+      return pow(t, n);
+
    if (!Term::simplification())
-      return exp(d * log(t));
+      return Term(std::make_shared<TermPowr>(t.rep(), d));
 
-   if (d == 0.0)
-      return Term(1.0);
-
-   else if (d == 1.0)
-      return t;
+   if (t.isConstant())
+   {
+      Interval x(powr(t.evalConst(), d));
+      return Term(x);
+   }
 
    else if (d == 0.5)
       return sqrt(t);
@@ -661,45 +676,13 @@ Term pow(Term t, double d)
    else if (d == -0.5)
       return Term(1.0) / sqrt(t);
 
-   else if (t.isConstant())
-   {
-      Interval x(exp(d * log(t.evalConst())));
-      return Term(x);
-   }
-
    else
-   {
-      int n = int(d);
-
-      if (n == d && n > 0)
-         return pow(t, n);
-
-      else
-         return exp(d * log(t));
-   }
-}
-
-Term pow(Term t, const Interval &x)
-{
-   if (!Term::simplification())
-      return exp(x * log(t));
-
-   if (x.isSingleton())
-      return pow(t, x.left());
-
-   else
-      return exp(x * log(t));
+      return Term(std::make_shared<TermPowr>(t.rep(), d));
 }
 
 Term pow(Term t, Term e)
 {
-   if (e.isConstant())
-   {
-      Interval d = e.evalConst();
-      return pow(t, d);
-   }
-   else
-      return exp(e * log(t));
+   return exp(e * log(t));
 }
 
 Term exp(Term t)
@@ -822,13 +805,103 @@ Term tanh(Term t)
       return Term(std::make_shared<TermTanh>(t.rep()));
 }
 
+Term acos(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermAcos>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x(acos(t.evalConst()));
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermAcos>(t.rep()));
+}
+
+Term asin(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermAsin>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x(asin(t.evalConst()));
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermAsin>(t.rep()));
+}
+
+Term atan(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermAtan>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x(atan(t.evalConst()));
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermAtan>(t.rep()));
+}
+
+Term acosh(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermAcosh>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x(acosh(t.evalConst()));
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermAcosh>(t.rep()));
+}
+
+Term asinh(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermAsinh>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x(asinh(t.evalConst()));
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermAsinh>(t.rep()));
+}
+
+Term atanh(Term t)
+{
+   if (!Term::simplification())
+      return Term(std::make_shared<TermAtanh>(t.rep()));
+
+   if (t.isConstant())
+   {
+      Interval x(atanh(t.evalConst()));
+      return Term(x);
+   }
+
+   else
+      return Term(std::make_shared<TermAtanh>(t.rep()));
+}
+
 /*----------------------------------------------------------------------------*/
 
 TermCst::TermCst(const Interval &x)
     : TermRep(TermSymbol::Cst, NodePriority::Low)
     , x_(x)
 {
-   ASSERT(!x.isEmpty(), "Bad constant term " << x);
+   REALPAVER_ASSERT(!x.isEmpty(), "Bad constant term " << x);
 
    hcode_ = x.hashCode();
    constant_ = true;
@@ -899,6 +972,11 @@ bool TermCst::dependsOn(const Variable &v) const
 }
 
 bool TermCst::isLinear() const
+{
+   return true;
+}
+
+bool TermCst::isPolynomial() const
 {
    return true;
 }
@@ -974,6 +1052,11 @@ bool TermVar::dependsOn(const Variable &v) const
 }
 
 bool TermVar::isLinear() const
+{
+   return true;
+}
+
+bool TermVar::isPolynomial() const
 {
    return true;
 }
@@ -1081,6 +1164,11 @@ bool TermOp::isLinear() const
    return isConstant();
 }
 
+bool TermOp::isPolynomial() const
+{
+   return isConstant();
+}
+
 void TermOp::insert(const SharedRep &t)
 {
    v_.push_back(t);
@@ -1144,28 +1232,28 @@ size_t TermOp::arity() const
 
 TermRep::SharedRep TermOp::subTerm(size_t i) const
 {
-   ASSERT(i < arity(), "Access out of range to a term operand");
+   REALPAVER_ASSERT(i < arity(), "Access out of range to a term operand");
 
    return v_[i];
 }
 
 TermRep::SharedRep TermOp::left() const
 {
-   ASSERT(arity() == 2, "Access out of range to a term operand");
+   REALPAVER_ASSERT(arity() == 2, "Access out of range to a term operand");
 
    return v_[0];
 }
 
 TermRep::SharedRep TermOp::right() const
 {
-   ASSERT(arity() == 2, "Access out of range to a term operand");
+   REALPAVER_ASSERT(arity() == 2, "Access out of range to a term operand");
 
    return v_[1];
 }
 
 TermRep::SharedRep TermOp::child() const
 {
-   ASSERT(arity() == 1, "Access out of range to a term operand");
+   REALPAVER_ASSERT(arity() == 1, "Access out of range to a term operand");
 
    return v_[0];
 }
@@ -1207,6 +1295,11 @@ void TermAdd::acceptVisitor(TermVisitor &vis) const
 bool TermAdd::isLinear() const
 {
    return left()->isLinear() && right()->isLinear();
+}
+
+bool TermAdd::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isPolynomial();
 }
 
 TermRep *TermAdd::cloneRoot() const
@@ -1262,6 +1355,11 @@ void TermSub::acceptVisitor(TermVisitor &vis) const
 bool TermSub::isLinear() const
 {
    return left()->isLinear() && right()->isLinear();
+}
+
+bool TermSub::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isPolynomial();
 }
 
 bool TermSub::isIntegerRoot() const
@@ -1333,6 +1431,11 @@ bool TermMul::isLinear() const
           (left()->isLinear() && right()->isConstant());
 }
 
+bool TermMul::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isPolynomial();
+}
+
 bool TermMul::isIntegerRoot() const
 {
    return true;
@@ -1393,6 +1496,16 @@ void TermDiv::print(std::ostream &os) const
 void TermDiv::acceptVisitor(TermVisitor &vis) const
 {
    vis.apply(this);
+}
+
+bool TermDiv::isLinear() const
+{
+   return left()->isLinear() && right()->isConstant();
+}
+
+bool TermDiv::isPolynomial() const
+{
+   return left()->isPolynomial() && right()->isConstant();
 }
 
 bool TermDiv::isIntegerRoot() const
@@ -1517,6 +1630,11 @@ bool TermUsb::isIntegerRoot() const
 bool TermUsb::isLinear() const
 {
    return child()->isLinear();
+}
+
+bool TermUsb::isPolynomial() const
+{
+   return child()->isPolynomial();
 }
 
 void TermUsb::print(std::ostream &os) const
@@ -1666,6 +1784,11 @@ bool TermSqr::isIntegerRoot() const
    return true;
 }
 
+bool TermSqr::isPolynomial() const
+{
+   return child()->isPolynomial();
+}
+
 TermRep *TermSqr::cloneRoot() const
 {
    return new TermSqr(child());
@@ -1717,17 +1840,17 @@ TermRep *TermSqrt::clone() const
 
 /*----------------------------------------------------------------------------*/
 
-TermPow::TermPow(const SharedRep &t, int n)
+TermPow::TermPow(const SharedRep &t, unsigned int n)
     : TermOp(t, TermSymbol::Pow, NodePriority::High)
     , n_(n)
 {
-   ASSERT(n > 0, "Bad integral exponent in a term " << n);
+   THROW_IF(n <= 2, "Bad exponent in a pow term (must be >= 3) : " << n);
 
-   size_t h = hash1<int>(n);
+   size_t h = hash1<unsigned int>(n);
    hcode_ = hash2(h, hcode_);
 }
 
-int TermPow::exponent() const
+unsigned int TermPow::exponent() const
 {
    return n_;
 }
@@ -1759,6 +1882,11 @@ bool TermPow::isIntegerRoot() const
    return true;
 }
 
+bool TermPow::isPolynomial() const
+{
+   return child()->isPolynomial();
+}
+
 TermRep *TermPow::cloneRoot() const
 {
    return new TermPow(child(), n_);
@@ -1768,6 +1896,72 @@ TermRep *TermPow::clone() const
 {
    SharedRep sc(child()->clone());
    return new TermPow(sc, n_);
+}
+
+/*----------------------------------------------------------------------------*/
+
+TermPowr::TermPowr(const SharedRep &t, double r)
+    : TermOp(t, TermSymbol::Powr, NodePriority::High)
+    , r_(r)
+{
+   THROW_IF((int)r == r, "Bad real exponent in a term (must not be integral): " << r);
+
+   size_t h = hash1<double>(r);
+   hcode_ = hash2(h, hcode_);
+}
+
+double TermPowr::exponent() const
+{
+   return r_;
+}
+
+Interval TermPowr::evalConst() const
+{
+   return powr(child()->evalConst(), r_);
+}
+
+void TermPowr::evalRoot()
+{
+   ival_ = powr(child()->ival(), r_);
+}
+
+void TermPowr::print(std::ostream &os) const
+{
+   if (child()->isVar())
+   {
+      child()->print(os);
+   }
+   else
+   {
+      os << "(";
+      child()->print(os);
+      os << ")";
+   }
+   os << "^";
+   if (r_ < 0.0)
+   {
+      os << "(" << r_ << ")";
+   }
+   else
+   {
+      os << r_;
+   }
+}
+
+void TermPowr::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermPowr::cloneRoot() const
+{
+   return new TermPowr(child(), r_);
+}
+
+TermRep *TermPowr::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermPowr(sc, r_);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -2036,6 +2230,204 @@ TermRep *TermTanh::clone() const
 
 /*----------------------------------------------------------------------------*/
 
+TermAcos::TermAcos(const SharedRep &t)
+    : TermOp(t, TermSymbol::Acos, NodePriority::High)
+{
+}
+
+Interval TermAcos::evalConst() const
+{
+   return acos(child()->evalConst());
+}
+
+void TermAcos::evalRoot()
+{
+   ival_ = acos(child()->ival());
+}
+
+void TermAcos::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermAcos::cloneRoot() const
+{
+   return new TermAcos(child());
+}
+
+TermRep *TermAcos::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAcos(sc);
+}
+
+/*----------------------------------------------------------------------------*/
+
+TermAsin::TermAsin(const SharedRep &t)
+    : TermOp(t, TermSymbol::Asin, NodePriority::High)
+{
+}
+
+Interval TermAsin::evalConst() const
+{
+   return asin(child()->evalConst());
+}
+
+void TermAsin::evalRoot()
+{
+   ival_ = asin(child()->ival());
+}
+
+void TermAsin::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermAsin::cloneRoot() const
+{
+   return new TermAsin(child());
+}
+
+TermRep *TermAsin::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAsin(sc);
+}
+
+/*----------------------------------------------------------------------------*/
+
+TermAtan::TermAtan(const SharedRep &t)
+    : TermOp(t, TermSymbol::Atan, NodePriority::High)
+{
+}
+
+Interval TermAtan::evalConst() const
+{
+   return atan(child()->evalConst());
+}
+
+void TermAtan::evalRoot()
+{
+   ival_ = atan(child()->ival());
+}
+
+void TermAtan::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermAtan::cloneRoot() const
+{
+   return new TermAtan(child());
+}
+
+TermRep *TermAtan::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAtan(sc);
+}
+
+/*----------------------------------------------------------------------------*/
+
+TermAcosh::TermAcosh(const SharedRep &t)
+    : TermOp(t, TermSymbol::Acosh, NodePriority::High)
+{
+}
+
+Interval TermAcosh::evalConst() const
+{
+   return acosh(child()->evalConst());
+}
+
+void TermAcosh::evalRoot()
+{
+   ival_ = acosh(child()->ival());
+}
+
+void TermAcosh::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermAcosh::cloneRoot() const
+{
+   return new TermAcosh(child());
+}
+
+TermRep *TermAcosh::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAcosh(sc);
+}
+
+/*----------------------------------------------------------------------------*/
+
+TermAsinh::TermAsinh(const SharedRep &t)
+    : TermOp(t, TermSymbol::Asinh, NodePriority::High)
+{
+}
+
+Interval TermAsinh::evalConst() const
+{
+   return asinh(child()->evalConst());
+}
+
+void TermAsinh::evalRoot()
+{
+   ival_ = asinh(child()->ival());
+}
+
+void TermAsinh::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermAsinh::cloneRoot() const
+{
+   return new TermAsinh(child());
+}
+
+TermRep *TermAsinh::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAsinh(sc);
+}
+
+/*----------------------------------------------------------------------------*/
+
+TermAtanh::TermAtanh(const SharedRep &t)
+    : TermOp(t, TermSymbol::Atanh, NodePriority::High)
+{
+}
+
+Interval TermAtanh::evalConst() const
+{
+   return atanh(child()->evalConst());
+}
+
+void TermAtanh::evalRoot()
+{
+   ival_ = atanh(child()->ival());
+}
+
+void TermAtanh::acceptVisitor(TermVisitor &vis) const
+{
+   vis.apply(this);
+}
+
+TermRep *TermAtanh::cloneRoot() const
+{
+   return new TermAtanh(child());
+}
+
+TermRep *TermAtanh::clone() const
+{
+   SharedRep sc(child()->clone());
+   return new TermAtanh(sc);
+}
+
+/*----------------------------------------------------------------------------*/
+
 TermVisitor::~TermVisitor()
 {
 }
@@ -2110,6 +2502,11 @@ void TermVisitor::apply(const TermPow *t)
    THROW("Visit method not implemented");
 }
 
+void TermVisitor::apply(const TermPowr *t)
+{
+   THROW("Visit method not implemented");
+}
+
 void TermVisitor::apply(const TermExp *t)
 {
    THROW("Visit method not implemented");
@@ -2146,6 +2543,36 @@ void TermVisitor::apply(const TermSinh *t)
 }
 
 void TermVisitor::apply(const TermTanh *t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermAcos *t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermAsin *t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermAtan *t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermAcosh *t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermAsinh *t)
+{
+   THROW("Visit method not implemented");
+}
+
+void TermVisitor::apply(const TermAtanh *t)
 {
    THROW("Visit method not implemented");
 }
@@ -2249,6 +2676,10 @@ void SumOfSquaresCreator::apply(const TermPow *t)
 {
 }
 
+void SumOfSquaresCreator::apply(const TermPowr *t)
+{
+}
+
 void SumOfSquaresCreator::apply(const TermExp *t)
 {
 }
@@ -2278,6 +2709,30 @@ void SumOfSquaresCreator::apply(const TermSinh *t)
 }
 
 void SumOfSquaresCreator::apply(const TermTanh *t)
+{
+}
+
+void SumOfSquaresCreator::apply(const TermAcos *t)
+{
+}
+
+void SumOfSquaresCreator::apply(const TermAsin *t)
+{
+}
+
+void SumOfSquaresCreator::apply(const TermAtan *t)
+{
+}
+
+void SumOfSquaresCreator::apply(const TermAcosh *t)
+{
+}
+
+void SumOfSquaresCreator::apply(const TermAsinh *t)
+{
+}
+
+void SumOfSquaresCreator::apply(const TermAtanh *t)
 {
 }
 

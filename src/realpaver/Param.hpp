@@ -15,7 +15,7 @@
  * @file   Param.hpp
  * @brief  Parameters of solvers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   4 Feb 2025
  */
 
 #ifndef REALPAVER_PARAM_HPP
@@ -390,6 +390,14 @@ public:
 
    /// Sets the value of a parameter called 'name' to val
    void setParam(const std::string &name, const std::string &val);
+
+   /**
+    * @brief Reads the value of a parameter.
+    *
+    * The string must have the form "name=value". It returns true if the
+    * corresponding parameter has been assigned, false otherwise.
+    */
+   bool readParam(const std::string &str);
 
 private:
    static Params instance_; // default instance

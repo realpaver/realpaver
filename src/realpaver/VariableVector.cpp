@@ -15,11 +15,11 @@
  * @file   VariableVector.cpp
  * @brief  Vector of variables
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/VariableVector.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/VariableVector.hpp"
 #include <sstream>
 
 namespace realpaver {
@@ -30,7 +30,7 @@ VariableVectorRep::VariableVectorRep(const std::string &name, int first, int las
     , last_(last)
     , vars_()
 {
-   ASSERT(first <= last, "Bad indexes for the creation of a variable vector");
+   REALPAVER_ASSERT(first <= last, "Bad indexes for the creation of a variable vector");
 
    for (int i = first; i <= last; ++i)
    {
@@ -59,7 +59,7 @@ void VariableVectorRep::print(std::ostream &os) const
 
 Variable VariableVectorRep::get(int i) const
 {
-   ASSERT(i >= first_ && i <= last_, "Bad access in a variable vector @ " << i);
+   REALPAVER_ASSERT(i >= first_ && i <= last_, "Bad access in a variable vector @ " << i);
    return vars_[i - first_];
 }
 

@@ -1,94 +1,121 @@
 #include "realpaver/BoxReporter.hpp"
-#include "realpaver/CSPSolver.hpp"
+#include "realpaver/Domain.hpp"
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/Logger.hpp"
-#include "realpaver/Param.hpp"
 #include "realpaver/Parser.hpp"
+#include "realpaver/Solver.hpp"
 #include "realpaver/configure.hpp"
+#include "rp_util.hpp"
 #include <chrono>
-#include <fstream>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 
 using namespace realpaver;
 using namespace std;
 
-#define BLACK(s) "\033[30m" << s << "\033[39m"
-#define RED(s) "\033[31m" << s << "\033[39m"
-#define GREEN(s) "\033[32m" << s << "\033[39m"
-#define ORANGE(s) "\033[33m" << s << "\033[39m"
-#define BLUE(s) "\033[34m" << s << "\033[39m"
-#define MAGENTA(s) "\033[35m" << s << "\033[39m"
-#define CYAN(s) "\033[36m" << s << "\033[39m"
-#define GRAY(s) "\033[37m" << s << "\033[39m"
-
-// parses the filename
-void parseFilename(const std::string &filename, std::string &path, std::string &base,
-                   std::string &ext);
-
-// processes the argulments on the command line
-bool processArgs(int argc, char **argv, string &filename, string &pfilename);
-
-// inserts points at the end of a string
-string WP(const string &s, int n);
-
 // main function
 int main(int argc, char **argv)
 {
    try
    {
-      string filename = "", pfilename = "", sfilename = "";
+      string pbFilename = "", paramFilename = "", solFilename = "", logFilename = "",
+             msgError = "";
+      vector<string> options;
+      Interval objBounds = Interval::universe();
 
       // processes the arguments
-      bool ok = processArgs(argc, argv, filename, pfilename);
+      bool ok = processArgs(argc, argv, pbFilename, solFilename, paramFilename,
+                            logFilename, options, objBounds, msgError);
       if (!ok)
-         THROW("Bad arguments on the command line");
+         THROW(msgError);
 
       // parses the problem file name
       string baseFilename, pathFilename, extFilename;
-      parseFilename(filename, pathFilename, baseFilename, extFilename);
+      parseFilename(pbFilename, pathFilename, baseFilename, extFilename);
 
       // tries to open the problem file
-      ifstream infile(filename);
+      ifstream infile(pbFilename);
       if (!infile.is_open())
-         THROW("Bad problem filename: " << filename);
+         THROW("Bad problem filename: " << pbFilename);
       else
          infile.close();
 
       // reads the parameters
       Params params;
-      if (pfilename != "")
-         params.loadParam(pfilename);
+      if (paramFilename != "")
+         params.loadParam(paramFilename);
+      ok = processOptions(params, options, msgError);
+      if (!ok)
+         THROW(msgError);
 
       // logger
-#if LOG_ON
+#if REALPAVER_LOG_ON
       LogLevel loglevel = StringToLogLevel(params.getStrParam("LOG_LEVEL"));
-      string flog = "";
       if (loglevel != LogLevel::none)
       {
-         flog = baseFilename + ".log";
-         Logger::init(loglevel, flog);
+         if (logFilename == "")
+            logFilename = baseFilename + ".log";
+         Logger::init(loglevel, logFilename);
       }
 #endif
 
       LOG_MAIN("CSP solving");
-      LOG_MAIN("Input file: " << filename);
+      LOG_MAIN("Input file: " << pbFilename);
+      if (paramFilename != "")
+         LOG_MAIN("Parameter file: " << paramFilename);
       LOG_MAIN("Parsing...");
 
       // parsing
       Parser parser(params);
       Problem problem;
 
-      ok = parser.parseFile(filename, problem);
-      if (!ok)
-         THROW("Parse error: " << parser.getParseError());
+      try
+      {
+         ok = parser.parseFile(pbFilename, problem);
+         if (!ok)
+            THROW("Parse error: " << parser.getParseError());
+      }
+      catch (Exception &e)
+      {
+         THROW("Parse error: " << e.what());
+      }
 
       LOG_MAIN("End of parsing");
-      if (!problem.isCSP())
-         THROW("Not a CSP");
+      if (problem.nbCtrs() == 0)
+         THROW("There is no constraint!");
+
+      // bounds of the objective function can be given on the command line
+      if (objBounds.isEmpty())
+      {
+         THROW("The bounds of the objective function are invalid");
+      }
+
+      if (problem.hasObjective())
+      {
+         Objective obj = problem.getObjective();
+         Variable z = obj.getVar();
+         Domain *dom = z.getDomain();
+         dom->contract(objBounds);
+
+         if (dom->isEmpty())
+            THROW("The objective function has an empty domain");
+
+         problem.generateObjectiveConstraint();
+
+         LOG_MAIN("Bounds of objective function: " << objBounds);
+         LOG_MAIN("Objective onstraint added: " << problem.ctrObjective());
+      }
+      else
+      {
+         if (objBounds.isSetNeq(Interval::universe()))
+         {
+            LOG_MAIN("Bound(s) given but there is no objective function")
+         }
+      }
 
       // solving
-      CSPSolver solver(problem);
+      Solver solver(problem);
       solver.getEnv()->setParams(params);
 
       std::string sep = "########################################";
@@ -103,9 +130,10 @@ int main(int argc, char **argv)
       solver.solve();
       ////////////////////
 
-      string solfilename = baseFilename + ".sol";
+      if (solFilename == "")
+         solFilename = baseFilename + ".sol";
       ofstream fsol;
-      fsol.open(solfilename, std::ofstream::out);
+      fsol.open(solFilename, std::ofstream::out);
       if (fsol.bad())
          THROW("Open error of solution file");
 
@@ -113,28 +141,31 @@ int main(int argc, char **argv)
       cout << GRAY(sep) << endl;
       cout << BLUE("Files") << endl;
 
-      cout << indent << WP("Input file", wpl) << BLACK(filename) << endl;
+      cout << indent << WP("Input file", wpl) << BLACK(pbFilename) << endl;
 
-#if LOG_ON
+      if (paramFilename != "")
+         cout << indent << WP("Parameter file", wpl) << BLACK(paramFilename) << endl;
+
+#if REALPAVER_LOG_ON
       cout << indent << WP("Log file", wpl);
-      string meslog = (loglevel != LogLevel::none) ? flog : "no log";
+      string meslog = (loglevel != LogLevel::none) ? logFilename : "no log";
       cout << BLACK(meslog) << endl;
 #endif
 
-      cout << indent << WP("Output file", wpl) << BLACK(solfilename) << endl;
+      cout << indent << WP("Output file", wpl) << BLACK(solFilename) << endl;
 
       // preprocessing
       cout << GRAY(sep) << endl;
       string prepro = solver.getEnv()->getParams()->getStrParam("PREPROCESSING");
 
-      Preprocessor *preproc = solver.getPreprocessor();
+      SharedPreprocessor preproc = solver.getPreprocessor();
 
       fsol << WP("CSP solver", wpl) << REALPAVER_STRING << endl;
 
       auto now = chrono::system_clock::now();
       std::time_t end_time = chrono::system_clock::to_time_t(now);
 
-      fsol << WP("Input file", wpl) << filename << endl;
+      fsol << WP("Input file", wpl) << pbFilename << endl;
       fsol << WP("Current date and time", wpl) << ctime(&end_time) << endl;
 
       if (prepro == "YES")
@@ -154,8 +185,8 @@ int main(int argc, char **argv)
          {
             if (preproc->isUnfeasible())
             {
-               fsol << "solved unfeasible" << endl;
-               cout << RED("solved unfeasible") << endl;
+               fsol << "solved infeasible" << endl;
+               cout << RED("solved infeasible") << endl;
             }
             else
             {
@@ -194,9 +225,7 @@ int main(int argc, char **argv)
             if (preproc->nbInactiveCtrs() > 0)
             {
                for (size_t i = 0; i < preproc->nbInactiveCtrs(); ++i)
-               {
                   fsol << preproc->getInactiveCtr(i) << endl;
-               }
             }
             fsol << endl;
          }
@@ -206,12 +235,12 @@ int main(int argc, char **argv)
          cout << BLUE("No preprocessing") << endl;
       }
 
-      std::shared_ptr<CSPEnv> env = solver.getEnv();
+      std::shared_ptr<EnvSolver> env = solver.getEnv();
 
       // solving
       if (!(prepro == "YES" && preproc->isSolved()))
       {
-         CSPSpace *space = solver.getSpace();
+         std::shared_ptr<Space<Node>> space = solver.getSpace();
 
          fsol << "--- SOLVING ---" << endl << endl;
          cout << GRAY(sep) << endl;
@@ -247,8 +276,8 @@ int main(int argc, char **argv)
          {
             if (complete)
             {
-               fsol << "proved unfeasible" << endl;
-               cout << RED("unfeasible") << endl;
+               fsol << "proved infeasible" << endl;
+               cout << RED("infeasible") << endl;
             }
             else
             {
@@ -323,8 +352,7 @@ int main(int argc, char **argv)
          }
 
          // writes the solutions
-         Scope sco = preproc->unfixedScope();
-
+         Scope sco = preproc->isOn() ? preproc->unfixedScope() : problem.scope();
          std::string dr = params.getStrParam("DISPLAY_REGION");
 
          StreamReporter reporter(problem, fsol);
@@ -418,91 +446,4 @@ int main(int argc, char **argv)
    }
 
    return 0;
-}
-
-bool processArgs(int argc, char **argv, string &filename, string &pfilename)
-{
-   bool hasfile = false;
-   int i = 1;
-
-   while (i < argc)
-   {
-      std::string text(argv[i]);
-      if (text[0] != '-' && !hasfile)
-      {
-         filename = text;
-         hasfile = true;
-         i = i + 1;
-      }
-      else if (text == "-p")
-      {
-         i = i + 1;
-         if (i == argc)
-            return false;
-         else
-         {
-            pfilename = std::string(argv[i]);
-            i = i + 1;
-         }
-      }
-      else
-         return false;
-   }
-
-   return hasfile;
-}
-
-void parseFilename(const std::string &filename, std::string &path, std::string &base,
-                   std::string &ext)
-{
-   bool iter = true, found = false;
-   size_t pos = 0;
-   do
-   {
-      size_t k = filename.find('/', pos);
-      if (k == std::string::npos)
-      {
-         k = filename.find('\\', pos);
-      }
-      if (k == std::string::npos)
-      {
-         iter = false;
-      }
-      else
-      {
-         pos = k + 1;
-         found = true;
-      }
-   } while (iter);
-
-   if (found)
-   {
-      path = filename.substr(0, pos);
-   }
-   else
-   {
-      path = "";
-   }
-
-   size_t k = filename.find('.', pos);
-   if (k == std::string::npos)
-   {
-      base = filename.substr(pos, filename.length() - pos);
-      ext = "";
-   }
-   else
-   {
-      base = filename.substr(pos, k - pos);
-      ext = filename.substr(k, filename.length() - k);
-   }
-}
-
-string WP(const string &s, int n)
-{
-   string str = s;
-   int m = n - s.length();
-   while (--m >= 0)
-      str += ".";
-   str += " ";
-   return str;
 }

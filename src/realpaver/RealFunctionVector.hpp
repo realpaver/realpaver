@@ -15,7 +15,7 @@
  * @file   RealFunctionVector.hpp
  * @brief  Vector of real functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_FUNCTION_VECTOR_HPP

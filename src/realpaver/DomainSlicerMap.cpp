@@ -15,11 +15,10 @@
  * @file   DomainSlicerMap.cpp
  * @brief  Map of domain slicers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/DomainSlicerMap.hpp"
-#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 

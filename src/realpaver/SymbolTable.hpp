@@ -15,7 +15,7 @@
  * @file   SymbolTable.hpp
  * @brief  Symbol table for parsing
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SYMBOL_TABLE_HPP
@@ -286,6 +286,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -294,6 +295,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
    /// Returns the new term
    Term getTerm() const;

@@ -15,12 +15,12 @@
  * @file   LPSolverHighs.cpp
  * @brief  Wrapper class for the LP solver Highs.
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/LPSolverHighs.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/LPModel.hpp"
+#include "realpaver/LPSolverHighs.hpp"
 #include "realpaver/Logger.hpp"
 #include <ostream>
 
@@ -39,8 +39,8 @@ LPSolver::~LPSolver()
 
 void LPSolver::makeVars()
 {
-   int n = getNbLinVars();
-   for (int i = 0; i < n; ++i)
+   size_t n = getNbLinVars();
+   for (size_t i = 0; i < n; ++i)
    {
       const LinVar &v = getLinVar(i);
       simplex_->addVar(v.getLB(), v.getUB());
@@ -50,8 +50,8 @@ void LPSolver::makeVars()
 void LPSolver::makeCtrs()
 {
    // bound constraints (necessary for certification methods)
-   int n = getNbLinVars();
-   for (int i = 0; i < n; ++i)
+   size_t n = getNbLinVars();
+   for (size_t i = 0; i < n; ++i)
    {
       LinVar v = getLinVar(i);
       LinExpr e = {{1.0}, {v}};
@@ -60,8 +60,8 @@ void LPSolver::makeCtrs()
    }
 
    // constraints
-   int m = getNbLinCtrs();
-   for (int i = 0; i < m; ++i)
+   size_t m = getNbLinCtrs();
+   for (size_t i = 0; i < m; ++i)
    {
       LinCtr c = getLinCtr(i);
       LinExpr e = c.getExpr();
@@ -73,12 +73,10 @@ void LPSolver::makeCtrs()
 void LPSolver::makeCost()
 {
    LinExpr obj = getCost();
-   int n = obj.getNbTerms();
-   for (int i = 0; i < n; ++i)
+   size_t n = obj.getNbTerms();
+   for (size_t i = 0; i < n; ++i)
    {
-      LinVar v = getLinVar(i);
-      int j = v.getIndex();
-      simplex_->changeColCost(j, obj.getCoef(i));
+      simplex_->changeColCost(obj.getIndexVar(i), obj.getCoef(i));
    }
 
    ObjSense sense =
@@ -129,27 +127,31 @@ LPStatus LPSolver::toLPStatus() const
    }
 }
 
+void REALPAVER_ASSERT_OPTION(HighsStatus hs, const std::string &option)
+{
+   REALPAVER_ASSERT(hs == HighsStatus::kOk, "Bad option in Highs: " + option);
+}
+
 void LPSolver::setOptions()
 {
-   int maxsec = getMaxSeconds();
-   int maxiter = getMaxIter();
+   double maxsec = getMaxSeconds();
+   int maxiter = (int)getMaxIter();
    double tol = getFeasTol();
-   HighsStatus hs, ok = HighsStatus::kOk;
 
-   hs = simplex_->setOptionValue("time_limit", maxsec);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   std::string option = "time_limit";
+   REALPAVER_ASSERT_OPTION(simplex_->setOptionValue(option, maxsec), option);
 
-   hs = simplex_->setOptionValue("simplex_iteration_limit", maxiter);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   option = "simplex_iteration_limit";
+   REALPAVER_ASSERT_OPTION(simplex_->setOptionValue(option, maxiter), option);
 
-   hs = simplex_->setOptionValue("log_to_console", false);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   option = "log_to_console";
+   REALPAVER_ASSERT_OPTION(simplex_->setOptionValue(option, false), option);
 
-   hs = simplex_->setOptionValue("output_flag", false);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   option = "output_flag";
+   REALPAVER_ASSERT_OPTION(simplex_->setOptionValue(option, false), option);
 
-   hs = simplex_->setOptionValue("primal_feasibility_tolerance", tol);
-   ASSERT(hs == ok, "Bad option in Highs: ");
+   option = "primal_feasibility_tolerance";
+   REALPAVER_ASSERT_OPTION(simplex_->setOptionValue(option, tol), option);
 }
 
 LPStatus LPSolver::run()
@@ -160,7 +162,7 @@ LPStatus LPSolver::run()
 
    LPStatus status = toLPStatus();
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (status == LPStatus::Optimal)
    {
       LOG_INTER("Status: " << status << std::endl
@@ -184,7 +186,7 @@ LPStatus LPSolver::optimize()
 
 LPStatus LPSolver::reoptimize()
 {
-   for (int i = 0; i < getNbLinVars(); ++i)
+   for (size_t i = 0; i < getNbLinVars(); ++i)
       simplex_->changeColCost(i, 0.0);
 
    makeCost();
@@ -204,9 +206,9 @@ RealVector LPSolver::primalSolution() const
    THROW_IF(!has_primal, "Primal solution not found (Highs)");
 
    const HighsSolution &sol = simplex_->getSolution();
-   int m = getNbLinVars();
+   size_t m = getNbLinVars();
    RealVector primal(m);
-   for (int i = 0; i < m; ++i)
+   for (size_t i = 0; i < m; ++i)
       primal[i] = sol.col_value[i];
 
    return primal;
@@ -219,10 +221,10 @@ RealVector LPSolver::dualSolution() const
    THROW_IF(!has_dual, "Dual solution not found (Highs)");
 
    const HighsSolution &sol = simplex_->getSolution();
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    RealVector dual(p);
 
-   for (int i = 0; i < p; ++i)
+   for (size_t i = 0; i < p; ++i)
       dual[i] = sol.row_dual[i];
 
    return dual;
@@ -235,13 +237,13 @@ bool LPSolver::infeasibleRay(RealVector &ray) const
    if ((status != LPStatus::Infeasible) && (status != LPStatus::InfeasibleOrUnbounded))
       return false;
 
-   int p = getNbLinVars() + getNbLinCtrs();
+   size_t p = getNbLinVars() + getNbLinCtrs();
    if (ray.size() != p)
       ray.resize(p);
 
    // Technique implemented in SCIP
    int dualdir = (getSense() == LPSense::Min) ? 1.0 : -1.0;
-   for (int i = 0; i < p; ++i)
+   for (size_t i = 0; i < p; ++i)
    {
       if (simplex_->getLp().row_lower_[i] > 0.0)
          ray[i] = dualdir;

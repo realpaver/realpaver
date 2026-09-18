@@ -1,0 +1,9 @@
+Variables
+  x1 in [-2.0,2.0],
+  x2 in [-3.0,3.0];
+
+Min
+ 100 * (x2 - x1^2)^2 + (1 -x1) ^ 2;
+
+Constraints
+  x1^2 + x2^2 <= 2;

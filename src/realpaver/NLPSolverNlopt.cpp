@@ -15,12 +15,17 @@
  * @file   NLPSolverNlopt.cpp
  * @brief  Implementation of NLP solver for Nlopt
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/NLPSolverNlopt.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/Bitset.hpp"
+#include "realpaver/Dag.hpp"
 #include "realpaver/Logger.hpp"
+#include "realpaver/NLPSolverNlopt.hpp"
+#include "realpaver/Timer.hpp"
+#include <cstddef>
+#include <memory>
 
 namespace realpaver {
 
@@ -28,40 +33,110 @@ double ctr_nlopt(const std::vector<double> &x, std::vector<double> &grad, void *
 {
    NLPSolver::Ctr *c = reinterpret_cast<NLPSolver::Ctr *>(f_data);
    NLPSolver *ls = c->ls;
-   RealFunctionVector *V = ls->ctrs();
-   RealFunction f = V->fun(c->idx);
-   Interval img = f.getImage();
+   std::shared_ptr<DagFunExt> fext = c->f;
 
+   LOG_LOW("NLOPT EVALUATE CTR")
    // evaluates the function on x
    // we have a <= f (if c->isleft) or f <= b
    // i.e. a - f <= 0 or f - b <= 0
    RealPoint pt(ls->scope());
    pt.setArray(x.data());
-   double tmp = f.eval(pt), val = (c->isleft ? img.left() - tmp : tmp - img.right());
 
-   // no evaluation of the gradient if grad is empty
-   if (grad.empty())
-      return val;
-
-   // evaluates the gradient
-   RealVector g(f.nbVars(), 0.0);
-   f.diff(pt, g);
-
-   // puts g (scope : variables in f) in grad (scope : all the variables)
-   size_t i = 0, j = 0;
-   for (auto v : ls->scope())
+   double val = 0.0;
+   // Check DagFunExt
+   if (fext != nullptr)
    {
-      if (f.scope().contains(v))
+      // LOG_LOW("DagFunExt: " << fext->ctr())
+      SharedDagFun f = fext->getActive(pt, c->active);
+      // LOG_LOW("DagFun: " << f)
+      // Check if any active constraint
+      if (f != nullptr)
       {
-         grad[i] = (c->isleft ? -g[j] : g[j]);
-         ++j;
+         // LOG_LOW("ctr active")
+         Interval img = f->getImage();
+
+         double tmp = f->rEval(pt);
+         val = (img.isInfRight() ? img.left() - tmp : tmp - img.right());
+
+         // no evaluation of the gradient if grad is empty
+         if (grad.empty())
+         {
+            LOG_LOW("ctr val: " << val)
+            return val;
+         }
+
+         // evaluates the gradient
+         RealVector g(f->scope().size(), 0.0);
+         f->rDiff(pt, g);
+
+         // puts g (scope : variables in f) in grad (scope : all the variables)
+         size_t i = 0, j = 0;
+         for (auto v : ls->scope())
+         {
+            if (f->scope().contains(v))
+            {
+               grad[i] = (img.isInfRight() ? -g[j] : g[j]);
+               ++j;
+            }
+            else
+               grad[i] = 0.0;
+
+            ++i;
+         }
+         LOG_LOW("ctr val: " << val)
+         return val;
       }
       else
-         grad[i] = 0.0;
-
-      ++i;
+      {
+         // LOG_LOW("ctr inactive")
+         for (size_t i = 0; i < grad.size(); i++)
+         {
+            grad[i] = 0.0;
+         }
+      }
    }
+   // Else ctr not representable as a DAG
+   else
+   {
+      std::shared_ptr<ConstraintRep> ctr = c->ctr;
+      if (ctr != nullptr)
+      {
+         val = ctr->violation(pt);
 
+         // no evaluation of the gradient if grad is empty
+         if (grad.empty())
+         {
+            LOG_LOW("ctr val: " << val)
+            return val;
+         }
+
+         // evaluates the gradient
+         RealVector g(ls->scope().size(), 0.0);
+
+         // puts g (scope : variables in f) in grad (scope : all the variables)
+         size_t i = 0, j = 0;
+         for (auto v : ls->scope())
+         {
+            if (ctr->scope().contains(v))
+            {
+               grad[i] = g[j];
+               ++j;
+            }
+            else
+               grad[i] = 0.0;
+
+            ++i;
+         }
+      }
+      else
+      {
+         for (size_t i = 0; i < grad.size(); i++)
+         {
+            grad[i] = 0.0;
+         }
+      }
+   }
+   LOG_LOW("ctr val: " << val)
    return val;
 }
 
@@ -70,13 +145,15 @@ double f_nlopt(const std::vector<double> &x, std::vector<double> &grad, void *f_
    NLPSolver *ls = reinterpret_cast<NLPSolver *>(f_data);
    RealFunction *obj = ls->obj();
 
-   ASSERT(x.size() == ls->scope().size(), "Bad scopes in f_nlopt");
+   REALPAVER_ASSERT(x.size() == ls->scope().size(), "Bad scopes in f_nlopt");
+   LOG_LOW("NLOPT EVALUATE OBJ")
 
    // evaluates the function on x
    RealPoint pt(ls->scope());
    pt.setArray(x.data());
    double val = obj->eval(pt);
 
+   LOG_LOW("obj: " << val)
    // no evaluation of the gradient if grad is empty
    if (grad.empty())
       return val;
@@ -116,8 +193,8 @@ NLPSolver::NLPSolver(const RealFunction &obj)
 {
 }
 
-NLPSolver::NLPSolver(const RealFunction &obj, const RealFunctionVector &ctrs)
-    : NLPModel(obj, ctrs)
+NLPSolver::NLPSolver(SharedDag obj_dag, int obj_idx, SharedDagExtended edag)
+    : NLPModel(obj_dag, obj_idx, edag)
     , optimizer_(nullptr)
     , nl_ctrs_()
 {
@@ -129,19 +206,20 @@ NLPSolver::~NLPSolver()
       delete optimizer_;
 }
 
-OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &src)
+OptimizationStatus NLPSolver::minimizeImpl(const IntervalBox &box, const RealPoint &src,
+                                           const Bitset &active)
 {
-   ASSERT(box.scope().contains(scope()),
-          "Bad scope of an interval box given as input of NlpOpt");
+   REALPAVER_ASSERT(box.scope().contains(scope()),
+                    "Bad scope of an interval box given as input of NlpOpt");
 
-   ASSERT(src.scope().contains(scope()),
-          "Bad scope of astarting point given as input of NlpOpt");
+   REALPAVER_ASSERT(src.scope().contains(scope()),
+                    "Bad scope of astarting point given as input of NlpOpt");
 
    // gets the dimension
    size_t n = this->scope().size();
 
    // projects B and src on the scope of this
-   IntervalBox X(box, this->scope());
+   IntervalBox X(this->scope(), box);
    RealPoint P(src, this->scope());
 
    LOG_LOW("Nlopt optimize at point: " << P);
@@ -158,7 +236,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    // assigns the parameters
    optimizer_->set_ftol_rel(tol_.getRelTol());
    optimizer_->set_ftol_abs(tol_.getAbsTol());
-   optimizer_->set_maxeval(iter_limit_);
+   optimizer_->set_maxeval(this->iterLimit());
    optimizer_->set_maxtime(this->timeLimit());
 
    // assigns the bound constraints
@@ -173,22 +251,36 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    optimizer_->set_upper_bounds(x_u);
 
    // creates the constraints
-   makeCtrs();
+   makeCtrs(box, active);
+
    for (size_t i = 0; i < nl_ctrs_.size(); ++i)
       optimizer_->add_inequality_constraint(ctr_nlopt, &nl_ctrs_[i], tol_.getAbsTol());
 
    // calls the optimizer
-   nlopt::result status;
+   nlopt::result status = nlopt::FAILURE;
    try
    {
+      Timer opt_time;
+      opt_time.start();
       status = optimizer_->optimize(x, best_val_);
+      // opt_time.stop();
+      time_ = opt_time.elapsedTime();
+      iter_ = optimizer_->get_numevals();
+   }
+   catch (nlopt::roundoff_limited e)
+   {
+      LOG_INTER("Nlopt exception catched: " << e.what());
+      LOG_LOW("From documentation, result may be interesting...")
+      status = nlopt::XTOL_REACHED;
    }
    catch (std::exception &e)
    {
       LOG_LOW("Nlopt exception catched: " << e.what());
-      status_ = OptimizationStatus::Other;
-      return status_;
+      // status_ = OptimizationStatus::Other;
+      status = nlopt::FAILURE;
+      // return status_;
    }
+   LOG_LOW("Nlopt status: " << status);
 
    // assigns the resulting status
    if (status == nlopt::SUCCESS || status == nlopt::FTOL_REACHED ||
@@ -206,7 +298,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
       status_ = OptimizationStatus::Other;
    }
 
-   LOG_LOW("Result of local optimization: " << status_);
+   LOG_LOW("Status of LOCALSOLVER: " << status_);
 
    if (status_ != OptimizationStatus::Other)
    {
@@ -223,29 +315,46 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    return status_;
 }
 
-void NLPSolver::makeCtrs()
+void NLPSolver::makeCtrs(const IntervalBox &B, const Bitset &active)
 {
-   RealFunctionVector *V = this->ctrs();
-
-   for (size_t i = 0; i < nbCtrs(); ++i)
+   // RealFunctionVector *V = this->ctrs();
+   cur_active_ = active;
+   nl_ctrs_.clear();
+   for (size_t i = 0; i < edag()->size(); ++i)
    {
-      RealFunction f = V->fun(i);
-      Interval img = f.getImage();
+      // Bitset act(active);
+      Ctr ctr = {this, edag()->fun(i), nullptr, active};
+      nl_ctrs_.push_back(ctr);
+      // SharedDagFun f = edag()->getActiveFun(i, B, active);
+      // if (f == nullptr)
+      //    continue;
 
-      // left bound
-      if (!img.isInfLeft())
-      {
-         Ctr c = {this, i, true};
-         nl_ctrs_.push_back(c);
-      }
+      // Interval img = f->getImage();
 
-      // right bound
-      if (!img.isInfRight())
-      {
-         Ctr c = {this, i, false};
-         nl_ctrs_.push_back(c);
-      }
+      // // left bound
+      // if (!img.isInfLeft())
+      // {
+      //    // Ctr c = {this, f, i, true};
+      //    Ctr c = {this, f, nullptr, true};
+      //    nl_ctrs_.push_back(c);
+      // }
+
+      // // right bound
+      // if (!img.isInfRight())
+      // {
+      //    // Ctr c = {this, f, i, false};
+      //    Ctr c = {this, f, nullptr, false};
+      //    nl_ctrs_.push_back(c);
+      // }
    }
+
+   for (size_t i = 0; i < edag()->nbOutsideCtrs(); i++)
+   {
+      std::shared_ptr<ConstraintRep> c = edag()->outsideCtr(i).rep();
+      Ctr ctr = {this, nullptr, c, active};
+      nl_ctrs_.push_back(ctr);
+   }
+   LOG_LOW(nl_ctrs_.size() << " constraints handled by NLOPT")
 }
 
 void NLPSolver::makeAlgorithm()
@@ -259,10 +368,18 @@ void NLPSolver::makeAlgorithm()
 
       if (alg == "NLOPT_MMA")
          nlopt_alg_ = nlopt::algorithm::LD_MMA;
+      else if (alg != "NLOPT_SLSQP")
+      {
+         LOG_LOW("WARNING: irrelevant NLOPT algorithm selection! With constraints "
+                 << "SLSQP or MMA have to be used (default: SLSQP)")
+      }
    }
    else
    {
-      if (alg == "NLOPT_BOBYQA")
+      if (alg == "NLOPT_LBFGS")
+         nlopt_alg_ = nlopt::algorithm::LD_LBFGS;
+
+      else if (alg == "NLOPT_BOBYQA")
          nlopt_alg_ = nlopt::algorithm::LN_BOBYQA;
 
       else if (alg == "NLOPT_MMA")
@@ -274,6 +391,7 @@ void NLPSolver::makeAlgorithm()
       else
          nlopt_alg_ = nlopt::algorithm::LN_NELDERMEAD;
    }
+   LOG_INTER("Using NLOPT with " << nlopt_alg_)
 }
 
 } // namespace realpaver

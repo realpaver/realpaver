@@ -40,9 +40,9 @@ if local_solver_dep.found()
   )
 endif
 
-csp = executable(
-  'csp',
-  sources: 'csp.cpp',
+ncsp = executable(
+  'ncsp',
+  sources: 'ncsp.cpp',
   link_with: realpaver_lib,
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,
@@ -83,6 +83,14 @@ solve_2r_v1 = executable(
 solve_2r_v2 = executable(
   'solve_2r_v2',
   sources: 'solve_2r_v2.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
+optimize_beam = executable(
+  'optimize_beam',
+  sources: 'optimize_beam.cpp',
   link_with: realpaver_lib,
   include_directories: ['../src'] + incdir,
   dependencies: deps_lib,

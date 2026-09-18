@@ -15,7 +15,7 @@
  * @file   RealPoint.hpp
  * @brief  Classes of real points
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_POINT_HPP
@@ -29,12 +29,15 @@ namespace realpaver {
 /// Scoped real vector
 class RealPoint : public RealVector {
 public:
+   /// Constructor
+   RealPoint(Scope scop);
+
    /**
     * @brief Constructor.
     *
     * Each variable from scop is assigned to a.
     */
-   RealPoint(Scope scop, double a = 0.0);
+   RealPoint(Scope scop, double a);
 
    /**
     * @brief Constructor.

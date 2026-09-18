@@ -12,7 +12,7 @@
  *------------------------------------------------------------------------------
  * Lexical analyzer used by the parser of nonlinear problems.
  * Author: Laurent Granvilliers
- * Date: 2024-4-11
+ * Date: 11 Apr 2024
  -----------------------------------------------------------------------------*/
 
 %{
@@ -43,7 +43,6 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "Constants"     return TK_STR_CONST;
 "Aliases"       return TK_STR_ALIAS;
 "Constraints"   return TK_STR_CTR;
-"Objectives"    return TK_STR_OBJ;
 "Functions"     return TK_STR_FUN;
 
 "integer"       return TK_STR_INT;
@@ -53,10 +52,19 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "table"         return TK_TABLE;
 "piecewise"     return TK_PW;
 
-"min"    return TK_MIN;
-"max"    return TK_MAX;
-"MIN"    return TK_MIN;
-"MAX"	   return TK_MAX;
+"min"         return TK_MIN;
+"max"         return TK_MAX;
+"MIN"         return TK_MIN;
+"MAX"	        return TK_MAX;
+"Min"         return TK_MIN;
+"Max"	        return TK_MAX;
+"minimize"    return TK_MIN;
+"maximize"    return TK_MAX;
+"MINIMIZE"    return TK_MIN;
+"MAXIMIZE"	  return TK_MAX;
+"Minimize"    return TK_MIN;
+"Maximize"	  return TK_MAX;
+
 "sqr"	   return TK_SQR;
 "sqrt"	return TK_SQRT;
 "log"    return TK_LOG;
@@ -70,6 +78,12 @@ REAL        ({DIG}+{E}|{DIG}*"."{DIG}+({E})?|{DIG}+"."{DIG}*({E})?)
 "cosh"   return TK_COSH;
 "sinh"   return TK_SINH;
 "tanh"   return TK_TANH;
+"acos"   return TK_ACOS;
+"asin"   return TK_ASIN;
+"atan"   return TK_ATAN;
+"acosh"  return TK_ACOSH;
+"asinh"  return TK_ASINH;
+"atanh"  return TK_ATANH;
 
 "in"     return TK_IN;
 "-inf"   return TK_MINUS_INF;
@@ -117,7 +131,7 @@ std::vector<realpaver::Variable>* realpaver_var_vector;
 std::vector<realpaver::Interval>* realpaver_itv_vector;
 
 // vectors used to parse the piecewise constraints
-std::vector<realpaver::Variable>* realpaver_ctr_pieces;
+std::vector<realpaver::Constraint>* realpaver_ctr_pieces;
 std::vector<realpaver::Interval>* realpaver_itv_pieces;
 
 // unions used to parse the variable domains
@@ -126,6 +140,9 @@ realpaver::RangeUnion* realpaver_range_union;
 
 // constraint representation used to parse (conditional) constraints
 realpaver::ConstraintRep* realpaver_ctr_rep;
+
+// optimization sense
+bool realpaver_minimization;
 
 YY_BUFFER_STATE realpaver_bison_buffer;
 std::string realpaver_parse_error;

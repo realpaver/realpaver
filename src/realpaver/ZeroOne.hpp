@@ -15,7 +15,7 @@
  * @file   ZeroOne.hpp
  * @brief  Subset of {0, 1}
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_ZERO_ONE_HPP

@@ -15,12 +15,12 @@
  * @file   TermLin.hpp
  * @brief  Linear expression
  * @author Laurent Granvilliers
- * @date   2024-6-22
+ * @date   22 June 2024
  */
 
-#include "realpaver/TermLin.hpp"
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ScopeBank.hpp"
+#include "realpaver/TermLin.hpp"
 
 namespace realpaver {
 
@@ -36,6 +36,17 @@ TermLin::TermLin(const Term &t)
 {
    TermLinCreator creator(this);
    t.acceptVisitor(creator);
+
+   if (!creator.visitSuccessfull())
+      THROW("Creation of linear term failed");
+}
+
+TermLin::TermLin(const TermRep *rep)
+    : cst_(Interval::zero())
+    , sl_()
+{
+   TermLinCreator creator(this);
+   rep->acceptVisitor(creator);
 
    if (!creator.visitSuccessfull())
       THROW("Creation of linear term failed");
@@ -117,7 +128,7 @@ size_t TermLin::nbTerms() const
 
 Interval TermLin::coef(size_t i) const
 {
-   ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
 
    auto it = sl_.cbegin();
    std::advance(it, i);
@@ -126,7 +137,7 @@ Interval TermLin::coef(size_t i) const
 
 Variable TermLin::var(size_t i) const
 {
-   ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
+   REALPAVER_ASSERT(i < nbTerms(), "Bad access in a linear term @ " << i);
 
    auto it = sl_.cbegin();
    std::advance(it, i);
@@ -365,6 +376,16 @@ void TermLinCreator::apply(const TermPow *t)
    }
 }
 
+void TermLinCreator::apply(const TermPowr *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
 void TermLinCreator::apply(const TermExp *t)
 {
    if (t->isConstant())
@@ -436,6 +457,66 @@ void TermLinCreator::apply(const TermSinh *t)
 }
 
 void TermLinCreator::apply(const TermTanh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAcos *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAsin *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAtan *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAcosh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAsinh *t)
+{
+   if (t->isConstant())
+   {
+      Interval x = t->evalConst() * factor_;
+      lt_->addConstant(x);
+      success_ = true;
+   }
+}
+
+void TermLinCreator::apply(const TermAtanh *t)
 {
    if (t->isConstant())
    {

@@ -15,11 +15,10 @@
  * @file   LPSolverSoplex.cpp
  * @brief  Wrapper class for the LP solver Soplex.
  * @author Raphaël Chenouard
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "LPModel.hpp"
-#include "realpaver/AssertDebug.hpp"
+#include "realpaver/LPModel.hpp"
 #include "realpaver/LPSolverSoplex.hpp"
 #include "realpaver/Logger.hpp"
 #include <cstddef>
@@ -44,7 +43,7 @@ void LPSolver::makeVars()
    size_t nb_int = 0;
    std::vector<int> vint;
    soplex::DSVectorReal dscol(0);
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
    {
       simplex_->addColReal(
           soplex::LPColReal(0, dscol, soplex::infinity, -soplex::infinity));
@@ -146,7 +145,7 @@ LPStatus LPSolver::toLPStatus() const
 
 void LPSolver::setOptions()
 {
-   size_t maxsec = getMaxSeconds();
+   double maxsec = getMaxSeconds();
    size_t maxiter = getMaxIter();
    double tol = getFeasTol();
 
@@ -168,7 +167,7 @@ LPStatus LPSolver::run()
 
    LPStatus status = toLPStatus();
 
-#if LOG_ON
+#if REALPAVER_LOG_ON
    if (status == LPStatus::Optimal)
    {
       LOG_INTER("Status: " << status << std::endl
@@ -206,7 +205,7 @@ RealVector LPSolver::primalSolution() const
    RealVector primal(n);
    soplex::DVectorReal solution(n);
    simplex_->getPrimal(solution);
-   for (int i = 0; i < n; ++i)
+   for (size_t i = 0; i < n; ++i)
       primal[i] = solution[i];
    return primal;
 }
@@ -252,7 +251,7 @@ bool LPSolver::infeasibleRay(RealVector &ray) const
       soplex::DVector lhs(p), rhs(p);
       simplex_->getLhsReal(lhs);
       simplex_->getRhsReal(rhs);
-      for (int i = 0; i < getNbLinCtrs(); ++i)
+      for (size_t i = 0; i < getNbLinCtrs(); ++i)
       {
          if (lhs[i] > 0.0)
             ray[i] = dualdir;

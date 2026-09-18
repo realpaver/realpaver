@@ -15,7 +15,7 @@
  * @file   RealFunction.hpp
  * @brief  Real functions
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_FUNCTION_HPP
@@ -40,11 +40,8 @@ public:
    /// Virtual destructor
    virtual ~RealFunctionRep();
 
-   /// Assigns the image of this
-   void setImage(const Interval &img);
-
    /// Returns the image of this
-   Interval getImage() const;
+   virtual Interval getImage() const = 0;
 
    /// Returns the scope of this, i.e. the set of variables
    virtual Scope scope() const = 0;
@@ -62,9 +59,6 @@ public:
     * at pt with respect to the i-th variable of its scope
     */
    virtual void diff(const RealPoint &pt, RealVector &G) = 0;
-
-protected:
-   Interval img_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -86,6 +80,9 @@ public:
    /// Constructor from the i-th function of a DAG
    RealFunction(SharedDag dag, size_t i);
 
+   /// Constructor from a DAG function
+   RealFunction(SharedDagFun f);
+
    /// Constructor that creates a DAG from a term and assigns its image
    RealFunction(Term t, const Interval &img = Interval::universe());
 
@@ -97,9 +94,6 @@ public:
 
    /// No assignment
    RealFunction &operator=(const RealFunction &) = delete;
-
-   /// Assigns the image of this
-   void setImage(const Interval &img);
 
    /// Returns the image of this
    Interval getImage() const;
@@ -143,8 +137,8 @@ private:
  */
 class RealFunctionDag : public RealFunctionRep {
 public:
-   /// Constructor from the i-th function of a DAG
-   RealFunctionDag(SharedDag dag, size_t i);
+   /// Constructor
+   RealFunctionDag(SharedDagFun f);
 
    /// Constructor that creates a DAG from a term and assigns its image
    RealFunctionDag(Term t, const Interval &img = Interval::universe());
@@ -158,20 +152,14 @@ public:
    /// No asssignment
    RealFunctionDag &operator=(const RealFunctionDag &) = delete;
 
-   /// Returns the dag
-   SharedDag dag() const;
-
-   /// Returns the function index in the dag
-   size_t index() const;
-
+   Interval getImage() const override;
    Scope scope() const override;
    size_t nbVars() const override;
    double eval(const RealPoint &pt) override;
    void diff(const RealPoint &pt, RealVector &G) override;
 
 private:
-   SharedDag dag_; // DAG
-   size_t index_;  // index of function
+   SharedDagFun f_;
 };
 
 } // namespace realpaver

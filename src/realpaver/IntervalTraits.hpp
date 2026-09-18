@@ -15,7 +15,7 @@
  * @file   IntervalTraits.hpp
  * @brief  Traits class interfacing interval arithmetic libraries
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 #ifndef REALPAVER_INTERVAL_TRAITS_HPP
 #define REALPAVER_INTERVAL_TRAITS_HPP
@@ -108,6 +108,9 @@ template <typename T> struct IntervalTraits {
 
    /// Returns the hull of [0, 2*Pi]
    static interval zeroTwoPi();
+
+   /// Returns the hull of [-Pi/2, Pi/2]
+   static interval minusHalfPiPlusHalfPi();
 
    /// Returns +oo (double)
    static double infinity();
@@ -300,12 +303,20 @@ template <typename T> struct IntervalTraits {
    static interval sqrtPY(const interval &x, const interval &y);
    ///@}
 
-   /// @name Power function
+   /// @name Power function with integral exponent
    ///@{
 
-   static interval pow(const interval &x, int n);
-   static interval powPX(const interval &x, int n, const interval &y);
-   static interval powPY(const interval &x, int n, const interval &y);
+   static interval pow(const interval &x, unsigned int n);
+   static interval powPX(const interval &x, unsigned int n, const interval &y);
+   static interval powPY(const interval &x, unsigned int n, const interval &y);
+   ///@}
+
+   /// @name Power function with real exponent
+   ///@{
+
+   static interval powr(const interval &x, const double &r);
+   static interval powrPX(const interval &x, const double &r, const interval &y);
+   static interval powrPY(const interval &x, const double &r, const interval &y);
    ///@}
 
    /// @name Exponential function
@@ -331,7 +342,7 @@ template <typename T> struct IntervalTraits {
    static interval cosPY(const interval &x, const interval &y);
    ///@}
 
-   /// @name Sibe
+   /// @name Sine
    ///@{
 
    static interval sin(const interval &x);
@@ -369,6 +380,48 @@ template <typename T> struct IntervalTraits {
    static interval tanh(const interval &x);
    static interval tanhPX(const interval &x, const interval &y);
    static interval tanhPY(const interval &x, const interval &y);
+   ///@}
+
+   /// @name Arc-cosine
+   ///@{
+   static interval acos(const interval &x);
+   static interval acosPX(const interval &x, const interval &y);
+   static interval acosPY(const interval &x, const interval &y);
+   ///@}
+
+   /// @name Arc-sine
+   ///@{
+   static interval asin(const interval &x);
+   static interval asinPX(const interval &x, const interval &y);
+   static interval asinPY(const interval &x, const interval &y);
+   ///@}
+
+   /// @name Arc-tangent
+   ///@{
+   static interval atan(const interval &x);
+   static interval atanPX(const interval &x, const interval &y);
+   static interval atanPY(const interval &x, const interval &y);
+   ///@}
+
+   /// @name Hyperbolic arc-cosine
+   ///@{
+   static interval acosh(const interval &x);
+   static interval acoshPX(const interval &x, const interval &y);
+   static interval acoshPY(const interval &x, const interval &y);
+   ///@}
+
+   /// @name Hyperbolic arc-sine
+   ///@{
+   static interval asinh(const interval &x);
+   static interval asinhPX(const interval &x, const interval &y);
+   static interval asinhPY(const interval &x, const interval &y);
+   ///@}
+
+   /// @name Hyperbolic arc-tangent
+   ///@{
+   static interval atanh(const interval &x);
+   static interval atanhPX(const interval &x, const interval &y);
+   static interval atanhPY(const interval &x, const interval &y);
    ///@}
 
    /// @name Absolute value

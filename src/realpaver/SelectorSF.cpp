@@ -27,16 +27,17 @@ SelectorSF::SelectorSF(Scope scop)
 {
 }
 
-bool SelectorSF::apply(const DomainBox &box)
+bool SelectorSF::apply(SharedNode node, NodeContext &context)
 {
+   const DomainBox *box = node->box();
    double dmin;
    bool found = false;
 
    for (const auto &v : scop_)
    {
-      if (box.isSplitable(v))
+      if (box->isSplitable(v))
       {
-         double d = box.get(v)->discreteSize(v.getTolerance().getAbsTol());
+         double d = box->get(v)->discreteSize(v.getTolerance().getAbsTol());
          if ((!found) || (d < dmin))
          {
             setSelectedVar(v);

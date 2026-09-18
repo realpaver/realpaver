@@ -15,7 +15,7 @@
  * @file   Term.hpp
  * @brief  Terms (nonlinear expressions)
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_TERM_HPP
@@ -24,8 +24,6 @@
 #include "realpaver/DomainBox.hpp"
 #include "realpaver/IntervalBox.hpp"
 #include "realpaver/Scope.hpp"
-#include <set>
-#include <unordered_map>
 #include <vector>
 
 namespace realpaver {
@@ -34,28 +32,35 @@ class TermVisitor;
 
 /// Enumeration of term node symbols
 enum class TermSymbol {
-   Cst,  ///< constant
-   Var,  ///< variable
-   Add,  ///< addition
-   Sub,  ///< subtraction
-   Mul,  ///< multiplication
-   Div,  ///< division
-   Min,  ///< minimum
-   Max,  ///< maximum
-   Usb,  ///< unary subtraction
-   Abs,  ///< absolute value
-   Sgn,  ///< sign
-   Sqr,  ///< square
-   Sqrt, ///< square root
-   Pow,  ///< power
-   Exp,  ///< exponential
-   Log,  ///< logarithm
-   Cos,  ///< cosine
-   Sin,  ///< sine
-   Tan,  ///< tangent
-   Cosh, ///< hyperbolic cosine
-   Sinh, ///< hyperbolic sine
-   Tanh  ///< hyperbolic tangent
+   Cst,   ///< constant
+   Var,   ///< variable
+   Add,   ///< addition
+   Sub,   ///< subtraction
+   Mul,   ///< multiplication
+   Div,   ///< division
+   Min,   ///< minimum
+   Max,   ///< maximum
+   Usb,   ///< unary subtraction
+   Abs,   ///< absolute value
+   Sgn,   ///< sign
+   Sqr,   ///< square
+   Sqrt,  ///< square root
+   Pow,   ///< power (integral)
+   Powr,  ///< power (real exponent)
+   Exp,   ///< exponential
+   Log,   ///< logarithm
+   Cos,   ///< cosine
+   Sin,   ///< sine
+   Tan,   ///< tangent
+   Cosh,  ///< hyperbolic cosine
+   Sinh,  ///< hyperbolic sine
+   Tanh,  ///< hyperbolic tangent
+   Acos,  ///< arc-cosine
+   Asin,  ///< arc-sine
+   Atan,  ///< arc-tangent
+   Acosh, ///< hyperbolic arc-cosine
+   Asinh, ///< hyperbolic arc-sine
+   Atanh  ///< hyperbolic arc-tangent
 };
 
 /// Output on a stream
@@ -153,6 +158,9 @@ public:
 
    /// Returns true if this is a linear expression
    virtual bool isLinear() const = 0;
+
+   // Returns true if this is a polynomial expression
+   virtual bool isPolynomial() const = 0;
 
    /// Returns true if this is an integer term
    virtual bool isInteger() const = 0;
@@ -283,6 +291,9 @@ public:
    /// Returns true if this is a linear expression
    bool isLinear() const;
 
+   // Returns true if this is a polynomial expression
+   bool isPolynomial() const;
+
    /**
     * @brief Returns true if this is an integer term.
     *
@@ -407,15 +418,15 @@ Term sqr(Term t);
 Term sqrt(Term t);
 
 /// Returns t^n
+Term pow(Term t, unsigned int n);
+
+/// Returns t^n
 Term pow(Term t, int n);
 
 /// Returns t^d
 Term pow(Term t, double d);
 
-/// Returns t^x
-Term pow(Term t, const Interval &x);
-
-/// Returns t^e
+/// Returns exp(e*log(t))
 Term pow(Term t, Term e);
 
 /// Returns exp(t)
@@ -441,6 +452,24 @@ Term sinh(Term t);
 
 /// Returns tanh(t)
 Term tanh(Term t);
+
+/// Returns acos(t)
+Term acos(Term t);
+
+/// Returns asin(t)
+Term asin(Term t);
+
+/// Returns atan(t)
+Term atan(Term t);
+
+/// Returns acosh(t)
+Term acosh(Term t);
+
+/// Returns asinh(t)
+Term asinh(Term t);
+
+/// Returns atanh(t)
+Term atanh(Term t);
 ///@}
 
 /*----------------------------------------------------------------------------*/
@@ -463,6 +492,7 @@ public:
    bool isMinusOne() const override;
    bool dependsOn(const Variable &v) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isInteger() const override;
    void makeScope(Scope &scop) const override;
    TermRep *cloneRoot() const override;
@@ -492,6 +522,7 @@ public:
    void acceptVisitor(TermVisitor &vis) const override;
    bool dependsOn(const Variable &v) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isInteger() const override;
    void makeScope(Scope &scop) const override;
    bool isVar() const override;
@@ -545,6 +576,7 @@ public:
    bool isUsb() const override;
    bool isInteger() const override;
    virtual bool isLinear() const override;
+   virtual bool isPolynomial() const override;
    void eval(const IntervalBox &B) override;
    void eval(const DomainBox &box) override;
    virtual void print(std::ostream &os) const override;
@@ -575,6 +607,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -593,6 +626,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -611,6 +645,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -628,6 +663,8 @@ public:
    void evalRoot() override;
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
+   bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -678,6 +715,7 @@ public:
    void evalRoot() override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isLinear() const override;
+   bool isPolynomial() const override;
    bool isIntegerRoot() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
@@ -728,6 +766,7 @@ public:
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
+   bool isPolynomial() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
 };
@@ -750,25 +789,48 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// Power of a term
+/// Power of a term (integral exponent >= 3)
 class TermPow : public TermOp {
 public:
    /// Constructor
-   TermPow(const SharedRep &t, int n);
+   TermPow(const SharedRep &t, unsigned int n);
 
    /// Returns the exponent
-   int exponent() const;
+   unsigned int exponent() const;
 
    Interval evalConst() const override;
    void evalRoot() override;
    void print(std::ostream &os) const override;
    void acceptVisitor(TermVisitor &vis) const override;
    bool isIntegerRoot() const override;
+   bool isPolynomial() const override;
    TermRep *cloneRoot() const override;
    TermRep *clone() const override;
 
 private:
-   int n_;
+   unsigned int n_;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Power of a term
+class TermPowr : public TermOp {
+public:
+   /// Constructor
+   TermPowr(const SharedRep &t, double r);
+
+   /// Returns the exponent
+   double exponent() const;
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+
+private:
+   double r_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -893,6 +955,96 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
+/// Arc-cosine of a term
+class TermAcos : public TermOp {
+public:
+   /// Constructor
+   TermAcos(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Arc-sine of a term
+class TermAsin : public TermOp {
+public:
+   /// Constructor
+   TermAsin(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Arc-tangent of a term
+class TermAtan : public TermOp {
+public:
+   /// Constructor
+   TermAtan(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic arc-cosine of a term
+class TermAcosh : public TermOp {
+public:
+   /// Constructor
+   TermAcosh(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic arc-sine of a term
+class TermAsinh : public TermOp {
+public:
+   /// Constructor
+   TermAsinh(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// Hyperbolic arc-tangent of a term
+class TermAtanh : public TermOp {
+public:
+   /// Constructor
+   TermAtanh(const SharedRep &t);
+
+   Interval evalConst() const override;
+   void evalRoot() override;
+   void acceptVisitor(TermVisitor &vis) const override;
+   TermRep *cloneRoot() const override;
+   TermRep *clone() const override;
+};
+
+/*----------------------------------------------------------------------------*/
+
 /// Base class of visitors of terms
 class TermVisitor {
 public:
@@ -913,6 +1065,7 @@ public:
    virtual void apply(const TermSqr *t);
    virtual void apply(const TermSqrt *t);
    virtual void apply(const TermPow *t);
+   virtual void apply(const TermPowr *t);
    virtual void apply(const TermExp *t);
    virtual void apply(const TermLog *t);
    virtual void apply(const TermCos *t);
@@ -921,6 +1074,12 @@ public:
    virtual void apply(const TermCosh *t);
    virtual void apply(const TermSinh *t);
    virtual void apply(const TermTanh *t);
+   virtual void apply(const TermAcos *t);
+   virtual void apply(const TermAsin *t);
+   virtual void apply(const TermAtan *t);
+   virtual void apply(const TermAcosh *t);
+   virtual void apply(const TermAsinh *t);
+   virtual void apply(const TermAtanh *t);
 };
 
 /*----------------------------------------------------------------------------*/
@@ -959,6 +1118,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -967,6 +1127,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    bool sos_;            // true if this has visited a sum of squares

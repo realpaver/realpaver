@@ -15,17 +15,19 @@
  * @file   Dag.hpp
  * @brief  DAG of constraints
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_DAG_HPP
 #define REALPAVER_DAG_HPP
 
-#include "RealPoint.hpp"
 #include "realpaver/Bitset.hpp"
 #include "realpaver/Constraint.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintVisitor.hpp"
 #include "realpaver/IntervalMatrix.hpp"
 #include "realpaver/RealMatrix.hpp"
+#include "realpaver/RealPoint.hpp"
 #include "realpaver/TermLin.hpp"
 #include <memory>
 #include <unordered_map>
@@ -43,29 +45,36 @@ using IndexList = std::vector<size_t>;
 
 /// Enumeration of dag node symbols
 enum class DagSymbol {
-   Cst,  ///< constant
-   Var,  ///< variable
-   Add,  ///< addition
-   Sub,  ///< subtraction
-   Mul,  ///< multiplication
-   Div,  ///< division
-   Min,  ///< minimum
-   Max,  ///< maximum
-   Usb,  ///< unary subtraction
-   Abs,  ///< absolute value
-   Sgn,  ///< sign
-   Sqr,  ///< square
-   Sqrt, ///< square root
-   Pow,  ///< power
-   Exp,  ///< exponential
-   Log,  ///< logarithm
-   Cos,  ///< cosine
-   Sin,  ///< sine
-   Tan,  ///< tangent
-   Cosh, ///< hyperbolic cosine
-   Sinh, ///< hyperbolic sine
-   Tanh, ///< hyperbolic tangent
-   Lin   ///< linear expression
+   Cst,   ///< constant
+   Var,   ///< variable
+   Add,   ///< addition
+   Sub,   ///< subtraction
+   Mul,   ///< multiplication
+   Div,   ///< division
+   Min,   ///< minimum
+   Max,   ///< maximum
+   Usb,   ///< unary subtraction
+   Abs,   ///< absolute value
+   Sgn,   ///< sign
+   Sqr,   ///< square
+   Sqrt,  ///< square root
+   Pow,   ///< power (integral exponent)
+   Powr,  ///< power (real exponent)
+   Exp,   ///< exponential
+   Log,   ///< logarithm
+   Cos,   ///< cosine
+   Sin,   ///< sine
+   Tan,   ///< tangent
+   Cosh,  ///< hyperbolic cosine
+   Sinh,  ///< hyperbolic sine
+   Tanh,  ///< hyperbolic tangent
+   Acos,  ///< arc-cosine
+   Asin,  ///< arc-sine
+   Atan,  ///< arc-tangent
+   Acosh, ///< hyperbolic arc-cosine
+   Asinh, ///< hyperbolic arc-sine
+   Atanh, ///< hyperbolic arc-tangent
+   Lin    ///< linear expression
 };
 
 /// Output on a stream
@@ -195,8 +204,11 @@ public:
    void iEvalNode(const IntervalBox &B) override;
    void iEvalTree(const IntervalBox &B) override;
 
+   /// Assigns the value
+   void setValue(const Interval &x);
+
    /// Returns the constant interval value
-   const Interval &getConst() const;
+   const Interval &getValue() const;
 
 private:
    Interval x_;
@@ -444,7 +456,7 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
-/// DAG node representing the power operation
+/// DAG node representing the power operation (integral exponent)
 class DagPow : public DagOp {
 public:
    /**
@@ -453,10 +465,10 @@ public:
     * @param n exponent
     * @param lsub list of DAG indexes of the sub-nodes of this
     */
-   DagPow(Dag *dag, int n, const IndexList &lsub);
+   DagPow(Dag *dag, unsigned int n, const IndexList &lsub);
 
    /// Returns the exponent
-   int exponent() const;
+   unsigned int exponent() const;
 
    bool eqSymbol(const DagOp *other) const override;
    void print(std::ostream &os) const override;
@@ -464,7 +476,32 @@ public:
    void iEvalNode() override;
 
 private:
-   int n_; // exponent
+   unsigned int n_; // exponent
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the power operation (real exponent)
+class DagPowr : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param n exponent
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagPowr(Dag *dag, const double &r, const IndexList &lsub);
+
+   /// Returns the exponent
+   double exponent() const;
+
+   bool eqSymbol(const DagOp *other) const override;
+   void print(std::ostream &os) const override;
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+
+private:
+   double r_; // exponent
 };
 
 /*----------------------------------------------------------------------------*/
@@ -597,6 +634,102 @@ public:
 
 /*----------------------------------------------------------------------------*/
 
+/// DAG node representing the arc-cosine function
+class DagAcos : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAcos(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the arc-sine function
+class DagAsin : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAsin(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the arc-tangent function
+class DagAtan : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAtan(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic arc-cosine function
+class DagAcosh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAcosh(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic arc-sine function
+class DagAsinh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAsinh(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
+/// DAG node representing the hyperbolic arc-tangent function
+class DagAtanh : public DagOp {
+public:
+   /**
+    * @brief Constructor.
+    * @param dag owner of this
+    * @param lsub list of DAG indexes of the sub-nodes of this
+    */
+   DagAtanh(Dag *dag, const IndexList &lsub);
+
+   void acceptVisitor(DagVisitor &vis) const override;
+   void iEvalNode() override;
+};
+
+/*----------------------------------------------------------------------------*/
+
 /**
  * @brief DAG node representing a (non-constant) linear expression.
  *
@@ -622,6 +755,9 @@ public:
 
    /// Returns the constant value of this linear expression
    Interval getCst() const;
+
+   /// Assigns the constant value of this linear expression
+   void setCst(const Interval &x);
 
    /// Returns the number of linear terms
    size_t nbTerms() const;
@@ -650,20 +786,37 @@ private:
    std::set<Item, CompItem> terms_; // set of linear terms
 
 public:
-   /// Type of iterators on the list of linear terms
+   /// Type of constant iterators on the list of linear terms
    typedef std::set<Item, CompItem>::const_iterator const_iterator;
 
-   /// Returns an iterator on the beginning of the list of linear terms
+   /// Type of iterators on the list of linear terms
+   typedef std::set<Item, CompItem>::iterator iterator;
+
+   /// Returns a constant iterator on the beginning of the list of linear terms
    const_iterator begin() const;
 
-   /// Returns an iterator on the end of the list of linear terms
+   /// Returns an iterator on the beginning of the list of linear terms
+   iterator begin();
+
+   /// Returns a constant iterator on the end of the list of linear terms
    const_iterator end() const;
+
+   /// Returns an iterator on the end of the list of linear terms
+   iterator end();
 
    /// Returns the coefficient of a linear term pointed by an iterator
    Interval getCoefSub(const_iterator it) const;
 
    /// Returns the variable of a linear term pointed by an iterator
    DagVar *getNodeSub(const_iterator it) const;
+
+   /// Assigns the coefficient of the term on v
+   void setCoef(const Interval &x, const Variable &v);
+
+private:
+   // map var id -> iterator in the set
+   typedef std::unordered_map<size_t, iterator> map_type_;
+   map_type_ map_;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -680,9 +833,10 @@ public:
     * @param dag owner of this
     * @param root DAG index of the root node
     * @param scop set of variables
+    * @param t term used to create this
     * @param image image of this
     */
-   DagFun(Dag *dag, size_t root, Scope scop, const Interval &image);
+   DagFun(Dag *dag, size_t root, Scope scop, Term t, const Interval &image);
 
    /// Destructor
    ~DagFun();
@@ -693,8 +847,14 @@ public:
    /// Assigns the image of this
    void setImage(const Interval &x);
 
+   /// Returns the term used to create this
+   Term getTerm() const;
+
    /// Returns the dag
    Dag *dag() const;
+
+   /// Returns true if this is an equation
+   bool isAnEquation() const;
 
    /// Inserts a constant node
    void insertConstNode(DagConst *node);
@@ -776,7 +936,18 @@ public:
     *
     * The point c must belong to B on the scope of this.
     */
-   void iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalVector &G);
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, IntervalVector &G);
+
+   /**
+    * @brief Interval differentiation method using Hansen's strategy.
+    *
+    * Calculates the gradient of this on B (reverse mode) on a sub-scope. G[i] is the
+    * partial derivative of this with respect to the i-th variable of the input scope.
+    *
+    * The box c must belong to B on the scope of this.
+    */
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                    IntervalVector &G);
 
    /// Returns the real evaluation of this at pt
    double rEval(const RealPoint &pt);
@@ -809,6 +980,7 @@ private:
                                         // sorted by an ascending ordering of the
                                         // identifiers of the variables
    Scope scop_;                         // the set of variables
+   Term t_;                             // term used to create this
    Interval image_;                     // bounds of the function, i.e. the co-domain
    size_t idx_;                         // index in the dag
    std::shared_ptr<FlatFunction> flat_; // implements hc4Revise
@@ -819,6 +991,9 @@ private:
    // set of node indexes used to implement hasNode in O(1)
    std::unordered_set<size_t> inode_;
 };
+
+/// Shared pointer on DAG function
+using SharedDagFun = std::shared_ptr<DagFun>;
 
 /*----------------------------------------------------------------------------*/
 
@@ -855,7 +1030,7 @@ public:
    size_t nbFuns() const;
 
    /// Gets the i-th function with 0 <= i < nbFuns()
-   DagFun *fun(size_t i) const;
+   SharedDagFun fun(size_t i) const;
 
    /// Returns the number of variables
    size_t nbVars() const;
@@ -874,16 +1049,12 @@ public:
    /**
     * @brief Inserts a constraint in this and returns its index.
     *
-    * Throws an exception if the constraint cannot be handled.
+    * Throws an exception if the constraint cannot be handled or if the
+    * constraint has no identifier.
     */
    size_t insert(Constraint c);
 
-   /**
-    * @brief Inserts a constraint in this and returns its index.
-    *
-    * The constraint is given by a term and its image.
-    * Throws an exception if the constraint cannot be handled.
-    */
+   /// Inserts a term and its image in this and returns its index.
    size_t insert(Term t, const Interval &img = Interval::universe());
 
    /**
@@ -911,7 +1082,7 @@ public:
    size_t insertOpNode(size_t hcode, DagOp *node);
 
    /// Inserts a function and returns its index
-   size_t insertFun(DagFun *f);
+   size_t insertFun(SharedDagFun f);
 
    /// Returns the scope of this
    Scope scope() const;
@@ -951,7 +1122,18 @@ public:
     *
     * The point c must belong to B.
     */
-   void iDiffHansen(const IntervalBox &B, const RealPoint &c, IntervalMatrix &H);
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, IntervalMatrix &H);
+
+   /**
+    * @brief Calculates the Hansen matrix of this on B on a sub-scope.
+    *
+    * H[i,k] is the partial derivative of the i-th function with respect to the
+    * k-th variable of the input scope.
+    *
+    * The box c must belong to B.
+    */
+   void iDiffHansen(const IntervalBox &B, const IntervalBox &c, const Scope &scop,
+                    IntervalMatrix &H);
 
    /**
     * @brief Real evaluation of the functions at pt.
@@ -985,7 +1167,7 @@ private:
    std::vector<DagOp *> onode_;
 
    // vector of functions
-   std::vector<DagFun *> fun_;
+   std::vector<SharedDagFun> fun_;
 
    // map (variable id -> node index)
    std::unordered_map<size_t, size_t> vmap_;
@@ -1034,6 +1216,7 @@ public:
    virtual void apply(const DagSqr *d);
    virtual void apply(const DagSqrt *d);
    virtual void apply(const DagPow *d);
+   virtual void apply(const DagPowr *d);
    virtual void apply(const DagExp *d);
    virtual void apply(const DagLog *d);
    virtual void apply(const DagCos *d);
@@ -1042,6 +1225,12 @@ public:
    virtual void apply(const DagCosh *d);
    virtual void apply(const DagSinh *d);
    virtual void apply(const DagTanh *d);
+   virtual void apply(const DagAcos *d);
+   virtual void apply(const DagAsin *d);
+   virtual void apply(const DagAtan *d);
+   virtual void apply(const DagAcosh *d);
+   virtual void apply(const DagAsinh *d);
+   virtual void apply(const DagAtanh *d);
    virtual void apply(const DagLin *d);
    ///@}
 };
@@ -1070,6 +1259,7 @@ public:
    void apply(const DagSqr *d) override;
    void apply(const DagSqrt *d) override;
    void apply(const DagPow *d) override;
+   void apply(const DagPowr *d) override;
    void apply(const DagExp *d) override;
    void apply(const DagLog *d) override;
    void apply(const DagCos *d) override;
@@ -1078,6 +1268,12 @@ public:
    void apply(const DagCosh *d) override;
    void apply(const DagSinh *d) override;
    void apply(const DagTanh *d) override;
+   void apply(const DagAcos *d) override;
+   void apply(const DagAsin *d) override;
+   void apply(const DagAtan *d) override;
+   void apply(const DagAcosh *d) override;
+   void apply(const DagAsinh *d) override;
+   void apply(const DagAtanh *d) override;
    void apply(const DagLin *d) override;
    ///@}
 
@@ -1103,12 +1299,12 @@ public:
    /// Returns the constraint index in the DAG
    size_t index();
 
-   void apply(const ArithCtrEq *c) override;
-   void apply(const ArithCtrLe *c) override;
-   void apply(const ArithCtrLt *c) override;
-   void apply(const ArithCtrGe *c) override;
-   void apply(const ArithCtrGt *c) override;
-   void apply(const ArithCtrIn *c) override;
+   void apply(const ConstraintEq *c) override;
+   void apply(const ConstraintLe *c) override;
+   void apply(const ConstraintLt *c) override;
+   void apply(const ConstraintGe *c) override;
+   void apply(const ConstraintGt *c) override;
+   void apply(const ConstraintIn *c) override;
 
 private:
    Dag *dag_;     // DAG
@@ -1144,6 +1340,7 @@ public:
    void apply(const TermSqr *t) override;
    void apply(const TermSqrt *t) override;
    void apply(const TermPow *t) override;
+   void apply(const TermPowr *t) override;
    void apply(const TermExp *t) override;
    void apply(const TermLog *t) override;
    void apply(const TermCos *t) override;
@@ -1152,6 +1349,12 @@ public:
    void apply(const TermCosh *t) override;
    void apply(const TermSinh *t) override;
    void apply(const TermTanh *t) override;
+   void apply(const TermAcos *t) override;
+   void apply(const TermAsin *t) override;
+   void apply(const TermAtan *t) override;
+   void apply(const TermAcosh *t) override;
+   void apply(const TermAsinh *t) override;
+   void apply(const TermAtanh *t) override;
 
 private:
    Dag *dag_;       // DAG

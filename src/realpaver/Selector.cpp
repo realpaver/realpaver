@@ -27,7 +27,6 @@ Selector::Selector(Scope scop)
     : scop_(scop)
     , v_()
 {
-   ASSERT(!scop.isEmpty(), "Empty scope");
 }
 
 Selector::~Selector()
@@ -42,6 +41,11 @@ void Selector::setSelectedVar(Variable v)
 Variable Selector::getSelectedVar() const
 {
    return v_;
+}
+
+void Selector::setScope(Scope scop)
+{
+   scop_ = scop;
 }
 
 Scope Selector::scope() const

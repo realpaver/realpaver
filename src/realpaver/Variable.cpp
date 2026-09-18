@@ -12,25 +12,45 @@
  *----------------------------------------------------------------------------*/
 
 /**
- * @file   Variables.cpp
+ * @file   Variable.cpp
  * @brief  Variable in a problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
+#include "realpaver/Exception.hpp"
 #include "realpaver/Variable.hpp"
-#include "realpaver/AssertDebug.hpp"
 #include <memory>
 
 namespace realpaver {
 
 int VariableRep::NEXT_ID = 0;
 
+std::ostream &operator<<(std::ostream &os, VariableStatus status)
+{
+   switch (status)
+   {
+   case VariableStatus::Decision:
+      return os << "Decision";
+   case VariableStatus::Objective:
+      return os << "Objective";
+   case VariableStatus::Auxiliary:
+      return os << "Auxiliary";
+   default:
+      os.setstate(std::ios::failbit);
+   }
+   return os;
+}
+
+/*----------------------------------------------------------------------------*/
+
 VariableRep::VariableRep(const std::string &name)
     : name_(name)
     , id_(NEXT_ID++)
     , dom_(nullptr)
+    , status_(VariableStatus::Decision)
     , tol_(0.0, 0.0)
+    , split_(true)
 {
    dom_ = new IntervalDomain(Interval::universe());
 }
@@ -75,6 +95,16 @@ void VariableRep::setDomain(Domain *dom)
    dom_ = dom;
 }
 
+VariableStatus VariableRep::getStatus() const
+{
+   return status_;
+}
+
+void VariableRep::setStatus(VariableStatus status)
+{
+   status_ = status;
+}
+
 bool VariableRep::isBinary() const
 {
    return dom_->isBinary();
@@ -103,6 +133,16 @@ Tolerance VariableRep::getTolerance() const
 void VariableRep::setTolerance(const Tolerance &tol)
 {
    tol_ = tol;
+}
+
+void VariableRep::setSplitable(bool splitable)
+{
+   split_ = splitable;
+}
+
+bool VariableRep::isSplitable() const
+{
+   return split_;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -150,6 +190,17 @@ Variable &Variable::setDomain(std::unique_ptr<Domain> dom)
    return *this;
 }
 
+VariableStatus Variable::getStatus() const
+{
+   return rep_->getStatus();
+}
+
+Variable &Variable::setStatus(VariableStatus status)
+{
+   rep_->setStatus(status);
+   return *this;
+}
+
 bool Variable::isBinary() const
 {
    return rep_->isBinary();
@@ -191,6 +242,17 @@ bool Variable::operator!=(const Variable &other) const
    return rep_.get() != other.rep_.get();
 }
 
+Variable &Variable::setSplitable(bool splitable)
+{
+   rep_->setSplitable(splitable);
+   return *this;
+}
+
+bool Variable::isSplitable() const
+{
+   return rep_->isSplitable();
+}
+
 std::ostream &operator<<(std::ostream &os, const Variable &v)
 {
    os << v.getName() << " in " << (*v.getDomain());
@@ -207,12 +269,16 @@ Variable Variable::clone() const
 
    std::unique_ptr<Domain> dom(getDomain()->clone());
 
-   v.setId(id()).setDomain(std::move(dom)).setTolerance(getTolerance());
+   v.setId(id())
+       .setDomain(std::move(dom))
+       .setTolerance(getTolerance())
+       .setStatus(getStatus())
+       .setSplitable(isSplitable());
 
    return v;
 }
 
-bool Variable::hasNullPointer() const
+bool Variable::hasNullRep() const
 {
    return rep_ == nullptr;
 }

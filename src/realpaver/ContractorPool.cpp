@@ -15,11 +15,11 @@
  * @file   ContractorPool.cpp
  * @brief  Classes of pools of contractoirs
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/ContractorPool.hpp"
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ContractorPool.hpp"
 #include "realpaver/ScopeBank.hpp"
 
 namespace realpaver {
@@ -42,7 +42,7 @@ Scope ContractorPool::scope() const
 
 void ContractorPool::push(SharedContractor op)
 {
-   ASSERT(op != nullptr, "Bad insertion in a vector of contractors");
+   REALPAVER_ASSERT(op != nullptr, "Bad insertion in a vector of contractors");
 
    v_.push_back(op);
    scop_.insert(op->scope());
@@ -52,7 +52,8 @@ void ContractorPool::push(SharedContractor op)
 
 SharedContractor ContractorPool::contractorAt(size_t i) const
 {
-   ASSERT(i < v_.size(), "Access out of range in a vector of contractors @ " << i);
+   REALPAVER_ASSERT(i < v_.size(),
+                    "Access out of range in a vector of contractors @ " << i);
 
    return v_[i];
 }

@@ -15,12 +15,13 @@
  * @file   Contractor3BCID.cpp
  * @brief  3BCID contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
 #include "realpaver/ContractorVar3BCID.hpp"
 #include "realpaver/IntervalSlicer.hpp"
+#include "realpaver/Param.hpp"
 
 namespace realpaver {
 
@@ -32,8 +33,8 @@ ContractorVar3BCID::ContractorVar3BCID(SharedContractor op, Variable v, size_t n
     , nsCID_(nsCID)
     , varMnWidth_(Params::GetDblParam("VAR3BCID_MIN_WIDTH"))
 {
-   ASSERT(ns3B >= 2, "Bas number of slices in a var3BCID contractor");
-   ASSERT(nsCID >= 2, "Bas number of slices in a var3BCID contractor");
+   REALPAVER_ASSERT(ns3B >= 2, "Bas number of slices in a var3BCID contractor");
+   REALPAVER_ASSERT(nsCID >= 2, "Bas number of slices in a var3BCID contractor");
 }
 
 Variable ContractorVar3BCID::getVar() const
@@ -43,7 +44,8 @@ Variable ContractorVar3BCID::getVar() const
 
 void ContractorVar3BCID::setVar(Variable v)
 {
-   ASSERT(scope().contains(v), "Bad variable " << v << " in a var3BCID contractor");
+   REALPAVER_ASSERT(scope().contains(v),
+                    "Bad variable " << v << " in a var3BCID contractor");
 
    v_ = v;
 }
@@ -64,6 +66,16 @@ void ContractorVar3BCID::setVarMinWidth(double val)
 }
 
 Proof ContractorVar3BCID::contract(IntervalBox &B)
+{
+   return contractImpl(B, ContractSimple());
+}
+
+Proof ContractorVar3BCID::contract(IntervalBox &B, const Bitset &active)
+{
+   return contractImpl(B, ContractActive(active));
+}
+
+Proof ContractorVar3BCID::contractImpl(IntervalBox &B, const ContractMethod &contract)
 {
    Interval dom = B.get(v_);
 
@@ -89,7 +101,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
 
    // 3B
    IntervalBox save(B);
-   IntervalPartitionMaker slicer(n3B);
+   IntervalPartitioner slicer(n3B);
    slicer.apply(dom);
    n3B = slicer.nbSlices();
 
@@ -105,7 +117,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
       leftSlice = slicer.slice(i);
 
       B.set(v_, leftSlice);
-      Proof certif = op_->contract(B);
+      Proof certif = contract.apply(*op_, B);
 
       if (certif == Proof::Empty)
       {
@@ -143,7 +155,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
       B = save;
       rightSlice = slicer.slice(j);
       B.set(v_, rightSlice);
-      Proof certif = op_->contract(B);
+      Proof certif = contract.apply(*op_, B);
 
       if (certif == Proof::Empty)
       {
@@ -174,7 +186,7 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
 
    // varCID on the remaining box, use savebox
    save.set(v_, Interval(leftSlice.right(), rightSlice.left()));
-   bool reduced = contractCID(save, newbox);
+   bool reduced = contractCID(save, newbox, contract);
 
    if (reduced)
    {
@@ -189,7 +201,8 @@ Proof ContractorVar3BCID::contract(IntervalBox &B)
    return Proof::Maybe;
 }
 
-bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid)
+bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid,
+                                     const ContractMethod &contract)
 {
    if (nsCID_ == 0 || Bcid.equals(B3bCid, v_))
       return false;
@@ -197,7 +210,7 @@ bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid)
    IntervalBox B(Bcid);
    Interval dom(Bcid.get(v_));
 
-   IntervalPartitionMaker slicer(nsCID_);
+   IntervalPartitioner slicer(nsCID_);
    slicer.apply(dom);
    size_t nCID = slicer.nbSlices();
 
@@ -206,7 +219,7 @@ bool ContractorVar3BCID::contractCID(IntervalBox &Bcid, IntervalBox &B3bCid)
       if (i > 0)
          B = Bcid;
       B.set(v_, slicer.slice(i));
-      Proof certif = op_->contract(B);
+      Proof certif = contract.apply(*op_, B);
 
       if (certif != Proof::Empty)
       {

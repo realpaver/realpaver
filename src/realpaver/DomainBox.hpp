@@ -15,7 +15,7 @@
  * @file   DomainBox.hpp
  * @brief  Box of domains
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_DOMAIN_BOX_HPP
@@ -28,6 +28,7 @@
 namespace realpaver {
 
 class IntervalBox;
+class RealPoint;
 
 /**
  * @brief Box of domains.
@@ -95,7 +96,12 @@ public:
    /// Returns a clone of this
    DomainBox *clone() const;
 
-   /// Tests if the domain of a variable is splitable
+   /**
+    * @brief Tests if the domain of a variable is splitable.
+    *
+    * It returns false if v is not a splitable variable or if its domain in this box
+    * has the required tolerance; true otherwise.
+    */
    bool isSplitable(const Variable &v) const;
 
    /// Output on a stream using a vector notation
@@ -130,6 +136,9 @@ public:
 
    /// Equality test
    bool equals(const DomainBox &box) const;
+
+   /// Membership test
+   bool contains(const RealPoint &pt) const;
 
 private:
    Scope scop_;                 // ordered set of variables

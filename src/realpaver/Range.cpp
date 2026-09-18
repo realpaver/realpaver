@@ -15,13 +15,12 @@
  * @file   Range.cpp
  * @brief  Finite integer interval bounded by safe integers
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/Range.hpp"
-#include "realpaver/AssertDebug.hpp"
+#include "realpaver/Exception.hpp"
 #include "realpaver/Interval.hpp"
-#include <cmath>
+#include "realpaver/Range.hpp"
 
 namespace realpaver {
 

@@ -17,17 +17,19 @@ class MyFun : public IntervalFunctionUni {
 
 int main(void)
 {
-   Logger::init(LogLevel::full, "newton.log");
 
-   IntervalNewtonUni newton;
-   MyFun f;
-   Interval I(1, 10);
+   // TODO
+   // Logger::init(LogLevel::full, "newton.log");
 
-   Proof p = newton.contract(f, I);
-   cout << "Proof: " << p << endl;
+   // IntervalNewtonUni newton;
+   // MyFun f;
+   // Interval I(1, 10);
 
-   if (p != Proof::Empty)
-      cout << "New domain: " << I << endl;
+   // Proof p = newton.contract(f, I);
+   // cout << "Proof: " << p << endl;
+
+   // if (p != Proof::Empty)
+   //    cout << "New domain: " << I << endl;
 
    return 0;
 }

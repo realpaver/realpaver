@@ -24,29 +24,32 @@
 
 namespace realpaver {
 
-ContractorAffineRevise::ContractorAffineRevise(SharedDag dag, size_t i, bool minrange)
+ContractorAffineRevise::ContractorAffineRevise(SharedDagExtended edag, size_t i,
+                                               bool minrange)
     : Contractor()
-    , dag_(dag)
+    , edag_(edag)
     , idx_(i)
     , minrange_(minrange)
 {
-   ASSERT(dag != nullptr, "Creation of affine contractor from a null pointer");
-   ASSERT(i < dag->nbFuns(),
-          "Creation of affine contractor given a bad " << " function index " << i);
+   REALPAVER_ASSERT(edag != nullptr, "Creation of affine contractor from a null pointer");
+   REALPAVER_ASSERT(i < edag->size(), "Creation of affine contractor given a bad "
+                                          << " function index " << i);
 }
 
 Scope ContractorAffineRevise::scope() const
 {
-   return dag_->fun(idx_)->scope();
+   return edag_->fun(idx_)->ctr().scope();
 }
 
-Proof ContractorAffineRevise::contract(IntervalBox &B)
+Proof ContractorAffineRevise::contract(IntervalBox &B, const Bitset &active)
 {
-   AffineCreator creator(dag_, idx_, minrange_);
-   creator.create(B);
-   const AffineForm &f = creator.fun(0);
+   AffineCreator creator(edag_, minrange_);
+   bool ok = creator.create(B, idx_, active);
+   if (!ok)
+      return Proof::Maybe;
 
-   Interval I = dag_->fun(idx_)->getImage();
+   const AffineForm &f = creator.fun(0);
+   Interval I = creator.image(0);
    Interval E = f.errorTerm();
    Interval J = I - f.constantTerm() + Interval(-E.right(), E.right());
 
@@ -69,7 +72,11 @@ Proof ContractorAffineRevise::contract(IntervalBox &B)
    // reduction of domains
    for (auto it = f.cbegin(); it != f.cend(); ++it)
    {
-      const Variable &v = dag_->scope().var(it->var);
+      // no reduction if it->itv contains 0
+      if (it->itv.containsZero())
+         continue;
+
+      const Variable &v = edag_->scope().var(it->var);
 
       // new domain of the variable ei associated with v
       Double::rndUp();
@@ -89,19 +96,14 @@ Proof ContractorAffineRevise::contract(IntervalBox &B)
    return Proof::Maybe;
 }
 
+Proof ContractorAffineRevise::contract(IntervalBox &B)
+{
+   return contract(B, Bitset());
+}
+
 void ContractorAffineRevise::print(std::ostream &os) const
 {
    os << "Affine contractor / function " << " @ " << idx_;
-}
-
-SharedDag ContractorAffineRevise::getDag() const
-{
-   return dag_;
-}
-
-size_t ContractorAffineRevise::getFunIndex() const
-{
-   return idx_;
 }
 
 void ContractorAffineRevise::useMinrange(bool minrange)

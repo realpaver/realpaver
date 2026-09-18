@@ -9,7 +9,7 @@ int main()
    try
    {
       Params params;
-      params.loadParam("../../examples/param.txt");
+      params.loadParam("bin/rp_params.txt");
 
       Problem problem;
 
@@ -18,7 +18,7 @@ int main()
 
       if (ok)
       {
-         CSPSolver solver(problem);
+         Solver solver(problem);
          solver.getEnv()->setParams(params);
          solver.solve();
          for (size_t i = 0; i < solver.nbSolutions(); ++i)

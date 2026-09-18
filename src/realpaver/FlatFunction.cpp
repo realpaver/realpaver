@@ -15,9 +15,10 @@
  * @file   FlatFunction.cpp
  * @brief  Function with fast hc4Revise
  * @author Laurent Granvilliers
- * @date   2024-6-11
+ * @date   6 Nov 2024
  */
 
+#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Dag.hpp"
 #include "realpaver/FlatFunction.hpp"
 
@@ -71,6 +72,8 @@ std::ostream &operator<<(std::ostream &os, FlatSymbol op)
       return os << "sqrt";
    case FlatSymbol::Pow:
       return os << "pow";
+   case FlatSymbol::Powr:
+      return os << "powr";
    case FlatSymbol::Exp:
       return os << "exp";
    case FlatSymbol::Log:
@@ -87,6 +90,18 @@ std::ostream &operator<<(std::ostream &os, FlatSymbol op)
       return os << "sinh";
    case FlatSymbol::Tanh:
       return os << "tanh";
+   case FlatSymbol::Acos:
+      return os << "acos";
+   case FlatSymbol::Asin:
+      return os << "asin";
+   case FlatSymbol::Atan:
+      return os << "atan";
+   case FlatSymbol::Acosh:
+      return os << "acosh";
+   case FlatSymbol::Asinh:
+      return os << "asinh";
+   case FlatSymbol::Atanh:
+      return os << "atanh";
    default:
       os.setstate(std::ios::failbit);
    }
@@ -115,9 +130,9 @@ FlatFunction::FlatFunction(const Term &t, const Interval &img)
    t.acceptVisitor(creator);
 }
 
-FlatFunction::FlatFunction(const DagFun *f)
-    : scop_(f->scope())
-    , img_(f->getImage())
+FlatFunction::FlatFunction(const DagFun &f)
+    : scop_(f.scope())
+    , img_(f.getImage())
     , cst_()
     , var_()
 {
@@ -131,16 +146,17 @@ FlatFunction::FlatFunction(const DagFun *f)
    nb_ = 0;
 
    FlatFunDagCreator creator(this);
-   f->rootNode()->acceptVisitor(creator);
+   f.rootNode()->acceptVisitor(creator);
 }
 
-FlatFunction::FlatFunction(const DagFun *f, const IntervalBox &B, Variable v)
+FlatFunction::FlatFunction(const DagFun &f, const IntervalBox &B, Variable v)
     : scop_()
-    , img_(f->getImage())
+    , img_(f.getImage())
     , cst_()
     , var_()
 {
-   ASSERT(f->scope().contains(v), "The DAG function lustr depend on " << v.getName());
+   REALPAVER_ASSERT(f.scope().contains(v),
+                    "The DAG function must depend on " << v.getName());
 
    scop_.insert(v);
 
@@ -154,7 +170,7 @@ FlatFunction::FlatFunction(const DagFun *f, const IntervalBox &B, Variable v)
    nb_ = 0;
 
    FlatFunUniCreator creator(this, B, v);
-   f->rootNode()->acceptVisitor(creator);
+   f.rootNode()->acceptVisitor(creator);
 }
 
 void FlatFunction::extendCapacity()
@@ -331,16 +347,31 @@ size_t FlatFunction::insertLin(const Interval &x, Variable v)
    }
 }
 
-size_t FlatFunction::insertPow(FlatSymbol symb, size_t ic, int e)
+size_t FlatFunction::insertPow(size_t ic, unsigned int e)
 {
    extendCapacity();
 
    size_t i = nb_++;
-   symb_[i] = symb;
+   symb_[i] = FlatSymbol::Pow;
    arg_[i] = new size_t[3];
    arg_[i][0] = 3;
    arg_[i][1] = ic;
    arg_[i][2] = (size_t)e;
+   return i;
+}
+
+size_t FlatFunction::insertPowr(size_t ic, const double &r)
+{
+   size_t ie = insertCst(r);
+
+   extendCapacity();
+
+   size_t i = nb_++;
+   symb_[i] = FlatSymbol::Powr;
+   arg_[i] = new size_t[3];
+   arg_[i][0] = 3;
+   arg_[i][1] = ic;
+   arg_[i][2] = ie;
    return i;
 }
 
@@ -430,6 +461,12 @@ Interval FlatFunction::iEval(const IntervalVector &V)
          ival_[i] = pow(ival_[arg_[i][1]], arg_[i][2]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[i] = powr(ival_[arg_[i][1]], r);
+      }
+      break;
+
       case FlatSymbol::Exp:
          ival_[i] = exp(ival_[arg_[i][1]]);
          break;
@@ -460,6 +497,30 @@ Interval FlatFunction::iEval(const IntervalVector &V)
 
       case FlatSymbol::Tanh:
          ival_[i] = tanh(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acos:
+         ival_[i] = acos(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asin:
+         ival_[i] = asin(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atan:
+         ival_[i] = atan(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acosh:
+         ival_[i] = acosh(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asinh:
+         ival_[i] = asinh(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atanh:
+         ival_[i] = atanh(ival_[arg_[i][1]]);
          break;
       }
    }
@@ -542,6 +603,12 @@ Interval FlatFunction::iEval(const IntervalBox &B)
          ival_[i] = pow(ival_[arg_[i][1]], arg_[i][2]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[i] = powr(ival_[arg_[i][1]], r);
+      }
+      break;
+
       case FlatSymbol::Exp:
          ival_[i] = exp(ival_[arg_[i][1]]);
          break;
@@ -572,6 +639,30 @@ Interval FlatFunction::iEval(const IntervalBox &B)
 
       case FlatSymbol::Tanh:
          ival_[i] = tanh(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acos:
+         ival_[i] = acos(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asin:
+         ival_[i] = asin(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atan:
+         ival_[i] = atan(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acosh:
+         ival_[i] = acosh(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asinh:
+         ival_[i] = asinh(ival_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atanh:
+         ival_[i] = atanh(ival_[arg_[i][1]]);
          break;
       }
    }
@@ -655,6 +746,12 @@ double FlatFunction::rEval(const RealVector &V)
          rval_[i] = Double::pow(rval_[arg_[i][1]], arg_[i][2]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         rval_[i] = Double::powr(rval_[arg_[i][1]], r);
+      }
+      break;
+
       case FlatSymbol::Exp:
          rval_[i] = Double::exp(rval_[arg_[i][1]]);
          break;
@@ -685,6 +782,30 @@ double FlatFunction::rEval(const RealVector &V)
 
       case FlatSymbol::Tanh:
          rval_[i] = Double::tanh(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acos:
+         rval_[i] = Double::acos(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asin:
+         rval_[i] = Double::asin(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atan:
+         rval_[i] = Double::atan(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acosh:
+         rval_[i] = Double::acosh(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asinh:
+         rval_[i] = Double::asinh(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atanh:
+         rval_[i] = Double::atanh(rval_[arg_[i][1]]);
          break;
       }
    }
@@ -767,6 +888,12 @@ double FlatFunction::rEval(const RealPoint &pt)
          rval_[i] = Double::pow(rval_[arg_[i][1]], arg_[i][2]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         rval_[i] = Double::powr(rval_[arg_[i][1]], r);
+      }
+      break;
+
       case FlatSymbol::Exp:
          rval_[i] = Double::exp(rval_[arg_[i][1]]);
          break;
@@ -797,6 +924,30 @@ double FlatFunction::rEval(const RealPoint &pt)
 
       case FlatSymbol::Tanh:
          rval_[i] = Double::tanh(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acos:
+         rval_[i] = Double::acos(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asin:
+         rval_[i] = Double::asin(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atan:
+         rval_[i] = Double::atan(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Acosh:
+         rval_[i] = Double::acosh(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Asinh:
+         rval_[i] = Double::asinh(rval_[arg_[i][1]]);
+         break;
+
+      case FlatSymbol::Atanh:
+         rval_[i] = Double::atanh(rval_[arg_[i][1]]);
          break;
       }
    }
@@ -878,7 +1029,7 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox &B)
             aux[i] = ival_[i];
 
          // contracts the first part
-         IntervalBox Xl(B, scop_);
+         IntervalBox Xl(scop_, B);
          ival_[nb_ - 1] = e & Interval::lessThan(img_.left());
          Proof pl = hc4ReviseBackward(Xl);
 
@@ -887,7 +1038,7 @@ Proof FlatFunction::hc4ReviseNeg(IntervalBox &B)
             ival_[i] = aux[i];
 
          // contracts the second part
-         IntervalBox Xr(B, scop_);
+         IntervalBox Xr(scop_, B);
          ival_[nb_ - 1] = e & Interval::moreThan(img_.right());
          Proof pr = hc4ReviseBackward(Xr);
 
@@ -1032,6 +1183,12 @@ Proof FlatFunction::hc4ReviseBackward(IntervalBox &B)
          ival_[arg_[i][1]] = powPX(ival_[arg_[i][1]], arg_[i][2], ival_[i]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[arg_[i][1]] = powrPX(ival_[arg_[i][1]], r, ival_[i]);
+      }
+      break;
+
       case FlatSymbol::Exp:
          ival_[arg_[i][1]] = expPX(ival_[arg_[i][1]], ival_[i]);
          break;
@@ -1062,6 +1219,30 @@ Proof FlatFunction::hc4ReviseBackward(IntervalBox &B)
 
       case FlatSymbol::Tanh:
          ival_[arg_[i][1]] = tanhPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Acos:
+         ival_[arg_[i][1]] = acosPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Asin:
+         ival_[arg_[i][1]] = asinPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Atan:
+         ival_[arg_[i][1]] = atanPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Acosh:
+         ival_[arg_[i][1]] = acoshPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Asinh:
+         ival_[arg_[i][1]] = asinhPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Atanh:
+         ival_[arg_[i][1]] = atanhPX(ival_[arg_[i][1]], ival_[i]);
          break;
       }
    }
@@ -1171,6 +1352,12 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector &V)
          ival_[arg_[i][1]] = powPX(ival_[arg_[i][1]], arg_[i][2], ival_[i]);
          break;
 
+      case FlatSymbol::Powr: {
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         ival_[arg_[i][1]] = powrPX(ival_[arg_[i][1]], r, ival_[i]);
+      }
+      break;
+
       case FlatSymbol::Exp:
          ival_[arg_[i][1]] = expPX(ival_[arg_[i][1]], ival_[i]);
          break;
@@ -1202,6 +1389,30 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector &V)
       case FlatSymbol::Tanh:
          ival_[arg_[i][1]] = tanhPX(ival_[arg_[i][1]], ival_[i]);
          break;
+
+      case FlatSymbol::Acos:
+         ival_[arg_[i][1]] = acosPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Asin:
+         ival_[arg_[i][1]] = asinPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Atan:
+         ival_[arg_[i][1]] = atanPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Acosh:
+         ival_[arg_[i][1]] = acoshPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Asinh:
+         ival_[arg_[i][1]] = asinhPX(ival_[arg_[i][1]], ival_[i]);
+         break;
+
+      case FlatSymbol::Atanh:
+         ival_[arg_[i][1]] = atanhPX(ival_[arg_[i][1]], ival_[i]);
+         break;
       }
    }
 
@@ -1210,9 +1421,9 @@ Proof FlatFunction::hc4ReviseBackward(IntervalVector &V)
 
 void FlatFunction::iDiff(const IntervalBox &B, IntervalVector &G)
 {
-   ASSERT(scop_.size() == G.size(),
-          "The size of the gradient must be equal to the number "
-              << "of variables of the flat function");
+   REALPAVER_ASSERT(scop_.size() == G.size(),
+                    "The size of the gradient must be equal to the number "
+                        << "of variables of the flat function");
 
    // forward phase: evaluates this on B
    Interval val = iEval(B);
@@ -1394,8 +1605,15 @@ void FlatFunction::iDiff()
 
       case FlatSymbol::Pow: {
          // d(u^n)/du = n * u^(n-1)
-         int e = (int)arg_[i][2];
+         unsigned int e = arg_[i][2];
          idv_[arg_[i][1]] = Interval(e) * idv_[i] * pow(ival_[arg_[i][1]], e - 1);
+      }
+      break;
+
+      case FlatSymbol::Powr: {
+         // d(u^n)/du = n * u^(n-1)
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         idv_[arg_[i][1]] = Interval(r) * idv_[i] * powr(ival_[arg_[i][1]], r - 1);
       }
       break;
 
@@ -1438,15 +1656,45 @@ void FlatFunction::iDiff()
          // d(tanh(u))/du = 1-tanh^2(u)
          idv_[arg_[i][1]] = idv_[i] * (1.0 - sqr(ival_[i]));
          break;
+
+      case FlatSymbol::Acos:
+         // d(acos(u))/du = -1/sqrt(1-u^2)
+         idv_[arg_[i][1]] = (-idv_[i]) / sqrt(1.0 - sqr(ival_[arg_[i][1]]));
+         break;
+
+      case FlatSymbol::Asin:
+         // d(asin(u))/du = 1/sqrt(1-u^2)
+         idv_[arg_[i][1]] = idv_[i] / sqrt(1.0 - sqr(ival_[arg_[i][1]]));
+         break;
+
+      case FlatSymbol::Atan:
+         // d(atan(u))/du = 1/(1+u^2)
+         idv_[arg_[i][1]] = idv_[i] / (1.0 + sqr(ival_[arg_[i][1]]));
+         break;
+
+      case FlatSymbol::Acosh:
+         // d(acos(u))/du = 1/sqrt(u^2-1)
+         idv_[arg_[i][1]] = idv_[i] / sqrt(sqr(ival_[arg_[i][1]]) - 1.0);
+         break;
+
+      case FlatSymbol::Asinh:
+         // d(asin(u))/du = 1/sqrt(1+u^2)
+         idv_[arg_[i][1]] = idv_[i] / sqrt(1.0 + sqr(ival_[arg_[i][1]]));
+         break;
+
+      case FlatSymbol::Atanh:
+         // d(atan(u))/du = 1/(1-u^2)
+         idv_[arg_[i][1]] = idv_[i] / (1.0 - sqr(ival_[arg_[i][1]]));
+         break;
       }
    }
 }
 
 void FlatFunction::rDiff(const RealPoint &pt, RealVector &G)
 {
-   ASSERT(scop_.size() == G.size(),
-          "The size of the gradient must be equal to the number "
-              << "of variables of the flat function");
+   REALPAVER_ASSERT(scop_.size() == G.size(),
+                    "The size of the gradient must be equal to the number "
+                        << "of variables of the flat function");
 
    // forward phase: evaluates this at pt
    double val = rEval(pt);
@@ -1635,9 +1883,17 @@ bool FlatFunction::rDiff()
 
       case FlatSymbol::Pow: {
          // d(u^n)/du = n * u^(n-1)
-         int e = (int)arg_[i][2];
+         unsigned int e = arg_[i][2];
          rdv_[arg_[i][1]] =
              Double::mul(Double::mul(e, rdv_[i]), Double::pow(rval_[arg_[i][1]], e - 1));
+      }
+      break;
+
+      case FlatSymbol::Powr: {
+         // d(u^n)/du = n * u^(n-1)
+         double r = cst_[arg_[arg_[i][2]][1]].left();
+         rdv_[arg_[i][1]] =
+             Double::mul(Double::mul(r, rdv_[i]), Double::powr(rval_[arg_[i][1]], r - 1));
       }
       break;
 
@@ -1680,6 +1936,42 @@ bool FlatFunction::rDiff()
       case FlatSymbol::Tanh:
          // d(tanh(u))/du = 1-tanh^2(u)
          rdv_[arg_[i][1]] = Double::mul(rdv_[i], Double::sub(1.0, Double::sqr(rval_[i])));
+         break;
+
+      case FlatSymbol::Acos:
+         // d(acos(u))/du = -1 / sqrt(1-u^2)
+         rdv_[arg_[i][1]] = Double::usb(Double::div(
+             rdv_[i], Double::sqrt(Double::sub(1.0, Double::sqr(rval_[arg_[i][1]])))));
+         break;
+
+      case FlatSymbol::Asin:
+         // d(asin(u))/du = 1 / sqrt(1-u^2)
+         rdv_[arg_[i][1]] = Double::div(
+             rdv_[i], Double::sqrt(Double::sub(1.0, Double::sqr(rval_[arg_[i][1]]))));
+         break;
+
+      case FlatSymbol::Atan:
+         // d(atan(u))/du = 1 / (1+u^2)
+         rdv_[arg_[i][1]] =
+             Double::div(rdv_[i], Double::add(1.0, Double::sqr(rval_[arg_[i][1]])));
+         break;
+
+      case FlatSymbol::Acosh:
+         // d(acos(u))/du = 1 / sqrt(u^2-1)
+         rdv_[arg_[i][1]] = Double::div(
+             rdv_[i], Double::sqrt(Double::sub(Double::sqr(rval_[arg_[i][1]]), 1.0)));
+         break;
+
+      case FlatSymbol::Asinh:
+         // d(asin(u))/du = 1 / sqrt(1+u^2)
+         rdv_[arg_[i][1]] = Double::div(
+             rdv_[i], Double::sqrt(Double::add(1.0, Double::sqr(rval_[arg_[i][1]]))));
+         break;
+
+      case FlatSymbol::Atanh:
+         // d(atan(u))/du = 1 / (1-u^2)
+         rdv_[arg_[i][1]] =
+             Double::div(rdv_[i], Double::sub(1.0, Double::sqr(rval_[arg_[i][1]])));
          break;
       }
    }
@@ -1749,10 +2041,8 @@ void FlatFunTermCreator::apply(const TermAdd *t)
 {
    FlatFunTermCreator vl(f_);
    t->left()->acceptVisitor(vl);
-
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Add, vl.idx_, vr.idx_);
 }
 
@@ -1760,10 +2050,8 @@ void FlatFunTermCreator::apply(const TermSub *t)
 {
    FlatFunTermCreator vl(f_);
    t->left()->acceptVisitor(vl);
-
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Sub, vl.idx_, vr.idx_);
 }
 
@@ -1771,10 +2059,8 @@ void FlatFunTermCreator::apply(const TermMul *t)
 {
    FlatFunTermCreator vl(f_);
    t->left()->acceptVisitor(vl);
-
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Mul, vl.idx_, vr.idx_);
 }
 
@@ -1782,10 +2068,8 @@ void FlatFunTermCreator::apply(const TermDiv *t)
 {
    FlatFunTermCreator vl(f_);
    t->left()->acceptVisitor(vl);
-
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Div, vl.idx_, vr.idx_);
 }
 
@@ -1793,10 +2077,8 @@ void FlatFunTermCreator::apply(const TermMin *t)
 {
    FlatFunTermCreator vl(f_);
    t->left()->acceptVisitor(vl);
-
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Min, vl.idx_, vr.idx_);
 }
 
@@ -1804,10 +2086,8 @@ void FlatFunTermCreator::apply(const TermMax *t)
 {
    FlatFunTermCreator vl(f_);
    t->left()->acceptVisitor(vl);
-
    FlatFunTermCreator vr(f_);
    t->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Max, vl.idx_, vr.idx_);
 }
 
@@ -1815,7 +2095,6 @@ void FlatFunTermCreator::apply(const TermUsb *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Usb, vc.idx_);
 }
 
@@ -1823,7 +2102,6 @@ void FlatFunTermCreator::apply(const TermAbs *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Abs, vc.idx_);
 }
 
@@ -1831,7 +2109,6 @@ void FlatFunTermCreator::apply(const TermSgn *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sgn, vc.idx_);
 }
 
@@ -1839,7 +2116,6 @@ void FlatFunTermCreator::apply(const TermSqr *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sqr, vc.idx_);
 }
 
@@ -1847,7 +2123,6 @@ void FlatFunTermCreator::apply(const TermSqrt *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sqrt, vc.idx_);
 }
 
@@ -1855,15 +2130,20 @@ void FlatFunTermCreator::apply(const TermPow *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
+   idx_ = f_->insertPow(vc.idx_, t->exponent());
+}
 
-   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, t->exponent());
+void FlatFunTermCreator::apply(const TermPowr *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertPowr(vc.idx_, t->exponent());
 }
 
 void FlatFunTermCreator::apply(const TermExp *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Exp, vc.idx_);
 }
 
@@ -1871,7 +2151,6 @@ void FlatFunTermCreator::apply(const TermLog *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Log, vc.idx_);
 }
 
@@ -1879,7 +2158,6 @@ void FlatFunTermCreator::apply(const TermCos *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Cos, vc.idx_);
 }
 
@@ -1887,7 +2165,6 @@ void FlatFunTermCreator::apply(const TermSin *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sin, vc.idx_);
 }
 
@@ -1895,7 +2172,6 @@ void FlatFunTermCreator::apply(const TermTan *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Tan, vc.idx_);
 }
 
@@ -1903,7 +2179,6 @@ void FlatFunTermCreator::apply(const TermCosh *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Cosh, vc.idx_);
 }
 
@@ -1911,7 +2186,6 @@ void FlatFunTermCreator::apply(const TermSinh *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sinh, vc.idx_);
 }
 
@@ -1919,8 +2193,49 @@ void FlatFunTermCreator::apply(const TermTanh *t)
 {
    FlatFunTermCreator vc(f_);
    t->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
+}
+
+void FlatFunTermCreator::apply(const TermAcos *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Acos, vc.idx_);
+}
+
+void FlatFunTermCreator::apply(const TermAsin *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Asin, vc.idx_);
+}
+
+void FlatFunTermCreator::apply(const TermAtan *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Atan, vc.idx_);
+}
+
+void FlatFunTermCreator::apply(const TermAcosh *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Acosh, vc.idx_);
+}
+
+void FlatFunTermCreator::apply(const TermAsinh *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Asinh, vc.idx_);
+}
+
+void FlatFunTermCreator::apply(const TermAtanh *t)
+{
+   FlatFunTermCreator vc(f_);
+   t->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Atanh, vc.idx_);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1932,7 +2247,7 @@ FlatFunDagCreator::FlatFunDagCreator(FlatFunction *f)
 
 void FlatFunDagCreator::apply(const DagConst *d)
 {
-   idx_ = f_->insertCst(d->getConst());
+   idx_ = f_->insertCst(d->getValue());
 }
 
 void FlatFunDagCreator::apply(const DagVar *d)
@@ -1944,10 +2259,8 @@ void FlatFunDagCreator::apply(const DagAdd *d)
 {
    FlatFunDagCreator vl(f_);
    d->left()->acceptVisitor(vl);
-
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Add, vl.idx_, vr.idx_);
 }
 
@@ -1955,10 +2268,8 @@ void FlatFunDagCreator::apply(const DagSub *d)
 {
    FlatFunDagCreator vl(f_);
    d->left()->acceptVisitor(vl);
-
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Sub, vl.idx_, vr.idx_);
 }
 
@@ -1966,10 +2277,8 @@ void FlatFunDagCreator::apply(const DagMul *d)
 {
    FlatFunDagCreator vl(f_);
    d->left()->acceptVisitor(vl);
-
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Mul, vl.idx_, vr.idx_);
 }
 
@@ -1977,10 +2286,8 @@ void FlatFunDagCreator::apply(const DagDiv *d)
 {
    FlatFunDagCreator vl(f_);
    d->left()->acceptVisitor(vl);
-
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Div, vl.idx_, vr.idx_);
 }
 
@@ -1988,10 +2295,8 @@ void FlatFunDagCreator::apply(const DagMin *d)
 {
    FlatFunDagCreator vl(f_);
    d->left()->acceptVisitor(vl);
-
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Min, vl.idx_, vr.idx_);
 }
 
@@ -1999,10 +2304,8 @@ void FlatFunDagCreator::apply(const DagMax *d)
 {
    FlatFunDagCreator vl(f_);
    d->left()->acceptVisitor(vl);
-
    FlatFunDagCreator vr(f_);
    d->right()->acceptVisitor(vr);
-
    idx_ = f_->insertBinary(FlatSymbol::Max, vl.idx_, vr.idx_);
 }
 
@@ -2010,7 +2313,6 @@ void FlatFunDagCreator::apply(const DagUsb *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Usb, vc.idx_);
 }
 
@@ -2018,7 +2320,6 @@ void FlatFunDagCreator::apply(const DagAbs *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Abs, vc.idx_);
 }
 
@@ -2026,7 +2327,6 @@ void FlatFunDagCreator::apply(const DagSgn *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sgn, vc.idx_);
 }
 
@@ -2034,7 +2334,6 @@ void FlatFunDagCreator::apply(const DagSqr *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sqr, vc.idx_);
 }
 
@@ -2042,7 +2341,6 @@ void FlatFunDagCreator::apply(const DagSqrt *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sqrt, vc.idx_);
 }
 
@@ -2050,15 +2348,20 @@ void FlatFunDagCreator::apply(const DagPow *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
+   idx_ = f_->insertPow(vc.idx_, d->exponent());
+}
 
-   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, d->exponent());
+void FlatFunDagCreator::apply(const DagPowr *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertPowr(vc.idx_, d->exponent());
 }
 
 void FlatFunDagCreator::apply(const DagExp *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Exp, vc.idx_);
 }
 
@@ -2066,7 +2369,6 @@ void FlatFunDagCreator::apply(const DagLog *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Log, vc.idx_);
 }
 
@@ -2074,7 +2376,6 @@ void FlatFunDagCreator::apply(const DagCos *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Cos, vc.idx_);
 }
 
@@ -2082,7 +2383,6 @@ void FlatFunDagCreator::apply(const DagSin *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sin, vc.idx_);
 }
 
@@ -2090,7 +2390,6 @@ void FlatFunDagCreator::apply(const DagTan *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Tan, vc.idx_);
 }
 
@@ -2098,7 +2397,6 @@ void FlatFunDagCreator::apply(const DagCosh *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Cosh, vc.idx_);
 }
 
@@ -2106,7 +2404,6 @@ void FlatFunDagCreator::apply(const DagSinh *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Sinh, vc.idx_);
 }
 
@@ -2114,8 +2411,49 @@ void FlatFunDagCreator::apply(const DagTanh *d)
 {
    FlatFunDagCreator vc(f_);
    d->child()->acceptVisitor(vc);
-
    idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
+}
+
+void FlatFunDagCreator::apply(const DagAcos *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Acos, vc.idx_);
+}
+
+void FlatFunDagCreator::apply(const DagAsin *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Asin, vc.idx_);
+}
+
+void FlatFunDagCreator::apply(const DagAtan *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Atan, vc.idx_);
+}
+
+void FlatFunDagCreator::apply(const DagAcosh *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Acosh, vc.idx_);
+}
+
+void FlatFunDagCreator::apply(const DagAsinh *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Asinh, vc.idx_);
+}
+
+void FlatFunDagCreator::apply(const DagAtanh *d)
+{
+   FlatFunDagCreator vc(f_);
+   d->child()->acceptVisitor(vc);
+   idx_ = f_->insertUnary(FlatSymbol::Atanh, vc.idx_);
 }
 
 void FlatFunDagCreator::apply(const DagLin *d)
@@ -2184,7 +2522,7 @@ FlatFunUniCreator::FlatFunUniCreator(FlatFunction *f, const IntervalBox &B, Vari
 
 void FlatFunUniCreator::apply(const DagConst *d)
 {
-   idx_ = f_->insertCst(d->getConst());
+   idx_ = f_->insertCst(d->getValue());
 }
 
 void FlatFunUniCreator::apply(const DagVar *d)
@@ -2423,7 +2761,15 @@ void FlatFunUniCreator::apply(const DagPow *d)
    FlatFunUniCreator vc(f_, B_, v_);
    d->child()->acceptVisitor(vc);
 
-   idx_ = f_->insertPow(FlatSymbol::Pow, vc.idx_, d->exponent());
+   idx_ = f_->insertPow(vc.idx_, d->exponent());
+}
+
+void FlatFunUniCreator::apply(const DagPowr *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertPowr(vc.idx_, d->exponent());
 }
 
 void FlatFunUniCreator::apply(const DagExp *d)
@@ -2488,6 +2834,54 @@ void FlatFunUniCreator::apply(const DagTanh *d)
    d->child()->acceptVisitor(vc);
 
    idx_ = f_->insertUnary(FlatSymbol::Tanh, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAcos *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Acos, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAsin *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Asin, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAtan *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Atan, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAcosh *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Acosh, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAsinh *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Asinh, vc.idx_);
+}
+
+void FlatFunUniCreator::apply(const DagAtanh *d)
+{
+   FlatFunUniCreator vc(f_, B_, v_);
+   d->child()->acceptVisitor(vc);
+
+   idx_ = f_->insertUnary(FlatSymbol::Atanh, vc.idx_);
 }
 
 void FlatFunUniCreator::apply(const DagLin *d)

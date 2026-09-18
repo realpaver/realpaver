@@ -11,11 +11,15 @@ The RealPaver library provides a C++ API to deal with interval analysis, constra
 ### Mandatory dependencies
 
 - meson build system (https://mesonbuild.com/)
-- a supported interval library (eg: GAOL https://github.com/goualard-f/GAOL)
+- a supported interval library
+  - GAOL: https://github.com/goualard-f/GAOL or https://github.com/raphaelchenouard/GAOL (for MacOS ARM users)
+  - Inum64: https://gitlab.univ-nantes.fr/granvilliers-l/inum64 (configure it with MPFR)
 - a supported linear solver library:
   - CLP: https://github.com/coin-or/Clp
-  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/
+  - Gurobi: https://www.gurobi.com/solutions/gurobi-optimizer/ (a sample pkg-config file for Gurobi (gurobi.pc) is provided but it must be adapted to your context, see below for details)
   - HiGHS: https://highs.dev/
+
+**WARNING: interval libraries rely on the used math library to make safe computations. It must preserve floating-point rounding mode during computations! (This is not guaranteed by most standard math libraries)**
 
 ### Optional dependencies
 
@@ -94,6 +98,11 @@ In the build folder run:
 ```bash
 meson install
 ```
+
+## Build and test RealPaver using Docker
+
+The folder `docker` contains Dockerfiles and a `Readme.md` file explaining how to use them.
+
 
 ## More documentation on meson:
 

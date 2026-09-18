@@ -15,7 +15,7 @@
  * @file   Bitset.hpp
  * @brief  The Bitset class
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_BITSET_HPP
@@ -60,10 +60,10 @@ public:
    /// Move assignment
    Bitset &operator=(Bitset &&other);
 
-   /// Rreturns the number of bits
+   /// Returns the number of bits
    size_t size() const;
 
-   /// Rreturns the index of the first bit
+   /// Returns the index of the first bit
    int first() const;
 
    /// Returns the index of the last bit
@@ -104,6 +104,9 @@ public:
 
    /// Returns true if all the bits are equal to 0
    bool areAllZeros() const;
+
+   /// Returns true if this has been created by Bitset()
+   bool isEmpty() const;
 
    /// Output on a stream
    void print(std::ostream &os) const;

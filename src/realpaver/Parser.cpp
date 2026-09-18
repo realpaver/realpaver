@@ -15,10 +15,9 @@
  * @file   Parser.cpp
  * @brief  Wrapper for the parser of the modelling language
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
-#include "realpaver/AssertDebug.hpp"
 #include "realpaver/Parser.hpp"
 #include <vector>
 
@@ -38,11 +37,11 @@ extern std::string realpaver_parse_error;
 namespace realpaver {
 
 static std::vector<std::string> keywords = {
-    "Variables", "Constants", "Constraints", "Aliases", "Functions", "Objectives",
-    "integer",   "in",        "binary",      "tol",     "inf",       "MIN",
-    "MAX",       "min",       "max",         "abs",     "sgn",       "sqr",
-    "sqrt",      "pow",       "log",         "exp",     "cos",       "sin",
-    "tan",       "cosh",      "sinh",        "tanh",    "if",        "then",
+    "Variables", "Constants", "Constraints", "Aliases", "Functions", "integer", "in",
+    "binary",    "tol",       "inf",         "MIN",     "MAX",       "min",     "max",
+    "abs",       "sgn",       "sqr",         "sqrt",    "pow",       "log",     "exp",
+    "cos",       "sin",       "tan",         "cosh",    "sinh",      "tanh",    "acos",
+    "asin",      "atan",      "acosh",       "asinh",   "atanh",     "if",      "then",
     "else",      "or",        "and",         "not"};
 
 Parser::Parser()

@@ -15,17 +15,16 @@
  * @file   IntervalThickFunction.cpp
  * @brief  Thick interval function
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/IntervalThickFunction.hpp"
-#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
-IntervalThickFunction::IntervalThickFunction(SharedDag dag, size_t i, Variable v)
+IntervalThickFunction::IntervalThickFunction(SharedDagFun f, Variable v)
     : IntervalFunctionUni()
-    , f_(dag->fun(i))
+    , f_(f)
     , v_(v)
     , flat_(nullptr)
     , B_({v})
@@ -56,7 +55,7 @@ void IntervalThickFunction::update(const IntervalBox &B)
 {
    if (flat_ != nullptr)
       delete flat_;
-   flat_ = new FlatFunction(f_, B, v_);
+   flat_ = new FlatFunction(*f_, B, v_);
 }
 
 Variable IntervalThickFunction::getVar() const
@@ -64,7 +63,7 @@ Variable IntervalThickFunction::getVar() const
    return v_;
 }
 
-DagFun *IntervalThickFunction::getFun() const
+SharedDagFun IntervalThickFunction::getFun() const
 {
    return f_;
 }

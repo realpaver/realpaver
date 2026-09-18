@@ -15,7 +15,7 @@
  * @file   IntervalGaol.hpp
  * @brief  Interface of the Gaol library
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_GAOL_HPP
@@ -23,36 +23,7 @@
 
 #include "realpaver/IntervalTraits.hpp"
 #include <gaol/gaol>
-#include <iomanip>
 #include <iostream>
-
-#if defined(PACKAGE_BUGREPORT)
-#undef PACKAGE_BUGREPORT
-#endif
-
-#if defined(PACKAGE_NAME)
-#undef PACKAGE_NAME
-#endif
-
-#if defined(PACKAGE_STRING)
-#undef PACKAGE_STRING
-#endif
-
-#if defined(PACKAGE_TARNAME)
-#undef PACKAGE_TARNAME
-#endif
-
-#if defined(PACKAGE_VERSION)
-#undef PACKAGE_VERSION
-#endif
-
-#if defined(PACKAGE_URL)
-#undef PACKAGE_URL
-#endif
-
-#if defined(VERSION)
-#undef VERSION
-#endif
 
 namespace realpaver {
 
@@ -225,6 +196,12 @@ template <> struct IntervalTraits<RawInterval> {
    static inline interval zeroTwoPi()
    {
       static interval x = interval::zero() | interval::two_pi();
+      return x;
+   }
+
+   static inline interval minusHalfPiPlusHalfPi()
+   {
+      static interval x = interval::half_pi() | (-interval::half_pi());
       return x;
    }
 
@@ -635,19 +612,34 @@ template <> struct IntervalTraits<RawInterval> {
       return y & gaol::sqrt(x);
    }
 
-   static inline interval pow(const interval &x, int n)
+   static inline interval pow(const interval &x, unsigned int n)
    {
-      return gaol::pow(x, n);
+      return gaol::pow(x, (int)n);
    }
 
-   static inline interval powPX(const interval &x, int n, const interval &y)
+   static inline interval powPX(const interval &x, unsigned int n, const interval &y)
    {
       return gaol::nth_root_rel(y, n, x);
    }
 
-   static inline interval powPY(const interval &x, int n, const interval &y)
+   static inline interval powPY(const interval &x, unsigned int n, const interval &y)
    {
-      return y & gaol::pow(x, n);
+      return y & gaol::pow(x, (int)n);
+   }
+
+   static inline interval powr(const interval &x, const double &r)
+   {
+      return exp(r * log(x));
+   }
+
+   static inline interval powrPX(const interval &x, const double &r, const interval &y)
+   {
+      return x & exp(log(y) / r);
+   }
+
+   static inline interval powrPY(const interval &x, const double &r, const interval &y)
+   {
+      return y & powr(x, r);
    }
 
    static inline interval exp(const interval &x)
@@ -775,9 +767,29 @@ template <> struct IntervalTraits<RawInterval> {
       return gaol::acos(x);
    }
 
+   static inline interval acosPX(const interval &x, const interval &y)
+   {
+      return x & cos(inter(y, zeroPi()));
+   }
+
+   static inline interval acosPY(const interval &x, const interval &y)
+   {
+      return y & gaol::acos(x);
+   }
+
    static inline interval asin(const interval &x)
    {
       return gaol::asin(x);
+   }
+
+   static inline interval asinPX(const interval &x, const interval &y)
+   {
+      return x & sin(inter(y, minusHalfPiPlusHalfPi()));
+   }
+
+   static inline interval asinPY(const interval &x, const interval &y)
+   {
+      return y & gaol::asin(x);
    }
 
    static inline interval atan(const interval &x)
@@ -785,9 +797,29 @@ template <> struct IntervalTraits<RawInterval> {
       return gaol::atan(x);
    }
 
+   static inline interval atanPX(const interval &x, const interval &y)
+   {
+      return x & tan(inter(y, minusHalfPiPlusHalfPi()));
+   }
+
+   static inline interval atanPY(const interval &x, const interval &y)
+   {
+      return y & gaol::atan(x);
+   }
+
    static inline interval acosh(const interval &x)
    {
       return gaol::acosh(x);
+   }
+
+   static inline interval acoshPX(const interval &x, const interval &y)
+   {
+      return x & cosh(inter(y, positive()));
+   }
+
+   static inline interval acoshPY(const interval &x, const interval &y)
+   {
+      return y & gaol::acosh(x);
    }
 
    static inline interval asinh(const interval &x)
@@ -795,9 +827,29 @@ template <> struct IntervalTraits<RawInterval> {
       return gaol::asinh(x);
    }
 
+   static inline interval asinhPX(const interval &x, const interval &y)
+   {
+      return x & sinh(y);
+   }
+
+   static inline interval asinhPY(const interval &x, const interval &y)
+   {
+      return y & gaol::asinh(x);
+   }
+
    static inline interval atanh(const interval &x)
    {
       return gaol::atanh(x);
+   }
+
+   static inline interval atanhPX(const interval &x, const interval &y)
+   {
+      return x & tanh(y);
+   }
+
+   static inline interval atanhPY(const interval &x, const interval &y)
+   {
+      return y & gaol::atanh(x);
    }
 
    static inline interval abs(const interval &x)

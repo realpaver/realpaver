@@ -15,14 +15,12 @@
  * @file   RealVector.hpp
  * @brief  Real vector
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_REAL_VECTOR_HPP
 #define REALPAVER_REAL_VECTOR_HPP
 
-#include "realpaver/Double.hpp"
-#include "realpaver/NumericDoubleTraits.hpp"
 #include "realpaver/NumericVector.hpp"
 #include "realpaver/RealMatrix.hpp"
 
@@ -38,8 +36,11 @@ public:
    /// Base class
    using BaseType = NumericVector<double>;
 
+   /// Creates a vector with n elements
+   RealVector(size_t n = 0);
+
    /// Creates a vector with n elements assigned to x
-   RealVector(size_t n = 0, double x = 0.0);
+   RealVector(size_t n, double x);
 
    /// Creates a vector from a list
    RealVector(const std::initializer_list<double> &l);

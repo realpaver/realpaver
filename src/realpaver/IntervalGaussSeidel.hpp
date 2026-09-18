@@ -15,7 +15,7 @@
  * @file   IntervalGaussSeidel.hpp
  * @brief  Interval Gauss Seidel method
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_GAUSS_SEIDEL_HPP
@@ -70,6 +70,13 @@ public:
     */
    Proof contractPrecond(const IntervalMatrix &A, IntervalVector &x,
                          const IntervalVector &b);
+
+   ///
+   Proof certify(const IntervalMatrix &A, IntervalVector &x, const IntervalVector &b);
+
+   ///
+   Proof certifyPrecond(const IntervalMatrix &A, IntervalVector &x,
+                        const IntervalVector &b);
 
    /// Sets a limit of iterations of the iterative method
    void setMaxIter(size_t n);

@@ -15,7 +15,7 @@
  * @file   Scope.hpp
  * @brief  Scope of variables
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_SCOPE_HPP
@@ -318,6 +318,12 @@ public:
 
    /// Returns this set minus scop
    Scope setminus(const Scope &scop) const;
+
+   /// Return the scope of all the continuous variables in this
+   Scope continuousScope() const;
+
+   /// Return the scope of all the discrete variables in this
+   Scope discreteScope() const;
 
 private:
    std::shared_ptr<ScopeRep> rep_; // shared representation

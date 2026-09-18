@@ -15,11 +15,10 @@
  * @file   ContractorConstraint.cpp
  * @brief  Contractor associated with a constraint
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/ContractorConstraint.hpp"
-#include "realpaver/AssertDebug.hpp"
 
 namespace realpaver {
 
@@ -36,6 +35,11 @@ Scope ContractorConstraint::scope() const
 Proof ContractorConstraint::contract(IntervalBox &B)
 {
    return c_.contract(B);
+}
+
+Proof ContractorConstraint::contract(IntervalBox &B, const Bitset &active)
+{
+   return (active.get(c_.id())) ? c_.contract(B) : Proof::Inner;
 }
 
 void ContractorConstraint::print(std::ostream &os) const

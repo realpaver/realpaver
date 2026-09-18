@@ -15,7 +15,7 @@
  * @file   ContractorConstraint.hpp
  * @brief  Contractor associated with a constraint
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_CONSTRAINT_HPP
@@ -47,6 +47,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
    /// Returns the constraint enclosed in this

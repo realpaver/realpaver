@@ -15,7 +15,7 @@
  * @file   ContractorHC4.hpp
  * @brief  HC4 contractor
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_CONTRACTOR_HC4_HPP
@@ -26,19 +26,14 @@
 
 namespace realpaver {
 
-/**
- * @brief HC4 contractor.
- *
- * Constraint propagation algorithm applying HC4Revise contractors on a DAG
- * such that the projections are intersected at the shared nodes.
- */
+/// @brief Constraint propagation algorithm applying HC4Revise contractors
 class ContractorHC4 : public Contractor {
 public:
-   /// Constructor
-   ContractorHC4(SharedDag dag);
+   /// Default constructor
+   ContractorHC4() = default;
 
-   /// Destructor
-   ~ContractorHC4();
+   /// Default destructor
+   ~ContractorHC4() = default;
 
    /// No copy
    ContractorHC4(const ContractorHC4 &) = delete;
@@ -48,6 +43,7 @@ public:
 
    Scope scope() const override;
    Proof contract(IntervalBox &B) override;
+   Proof contract(IntervalBox &B, const Bitset &active) override;
    void print(std::ostream &os) const override;
 
    /// Inserts a contractor in this
@@ -60,8 +56,7 @@ public:
    void setTol(double tol);
 
 private:
-   SharedDag dag_;              // DAG
-   IntervalPropagator *propag_; // propagation algorithm
+   IntervalPropagator propag_; // propagation algorithm
 };
 
 /// Type of shared pointers of HC4 contractors

@@ -15,10 +15,12 @@
  * @file   Problem.cpp
  * @brief  Constraint satisfaction and optimization problem
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #include "realpaver/AssertDebug.hpp"
+#include "realpaver/ConstraintArithmetic.hpp"
+#include "realpaver/ConstraintRep.hpp"
 #include "realpaver/Param.hpp"
 #include "realpaver/Problem.hpp"
 #include "realpaver/ScopeBank.hpp"
@@ -32,9 +34,12 @@ Problem::Problem(const std::string &name)
     : name_()
     , vars_()
     , ctrs_()
-    , obj_(MIN(Term(0)))
+    , obj_()
     , scop_()
     , als_()
+    , init_ctrs_()
+    , red_ctrs_()
+    , obj_ctr_(-1)
     , vname_()
     , erv_(std::make_shared<EntityReportedVector>())
     , id_(NP++)
@@ -275,9 +280,26 @@ void Problem::pushVar(Variable v)
    erv_->addVariable(v);
 }
 
-void Problem::addCtr(Constraint c)
+size_t Problem::addCtr(Constraint c)
 {
+   size_t id = ctrs_.size();
+   c.setId(id);
    ctrs_.push_back(c);
+   switch (c.status())
+   {
+   case ConstraintStatus::Initial:
+      init_ctrs_.push_back(id);
+      break;
+
+   case ConstraintStatus::Objective:
+      obj_ctr_ = id;
+      break;
+
+   case ConstraintStatus::Redundant:
+      red_ctrs_.push_back(id);
+      break;
+   }
+   return id;
 }
 
 void Problem::addCtr(const std::initializer_list<Constraint> &l)
@@ -288,30 +310,73 @@ void Problem::addCtr(const std::initializer_list<Constraint> &l)
 
 void Problem::addObjective(Objective obj)
 {
+   THROW_IF(obj.hasNullRep(), "Empty objective function");
+   THROW_IF(hasObjective(), "Only one objective function is allowed");
+
+   // assigns the objective
    obj_ = obj;
+
+   // assigns the domain of the objective variable
+   IntervalBox box(this->scope());
+   Interval x = obj_.getTerm().eval(box);
+   obj_.getVar().getDomain()->contractInterval(x);
+}
+
+bool Problem::hasObjectiveConstraint() const
+{
+   return obj_ctr_ >= 0;
+}
+
+void Problem::generateObjectiveConstraint()
+{
+   if (hasObjective() && (!hasObjectiveConstraint()))
+   {
+      if (obj_.isMinimization())
+      {
+         // min z = f(X) => equation z-f(X)==0
+         Constraint c(obj_.getVar() - obj_.getTerm() == 0.0);
+         c.setStatus(ConstraintStatus::Objective);
+         addCtr(c);
+      }
+      else
+      {
+         // max z = f(X) <=> min z = -f(X) => equation z+f(X)==0
+         Constraint c(obj_.getVar() + obj_.getTerm() == 0.0);
+         c.setStatus(ConstraintStatus::Objective);
+         addCtr(c);
+      }
+   }
 }
 
 std::ostream &operator<<(std::ostream &os, const Problem &p)
 {
    if (p.isEmpty())
-      return os << "Nothing in this problem";
+      return os << "empty problem";
 
-   std::string indent = "", s_var = "Variables", s_ctr = "Constraints", s_int = "Integer",
-               s_obj = "Objectives", s_als = "Aliases";
+   std::string indent = "  ", s_var = "Variables", s_ctr = "Constraints",
+               s_int = "Integer", s_als = "Aliases";
 
    // variables
    bool first = true;
    os << s_var << std::endl;
    for (size_t i = 0; i < p.nbVars(); ++i)
    {
+      Variable v = p.varAt(i);
+
       if (!first)
          os << "," << std::endl;
       else
          first = false;
 
-      os << p.varAt(i);
+      os << indent << p.varAt(i);
    }
    os << std::endl << ";";
+
+   // objective function
+   if (p.hasObjective())
+   {
+      os << std::endl << p.getObjective() << ";";
+   }
 
    // constraints
    if (p.nbCtrs() > 0)
@@ -328,13 +393,6 @@ std::ostream &operator<<(std::ostream &os, const Problem &p)
          os << indent << p.ctrAt(i);
       }
       os << std::endl << ";";
-   }
-
-   // objective function
-   if (p.hasObjective())
-   {
-      os << std::endl << s_obj << std::endl;
-      os << indent << p.getObjective() << std::endl << ";";
    }
 
    // aliases
@@ -419,7 +477,7 @@ bool Problem::isEqConstrained() const
       return false;
 
    for (size_t i = 0; i < nbCtrs(); ++i)
-      if (!ctrAt(i).isEquation())
+      if (!ctrAt(i).isAnEquation())
          return false;
 
    return true;
@@ -431,7 +489,7 @@ bool Problem::isIneqConstrained() const
       return false;
 
    for (size_t i = 0; i < nbCtrs(); ++i)
-      if (!ctrAt(i).isInequality())
+      if (!ctrAt(i).isAnInequality())
          return false;
 
    return true;
@@ -446,9 +504,9 @@ bool Problem::isMixedConstrained() const
 
    for (size_t i = 0; i < nbCtrs(); ++i)
    {
-      if (ctrAt(i).isEquation())
+      if (ctrAt(i).isAnEquation())
          eq = true;
-      if (ctrAt(i).isInequality())
+      if (ctrAt(i).isAnInequality())
          ineq = true;
 
       if (eq && ineq)
@@ -476,8 +534,8 @@ size_t Problem::nbVars() const
 
 Variable Problem::varAt(size_t i) const
 {
-   ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
-   ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
+   REALPAVER_ASSERT(vars_.size() > 0, "Bad access to a variable in an empty problem");
+   REALPAVER_ASSERT(i < vars_.size(), "Bad access to a variable in a problem");
 
    return vars_[i];
 }
@@ -494,14 +552,41 @@ size_t Problem::nbCtrs() const
 
 Constraint Problem::ctrAt(size_t i) const
 {
-   ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
-   ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
+   REALPAVER_ASSERT(ctrs_.size() > 0, "Bad access to a constraint in an empty problem");
+   REALPAVER_ASSERT(i < ctrs_.size(), "Bad access to a constraint in a problem");
 
    return ctrs_[i];
 }
 
+size_t Problem::nbInitialCtrs() const
+{
+   return init_ctrs_.size();
+}
+
+Constraint Problem::ctrInitialAt(size_t i) const
+{
+   return ctrAt(init_ctrs_[i]);
+}
+
+size_t Problem::nbRedundantCtrs() const
+{
+   return red_ctrs_.size();
+}
+
+Constraint Problem::ctrRedundantAt(size_t i) const
+{
+   return ctrAt(red_ctrs_[i]);
+}
+
+Constraint Problem::ctrObjective() const
+{
+   THROW_IF(!hasObjective(), "No objective constraint");
+   return ctrAt(obj_ctr_);
+}
+
 Objective Problem::getObjective() const
 {
+   THROW_IF(!hasObjective(), "No objective function");
    return obj_;
 }
 
@@ -527,7 +612,7 @@ bool Problem::isConstrained() const
 
 bool Problem::hasObjective() const
 {
-   return !obj_.isConstant();
+   return !obj_.hasNullRep();
 }
 
 bool Problem::isLinObjective() const
@@ -587,7 +672,7 @@ size_t Problem::nbAliases() const
 
 Alias Problem::aliasAt(size_t i) const
 {
-   ASSERT(i < als_.size(), "Bad access to aa alias in a problem");
+   REALPAVER_ASSERT(i < als_.size(), "Bad access to aa alias in a problem");
    return als_[i];
 }
 

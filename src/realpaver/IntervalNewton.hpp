@@ -15,7 +15,7 @@
  * @file   IntervalNewton.hpp
  * @brief  Interval Newton method
  * @author Laurent Granvilliers
- * @date   2024-4-11
+ * @date   11 Apr 2024
  */
 
 #ifndef REALPAVER_INTERVAL_NEWTON_HPP
@@ -24,6 +24,7 @@
 #include "realpaver/Contractor.hpp"
 #include "realpaver/IntervalFunctionVector.hpp"
 #include "realpaver/IntervalGaussSeidel.hpp"
+#include "realpaver/RealPoint.hpp"
 
 namespace realpaver {
 
@@ -50,11 +51,11 @@ public:
    /// Constructor
    IntervalNewton(IntervalFunctionVector F);
 
-   /// Destructor
-   ~IntervalNewton();
+   /// Default destructor
+   ~IntervalNewton() = default;
 
-   /// Copy constructor
-   IntervalNewton(const IntervalNewton &);
+   /// No copy constructor
+   IntervalNewton(const IntervalNewton &) = delete;
 
    /// No assignment
    IntervalNewton &operator=(const IntervalNewton &) = delete;
@@ -64,7 +65,7 @@ public:
    void print(std::ostream &os) const override;
 
    /// Returns the interval GFauss Seidel operator of this
-   IntervalGaussSeidel *getGaussSeidel() const;
+   IntervalGaussSeidel &getGaussSeidel();
 
    /// Sets a limit of iterations of the contraction method
    void setMaxIter(size_t n);
@@ -111,11 +112,11 @@ public:
    size_t getCertifyMaxIter() const;
 
 private:
-   IntervalFunctionVector F_;   // vector of interval functions
-   IntervalMatrix jac_;         // Jacobian matrix
-   IntervalVector val_, y_, b_; // working vectors
-   RealPoint c_;                // point of expansion
-   IntervalGaussSeidel *gs_;    // Gauss-Seidel operator
+   IntervalFunctionVector F_;                // vector of interval functions
+   IntervalMatrix jac_;                      // Jacobian matrix
+   IntervalVector val_, y_, b_;              // working vectors
+   RealPoint c_;                             // point of expansion
+   std::unique_ptr<IntervalGaussSeidel> gs_; // Gauss-Seidel operator
 
    size_t maxiter_; // maximum number of iterations (contraction)
    double tol_;     // tolerance on the distance between two intervals
