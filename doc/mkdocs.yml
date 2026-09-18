@@ -114,6 +114,7 @@ nav:
       - How to install: userdoc/install.md
       - Introduction to interval computations: userdoc/interval.md
       - How to solve a constraint satisfaction problem: userdoc/solve_csp.md
+      - How to solve a constrained optimization problem: userdoc/solve_cop.md
       - Modeling language: userdoc/language.md
       - Parameters: userdoc/parameters.md
   - API:

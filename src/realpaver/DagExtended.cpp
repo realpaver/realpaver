@@ -195,12 +195,13 @@ DagExtended::DagExtended(const Problem &pbm)
     : dag_(nullptr)
     , lfun_()
     , lctr_()
-    , scope_(pbm.scope())
+// , scope_(pbm.scope())
 {
    dag_ = std::make_shared<Dag>();
    for (size_t i = 0; i < pbm.nbCtrs(); ++i)
    {
       Constraint ctr = pbm.ctrAt(i);
+      scope_.insert(ctr.scope());
       DagExtendedCreator creator(this, ctr);
       ctr.acceptVisitor(creator);
 

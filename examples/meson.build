@@ -88,6 +88,14 @@ solve_2r_v2 = executable(
   dependencies: deps_lib,
 )
 
+optimize_beam = executable(
+  'optimize_beam',
+  sources: 'optimize_beam.cpp',
+  link_with: realpaver_lib,
+  include_directories: ['../src'] + incdir,
+  dependencies: deps_lib,
+)
+
 # TODO
 # Sub-directories
 # subdir('ncsp')

@@ -19,4 +19,4 @@ option('INTERVAL_LIB', type : 'string', value : 'Gaol', description : 'Interval 
 option('ASSERT', type : 'boolean', value : false, description : 'Activate assertions')
 option('LOG', type : 'boolean', value : false, description : 'Activate file logging')
 option('GENERATE_DOC', type : 'boolean', value: false, description : 'Activate the generation of the documentation (Doxygen)')
-option('LOCAL_SOLVER', type : 'string', value : 'none', description : 'Local solver library (e.g. NLOPT)')
+option('LOCAL_SOLVER', type : 'string', value : 'none', description : 'Local solver library (NLOPT or IPOPT)')

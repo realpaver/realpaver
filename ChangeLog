@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-28
+
+* Various fixes and refactoring (including those from JOSS branch/publication)
+* Fix IPOPT wrapper
+* Improvement of contractors and other numerical techniques avoiding the processing of inactive constraints
+* Add inner relaxation strategies (Taylor or Affine)
+* Add prover based on parametric interval Newton
+* Add prospecting operator to find feasible points
+* Add optimizer to solve Constrained Optimization Problems (COPs)
+* Add parameters to handle the new or modified features (see the doc for details)
+* Add `rp_optimizer` as a new binary to be used in the same way of `rp_solver`
+
 ## [1.1.1] - 2025-05-20
 
 * Minor update of documentation [4115f9585588b20b539bb699c75fb47f30474079, 5237dad2daa912528372a623e39a0f040664311b]
@@ -21,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add Piecewise constraints
 * Add Fixed-point contractor
 * Add Interface to report solutions
-# Reorganize definition of RealPaver parameters
+* Reorganize definition of RealPaver parameters
 * Add SEARCH_STATUS parameter
 * Update of documentation
 

@@ -288,3 +288,14 @@ inner_linearizer_affine_test = executable(
     include_directories: ['../src'],
 )
 test('Test of inner linearization based on Affine', inner_linearizer_affine_test)
+
+if local_solver_name.to_upper() == 'IPOPT'
+  ipopt_test = executable(
+      'ipopt_test',
+      sources: 'ipopt_test.cpp',
+      link_with: realpaver_lib,
+      dependencies: deps_lib,
+      include_directories: ['../src'],
+  )
+  test('Test of ipopt_test NLP solver', ipopt_test)
+endif
