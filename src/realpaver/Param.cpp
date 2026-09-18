@@ -1585,7 +1585,7 @@ void Params::makeLocalOptim()
    time_lim.setName("NLP_SOLVER_TIME_LIMIT")
        .setCat(cat)
        .setWhat("Time limit in seconds")
-       .setValue(10.0)
+       .setValue(1)
        .setMinValue(0.0);
    add(time_lim);
 

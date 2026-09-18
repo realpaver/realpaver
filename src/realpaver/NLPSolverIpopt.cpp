@@ -18,18 +18,22 @@
  * @date   11 Apr 2024
  */
 
+#include "Dag.hpp"
 #include "realpaver/AssertDebug.hpp"
-#include "realpaver/Common.hpp"
+#include "realpaver/Dag.hpp"
+#include "realpaver/DagExtended.hpp"
 #include "realpaver/Logger.hpp"
 #include "realpaver/NLPSolverIpopt.hpp"
-#include "realpaver/RealPoint.hpp"
+#include "realpaver/RealVector.hpp"
 
 namespace realpaver {
 
-RealPaverTNLP::RealPaverTNLP(NLPSolver *ls)
+RealPaverTNLP::RealPaverTNLP(NLPSolver *ls, SharedDagExtended edag)
     : ls_(ls)
     , box_(ls_->scope())
     , start_(ls_->scope())
+    , active_(ls_->nbCtrs())
+    , edag_(edag)
 {
    size_t n = ls_->nbVars();
    size_t m = ls_->nbCtrs();
@@ -40,10 +44,11 @@ RealPaverTNLP::RealPaverTNLP(NLPSolver *ls)
    {
       for (size_t i = 0; i < n; i++)
       {
-         if (ls_->ctrs()->fun(j).scope().contains(ls_->scope().var(i)))
+         if (edag_->fun(j)->ctr().scope().contains(ls_->scope().var(i)))
             nnz_jac_g_++;
       }
    }
+   LOG_LOW("nnz_jac_g: " << nnz_jac_g_)
    // std::cerr<<"nnz_jac_g: "<<nnz_jac_g<<std::endl;
    // nnz_h_lag: number of nonzeros in hessian
    // TODO
@@ -72,6 +77,7 @@ bool RealPaverTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number *x_l,
                                     Ipopt::Number *x_u, Ipopt::Index m,
                                     Ipopt::Number *g_l, Ipopt::Number *g_u)
 {
+   LOG_LOW("get_bounds_info ...")
    for (size_t i = 0; i < n; i++)
    {
       x_l[i] = box_[i].left();
@@ -82,11 +88,25 @@ bool RealPaverTNLP::get_bounds_info(Ipopt::Index n, Ipopt::Number *x_l,
    // TODO
    for (size_t i = 0; i < m; i++)
    {
+      LOG_LOW("ctr_" << i << ": " << edag_->fun(i)->ctr())
       // std::cerr<<"ctr_"<<i<<" in "<<ctrs->fun(i).getImage()<<std::endl;
-      g_l[i] = ls_->ctrs()->fun(i).getImage().left();
-      g_u[i] = ls_->ctrs()->fun(i).getImage().right();
+      // SharedDagFun f = ls_->ctrs()[i].f->getActive(box_, active_);
+      SharedDagFun f = edag_->fun(i)->getActive(box_, active_);
+      if (f != nullptr)
+      {
+         LOG_LOW("ctr_" << i << " active ")
+         Interval f_i = f->getImage();
+         g_l[i] = f_i.left();
+         g_u[i] = f_i.right();
+      }
+      else
+      { // Case of inactive constraints -> -inf<=c(x)<=inf ?
+         g_l[i] = Double::neginf();
+         g_u[i] = Double::inf();
+      }
    }
 
+   LOG_LOW("get_bounds_info DONE")
    return true;
 }
 
@@ -95,12 +115,14 @@ bool RealPaverTNLP::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Numbe
                                        Ipopt::Number *z_U, Ipopt::Index m,
                                        bool init_lambda, Ipopt::Number *lambda)
 {
+   LOG_LOW("start: ")
    for (size_t i = 0; i < n; i++)
       x[i] = start_[i];
 
    // z are dual variables, not mandatory
    // lambda are the dual multipliers, not mandatory
    // TODO?
+   LOG_LOW("start: " << start_)
    // std::cerr<<*start_<<std::endl;
 
    return true;
@@ -109,47 +131,59 @@ bool RealPaverTNLP::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Numbe
 bool RealPaverTNLP::eval_f(Ipopt::Index n, const Ipopt::Number *x, bool new_x,
                            Ipopt::Number &obj_value)
 {
+   LOG_LOW("eval_f ...")
    // compute obj_value, i.e. the value of the objective function, from x vector
    RealPoint pt(ls_->scope());
    for (size_t i = 0; i < ls_->scope().size(); i++)
       pt[i] = x[i];
    obj_value = ls_->obj()->eval(pt);
 
+   LOG_LOW("eval_f DONE")
    return true;
 }
 
 bool RealPaverTNLP::eval_grad_f(Ipopt::Index n, const Ipopt::Number *x, bool new_x,
                                 Ipopt::Number *grad_f)
 {
+   LOG_LOW("eval_grad_f ...")
    const Scope s = ls_->scope();
    const Scope os = ls_->obj()->scope();
    // compute grad_f, i.e. the gradient of the objective function, from x vector
-   RealPoint pt(ls_->scope());
-   for (size_t i = 0; i < ls_->obj()->scope().size(); i++)
+   RealPoint pt(s);
+   for (size_t i = 0; i < s.size(); i++)
    {
       pt[i] = x[i]; // x[s.index(os.var(i))];
    }
-   RealPoint gf(ls_->obj()->scope());
-   ls_->obj()->diff(pt.subPoint(ls_->obj()->scope()), gf);
+   RealPoint gf(os);
+   ls_->obj()->diff(pt.subPoint(os), gf);
+   LOG_LOW("gf: " << gf << " with x: " << pt)
    // std::cerr<<"gf: "<<gf<<" with x: "<<pt<<std::endl;
-   for (size_t i = 0; i < ls_->obj()->scope().size(); i++)
-      grad_f[ls_->scope().index(ls_->obj()->scope().var(i))] = gf[i];
+   for (size_t i = 0; i < os.size(); i++)
+      grad_f[s.index(os.var(i))] = gf[i];
 
+   LOG_LOW("eval_grad_f DONE")
    return true;
 }
 
 bool RealPaverTNLP::eval_g(Ipopt::Index n, const Ipopt::Number *x, bool new_x,
                            Ipopt::Index m, Ipopt::Number *g)
 {
+   LOG_LOW("eval_g ...")
    // compute g, i.e. the value of the constraints, from x vector
-   RealPoint pt(ls_->scope());
-   for (size_t i = 0; i < ls_->scope().size(); i++)
+   Scope s(ls_->scope());
+   RealPoint pt(s);
+   for (size_t i = 0; i < s.size(); i++)
       pt[i] = x[i];
    for (size_t j = 0; j < m; j++)
    {
-      g[j] = ls_->ctrs()->fun(j).eval(pt);
+      SharedDagFun f = edag_->fun(j)->getActive(pt, active_);
+      if (f != nullptr)
+         g[j] = f->rEval(pt);
+      else // Default value for inactive constraint
+         g[j] = 0;
    }
 
+   LOG_LOW("eval_g DONE")
    return true;
 }
 
@@ -157,6 +191,7 @@ bool RealPaverTNLP::eval_jac_g(Ipopt::Index n, const Ipopt::Number *x, bool new_
                                Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index *iRow,
                                Ipopt::Index *jCol, Ipopt::Number *values)
 {
+   LOG_LOW("eval_jac_g ...")
    // compute values, i.e. the Jacobian of the constraints, from x vector where:
    // - nele_jac is the number of nonzeros in the Jacobian
    // - iRow are the row indices of the Jacobian entries
@@ -165,76 +200,146 @@ bool RealPaverTNLP::eval_jac_g(Ipopt::Index n, const Ipopt::Number *x, bool new_
    // - iRow[i] and iCol[i] defines its coordinates in J
    // - values[i] defines its value
    const Scope s = ls_->scope();
+   RealPoint pt(s);
+   LOG_LOW("n: " << n << " scope:" << s << " x:" << x)
+   for (size_t i = 0; i < s.size(); i++)
+   {
+      if (x == 0)
+         pt[i] = start_[i];
+      else
+         // LOG_LOW("x[" << i << "]=" << x[i])
+         pt[i] = x[i];
+   }
+   LOG_LOW("x: " << pt)
+   // Check if values defined
    if (values == nullptr || values == NULL || values == 0)
    {
       size_t nb_val = 0;
       // Return the structure of the Jacobian:
       for (size_t j = 0; j < m; j++)
       {
+         LOG_LOW("ctr " << j << ": " << edag_->fun(j)->ctr().scope())
          // std::cerr<<"ctr"<<j<<": "<<ctrs->fun(j).scope()<<std::endl;
+         // std::shared_ptr<DagFunExt> fe_j = edag_->fun(j);
+         Constraint c_j = edag_->fun(j)->ctr();
          for (size_t i = 0; i < n; i++)
          {
-            if (ls_->ctrs()->fun(j).scope().contains(s.var(i)))
+            if (c_j.scope().contains(s.var(i)))
             {
+               LOG_LOW("var " << i << ":" << s.var(i))
                // std::cerr<<"var"<<i<<":"<<s.var(i)<<std::endl;
-               // iRow[j*m+i] = j;
-               // jCol[j*m+i] = i;
                iRow[nb_val] = j;
                jCol[nb_val] = i;
                nb_val++;
             }
          }
+
+         // SharedDagFun f = fe_j->getActive(pt, active_);
+         // if (f != nullptr) // Add non zero values only for active constraints
+         //                   // What if nele_jac is not the effective number of nonzeros?
+         //    for (size_t i = 0; i < n; i++)
+         //    {
+         //       if (f->scope().contains(s.var(i)))
+         //       {
+         //          // std::cerr<<"var"<<i<<":"<<s.var(i)<<std::endl;
+         //          // iRow[j*m+i] = j;
+         //          // jCol[j*m+i] = i;
+         //          iRow[nb_val] = j;
+         //          jCol[nb_val] = i;
+         //          nb_val++;
+         //       }
+         //    }
+         // else
+         // {
+         //    for (size_t i = 0; i < n; i++)
+         //    {
+         //       if (fe_j->ctr().scope().contains(s.var(i)))
+         //       {
+         //          // std::cerr<<"var"<<i<<":"<<s.var(i)<<std::endl;
+         //          // iRow[j*m+i] = j;
+         //          // jCol[j*m+i] = i;
+         //          iRow[nb_val] = j;
+         //          jCol[nb_val] = i;
+         //          nb_val++;
+         //       }
+         //    }
+         // }
+         // std::cerr<<"nb_val: "<<nb_val<<std::endl;
       }
-      // std::cerr<<"nb_val: "<<nb_val<<std::endl;
+      LOG_LOW("nb_val: " << nb_val << " / " << nele_jac)
    }
    else
    {
       // std::cerr<<"Computing jacobian"<<std::endl;
-      Scope cs = ls_->ctrs()->scope();
-      RealPoint pt(cs);
-      // std::cerr<<"x_:";
-      for (size_t i = 0; i < n; i++)
-      {
-         // std::cerr<<x[i]<<",";
-         if (cs.contains(s.var(i)))
-            pt[cs.index(s.var(i))] = x[i];
-         // pt[i] = x[i];
-      }
+      // Scope cs = edag_->scope();
+      // RealPoint pt(cs);
+      // // std::cerr<<"x_:";
+      // for (size_t i = 0; i < n; i++)
+      // {
+      //    // std::cerr<<x[i]<<",";
+      //    if (cs.contains(s.var(i)))
+      //       pt[cs.index(s.var(i))] = x[i];
+      //    // pt[i] = x[i];
+      // }
       // std::cerr<<std::endl<<"x: "<<pt<<std::endl;
       size_t nb_val = 0;
-      RealMatrix jac(m, cs.size());
+      // RealMatrix jac(m, cs.size());
+      // RealMatrix jac(m, s.size());
       // ctrs->diff(pt.subPoint(cs),jac);
-      ls_->ctrs()->diff(pt, jac);
+      // ls_->ctrs()->diff(pt, jac);
       // std::cerr<<"J: "<<std::endl<<jac<<std::endl;
       for (size_t j = 0; j < m; j++)
       {
-         for (size_t i = 0; i < n; i++)
+         SharedDagFun f_j = edag_->fun(j)->getActive(pt, active_);
+         if (f_j != nullptr)
          {
-            if (ls_->ctrs()->fun(j).scope().contains(s.var(i)))
+            RealVector grad(pt.scope().size());
+            f_j->rDiff(pt, grad);
+            for (size_t i = 0; i < n; i++)
             {
-               // std::cerr<<"J["<<j<<","<<i<<"]:"<<jac.get(j,cs.index(s.var(i)))<<std::endl;
-               values[nb_val] = jac.get(j, cs.index(s.var(i)));
+               if (f_j->scope().contains(s.var(i)))
+               {
+                  LOG_LOW("J[" << j << "," << i
+                               << "]:" << grad.get(f_j->scope().index(s.var(i))))
+                  // std::cerr<<"J["<<j<<","<<i<<"]:"<<jac.get(j,cs.index(s.var(i)))<<std::endl;
+                  values[nb_val] = grad.get(f_j->scope().index(s.var(i)));
+                  nb_val++;
+               }
+            }
+         }
+         else // inactive constraint
+         {
+            Constraint c_j = edag_->fun(j)->ctr();
+            for (size_t i = 0; i < n; i++)
+            {
+               if (c_j.scope().contains(s.var(i)))
+               {
+                  values[nb_val] = 0;
+                  nb_val++;
+               }
             }
          }
       }
+      LOG_LOW("nb_val: " << nb_val << " / " << nele_jac)
    }
 
+   LOG_LOW("eval_jac_g DONE")
    return true;
 }
 
 // bool RealPaverTNLP::eval_h (Ipopt::Index n, const Ipopt::Number *x, bool
 // new_x,Ipopt::Number obj_factor,
-//                         Ipopt::Index m, const Ipopt::Number *lambda, bool new_lambda,
-//                         Ipopt::Index nele_hess, Ipopt::Index *iRow, Ipopt::Index *jCol,
-//                         Ipopt::Number *values)
+//                         Ipopt::Index m, const Ipopt::Number *lambda, bool
+//                         new_lambda, Ipopt::Index nele_hess, Ipopt::Index *iRow,
+//                         Ipopt::Index *jCol, Ipopt::Number *values)
 // {
 //     // compute values for the Hessian matrix, where:
 //     // - obj_factor is the factor in front of the objective term in the Hessian, $
 //     \sigma_f$. (input)
-//     // - lambda is the values for the constraint multipliers, $ \lambda$, at which the
-//     Hessian is to be evaluated. (input)
-//     // - nele_hess is the number of nonzeros in the Hessian (dimension of iRow, jCol,
-//     and values). (input)
+//     // - lambda is the values for the constraint multipliers, $ \lambda$, at which
+//     the Hessian is to be evaluated. (input)
+//     // - nele_hess is the number of nonzeros in the Hessian (dimension of iRow,
+//     jCol, and values). (input)
 //     // - iRow is the row indices of entries in the Hessian. (output)
 //     // - jCol is the column indices of entries in the Hessian. (output)
 //     // - values is the values of the entries in the Hessian. (output)
@@ -266,30 +371,32 @@ void RealPaverTNLP::finalize_solution(Ipopt::SolverReturn status, Ipopt::Index n
 {
    /*
     status: (in), gives the status of the algorithm as specified in IpAlgTypes.hpp,
-        SUCCESS: Algorithm terminated successfully at a locally optimal point, satisfying
-    the convergence tolerances (can be specified by options). MAXITER_EXCEEDED: Maximum
-    number of iterations exceeded (can be specified by an option). CPUTIME_EXCEEDED:
-    Maximum number of CPU seconds exceeded (can be specified by an option).
-        STOP_AT_TINY_STEP: Algorithm proceeds with very little progress.
-        STOP_AT_ACCEPTABLE_POINT: Algorithm stopped at a point that was converged, not to
+        SUCCESS: Algorithm terminated successfully at a locally optimal point,
+    satisfying the convergence tolerances (can be specified by options).
+    MAXITER_EXCEEDED: Maximum number of iterations exceeded (can be specified by an
+    option). CPUTIME_EXCEEDED: Maximum number of CPU seconds exceeded (can be specified
+    by an option). STOP_AT_TINY_STEP: Algorithm proceeds with very little progress.
+        STOP_AT_ACCEPTABLE_POINT: Algorithm stopped at a point that was converged, not
+    to
     ``desired'' tolerances, but to ``acceptable'' tolerances (see the acceptable-...
-    options). LOCAL_INFEASIBILITY: Algorithm converged to a point of local infeasibility.
-    Problem may be infeasible. USER_REQUESTED_STOP: The user call-back function
-    intermediate_callback (see Section 3.3.4) returned false, i.e., the user code
-    requested a premature termination of the optimization. DIVERGING_ITERATES: It seems
-    that the iterates diverge. RESTORATION_FAILURE: Restoration phase failed, algorithm
-    doesn't know how to proceed. ERROR_IN_STEP_COMPUTATION: An unrecoverable error
-    occurred while IPOPT tried to compute the search direction. INVALID_NUMBER_DETECTED:
-    Algorithm received an invalid number (such as NaN or Inf) from the NLP; see also
-    option check_derivatives_for_naninf. INTERNAL_ERROR: An unknown internal error
-    occurred. Please contact the IPOPT authors through the mailing list. n: (in), the
-    number of variables in the problem (dimension of $ x$). x: (in), the final values for
-    the primal variables, $ x_*$. z_L: (in), the final values for the lower bound
-    multipliers, $ z^L_*$. z_U: (in), the final values for the upper bound multipliers, $
-    z^U_*$. m: (in), the number of constraints in the problem (dimension of $ g(x)$). g:
-    (in), the final value of the constraint function values, $ g(x_*)$. lambda: (in), the
-    final values of the constraint multipliers, $ \lambda_*$. obj_value: (in), the final
-    value of the objective, $ f(x_*)$. ip_data and ip_cq are provided for expert users.
+    options). LOCAL_INFEASIBILITY: Algorithm converged to a point of local
+    infeasibility. Problem may be infeasible. USER_REQUESTED_STOP: The user call-back
+    function intermediate_callback (see Section 3.3.4) returned false, i.e., the user
+    code requested a premature termination of the optimization. DIVERGING_ITERATES: It
+    seems that the iterates diverge. RESTORATION_FAILURE: Restoration phase failed,
+    algorithm doesn't know how to proceed. ERROR_IN_STEP_COMPUTATION: An unrecoverable
+    error occurred while IPOPT tried to compute the search direction.
+    INVALID_NUMBER_DETECTED: Algorithm received an invalid number (such as NaN or Inf)
+    from the NLP; see also option check_derivatives_for_naninf. INTERNAL_ERROR: An
+    unknown internal error occurred. Please contact the IPOPT authors through the
+    mailing list. n: (in), the number of variables in the problem (dimension of $ x$).
+    x: (in), the final values for the primal variables, $ x_*$. z_L: (in), the final
+    values for the lower bound multipliers, $ z^L_*$. z_U: (in), the final values for
+    the upper bound multipliers, $ z^U_*$. m: (in), the number of constraints in the
+    problem (dimension of $ g(x)$). g: (in), the final value of the constraint function
+    values, $ g(x_*)$. lambda: (in), the final values of the constraint multipliers, $
+    \lambda_*$. obj_value: (in), the final value of the objective, $ f(x_*)$. ip_data
+    and ip_cq are provided for expert users.
 */
    RealPoint best(ls_->scope());
    for (size_t i = 0; i < n; i++)
@@ -303,11 +410,15 @@ double RealPaverTNLP::getBestVal() const
    return best_val_;
 }
 
-void RealPaverTNLP::update(const IntervalBox &box, const RealPoint src)
+void RealPaverTNLP::update(const IntervalBox &box, const RealPoint src,
+                           const Bitset &active)
 {
    box_ = box;
    start_ = src;
+   active_ = active;
 }
+
+////////////////////////////////////////////////////
 
 NLPSolver::NLPSolver(const Problem &pb)
     : NLPModel(pb)
@@ -329,8 +440,8 @@ NLPSolver::NLPSolver(const RealFunction &obj)
    makeIpoptAlgorithm();
 }
 
-NLPSolver::NLPSolver(const RealFunction &obj, const RealFunctionVector &ctrs)
-    : NLPModel(obj, ctrs)
+NLPSolver::NLPSolver(SharedDag obj_dag, int obj_idx, SharedDagExtended edag)
+    : NLPModel(obj_dag, obj_idx, edag)
     , nlp_(nullptr)
     , optimizer_(nullptr)
 {
@@ -341,13 +452,10 @@ NLPSolver::NLPSolver(const RealFunction &obj, const RealFunctionVector &ctrs)
 
 NLPSolver::~NLPSolver()
 {
-   // if (nlp_ != nullptr)
-   //    delete nlp_;
-   // if (optimizer_ != nullptr)
-   //    delete optimizer_;
 }
 
-OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &src)
+OptimizationStatus NLPSolver::minimizeImpl(const IntervalBox &box, const RealPoint &src,
+                                           const Bitset &active)
 {
    REALPAVER_ASSERT(box.scope().contains(scope()),
                     "Bad scope of an interval box given as input of NlpOpt");
@@ -356,7 +464,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
                     "Bad scope of astarting point given as input of NlpOpt");
 
    // projects B and src on the scope of this
-   IntervalBox X(box, this->scope());
+   IntervalBox X(box);
    RealPoint P(src, this->scope());
 
    LOG_LOW("Nlopt optimize at point: " << P);
@@ -365,7 +473,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
    // if (optimizer_ == nullptr)
    // makeIpoptAlgorithm();
 
-   nlp_->update(box, src);
+   nlp_->update(box, src, active);
 
    // calls the optimizer
    // Initialize the IpoptApplication and process the options
@@ -414,9 +522,7 @@ OptimizationStatus NLPSolver::minimize(const IntervalBox &box, const RealPoint &
 
 void NLPSolver::makeIpoptProblem()
 {
-   nlp_ = new RealPaverTNLP(this);
-   // nlp_ = std::make_shared<RealPaverTNLP>(std::make_shared<NLPSolver>(*this));
-   // nlp_ = std::make_shared<RealPaverTNLP>(this);
+   nlp_ = new RealPaverTNLP(this, this->edag_);
 }
 
 void NLPSolver::makeIpoptAlgorithm()
@@ -425,10 +531,11 @@ void NLPSolver::makeIpoptAlgorithm()
 
    // Change some options
    optimizer_->Options()->SetNumericValue("tol", tol_.getRelTol());
-   optimizer_->Options()->SetStringValue("mu_strategy", "adaptive");
-   optimizer_->Options()->SetStringValue("line_search_method", "penalty");
+   // optimizer_->Options()->SetStringValue("mu_strategy", "adaptive");
+   // optimizer_->Options()->SetStringValue("line_search_method", "penalty");
    optimizer_->Options()->SetStringValue("fast_step_computation", "yes");
-   optimizer_->Options()->SetStringValue("nlp_scaling_method", "gradient-based");
+   // optimizer_->Options()->SetStringValue("nlp_scaling_method", "gradient-based");
+   optimizer_->Options()->SetStringValue("nlp_scaling_method", "none");
    optimizer_->Options()->SetStringValue("hessian_approximation", "limited-memory");
    optimizer_->Options()->SetNumericValue("max_cpu_time", this->timeLimit());
    optimizer_->Options()->SetIntegerValue("max_iter", this->iterLimit());
