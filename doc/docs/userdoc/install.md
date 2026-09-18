@@ -15,6 +15,7 @@ Required software or libraries:
 
 Optional software or libraries:
 
+- local optimizer, supported ones: [nlopt](https://nlopt.readthedocs.io/en/latest/) (recommended one), [ipopt](https://coin-or.github.io/Ipopt/)
 - doxygen
 - mkdocs
   - mkdocs-material
